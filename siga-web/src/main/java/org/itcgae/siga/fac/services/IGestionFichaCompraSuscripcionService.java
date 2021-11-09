@@ -56,4 +56,7 @@ public interface IGestionFichaCompraSuscripcionService {
 	public UpdateResponseDTO anularPeticion(HttpServletRequest request, String nSolicitud) throws Exception;
 
 	ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud, Date aFechaDe);
+
+	InsertResponseDTO updateServiciosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
+			throws Exception;
 }

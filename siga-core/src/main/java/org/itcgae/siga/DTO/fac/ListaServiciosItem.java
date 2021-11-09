@@ -27,6 +27,8 @@ public class ListaServiciosItem {
 	private String idFormasPago;
 	private String formasPagoInternet;
 	private String solicitarBaja;
+	private Date fechaBajaIva;
+	private String valorIva;
 	
 	
 	private Double valorminimo;
@@ -276,6 +278,18 @@ public class ListaServiciosItem {
 	}
 	public void setSolicitarBaja(String solicitarBaja) {
 		this.solicitarBaja = solicitarBaja;
+	}
+	public Date getFechaBajaIva() {
+		return fechaBajaIva;
+	}
+	public void setFechaBajaIva(Date fechaBajaIva) {
+		this.fechaBajaIva = fechaBajaIva;
+	}
+	public String getValorIva() {
+		return valorIva;
+	}
+	public void setValorIva(String valorIva) {
+		this.valorIva = valorIva;
 	}
 	
 }

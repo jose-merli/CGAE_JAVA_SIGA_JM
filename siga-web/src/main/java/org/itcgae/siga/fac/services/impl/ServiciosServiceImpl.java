@@ -1096,8 +1096,15 @@ public class ServiciosServiceImpl implements IServiciosService {
 					String idioma = usuarios.get(0).getIdlenguaje();
 					NewIdDTO idServicioInstitucion = pysServiciosInstitucionExtendsMapper.getIdServicioInstitucion(servicio, idInstitucion);	
 				
-					List<FichaTarjetaPreciosItem> fichaTarjetaPreciosLista = pysPreciosServiciosExtendsMapper
+					List<FichaTarjetaPreciosItem> fichaTarjetaPreciosLista = new ArrayList<FichaTarjetaPreciosItem>();
+					if(idServicioInstitucion != null) { 
+						fichaTarjetaPreciosLista = pysPreciosServiciosExtendsMapper
 							.detalleTarjetaPrecios(servicio.getIdtiposervicios(), servicio.getIdservicio(), Integer.parseInt(idServicioInstitucion.getNewId()), idInstitucion, idioma);
+					}
+					else {
+						fichaTarjetaPreciosLista = pysPreciosServiciosExtendsMapper
+								.detalleTarjetaPrecios(servicio.getIdtiposervicios(), servicio.getIdservicio(), servicio.getIdserviciosinstitucion(), idInstitucion, idioma);
+					}
 					
 					for (FichaTarjetaPreciosItem fichaTarjetaPreciosItem : fichaTarjetaPreciosLista) {
 						fichaTarjetaPreciosItem.setIdperiodicidadoriginal(fichaTarjetaPreciosItem.getIdperiodicidad());

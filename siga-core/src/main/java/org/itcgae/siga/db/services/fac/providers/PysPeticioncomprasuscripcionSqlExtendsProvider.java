@@ -158,12 +158,12 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						if(esColegiado)fromPagosComunes += " and pago.internet = 'A'";
 						else fromPagosComunes += " and pago.internet = 'S'";
 						fromPagosComunes += " and (serv.idservicio = " + servicio.getIdServicio() + " and serv.idtiposervicios="
-						+ servicio.getIdTipoServicio() + " and serv.idserviciosinstitucion="
-						+ servicio.getIdServicioInstitucion() + ") \r\n";
+						+ servicio.getIdTipoServicios() + " and serv.idserviciosinstitucion="
+						+ servicio.getIdServiciosInstitucion() + ") \r\n";
 				fromPagosComunes += "intersect\r\n";
 				
-				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and servIns.idtiposervicios="+servicio.getIdTipoServicio()+
-						" and servIns.idserviciosinstitucion="+servicio.getIdServicioInstitucion()+") OR";
+				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and servIns.idtiposervicios="+servicio.getIdTipoServicios()+
+						" and servIns.idserviciosinstitucion="+servicio.getIdServiciosInstitucion()+") OR";
 				
 			}
 			//Se elimina el ultimo OR
@@ -315,12 +315,12 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						if(esColegiado)fromPagosComunes += " and pago.internet = 'A'";
 						else fromPagosComunes += " and pago.internet = 'S'";
 						fromPagosComunes += " and (serv.idservicio = " + servicio.getIdServicio() + " and prod.idtiposervicio="
-						+ servicio.getIdTipoServicio() + " and prod.idservicioinstitucion="
-						+ servicio.getIdServicioInstitucion() + ") \r\n";
+						+ servicio.getIdTipoServicios() + " and prod.idservicioinstitucion="
+						+ servicio.getIdServiciosInstitucion() + ") \r\n";
 				fromPagosComunes += "intersect\r\n";
 				
-				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and prin.idtiposervicio="+servicio.getIdTipoServicio()+
-						" and servIns.idservicioinstitucion="+servicio.getIdServicioInstitucion()+") OR";
+				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and prin.idtiposervicio="+servicio.getIdTipoServicios()+
+						" and servIns.idservicioinstitucion="+servicio.getIdServiciosInstitucion()+") OR";
 				
 			}
 			//Se elimina el ultimo OR
@@ -632,6 +632,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
 					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
 		}
+		//REVISAR: No se busca correctamente con alos anteriores al 2000
 		else{
 			if (filtro.getFechaSolicitudDesde() != null) {
 				DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
@@ -675,7 +676,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT(" case when servSol.orden is null then rownum \r\n" + "else servSol.orden end as orden");
 		sql.SELECT_DISTINCT(" servIns.descripcion");
 		sql.SELECT_DISTINCT(" servSol.cantidad");
-		sql.SELECT_DISTINCT(" precioServ.valor");
+		sql.SELECT_DISTINCT(" coalesce(precioServ.valor, 0) as valor");
 		sql.SELECT_DISTINCT(" servIns.idtipoiva as idtipoiva");
 		sql.SELECT_DISTINCT("TIVA.descripcion as IVA");
 		sql.SELECT_DISTINCT("TIVA.valor as valorIva");
@@ -692,12 +693,16 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("precioServ.valor as precio");
 		sql.SELECT_DISTINCT("periodicidad.IDPERIODICIDAD as idPeriodicidad");
 		sql.SELECT_DISTINCT("periodicidad.periodosMes as periodicidadValor");
-		sql.SELECT_DISTINCT("periodicidad.descripcion as periodicidadDesc");
+		sql.SELECT_DISTINCT("f_siga_getrecurso(periodicidad.descripcion, "+idioma+") as periodicidadDesc");     
+		sql.SELECT_DISTINCT("precioServ.descripcion as precioServicioDesc");
 
-		sql.FROM(" pys_serviciosinstitucion servIns, pys_tipoiva tiva");
 		sql.FROM("pys_serviciossolicitados servSol");
-		sql.FROM("pys_preciosServicios precioServ");
-		sql.FROM("pys_periodicidad periodicidad");
+		
+		sql.INNER_JOIN("pys_serviciosInstitucion servIns on servIns.idinstitucion = servSol.idinstitucion AND servIns.idservicio = servSol.idservicio and servIns.idtiposervicios = servSol.idtiposervicios and servIns.idserviciosinstitucion = servSol.idserviciosinstitucion\r\n");
+		sql.LEFT_OUTER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = servIns.idtipoiva \r\n");
+		sql.LEFT_OUTER_JOIN("pys_preciosServicios precioServ on precioserv.idservicio = servIns.idservicio AND precioserv.idtiposervicios = servSol.idtiposervicios AND precioserv.idserviciosinstitucion = servSol.idserviciosinstitucion AND precioserv.idinstitucion = servSol.idinstitucion and precioserv.idpreciosServicios  = servSol.IDPRECIOSSERVICIOS\r\n");
+		sql.LEFT_OUTER_JOIN("pys_periodicidad periodicidad on periodicidad.idperiodicidad = precioServ.idperiodicidad \r\n");
+		sql.LEFT_OUTER_JOIN("pys_suscripcion suscripcion on suscripcion.idPeticion = servSol.idPeticion and suscripcion.idInstitucion = servSol.idInstitucion and suscripcion.idservicio = servSol.idservicio and suscripcion.idtiposervicios = servSol.idtiposervicios and suscripcion.idserviciosinstitucion = servSol.idserviciosinstitucion \r\n");
 		
 		//REVISAR: NO QUEDA CLARO QUE HAY QUE COMPROBAR PARA QUE TENGA EN CONSIDERACION LA FECHA
 		if(aFechaDe != null) {
@@ -712,17 +717,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 //					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
 		}
 
-		sql.WHERE(" servIns.IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE(" tiva.idtipoiva (+) = servIns.idtipoiva");
-		sql.WHERE(" servSol.idinstitucion(+) = servIns.idinstitucion");
+		sql.WHERE(" servSol.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("servSol.idpeticion = " + idPeticion);
-		sql.WHERE("servSol.idservicio(+) = servIns.idservicio and servSol.idtiposervicios(+) = servIns.idtiposervicios "
-				+ "and servSol.idserviciosinstitucion(+) = servIns.idserviciosinstitucion");
-		sql.WHERE("precioserv.idservicio (+) = servIns.idservicio");
-		sql.WHERE("precioserv.idtiposervicios (+) = servIns.idtiposervicios");
-		sql.WHERE("precioserv.idserviciosinstitucion (+) = servIns.idserviciosinstitucion");
-		sql.WHERE("precioserv.idinstitucion (+) = servIns.idinstitucion");
-		sql.WHERE("periodicidad.idperiodicidad (+) = precioServ.idperiodicidad");
 
 		sql.ORDER_BY(" servIns.DESCRIPCION");
 

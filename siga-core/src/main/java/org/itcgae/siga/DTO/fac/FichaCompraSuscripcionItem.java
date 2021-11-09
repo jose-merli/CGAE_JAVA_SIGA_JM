@@ -34,13 +34,13 @@ public class FichaCompraSuscripcionItem {
     private List<ListaProductosCompraItem> productos;
     
     //TARJETA SERVICIOS
-    //REVISAR
+    private Date aFechaDeServicio;
     private List<ListaServiciosSuscripcionItem> servicios;
 	
 	private String idEstadoPeticion;
 
 
-    //TRARJETA FACTURACION
+    //TARJETA FACTURACION
     private List<ListaFacturasPeticionItem> facturas;
     
 	public String getIdInstitucion() {
@@ -192,6 +192,12 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setServicios(List<ListaServiciosSuscripcionItem> servicios) {
 		this.servicios = servicios;
+	}
+	public Date getaFechaDeServicio() {
+		return aFechaDeServicio;
+	}
+	public void setaFechaDeServicio(Date aFechaDeServicio) {
+		this.aFechaDeServicio = aFechaDeServicio;
 	}
 
 }
