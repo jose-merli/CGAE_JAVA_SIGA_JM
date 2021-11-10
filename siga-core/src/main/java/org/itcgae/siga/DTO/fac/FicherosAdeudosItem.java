@@ -78,16 +78,16 @@ public class FicherosAdeudosItem {
 		this.bancosCodigo = bancosCodigo;
 	}
 	/**
-	 * @return the comisionDescripcion
+	 * @return the cuentaEntidad
 	 */
-	public String getComisionDescripcion() {
+	public String getCuentaEntidad() {
 		return cuentaEntidad;
 	}
 	/**
-	 * @param comisionDescripcion the comisionDescripcion to set
+	 * @param cuentaEntidad the cuentaEntidad to set
 	 */
-	public void setComisionDescripcion(String comisionDescripcion) {
-		this.cuentaEntidad = comisionDescripcion;
+	public void setCuentaEntidad(String cuentaEntidad) {
+		this.cuentaEntidad = cuentaEntidad;
 	}
 	/**
 	 * @return the iban
@@ -490,7 +490,7 @@ public class FicherosAdeudosItem {
 	@Override
 	public String toString() {
 		return "FicherosAdeudosItem [idInstitucion=" + idInstitucion + ", idDisqueteCargos=" + idDisqueteCargos
-				+ ", nombreFichero=" + nombreFichero + ", bancosCodigo=" + bancosCodigo + ", comisionDescripcion="
+				+ ", nombreFichero=" + nombreFichero + ", bancosCodigo=" + bancosCodigo + ", cuentaEntidad="
 				+ cuentaEntidad + ", iban=" + iban + ", fechaCreacion=" + fechaCreacion + ", fechaCreacionDesde="
 				+ fechaCreacionDesde + ", fechaCreacionHasta=" + fechaCreacionHasta + ", idseriefacturacion="
 				+ idseriefacturacion + ", nombreabreviado=" + nombreabreviado + ", idprogramacion=" + idprogramacion

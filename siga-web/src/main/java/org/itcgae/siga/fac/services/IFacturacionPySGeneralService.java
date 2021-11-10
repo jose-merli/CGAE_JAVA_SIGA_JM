@@ -6,31 +6,31 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IFacturacionPySGeneralService {
 
-	public ComboDTO comboCuentasBancarias(HttpServletRequest request);
+	public ComboDTO comboCuentasBancarias(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboSufijos(HttpServletRequest request);
+	public ComboDTO comboSufijos(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboSeriesFacturacion(HttpServletRequest request);
+	public ComboDTO comboSeriesFacturacion(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboEtiquetas(HttpServletRequest request);
+	public ComboDTO comboEtiquetas(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboDestinatarios(HttpServletRequest request);
+	public ComboDTO comboDestinatarios(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboContadores(HttpServletRequest request);
+	public ComboDTO comboContadores(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboContadoresRectificativas(HttpServletRequest request);
+	public ComboDTO comboContadoresRectificativas(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboPlanificacion(String idSerieFacturacion, HttpServletRequest request);
+	public ComboDTO comboPlanificacion(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboPlantillasEnvio(HttpServletRequest request);
+	public ComboDTO comboPlantillasEnvio(HttpServletRequest request) throws Exception;
 
-	public ComboDTO getFormasPagosDisponiblesSeries(HttpServletRequest request);
+	public ComboDTO getFormasPagosDisponiblesSeries(HttpServletRequest request) throws Exception;
 
-	public ComboDTO getFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request);
+	public ComboDTO getFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboModelosComunicacion(HttpServletRequest request);
+	public ComboDTO comboModelosComunicacion(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboTiposIVA(HttpServletRequest request);
+	public ComboDTO comboTiposIVA(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request);
+	public ComboDTO comboEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 }
