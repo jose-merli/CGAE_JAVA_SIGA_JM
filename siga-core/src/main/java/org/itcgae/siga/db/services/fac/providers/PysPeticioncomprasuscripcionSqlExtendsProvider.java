@@ -3,7 +3,9 @@ package org.itcgae.siga.db.services.fac.providers;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.ibatis.jdbc.SQL;
@@ -586,39 +588,46 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.WHERE("rownum <= 200");
 		sql.WHERE("factSusBis.idfactura is null");
 
-		if (filtro.getIdEstadoSolicitud() != null) {
-			switch (filtro.getIdEstadoSolicitud()) {
-			case "1": //Pendiente
-				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha\r\n"
-						+ "				ELSE null END is null and suscripcion.fechaSuscripcion is null");
-				break;
-			case "2"://Denegada
-				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha \r\n"
-						+ "				ELSE null END is not null");
-				break;
-			case "3"://Aceptada
-				sql.WHERE(
-						"suscripcion.fechaSuscripcion is not null and CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
-								+ "				ELSE null END is null");
-				break;
-			case "4"://Anulacion solicitada
-				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
-						+ "				ELSE null END is not null and suscripcion.fechaBaja is null");
-				break;
-			case "5"://Anulada
-				sql.WHERE("suscripcion.fechaBaja is not null");
-				break;
+		if (filtro.getIdEstadoSolicitud() != null && !filtro.getIdEstadoSolicitud().isEmpty()) {
+			//Recorremos el array de estados seleccionados
+			List<String> estados = filtro.getIdEstadoSolicitud();
+			String condSolicitud = "((";
+			for(String estado : estados) {
+				switch (estado) {
+				case "1": //Pendiente
+					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha\r\n"
+							+ "				ELSE null END is null and suscripcion.fechaSuscripcion is null";
+					break;
+				case "2"://Denegada
+					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha \r\n"
+							+ "				ELSE null END is not null";
+					break;
+				case "3"://Aceptada
+					condSolicitud += "suscripcion.fechaSuscripcion is not null and CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
+									+ "				ELSE null END is null";
+					break;
+				case "4"://Anulacion solicitada
+					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
+							+ "				ELSE null END is not null and suscripcion.fechaBaja is null";
+					break;
+				case "5"://Anulada
+					condSolicitud += "suscripcion.fechaBaja is not null";
+					break;
+				}
+				condSolicitud += ") OR (";
 			}
+			condSolicitud = condSolicitud.substring(0, condSolicitud.length() - 4)+")";
+			sql.WHERE(condSolicitud); 
 		}
 
 		if (filtro.getIdpersona() != null)
 			sql.WHERE("pet.idpersona = " + filtro.getIdpersona());
 
 		if (filtro.getnSolicitud() != null && filtro.getnSolicitud().trim() != "")
-			sql.WHERE("pet.idpeticion like '%" + filtro.getnSolicitud() + "%'");
+			sql.WHERE("pet.idpeticion like '%" + filtro.getnSolicitud().trim() + "%'");
 
 		if (filtro.getDescServ() != null && filtro.getDescServ().trim() != "")
-			sql.WHERE("convert(UPPER(servIns.descripcion) , 'US7ASCII' ) like convert(UPPER('%" + filtro.getDescServ()
+			sql.WHERE("convert(UPPER(servIns.descripcion) , 'US7ASCII' ) like convert(UPPER('%" + filtro.getDescServ().trim()
 					+ "%') , 'US7ASCII' )");
 
 		if(filtro.getaFechaDe() != null) {
@@ -650,17 +659,44 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				sql.WHERE("pet.fecha <= to_date('" + strDate + "','dd/MM/YY')");
 			}
 		}
+		
+		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
+			if (filtro.getIdTipoServicio() != null && !filtro.getIdTipoServicio().isEmpty()) {
+				String condTipoServ = "((";
+				//Actualmente el id de servicio se define así "IDTIPOSERVICIOS || '-' || IDSERVICIO".
+				//Aunque lleve a confusion, IDTIPOSERVICIOS en la BBDD hace referencia a idCategoria
+				//mientras que IDSERVICIO a idTipoServicio
+				List<String> categoriasConServicio = new ArrayList<String>();
+				for(String servicio : filtro.getIdTipoServicio()) {
+					categoriasConServicio.add(servicio.split("-")[0]);
+					//Creamos las condiciones por pares para los servicios especificos seleccionados
+					condTipoServ += ("(servSol.idServiciosInstitucion = "+servicio.split("-")[1]+" AND servSol.idTipoServicios = "+servicio.split("-")[0]+" ) OR ");
+				}
 
-		if (filtro.getIdTipoServicio() != null) {
-			sql.WHERE("servSol.idServiciosInstitucion = " + filtro.getIdTipoServicio());
+				condTipoServ = condTipoServ.substring(0, condTipoServ.length() - 3)+")";
+				//Comprobamos que categorias no tienen un servicio seleccionado
+				List<String> categoriasSinServicio = filtro.getIdCategoria();
+				
+				categoriasSinServicio.removeAll(categoriasConServicio);
+				if(!categoriasSinServicio.isEmpty()) {
+					condTipoServ += (" OR (servSol.idTipoServicios IN (" + String.join(",",filtro.getIdCategoria())+"))");
+				}
+				
+				condTipoServ += ")";
+				
+				sql.WHERE(condTipoServ);
+			}
+			else {
+				sql.WHERE("servSol.idTipoServicios IN (" + String.join(",",filtro.getIdCategoria())+")");
+			}
 		}
 
-		if (filtro.getIdCategoria() != null) {
-			sql.WHERE("servSol.idTipoServicios = " + filtro.getIdCategoria());
-		}
 
-		if(filtro.getIdEstadoFactura() != null) {
-			sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
+		
+
+		
+		if(filtro.getIdEstadoFactura() != null && !filtro.getIdEstadoFactura().isEmpty()) {
+			sql.WHERE("fact.estado IN ("+String.join(",",filtro.getIdEstadoFactura())+")");
 		}
 //		private String importe; // valor aplicado durante la compra (importe total)
 		sql.WHERE("rownum <= 200");
