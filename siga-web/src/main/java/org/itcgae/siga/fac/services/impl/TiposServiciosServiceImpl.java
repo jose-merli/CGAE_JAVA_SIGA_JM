@@ -272,6 +272,63 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 	}
 	
 	@Override
+	public ComboDTO searchTiposServiciosByIdCategoriaMultiple(HttpServletRequest request, String idCategoria) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("searchTiposServiciosByIdCategoriaMultiple() -> Entrada al servicio para recuperar el combo de servicios segun multiples categorias");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"searchTiposServiciosByIdCategoriaMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTiposServiciosByIdCategoriaMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"searchTiposProductosByIdCategoria() / pysServiciosExtendsMapper.searchTiposServiciosByIdCategoria() -> Entrada a pysServiciosExtendsMapper para obtener el combo de servicios segun multiples categorias");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboTiposServicios = pysServiciosExtendsMapper
+							.searchTiposServiciosByIdCategoria(idioma, idInstitucion, idCategoria);
+
+					LOGGER.info(
+							"searchTiposServiciosByIdCategoriaMultiple() / pysServiciosExtendsMapper.searchTiposServiciosByIdCategoria() -> Salida de pysServiciosExtendsMapper para obtener el combo de servicios segun multiples categorias");
+
+					if (listaComboTiposServicios != null && listaComboTiposServicios.size() > 0) {
+						comboDTO.setCombooItems(listaComboTiposServicios);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposServiciosServiceImpl.searchTiposServiciosByIdCategoriaMultiple() -> Se ha producido un error al obtener el combo de servicios de multiples categorias",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("searchTiposServiciosByIdCategoriaMultiple() -> Salida del servicio para obtener el combo de servicios de multiples categorias");
+
+		return comboDTO;
+	}
+	
+	@Override
 	public InsertResponseDTO crearServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request) {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
