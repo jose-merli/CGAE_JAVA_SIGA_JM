@@ -19,7 +19,16 @@ public class RemesasBusquedaItem {
 	private Date fechaEnvioHasta;
 	private Date fechaRecepcionHasta;
 	private boolean ficha;
-	
+	private boolean informacionEconomica;
+		
+	public boolean isInformacionEconomica() {
+		return informacionEconomica;
+	}
+
+	public void setInformacionEconomica(boolean informacionEconomica) {
+		this.informacionEconomica = informacionEconomica;
+	}
+
 	public boolean isFicha() {
 		return ficha;
 	}

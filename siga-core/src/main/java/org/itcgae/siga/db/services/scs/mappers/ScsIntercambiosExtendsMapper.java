@@ -28,7 +28,8 @@ public interface ScsIntercambiosExtendsMapper {
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "NUMREGISTROS", property = "numRegistros", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NUMREGISTROSERRONEOS", property = "numRegistrosErroneos", jdbcType = JdbcType.NUMERIC)
+		@Result(column = "NUMREGISTROSERRONEOS", property = "numRegistrosErroneos", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "usuario", jdbcType = JdbcType.VARCHAR)
 	})
 	List<CargaMasivaProcuradorItem> listadoCargaMasivaProcuradores(CargaMasivaProcuradorBusquedaItem cargaMasivaItem, Short idInstitucion);
 	

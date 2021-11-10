@@ -173,6 +173,12 @@ public class ScsRemesasExtendsProvider {
 		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString()); // colegio logado
 		
 		sql.WHERE("est.idremesa = rem.idremesa");
+		
+		if(remesasBusquedaItem.isInformacionEconomica()) {
+			sql.WHERE("rem.IDTIPOREMESA = 1");
+		}else {
+			sql.WHERE("rem.IDTIPOREMESA = 0 or rem.IDTIPOREMESA is null");
+		}
 
 		sql.WHERE("est.fechamodificacion = (" + fechamodificacion.toString() + ")");
 

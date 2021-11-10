@@ -6,10 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,7 +16,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -37,33 +34,24 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaDatosPDItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorBusquedaItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorItem;
-import org.itcgae.siga.DTOs.scs.InscripcionesItem;
-import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
-import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCargamasiva;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenHistorico;
-import org.itcgae.siga.db.entities.GenFichero;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursos;
@@ -72,24 +60,14 @@ import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.entities.ScsDatosprocuradores;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
-import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignaprocurador;
 import org.itcgae.siga.db.entities.ScsDesignaprocuradorExample;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgExample;
-import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsEjgdesignaExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
-import org.itcgae.siga.db.entities.ScsGuardiasturno;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
-import org.itcgae.siga.db.entities.ScsInscripcionguardia;
-import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
-import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
-import org.itcgae.siga.db.entities.ScsInscripcionturno;
-import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
-import org.itcgae.siga.db.entities.ScsInscripcionturnoKey;
 import org.itcgae.siga.db.entities.ScsProcurador;
 import org.itcgae.siga.db.entities.ScsProcuradorKey;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
@@ -102,16 +80,12 @@ import org.itcgae.siga.db.mappers.ScsProcuradorMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsIntercambiosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
-import org.itcgae.siga.scs.services.impl.ejg.BusquedaRemesasServiceImpl;
-import org.itcgae.siga.scs.services.impl.oficio.GestionCargasMasivasOficioServiceImpl;
 import org.itcgae.siga.scs.services.intercambios.ICargaMasivaProcuradores;
-import org.itcgae.siga.scs.services.oficio.IGestionCargasMasivasOficio;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -230,6 +204,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		CargaMasivaProcuradorDTO cargaMasivaProcuradorDTO = new CargaMasivaProcuradorDTO();
+		List<CargaMasivaProcuradorItem> cargaMasivaProcurador = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -245,8 +220,9 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 			LOGGER.debug(
 					"listado() / ScsRemesasExtendsMapper.buscarRemesas() -> Entrada a ScsIntercambiosExtendsMapper para obtener las Cargas Maivas de Procuradores");
 
-			List<CargaMasivaProcuradorItem> cargaMasivaProcurador = scsIntercambiosExtendsMapper
-					.listadoCargaMasivaProcuradores(cargaMasivaItem, idInstitucion);
+			if (null != usuarios && usuarios.size() > 0) {
+				cargaMasivaProcurador = scsIntercambiosExtendsMapper.listadoCargaMasivaProcuradores(cargaMasivaItem, idInstitucion);
+			}
 
 			LOGGER.debug(
 					"listado() / ScsRemesasExtendsMapper.buscarRemesas() -> Salida a ScsRemesasExtendsMapper para obtener las Cargas Maivas de Procuradores");
@@ -427,14 +403,6 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 
 						cenCargamasivacv.setIdfichero(idFile);
 						cenCargamasivacv.setIdficherolog(idLogFile);
-						
-						try {
-							guardarFicheroEnDisco(file.getBytes(), cenCargamasivacv, false);
-							guardarFicheroEnDisco(bytesLog, cenCargamasivacv, true);
-						} catch (IOException e) {
-							LOGGER.debug("Error al crear y escribir el fichero: " + e.getStackTrace());
-							throw e;
-						}
 
 						result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
 					}catch(IOException e) {
@@ -596,46 +564,17 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 
 		ficheroVo.setIdinstitucion(cenCargamasiva.getIdinstitucion());
 		ficheroVo.setFichero(bytes);
-		ficheroVo.setExtension("xls");
+		ficheroVo.setExtension(SigaConstants.tipoExcelXls);
 
 		ficheroVo.setUsumodificacion(Integer.valueOf(cenCargamasiva.getUsumodificacion()));
 		ficheroVo.setFechamodificacion(new Date());
 		
 		ficherosServiceImpl.insert(ficheroVo);
 
-		if (isLog) {
-			ficheroVo.setDescripcion("log_" + ficheroVo.getDescripcion());
-			ficheroVo.setNombre("log_" + ficheroVo.getNombre());
-		}
-
 		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
 		
 		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl uploadFileLog");
 		return ficheroVo.getIdfichero();
-	}
-	
-	private String getDirectorioFichero(Short idInstitucion) {
-		Date dateLog = new Date();
-		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl getDirectorioFichero");
-
-		// Extraer propiedad
-		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
-		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
-		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
-		String pathCV = genPropertiesPath.get(0).getValor(); 
-		
-		StringBuffer directorioFichero = new StringBuffer(pathCV);
-		directorioFichero.append(idInstitucion);
-		directorioFichero.append(File.separator);
-
-		// Extraer propiedad
-		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
-		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaCV");
-		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
-		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
-
-		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl getDirectorioFichero");
-		return directorioFichero.toString();
 	}
 
 	private List<CargaMasivaDatosPDItem> parseExcelFilePD(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario) {
@@ -888,48 +827,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		return masivaDatosPDVos;
 	}
 	
-	public void guardarFicheroEnDisco(byte[] bytes, CenCargamasiva cenCargamasiva, boolean isLog) throws IOException {
-		
-		File directorio = new File(getDirectorioFicheroSigaClassique(cenCargamasiva.getIdinstitucion()) + File.separator + cenCargamasiva.getIdcargamasiva());
-		
-		if(!directorio.exists()) 
-			directorio.mkdirs();
-		
-		StringBuffer pathDirectorio = new StringBuffer(getDirectorioFicheroSigaClassique(cenCargamasiva.getIdinstitucion()));
-		
-		pathDirectorio.append(File.separator);
-		pathDirectorio.append(isLog ? "log_" + cenCargamasiva.getIdficherolog() + "_" + cenCargamasiva.getNombrefichero() : cenCargamasiva.getIdfichero() + "_" +  cenCargamasiva.getNombrefichero());
-		File file = new File(pathDirectorio.toString());
-		
-		OutputStream output = null;
-		
-		try {
-			
-			if(!file.exists()) {
-				file.createNewFile();
-			}
-			
-			output = new FileOutputStream(file);
-			output.write(bytes);
-			output.flush();
-		} catch (IOException e) {
-			LOGGER.debug("Error al crear y escribir el fichero: " + e.getStackTrace());
-			throw e;
-		}finally {
-			if(output!=null) {
-				try {
-					output.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-				
-			output = null;
-		}
-	}
-		
-	
-	private String getDirectorioFicheroSigaClassique(Short idInstitucion) {
+	private String getDirectorioFichero(Short idInstitucion) {
 		Date dateLog = new Date();
 		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl getDirectorioFicheroSigaClassique");
 
@@ -961,79 +859,75 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		InputStream fileStream = null;
 		ResponseEntity<InputStreamResource> res = null;
 
 		try {
 
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			LOGGER.debug(
-					"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.debug(
-					"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
-			
-			if(cargaMasivaProcuradorItem.size() == 1) {
-				res = soloUnArchivo(cargaMasivaProcuradorItem, idInstitucion);
-			}else {
-				res = getZipFile(cargaMasivaProcuradorItem, idInstitucion);
+			if(idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+				LOGGER.debug(
+						"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
+	
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	
+				LOGGER.debug(
+						"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
+				
+				if (null != usuarios && usuarios.size() > 0) {
+					if(cargaMasivaProcuradorItem.size() == 1) {
+						res = soloUnArchivo(cargaMasivaProcuradorItem, idInstitucion);
+					}else {
+						res = getZipFile(cargaMasivaProcuradorItem, idInstitucion);
+					}
+				}
+				
 			}
 			
-			LOGGER.info("descargarFicheros() -> Salida del servicio para generar la plantilla de errores");
-
 		} catch (Exception e) {
 			LOGGER.error(
 					"descargarFicheros() -> Se ha producido un error al descargar archivos asociados a la carga masiva de procuradores",
 					e);
 		}
 		
+		LOGGER.info("descargarFicheros() -> Salida del servicio para generar la plantilla de errores");
+		
 		return res;
 	}
 
-	private ResponseEntity<InputStreamResource> soloUnArchivo(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem,
-			Short idInstitucion) {
+	private ResponseEntity<InputStreamResource> soloUnArchivo(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem, Short idInstitucion) throws Exception {
 		
-		// Extraer el path
-		//String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
-		String path = getDirectorioFichero(idInstitucion);
-		path += File.separator + "log_" + cargaMasivaProcuradorItem.get(0).getIdFicheroLog() + "_" + cargaMasivaProcuradorItem.get(0).getNombreFichero();
-		File file = new File(path);
+		byte[] buf = {};
 		
-		InputStream fileStream;
+		InputStream fileStream = new ByteArrayInputStream(buf);
+		
 		ResponseEntity<InputStreamResource> res = null;
+
+		LOGGER.debug("descargarFicheros() -> Se busca el fichero original");
+
+		String pathClassique = getDirectorioFichero(idInstitucion);
+		pathClassique += File.separator + idInstitucion + "_" + cargaMasivaProcuradorItem.get(0).getIdFicheroLog()  + "." + SigaConstants.tipoExcelXls;
+		
+		HttpHeaders headersClassique = new HttpHeaders();
+		headersClassique.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+		headersClassique.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + cargaMasivaProcuradorItem.get(0).getNombreFichero());
+		headersClassique.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
+		
 		try {
-			fileStream = new FileInputStream(file);
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
-			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + cargaMasivaProcuradorItem.get(0).getNombreFichero());
-			headers.setContentLength(file.length());
-			headers.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
-			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
-		} catch (FileNotFoundException e) {
-			LOGGER.warn("descargarFicheros() -> No encuentra el fichero original en la ruta SigaNovo");
-
-			//Si no encuentra el fichero buscamos en la ruta de siga classique
-			String pathClassique = getDirectorioFicheroSigaClassique(idInstitucion);
-			pathClassique += File.separator +"log_" + cargaMasivaProcuradorItem.get(0).getIdFicheroLog() + "_" + cargaMasivaProcuradorItem.get(0).getNombreFichero();
-			
 			File fileClassique = new File(pathClassique);
-
-			try {
-				fileStream = new FileInputStream(fileClassique);
-				HttpHeaders headersClassique = new HttpHeaders();
-				headersClassique.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
-
-				headersClassique.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + cargaMasivaProcuradorItem.get(0).getNombreFichero());
-				headersClassique.setContentLength(fileClassique.length());
-				headersClassique.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
-				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headersClassique, HttpStatus.OK);
 			
-			} catch (FileNotFoundException eClassique) {
-				LOGGER.warn("descargarFicheros() -> No encuentra el fichero original en la ruta SigaClassique");
+			if(fileClassique.exists()) {
+				fileStream = new FileInputStream(fileClassique);
+				headersClassique.setContentLength(fileClassique.length());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headersClassique, HttpStatus.OK);
+			}else {
+				LOGGER.debug("descargarFicheros() -> No encuentra el fichero original");
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headersClassique, HttpStatus.NO_CONTENT);
 			}
+			
+		} catch (Exception eClassique) {
+			LOGGER.debug("descargarFicheros() -> " + eClassique.getStackTrace());
+			throw eClassique;
 		}
 		return res;
 	}
@@ -1054,35 +948,33 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		byteArrayOutputStream = new ByteArrayOutputStream();
 		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
 		ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+		
+		List<CargaMasivaProcuradorItem> cargaMasiva = new ArrayList<CargaMasivaProcuradorItem>();
+		
+		int ficherosEncontrados = 0;
 				
 		try {
 			for (CargaMasivaProcuradorItem doc : cargaMasivaProcuradorItem) {
-				try {
-					String path = getDirectorioFichero(idInstitucion);
-					path += File.separator + "log_" + doc.getIdFicheroLog() + "_" + doc.getNombreFichero();
-					File file = new File(path);
-					FileInputStream fileInputStream = new FileInputStream(file);
-					zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
-					IOUtils.copy(fileInputStream, zipOutputStream);
-					fileInputStream.close();
-				}catch(FileNotFoundException e) {
-					//Si no encuentra el fichero buscamos en la ruta de siga classique
-					String pathClassique = getDirectorioFicheroSigaClassique(idInstitucion);
-					pathClassique += File.separator +"log_" + doc.getIdFicheroLog() + "_" + doc.getNombreFichero();
+					LOGGER.debug("descargarFicheros() -> Sebusca el fichero original");
+					String pathClassique = getDirectorioFichero(idInstitucion);
+					pathClassique += File.separator + idInstitucion + "_" + doc.getIdFicheroLog() + "." + SigaConstants.tipoExcelXls;
 					
 					try {
 						File fileClassique = new File(pathClassique);
-						zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
 						FileInputStream fileInputStream = new FileInputStream(fileClassique);
+						zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
 						IOUtils.copy(fileInputStream, zipOutputStream);
 						fileInputStream.close();
+						
+						ficherosEncontrados++;
+						
+						cargaMasiva.add(doc);
+						
 					}catch(FileNotFoundException eClassique) {
-						LOGGER.warn("descargarFicheros() -> No encuentra el fichero original en la ruta SigaClassique");
-						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), headersClassique, HttpStatus.NO_CONTENT);
+						LOGGER.debug("descargarFicheros() -> No encuentra el fichero original");
 					}
-				}
 			}
-
+			
 			zipOutputStream.closeEntry();
 
 			if (zipOutputStream != null) {
@@ -1098,10 +990,17 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 			e.printStackTrace();
 		}
 		
-		res = new ResponseEntity<InputStreamResource>(new InputStreamResource(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), headersClassique, HttpStatus.OK);
+		if(ficherosEncontrados == 1) {
+			try {
+				res = soloUnArchivo(cargaMasiva, idInstitucion);
+			} catch (Exception e) {
+				LOGGER.debug("Error al descarga fichero -> " + e.getStackTrace());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), headersClassique, HttpStatus.NO_CONTENT);
+			}
+		}else{
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), headersClassique, ficherosEncontrados > 1 ? HttpStatus.OK : HttpStatus.NO_CONTENT);			
+		}
 
 		return res;
-		
-		
 	}
 }

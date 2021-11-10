@@ -15,25 +15,30 @@ public class ScsIntercambiosExtendsProvider {
 		SQL sql = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-		sql.SELECT("IDCARGAMASIVA");
-		sql.SELECT("TIPOCARGA");
-		sql.SELECT("IDINSTITUCION");
-		sql.SELECT("FECHACARGA");
-		sql.SELECT("IDFICHERO");
-		sql.SELECT("IDFICHEROLOG");
-		sql.SELECT("FECHAMODIFICACION");
-		sql.SELECT("NUMREGISTROS");
-		sql.SELECT("NOMBREFICHERO");
-		sql.SELECT("NUMREGISTROSERRONEOS");
-		sql.FROM("cen_cargamasiva");
-		sql.WHERE("tipocarga = 'PD'");
-		sql.WHERE("idinstitucion = " + idInstitucion.toString());
+		sql.SELECT("cm.IDCARGAMASIVA");
+		sql.SELECT("cm.TIPOCARGA");
+		sql.SELECT("cm.IDINSTITUCION");
+		sql.SELECT("cm.FECHACARGA");
+		sql.SELECT("cm.IDFICHERO");
+		sql.SELECT("cm.IDFICHEROLOG");
+		sql.SELECT("cm.FECHAMODIFICACION");
+		sql.SELECT("cm.NUMREGISTROS");
+		sql.SELECT("cm.NOMBREFICHERO");
+		sql.SELECT("cm.NUMREGISTROSERRONEOS");
+		sql.SELECT("usu.DESCRIPCION");
+		sql.FROM("cen_cargamasiva cm");
+		sql.FROM("adm_usuarios usu");
+		sql.WHERE("cm.USUMODIFICACION = usu.idusuario");
+		sql.WHERE("cm.tipocarga = 'PD'");
+		sql.WHERE("usu.idinstitucion = " + idInstitucion.toString());
 		
 		if(cargaMasivaItem.getFechaCarga() != null) {
 			String fechaCarga = "";
 			fechaCarga = dateFormat.format(cargaMasivaItem.getFechaCarga());
 			sql.WHERE("TRUNC(fechacarga) <= TO_DATE('" + fechaCarga + "', 'DD/MM/RRRR')");
 		}
+		
+		sql.WHERE("rownum <= 200");
 		
 		LOGGER.debug(sql.toString());
 
