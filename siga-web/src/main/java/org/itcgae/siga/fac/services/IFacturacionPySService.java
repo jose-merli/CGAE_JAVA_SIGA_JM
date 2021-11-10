@@ -19,34 +19,37 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 
 public interface IFacturacionPySService {
 
-	public CuentasBancariasDTO getCuentasBancarias(HttpServletRequest request);
+	public CuentasBancariasDTO getCuentasBancarias(HttpServletRequest request) throws Exception;
 
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
 
 	public SeriesFacturacionDTO getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
 
 	public DeleteResponseDTO eliminaSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO reactivarSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO guardarSerieFacturacion(SerieFacturacionItem serieFacturacion, HttpServletRequest request);
+	public UpdateResponseDTO guardarSerieFacturacion(SerieFacturacionItem serieFacturacion, HttpServletRequest request)
+			throws Exception;
 
 	public UpdateResponseDTO guardarEtiquetasSerieFacturacion(TarjetaPickListSerieDTO etiquetas,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
 
-	public DestinatariosSeriesDTO getDestinatariosSeries(String idSerieFacturacion, HttpServletRequest request);
+	public DestinatariosSeriesDTO getDestinatariosSeries(String idSerieFacturacion, HttpServletRequest request)
+			throws Exception;
 
-	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request);
+	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request)
+			throws Exception;
 
-	public ContadorSeriesDTO getContadoresSerie(HttpServletRequest request);
+	public ContadorSeriesDTO getContadoresSerie(HttpServletRequest request) throws Exception;
 
-	public ContadorSeriesDTO getContadoresRectificativasSerie(HttpServletRequest request);
+	public ContadorSeriesDTO getContadoresRectificativasSerie(HttpServletRequest request) throws Exception;
 
-	public FicherosAdeudosDTO getFicherosAdeudos(FicherosAdeudosItem item, HttpServletRequest request);
+	public FicherosAdeudosDTO getFicherosAdeudos(FicherosAdeudosItem item, HttpServletRequest request) throws Exception;
 
-	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request);
+	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request) throws Exception;
 }

@@ -1,6 +1,5 @@
 package org.itcgae.siga.security;
 
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +9,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;*/
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -92,7 +92,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 		return authentication.equals(UserAuthenticationToken.class);
 	}
 
-	public AdmUsuarios checkAuthentication(HttpServletRequest request) {
+	public AdmUsuarios checkAuthentication(HttpServletRequest request) throws Exception {
 		AdmUsuarios usuario = new AdmUsuarios();
 		
 		try {
@@ -117,7 +117,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 				if (usuarios != null && !usuarios.isEmpty()) {
 					usuario = usuarios.get(0);
 				}else {
-					throw new Exception("usuario no encontrado");
+					throw new SigaExceptions("usuario no encontrado");
 				}
 				
 			}
@@ -125,6 +125,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 			LOGGER.debug("UserTokenUtils.checkAuthentication > ok");
 		} catch (Exception e) {
 			LOGGER.error("UserTokenUtils.checkAuthentication > ERROR al comprobar los datos del token. ", e);
+			throw e;
 		}
 
 		return usuario;
