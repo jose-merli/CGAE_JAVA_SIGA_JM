@@ -186,7 +186,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarCuentaBancaria(CuentasBancariasItem cuentaBancaria,
 													 HttpServletRequest request) throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -300,7 +300,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO insertaActualizaSerie(List<UsosSufijosItem> usosSufijosItems,
 												   HttpServletRequest request) throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -390,7 +390,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public DeleteResponseDTO eliminaSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems,
 			HttpServletRequest request) throws Exception {
 		LOGGER.info("eliminaSerieFacturacion() -> Entrada al servicio para eliminar series de facturación");
@@ -445,6 +445,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				}
 
 			}
+
 		}
 
 		LOGGER.info("eliminaSerieFacturacion() -> Salida del servicio para eliminar series de facturación");
@@ -452,7 +453,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO reactivarSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems,
 			HttpServletRequest request) throws Exception {
 		LOGGER.info("reactivarSerieFacturacion() -> Entrada al servicio para reactivar series de facturación");
@@ -497,7 +498,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarSerieFacturacion(SerieFacturacionItem serieFacturacion, HttpServletRequest request)
 			throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -724,7 +725,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarEtiquetasSerieFacturacion(TarjetaPickListSerieDTO etiquetas,
 			HttpServletRequest request) throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -820,7 +821,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request)
 			throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -1006,8 +1007,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	@Transactional
-
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request)
 			throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
