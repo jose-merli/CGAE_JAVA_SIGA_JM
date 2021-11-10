@@ -1,7 +1,6 @@
 package org.itcgae.siga.fac.services.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,33 +90,25 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboCuentasBancarias() -> Entrada al servicio para recuperar el combo de cuentas bancarias");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboCuentasBancarias() / facBancoInstitucionExtendsMapper.comboCuentasBancarias() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de cuentas bancarias");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				comboItems = facBancoinstitucionExtendsMapper.comboCuentasBancarias(usuario.getIdinstitucion());
+				LOGGER.debug("comboCuentasBancarias() ->" + comboItems.toString());
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboCuentasBancarias() / facBancoInstitucionExtendsMapper.comboCuentasBancarias() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de cuentas bancarias");
+				// comprobar primero si la lista de cuentas bancarias viene vacia
+				comboDTO.setCombooItems(comboItems);
 
-					// Logica
-					comboItems = facBancoinstitucionExtendsMapper
-							.comboCuentasBancarias(Short.parseShort(idInstitucion));
-					LOGGER.debug("comboCuentasBancarias() ->" + comboItems.toString());
-
-					// comprobar primero si la lista de cuentas bancarias viene vacia
-					comboDTO.setCombooItems(comboItems);
-
-				}
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -140,48 +131,41 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboSufijos() -> Entrada al servicio para recuperar el combo de sufijos");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboSufijos() / facBancoInstitucionExtendsMapper.comboSufijos() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de sufijos");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				FacSufijoExample exampleSufijo = new FacSufijoExample();
+				exampleSufijo.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+				exampleSufijo.setOrderByClause("SUFIJO, CONCEPTO");
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboSufijos() / facBancoInstitucionExtendsMapper.comboSufijos() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de sufijos");
+				List<FacSufijo> sufijos = facSufijoMapper.selectByExample(exampleSufijo);
 
-					// Logica
-					FacSufijoExample exampleSufijo = new FacSufijoExample();
-					exampleSufijo.createCriteria().andIdinstitucionEqualTo(Short.parseShort(idInstitucion));
-					exampleSufijo.setOrderByClause("SUFIJO, CONCEPTO");
+				if (sufijos != null) {
+					comboItems = new ArrayList<>();
+					for (FacSufijo facSufijo : sufijos) {
+						ComboItem comboItem = new ComboItem();
+						comboItem.setValue(facSufijo.getIdsufijo().toString());
+						comboItem.setLabel(facSufijo.getSufijo().toString() + " - " + facSufijo.getConcepto());
 
-					List<FacSufijo> sufijos = facSufijoMapper.selectByExample(exampleSufijo);
-
-					if (sufijos != null) {
-						comboItems = new ArrayList<>();
-						for (FacSufijo facSufijo : sufijos) {
-							ComboItem comboItem = new ComboItem();
-							comboItem.setValue(facSufijo.getIdsufijo().toString());
-							comboItem.setLabel(facSufijo.getSufijo().toString() + " - " + facSufijo.getConcepto());
-
-							comboItems.add(comboItem);
-						}
-
-						LOGGER.debug("comboSufijos() ->" + comboItems.toString());
-
-						// comprobar primero si la lista de cuentas bancarias viene vacia
-						comboDTO.setCombooItems(comboItems);
+						comboItems.add(comboItem);
 					}
 
+					LOGGER.debug("comboSufijos() ->" + comboItems.toString());
+
+					// comprobar primero si la lista de cuentas bancarias viene vacia
+					comboDTO.setCombooItems(comboItems);
 				}
+
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -202,7 +186,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	public ComboDTO comboEtiquetas(HttpServletRequest request) {
 		ComboDTO comboDTO = new ComboDTO();
 
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 		List<ComboItem> comboItems;
 		Error error = new Error();
 
@@ -210,26 +194,19 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboEtiquetas() / facBancoInstitucionExtendsMapper.comboEtiquetas() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de etiquetas");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				String idioma = usuario.getIdlenguaje();
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboEtiquetas() / facBancoInstitucionExtendsMapper.comboEtiquetas() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de etiquetas");
+				// Logica
+				comboItems = cenGruposclienteExtendsMapper.comboEtiquetas(idioma, usuario.getIdinstitucion());
 
-					String idioma = usuarios.get(0).getIdlenguaje();
+				comboDTO.setCombooItems(comboItems);
 
-					// Logica
-					comboItems = cenGruposclienteExtendsMapper.comboEtiquetas(idioma, Short.parseShort(idInstitucion));
-
-					comboDTO.setCombooItems(comboItems);
-
-				}
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -252,31 +229,22 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboDestinatarios() -> Entrada al servicio para recuperar el combo de destinatarios");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboDestinatarios() / facBancoInstitucionExtendsMapper.comboDestinatarios() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de destinatarios");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				comboItems = cenGruposclienteClienteExtendsMapper.comboDestinatarios(usuario.getIdinstitucion());
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboDestinatarios() / facBancoInstitucionExtendsMapper.comboDestinatarios() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de destinatarios");
-
-					// Logica
-					comboItems = cenGruposclienteClienteExtendsMapper
-							.comboDestinatarios(Short.parseShort(idInstitucion));
-
-					comboDTO.setCombooItems(comboItems);
-
-				}
+				comboDTO.setCombooItems(comboItems);
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -299,46 +267,39 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboContadores() -> Entrada al servicio para recuperar el combo de contadores");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboContadores() / facBancoInstitucionExtendsMapper.comboContadores() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de contadores");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				AdmContadorExample exampleContador = new AdmContadorExample();
+				exampleContador.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andIdtablaEqualTo("FAC_FACTURA");
+				exampleContador.setOrderByClause("NOMBRE");
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboContadores() / facBancoInstitucionExtendsMapper.comboContadores() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de contadores");
+				List<AdmContador> contadores = admContadorMapper.selectByExample(exampleContador);
 
-					// Logica
-					AdmContadorExample exampleContador = new AdmContadorExample();
-					exampleContador.createCriteria().andIdinstitucionEqualTo(Short.parseShort(idInstitucion))
-							.andIdtablaEqualTo("FAC_FACTURA");
-					exampleContador.setOrderByClause("NOMBRE");
+				if (contadores != null) {
+					comboItems = new ArrayList<>();
+					for (AdmContador contador : contadores) {
+						ComboItem comboItem = new ComboItem();
+						comboItem.setValue(contador.getIdcontador());
+						comboItem.setLabel(contador.getNombre());
 
-					List<AdmContador> contadores = admContadorMapper.selectByExample(exampleContador);
-
-					if (contadores != null) {
-						comboItems = new ArrayList<>();
-						for (AdmContador contador : contadores) {
-							ComboItem comboItem = new ComboItem();
-							comboItem.setValue(contador.getIdcontador());
-							comboItem.setLabel(contador.getNombre());
-
-							comboItems.add(comboItem);
-						}
-
-						comboDTO.setCombooItems(comboItems);
+						comboItems.add(comboItem);
 					}
 
+					comboDTO.setCombooItems(comboItems);
 				}
+
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -361,47 +322,40 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug(
 				"comboContadoresRectificativas() -> Entrada al servicio para recuperar el combo de contadores rectificativas");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboContadoresRectificativas() / facBancoInstitucionExtendsMapper.comboContadoresRectificativas() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de contadores rectificativas");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				AdmContadorExample exampleContador = new AdmContadorExample();
+				exampleContador.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andIdtablaEqualTo("FAC_ABONO").andIdcontadorNotEqualTo("FAC_ABONOS_FCS");
+				exampleContador.setOrderByClause("NOMBRE");
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboContadoresRectificativas() / facBancoInstitucionExtendsMapper.comboContadoresRectificativas() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de contadores rectificativas");
+				List<AdmContador> contadores = admContadorMapper.selectByExample(exampleContador);
 
-					// Logica
-					AdmContadorExample exampleContador = new AdmContadorExample();
-					exampleContador.createCriteria().andIdinstitucionEqualTo(Short.parseShort(idInstitucion))
-							.andIdtablaEqualTo("FAC_ABONO").andIdcontadorNotEqualTo("FAC_ABONOS_FCS");
-					exampleContador.setOrderByClause("NOMBRE");
+				if (contadores != null) {
+					comboItems = new ArrayList<>();
+					for (AdmContador contador : contadores) {
+						ComboItem comboItem = new ComboItem();
+						comboItem.setValue(contador.getIdcontador());
+						comboItem.setLabel(contador.getNombre());
 
-					List<AdmContador> contadores = admContadorMapper.selectByExample(exampleContador);
-
-					if (contadores != null) {
-						comboItems = new ArrayList<>();
-						for (AdmContador contador : contadores) {
-							ComboItem comboItem = new ComboItem();
-							comboItem.setValue(contador.getIdcontador());
-							comboItem.setLabel(contador.getNombre());
-
-							comboItems.add(comboItem);
-						}
-
-						comboDTO.setCombooItems(comboItems);
+						comboItems.add(comboItem);
 					}
 
+					comboDTO.setCombooItems(comboItems);
 				}
+
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -425,47 +379,41 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
-		LOGGER.debug("comboPlanificacion() -> Entrada al servicio para recuperar el combo de contadores rectificativas");
+		LOGGER.debug(
+				"comboPlanificacion() -> Entrada al servicio para recuperar el combo de contadores rectificativas");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboPlanificacion() / fac.comboPlanificacion() -> Entrada a facSeriefacturacionExtendsMapper para obtener el combo de planificación");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				FacSeriefacturacionExample exampleSerieFacturacion = new FacSeriefacturacionExample();
+				exampleSerieFacturacion.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andIdseriefacturacionNotEqualTo(Long.valueOf(idSerieFacturacion)).andFechabajaIsNull();
+				exampleSerieFacturacion.setOrderByClause("descripcion");
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboPlanificacion() / fac.comboPlanificacion() -> Entrada a facSeriefacturacionExtendsMapper para obtener el combo de planificación");
+				List<FacSeriefacturacion> seriesFacturacion = facSeriefacturacionExtendsMapper
+						.selectByExample(exampleSerieFacturacion);
 
-					// Logica
-					FacSeriefacturacionExample exampleSerieFacturacion = new FacSeriefacturacionExample();
-					exampleSerieFacturacion.createCriteria().andIdinstitucionEqualTo(Short.parseShort(idInstitucion))
-							.andIdseriefacturacionNotEqualTo(Long.valueOf(idSerieFacturacion)).andFechabajaIsNull();
-					exampleSerieFacturacion.setOrderByClause("descripcion");
+				if (seriesFacturacion != null) {
+					comboItems = new ArrayList<>();
+					for (FacSeriefacturacion serieFacturacion : seriesFacturacion) {
+						ComboItem comboItem = new ComboItem();
+						comboItem.setValue(serieFacturacion.getIdseriefacturacion().toString());
+						comboItem.setLabel(serieFacturacion.getNombreabreviado());
 
-					List<FacSeriefacturacion> seriesFacturacion = facSeriefacturacionExtendsMapper
-							.selectByExample(exampleSerieFacturacion);
-
-					if (seriesFacturacion != null) {
-						comboItems = new ArrayList<>();
-						for (FacSeriefacturacion serieFacturacion : seriesFacturacion) {
-							ComboItem comboItem = new ComboItem();
-							comboItem.setValue(serieFacturacion.getIdseriefacturacion().toString());
-							comboItem.setLabel(serieFacturacion.getNombreabreviado());
-
-							comboItems.add(comboItem);
-						}
-
-						comboDTO.setCombooItems(comboItems);
+						comboItems.add(comboItem);
 					}
 
+					comboDTO.setCombooItems(comboItems);
 				}
+
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -488,35 +436,28 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug(
 				"getEtiquetasSerie() -> Entrada al servicio para recuperar las etiquetas de la serie de facturación");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"getEtiquetasSerie() / facTipocliincluidoenseriefacExtendsMapper.getEtiquetasSerie() -> Entrada a facTipocliincluidoenseriefacExtendsMapper para obtener las etiquetas de la serie");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				String idioma = usuario.getIdlenguaje();
+				comboItems = facTipocliincluidoenseriefacExtendsMapper.getEtiquetasSerie(idSerieFacturacion,
+						usuario.getIdinstitucion(), idioma);
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"getEtiquetasSerie() / facTipocliincluidoenseriefacExtendsMapper.getEtiquetasSerie() -> Entrada a facTipocliincluidoenseriefacExtendsMapper para obtener las etiquetas de la serie");
+				LOGGER.debug(
+						"getEtiquetasSerie() / facTipocliincluidoenseriefacExtendsMapper.getEtiquetasSerie() -> Saliendo de facTipocliincluidoenseriefacExtendsMapper para obtener las etiquetas de la serie");
 
-					// Logica
-					String idioma = usuarios.get(0).getIdlenguaje();
-					comboItems = facTipocliincluidoenseriefacExtendsMapper.getEtiquetasSerie(idSerieFacturacion,
-							Short.parseShort(idInstitucion), idioma);
-
-					LOGGER.debug(
-							"getEtiquetasSerie() / facTipocliincluidoenseriefacExtendsMapper.getEtiquetasSerie() -> Saliendo de facTipocliincluidoenseriefacExtendsMapper para obtener las etiquetas de la serie");
-
-					comboDTO.setCombooItems(comboItems);
-				}
+				comboDTO.setCombooItems(comboItems);
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -539,32 +480,25 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboPlantillasEnvio() -> Entrada al servicio para recuperar lel combo de platillas envio");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboPlantillasEnvio() / envPlantillaEnviosExtendsMapper.comboPlantillasEnvio() -> Entrada a envPlantillaEnviosExtendsMapper para obtener el combo de platillas envio");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				comboItems = envPlantillaEnviosExtendsMapper.comboPlantillasEnvio(usuario.getIdinstitucion());
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboPlantillasEnvio() / envPlantillaEnviosExtendsMapper.comboPlantillasEnvio() -> Entrada a envPlantillaEnviosExtendsMapper para obtener el combo de platillas envio");
+				LOGGER.debug(
+						"comboPlantillasEnvio() / envPlantillaEnviosExtendsMapper.comboPlantillasEnvio() -> Saliendo de envPlantillaEnviosExtendsMapper para obtener el combo de platillas envio");
 
-					// Logica
-					comboItems = envPlantillaEnviosExtendsMapper.comboPlantillasEnvio(Short.parseShort(idInstitucion));
-
-					LOGGER.debug(
-							"comboPlantillasEnvio() / envPlantillaEnviosExtendsMapper.comboPlantillasEnvio() -> Saliendo de envPlantillaEnviosExtendsMapper para obtener el combo de platillas envio");
-
-					comboDTO.setCombooItems(comboItems);
-				}
+				comboDTO.setCombooItems(comboItems);
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -587,33 +521,27 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
-		LOGGER.debug("getFormasPagosDisponiblesSeries() -> Entrada al servicio para recuperar todas las formas de pago");
+		LOGGER.debug(
+				"getFormasPagosDisponiblesSeries() -> Entrada al servicio para recuperar todas las formas de pago");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboPlantillasEnvio() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Entrada a pysFormapagoExtendsMapper para obtener todas las formas de pago");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				String idioma = usuario.getIdlenguaje();
+				comboItems = pysFormapagoExtendsMapper.getWayToPayWithIdFormapago(idioma);
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboPlantillasEnvio() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Entrada a pysFormapagoExtendsMapper para obtener todas las formas de pago");
+				LOGGER.debug(
+						"comboPlantillasEnvio() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Saliendo de pysFormapagoExtendsMapper para obtener todas las formas de pago");
 
-					// Logica
-					String idioma = usuarios.get(0).getIdlenguaje();
-					comboItems = pysFormapagoExtendsMapper.getWayToPayWithIdFormapago(idioma);
-
-					LOGGER.debug(
-							"comboPlantillasEnvio() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Saliendo de pysFormapagoExtendsMapper para obtener todas las formas de pago");
-
-					comboDTO.setCombooItems(comboItems);
-				}
+				comboDTO.setCombooItems(comboItems);
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -636,35 +564,28 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug(
 				"getFormasPagosSerie() -> Entrada al servicio para recuperar las formas de pago de la serie de facturación");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"getFormasPagosSerie() / facFormapagoserieExtendsMapper.getFormasPagosSerie() -> Entrada a facFormapagoserieExtendsMapper para obtener las formas de pago de la serie de facturación");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				String idioma = usuario.getIdlenguaje();
+				comboItems = facFormapagoserieExtendsMapper.getFormasPagosSerie(idSerieFacturacion,
+						usuario.getIdinstitucion(), idioma);
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"getFormasPagosSerie() / facFormapagoserieExtendsMapper.getFormasPagosSerie() -> Entrada a facFormapagoserieExtendsMapper para obtener las formas de pago de la serie de facturación");
+				LOGGER.debug(
+						"getFormasPagosSerie() / facFormapagoserieExtendsMapper.getFormasPagosSerie() -> Saliendo de facFormapagoserieExtendsMapper para obtener las formas de pago de la serie de facturación");
 
-					// Logica
-					String idioma = usuarios.get(0).getIdlenguaje();
-					comboItems = facFormapagoserieExtendsMapper.getFormasPagosSerie(idSerieFacturacion,
-							Short.parseShort(idInstitucion), idioma);
-
-					LOGGER.debug(
-							"getFormasPagosSerie() / facFormapagoserieExtendsMapper.getFormasPagosSerie() -> Saliendo de facFormapagoserieExtendsMapper para obtener las formas de pago de la serie de facturación");
-
-					comboDTO.setCombooItems(comboItems);
-				}
+				comboDTO.setCombooItems(comboItems);
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -688,43 +609,35 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboModelosComunicacion() -> Entrada al servicio para recuperar los modelos de comunicación");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboModelosComunicacion() / modModeloComunicacionExtendsMapper.selectByExample() -> Entrada a modModeloComunicacionExtendsMapper para obtener los modelos de comunicación");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				// Logica
+				ModModelocomunicacionExample modeloExample = new ModModelocomunicacionExample();
+				modeloExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+				modeloExample.setOrderByClause("nombre");
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboModelosComunicacion() / modModeloComunicacionExtendsMapper.selectByExample() -> Entrada a modModeloComunicacionExtendsMapper para obtener los modelos de comunicación");
+				List<ModModelocomunicacion> modelos = modModeloComunicacionExtendsMapper.selectByExample(modeloExample);
+				comboItems = modelos.stream().map(m -> {
+					ComboItem item = new ComboItem();
+					item.setValue(String.valueOf(m.getIdmodelocomunicacion()));
+					item.setLabel(m.getNombre());
+					return item;
+				}).collect(Collectors.toList());
 
-					// Logica
-					ModModelocomunicacionExample modeloExample = new ModModelocomunicacionExample();
-					modeloExample.createCriteria().andIdinstitucionEqualTo(Short.parseShort(idInstitucion));
-					modeloExample.setOrderByClause("nombre");
+				LOGGER.debug(
+						"comboModelosComunicacion() / modModeloComunicacionExtendsMapper.selectByExample() -> Saliendo de modModeloComunicacionExtendsMapper para obtener los modelos de comunicación");
 
-					List<ModModelocomunicacion> modelos = modModeloComunicacionExtendsMapper
-							.selectByExample(modeloExample);
-					comboItems = modelos.stream().map(m -> {
-						ComboItem item = new ComboItem();
-						item.setValue(String.valueOf(m.getIdmodelocomunicacion()));
-						item.setLabel(m.getNombre());
-						return item;
-					}).collect(Collectors.toList());
-
-					LOGGER.debug(
-							"comboModelosComunicacion() / modModeloComunicacionExtendsMapper.selectByExample() -> Saliendo de modModeloComunicacionExtendsMapper para obtener los modelos de comunicación");
-
-					comboDTO.setCombooItems(comboItems);
-				}
+				comboDTO.setCombooItems(comboItems);
 			}
 		} catch (Exception e) {
 			LOGGER.error(
@@ -748,7 +661,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug(
 				"FacturacionPySGeneralServiceImpl.comboSeriesFacturacion() -> Entrada al servicio para recuperar el combo de series de facturacion");
@@ -756,39 +669,31 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		// Conseguimos información del usuario logeado
 		try {
 
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"FacturacionPySGeneralServiceImpl.comboSeriesFacturacion() -> obteniendo datos para el el combo de series de facturación");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				FacSeriefacturacionExample example = new FacSeriefacturacionExample();
+				example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion()).andFechabajaIsNull();
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"FacturacionPySGeneralServiceImpl.comboSeriesFacturacion() -> obteniendo datos para el el combo de series de facturación");
+				List<FacSeriefacturacion> seriesFac = facSeriefacturacionMapper.selectByExample(example);
 
-					FacSeriefacturacionExample example = new FacSeriefacturacionExample();
-					example.createCriteria().andIdinstitucionEqualTo(Short.parseShort(idInstitucion))
-							.andFechabajaIsNull();
+				if (seriesFac.size() > 0) {
 
-					List<FacSeriefacturacion> seriesFac = facSeriefacturacionMapper.selectByExample(example);
+					comboItems = seriesFac.stream().map(m -> {
 
-					if (seriesFac.size() > 0) {
+						ComboItem item = new ComboItem();
 
-						comboItems = seriesFac.stream().map(m -> {
+						item.setValue(String.valueOf(m.getIdseriefacturacion()));
+						item.setLabel(m.getNombreabreviado());
 
-							ComboItem item = new ComboItem();
+						return item;
 
-							item.setValue(String.valueOf(m.getIdseriefacturacion()));
-							item.setLabel(m.getNombreabreviado());
+					}).collect(Collectors.toList());
 
-							return item;
-
-						}).collect(Collectors.toList());
-
-						comboDTO.setCombooItems(comboItems);
-					}
+					comboDTO.setCombooItems(comboItems);
 				}
 			}
 		} catch (Exception e) {
@@ -812,32 +717,25 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		List<ComboItem> comboItems;
 		Error error = new Error();
-		String dni, idInstitucion;
+		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboTiposIVA() -> Entrada al servicio para recuperar el combo de tipos de IVA");
 
 		try {
 			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+			usuario = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+			if (usuario != null) {
+				LOGGER.debug(
+						"comboTiposIVA() / pySTipoIvaExtendsMapper.comboTiposIVA() -> Entrada a pySTipoIvaExtendsMapper para obtener el combo de tipos de IVA");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+				String idioma = usuario.getIdlenguaje();
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.debug(
-							"comboTiposIVA() / pySTipoIvaExtendsMapper.comboTiposIVA() -> Entrada a pySTipoIvaExtendsMapper para obtener el combo de tipos de IVA");
+				// Logica
+				comboItems = pySTipoIvaExtendsMapper.comboTiposIVA(idioma);
 
-					String idioma = usuarios.get(0).getIdlenguaje();
+				comboDTO.setCombooItems(comboItems);
 
-					// Logica
-					comboItems = pySTipoIvaExtendsMapper.comboTiposIVA(idioma);
-
-					comboDTO.setCombooItems(comboItems);
-
-				}
 			}
 		} catch (Exception e) {
 			LOGGER.error(
