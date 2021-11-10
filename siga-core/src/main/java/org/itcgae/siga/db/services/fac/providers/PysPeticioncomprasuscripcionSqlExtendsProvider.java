@@ -738,6 +738,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("periodicidad.periodosMes as periodicidadValor");
 		sql.SELECT_DISTINCT("f_siga_getrecurso(periodicidad.descripcion, "+idioma+") as periodicidadDesc");     
 		sql.SELECT_DISTINCT("precioServ.descripcion as precioServicioDesc");
+		sql.SELECT_DISTINCT("suscripcion.fechaSuscripcion as fechaAlta");
+		sql.SELECT_DISTINCT("suscripcion.fechaBajaFacturacion as fechaBaja");
 
 		sql.FROM("pys_serviciossolicitados servSol");
 		
