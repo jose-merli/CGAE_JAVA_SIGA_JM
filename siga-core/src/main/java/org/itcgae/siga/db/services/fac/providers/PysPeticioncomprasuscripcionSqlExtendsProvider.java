@@ -420,15 +420,18 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 					break;
 				case "2":
 					sql.WHERE("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null");
+							+ "				ELSE null END is not null and"
+							+ "				and compra.fecha is null");
 					break;
 				case "3":
 					sql.WHERE("compra.fecha is not null and CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is null");
+							+ "				ELSE null END is null and"
+							+ "				compra.fechaBaja is null");
 					break;
 				case "4":
 					sql.WHERE("CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null and compra.fechaBaja is null");
+							+ "				ELSE null END is not null and compra.fechaBaja is null"
+							+ "				and compra.fecha is not null");
 					break;
 				case "5":
 					sql.WHERE("compra.fechaBaja is not null");
@@ -600,15 +603,19 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 					break;
 				case "2"://Denegada
 					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null";
+							+ "				ELSE null END is not null and"
+							+ "				suscripcion.fecha.suscripcion is null";
 					break;
 				case "3"://Aceptada
-					condSolicitud += "suscripcion.fechaSuscripcion is not null and CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
-									+ "				ELSE null END is null";
+					condSolicitud += "suscripcion.fechaSuscripcion is not null and "
+									+ "CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
+									+ "				ELSE null END is null and "
+									+ "suscripcion.fechaBaja is null";
 					break;
 				case "4"://Anulacion solicitada
 					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null and suscripcion.fechaBaja is null";
+							+ "				ELSE null END is not null and suscripcion.fechaBaja is null"
+							+ "				and suscripcion.fechasuscripcion is not null";
 					break;
 				case "5"://Anulada
 					condSolicitud += "suscripcion.fechaBaja is not null";
