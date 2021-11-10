@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,5 +73,17 @@ public class CombosController {
         ComboDTO response = combosServices.getComboPagosRetenciones(request);
         return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
     }
+    
+    @GetMapping("/combo/getComboColegios")
+    ResponseEntity<ComboDTO> getComboColegios(HttpServletRequest request) {
+        ComboDTO response = combosServices.getComboColegios(request);
+        return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+    }
+    
+    @GetMapping("/combo/grupoFacturacionByColegio")
+	public ResponseEntity<ComboDTO> comboGrupoFacturacion(@RequestParam("idColegio")String idColegio,HttpServletRequest request) {
+		ComboDTO response = combosServices.getComboGrupoFacturacionByColegio(idColegio,request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 }

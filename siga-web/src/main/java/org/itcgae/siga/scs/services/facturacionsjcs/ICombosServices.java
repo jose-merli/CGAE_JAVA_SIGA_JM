@@ -23,4 +23,8 @@ public interface ICombosServices {
     ComboDTO getComboDestinatarios(HttpServletRequest request);
 
     ComboDTO getComboPagosRetenciones(HttpServletRequest request);
+    
+    ComboDTO getComboColegios(HttpServletRequest request);
+    
+    ComboDTO getComboGrupoFacturacionByColegio(String idColegio, HttpServletRequest request);
 }
