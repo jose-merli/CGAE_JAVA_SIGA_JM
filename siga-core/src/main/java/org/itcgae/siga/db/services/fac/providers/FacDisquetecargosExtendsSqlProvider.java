@@ -24,7 +24,7 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		numRecibos.WHERE("fi.idinstitucion = c.idinstitucion AND fi.iddisquetecargos = c.iddisquetecargos");
 		
 		//query principal
-		sql.SELECT("c.idinstitucion, c.iddisquetecargos, c.nombrefichero, c.bancos_codigo, b.comisiondescripcion, b.iban, "
+		sql.SELECT("c.idinstitucion, c.iddisquetecargos, c.nombrefichero, c.bancos_codigo, b.comisiondescripcion || ' (...' || SUBSTR(IBAN, -4) || ')' CUENTA_ENTIDAD, b.iban, "
 				+ "c.fechacreacion, c.idseriefacturacion, sf.nombreabreviado,c .idprogramacion, p.descripcion , c.fechacargo, "
 				+ "c.numerolineas, c.idsufijo, s.sufijo, ("+totalRemesa.toString()+") total_remesa, ("+numRecibos.toString()+") AS NUMRECIBOS");
 	

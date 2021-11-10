@@ -92,9 +92,9 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 		return authentication.equals(UserAuthenticationToken.class);
 	}
 
-	public HashMap<String, String> checkAuthentication(HttpServletRequest request) {
-		HashMap<String, String> data = new HashMap<String, String>();
-
+	public AdmUsuarios checkAuthentication(HttpServletRequest request) {
+		AdmUsuarios usuario = new AdmUsuarios();
+		
 		try {
 			LOGGER.debug("UserTokenUtils.checkAuthentication > Comprobando token...");
 
@@ -102,10 +102,6 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 			String token = request.getHeader("Authorization");
 			String dni = UserTokenUtils.getDniFromJWTToken(token);
 			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-			data.put("token", token);
-			data.put("dni", dni);
-			data.put("idInstitucion", idInstitucion.toString());
 
 			LOGGER.debug("UserTokenUtils.checkAuthentication > ok");
 
@@ -117,6 +113,13 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				
+				if (usuarios != null && !usuarios.isEmpty()) {
+					usuario = usuarios.get(0);
+				}else {
+					throw new Exception("usuario no encontrado");
+				}
+				
 			}
 
 			LOGGER.debug("UserTokenUtils.checkAuthentication > ok");
@@ -124,29 +127,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 			LOGGER.error("UserTokenUtils.checkAuthentication > ERROR al comprobar los datos del token. ", e);
 		}
 
-		return data;
-	}
-
-	public List<AdmUsuarios> getUsuarios(String dni, String idInstitucion) {
-		List<AdmUsuarios> usuarios = null;
-
-		try {
-			LOGGER.debug("UserTokenUtils.getDataUser > obteniendo datos...");
-
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.parseShort(idInstitucion));
-
-				usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			}
-
-			LOGGER.debug("UserTokenUtils.getDataUser > ok");
-		} catch (Exception e) {
-			LOGGER.error("UserTokenUtils.getDataUser > ERROR al obtener los datos del usuario. ", e);
-		}
-
-		return usuarios;
+		return usuario;
 	}
 
 	/*

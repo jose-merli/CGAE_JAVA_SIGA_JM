@@ -8,7 +8,7 @@ public class FicherosAdeudosItem {
 	String idDisqueteCargos;
 	String nombreFichero;
 	String bancosCodigo;
-	String comisionDescripcion;
+	String cuentaEntidad;
 	String iban;
 	Date fechaCreacion;
 	Date fechaCreacionDesde;
@@ -81,13 +81,13 @@ public class FicherosAdeudosItem {
 	 * @return the comisionDescripcion
 	 */
 	public String getComisionDescripcion() {
-		return comisionDescripcion;
+		return cuentaEntidad;
 	}
 	/**
 	 * @param comisionDescripcion the comisionDescripcion to set
 	 */
 	public void setComisionDescripcion(String comisionDescripcion) {
-		this.comisionDescripcion = comisionDescripcion;
+		this.cuentaEntidad = comisionDescripcion;
 	}
 	/**
 	 * @return the iban
@@ -334,7 +334,7 @@ public class FicherosAdeudosItem {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((bancosCodigo == null) ? 0 : bancosCodigo.hashCode());
-		result = prime * result + ((comisionDescripcion == null) ? 0 : comisionDescripcion.hashCode());
+		result = prime * result + ((cuentaEntidad == null) ? 0 : cuentaEntidad.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		result = prime * result + ((facturacion == null) ? 0 : facturacion.hashCode());
 		result = prime * result + ((fechaCreacion == null) ? 0 : fechaCreacion.hashCode());
@@ -374,10 +374,10 @@ public class FicherosAdeudosItem {
 				return false;
 		} else if (!bancosCodigo.equals(other.bancosCodigo))
 			return false;
-		if (comisionDescripcion == null) {
-			if (other.comisionDescripcion != null)
+		if (cuentaEntidad == null) {
+			if (other.cuentaEntidad != null)
 				return false;
-		} else if (!comisionDescripcion.equals(other.comisionDescripcion))
+		} else if (!cuentaEntidad.equals(other.cuentaEntidad))
 			return false;
 		if (descripcion == null) {
 			if (other.descripcion != null)
@@ -491,7 +491,7 @@ public class FicherosAdeudosItem {
 	public String toString() {
 		return "FicherosAdeudosItem [idInstitucion=" + idInstitucion + ", idDisqueteCargos=" + idDisqueteCargos
 				+ ", nombreFichero=" + nombreFichero + ", bancosCodigo=" + bancosCodigo + ", comisionDescripcion="
-				+ comisionDescripcion + ", iban=" + iban + ", fechaCreacion=" + fechaCreacion + ", fechaCreacionDesde="
+				+ cuentaEntidad + ", iban=" + iban + ", fechaCreacion=" + fechaCreacion + ", fechaCreacionDesde="
 				+ fechaCreacionDesde + ", fechaCreacionHasta=" + fechaCreacionHasta + ", idseriefacturacion="
 				+ idseriefacturacion + ", nombreabreviado=" + nombreabreviado + ", idprogramacion=" + idprogramacion
 				+ ", descripcion=" + descripcion + ", fechacargo=" + fechacargo + ", numerolineas=" + numerolineas
