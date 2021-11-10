@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface IFacturacionPySService {
 
@@ -15,8 +16,14 @@ public interface IFacturacionPySService {
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
 			HttpServletRequest request);
 
+	public UpdateResponseDTO guardarCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+											HttpServletRequest request);
+
+	public UpdateResponseDTO insertaActualizaSerie(List<UsosSufijosItem> usosSufijosItems,
+												   HttpServletRequest request);
+
 	public SeriesFacturacionDTO getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem,
-			HttpServletRequest request);
+													 HttpServletRequest request);
 
 	public DeleteResponseDTO eliminaSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems,
 			HttpServletRequest request);

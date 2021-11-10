@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,26 +28,14 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.AdmContador;
-import org.itcgae.siga.db.entities.AdmContadorExample;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.FacBancoinstitucion;
-import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
-import org.itcgae.siga.db.entities.FacFacturaExample;
-import org.itcgae.siga.db.entities.FacFormapagoserie;
-import org.itcgae.siga.db.entities.FacFormapagoserieExample;
-import org.itcgae.siga.db.entities.FacSeriefacturacion;
-import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
-import org.itcgae.siga.db.entities.FacSeriefacturacionBancoExample;
-import org.itcgae.siga.db.entities.FacSeriefacturacionExample;
-import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
-import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefac;
-import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefacExample;
+import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
+import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacDisquetecargosExtendsMapper;
@@ -62,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class FacturacionPySServiceImpl implements IFacturacionPySService {
@@ -106,6 +96,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacDisquetecargosExtendsMapper facDisquetecargosExtendsMapper;
+
+	@Autowired
+	private CenBancosMapper cenBancosMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -204,6 +197,164 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("getCuentasBancarias() -> Salida del servicio para obtener el listado de cuentas bancarias");
 
 		return cuentasBancariasDTO;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO guardarCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+													 HttpServletRequest request) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		AdmUsuarios usuario = new AdmUsuarios();
+		FacBancoinstitucion record = new FacBancoinstitucion();
+
+		LOGGER.info("guardarCuentaBancaria() -> Entrada al servicio para guardar una serie de facturación");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			// Logica
+
+			boolean isNew = UtilidadesString.esCadenaVacia(cuentaBancaria.getBancosCodigo());
+
+			if (isNew) {
+				record.setIdinstitucion(usuario.getIdinstitucion());
+				record.setBancosCodigo(""); // Buscar siguiente código.
+			} else {
+				FacBancoinstitucionKey bancoKey = new FacBancoinstitucionKey();
+				bancoKey.setIdinstitucion(usuario.getIdinstitucion());
+				bancoKey.setBancosCodigo(cuentaBancaria.getBancosCodigo());
+				record = facBancoinstitucionExtendsMapper.selectByPrimaryKey(bancoKey);
+			}
+
+			record.setFechamodificacion(new Date());
+			record.setUsumodificacion(usuario.getIdusuario());
+
+			String iban = cuentaBancaria.getIBAN().trim();
+
+			String codBanco = iban.substring(4, 8);
+			String codSucursal = iban.substring(8, 12);
+			String codControl = iban.substring(12, 14);
+			String numCuenta = iban.substring(14, 24);
+
+			/*
+			CenBancosExample bancoExample = new CenBancosExample();
+			bancoExample.createCriteria().andCodigoEqualTo(codBanco);
+			List<CenBancos> bancos = cenBancosMapper.selectByExample(bancoExample);
+			*/
+
+			record.setIban(iban);
+			record.setCodBanco(codBanco);
+			record.setCodSucursal(codSucursal);
+			record.setDigitocontrol(codControl);
+			record.setNumerocuenta(numCuenta);
+
+			if (isNew) {
+				LOGGER.info(
+						"guardarCuentaBancaria() / facBancoinstitucionExtendsMapper.insertSelective() -> Entrada a facBancoinstitucionExtendsMapper para obtener crear una nueva cuenta bancaria");
+
+				facBancoinstitucionExtendsMapper.insertSelective(record);
+			} else {
+
+				// Actualización de la tarjeta de comisión
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionImporte()))
+					record.setComisionimporte(new BigDecimal(cuentaBancaria.getComisionImporte()));
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionDescripcion()))
+					record.setComisiondescripcion(cuentaBancaria.getComisionDescripcion().trim());
+
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getIdTipoIVA())) {
+					record.setIdtipoiva(Integer.parseInt(cuentaBancaria.getIdTipoIVA()));
+				} else {
+					record.setIdtipoiva(null);
+				}
+
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
+					record.setAsientocontable(cuentaBancaria.getAsientoContable().trim());
+				} else {
+					record.setAsientocontable(null);
+				}
+
+				// Actualización de la tarjeta de configuración
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigFicherosEsquema()))
+					record.setConfigficherosesquema(Short.parseShort(cuentaBancaria.getConfigFicherosEsquema()));
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigFicherosSecuencia()))
+					record.setConfigficherossecuencia(Short.parseShort(cuentaBancaria.getConfigFicherosSecuencia()));
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigLugaresQueMasSecuencia()))
+					record.setConfiglugaresquemasecuencia(Short.parseShort(cuentaBancaria.getConfigLugaresQueMasSecuencia()));
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigConceptoAmpliado()))
+					record.setConfigconceptoampliado(Short.parseShort(cuentaBancaria.getConfigConceptoAmpliado()));
+
+				//
+				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
+					record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
+				} else {
+					record.setCuentacontabletarjeta(null);
+				}
+
+
+				LOGGER.info(
+						"guardarCuentaBancaria() / facBancoinstitucionExtendsMapper.updateByPrimaryKey() -> Entrada a facBancoinstitucionExtendsMapper para actualizar una cuenta bancaria");
+
+				facBancoinstitucionExtendsMapper.updateByPrimaryKey(record);
+			}
+
+			if (error.getCode() == null) {
+				error.setCode(200);
+				updateResponseDTO.setStatus(SigaConstants.OK);
+			}
+		}
+
+		updateResponseDTO.setId(record.getBancosCodigo());
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("guardarCuentaBancaria() -> Salida del servicio para guardar la serie de facturación");
+
+		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO insertaActualizaSerie(List<UsosSufijosItem> usosSufijosItems,
+												   HttpServletRequest request) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		Long idSerieFacturacion = null;
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("insertaActualizaSerie() -> Entrada al servicio para actualizar las series que usan la cuenta bancaria");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			Integer idUsuario = usuario.getIdusuario();
+			LOGGER.info(
+					"insertaActualizaSerie() / facSeriefacturacionBancoMapper.updateByExampleSelective() -> Entrada a facSeriefacturacionBancoMapper para actualizar las series que usan la cuenta bancaria");
+
+			// Logica
+			for (UsosSufijosItem usosSufijos : usosSufijosItems) {
+				FacSeriefacturacionBancoExample serieBancoExample = new FacSeriefacturacionBancoExample();
+
+				FacSeriefacturacionBanco record = new FacSeriefacturacionBanco();
+				record.setBancosCodigo(usosSufijos.getBancosCodigo());
+				record.setIdsufijo(Short.parseShort(usosSufijos.getIdSufijo()));
+
+				facSeriefacturacionBancoMapper.updateByExampleSelective(record, serieBancoExample);
+			}
+
+			if (error.getCode() == null) {
+				error.setCode(200);
+				updateResponseDTO.setStatus(SigaConstants.OK);
+			}
+		}
+
+		updateResponseDTO.setId(String.valueOf(idSerieFacturacion));
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("insertaActualizaSerie() -> Salida del servicio para actualizar las series que usan la cuenta bancaria");
+
+		return updateResponseDTO;
 	}
 
 	@Override

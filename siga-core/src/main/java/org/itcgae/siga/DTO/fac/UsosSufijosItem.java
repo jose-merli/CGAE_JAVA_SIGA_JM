@@ -6,6 +6,7 @@ public class UsosSufijosItem {
 
     private String tipo;
     private String idSerieFacturacion;
+    private String bancosCodigo;
     private String abreviatura;
     private String descripcion;
     private String idSufijo;
@@ -64,6 +65,14 @@ public class UsosSufijosItem {
         return idSufijo;
     }
 
+    public String getBancosCodigo() {
+        return bancosCodigo;
+    }
+
+    public void setBancosCodigo(String bancosCodigo) {
+        this.bancosCodigo = bancosCodigo;
+    }
+
     public void setIdSufijo(String idSufijo) {
         this.idSufijo = idSufijo;
     }
@@ -75,6 +84,7 @@ public class UsosSufijosItem {
         UsosSufijosItem that = (UsosSufijosItem) o;
         return Objects.equals(tipo, that.tipo) &&
                 Objects.equals(idSerieFacturacion, that.idSerieFacturacion) &&
+                Objects.equals(bancosCodigo, that.bancosCodigo) &&
                 Objects.equals(abreviatura, that.abreviatura) &&
                 Objects.equals(descripcion, that.descripcion) &&
                 Objects.equals(idSufijo, that.idSufijo) &&
@@ -84,7 +94,7 @@ public class UsosSufijosItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(tipo, idSerieFacturacion, abreviatura, descripcion, idSufijo, sufijo, numPendientes);
+        return Objects.hash(tipo, idSerieFacturacion, bancosCodigo, abreviatura, descripcion, idSufijo, sufijo, numPendientes);
     }
 
     @Override
@@ -92,6 +102,7 @@ public class UsosSufijosItem {
         return "UsosSufijosItem{" +
                 "tipo='" + tipo + '\'' +
                 ", idSerieFacturacion='" + idSerieFacturacion + '\'' +
+                ", bancosCodigo='" + bancosCodigo + '\'' +
                 ", abreviatura='" + abreviatura + '\'' +
                 ", descripcion='" + descripcion + '\'' +
                 ", idSufijo='" + idSufijo + '\'' +

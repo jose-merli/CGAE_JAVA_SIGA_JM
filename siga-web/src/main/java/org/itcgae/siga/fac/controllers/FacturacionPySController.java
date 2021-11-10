@@ -46,6 +46,16 @@ public class FacturacionPySController {
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.NO_CONTENT);
 	}
 
+	@PostMapping(value = "/insertaActualizaSerie")
+	ResponseEntity<UpdateResponseDTO> insertaActualizaSerie(@RequestBody List<UsosSufijosItem> usosSufijos,
+															  HttpServletRequest request) {
+		UpdateResponseDTO response = facturacionService.insertaActualizaSerie(usosSufijos, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
 	@PostMapping(value = "/eliminaSerieFacturacion")
 	ResponseEntity<DeleteResponseDTO> eliminaSerieFacturacion(
 			@RequestBody List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
