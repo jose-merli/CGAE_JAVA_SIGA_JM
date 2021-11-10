@@ -4,16 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
-import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
-import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
-import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
-import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
-import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
-import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
-import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
-import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
-import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
+import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 
@@ -47,6 +38,8 @@ public interface IFacturacionPySService {
 	public ContadorSeriesDTO getContadoresRectificativasSerie(HttpServletRequest request);
 
 	public FicherosAdeudosDTO getFicherosAdeudos(FicherosAdeudosItem item, HttpServletRequest request);
+
+	public UpdateResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request);
 
 	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request);
 }

@@ -134,6 +134,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		pagos.SELECT("sf.idseriefacturacion");
 		pagos.SELECT("sf.nombreabreviado abreviatura");
 		pagos.SELECT("sf.descripcion");
+		pagos.SELECT("s.idsufijo");
 		pagos.SELECT("s.sufijo || ' - ' || s.concepto sufijo ");
 
 		// Subsonsulta 1 de los pagos
@@ -164,6 +165,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		series.SELECT("sf.idseriefacturacion");
 		series.SELECT("sf.nombreabreviado abreviatura");
 		series.SELECT("sf.descripcion");
+		series.SELECT("s.idsufijo");
 		series.SELECT("s.sufijo || ' - ' || s.concepto sufijo");
 
 		// Subsonsulta 1 de las series

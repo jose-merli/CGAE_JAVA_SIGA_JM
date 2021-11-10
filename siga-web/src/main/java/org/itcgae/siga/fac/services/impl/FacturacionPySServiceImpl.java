@@ -23,7 +23,6 @@ import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
 import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
 import org.itcgae.siga.DTO.fac.UsosSufijosItem;
-import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -676,7 +675,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				if (error.getCode() == null) {
 					error.setCode(200);
-					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
 			}
@@ -1064,71 +1062,115 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return ficherosAdeudosDTO;
 	}
 
-	// @Override
+	@Override
 	@Transactional
-	public CreateResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request) {
-		CreateResponseDTO createResponseDTO = new CreateResponseDTO();
+	public UpdateResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 
 		Error error = new Error();
 		String dni, idInstitucion;
 
 		LOGGER.info("guardarContadorSerie() -> Entrada al servicio para crear un nuevo contador");
 
-		try {
-			// Conseguimos información del usuario logeado
-			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+		// Conseguimos información del usuario logeado
+		HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
 
-			dni = authentication.get("dni");
-			idInstitucion = authentication.get("idInstitucion");
+		dni = authentication.get("dni");
+		idInstitucion = authentication.get("idInstitucion");
 
-			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
-				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+		if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
+			List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					Integer idUsuario = usuarios.get(0).getIdusuario();
-					String idSerieFacturacion = contador.getIdSerieFacturacion();
-					LOGGER.info(
-							"guardarContadorSerie() / admContadorMapper.insertSelective() -> Entrada a admContadorMapper para crear un nuevo contador");
+			if (usuarios != null && !usuarios.isEmpty()) {
+				Integer idUsuario = usuarios.get(0).getIdusuario();
+				String idSerieFacturacion = contador.getIdSerieFacturacion();
+				LOGGER.info(
+						"guardarContadorSerie() / admContadorMapper.insertSelective() -> Entrada a admContadorMapper para crear un nuevo contador");
 
-					// Logica
-					AdmContador nuevoContador = new AdmContador();
-					nuevoContador.setNombre(contador.getNombre());
-					nuevoContador.setDescripcion(contador.getNombre());
-					nuevoContador.setPrefijo(contador.getPrefijo());
-					nuevoContador.setContador(Long.parseLong(contador.getContador()));
-					nuevoContador.setSufijo(contador.getSufijo());
+				// Logica
+				String idContador = getNextIdContador(idInstitucion, idSerieFacturacion, contador.getFacturaRectificativa()); // Obtener autoincremental
+
+				AdmContador nuevoContador = new AdmContador();
+				nuevoContador.setNombre(contador.getNombre());
+				nuevoContador.setDescripcion(contador.getNombre());
+				nuevoContador.setPrefijo(contador.getPrefijo());
+				nuevoContador.setContador(Long.parseLong(contador.getContador()));
+				nuevoContador.setSufijo(contador.getSufijo());
+				nuevoContador.setIdcontador(idContador);
+				nuevoContador.setIdmodulo(Short.parseShort("6"));
+
+				if (!contador.getFacturaRectificativa()) {
 					nuevoContador.setIdtabla("FAC_FACTURA");
-
-					nuevoContador.setIdcontador("FAC_" + idSerieFacturacion + "_" + "1");
-
 					nuevoContador.setIdcamposufijo("NUMEROFACTURA");
 					nuevoContador.setIdcampoprefijo("NUMEROFACTURA");
 					nuevoContador.setIdcampocontador("NUMEROFACTURA");
-
-					nuevoContador.setIdinstitucion(Short.parseShort(idInstitucion));
-					nuevoContador.setUsucreacion(idUsuario);
-					nuevoContador.setFechacreacion(new Date());
-					nuevoContador.setUsumodificacion(idUsuario);
-					nuevoContador.setFechamodificacion(new Date());
-					nuevoContador.setModificablecontador("1");
-
-					admContadorMapper.insertSelective(nuevoContador);
-
+				} else {
+					nuevoContador.setIdtabla("FAC_ABONO");
+					nuevoContador.setIdcamposufijo("NUMEROABONO");
+					nuevoContador.setIdcampoprefijo("NUMEROABONO");
+					nuevoContador.setIdcampocontador("NUMEROABONO");
 				}
+
+				nuevoContador.setIdinstitucion(Short.parseShort(idInstitucion));
+				nuevoContador.setUsucreacion(idUsuario);
+				nuevoContador.setFechacreacion(new Date());
+				nuevoContador.setUsumodificacion(idUsuario);
+				nuevoContador.setFechamodificacion(new Date());
+				nuevoContador.setModificablecontador("1");
+
+				admContadorMapper.insertSelective(nuevoContador);
+
+				FacSeriefacturacionKey serieKey = new FacSeriefacturacionKey();
+				serieKey.setIdinstitucion(Short.parseShort(idInstitucion));
+				serieKey.setIdseriefacturacion(Long.parseLong(idSerieFacturacion));
+				FacSeriefacturacion serieToUpdate = facSeriefacturacionExtendsMapper.selectByPrimaryKey(serieKey);
+				serieToUpdate.setIdcontador(idContador);
+				facSeriefacturacionExtendsMapper.updateByPrimaryKey(serieToUpdate);
+
+				error.setCode(200);
+				updateResponseDTO.setStatus(SigaConstants.OK);
+				updateResponseDTO.setId(idContador);
+			} else {
+				error.setCode(500);
+				updateResponseDTO.setStatus(SigaConstants.KO);
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"FacturacionPySServiceImpl.guardarContadorSerie() -> Se ha producido un error al crear un nuevo contador",
-					e);
+		} else {
 			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
+			updateResponseDTO.setStatus(SigaConstants.KO);
 		}
 
-		createResponseDTO.setError(error);
+		updateResponseDTO.setError(error);
 
 		LOGGER.info("guardarContadorSerie() -> Salida del servicio para crear un nuevo contador");
 
-		return createResponseDTO;
+		return updateResponseDTO;
+	}
+
+	private String getNextIdContador(String idInstitucion, String idSerieFacturacion, Boolean isRectificativa) {
+		String res = "FAC_" + (isRectificativa ? "ABONOS_" : "") + idSerieFacturacion.trim() + "_";
+		AdmContadorExample contadorExample = new AdmContadorExample();
+
+		if (!isRectificativa)
+			contadorExample.createCriteria()
+					.andIdinstitucionEqualTo(Short.parseShort(idInstitucion))
+					.andIdtablaEqualTo("FAC_FACTURA");
+		else
+			contadorExample.createCriteria()
+					.andIdinstitucionEqualTo(Short.parseShort(idInstitucion))
+					.andIdtablaEqualTo("FAC_ABONO").andIdcontadorNotEqualTo("FAC_ABONOS_FCS");
+
+		List<AdmContador> contadores = admContadorMapper.selectByExample(contadorExample);
+
+
+		if (contadores == null || contadores.isEmpty())
+			return res + "1";
+		else
+			return res + String.valueOf(contadores.stream()
+					.map(c -> c.getIdcontador())
+					.filter(c -> c.contains(res))
+					.mapToInt(c -> Integer.parseInt(c.replace(res, "")))
+					.max()
+					.orElse(0) + 1);
 	}
 
 	@Override

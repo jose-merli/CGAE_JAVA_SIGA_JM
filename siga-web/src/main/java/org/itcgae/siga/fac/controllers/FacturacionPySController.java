@@ -2,16 +2,8 @@ package org.itcgae.siga.fac.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
-import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
-import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
-import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
-import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
-import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
-import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
-import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
-import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
-import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
+import org.itcgae.siga.DTO.fac.*;
+import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
@@ -109,6 +101,15 @@ public class FacturacionPySController {
 			HttpServletRequest request) {
 		UpdateResponseDTO response = facturacionService.guardarFormasPagosSerie(formasPagos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/guardarContadorSerie")
+	ResponseEntity<UpdateResponseDTO> guardarContadorSerie(@RequestBody ContadorSeriesItem contador, HttpServletRequest request) {
+		UpdateResponseDTO response = facturacionService.guardarContadorSerie(contador, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@PostMapping(value = "/getFicherosAdeudos")

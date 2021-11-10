@@ -5,6 +5,8 @@ import java.util.Objects;
 public class ContadorSeriesItem {
 
     private String idSerieFacturacion;
+    private Boolean facturaRectificativa;
+
     private String idContador;
     private String nombre;
     private String prefijo;
@@ -59,12 +61,21 @@ public class ContadorSeriesItem {
         this.idSerieFacturacion = idSerieFacturacion;
     }
 
+    public Boolean getFacturaRectificativa() {
+        return facturaRectificativa;
+    }
+
+    public void setFacturaRectificativa(Boolean facturaRectificativa) {
+        this.facturaRectificativa = facturaRectificativa;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ContadorSeriesItem that = (ContadorSeriesItem) o;
         return Objects.equals(idSerieFacturacion, that.idSerieFacturacion) &&
+                Objects.equals(facturaRectificativa, that.facturaRectificativa) &&
                 Objects.equals(idContador, that.idContador) &&
                 Objects.equals(nombre, that.nombre) &&
                 Objects.equals(prefijo, that.prefijo) &&
@@ -74,13 +85,14 @@ public class ContadorSeriesItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idSerieFacturacion, idContador, nombre, prefijo, sufijo, contador);
+        return Objects.hash(idSerieFacturacion, facturaRectificativa, idContador, nombre, prefijo, sufijo, contador);
     }
 
     @Override
     public String toString() {
         return "ContadorSeriesItem{" +
                 "idSerieFacturacion='" + idSerieFacturacion + '\'' +
+                ", facturaRectificativa=" + facturaRectificativa +
                 ", idContador='" + idContador + '\'' +
                 ", nombre='" + nombre + '\'' +
                 ", prefijo='" + prefijo + '\'' +

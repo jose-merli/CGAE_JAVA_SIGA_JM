@@ -62,6 +62,7 @@ public interface FacSeriefacturacionExtendsMapper extends FacSeriefacturacionMap
 		@Result(column = "cod_banco", property = "codBanco", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "abreviatura", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idsufijo", property = "idSufijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "sufijo", property = "sufijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "num_pendientes", property = "numPendientes", jdbcType = JdbcType.VARCHAR),
 	})
