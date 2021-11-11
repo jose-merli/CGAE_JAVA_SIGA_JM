@@ -29,8 +29,9 @@ public class ScsIntercambiosExtendsProvider {
 		sql.FROM("cen_cargamasiva cm");
 		sql.FROM("adm_usuarios usu");
 		sql.WHERE("cm.USUMODIFICACION = usu.idusuario");
+		sql.WHERE("cm.idinstitucion = usu.idinstitucion");
 		sql.WHERE("cm.tipocarga = 'PD'");
-		sql.WHERE("usu.idinstitucion = " + idInstitucion.toString());
+		sql.WHERE("cm.idinstitucion = " + idInstitucion.toString());
 		
 		if(cargaMasivaItem.getFechaCarga() != null) {
 			String fechaCarga = "";
