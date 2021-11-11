@@ -375,6 +375,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		sql.SELECT_DISTINCT("pet.fecha as fechaSolicitud");
 		sql.SELECT_DISTINCT("pet.idPeticion as nSolicitud");
+		sql.SELECT_DISTINCT("pet.idPersona as idPersona");
 		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
 		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
 		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
@@ -528,6 +529,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 		sql.SELECT_DISTINCT("pet.fecha as fechaSolicitud");
 		sql.SELECT_DISTINCT("pet.idPeticion as nSolicitud");
+		sql.SELECT_DISTINCT("pet.idPersona as idPersona");
 		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
 		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
 		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");

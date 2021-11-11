@@ -179,7 +179,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
 
 		FichaCompraSuscripcionItem fichaCompleta = null;
-		Error error = new Error();
 
 		LOGGER.debug(
 				"getFichaCompraSuscripcion() -> Entrada al servicio para recuperar los detalles de la compra/suscripcion");
@@ -211,6 +210,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						ficha.setIdInstitucion(idInstitucion.toString());
 						ficha.setUsuModificacion(usuarios.get(0).getIdusuario().toString());
 						
+						//Si es colegiado se debe coger el idpersona del usuario conectado
 						if(!letrado.equals("N")) {
 							
 							LOGGER.info(
@@ -225,7 +225,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							LOGGER.info(
 									"getFichaCompraSuscripcion() / cenPersonaMapper.selectByExample -> Salida de CenPersonaMapper los detalles del usuario logeado");
 							
-							ficha.setIdPersona(persona.getIdpersona().toString());
+							ficha.setIdPersona(persona.getIdpersona());
 						}
 						
 						LOGGER.info(
@@ -268,7 +268,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								servicios = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, ficha.getnSolicitud(), usuarios.get(0).getIdlenguaje(), null);
 								ficha.setServicios(servicios);
 							}
-							else if(ficha.getProductos().size()>0){
+							else if(ficha.getServicios().size()>0){
 								servicios = ficha.getServicios();
 							}
 						}
@@ -342,6 +342,18 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 //				if(letrado.equals("N"))
 //					throw new Exception("El usuario conectado no es un colegiado y no deberia tener acceso a este servicio");
 				
+				Long idPersona = Long.valueOf(ficha.getIdPersona());
+				//Si es colegiado se debe coger el idpersona del usuario conectado
+				if(!letrado.equals("N")) {
+				CenPersonaExample persExample = new CenPersonaExample();
+
+				persExample.createCriteria().andNifcifEqualTo(dni);
+
+				List<CenPersona> personas = cenPersonaMapper.selectByExample(persExample);
+
+				idPersona = personas.get(0).getIdpersona();
+				}
+				
 				GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 
 				LOGGER.info(
@@ -351,7 +363,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				solicitud.setFecha(new Date());
 				solicitud.setIdinstitucion(idInstitucion);
-				solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+				solicitud.setIdpersona(idPersona);
 				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
 				solicitud.setTipopeticion("A");
 				// Caso en el que el colegio no necesite aprobacion para realizar compras o
@@ -365,7 +377,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
 				solicitud.setNumOperacion(
-						"1" + idInstitucion.toString() + ficha.getIdPersona() + fechaActual.toString()); // REVISAR: Necesita
+						"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR: Necesita
 																											// confirmacion
 																											// de que es
 																											// el valor
@@ -453,6 +465,19 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				// aplicacion
 //				if(letrado.equals("N"))
 //					throw new Exception("El usuario conectado no es un colegiado y no deberia tener acceso a este servicio");
+				
+				Long idPersona = Long.valueOf(ficha.getIdPersona());
+				String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+				//Si es colegiado se debe coger el idpersona del usuario conectado
+				if(!letrado.equals("N")) {
+				CenPersonaExample persExample = new CenPersonaExample();
+
+				persExample.createCriteria().andNifcifEqualTo(dni);
+
+				List<CenPersona> personas = cenPersonaMapper.selectByExample(persExample);
+
+				idPersona = personas.get(0).getIdpersona();
+				}
 
 				GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 
@@ -463,7 +488,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				solicitud.setFecha(new Date());
 				solicitud.setIdinstitucion(idInstitucion);
-				solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+				solicitud.setIdpersona(idPersona);
 				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
 				solicitud.setTipopeticion("A");
 				// Caso en el que el colegio no necesite aprobacion para realizar compras o
@@ -476,7 +501,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
 				solicitud.setNumOperacion(
-						"1" + idInstitucion.toString() + ficha.getIdPersona() + fechaActual.toString()); // REVISAR:
+						"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR:
 																											// Necesita
 																											// confirmacion
 																											// de que es
@@ -547,6 +572,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"aprobarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty()) {
+					
+					
+					
 					LOGGER.info(
 							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Entrada a pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
 					
@@ -561,13 +589,17 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					LOGGER.info(
 							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
 
+					
 					if(solicitud==null) {
 						this.solicitarSuscripcion(request, ficha);
 					}
 					
+					
 					//En el caso que se realice la aprobación desde la pantalla "Suscripcion de servicios"
-					if(ficha.getIdPersona()==null) {
-						ficha.setIdPersona(solicitud.getIdpersona().toString());
+					if(solicitud==null) {
+						this.solicitarCompra(request, ficha);
+						solicitud = pysPeticioncomprasuscripcionMapper
+								.selectByPrimaryKey(solicitudKey);
 					}
 
 					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
@@ -585,7 +617,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						suscripcion.setFechasuscripcion(new Date());
 						suscripcion.setFechamodificacion(new Date());
 						suscripcion.setIdinstitucion(idInstitucion);
-						suscripcion.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+						suscripcion.setIdpersona(solicitud.getIdpersona());
 						suscripcion.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
 						suscripcion.setUsumodificacion(usuarios.get(0).getIdusuario());
 	
@@ -594,6 +626,21 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							suscripcion.setIdservicio((long) servicio.getIdServicio());
 							suscripcion.setIdtiposervicios((short) servicio.getIdTipoServicios());
 							suscripcion.setIdserviciosinstitucion((long) servicio.getIdServiciosInstitucion());
+							
+							//Obtenemos el id para la nueva suscripcion
+							PysSuscripcionExample susExample = new PysSuscripcionExample();
+							
+							susExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+							
+							LOGGER.info(
+									"aprobarSuscripcion() / pysSuscripcionMapper.countByExample() -> Entrada a pysSuscripcionMapper para obtener el id para la nueva suscripcion");
+							
+							long newIdSus = pysSuscripcionMapper.countByExample(susExample) + 1;
+
+							LOGGER.info(
+									"aprobarSuscripcion() / pysSuscripcionMapper.countByExample() -> Salida de pysSuscripcionMapper para obtener el id para la nueva suscripcion");
+							
+							suscripcion.setIdsuscripcion(newIdSus);
 							suscripcion.setDescripcion(servicio.getDescripcion());
 							//Si se ha seleccionado como forma de pago "No facturable"
 							if(ficha.getIdFormaPagoSeleccionada().equals("-1")) {
@@ -684,12 +731,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					if(solicitud==null) {
 						this.solicitarCompra(request, ficha);
+						solicitud = pysPeticioncomprasuscripcionMapper
+								.selectByPrimaryKey(solicitudKey);
 					}
 					
-					//En el caso que se realice la aprobación desde la pantalla "Compra de productos"
-					if(ficha.getIdPersona()==null) {
-						ficha.setIdPersona(solicitud.getIdpersona().toString());
-					}
 
 					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 					
@@ -706,7 +751,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						compra.setFecha(new Date());
 						compra.setFechamodificacion(new Date());
 						compra.setIdinstitucion(idInstitucion);
-						compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+						compra.setIdpersona(solicitud.getIdpersona());
 						compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
 						compra.setUsumodificacion(usuarios.get(0).getIdusuario());
 	
@@ -1034,7 +1079,20 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				PysProductossolicitados productoSolicitado = new PysProductossolicitados();
 
 				productoSolicitado.setIdinstitucion(idInstitucion);
-				productoSolicitado.setIdpersona(Long.valueOf(peticion.getIdPersona()));
+				
+				Long idPersona = Long.valueOf(peticion.getIdPersona());
+				String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+				//Si es colegiado se debe coger el idpersona del usuario conectado
+				if(!letrado.equals("N")) {
+				CenPersonaExample persExample = new CenPersonaExample();
+
+				persExample.createCriteria().andNifcifEqualTo(dni);
+
+				List<CenPersona> personas = cenPersonaMapper.selectByExample(persExample);
+
+				idPersona = personas.get(0).getIdpersona();
+				}
+				productoSolicitado.setIdpersona(idPersona);
 				productoSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
 				//Si se ha seleccionado como forma de pago "No facturable"
 				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
@@ -2062,7 +2120,21 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				PysServiciossolicitados servicioSolicitado = new PysServiciossolicitados();
 
 				servicioSolicitado.setIdinstitucion(idInstitucion);
-				servicioSolicitado.setIdpersona(Long.valueOf(peticion.getIdPersona()));
+
+				Long idPersona = Long.valueOf(peticion.getIdPersona());
+				String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+				//Si es colegiado se debe coger el idpersona del usuario conectado
+				if(!letrado.equals("N")) {
+					CenPersonaExample persExample = new CenPersonaExample();
+	
+					persExample.createCriteria().andNifcifEqualTo(dni);
+	
+					List<CenPersona> personas = cenPersonaMapper.selectByExample(persExample);
+	
+					idPersona = personas.get(0).getIdpersona();
+				}
+				
+				servicioSolicitado.setIdpersona(idPersona);
 				servicioSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
 				//Si se ha seleccionado como forma de pago "No facturable"
 //				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {

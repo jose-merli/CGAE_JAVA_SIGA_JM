@@ -7,7 +7,7 @@ public class FichaCompraSuscripcionItem {
 
 	// TARJETA CLIENTE
 	private String idInstitucion;
-	private String idPersona;
+	private Long idPersona;
 	private String nombre;
 	private String apellidos;
 	private String idtipoidentificacion;
@@ -49,10 +49,10 @@ public class FichaCompraSuscripcionItem {
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-	public String getIdPersona() {
+	public Long getIdPersona() {
 		return idPersona;
 	}
-	public void setIdPersona(String idPersona) {
+	public void setIdPersona(Long idPersona) {
 		this.idPersona = idPersona;
 	}
 	public String getNombre() {
