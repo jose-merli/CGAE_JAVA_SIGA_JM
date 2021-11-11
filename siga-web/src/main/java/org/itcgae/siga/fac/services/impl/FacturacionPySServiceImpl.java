@@ -23,6 +23,7 @@ import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
 import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
 import org.itcgae.siga.DTO.fac.UsosSufijosItem;
+import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -32,6 +33,9 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenBancos;
+import org.itcgae.siga.db.entities.CenBancosExample;
+import org.itcgae.siga.db.entities.CenSucursalesExample;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
 import org.itcgae.siga.db.entities.FacFacturaExample;
@@ -187,48 +191,53 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public UpdateResponseDTO guardarCuentaBancaria(CuentasBancariasItem cuentaBancaria,
-													 HttpServletRequest request) throws Exception {
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+	public CuentasBancariasDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+												   HttpServletRequest request) throws Exception {
+		CuentasBancariasDTO cuentasBancariasDTO = new CuentasBancariasDTO();
 		Error error = new Error();
 		AdmUsuarios usuario = new AdmUsuarios();
 		FacBancoinstitucion record = new FacBancoinstitucion();
 
-		LOGGER.info("guardarCuentaBancaria() -> Entrada al servicio para guardar una serie de facturación");
+		LOGGER.info("insertaCuentaBancaria() -> Entrada al servicio para crear una cuenta bancaria");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
 
 		if (usuario != null) {
 			// Logica
-
-			boolean isNew = UtilidadesString.esCadenaVacia(cuentaBancaria.getBancosCodigo());
-
-			if (isNew) {
-				record.setIdinstitucion(usuario.getIdinstitucion());
-				record.setBancosCodigo(""); // Buscar siguiente código.
-			} else {
-				FacBancoinstitucionKey bancoKey = new FacBancoinstitucionKey();
-				bancoKey.setIdinstitucion(usuario.getIdinstitucion());
-				bancoKey.setBancosCodigo(cuentaBancaria.getBancosCodigo());
-				record = facBancoinstitucionExtendsMapper.selectByPrimaryKey(bancoKey);
-			}
+			record.setIdinstitucion(usuario.getIdinstitucion());
+			record.setBancosCodigo(facBancoinstitucionExtendsMapper.getNextIdCuentaBancaria(record.getIdinstitucion()).getNewId());
 
 			record.setFechamodificacion(new Date());
 			record.setUsumodificacion(usuario.getIdusuario());
 
-			String iban = cuentaBancaria.getIBAN().trim();
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
+				record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
+			} else {
+				record.setCuentacontabletarjeta(null);
+			}
+
+			String iban = cuentaBancaria.getIBAN().replaceAll(" ", "").trim();
+			if (!iban.substring(0, 2).equals("ES"))
+				throw new Exception("El IBAN debe pertenecer a una cuenta bancaria española.");
 
 			String codBanco = iban.substring(4, 8);
 			String codSucursal = iban.substring(8, 12);
 			String codControl = iban.substring(12, 14);
 			String numCuenta = iban.substring(14, 24);
 
-			/*
+			// Comprobación del banco
 			CenBancosExample bancoExample = new CenBancosExample();
 			bancoExample.createCriteria().andCodigoEqualTo(codBanco);
 			List<CenBancos> bancos = cenBancosMapper.selectByExample(bancoExample);
-			*/
+			if (bancos == null || bancos.isEmpty())
+				throw new Exception("El código del banco es incorrecto.");
+
+			// Conprobación de la sucursal
+			CenSucursalesExample sucursalesExample = new CenSucursalesExample();
+			sucursalesExample.createCriteria().andCodSucursalEqualTo(codSucursal);
+			if (bancos == null || bancos.isEmpty())
+				throw new Exception("El código de la sucursal es incorrecto.");
 
 			record.setIban(iban);
 			record.setCodBanco(codBanco);
@@ -236,65 +245,101 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			record.setDigitocontrol(codControl);
 			record.setNumerocuenta(numCuenta);
 
-			if (isNew) {
-				LOGGER.info(
-						"guardarCuentaBancaria() / facBancoinstitucionExtendsMapper.insertSelective() -> Entrada a facBancoinstitucionExtendsMapper para obtener crear una nueva cuenta bancaria");
+			LOGGER.info(
+					"insertaCuentaBancaria() / facBancoinstitucionExtendsMapper.insertSelective() -> Entrada a facBancoinstitucionExtendsMapper para crear una nueva cuenta bancaria");
 
-				facBancoinstitucionExtendsMapper.insertSelective(record);
+			facBancoinstitucionExtendsMapper.insertSelective(record);
+		}
+
+		List<CuentasBancariasItem> cuentasBancariasItems = facBancoinstitucionExtendsMapper.getCuentasBancarias(usuario.getIdinstitucion()).stream()
+				.filter(bi -> bi.getBancosCodigo().equals(record.getBancosCodigo())).collect(Collectors.toList());
+
+		cuentasBancariasDTO.setCuentasBancariasITem(cuentasBancariasItems);
+		cuentasBancariasDTO.setError(error);
+
+		LOGGER.info("insertaCuentaBancaria() -> Salida del servicio para crear una cuenta bancaria");
+
+		return cuentasBancariasDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO actualizaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+													 HttpServletRequest request) throws Exception {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		AdmUsuarios usuario = new AdmUsuarios();
+		FacBancoinstitucion record = new FacBancoinstitucion();
+
+		LOGGER.info("actualizaCuentaBancaria() -> Entrada al servicio para actualizar una cuenta bancaria");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			// Logica
+
+			FacBancoinstitucionKey bancoKey = new FacBancoinstitucionKey();
+			bancoKey.setIdinstitucion(usuario.getIdinstitucion());
+			bancoKey.setBancosCodigo(cuentaBancaria.getBancosCodigo());
+			record = facBancoinstitucionExtendsMapper.selectByPrimaryKey(bancoKey);
+
+			record.setFechamodificacion(new Date());
+			record.setUsumodificacion(usuario.getIdusuario());
+
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
+				record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
 			} else {
-
-				// Actualización de la tarjeta de comisión
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionImporte()))
-					record.setComisionimporte(new BigDecimal(cuentaBancaria.getComisionImporte()));
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionDescripcion()))
-					record.setComisiondescripcion(cuentaBancaria.getComisionDescripcion().trim());
-
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getIdTipoIVA())) {
-					record.setIdtipoiva(Integer.parseInt(cuentaBancaria.getIdTipoIVA()));
-				} else {
-					record.setIdtipoiva(null);
-				}
-
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
-					record.setAsientocontable(cuentaBancaria.getAsientoContable().trim());
-				} else {
-					record.setAsientocontable(null);
-				}
-
-				// Actualización de la tarjeta de configuración
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigFicherosEsquema()))
-					record.setConfigficherosesquema(Short.parseShort(cuentaBancaria.getConfigFicherosEsquema()));
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigFicherosSecuencia()))
-					record.setConfigficherossecuencia(Short.parseShort(cuentaBancaria.getConfigFicherosSecuencia()));
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigLugaresQueMasSecuencia()))
-					record.setConfiglugaresquemasecuencia(Short.parseShort(cuentaBancaria.getConfigLugaresQueMasSecuencia()));
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigConceptoAmpliado()))
-					record.setConfigconceptoampliado(Short.parseShort(cuentaBancaria.getConfigConceptoAmpliado()));
-
-				//
-				if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
-					record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
-				} else {
-					record.setCuentacontabletarjeta(null);
-				}
-
-
-				LOGGER.info(
-						"guardarCuentaBancaria() / facBancoinstitucionExtendsMapper.updateByPrimaryKey() -> Entrada a facBancoinstitucionExtendsMapper para actualizar una cuenta bancaria");
-
-				facBancoinstitucionExtendsMapper.updateByPrimaryKey(record);
+				record.setCuentacontabletarjeta(null);
 			}
 
-			if (error.getCode() == null) {
-				error.setCode(200);
-				updateResponseDTO.setStatus(SigaConstants.OK);
+			// Actualización de la tarjeta de comisión
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionImporte()))
+				record.setComisionimporte(new BigDecimal(cuentaBancaria.getComisionImporte()));
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionDescripcion()))
+				record.setComisiondescripcion(cuentaBancaria.getComisionDescripcion().trim());
+
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getIdTipoIVA())) {
+				record.setIdtipoiva(Integer.parseInt(cuentaBancaria.getIdTipoIVA()));
+			} else {
+				record.setIdtipoiva(null);
 			}
+
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
+				record.setAsientocontable(cuentaBancaria.getAsientoContable().trim());
+			} else {
+				record.setAsientocontable(null);
+			}
+
+			// Actualización de la tarjeta de configuración
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigFicherosEsquema()))
+				record.setConfigficherosesquema(Short.parseShort(cuentaBancaria.getConfigFicherosEsquema()));
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigFicherosSecuencia()))
+				record.setConfigficherossecuencia(Short.parseShort(cuentaBancaria.getConfigFicherosSecuencia()));
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigLugaresQueMasSecuencia()))
+				record.setConfiglugaresquemasecuencia(Short.parseShort(cuentaBancaria.getConfigLugaresQueMasSecuencia()));
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getConfigConceptoAmpliado()))
+				record.setConfigconceptoampliado(Short.parseShort(cuentaBancaria.getConfigConceptoAmpliado()));
+
+			// Actualizar tarjeta de uso en ficheros
+			record.setSjcs((cuentaBancaria.getSjcs() != null && cuentaBancaria.getSjcs()) ? "1" : "0");
+
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getIdSufijoSjcs())) {
+				record.setIdsufijosjcs(Short.parseShort(cuentaBancaria.getIdSufijoSjcs()));
+			} else {
+				record.setIdsufijosjcs(null);
+			}
+
+			LOGGER.info(
+					"actualizaCuentaBancaria() / facBancoinstitucionExtendsMapper.updateByPrimaryKey() -> Entrada a facBancoinstitucionExtendsMapper para actualizar una cuenta bancaria");
+
+			facBancoinstitucionExtendsMapper.updateByPrimaryKey(record);
 		}
 
 		updateResponseDTO.setId(record.getBancosCodigo());
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("guardarCuentaBancaria() -> Salida del servicio para guardar la serie de facturación");
+		LOGGER.info("actualizaCuentaBancaria() -> Salida del servicio para actualizar una cuenta bancaria");
 
 		return updateResponseDTO;
 	}
@@ -305,7 +350,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 												   HttpServletRequest request) throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
-		Long idSerieFacturacion = null;
 		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.info("insertaActualizaSerie() -> Entrada al servicio para actualizar las series que usan la cuenta bancaria");
@@ -321,6 +365,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// Logica
 			for (UsosSufijosItem usosSufijos : usosSufijosItems) {
 				FacSeriefacturacionBancoExample serieBancoExample = new FacSeriefacturacionBancoExample();
+				serieBancoExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion()).andIdseriefacturacionEqualTo(Long.parseLong(usosSufijos.getIdSerieFacturacion()));
 
 				FacSeriefacturacionBanco record = new FacSeriefacturacionBanco();
 				record.setBancosCodigo(usosSufijos.getBancosCodigo());
@@ -329,13 +374,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				facSeriefacturacionBancoMapper.updateByExampleSelective(record, serieBancoExample);
 			}
 
-			if (error.getCode() == null) {
-				error.setCode(200);
-				updateResponseDTO.setStatus(SigaConstants.OK);
-			}
 		}
 
-		updateResponseDTO.setId(String.valueOf(idSerieFacturacion));
 		updateResponseDTO.setError(error);
 
 		LOGGER.info("insertaActualizaSerie() -> Salida del servicio para actualizar las series que usan la cuenta bancaria");
@@ -601,7 +641,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				serieToUpdate.setObservaciones(null);
 			}
 
-			if (serieFacturacion.getSerieGenerica()) {
+			if (serieFacturacion.getSerieGenerica() != null && serieFacturacion.getSerieGenerica()) {
 				serieToUpdate.setTiposerie("G");
 			} else {
 				serieToUpdate.setTiposerie(null);
@@ -617,7 +657,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			// 3. Actualizar generación de ficheros
-			serieToUpdate.setGenerarpdf(serieFacturacion.getGenerarPDF() ? "1" : "0");
+			serieToUpdate.setGenerarpdf((serieFacturacion.getGenerarPDF() != null && serieFacturacion.getGenerarPDF()) ? "1" : "0");
 			if (serieFacturacion.getIdModeloFactura() != null
 					&& !serieFacturacion.getIdModeloFactura().trim().isEmpty()) {
 				serieToUpdate.setIdmodelofactura(Long.parseLong(serieFacturacion.getIdModeloFactura()));
@@ -633,7 +673,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			// 4. Envío de facturas
-			serieToUpdate.setEnviofacturas(serieFacturacion.getEnvioFacturas() ? "1" : "0");
+			serieToUpdate.setEnviofacturas((serieFacturacion.getEnvioFacturas() != null && serieFacturacion.getEnvioFacturas()) ? "1" : "0");
 
 			if (serieFacturacion.getIdPlantillaMail() != null
 					&& !serieFacturacion.getIdPlantillaMail().trim().isEmpty()) {
@@ -646,7 +686,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			// 5. Actualizar traspaso de facturas
-			serieToUpdate.setTraspasofacturas(serieFacturacion.getTraspasoFacturas() ? "1" : "0");
+			serieToUpdate.setTraspasofacturas((serieFacturacion.getTraspasoFacturas() != null && serieFacturacion.getTraspasoFacturas()) ? "1" : "0");
 
 			if (serieFacturacion.getTraspasoPlantilla() != null
 					&& !serieFacturacion.getTraspasoPlantilla().trim().isEmpty()

@@ -47,7 +47,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -61,7 +61,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -75,7 +75,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -89,7 +89,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -104,7 +104,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -119,7 +119,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -134,7 +134,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -149,7 +149,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -164,7 +164,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -179,7 +179,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -193,7 +193,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -207,7 +207,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -221,7 +221,7 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

@@ -17,8 +17,11 @@ public interface IFacturacionPySService {
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
 			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO guardarCuentaBancaria(CuentasBancariasItem cuentaBancaria,
-											HttpServletRequest request) throws Exception;
+	public CuentasBancariasDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+											  HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO actualizaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+											  HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO insertaActualizaSerie(List<UsosSufijosItem> usosSufijosItems,
 												   HttpServletRequest request) throws Exception;

@@ -36,7 +36,7 @@ public class FacturacionPySController {
 			response = facturacionService.getCuentasBancarias(request);
 			return new ResponseEntity<CuentasBancariasDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<CuentasBancariasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -50,7 +50,7 @@ public class FacturacionPySController {
 			response = facturacionService.getSeriesFacturacion(serieFacturacionItem, request);
 			return new ResponseEntity<SeriesFacturacionDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<SeriesFacturacionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -64,8 +64,36 @@ public class FacturacionPySController {
 			response = this.facturacionService.borrarCuentasBancarias(cuentasBancarias, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+    @PostMapping(value = "/insertaCuentaBancaria")
+    ResponseEntity<CuentasBancariasDTO> insertaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
+                                                             HttpServletRequest request) {
+		CuentasBancariasDTO response = new CuentasBancariasDTO();
+
+        try {
+            response = this.facturacionService.insertaCuentaBancaria(cuentaBancaria, request);
+            return new ResponseEntity<CuentasBancariasDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<CuentasBancariasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+	@PostMapping(value = "/actualizaCuentaBancaria")
+	ResponseEntity<UpdateResponseDTO> actualizaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
+															HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+
+		try {
+			response = this.facturacionService.actualizaCuentaBancaria(cuentaBancaria, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -78,7 +106,7 @@ public class FacturacionPySController {
 			response = facturacionService.insertaActualizaSerie(usosSufijos, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -92,7 +120,7 @@ public class FacturacionPySController {
 			response = facturacionService.eliminaSerieFacturacion(serieFacturacionItems, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -106,7 +134,7 @@ public class FacturacionPySController {
 			response = facturacionService.reactivarSerieFacturacion(serieFacturacionItems, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -121,7 +149,7 @@ public class FacturacionPySController {
 			response = facturacionService.guardarSerieFacturacion(serieFacturacion, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -135,7 +163,7 @@ public class FacturacionPySController {
 			response = facturacionService.getDestinatariosSeries(idSerieFacturacion, request);
 			return new ResponseEntity<DestinatariosSeriesDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<DestinatariosSeriesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -148,7 +176,7 @@ public class FacturacionPySController {
 			response = facturacionService.getContadoresSerie(request);
 			return new ResponseEntity<ContadorSeriesDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ContadorSeriesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -161,7 +189,7 @@ public class FacturacionPySController {
 			response = facturacionService.getContadoresRectificativasSerie(request);
 			return new ResponseEntity<ContadorSeriesDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ContadorSeriesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -175,7 +203,7 @@ public class FacturacionPySController {
 			response = facturacionService.guardarEtiquetasSerieFacturacion(etiquetas, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -189,7 +217,7 @@ public class FacturacionPySController {
 			response = facturacionService.guardarFormasPagosSerie(formasPagos, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -202,7 +230,7 @@ public class FacturacionPySController {
 			response = response = facturacionService.guardarContadorSerie(contador, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -216,7 +244,7 @@ public class FacturacionPySController {
 			response = facturacionService.getFicherosAdeudos(item, request);
 			return new ResponseEntity<FicherosAdeudosDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<FicherosAdeudosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -229,7 +257,7 @@ public class FacturacionPySController {
 			response = facturacionService.getUsosSufijos(codBanco, request);
 			return new ResponseEntity<UsosSufijosDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.toString()));
+			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<UsosSufijosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
