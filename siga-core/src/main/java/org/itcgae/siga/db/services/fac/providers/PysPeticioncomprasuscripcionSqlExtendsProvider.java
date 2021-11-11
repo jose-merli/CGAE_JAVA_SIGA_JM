@@ -139,8 +139,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			
 
 			sql.INNER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = prodSol.idtipoiva");
-		}
-		else if (peticion.getServicios() != null && peticion.getServicios().size() > 0){
+		}else if (peticion.getServicios() != null && peticion.getServicios().size() > 0){
 			SQL sqlPagos = new SQL();
 			// Con listagg logramos que los distintos ids de formas de pago se muestren en
 			// unica fila
@@ -164,7 +163,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ servicio.getIdServiciosInstitucion() + ") \r\n";
 				fromPagosComunes += "intersect\r\n";
 				
-				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and servIns.idtiposervicios="+servicio.getIdTipoServicios()+
+				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and servIns.idtiposervicios ="+servicio.getIdTipoServicios()+
 						" and servIns.idserviciosinstitucion="+servicio.getIdServiciosInstitucion()+") OR";
 				
 			}
@@ -177,9 +176,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
 			//Obtenemos el id de la forma de pago utilizada.
-			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.FECHAMODIFICACION) as idFormaPagoSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.IDPETICION) as idFormaPagoSeleccionada");
 			//Obtenemos la cuenta bancaria
-			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.FECHAMODIFICACION) as idCuentaBancSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.IDPETICION) as idCuentaBancSeleccionada");
 			
 				
 			sql.INNER_JOIN("pys_serviciossolicitados servSol on servSol.idinstitucion = pet.idinstitucion and servSol.idpeticion = pet.idpeticion");
@@ -334,9 +333,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
 			//Obtenemos el id de la forma de pago utilizada.
-			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.FECHARECEPCIONSOLICITUD) as idFormaPagoSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.IDPETICION) as idFormaPagoSeleccionada");
 			//Obtenemos la cuenta bancaria
-			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.FECHARECEPCIONSOLICITUD) as idCuentaBancSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.IDPETICION) as idCuentaBancSeleccionada");
 			
 				
 			sql.INNER_JOIN("pys_serviciossolicitados servSol on servSol.idinstitucion = pet.idinstitucion and servSol.idpeticion = pet.idpeticion");
