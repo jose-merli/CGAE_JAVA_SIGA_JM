@@ -11,7 +11,8 @@ public class CenTratamientoSqlExtendsProvider extends CenTratamientoSqlProvider{
 		SQL sql = new SQL();
 		
 		sql.SELECT("T.IDTRATAMIENTO AS VALUE");
-		sql.SELECT("F_SIGA_GETRECURSO(DESCRIPCION," + idLenguage + ") AS LABEL");
+		sql.SELECT("CASE WHEN T.OBSERVACIONES IS NOT NULL THEN F_SIGA_GETRECURSO(DESCRIPCION," + idLenguage + ") ||"
+				+ "' (' || T.OBSERVACIONES || ')' ELSE F_SIGA_GETRECURSO(DESCRIPCION," + idLenguage + ") END AS LABEL");
 		sql.FROM("CEN_TRATAMIENTO T");
 		sql.ORDER_BY("LABEL");
 		return sql.toString();
