@@ -17,5 +17,6 @@ public interface ITiposServiciosService {
 	public InsertResponseDTO crearServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request);
 	public DeleteResponseDTO modificarServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request);
 	public ServicioDTO activarDesactivarServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request);
+	ComboDTO searchTiposServiciosByIdCategoriaMultiple(HttpServletRequest request, String idCategoria);
 
 }

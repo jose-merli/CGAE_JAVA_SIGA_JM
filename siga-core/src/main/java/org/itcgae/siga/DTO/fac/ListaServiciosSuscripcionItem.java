@@ -30,6 +30,7 @@ public class ListaServiciosSuscripcionItem {
 	
 	private String idPeticion;
 	private String idPersona;
+	private String idComboPrecio;
 	
 	public String getOrden() {
 		return orden;

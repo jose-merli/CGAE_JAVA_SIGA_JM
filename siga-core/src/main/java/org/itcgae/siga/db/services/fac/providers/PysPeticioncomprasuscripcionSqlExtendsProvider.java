@@ -3,7 +3,9 @@ package org.itcgae.siga.db.services.fac.providers;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.ibatis.jdbc.SQL;
@@ -137,8 +139,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			
 
 			sql.INNER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = prodSol.idtipoiva");
-		}
-		else if (peticion.getServicios() != null && peticion.getServicios().size() > 0){
+		}else if (peticion.getServicios() != null && peticion.getServicios().size() > 0){
 			SQL sqlPagos = new SQL();
 			// Con listagg logramos que los distintos ids de formas de pago se muestren en
 			// unica fila
@@ -162,7 +163,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ servicio.getIdServiciosInstitucion() + ") \r\n";
 				fromPagosComunes += "intersect\r\n";
 				
-				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and servIns.idtiposervicios="+servicio.getIdTipoServicios()+
+				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and servIns.idtiposervicios ="+servicio.getIdTipoServicios()+
 						" and servIns.idserviciosinstitucion="+servicio.getIdServiciosInstitucion()+") OR";
 				
 			}
@@ -175,9 +176,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
 			//Obtenemos el id de la forma de pago utilizada.
-			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.FECHAMODIFICACION) as idFormaPagoSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.IDPETICION) as idFormaPagoSeleccionada");
 			//Obtenemos la cuenta bancaria
-			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.FECHAMODIFICACION) as idCuentaBancSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.IDPETICION) as idCuentaBancSeleccionada");
 			
 				
 			sql.INNER_JOIN("pys_serviciossolicitados servSol on servSol.idinstitucion = pet.idinstitucion and servSol.idpeticion = pet.idpeticion");
@@ -332,9 +333,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
 			//Obtenemos el id de la forma de pago utilizada.
-			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.FECHARECEPCIONSOLICITUD) as idFormaPagoSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.IDPETICION) as idFormaPagoSeleccionada");
 			//Obtenemos la cuenta bancaria
-			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.FECHARECEPCIONSOLICITUD) as idCuentaBancSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.IDPETICION) as idCuentaBancSeleccionada");
 			
 				
 			sql.INNER_JOIN("pys_serviciossolicitados servSol on servSol.idinstitucion = pet.idinstitucion and servSol.idpeticion = pet.idpeticion");
@@ -374,6 +375,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		sql.SELECT_DISTINCT("pet.fecha as fechaSolicitud");
 		sql.SELECT_DISTINCT("pet.idPeticion as nSolicitud");
+		sql.SELECT_DISTINCT("pet.idPersona as idPersona");
 		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
 		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
 		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
@@ -418,15 +420,18 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 					break;
 				case "2":
 					sql.WHERE("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null");
+							+ "				ELSE null END is not null and"
+							+ "				and compra.fecha is null");
 					break;
 				case "3":
 					sql.WHERE("compra.fecha is not null and CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is null");
+							+ "				ELSE null END is null and"
+							+ "				compra.fechaBaja is null");
 					break;
 				case "4":
 					sql.WHERE("CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null and compra.fechaBaja is null");
+							+ "				ELSE null END is not null and compra.fechaBaja is null"
+							+ "				and compra.fecha is not null");
 					break;
 				case "5":
 					sql.WHERE("compra.fechaBaja is not null");
@@ -524,6 +529,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 		sql.SELECT_DISTINCT("pet.fecha as fechaSolicitud");
 		sql.SELECT_DISTINCT("pet.idPeticion as nSolicitud");
+		sql.SELECT_DISTINCT("pet.idPersona as idPersona");
 		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
 		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
 		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
@@ -572,10 +578,10 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				"pys_peticioncomprasuscripcion petBaja on petBaja.idinstitucion = pet.idinstitucion and petBaja.idpeticionalta = pet.idpeticion");
 		sql.LEFT_OUTER_JOIN("fac_facturacionSuscripcion factSus on factSus.idservicio = suscripcion.idservicio \r\n"
 				+ "and factSus.idTipoServicios = suscripcion.idTipoServicios and factSus.idServiciosInstitucion = suscripcion.idServiciosInstitucion "
-				+ "and factSus.idinstitucion = suscripcion.idinstitucion and factSus.idsuscripcion = suscripcion.idpeticion");
+				+ "and factSus.idinstitucion = suscripcion.idinstitucion and factSus.idsuscripcion = suscripcion.idsuscripcion");
 		sql.LEFT_OUTER_JOIN("fac_facturacionSuscripcion factSusBis ON (factSusBis.idservicio = suscripcion.idservicio \r\n"
 				+ "and factSusBis.idTipoServicios = suscripcion.idTipoServicios and factSusBis.idServiciosInstitucion = suscripcion.idServiciosInstitucion \r\n"
-				+ "and factSusBis.idinstitucion = suscripcion.idinstitucion and factSusBis.idsuscripcion = suscripcion.idpeticion AND \r\n"
+				+ "and factSusBis.idinstitucion = suscripcion.idinstitucion and factSusBis.idsuscripcion = suscripcion.idsuscripcion AND \r\n"
 			   + "(factSus.idfactura < factSusBis.idfactura))");
 		sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = factSus.idfactura \r\n"
 				+ "and fact.idinstitucion = suscripcion.idinstitucion");
@@ -586,39 +592,50 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.WHERE("rownum <= 200");
 		sql.WHERE("factSusBis.idfactura is null");
 
-		if (filtro.getIdEstadoSolicitud() != null) {
-			switch (filtro.getIdEstadoSolicitud()) {
-			case "1": //Pendiente
-				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha\r\n"
-						+ "				ELSE null END is null and suscripcion.fechaSuscripcion is null");
-				break;
-			case "2"://Denegada
-				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha \r\n"
-						+ "				ELSE null END is not null");
-				break;
-			case "3"://Aceptada
-				sql.WHERE(
-						"suscripcion.fechaSuscripcion is not null and CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
-								+ "				ELSE null END is null");
-				break;
-			case "4"://Anulacion solicitada
-				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
-						+ "				ELSE null END is not null and suscripcion.fechaBaja is null");
-				break;
-			case "5"://Anulada
-				sql.WHERE("suscripcion.fechaBaja is not null");
-				break;
+		if (filtro.getIdEstadoSolicitud() != null && !filtro.getIdEstadoSolicitud().isEmpty()) {
+			//Recorremos el array de estados seleccionados
+			List<String> estados = filtro.getIdEstadoSolicitud();
+			String condSolicitud = "((";
+			for(String estado : estados) {
+				switch (estado) {
+				case "1": //Pendiente
+					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha\r\n"
+							+ "				ELSE null END is null and suscripcion.fechaSuscripcion is null";
+					break;
+				case "2"://Denegada
+					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha \r\n"
+							+ "				ELSE null END is not null and"
+							+ "				suscripcion.fecha.suscripcion is null";
+					break;
+				case "3"://Aceptada
+					condSolicitud += "suscripcion.fechaSuscripcion is not null and "
+									+ "CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
+									+ "				ELSE null END is null and "
+									+ "suscripcion.fechaBaja is null";
+					break;
+				case "4"://Anulacion solicitada
+					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
+							+ "				ELSE null END is not null and suscripcion.fechaBaja is null"
+							+ "				and suscripcion.fechasuscripcion is not null";
+					break;
+				case "5"://Anulada
+					condSolicitud += "suscripcion.fechaBaja is not null";
+					break;
+				}
+				condSolicitud += ") OR (";
 			}
+			condSolicitud = condSolicitud.substring(0, condSolicitud.length() - 4)+")";
+			sql.WHERE(condSolicitud); 
 		}
 
 		if (filtro.getIdpersona() != null)
 			sql.WHERE("pet.idpersona = " + filtro.getIdpersona());
 
 		if (filtro.getnSolicitud() != null && filtro.getnSolicitud().trim() != "")
-			sql.WHERE("pet.idpeticion like '%" + filtro.getnSolicitud() + "%'");
+			sql.WHERE("pet.idpeticion like '%" + filtro.getnSolicitud().trim() + "%'");
 
 		if (filtro.getDescServ() != null && filtro.getDescServ().trim() != "")
-			sql.WHERE("convert(UPPER(servIns.descripcion) , 'US7ASCII' ) like convert(UPPER('%" + filtro.getDescServ()
+			sql.WHERE("convert(UPPER(servIns.descripcion) , 'US7ASCII' ) like convert(UPPER('%" + filtro.getDescServ().trim()
 					+ "%') , 'US7ASCII' )");
 
 		if(filtro.getaFechaDe() != null) {
@@ -650,17 +667,44 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				sql.WHERE("pet.fecha <= to_date('" + strDate + "','dd/MM/YY')");
 			}
 		}
+		
+		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
+			if (filtro.getIdTipoServicio() != null && !filtro.getIdTipoServicio().isEmpty()) {
+				String condTipoServ = "((";
+				//Actualmente el id de servicio se define así "IDTIPOSERVICIOS || '-' || IDSERVICIO".
+				//Aunque lleve a confusion, IDTIPOSERVICIOS en la BBDD hace referencia a idCategoria
+				//mientras que IDSERVICIO a idTipoServicio
+				List<String> categoriasConServicio = new ArrayList<String>();
+				for(String servicio : filtro.getIdTipoServicio()) {
+					categoriasConServicio.add(servicio.split("-")[0]);
+					//Creamos las condiciones por pares para los servicios especificos seleccionados
+					condTipoServ += ("(servSol.idServiciosInstitucion = "+servicio.split("-")[1]+" AND servSol.idTipoServicios = "+servicio.split("-")[0]+" ) OR ");
+				}
 
-		if (filtro.getIdTipoServicio() != null) {
-			sql.WHERE("servSol.idServiciosInstitucion = " + filtro.getIdTipoServicio());
+				condTipoServ = condTipoServ.substring(0, condTipoServ.length() - 3)+")";
+				//Comprobamos que categorias no tienen un servicio seleccionado
+				List<String> categoriasSinServicio = filtro.getIdCategoria();
+				
+				categoriasSinServicio.removeAll(categoriasConServicio);
+				if(!categoriasSinServicio.isEmpty()) {
+					condTipoServ += (" OR (servSol.idTipoServicios IN (" + String.join(",",filtro.getIdCategoria())+"))");
+				}
+				
+				condTipoServ += ")";
+				
+				sql.WHERE(condTipoServ);
+			}
+			else {
+				sql.WHERE("servSol.idTipoServicios IN (" + String.join(",",filtro.getIdCategoria())+")");
+			}
 		}
 
-		if (filtro.getIdCategoria() != null) {
-			sql.WHERE("servSol.idTipoServicios = " + filtro.getIdCategoria());
-		}
 
-		if(filtro.getIdEstadoFactura() != null) {
-			sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
+		
+
+		
+		if(filtro.getIdEstadoFactura() != null && !filtro.getIdEstadoFactura().isEmpty()) {
+			sql.WHERE("fact.estado IN ("+String.join(",",filtro.getIdEstadoFactura())+")");
 		}
 //		private String importe; // valor aplicado durante la compra (importe total)
 		sql.WHERE("rownum <= 200");
@@ -695,6 +739,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("periodicidad.periodosMes as periodicidadValor");
 		sql.SELECT_DISTINCT("f_siga_getrecurso(periodicidad.descripcion, "+idioma+") as periodicidadDesc");     
 		sql.SELECT_DISTINCT("precioServ.descripcion as precioServicioDesc");
+		sql.SELECT_DISTINCT("suscripcion.fechaSuscripcion as fechaAlta");
+		sql.SELECT_DISTINCT("suscripcion.fechaBajaFacturacion as fechaBaja");
 
 		sql.FROM("pys_serviciossolicitados servSol");
 		

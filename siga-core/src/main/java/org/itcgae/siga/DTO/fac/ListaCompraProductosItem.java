@@ -5,6 +5,7 @@ import java.util.Date;
 public class ListaCompraProductosItem {
 
 	private Date fechaSolicitud;
+	private String idPersona;
 	private String nSolicitud; //Equivaldria al idpeticion de la tabla pys_peticioncomprasuscripcion
 	private String nIdentificacion; //de la persona asociada a la compra (cliente)
 	private String nColegiado; //si el comprador es colegiado de ese colegio.
@@ -109,5 +110,11 @@ public class ListaCompraProductosItem {
 	}
 	public void setDesFormaPago(String desFormaPago) {
 		this.desFormaPago = desFormaPago;
+	}
+	public String getIdPersona() {
+		return idPersona;
+	}
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
 	}
 }

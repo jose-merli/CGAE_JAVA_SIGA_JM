@@ -59,6 +59,7 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 		sql.SELECT(" f_siga_getrecurso(perio.descripcion," + idioma +") descripcionperiodicidad");
 		sql.SELECT(" CASE WHEN f_siga_getrecurso(consul.descripcion," + idioma +") IS NOT NULL THEN f_siga_getrecurso(consul.descripcion," + idioma +") ELSE 'No tiene condición' END descripcionconsulta");
 		sql.SELECT(" pordefecto");
+		sql.SELECT(" perio.periodosmes as periodicidadValor");
 		
 		sql.FROM(" pys_preciosservicios preciosserv");
 		sql.FROM(" pys_periodicidad perio");

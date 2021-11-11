@@ -64,6 +64,13 @@ public class GestionFichaCompraSuscripcionController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@PostMapping(value = "/pys/aprobarSuscripcion")
+	ResponseEntity<UpdateResponseDTO> aprobarSuscricion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
+		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.aprobarSuscripcion(request, ficha);
+		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@PostMapping(value = "/pys/denegarPeticion")
 	ResponseEntity<InsertResponseDTO>  denegarPeticion(HttpServletRequest request, @RequestBody String nSolicitud) throws Exception {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.denegarPeticion(request, nSolicitud);
@@ -101,6 +108,13 @@ public class GestionFichaCompraSuscripcionController {
 	@PostMapping(value = "/pys/updateProductosPeticion")
 	ResponseEntity<InsertResponseDTO> updateProductosPeticion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem peticiones) throws Exception {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.updateProductosPeticion(request, peticiones);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/updateServiciosPeticion")
+	ResponseEntity<InsertResponseDTO> updateServiciosPeticion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem peticiones) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.updateServiciosPeticion(request, peticiones);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

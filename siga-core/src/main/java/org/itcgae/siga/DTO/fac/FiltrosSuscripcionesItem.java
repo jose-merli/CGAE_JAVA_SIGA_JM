@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
+import java.util.List;
 
 public class FiltrosSuscripcionesItem {
 
@@ -9,11 +10,11 @@ public class FiltrosSuscripcionesItem {
 	private Date fechaSolicitudHasta;
 	private Date aFechaDe;
     private String nSolicitud;
-    private String idCategoria;
-    private String idTipoServicio;
+    private List<String> idCategoria;
+    private List<String> idTipoServicio;
     private String descServ;
-    private String idEstadoSolicitud;
-    private String idEstadoFactura; //Actualmente estados: En revisión, Pendiente de pago, Pagada, Devuelta, Anulada pendiente de abono, Anulada
+    private List<String> idEstadoSolicitud;
+    private List<String> idEstadoFactura; //Actualmente estados: En revisión, Pendiente de pago, Pagada, Devuelta, Anulada pendiente de abono, Anulada
 	
     public String getIdpersona() {
 		return idPersona;
@@ -39,28 +40,28 @@ public class FiltrosSuscripcionesItem {
 	public void setnSolicitud(String nSolicitud) {
 		this.nSolicitud = nSolicitud;
 	}
-	public String getIdCategoria() {
+	public List<String> getIdCategoria() {
 		return idCategoria;
 	}
-	public void setIdCategoria(String idCategoria) {
+	public void setIdCategoria(List<String> idCategoria) {
 		this.idCategoria = idCategoria;
 	}
-	public String getIdEstadoSolicitud() {
+	public List<String> getIdEstadoSolicitud() {
 		return idEstadoSolicitud;
 	}
-	public void setIdEstadoSolicitud(String idEstadoSolicitud) {
+	public void setIdEstadoSolicitud(List<String> idEstadoSolicitud) {
 		this.idEstadoSolicitud = idEstadoSolicitud;
 	}
-	public String getIdEstadoFactura() {
+	public List<String> getIdEstadoFactura() {
 		return idEstadoFactura;
 	}
-	public void setIdEstadoFactura(String idEstadoFactura) {
+	public void setIdEstadoFactura(List<String> idEstadoFactura) {
 		this.idEstadoFactura = idEstadoFactura;
 	}
-	public String getIdTipoServicio() {
+	public List<String> getIdTipoServicio() {
 		return idTipoServicio;
 	}
-	public void setIdTipoServicio(String idTipoServicio) {
+	public void setIdTipoServicio(List<String> idTipoServicio) {
 		this.idTipoServicio = idTipoServicio;
 	}
 	public String getDescServ() {

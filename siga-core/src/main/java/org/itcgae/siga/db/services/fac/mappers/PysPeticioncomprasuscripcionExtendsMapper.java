@@ -89,6 +89,7 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaCompras")
 	@Results({
 			@Result(column = "fechaSolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
+			@Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fechaEfectiva", property = "fechaEfectiva", jdbcType = JdbcType.DATE),
 			@Result(column = "fechaDenegada", property = "fechaDenegada", jdbcType = JdbcType.DATE),
 			@Result(column = "fechaSolicitadaAnulacion", property = "fechaSolicitadaAnulacion", jdbcType = JdbcType.DATE),
@@ -135,6 +136,7 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaSuscripciones")
 	@Results({
 			@Result(column = "fechaSolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
+			@Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fechaEfectiva", property = "fechaEfectiva", jdbcType = JdbcType.DATE),
 			@Result(column = "fechaDenegada", property = "fechaDenegada", jdbcType = JdbcType.DATE),
 			@Result(column = "fechaSolicitadaAnulacion", property = "fechaSolicitadaAnulacion", jdbcType = JdbcType.DATE),
@@ -176,7 +178,9 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		@Result(column = "idPeriodicidad", property = "idPeriodicidad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "periodicidadValor", property = "periodicidadValor", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "periodicidadDesc", property = "periodicidadDesc", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "fechaAlta", property = "fechaAlta", jdbcType = JdbcType.DATE)
 		}) 
 	List<ListaServiciosSuscripcionItem> getListaServiciosSuscripcion(Short idInstitucion, String nSolicitud, String idioma, Date aFechaDe);
 }

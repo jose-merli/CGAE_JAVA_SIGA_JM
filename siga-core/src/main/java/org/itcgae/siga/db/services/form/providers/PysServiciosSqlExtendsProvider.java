@@ -104,6 +104,22 @@ public class PysServiciosSqlExtendsProvider extends PysServiciosSqlProvider {
 		return sql.toString();
 	}
 	
+	public String searchTiposServiciosByIdCategoriaMultiple(String idioma, Short idInstitucion, String idCategoria) { //En realidad busca los servicios con ese idcategoria
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDTIPOSERVICIOS || '-' || IDSERVICIO AS ID");
+		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
+		
+		sql.FROM("PYS_SERVICIOS");
+		
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTIPOSERVICIOS IN ( " + idCategoria + ")");
+		
+		sql.ORDER_BY("DESCRIPCION");
+		
+		return sql.toString();
+	}
+	
 	public String searchTiposServiciosByIdCategoria(String idioma, Short idInstitucion, String idCategoria) { //En realidad busca los servicios con ese idcategoria
 		SQL sql = new SQL();
 		
@@ -113,7 +129,7 @@ public class PysServiciosSqlExtendsProvider extends PysServiciosSqlProvider {
 		sql.FROM("PYS_SERVICIOS");
 		
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("IDTIPOSERVICIOS = '" + idCategoria + "'");
+		sql.WHERE("IDTIPOSERVICIOS IN ( " + idCategoria + ")");
 		
 		sql.ORDER_BY("DESCRIPCION");
 		
