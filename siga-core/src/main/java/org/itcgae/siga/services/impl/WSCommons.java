@@ -24,6 +24,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import com.exea.sincronizacion.redabogacia.ObtenerNumColegiacionResponseDocument;
 import org.apache.xmlbeans.XmlObject;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
@@ -260,6 +261,13 @@ public class WSCommons {
 				errorType.setXmlError(xmlObjectRequest.xmlText());
 			} else {
 				errorType.setXmlError("Sin error xml");
+			}
+		}else if(xmlObjectResponse instanceof ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse){
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse) xmlObjectResponse).addNewError();
+			errorType.setCodigo("FORMATO_NOVALIDO");
+			errorType.setDescripcion(message);
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
 			}
 		}
 

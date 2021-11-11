@@ -271,31 +271,6 @@ public class MenuServiceImpl implements IMenuService {
 				}
 
 			}
-
-			//Miramos si trae la opcion de menu Expedientes EXEA, si es así pero el colegio no tiene configurada esta opcion de menu por parametro, la quitamos
-			if(items != null && !items.isEmpty()
-				&&  items.stream().anyMatch(menuItem -> SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel()))){
-
-				List<Short> instituciones = new ArrayList<Short>();
-				instituciones.add(idInstitucion);
-				instituciones.add(SigaConstants.IDINSTITUCION_0_SHORT);
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-				genParametrosExample.createCriteria()
-						.andFechaBajaIsNull()
-						.andIdinstitucionIn(instituciones)
-						.andModuloEqualTo("EXP")
-						.andParametroEqualTo(SigaConstants.PARAM_MENU_EXEA_ACTIVO);
-				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-				List<GenParametros> genParametros = genParametrosMapper.selectByExample(genParametrosExample);
-
-				if(genParametros != null && !genParametros.isEmpty()){
-					String expedientesEXEAActivo = genParametros.get(0).getValor();
-					//Si vale N, tendremos que eliminar la opcion Expedientes EXEA del menu
-					if("N".equals(expedientesEXEAActivo)){
-						items = items.stream().filter(menuItem -> !SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel())).collect(Collectors.toList());
-					}
-				}
-			}
 			response.setMenuItems(items);
 		}
 
@@ -924,7 +899,6 @@ public class MenuServiceImpl implements IMenuService {
 		if (idInstitucion == null){
 			idInstitucion = "";
 		}
-
 		return idInstitucion;
 	}
 	
