@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
@@ -58,6 +59,14 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 			@Result(column = "IDSERVICIO", property = "idservicio", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "IDTIPOSERVICIOS", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC)})
 	List<ServicioDetalleDTO> selectServiciosByConsulta(Short idInstitucion, String idConsulta);
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectPreciosByConsulta")
+	@Results({ @Result(column = "idtiposervicios", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "idservicio", property = "idservicio", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "idserviciosinstitucion", property = "idserviciosinstitucion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "idperiodicidad", property = "idperiodicidad", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "idpreciosservicios", property = "idpreciosservicios", jdbcType = JdbcType.NUMERIC)})
+	List<FichaTarjetaPreciosItem> selectPreciosByConsulta(Short idInstitucion, String idConsulta);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectMaxIdConsulta")
 	@Results({

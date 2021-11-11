@@ -324,4 +324,21 @@ public class ConConsultasExtendsSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectPreciosByConsulta(Short idInstitucion, String idConsulta){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" idtiposervicios");
+		sql.SELECT(" idservicio");
+		sql.SELECT(" idserviciosinstitucion");
+		sql.SELECT(" idperiodicidad");
+		sql.SELECT(" idpreciosservicios");
+		
+		sql.FROM(" pys_preciosservicios");
+		
+		sql.WHERE(" IDINSTITUCION = " + idInstitucion);
+		sql.WHERE(" IDCONSULTA = " + idConsulta);
+		
+		return sql.toString();
+	}
+	
 }

@@ -29,6 +29,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
@@ -78,6 +80,7 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
+import org.itcgae.siga.db.entities.PysPreciosservicios;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.ConCriterioconsultaMapper;
@@ -89,6 +92,7 @@ import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
+import org.itcgae.siga.db.mappers.PysPreciosserviciosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -187,6 +191,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 	
 	@Autowired
 	private PysServiciosinstitucionMapper _pysServiciosInstitucionMapper;
+	
+	@Autowired
+	private PysPreciosserviciosMapper _pysPreciosServiciosMapper;
 
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -2665,6 +2672,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 			queryBuilderDTO.setConsulta(this.eliminarParentesisOperadorLike(queryBuilderDTO.getConsulta(), listIndicesLikes));
 		}
 		
+		//PRIMERO ANTES DE INSERTAR ELIMINAMOS LOS CRITERIOS YA EXISTENTES EN CON_CRITERIOCONSULTA EN CASO QUE EXISTIERA ALGUNO/S
 		LOGGER.info(
 				"constructorConsultas() / ConCriterioConsultaMapper.deleteByPrimaryKey() -> Entrada a ConCriterioConsultaMapper para eliminar los registros ya existentes antes de insertar los nuevos");
 		//Primero obtenemos todos los registros de con_criterioconsulta existentes
@@ -2681,7 +2689,6 @@ public class ConsultasServiceImpl implements IConsultasService {
 				conCriterioConsultaEliminar.setIdconsulta((long) rule.getIdconsulta());
 				
 				statusDeleteConCriterioConsulta = conCriterioConsultaMapper.deleteByPrimaryKey(conCriterioConsultaEliminar);
-				conCriterioConsultaMapper.selectByExample(null);
 				
 				if(statusDeleteConCriterioConsulta == 0) {
 					throw new Exception("Ha fallado la eliminacion del registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + idInstitucion);
@@ -2724,6 +2731,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					
 		            String delimitador = null;
 		                      
+		            //Procesamos la consulta llegada del constructor para transformarla en un objeto entendible para la tabla con_consultacriterio
 		            extraeCriterio(queryBuilderDTO.getConsulta(), delimitador);
 		            
 		            //Recorro la lista y voy insertando en con_criterioconsulta
@@ -2747,6 +2755,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		            	LOGGER.info(
 								"constructorConsultas() / ConConsultaExtendsMapper.getIdOperacion() -> Entrada al servicio para obtener el idOperacion necesario para la insercion en con_criterioconsulta");
 		            	
+		            	//Segun el simbolo obtenido del constructor de consultas para realizar la insercion en con_critericonsultas necesitamos el idoperacion el cual depende del simbolo y del idcampo seleccionado en el constructor
 		            	if(!filtroSplit[1].equals("IS")) {
 		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(filtroSplit[0], filtroSplit[1].toLowerCase());
 		            		if(idoperacion != 0) {
@@ -2808,11 +2817,10 @@ public class ConsultasServiceImpl implements IConsultasService {
 				}
 		            
 		            int statusUpdateConConsulta = 0;
-		            int statusDeleteConConsulta = 0;
 		            boolean queryPorDefecto = false;
 		            
 		            
-		            //Si hay criterios formamos la query basandonos en ellos
+		            //Si hay criterios, es decir la consulta no ha llegado vacia del constructor de consultas por lo que hemos insertado en con_criterioconsulta formamos la query basandonos en ellos
 		            if(!queryBuilderDTO.getConsulta().equals("")) {
 		            	consulta = obtenerConsultaByConCriterios(_conConsultasExtendsMapper.obtenerDatosConsulta(idioma, idInstitucion,queryBuilderDTO.getIdconsulta()));
 		            	//Cambiamos @IDGRUPO@ por el idGrupo correcto
@@ -2838,7 +2846,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		            
 		            conConsulta.setSentencia(consulta);            
 		            
-		         // Actualizo en CON_CONSULTA
+		          //Actualizo en CON_CONSULTA
 					statusUpdateConConsulta = _conConsultaMapper.updateByPrimaryKeySelective(conConsulta);
 						
 					if(statusUpdateConConsulta == 0) {			
@@ -2855,29 +2863,67 @@ public class ConsultasServiceImpl implements IConsultasService {
 					List<ServicioDetalleDTO> listaServicios = new ArrayList<ServicioDetalleDTO>();
 					
 					listaServicios = _conConsultasExtendsMapper.selectServiciosByConsulta(idInstitucion, queryBuilderDTO.getIdconsulta());
-				
-					for (ServicioDetalleDTO servicioDetalleDTO : listaServicios) {
-						int statusUpdatePysServiciosInstitucion = 0;
-						PysServiciosinstitucion pysServiciosInstitucion = new PysServiciosinstitucion();
-						
-						pysServiciosInstitucion.setIdinstitucion(idInstitucion);
-						pysServiciosInstitucion.setIdserviciosinstitucion((long) servicioDetalleDTO.getIdserviciosinstitucion());
-						pysServiciosInstitucion.setIdservicio((long) servicioDetalleDTO.getIdservicio());
-						pysServiciosInstitucion.setIdtiposervicios((short) servicioDetalleDTO.getIdtiposervicios());
-						
-						pysServiciosInstitucion.setCriterios(consulta);
-						
-						statusUpdatePysServiciosInstitucion = _pysServiciosInstitucionMapper.updateByPrimaryKeySelective(pysServiciosInstitucion);
-						
-						if(statusUpdatePysServiciosInstitucion == 0) {			
-							throw new Exception("No se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
+					
+					if(listaServicios.size() > 0 && listaServicios != null) {
+						for (ServicioDetalleDTO servicioDetalleDTO : listaServicios) {
+							int statusUpdatePysServiciosInstitucion = 0;
+							PysServiciosinstitucion pysServiciosInstitucion = new PysServiciosinstitucion();
 							
-						}else if(statusUpdatePysServiciosInstitucion == 1) {
-							LOGGER.info(
-									"constructorConsultas() / _pysServiciosInstitucionMapper.updateByPrimaryKeySelective) -> Se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
-						}		
+							pysServiciosInstitucion.setIdinstitucion(idInstitucion);
+							pysServiciosInstitucion.setIdserviciosinstitucion((long) servicioDetalleDTO.getIdserviciosinstitucion());
+							pysServiciosInstitucion.setIdservicio((long) servicioDetalleDTO.getIdservicio());
+							pysServiciosInstitucion.setIdtiposervicios((short) servicioDetalleDTO.getIdtiposervicios());
+							
+							pysServiciosInstitucion.setCriterios(consulta);
+							
+							pysServiciosInstitucion.setFechamodificacion(new Date());
+							pysServiciosInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							statusUpdatePysServiciosInstitucion = _pysServiciosInstitucionMapper.updateByPrimaryKeySelective(pysServiciosInstitucion);
+							
+							if(statusUpdatePysServiciosInstitucion == 0) {			
+								throw new Exception("No se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
+								
+							}else if(statusUpdatePysServiciosInstitucion == 1) {
+								LOGGER.info(
+										"constructorConsultas() / _pysServiciosInstitucionMapper.updateByPrimaryKeySelective) -> Se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
+							}		
+						}
 					}
 					
+					//Actualizo PYS_PRECIOSSERVICIOS (HABRIA QUE RECORRER PYS_PRECIOSSERVICIOS EN BUSCA DE TODOS LOS PRECIOS DE ESTA INSTITUCION QUE TENGAN ASIGNADA ESTA CONSULTA)
+					List<FichaTarjetaPreciosItem> listaPrecios = new ArrayList<FichaTarjetaPreciosItem>();
+					
+					listaPrecios = _conConsultasExtendsMapper.selectPreciosByConsulta(idInstitucion, queryBuilderDTO.getIdconsulta());
+				
+					if(listaPrecios.size() > 0 && listaPrecios != null) {
+						for (FichaTarjetaPreciosItem fichaTarjetaPreciosItem : listaPrecios) {
+							int statusUpdatePysPreciosServicios = 0;
+							PysPreciosservicios pysPreciosservicios = new PysPreciosservicios();
+							
+							pysPreciosservicios.setIdinstitucion(idInstitucion);
+							pysPreciosservicios.setIdserviciosinstitucion((long) fichaTarjetaPreciosItem.getIdserviciosinstitucion());
+							pysPreciosservicios.setIdservicio((long) fichaTarjetaPreciosItem.getIdservicio());
+							pysPreciosservicios.setIdtiposervicios((short) fichaTarjetaPreciosItem.getIdtiposervicios());
+							pysPreciosservicios.setIdperiodicidad((short) fichaTarjetaPreciosItem.getIdperiodicidad());
+							pysPreciosservicios.setIdpreciosservicios((short) fichaTarjetaPreciosItem.getIdpreciosservicios());
+													
+							pysPreciosservicios.setCriterios(consulta);
+							
+							pysPreciosservicios.setFechamodificacion(new Date());
+							pysPreciosservicios.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							statusUpdatePysPreciosServicios = _pysPreciosServiciosMapper.updateByPrimaryKeySelective(pysPreciosservicios);
+							
+							if(statusUpdatePysPreciosServicios == 0) {			
+								throw new Exception("No se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_preciosservicios");
+								
+							}else if(statusUpdatePysPreciosServicios == 1) {
+								LOGGER.info(
+										"constructorConsultas() / _pysPreciosServiciosMapper.updateByPrimaryKeySelective) -> Se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_preciosservicios");
+							}		
+						}
+					}
 				}		
 			
 			LOGGER.info("constructorConsultas() -> Salida del servicio para crear una nueva consulta desde el constructor de consultas");
@@ -3177,6 +3223,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	 
 	//FINAL CONVERTIR DATOS CON_CRITERIOCONSULTA A QUERY NECESARIA PARA CON_CONSULTA Y PYS_SERVICIOSINSTITUCION
 
+	//INICIO METODOS CONVERTIR SQL A OBJETO ENTENDIBLE PARA SU INSERCION EN CON_CRITERIOCONSULTA 
     public void extraeCriterio(String consulta, String delimitador) {
         if (delimitador!=null) {
                       consulta = consulta.replaceFirst(delimitador, "");
@@ -3273,6 +3320,7 @@ public class ConsultasServiceImpl implements IConsultasService {
   
     	return stringBuilder.toString();	
     }
+  //FIN METODOS CONVERTIR SQL A OBJETO ENTENDIBLE PARA SU INSERCION EN CON_CRITERIOCONSULTA 
 
 	
 	//SQL
