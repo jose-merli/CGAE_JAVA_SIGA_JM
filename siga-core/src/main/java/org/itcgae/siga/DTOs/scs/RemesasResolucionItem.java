@@ -9,6 +9,7 @@ public class RemesasResolucionItem {
 	private int idRemesaResolucion;
 	private String numRemesaPrefijo;
 	private String numRemesaSufijo;
+	private String numRemesaNumero;
 	private String nombreFichero;
 	private String observaciones;
 	private Date fechaCargaDesde;
@@ -88,6 +89,11 @@ public class RemesasResolucionItem {
 	public int getLog() {
 		return log;
 	}
+	
+	@JsonProperty("numRemesaNumero")
+	public String getNumRemesaNumero() {
+		return numRemesaNumero;
+	}
 
 	//SETTERS
 	public void setIdRemesaResolucion(int idRemesaResolucion) {
@@ -140,6 +146,10 @@ public class RemesasResolucionItem {
 
 	public void setLog(int log) {
 		this.log = log;
+	}
+
+	public void setNumRemesaNumero(String numRemesaNumero) {
+		this.numRemesaNumero = numRemesaNumero;
 	}
 	
 	

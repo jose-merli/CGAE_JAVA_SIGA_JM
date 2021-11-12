@@ -16,9 +16,9 @@ public class ScsRemesasResolucionesExtendsProvider {
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
 		sql.SELECT("RES.IDREMESARESOLUCION");
-		sql.SELECT("RES.PREFIJO AS PREFIJORESULTADO");
-		sql.SELECT("RES.NUMERO AS NUMERORESULTADO");
-		sql.SELECT("RES.SUFIJO AS SUFIJORESULTADO");
+		sql.SELECT("RES.PREFIJO");
+		sql.SELECT("RES.NUMERO");
+		sql.SELECT("RES.SUFIJO");
 		sql.SELECT("RES.NOMBREFICHERO");
 		sql.SELECT("RES.OBSERVACIONES");
 		sql.SELECT("RES.FECHACARGA");
@@ -29,11 +29,19 @@ public class ScsRemesasResolucionesExtendsProvider {
 		sql.FROM("CAJG_REMESARESOLUCION RES");
 		
 		if(remesasResolucionItem.getNumRemesaPrefijo() != null && !remesasResolucionItem.getNumRemesaPrefijo().isEmpty()) {
-			sql.WHERE("RES.PREFIJO = '" + remesasResolucionItem.getNumRemesaPrefijo() + "'");
+			sql.WHERE("RES.PREFIJO LIKE '%" + remesasResolucionItem.getNumRemesaPrefijo() + "%'");
+		}
+		
+		if(remesasResolucionItem.getNumRemesaNumero() != null && !remesasResolucionItem.getNumRemesaNumero().isEmpty()) {
+			sql.WHERE("RES.NUMERO LIKE '%" + remesasResolucionItem.getNumRemesaNumero() + "%'");
 		}
 
+		if(remesasResolucionItem.getNumRemesaSufijo() != null && !remesasResolucionItem.getNumRemesaSufijo().isEmpty()) {
+			sql.WHERE("RES.SUFIJO LIKE '%" + remesasResolucionItem.getNumRemesaSufijo() + "%'");
+		}
+		
 		if(remesasResolucionItem.getNombreFichero() != null && !remesasResolucionItem.getNombreFichero().isEmpty()) {
-			sql.WHERE("RES.NOMBREFICHERO = '" + remesasResolucionItem.getNombreFichero() + "'");
+			sql.WHERE("RES.NOMBREFICHERO LIKE '%" + remesasResolucionItem.getNombreFichero() + "%'");
 		}
 		
 		if(remesasResolucionItem.getFechaResolucionDesde() != null) {
@@ -119,12 +127,14 @@ public class ScsRemesasResolucionesExtendsProvider {
 		sql.SELECT("E.DESCRIPCION AS descripcion");
 		sql.SELECT("R.PARAMETROSERROR AS prametrosError");
 		sql.SELECT("R.NUMEROLINEA AS numeroLinea");
-		sql.FROM("CAJG_REMESARESOLUCIONFICHERO R","CAJG_ERRORESREMESARESOL E");
+		sql.FROM("CAJG_REMESARESOLUCIONFICHERO R");
+		sql.FROM("CAJG_ERRORESREMESARESOL E");
 		sql.WHERE("R.IDERRORESREMESARESOL = E.IDERRORESREMESARESOL");
 		sql.WHERE("R.IDINSTITUCION = E.IDINSTITUCION");
 		sql.WHERE("R.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("R.IDREMESARESOLUCION = " + idRemesaResolucion);
 		sql.ORDER_BY("R.NUMEROLINEA");
+		LOGGER.info(sql.toString());
 		return sql.toString();
 	}
 	

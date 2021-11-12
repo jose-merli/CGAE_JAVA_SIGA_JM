@@ -25,6 +25,7 @@ public interface ScsRemesasResolucionesExtendsMapper {
 		@Result(column = "IDREMESARESOLUCION", property = "idRemesaResolucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "PREFIJO", property = "numRemesaPrefijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SUFIJO", property = "numRemesaSufijo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMERO", property= "numRemesaNumero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHACARGA", property = "fechaCarga", jdbcType = JdbcType.DATE),
@@ -63,7 +64,7 @@ public interface ScsRemesasResolucionesExtendsMapper {
 		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PARAMETROSERROR", property = "parametrosError", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NUEROLINEA", property = "numeroLinea", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROLINEA", property = "numeroLinea", jdbcType = JdbcType.VARCHAR),
 	})
 	List<LogRemesaResolucionItem> logRemesaResoluciones(String idInstitucion, String idRemesaResolucion) ;
 }
