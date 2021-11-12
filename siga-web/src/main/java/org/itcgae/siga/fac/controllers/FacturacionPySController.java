@@ -199,7 +199,7 @@ public class FacturacionPySController {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
 		try {
-			response = response = facturacionService.guardarContadorSerie(contador, request);
+			 response = facturacionService.guardarContadorSerie(contador, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.toString()));
@@ -214,6 +214,11 @@ public class FacturacionPySController {
 
 		try {
 			response = facturacionService.getFicherosAdeudos(item, request);
+			
+			if(response.getFicherosAdeudosItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+			
 			return new ResponseEntity<FicherosAdeudosDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.toString()));

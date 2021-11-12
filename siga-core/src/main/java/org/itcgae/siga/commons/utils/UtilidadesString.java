@@ -464,4 +464,12 @@ public class UtilidadesString {
 		
 		return error;
 	}
+	
+	public static Error creaInfoResultados() {
+		Error error = new Error();
+		
+		error.setMessage("general.message.consulta.resultados");
+		
+		return error;
+	}
 }
