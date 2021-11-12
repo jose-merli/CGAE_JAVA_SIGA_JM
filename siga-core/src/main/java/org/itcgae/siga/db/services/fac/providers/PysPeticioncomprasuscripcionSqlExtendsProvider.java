@@ -414,26 +414,25 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		if(filtro.getIdEstadoSolicitud() != null) {
 			switch(filtro.getIdEstadoSolicitud()) {
-				case "1":
+				case "1"://Pendiente
 					sql.WHERE("CASE WHEN compra.fecha is null THEN petBaja.fecha\r\n"
 							+ "				ELSE null END is null and compra.fecha is null");
 					break;
-				case "2":
+				case "2"://Denegada
 					sql.WHERE("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null and"
-							+ "				and compra.fecha is null");
+							+ "				ELSE null END is not null");
 					break;
-				case "3":
+				case "3"://Aceptada
 					sql.WHERE("compra.fecha is not null and CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
 							+ "				ELSE null END is null and"
 							+ "				compra.fechaBaja is null");
 					break;
-				case "4":
+				case "4"://Solicitada anulacion
 					sql.WHERE("CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
 							+ "				ELSE null END is not null and compra.fechaBaja is null"
 							+ "				and compra.fecha is not null");
 					break;
-				case "5":
+				case "5"://Anulada
 					sql.WHERE("compra.fechaBaja is not null");
 					break;
 			}
@@ -552,7 +551,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("suscripcion.fechasuscripcion as fechaEfectiva");
 		sql.SELECT_DISTINCT("suscripcion.fechaBaja as fechaAnulada");
 		sql.SELECT_DISTINCT("f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'" + idioma + "') AS estadoFactura");
-		sql.SELECT_DISTINCT("precioServ.valor || '(' || f_siga_getrecurso(periodicidad.descripcion, "+idioma+") || ')' as PrecioPerio");
+		sql.SELECT_DISTINCT("CASE WHEN SUBSTR(precioServ.valor, 1, 1) = ',' THEN \r\n"
+				+ "'0' || precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, "+idioma+") || ')' \r\n"
+						+ "ELSE precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, "+idioma+") || ')' END as PrecioPerio");
 		sql.SELECT_DISTINCT("suscripcion.fechasuscripcion as fechasuscripcion");
 		sql.SELECT_DISTINCT("suscripcion.fechabaja as fechabaja");
 
@@ -604,8 +605,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 					break;
 				case "2"://Denegada
 					condSolicitud += "CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null and"
-							+ "				suscripcion.fecha.suscripcion is null";
+							+ "				ELSE null END is not null";
 					break;
 				case "3"://Aceptada
 					condSolicitud += "suscripcion.fechaSuscripcion is not null and "
