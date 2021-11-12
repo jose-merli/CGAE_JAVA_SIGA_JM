@@ -1121,7 +1121,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			noColegiado.setUsumodificacion(usuario.getIdusuario());
 			cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
 			CenCliente clienteupdate = clienteExistente;
-			clienteupdate.setLetrado("1");
+			clienteupdate.setLetrado("0");
 			if(solicitud.getIdtratamiento() != null) {
 				clienteupdate.setIdtratamiento(solicitud.getIdtratamiento()); // 1
 			}else {
@@ -1149,7 +1149,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			cliente.setUsumodificacion(usuario.getIdusuario());
 			cliente.setIdlenguaje(usuario.getIdlenguaje());
 			cliente.setExportarfoto(SigaConstants.DB_FALSE);
-			cliente.setLetrado("1");
+			cliente.setLetrado("0");
 			cliente.setNoenviarrevista("0");
 			cliente.setNoaparecerredabogacia("0");
 			cliente.setFechacarga(new Date());
