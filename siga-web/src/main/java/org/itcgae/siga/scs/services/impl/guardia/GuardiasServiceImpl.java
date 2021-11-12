@@ -2122,7 +2122,7 @@ public class GuardiasServiceImpl implements GuardiasService {
                         if (existe == 0) {
                             //no existe - llamamos dos veces para guardar en ambas direcciones
                             scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()), Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardiaIncompatible), usuarios.get(0).getIdusuario(), incompatibilidad.getMotivos(), Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
-                            scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()), Integer.parseInt(idGuardiaIncompatible), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(), incompatibilidad.getMotivos(), Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+                            scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurnoIncompatible), Integer.parseInt(incompatibilidad.getIdInstitucion()), Integer.parseInt(idGuardiaIncompatible), Integer.parseInt(idTurno), Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(), incompatibilidad.getMotivos(), Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
 
                         }
                     }else {
