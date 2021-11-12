@@ -8,8 +8,10 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.FacBancoinstitucionMapper;
 import org.itcgae.siga.db.services.fac.providers.FacBancoinstitucionSqlExtendsProvider;
+import org.itcgae.siga.db.services.fac.providers.FacSeriefacturacionExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,6 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 		@Result(column = "fechabaja", property = "fechaBaja", jdbcType = JdbcType.DATE),
 		@Result(column = "iban", property = "IBAN", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "asientocontable", property = "asientoContable", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "cuentacontabletarjeta", property = "cuentaContableTarjeta", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "bic", property = "BIC", jdbcType = JdbcType.VARCHAR),
@@ -42,7 +43,10 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 		@Result(column = "concepto", property = "concepto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "sjcs", property = "sjcs", jdbcType = JdbcType.VARCHAR)})
 	List<CuentasBancariasItem> getCuentasBancarias(Short idInstitucion);
-	
+
+	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "getNextIdCuentaBancaria")
+	@Results({ @Result(column = "bancos_codigo", property = "newId", jdbcType = JdbcType.VARCHAR) })
+	NewIdDTO getNextIdCuentaBancaria(Short idInstitucion);
 	
 	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "comboCuentasBancarias")
 	@Results({ 

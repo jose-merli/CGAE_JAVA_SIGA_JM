@@ -28,7 +28,7 @@ public class CuentasBancariasItem {
 	private String configLugaresQueMasSecuencia;
 	private String configConceptoAmpliado;
 
-	private String sjcs;
+	private Boolean sjcs;
 	private String idSufijoSjcs;
 	private String concepto;
 
@@ -192,11 +192,11 @@ public class CuentasBancariasItem {
 		this.configConceptoAmpliado = configConceptoAmpliado;
 	}
 
-	public String getSjcs() {
+	public Boolean getSjcs() {
 		return sjcs;
 	}
 
-	public void setSjcs(String sjcs) {
+	public void setSjcs(Boolean sjcs) {
 		this.sjcs = sjcs;
 	}
 
