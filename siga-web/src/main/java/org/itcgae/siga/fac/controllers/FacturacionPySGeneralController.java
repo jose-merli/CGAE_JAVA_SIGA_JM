@@ -23,7 +23,6 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboCuentasBancarias")
 	ResponseEntity<ComboDTO> comboCuentasBancarias(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
-		new ComboDTO();
 
 		try {
 			response = facturacionGeneralService.comboCuentasBancarias(request);
@@ -39,7 +38,6 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboSufijos")
 	ResponseEntity<ComboDTO> comboSufijos(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
-		new ComboDTO();
 
 		try {
 			response = facturacionGeneralService.comboSufijos(request);
@@ -55,6 +53,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboSeriesFacturacion")
 	ResponseEntity<ComboDTO> comboSeriesFacturacion(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
+		
 		try {
 			response = facturacionGeneralService.comboSeriesFacturacion(request);
 
@@ -69,6 +68,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboEtiquetas")
 	ResponseEntity<ComboDTO> comboEtiquetas(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
+		
 		try {
 			response = facturacionGeneralService.comboEtiquetas(request);
 
@@ -83,6 +83,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboDestinatarios")
 	ResponseEntity<ComboDTO> comboDestinatarios(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
+		
 		try {
 			response = facturacionGeneralService.comboDestinatarios(request);
 
@@ -187,6 +188,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/getFormasPagosSerie")
 	ResponseEntity<ComboDTO> getFormasPagosSerie(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
+		
 		try {
 			response = facturacionGeneralService.getFormasPagosSerie(idSerieFacturacion, request);
 
@@ -201,6 +203,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboModelosComunicacion")
 	ResponseEntity<ComboDTO> comboModelosComunicacion(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
+		
 		try {
 			response = facturacionGeneralService.comboModelosComunicacion(request);
 
@@ -215,6 +218,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboTiposIVA")
 	ResponseEntity<ComboDTO> comboTiposIVA(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
+		
 		try {
 			response = facturacionGeneralService.comboTiposIVA(request);
 

@@ -24,9 +24,9 @@ public class FicherosAdeudosItem {
 	String totalRemesa;
 	String importeTotalDesde;
 	String importeTotalHasta;
-	int numRecibos;
-	int numRecibosDesde;
-	int numRecibosHasta;
+	String numRecibos;
+	String numRecibosDesde;
+	String numRecibosHasta;
 	String origen;
 	String facturacion;
 	/**
@@ -272,37 +272,37 @@ public class FicherosAdeudosItem {
 	/**
 	 * @return the numRecibos
 	 */
-	public int getNumRecibos() {
+	public String getNumRecibos() {
 		return numRecibos;
 	}
 	/**
 	 * @param numRecibos the numRecibos to set
 	 */
-	public void setNumRecibos(int numRecibos) {
+	public void setNumRecibos(String numRecibos) {
 		this.numRecibos = numRecibos;
 	}
 	/**
 	 * @return the numRecibosDesde
 	 */
-	public int getNumRecibosDesde() {
+	public String getNumRecibosDesde() {
 		return numRecibosDesde;
 	}
 	/**
 	 * @param numRecibosDesde the numRecibosDesde to set
 	 */
-	public void setNumRecibosDesde(int numRecibosDesde) {
+	public void setNumRecibosDesde(String numRecibosDesde) {
 		this.numRecibosDesde = numRecibosDesde;
 	}
 	/**
 	 * @return the numRecibosHasta
 	 */
-	public int getNumRecibosHasta() {
+	public String getNumRecibosHasta() {
 		return numRecibosHasta;
 	}
 	/**
 	 * @param numRecibosHasta the numRecibosHasta to set
 	 */
-	public void setNumRecibosHasta(int numRecibosHasta) {
+	public void setNumRecibosHasta(String numRecibosHasta) {
 		this.numRecibosHasta = numRecibosHasta;
 	}
 	/**
@@ -351,9 +351,9 @@ public class FicherosAdeudosItem {
 		result = prime * result + ((importeTotalHasta == null) ? 0 : importeTotalHasta.hashCode());
 		result = prime * result + ((nombreFichero == null) ? 0 : nombreFichero.hashCode());
 		result = prime * result + ((nombreabreviado == null) ? 0 : nombreabreviado.hashCode());
-		result = prime * result + numRecibos;
-		result = prime * result + numRecibosDesde;
-		result = prime * result + numRecibosHasta;
+		result = prime * result + ((numRecibos == null) ? 0 : numRecibos.hashCode());
+		result = prime * result + ((numRecibosDesde == null) ? 0 : numRecibosDesde.hashCode());
+		result = prime * result + ((numRecibosHasta == null) ? 0 : numRecibosHasta.hashCode());
 		result = prime * result + ((numerolineas == null) ? 0 : numerolineas.hashCode());
 		result = prime * result + ((origen == null) ? 0 : origen.hashCode());
 		result = prime * result + ((sufijo == null) ? 0 : sufijo.hashCode());
