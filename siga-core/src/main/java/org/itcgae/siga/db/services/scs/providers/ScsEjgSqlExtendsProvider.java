@@ -456,7 +456,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                         sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
                 }
             } else {
-                if (ejgItem.getTipoLetrado().equals("E")) {
+            	sql.LEFT_OUTER_JOIN("cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
+            	if (ejgItem.getTipoLetrado().equals("E")) {
                     // letrado tramitador
                     if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
                         sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
