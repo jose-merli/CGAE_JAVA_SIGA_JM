@@ -27,4 +27,7 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 
     @SelectProvider(type = FacAbonoSqlExtendsProvider.class, method = "getAbonoAnterior")
     List<Long> getAbonoAnterior(Short idInstitucion, Date fecha);
+    
+    @SelectProvider(type = FacAbonoSqlExtendsProvider.class, method = "getPagosCerrados")
+    List<FacAbono> getPagosCerrados(String idInstitucion, String anio);
 }

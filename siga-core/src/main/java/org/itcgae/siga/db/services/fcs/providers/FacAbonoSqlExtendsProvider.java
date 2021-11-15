@@ -1,9 +1,11 @@
 package org.itcgae.siga.db.services.fcs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.mappers.FacAbonoSqlProvider;
 
 import java.util.Date;
+import java.util.List;
 
 public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider {
 
@@ -99,5 +101,18 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider {
         query.WHERE("ROWNUM = 1");
 
         return query.toString();
+    }
+    
+    public String getPagosCerrados(Short idInstitucion, String anio) {
+    	
+    	SQL sql = new SQL();
+    	
+    	sql.SELECT("IDPAGOSJG");
+    	sql.FROM("FAC_ABONO");
+    	sql.WHERE("IDINSTITUCION = " + idInstitucion);
+    	sql.WHERE("to_char(FECHA, 'YYYY') = "+ anio);
+    	sql.WHERE("IDPAGOSJG is not null");
+    	
+    	return sql.toString();
     }
 }

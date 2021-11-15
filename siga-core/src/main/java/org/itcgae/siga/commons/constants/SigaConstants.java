@@ -1172,5 +1172,8 @@ public class SigaConstants {
     public static final String C_PPN_IDTIPOPRODUCTO = "PPN_IDTIPOPRODUCTO";
     public static final String C_PPN_IDPRODUCTO = "PPN_IDPRODUCTO";
     public static final String C_PPN_IDPRODUCTOINSTITUCION = "PPN_IDPRODUCTOINSTITUCION";
+    public static final String CODIGO_PROVINCIA_CEUTA = "51";
+    public static final String CODIGO_PROVINCIA_MELILLA = "52";
+    
 
 }

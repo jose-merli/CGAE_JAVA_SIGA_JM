@@ -179,4 +179,25 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ColegiadoJGItem> busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDatosPersonaForImpreso190")
+	@Results({
+		@Result(column = "NIFCIF", property = "NIFCIF", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "NOMBRE", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO1", property = "APELLIDOS1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO2", property = "APELLIDOS2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "IDTIPOIDENTIFICACION", jdbcType = JdbcType.VARCHAR),
+
+	})
+	CenPersona getDatosPersonaForImpreso190(String idPersona);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDatosInstitucionForImpreso190")
+	@Results({
+		@Result(column = "NIFCIF", property = "NIFCIF", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "NOMBRE", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "IDPERSONA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "IDTIPOIDENTIFICACION", jdbcType = JdbcType.VARCHAR),
+
+	})
+	CenPersona getDatosInstitucionForImpreso190(String idinstitucion);
 }
