@@ -59,4 +59,10 @@ public interface IGestionFichaCompraSuscripcionService {
 
 	InsertResponseDTO updateServiciosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
 			throws Exception;
+
+	InsertResponseDTO aprobarSuscripcionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
+
+	InsertResponseDTO anularPeticionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
 }

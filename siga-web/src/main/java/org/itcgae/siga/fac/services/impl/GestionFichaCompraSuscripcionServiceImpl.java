@@ -590,14 +590,12 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
 
 					
-					if(solicitud==null) {
-						this.solicitarSuscripcion(request, ficha);
-					}
 					
 					
 					//En el caso que se realice la aprobación desde la pantalla "Suscripcion de servicios"
+					//O se realice una aprobación directa
 					if(solicitud==null) {
-						this.solicitarCompra(request, ficha);
+						this.solicitarSuscripcion(request, ficha);
 						solicitud = pysPeticioncomprasuscripcionMapper
 								.selectByPrimaryKey(solicitudKey);
 					}
@@ -1019,6 +1017,75 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 		insertResponseDTO.setError(error);
 		LOGGER.debug("aprobarCompraMultiple() -> Salida del servicio para aprobar una o varias peticiones de compra");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO aprobarSuscripcionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("aprobarSuscripcionMultiple() -> Entrada al servicio para aprobar una o varias peticiones de suscripcion");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"aprobarSuscripcionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"aprobarSuscripcionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"aprobarSuscripcionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para aprobar una o varias peticiones de suscripcion");
+
+				//Se guardaran aqui los numeros de solicitud de aquellas solicitudes no validas por el estado en el que vienen
+				error.setDescription("");
+				for(FichaCompraSuscripcionItem peticion : peticiones) {
+					if(peticion.getFechaDenegada() != null || peticion.getFechaAceptada() != null) {
+						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
+					}
+					else {
+						peticion.setServicios(pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, peticion.getnSolicitud(), usuarios.get(0).getIdlenguaje(), null));
+						this.aprobarSuscripcion(request, peticion);
+					}
+				}
+
+				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));
+				
+				
+				LOGGER.info(
+						"aprobarSuscripcionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una o varias peticiones de suscripcion");
+
+				LOGGER.info(
+						"aprobarSuscripcionMultiple() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una o varias peticiones de suscripcion");
+			}
+
+			LOGGER.info(
+					"aprobarSuscripcionMultiple() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de una o varias peticiones de suscripcion");
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.debug("aprobarSuscripcionMultiple() -> Salida del servicio para aprobar una o varias peticiones de suscripcion");
 
 		return insertResponseDTO;
 	}
@@ -2015,6 +2082,74 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	}
 
 	@Override
+	@Transactional
+	public InsertResponseDTO anularPeticionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("anularPeticionMultiple() -> Entrada al servicio para anular una o varias peticiones");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"anularPeticionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"anularPeticionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"anularPeticionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para anular una o varias peticiones");
+
+				//Se guardaran aqui los numeros de solicitud de aquellas solicitudes no validas por el estado en el que vienen
+				error.setDescription("");
+				for(FichaCompraSuscripcionItem peticion : peticiones) {
+					if(peticion.getFechaAnulada() == null && (peticion.getFechaAceptada() != null || peticion.getFechaSolicitadaAnulacion() != null)) {
+						this.anularPeticion(request, peticion.getnSolicitud());
+					}
+					else {
+						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
+					}
+				}
+
+				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));
+				
+				
+				LOGGER.info(
+						"anularPeticionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para anular una o varias peticiones");
+
+				LOGGER.info(
+						"anularPeticionMultiple() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para anular una o varias peticiones");
+			}
+
+			LOGGER.info(
+					"anularPeticionMultiple() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para anular una o varias peticiones");
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.debug("anularPeticionnMultiple() -> Salida del servicio para anular una o varias peticiones");
+
+		return insertResponseDTO;
+	}
+
+	@Override
 	public ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud, Date aFechaDe) {
 		
 			ListaServiciosSuscripcionDTO listaServiciosSuscripcion = new ListaServiciosSuscripcionDTO();
@@ -2200,14 +2335,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							if(!peticion.getFechaAceptada().equals(peticion.getServicios().get(0).getFechaAlta())){
 								susc.setFechasuscripcion(peticion.getServicios().get(0).getFechaAlta());
 							}
-							if(!susc.getFechabajafacturacion().equals(peticion.getServicios().get(0).getFechaBaja())){
+							if(susc.getFechabajafacturacion() != null && !susc.getFechabajafacturacion().equals(peticion.getServicios().get(0).getFechaBaja())){
 								//Se modifica unicamente la fecha de bajafacturacion sin importar que el servicio sea automatico o no
 								//ya que la fecha de baja determina la fecha de anulacion de la ficha de suscripcion
 								//y eso no viene reflejado en el funcional.
-								susc.setFechabajafacturacion(peticion.getServicios().get(0).getFechaAlta());
+								susc.setFechabajafacturacion(peticion.getServicios().get(0).getFechaBaja());
 							}
 							if(!peticion.getFechaAceptada().equals(peticion.getServicios().get(0).getFechaAlta()) ||
-									!susc.getFechabajafacturacion().equals(peticion.getServicios().get(0).getFechaBaja())) {
+									(susc.getFechabajafacturacion() != null &&!susc.getFechabajafacturacion().equals(peticion.getServicios().get(0).getFechaBaja()))) {
 								pysSuscripcionMapper.updateByPrimaryKey(susc);
 								if(response == 0) {
 									throw new Exception("Eror al actualizar las suscripciones solicitadas de la petición");

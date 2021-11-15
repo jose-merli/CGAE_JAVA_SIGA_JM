@@ -85,6 +85,13 @@ public class GestionFichaCompraSuscripcionController {
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@PostMapping(value = "/pys/aprobarSuscripcionMultiple")
+	ResponseEntity<InsertResponseDTO> aprobarSuscripcionMultiple(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem[] peticiones) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.aprobarSuscripcionMultiple(request, peticiones);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@PostMapping(value = "/pys/denegarPeticionMultiple")
 	ResponseEntity<InsertResponseDTO> denegarPeticionMultiple(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem[] peticiones) throws Exception {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.denegarPeticionMultiple(request, peticiones);
@@ -152,6 +159,13 @@ public class GestionFichaCompraSuscripcionController {
 		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.anularPeticion(request, nSolicitud);
 		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/anularSuscripcionMultiple")
+	ResponseEntity<InsertResponseDTO> anularSuscripcionMultiple(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem[] peticiones) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.anularPeticionMultiple(request, peticiones);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@GetMapping(value = "/pys/getListaServiciosSuscripcion")
