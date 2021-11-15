@@ -740,13 +740,15 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("f_siga_getrecurso(periodicidad.descripcion, "+idioma+") as periodicidadDesc");     
 		sql.SELECT_DISTINCT("precioServ.descripcion as precioServicioDesc");
 		sql.SELECT_DISTINCT("suscripcion.fechaSuscripcion as fechaAlta");
-		sql.SELECT_DISTINCT("suscripcion.fechaBajaFacturacion as fechaBaja");
+		sql.SELECT_DISTINCT("suscripcion.fechaBajaFacturacion as fechaBaja"); 
 
 		sql.FROM("pys_serviciossolicitados servSol");
 		
 		sql.INNER_JOIN("pys_serviciosInstitucion servIns on servIns.idinstitucion = servSol.idinstitucion AND servIns.idservicio = servSol.idservicio and servIns.idtiposervicios = servSol.idtiposervicios and servIns.idserviciosinstitucion = servSol.idserviciosinstitucion\r\n");
 		sql.LEFT_OUTER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = servIns.idtipoiva \r\n");
-		sql.LEFT_OUTER_JOIN("pys_preciosServicios precioServ on precioserv.idservicio = servIns.idservicio AND precioserv.idtiposervicios = servSol.idtiposervicios AND precioserv.idserviciosinstitucion = servSol.idserviciosinstitucion AND precioserv.idinstitucion = servSol.idinstitucion and precioserv.idpreciosServicios  = servSol.IDPRECIOSSERVICIOS\r\n");
+		sql.LEFT_OUTER_JOIN("pys_preciosServicios precioServ on precioserv.idservicio = servIns.idservicio AND precioserv.idtiposervicios = servSol.idtiposervicios "
+				+ "AND precioserv.idserviciosinstitucion = servSol.idserviciosinstitucion AND precioserv.idinstitucion = servSol.idinstitucion "
+				+ "and precioserv.idpreciosServicios  = servSol.IDPRECIOSSERVICIOS and precioServ.idperiodicidad = servSol.idperiodicidad\r\n");
 		sql.LEFT_OUTER_JOIN("pys_periodicidad periodicidad on periodicidad.idperiodicidad = precioServ.idperiodicidad \r\n");
 		sql.LEFT_OUTER_JOIN("pys_suscripcion suscripcion on suscripcion.idPeticion = servSol.idPeticion and suscripcion.idInstitucion = servSol.idInstitucion and suscripcion.idservicio = servSol.idservicio and suscripcion.idtiposervicios = servSol.idtiposervicios and suscripcion.idserviciosinstitucion = servSol.idserviciosinstitucion \r\n");
 		
