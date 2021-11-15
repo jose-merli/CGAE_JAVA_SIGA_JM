@@ -44,6 +44,7 @@ import org.itcgae.siga.db.entities.FacFormapagoserieExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
 import org.itcgae.siga.db.entities.FacSeriefacturacionBancoExample;
+import org.itcgae.siga.db.entities.FacSeriefacturacionBancoKey;
 import org.itcgae.siga.db.entities.FacSeriefacturacionExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
 import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefac;
@@ -443,19 +444,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			for (SerieFacturacionItem serieFacturacion : serieFacturacionItems) {
+				Long idSerieFacturacion = Long.valueOf(serieFacturacion.getIdSerieFacturacion());
+
 				FacFacturaExample facturaExample = new FacFacturaExample();
 				facturaExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
 						.andIdseriefacturacionEqualTo(Long.valueOf(serieFacturacion.getIdSerieFacturacion()));
 
-				FacSeriefacturacionExample seriefacturacionExample = new FacSeriefacturacionExample();
-				seriefacturacionExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
-						.andIdseriefacturacionEqualTo(Long.valueOf(serieFacturacion.getIdSerieFacturacion()));
+				FacSeriefacturacionKey seriefacturacionKey = new FacSeriefacturacionKey();
+				seriefacturacionKey.setIdinstitucion(usuario.getIdinstitucion());
+				seriefacturacionKey.setIdseriefacturacion(idSerieFacturacion);
 
-				List<FacSeriefacturacion> sfResults = facSeriefacturacionExtendsMapper
-						.selectByExample(seriefacturacionExample);
-				if (null != sfResults && !sfResults.isEmpty()) {
-					FacSeriefacturacion sfToUpdate = sfResults.get(0);
-
+				FacSeriefacturacion sfToUpdate = facSeriefacturacionExtendsMapper.selectByPrimaryKey(seriefacturacionKey);
+				if (null != sfToUpdate) {
 					if (sfToUpdate.getFechabaja() == null) {
 						long numFacturas = facFacturaMapper.countByExample(facturaExample);
 						if (numFacturas == 0) {
@@ -463,15 +463,23 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 									"eliminaSerieFacturacion() -> Baja física de la serie de facturación con idseriefacturacion="
 											+ serieFacturacion.getIdSerieFacturacion());
 
-							facSeriefacturacionExtendsMapper.deleteByExample(seriefacturacionExample);
+							FacSeriefacturacionBancoKey seriefacturacionBancoKey = new FacSeriefacturacionBancoKey();
+							seriefacturacionBancoKey.setIdinstitucion(usuario.getIdinstitucion());
+							seriefacturacionBancoKey.setIdseriefacturacion(idSerieFacturacion);
+							seriefacturacionBancoKey.setBancosCodigo(serieFacturacion.getIdCuentaBancaria());
+
+							facSeriefacturacionBancoMapper.deleteByPrimaryKey(seriefacturacionBancoKey);
+							facSeriefacturacionExtendsMapper.deleteByPrimaryKey(seriefacturacionKey);
 						} else {
 							LOGGER.info(
 									"eliminaSerieFacturacion() -> Baja lógica de la serie de facturación con idseriefacturacion="
-											+ serieFacturacion.getIdSerieFacturacion());
+											+ idSerieFacturacion);
 
 							FacSeriefacturacion sf = new FacSeriefacturacion();
+							sf.setIdinstitucion(usuario.getIdinstitucion());
+							sf.setIdseriefacturacion(idSerieFacturacion);
 							sf.setFechabaja(new Date());
-							facSeriefacturacionExtendsMapper.updateByExampleSelective(sf, seriefacturacionExample);
+							facSeriefacturacionExtendsMapper.updateByPrimaryKeySelective(sf);
 						}
 					} else {
 						LOGGER.debug(
@@ -715,8 +723,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			else
 				serieFacturacion.setConfIngresos(null);
 
-			serieToUpdate.setCtaclientes(serieFacturacion.getCtaClientes().trim());
-			serieToUpdate.setCtaingresos(serieFacturacion.getCtaIngresos().trim());
+			serieToUpdate.setCtaclientes(serieFacturacion.getCtaClientes() != null ? serieFacturacion.getCtaClientes().trim() : null);
+			serieToUpdate.setCtaingresos(serieFacturacion.getCtaIngresos() != null ? serieFacturacion.getCtaIngresos().trim() : null);
 
 			if (isNewSerie) {
 				facSeriefacturacionExtendsMapper.insert(serieToUpdate);
