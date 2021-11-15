@@ -231,7 +231,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String idUltimoEstado = "";
+		//String idUltimoEstado = "";
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -265,11 +265,11 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					tamMaximo = null;
 				}
 
-				idUltimoEstado = scsEjgComisionExtendsMapper.idUltimoEstado(ejgItem, idInstitucion.toString());
+				//idUltimoEstado = scsEjgComisionExtendsMapper.idUltimoEstado(ejgItem, idInstitucion.toString());
 
 				LOGGER.info(
 						"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
-				ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGComision(idUltimoEstado, ejgItem,
+				ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGComision(ejgItem,
 						idInstitucion.toString(), tamMaximo, "1"));
 				LOGGER.info(
 						"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
