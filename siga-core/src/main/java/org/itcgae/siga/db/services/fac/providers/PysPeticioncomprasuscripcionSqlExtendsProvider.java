@@ -556,6 +556,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ "ELSE precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, "+idioma+") || ')' END as PrecioPerio");
 		sql.SELECT_DISTINCT("suscripcion.fechasuscripcion as fechasuscripcion");
 		sql.SELECT_DISTINCT("suscripcion.fechabaja as fechabaja");
+		sql.SELECT_DISTINCT("SUM(servIns.solicitarBaja) as solicitarBaja");
+		sql.SELECT_DISTINCT("case when factSus.idfactura is null then '0' else '1' end as facturas");
 
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet"); 
 
@@ -708,6 +710,19 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		}
 //		private String importe; // valor aplicado durante la compra (importe total)
 		sql.WHERE("rownum <= 200");
+		
+		sql.GROUP_BY("servIns.solicitarBaja, pet.fecha, pet.idPeticion, pet.idPersona, per.nifcif, col.NCOLEGIADO \r\n"
+				+ ", per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre \r\n"
+				+ ", CASE WHEN suscripcion.fechabaja is not null or petBaja.fecha is null THEN servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' ELSE servIns.descripcion END , servSol.idformapago\r\n"
+				+ ", CASE WHEN servIns.noFacturable = '1' THEN 'No facturable'\r\n"
+				+ "ELSE f_siga_getrecurso(formPago.descripcion, 1) END , CASE WHEN suscripcion.fechasuscripcion is null THEN petBaja.fecha \r\n"
+				+ "ELSE null END\r\n"
+				+ ", CASE WHEN suscripcion.fechasuscripcion is not null THEN petBaja.fecha \r\n"
+				+ "ELSE null END\r\n"
+				+ ", suscripcion.fechasuscripcion, suscripcion.fechaBaja, f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'1'), CASE WHEN SUBSTR(precioServ.valor, 1, 1) = ',' THEN \r\n"
+				+ "'0' || precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, 1) || ')' \r\n"
+				+ "ELSE precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, 1) || ')' END, suscripcion.fechasuscripcion , suscripcion.fechabaja\r\n"
+				+ ", case when factSus.idfactura is null then '0' else '1' end");
 
 		return sql.toString();
 	}

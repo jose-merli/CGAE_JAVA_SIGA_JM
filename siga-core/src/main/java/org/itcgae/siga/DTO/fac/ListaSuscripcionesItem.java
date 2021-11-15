@@ -23,6 +23,10 @@ public class ListaSuscripcionesItem {
 	private Date fechaSuscripcion; 
 	private Date fechaBaja;
 	private String idEstadoFactura;
+	private String facturas;
+	private String solicitarBaja;//En este caso representa si todos los servicios tienen el valor "solicitarBaja" a 1 o no. 
+	//Se realiza una resta de los valores con el numero de columnas. Si no es 0, un colegiado no puede solicitar una anulación.
+	private String automatico;
 	
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
@@ -137,6 +141,24 @@ public class ListaSuscripcionesItem {
 	}
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
+	}
+	public String getFacturas() {
+		return facturas;
+	}
+	public void setFacturas(String facturas) {
+		this.facturas = facturas;
+	}
+	public String getSolicitarBaja() {
+		return solicitarBaja;
+	}
+	public void setSolicitarBaja(String solicitarBaja) {
+		this.solicitarBaja = solicitarBaja;
+	}
+	public String getAutomatico() {
+		return automatico;
+	}
+	public void setAutomatico(String automatico) {
+		this.automatico = automatico;
 	}
 
 }

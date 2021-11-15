@@ -153,7 +153,10 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "fechaSuscripcion", property = "fechaSuscripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "estadoFactura", property = "idEstadoFactura", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "precioServicioDesc", property = "precioServicioDesc", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "precioServicioDesc", property = "precioServicioDesc", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "facturas", property = "facturas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR)
 			
 		})
 	List<ListaSuscripcionesItem> getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma);
