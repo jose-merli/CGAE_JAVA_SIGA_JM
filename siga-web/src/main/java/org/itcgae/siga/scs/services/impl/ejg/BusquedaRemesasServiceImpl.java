@@ -891,6 +891,11 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			key.setParametro("PCAJG_TIPO");
 
 			parametro = genParametrosMapper.selectByPrimaryKey(key);
+			
+			if(parametro == null) {
+				key.setIdinstitucion(new Short("0"));
+				parametro = genParametrosMapper.selectByPrimaryKey(key);	
+			}
 
 			LOGGER.debug(
 					"getTipoPCAJG() / genParametrosMapper.selectByPrimaryKey() -> Entrada a GenParametrosMapper para obtener el tipo de PCAJG de la institucion logeada"

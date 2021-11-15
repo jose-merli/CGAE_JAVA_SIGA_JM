@@ -53,7 +53,7 @@ public class RemesasResolucionesController {
 		return response;	
 	}
 	
-	@RequestMapping(value = "/obtenerOperacionTipoAccion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/obtenerOperacionTipoAccion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EcomOperacionTipoaccionDTO> obtenerOperacionTipoAccion(HttpServletRequest request) {
 		LOGGER.info("Entra en el método obtenerOperacionTipoAccion");
 		EcomOperacionTipoaccionDTO response = remesasResoluciones.obtenerOperacionTipoAccion(request);
@@ -70,7 +70,7 @@ public class RemesasResolucionesController {
 	}
 	
 	@RequestMapping(value = "/guardarRemesaResolucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestParam int idRemesa,
+	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestParam int idRemesaResolucion,
 													@RequestParam("observaciones") String observaciones,
 													@RequestParam("nombreFichero") String nombreFichero,
 													@RequestParam("fechaResolucion") String fechaResolucion,
@@ -78,8 +78,8 @@ public class RemesasResolucionesController {
 		LOGGER.info("----ENTRA METODO GUARDAR RESOLUCION-----");
 		RemesasResolucionItem remesasResolucionItem = new RemesasResolucionItem();
 		
-		if(idRemesa != 0) {
-			remesasResolucionItem.setIdRemesa(idRemesa);
+		if(idRemesaResolucion != 0) {
+			remesasResolucionItem.setIdRemesa(idRemesaResolucion);
 		}
 		remesasResolucionItem.setObservaciones(observaciones);
 		remesasResolucionItem.setNombreFichero(nombreFichero);
