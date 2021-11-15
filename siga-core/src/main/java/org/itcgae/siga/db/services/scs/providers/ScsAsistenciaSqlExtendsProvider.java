@@ -687,38 +687,43 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 	public String searchAsistencias(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion, Integer idLenguaje, Integer tamMax) {
 		SQL SQL = new SQL();
 		SQL SQL_PADRE = new SQL();
-		SQL.SELECT_DISTINCT("a.anio",
-				"a.numero",
-				"TO_CHAR(a.fechahora,'DD/MM/YYYY HH24:MI') fechahora",
-				"a.idguardia",
-				"g.nombre nombreGuardia",
-				"a.idturno",
-				"t.nombre nombreTurno",
-				"a.idpersonajg",
-				"CASE" +
-						" WHEN a.idpersonajg is not null" +
-						" then pjg.apellido1 || ' ' || pjg.apellido2 || ', ' || pjg.nombre" +
-						" else ''" +
-						" end asistido",
-				"a.idestadoasistencia",
-				"f_siga_getrecurso (ea.descripcion,"+idLenguaje+") estadoasistencia",
-				"a.idpersonacolegiado",
-				"p.apellidos1 || ' ' || p.apellidos2 || ', ' || p.nombre letrado",
-				"CASE" +
-				" WHEN UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) is null" +
-				"    THEN 'VACÍO'" +
-				" ELSE" +
-				"    UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) " +
-				"END actuacionesvalidadas",
-				"a.IDTIPOASISTENCIACOLEGIO",
-				"a.fechacierre",
-				"a.fechasolicitud",
-				"g.REQUERIDAVALIDACION");
+		SQL.SELECT("a.anio");
+		SQL.SELECT("a.numero");
+		SQL.SELECT("TO_CHAR(a.fechahora,'DD/MM/YYYY HH24:MI') fechahora");
+		SQL.SELECT("a.idguardia");
+		SQL.SELECT("(SELECT g.nombre FROM scs_guardiasturno g WHERE a.idguardia = g.idguardia AND a.idinstitucion = g.idinstitucion AND a.idturno = g.idturno) nombreguardia");
+		SQL.SELECT("a.idturno");
+		SQL.SELECT("(SELECT t.nombre FROM scs_turno t WHERE a.idturno = t.idturno AND a.idinstitucion = t.idinstitucion ) nombreturno");
+		SQL.SELECT("a.idpersonajg");
+		SQL.SELECT("(SELECT pjg.apellido1 || ' ' || pjg.apellido2 || ', ' || pjg.nombre FROM scs_personajg pjg WHERE pjg.idinstitucion = a.idinstitucion AND pjg.idpersona = a.idpersonajg) asistido");
+		SQL.SELECT("a.idestadoasistencia");
+		SQL.SELECT("(SELECT f_siga_getrecurso(ea.descripcion, "+idLenguaje+") FROM scs_estadoasistencia ea WHERE a.idestadoasistencia = ea.idestadoasistencia) estadoasistencia");
+		SQL.SELECT("a.idpersonacolegiado");
+		SQL.SELECT("p.apellidos1 || ' ' || p.apellidos2 || ', ' || p.nombre letrado");
+		SQL.SELECT("CASE" +
+			" WHEN (" +
+            	" SELECT COUNT(*) cantidad FROM scs_actuacionasistencia act" +
+            	" WHERE act.idinstitucion = a.idinstitucion AND act.anio = a.anio AND act.numero = a.numero" +
+            " ) = 0 THEN" +
+            	" 'VACÍO'" +
+            " WHEN (" +
+            	" SELECT COUNT(*) cantidad FROM scs_actuacionasistencia act" +
+            	" WHERE act.idinstitucion = a.idinstitucion AND act.anio = a.anio AND act.numero = a.numero AND act.validada = 0" +
+            " ) > 0 THEN" +
+            	" 'NO'" +
+            " ELSE" +
+            	" 'SI'" +
+			" END actuacionesvalidadas");
+		SQL.SELECT("a.IDTIPOASISTENCIACOLEGIO");
+		SQL.SELECT("a.fechacierre");
+		SQL.SELECT("a.fechasolicitud");
+		SQL.SELECT("(SELECT g.requeridavalidacion FROM scs_guardiasturno g WHERE a.idguardia = g.idguardia AND a.idinstitucion = g.idinstitucion AND a.idturno = g.idturno) requeridavalidacion");
 		SQL.FROM("scs_asistencia a");
 
-		SQL.INNER_JOIN("scs_guardiasturno g on a.idguardia = g.idguardia and a.idinstitucion = g.idinstitucion and a.idturno = g.idturno",
-				"scs_turno t on a.idturno = t.idturno and a.idinstitucion = t.idinstitucion",
-				"scs_estadoasistencia ea on a.idestadoasistencia = ea.idestadoasistencia",
+		SQL.INNER_JOIN(
+				//"scs_guardiasturno g on a.idguardia = g.idguardia and a.idinstitucion = g.idinstitucion and a.idturno = g.idturno",
+				//"scs_turno t on a.idturno = t.idturno and a.idinstitucion = t.idinstitucion",
+				//"scs_estadoasistencia ea on a.idestadoasistencia = ea.idestadoasistencia",
 				"cen_persona p on p.idpersona = a.idpersonacolegiado");
 		SQL.WHERE("a.idinstitucion = "+idInstitucion);
 		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getAnio())){
@@ -893,7 +898,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 			}
 
 		}
-		SQL.ORDER_BY("a.anio","a.numero");
+		SQL.ORDER_BY("a.anio DESC","a.numero DESC");
 		SQL_PADRE.SELECT(" *");
 		SQL_PADRE.FROM("( " + SQL.toString() + " )");
 		if(tamMax != null && tamMax > 0) {
