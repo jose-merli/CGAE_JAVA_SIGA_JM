@@ -177,7 +177,7 @@ public class ScsRemesasExtendsProvider {
 		if(remesasBusquedaItem.isInformacionEconomica()) {
 			sql.WHERE("rem.IDTIPOREMESA = 1");
 		}else {
-			sql.WHERE("rem.IDTIPOREMESA = 0 or rem.IDTIPOREMESA is null");
+			sql.WHERE("(rem.IDTIPOREMESA = 0 or rem.IDTIPOREMESA is null)");
 		}
 
 		sql.WHERE("est.fechamodificacion = (" + fechamodificacion.toString() + ")");
