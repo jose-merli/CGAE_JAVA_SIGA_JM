@@ -35,7 +35,7 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
 
 	})
-	List<EjgItem> busquedaEJGComision(String idUltimoEstado, EjgItem ejgItem, String string, Integer tamMaximo,
+	List<EjgItem> busquedaEJGComision(EjgItem ejgItem, String string, Integer tamMaximo,
 			String idLenguaje);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "comboColegioEjgComision")
