@@ -32,8 +32,9 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		//query principal
 		principal.SELECT("c.idinstitucion, c.iddisquetecargos, c.nombrefichero, c.bancos_codigo, b.comisiondescripcion || ' (...' || SUBSTR(IBAN, -4) || ')' CUENTA_ENTIDAD, b.iban, "
 				+ "c.fechacreacion, c.idseriefacturacion, nvl(sf.nombreabreviado,'<FACTURAS SUELTAS>') nombreabreviado,c .idprogramacion, nvl(p.descripcion,'<FACTURAS SUELTAS>') descripcion, "
-				+ "c.fechacargo, c.numerolineas, c.idsufijo,( sufijo || ' - ' || concepto ) sufijo, ("+totalRemesa.toString()+") total_remesa, ("+numRecibos.toString()+") AS NUMRECIBOS");
-	
+				+ "c.fechacargo, c.numerolineas, c.idsufijo,( sufijo || ' - ' || concepto ) sufijo, ("+totalRemesa.toString()+") total_remesa, ("+numRecibos.toString()+") AS NUMRECIBOS, "
+				+ "c.fechapresentacion, c. fecharecibosprimeros, c.fecharecibosrecurrentes, c.fechareciboscor1, c.fecharecibosb2b");
+		
 		principal.FROM("fac_disquetecargos c");
 		principal.INNER_JOIN("fac_bancoinstitucion b ON (c.idinstitucion=b.idinstitucion AND c.bancos_codigo=b.bancos_codigo)");
 		principal.LEFT_OUTER_JOIN("fac_seriefacturacion sf ON (sf.idinstitucion=c.idinstitucion AND sf.idseriefacturacion=c.idseriefacturacion)");
