@@ -1,9 +1,51 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.poi.openxml4j.opc.internal.FileHelper;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.PropertyReader;
+import org.itcgae.siga.commons.utils.ReadProperties;
+import org.itcgae.siga.commons.utils.SIGAReferences;
+import org.itcgae.siga.commons.utils.SIGAReferences.RESOURCE_FILES;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class UtilidadesImpreso190 {
+	
+	private static final SimpleDateFormat sdfLong = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); 
+	private static final SimpleDateFormat sdfShort = new SimpleDateFormat("yyyyMMdd"); 
+	private static final String sError = "\n***** ERROR ***** ";
+	private static String fileName;
+	private static int loglevel=10;
+	
+	private static boolean iniciado=false;
+	private static boolean bStoreFile; //Indica si se escribir� en el fichero de log de la capa b�sica.
+	private static boolean bConsole=true;   //Indica si se escribir� en la consola. 
+	private static boolean bLog4j;     //Indica si se escribir� en el fichero de log de log4j.
+	private static boolean bLogXeMail;     //Indica si se escribir� en el fichero de log de log4j.
+	
+	//private static Logger logger=null;
+	private static Logger logger = null;
+	private static Logger logXeMail = null;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
 	// quita los acentos
 			public static String quitarAcentos (String cadena) {
 				
@@ -48,7 +90,7 @@ public class UtilidadesImpreso190 {
 	 private static int replaceFirstIgnoreCase (String texto[], String clave, String valor, int posIni)
 	    {
 	    	if (texto==null || texto.length < 0 ||clave ==null||valor ==null){ 
-	    		//ClsLogging.writeFileLogWithoutSession("replaceFirstIgnoreCase.returnmenosuno");
+	    		//writeFileLogWithoutSession("replaceFirstIgnoreCase.returnmenosuno");
 	    		return -1;
 	    	}
 	    	
@@ -61,6 +103,41 @@ public class UtilidadesImpreso190 {
 	    	texto[0] = t;
 	    	return ini + valor.length();
 	    }
+	 
+	 public void writeFileLogWithoutSession(String s, int i)
+		{
+		 //init();
+			PrintWriter printer = null;
+			try
+			{
+				Date dat = Calendar.getInstance().getTime();
+
+				if (bConsole)
+				{
+					System.out.println(sdfLong.format(dat)+s);
+				}
+
+				if (bLog4j && logger!=null)
+				{
+					logger.info(s);
+				}
+
+				if(bStoreFile)
+				{
+					printer = new PrintWriter(new BufferedWriter(new FileWriter(fileName+sdfShort.format(dat) +".out", true)));
+					printer.println(sdfLong.format(dat)+ s);
+					printer.flush();
+					printer.close();
+				} 
+			} catch(Exception _ex) {
+				System.out.println("Error Escribiendo Log :"+_ex.toString());
+			} finally {
+			    try {
+			        printer.flush();
+					printer.close();
+			    } catch (Exception eee) {}
+			}
+		}
 	 
 	 public static String validarModelo190 (String nombre) 
 	    {
@@ -189,4 +266,117 @@ public class UtilidadesImpreso190 {
 				
 				return salida;	
 			}
+			
+			public static String formateaDecimal (Object datoOrig, int longitud) {
+				String salida= datoOrig.toString();
+				if (datoOrig==null) {
+					salida += relleno("0",longitud);  
+				} 
+				else {
+					salida += relleno("0",longitud - salida.length());
+				}
+				return salida;
+			}
+			
+			public static String getTipoIdentificacion(int tipo){
+				String sal = "";
+				
+				switch(tipo) {
+					case SigaConstants.TIPO_IDENTIFICACION_NIF: sal="NIF";
+					case SigaConstants.TIPO_IDENTIFICACION_CIF: sal="CIF";
+					case SigaConstants.TIPO_IDENTIFICACION_OTRO: sal="OTRO";
+					case SigaConstants.TIPO_IDENTIFICACION_PASAPORTE: sal="PASAPORTE";
+					case SigaConstants.TIPO_IDENTIFICACION_TRESIDENTE: sal="NIE";
+				}
+				
+				return sal;
+			}
+		
+//			private static synchronized void init() {
+//		
+//				if(!iniciado) {
+//					iniciado=true;
+//					//ClsLogging.writeFileLog("CLSLOGGING INIT() SE EJECUTA",3);
+//				    ReadProperties rp= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
+////					ReadProperties rp=new ReadProperties("SIGA.properties");
+//
+//					//LMS 29/08/2006
+//					//Esto viene de la capa b�sica, pero se ha adaptado a SIGA.
+//					//bStoreFile=rp.returnProperty("LOG.run").equals("1");
+//					bStoreFile=rp.returnProperty("LOG.fichero").equals("1");
+//					bConsole=rp.returnProperty("LOG.consola").equals("1");
+//					bLog4j=rp.returnProperty("LOG.log4j").equals("1");
+//					bLogXeMail=rp.returnProperty("LOG.email").equals("1");
+//					
+//					try {
+//						StringBuilder strBld = new StringBuilder();
+//						strBld.append(SIGAReferences.RESOURCE_FILES.WEB_INF_DIR.getFileName())
+//								.append(rp.returnProperty("LOG.dir")).append("/").append(rp.returnProperty("LOG.name"));
+//						fileName=SIGAReferences.getReference(strBld.toString());
+//					} catch (Exception e){
+//						e.printStackTrace();
+//					}
+//					
+//					try{
+//						loglevel = Integer.parseInt(rp.returnProperty("LOG.level").trim());
+//					}catch (Exception nfe){
+//						nfe.printStackTrace();
+//					}
+//					
+//					try{
+//						PropertyConfigurator.configure(PropertyReader.getProperties(RESOURCE_FILES.SIGA.LOG4J));
+//						logger = Logger.getLogger("SIGA");
+//					}catch(Exception e){
+//						logger=null;
+//						e.printStackTrace();
+//					}
+//					
+//					try{
+//						logXeMail = Logger.getLogger("EMAIL");
+//					}catch(Exception e){
+//						logXeMail=null;
+//						e.printStackTrace();
+//					}
+//					
+//					//System.out.println("GESTION DEL LOG: logLevel Init="+loglevel);
+//					ClsLogging.writeFileLog("--------------------",3);
+//					ClsLogging.writeFileLog("Info del LOG de SIGA",3);
+//					ClsLogging.writeFileLog("--------------------",3);
+//					ClsLogging.writeFileLog("- Fichero: " + (bStoreFile?"ACTIVADO":"DESACTIVADO"),3);
+//					ClsLogging.writeFileLog("- Consola: " + (bConsole?"ACTIVADA":"DESACTIVADA"),3);
+//					ClsLogging.writeFileLog("- Log4j:   " + (bLog4j?"ACTIVADO":"DESACTIVADO"),3);
+//					ClsLogging.writeFileLog("- LogXeMail:   " + (bLogXeMail?"ACTIVADO":"DESACTIVADO"),3);
+//					ClsLogging.writeFileLog("--------------------",3);
+//				}
+//			}
+//			
+//			public static void reset(){
+//				iniciado = false;
+//				init();
+//			}
+//			
+//			public static void writeFileLog(String s, int i) {
+//				writeFileLog(s, null, i);  
+//			}
+//			
+//			public static void writeFileLog(String s) {
+//				init();
+//				writeFileLogWithoutSession(s);  
+//			}
+//			
+//			public static void writeFileLog(String s, HttpServletRequest httpservletrequest, int i)
+//			{
+//				if (httpservletrequest==null)
+//				{
+//					init();
+//					if(i <= loglevel)  {
+//						writeFileLogWithoutSession(s,i);
+//					}
+//				} else {
+//					HttpSession httpsession = httpservletrequest.getSession(true);
+//					writeFileLog(s, httpservletrequest.getHeader("user-agent"), httpsession.getId(),
+//							(UsrBean)httpsession.getAttribute("USRBEAN"),
+//							httpservletrequest.getRemoteAddr(), i, false);
+//				}
+//			}
 }

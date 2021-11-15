@@ -1175,5 +1175,16 @@ public class SigaConstants {
     public static final String CODIGO_PROVINCIA_CEUTA = "51";
     public static final String CODIGO_PROVINCIA_MELILLA = "52";
     
+//	Tipo de identificaci�n
+	public static final int TIPO_IDENTIFICACION_NIF 		= 10;	
+	public static final int TIPO_IDENTIFICACION_CIF 		= 20;	
+	public static final int TIPO_IDENTIFICACION_TRESIDENTE 	= 40;	
+	public static final int TIPO_IDENTIFICACION_PASAPORTE 	= 30;
+	public static final int TIPO_IDENTIFICACION_OTRO	 	= 50;
+	
+	public static final String SEPARADOR = "	";
+	
+	public static final String IMPRESO190_ENCODING =  "ISO-8859-1";
+    
 
 }

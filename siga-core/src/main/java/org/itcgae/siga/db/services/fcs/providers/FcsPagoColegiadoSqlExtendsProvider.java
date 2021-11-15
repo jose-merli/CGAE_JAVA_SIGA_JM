@@ -40,7 +40,7 @@ public class FcsPagoColegiadoSqlExtendsProvider extends FcsPagoColegiadoSqlProvi
 	
 	
 	
-	public String getIrpfPagos(String institucion, String pagos) {
+	public String getIrpfByPago(String institucion, String pagos) {
 		SQL sql = new SQL();
 		
 		sql.SELECT("IDPERSONAIMPRESO,"

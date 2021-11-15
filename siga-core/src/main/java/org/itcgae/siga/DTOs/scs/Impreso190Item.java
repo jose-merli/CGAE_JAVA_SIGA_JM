@@ -11,10 +11,15 @@ public class Impreso190Item {
 	String anio;
 	int telefonoContacto;
 	String nombreContacto;
+	String apellido1Contacto;
+	String apellido2Contacto;
+	int telefono;
+	String nombrePersona;
 	String apellido1;
 	String apellido2;
 	String soporte;
-	String nomFichero;
+	String nomFicheroOriginal;
+	String nomFicheroCompleto;
 	String idpersonaImpreso;
 	String totalImporteIrpf;
 	String totalImportePagado;
@@ -25,6 +30,8 @@ public class Impreso190Item {
 	String nombreInstitucion;
 	String idinstitucion;
 	String usuarioModificacion;
+	String codigoProvincia;
+	String nomFichero;
 	
 
 }
