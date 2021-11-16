@@ -634,7 +634,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					//comprobamos si es insert o update
 					if(SolIncorporacionDTO.getIdSolicitud()!=null){
 						solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
-						update = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
+						update = _cenSolicitudincorporacionMapper.updateByPrimaryKeySelective(solIncorporacion);
 					}else{
 						MaxIdDto idSolicitud = _cenSolicitudincorporacionExtendsMapper.getMaxIdRecurso();
 						Long idMax = idSolicitud.getIdMax() +1;
@@ -674,7 +674,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						
 						solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
 						solIncorporacion.setIdestado((short)20);
-						insert = _cenSolicitudincorporacionMapper.insert(solIncorporacion);
+						insert = _cenSolicitudincorporacionMapper.insertSelective(solIncorporacion);
 					}
 					if(insert == 1 | update ==1 ){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
@@ -904,14 +904,29 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setApellido1(dto.getApellido1());
 		solIncorporacion.setApellido2(dto.getApellido2());
 		solIncorporacion.setCboCodigo(dto.getCboCodigo());
-		solIncorporacion.setCodigopostal(dto.getCodigoPostal());
+		
+		if(!dto.getCodigoPostal().equals("") && dto.getCodigoPostal() != null) {
+			solIncorporacion.setCodigopostal(dto.getCodigoPostal());
+		}else {
+			solIncorporacion.setCodigopostal(" ");
+		}
+		
 		solIncorporacion.setCodigosucursal(dto.getCodigoSucursal());
-		solIncorporacion.setCorreoelectronico(dto.getCorreoElectronico());
+		
+		if(!dto.getCorreoElectronico().equals("") && dto.getCorreoElectronico() != null) {
+			solIncorporacion.setCorreoelectronico(dto.getCorreoElectronico());
+		}else {
+			solIncorporacion.setCorreoelectronico(" ");
+		}
 		solIncorporacion.setDigitocontrol(dto.getDigitoControl());
 		solIncorporacion.setFax1(dto.getFax1());
 		solIncorporacion.setFax2(dto.getFax2());
 		////solIncorporacion.setFechaalta(new Date());
-		solIncorporacion.setFechaestado(dto.getFechaEstado());
+		if(dto.getFechaEstado() != null) {
+			solIncorporacion.setFechaestado(dto.getFechaEstado());
+		}else {
+			solIncorporacion.setFechaestado(new Date());
+		}
 		solIncorporacion.setFechaestadocolegial(dto.getFechaIncorporacion());
 		solIncorporacion.setFechamodificacion(new Date());
 		solIncorporacion.setFechanacimiento(dto.getFechaNacimiento());
@@ -937,16 +952,33 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			solIncorporacion.setIdestadocivil(Short.parseShort(dto.getIdEstadoCivil()));
 		}
 		solIncorporacion.setIdinstitucion(usuario.getIdinstitucion());
-		solIncorporacion.setIdmodalidaddocumentacion(Short.parseShort(dto.getIdModalidadDocumentacion()));
+		
+		if(dto.getIdModalidadDocumentacion() != null){
+			solIncorporacion.setIdmodalidaddocumentacion(Short.parseShort(dto.getIdModalidadDocumentacion()));
+		}
+		
 		solIncorporacion.setIdpais(dto.getIdPais());
 		solIncorporacion.setDomicilio(dto.getDomicilio());
 		solIncorporacion.setIdpoblacion(dto.getIdPoblacion());
 		solIncorporacion.setIdprovincia(dto.getIdProvincia());
 		solIncorporacion.setPoblacionextranjera(dto.getPoblacionExtranjera());
-		solIncorporacion.setIdtipocolegiacion(Short.parseShort(dto.getTipoColegiacion()));
-		solIncorporacion.setIdtipoidentificacion(Short.parseShort(dto.getIdTipoIdentificacion()));
-		solIncorporacion.setIdtiposolicitud(Short.parseShort(dto.getIdTipo()));
-		solIncorporacion.setIdtratamiento(Short.parseShort(dto.getTratamiento()));
+		
+		if(dto.getTipoColegiacion() != null) {
+			solIncorporacion.setIdtipocolegiacion(Short.parseShort(dto.getTipoColegiacion()));
+		}
+		
+		if(dto.getIdTipoIdentificacion() != null) {
+			solIncorporacion.setIdtipoidentificacion(Short.parseShort(dto.getIdTipoIdentificacion()));
+		}
+		
+		if(dto.getIdTipo() != null) {
+			solIncorporacion.setIdtiposolicitud(Short.parseShort(dto.getIdTipo()));
+		}
+		
+		if(dto.getTratamiento() != null) {
+			solIncorporacion.setIdtratamiento(Short.parseShort(dto.getTratamiento()));
+		}
+		
 		solIncorporacion.setMovil(dto.getMovil());
 		solIncorporacion.setNaturalde(dto.getNaturalDe());
 		solIncorporacion.setNcolegiado(dto.getNumColegiado());
