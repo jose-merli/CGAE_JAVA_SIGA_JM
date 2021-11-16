@@ -27,6 +27,7 @@ import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioyProgramacionItem;
 import org.itcgae.siga.DTOs.scs.DeleteCalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
@@ -236,9 +237,10 @@ public class GuardiaController {
 		List<DatosCalendarioProgramadoItem> response = guardiasService.getCalendarioProgramado(calendarioProgBody, request);
 		return new ResponseEntity<List<DatosCalendarioProgramadoItem>>(response, HttpStatus.OK);
 	}
-	@PostMapping(value = "/getGuardiasCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<GuardiaCalendarioItem>> getGuardiasCalendario(@RequestBody String idCalendar, HttpServletRequest request) {
-		List<GuardiaCalendarioItem> response = guardiasService.getGuardiasFromCalendar(idCalendar, request);
+	@GetMapping(value = "/getGuardiasCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<GuardiaCalendarioItem>> getGuardiasCalendario(@RequestParam("idCalendar") String idCalendar,
+			@RequestParam("fechaDesde") String fechaDesde, @RequestParam("fechaHasta") String fechaHasta, HttpServletRequest request) {
+		List<GuardiaCalendarioItem> response = guardiasService.getGuardiasFromCalendar(idCalendar, fechaDesde, fechaHasta, request);
 	return new ResponseEntity<List<GuardiaCalendarioItem>>(response, HttpStatus.OK);
 }
 	
@@ -336,7 +338,7 @@ public class GuardiaController {
 	
 	@PostMapping(value = "/generarCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> generarCalendario(
-			@RequestBody DatosCalendarioProgramadoItem programacionItem, HttpServletRequest request) {
+			@RequestBody DatosCalendarioProgramadoItem programacionItem, HttpServletRequest request) throws Exception {
 		InsertResponseDTO response = guardiasService.generarCalendario(request, programacionItem);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 			}
@@ -344,7 +346,7 @@ public class GuardiaController {
 	
 	@PostMapping(value = "/descargarZipExcelLog", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InputStreamResource> descargarZIPExcelLog(
-			@RequestBody  List<DatosCalendarioProgramadoItem> programacionItemList, HttpServletRequest request) {
+			@RequestBody  List<DatosCalendarioyProgramacionItem> programacionItemList, HttpServletRequest request) {
 		ByteArrayInputStream response = guardiasService.descargarZIPExcelLog(request, programacionItemList);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.parseMediaType("application/zip"));
@@ -366,8 +368,8 @@ public class GuardiaController {
 	
 	
 	@RequestMapping(value = "/descargarExcelLog",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public ResponseEntity<InputStreamResource> descargarModelo(@RequestBody DatosCalendarioProgramadoItem programacionItem, HttpServletRequest request) throws IOException, EncryptedDocumentException, InvalidFormatException {
-		DatosDocumentoItem response = guardiasService.descargarExcelLog(request, programacionItem);
+	public ResponseEntity<InputStreamResource> descargarExcelLog(@RequestBody DatosCalendarioyProgramacionItem calyProgItem, HttpServletRequest request) throws IOException, EncryptedDocumentException, InvalidFormatException {
+		DatosDocumentoItem response = guardiasService.descargarExcelLog(request, calyProgItem);
 		ByteArrayInputStream bis = new ByteArrayInputStream(response.getDatos());
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.parseMediaType("application/octet-stream"));

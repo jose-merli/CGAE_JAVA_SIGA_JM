@@ -20,6 +20,7 @@ public class DatosCalendarioProgramadoItem {
 	private String idCalendarioProgramado;
 	private Boolean facturado;
 	private Boolean asistenciasAsociadas;
+	private String idCalendarioGuardia;
 	
 	public String getFechaDesde() {
 		return fechaDesde;
@@ -122,6 +123,12 @@ public class DatosCalendarioProgramadoItem {
 	}
 	public void setAsistenciasAsociadas(Boolean asistenciasAsociadas) {
 		this.asistenciasAsociadas = asistenciasAsociadas;
+	}
+	public String getIdCalendarioGuardia() {
+		return idCalendarioGuardia;
+	}
+	public void setIdCalendarioGuardia(String idCalendarioGuardia) {
+		this.idCalendarioGuardia = idCalendarioGuardia;
 	}
 
 	

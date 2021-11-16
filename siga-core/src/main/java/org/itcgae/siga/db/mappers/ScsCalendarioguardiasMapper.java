@@ -201,4 +201,37 @@ public interface ScsCalendarioguardiasMapper {
           "and IDCALENDARIOGUARDIAS = #{idcalendarioguardias,jdbcType=DECIMAL}"
     })
     int updateByPrimaryKey(ScsCalendarioguardias record);
+    
+    @SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "setLogName")
+	@Results(
+			)
+	String setLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String logName, String idTurno, String idGuardia);
+	
+	
+//	@SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "addLogName")
+//	@Results(
+//			)
+//	String addLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String logName, String idTurno, String idGuardia);
+//	
+	
+	@SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "getLogName")
+	@Results(
+			)
+	String getLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String idTurno, String idGuardia);
+	
+	@SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "getGeneracionEnProceso")
+	@Results(
+			)
+	String getGeneracionEnProceso();
+	
+	@SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "getGenerado")
+	@Results(
+			)
+	String getGenerado(String idProgCal);
+	
+	@InsertProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "setGeneracionEnProceso")
+	@Results(
+			)
+	int setGeneracionEnProceso(String idProgCal, String procesando);
+	
 }

@@ -387,4 +387,5 @@ public class ScsProgCalendariosSqlProvider {
 			sql.WHERE(sb.toString());
 		}
 	}
+	
 }

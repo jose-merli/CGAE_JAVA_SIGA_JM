@@ -121,6 +121,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 	@Autowired
 	private ScsGuardiascolegiadoMapper scsGuardiascolegiadoMapper;
 	
+	@Autowired
+	private ScsCalendarioguardiasMapper scsCalendarioguardiasMapper;
 	
 	private static final String ESTADO_PENDIENTE = "5"; 
 	@Override
@@ -1909,8 +1911,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									String nextIdCalendarioProgramado = getNuevoIdCalProg();
 									calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
 									int  res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(nextIdCalendarioProgramado, calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
-
-										String idProgramacion = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
+										
+									String idProgramacion = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
 										//generamos un calendario por cada guardia asociada a esa programacion	
 										GuardiaCalendarioItem item = new GuardiaCalendarioItem();
 										item.setIdGuardia(idGuardia);

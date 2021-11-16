@@ -413,4 +413,107 @@ public class ScsCalendarioguardiasSqlProvider {
             sql.WHERE(sb.toString());
         }
     }
+    
+	
+	
+	   public String setLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String logName, String idTurno, String idGuardia) {
+
+		SQL sql = new SQL();
+		 
+		sql.UPDATE("SCS_CALENDARIOGUARDIAS PC");
+			if (logName != null && !logName.isEmpty()) {
+				sql.SET("LOG_GENERACION_NAME = '" + logName + "'");
+			}
+			if (idCG != null && !idCG.isEmpty()) {
+				sql.WHERE("PC.IDCALENDARIOGUARDIAS = " + idCG);
+			}
+			if (idInstitucion != null && !idInstitucion.isEmpty()) {
+				sql.WHERE("PC.IDINSTITUCION = " + idInstitucion);
+			}
+			if (idTurno != null && !idTurno.isEmpty()) {
+				sql.WHERE("PC.IDTURNO = " + idTurno);
+			}
+			if (idGuardia != null && !idGuardia.isEmpty()) {
+				sql.WHERE("PC.IDGUARDIA = " + idGuardia);
+			}
+
+		return sql.toString();
+	}
+
+//	   public String addLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String logName, String idTurno, String idGuardia) {
+//
+//		SQL sql = new SQL();
+//		 
+//		sql.INSERT_INTO("SCS_CALENDARIOGUARDIAS");
+//			if (logName != null && !logName.isEmpty()) {
+//			sql.VALUES("LOG_GENERACION_NAME", logName);
+//			}
+//			if (fechaIni != null && !fechaIni.isEmpty()) {
+//			sql.WHERE("FECHACALINICIO", "TO_DATE('" + fechaIni+ "', 'dd/MM/yyyy')");
+//			}
+//			if (fechaFin != null && !fechaFin.isEmpty()) {
+//			sql.WHERE("FECHACALFIN", "TO_DATE('" + fechaFin + "', 'dd/MM/yyyy')");
+//			}
+//			if (idCG != null && !idCG.isEmpty()) {
+//			sql.VALUES("IDCALENDARIOGUARDIAS" , idCG);
+//			}
+//			if (idInstitucion != null && !idInstitucion.isEmpty()) {
+//			sql.VALUES("IDINSTITUCION" , idInstitucion);
+//			}
+//			if (idTurno != null && !idTurno.isEmpty()) {
+//			sql.VALUES("IDTURNO" , idTurno);
+//			}
+//			if (idGuardia != null && !idGuardia.isEmpty()) {
+//			sql.VALUES("IDGUARDIA" , idGuardia);
+//			}
+//
+//		return sql.toString();
+//	}  
+	   
+	   public String getLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String idTurno, String idGuardia) {
+
+		SQL sql = new SQL();
+			sql.SELECT("LOG_GENERACION_NAME");
+			sql.FROM("SCS_CALENDARIOGUARDIAS");
+			if (idCG != null && !idCG.isEmpty()) {
+				sql.WHERE("IDCALENDARIOGUARDIAS = " + idCG);
+			}
+			if (idInstitucion != null && !idInstitucion.isEmpty()) {
+				sql.WHERE("IDINSTITUCION = " + idInstitucion);
+			}
+			if (idTurno != null && !idTurno.isEmpty()) {
+				sql.WHERE("IDTURNO = " + idTurno);
+			}
+			if (idGuardia != null && !idGuardia.isEmpty()) {
+				sql.WHERE("IDGUARDIA = " + idGuardia);
+			}
+
+		return sql.toString();
+	}
+	   
+	   public String getGenerado(String idProgCal) {
+		   SQL sql = new SQL();
+			sql.SELECT("DECODE(PC.ESTADO, 2, 'No', 'Si') AS GENERADO");
+			sql.FROM("SCS_PROG_CALENDARIOS PC");
+			sql.WHERE("IDPROGCALENDARIO = " + idProgCal);
+			return sql.toString();
+	   }
+	   
+	   public String getGeneracionEnProceso(String idProgCal) {
+		   SQL sql = new SQL();
+			sql.SELECT("IDPROGCALENDARIO");
+			sql.FROM("SCS_PROG_CALENDARIOS PC");
+			sql.WHERE("PROCESANDOGENERACION = " + 1);
+			
+			return sql.toString();
+	   }
+	   
+	   public String setGeneracionEnProceso(String idProgCal, String procesando) {
+		   SQL sql = new SQL();
+		   	sql.UPDATE("SCS_PROG_CALENDARIOS PC");
+			sql.SET("PROCESANDOGENERACION = " +  procesando);
+			sql.WHERE("IDPROGCALENDARIO = " + idProgCal);
+			return sql.toString();
+	   }
+
 }
