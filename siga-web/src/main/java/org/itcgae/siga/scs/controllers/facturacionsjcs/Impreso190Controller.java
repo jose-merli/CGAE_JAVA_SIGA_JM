@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.Impreso190DTO;
 import org.itcgae.siga.DTOs.scs.Impreso190Item;
@@ -18,13 +19,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Impreso190Controller {
 
-	//@Autowired
-	//private IImpreso190Service impresoService;
+	@Autowired
+	private IImpreso190Service iImpreso190Service;
 	
-	/*@RequestMapping(value="/facturacionsjcs/impreso190generar", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Impreso190DTO> impreso190generar(@RequestBody Impreso190Item impreso190Item, HttpServletRequest request){
-		Impreso190DTO response = impresoService.impreso190generar(impreso190Item, request);
-		return new ResponseEntity<Impreso190DTO>(response, HttpStatus.OK);
-	}*/
+	
+	@RequestMapping(value="/facturacionsjcs/impreso190generar", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Impreso190DTO> impreso190generar(@RequestBody Impreso190Item impreso190Item, HttpServletRequest request) throws Exception{
+		Impreso190DTO response = iImpreso190Service.impreso190generar(impreso190Item, request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
 	
 }
