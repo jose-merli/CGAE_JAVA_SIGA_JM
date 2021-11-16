@@ -1,13 +1,13 @@
 package org.itcgae.siga.db.services.fcs.providers;
 
-import java.text.SimpleDateFormat;
-
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgSqlProvider;
+
+import java.text.SimpleDateFormat;
 
 public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvider {
 
@@ -393,7 +393,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
     }
 
     public String buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion,
-                                          Integer tamMax) {
+                                          Integer tamMax, boolean letrado) {
 
         SQL sql = new SQL();
         SQL sqlOrder = new SQL();
@@ -470,7 +470,9 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("fac.idinstitucion = importes.idinstitucion");
         sql.WHERE("fac.idinstitucion = grupo.idinstitucion");
         sql.WHERE("fac.idfacturacion = grupo.idfacturacion");
-//        sql.WHERE("fac.visible = '1'");
+        if (letrado) {
+            sql.WHERE("fac.visible = '1'");
+        }
         sql.WHERE("fac.idinstitucion = " + idInstitucion);
 
         if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
@@ -687,7 +689,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
         sql.FROM("(" + sql2 + ")");
         sql.WHERE("totalimportesjcs > 0");
-        sql.WHERE("1 = 1");
 
         if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
 
