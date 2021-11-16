@@ -74,6 +74,7 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsJuzgadoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EcomColaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
@@ -148,6 +149,9 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private EnvDestinatariosMapper envDestinatariosMapper;
+	
+	@Autowired
+	private EcomColaExtendsMapper ecomColaExtendsMapper;
 	
 	@Autowired
 	private ScsJuzgadoMapper scsJuzgadoMapper;
@@ -649,13 +653,11 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
                 	
                 	EcomCola elementoCola = new EcomCola();
 
-                	EcomColaExample ecomColaExample = new EcomColaExample();
+                	//No se introduce esta nueva id ya que el valor del id se asigna automaticamente dentro del propio método de insert
+                	String newIdEcomCola = ecomColaExtendsMapper.getNewId().getNewId();
+                	newIdEcomCola = Long.toString((Long.valueOf(newIdEcomCola)+1));
                 	
-                	ecomColaExample.createCriteria();
-                	
-                	long newIdEcomCola = ecomColaMapper.countByExample(ecomColaExample) + 1;
-                	
-                	elementoCola.setIdecomcola(newIdEcomCola);
+//                    elementoCola.setIdecomcola(Long.valueOf(newIdEcomCola));
                 	
                 	elementoCola.setFechacreacion(new Date());
                 	elementoCola.setIdinstitucion(idInstitucion);
@@ -684,7 +686,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
                 	
                 	//Insertamos los distintos parametros de eCOM a partir de los campos rellenados 
                 	//del formulario de la nueva comunicación
-                	insertParametrosNewComm(nuevaComm, newIdEcomCola, idInstitucion);
+                	insertParametrosNewComm(nuevaComm.getIdTipoMensaje(), newIdEcomCola, idInstitucion, newIdEnvio);
                 	
                 	LOGGER.info(
                             "ComunicacionesServiceImpl.saveNuevaComm() / insertParametrosNewComm() -> Salida de insertParametrosNewComm() para insertar los parametros para la nueva fila de eCOM");
@@ -770,18 +772,18 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 //		return ficheroVo.getIdfichero();
 //	}
     
-    private void insertParametrosNewComm(NuevaComunicacionItem nuevaComm, long newIdEcomCola, Short idInstitucion) throws SigaExceptions {
+    private void insertParametrosNewComm(String idTipoMensaje, String newIdEcomCola, Short idInstitucion, Long idEnvio) throws SigaExceptions {
     	int response = 0;
     	
     	EcomColaParametros parametro = new EcomColaParametros();
     	
-    	parametro.setIdecomcola(newIdEcomCola);
+    	parametro.setIdecomcola(Long.valueOf(newIdEcomCola));
     	
     	
     	 parametro.setClave("TIPOMENSAJE");
     	 //VALORES: 30 (ESTANDAR), 31 (TURNO OFICIO), 32 (HONORARIOS PROFESIONALES) Y 33 (JUSTICIA GRATUITA)
-         if(nuevaComm.getIdTipoMensaje() != null) {
-        	 parametro.setValor(nuevaComm.getIdTipoMensaje());
+         if(idTipoMensaje != null) {
+        	 parametro.setValor(idTipoMensaje);
          }
          else {
         	 throw new SigaExceptions("Se debe introducir un valor de \"idTipoMensaje\" para poder crear un nuevo envío telemático");
@@ -795,7 +797,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
     	
     	
         parametro.setClave("IDDENVIO");
-        parametro.setValor(Long.toString(newIdEcomCola));
+        parametro.setValor(idEnvio.toString());
         	
         response = ecomColaParametrosMapper.insert(parametro);
         	
