@@ -511,7 +511,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 
         
         if(inscripciones.getaFechaDe() != null) {
-        	sql.WHERE("trunc(TO_DATE('" + inscripciones.getaFechaDe() + "','DD/MM/RRRR')) between trunc(FECHAVALIDACION) and nvl(trunc(FECHABAJA), '31/12/2999')");
+        	sql.WHERE("trunc(TO_DATE('" + inscripciones.getaFechaDe() + "','DD/MM/RRRR')) between trunc(ins.FECHAVALIDACION) and nvl(trunc(ins.FECHABAJA), '31/12/2999')");
         }
         
         if(inscripciones.getFechaDesde() != null) {
