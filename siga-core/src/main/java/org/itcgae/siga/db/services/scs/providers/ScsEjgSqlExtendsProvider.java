@@ -456,7 +456,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                         sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
                 }
             } else {
-                if (ejgItem.getTipoLetrado().equals("E")) {
+            	sql.LEFT_OUTER_JOIN("cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
+            	if (ejgItem.getTipoLetrado().equals("E")) {
                     // letrado tramitador
                     if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
                         sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
@@ -596,7 +597,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.SELECT("ejg.dictamen as observacionesDictamen");
         // REGTEL
         sql.SELECT("ejg.identificadords");
-        sql.SELECT("(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA) AS NCOLEGIADO");
+        sql.SELECT("(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA and ejg.idinstitucion = CEN_COLEGIADO.idinstitucion) AS NCOLEGIADO");
         // from
         sql.FROM("scs_ejg ejg");
         // joins
