@@ -521,6 +521,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
             	nuevoEnvio.setIdplantillaenvios(Integer.valueOf(nuevaComm.getIdPlantillaEnvios()));
             	nuevoEnvio.setIdestado((short) 1);//Estado "Pendiente Manual"
             	nuevoEnvio.setIdtipoenvios((short) 6); //Tipo envio "Envío telemático"
+            	nuevoEnvio.setFechaprogramada(nuevaComm.getFechaEfecto());
             	
             	LOGGER.info(
                         "ComunicacionesServiceImpl.saveNuevaComm() / envEnviosMapper.insert() -> Entrada a envEnviosMapper para insertar un nuevo envio asociado a la nueva comunicación");
