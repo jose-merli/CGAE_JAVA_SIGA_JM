@@ -60,6 +60,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	}
 	public String searchGuardias2(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje, Integer tamMax) {
 		SQL sql = new SQL();
+		SQL SQL_PADRE = new SQL();
 		//La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias
 
 		sql.SELECT("SCS_TURNO.NOMBRE AS turno");
@@ -192,14 +193,17 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		if (guardiaItem.getIdTipoGuardia() != null && guardiaItem.getIdTipoGuardia() != "")
 			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA IN (" + guardiaItem.getIdTipoGuardia() + ")");
 
-		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
+		sql.ORDER_BY("SCS_TURNO.NOMBRE DESC, SCS_GUARDIASTURNO.NOMBRE DESC");
 
-		if (tamMax != null) {
-			Integer tamMaxNumber = tamMax + 1;
-			sql.WHERE("rownum <= " + tamMaxNumber);
+		SQL_PADRE.SELECT(" *");
+		SQL_PADRE.FROM("( " + sql.toString() + " )");
+		if(tamMax != null && tamMax > 0) {
+			tamMax += 1;
+			SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
 		}
 
-		return sql.toString();
+
+		return SQL_PADRE.toString();
 	}
 	
 	public String searchGuardias(TurnosItem turnosItem, String idInstitucion, String idLenguaje) {
@@ -541,8 +545,8 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 				+ "		SCS_TURNO T\r\n" + "	WHERE\r\n" + "		CG.IDINSTITUCION = GT.IDINSTITUCION\r\n"
 				+ "		AND CG.IDTURNO = GT.IDTURNO\r\n" + "		AND CG.IDGUARDIA = GT.IDGUARDIA\r\n"
 				+ "		AND GT.IDINSTITUCION = T.IDINSTITUCION\r\n" + "		AND GT.IDTURNO = T.IDTURNO\r\n"
-				+ "		AND GT.IDGUARDIA = " + idGuardia + "\r\n" + "	ORDER BY\r\n" + "		CG.FECHAINICIO,\r\n"
-				+ "		CG.FECHAFIN) consulta\r\n" + "WHERE\r\n" + "	ROWNUM <= 1");
+				+ "		AND GT.IDGUARDIA = " + idGuardia + "\r\n" + "	ORDER BY\r\n" + "		CG.FECHAINICIO DESC,\r\n"
+				+ "		CG.FECHAFIN DESC) consulta\r\n" + "WHERE\r\n" + "	ROWNUM <= 1");
 
 		return sql.toString();
 	}
@@ -1221,7 +1225,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 //		if (calendarioItem.getIdTurno() != null && calendarioItem.getIdTurno() != "") {
 //			sql.WHERE("EXISTS (SELECT 1 FROM SCS_HCO_CONF_PROG_CALENDARIOS HPC, SCS_TURNO T WHERE T.IDTURNO = HPC.IDTURNO AND T.FECHABAJA IS NULL AND HPC.IDINSTITUCION = PC.IDINSTITUCION AND HPC.IDPROGCALENDARIO = PC.IDPROGCALENDARIO  AND HPC.IDTURNO IN ( " + calendarioItem.getIdTurno() + ") and HPC.IDINSTITUCION =" + idInstitucion + " )");
 //		}
-		sql.ORDER_BY("PC.FECHAPROGRAMACION");
+		sql.ORDER_BY("PC.FECHAPROGRAMACION DESC");
 
 
 		return sql.toString();
@@ -1245,7 +1249,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 				"AND HPC.IDGUARDIA = GT.IDGUARDIA  AND GT.IDINSTITUCION = T.IDINSTITUCION  AND GT.IDTURNO = T.IDTURNO  AND HPC.IDINSTITUCION = PC.IDINSTITUCION  " +
 				"AND HPC.IDPROGCALENDARIO = PC.IDPROGCALENDARIO  AND not exists (select * from SCS_CALENDARIOGUARDIAS CAL where HPC.IDTURNO = CAL.IDTURNO AND HPC.IDGUARDIA = CAL.IDGUARDIA " +
 				"AND HPC.IDINSTITUCION = CAL.IDINSTITUCION AND PC.Fechacalinicio = CAL.Fechainicio AND PC.Fechacalfin = CAL.Fechafin)  AND HPC.IDINSTITUCION = " + idInstitucion + " )ORDER BY NOMBRETURNO, " +
-				"NOMBREGUARDIA,FECHAINICIO,FECHAFIN ";
+				"NOMBREGUARDIA,FECHAINICIO DESC, FECHAFIN DESC ";
 		//return sql.toString();
 				return consulta_siga_classique;
 
@@ -1783,7 +1787,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql2.WHERE("SCS_GUARDIASTURNO.Idguardia = '" + idGuardia + "'");
 
 		sql2.ORDER_BY(
-				"numeroGrupo, ordengrupo, SCS_INSCRIPCIONGUARDIA.FECHASUSCRIPCION, SCS_INSCRIPCIONGUARDIA.Idpersona");
+				"numeroGrupo, ordengrupo, SCS_INSCRIPCIONGUARDIA.FECHASUSCRIPCION desc, SCS_INSCRIPCIONGUARDIA.Idpersona");
 
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
