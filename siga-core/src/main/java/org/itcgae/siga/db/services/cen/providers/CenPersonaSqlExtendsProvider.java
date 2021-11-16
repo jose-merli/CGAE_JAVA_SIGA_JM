@@ -542,12 +542,13 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 	public String getDatosPersonaForImpreso190(String idPersona) {
 		SQL sql = new SQL();
 
-		sql.SELECT_DISTINCT("PER.NIFCIF,");
-		sql.SELECT("PER.IDTIPOIDENTIFICACION AS IDTIPOIDENTIFICACION,");
+		sql.SELECT("PER.NIFCIF");
+		sql.SELECT("PER.IDTIPOIDENTIFICACION AS IDTIPOIDENTIFICACION");
 		sql.SELECT("PER.NOMBRE AS NOMBRE");
 		sql.SELECT("PER.APELLIDOS1 AS APELLIDO1");
 		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
 		sql.SELECT("PER.NIFCIF AS NIDENTIFICACION");
+		sql.SELECT("PER.APELLIDOS1 || ' ' || PER.APELLIDOS2 || ', ' || PER.NOMBRE AS NOMBREPERSONA ");
 		sql.FROM("cen_persona per");
 		sql.WHERE("per.IDPERSONA = '" + idPersona + "'");
 
@@ -558,11 +559,11 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 	public String getDatosInstitucionForImpreso190(String idinstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT_DISTINCT("PER.NIFCIF,");
-		sql.SELECT("PER.IDPERSONA,");
+		sql.SELECT("PER.NIFCIF");
+		sql.SELECT("PER.IDPERSONA");
 		sql.SELECT("PER.NOMBRE");
-		sql.FROM("Cen_Institucion INS,Cen_Persona PER ");
-		sql.WHERE("INS.IDINSTITUCION = " + idinstitucion );
+		sql.FROM("Cen_Persona PER ");
+		sql.JOIN("Cen_Institucion INS ON INS.IDINSTITUCION = " + idinstitucion + " and INS.IDPERSONA = PER.IDPERSONA");
 
 		return sql.toString();
 	}

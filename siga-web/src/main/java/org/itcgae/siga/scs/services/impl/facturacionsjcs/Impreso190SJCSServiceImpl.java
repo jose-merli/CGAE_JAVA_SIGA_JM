@@ -59,9 +59,12 @@ import org.itcgae.siga.db.services.fcs.mappers.FcsPagoColegiadoExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IImpreso190Service;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class Impreso190SJCSServiceImpl implements IImpreso190Service {
-	
+
 	private final Logger LOGGER = Logger.getLogger(Impreso190SJCSServiceImpl.class);
 
 	@Autowired
@@ -79,67 +82,66 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
 
-	
-	 @Autowired
-	    private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
-	    @Autowired
-	    private GenParametrosExtendsMapper genParametrosMapper;
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosMapper;
 
-	@Override public Impreso190DTO impreso190generar(Impreso190Item impreso190Item, HttpServletRequest request) { 
+	@Override
+	@Transactional
+	public Impreso190DTO impreso190generar(Impreso190Item impreso190Item, HttpServletRequest request) throws Exception {
 		String token = request.getHeader("Authorization");
-        String dni = UserTokenUtils.getDniFromJWTToken(token);
-        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        Impreso190DTO impreso190DTO = new Impreso190DTO();
-        String salida = null;
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Impreso190DTO impreso190DTO = new Impreso190DTO();
+		String salida = null;
 		String sNombreFichero = "";
-        Error error = new Error();
+		Error error = new Error();
 
-        try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-            if ( idInstitucion != null ) {
-                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-                exampleUsuarios.createCriteria().andNifEqualTo(dni)
-                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-               
-                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-                
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-                if ( usuarios != null && usuarios.size() > 0) {
-                    sNombreFichero = impreso190Item.getNomFicheroOriginal();
-                    String sDirectorio = "/Datos/SIGA/ficheros/impreso190";
-                    new File(sDirectorio + File.separator + idInstitucion);
-                    String sNombreCompletoFichero=sDirectorio + File.separator + idInstitucion + File.separator + sNombreFichero;
-        			File fichero = new File(sNombreCompletoFichero);
-        			
-        			fichero = generarImpreso190(impreso190Item, sNombreCompletoFichero);
-                	
-        			if (fichero.getName().indexOf(".zip")!=-1) {
-    					error.setCode(200);
-    					error.setDescription("facturacionSJCS.impreso190.impresoGenerado");
-    				} else {
-    					error.setCode(400);
-    					error.setDescription("facturacionSJCS.impreso190.impresoNoGenerado");
-    				}
-    					
+			if (usuarios != null && usuarios.size() > 0) {
+				sNombreFichero = impreso190Item.getNomFicheroOriginal();
+				String sDirectorio = "/Datos/SIGA/ficheros/impreso190";
+				new File(sDirectorio + File.separator + idInstitucion);
+				String sNombreCompletoFichero = sDirectorio + File.separator + idInstitucion + File.separator
+						+ sNombreFichero;
+				File fichero = new File(sNombreCompletoFichero);
 
+				fichero = generarImpreso190(impreso190Item, idInstitucion.toString());
+				
+				
+				if(fichero != null) {
+					if (fichero.getName().indexOf(".zip") != -1) {
+						error.setCode(200);
+						error.setDescription("facturacionSJCS.impreso190.impresoErrorLog");
+					} else if(fichero.getName().indexOf(".190") != -1) {
+						error.setCode(200);
+						error.setDescription("facturacionSJCS.impreso190.impresoGenerado");
+					}else {
+						error.setCode(400);
+						error.setDescription("facturacionSJCS.impreso190.impresoNoGenerado");
+					}
+				}else {
+					error.setCode(400);
+					error.setDescription("facturacionSJCS.impreso190.impresoNoGenerado");
+				}
+				
 
-                } 
-            } 
+			}
+		}
 
-        } catch (Exception e) {
-            
-            error.setCode(500);
-            error.setDescription("general.mensaje.error.bbdd");
-        }
+		impreso190DTO.setError(error);
 
-        impreso190DTO.setError(error);
-		
 		return impreso190DTO;
-	} 
-	
-	
+	}
 
+	@Transactional
 	private File generarImpreso190(Impreso190Item dataEntry, String idinstitucion) throws Exception {
 
 		File impreso190 = null;
@@ -161,14 +163,14 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		List<Map<String, String>> vErrores = new ArrayList<Map<String, String>>();
 
 		// obtener datos de la institucion
-		CenPersona datosInstitucion = cenPersonaExtendsMapper.getDatosPersonaForImpreso190(idinstitucion);
+		CenPersona datosInstitucion = cenPersonaExtendsMapper.getDatosInstitucionForImpreso190(idinstitucion);
 
 		// obtener datos de las provincias
 		codigoProvincia = cenDireccionesExtendsMapper.getIdProvinciaImpreso190(
 				datosInstitucion.getIdpersona().toString(), idinstitucion, SigaConstants.TIPO_DIRECCION_FACTURACION);
 		dataEntry.setCodigoProvincia(codigoProvincia);
 
-		List<FacAbono> abonos = facAbonoExtendsMapper.getPagosCerrados(idinstitucion, dataEntry.getAnio());
+		List<FacAbono> abonos = facAbonoExtendsMapper.getPagosCerrados(Short.parseShort(idinstitucion), dataEntry.getAnio());
 		if (abonos != null || abonos.size() > 0) {
 			for (int i = 0; i < abonos.size(); i++) {
 				sPagos += abonos.get(i).getIdpagosjg().toString();
@@ -181,7 +183,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 			if (pagoColegiado != null || pagoColegiado.size() > 0) {
 				for (Impreso190Item pagoCol : pagoColegiado) {
-					String idPersona = pagoCol.getIdpersonaImpreso();
+					String idPersona = pagoCol.getIdPersonaImpreso();
 					Double importeIrpfPersona = Double.parseDouble(pagoCol.getTotalImporteIrpf());
 					Double importePagadoPersona = Double.parseDouble(pagoCol.getTotalImportePagado());
 					String claveM190 = pagoCol.getClaveM190();
@@ -189,14 +191,15 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 					if (!importeIrpfPersona.equals(new Double(0.0))) {
 
 						// obtener datos de persona por idPersona;
-						CenPersona datosPersona = cenPersonaExtendsMapper.getDatosPersonaForImpreso190(idPersona);
+						Impreso190Item datosPersona = cenPersonaExtendsMapper.getDatosPersonaForImpreso190(idPersona);
 						String mensajeError = "";
 						if (datosPersona != null) {
-							String tipoIdentificacion = datosPersona.getIdtipoidentificacion().toString();
+							String tipoIdentificacion = datosPersona.getIdtipoidentificacion();
 							String nombre = datosPersona.getNombre();
 							String apellidos1 = datosPersona.getApellidos1();
 							String apellidos2 = datosPersona.getApellidos2();
 							String numIdentificacion = datosPersona.getNifcif();
+							String nombrePersona = datosPersona.getNombrePersona();
 
 							dataPersonas.put("IDPERSONA", idPersona);
 							dataPersonas.put("IDTIPOIDENTIFICACION", tipoIdentificacion);
@@ -204,6 +207,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 							dataPersonas.put("APELLIDOS1", apellidos1);
 							dataPersonas.put("APELLIDOS2", apellidos2);
 							dataPersonas.put("NIDENTIFICACION", numIdentificacion);
+							dataPersonas.put("NOMBREPERSONA", nombrePersona);
 							dataErrorLogs.putAll(dataPersonas);
 
 							if (nombre == null || nombre.equals("")) {
@@ -248,12 +252,10 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		}
 
 		// realizo la generaci�n del directorio y del fichero:
-		String sNombreFichero = "";
+		String sNombreFichero = dataEntry.getNomFicheroOriginal();
 		if (dataEntry.getNomFicheroOriginal() != "" && dataEntry.getNomFicheroOriginal().indexOf(".190") < 0) {
 			sNombreFichero = dataEntry.getNomFicheroOriginal() + ".190";
-		} else {
-			sNombreFichero = dataEntry.getNomFicheroOriginal();
-		}
+		} 
 		// String sDirectorio = getDirectorioFichero(Short.parseShort(idinstitucion));
 		String sDirectorio = "/Datos/SIGA/ficheros/impreso190";
 		String sCamino = sDirectorio + File.separator + idinstitucion;
@@ -285,7 +287,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 			ZipOutputStream outZIP = null;
 			FileInputStream in = null;
 
-			try {
+			
 				// Genero un .ZIP con los ficheros de log de errores y el informe 190 de los que
 				// he podido generar:
 //							inputImpreso190 = new FileInputStream(fichero190);
@@ -320,7 +322,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 				outZIP.close();
 
 				fichero = new File(sNombreFicheroZip);
-			} catch (Exception e) {
+			
 				/*
 				 * if (inputImpreso190!=null) inputImpreso190.close(); if
 				 * (inputFicheroErrores!=null) inputFicheroErrores.close();
@@ -329,10 +331,10 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 				if (in != null)
 					in.close();
 				throw new Exception("Error en FcsFacturacionJG.generarImpreso190() al crear el .ZIP");
-			}
+			
 		}
 
-		return impreso190;
+		return fichero;
 	}
 
 	private File generarModelo190(String nombreCompletoFichero, Impreso190Item impreso190Item,

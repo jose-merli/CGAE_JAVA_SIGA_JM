@@ -20,6 +20,7 @@ import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
+import org.itcgae.siga.DTOs.scs.Impreso190Item;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
@@ -182,21 +183,22 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDatosPersonaForImpreso190")
 	@Results({
-		@Result(column = "NIFCIF", property = "NIFCIF", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "NOMBRE", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "APELLIDO1", property = "APELLIDOS1", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "APELLIDO2", property = "APELLIDOS2", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOIDENTIFICACION", property = "IDTIPOIDENTIFICACION", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "idtipoidentificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPERSONA", property = "nombrePersona", jdbcType = JdbcType.VARCHAR),
 
 	})
-	CenPersona getDatosPersonaForImpreso190(String idPersona);
+	Impreso190Item getDatosPersonaForImpreso190(String idPersona);
 	
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDatosInstitucionForImpreso190")
 	@Results({
-		@Result(column = "NIFCIF", property = "NIFCIF", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "NOMBRE", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPERSONA", property = "IDPERSONA", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOIDENTIFICACION", property = "IDTIPOIDENTIFICACION", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "idtipoidentificacion", jdbcType = JdbcType.VARCHAR),
 
 	})
 	CenPersona getDatosInstitucionForImpreso190(String idinstitucion);

@@ -54,9 +54,9 @@ public class FcsPagoColegiadoSqlExtendsProvider extends FcsPagoColegiadoSqlProvi
 				+ "  AND IDPAGOSJG IN ( "+ pagos +")"
 				+ "  AND PORCENTAJEIRPF > 0 "
 				+ "  AND ("
-				+ "IMPOFICIO > 0 or"
-				+ "IMPASISTENCIA > 0 or"
-				+ "IMPEJG > 0 or"
+				+ "IMPOFICIO > 0 or  "
+				+ "IMPASISTENCIA > 0 or "
+				+ "IMPEJG > 0 or  "
 				+ "IMPSOJ > 0 ) )"
 				+ "GROUP BY IDPERSONAIMPRESO, CLAVEM190");
 		

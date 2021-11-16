@@ -107,7 +107,7 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider {
     	
     	SQL sql = new SQL();
     	
-    	sql.SELECT("IDPAGOSJG");
+    	sql.SELECT_DISTINCT("IDPAGOSJG");
     	sql.FROM("FAC_ABONO");
     	sql.WHERE("IDINSTITUCION = " + idInstitucion);
     	sql.WHERE("to_char(FECHA, 'YYYY') = "+ anio);

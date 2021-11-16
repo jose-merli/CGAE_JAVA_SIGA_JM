@@ -150,7 +150,7 @@ public class UtilidadesImpreso190 {
 	    	String nombreValido = "";
 	    	
 	    	for (int i=0; i<nombre.length(); i++){
-	    		// Si el caracter del nombre esta entre los validos
+	    	
 	    		if( caracteresValidos.indexOf(nombre.charAt(i)) >= 0){
 	    			nombreValido += nombre.charAt(i);
 	    		}else{
@@ -158,14 +158,14 @@ public class UtilidadesImpreso190 {
 	    		}
 	    	}
 	    	
-	    	// Finalmente quitamos espacios dobles y triples (ocurre al quitar ciertos caracteres)
+	    	
 	    	nombre = replaceAllIgnoreCase(nombre, "  ", " ");
 	    	nombre = replaceAllIgnoreCase(nombre, "  ", " ");
 
 	    	return nombreValido;
 	    }
 	 
-	// vector con el signo, la parte entera y la parte decimal (dos posiciones decimales) para el impreso 190
+	
 			public static List<String> desdoblarDouble (Double valor) {
 				List<String> salida= new ArrayList<String>();
 				
@@ -250,13 +250,7 @@ public class UtilidadesImpreso190 {
 				return relleno(caracter, Math.abs(fin-inicio)+1);
 			}
 			
-			/** 
-			 * Crea un string de longitud x relleno de caracteres para el impreso 190
-			 * @param caracter
-			 * @param longitud
-			 * @return
-			 * @throws ClsExceptions
-			 */
+			
 			public static String relleno (String caracter, int longitud){
 				String salida= "";
 				
@@ -292,91 +286,5 @@ public class UtilidadesImpreso190 {
 				return sal;
 			}
 		
-//			private static synchronized void init() {
-//		
-//				if(!iniciado) {
-//					iniciado=true;
-//					//ClsLogging.writeFileLog("CLSLOGGING INIT() SE EJECUTA",3);
-//				    ReadProperties rp= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
-////					ReadProperties rp=new ReadProperties("SIGA.properties");
-//
-//					//LMS 29/08/2006
-//					//Esto viene de la capa b�sica, pero se ha adaptado a SIGA.
-//					//bStoreFile=rp.returnProperty("LOG.run").equals("1");
-//					bStoreFile=rp.returnProperty("LOG.fichero").equals("1");
-//					bConsole=rp.returnProperty("LOG.consola").equals("1");
-//					bLog4j=rp.returnProperty("LOG.log4j").equals("1");
-//					bLogXeMail=rp.returnProperty("LOG.email").equals("1");
-//					
-//					try {
-//						StringBuilder strBld = new StringBuilder();
-//						strBld.append(SIGAReferences.RESOURCE_FILES.WEB_INF_DIR.getFileName())
-//								.append(rp.returnProperty("LOG.dir")).append("/").append(rp.returnProperty("LOG.name"));
-//						fileName=SIGAReferences.getReference(strBld.toString());
-//					} catch (Exception e){
-//						e.printStackTrace();
-//					}
-//					
-//					try{
-//						loglevel = Integer.parseInt(rp.returnProperty("LOG.level").trim());
-//					}catch (Exception nfe){
-//						nfe.printStackTrace();
-//					}
-//					
-//					try{
-//						PropertyConfigurator.configure(PropertyReader.getProperties(RESOURCE_FILES.SIGA.LOG4J));
-//						logger = Logger.getLogger("SIGA");
-//					}catch(Exception e){
-//						logger=null;
-//						e.printStackTrace();
-//					}
-//					
-//					try{
-//						logXeMail = Logger.getLogger("EMAIL");
-//					}catch(Exception e){
-//						logXeMail=null;
-//						e.printStackTrace();
-//					}
-//					
-//					//System.out.println("GESTION DEL LOG: logLevel Init="+loglevel);
-//					ClsLogging.writeFileLog("--------------------",3);
-//					ClsLogging.writeFileLog("Info del LOG de SIGA",3);
-//					ClsLogging.writeFileLog("--------------------",3);
-//					ClsLogging.writeFileLog("- Fichero: " + (bStoreFile?"ACTIVADO":"DESACTIVADO"),3);
-//					ClsLogging.writeFileLog("- Consola: " + (bConsole?"ACTIVADA":"DESACTIVADA"),3);
-//					ClsLogging.writeFileLog("- Log4j:   " + (bLog4j?"ACTIVADO":"DESACTIVADO"),3);
-//					ClsLogging.writeFileLog("- LogXeMail:   " + (bLogXeMail?"ACTIVADO":"DESACTIVADO"),3);
-//					ClsLogging.writeFileLog("--------------------",3);
-//				}
-//			}
-//			
-//			public static void reset(){
-//				iniciado = false;
-//				init();
-//			}
-//			
-//			public static void writeFileLog(String s, int i) {
-//				writeFileLog(s, null, i);  
-//			}
-//			
-//			public static void writeFileLog(String s) {
-//				init();
-//				writeFileLogWithoutSession(s);  
-//			}
-//			
-//			public static void writeFileLog(String s, HttpServletRequest httpservletrequest, int i)
-//			{
-//				if (httpservletrequest==null)
-//				{
-//					init();
-//					if(i <= loglevel)  {
-//						writeFileLogWithoutSession(s,i);
-//					}
-//				} else {
-//					HttpSession httpsession = httpservletrequest.getSession(true);
-//					writeFileLog(s, httpservletrequest.getHeader("user-agent"), httpsession.getId(),
-//							(UsrBean)httpsession.getAttribute("USRBEAN"),
-//							httpservletrequest.getRemoteAddr(), i, false);
-//				}
-//			}
+
 }

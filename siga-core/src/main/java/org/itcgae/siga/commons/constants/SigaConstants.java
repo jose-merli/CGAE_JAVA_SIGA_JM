@@ -1185,6 +1185,10 @@ public class SigaConstants {
 	public static final String SEPARADOR = "	";
 	
 	public static final String IMPRESO190_ENCODING =  "ISO-8859-1";
+	
+	public static final String TIPO_SOPORTE_CARTUCHO = "C";
+	public static final String TIPO_SOPORTE_TELEMATICO = "T";
+	public static final String TIPO_SOPORTE_DISQUETE = "D";
     
 
 }
