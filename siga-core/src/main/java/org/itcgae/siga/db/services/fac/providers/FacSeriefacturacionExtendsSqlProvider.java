@@ -44,7 +44,8 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.SELECT("sf.idseriefacturacionprevia");
 		sql.SELECT("(CASE WHEN sf.tiposerie = 'G' then 1 else 0 end) serieGenerica");
 		sql.SELECT("sf.idcontador");
-		
+		sql.SELECT("sf.idcontador_abonos");
+
 		// From
 		sql.FROM("fac_seriefacturacion sf");
 		
@@ -105,8 +106,12 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		if (serieFacturacionItem.getIdContadorFacturas() != null && serieFacturacionItem.getIdContadorFacturas() != "")
 			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getIdContadorFacturas() + "'");
 		if (serieFacturacionItem.getIdContadorFacturasRectificativas() != null && serieFacturacionItem.getIdContadorFacturasRectificativas() != "")
-			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getIdContadorFacturasRectificativas() + "'");
-		
+			sql.WHERE("sf.idcontador_abonos = '" + serieFacturacionItem.getIdContadorFacturasRectificativas() + "'");
+
+		// Para la vista de detalles de una serie de facturación
+		if (serieFacturacionItem.getIdSerieFacturacion() != null && serieFacturacionItem.getIdSerieFacturacion() != "")
+			sql.WHERE("sf.idseriefacturacion = " + serieFacturacionItem.getIdSerieFacturacion());
+
 		// Order by
 		sql.ORDER_BY("sf.idseriefacturacion");
 		

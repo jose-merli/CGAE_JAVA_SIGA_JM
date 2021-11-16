@@ -20,10 +20,17 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
+import org.itcgae.siga.db.entities.PysProductos;
+import org.itcgae.siga.db.entities.PysProductosExample;
+import org.itcgae.siga.db.entities.PysServicios;
+import org.itcgae.siga.db.entities.PysServiciosExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
+import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.PysProductosMapper;
+import org.itcgae.siga.db.mappers.PysServiciosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -34,6 +41,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionPySGeneralService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +97,12 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
 
+	@Autowired
+	private PysProductosMapper pysProductosMapper;
+
+	@Autowired
+	private PysServiciosMapper pysServiciosMapper;
+
 	@Override
 	public ComboDTO comboCuentasBancarias(HttpServletRequest request) throws Exception {
 		ComboDTO comboDTO = new ComboDTO();
@@ -115,6 +129,94 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		}
 
 		LOGGER.debug("comboCuentasBancarias() -> Salida del servicio para obtener el combo de cuentas bancarias");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboTiposProductos(HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems;
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.debug("comboTiposProductos() -> Entrada al servicio para recuperar el combo de productos");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"comboTiposProductos() / pysProductosMapper.selectByExample() -> Entrada a pysProductosMapper para obtener el combo de productos");
+
+			// Logica
+			PysProductosExample exampleProductos = new PysProductosExample();
+			exampleProductos.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+			exampleProductos.setOrderByClause("DESCRIPCION");
+
+			List<PysProductos> productos = pysProductosMapper.selectByExample(exampleProductos);
+
+			if (productos != null) {
+				comboItems = new ArrayList<>();
+				for (PysProductos pysProductos : productos) {
+					ComboItem comboItem = new ComboItem();
+					// idtipoproducto-idproducto
+					comboItem.setValue(pysProductos.getIdtipoproducto().toString() + "-" + pysProductos.getIdproducto().toString());
+					comboItem.setLabel(pysProductos.getDescripcion());
+
+					comboItems.add(comboItem);
+				}
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+		}
+
+		LOGGER.debug("comboTiposProductos() -> Salida del servicio para obtener el combo de productos");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboTiposServicios(HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems;
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.debug("comboTiposServicios() -> Entrada al servicio para recuperar el combo de servicios");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"comboTiposServicios() / facBancoInstitucionExtendsMapper.comboSufijos() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de sufijos");
+
+			// Logica
+			PysServiciosExample exampleServicios = new PysServiciosExample();
+			exampleServicios.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+			exampleServicios.setOrderByClause("DESCRIPCION");
+
+			List<PysServicios> servicios = pysServiciosMapper.selectByExample(exampleServicios);
+
+			if (servicios != null) {
+				comboItems = new ArrayList<>();
+				for (PysServicios pysServicios : servicios) {
+					ComboItem comboItem = new ComboItem();
+					// idtiposervicios-idservicio
+					comboItem.setValue(pysServicios.getIdtiposervicios().toString() + "-" + pysServicios.getIdservicio().toString());
+					comboItem.setLabel(pysServicios.getDescripcion());
+
+					comboItems.add(comboItem);
+				}
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+		}
+
+		LOGGER.debug("comboTiposServicios() -> Salida del servicio para obtener el combo de servicios");
 
 		return comboDTO;
 	}

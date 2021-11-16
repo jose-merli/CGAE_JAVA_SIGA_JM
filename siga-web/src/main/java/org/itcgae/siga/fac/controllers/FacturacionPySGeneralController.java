@@ -53,6 +53,34 @@ public class FacturacionPySGeneralController {
 		}
 	}
 
+	@GetMapping(value = "/comboTiposProductos")
+	ResponseEntity<ComboDTO> comboTiposProductos(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboTiposProductos(request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/comboTiposServicios")
+	ResponseEntity<ComboDTO> comboTiposServicios(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboTiposServicios(request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GetMapping(value = "/comboSeriesFacturacion")
 	ResponseEntity<ComboDTO> comboSeriesFacturacion(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
