@@ -29,6 +29,12 @@ public class FicherosAdeudosItem {
 	String numRecibosHasta;
 	String origen;
 	String facturacion;
+	Date fechaPresentacion;
+	Date fechaRecibosPrimeros;
+	Date fechaRecibosRecurrentes;
+	Date fechaRecibosCOR;
+	Date fechaRecibosB2B;
+	
 	/**
 	 * @return the idInstitucion
 	 */
@@ -311,24 +317,28 @@ public class FicherosAdeudosItem {
 	public String getOrigen() {
 		return origen;
 	}
+	
 	/**
 	 * @param origen the origen to set
 	 */
 	public void setOrigen(String origen) {
 		this.origen = origen;
 	}
+	
 	/**
 	 * @return the facturacion
 	 */
 	public String getFacturacion() {
 		return facturacion;
 	}
+	
 	/**
 	 * @param facturacion the facturacion to set
 	 */
 	public void setFacturacion(String facturacion) {
 		this.facturacion = facturacion;
 	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -340,6 +350,11 @@ public class FicherosAdeudosItem {
 		result = prime * result + ((fechaCreacion == null) ? 0 : fechaCreacion.hashCode());
 		result = prime * result + ((fechaCreacionDesde == null) ? 0 : fechaCreacionDesde.hashCode());
 		result = prime * result + ((fechaCreacionHasta == null) ? 0 : fechaCreacionHasta.hashCode());
+		result = prime * result + ((fechaPresentacion == null) ? 0 : fechaPresentacion.hashCode());
+		result = prime * result + ((fechaRecibosB2B == null) ? 0 : fechaRecibosB2B.hashCode());
+		result = prime * result + ((fechaRecibosCOR == null) ? 0 : fechaRecibosCOR.hashCode());
+		result = prime * result + ((fechaRecibosPrimeros == null) ? 0 : fechaRecibosPrimeros.hashCode());
+		result = prime * result + ((fechaRecibosRecurrentes == null) ? 0 : fechaRecibosRecurrentes.hashCode());
 		result = prime * result + ((fechacargo == null) ? 0 : fechacargo.hashCode());
 		result = prime * result + ((iban == null) ? 0 : iban.hashCode());
 		result = prime * result + ((idDisqueteCargos == null) ? 0 : idDisqueteCargos.hashCode());
@@ -360,6 +375,7 @@ public class FicherosAdeudosItem {
 		result = prime * result + ((totalRemesa == null) ? 0 : totalRemesa.hashCode());
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -403,6 +419,31 @@ public class FicherosAdeudosItem {
 			if (other.fechaCreacionHasta != null)
 				return false;
 		} else if (!fechaCreacionHasta.equals(other.fechaCreacionHasta))
+			return false;
+		if (fechaPresentacion == null) {
+			if (other.fechaPresentacion != null)
+				return false;
+		} else if (!fechaPresentacion.equals(other.fechaPresentacion))
+			return false;
+		if (fechaRecibosB2B == null) {
+			if (other.fechaRecibosB2B != null)
+				return false;
+		} else if (!fechaRecibosB2B.equals(other.fechaRecibosB2B))
+			return false;
+		if (fechaRecibosCOR == null) {
+			if (other.fechaRecibosCOR != null)
+				return false;
+		} else if (!fechaRecibosCOR.equals(other.fechaRecibosCOR))
+			return false;
+		if (fechaRecibosPrimeros == null) {
+			if (other.fechaRecibosPrimeros != null)
+				return false;
+		} else if (!fechaRecibosPrimeros.equals(other.fechaRecibosPrimeros))
+			return false;
+		if (fechaRecibosRecurrentes == null) {
+			if (other.fechaRecibosRecurrentes != null)
+				return false;
+		} else if (!fechaRecibosRecurrentes.equals(other.fechaRecibosRecurrentes))
 			return false;
 		if (fechacargo == null) {
 			if (other.fechacargo != null)
@@ -459,11 +500,20 @@ public class FicherosAdeudosItem {
 				return false;
 		} else if (!nombreabreviado.equals(other.nombreabreviado))
 			return false;
-		if (numRecibos != other.numRecibos)
+		if (numRecibos == null) {
+			if (other.numRecibos != null)
+				return false;
+		} else if (!numRecibos.equals(other.numRecibos))
 			return false;
-		if (numRecibosDesde != other.numRecibosDesde)
+		if (numRecibosDesde == null) {
+			if (other.numRecibosDesde != null)
+				return false;
+		} else if (!numRecibosDesde.equals(other.numRecibosDesde))
 			return false;
-		if (numRecibosHasta != other.numRecibosHasta)
+		if (numRecibosHasta == null) {
+			if (other.numRecibosHasta != null)
+				return false;
+		} else if (!numRecibosHasta.equals(other.numRecibosHasta))
 			return false;
 		if (numerolineas == null) {
 			if (other.numerolineas != null)
@@ -487,6 +537,7 @@ public class FicherosAdeudosItem {
 			return false;
 		return true;
 	}
+	
 	@Override
 	public String toString() {
 		return "FicherosAdeudosItem [idInstitucion=" + idInstitucion + ", idDisqueteCargos=" + idDisqueteCargos
@@ -498,8 +549,9 @@ public class FicherosAdeudosItem {
 				+ ", idSufijo=" + idSufijo + ", sufijo=" + sufijo + ", totalRemesa=" + totalRemesa
 				+ ", importeTotalDesde=" + importeTotalDesde + ", importeTotalHasta=" + importeTotalHasta
 				+ ", numRecibos=" + numRecibos + ", numRecibosDesde=" + numRecibosDesde + ", numRecibosHasta="
-				+ numRecibosHasta + ", origen=" + origen + ", facturacion=" + facturacion + "]";
+				+ numRecibosHasta + ", origen=" + origen + ", facturacion=" + facturacion + ", fechaPresentacion="
+				+ fechaPresentacion + ", fechaRecibosPrimeros=" + fechaRecibosPrimeros + ", fechaRecibosRecurrentes="
+				+ fechaRecibosRecurrentes + ", fechaRecibosCOR=" + fechaRecibosCOR + ", fechaRecibosB2B="
+				+ fechaRecibosB2B + "]";
 	}
-	
-	
 }
