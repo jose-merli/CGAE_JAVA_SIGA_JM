@@ -20,6 +20,9 @@ public class ListaCompraProductosItem {
 	private Date fechaSolicitadaAnulacion;
 	private Date fechaAnulada;
 	private String desFormaPago;
+	private String facturas;
+	private String solicitarBaja;//En este caso representa si todos los servicios tienen el valor "solicitarBaja" a 1 o no. 
+	//Se realiza una resta de los valores con el numero de columnas. Si no es 0, un colegiado no puede solicitar una anulación.
 	
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
@@ -116,5 +119,17 @@ public class ListaCompraProductosItem {
 	}
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
+	}
+	public String getFacturas() {
+		return facturas;
+	}
+	public void setFacturas(String facturas) {
+		this.facturas = facturas;
+	}
+	public String getSolicitarBaja() {
+		return solicitarBaja;
+	}
+	public void setSolicitarBaja(String solicitarBaja) {
+		this.solicitarBaja = solicitarBaja;
 	}
 }

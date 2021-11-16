@@ -394,6 +394,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("compra.fecha as fechaEfectiva");
 		sql.SELECT_DISTINCT("compra.fechaBaja as fechaAnulada");
 		sql.SELECT_DISTINCT("f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'" + idioma + "') AS estadoFactura");
+//		sql.SELECT_DISTINCT("SUM(prodIns.solicitarBaja)-COUNT(prodIns.solicitarBaja) as solicitarBaja");
+		sql.SELECT_DISTINCT("case when fact.idfactura is null then '0' else '1' end as facturas");
 		
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet");
 		
@@ -467,6 +469,19 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		if(filtro.getIdEstadoFactura() != null)sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
 //		private String importe; // valor aplicado durante la compra (importe total)
+		
+//		sql.GROUP_BY("pet.fecha , pet.idPeticion, pet.idPersona , per.nifcif, col.NCOLEGIADO \r\n"
+//				+ ", per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre  \r\n"
+//				+ ", CASE WHEN COUNT(1) OVER (ORDER BY prodIns.descripcion) >1 THEN FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) || '...'\r\n"
+//				+ "ELSE FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) END \r\n"
+//				+ ", prodSol.idformapago \r\n"
+//				+ ", CASE WHEN prodSol.noFacturable = '1' THEN 'No facturable'\r\n"
+//				+ "ELSE f_siga_getrecurso(formPago.descripcion, 1) END , CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
+//				+ "ELSE null END \r\n"
+//				+ ", CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
+//				+ "ELSE null END\r\n"
+//				+ ", compra.fecha, compra.fechaBaja, f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'1')\r\n"
+//				+ ",case when fact.idfactura is null then '0' else '1' end");
 		
 		return sql.toString();
 		
@@ -556,7 +571,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ "ELSE precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, "+idioma+") || ')' END as PrecioPerio");
 		sql.SELECT_DISTINCT("suscripcion.fechasuscripcion as fechasuscripcion");
 		sql.SELECT_DISTINCT("suscripcion.fechabaja as fechabaja");
-		sql.SELECT_DISTINCT("SUM(servIns.solicitarBaja) as solicitarBaja");
+		sql.SELECT_DISTINCT("SUM(servIns.solicitarBaja)-COUNT(servIns.solicitarBaja) as solicitarBaja");
 		sql.SELECT_DISTINCT("case when factSus.idfactura is null then '0' else '1' end as facturas");
 
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet"); 
