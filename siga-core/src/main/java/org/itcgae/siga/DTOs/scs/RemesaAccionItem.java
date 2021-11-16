@@ -5,7 +5,14 @@ public class RemesaAccionItem {
 	private int idRemesa;
 	private int accion;
 	private String descripcion;
-	
+	private boolean informacionEconomica;
+		
+	public boolean isInformacionEconomica() {
+		return informacionEconomica;
+	}
+	public void setInformacionEconomica(boolean informacionEconomica) {
+		this.informacionEconomica = informacionEconomica;
+	}
 	public String getDescripcion() {
 		return descripcion;
 	}

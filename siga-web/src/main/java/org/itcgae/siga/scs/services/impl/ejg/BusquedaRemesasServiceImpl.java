@@ -39,8 +39,10 @@ import org.itcgae.siga.DTOs.scs.CheckAccionesRemesas;
 import org.itcgae.siga.DTOs.scs.CheckAccionesRemesasDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
+import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoItem;
 import org.itcgae.siga.DTOs.scs.RemesaAccionItem;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
@@ -77,6 +79,8 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosKey;
+import org.itcgae.siga.db.entities.ScsEejgPeticiones;
+import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.mappers.CajgRemesaestadosMapper;
@@ -91,7 +95,9 @@ import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgEjgremesaExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgRemesaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEejgPeticionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRemesasExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
@@ -101,6 +107,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.bytebuddy.dynamic.scaffold.MethodRegistry.Handler.ForAbstractMethod;
 import net.bytebuddy.implementation.auxiliary.AuxiliaryType;
 
 @Service
@@ -149,6 +156,12 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	
 	@Autowired
 	private GenRecursosMapper genRecursosMapper;
+	
+	@Autowired
+    private ScsExpedienteEconomicoExtendsMapper scsExpedienteEconomicoExtendsMapper;
+	
+	@Autowired
+    private ScsEejgPeticionesExtendsMapper ScsEejgpeticionesExtendsMapper;
 
 	@Override
 	public ComboDTO comboEstado(HttpServletRequest request) {
@@ -992,7 +1005,43 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				validar = validarAccion(remesaAccionItem, request, remesaAccionItem.getDescripcion());
 				
 				if(validar) {
-					insertResponseDTO = validaEnviaExpedientes(idInstitucion, Long.valueOf(remesaAccionItem.getIdRemesa()), remesaAccionItem.getAccion(), parametro.getValor(), gr.getDescripcion(), request);
+					if(parametro.getValor().equals("5")) {
+						if(remesaAccionItem.isInformacionEconomica()) {
+							CajgEjgremesaExample cajgEjgremesaExample = new CajgEjgremesaExample();
+							cajgEjgremesaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdremesaEqualTo(Long.valueOf(remesaAccionItem.getIdRemesa()));
+							List<CajgEjgremesa> cajgEjgremesa = cajgEjgremesaExtendsMapper.selectByExample(cajgEjgremesaExample);
+							
+							if(!cajgEjgremesa.isEmpty() && cajgEjgremesa != null) {
+								for(CajgEjgremesa ejgRemesa : cajgEjgremesa){
+									ScsEejgPeticionesExample peticionesExample = new ScsEejgPeticionesExample();
+									
+									peticionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejgRemesa.getAnio()).andIdtipoejgEqualTo(ejgRemesa.getIdtipoejg())
+									.andNumeroEqualTo(ejgRemesa.getNumero());							
+									
+									List<ScsEejgPeticiones> eejgPeticiones = scsExpedienteEconomicoExtendsMapper.selectByExample(peticionesExample);
+									
+									if(!eejgPeticiones.isEmpty() && eejgPeticiones != null) {
+										
+										for(ScsEejgPeticiones eejgPeticion : eejgPeticiones) {
+											
+											if(eejgPeticion.getCsv() !=null){
+												
+												ScsEejgpeticionesExtendsMapper.updateByPrimaryKeySelective(eejgPeticion);
+											}
+											
+										}
+										
+									}
+								}
+							}
+							
+							
+						}else {
+							
+						}
+					}else {
+						insertResponseDTO = validaEnviaExpedientes(idInstitucion, Long.valueOf(remesaAccionItem.getIdRemesa()), remesaAccionItem.getAccion(), parametro.getValor(), gr.getDescripcion(), request, usuarios.get(0).getUsumodificacion());
+					}
 				}else {
 					LOGGER.error("Error al validar la remesa. No cumple los requisitos");
 					error.setCode(200);
@@ -1032,7 +1081,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		return false;
 	}
 
-	private InsertResponseDTO validaEnviaExpedientes(Short idinstitucion, Long idremesa , int accion, String tipoPCAJG, String mensajeValidando, HttpServletRequest request) {
+	private InsertResponseDTO validaEnviaExpedientes(Short idinstitucion, Long idremesa , int accion, String tipoPCAJG, String mensajeValidando, HttpServletRequest request, Integer usuModificacion) {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		LOGGER.debug("Insertando un nuevo registro para la validación o envío de datos de una remesa de envío.");
@@ -1062,6 +1111,21 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			mapa.put("IDREMESA", idremesa.toString());
 
 			insertResponseDTO = insertaColaRemesa(ecomCola, mapa, cajgRemesaKey);
+						
+			if(insertResponseDTO.getStatus().equals(SigaConstants.OK) && insertResponseDTO.getError().getCode() == 200
+					&& ecomOperacionTipoaccion.get(0).getIdoperacion() == 48) { //OPERACION PARA ENVIAR REMESA ALCALÁ -> ACCIÓN 48
+				
+				CajgRemesaestados cajgRemesa = new CajgRemesaestados();
+				
+				cajgRemesa.setIdremesa(idremesa);
+				cajgRemesa.setIdinstitucion(idinstitucion);
+				cajgRemesa.setIdestado(Short.valueOf("1")); //GENERADA
+				cajgRemesa.setFecharemesa(new Date());
+				cajgRemesa.setFechamodificacion(new Date());
+				cajgRemesa.setUsumodificacion(usuModificacion);
+				
+				cajgRemesaEstadosMapper.insert(cajgRemesa);
+			}
 
 		} catch (Exception e) {
 			LOGGER.error("Error al solicitar envío o validación de expedientes. " + e.getStackTrace());
