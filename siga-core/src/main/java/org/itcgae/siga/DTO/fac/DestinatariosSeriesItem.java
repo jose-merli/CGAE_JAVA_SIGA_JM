@@ -5,6 +5,8 @@ import java.util.Objects;
 public class DestinatariosSeriesItem {
 	
 	private String idPersona;
+	private String idSerieFacturacion;
+	private String idInstitucion;
 	private String nombre;
 	private String apellido1;
 	private String apellido2;
@@ -78,12 +80,30 @@ public class DestinatariosSeriesItem {
 		this.domicilio = domicilio;
 	}
 
+	public String getIdSerieFacturacion() {
+		return idSerieFacturacion;
+	}
+
+	public void setIdSerieFacturacion(String idSerieFacturacion) {
+		this.idSerieFacturacion = idSerieFacturacion;
+	}
+
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		DestinatariosSeriesItem that = (DestinatariosSeriesItem) o;
 		return Objects.equals(idPersona, that.idPersona) &&
+				Objects.equals(idSerieFacturacion, that.idSerieFacturacion) &&
+				Objects.equals(idInstitucion, that.idInstitucion) &&
 				Objects.equals(nombre, that.nombre) &&
 				Objects.equals(apellido1, that.apellido1) &&
 				Objects.equals(apellido2, that.apellido2) &&
@@ -95,13 +115,15 @@ public class DestinatariosSeriesItem {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idPersona, nombre, apellido1, apellido2, nif, movil, correoElectronico, domicilio);
+		return Objects.hash(idPersona, idSerieFacturacion, idInstitucion, nombre, apellido1, apellido2, nif, movil, correoElectronico, domicilio);
 	}
 
 	@Override
 	public String toString() {
 		return "DestinatariosSeriesItem{" +
 				"idPersona='" + idPersona + '\'' +
+				", idSerieFacturacion='" + idSerieFacturacion + '\'' +
+				", idInstitucion='" + idInstitucion + '\'' +
 				", nombre='" + nombre + '\'' +
 				", apellido1='" + apellido1 + '\'' +
 				", apellido2='" + apellido2 + '\'' +
@@ -111,6 +133,4 @@ public class DestinatariosSeriesItem {
 				", domicilio='" + domicilio + '\'' +
 				'}';
 	}
-
-
 }

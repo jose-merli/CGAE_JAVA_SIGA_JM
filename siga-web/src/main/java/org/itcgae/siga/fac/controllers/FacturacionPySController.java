@@ -168,6 +168,34 @@ public class FacturacionPySController {
 		}
 	}
 
+	@PostMapping(value = "/nuevoDestinatariosSerie")
+	ResponseEntity<CreateResponseDTO> nuevoDestinatariosSerie(@RequestBody DestinatariosSeriesItem destinatariosSeriesItem,
+																  HttpServletRequest request) {
+		CreateResponseDTO response = new CreateResponseDTO();
+
+		try {
+			response = facturacionService.nuevoDestinatariosSerie(destinatariosSeriesItem, request);
+			return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/eliminaDestinatariosSerie")
+	ResponseEntity<DeleteResponseDTO> eliminaDestinatariosSerie(@RequestBody List<DestinatariosSeriesItem> destinatariosSeriesItems,
+																  HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = facturacionService.eliminaDestinatariosSerie(destinatariosSeriesItems, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GetMapping(value = "/getContadoresSerie")
 	ResponseEntity<ContadorSeriesDTO> getContadoresSerie(HttpServletRequest request) {
 		ContadorSeriesDTO response = new ContadorSeriesDTO();

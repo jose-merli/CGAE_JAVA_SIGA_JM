@@ -44,6 +44,12 @@ public interface IFacturacionPySService {
 	public DestinatariosSeriesDTO getDestinatariosSeries(String idSerieFacturacion, HttpServletRequest request)
 			throws Exception;
 
+    public CreateResponseDTO nuevoDestinatariosSerie(DestinatariosSeriesItem destinatariosSeriesItem,
+                                              HttpServletRequest request) throws Exception;
+
+	public DeleteResponseDTO eliminaDestinatariosSerie(List<DestinatariosSeriesItem> destinatariosSeriesItems,
+												HttpServletRequest request) throws Exception;
+
 	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request)
 			throws Exception;
 

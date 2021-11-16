@@ -184,6 +184,7 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDestinatariosSeries")
 	@Results({
 		@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idinstitucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "apellidos1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "apellidos2", property = "apellido2", jdbcType = JdbcType.VARCHAR),

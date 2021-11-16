@@ -544,6 +544,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		// Select
 		sql.SELECT_DISTINCT("p.idpersona");
+		sql.SELECT_DISTINCT("c.idinstitucion");
 		sql.SELECT_DISTINCT("p.nombre");
 		sql.SELECT_DISTINCT("p.apellidos1");
 		sql.SELECT_DISTINCT("p.apellidos2");
@@ -557,13 +558,12 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		// Joins
 		sql.INNER_JOIN("cen_cliente c ON ( c.idpersona = p.idpersona )");
+		sql.INNER_JOIN("fac_clienincluidoenseriefactur fc ON ( fc.idpersona = c.idpersona AND fc.idinstitucion = c.idinstitucion )");
 		sql.INNER_JOIN("cen_direcciones d ON ( d.idpersona = p.idpersona AND d.idinstitucion = c.idinstitucion )");
-		sql.INNER_JOIN("cen_gruposcliente_cliente gcc ON ( gcc.idinstitucion = c.idinstitucion AND gcc.idpersona = c.idpersona )");
-		sql.LEFT_OUTER_JOIN("cen_colegiado co ON ( co.idpersona = p.idpersona AND co.idinstitucion = c.idinstitucion )");
-		
+
 		// Where
-		sql.WHERE("c.idinstitucion = " + idInstitucion);
-		sql.WHERE("gcc.idgrupo IN ( SELECT idgrupo FROM fac_tipocliincluidoenseriefac WHERE idseriefacturacion = '" + idSerieFacturacion + "')");
+		sql.WHERE("fc.idinstitucion = " + idInstitucion);
+		sql.WHERE("fc.idseriefacturacion = " + idSerieFacturacion);
 		
 		// Order by
 		sql.ORDER_BY("p.nombre");

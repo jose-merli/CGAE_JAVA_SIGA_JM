@@ -47,7 +47,8 @@ public interface FacSeriefacturacionExtendsMapper extends FacSeriefacturacionMap
 		@Result(column = "ctaingresos", property = "ctaIngresos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idSerieFacturacionPrevia", property = "idSerieFacturacionPrevia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "serieGenerica", property = "serieGenerica", jdbcType = JdbcType.BOOLEAN),
-		@Result(column = "idcontador", property = "idContadorFacturas", jdbcType = JdbcType.BOOLEAN)
+		@Result(column = "idcontador", property = "idContadorFacturas", jdbcType = JdbcType.BOOLEAN),
+		@Result(column = "idcontador_abonos", property = "idContadorFacturasRectificativas", jdbcType = JdbcType.BOOLEAN)
 	})
 	List<SerieFacturacionItem> getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, Short idInstitucion, String idioma);
 
