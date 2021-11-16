@@ -34,6 +34,7 @@ public class FicherosAdeudosItem {
 	Date fechaRecibosRecurrentes;
 	Date fechaRecibosCOR;
 	Date fechaRecibosB2B;
+	Date fechaUltimaModificacion;
 	
 	/**
 	 * @return the idInstitucion
@@ -338,7 +339,78 @@ public class FicherosAdeudosItem {
 	public void setFacturacion(String facturacion) {
 		this.facturacion = facturacion;
 	}
-	
+	/**
+	 * @return the fechaPresentacion
+	 */
+	public Date getFechaPresentacion() {
+		return fechaPresentacion;
+	}
+	/**
+	 * @param fechaPresentacion the fechaPresentacion to set
+	 */
+	public void setFechaPresentacion(Date fechaPresentacion) {
+		this.fechaPresentacion = fechaPresentacion;
+	}
+	/**
+	 * @return the fechaRecibosPrimeros
+	 */
+	public Date getFechaRecibosPrimeros() {
+		return fechaRecibosPrimeros;
+	}
+	/**
+	 * @param fechaRecibosPrimeros the fechaRecibosPrimeros to set
+	 */
+	public void setFechaRecibosPrimeros(Date fechaRecibosPrimeros) {
+		this.fechaRecibosPrimeros = fechaRecibosPrimeros;
+	}
+	/**
+	 * @return the fechaRecibosRecurrentes
+	 */
+	public Date getFechaRecibosRecurrentes() {
+		return fechaRecibosRecurrentes;
+	}
+	/**
+	 * @param fechaRecibosRecurrentes the fechaRecibosRecurrentes to set
+	 */
+	public void setFechaRecibosRecurrentes(Date fechaRecibosRecurrentes) {
+		this.fechaRecibosRecurrentes = fechaRecibosRecurrentes;
+	}
+	/**
+	 * @return the fechaRecibosCOR
+	 */
+	public Date getFechaRecibosCOR() {
+		return fechaRecibosCOR;
+	}
+	/**
+	 * @param fechaRecibosCOR the fechaRecibosCOR to set
+	 */
+	public void setFechaRecibosCOR(Date fechaRecibosCOR) {
+		this.fechaRecibosCOR = fechaRecibosCOR;
+	}
+	/**
+	 * @return the fechaRecibosB2B
+	 */
+	public Date getFechaRecibosB2B() {
+		return fechaRecibosB2B;
+	}
+	/**
+	 * @param fechaRecibosB2B the fechaRecibosB2B to set
+	 */
+	public void setFechaRecibosB2B(Date fechaRecibosB2B) {
+		this.fechaRecibosB2B = fechaRecibosB2B;
+	}
+	/**
+	 * @return the fechaUltimaModificacion
+	 */
+	public Date getFechaUltimaModificacion() {
+		return fechaUltimaModificacion;
+	}
+	/**
+	 * @param fechaUltimaModificacion the fechaUltimaModificacion to set
+	 */
+	public void setFechaUltimaModificacion(Date fechaUltimaModificacion) {
+		this.fechaUltimaModificacion = fechaUltimaModificacion;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -355,6 +427,7 @@ public class FicherosAdeudosItem {
 		result = prime * result + ((fechaRecibosCOR == null) ? 0 : fechaRecibosCOR.hashCode());
 		result = prime * result + ((fechaRecibosPrimeros == null) ? 0 : fechaRecibosPrimeros.hashCode());
 		result = prime * result + ((fechaRecibosRecurrentes == null) ? 0 : fechaRecibosRecurrentes.hashCode());
+		result = prime * result + ((fechaUltimaModificacion == null) ? 0 : fechaUltimaModificacion.hashCode());
 		result = prime * result + ((fechacargo == null) ? 0 : fechacargo.hashCode());
 		result = prime * result + ((iban == null) ? 0 : iban.hashCode());
 		result = prime * result + ((idDisqueteCargos == null) ? 0 : idDisqueteCargos.hashCode());
@@ -375,7 +448,6 @@ public class FicherosAdeudosItem {
 		result = prime * result + ((totalRemesa == null) ? 0 : totalRemesa.hashCode());
 		return result;
 	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -444,6 +516,11 @@ public class FicherosAdeudosItem {
 			if (other.fechaRecibosRecurrentes != null)
 				return false;
 		} else if (!fechaRecibosRecurrentes.equals(other.fechaRecibosRecurrentes))
+			return false;
+		if (fechaUltimaModificacion == null) {
+			if (other.fechaUltimaModificacion != null)
+				return false;
+		} else if (!fechaUltimaModificacion.equals(other.fechaUltimaModificacion))
 			return false;
 		if (fechacargo == null) {
 			if (other.fechacargo != null)
@@ -537,7 +614,6 @@ public class FicherosAdeudosItem {
 			return false;
 		return true;
 	}
-	
 	@Override
 	public String toString() {
 		return "FicherosAdeudosItem [idInstitucion=" + idInstitucion + ", idDisqueteCargos=" + idDisqueteCargos
@@ -552,6 +628,6 @@ public class FicherosAdeudosItem {
 				+ numRecibosHasta + ", origen=" + origen + ", facturacion=" + facturacion + ", fechaPresentacion="
 				+ fechaPresentacion + ", fechaRecibosPrimeros=" + fechaRecibosPrimeros + ", fechaRecibosRecurrentes="
 				+ fechaRecibosRecurrentes + ", fechaRecibosCOR=" + fechaRecibosCOR + ", fechaRecibosB2B="
-				+ fechaRecibosB2B + "]";
+				+ fechaRecibosB2B + ", fechaUltimaModificacion=" + fechaUltimaModificacion + "]";
 	}
 }

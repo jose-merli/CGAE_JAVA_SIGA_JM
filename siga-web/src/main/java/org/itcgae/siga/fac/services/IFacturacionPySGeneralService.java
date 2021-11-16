@@ -1,5 +1,7 @@
 package org.itcgae.siga.fac.services;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -33,4 +35,6 @@ public interface IFacturacionPySGeneralService {
 	public ComboDTO comboTiposIVA(HttpServletRequest request) throws Exception;
 
 	public ComboDTO comboEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
+	
+	public ComboDTO parametrosSEPA(String idInstitucion, HttpServletRequest request) throws Exception;
 }

@@ -1,5 +1,8 @@
 package org.itcgae.siga.fac.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -226,6 +229,21 @@ public class FacturacionPySGeneralController {
 		} catch (Exception e) {
 
 			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping(value = "/parametrosSEPA")
+	ResponseEntity<ComboDTO> parametrosSEPA(@RequestParam String idInstitucion, HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.parametrosSEPA(idInstitucion, request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.toString()));
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

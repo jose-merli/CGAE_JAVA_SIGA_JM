@@ -16,11 +16,14 @@ import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionExample;
 import org.itcgae.siga.db.entities.FacSufijo;
 import org.itcgae.siga.db.entities.FacSufijoExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -82,6 +85,9 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private CgaeAuthenticationProvider authenticationProvider;
+	
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 
 	@Override
 	public ComboDTO comboCuentasBancarias(HttpServletRequest request) throws Exception {
@@ -596,4 +602,102 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		return comboDTO;
 	}
 
+	@Override
+	public ComboDTO parametrosSEPA(String idInstitucion, HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+		
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboItem item = new ComboItem();
+		
+		AdmUsuarios usuario = new AdmUsuarios();
+		GenParametrosExample example = new GenParametrosExample();
+		List<GenParametros> parametros;
+		short institucion;
+		
+		LOGGER.debug("parametrosSEPA() -> Entrada al servicio para recuperar los valores de los parámetros");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+		
+		if (usuario != null) {
+			
+			if(idInstitucion==null) {
+				institucion=Short.parseShort(idInstitucion);
+			}else {
+				institucion=usuario.getIdinstitucion();
+			}
+			
+			//primeros recibos
+			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_PRIMEROS_RECIBOS");
+			parametros = genParametrosMapper.selectByExample(example);
+			
+			item.setValue("SEPA_DIAS_HABILES_PRIMEROS_RECIBOS");
+			
+			if (null != parametros && parametros.size() > 0) {
+				
+				item.setLabel(parametros.get(0).getValor());
+			}else {
+				item.setLabel("0");
+			}
+			
+			comboItems.add(item);
+			
+			//recibosRecurrentes
+			item = new ComboItem();
+			example = new GenParametrosExample();
+			
+			item.setValue("SEPA_DIAS_HABILES_RECIBOS_RECURRENTES");
+			
+			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_RECURRENTES");
+			parametros = genParametrosMapper.selectByExample(example);
+			
+			if (null != parametros && parametros.size() > 0) {
+				item.setLabel(parametros.get(0).getValor());
+			}else {
+				item.setLabel("0");
+			}
+			
+			comboItems.add(item);
+			
+			//recibos cor1
+			item = new ComboItem();
+			example = new GenParametrosExample();
+			
+			item.setValue("SEPA_DIAS_HABILES_RECIBOS_COR1");
+			
+			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_COR1");
+			parametros = genParametrosMapper.selectByExample(example);
+			
+			if (null != parametros && parametros.size() > 0) {
+				item.setLabel(parametros.get(0).getValor());
+			}else {
+				item.setLabel("0");
+			}
+			
+			comboItems.add(item);
+			
+			//recibos b2b
+			item = new ComboItem();
+			example = new GenParametrosExample();
+			
+			item.setValue("SEPA_DIAS_HABILES_RECIBOS_B2B");
+			
+			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_B2B");
+			parametros = genParametrosMapper.selectByExample(example);
+			
+			if (null != parametros && parametros.size() > 0) {
+				item.setLabel(parametros.get(0).getValor());
+			}else {
+				item.setLabel("0");
+			}
+			
+			comboItems.add(item);
+			
+			comboDTO.setCombooItems(comboItems);
+		}
+
+		LOGGER.debug("parametrosSEPA() -> Salida del servicio");
+
+		return comboDTO;
+	}
 }

@@ -39,7 +39,8 @@ public interface FacDisquetecargosExtendsMapper extends FacDisquetecargosMapper 
 		@Result(column = "FECHARECIBOSPRIMEROS", property = "fechaRecibosPrimeros", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHARECIBOSRECURRENTES", property = "fechaRecibosRecurrentes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHARECIBOSCOR1", property = "fechaRecibosCOR", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHARECIBOSB2B", property = "fechaRecibosB2B", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "FECHARECIBOSB2B", property = "fechaRecibosB2B", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAMODIFICACION", property = "fechaUltimaModificacion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FicherosAdeudosItem> getFicherosAdeudos(FicherosAdeudosItem item, String idInstitucion);
 }
