@@ -181,7 +181,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	public CuentasBancariasDTO getCuentasBancarias(HttpServletRequest request) throws Exception {
+	public CuentasBancariasDTO getCuentasBancarias(String idCuenta, HttpServletRequest request) throws Exception {
 
 		CuentasBancariasDTO cuentasBancariasDTO = new CuentasBancariasDTO();
 		List<CuentasBancariasItem> listaCuentasBancarias;
@@ -198,7 +198,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					"getCuentasBancarias() / facBancoInstitucionExtendsMapper.getCuentasBancarias() -> Entrada a facBancoInstitucionExtendsMapper para obtener el listado de cuentas bancarias");
 
 			// Logica
-			listaCuentasBancarias = facBancoinstitucionExtendsMapper.getCuentasBancarias(usuario.getIdinstitucion());
+			listaCuentasBancarias = facBancoinstitucionExtendsMapper.getCuentasBancarias(idCuenta, usuario.getIdinstitucion());
 			LOGGER.info("getCuentasBancarias() ->" + listaCuentasBancarias.toString());
 
 			// comprobar primero si la lista de cuentas bancarias viene vacia
@@ -275,7 +275,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			facBancoinstitucionExtendsMapper.insertSelective(record);
 		}
 
-		List<CuentasBancariasItem> cuentasBancariasItems = facBancoinstitucionExtendsMapper.getCuentasBancarias(usuario.getIdinstitucion()).stream()
+		List<CuentasBancariasItem> cuentasBancariasItems = facBancoinstitucionExtendsMapper.getCuentasBancarias("", usuario.getIdinstitucion()).stream()
 				.filter(bi -> bi.getBancosCodigo().equals(record.getBancosCodigo())).collect(Collectors.toList());
 
 		cuentasBancariasDTO.setCuentasBancariasITem(cuentasBancariasItems);

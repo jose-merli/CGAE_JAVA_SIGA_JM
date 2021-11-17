@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface IFacturacionPySService {
 
-	public CuentasBancariasDTO getCuentasBancarias(HttpServletRequest request) throws Exception;
+	public CuentasBancariasDTO getCuentasBancarias(String idCuenta, HttpServletRequest request) throws Exception;
 
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
 			HttpServletRequest request) throws Exception;

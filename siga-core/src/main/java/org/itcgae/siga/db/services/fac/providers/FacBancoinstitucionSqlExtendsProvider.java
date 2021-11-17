@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.FacBancoinstitucionSqlProvider;
 
 public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSqlProvider {
 
-	public String getCuentasBancarias(Short idInstitucion) {
+	public String getCuentasBancarias(String idCuenta, Short idInstitucion) {
 		SQL query = new SQL();
 		
 		//Consulta principal
@@ -101,6 +101,10 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.LEFT_OUTER_JOIN("fac_sufijo su ON (bi.idsufijosjcs = su.idsufijo and bi.idinstitucion=su.idinstitucion)");
 		query.WHERE("bi.idinstitucion = " + idInstitucion);
 		
+		if(!idCuenta.isEmpty()) {
+			query.WHERE("bi.bancos_codigo="+idCuenta);
+		}
+			
 		return query.toString();
 	   
 	}

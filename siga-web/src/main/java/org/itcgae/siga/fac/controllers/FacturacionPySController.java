@@ -29,11 +29,11 @@ public class FacturacionPySController {
 	private IFacturacionPySService facturacionService;
 
 	@GetMapping(value = "/getCuentasBancarias")
-	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(HttpServletRequest request) {
+	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(@RequestParam String idCuenta, HttpServletRequest request) {
 		CuentasBancariasDTO response = new CuentasBancariasDTO();
 
 		try {
-			response = facturacionService.getCuentasBancarias(request);
+			response = facturacionService.getCuentasBancarias(idCuenta, request);
 			return new ResponseEntity<CuentasBancariasDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
