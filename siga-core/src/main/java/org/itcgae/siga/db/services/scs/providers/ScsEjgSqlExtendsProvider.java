@@ -439,6 +439,19 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                     "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
             sql.WHERE("PET.ESTADO IN (" + String.join(",", ejgItem.getEstadosSolicitudExpEco()) + ")");
         }
+        
+        if (ejgItem.isInformacionEconomica()) {
+        	if (ejgItem.getEstadosSolicitudExpEco() == null || ejgItem.getEstadosSolicitudExpEco().length == 0) {
+	            sql.INNER_JOIN("SCS_EEJG_PETICIONES PET " +
+	                    "ON PET.ANIO = ejg.ANIO " +
+	                    "AND PET.NUMERO = ejg.NUMERO " +
+	                    "AND PET.IDINSTITUCION = ejg.IDINSTITUCION " +
+	                    "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
+        	}
+            sql.INNER_JOIN("SCS_EEJG_XML EXML " +
+                    "ON PET.IDPETICION = EXML.IDPETICION ");
+            sql.WHERE("EXML.IDXML IS NOT NULL");
+        }
 
         if (tamMaximo != null) {
             Integer tamMaxNumber = tamMaximo + 1;
@@ -447,6 +460,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         }
 
         sql.ORDER_BY("TURNO ASC, GUARDIA.NOMBRE ASC");
+        
+        LOGGER.info(sql.toString());
 
         return sql.toString();
     }

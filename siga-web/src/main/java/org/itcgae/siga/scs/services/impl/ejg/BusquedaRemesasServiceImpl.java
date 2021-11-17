@@ -1005,43 +1005,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				validar = validarAccion(remesaAccionItem, request, remesaAccionItem.getDescripcion());
 				
 				if(validar) {
-					if(parametro.getValor().equals("5")) {
-						if(remesaAccionItem.isInformacionEconomica()) {
-							CajgEjgremesaExample cajgEjgremesaExample = new CajgEjgremesaExample();
-							cajgEjgremesaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdremesaEqualTo(Long.valueOf(remesaAccionItem.getIdRemesa()));
-							List<CajgEjgremesa> cajgEjgremesa = cajgEjgremesaExtendsMapper.selectByExample(cajgEjgremesaExample);
-							
-							if(!cajgEjgremesa.isEmpty() && cajgEjgremesa != null) {
-								for(CajgEjgremesa ejgRemesa : cajgEjgremesa){
-									ScsEejgPeticionesExample peticionesExample = new ScsEejgPeticionesExample();
-									
-									peticionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejgRemesa.getAnio()).andIdtipoejgEqualTo(ejgRemesa.getIdtipoejg())
-									.andNumeroEqualTo(ejgRemesa.getNumero());							
-									
-									List<ScsEejgPeticiones> eejgPeticiones = scsExpedienteEconomicoExtendsMapper.selectByExample(peticionesExample);
-									
-									if(!eejgPeticiones.isEmpty() && eejgPeticiones != null) {
-										
-										for(ScsEejgPeticiones eejgPeticion : eejgPeticiones) {
-											
-											if(eejgPeticion.getCsv() !=null){
-												
-												ScsEejgpeticionesExtendsMapper.updateByPrimaryKeySelective(eejgPeticion);
-											}
-											
-										}
-										
-									}
-								}
-							}
-							
-							
-						}else {
-							
-						}
-					}else {
-						insertResponseDTO = validaEnviaExpedientes(idInstitucion, Long.valueOf(remesaAccionItem.getIdRemesa()), remesaAccionItem.getAccion(), parametro.getValor(), gr.getDescripcion(), request, usuarios.get(0).getUsumodificacion());
-					}
+					insertResponseDTO = validaEnviaExpedientes(idInstitucion, remesaAccionItem, parametro.getValor(), gr.getDescripcion(), request, usuarios.get(0).getUsumodificacion());
 				}else {
 					LOGGER.error("Error al validar la remesa. No cumple los requisitos");
 					error.setCode(200);
@@ -1081,7 +1045,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		return false;
 	}
 
-	private InsertResponseDTO validaEnviaExpedientes(Short idinstitucion, Long idremesa , int accion, String tipoPCAJG, String mensajeValidando, HttpServletRequest request, Integer usuModificacion) {
+	private InsertResponseDTO validaEnviaExpedientes(Short idinstitucion, RemesaAccionItem remesaAccionItem, String tipoPCAJG, String mensajeValidando, HttpServletRequest request, Integer usuModificacion) {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		LOGGER.debug("Insertando un nuevo registro para la validación o envío de datos de una remesa de envío.");
@@ -1089,7 +1053,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		try {
 			
 			EcomOperacionTipoaccionExample ecomOperacionTipoAccionExample = new EcomOperacionTipoaccionExample();
-			ecomOperacionTipoAccionExample.createCriteria().andIdtipoaccionremesaEqualTo(accion).andTipoPcajgEqualTo(tipoPCAJG);
+			ecomOperacionTipoAccionExample.createCriteria().andIdtipoaccionremesaEqualTo(remesaAccionItem.getAccion()).andTipoPcajgEqualTo(tipoPCAJG);
 			List<EcomOperacionTipoaccion> ecomOperacionTipoaccion = ecomOperacionTipoaccionMapper.selectByExample(ecomOperacionTipoAccionExample);
 			
 			EcomCola ecomCola = new EcomCola();
@@ -1101,23 +1065,27 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			
 			CajgRemesa cajgRemesaKey = new CajgRemesa();
 			cajgRemesaKey.setIdinstitucion(idinstitucion);
-			cajgRemesaKey.setIdremesa(idremesa);
+			cajgRemesaKey.setIdremesa(Long.valueOf(remesaAccionItem.getIdRemesa()));
 
 			insertResponseDTO = deleteCajgRespuestasRemesa(cajgRemesaKey);
 
 			insertResponseDTO = insertaEstadoValidandoRemesa(cajgRemesaKey, mensajeValidando, request);
 
 			Map<String, String> mapa = new HashMap<String, String>();
-			mapa.put("IDREMESA", idremesa.toString());
+			mapa.put("IDREMESA", String.valueOf(remesaAccionItem.getIdRemesa()));
+			
+			if(remesaAccionItem.isInformacionEconomica()) {
+				mapa.put("IDINSTITUCION", idinstitucion.toString());
+			}
 
 			insertResponseDTO = insertaColaRemesa(ecomCola, mapa, cajgRemesaKey);
 						
 			if(insertResponseDTO.getStatus().equals(SigaConstants.OK) && insertResponseDTO.getError().getCode() == 200
-					&& ecomOperacionTipoaccion.get(0).getIdoperacion() == 48) { //OPERACION PARA ENVIAR REMESA ALCALÁ -> ACCIÓN 48
+					&& remesaAccionItem.isInformacionEconomica()) {
 				
 				CajgRemesaestados cajgRemesa = new CajgRemesaestados();
 				
-				cajgRemesa.setIdremesa(idremesa);
+				cajgRemesa.setIdremesa(Long.valueOf(remesaAccionItem.getIdRemesa()));
 				cajgRemesa.setIdinstitucion(idinstitucion);
 				cajgRemesa.setIdestado(Short.valueOf("1")); //GENERADA
 				cajgRemesa.setFecharemesa(new Date());

@@ -139,6 +139,8 @@ public class EjgItem {
 
     // Check que indica si se busca EJGs por estados concretos o que hayan pasado por ese estado en algún momento
     private boolean ultimoEstado;
+    
+    private boolean informacionEconomica;
 
     /**
      *
@@ -1719,4 +1721,13 @@ public class EjgItem {
     public void setUltimoEstado(boolean ultimoEstado) {
         this.ultimoEstado = ultimoEstado;
     }
+
+	public boolean isInformacionEconomica() {
+		return informacionEconomica;
+	}
+
+	public void setInformacionEconomica(boolean informacionEconomica) {
+		this.informacionEconomica = informacionEconomica;
+	}
+    
 }
