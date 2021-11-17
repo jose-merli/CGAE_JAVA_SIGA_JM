@@ -294,4 +294,19 @@ public class FacturacionPySController {
 			return new ResponseEntity<UsosSufijosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@PostMapping(value = "/getFacturacionesProgramadas")
+	ResponseEntity<FacFacturacionprogramadaDTO> getFacturacionesProgramadas(@RequestBody FacFacturacionprogramadaItem facturacionProgramadaItem,
+															  HttpServletRequest request) {
+		FacFacturacionprogramadaDTO response = new FacFacturacionprogramadaDTO();
+
+		try {
+			response = facturacionService.getFacturacionesProgramadas(facturacionProgramadaItem, request);
+			return new ResponseEntity<FacFacturacionprogramadaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacFacturacionprogramadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }

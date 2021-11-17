@@ -33,6 +33,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacEstadoconfirmfactExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
@@ -96,6 +97,9 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private PysServiciosMapper pysServiciosMapper;
+
+	@Autowired
+	private FacEstadoconfirmfactExtendsMapper facEstadoconfirmfactExtendsMapper;
 
 	@Override
 	public ComboDTO comboCuentasBancarias(HttpServletRequest request) throws Exception {
@@ -694,6 +698,36 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		}
 
 		LOGGER.debug("comboTiposIVA() -> Salida del servicio para obtener el combo de tipos de IVA");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboEstadosFact(String tipo, HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+
+		AdmUsuarios usuario = new AdmUsuarios();
+		List<ComboItem> comboItems;
+
+		LOGGER.debug("comboEstadosFact() -> Entrada al servicio para recuperar el combo de estados con tipo=" + tipo);
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"comboEstadosFact() / facEstadoconfirmfactExtendsMapper.comboEstados() -> Entrada a facEstadoconfirmfactExtendsMapper para obtener combo de estados con tipo=" + tipo);
+
+			String idioma = usuario.getIdlenguaje();
+
+			// Logica
+			comboItems = facEstadoconfirmfactExtendsMapper.comboEstados(tipo, idioma);
+
+			comboDTO.setCombooItems(comboItems);
+
+		}
+
+		LOGGER.debug("comboEstadosFact() -> Salida del servicio recuperar el combo de estados con tipo=" + tipo);
 
 		return comboDTO;
 	}

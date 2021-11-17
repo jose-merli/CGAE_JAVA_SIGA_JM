@@ -257,4 +257,65 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@GetMapping(value = "/comboEstadosFacturacion")
+	ResponseEntity<ComboDTO> comboEstadosFacturacion(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboEstadosFact("C", request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/comboEstadosFicheros")
+	ResponseEntity<ComboDTO> comboEstadosFicheros(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboEstadosFact("P", request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/comboEstadosEnvios")
+	ResponseEntity<ComboDTO> comboEstadosEnvios(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboEstadosFact("E", request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/comboEstadosTraspasos")
+	ResponseEntity<ComboDTO> comboEstadosTraspasos(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboEstadosFact("T", request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }

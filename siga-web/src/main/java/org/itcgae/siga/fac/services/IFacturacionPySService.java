@@ -63,4 +63,6 @@ public interface IFacturacionPySService {
 
 	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request) throws Exception;
 
+    public FacFacturacionprogramadaDTO getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) throws Exception;
+
 }

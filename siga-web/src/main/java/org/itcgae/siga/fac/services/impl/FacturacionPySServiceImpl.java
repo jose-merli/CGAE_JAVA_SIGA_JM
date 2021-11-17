@@ -16,6 +16,8 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
@@ -59,12 +61,12 @@ import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
-import org.itcgae.siga.db.mappers.FacTiposservinclsenfactMapper;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacDisquetecargosExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
@@ -129,6 +131,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacClienincluidoenseriefacturMapper facClienincluidoenseriefacturMapper;
+
+	@Autowired
+	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1314,4 +1319,35 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		return usosSufijosDTO;
 	}
+
+	@Override
+	public FacFacturacionprogramadaDTO getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) throws Exception {
+
+		FacFacturacionprogramadaDTO itemsDTO = new FacFacturacionprogramadaDTO();
+		List<FacFacturacionprogramadaItem> items;
+		Error error = new Error();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("getFacturacionesProgramadas() -> Entrada al servicio para recuperar el listado de facturaciones programadas");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info(
+					"getFacturacionesProgramadas() / facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas() -> Entrada a facFacturacionprogramadaExtendsMapper para obtener el listado de facturaciones programadas");
+
+			// Logica
+			items = facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas(facturacionProgramadaItem, usuario.getIdinstitucion(), usuario.getIdlenguaje(), 200);
+			itemsDTO.setFacturacionprogramadaItems(items);
+
+		}
+
+		itemsDTO.setError(error);
+
+		LOGGER.info("getFacturacionesProgramadas() -> Salida del servicio para obtener el listado de facturaciones programadas");
+
+		return itemsDTO;
+	}
+
 }
