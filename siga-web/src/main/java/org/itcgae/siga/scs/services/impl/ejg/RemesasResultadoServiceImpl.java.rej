@@ -1,9 +1,0 @@
-diff a/siga-web/src/main/java/org/itcgae/siga/scs/services/impl/ejg/RemesasResultadoServiceImpl.java b/siga-web/src/main/java/org/itcgae/siga/scs/services/impl/ejg/RemesasResultadoServiceImpl.java	(rejected hunks)
-@@ -252,6 +252,7 @@
-         List<GenProperties> genPropertiesPathP = genPropertiesMapper.selectByExample(genPropertiesExamplePG);
-         path += genPropertiesPathP.get(0).getValor();
-       //Para local
-+        path = "C:\\Users\\kvargasnunez\\Desktop\\Server";
-         path += File.separator + idInstitucion + File.separator + "remesaResoluciones";		
-         path += File.separator + idRemesaResolucion;
-         
