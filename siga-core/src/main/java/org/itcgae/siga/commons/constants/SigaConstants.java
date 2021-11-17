@@ -1189,6 +1189,7 @@ public class SigaConstants {
 	public static final String TIPO_SOPORTE_CARTUCHO = "C";
 	public static final String TIPO_SOPORTE_TELEMATICO = "T";
 	public static final String TIPO_SOPORTE_DISQUETE = "D";
+	public static final String PATH_IMPRESO190 = "PATH_IMPRESO190";
     
 
 }

@@ -59,6 +59,8 @@ import org.itcgae.siga.db.services.fcs.mappers.FcsPagoColegiadoExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IImpreso190Service;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -107,7 +109,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				sNombreFichero = impreso190Item.getNomFicheroOriginal();
-				String sDirectorio = "/Datos/SIGA/ficheros/impreso190";
+				String sDirectorio = getPathTemporal("FCS", SigaConstants.PATH_IMPRESO190);
 				new File(sDirectorio + File.separator + idInstitucion);
 				String sNombreCompletoFichero = sDirectorio + File.separator + idInstitucion + File.separator
 						+ sNombreFichero;
@@ -158,7 +160,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		boolean hayError = false;
 		Impreso190DTO error = new Impreso190DTO();
 		String codigoProvincia;
-		Map<String, String> dataPersonas = new HashMap<String, String>();
+		
 		Map<String, String> dataErrorLogs = new HashMap<String, String>();
 		List<Map<String, String>> vErrores = new ArrayList<Map<String, String>>();
 
@@ -187,6 +189,8 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 					Double importeIrpfPersona = Double.parseDouble(pagoCol.getTotalImporteIrpf());
 					Double importePagadoPersona = Double.parseDouble(pagoCol.getTotalImportePagado());
 					String claveM190 = pagoCol.getClaveM190();
+					
+					Map<String, String> dataPersonas = new HashMap<String, String>();
 
 					if (!importeIrpfPersona.equals(new Double(0.0))) {
 
@@ -194,6 +198,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 						Impreso190Item datosPersona = cenPersonaExtendsMapper.getDatosPersonaForImpreso190(idPersona);
 						String mensajeError = "";
 						if (datosPersona != null) {
+							
 							String tipoIdentificacion = datosPersona.getIdtipoidentificacion();
 							String nombre = datosPersona.getNombre();
 							String apellidos1 = datosPersona.getApellidos1();
@@ -208,7 +213,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 							dataPersonas.put("APELLIDOS2", apellidos2);
 							dataPersonas.put("NIDENTIFICACION", numIdentificacion);
 							dataPersonas.put("NOMBREPERSONA", nombrePersona);
-							dataErrorLogs.putAll(dataPersonas);
+							dataErrorLogs.putAll(dataPersonas);//sube todos los datos de la persona para el log de error
 
 							if (nombre == null || nombre.equals("")) {
 								mensajeError = "ERROR: el nombre es necesario";
@@ -257,7 +262,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 			sNombreFichero = dataEntry.getNomFicheroOriginal() + ".190";
 		} 
 		// String sDirectorio = getDirectorioFichero(Short.parseShort(idinstitucion));
-		String sDirectorio = "/Datos/SIGA/ficheros/impreso190";
+		String sDirectorio = getPathTemporal("FCS", SigaConstants.PATH_IMPRESO190);
 		String sCamino = sDirectorio + File.separator + idinstitucion;
 
 		// LOG_IMPRESO190_[IDINSTITUCION]_[A�O]_[FECHA_EJECUCION]
@@ -426,10 +431,10 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 			//
 			// MODELO 190: REGISTROS DE PERCEPCION
 			//
-			Object[] claves = importes.keySet().toArray();
-			for (int i = 0; i < claves.length; i++) {
-				Object o = claves[i];
-				String persona = (String) o;
+			Iterator claves = datos.keySet().iterator();
+			
+			while(claves.hasNext()){
+				  Object persona = claves.next();
 				Map<String, String> datosPersonaRegistro = datos.get(persona);
 
 				// registro unico de persona
@@ -617,6 +622,21 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 			throw new Exception("Error en FcsFacturacionJG.generarLogImpreso190()");
 		}
 		return fichero;
+	}
+	
+	private String getPathTemporal(String modulo,String parametro){
+		GenParametrosExample path = new GenParametrosExample();
+		path.createCriteria().andModuloEqualTo(modulo).andParametroEqualTo(parametro);
+		
+		String valor = genParametrosMapper.selectByExample(path).get(0).toString();
+		return valor;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> impreso190descargar(Impreso190Item impreso190Item,
+			HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
