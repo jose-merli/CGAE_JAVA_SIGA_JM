@@ -414,30 +414,39 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.WHERE("pet.idinstitucion = "+idInstitucion.toString());
 		sql.WHERE("rownum <= 200");
 		
-		if(filtro.getIdEstadoSolicitud() != null) {
-			switch(filtro.getIdEstadoSolicitud()) {
-				case "1"://Pendiente
-					sql.WHERE("CASE WHEN compra.fecha is null THEN petBaja.fecha\r\n"
-							+ "				ELSE null END is null and compra.fecha is null");
-					break;
-				case "2"://Denegada
-					sql.WHERE("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null");
-					break;
-				case "3"://Aceptada
-					sql.WHERE("compra.fecha is not null and CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is null and"
-							+ "				compra.fechaBaja is null");
-					break;
-				case "4"://Solicitada anulacion
-					sql.WHERE("CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
-							+ "				ELSE null END is not null and compra.fechaBaja is null"
-							+ "				and compra.fecha is not null");
-					break;
-				case "5"://Anulada
-					sql.WHERE("compra.fechaBaja is not null");
-					break;
+		if(filtro.getIdEstadoSolicitud() != null && !filtro.getIdEstadoSolicitud().isEmpty()) {
+			//Recorremos el array de estados seleccionados
+			List<String> estados = filtro.getIdEstadoSolicitud();
+			String condSolicitud = "((";
+			for(String estado : estados) {
+				switch(estado) {
+					case "1"://Pendiente
+						condSolicitud +="CASE WHEN compra.fecha is null THEN petBaja.fecha\r\n"
+								+ "				ELSE null END is null and compra.fecha is null";
+						break;
+					case "2"://Denegada
+						condSolicitud +="CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
+								+ "				ELSE null END is not null";
+						break;
+					case "3"://Aceptada
+						condSolicitud += "compra.fecha is not null and CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
+								+ "				ELSE null END is null and"
+								+ "				compra.fechaBaja is null";
+						break;
+					case "4"://Solicitada anulacion
+						condSolicitud += "CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
+								+ "				ELSE null END is not null and compra.fechaBaja is null"
+								+ "				and compra.fecha is not null";
+						break;
+					case "5"://Anulada
+						condSolicitud += "compra.fechaBaja is not null";
+						break;
+				}
+				condSolicitud += ") OR (";
 			}
+
+			condSolicitud = condSolicitud.substring(0, condSolicitud.length() - 4)+")";
+			sql.WHERE(condSolicitud);
 		}
 		
 		if(filtro.getIdpersona() != null)sql.WHERE("pet.idpersona = "+filtro.getIdpersona());
@@ -463,11 +472,40 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.WHERE("pet.fecha <= to_date('"+strDate+"','dd/MM/YY')");
 		}
 			
-		if(filtro.getIdTipoProducto() != null)sql.WHERE("prodSol.idProductoInstitucion = "+filtro.getIdTipoProducto());
+		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
+			if (filtro.getIdTipoProducto() != null && !filtro.getIdTipoProducto().isEmpty()) {
+				String condTipoProd = "((";
+				//Actualmente el id de producto se define así "IDTIPOPRODUCTOS || '-' || IDPRODUCTO".
+				//Aunque lleve a confusion, IDTIPOPRODUCTOS en la BBDD hace referencia a idCategoria
+				//mientras que IDPRODUCTO a idTipoProducto
+				List<String> categoriasConProducto = new ArrayList<String>();
+				for(String producto : filtro.getIdTipoProducto()) {
+					categoriasConProducto.add(producto.split("-")[0]);
+					//Creamos las condiciones por pares para los servicios especificos seleccionados
+					condTipoProd += ("(prodSol.idProductoInstitucion = "+producto.split("-")[1]+" AND prodSol.idTipoProducto = "+producto.split("-")[0]+" ) OR ");
+				}
 
-		if(filtro.getIdCategoria() != null)sql.WHERE("prodSol.idTipoProducto = "+filtro.getIdCategoria());
+				condTipoProd = condTipoProd.substring(0, condTipoProd.length() - 3)+")";
+				//Comprobamos que categorias no tienen un servicio seleccionado
+				List<String> categoriasSinProducto = filtro.getIdCategoria();
+				
+				categoriasSinProducto.removeAll(categoriasConProducto);
+				if(!categoriasSinProducto.isEmpty()) {
+					condTipoProd += (" OR (prodSol.idTipoProducto IN (" + String.join(",",filtro.getIdCategoria())+"))");
+				}
+				
+				condTipoProd += ")";
+				
+				sql.WHERE(condTipoProd);
+			}
+			else {
+				sql.WHERE("prodSol.idTipoproducto IN (" + String.join(",",filtro.getIdCategoria())+")");
+			}
+		}
 		
-		if(filtro.getIdEstadoFactura() != null)sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
+		if(filtro.getIdEstadoFactura() != null && !filtro.getIdEstadoFactura().isEmpty()) {
+			sql.WHERE("fact.estado IN ("+String.join(",",filtro.getIdEstadoFactura())+")");
+		}
 //		private String importe; // valor aplicado durante la compra (importe total)
 		
 //		sql.GROUP_BY("pet.fecha , pet.idPeticion, pet.idPersona , per.nifcif, col.NCOLEGIADO \r\n"

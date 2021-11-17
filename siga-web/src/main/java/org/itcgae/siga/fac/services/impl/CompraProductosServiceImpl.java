@@ -137,6 +137,7 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 							else if(compraProductos.getFechaDenegada() != null) compraProductos.setIdEstadoSolicitud("2");
 							else compraProductos.setIdEstadoSolicitud("1");
 							
+							//REVISAR
 							List<ListaProductosCompraItem> productosCompra = gestionFichaCompraSuscripcionServiceImpl.getListaProductosCompra(request, compraProductos.getnSolicitud()).getListaProductosCompraItems();
 							
 							Float totalCompra = (float) 0;
