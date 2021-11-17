@@ -378,14 +378,15 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("pet.idPersona as idPersona");
 		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
 		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
+		sql.SELECT_DISTINCT("count(prodIns.solicitarBaja) as nProd");
 		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
 		//REVISAR COUNT que siempre devuelve 200
-		sql.SELECT_DISTINCT("CASE WHEN COUNT(1) OVER (ORDER BY prodIns.descripcion) >1 THEN FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) || '...'\r\n"
-				+ "ELSE FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) END as concepto \r\n");
+//		sql.SELECT_DISTINCT("CASE WHEN COUNT(1) OVER (ORDER BY prodIns.descripcion) >1 THEN FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) || '...'\r\n"
+//				+ "ELSE FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) END as concepto \r\n");
 		sql.SELECT_DISTINCT("prodSol.idformapago as idformapago \r\n");
 		sql.SELECT_DISTINCT("CASE WHEN prodSol.noFacturable = '1' THEN 'No facturable'\r\n"
 				+ "ELSE f_siga_getrecurso(formPago.descripcion, "+ idioma +") END as desFormaPago");
-//		sql.SELECT_DISTINCT("(prodSol.VALOR*prodSol.cantidad)*(1+TIVA.VALOR/100) AS impTotal \r\n");
+		sql.SELECT_DISTINCT("SUM((prodSol.VALOR*prodSol.cantidad)*(1+TIVA.VALOR/100)) AS impTotal \r\n");
 		
 		sql.SELECT_DISTINCT("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
 				+ "ELSE null END as fechaDenegada \r\n");
@@ -394,14 +395,15 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("compra.fecha as fechaEfectiva");
 		sql.SELECT_DISTINCT("compra.fechaBaja as fechaAnulada");
 		sql.SELECT_DISTINCT("f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'" + idioma + "') AS estadoFactura");
-//		sql.SELECT_DISTINCT("SUM(prodIns.solicitarBaja)-COUNT(prodIns.solicitarBaja) as solicitarBaja");
+		sql.SELECT_DISTINCT("SUM(prodIns.solicitarBaja)-COUNT(prodIns.solicitarBaja) as solicitarBaja");
 		sql.SELECT_DISTINCT("case when fact.idfactura is null then '0' else '1' end as facturas");
 		
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet");
 		
 		sql.INNER_JOIN("PYS_productosSolicitados prodSol on prodSol.idinstitucion=pet.idInstitucion and prodSol.idpeticion=pet.idPeticion");
 		sql.LEFT_OUTER_JOIN("pys_formapago formPago on formPago.idformapago = prodSol.idformapago");
-		sql.LEFT_OUTER_JOIN("pys_compra compra on compra.idinstitucion = pet.idinstitucion and compra.idpeticion = pet.idpeticion");
+		sql.LEFT_OUTER_JOIN("pys_compra compra on compra.idinstitucion = pet.idinstitucion and compra.idpeticion = pet.idpeticion and compra.idproducto = prodSol.idProducto \r\n"
+				+ "and compra.idTipoProducto = prodSol.idTipoProducto and compra.idProductoInstitucion = prodSol.idProductoInstitucion");
 		sql.INNER_JOIN("cen_persona per on per.idpersona = pet.idpersona");
 		sql.LEFT_OUTER_JOIN("cen_colegiado col on col.idpersona = pet.idpersona and col.idinstitucion = pet.idinstitucion");
 		sql.INNER_JOIN("pys_productosinstitucion prodIns on prodIns.idinstitucion = prodSol.idinstitucion and prodIns.idproducto = prodSol.idProducto \r\n"
@@ -475,8 +477,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
 			if (filtro.getIdTipoProducto() != null && !filtro.getIdTipoProducto().isEmpty()) {
 				String condTipoProd = "((";
-				//Actualmente el id de producto se define así "IDTIPOPRODUCTOS || '-' || IDPRODUCTO".
-				//Aunque lleve a confusion, IDTIPOPRODUCTOS en la BBDD hace referencia a idCategoria
+				//Actualmente el id de producto se define así "IDTIPOPRODUCTO || '-' || IDPRODUCTO".
+				//Aunque lleve a confusion, IDTIPOPRODUCTO en la BBDD hace referencia a idCategoria
 				//mientras que IDPRODUCTO a idTipoProducto
 				List<String> categoriasConProducto = new ArrayList<String>();
 				for(String producto : filtro.getIdTipoProducto()) {
@@ -508,20 +510,31 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		}
 //		private String importe; // valor aplicado durante la compra (importe total)
 		
-//		sql.GROUP_BY("pet.fecha , pet.idPeticion, pet.idPersona , per.nifcif, col.NCOLEGIADO \r\n"
-//				+ ", per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre  \r\n"
-//				+ ", CASE WHEN COUNT(1) OVER (ORDER BY prodIns.descripcion) >1 THEN FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) || '...'\r\n"
-//				+ "ELSE FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) END \r\n"
-//				+ ", prodSol.idformapago \r\n"
-//				+ ", CASE WHEN prodSol.noFacturable = '1' THEN 'No facturable'\r\n"
-//				+ "ELSE f_siga_getrecurso(formPago.descripcion, 1) END , CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
-//				+ "ELSE null END \r\n"
-//				+ ", CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
-//				+ "ELSE null END\r\n"
-//				+ ", compra.fecha, compra.fechaBaja, f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'1')\r\n"
-//				+ ",case when fact.idfactura is null then '0' else '1' end");
+		sql.GROUP_BY("pet.fecha , pet.idPeticion, pet.idPersona , per.nifcif, col.NCOLEGIADO \r\n"
+				+ ", per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre  \r\n"
+				+ ", prodSol.idformapago \r\n"
+				+ ", CASE WHEN prodSol.noFacturable = '1' THEN 'No facturable'\r\n"
+				+ "ELSE f_siga_getrecurso(formPago.descripcion, 1) END , CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
+				+ "ELSE null END \r\n"
+				+ ", CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
+				+ "ELSE null END\r\n"
+				+ ", compra.fecha, compra.fechaBaja, f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'1')\r\n"
+				+ ",case when fact.idfactura is null then '0' else '1' end");
 		
-		return sql.toString();
+		//Para determinar los puntos suspensivos de  de la descripcion
+		
+				String query = "select \r\n"
+				+ "case when nProd = 1 then MAX(prodIns.descripcion) else MAX(prodIns.descripcion) || '...' end as concepto\r\n"
+				+ " , gen.*\r\n"
+				+ "from (\r\n"+sql.toString()+") gen\r\n"
+						+ "INNER JOIN PYS_productosSolicitados prodSol on prodSol.idinstitucion=2005 and prodSol.idpeticion = gen.nsolicitud\r\n"
+						+ "INNER JOIN pys_productosinstitucion prodIns on prodIns.idinstitucion = prodSol.idinstitucion and prodIns.idproducto = prodSol.idProducto \r\n"
+						+ "and prodIns.idTipoProducto = prodSol.idTipoProducto and prodIns.idProductoInstitucion = prodSol.idProductoInstitucion\r\n"
+						+ "group by gen.fechasolicitud, gen.nsolicitud, gen.idpersona, gen.nidentificacion, gen.ncolegiado, gen.apellidosnombre, gen.nprod, gen.idformapago, gen.desformapago, \r\n"
+						+ "gen.imptotal, gen.fechadenegada, gen.fechasolicitadaanulacion, gen.fechaefectiva, gen.fechaanulada, gen.estadofactura, gen.solicitarbaja, gen.facturas";
+				
+				
+				return query;
 		
 	}
 	
@@ -753,9 +766,6 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				sql.WHERE("servSol.idTipoServicios IN (" + String.join(",",filtro.getIdCategoria())+")");
 			}
 		}
-
-
-		
 
 		
 		if(filtro.getIdEstadoFactura() != null && !filtro.getIdEstadoFactura().isEmpty()) {
