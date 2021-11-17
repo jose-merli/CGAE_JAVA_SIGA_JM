@@ -42,7 +42,7 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 		@Result(column = "idsufijosjcs", property = "idSufijoSjcs", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "concepto", property = "concepto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "sjcs", property = "sjcs", jdbcType = JdbcType.VARCHAR)})
-	List<CuentasBancariasItem> getCuentasBancarias(Short idInstitucion);
+	List<CuentasBancariasItem> getCuentasBancarias(String idCuenta, Short idInstitucion);
 
 	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "getNextIdCuentaBancaria")
 	@Results({ @Result(column = "bancos_codigo", property = "newId", jdbcType = JdbcType.VARCHAR) })
