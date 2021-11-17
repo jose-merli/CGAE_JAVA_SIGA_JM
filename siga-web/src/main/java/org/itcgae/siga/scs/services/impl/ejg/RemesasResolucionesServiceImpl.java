@@ -109,8 +109,6 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 	@Autowired
 	private EcomOperacionTipoaccionMapper ecomOperacionTipoaccionMapper;
 	
-	@Autowired
-	private ScsRemesasResolucionesExtendsMapper remesasResolucionesExtendsMapper;
 	
 	@Autowired
 	private CajgProcedimientoremesaresolMapper cajgProcedimientoremesaresolMapper;
@@ -467,7 +465,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 			boolean conFichero = (!fileName.isEmpty()) ? true : false; 					
 			
 			RemesasResolucionItem remesaResolucionID = new RemesasResolucionItem();
-			remesaResolucionID = remesasResolucionesExtendsMapper.getMaxIdRemesaResolucion(idInstitucion);
+			remesaResolucionID = scsRemesasResolucionesExtendsMapper.getMaxIdRemesaResolucion(idInstitucion);
 			
 			String path = getDirectorioFicheroRemesa(idInstitucion,remesasResolucionItem.getIdRemesaResolucion());
 			if(remesasResolucionItem.getIdRemesaResolucion() == 0) {
@@ -503,7 +501,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 					
 					//Actualizar contador.
 					
-					//gestorContadores.setContador(adm,remesaResolucion.getNumero());
+					gestorContadores.setContador(adm,remesaResolucion.getNumero());
 					
 					LOGGER.info(
 							"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion");
@@ -742,7 +740,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 	private void insertRemesaResolucionFichero(Short idInstitucion, RemesasResolucionItem remesaResolucionID, MultipartFile  fileIn,String path ) {
 
 		CajgRemesaresolucionfichero remesaResolucionFicheroID = new CajgRemesaresolucionfichero();
-		remesaResolucionFicheroID = remesasResolucionesExtendsMapper.getMaxIdRemesaResolucionFichero(idInstitucion);
+		remesaResolucionFicheroID = scsRemesasResolucionesExtendsMapper.getMaxIdRemesaResolucionFichero(idInstitucion);
 		Long idRemesaResolucionFichero = remesaResolucionFicheroID.getIdremesaresolucionfichero();
 		FileInputStream fis;
 

@@ -10,10 +10,14 @@ import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResolucionDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+@Service
+@Primary
 public interface IRemesasResoluciones {
 	
 	RemesaResolucionDTO buscarRemesasResoluciones( RemesasResolucionItem remesasResolucionItem, HttpServletRequest request);
