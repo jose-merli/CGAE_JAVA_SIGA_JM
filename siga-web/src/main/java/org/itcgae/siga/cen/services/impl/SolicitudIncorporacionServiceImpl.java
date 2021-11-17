@@ -897,7 +897,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenSolicitudincorporacion solIncorporacion = new CenSolicitudincorporacion();
 		
-
 		solIncorporacion.setIdsolicitud(Long.parseLong(dto.getIdSolicitud()));
 		solIncorporacion.setAbonocargo(dto.getAbonoCargo());
 		solIncorporacion.setAbonosjcs(dto.getAbonoJCS());
@@ -905,19 +904,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setApellido2(dto.getApellido2());
 		solIncorporacion.setCboCodigo(dto.getCboCodigo());
 		
-		if(!dto.getCodigoPostal().equals("") && dto.getCodigoPostal() != null) {
-			solIncorporacion.setCodigopostal(dto.getCodigoPostal());
-		}else {
-			solIncorporacion.setCodigopostal(" ");
-		}
-		
+		solIncorporacion.setCodigopostal(dto.getCodigoPostal());
 		solIncorporacion.setCodigosucursal(dto.getCodigoSucursal());
 		
-		if(!dto.getCorreoElectronico().equals("") && dto.getCorreoElectronico() != null) {
-			solIncorporacion.setCorreoelectronico(dto.getCorreoElectronico());
-		}else {
-			solIncorporacion.setCorreoelectronico(" ");
-		}
+		solIncorporacion.setCorreoelectronico(dto.getCorreoElectronico());
+			
 		solIncorporacion.setDigitocontrol(dto.getDigitoControl());
 		solIncorporacion.setFax1(dto.getFax1());
 		solIncorporacion.setFax2(dto.getFax2());
