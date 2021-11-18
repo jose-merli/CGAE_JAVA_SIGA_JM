@@ -39,8 +39,18 @@ public class Impreso190Controller {
 	}
 	
 	@PostMapping(value = "/facturacionsjcs/impreso190descargar", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InputStreamResource> impreso190descargar(@RequestBody Impreso190Item impreso190Item, HttpServletRequest request) {
+	ResponseEntity<InputStreamResource> impreso190descargar(@RequestBody List<Impreso190Item> impreso190Item, HttpServletRequest request) {
 		ResponseEntity<InputStreamResource> response = iImpreso190Service.impreso190descargar(impreso190Item, request);
 		return response;
+	}
+	
+	@PostMapping(value = "/facturacionsjcs/searchImpreso190", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Impreso190DTO> searchImpreso190(@RequestBody int  anio, HttpServletRequest request) throws Exception {
+		Impreso190DTO response = iImpreso190Service.searchImpreso190(anio, request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.FORBIDDEN);
+        }
 	}
 }

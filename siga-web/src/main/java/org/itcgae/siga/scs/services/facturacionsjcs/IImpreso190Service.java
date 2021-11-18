@@ -15,5 +15,7 @@ public interface IImpreso190Service {
 
 	Impreso190DTO impreso190generar(Impreso190Item impreso190Item, HttpServletRequest request) throws Exception;
 	
-	public ResponseEntity<InputStreamResource> impreso190descargar(Impreso190Item impreso190Item, HttpServletRequest request);
+	public ResponseEntity<InputStreamResource> impreso190descargar(List<Impreso190Item> impreso190Item, HttpServletRequest request);
+	
+	Impreso190DTO searchImpreso190(int anio, HttpServletRequest request) throws Exception;
 }
