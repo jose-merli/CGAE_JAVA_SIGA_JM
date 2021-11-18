@@ -471,5 +471,17 @@ public class UtilidadesString {
 		error.setMessage("general.message.consulta.resultados");
 		
 		return error;
+	 /**
+	 * Reemplaza una cadea de caracteres por otro
+	 * 
+	 * @param cadenaOld, cadena a reemplazar
+	 * @param cadenaNew, nueva cadea de caracteres
+	 */
+	public static String reemplazaString (String cadenaOld, String cadenaNew, String frase){
+		
+		final Pattern pattern = Pattern.compile(cadenaOld);
+		final Matcher matcher = pattern.matcher( frase );
+		frase = matcher.replaceAll(cadenaNew);
+		return frase;
 	}
 }

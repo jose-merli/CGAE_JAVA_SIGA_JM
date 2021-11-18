@@ -19,6 +19,10 @@ import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionDTO;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -51,6 +55,8 @@ import org.itcgae.siga.db.entities.PysLineaanticipoExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionKey;
+import org.itcgae.siga.db.entities.PysPreciosservicios;
+import org.itcgae.siga.db.entities.PysPreciosserviciosKey;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.entities.PysProductossolicitados;
 import org.itcgae.siga.db.entities.PysProductossolicitadosExample;
@@ -71,6 +77,7 @@ import org.itcgae.siga.db.mappers.PysCompraMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
 import org.itcgae.siga.db.mappers.PysLineaanticipoMapper;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionMapper;
+import org.itcgae.siga.db.mappers.PysPreciosserviciosMapper;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionMapper;
 import org.itcgae.siga.db.mappers.PysProductossolicitadosMapper;
 import org.itcgae.siga.db.mappers.PysServicioanticipoMapper;
@@ -164,14 +171,16 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	@Autowired
 	private PysServicioanticipoMapper pysServicioanticipoMapper;
 	
+	@Autowired
+	private PysPreciosserviciosMapper pysPreciosserviciosMapper;
+	
 	
 	@Override
 	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
 
 		FichaCompraSuscripcionItem fichaCompleta = null;
-		Error error = new Error();
 
-		LOGGER.info(
+		LOGGER.debug(
 				"getFichaCompraSuscripcion() -> Entrada al servicio para recuperar los detalles de la compra/suscripcion");
 
 		// Conseguimos información del usuario logeado
@@ -201,6 +210,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						ficha.setIdInstitucion(idInstitucion.toString());
 						ficha.setUsuModificacion(usuarios.get(0).getIdusuario().toString());
 						
+						//Si es colegiado se debe coger el idpersona del usuario conectado
 						if(!letrado.equals("N")) {
 							
 							LOGGER.info(
@@ -215,7 +225,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							LOGGER.info(
 									"getFichaCompraSuscripcion() / cenPersonaMapper.selectByExample -> Salida de CenPersonaMapper los detalles del usuario logeado");
 							
-							ficha.setIdPersona(persona.getIdpersona().toString());
+							ficha.setIdPersona(persona.getIdpersona());
 						}
 						
 						LOGGER.info(
@@ -228,19 +238,39 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
 						fichaCompleta.setProductos(ficha.getProductos());
+						fichaCompleta.setServicios(ficha.getServicios());
 						if(fichaCompleta.getIdFormasPagoComunes() != null)fichaCompleta.setIdFormaPagoSeleccionada(fichaCompleta.getIdFormasPagoComunes().split(",")[0]);
 					}
 					//Para obtener toda la informacion de una compra/suscripcion ya creada
 					else { 
-						List<ListaProductosCompraItem> productos = null;
 						
-						//Si se viene de otra pantalla a consultar la ficha de compra
-						if(ficha.getProductos().size()==0) {
-							productos = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, ficha.getnSolicitud());
-							ficha.setProductos(productos);
+						List<ListaProductosCompraItem> productos = null;
+						List<ListaServiciosSuscripcionItem> servicios = null;
+						
+						
+						//Si es una ficha de compra
+						if(ficha.getProductos() != null) {
+							
+							//Si se viene de otra pantalla a consultar la ficha de compra
+							if(ficha.getProductos().size()==0) {
+								productos = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, ficha.getnSolicitud());
+								ficha.setProductos(productos);
+							}
+							else if(ficha.getProductos().size()>0){
+								productos = ficha.getProductos();
+							}
 						}
-						else if(ficha.getProductos().size()>0){
-							productos = ficha.getProductos();
+						//Si es una ficha de suscripcion
+						else {
+							
+							//Si se viene de otra pantalla a consultar la ficha de compra
+							if(ficha.getServicios().size()==0) {
+								servicios = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, ficha.getnSolicitud(), usuarios.get(0).getIdlenguaje(), null);
+								ficha.setServicios(servicios);
+							}
+							else if(ficha.getServicios().size()>0){
+								servicios = ficha.getServicios();
+							}
 						}
 						LOGGER.info(
 								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la compra/suscripcion");
@@ -253,7 +283,12 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
-						if(productos != null)fichaCompleta.setProductos(productos);
+						if(productos != null) {
+							fichaCompleta.setProductos(productos);
+						}
+						if(servicios != null) {
+							fichaCompleta.setServicios(servicios);
+						}
 					}
 				}
 
@@ -264,7 +299,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					e);
 		}
 
-		LOGGER.info(
+		LOGGER.debug(
 				"getFichaCompraSuscripcion() -> Salida del servicio para obtener los detalles de la compra/suscripcion");
 
 		return fichaCompleta;
@@ -279,7 +314,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("solicitarCompra() -> Entrada al servicio para crear una solicitud de compra");
+		LOGGER.debug("solicitarCompra() -> Entrada al servicio para crear una solicitud de compra");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -303,8 +338,21 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			if (usuarios != null && !usuarios.isEmpty()) {
 				
 				//Si no es un colegiado se lanza un error ya que no deberia tener acceso a este servicio.
+				//Se omite esta llamada para que no afecte a llamadas desde otros puntos de la aplicacion
 //				if(letrado.equals("N"))
 //					throw new Exception("El usuario conectado no es un colegiado y no deberia tener acceso a este servicio");
+				
+				Long idPersona = Long.valueOf(ficha.getIdPersona());
+				//Si es colegiado se debe coger el idpersona del usuario conectado
+				if(!letrado.equals("N")) {
+				CenPersonaExample persExample = new CenPersonaExample();
+
+				persExample.createCriteria().andNifcifEqualTo(dni);
+
+				List<CenPersona> personas = cenPersonaMapper.selectByExample(persExample);
+
+				idPersona = personas.get(0).getIdpersona();
+				}
 				
 				GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 
@@ -315,19 +363,21 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				solicitud.setFecha(new Date());
 				solicitud.setIdinstitucion(idInstitucion);
-				solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+				solicitud.setIdpersona(idPersona);
 				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
 				solicitud.setTipopeticion("A");
 				// Caso en el que el colegio no necesite aprobacion para realizar compras o
 				// suscripciones
-				if (aprobNecesaria.getValor().equals("N"))
+				if (aprobNecesaria.getValor().equals("N")) {
 					solicitud.setIdestadopeticion((short) 20);
-				else
+				}
+				else {
 					solicitud.setIdestadopeticion((short) 10);
+				}
 				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
 				solicitud.setNumOperacion(
-						"1" + idInstitucion.toString() + ficha.getIdPersona() + fechaActual.toString()); // Necesita
+						"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR: Necesita
 																											// confirmacion
 																											// de que es
 																											// el valor
@@ -343,12 +393,12 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
 
 				LOGGER.info(
-						"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para crear una solicitud de compra");
+						"solicitarCompra() / updateProductosPeticion() -> Entrada a pysProductossolicitadosMapper para introducir los productos solicitado");
 
 				this.updateProductosPeticion(request, ficha);
 
 				LOGGER.info(
-						"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para crear una solicitud de compra");
+						"solicitarCompra() / updateProductosPeticion() -> Salida de pysProductossolicitadosMapper para introducir los productos solicitados");
 
 				// Al no necesitar aprobación, se crea el registro de compra
 				// inmediatamente
@@ -364,7 +414,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("solicitarCompra() -> Salida del servicio para crear una solicitud de compra");
+		LOGGER.debug("solicitarCompra() -> Salida del servicio para crear una solicitud de compra");
 		
 		return insertResponseDTO;
 	}
@@ -388,16 +438,13 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("solicitarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
+		LOGGER.debug("solicitarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		// Se comentan el try y el catch para que la anotación @Transactional funcione
-		// correctamente
-//		try {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -411,75 +458,107 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					"solicitarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty()) {
+
+				// Si no es un colegiado se lanza un error ya que no deberia tener acceso a este
+				// servicio.
+				// Se omite esta llamada para que no afecte a llamadas desde otros puntos de la
+				// aplicacion
+//				if(letrado.equals("N"))
+//					throw new Exception("El usuario conectado no es un colegiado y no deberia tener acceso a este servicio");
+				
+				Long idPersona = Long.valueOf(ficha.getIdPersona());
+				String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+				//Si es colegiado se debe coger el idpersona del usuario conectado
+				if(!letrado.equals("N")) {
+				CenPersonaExample persExample = new CenPersonaExample();
+
+				persExample.createCriteria().andNifcifEqualTo(dni);
+
+				List<CenPersona> personas = cenPersonaMapper.selectByExample(persExample);
+
+				idPersona = personas.get(0).getIdpersona();
+				}
+
+				GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
+
 				LOGGER.info(
-						"solicitarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de suscripción");
+						"solicitarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de suscripcion");
 
 				PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
 
 				solicitud.setFecha(new Date());
-				solicitud.setFechamodificacion(new Date());
 				solicitud.setIdinstitucion(idInstitucion);
-				solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+				solicitud.setIdpersona(idPersona);
 				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
-				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
 				solicitud.setTipopeticion("A");
+				// Caso en el que el colegio no necesite aprobacion para realizar compras o
+				// suscripciones
+				if (aprobNecesaria.getValor().equals("N")) {
+					solicitud.setIdestadopeticion((short) 20);
+				} else {
+					solicitud.setIdestadopeticion((short) 10);
+				}
+				solicitud.setFecha(new Date());
+				Long fechaActual = new Date().getTime();
+				solicitud.setNumOperacion(
+						"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR:
+																											// Necesita
+																											// confirmacion
+																											// de que es
+																											// el valor
+																											// correcto
+				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
+				solicitud.setFechamodificacion(new Date());
 
 				response = pysPeticioncomprasuscripcionMapper.insert(solicitud);
 				if (response == 0)
-					throw new Exception("Error al insertar la solicitud de suscripción en la BBDD.");
+					throw new Exception("Error al insertar la solicitud de suscripcion en la BBDD.");
 
 				LOGGER.info(
-						"solicitarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear una solicitud de suscripción");
+						"solicitarSuscripcion() / pysPeticionsuscripcionsuscripcionMapper.insert() -> Salida de pysPeticionsuscripcionsuscripcionMapper para crear una solicitud de suscripcion");
 
 				LOGGER.info(
-						"solicitarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para crear una solicitud de suscripción");
+						"solicitarSuscripcion() / updateServiciosPeticion() -> Entrada a updateServiciosPeticion para introducir el servicio solicitado");
 
-				PysServiciossolicitados servicioSolicitado = new PysServiciossolicitados();
+				this.updateServiciosPeticion(request, ficha);
 
-				servicioSolicitado.setFechamodificacion(new Date());
-				servicioSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+				LOGGER.info(
+						"solicitarSuscripcion() / updateServiciosPeticion() -> Salida de updateServiciosPeticion para introducir el servicio solicitado");
 
-				response = pysServiciossolicitadosMapper.insert(servicioSolicitado);
-				if (response == 0)
-					throw new Exception("Error al insertar un servicio solicitado en la BBDD.");
+				// Al no necesitar aprobación, se crea el registro de suscripcion
+				// inmediatamente. Aunque el nombre del parametro puede inducir error,
+				// tambien hace referencia a servicios como se indica en el documento funcional.
+				if (aprobNecesaria.getValor() == "N") {
+
+					this.aprobarSuscripcion(request, ficha);
+
+				}
+
+				insertResponseDTO.setStatus("200");
 			}
-
-			LOGGER.info(
-					"solicitarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de suscripción");
-
-			insertResponseDTO.setStatus("200");
 		}
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"GestionFichaCompraSuscripcionServiceImpl.solicitarSuscripcion() -> Se ha producido un error al crear una solicitud de suscripción",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//			insertResponseDTO.setStatus("500");
-//		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("solicitarSuscripcion() -> Salida del servicio para crear una solicitud de suscripción");
+		LOGGER.debug("solicitarSuscripcion() -> Salida del servicio para crear una solicitud de suscripción");
 
 		return insertResponseDTO;
 	}
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
+	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("aprobarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
+		LOGGER.debug("aprobarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -493,56 +572,115 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"aprobarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty()) {
+					
+					
+					
 					LOGGER.info(
-							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para aprobar una solicitud de suscripción");
+							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Entrada a pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
+					
+					PysPeticioncomprasuscripcionKey solicitudKey = new PysPeticioncomprasuscripcionKey();
 
-					PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
+					solicitudKey.setIdinstitucion(idInstitucion);
+					solicitudKey.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
 
-					solicitud.setFecha(new Date());
-					solicitud.setFechamodificacion(new Date());
-					solicitud.setIdinstitucion(idInstitucion);
-					solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
-					solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
-					solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
-					solicitud.setTipopeticion("A");
-
-					response = pysPeticioncomprasuscripcionMapper.insert(solicitud);
-					if (response == 0)
-						throw new Exception(
-								"Error al modificar la solicitud de suscripción en la BBDD para su aprobación.");
+					PysPeticioncomprasuscripcion solicitud = pysPeticioncomprasuscripcionMapper
+							.selectByPrimaryKey(solicitudKey);
 
 					LOGGER.info(
-							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una solicitud de suscripción");
+							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
 
-					LOGGER.info(
-							"aprobarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de suscripción");
+					
+					
+					
+					//En el caso que se realice la aprobación desde la pantalla "Suscripcion de servicios"
+					//O se realice una aprobación directa
+					if(solicitud==null) {
+						this.solicitarSuscripcion(request, ficha);
+						solicitud = pysPeticioncomprasuscripcionMapper
+								.selectByPrimaryKey(solicitudKey);
+					}
 
-					PysServiciossolicitados servicioSolicitado = new PysServiciossolicitados();
+					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
+					
+					// Al necesitar aprobación, se crea el registro de suscripcion
+					// inmediatamente. Esto es a diferencia del servicio de solicitud.
+					if (aprobNecesaria.getValor().equals("S")) {
 
-					servicioSolicitado.setFechamodificacion(new Date());
-					servicioSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+						LOGGER.info(
+								"aprobarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de suscripcion");
+	
+						PysSuscripcion suscripcion = new PysSuscripcion();
+	
+						suscripcion.setFechasuscripcion(new Date());
+						suscripcion.setFechamodificacion(new Date());
+						suscripcion.setIdinstitucion(idInstitucion);
+						suscripcion.setIdpersona(solicitud.getIdpersona());
+						suscripcion.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
+						suscripcion.setUsumodificacion(usuarios.get(0).getIdusuario());
+	
+						for (ListaServiciosSuscripcionItem servicio : ficha.getServicios()) {
+	
+							suscripcion.setIdservicio((long) servicio.getIdServicio());
+							suscripcion.setIdtiposervicios((short) servicio.getIdTipoServicios());
+							suscripcion.setIdserviciosinstitucion((long) servicio.getIdServiciosInstitucion());
+							
+							//Obtenemos el id para la nueva suscripcion
+							PysSuscripcionExample susExample = new PysSuscripcionExample();
+							
+							susExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+							
+							LOGGER.info(
+									"aprobarSuscripcion() / pysSuscripcionMapper.countByExample() -> Entrada a pysSuscripcionMapper para obtener el id para la nueva suscripcion");
+							
+							long newIdSus = pysSuscripcionMapper.countByExample(susExample) + 1;
 
-					response = pysServiciossolicitadosMapper.insert(servicioSolicitado);
-					if (response == 0)
-						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
+							LOGGER.info(
+									"aprobarSuscripcion() / pysSuscripcionMapper.countByExample() -> Salida de pysSuscripcionMapper para obtener el id para la nueva suscripcion");
+							
+							suscripcion.setIdsuscripcion(newIdSus);
+							suscripcion.setDescripcion(servicio.getDescripcion());
+							//Si se ha seleccionado como forma de pago "No facturable"
+							if(ficha.getIdFormaPagoSeleccionada().equals("-1")) {
+								//servicioSolicitado.setIdformapago(null);
+								//Al no poder poner a nulo la forma de pago se el asigna el valor del 
+								//elemento del combo equivalente a "No facturable" en el combo de formas de pago del front
+								suscripcion.setIdformapago((short) 80);
+							}
+							else{
+								suscripcion.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
+							}
+							if(ficha.getIdFormaPagoSeleccionada().equals("80")) {
+								suscripcion.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
+							}
+							else {
+								suscripcion.setIdcuenta(null);
+							}
+							suscripcion.setCantidad(Integer.valueOf(servicio.getCantidad()));
+							if(servicio.getIdPrecioServicio()!=null) {
+								suscripcion.setImporteunitario(new BigDecimal(servicio.getPrecioServicioValor()));
+							}
+							else {
+								suscripcion.setImporteunitario(new BigDecimal(0));
+							}
+							
+							response = pysSuscripcionMapper.insert(suscripcion);
+							if (response == 0)
+								throw new Exception("Error al insertar un registro de suscripcion en la BBDD.");
+						}
+						
+						LOGGER.info(
+								"aprobarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de suscripcion");
+
+					}
 				}
 
-				LOGGER.info(
-						"aprobarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de suscripción");
-
+				
 				updateResponseDTO.setStatus("200");
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"GestionFichaCompraSuscripcionServiceImpl.aprobarSuscripcion() -> Se ha producido un error al aprobar una solicitud de suscripción",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			updateResponseDTO.setStatus("500");
-		}
 
 		updateResponseDTO.setError(error);
-		LOGGER.info("aprobarSuscripcion() -> Salida del servicio para aprobar una solicitud de suscripción");
+		LOGGER.debug("aprobarSuscripcion() -> Salida del servicio para aprobar una solicitud de compra");
 
 		return updateResponseDTO;
 	}
@@ -555,14 +693,13 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("aprobarCompra() -> Entrada al servicio para crear una solicitud de suscripción");
+		LOGGER.debug("aprobarCompra() -> Entrada al servicio para crear una solicitud de suscripción");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-//		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -592,12 +729,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					if(solicitud==null) {
 						this.solicitarCompra(request, ficha);
+						solicitud = pysPeticioncomprasuscripcionMapper
+								.selectByPrimaryKey(solicitudKey);
 					}
 					
-					//En el caso que se realice la aprobación desde la pantalla "Compra de productos"
-					if(ficha.getIdPersona()==null) {
-						ficha.setIdPersona(solicitud.getIdpersona().toString());
-					}
 
 					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 					
@@ -614,7 +749,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						compra.setFecha(new Date());
 						compra.setFechamodificacion(new Date());
 						compra.setIdinstitucion(idInstitucion);
-						compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+						compra.setIdpersona(solicitud.getIdpersona());
 						compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
 						compra.setUsumodificacion(usuarios.get(0).getIdusuario());
 	
@@ -665,17 +800,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				
 				updateResponseDTO.setStatus("200");
 			}
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"GestionFichaCompraSuscripcionServiceImpl.aprobarCompra() -> Se ha producido un error al aprobar una solicitud de compra",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//			updateResponseDTO.setStatus("500");
-//		}
 
 		updateResponseDTO.setError(error);
-		LOGGER.info("aprobarCompra() -> Salida del servicio para aprobar una solicitud de compra");
+		LOGGER.debug("aprobarCompra() -> Salida del servicio para aprobar una solicitud de compra");
 
 		return updateResponseDTO;
 	}
@@ -689,7 +816,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("denegarPeticion() -> Entrada al servicio para crear la denegación de la petición");
+		LOGGER.debug("denegarPeticion() -> Entrada al servicio para crear la denegación de la petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -754,7 +881,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
+		LOGGER.debug("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
 
 		return insertResponseDTO;
 	}
@@ -768,7 +895,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("denegarPeticionMultiple() -> Entrada al servicio para crear la denegación de una o varias peticiones");
+		LOGGER.debug("denegarPeticionMultiple() -> Entrada al servicio para crear la denegación de una o varias peticiones");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -820,7 +947,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("denegarPeticionMultiple() -> Salida del servicio para crear la denegación de una petición");
+		LOGGER.debug("denegarPeticionMultiple() -> Salida del servicio para crear la denegación de una o varias peticiones");
 
 		return insertResponseDTO;
 	}
@@ -834,7 +961,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("aprobarCompraMultiple() -> Entrada al servicio para aprobar una o varias peticiones de compra");
+		LOGGER.debug("aprobarCompraMultiple() -> Entrada al servicio para aprobar una o varias peticiones de compra");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -889,7 +1016,76 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("aprobarCompraMultiple() -> Salida del servicio para aprobar una o varias peticiones de compra");
+		LOGGER.debug("aprobarCompraMultiple() -> Salida del servicio para aprobar una o varias peticiones de compra");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO aprobarSuscripcionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("aprobarSuscripcionMultiple() -> Entrada al servicio para aprobar una o varias peticiones de suscripcion");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"aprobarSuscripcionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"aprobarSuscripcionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"aprobarSuscripcionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para aprobar una o varias peticiones de suscripcion");
+
+				//Se guardaran aqui los numeros de solicitud de aquellas solicitudes no validas por el estado en el que vienen
+				error.setDescription("");
+				for(FichaCompraSuscripcionItem peticion : peticiones) {
+					if(peticion.getFechaDenegada() != null || peticion.getFechaAceptada() != null) {
+						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
+					}
+					else {
+						peticion.setServicios(pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, peticion.getnSolicitud(), usuarios.get(0).getIdlenguaje(), null));
+						this.aprobarSuscripcion(request, peticion);
+					}
+				}
+
+				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));
+				
+				
+				LOGGER.info(
+						"aprobarSuscripcionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una o varias peticiones de suscripcion");
+
+				LOGGER.info(
+						"aprobarSuscripcionMultiple() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una o varias peticiones de suscripcion");
+			}
+
+			LOGGER.info(
+					"aprobarSuscripcionMultiple() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de una o varias peticiones de suscripcion");
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.debug("aprobarSuscripcionMultiple() -> Salida del servicio para aprobar una o varias peticiones de suscripcion");
 
 		return insertResponseDTO;
 	}
@@ -903,7 +1099,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("updateProductosPeticion() -> Entrada al servicio para actualizar los productos solicitados asociados con una solicitud");
+		LOGGER.debug("updateProductosPeticion() -> Entrada al servicio para actualizar los productos solicitados asociados con una solicitud");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -950,7 +1146,20 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				PysProductossolicitados productoSolicitado = new PysProductossolicitados();
 
 				productoSolicitado.setIdinstitucion(idInstitucion);
-				productoSolicitado.setIdpersona(Long.valueOf(peticion.getIdPersona()));
+				
+				Long idPersona = Long.valueOf(peticion.getIdPersona());
+				String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+				//Si es colegiado se debe coger el idpersona del usuario conectado
+				if(!letrado.equals("N")) {
+				CenPersonaExample persExample = new CenPersonaExample();
+
+				persExample.createCriteria().andNifcifEqualTo(dni);
+
+				List<CenPersona> personas = cenPersonaMapper.selectByExample(persExample);
+
+				idPersona = personas.get(0).getIdpersona();
+				}
+				productoSolicitado.setIdpersona(idPersona);
 				productoSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
 				//Si se ha seleccionado como forma de pago "No facturable"
 				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
@@ -1011,7 +1220,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("updateProductosPeticion() -> Salida del servicio para actualizar los productos solicitados asociados con una solicitud");
+		LOGGER.debug("updateProductosPeticion() -> Salida del servicio para actualizar los productos solicitados asociados con una solicitud");
 
 		return insertResponseDTO;
 	}
@@ -1022,7 +1231,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		ListaProductosCompraDTO listaProductosCompra = new ListaProductosCompraDTO();
 		Error error = new Error();
 
-		LOGGER.info("getListaProductosCompra() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
+		LOGGER.debug("getListaProductosCompra() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1061,7 +1270,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"getListaProductosCompra() / pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
 			}
 		}
-		LOGGER.info("getListaProductosCompra() -> Salida del servicio para obtener la informacion de los productos de una peticion");
+		LOGGER.debug("getListaProductosCompra() -> Salida del servicio para obtener la informacion de los productos de una peticion");
 
 		return listaProductosCompra;
 	}
@@ -1091,7 +1300,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("getFacturasPeticion() -> Entrada al servicio para obtener las facturas de una petición");
+		LOGGER.debug("getFacturasPeticion() -> Entrada al servicio para obtener las facturas de una petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1237,7 +1446,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			listaFacturasDTO.setError(error);
 		}
 
-		LOGGER.info("getFacturasPeticion() -> Salida del servicio para obtener las facturas de una petición");
+		LOGGER.debug("getFacturasPeticion() -> Salida del servicio para obtener las facturas de una petición");
 
 		return listaFacturasDTO;
 	}
@@ -1249,7 +1458,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("getDescuentosPeticion() -> Entrada al servicio para obterner los descuentos y anticipos de una petición");
+		LOGGER.debug("getDescuentosPeticion() -> Entrada al servicio para obterner los descuentos y anticipos de una petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1421,7 +1630,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			listaDescuentosDTO.setError(error);
 		}
 
-		LOGGER.info("getDescuentosPeticion() -> Salida del servicio para obtener los descuentos y anticipos de una petición");
+		LOGGER.debug("getDescuentosPeticion() -> Salida del servicio para obtener los descuentos y anticipos de una petición");
 
 		return listaDescuentosDTO;
 	}
@@ -1436,7 +1645,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info(
+		LOGGER.debug(
 				"deleteAnticipoPeticion() -> Entrada al servicio para eliminar anticipos de a una solicitud");
 
 		// Conseguimos información del usuario logeado
@@ -1568,7 +1777,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			}
 
 			deleteResponseDTO.setError(error);
-			LOGGER.info(
+			LOGGER.debug(
 					"deleteAnticipoPeticion() -> Salida del servicio para eliminar anticipos de a una solicitud");
 
 			
@@ -1587,7 +1796,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info(
+		LOGGER.debug(
 				"saveAnticipo() -> Entrada al servicio para asociar un nuevo anticipo a una solicitud");
 
 		// Conseguimos información del usuario logeado
@@ -1705,7 +1914,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			}
 
 			insertResponseDTO.setError(error);
-			LOGGER.info(
+			LOGGER.debug(
 					"saveAnticipo() -> Salida del servicio para asociar un nuevo anticipo a una solicitud");
 
 			
@@ -1722,7 +1931,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("anularPeticion() -> Entrada al servicio para anular una petición");
+		LOGGER.debug("anularPeticion() -> Entrada al servicio para anular una petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1867,10 +2076,297 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			}
 
 		updateResponseDTO.setError(error);
-		LOGGER.info("anularPeticion() -> Salida del servicio para anular una petición");
+		LOGGER.debug("anularPeticion() -> Salida del servicio para anular una petición");
 
 		return updateResponseDTO;
 	}
+
+	@Override
+	@Transactional
+	public InsertResponseDTO anularPeticionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("anularPeticionMultiple() -> Entrada al servicio para anular una o varias peticiones");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"anularPeticionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"anularPeticionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"anularPeticionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para anular una o varias peticiones");
+
+				//Se guardaran aqui los numeros de solicitud de aquellas solicitudes no validas por el estado en el que vienen
+				error.setDescription("");
+				for(FichaCompraSuscripcionItem peticion : peticiones) {
+					if(peticion.getFechaAnulada() == null && (peticion.getFechaAceptada() != null || peticion.getFechaSolicitadaAnulacion() != null)) {
+						this.anularPeticion(request, peticion.getnSolicitud());
+					}
+					else {
+						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
+					}
+				}
+
+				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));
+				
+				
+				LOGGER.info(
+						"anularPeticionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para anular una o varias peticiones");
+
+				LOGGER.info(
+						"anularPeticionMultiple() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para anular una o varias peticiones");
+			}
+
+			LOGGER.info(
+					"anularPeticionMultiple() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para anular una o varias peticiones");
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.debug("anularPeticionnMultiple() -> Salida del servicio para anular una o varias peticiones");
+
+		return insertResponseDTO;
+	}
+
+	@Override
+	public ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud, Date aFechaDe) {
+		
+			ListaServiciosSuscripcionDTO listaServiciosSuscripcion = new ListaServiciosSuscripcionDTO();
+			Error error = new Error();
+	
+			LOGGER.debug("getListaServiciosSuscripcion() -> Entrada al servicio para obtener la informacion de los servicios de una peticion");
+	
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+	
+			// Se comentan el try y el catch para que la anotación @Transactional funcione
+			// correctamente
+	//		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+	
+				LOGGER.info(
+						"getListaServiciosSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	
+				LOGGER.info(
+						"getListaServiciosSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				if (usuarios != null && !usuarios.isEmpty()) {
+					
+					LOGGER.info(
+							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServicios() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los servicios de una peticion");
+	
+					List<ListaServiciosSuscripcionItem> serviciosSuscripcion = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, nSolicitud, usuarios.get(0).getIdlenguaje(), aFechaDe);
+	
+					LOGGER.info(
+							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los servicios de una peticion");
+				
+					listaServiciosSuscripcion.setListaServiciosSuscripcionItems(serviciosSuscripcion);
+					
+					error.setCode(200);
+					
+					listaServiciosSuscripcion.setError(error);
+					
+				}
+			}
+			LOGGER.debug("getListaServiciosSuscripcion() -> Salida del servicio para obtener la informacion de los servicios de una peticion");
+	
+			return listaServiciosSuscripcion;
+		}
 	
 	
-}
+	@Override
+	@Transactional
+	public InsertResponseDTO updateServiciosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("updateServiciosPeticion() -> Entrada al servicio para actualizar los servicios solicitados asociados con una solicitud");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"updateServiciosPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateServiciosPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"updateServiciosPeticion() / pysServiciossolicitadosMapper.deleteByExample() -> Entrada a pysServiciossolicitadosMapper para eliminar los servicios solicitados asociados con una solicitud");
+
+				PysServiciossolicitadosExample prodExample = new PysServiciossolicitadosExample();
+				
+				prodExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
+				//para comprobar que hay servicios a eliminar
+				List<PysServiciossolicitados> serviciosViejos = pysServiciossolicitadosMapper.selectByExample(prodExample);
+				response = pysServiciossolicitadosMapper.deleteByExample(prodExample);
+				//La segunda condicion es para evitar que se lance una excepcion al intentar eliminar un conjunto vacio
+				if(response == 0 && !serviciosViejos.isEmpty()) {
+					throw new Exception("Eror al eliminar los servicios solicitados de la petición");
+				}
+				
+				LOGGER.info(
+						"updateServiciosPeticion() / pysServiciossolicitadosMapper.deleteByExaple() -> Salida de pysServiciossolicitadosMapper para eliminar los servicios solicitados asociados con una solicitud");
+
+				
+				
+				PysServiciossolicitados servicioSolicitado = new PysServiciossolicitados();
+
+				servicioSolicitado.setIdinstitucion(idInstitucion);
+
+				Long idPersona = Long.valueOf(peticion.getIdPersona());
+				String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+				//Si es colegiado se debe coger el idpersona del usuario conectado
+				if(!letrado.equals("N")) {
+					CenPersonaExample persExample = new CenPersonaExample();
+	
+					persExample.createCriteria().andNifcifEqualTo(dni);
+	
+					List<CenPersona> personas = cenPersonaMapper.selectByExample(persExample);
+	
+					idPersona = personas.get(0).getIdpersona();
+				}
+				
+				servicioSolicitado.setIdpersona(idPersona);
+				servicioSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
+				//Si se ha seleccionado como forma de pago "No facturable"
+//				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
+//					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
+//					//que no tendra cuenta bancaria seleccionada.
+//					servicioSolicitado.setIdformapago((short) 80);
+//					servicioSolicitado.setNofacturable("1");
+//				}
+//				else{
+					servicioSolicitado.setIdformapago(Short.valueOf(peticion.getIdFormaPagoSeleccionada()));
+//					servicioSolicitado.setNofacturable("0");
+//				}
+				//En el caso que la forma de pago sea domiciliación bancaria
+				if(peticion.getIdFormaPagoSeleccionada().equals("80")) {
+					servicioSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
+				}
+				else {
+					servicioSolicitado.setIdcuenta(null);
+				}
+				
+				servicioSolicitado.setFechamodificacion(new Date());
+				servicioSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				for (ListaServiciosSuscripcionItem servicio : peticion.getServicios()) {
+					
+					servicioSolicitado.setIdservicio((long) servicio.getIdServicio());
+					servicioSolicitado.setIdtiposervicios((short) servicio.getIdTipoServicios());
+					servicioSolicitado.setIdserviciosinstitucion((long) servicio.getIdServiciosInstitucion());
+					servicioSolicitado.setIdpreciosservicios(Short.valueOf(servicio.getIdPrecioServicio()));
+					servicioSolicitado.setIdperiodicidad(Short.valueOf(servicio.getIdPeriodicidad()));
+					
+					//REVISAR: 
+					servicioSolicitado.setAceptado("A");
+					
+					servicioSolicitado.setOrden(Short.valueOf(servicio.getOrden()));
+					servicioSolicitado.setCantidad(1);
+					
+					LOGGER.info(
+							"updateServiciosPeticion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar los servicios solicitados asociados con una solicitud");
+					
+					response = pysServiciossolicitadosMapper.insert(servicioSolicitado);
+					if (response == 0)
+						throw new Exception("Error al insertar un servicio solicitado en la BBDD.");
+				}
+				LOGGER.info(
+						"updateServiciosPeticion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para insertar los servicios solicitados asociados con una solicitud");
+			
+				
+				
+				if(peticion.getFechaAceptada() != null) {
+					LOGGER.info(
+							"updateServiciosPeticion() / pysSuscripcionMapper.updateByPrimaryKey() -> Entrada a pysSuscripcionesMapper para actualizar las suscripciones asociadas con una solicitud");
+
+					PysSuscripcionExample suscExample = new PysSuscripcionExample();
+					
+					suscExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
+					//para comprobar que hay suscripciones
+					List<PysSuscripcion> listSuscPeticion = pysSuscripcionMapper.selectByExample(suscExample);
+
+					//Se comprueba si se han cambiado la fecha de alta o de baja en el front. Se comprueba solo el primera ya que supuestamente solo se manejara un servicio por suscripcion.
+					if(!listSuscPeticion.isEmpty()) {
+						for(PysSuscripcion susc : listSuscPeticion) {
+							if(!peticion.getFechaAceptada().equals(peticion.getServicios().get(0).getFechaAlta())){
+								susc.setFechasuscripcion(peticion.getServicios().get(0).getFechaAlta());
+							}
+							if(susc.getFechabajafacturacion() != null && !susc.getFechabajafacturacion().equals(peticion.getServicios().get(0).getFechaBaja())){
+								//Se modifica unicamente la fecha de bajafacturacion sin importar que el servicio sea automatico o no
+								//ya que la fecha de baja determina la fecha de anulacion de la ficha de suscripcion
+								//y eso no viene reflejado en el funcional.
+								susc.setFechabajafacturacion(peticion.getServicios().get(0).getFechaBaja());
+							}
+							if(!peticion.getFechaAceptada().equals(peticion.getServicios().get(0).getFechaAlta()) ||
+									(susc.getFechabajafacturacion() != null &&!susc.getFechabajafacturacion().equals(peticion.getServicios().get(0).getFechaBaja()))) {
+								pysSuscripcionMapper.updateByPrimaryKey(susc);
+								if(response == 0) {
+									throw new Exception("Eror al actualizar las suscripciones solicitadas de la petición");
+								}
+							}
+						}
+					}
+					
+					LOGGER.info(
+							"updateServiciosPeticion() / pysSuscripcionMapper.updateByPrimaryKey() -> Salida de pysSuscripcionesMapper para eliminar las suscripciones asociadas con una solicitud");
+
+				}
+
+				}
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.debug("updateServiciosPeticion() -> Salida del servicio para actualizar los servicios solicitados asociados con una solicitud");
+
+		return insertResponseDTO;
+	}
+	
+	
+	}
+	

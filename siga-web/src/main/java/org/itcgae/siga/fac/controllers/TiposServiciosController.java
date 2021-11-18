@@ -49,6 +49,12 @@ public class TiposServiciosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/pys/listadoTipoServicioByIdCategoriaMultiple")
+	ResponseEntity<ComboDTO> listadoTipoServicioByIdCategoriaMultiple(HttpServletRequest request, @RequestParam String idCategoria) { 
+		ComboDTO response = tiposServiciosService.searchTiposServiciosByIdCategoriaMultiple(request, idCategoria);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@PostMapping(value="/pys/activarDesactivarServicio")
 	ResponseEntity<ServicioDTO> activarDesactivarServicio(@RequestBody ListadoTipoServicioDTO listadoServicios, HttpServletRequest request){
 		ServicioDTO response = tiposServiciosService.activarDesactivarServicio(listadoServicios, request);

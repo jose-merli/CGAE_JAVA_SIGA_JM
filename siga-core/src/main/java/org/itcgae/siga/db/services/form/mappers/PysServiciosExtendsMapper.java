@@ -67,9 +67,16 @@ public interface PysServiciosExtendsMapper extends PysServiciosMapper{
 		}) 
 	List<ComboItem> comboTiposServicios(String idioma);
 	
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosByIdCategoriaMultiple")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> searchTiposServiciosByIdCategoriaMultiple(String idioma, Short idInstitucion, String idCategoria);
+	
 	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosByIdCategoria")
 	@Results({ 
-		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> searchTiposServiciosByIdCategoria(String idioma, Short idInstitucion, String idCategoria);

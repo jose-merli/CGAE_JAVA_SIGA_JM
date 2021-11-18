@@ -8,6 +8,7 @@ public class FichaTarjetaPreciosItem {
 	private int idservicio;
 	private String precio;
 	private int idperiodicidad;
+	private int periodicidadValor;
 	private String descripcionprecio;
 	private int idcondicion;
 	private String descripcionperiodicidad;
@@ -196,6 +197,12 @@ public class FichaTarjetaPreciosItem {
 				+ descripcionperiodicidad + ", descripcionconsulta=" + descripcionconsulta + ", pordefecto="
 				+ pordefecto + ", idperiodicidadoriginal=" + idperiodicidadoriginal + ", nuevo=" + nuevo + ", valor="
 				+ valor + "]";
+	}
+	public int getPeriodicidadValor() {
+		return periodicidadValor;
+	}
+	public void setPeriodicidadValor(int periodicidadValor) {
+		this.periodicidadValor = periodicidadValor;
 	}
 	
 }

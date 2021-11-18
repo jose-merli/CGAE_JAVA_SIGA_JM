@@ -23,6 +23,12 @@ public class ListaServiciosItem {
 	private String iva;
 	private String precioperiodicidad;
 	private String formapago;
+	private String noFacturable;
+	private String idFormasPago;
+	private String formasPagoInternet;
+	private String solicitarBaja;
+	private Date fechaBajaIva;
+	private String valorIva;
 	
 	
 	private Double valorminimo;
@@ -248,6 +254,42 @@ public class ListaServiciosItem {
 				+ ", precioperiodicidad=" + precioperiodicidad + ", formapago=" + formapago + ", valorminimo="
 				+ valorminimo + ", periodominimo=" + periodominimo + ", valormaximo=" + valormaximo + ", periodomaximo="
 				+ periodomaximo + "]";
+	}
+	public String getNoFacturable() {
+		return noFacturable;
+	}
+	public void setNoFacturable(String noFacturable) {
+		this.noFacturable = noFacturable;
+	}
+	public String getIdFormasPago() {
+		return idFormasPago;
+	}
+	public void setIdFormasPago(String idFormasPago) {
+		this.idFormasPago = idFormasPago;
+	}
+	public String getFormasPagoInternet() {
+		return formasPagoInternet;
+	}
+	public void setFormasPagoInternet(String formasPagoInternet) {
+		this.formasPagoInternet = formasPagoInternet;
+	}
+	public String getSolicitarBaja() {
+		return solicitarBaja;
+	}
+	public void setSolicitarBaja(String solicitarBaja) {
+		this.solicitarBaja = solicitarBaja;
+	}
+	public Date getFechaBajaIva() {
+		return fechaBajaIva;
+	}
+	public void setFechaBajaIva(Date fechaBajaIva) {
+		this.fechaBajaIva = fechaBajaIva;
+	}
+	public String getValorIva() {
+		return valorIva;
+	}
+	public void setValorIva(String valorIva) {
+		this.valorIva = valorIva;
 	}
 	
 }

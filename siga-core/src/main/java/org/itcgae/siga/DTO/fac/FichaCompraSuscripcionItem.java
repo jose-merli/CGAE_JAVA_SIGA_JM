@@ -7,7 +7,7 @@ public class FichaCompraSuscripcionItem {
 
 	// TARJETA CLIENTE
 	private String idInstitucion;
-	private String idPersona;
+	private Long idPersona;
 	private String nombre;
 	private String apellidos;
 	private String idtipoidentificacion;
@@ -32,11 +32,15 @@ public class FichaCompraSuscripcionItem {
 	private String impPagado;
     private String cuentaBancSelecc;
     private List<ListaProductosCompraItem> productos;
+    
+    //TARJETA SERVICIOS
+    private Date aFechaDeServicio;
+    private List<ListaServiciosSuscripcionItem> servicios;
 	
 	private String idEstadoPeticion;
 
 
-    //TRARJETA FACTURACION
+    //TARJETA FACTURACION
     private List<ListaFacturasPeticionItem> facturas;
     
 	public String getIdInstitucion() {
@@ -45,10 +49,10 @@ public class FichaCompraSuscripcionItem {
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-	public String getIdPersona() {
+	public Long getIdPersona() {
 		return idPersona;
 	}
-	public void setIdPersona(String idPersona) {
+	public void setIdPersona(Long idPersona) {
 		this.idPersona = idPersona;
 	}
 	public String getNombre() {
@@ -182,6 +186,18 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setImpPagado(String impPagado) {
 		this.impPagado = impPagado;
+	}
+	public List<ListaServiciosSuscripcionItem> getServicios() {
+		return servicios;
+	}
+	public void setServicios(List<ListaServiciosSuscripcionItem> servicios) {
+		this.servicios = servicios;
+	}
+	public Date getaFechaDeServicio() {
+		return aFechaDeServicio;
+	}
+	public void setaFechaDeServicio(Date aFechaDeServicio) {
+		this.aFechaDeServicio = aFechaDeServicio;
 	}
 
 }

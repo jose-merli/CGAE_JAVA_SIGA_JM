@@ -107,6 +107,12 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 				+ " ELSE TO_CHAR(COUNT(foserv.idformapago) )\r\n"
 				+ " END\r\n"
 				+ " forma_pago");
+		sql.SELECT("servin.noFacturable");
+		sql.SELECT("LISTAGG(fo.idformapago, ',') WITHIN GROUP (ORDER BY fo.idformapago) as idformaspago");
+		sql.SELECT("LISTAGG(fo.internet, ',') WITHIN GROUP (ORDER BY fo.idformapago) as formaspagoInternet");
+		sql.SELECT("servin.SOLICITARBAJA");
+		sql.SELECT(" TIVA.FECHABAJA AS fechaBajaIva");
+		sql.SELECT(" TIVA.valor as valorIva");
 		
 		sql.FROM("   (\r\n"
 				+ "	        SELECT\r\n"
@@ -295,6 +301,10 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 		sql.GROUP_BY(" servin.automatico");
 		sql.GROUP_BY(" tiva.descripcion");
 		sql.GROUP_BY(" servis.descripcion");
+		sql.GROUP_BY("servin.noFacturable");
+		sql.GROUP_BY("servin.SOLICITARBAJA");
+		sql.GROUP_BY("TIVA.FECHABAJA");
+		sql.GROUP_BY("TIVA.valor");
 			
 		sql.ORDER_BY(" servin.DESCRIPCION");
 		
