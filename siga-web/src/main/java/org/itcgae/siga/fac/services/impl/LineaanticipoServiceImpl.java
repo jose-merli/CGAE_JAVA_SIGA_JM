@@ -66,9 +66,9 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
                     Long personId = people.get(0).getIdpersona();
                     List<MonederoDTO> walletDTOs = lineaanticipoExtendsMapper.selectByPersonIdAndCreationDate(institutionId, personId, filtroMonederoItem);
                     ListaMonederoDTO walletListDTO = new ListaMonederoDTO();
-                    walletListDTO.setMonederoItems(walletDTOs);
+//                    walletListDTO.setMonederoItems(walletDTOs);
                     error.setCode(200);
-                    walletListDTO.setError(error);
+//                    walletListDTO.setError(error);
 
                     return walletListDTO;
 

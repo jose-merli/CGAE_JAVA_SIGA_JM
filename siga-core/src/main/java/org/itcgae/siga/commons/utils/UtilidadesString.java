@@ -471,6 +471,8 @@ public class UtilidadesString {
 		error.setMessage("general.message.consulta.resultados");
 		
 		return error;
+	}
+	
 	 /**
 	 * Reemplaza una cadea de caracteres por otro
 	 * 
