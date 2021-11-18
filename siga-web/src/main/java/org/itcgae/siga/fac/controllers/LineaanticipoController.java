@@ -19,11 +19,11 @@ public class LineaanticipoController {
     @Autowired
     private ILineaanticipoService walletService;
 
-    @GetMapping(value = "/pys/getMonedero")
-    ResponseEntity<ListaMonederoDTO> getMonederos(HttpServletRequest request, @RequestBody FiltroMonederoItem filtroMonederoItem) throws Exception {
-        ListaMonederoDTO response = walletService.listarMonederos(request, filtroMonederoItem);
-        return new ResponseEntity<>(response, response.getError() == null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @GetMapping(value = "/pys/getMonedero")
+//    ResponseEntity<ListaMonederoDTO> getMonederos(HttpServletRequest request, @RequestBody FiltroMonederoItem filtroMonederoItem) throws Exception {
+//        ListaMonederoDTO response = walletService.listarMonederos(request, filtroMonederoItem);
+//        return new ResponseEntity<>(response, response.getError() == null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
 
 }

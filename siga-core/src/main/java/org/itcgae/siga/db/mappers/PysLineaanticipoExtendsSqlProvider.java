@@ -20,14 +20,14 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
                 .WHERE("anti.idinstitucion = " + institutionId)
                 .WHERE("pers.idpersona = " + personId);
 
-        if (filter.getFechaDesde() != null && filter.getFechaHasta() != null){
-
-            String since = dateFormat.format(filter.getFechaDesde());
-            String until = dateFormat.format(filter.getFechaHasta());
-            query.WHERE("(TO_CHAR(anti.FECHA, 'DD/MM/YYYY') >= TO_DATE('" + since
-                    + "','DD/MM/YYYY') " + " and ( TO_CHAR(anti.FECHA, 'DD/MM/YYYY') <= TO_DATE('"
-                    + until + "','DD/MM/YYYY')))");
-        }
+//        if (filter.getFechaDesde() != null && filter.getFechaHasta() != null){
+//
+//            String since = dateFormat.format(filter.getFechaDesde());
+//            String until = dateFormat.format(filter.getFechaHasta());
+//            query.WHERE("(TO_CHAR(anti.FECHA, 'DD/MM/YYYY') >= TO_DATE('" + since
+//                    + "','DD/MM/YYYY') " + " and ( TO_CHAR(anti.FECHA, 'DD/MM/YYYY') <= TO_DATE('"
+//                    + until + "','DD/MM/YYYY')))");
+//        }
 
         query.GROUP_BY("anti.idanticipo", "anti.FECHA", "pers.NIFCIF", "pers.idpersona", "anti.idanticipo", "pers.APELLIDOS1", "pers.APELLIDOS2", "pers.NOMBRE", "anti.descripcion", "anti.importeinicial", "linea.importeanticipado");
         query.ORDER_BY("anti.FECHA desc")
