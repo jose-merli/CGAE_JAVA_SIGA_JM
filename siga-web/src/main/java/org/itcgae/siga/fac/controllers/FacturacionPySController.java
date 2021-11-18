@@ -70,16 +70,16 @@ public class FacturacionPySController {
 	}
 
     @PostMapping(value = "/insertaCuentaBancaria")
-    ResponseEntity<CuentasBancariasDTO> insertaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
+    ResponseEntity<UpdateResponseDTO> insertaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
                                                              HttpServletRequest request) {
-		CuentasBancariasDTO response = new CuentasBancariasDTO();
+		UpdateResponseDTO response = new UpdateResponseDTO();
 
         try {
             response = this.facturacionService.insertaCuentaBancaria(cuentaBancaria, request);
-            return new ResponseEntity<CuentasBancariasDTO>(response, HttpStatus.OK);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<CuentasBancariasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

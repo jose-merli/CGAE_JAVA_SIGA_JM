@@ -30,6 +30,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
@@ -215,9 +216,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public CuentasBancariasDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+	public UpdateResponseDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
 												   HttpServletRequest request) throws Exception {
-		CuentasBancariasDTO cuentasBancariasDTO = new CuentasBancariasDTO();
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		AdmUsuarios usuario = new AdmUsuarios();
 		FacBancoinstitucion record = new FacBancoinstitucion();
@@ -229,8 +230,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			// Logica
+			String newBancosCodigo = facBancoinstitucionExtendsMapper.getNextIdCuentaBancaria(record.getIdinstitucion()).getNewId();
+
 			record.setIdinstitucion(usuario.getIdinstitucion());
-			record.setBancosCodigo(facBancoinstitucionExtendsMapper.getNextIdCuentaBancaria(record.getIdinstitucion()).getNewId());
+			record.setBancosCodigo(newBancosCodigo);
 
 			record.setFechamodificacion(new Date());
 			record.setUsumodificacion(usuario.getIdusuario());
@@ -273,17 +276,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					"insertaCuentaBancaria() / facBancoinstitucionExtendsMapper.insertSelective() -> Entrada a facBancoinstitucionExtendsMapper para crear una nueva cuenta bancaria");
 
 			facBancoinstitucionExtendsMapper.insertSelective(record);
+
+			updateResponseDTO.setId(newBancosCodigo);
 		}
-
-		List<CuentasBancariasItem> cuentasBancariasItems = facBancoinstitucionExtendsMapper.getCuentasBancarias("", usuario.getIdinstitucion()).stream()
-				.filter(bi -> bi.getBancosCodigo().equals(record.getBancosCodigo())).collect(Collectors.toList());
-
-		cuentasBancariasDTO.setCuentasBancariasITem(cuentasBancariasItems);
-		cuentasBancariasDTO.setError(error);
 
 		LOGGER.info("insertaCuentaBancaria() -> Salida del servicio para crear una cuenta bancaria");
 
-		return cuentasBancariasDTO;
+		return updateResponseDTO;
 	}
 
 	@Override
