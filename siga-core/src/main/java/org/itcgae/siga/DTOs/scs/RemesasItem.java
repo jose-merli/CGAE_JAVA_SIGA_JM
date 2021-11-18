@@ -19,6 +19,7 @@ public class RemesasItem {
 	private int totalEJG;
 	private String incidencias;
 	private String comboIncidencia;
+	private boolean informacionEconomica;
 	
 	public int getIdRemesa() {
 		return idRemesa;
@@ -131,5 +132,13 @@ public class RemesasItem {
 	public void setComboIncidencia(String comboIncidencia) {
 		this.comboIncidencia = comboIncidencia;
 	}
-		
+
+	public boolean isInformacionEconomica() {
+		return informacionEconomica;
+	}
+
+	public void setInformacionEconomica(boolean informacionEconomica) {
+		this.informacionEconomica = informacionEconomica;
+	}
+	
 }

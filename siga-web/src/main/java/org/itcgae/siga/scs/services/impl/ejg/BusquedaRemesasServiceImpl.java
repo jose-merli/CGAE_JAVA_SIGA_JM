@@ -252,7 +252,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				
 				if(nRegistro.length() < 5) {
 					String ceros = "";
-					for(; (nRegistro.length() - ceros.length()) < 5;) {
+					for(; (nRegistro.length() + ceros.length()) < 5;) {
 						ceros += "0";
 					}
 					nRegistro = ceros + nRegistro;
@@ -576,6 +576,8 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 							"guardarRemesa() / cajgRemesaExtendsMapper.insert() -> Entrada a CajgRemesaExtendsMapper para insertar una remesa");
 
 					CajgRemesa remesa = new CajgRemesa();
+					
+					AdmContador contador = getUltimoRegitroRemesa(request);
 
 					RemesasItem rem = scsRemesasExtendsMapper.getMaxIdRemesa(idInstitucion);
 
@@ -584,7 +586,12 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					remesa.setIdinstitucion(idInstitucion);
 					remesa.setIdremesa(Long.valueOf(rem.getIdRemesa()));
 					remesa.setDescripcion(remesasItem.getDescripcion());
+					if(contador != null) {
+						remesa.setPrefijo(contador.getPrefijo());
+						remesa.setSufijo(contador.getSufijo());
+					}
 					remesa.setNumero(String.valueOf(remesasItem.getNumero()));
+					remesa.setIdtiporemesa(remesasItem.isInformacionEconomica() ? Short.valueOf("1") : Short.valueOf("0"));
 					remesa.setFechamodificacion(new Date());
 
 					response = cajgRemesaExtendsMapper.insert(remesa);
@@ -596,8 +603,6 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 						LOGGER.debug(
 								"guardarRemesa() / admContadorExtendsMapper.selectByPrimaryKey() -> Entrada de AdmContadorExtendsMapper para obtener el contador de REMESA");
-
-						AdmContador contador = getUltimoRegitroRemesa(request);
 
 						LOGGER.debug(
 								"guardarRemesa() / admContadorExtendsMapper.selectByPrimaryKey() -> Salida de AdmContadorExtendsMapper para obtener el contador de REMESA");
