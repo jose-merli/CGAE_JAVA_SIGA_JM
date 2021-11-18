@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.fac.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FacBancoinstitucionSqlProvider;
 
 public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSqlProvider {
@@ -101,7 +102,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.LEFT_OUTER_JOIN("fac_sufijo su ON (bi.idsufijosjcs = su.idsufijo and bi.idinstitucion=su.idinstitucion)");
 		query.WHERE("bi.idinstitucion = " + idInstitucion);
 		
-		if(!idCuenta.isEmpty()) {
+		if(!UtilidadesString.esCadenaVacia(idCuenta)) {
 			query.WHERE("bi.bancos_codigo="+idCuenta);
 		}
 			

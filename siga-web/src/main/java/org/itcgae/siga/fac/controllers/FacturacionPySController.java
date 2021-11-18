@@ -29,7 +29,7 @@ public class FacturacionPySController {
 	private IFacturacionPySService facturacionService;
 
 	@GetMapping(value = "/getCuentasBancarias")
-	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(@RequestParam String idCuenta, HttpServletRequest request) {
+	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(@RequestParam(required = false) String idCuenta, HttpServletRequest request) {
 		CuentasBancariasDTO response = new CuentasBancariasDTO();
 
 		try {

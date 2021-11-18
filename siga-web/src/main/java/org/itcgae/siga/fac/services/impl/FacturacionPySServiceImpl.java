@@ -230,9 +230,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			// Logica
-			String newBancosCodigo = facBancoinstitucionExtendsMapper.getNextIdCuentaBancaria(record.getIdinstitucion()).getNewId();
-
 			record.setIdinstitucion(usuario.getIdinstitucion());
+
+			String newBancosCodigo = facBancoinstitucionExtendsMapper.getNextIdCuentaBancaria(usuario.getIdinstitucion()).getNewId();
 			record.setBancosCodigo(newBancosCodigo);
 
 			record.setFechamodificacion(new Date());
