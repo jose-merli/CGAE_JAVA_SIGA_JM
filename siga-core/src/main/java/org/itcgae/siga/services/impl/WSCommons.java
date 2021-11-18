@@ -24,6 +24,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import com.exea.sincronizacion.redabogacia.AltaColegiadoResponseDocument;
 import com.exea.sincronizacion.redabogacia.ObtenerNumColegiacionResponseDocument;
 import org.apache.xmlbeans.XmlObject;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
@@ -264,6 +265,13 @@ public class WSCommons {
 			}
 		}else if(xmlObjectResponse instanceof ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse){
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse) xmlObjectResponse).addNewError();
+			errorType.setCodigo("FORMATO_NOVALIDO");
+			errorType.setDescripcion(message);
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+		}else if(xmlObjectResponse instanceof AltaColegiadoResponseDocument.AltaColegiadoResponse){
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((AltaColegiadoResponseDocument.AltaColegiadoResponse) xmlObjectResponse).addNewError();
 			errorType.setCodigo("FORMATO_NOVALIDO");
 			errorType.setDescripcion(message);
 			if(xmlObjectRequest != null){

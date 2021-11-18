@@ -1156,4 +1156,32 @@ public class SigaConstants {
 	public static final String RECURSO_MENU_EXP_EXEA = "menu.expedientesexea";
 	public static final String PARAM_MENU_EXEA_ACTIVO = "EXPEDIENTES_EXEA_ACTIVOS";
 
+	public enum ERROR_SINCRONIZACION_EXEA {
+		FORMATO_NOVALIDO("Formato XML de petición no correcto."),
+		SERV_NODISPONIBLE("Servicio no disponible."),
+		IP_NOVALIDA("La IP desde la que se ha recibido la petición no está autorizada."),
+		IDENTIFICACION_NOVALIDA("La identificación del colegiado no es válida."),
+		COLEGIO_NOVALIDO("El código del colegio recibido no es válido."),
+		NUMCOLEGIADO_NOVALIDO("Número de colegiado no válido para el colegio indicado."),
+		COLEGIADO_NOENCONTRADO("No se encuentra en el sistema ningún colegiado con la identificación facilitada."),
+		COLEGIADO_ENCONTRADO("No es posible el alta del colegiado debido a que existe ya en el sistema."),
+		POBLACION_NOENCONTRADA("Población indicada no ha sido identificada."),
+		PROVINCIA_NOVALIDA("Provincia desconocida."),
+		PAIS_NOVALIDO("País desconocido."),
+		TIPOVIA_NOVALIDA("Tipo de vía desconocida."),
+		SANCION_NOENCONTRADA("La sanción correspondiente a la referencia recibida no ha sido encontrada en el sistema."),
+		EXPEDIENTE_NOENCONTRADO("El expediente recibido en la petición no ha sido encontrado en el sistema."),
+		OTRO_ERROR("Se ha producido un error en el procesado de la petición.");
+
+		private String mensajeError = null;
+
+		private ERROR_SINCRONIZACION_EXEA(String mensajeError) {
+			this.mensajeError = mensajeError;
+		}
+
+		public String getMensajeError() {
+			return mensajeError;
+		}
+	}
+
 }

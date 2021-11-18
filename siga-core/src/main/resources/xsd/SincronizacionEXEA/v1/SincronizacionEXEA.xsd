@@ -5,8 +5,8 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element name="colegio" type="colegioType"/>
-        <xs:element name="tipoColegiacion" type="situacionPreviaType"/>
         <xs:element name="tipoSolicitud" type="tipoColegiacionType"/>
+        <xs:element name="situacionPrevia" type="situacionPreviaType"/>
         <xs:element name="numeroExpediente" type="xs:string"/>
         <xs:element name="identificacion" type="identificacionType" minOccurs="1" maxOccurs="1"/>
         <xs:element ref="versionEsquema" minOccurs="1" maxOccurs="1"/>

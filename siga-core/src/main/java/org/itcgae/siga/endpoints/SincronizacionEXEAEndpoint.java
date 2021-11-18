@@ -1,7 +1,10 @@
 package org.itcgae.siga.endpoints;
 
+import com.exea.sincronizacion.redabogacia.AltaColegiadoRequestDocument;
+import com.exea.sincronizacion.redabogacia.AltaColegiadoResponseDocument;
 import com.exea.sincronizacion.redabogacia.ObtenerNumColegiacionRequestDocument;
 import com.exea.sincronizacion.redabogacia.ObtenerNumColegiacionResponseDocument;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.services.ISincronizacionEXEAService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +27,12 @@ public class SincronizacionEXEAEndpoint {
     private String ipCliente = "";
 
     @Autowired
-    ISincronizacionEXEAService service;
+    private ISincronizacionEXEAService service;
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "obtenerNumColegiacionRequest")
     @ResponsePayload
     public ObtenerNumColegiacionResponseDocument obtenerNumColegiacion(@RequestPayload ObtenerNumColegiacionRequestDocument peticion) {
-        LOGGER.info("Entra en ws getListaSociedades");
+        LOGGER.info("Entra en ws obtenerNumColegiacion");
 
         TransportContext ctx = TransportContextHolder.getTransportContext();
 
@@ -42,5 +45,23 @@ public class SincronizacionEXEAEndpoint {
             LOGGER.info("Imposible obtener la url de conexion de acceso a obtenerNumColegiacion");
         }
         return service.getNumColegiacion(peticion, ipCliente);
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "altaColegiadoRequest")
+    @ResponsePayload
+    public AltaColegiadoResponseDocument altaColegiado(@RequestPayload AltaColegiadoRequestDocument peticion) throws SigaExceptions {
+        LOGGER.info("Entra en ws aprobarAltaColegiado");
+
+        TransportContext ctx = TransportContextHolder.getTransportContext();
+
+        try {
+            HttpServletConnection connection = (HttpServletConnection) ctx.getConnection();
+            ipCliente = connection.getHttpServletRequest().getRemoteAddr();
+            LOGGER.info("IP desde la que se recibe la peticion: "+ ipCliente);
+
+        }catch (Exception e){
+            LOGGER.info("Imposible obtener la url de conexion de acceso a obtenerNumColegiacion");
+        }
+        return service.aprobarAltaColegiado(peticion, ipCliente);
     }
 }
