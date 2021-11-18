@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.services;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,6 +9,7 @@ import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -25,7 +27,7 @@ public interface IGestionFichaCompraSuscripcionService {
 
 	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 
-	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha);
+	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 
 	public InsertResponseDTO denegarPeticionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
 			throws Exception;
@@ -52,4 +54,15 @@ public interface IGestionFichaCompraSuscripcionService {
 			List<ListaDescuentosPeticionItem> anticiposLista) throws SigaExceptions;
 
 	public UpdateResponseDTO anularPeticion(HttpServletRequest request, String nSolicitud) throws Exception;
+
+	ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud, Date aFechaDe);
+
+	InsertResponseDTO updateServiciosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
+			throws Exception;
+
+	InsertResponseDTO aprobarSuscripcionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
+
+	InsertResponseDTO anularPeticionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
 }

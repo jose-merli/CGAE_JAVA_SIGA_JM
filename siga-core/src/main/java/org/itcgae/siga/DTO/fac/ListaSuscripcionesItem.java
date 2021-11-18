@@ -2,8 +2,8 @@ package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
 
-public class ListaCompraProductosItem {
-
+public class ListaSuscripcionesItem {
+	
 	private Date fechaSolicitud;
 	private String idPersona;
 	private String nSolicitud; //Equivaldria al idpeticion de la tabla pys_peticioncomprasuscripcion
@@ -15,14 +15,18 @@ public class ListaCompraProductosItem {
 	private String importe; // valor aplicado durante la compra (importe total)
 	private String idEstadoSolicitud; // ver estados en Ficha Compra/Suscripción > Tarjeta Solicitud.
 	private Date fechaEfectiva; // fecha cuando se acepta la solicitud
-	private String estadoFactura;
 	private Date fechaDenegada;
 	private Date fechaSolicitadaAnulacion;
 	private Date fechaAnulada;
 	private String desFormaPago;
+	private String precioPerio; 
+	private Date fechaSuscripcion; 
+	private Date fechaBaja;
+	private String idEstadoFactura;
 	private String facturas;
 	private String solicitarBaja;//En este caso representa si todos los servicios tienen el valor "solicitarBaja" a 1 o no. 
 	//Se realiza una resta de los valores con el numero de columnas. Si no es 0, un colegiado no puede solicitar una anulación.
+	private String automatico;
 	
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
@@ -84,12 +88,6 @@ public class ListaCompraProductosItem {
 	public void setFechaEfectiva(Date fechaEfectiva) {
 		this.fechaEfectiva = fechaEfectiva;
 	}
-	public String getEstadoFactura() {
-		return estadoFactura;
-	}
-	public void setEstadoFactura(String estadoFactura) {
-		this.estadoFactura = estadoFactura;
-	}
 	public Date getFechaDenegada() {
 		return fechaDenegada;
 	}
@@ -114,6 +112,30 @@ public class ListaCompraProductosItem {
 	public void setDesFormaPago(String desFormaPago) {
 		this.desFormaPago = desFormaPago;
 	}
+	public String getPrecioPerio() {
+		return precioPerio;
+	}
+	public void setPrecioPerio(String precioPerio) {
+		this.precioPerio = precioPerio;
+	}
+	public Date getFechaSuscripcion() {
+		return fechaSuscripcion;
+	}
+	public void setFechaSuscripcion(Date fechaSuscripcion) {
+		this.fechaSuscripcion = fechaSuscripcion;
+	}
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	public String getIdEstadoFactura() {
+		return idEstadoFactura;
+	}
+	public void setIdEstadoFactura(String idEstadoFactura) {
+		this.idEstadoFactura = idEstadoFactura;
+	}
 	public String getIdPersona() {
 		return idPersona;
 	}
@@ -132,4 +154,11 @@ public class ListaCompraProductosItem {
 	public void setSolicitarBaja(String solicitarBaja) {
 		this.solicitarBaja = solicitarBaja;
 	}
+	public String getAutomatico() {
+		return automatico;
+	}
+	public void setAutomatico(String automatico) {
+		this.automatico = automatico;
+	}
+
 }

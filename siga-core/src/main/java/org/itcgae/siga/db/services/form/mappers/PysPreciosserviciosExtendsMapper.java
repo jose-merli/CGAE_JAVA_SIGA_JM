@@ -44,6 +44,7 @@ public interface PysPreciosserviciosExtendsMapper extends PysPreciosserviciosMap
 		@Result(column = "idservicio", property = "idservicio", jdbcType = JdbcType.INTEGER),
 		@Result(column = "precio", property = "valor", jdbcType = JdbcType.DOUBLE),
 		@Result(column = "periodicidad", property = "idperiodicidad", jdbcType = JdbcType.INTEGER),
+		@Result(column = "periodicidadValor", property = "periodicidadValor", jdbcType = JdbcType.INTEGER),
 		@Result(column = "descripcionprecio", property = "descripcionprecio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "condicion", property = "idcondicion", jdbcType = JdbcType.INTEGER),
 		@Result(column = "descripcionperiodicidad", property = "descripcionperiodicidad", jdbcType = JdbcType.VARCHAR),

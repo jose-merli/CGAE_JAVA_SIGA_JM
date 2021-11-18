@@ -5,6 +5,16 @@ import java.util.List;
 import java.util.Objects;
 
 public class ConstructorConsultasRuleItem {
+	List<ConstructorConsultasRuleDTO> rules = new ArrayList<ConstructorConsultasRuleDTO>();
+	
+	public List<ConstructorConsultasRuleDTO> getRules() {
+		return rules;
+	}
+
+	public void setRules(List<ConstructorConsultasRuleDTO> rules) {
+		this.rules = rules;
+	}
+
 	String label;
 	String field;
 	String operator;
@@ -53,7 +63,7 @@ public class ConstructorConsultasRuleItem {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(field, label, operator, type, value);
+		return Objects.hash(field, label, operator, rules, type, value);
 	}
 
 	@Override
@@ -66,13 +76,14 @@ public class ConstructorConsultasRuleItem {
 			return false;
 		ConstructorConsultasRuleItem other = (ConstructorConsultasRuleItem) obj;
 		return Objects.equals(field, other.field) && Objects.equals(label, other.label)
-				&& Objects.equals(operator, other.operator) && Objects.equals(type, other.type) && Objects.equals(value, other.value);
+				&& Objects.equals(operator, other.operator) && Objects.equals(rules, other.rules)
+				&& Objects.equals(type, other.type) && Objects.equals(value, other.value);
 	}
 
 	@Override
 	public String toString() {
-		return "ConstructorConsultasRuleItem [label=" + label + ", field=" + field + ", operator=" + operator
-				+ ", type=" + type + ", value=" + value + "]";
+		return "ConstructorConsultasRuleItem [rules=" + rules + ", label=" + label + ", field=" + field + ", operator="
+				+ operator + ", type=" + type + ", value=" + value + "]";
 	}
 
 }
