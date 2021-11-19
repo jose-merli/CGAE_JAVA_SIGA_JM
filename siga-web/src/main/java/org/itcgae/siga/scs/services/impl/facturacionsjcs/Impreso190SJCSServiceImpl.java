@@ -762,42 +762,53 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		ResponseEntity<InputStreamResource> res = null;
 		InputStream fileStream = null;
 		HttpHeaders headers = new HttpHeaders();
+		boolean gen = false;
+		String ficheroPath = "";
 
 		try {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
-					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"Impreso190ServiceImpl.impreso190descargar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"Impreso190ServiceImpl.impreso190descargar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty() && !listaimpreso190.isEmpty()) {
 
 				if (listaimpreso190.size() == 1) {
 
 					String path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
-					path += File.separator + idInstitucion + "_" + listaimpreso190.get(0).getIdFichero()
-							+ listaimpreso190.get(0).getExtension().toLowerCase();
+					path += File.separator + idInstitucion + File.separator
+							+ listaimpreso190.get(0).getNomFicheroOriginal();
 
 					File file = new File(path);
+					if (!file.exists()) {
+						gen = generarImpreso(listaimpreso190.get(0), idInstitucion, usuarios.get(0).getIdusuario());
+						if (gen == true) {
+							path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
+							path += File.separator + idInstitucion + File.separator
+									+ listaimpreso190.get(0).getNomFicheroOriginal();
+							file = new File(path);
+						}
+					}
 					fileStream = new FileInputStream(file);
 
-					String tipoMime = getMimeType(listaimpreso190.get(0).getExtension());
+					String tipoMime = getMimeType(".txt");
 
 					headers.setContentType(MediaType.parseMediaType(tipoMime));
 					headers.set("Content-Disposition",
-							"attachment; filename=\"" + listaimpreso190.get(0).getNomFichero() + "\"");
+							"attachment; filename=\"" + listaimpreso190.get(0).getNomFicheroOriginal() + ".txt" + "\"");
 					headers.setContentLength(file.length());
 
 				} else {
-					fileStream = getZipFileImpreso190(listaimpreso190, idInstitucion);
+					fileStream = getZipFileImpreso190(listaimpreso190, idInstitucion,usuarios.get(0).getIdusuario());
 
 					headers.setContentType(MediaType.parseMediaType("application/zip"));
-					headers.set("Content-Disposition", "attachment; filename=\"documentos.zip\"");
+					headers.set("Content-Disposition", "attachment; filename=\"Impresos_190.zip\"");
 				}
 
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
@@ -806,7 +817,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 		} catch (Exception e) {
 			LOGGER.error(
-					"DesignacionesServiceImpl.descargarDocumentosActDesigna() -> Se ha producido un error al descargar un archivo asociado a la actuacion",
+					"Impreso190ServiceImpl.impreso190descargar() -> Se ha producido un error al descargar un fichero 190",
 					e);
 		}
 
@@ -846,10 +857,10 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		return mime;
 	}
 
-	private InputStream getZipFileImpreso190(List<Impreso190Item> listaImpreso190Item, Short idInstitucion) {
+	private InputStream getZipFileImpreso190(List<Impreso190Item> listaImpreso190Item, Short idInstitucion,int idusuario) throws Exception {
 
 		ByteArrayOutputStream byteArrayOutputStream = null;
-
+		boolean gen = false;
 		try {
 
 			byteArrayOutputStream = new ByteArrayOutputStream();
@@ -858,10 +869,19 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 			for (Impreso190Item doc : listaImpreso190Item) {
 
-				zipOutputStream.putNextEntry(new ZipEntry(doc.getNomFichero()));
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getNomFicheroOriginal() + ".txt"));
 				String path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
-				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + doc.getExtension().toLowerCase();
+				path += File.separator + idInstitucion + File.separator + doc.getNomFicheroOriginal();
 				File file = new File(path);
+				if (!file.exists()) {
+					gen = generarImpreso(doc, idInstitucion, idusuario);
+					if (gen == true) {
+						path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
+						path += File.separator + idInstitucion + File.separator
+								+ doc.getNomFicheroOriginal();
+						file = new File(path);
+					}
+				}
 				FileInputStream fileInputStream = new FileInputStream(file);
 				IOUtils.copy(fileInputStream, zipOutputStream);
 				fileInputStream.close();
@@ -926,6 +946,53 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		}
 
 		return impreso190DTO;
+	}
+
+	private boolean generarImpreso(Impreso190Item impreso190Item, Short idInstitucion, int idusuario) throws Exception {
+		String sDirectorio = "";
+		String codigoProvincia = "";
+		int responseUpImpreso = 0;
+		String sNombreFichero = "";
+		boolean generado = false;
+		sDirectorio = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
+
+		// primero genera los insert y updates a la base de datos
+		CenPersona datosInstitucion = cenPersonaExtendsMapper
+				.getDatosInstitucionForImpreso190(idInstitucion.toString());
+		codigoProvincia = cenDireccionesExtendsMapper.getIdProvinciaImpreso190(
+				datosInstitucion.getIdpersona().toString(), idInstitucion.toString(),
+				SigaConstants.TIPO_DIRECCION_FACTURACION);
+
+		FcsConfImpreso190Example impresoExample = new FcsConfImpreso190Example();
+		impresoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+		List<FcsConfImpreso190> confImpreso = fcsConfImpreso190Mapper.selectByExample(impresoExample);
+
+		// a continuacion genera el fichero. Si la generacion del fichero falla se hace
+		// un rollback con el transactioanal y no hace la insercion en BBDD
+
+		sNombreFichero = impreso190Item.getNomFicheroOriginal();
+
+		new File(sDirectorio + File.separator + idInstitucion).mkdir();
+
+		String sNombreCompletoFichero = sDirectorio + File.separator + idInstitucion + File.separator + sNombreFichero;
+		File fichero = new File(sNombreCompletoFichero);
+
+		fichero = generarImpreso190(impreso190Item, idInstitucion.toString());
+
+		if (fichero != null) {
+			if (fichero.getName().indexOf(".zip") != -1) {
+				throw new Exception("Error al generar el impreso 190. Comprobar Log.");
+			} else if (fichero.getName().indexOf(".190") != -1) {
+
+				generado = true;
+
+			}
+		} else {
+			throw new Exception("Error al generar el impreso 190.");
+		}
+
+		return generado;
+
 	}
 
 }
