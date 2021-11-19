@@ -907,6 +907,24 @@ public class SigaConstants {
 			BT_FECHAI, BT_FECHAF);
 	public static final List<String> CAMPOSLOGBT = Arrays.asList(BT_NCOLEGIADO, BT_NIF, BT_TIPO, BT_MOTIVO, BT_FECHAI,
 			BT_FECHAF, ERRORES);
+	
+	// CARGA MASIVA COMPRAS
+
+	public static final String COMP_NCOLEGIADO = "Nº COLEGIADO";
+	public static final String COMP_NIF = "NIF";
+	public static final String COMP_APELLIDOS_CLI = "APELLIDOS CLIENTE";
+	public static final String COMP_NOMBRE_CLI = "NOMBRE CLIENTE";
+	public static final String COMP_CANT_PROD = "CANTIDAD PRODUCTO";
+	public static final String COMP_NOMBRE_PROD = "NOMBRE PRODUCTO";
+	public static final String COMP_COD_PROD = "CODIGO PRODUCTO";
+	public static final String COMP_FECHA_COMP = "FECHA COMPRA";
+
+	public static final String nombreFicheroModeloCOMP = "PlantillaMasivaCompras";
+
+	public static final List<String> CAMPOSMODEL_COMP = Arrays.asList(COMP_NCOLEGIADO, COMP_NIF, COMP_APELLIDOS_CLI, COMP_NOMBRE_CLI,
+			COMP_CANT_PROD, COMP_NOMBRE_PROD, COMP_COD_PROD, COMP_FECHA_COMP);
+	public static final List<String> CAMPOSLOGCOMP = Arrays.asList(COMP_NCOLEGIADO, COMP_NIF, COMP_APELLIDOS_CLI, COMP_NOMBRE_CLI,
+			COMP_CANT_PROD, COMP_NOMBRE_PROD, COMP_COD_PROD, COMP_FECHA_COMP, ERRORES);
 
 	// AGENDA
 	public static final long CALENDARIO_GENERAL = 1;

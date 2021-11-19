@@ -302,7 +302,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					List<ComboItem> listaComboTiposServicios = pysServiciosExtendsMapper
-							.searchTiposServiciosByIdCategoria(idioma, idInstitucion, idCategoria);
+							.searchTiposServiciosByIdCategoriaMultiple(idioma, idInstitucion, idCategoria);
 
 					LOGGER.info(
 							"searchTiposServiciosByIdCategoriaMultiple() / pysServiciosExtendsMapper.searchTiposServiciosByIdCategoria() -> Salida de pysServiciosExtendsMapper para obtener el combo de servicios segun multiples categorias");

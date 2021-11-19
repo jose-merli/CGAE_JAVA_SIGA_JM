@@ -16,4 +16,5 @@ public interface ITiposProductosService {
 	public InsertResponseDTO crearProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request);
 	public DeleteResponseDTO modificarProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request);
 	public ProductoDTO activarDesactivarProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request);
+	public ComboDTO searchTiposProductosByIdCategoriaMultiple(HttpServletRequest request, String idCategoria);
 }

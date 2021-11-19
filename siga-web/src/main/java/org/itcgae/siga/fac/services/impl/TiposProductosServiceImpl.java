@@ -157,6 +157,63 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 	}
 	
 	@Override
+	public ComboDTO searchTiposProductosByIdCategoriaMultiple(HttpServletRequest request, String idCategoria) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.debug("searchTiposProductosByIdCategoriaMultiple() -> Entrada al servicio para recuperar el combo de productos segun varias categorias");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"searchTiposProductosByIdCategoriaMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTiposProductosByIdCategoriaMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"searchTiposProductosByIdCategoriaMultiple() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoriaMultiple() -> Entrada a pysTiposProductosExtendsMapper para obtener el combo de productos segun varias categorias");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboTiposProductos = pysTiposProductosExtendsMapper
+							.searchTiposProductosByIdCategoriaMultiple(idioma, idInstitucion, idCategoria);
+
+					LOGGER.info(
+							"searchTiposProductosByIdCategoriaMultiple() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoriaMultiple() -> Salida de pysTiposProductosExtendsMapper para obtener el combo de productos segun varias categorias");
+
+					if (listaComboTiposProductos != null && listaComboTiposProductos.size() > 0) {
+						comboDTO.setCombooItems(listaComboTiposProductos);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.searchTiposProductosByIdCategoriaaMultiple() -> Se ha producido un error al obtener el combo de productos segun varias categorias",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.debug("searchTiposProductosByIdCategoriaMultiple() -> Salida del servicio para obtener el combo de productos segun varias categorias");
+
+		return comboDTO;
+	}
+	
+	@Override
 	public ListadoTipoProductoDTO searchTiposProductosHistorico(HttpServletRequest request) {
 		ListadoTipoProductoDTO listadoTipoProductoDTO = new ListadoTipoProductoDTO();
 		Error error = new Error();
