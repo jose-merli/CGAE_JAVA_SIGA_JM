@@ -73,6 +73,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFicheroImpreso190ExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsPagoColegiadoExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IImpreso190Service;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -112,7 +113,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 	private GenParametrosExtendsMapper genParametrosMapper;
 
 	@Autowired
-	private FcsFicheroImpreso190Mapper fcsFicheroImpreso190Mapper;
+	private FcsFicheroImpreso190ExtendsMapper fcsFicheroImpreso190ExtendsMapper;
 
 	@Autowired
 	private FcsConfImpreso190Mapper fcsConfImpreso190Mapper;
@@ -200,7 +201,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 							impreso190.setUsumodificacion(usuarios.get(0).getIdusuario());
 							impreso190.setFechamodificacion(new Date());
 
-							responseUpImpreso = fcsFicheroImpreso190Mapper.insertSelective(impreso190);
+							responseUpImpreso = fcsFicheroImpreso190ExtendsMapper.insertSelective(impreso190);
 
 							if (responseUpImpreso != 0) {
 								// a continuacion genera el fichero. Si la generacion del fichero falla se hace
@@ -780,6 +781,8 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 			if (usuarios != null && !usuarios.isEmpty() && !listaimpreso190.isEmpty()) {
 
 				if (listaimpreso190.size() == 1) {
+					
+					//TODO Obtener el fichero a descargar por el id, ¿posibilidad de ficheros que se llamen igual en un mismo año?
 
 					String path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
 					path += File.separator + idInstitucion + File.separator
@@ -907,13 +910,11 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 	@Override
 	public Impreso190DTO searchImpreso190(int anio, HttpServletRequest request) throws Exception {
-
+		Error error = new Error();
 		LOGGER.info(
 				"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio para buscar los contrarios asociados a una designacion.");
 		List<Impreso190Item> impresos = null;
 		Impreso190DTO impreso190DTO = new Impreso190DTO();
-//			List<GenParametros> tamMax = null;
-//			Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -936,11 +937,11 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 				LOGGER.info(
 						"DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
 
-				FcsFicheroImpreso190Example impresosExample = new FcsFicheroImpreso190Example();
-				// Seguir aqui
-
-				// impresos = fcsFicheroImpreso190Mapper.selectByExample(impresosExample);
+				 impresos = fcsFicheroImpreso190ExtendsMapper.getImpreso190(anio, idInstitucion);
 				impreso190DTO.setImpreso190Item(impresos);
+				
+				error.setCode(200);
+				impreso190DTO.setError(error);
 
 			}
 		}
@@ -993,6 +994,12 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 		return generado;
 
+	}
+
+	@Override
+	public Impreso190DTO deleteImpreso190(Impreso190Item impreso190Item, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
