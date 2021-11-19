@@ -18,8 +18,8 @@ public class ActasItem {
 	private String nombrepresidente;
 	private Date fecharesolucion;
 	private Date fechareunion;
-	private Date horainicio;
-	private Date horafin;
+	private String horainicio;
+	private String horafin;
 	private String idinstitucion;
 	 
 	public String getMiembroscomision() {
@@ -106,16 +106,16 @@ public class ActasItem {
 	public void setFechareunion(Date fechareunion) {
 		this.fechareunion = fechareunion;
 	}
-	public Date getHorainicio() {
+	public String getHorainicio() {
 		return horainicio;
 	}
-	public void setHorainicio(Date horainicio) {
+	public void setHorainicio(String horainicio) {
 		this.horainicio = horainicio;
 	}
-	public Date getHorafin() {
+	public String getHorafin() {
 		return horafin;
 	}
-	public void setHorafin(Date horafin) {
+	public void setHorafin(String horafin) {
 		this.horafin = horafin;
 	}
 	public String getIdinstitucion() {

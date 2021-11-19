@@ -482,13 +482,17 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					acta.setAnioacta(Short.valueOf(actasItem.getAnioacta()));
 
 					if (actualizar == false) {
-						int idActa;
+						String idActa;
 						
 							idActa = scsActaExtendsMapper.obtenerIdActa(actasItem,
-									Short.valueOf(actasItem.getIdacta()));
+									idInstitucion);
+									//Short.valueOf(actasItem.getIdacta()));
+							if(idActa == null) {
+								idActa = "0";
+							}
 							LOGGER.info("EL id DEL ACTA ES" + idActa);
-							actasItem.setIdacta(String.valueOf(idActa));
-							acta.setIdacta(Long.valueOf(idActa + 1));
+							actasItem.setIdacta(idActa);
+							acta.setIdacta(Long.valueOf(Integer.parseInt(idActa) + 1));
 					}
 
 					// Tengo que cambiarlo
@@ -507,6 +511,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 							throw new SigaExceptions(
 									"Ya existe un acta con ese numero, por favor introduzca uno mas grande");
 						} else {
+							//acta.setNumeroacta(actasItem.getNumeroacta());
 							acta.setNumeroacta(actasItem.getNumeroacta() + actasItem.getSufijo());
 						}
 					} else if (actasItem.getNumeroacta() != null && actasItem.getSufijo() == null) {
@@ -523,12 +528,36 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					}
 
 					if (actasItem.getHorainicio() != null) {
-						acta.setHorainicioreunion(actasItem.getHorainicio());
-
+						//acta.setHorainicioreunion(actasItem.getHorainicio());
+						SimpleDateFormat formato = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+						Date fechaFormat = null;
+						String anioInicio = Integer.toString(actasItem.getFechareunion().getYear() + 1900);
+						String mesInico =  Integer.toString(actasItem.getFechareunion().getMonth() + 1);
+						String diaIncio = Integer.toString(actasItem.getFechareunion().getDate());
+						String fecha = anioInicio+"/"+mesInico+"/"+diaIncio+" "+actasItem.getHorainicio();
+						
+						try {
+						 fechaFormat = formato.parse(fecha);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						acta.setHorainicioreunion(fechaFormat);
 					}
 					if (actasItem.getHorafin() != null) {
-						acta.setHorafinreunion(actasItem.getHorafin());
-
+						//acta.setHorafinreunion(actasItem.getHorafin());
+						SimpleDateFormat formato = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+						Date fechaFormat = null;
+						String anioFin = Integer.toString(actasItem.getFechareunion().getYear() + 1900);
+						String mesFin =  Integer.toString(actasItem.getFechareunion().getMonth() + 1);
+						String diaFin = Integer.toString(actasItem.getFechareunion().getDate());
+						String fecha = anioFin+"/"+mesFin+"/"+diaFin+" "+actasItem.getHorafin();
+						
+						try {
+							fechaFormat = formato.parse(fecha);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						acta.setHorafinreunion(fechaFormat);
 					}
 					if (actasItem.getIdpresidente() != null) {
 						acta.setIdpresidente(Integer.parseInt(actasItem.getIdpresidente()));
@@ -665,7 +694,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 				LOGGER.info("DATOS ACTA PARA BUSCAR ****************" + actasItem.getIdacta() + " "
 						+ actasItem.getNumeroacta() + " " + actasItem.getIdinstitucion());
-
+				
 				// Obtenemos el acta con la que vamos a trabajar
 				ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
 
@@ -1108,7 +1137,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 				LOGGER.info(
 						"cerrarActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener las actas");
-
+				
 				// Obtenemos el acta que vamos a cerrar
 				ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
 
@@ -1524,7 +1553,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		ScsActacomisionKey key = new ScsActacomisionKey();
 
 		key.setAnioacta(Short.valueOf(actasItem.getAnioacta()));
-
+		
 		key.setIdacta(Long.valueOf(actasItem.getIdacta()));
 
 		key.setIdinstitucion(idInstitucion);

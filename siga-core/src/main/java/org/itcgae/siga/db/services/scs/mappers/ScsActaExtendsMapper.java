@@ -114,7 +114,7 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "obtenerIdActa")
 	@Results({ @Result(column = "IDACTA", property = "IDACTA", jdbcType = JdbcType.VARCHAR) })
-	int obtenerIdActa(ActasItem actasItem, Short idInstitucion);
+	String obtenerIdActa(ActasItem actasItem, Short idInstitucion);
 
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "obtenerNumActa")
 	@Results({ @Result(column = "NUMEROACTA", property = "NUMEROACTA", jdbcType = JdbcType.VARCHAR) })
