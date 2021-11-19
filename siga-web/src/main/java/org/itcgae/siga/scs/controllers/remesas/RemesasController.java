@@ -79,11 +79,20 @@ public class RemesasController {
 	
 	@RequestMapping(value = "/guardarRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
-		UpdateResponseDTO response = busquedaRemesas.guardarRemesa(remesasItem, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		UpdateResponseDTO response;
+		try {
+			response = busquedaRemesas.guardarRemesa(remesasItem, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else {
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
 	}
 	
 	@RequestMapping(value = "/getEJGRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

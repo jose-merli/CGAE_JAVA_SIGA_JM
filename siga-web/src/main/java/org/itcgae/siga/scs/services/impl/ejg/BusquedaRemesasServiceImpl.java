@@ -51,6 +51,7 @@ import org.itcgae.siga.DTOs.scs.RemesasItem2;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.commons.utils.ExcelHelper;
+import org.itcgae.siga.commons.utils.GestorContadores;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorKey;
@@ -162,6 +163,9 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	
 	@Autowired
     private ScsEejgPeticionesExtendsMapper ScsEejgpeticionesExtendsMapper;
+	
+	@Autowired
+    private GestorContadores gestor;
 
 	@Override
 	public ComboDTO comboEstado(HttpServletRequest request) {
@@ -529,12 +533,19 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 			LOGGER.debug(
 					"getUltimoRegitroRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesa() -> Entrada a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas");
-			AdmContadorKey key = new AdmContadorKey();
-
-			key.setIdinstitucion(idInstitucion);
-			key.setIdcontador("REMESA");
-
-			contador = admContadorExtendsMapper.selectByPrimaryKey(key);
+			
+			contador = gestor.getContador(idInstitucion, "REMESA");
+			
+			if(contador != null) {
+				String numero;
+				try {
+					numero = gestor.getNuevoContador(contador);
+					contador.setContador(Long.valueOf(numero));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 
 			LOGGER.debug(
 					"getUltimoRegitroRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesa() -> Salida a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas");
@@ -546,7 +557,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO guardarRemesa(RemesasItem remesasItem, HttpServletRequest request) {
+	public UpdateResponseDTO guardarRemesa(RemesasItem remesasItem, HttpServletRequest request) throws Exception {
 		// TODO Auto-generated method stub
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -611,33 +622,27 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 							LOGGER.debug(
 									"guardarRemesa() / admContadorExtendsMapper.updateByPrimaryKeySelective() -> Entrada de AdmContadorExtendsMapper para incrementar en 1 el contador de REMESA");
-
-							response = 0;
-
-							contador.setContador(contador.getContador() + 1);
-
-							response = admContadorExtendsMapper.updateByPrimaryKeySelective(contador);
+							
+							gestor.setContador(contador, contador.getContador().toString(), true);
 
 							LOGGER.debug(
 									"guardarRemesa() / admContadorExtendsMapper.updateByPrimaryKeySelective() -> Salida de AdmContadorExtendsMapper para incrementar en 1 el contador de REMESA");
 
-							if (response == 1) {
-								LOGGER.debug(
-										"guardarRemesa() / cajgRemesaEstadosMapper.insert() -> Entrada de CajgRemesaEstadosMapper para insertar un estado de una remesas");
+							LOGGER.debug(
+									"guardarRemesa() / cajgRemesaEstadosMapper.insert() -> Entrada de CajgRemesaEstadosMapper para insertar un estado de una remesas");
 
-								CajgRemesaestados remesaEstado = new CajgRemesaestados();
+							CajgRemesaestados remesaEstado = new CajgRemesaestados();
 
-								remesaEstado.setIdinstitucion(idInstitucion);
-								remesaEstado.setIdremesa(Long.valueOf(rem.getIdRemesa()));
-								remesaEstado.setIdestado(Short.valueOf("0"));
-								remesaEstado.setFecharemesa(new Date());
-								remesaEstado.setFechamodificacion(new Date());
+							remesaEstado.setIdinstitucion(idInstitucion);
+							remesaEstado.setIdremesa(Long.valueOf(rem.getIdRemesa()));
+							remesaEstado.setIdestado(Short.valueOf("0"));
+							remesaEstado.setFecharemesa(new Date());
+							remesaEstado.setFechamodificacion(new Date());
 
-								response = cajgRemesaEstadosMapper.insert(remesaEstado);
+							response = cajgRemesaEstadosMapper.insert(remesaEstado);
 
-								LOGGER.debug(
-										"guardarRemesa() / cajgRemesaEstadosMapper.insert() -> Salida de CajgRemesaEstadosMapper para insertar un estado de una remesas");
-							}
+							LOGGER.debug(
+									"guardarRemesa() / cajgRemesaEstadosMapper.insert() -> Salida de CajgRemesaEstadosMapper para insertar un estado de una remesas");
 						}
 					}
 
@@ -1064,7 +1069,12 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			EcomCola ecomCola = new EcomCola();
 			if(ecomOperacionTipoaccion != null && ecomOperacionTipoaccion.size() > 0) {
 				ecomCola.setIdinstitucion(idinstitucion);
-				ecomCola.setIdoperacion(ecomOperacionTipoaccion.get(0).getIdoperacion());
+				if(remesaAccionItem.isInformacionEconomica()) {
+					ecomCola.setIdoperacion(59); //VALIDAR REMESA PARA ALCALA Y REMESA INFORMACIÓN ECONÓMICA
+				}else {
+					ecomCola.setIdoperacion(ecomOperacionTipoaccion.get(0).getIdoperacion());
+				}
+				
 			}
 			
 			

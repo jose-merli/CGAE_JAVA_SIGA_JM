@@ -31,7 +31,7 @@ public interface IBusquedaRemesas {
 	
 	AdmContador getUltimoRegitroRemesa(HttpServletRequest request);
 
-	UpdateResponseDTO guardarRemesa(RemesasItem remesasItem, HttpServletRequest request);
+	UpdateResponseDTO guardarRemesa(RemesasItem remesasItem, HttpServletRequest request) throws Exception;
 	
 	EJGRemesaDTO getEJGRemesa(RemesasItem remesasItem, HttpServletRequest request);
 

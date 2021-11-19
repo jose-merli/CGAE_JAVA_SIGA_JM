@@ -62,6 +62,28 @@ public class GestorContadores {
             throw new Exception("Error al modificar los datos del contador", e);
         }
     }
+    
+    public void setContador(AdmContador datosContadorNuevo, String numRegNuevo, boolean remesa) throws Exception {
+        // registro contador que se obtiene de la tabla ADM_CONTADORES con el
+        // idinstitucion y el idcontador
+        AdmContador gcOriginal = null;
+
+        try {
+            gcOriginal = getContador(datosContadorNuevo.getIdinstitucion(), datosContadorNuevo.getIdcontador());
+            // Solo actualizamos la tabla Adm_Contador si el contador introducido por
+            // pantalla es mayor que el almacenado en la tabla de contadores
+            Long numReg = new Long(numRegNuevo);
+
+            if (numReg.longValue() > gcOriginal.getContador()) {
+                datosContadorNuevo.setContador(Long.valueOf(numRegNuevo));
+
+                admContadorExtendsMapper.updateByPrimaryKeySelective(datosContadorNuevo);
+            }
+
+        } catch (Exception e) {
+            throw new Exception("Error al modificar los datos del contador", e);
+        }
+    }
 
     public int getSiguienteNumContador(AdmContador contador) throws Exception {
         int contadorSiguiente = 0;
