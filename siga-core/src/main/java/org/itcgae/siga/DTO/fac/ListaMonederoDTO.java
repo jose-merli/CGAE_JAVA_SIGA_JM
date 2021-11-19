@@ -11,6 +11,7 @@ import java.util.List;
 public class ListaMonederoDTO {
     private List<MonederoDTO> monederoItems = new ArrayList<>();
     private Error error = null;
+	
 	public Error getError() {
 		return error;
 	}

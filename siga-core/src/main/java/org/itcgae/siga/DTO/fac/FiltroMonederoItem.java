@@ -9,6 +9,7 @@ public class FiltroMonederoItem {
 
     private Date fechaDesde;
     private Date fechaHasta;
+	
 	public Date getFechaDesde() {
 		return fechaDesde;
 	}

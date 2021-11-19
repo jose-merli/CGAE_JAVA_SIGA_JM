@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,10 +20,10 @@ public class LineaanticipoController {
     @Autowired
     private ILineaanticipoService walletService;
 
-    @GetMapping(value = "/pys/getMonedero")
-    ResponseEntity<ListaMonederoDTO> getMonederos(HttpServletRequest request, @RequestBody FiltroMonederoItem filtroMonederoItem) throws Exception {
+    @PostMapping(value = "/pys/getMonederos")
+    ResponseEntity<ListaMonederoDTO> getMonederos(HttpServletRequest request, @RequestBody FiltroMonederoItem filtroMonederoItem) {
         ListaMonederoDTO response = walletService.listarMonederos(request, filtroMonederoItem);
-        return new ResponseEntity<>(response, response.getError() == null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, response.getError().getCode() == HttpStatus.OK.value() ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
