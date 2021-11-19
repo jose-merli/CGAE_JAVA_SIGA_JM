@@ -7,11 +7,11 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
-import org.itcgae.siga.DTOs.scs.FacturacionItem;
-import org.itcgae.siga.DTOs.scs.PagosjgItem;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsFacturacionJGSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -207,5 +207,40 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
     @Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)})
     List<ComboItem> comboFacturaciones(String idInstitucion);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesPorActuacionDesigna")
+    @Results({@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosFacturacionAsuntoDTO> getFacturacionesPorActuacionDesigna(Short idInstitucion, ScsActuaciondesigna scsActuaciondesigna);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesPorEJG")
+    @Results({@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosFacturacionAsuntoDTO> getFacturacionesPorEJG(Short idInstitucion, ScsEjg scsEjg);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorFacturacion")
+    @Results({@Result(column = "IDPAGOSJG", property = "idPago", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorFacturacion(Short idInstitucion, String idFacturacion);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosMovimientoVarioAsuntoPorFacturacion")
+    @Results({@Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosMovimientoVarioDTO> getDatosMovimientoVarioAsuntoPorFacturacion(Short idInstitucion, String idFacturacion);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorMovimientoVario")
+    @Results({@Result(column = "IDPAGOSJG", property = "idPago", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorMovimientoVario(Short idInstitucion, String idMovimiento);
 
 }
