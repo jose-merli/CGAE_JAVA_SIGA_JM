@@ -849,7 +849,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		return sql.toString();
 	}
 	
-	String selectNuevoId(Short idInstitucion) {
+	public String selectNuevoId(Short idInstitucion) {
 		
 		SQL sql = new SQL();
 		
@@ -863,7 +863,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 	}
 	
 	
-	public String listadoCargaMasivaProcuradores(CargaMasivaComprasBusquedaItem cargaMasivaItem, Short idInstitucion) {
+	public String listadoCargaMasivaCompras(CargaMasivaComprasBusquedaItem cargaMasivaItem, Short idInstitucion) {
 		SQL sql = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -882,7 +882,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.FROM("adm_usuarios usu");
 		sql.WHERE("cm.USUMODIFICACION = usu.idusuario");
 		sql.WHERE("cm.idinstitucion = usu.idinstitucion");
-		sql.WHERE("cm.tipocarga = 'PD'");
+		sql.WHERE("cm.tipocarga = 'COMP'");
 		sql.WHERE("cm.idinstitucion = " + idInstitucion.toString());
 		
 		if(cargaMasivaItem.getFechaCarga() != null) {
