@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
+import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
@@ -17,6 +19,7 @@ import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesItem;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionMapper;
@@ -189,4 +192,27 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		@Result(column = "fechaAlta", property = "fechaAlta", jdbcType = JdbcType.DATE)
 		}) 
 	List<ListaServiciosSuscripcionItem> getListaServiciosSuscripcion(Short idInstitucion, String nSolicitud, String idioma, Date aFechaDe);
+	
+	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "selectNuevoId")
+	@Results({
+		@Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR),
+	})
+	MaxIdDto selectNuevoId(Short idInstitucion);
+	
+	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "listadoCargaMasivaCompras")
+	@Results({
+		@Result(column = "IDCARGAMASIVA", property = "idCargaMasiva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "TIPOCARGA", property = "tipoCarga", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHACARGA", property = "fechaCarga", jdbcType = JdbcType.DATE),
+		@Result(column = "IDFICHERO", property = "idFichero", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDFICHEROLOG", property = "idFicheroLog", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.DATE),
+		@Result(column = "NUMREGISTROS", property = "numRegistros", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMREGISTROSERRONEOS", property = "numRegistrosErroneos", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "usuario", jdbcType = JdbcType.VARCHAR)
+	})
+	List<CargaMasivaComprasItem> listadoCargaMasivaCompras(CargaMasivaComprasBusquedaItem cargaMasivaItem, Short idInstitucion);
+	
 }

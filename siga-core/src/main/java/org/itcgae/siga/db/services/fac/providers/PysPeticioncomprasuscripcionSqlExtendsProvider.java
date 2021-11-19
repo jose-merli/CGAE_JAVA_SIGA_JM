@@ -9,15 +9,21 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
 import org.itcgae.siga.DTO.fac.FiltrosSuscripcionesItem;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionSqlProvider;
 
 public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticioncomprasuscripcionSqlProvider {
+
+	
+	private Logger LOGGER = Logger.getLogger(PysPeticioncomprasuscripcionSqlExtendsProvider.class);
 
 	public String getFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion, boolean esColegiado, Short idInstitucion) {
 		SQL sql = new SQL();
@@ -828,16 +834,66 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			String strDate = dateFormatSql
 					.format(dateFormatFront.parse(aFechaDe.toString()).getTime());
 			//Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
-//			sql.WHERE(
-//					"(suscripcion.fechaSuscripcion is not null and "
-//					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
-//					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
+			//REVISAR
+			sql.WHERE(
+					"(suscripcion.fechaSuscripcion is not null and "
+					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
+					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
 		}
 
 		sql.WHERE(" servSol.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("servSol.idpeticion = " + idPeticion);
 
 		sql.ORDER_BY(" servIns.DESCRIPCION");
+
+		return sql.toString();
+	}
+	
+	String selectNuevoId(Short idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("MAX(IDPETICION) + 1");
+		
+		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION");
+		
+		sql.WHERE("IDINSTITUCION = "+idInstitucion);
+		
+		return sql.toString();
+	}
+	
+	
+	public String listadoCargaMasivaProcuradores(CargaMasivaComprasBusquedaItem cargaMasivaItem, Short idInstitucion) {
+		SQL sql = new SQL();
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		sql.SELECT("cm.IDCARGAMASIVA");
+		sql.SELECT("cm.TIPOCARGA");
+		sql.SELECT("cm.IDINSTITUCION");
+		sql.SELECT("cm.FECHACARGA");
+		sql.SELECT("cm.IDFICHERO");
+		sql.SELECT("cm.IDFICHEROLOG");
+		sql.SELECT("cm.FECHAMODIFICACION");
+		sql.SELECT("cm.NUMREGISTROS");
+		sql.SELECT("cm.NOMBREFICHERO");
+		sql.SELECT("cm.NUMREGISTROSERRONEOS");
+		sql.SELECT("usu.DESCRIPCION");
+		sql.FROM("cen_cargamasiva cm");
+		sql.FROM("adm_usuarios usu");
+		sql.WHERE("cm.USUMODIFICACION = usu.idusuario");
+		sql.WHERE("cm.idinstitucion = usu.idinstitucion");
+		sql.WHERE("cm.tipocarga = 'PD'");
+		sql.WHERE("cm.idinstitucion = " + idInstitucion.toString());
+		
+		if(cargaMasivaItem.getFechaCarga() != null) {
+			String fechaCarga = "";
+			fechaCarga = dateFormat.format(cargaMasivaItem.getFechaCarga());
+			sql.WHERE("TRUNC(fechacarga) <= TO_DATE('" + fechaCarga + "', 'DD/MM/RRRR')");
+		}
+		
+		sql.WHERE("rownum <= 200");
+		
+		LOGGER.debug(sql.toString());
 
 		return sql.toString();
 	}

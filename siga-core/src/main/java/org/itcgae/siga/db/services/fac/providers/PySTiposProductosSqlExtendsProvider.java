@@ -164,7 +164,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, "
 				+ "prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, "
 				+ "tiva.valor, prin.idcontador, PRIN.NOFACTURABLE, tiva.idtipoiva,  TIVA.DESCRIPCION,"
-				+ "tiva.fechabaja");
+				+ "tiva.fechabaja, PRIN.SOLICITARBAJA");
 
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		
