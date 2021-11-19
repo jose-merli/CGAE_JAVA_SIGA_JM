@@ -107,16 +107,8 @@ public class ScsRemesasResolucionesExtendsProvider {
 		sql.SELECT("idoperacion");
 		sql.FROM("ecom_operacion_tipoaccion");
 		sql.WHERE("tipo_pcajg = " + tipoCAJG);
-		sql.WHERE("idtipoaccionremesa = 3");
+		sql.WHERE("idtipoaccionremesa = 1");
 
-		LOGGER.info(sql.toString());
-		return sql.toString();
-	}
-	public String idTipoRemesa(String idInstitucion) {
-		SQL sql = new SQL();
-		sql.SELECT("IDTIPOREMESA");
-		sql.FROM("CAJG_TIPOREMESA");
-		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		LOGGER.info(sql.toString());
 		return sql.toString();
 	}
@@ -134,6 +126,26 @@ public class ScsRemesasResolucionesExtendsProvider {
 		sql.WHERE("R.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("R.IDREMESARESOLUCION = " + idRemesaResolucion);
 		sql.ORDER_BY("R.NUMEROLINEA");
+		LOGGER.info(sql.toString());
+		return sql.toString();
+	}
+	
+	public String nombreContador(String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDCONTADOR");
+		sql.FROM("CAJG_TIPOREMESA");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDTIPOREMESA = 1");
+		LOGGER.info(sql.toString());
+		return sql.toString();
+	}
+	
+	public String contador(String idInstitucion, String idTipoRemesa) {
+		SQL sql = new SQL();
+		sql.SELECT("IDCONTADOR");
+		sql.FROM("CAJG_TIPOREMESA");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDTIPOREMESA = " + idTipoRemesa);
 		LOGGER.info(sql.toString());
 		return sql.toString();
 	}

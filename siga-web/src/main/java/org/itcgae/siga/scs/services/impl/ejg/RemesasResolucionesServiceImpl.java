@@ -50,6 +50,7 @@ import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.GestorContadores;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmContador;
@@ -73,6 +74,7 @@ import org.itcgae.siga.db.mappers.CajgRemesaresolucionficheroMapper;
 import org.itcgae.siga.db.mappers.EcomOperacionTipoaccionMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsCargaDesignaProcuradoresExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRemesasResolucionesExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IRemesasResoluciones;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -124,6 +126,9 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 	
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
+	
+	@Autowired
+	private ScsCargaDesignaProcuradoresExtendsMapper scsCarcaDesignaProcuradoresExtendsMapper;
     
 	@Override
 	public RemesaResolucionDTO buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem,
@@ -242,22 +247,13 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
               ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
               
                   if (remesasResolucionItem.getNombreFichero() != null) {
-                		String nextEntry;
-                    	String nombreFichero = null;
-                    	if(remesasResolucionItem.getNombreFichero().contains(".")) {
-    	                 
-    	                  nombreFichero = remesasResolucionItem.getNombreFichero().substring(0, remesasResolucionItem.getNombreFichero().lastIndexOf("."));
-    	                  String extension = remesasResolucionItem.getNombreFichero()
-    	                          .substring(remesasResolucionItem.getNombreFichero().lastIndexOf("."), remesasResolucionItem.getNombreFichero().length())
-    	                          .toLowerCase();
-    	                  nextEntry = nombreFichero + extension;
-                    	} else {
-                    		nextEntry = remesasResolucionItem.getNombreFichero();
-                    	}
-                    	
-                    
+                		
+                    String nombreFichero =  remesasResolucionItem.getNombreFichero().substring(0, remesasResolucionItem.getNombreFichero().lastIndexOf("."));
+	                String extension = ".zip";
+	                
+	                String nextEntry = nombreFichero + extension;                
                     String path = getDirectorioFicheroRemesa(idInstitucion,remesasResolucionItem.getIdRemesaResolucion());
-                    path += File.separator + remesasResolucionItem.getNombreFichero();
+                    path += File.separator + nombreFichero + extension;      
                     File file = new File(path);
                     if(file.exists() && !file.isDirectory()) {
                   	  zipOutputStream.putNextEntry(new ZipEntry(nextEntry));
@@ -432,7 +428,6 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 		boolean produceLog = false;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		if (idInstitucion != null) {
 
@@ -447,15 +442,24 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 			LOGGER.info(
 					"guardarRemesaResoluciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			
+			String nombreContador = scsRemesasResolucionesExtendsMapper.contador(idInstitucion.toString(), String.valueOf(remesasResolucionItem.getIdTipoRemesa()));
 			
 			LOGGER.info(
 					"guardarRemesaResoluciones() / cajgProcedimientoremesaresolMapper.selectByExample() -> Entrada a cajgProcedimientoremesaresolMapper para obtener información del procedimiento");
 			
 			CajgProcedimientoremesaresolExample procedimientoExample = new CajgProcedimientoremesaresolExample();
-			procedimientoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtiporemesaEqualTo(new Short("1"));
+			procedimientoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtiporemesaEqualTo((short)remesasResolucionItem.getIdTipoRemesa());
 			List<CajgProcedimientoremesaresol> procedimientos;
 			
 			procedimientos = cajgProcedimientoremesaresolMapper.selectByExample(procedimientoExample);
+			
+			if(procedimientos == null || procedimientos.isEmpty()) {
+				error.setCode(400);
+				error.setDescription("NoPL");
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				updateResponseDTO.setError(error);
+				return updateResponseDTO;
+			}
 			
 			LOGGER.info(
 					"guardarRemesaResoluciones() / cajgProcedimientoremesaresolMapper.selectByExample() -> Salida de cajgProcedimientoremesaresolMapper para obtener información del procedimiento");
@@ -463,7 +467,6 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 			MultipartFile file = request.getFile(itr.next());
 			String fileName = file.getOriginalFilename();
 			boolean conFichero = (!fileName.isEmpty()) ? true : false; 					
-			
 			RemesasResolucionItem remesaResolucionID = new RemesasResolucionItem();
 			remesaResolucionID = scsRemesasResolucionesExtendsMapper.getMaxIdRemesaResolucion(idInstitucion);
 			
@@ -471,6 +474,8 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 			if(remesasResolucionItem.getIdRemesaResolucion() == 0) {
 				path = getDirectorioFicheroRemesa(idInstitucion,remesaResolucionID.getIdRemesaResolucion());
 			}
+			
+			
 			
 			if(remesasResolucionItem.getIdRemesaResolucion() == 0) {
 				try {
@@ -481,7 +486,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 					//1- Insert en la tabla CAJG_REMESARESOLUCION
 					CajgRemesaresolucion remesaResolucion = new CajgRemesaresolucion(); 
 					
-					AdmContador adm = gestorContadores.getContador(idInstitucion,SigaConstants.CONTADOR_REMESAS_RESULTADOS);
+					AdmContador adm = gestorContadores.getContador(idInstitucion,nombreContador);
 					
 					remesaResolucion.setIdremesaresolucion(Long.valueOf(remesaResolucionID.getIdRemesaResolucion()));
 					remesaResolucion.setIdinstitucion(idInstitucion);
@@ -491,17 +496,17 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 					remesaResolucion.setFechacarga(new Date());
 					remesaResolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
 					remesaResolucion.setObservaciones(remesasResolucionItem.getObservaciones());
-					remesaResolucion.setNombrefichero((conFichero) ? nombreFichero(fileName)+".zip" : "");
+					remesaResolucion.setNombrefichero((conFichero) ? fileName : "");
 					remesaResolucion.setFechamodificacion(new Date());
 					remesaResolucion.setUsumodificacion(usuarios.get(0).getIdusuario());
 					remesaResolucion.setLoggenerado(new Short("1"));
-					remesaResolucion.setIdtiporemesa(new Short("1"));
+					remesaResolucion.setIdtiporemesa((short)remesasResolucionItem.getIdRemesaResolucion());
 					
 					response = cajgRemesaresolucionMapper.insert(remesaResolucion);
 					
 					//Actualizar contador.
 					
-					gestorContadores.setContador(adm,remesaResolucion.getNumero());
+					//gestorContadores.setContador(adm,remesaResolucion.getNumero());
 					
 					LOGGER.info(
 							"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion");
@@ -597,7 +602,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 						cajgRemesaresolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
 						cajgRemesaresolucion.setObservaciones(remesasResolucionItem.getObservaciones());
 						if(conFichero) {
-							cajgRemesaresolucion.setNombrefichero(nombreFichero(fileName)+".zip");
+							cajgRemesaresolucion.setNombrefichero(fileName);
 						}
 						response = cajgRemesaresolucionMapper.updateByPrimaryKeySelective(cajgRemesaresolucion);
 						

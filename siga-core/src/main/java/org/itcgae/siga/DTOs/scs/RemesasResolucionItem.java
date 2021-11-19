@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class RemesasResolucionItem {
 	
 	private int idRemesaResolucion;
+	private int idTipoRemesa;
 	private String numRemesaPrefijo;
 	private String numRemesaSufijo;
 	private String numRemesaNumero;
@@ -25,11 +26,18 @@ public class RemesasResolucionItem {
 	private Date fechaCarga;
 	
 	//GETTERS
+	
+	
 	@JsonProperty("idRemesaResolucion")
 	public int getIdRemesaResolucion() {
 		return idRemesaResolucion;
 	}
 	
+	@JsonProperty("idTipoRemesa")
+	public int getIdTipoRemesa() {
+		return idTipoRemesa;
+	}
+
 	@JsonProperty("numRemesaPrefijo")
 	public String getNumRemesaPrefijo() {
 		return numRemesaPrefijo;
@@ -100,6 +108,11 @@ public class RemesasResolucionItem {
 		this.idRemesaResolucion = idRemesaResolucion;
 	}
 	
+	
+	public void setIdTipoRemesa(int idTipoRemesa) {
+		this.idTipoRemesa = idTipoRemesa;
+	}
+
 	public void setNumRemesaPrefijo(String numRemesaPrefijo) {
 		this.numRemesaPrefijo = numRemesaPrefijo;
 	}

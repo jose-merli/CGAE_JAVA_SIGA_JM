@@ -72,12 +72,13 @@ public class RemesasResolucionesController {
 	@RequestMapping(value = "/guardarRemesaResolucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestParam int idRemesaResolucion,
 													@RequestParam("observaciones") String observaciones,
+													@RequestParam("idTipoRemesa") int idTipoRemesa,
 													@RequestParam("nombreFichero") String nombreFichero,
 													@RequestParam("fechaResolucion") String fechaResolucion,
 													MultipartHttpServletRequest  request){
 		LOGGER.info("----ENTRA METODO GUARDAR RESOLUCION-----");
 		RemesasResolucionItem remesasResolucionItem = new RemesasResolucionItem();
-		
+		remesasResolucionItem.setIdTipoRemesa(idTipoRemesa);
 		if(idRemesaResolucion != 0) {
 			remesasResolucionItem.setIdRemesa(idRemesaResolucion);
 		}
@@ -85,11 +86,9 @@ public class RemesasResolucionesController {
 		remesasResolucionItem.setNombreFichero(nombreFichero);
 	
 		try {
-			Date dateC = new SimpleDateFormat("dd/mm/yyyy")
-					.parse(fechaResolucion);
+			Date dateC = new SimpleDateFormat("dd/mm/yyyy").parse(fechaResolucion);
 			remesasResolucionItem.setFechaResolucion(dateC);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		UpdateResponseDTO response = remesasResoluciones.guardarRemesaResolucion(remesasResolucionItem,  request);
