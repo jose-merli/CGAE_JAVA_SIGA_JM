@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.itcgae.siga.db.entities.CajgRemesaresolucionfichero;
 import org.itcgae.siga.db.entities.EcomOperacionTipoaccion;
+import org.itcgae.siga.db.services.scs.providers.ScsCargaDesignaProcuradoresExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasResolucionesExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -52,12 +53,6 @@ public interface ScsRemesasResolucionesExtendsMapper {
 		@Result(column = "IDOPERACION", property = "idoperacion", jdbcType = JdbcType.INTEGER)
 	})
 	List<EcomOperacionTipoaccion> ecomOperacionTipoAccion(String tipoCAJG);
-
-	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "idTipoRemesa")
-	@Results({
-		@Result(column = "IDTIPOREMESA", property = "idtiporemesa", jdbcType = JdbcType.INTEGER)
-	})
-	String idTipoRemesa (String idInstitucion);
 	
 	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "logRemesaResoluciones")
 	@Results({
@@ -67,4 +62,11 @@ public interface ScsRemesasResolucionesExtendsMapper {
 		@Result(column = "NUMEROLINEA", property = "numeroLinea", jdbcType = JdbcType.VARCHAR),
 	})
 	List<LogRemesaResolucionItem> logRemesaResoluciones(String idInstitucion, String idRemesaResolucion) ;
+	
+	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "contador")
+	@Results({
+		@Result(column = "IDCONTADOR", property = "idcontador", jdbcType = JdbcType.VARCHAR)
+	})
+	String contador(String idInstitucion, String idTipoRemesa);
+	
 }

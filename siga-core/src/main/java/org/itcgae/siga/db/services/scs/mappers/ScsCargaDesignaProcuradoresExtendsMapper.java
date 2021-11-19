@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
+import org.itcgae.siga.db.entities.EcomOperacionTipoaccion;
 import org.itcgae.siga.db.services.scs.providers.ScsCargaDesignaProcuradoresExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasResolucionesExtendsProvider;
 
@@ -33,5 +34,11 @@ public interface ScsCargaDesignaProcuradoresExtendsMapper {
 		@Result(column = "IDCONTADOR", property = "idcontador", jdbcType = JdbcType.VARCHAR)
 	})
 	String nombreContador (String idInstitucion);
+	
+	@SelectProvider(type = ScsCargaDesignaProcuradoresExtendsProvider.class, method = "ecomOperacionTipoAccion")
+	@Results({
+		@Result(column = "IDOPERACION", property = "idoperacion", jdbcType = JdbcType.INTEGER)
+	})
+	List<EcomOperacionTipoaccion> ecomOperacionTipoAccion(String tipoCAJG);
 	
 }

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.itcgae.siga.DTOs.gen.Error;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants;
 
@@ -532,5 +532,15 @@ public class UtilidadesString {
 		}
 
 		return salida;
+	}
+	
+	public static Error creaError(String mensaje) {
+		Error error = new Error();
+		
+		error.setCode(500);
+		error.setDescription("general.mensaje.error.bbdd");
+		error.setMessage(mensaje);
+		return error;
+
 	}
 }
