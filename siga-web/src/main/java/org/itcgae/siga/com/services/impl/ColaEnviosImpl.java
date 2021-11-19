@@ -124,6 +124,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 	@Autowired
 	private IEnviosMasivosService _enviosMasivosService;
 	
+	List<Exception> listaErrores = new ArrayList<Exception>();
+	
 	
 	//@Transactional
 	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
@@ -132,6 +134,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		
 		EnvEnvios envio = null;
 		try{
+			
 			List<EnvEnvios> enviosProgramados = _envEnviosExtendsMapper.obtenerEnviosProgramados();
 			if (enviosProgramados != null && enviosProgramados.size() > 0) {
 
@@ -145,8 +148,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 					switch (envio.getIdtipoenvios().toString()) {
 
 						case SigaConstants.ID_ENVIO_MAIL:
-							preparaCorreo(envio);
-							LOGGER.info("Correo electrónico enviado con éxito");
+							preparaCorreo(envio);					
+							LOGGER.info("Correo electrónico enviado con éxito");							
 							break;
 						case SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO:
 							preparaCorreo(envio);
@@ -165,6 +168,19 @@ public class ColaEnviosImpl implements IColaEnvios {
 							LOGGER.info("BURO SMS enviado con éxito");
 							break;
 						}
+					
+					if(this.listaErrores.size() == 0) {
+						LOGGER.info("Envio programado realizado con exito");
+					}else if(this.listaErrores.size() > 0){
+						LOGGER.info("El envio programado se ha procesado con errores");
+						
+						envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+						envio.setFechamodificacion(new Date());
+						_envEnviosMapper.updateByPrimaryKey(envio);
+						generaLogGenerico(envio.getIdinstitucion(), envio, "");	
+					}
+					
+					this.listaErrores.clear();
 				}
 
 			}
@@ -337,6 +353,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					destinatario.setMovil(dest.getMovil());
 					destinatarios.add(destinatario);
 				}
+				
 				
 				LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
 				
@@ -544,95 +561,95 @@ public class ColaEnviosImpl implements IColaEnvios {
 	}
 	
 	protected void insertaEnvDestinatarios(EnvEnvios etiquetasDTO, CenDirecciones direccion, CenGruposclienteCliente cenPersona) {
-		
-		EnvDestinatariosExample ejemplo = new EnvDestinatariosExample();
-		ejemplo.createCriteria().andIdinstitucionEqualTo(cenPersona.getIdinstitucion())
-				.andIdenvioEqualTo(etiquetasDTO.getIdenvio())
-				.andIdpersonaEqualTo(cenPersona.getIdpersona())
-				.andCorreoelectronicoEqualTo(direccion.getCorreoelectronico());
-		List<EnvDestinatarios> destinatariosExistentes = _envDestinatariosMapper
-				.selectByExample(ejemplo);
 
-//		LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + cenPersona.getNifcif() + "  IDGRUPO = " + etiquetasDTO.getEtiquetasSeleccionadas()[i].getValue());
-		if (destinatariosExistentes.size() > 0) {
-			try {
-				CenPersona personaTag = _cenPersonaMapper
-						.selectByPrimaryKey(cenPersona.getIdpersona());
-				CenDireccionesKey key = new CenDireccionesKey();
-				key.setIddireccion(direccion.getIddireccion());
-				key.setIdpersona(cenPersona.getIdpersona());
-				key.setIdinstitucion(cenPersona.getIdinstitucion());
-				CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
-				EnvDestinatarios dest = new EnvDestinatarios();
-				dest.setApellidos1(personaTag.getApellidos1());
-				dest.setApellidos2(personaTag.getApellidos2());
-				if(dir != null) {
-				if(dir.getCodigopostal() != null) dest.setCodigopostal(dir.getCodigopostal());
-				dest.setCorreoelectronico(dir.getCorreoelectronico());
-				dest.setDomicilio(dir.getDomicilio());
-				dest.setFax1(dir.getFax1());
-				dest.setFax2(dir.getFax2());
-				dest.setFechamodificacion(new Date());
-				dest.setIdenvio(etiquetasDTO.getIdenvio());
-				dest.setIdinstitucion(cenPersona.getIdinstitucion());
-				dest.setOrigendestinatario(Short.parseShort("1"));
-				dest.setIdpais(dir.getIdpais());
-				dest.setIdpersona(personaTag.getIdpersona());
-				dest.setIdpoblacion(dir.getIdpoblacion());
-				dest.setIdprovincia(dir.getIdprovincia());
-				dest.setMovil(dir.getMovil());
-				dest.setNifcif(personaTag.getNifcif());
-				dest.setNombre(personaTag.getNombre());
-				dest.setPoblacionextranjera(dir.getPoblacionextranjera());
-				dest.setUsumodificacion(2);
-				dest.setTipodestinatario("CEN_PERSONA");
-				_envDestinatariosMapper.updateByExample(dest, ejemplo);
-//				LOGGER.info("PRUEBA ENVIOS ETIQUETAS UPDATE");
-//				respuesta.setCode(200);
-//				respuesta.setDescription("Destinatario asociado con éxito");
+		try {
+			EnvDestinatariosExample ejemplo = new EnvDestinatariosExample();
+			ejemplo.createCriteria().andIdinstitucionEqualTo(cenPersona.getIdinstitucion())
+					.andIdenvioEqualTo(etiquetasDTO.getIdenvio())
+					.andIdpersonaEqualTo(cenPersona.getIdpersona());
+				
+			
+			List<EnvDestinatarios> destinatariosExistentes = _envDestinatariosMapper
+					.selectByExample(ejemplo);
+	
+	//		LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + cenPersona.getNifcif() + "  IDGRUPO = " + etiquetasDTO.getEtiquetasSeleccionadas()[i].getValue());
+			if (destinatariosExistentes.size() > 0) {
+				
+					CenPersona personaTag = _cenPersonaMapper
+							.selectByPrimaryKey(cenPersona.getIdpersona());
+					CenDireccionesKey key = new CenDireccionesKey();
+					key.setIddireccion(direccion.getIddireccion());
+					key.setIdpersona(cenPersona.getIdpersona());
+					key.setIdinstitucion(cenPersona.getIdinstitucion());
+					CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
+					EnvDestinatarios dest = new EnvDestinatarios();
+					dest.setApellidos1(personaTag.getApellidos1());
+					dest.setApellidos2(personaTag.getApellidos2());
+					if(dir != null) {
+					if(dir.getCodigopostal() != null) dest.setCodigopostal(dir.getCodigopostal());
+					dest.setCorreoelectronico(dir.getCorreoelectronico());
+					dest.setDomicilio(dir.getDomicilio());
+					dest.setFax1(dir.getFax1());
+					dest.setFax2(dir.getFax2());
+					dest.setFechamodificacion(new Date());
+					dest.setIdenvio(etiquetasDTO.getIdenvio());
+					dest.setIdinstitucion(cenPersona.getIdinstitucion());
+					dest.setOrigendestinatario(Short.parseShort("1"));
+					dest.setIdpais(dir.getIdpais());
+					dest.setIdpersona(personaTag.getIdpersona());
+					dest.setIdpoblacion(dir.getIdpoblacion());
+					dest.setIdprovincia(dir.getIdprovincia());
+					dest.setMovil(dir.getMovil());
+					dest.setNifcif(personaTag.getNifcif());
+					dest.setNombre(personaTag.getNombre());
+					dest.setPoblacionextranjera(dir.getPoblacionextranjera());
+					dest.setUsumodificacion(2);
+					dest.setTipodestinatario("CEN_PERSONA");
+					_envDestinatariosMapper.updateByExample(dest, ejemplo);
+	//				LOGGER.info("PRUEBA ENVIOS ETIQUETAS UPDATE");
+	//				respuesta.setCode(200);
+	//				respuesta.setDescription("Destinatario asociado con éxito");
+					}
+				
+			} else {
+			
+					CenPersona personaTag = _cenPersonaMapper
+							.selectByPrimaryKey(cenPersona.getIdpersona());
+					CenDireccionesKey key = new CenDireccionesKey();
+					key.setIddireccion(direccion.getIddireccion());
+					key.setIdpersona(cenPersona.getIdpersona());
+					key.setIdinstitucion(cenPersona.getIdinstitucion());
+					CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
+					EnvDestinatarios dest = new EnvDestinatarios();
+					dest.setApellidos1(personaTag.getApellidos1());
+					dest.setApellidos2(personaTag.getApellidos2());
+					if(dir != null) {
+					if(dir.getCodigopostal() != null) dest.setCodigopostal(dir.getCodigopostal());
+					dest.setCorreoelectronico(dir.getCorreoelectronico());
+					dest.setDomicilio(dir.getDomicilio());
+					dest.setFax1(dir.getFax1());
+					dest.setFax2(dir.getFax2());
+					dest.setFechamodificacion(new Date());
+					dest.setIdenvio(etiquetasDTO.getIdenvio());
+					dest.setIdinstitucion(cenPersona.getIdinstitucion());
+					dest.setOrigendestinatario(Short.parseShort("1"));
+					dest.setIdpais(dir.getIdpais());
+					dest.setIdpersona(personaTag.getIdpersona());
+					dest.setIdpoblacion(dir.getIdpoblacion());
+					dest.setIdprovincia(dir.getIdprovincia());
+					dest.setMovil(dir.getMovil());
+					dest.setNifcif(personaTag.getNifcif());
+					dest.setNombre(personaTag.getNombre());
+					dest.setPoblacionextranjera(dir.getPoblacionextranjera());
+					dest.setUsumodificacion(2);
+					dest.setTipodestinatario("CEN_PERSONA");
+	//				LOGGER.info("PRUEBA ENVIOS ETIQUETAS INSERT");
+					_envDestinatariosMapper.insert(dest);
+	//				respuesta.setDescription("Destinatario asociado con éxito");
+					}
 				}
-			} catch (Exception e) {
-				LOGGER.error(e);
-			}
-		} else {
-			try {
-				CenPersona personaTag = _cenPersonaMapper
-						.selectByPrimaryKey(cenPersona.getIdpersona());
-				CenDireccionesKey key = new CenDireccionesKey();
-				key.setIddireccion(direccion.getIddireccion());
-				key.setIdpersona(cenPersona.getIdpersona());
-				key.setIdinstitucion(cenPersona.getIdinstitucion());
-				CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
-				EnvDestinatarios dest = new EnvDestinatarios();
-				dest.setApellidos1(personaTag.getApellidos1());
-				dest.setApellidos2(personaTag.getApellidos2());
-				if(dir != null) {
-				if(dir.getCodigopostal() != null) dest.setCodigopostal(dir.getCodigopostal());
-				dest.setCorreoelectronico(dir.getCorreoelectronico());
-				dest.setDomicilio(dir.getDomicilio());
-				dest.setFax1(dir.getFax1());
-				dest.setFax2(dir.getFax2());
-				dest.setFechamodificacion(new Date());
-				dest.setIdenvio(etiquetasDTO.getIdenvio());
-				dest.setIdinstitucion(cenPersona.getIdinstitucion());
-				dest.setOrigendestinatario(Short.parseShort("1"));
-				dest.setIdpais(dir.getIdpais());
-				dest.setIdpersona(personaTag.getIdpersona());
-				dest.setIdpoblacion(dir.getIdpoblacion());
-				dest.setIdprovincia(dir.getIdprovincia());
-				dest.setMovil(dir.getMovil());
-				dest.setNifcif(personaTag.getNifcif());
-				dest.setNombre(personaTag.getNombre());
-				dest.setPoblacionextranjera(dir.getPoblacionextranjera());
-				dest.setUsumodificacion(2);
-				dest.setTipodestinatario("CEN_PERSONA");
-//				LOGGER.info("PRUEBA ENVIOS ETIQUETAS INSERT");
-				_envDestinatariosMapper.insert(dest);
-//				respuesta.setDescription("Destinatario asociado con éxito");
-				}
-			} catch (Exception e) {
-				LOGGER.error(e);
-			}
+		}catch(Exception e) {
+			this.listaErrores.add(e);
 		}
 	}
 
@@ -948,10 +965,24 @@ public class ColaEnviosImpl implements IColaEnvios {
 	 */
 	private void generaLogGenerico(Short idInstitucion, EnvEnvios envio, String error) {
 		Sheet sheet = null;
+		error = "No se ha podido realizar el envio";
 		
 		try {
 			sheet = _enviosService.creaLogGenericoExcel(envio);
-			_enviosService.insertaExcelRowLogGenerico(envio, sheet, error);
+			
+			if(this.listaErrores.size() > 0) {
+				for (Exception e : this.listaErrores) {
+					
+					if(e.getMessage().equals("Value for correoelectronico cannot be null")) {
+						error = "No se ha realizado el envio ya que el destinatario no tiene correo electronico";
+					}
+					
+					_enviosService.insertaExcelRowLogGenerico(envio, sheet, error);
+				}
+			}else {
+				_enviosService.insertaExcelRowLogGenerico(envio, sheet, error);
+			}
+			
 		} catch (Exception e) {
 			LOGGER.error("ColaEnviosImpl -- > generaLogGenerico: " + e);
 		} finally {
