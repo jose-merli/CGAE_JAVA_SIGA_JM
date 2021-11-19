@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -70,16 +71,16 @@ public class FacturacionPySController {
 	}
 
     @PostMapping(value = "/insertaCuentaBancaria")
-    ResponseEntity<UpdateResponseDTO> insertaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
-                                                             HttpServletRequest request) {
-		UpdateResponseDTO response = new UpdateResponseDTO();
+    ResponseEntity<InsertResponseDTO> insertaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
+															HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
 
         try {
             response = this.facturacionService.insertaCuentaBancaria(cuentaBancaria, request);
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -251,15 +252,15 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/guardarContadorSerie")
-	ResponseEntity<UpdateResponseDTO> guardarContadorSerie(@RequestBody ContadorSeriesItem contador, HttpServletRequest request) {
-		UpdateResponseDTO response = new UpdateResponseDTO();
+	ResponseEntity<InsertResponseDTO> guardarContadorSerie(@RequestBody ContadorSeriesItem contador, HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
 			 response = facturacionService.guardarContadorSerie(contador, request);
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

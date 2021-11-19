@@ -72,6 +72,9 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
 
         if (!UtilidadesString.esCadenaVacia(facturacionProgramada.getCompraSuscripcion())) {
             switch (facturacionProgramada.getCompraSuscripcion()) {
+                case "0":
+                    sql.WHERE("(facprog.fechainicioproductos IS NOT NULL OR facprog.fechafinproductos IS NOT NULL AND facprog.fechainicioservicios IS NOT NULL AND facprog.fechafinservicios IS NOT NULL)");
+                    break;
                 case "1":
                     sql.WHERE("((facprog.fechainicioproductos IS NOT NULL OR facprog.fechafinproductos IS NOT NULL) AND (facprog.fechainicioservicios IS NULL AND facprog.fechafinservicios IS NULL))");
                     break;
@@ -90,6 +93,8 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
 
         if (!UtilidadesString.esCadenaVacia(facturacionProgramada.getIdEstadoConfirmacion()))
             sql.WHERE("facprog.idestadoconfirmacion = " + facturacionProgramada.getIdEstadoConfirmacion());
+        if (!UtilidadesString.esCadenaVacia(facturacionProgramada.getIdEstadoPDF()))
+            sql.WHERE("facprog.idestadopdf = " + facturacionProgramada.getIdEstadoPDF());
         if (!UtilidadesString.esCadenaVacia(facturacionProgramada.getIdEstadoEnvio()))
             sql.WHERE("facprog.idestadoenvio = " + facturacionProgramada.getIdEstadoEnvio());
         if (!UtilidadesString.esCadenaVacia(facturacionProgramada.getIdEstadoTraspaso()))

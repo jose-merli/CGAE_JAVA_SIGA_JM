@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +18,8 @@ public interface IFacturacionPySService {
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
 			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
-											  HttpServletRequest request) throws Exception;
+	public InsertResponseDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+												   HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO actualizaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
 											  HttpServletRequest request) throws Exception;
@@ -59,7 +60,7 @@ public interface IFacturacionPySService {
 
 	public FicherosAdeudosDTO getFicherosAdeudos(FicherosAdeudosItem item, HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request) throws Exception;
+	public InsertResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request) throws Exception;
 
 	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request) throws Exception;
 
