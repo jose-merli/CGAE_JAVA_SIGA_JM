@@ -1,14 +1,18 @@
 package org.itcgae.siga.services.impl;
 
 import com.exea.sincronizacion.redabogacia.*;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.*;
 import org.itcgae.siga.exception.ValidationException;
@@ -65,6 +69,21 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
     @Autowired
     private  CenDireccionTipodireccionExtendsMapper cenDireccionTipodireccionExtendsMapper;
+
+    @Autowired
+    private CenPoblacionesExtendsMapper cenPoblacionesExtendsMapper;
+
+    @Autowired
+    private CenPaisExtendsMapper cenPaisExtendsMapper;
+
+    @Autowired
+    private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
+
+    @Autowired
+    private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
+
+    @Autowired
+    private CenBancosExtendsMapper cenBancosExtendsMapper;
 
     /**
      * Metodo que recibe una peticion {@link ObtenerNumColegiacionResponseDocument} y, tras varias validaciones, devuelve o no el proximo numero de colegiado
@@ -211,8 +230,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             boolean isReincorporacion = TipoBoolean.X_1.equals(request.getColegiado().getColegiacion().getReincorporacion());
             int situacionPrevia = request.getColegiado().getColegiacion().getSituacionPrevia().intValue();
             TipoColegiacionType.Enum tipoColegiacionType = request.getColegiado().getColegiacion().getTipoSolicitud();
-            TipoBoolean.Enum isResidente = request.getColegiado().getColegiacion().getResidente();
             Long idPersona, idDireccion = null;
+            Short idCuenta = null;
 
             int affectedRows = 0;
             if(institucion != null){
@@ -230,12 +249,16 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                     //Insertamos/updateamos los datos personales en CEN_PERSONA
                     idPersona = insertarDatosPersonales(request.getColegiado().getDatosPersonales(), idInstitucion);
+
                     affectedRows += insertarDatosCliente(idPersona, idInstitucion);
-                    idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud());
-                    //TODO: insertarDatosColegiado
+
+                    idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud(), idPersona);
+
+                    affectedRows += insertarDatosColegiado(request.getColegiado().getColegiacion(), idInstitucion, idPersona, numColegiado, request.getNumeroExpediente());
+
                     if(request.getColegiado().getDatosBancarios() != null
                         && !UtilidadesString.esCadenaVacia(request.getColegiado().getDatosBancarios().getIBAN())){
-                        //TODO: insertarDatosBancarios
+                        idCuenta = insertarDatosBancarios(request.getColegiado().getDatosBancarios(), idPersona, idInstitucion, request.getColegiado().getDatosPersonales());
                     }else{
                         //TODO: ejecutarPL_RevisionSuscripcionesLetrado ?
                     }
@@ -344,6 +367,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                     lastEstado.setSituacionresidente(SigaConstants.DB_FALSE);
                 }
                 lastEstado.setObservaciones("Tramitada reincorporación por EXEA");
+                lastEstado.setNumExpediente(request.getNumeroExpediente());
 
                 CenColegiado cenColegiado = new CenColegiado();
                 cenColegiado.setComunitario("0");
@@ -360,8 +384,6 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                     errorType.setXmlRequest("Sin error XML");
                     log.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / Error en BBDD, no se actualizo ninguna fila en la reincorporacion");
                 } else {
-                    //TODO: Asociar expediente a colegiado
-                    //TODO: Si el expediente esta asociado a una solicitud de incorporación, asociarlo
                     response.setNumeroExpediente(request.getNumeroExpediente());
                     log.info("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / Reincorporacion finalizada, se informa response y se devuelve");
                 }
@@ -644,12 +666,346 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
      * @return
      */
     @Transactional
-    private Long insertarDatosDireccion (LocalizacionType localizacionType, Short idInstitucion, TipoColegiacionType.Enum tipoColegiacion){
+    private Long insertarDatosDireccion (LocalizacionType localizacionType, Short idInstitucion, TipoColegiacionType.Enum tipoColegiacion, Long idPersona){
 
         log.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() - INICIO");
         Long idDireccion = null;
+
+        CenDirecciones direccion = new CenDirecciones();
+
+        //Creamos la direccion con los tipos de direccion oblogatorios
+        List<DatosDireccionesItem> direccionID = cenDireccionesExtendsMapper.selectNewIdDireccion(idPersona.toString(),idInstitucion.toString());
+        idDireccion = Long.valueOf(direccionID.get(0).getIdDireccion());
+        log.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() / Siguiente ID direccion obtenido: " + idDireccion);
+        direccion.setIddireccion(idDireccion);
+        if(localizacionType.getNacional() != null) {
+
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() / Es nacional");
+            direccion.setCodigopostal(localizacionType.getNacional().getCodigoPostal());
+            direccion.setIdprovincia(localizacionType.getNacional().getProvincia().getCodigoProvincia());
+
+            if(UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getCodigoPoblacion())
+                && !UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion())){
+
+                direccion.setIdpoblacion(getIdPoblacionFromDescripcion(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion()));
+
+            }
+
+        } else if(localizacionType.getExtranjero() != null){
+
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() / Es extranjero");
+            direccion.setCodigopostal(localizacionType.getExtranjero().getCodigoPostal());
+            direccion.setPoblacionextranjera(localizacionType.getExtranjero().getPoblacion());
+            direccion.setIdpais(getIdPaisFromCodISO(localizacionType.getExtranjero().getPais().getCodigoPais()));
+
+        }
+        direccion.setCorreoelectronico(localizacionType.getEmail());
+        direccion.setDomicilio(localizacionType.getDomicilio());
+
+        if(localizacionType.getContacto() != null
+                && localizacionType.getContacto().getFax1() != null
+                && !UtilidadesString.esCadenaVacia(localizacionType.getContacto().getFax1().getStringValue())) {
+            direccion.setFax1(localizacionType.getContacto().getFax1().getStringValue());
+        }
+        if(localizacionType.getContacto() != null
+                && localizacionType.getContacto().getFax2() != null
+                && !UtilidadesString.esCadenaVacia(localizacionType.getContacto().getFax2().getStringValue())){
+            direccion.setFax2(localizacionType.getContacto().getFax2().getStringValue());
+        }
+
+        direccion.setFechamodificacion(new Date());
+        direccion.setIdinstitucion(idInstitucion);
+        direccion.setIdpersona(idPersona);
+
+        if(localizacionType.getContacto() != null
+                && localizacionType.getContacto().getTelefono1() != null
+                && !UtilidadesString.esCadenaVacia(localizacionType.getContacto().getTelefono1().getStringValue())) {
+            direccion.setTelefono1(localizacionType.getContacto().getTelefono1().getStringValue());
+        }
+
+        if(localizacionType.getContacto() != null
+                && localizacionType.getContacto().getTelefono2() != null
+                && !UtilidadesString.esCadenaVacia(localizacionType.getContacto().getTelefono2().getStringValue())) {
+            direccion.setTelefono2(localizacionType.getContacto().getTelefono2().getStringValue());
+        }
+
+        direccion.setMovil(localizacionType.getContacto().getMovil().getStringValue());
+        direccion.setUsumodificacion(0);
+        direccion.setPreferente("ECS");
+
+        cenDireccionesExtendsMapper.insert(direccion);
+
+        log.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() / Una vez insertados los datos en CEN_DIRECCIONES, insertamos en CEN_DIRECCION_TIPODIRECCION");
+        CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
+        tipoDireccion.setFechamodificacion(new Date());
+        tipoDireccion.setIddireccion(direccion.getIddireccion());
+        tipoDireccion.setIdinstitucion(idInstitucion);
+        tipoDireccion.setIdpersona(idPersona);
+        tipoDireccion.setUsumodificacion(0);
+
+        //Añadimos los tipo de direcciones obligatorios
+        tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_TRASPASO));
+        cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+        tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_FACTURACION));
+        cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+        tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_CENSOWEB));
+        cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+        tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUIAJUDICIAL));
+        cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+        tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
+        cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+
+        tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL));
+        cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+        tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_CORREO));
+        cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+        tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
+        cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+
+        //Si el tipo de solicitud es Ejerciente o No Ejerciente, insertamos el tipo direccion Despacho
+        if(TipoColegiacionType.E.equals(tipoColegiacion)
+            || TipoColegiacionType.N.equals(tipoColegiacion)){
+
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() / Es ejerciente o no ejerciente, insertamos tipo direccion Despacho");
+            tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+            cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
+
+        }
+
         log.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() - FIN");
         return idDireccion;
+    }
+
+    /**
+     * Metodo encargado de insertar los datos relacionados con el colegiado
+     *
+     * @param colegiacionType
+     * @param idInstitucion
+     * @param idPersona
+     * @return
+     */
+    @Transactional
+    private int insertarDatosColegiado (ColegiacionType colegiacionType, Short idInstitucion, Long idPersona, String numColegiado, String numExpediente){
+
+        log.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() - INICIO");
+        int affectedRows = 0;
+        String nColegiado = null;
+        CenColegiado colegiado = new CenColegiado();
+
+        colegiado.setIdpersona(idPersona);
+        colegiado.setFechaincorporacion(colegiacionType.getFechaIncorporacion().getTime());
+        colegiado.setFechamodificacion(new Date());
+        colegiado.setIdinstitucion(idInstitucion);
+
+        if(UtilidadesString.esCadenaVacia(numColegiado)){
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() / No viene informado el numero de colegiado, buscamos el siguiente");
+            // Comprobamos si para la institucion tiene un contador unico
+            GenParametrosKey key = new GenParametrosKey();
+            key.setIdinstitucion(idInstitucion);
+            key.setModulo(SigaConstants.MODULO_CENSO);
+            key.setParametro(SigaConstants.PARAMETRO_CONTADOR_UNICO);
+            GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+
+            String contadorUnico = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
+
+            StringDTO stringDTO = new StringDTO();
+
+            if (SigaConstants.DB_TRUE.equals(contadorUnico)) {
+
+                stringDTO = cenSolicitudincorporacionExtendsMapper.getMaxNColegiadoComunitario(idInstitucion.toString());
+
+            } else {
+
+                if(TipoColegiacionType.E.equals(colegiacionType.getTipoSolicitud())
+                    || TipoColegiacionType.N.equals(colegiacionType.getTipoSolicitud())) {
+
+                    stringDTO = cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(idInstitucion.toString());
+
+                }else if(TipoColegiacionType.I.equals(colegiacionType.getTipoSolicitud())) {
+
+                    stringDTO = cenSolicitudincorporacionExtendsMapper.getMaxNComunitario(idInstitucion.toString());
+
+                }
+            }
+            colegiacionType.setNumColegiado(nColegiado);
+            nColegiado = stringDTO.getValor();
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() / Numero de colegiado obtenido: " + nColegiado);
+        }else{
+            nColegiado = numColegiado;
+        }
+
+        colegiado.setUsumodificacion(0);
+        colegiado.setFechapresentacion(new Date());
+
+        if(TipoColegiacionType.E.equals(colegiacionType.getTipoSolicitud())
+                || TipoColegiacionType.N.equals(colegiacionType.getTipoSolicitud())) {
+
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() / Es ejerciente o no ejerciente, ponemos marca comunitario a 0 y rellenamos numColegiado");
+            colegiado.setComunitario(SigaConstants.DB_FALSE);
+            colegiado.setNcolegiado(nColegiado);
+
+        }else if(TipoColegiacionType.I.equals(colegiacionType.getTipoSolicitud())) {
+
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() / Es inscrito, ponemos marca comunitario a 1 y rellenamos numComunitario");
+            colegiado.setComunitario(SigaConstants.DB_TRUE);
+            colegiado.setNcomunitario(nColegiado);
+
+        }
+        colegiado.setJubilacioncuota("0");
+        colegiado.setIndtitulacion("1");
+        colegiado.setSituacionejercicio("0");
+        colegiado.setSituacionempresa("0");
+        if(TipoBoolean.X_1.equals(colegiacionType.getResidente())){
+            colegiado.setSituacionresidente(SigaConstants.DB_TRUE);
+        }else{
+            colegiado.setSituacionresidente(SigaConstants.DB_FALSE);
+        }
+
+        CenColegiadoExample ejemploColegiado = new CenColegiadoExample();
+        ejemploColegiado.createCriteria().andIdpersonaEqualTo(idPersona).andIdinstitucionEqualTo(idInstitucion);
+
+        List <CenColegiado> listaColegiados = cenColegiadoExtendsMapper.selectByExample(ejemploColegiado);
+        //Si no esta ya dado de alto la persona como colegiado en la institucion, insertamos
+        if(listaColegiados.isEmpty()) {
+
+            affectedRows += cenColegiadoExtendsMapper.insert(colegiado);
+
+            if(affectedRows > 0){
+                log.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() / Una vez insertamos en CEN_COLEGIADO, insertamos en CEN_DATOSCOLEGIALESESTADO y por consecuencia en CEN_HISTORICO");
+                CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
+                datosColegiales.setFechaestado(colegiacionType.getFechaIncorporacion().getTime());
+                datosColegiales.setFechamodificacion(new Date());
+
+                if (TipoColegiacionType.E.equals(colegiacionType.getTipoSolicitud())
+                        || TipoColegiacionType.N.equals(colegiacionType.getTipoSolicitud())) {
+
+                    datosColegiales.setIdestado(Short.valueOf("20"));
+
+                }else{
+
+                    datosColegiales.setIdestado(Short.valueOf("10"));
+
+                }
+
+                if(TipoBoolean.X_1.equals(colegiacionType.getResidente())) {
+                    datosColegiales.setSituacionresidente("1");
+                }else {
+                    datosColegiales.setSituacionresidente("0");
+                }
+                datosColegiales.setIdinstitucion(idInstitucion);
+                datosColegiales.setIdpersona(idPersona);
+                datosColegiales.setUsumodificacion(0);
+                datosColegiales.setObservaciones("Tramitada alta por expediente de colegiacion EXEA");
+                datosColegiales.setNumExpediente(numExpediente);
+                affectedRows += cenDatoscolegialesestadoExtendsMapper.insert(datosColegiales );
+
+                if(affectedRows == 2){ //Una vez hecho insert en CEN_COLEGIADO y CEN_DATOSCOLEGIALESESTADO dejamos registro en CEN_HISTORICO
+
+                    log.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() / Insertamos en CEN_HISTORICO");
+                    CenHistorico cenHistorico = new CenHistorico();
+                    NewIdDTO idHistorico = cenHistoricoExtendsMapper.selectMaxIDHistoricoByPerson(idPersona.toString(), idInstitucion.toString());
+
+                    cenHistorico.setIdhistorico(Short.valueOf(idHistorico.getNewId()));
+                    cenHistorico.setIdtipocambio((short)SigaConstants.TIPO_CAMBIO_HISTORICO_ESTADO_ALTA_COLEGIAL);
+                    cenHistorico.setIdpersona(idPersona);
+                    cenHistorico.setFechaefectiva(colegiacionType.getFechaIncorporacion().getTime());
+                    cenHistorico.setFechamodificacion(new Date());
+                    cenHistorico.setFechaentrada(colegiacionType.getFechaIncorporacion().getTime());
+                    cenHistorico.setIdinstitucion(idInstitucion);
+                    cenHistorico.setDescripcion("Alta de colegiacion por Expediente Colegiacion EXEA");
+                    cenHistorico.setUsumodificacion(0);
+
+                    affectedRows += cenHistoricoExtendsMapper.insert(cenHistorico);
+                }
+            }
+        }
+        log.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() - FIN");
+        return affectedRows;
+    }
+
+    /**
+     * Metodo que se encarga de insertar los datos bancarios del colegiado si los tuviera
+     *
+     * @param datosBancarios
+     * @param idPersona
+     * @param idInstitucion
+     * @return
+     */
+    private Short insertarDatosBancarios(BancoType datosBancarios, Long idPersona, Short idInstitucion, DatosPersonalesType datosPersonalesType){
+
+        log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() - INICIO");
+        String titularCuenta = datosPersonalesType.getNombre().toUpperCase() + " " + datosPersonalesType.getApellido1();
+        if(!UtilidadesString.esCadenaVacia(datosPersonalesType.getApellido2())){
+            titularCuenta += " " + datosPersonalesType.getApellido2();
+        }
+        CenCuentasbancarias cuenta = new CenCuentasbancarias();
+        Short idCuenta = Short.valueOf(cenCuentasbancariasExtendsMapper.selectMaxID(idPersona, idInstitucion).getIdMax().toString());
+        cuenta.setIdcuenta(idCuenta);
+        cuenta.setAbonosjcs("0");
+        cuenta.setFechamodificacion(new Date());
+        cuenta.setIdinstitucion(idInstitucion);
+        cuenta.setIdpersona(idPersona);
+        cuenta.setNumerocuenta(datosBancarios.getBanco());
+        cuenta.setTitular(titularCuenta);
+        cuenta.setIban(datosBancarios.getIBAN());
+
+        if (cuenta.getIban().startsWith("ES")) {
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Cuenta bancaria espaniola");
+            cuenta.setCboCodigo(datosBancarios.getIBAN().substring(4, 8));
+            cuenta.setCodigosucursal(datosBancarios.getIBAN().substring(8, 12));
+            cuenta.setDigitocontrol(datosBancarios.getIBAN().substring(12, 14));
+            cuenta.setNumerocuenta(datosBancarios.getIBAN().substring(14, 24));
+        }
+
+        CenBancosExample cenBancosExample = new CenBancosExample();
+        cenBancosExample.createCriteria().andBicEqualTo(datosBancarios.getBIC())
+                .andNombreEqualTo(datosBancarios.getBanco());
+        List<CenBancos> cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
+
+        if (null != cenBancos && !cenBancos.isEmpty()) {
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Banco existente en BBDD");
+            cuenta.setCboCodigo(cenBancos.get(0).getCodigo()); // Tanto si es ext o esp tiene cod en cenBancos
+        } else {
+
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Banco no registrado en BBDD, insertamos en CEN_BANCOS");
+            NewIdDTO newIdDTO = cenBancosExtendsMapper.getMaxCode();
+
+            CenBancos record = new CenBancos();
+
+            if (!datosBancarios.getIBAN().startsWith("ES")) {
+                log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Banco Extranjero");
+                String rdo = UtilidadesString.fillCadena(newIdDTO.getNewId(), 5, "0");
+                record.setCodigo(rdo);
+                record.setNombre("BANCO EXTRANJERO");
+            } else {
+                log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Banco Espaniol");
+                record.setCodigo(datosBancarios.getIBAN().substring(4, 8));
+                record.setNombre(datosBancarios.getBanco());
+            }
+
+            record.setBic(datosBancarios.getBIC());
+            record.setFechamodificacion(new Date());
+
+            CenPaisExample cenPaisExample = new CenPaisExample();
+            cenPaisExample.createCriteria().andCodIsoEqualTo(datosBancarios.getIBAN().substring(0, 2));
+            List<CenPais> cenPais = cenPaisExtendsMapper.selectByExample(cenPaisExample);
+
+            if (null != cenPais && !cenPais.isEmpty()) {
+                record.setIdpais(cenPais.get(0).getIdpais());
+            }
+
+            record.setUsumodificacion(0);
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Insertamos el banco");
+            cenBancosExtendsMapper.insert(record);
+
+            cuenta.setCboCodigo(record.getCodigo());
+
+        }
+        log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Insertamos cuenta bancaria");
+        cenCuentasbancariasExtendsMapper.insertSelective(cuenta);
+
+        log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() - FIN");
+        return idCuenta;
     }
 
     /**
@@ -672,5 +1028,44 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         }
 
         return idEstadoCivil;
+    }
+
+
+    /**
+     * Metodo para buscar el id de poblacion a traves de la descripcion, ya
+     * que puede venir informada la descripcion y no el id
+     *
+     * @param descripcionPoblacion
+     * @return
+     */
+    private String getIdPoblacionFromDescripcion(String descripcionPoblacion){
+        String idPoblacion = "";
+        List<CenPoblaciones> poblaciones = cenPoblacionesExtendsMapper.selectByFilter(descripcionPoblacion, null);
+        if(poblaciones != null
+            && !poblaciones.isEmpty()){
+            idPoblacion = poblaciones.get(0).getIdpoblacion();
+        }
+        return idPoblacion;
+    }
+
+    /**
+     * Metodo para buscar el ID Pais desde su codigo ISO, que es el que recibiremos en la peticion
+     *
+     * @param ISOPais
+     * @return
+     */
+    private String getIdPaisFromCodISO(String ISOPais){
+        String idPais = "";
+        CenPaisExample cenPaisExample = new CenPaisExample();
+        cenPaisExample.createCriteria().andCodIsoEqualTo(ISOPais);
+
+        List<CenPais> paises =  cenPaisExtendsMapper.selectByExample(cenPaisExample);
+
+        if(paises != null
+            && !paises.isEmpty()){
+            idPais = paises.get(0).getIdpais();
+        }
+
+        return idPais;
     }
 }

@@ -457,5 +457,37 @@ public class UtilidadesString {
 			retorno=texto.substring(inicio+marcaInicial.length(),fin);
 		}
 		return retorno;
-	} 
+	}
+
+	/**
+	 * Metodo de utilidad para rellenar una cadena size veces con el caracter filler
+	 *
+	 * @param text
+	 * @param size
+	 * @param filler
+	 * @return
+	 */
+	public static String fillCadena(String text, int size, String filler){
+		String cadena = "";
+
+		if (!esCadenaVacia(text) && !esCadenaVacia(filler)) {
+			if (text != "") {
+				int lengthCad = size - text.length();
+
+				if (lengthCad == 0 || lengthCad < 0) {
+					return text;
+				} else if (lengthCad >= 1) {
+					for (int i = 0; i < lengthCad; i++) {
+						cadena += filler;
+					}
+
+					return cadena + text;
+				}
+			} else {
+				return text;
+			}
+		}
+
+		return text;
+	}
 }

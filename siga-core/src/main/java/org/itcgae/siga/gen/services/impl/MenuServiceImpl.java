@@ -68,6 +68,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.exp.mappers.ExpProcedimientosExeaExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.UserCgae;
@@ -139,6 +140,9 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
+
+	@Autowired
+	private ExpProcedimientosExeaExtendsMapper expProcedimientosExeaExtendsMapper;
 
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -270,6 +274,22 @@ public class MenuServiceImpl implements IMenuService {
 					}
 				}
 
+			}
+
+			//Miramos si trae la opcion de menu Expedientes EXEA, si es así pero el colegio no tiene procedimientos de EXEA configurados o no tiene ninguno de colegiacion, la quitamos
+			if(items != null && !items.isEmpty()
+				&&  items.stream().anyMatch(menuItem -> SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel()))){
+
+				ExpProcedimientosExeaExample expProcedimientosExeaExample = new ExpProcedimientosExeaExample();
+				expProcedimientosExeaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+				List<ExpProcedimientosExea> procedimientosExea = expProcedimientosExeaExtendsMapper.selectByExample(expProcedimientosExeaExample);
+				//Si la institucion no tiene procedimientos de EXEA o no tiene ninguno que sea de colegiacion, quitamos la opcion de menu EXPEDIENTES EXEA
+				if(procedimientosExea == null
+					|| procedimientosExea.isEmpty()
+					|| !procedimientosExea.stream().anyMatch(procedimiento -> 1 == procedimiento.getEsColegiacion())){
+
+						items = items.stream().filter(menuItem -> !SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel())).collect(Collectors.toList());
+				}
 			}
 			response.setMenuItems(items);
 		}
