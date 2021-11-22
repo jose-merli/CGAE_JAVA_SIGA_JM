@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
@@ -27,6 +28,7 @@ import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
 import org.itcgae.siga.DTO.fac.UsosSufijosItem;
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -41,6 +43,7 @@ import org.itcgae.siga.db.entities.CenSucursalesExample;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefactur;
+import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
@@ -54,8 +57,10 @@ import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
 import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefac;
 import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefacExample;
 import org.itcgae.siga.db.entities.FacTiposproduincluenfactu;
+import org.itcgae.siga.db.entities.FacTiposproduincluenfactuExample;
 import org.itcgae.siga.db.entities.FacTiposproduincluenfactuKey;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfact;
+import org.itcgae.siga.db.entities.FacTiposservinclsenfactExample;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
@@ -216,9 +221,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public UpdateResponseDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
-												   HttpServletRequest request) throws Exception {
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+	public InsertResponseDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+										HttpServletRequest request) throws Exception {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		AdmUsuarios usuario = new AdmUsuarios();
 		FacBancoinstitucion record = new FacBancoinstitucion();
@@ -277,12 +282,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			facBancoinstitucionExtendsMapper.insertSelective(record);
 
-			updateResponseDTO.setId(newBancosCodigo);
+			insertResponseDTO.setId(newBancosCodigo);
 		}
 
 		LOGGER.info("insertaCuentaBancaria() -> Salida del servicio para crear una cuenta bancaria");
 
-		return updateResponseDTO;
+		return insertResponseDTO;
 	}
 
 	@Override
@@ -485,12 +490,44 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 									"eliminaSerieFacturacion() -> Baja física de la serie de facturación con idseriefacturacion="
 											+ serieFacturacion.getIdSerieFacturacion());
 
+							// Elimina la asociación con cuenta bancaria
 							FacSeriefacturacionBancoKey seriefacturacionBancoKey = new FacSeriefacturacionBancoKey();
 							seriefacturacionBancoKey.setIdinstitucion(usuario.getIdinstitucion());
 							seriefacturacionBancoKey.setIdseriefacturacion(idSerieFacturacion);
 							seriefacturacionBancoKey.setBancosCodigo(serieFacturacion.getIdCuentaBancaria());
 
+							// Eliminamos las asociaciones con Productos
+							FacTiposproduincluenfactuExample prodExample = new FacTiposproduincluenfactuExample();
+							prodExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+									.andIdseriefacturacionEqualTo(idSerieFacturacion);
+
+							// Eliminamos las asociaciones con Servicios
+							FacTiposservinclsenfactExample servExample = new FacTiposservinclsenfactExample();
+							prodExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+									.andIdseriefacturacionEqualTo(idSerieFacturacion);
+
+							// Eliminamos las asociaciones con Etiquetas
+							FacTipocliincluidoenseriefacExample etiqExample = new FacTipocliincluidoenseriefacExample();
+							prodExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+									.andIdseriefacturacionEqualTo(idSerieFacturacion);
+
+							// Eliminamos las asociaciones con destinatarios individuales
+							FacClienincluidoenseriefacturExample destExample = new FacClienincluidoenseriefacturExample();
+							prodExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+									.andIdseriefacturacionEqualTo(idSerieFacturacion);
+
+							// Eliminamos las asociaciones con formas de pago
+							FacFormapagoserieExample formapagoExample = new FacFormapagoserieExample();
+							formapagoExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+									.andIdseriefacturacionEqualTo(idSerieFacturacion);
+
 							facSeriefacturacionBancoMapper.deleteByPrimaryKey(seriefacturacionBancoKey);
+							facTiposproduincluenfactuExtendsMapper.deleteByExample(prodExample);
+							facTiposservinclsenfactExtendsMapper.deleteByExample(servExample);
+							facTipocliincluidoenseriefacExtendsMapper.deleteByExample(etiqExample);
+							facClienincluidoenseriefacturMapper.deleteByExample(destExample);
+							facFormapagoserieExtendsMapper.deleteByExample(formapagoExample);
+
 							facSeriefacturacionExtendsMapper.deleteByPrimaryKey(seriefacturacionKey);
 						} else {
 							LOGGER.info(
@@ -876,9 +913,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			FacTipocliincluidoenseriefac etiqueta = null;
 			Long idSerie = Long.parseLong(etiquetas.getIdSerieFacturacion());
 
-			// Borra las formas de pago anteriores
-			// facFormapagoserieExtendsMapper.deleteByExample(formapagoExample);
-
 			for (ComboItem item : etiquetas.getNoSeleccionados()) {
 				Short idGrupo = Short.parseShort(item.getValue());
 
@@ -1196,9 +1230,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public UpdateResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request)
+	public InsertResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request)
 			throws Exception {
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 
 		AdmUsuarios usuario = new AdmUsuarios();
 
@@ -1258,12 +1292,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			facSeriefacturacionExtendsMapper.updateByPrimaryKey(serieToUpdate);
 
-			updateResponseDTO.setId(idContador);
+			insertResponseDTO.setId(idContador);
 		}
 
 		LOGGER.info("guardarContadorSerie() -> Salida del servicio para crear un nuevo contador");
 
-		return updateResponseDTO;
+		return insertResponseDTO;
 	}
 
 	private String getNextIdContador(Short idInstitucion, String idSerieFacturacion, Boolean isRectificativa) {
