@@ -716,22 +716,20 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
 		}
 		//REVISAR: No se busca correctamente con alos anteriores al 2000
-		else{
-			if (filtro.getFechaSolicitudDesde() != null) {
-				DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
-				DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
-				String strDate = dateFormatSql
-						.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
-				sql.WHERE("pet.fecha >= to_date('" + strDate + "','dd/MM/YY')");
-			}
+		if (filtro.getFechaSolicitudDesde() != null) {
+			DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
+			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
+			String strDate = dateFormatSql
+					.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
+			sql.WHERE("pet.fecha >= to_date('" + strDate + "','dd/MM/YY')");
+		}
 	
-			if (filtro.getFechaSolicitudHasta() != null) {
-				DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
-				DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
-				String strDate = dateFormatSql
-						.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
-				sql.WHERE("pet.fecha <= to_date('" + strDate + "','dd/MM/YY')");
-			}
+		if (filtro.getFechaSolicitudHasta() != null) {
+			DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
+			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
+			String strDate = dateFormatSql
+					.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
+			sql.WHERE("pet.fecha <= to_date('" + strDate + "','dd/MM/YY')");
 		}
 		
 		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
