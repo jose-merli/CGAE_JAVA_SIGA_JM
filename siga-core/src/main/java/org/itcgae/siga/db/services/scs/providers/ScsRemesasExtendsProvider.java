@@ -89,13 +89,13 @@ public class ScsRemesasExtendsProvider {
 		subquery7.FROM("cajg_ejgremesa ejgr");
 		subquery7.WHERE("ejgr.idremesa= rem.idremesa");
 		subquery7.WHERE("ejgr.idinstitucion = rem.idinstitucion");
-		subquery7.WHERE("numero like '%" + remesasBusquedaItem.getNumeroEJG() + "%'");
+		subquery7.WHERE("ejgr.numero = " + remesasBusquedaItem.getNumeroEJG());
 
 		subquery8.SELECT("1");
 		subquery8.FROM("cajg_ejgremesa ejgr");
 		subquery8.WHERE("ejgr.idremesa= rem.idremesa");
 		subquery8.WHERE("ejgr.idinstitucion = rem.idinstitucion");
-		subquery8.WHERE("anio = " + remesasBusquedaItem.getAnnioEJG());
+		subquery8.WHERE("ejgr.anio = " + remesasBusquedaItem.getAnnioEJG());
 
 		fechaGeneracion.SELECT("fecharemesa");
 		fechaGeneracion.FROM("cajg_remesaestados est");
@@ -201,7 +201,7 @@ public class ScsRemesasExtendsProvider {
 		}
 
 		if (remesasBusquedaItem.getEstado() != null) {
-			sql.WHERE("est.idestado like '%" + remesasBusquedaItem.getEstado() + "%'"); // estado
+			sql.WHERE("est.idestado = " + remesasBusquedaItem.getEstado()); // estado
 		}
 		
 		if(remesasBusquedaItem.getIdRemesa() != 0) {

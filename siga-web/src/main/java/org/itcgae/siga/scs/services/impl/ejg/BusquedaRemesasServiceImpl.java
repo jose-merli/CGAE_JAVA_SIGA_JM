@@ -1070,7 +1070,11 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			if(ecomOperacionTipoaccion != null && ecomOperacionTipoaccion.size() > 0) {
 				ecomCola.setIdinstitucion(idinstitucion);
 				if(remesaAccionItem.isInformacionEconomica()) {
-					ecomCola.setIdoperacion(59); //VALIDAR REMESA PARA ALCALA Y REMESA INFORMACIÓN ECONÓMICA
+					if(remesaAccionItem.getAccion() == 1) {
+						ecomCola.setIdoperacion(59); //VALIDAR REMESA PARA ALCALA Y REMESA INFORMACIÓN ECONÓMICA
+					}else{
+						ecomCola.setIdoperacion(48); //ENVIAR REMESA PARA ALCALA Y REMESA INFORMACIÓN ECONÓMICA
+					}
 				}else {
 					ecomCola.setIdoperacion(ecomOperacionTipoaccion.get(0).getIdoperacion());
 				}
@@ -1115,6 +1119,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			error.setCode(400);
 			error.setDescription("Se ha producido un error en la validación de los expedientes.");
 			insertResponseDTO.setStatus(SigaConstants.KO);
+			insertResponseDTO.setId(String.valueOf(remesaAccionItem.getIdRemesa()));
 			insertResponseDTO.setError(error);
 			throw e;
 		}
@@ -1248,9 +1253,10 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				insertResponseDTO.setError(error);
 				LOGGER.error("La operación ya se está ejecutando para la remesa.");
 			} else {
-				
 				insertResponseDTO = insertaColaConParametros(ecomCola, mapa);
 			}
+			
+			insertResponseDTO.setId(String.valueOf(cajgRemesaKey.getIdremesa()));
 		}catch(Exception e) {
 			error.setCode(400);
 			error.setDescription("Se ha producido un error en la inserción en la tabla ECOM_COLA O ECOM_COLA_PARAMETRO");
