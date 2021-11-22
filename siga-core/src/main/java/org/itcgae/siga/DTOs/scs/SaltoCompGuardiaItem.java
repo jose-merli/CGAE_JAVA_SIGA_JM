@@ -23,7 +23,7 @@ public class SaltoCompGuardiaItem {
 	private String fechaUso;
 	private String grupo;
 	private boolean historico;
-	private List<String> letradosGrupo;
+	private List<SaltoCompGuardiaLetradoGrupoDTO> letradosGrupo;
 	private String fechaAnulacion;
 	private List<ComboItem> comboGuardia;
 	private List<ComboItem> comboColegiados;
@@ -60,11 +60,17 @@ public class SaltoCompGuardiaItem {
 		this.fechaAnulacion = fechaAnulacion;
 	}
 
-	public List<String> getLetradosGrupo() {
+	/**
+	 * @return the letradosGrupo
+	 */
+	public List<SaltoCompGuardiaLetradoGrupoDTO> getLetradosGrupo() {
 		return letradosGrupo;
 	}
 
-	public void setLetradosGrupo(List<String> letradosGrupo) {
+	/**
+	 * @param letradosGrupo the letradosGrupo to set
+	 */
+	public void setLetradosGrupo(List<SaltoCompGuardiaLetradoGrupoDTO> letradosGrupo) {
 		this.letradosGrupo = letradosGrupo;
 	}
 
@@ -186,6 +192,17 @@ public class SaltoCompGuardiaItem {
 
 	public void setGrupo(String grupo) {
 		this.grupo = grupo;
+	}
+
+	@Override
+	public String toString() {
+		return "SaltoCompGuardiaItem [idPersona=" + idPersona + ", idGuardia=" + idGuardia + ", idTurno=" + idTurno
+				+ ", turno=" + turno + ", guardia=" + guardia + ", idSaltosTurno=" + idSaltosTurno + ", colegiadoGrupo="
+				+ colegiadoGrupo + ", letrado=" + letrado + ", saltoCompensacion=" + saltoCompensacion + ", fecha="
+				+ fecha + ", fechaDesde=" + fechaDesde + ", fechaHasta=" + fechaHasta + ", motivo=" + motivo
+				+ ", fechaUso=" + fechaUso + ", grupo=" + grupo + ", historico=" + historico + ", letradosGrupo="
+				+ letradosGrupo + ", fechaAnulacion=" + fechaAnulacion + ", comboGuardia=" + comboGuardia
+				+ ", comboColegiados=" + comboColegiados + "]";
 	}
 
 }

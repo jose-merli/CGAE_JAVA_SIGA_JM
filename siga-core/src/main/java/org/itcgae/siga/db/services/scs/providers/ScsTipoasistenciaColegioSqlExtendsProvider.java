@@ -41,6 +41,15 @@ public class ScsTipoasistenciaColegioSqlExtendsProvider extends ScsTipoasistenci
 		return sql.toString();
 	}
 	
+	public String selectTiposAsistenciaColegiado(Short idInstitucion, Integer idLenguaje, Short idTipoGuardia) {
+		
+		SQL sql = new SQL();
+		sql.SELECT("idtipoasistenciacolegio, f_siga_getrecurso(descripcion, " + idLenguaje + ") descripcion, pordefecto");
+		sql.FROM("scs_tipoasistenciacolegio");
+		sql.WHERE("scs_tipoasistenciacolegio.idinstitucion = "+idInstitucion +" AND ( EXISTS (SELECT tag.idtipoguardia FROM scs_tipoasistenciaguardia tag  WHERE ( tag.idinstitucion = scs_tipoasistenciacolegio.idinstitucion AND tag.idtipoasistenciacolegio = scs_tipoasistenciacolegio.idtipoasistenciacolegio AND tag.idtipoguardia = " + idTipoGuardia + " )) )");
+		return sql.toString();
+	}
+	
 	
 	
 	

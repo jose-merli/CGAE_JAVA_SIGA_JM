@@ -1050,43 +1050,322 @@ public class SigaConstants {
             this.id = id;
         }
 
-        public short getId() {
-            return this.id;
-        }
+	public static final long TIPO_EVENTO_INICIO_INSCRIPCION = 4;
+	public static final long TIPO_EVENTO_FIN_INSCRIPCION = 5;
+	public static final long TIPO_EVENTO_SESION = 8;
+	public static final long ESTADO_EVENTO_PLANIFICADO = 1;
 
-    }
+	public static final List<String> CAMPOSPLANTILLAEVENTOS = Arrays.asList(NIF, NOMBRE, ASISTENCIA);
 
-    public static enum ECOM_OPERACION {
-        ECOM2_INIT_PARAMETROS_GENERALES(206);
+	// CARGA MASIVA GF
 
-        public static ECOM_OPERACION getEnum(Integer codigo) {
-            for (ECOM_OPERACION sc : values()) {
-                if (sc.getId() == codigo) {
-                    return sc;
-                }
-            }
-            return null;
-        }
+	public static final String ALTA = "A";
+	public static final String BAJA = "B";
+	public static final String C_IDGRUPO = "IDGRUPO";
+	public static final String ACCION = "ACCION";
+	public static final String GENERAL = "GENERAL";
+	public static final String NOMBREGRUPO = "NOMBREGRUPO";
+	public static final String PERSONANOMBRE = "PERSONANOMBRE";
+	public static final String C_IDPERSONA = "IDPERSONA";
+	public static final String C_IDINSTITUCION = "IDINSTITUCION";
+	public static final String PERSONANIF = "PERSONANIFCIF";
+	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
+	public static final Short IDINSTITUCION_2000 = 2000;
+	public static final Short IDINSTITUCION_3500 = 3500;
+	public static final String TIPO_CARGA = "GF";
+	public static final String C_FECHAINICIO = "FECHAINICIO";
+	public static final String C_FECHAFIN = "FECHAFIN";
 
-        private int id = -1;
+	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, C_IDGRUPO, GENERAL,
+			ACCION, C_FECHAINICIO);
 
-        private ECOM_OPERACION(int id) {
-            this.id = id;
-        }
+	public static final List<String> CAMPOSLOGGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, PERSONANOMBRE,
+			C_IDPERSONA, C_IDGRUPO, GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO, ERRORES);
 
-        public int getId() {
-            return this.id;
-        }
-    }
+	public static final String tipoExcelXls = "xls";
+	public static final String tipoExcelXlsx = "xlsx";
+	public static final String nombreFicheroEjemplo = "PlantillaMasivaDatosGF";
+	public static final String nombreFicheroError = "LogErrorCargaMasivaGF";
 
-    public static enum GEN_PROPERTIES_FICHERO {
-        eCOM2_LOG4J
-    }
+	public static final String NOTA_SUSPENSO = "1";
+	public static final String NOTA_APROBADO = "2";
+	public static final String NOTA_BIEN = "3";
+	public static final String NOTA_NOTABLE = "4";
+	public static final String NOTA_SOBRESALIENTE = "5";
 
-    public static Integer USUMODIFICACION_0 = 0;
-    public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
+	// CARGA MASIVA CV
 
-    public static final String I_INFORMEFACTSJCS = "FACJ2";
+	public static final String C_IDTIPOCV = "IDTIPOCV";
+	public static final String C_CREDITOS = "CREDITOS";
+	public static final String C_IDTIPOCVSUBTIPO1 = "IDTIPOCVSUBTIPO1";
+	public static final String C_IDTIPOCVSUBTIPO2 = "IDTIPOCVSUBTIPO2";
+	public static final String TIPOCVCOD = "TIPOCVCOD";
+	public static final String SUBTIPOCV1COD = "SUBTIPOCV1COD";
+	public static final String SUBTIPOCV2COD = "SUBTIPOCV2COD";
+	public static final String TIPOCVNOMBRE = "TIPOCVNOMBRE";
+	public static final String SUBTIPOCV1NOMBRE = "SUBTIPOCV1NOMBRE";
+	public static final String SUBTIPOCV2NOMBRE = "SUBTIPOCV2NOMBRE";
+	public static final String FECHAVERIFICACION = "FECHAVERIFICACION";
+	public static final String C_DESCRIPCION = "DESCRIPCION";
+
+	public static final String nombreFicheroEjemploCV = "PlantillaMasivaDatosCV";
+
+	public static final List<String> CAMPOSEJEMPLOCV = Arrays.asList(COLEGIADONUMERO, PERSONANIF, C_FECHAINICIO,
+			C_FECHAFIN, C_CREDITOS, FECHAVERIFICACION, C_DESCRIPCION, TIPOCVCOD, SUBTIPOCV1COD, SUBTIPOCV2COD);
+	public static final List<String> CAMPOSLOGCV = Arrays.asList(COLEGIADONUMERO, PERSONANIF, PERSONANOMBRE,
+			C_IDPERSONA, C_FECHAINICIO, C_FECHAFIN, C_CREDITOS, FECHAVERIFICACION, C_DESCRIPCION, TIPOCVCOD,
+			TIPOCVNOMBRE, C_IDTIPOCV, SUBTIPOCV1COD, SUBTIPOCV1NOMBRE, C_IDTIPOCVSUBTIPO1, SUBTIPOCV2COD,
+			SUBTIPOCV2NOMBRE, C_IDTIPOCVSUBTIPO2, ERRORES);
+	public static String EVENTO_TIPO_FIESTA_NACIONAL = "Fiesta Nacional";
+
+	// CARGA MASIVA INSCRIPCIONES
+	public static final String IT_TURNO = "TURNO";
+	public static final String IT_GUARDIA = "GUARDIA";
+	public static final String IT_NCOLEGIADO = "Nº COLEGIADO";
+	public static final String IT_FECHAEFECTIVA = "FECHA EFECTIVA";
+	public static final String IT_TIPO = "TIPO";
+	public static final String IT_GRUPO = "GRUPO";
+	public static final String IT_ORDEN = "ORDEN";
+
+	public static final String nombreFicheroModeloIT = "PlantillaMasivaDatosIT";
+
+	public static final List<String> CAMPOSMODEL_IT = Arrays.asList(IT_TURNO, IT_GUARDIA, IT_NCOLEGIADO,
+			IT_FECHAEFECTIVA, IT_TIPO, IT_GRUPO, IT_ORDEN);
+	public static final List<String> CAMPOSLOGIT = Arrays.asList(IT_TURNO, IT_GUARDIA, IT_NCOLEGIADO, IT_FECHAEFECTIVA,
+			IT_TIPO, IT_GRUPO, IT_ORDEN, ERRORES);
+
+	// CARGA MASIVA BAJAS TEMPORALES
+
+	public static final String BT_NCOLEGIADO = "Nº COLEGIADO";
+	public static final String BT_NIF = "NIF";
+	public static final String BT_TIPO = "TIPO SOLICITUD";
+	public static final String BT_MOTIVO = "MOTIVO";
+	public static final String BT_FECHAI = "FECHA INICIO";
+	public static final String BT_FECHAF = "FECHA FIN";
+
+	public static final String nombreFicheroModeloBT = "PlantillaMasivaDatosBT";
+
+	public static final List<String> CAMPOSMODEL_BT = Arrays.asList(BT_NCOLEGIADO, BT_NIF, BT_TIPO, BT_MOTIVO,
+			BT_FECHAI, BT_FECHAF);
+	public static final List<String> CAMPOSLOGBT = Arrays.asList(BT_NCOLEGIADO, BT_NIF, BT_TIPO, BT_MOTIVO, BT_FECHAI,
+			BT_FECHAF, ERRORES);
+	
+	// CARGA MASIVA INSCRIPCIONES - Guardia
+		public static final String TURNO = "TURNO";
+		public static final String GUARDIAFIELD = "GUARDIA";
+		public static final String NCOLEGIADO = "Nº COLEGIADO";
+		public static final String FECHAEFECTIVA = "FECHA EFECTIVA";
+		public static final String TIPO = "TIPO";
+		public static final String GRUPO = "GRUPO";
+		public static final String ORDEN = "ORDEN";
+
+		public static final String nombreFicheroModeloI = "PlantillaMasivaDatosI";
+
+		public static final List<String> CAMPOSMODEL_I = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAEFECTIVA, TIPO, GRUPO, ORDEN);
+		public static final List<String> CAMPOSLOGI = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO, FECHAEFECTIVA,
+				TIPO, GRUPO, ORDEN, ERRORES);
+		// CARGA MASIVA GRUPOS COLA - Guardia
+		public static final String nombreFicheroModeloGC = "PlantillaMasivaDatosGC";
+		public static final List<String> CAMPOSMODEL_GC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				 GRUPO, ORDEN);
+		public static final List<String> CAMPOSLOGGC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				 GRUPO, ORDEN, ERRORES);
+		// CARGA MASIVA CALENDARIOS - Guardia
+
+		public static final String FECHAI = "FECHA INICIO";
+		public static final String FECHAF = "FECHA FIN";
+
+		public static final String nombreFicheroModeloC = "PlantillaMasivaDatosC";
+
+		public static final List<String> CAMPOSMODEL_C = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAI, FECHAF);
+		public static final List<String> CAMPOSLOGC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAI, FECHAF, ERRORES);
+	// AGENDA
+	public static final long CALENDARIO_GENERAL = 1;
+	public static final long CALENDARIO_LABORAL = 2;
+	public static final long CALENDARIO_FORMACION = 3;
+
+	// AVISOS PARA NOTIFICACIONES EN EVENTOS
+	public static final String AVISO_CANCELAR_CURSO = "1";
+	public static final String AVISO_MODIFICAR_CURSO = "2";
+	public static final String AVISO_PLAZAS_DISPONIBLES = "3";
+	public static final String AVISO_CANCELAR_SESION = "4";
+	public static final String AVISO_MODIFICAR_SESION = "5";
+
+	// NOTIFICACIONES
+	public static final long NOTIFICACION_TIPOCUANDO_ANTES = 1;
+	public static final long NOTIFICACION_TIPOCUANDO_DESPUES = 2;
+
+	public static final long NOTIFICACION_HORAS = 1;
+	public static final long NOTIFICACION_MINUTOS = 2;
+	public static final long NOTIFICACION_DIAS = 3;
+
+	// SOLICITUD INCORPORACION
+	public static final String TIPO_DIR_RESIDENCIA = "1";
+	public static final String TIPO_DIR_DESPACHO = "2";
+	public static final String TIPO_DIR_CENSOWEB = "3";
+	public static final String TIPO_DIR_PUBLICA = "4";
+	public static final String TIPO_DIR_GUIAJUDICIAL = "5";
+	public static final String TIPO_DIR_GUARDIA = "6";
+	public static final String TIPO_DIR_REVISTA = "7";
+	public static final String TIPO_DIR_FACTURACION = "8";
+	public static final String TIPO_DIR_TRASPASO = "9";
+	public static final String TIPO_DIR_PREFERENTE_EMAIL = "10";
+	public static final String TIPO_DIR_PREFERENTE_CORREO = "11";
+	public static final String TIPO_DIR_PREFERENTE_SMS = "12";
+	public static final String TIPO_DIR_PREFERENTE_FAX = "13";
+	public static final String TIPO_DIR_FORMACION = "14";
+
+	public static final String DIR_PREFERENTE_EMAIL = "E";
+	public static final String DIR_PREFERENTE_CORREO = "C";
+	public static final String DIR_PREFERENTE_SMS = "S";
+	public static final String DIR_PREFERENTE_FAX = "F";
+
+	public static final short REINCORPORACION_EJERCIENTE = 10;
+	public static final short REINCORPORACION_NO_EJERCIENTE = 20;
+	public static final short INCORPORACION_EJERCIENTE = 30;
+	public static final short INCORPORACION_NO_EJERCIENTE = 40;
+
+	public static final long TIPO_NOTIFICACION_INICIOINSCRIPCION = 3;
+	public static final long TIPO_NOTIFICACION_FININSCRIPCION = 4;
+	public static final long TIPO_NOTIFICACION_SESION = 7;
+
+	public static final String CENSO_WS_SITUACION_EJERCIENTE = "EJERCIENTE";
+	public static final String CENSO_WS_SITUACION_NOEJERCIENTE = "NOEJERCIENTE";
+	public static final String CENSO_WS_SITUACION_BAJACOLEGIO = "BAJACOLEGIO";
+	public static final String CENSO_WS_SITUACION_INSCRITO = "INSCRITO";
+
+	public static enum PARAMETRO_GENERAL {
+		MAX_FILE_SIZE("10485760");
+
+		private String valor = null;
+
+		private PARAMETRO_GENERAL(String valor) {
+			this.valor = valor;
+		}
+
+		public final String getValor() {
+			return this.valor;
+		}
+
+		public void setValor(String valor) {
+			this.valor = valor;
+		}
+	}
+
+	public static enum GEN_PARAMETROS {
+		PATH_DOCUMENTOSADJUNTOS
+	}
+
+	public static String DATEST_FORMAT_MIN = "dd/MM/yyyy HH:mm";
+	public static String DATEST_FORMAT_MIN_SEC = "dd/MM/yyyy HH:mm:ss";
+	public static String DATEST_FORMAT_ONLYDATE = "dd/MM/yyyy";
+
+	public static DateFormat DATE_FORMAT_MIN = new SimpleDateFormat(DATEST_FORMAT_MIN);
+	public static DateFormat DATE_FORMAT = new SimpleDateFormat(DATEST_FORMAT_ONLYDATE);
+
+	public static String[] columnsExcelLogEnvios = new String[] { "ENVIO", "DESCRIPCION", "FECHA ENVÍO", "REMITENTE",
+			"CORREO REMITENTE", "NIF/CIF", "NOMBRE", "APELLIDO 1", "APELLIDO 2", "MOVIL", "CORREO ELECTRONICO",
+			"MENSAJE", "DOCUMENTOS" };
+
+	public static String ENVIOS_MASIVOS_LOG_NOMBRE_FICHERO = "informeEnvio.log";
+
+	public static enum ENVIOS_MASIVOS_LOG_EXTENSION {
+		xls, xlsx
+	}
+
+	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
+	public static String EXPRESION_REGULAR_MAIL2 = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+	public static String EVENTO_TIPO_FESTIVO = "9";
+
+	public static final String JUSTICIABLE_ROL_SOLICITANTE = "1";
+	public static final String JUSTICIABLE_ROL_CONTRARIO = "2";
+	public static final String JUSTICIABLE_ROL_REPRESENTANTE = "3";
+	public static final String JUSTICIABLE_ROL_UNIDADFAMILIAR = "4";
+
+	public static final String TIPO_ASUNTO_EJG = "E";
+	public static final String TIPO_ASUNTO_DESIGNA = "D";
+	public static final String TIPO_ASUNTO_ASISTENCIA = "A";
+	public static final String TIPO_ASUNTO_SOJ = "S";
+
+	public static final String TIPO_ESTADO_EJG_DICTAMINADO = "6";
+	public static final String TIPO_ESTADO_EJG_RESUELTO_COMISION = "10";
+	public static final String TIPO_ESTADO_EJG_RESUELTA_IMPUGNACION = "13";
+
+	public static final String SCS_JUSTICIABLE = "0";
+	public static final String SCS_SOLICITANTE_EJG = "1";
+	public static final String SCS_UNIDAD_FAMILIAR_EJG = "2";
+	public static final String SCS_CONTRARIO_EJG = "3";
+	public static final String SCS_CONTRARIO_DESIGNACION = "4";
+	public static final String SCS_CONTRARIO_ASISTENCIA = "5";
+	public static final String SCS_SOLICITANTE_DESIGNACION = "6";
+	public static final String SCS_SOLICITANTE_ASISTENCIA = "7";
+	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
+	public static final String ROL_SOLICITANTE_EJG = "SE";
+	public static final String ROL_SOLICITANTE_ASISTENCIA = "SA";
+	public static final String ROL_SOLICITANTE_DESIGNACION = "SD";
+	public static final String ROL_UNIDAD_FAMILIAR_EJG = "UE";
+	public static final String ROL_CONTRARIO_EJG = "CE";
+	public static final String ROL_CONTRADIO_DESIGNACION = "CD";
+	public static final String ROL_CONTRARIO_ASISTENCIA = "CA";
+	public static final String ROL_REPRESENTANTE = "RE";
+
+	public static final Short ID_INSTITUCION_0 = 0;
+
+	public static enum ECOM_ESTADOSCOLA {
+		INICIAL((short) 1), EJECUTANDOSE((short) 2), REINTENTANDO((short) 3), ERROR((short) 4), FINAL((short) 5),
+		ERROR_VALIDACION((short) 6);
+
+		private short id = -1;
+
+		ECOM_ESTADOSCOLA(short id) {
+			this.id = id;
+		}
+
+		public short getId() {
+			return this.id;
+		}
+
+	}
+
+	public static enum ECOM_OPERACION {
+		ECOM2_INIT_PARAMETROS_GENERALES(206);
+
+		public static ECOM_OPERACION getEnum(Integer codigo) {
+			for (ECOM_OPERACION sc : values()) {
+				if (sc.getId() == codigo) {
+					return sc;
+				}
+			}
+			return null;
+		}
+
+		private int id = -1;
+
+		private ECOM_OPERACION(int id) {
+			this.id = id;
+		}
+
+		public int getId() {
+			return this.id;
+		}
+	}
+
+	public static enum GEN_PROPERTIES_FICHERO {
+		eCOM2_LOG4J
+	}
+
+	public static Integer USUMODIFICACION_0 = 0;
+	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
+	
+	public static final String TAM_MAX_CONSULTA_JG = "TAM_MAX_CONSULTA_JG";
+	
+
+	public static final String I_INFORMEFACTSJCS = "FACJ2";
 
     // hitos generales de facturacion
 
@@ -1189,7 +1468,5 @@ public class SigaConstants {
 	public static final String TIPO_SOPORTE_CARTUCHO = "C";
 	public static final String TIPO_SOPORTE_TELEMATICO = "T";
 	public static final String TIPO_SOPORTE_DISQUETE = "D";
-	public static final String PATH_IMPRESO190 = "PATH_IMPRESO190";
-    
-
+	public static final String PATH_IMPRESO190 = "PATH_IMPRESO190";    
 }

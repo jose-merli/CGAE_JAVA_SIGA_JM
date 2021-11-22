@@ -12,6 +12,7 @@ public class UnidadFamiliarEJGItem {
     private String uf_numero;
     private String uf_idPersona;
     private String uf_solicitante;
+    private String solicitantePpal;
     private String uf_enCalidad;
     private String pjg_nif;
     private String pjg_nombrecompleto;
@@ -561,6 +562,14 @@ public class UnidadFamiliarEJGItem {
 
 	public void setNifRepresentante(String nifRepresentante) {
 		this.nifRepresentante = nifRepresentante;
+	}
+
+	public String getSolicitantePpal() {
+		return solicitantePpal;
+	}
+
+	public void setSolicitantePpal(String solicitantePpal) {
+		this.solicitantePpal = solicitantePpal;
 	}
 
 	
