@@ -563,12 +563,20 @@ public class ColaEnviosImpl implements IColaEnvios {
 	protected void insertaEnvDestinatarios(EnvEnvios etiquetasDTO, CenDirecciones direccion, CenGruposclienteCliente cenPersona) {
 
 		try {
+
 			EnvDestinatariosExample ejemplo = new EnvDestinatariosExample();
-			ejemplo.createCriteria().andIdinstitucionEqualTo(cenPersona.getIdinstitucion())
-					.andIdenvioEqualTo(etiquetasDTO.getIdenvio())
-					.andIdpersonaEqualTo(cenPersona.getIdpersona());
 				
-			
+			if(direccion.getCorreoelectronico() == null) {
+				ejemplo.createCriteria().andIdinstitucionEqualTo(cenPersona.getIdinstitucion())
+				.andIdenvioEqualTo(etiquetasDTO.getIdenvio())
+				.andIdpersonaEqualTo(cenPersona.getIdpersona());
+			}else {
+				ejemplo.createCriteria().andIdinstitucionEqualTo(cenPersona.getIdinstitucion())
+	            .andIdenvioEqualTo(etiquetasDTO.getIdenvio())
+	            .andIdpersonaEqualTo(cenPersona.getIdpersona())
+		        .andCorreoelectronicoEqualTo(direccion.getCorreoelectronico());
+			}
+
 			List<EnvDestinatarios> destinatariosExistentes = _envDestinatariosMapper
 					.selectByExample(ejemplo);
 	
