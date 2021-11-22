@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.mappers;
 
-import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Insert;
@@ -16,6 +15,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionExample;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
+
+import java.util.List;
 
 public interface FcsFactEstadosfacturacionMapper {
 

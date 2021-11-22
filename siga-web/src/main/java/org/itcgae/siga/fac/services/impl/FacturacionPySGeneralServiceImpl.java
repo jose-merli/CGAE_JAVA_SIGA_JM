@@ -1,11 +1,5 @@
 package org.itcgae.siga.fac.services.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -25,7 +19,6 @@ import org.itcgae.siga.db.entities.PysProductosExample;
 import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
-import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -37,16 +30,22 @@ import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacEstadoconfirmfactExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FactEstadosfacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
-import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionPySGeneralService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralService {
@@ -106,6 +105,12 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private FacEstadoconfirmfactExtendsMapper facEstadoconfirmfactExtendsMapper;
+
+	@Autowired
+	private FactEstadosfacturaExtendsMapper factEstadosfacturaExtendsMapper;
+
+	@Autowired
+	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
 
 	@Override
 	public ComboDTO comboCuentasBancarias(HttpServletRequest request) throws Exception {
@@ -528,39 +533,39 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	}
 
 	@Override
-	public ComboDTO getFormasPagosDisponiblesSeries(HttpServletRequest request) throws Exception {
+	public ComboDTO comboFormasPagoFactura(HttpServletRequest request) throws Exception {
 		ComboDTO comboDTO = new ComboDTO();
 
 		List<ComboItem> comboItems;
 		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug(
-				"getFormasPagosDisponiblesSeries() -> Entrada al servicio para recuperar todas las formas de pago");
+				"comboFormasPagoFactura() -> Entrada al servicio para recuperar todas las formas de pago");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
 
 		if (usuario != null) {
 			LOGGER.debug(
-					"comboPlantillasEnvio() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Entrada a pysFormapagoExtendsMapper para obtener todas las formas de pago");
+					"comboFormasPagoFactura() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Entrada a pysFormapagoExtendsMapper para obtener todas las formas de pago");
 
 			// Logica
 			String idioma = usuario.getIdlenguaje();
 			comboItems = pysFormapagoExtendsMapper.getWayToPayWithIdFormapago(idioma);
 
 			LOGGER.debug(
-					"comboPlantillasEnvio() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Saliendo de pysFormapagoExtendsMapper para obtener todas las formas de pago");
+					"comboFormasPagoFactura() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Saliendo de pysFormapagoExtendsMapper para obtener todas las formas de pago");
 
 			comboDTO.setCombooItems(comboItems);
 		}
 
-		LOGGER.debug("getFormasPagosDisponiblesSeries() -> Salida del servicio para obtener todas las formas de pago");
+		LOGGER.debug("comboFormasPagoFactura() -> Salida del servicio para obtener todas las formas de pago");
 
 		return comboDTO;
 	}
 
 	@Override
-	public ComboDTO getFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception {
+	public ComboDTO comboFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception {
 		ComboDTO comboDTO = new ComboDTO();
 
 		List<ComboItem> comboItems;
@@ -734,6 +739,66 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		}
 
 		LOGGER.debug("comboEstadosFact() -> Salida del servicio recuperar el combo de estados con tipo=" + tipo);
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboEstadosFacturas(HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+
+		AdmUsuarios usuario = new AdmUsuarios();
+		List<ComboItem> comboItems;
+
+		LOGGER.debug("comboEstadosFacturas() -> Entrada al servicio para recuperar el combo de estados facturas");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"comboEstadosFacturas() / facEstadoconfirmfactExtendsMapper.comboEstadosFacturas() -> Entrada a facEstadoconfirmfactExtendsMapper para obtener combo de estados de facturas");
+
+			String idioma = usuario.getIdlenguaje();
+
+			// Logica
+			comboItems = factEstadosfacturaExtendsMapper.comboEstadosFacturas(idioma);
+
+			comboDTO.setCombooItems(comboItems);
+
+		}
+
+		LOGGER.debug("comboEstadosFacturas() -> Salida del servicio recuperar el combo de estados facturas");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboFacturaciones(HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+
+		AdmUsuarios usuario = new AdmUsuarios();
+		List<ComboItem> comboItems;
+
+		LOGGER.debug("comboFacturaciones() -> Entrada al servicio para recuperar el combo de formas de pagos para facturas");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"comboFacturaciones() / facEstadoconfirmfactExtendsMapper.comboFormasPagoFactura() -> Entrada a facEstadoconfirmfactExtendsMapper para obtener combo de formas de pagos para facturas");
+
+			Short idInstitucion = usuario.getIdinstitucion();
+
+			// Logica
+			comboItems = facFacturacionprogramadaExtendsMapper.comboFacturaciones(idInstitucion);
+
+			comboDTO.setCombooItems(comboItems);
+
+		}
+
+		LOGGER.debug("comboFacturaciones() -> Salida del servicio recuperar el combo de formas de pagos para facturas");
 
 		return comboDTO;
 	}
