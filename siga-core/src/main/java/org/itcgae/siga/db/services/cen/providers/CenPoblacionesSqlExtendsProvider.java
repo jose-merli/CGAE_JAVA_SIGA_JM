@@ -40,7 +40,7 @@ public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
 			sql.WHERE("IDPROVINCIA ='" + idProvincia + "'");
 		}
 		sql.WHERE(filtroTextoBusquedas("NOMBRE", filtro));
-		sql.ORDER_BY("NOMBRE");
+		sql.ORDER_BY("PRIORIDAD, NOMBRE");
 
 		return sql.toString();
 		

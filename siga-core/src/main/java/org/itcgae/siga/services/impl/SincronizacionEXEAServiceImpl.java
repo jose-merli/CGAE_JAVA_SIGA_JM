@@ -230,7 +230,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             boolean isReincorporacion = TipoBoolean.X_1.equals(request.getColegiado().getColegiacion().getReincorporacion());
             int situacionPrevia = request.getColegiado().getColegiacion().getSituacionPrevia().intValue();
             TipoColegiacionType.Enum tipoColegiacionType = request.getColegiado().getColegiacion().getTipoSolicitud();
-            Long idPersona, idDireccion = null;
+            Long idPersona, idDireccion;
             Short idCuenta = null;
 
             int affectedRows = 0;
@@ -247,39 +247,74 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             if(idInstitucion != null) {
                 if (UtilidadesString.esCadenaVacia(numColegiado)) {
 
-                    //Insertamos/updateamos los datos personales en CEN_PERSONA
-                    idPersona = insertarDatosPersonales(request.getColegiado().getDatosPersonales(), idInstitucion);
-
-                    affectedRows += insertarDatosCliente(idPersona, idInstitucion);
-
-                    idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud(), idPersona);
-
-                    affectedRows += insertarDatosColegiado(request.getColegiado().getColegiacion(), idInstitucion, idPersona, numColegiado, request.getNumeroExpediente());
-
-                    if(request.getColegiado().getDatosBancarios() != null
-                        && !UtilidadesString.esCadenaVacia(request.getColegiado().getDatosBancarios().getIBAN())){
-                        idCuenta = insertarDatosBancarios(request.getColegiado().getDatosBancarios(), idPersona, idInstitucion, request.getColegiado().getDatosPersonales());
+                    if(isReincorporacion){
+                        ErrorType errorType = response.addNewError();
+                        errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.COLEGIO_NOVALIDO.name());
+                        errorType.setDescripcion("No puede llevarse a cabo una reincorporacion si no viene informado el numero de colegiado");
+                        errorType.setXmlRequest("Sin error XML");
+                        log.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / No se puede llevar a cabo una reincorporacion sin el numero de colegiado");
                     }else{
-                        //TODO: ejecutarPL_RevisionSuscripcionesLetrado ?
-                    }
+                        log.info("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / No viene informado el numColegiado, insertamos datos y creamos el colegiado");
 
+                        //Insertamos/updateamos los datos personales en CEN_PERSONA
+                        idPersona = insertarDatosPersonales(request.getColegiado().getDatosPersonales(), idInstitucion);
+
+                        affectedRows += insertarDatosCliente(idPersona, idInstitucion);
+
+                        idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud(), idPersona);
+
+                        affectedRows += insertarDatosColegiado(request.getColegiado().getColegiacion(), idInstitucion, idPersona, numColegiado, request.getNumeroExpediente());
+
+                        if(request.getColegiado().getDatosBancarios() != null
+                                && !UtilidadesString.esCadenaVacia(request.getColegiado().getDatosBancarios().getIBAN())){
+                            idCuenta = insertarDatosBancarios(request.getColegiado().getDatosBancarios(), idPersona, idInstitucion, request.getColegiado().getDatosPersonales());
+                        }else{
+                            //TODO: ejecutarPL_RevisionSuscripcionesLetrado ?
+                        }
+
+                        if(idPersona != null && idDireccion != null && affectedRows > 0){
+                            response.setNumeroExpediente(request.getNumeroExpediente());
+                        }else{
+                            ErrorType errorType = response.addNewError();
+                            errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.name());
+                            errorType.setDescripcion("Ocurrio un error al crear el nuevo colegiado");
+                            errorType.setXmlRequest("Sin error XML");
+                            log.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / Error al crear el nuevo colegiado - idPersona: " + idPersona + " - idDireccion: " + idDireccion + " - affectedRows: " + affectedRows);
+                        }
+                    }
                 //Si viene informado el numColegiado puede que se trate de una reincorporacion, si no, lanzamos error
                 } else {
-                    List<ColegiadoJGItem> colegiadoJGItems = cenPersonaExtendsMapper.busquedaColegiadoExpress(numColegiado,idInstitucion.toString());
+                    CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+                    List<CenColegiado> cenColegiados;
+                    if (TipoColegiacionType.E.equals(request.getColegiado().getColegiacion().getTipoSolicitud())
+                            || TipoColegiacionType.N.equals(request.getColegiado().getColegiacion().getTipoSolicitud())) {
+                        cenColegiadoExample.createCriteria()
+                                .andNcolegiadoEqualTo(numColegiado)
+                                .andIdinstitucionEqualTo(idInstitucion)
+                                .andComunitarioEqualTo("0");
+                        //Inscrito
+                    } else if (TipoColegiacionType.I.equals(request.getColegiado().getColegiacion().getTipoSolicitud())) {
+                        cenColegiadoExample.createCriteria()
+                                .andNcomunitarioEqualTo(numColegiado)
+                                .andIdinstitucionEqualTo(idInstitucion)
+                                .andComunitarioEqualTo("1");
+                    }
 
-                    if(colegiadoJGItems != null
-                        && !colegiadoJGItems.isEmpty()){
+                    cenColegiados = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
 
-                        ColegiadoJGItem colegiado = colegiadoJGItems.get(0);
+                    if(cenColegiados != null
+                        && !cenColegiados.isEmpty()){
+
+                        CenColegiado colegiado = cenColegiados.get(0);
 
                         if(isReincorporacion
                                 && situacionPrevia != 1 //No puede ser una reincorporacion y que sea su primera colegiacion (situacionPrevia = 1)
-                                && ((situacionPrevia == 2 && TipoColegiacionType.E.equals(tipoColegiacionType))
+                                && ((situacionPrevia == 2 && (TipoColegiacionType.E.equals(tipoColegiacionType) || TipoColegiacionType.I.equals(tipoColegiacionType)))
                                     || (situacionPrevia == 3 && TipoColegiacionType.N.equals(tipoColegiacionType)))){
                             //Debe coincidir la situacion previa con el tipo de solicitud, es decir si era ejerciente, que el tipo de solicitud sea E (Ejerciente)
                             // y si era no ejerciente, que el tipo de solicitud sea N (No ejerciente)
 
-                                reincorporarColegiado(colegiado,request,response,idInstitucion);
+                                reincorporarColegiado(colegiado, request, response, idInstitucion);
 
                         //Si se ha encontrado el colegiado y no es una reincorporacion devolvemos error
                         }else if(!isReincorporacion){
@@ -309,7 +344,30 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                     //Si no existe en el sistema y no es reincorporacion le damos de alta
                     }else if (!isReincorporacion){
 
+                        //Insertamos/updateamos los datos personales en CEN_PERSONA
+                        idPersona = insertarDatosPersonales(request.getColegiado().getDatosPersonales(), idInstitucion);
 
+                        affectedRows += insertarDatosCliente(idPersona, idInstitucion);
+
+                        idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud(), idPersona);
+
+                        affectedRows += insertarDatosColegiado(request.getColegiado().getColegiacion(), idInstitucion, idPersona, numColegiado, request.getNumeroExpediente());
+
+                        if(request.getColegiado().getDatosBancarios() != null
+                                && !UtilidadesString.esCadenaVacia(request.getColegiado().getDatosBancarios().getIBAN())){
+                            idCuenta = insertarDatosBancarios(request.getColegiado().getDatosBancarios(), idPersona, idInstitucion, request.getColegiado().getDatosPersonales());
+                        }else{
+                            //TODO: ejecutarPL_RevisionSuscripcionesLetrado ?
+                        }
+
+                        if(idPersona != null && idDireccion != null && affectedRows > 0){
+                            response.setNumeroExpediente(request.getNumeroExpediente());
+                        }else{
+                            ErrorType errorType = response.addNewError();
+                            errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.name());
+                            errorType.setDescripcion("Ocurrio un error al crear el nuevo colegiado");
+                            errorType.setXmlRequest("Sin error XML");
+                        }
 
                     //Si no existe y es reincorporacion lanzamos error
                     }else{
@@ -333,8 +391,19 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         log.info("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() - FIN");
         return responseDocument;
     }
+
+    /**
+     *
+     * Metodo encargado de reincorporar un colegiado e insertar el estado nuevo
+     *
+     * @param colegiado
+     * @param request
+     * @param response
+     * @param idInstitucion
+     * @return
+     */
     @Transactional
-    private int reincorporarColegiado(ColegiadoJGItem colegiado,
+    private int reincorporarColegiado(CenColegiado colegiado,
                                       AltaColegiadoRequestDocument.AltaColegiadoRequest request,
                                       AltaColegiadoResponseDocument.AltaColegiadoResponse response, Short idInstitucion){
         int affectedRows = 0;
@@ -344,7 +413,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         //Comprobaremos si realmente está de baja
         CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
         cenDatoscolegialesestadoExample.createCriteria()
-                .andIdpersonaEqualTo(Long.valueOf(colegiado.getIdPersona()))
+                .andIdpersonaEqualTo(colegiado.getIdpersona())
                 .andIdinstitucionEqualTo(idInstitucion);
         cenDatoscolegialesestadoExample.setOrderByClause("FECHAESTADO DESC");
         List<CenDatoscolegialesestado> estados = cenDatoscolegialesestadoExtendsMapper.selectByExample(cenDatoscolegialesestadoExample);
@@ -355,7 +424,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             //Si su estado es baja colegial, cambiamos estado y ponemos la marca inscrito
             if (SigaConstants.ESTADO_COLEGIAL_BAJACOLEGIAL == lastEstado.getIdestado()) {
                 lastEstado.setFechaestado(request.getColegiado().getColegiacion().getFechaIncorporacion().getTime());
-                if (TipoColegiacionType.N.equals(tipoColegiacionType)) {
+                if (TipoColegiacionType.N.equals(tipoColegiacionType)
+                        || TipoColegiacionType.I.equals(tipoColegiacionType)) {
                     lastEstado.setIdestado((short) SigaConstants.ESTADO_COLEGIAL_SINEJERCER);
                 } else if (TipoColegiacionType.E.equals(tipoColegiacionType)) {
                     lastEstado.setIdestado((short) SigaConstants.ESTADO_COLEGIAL_EJERCIENTE);
@@ -370,9 +440,13 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 lastEstado.setNumExpediente(request.getNumeroExpediente());
 
                 CenColegiado cenColegiado = new CenColegiado();
-                cenColegiado.setComunitario("0");
+                if(TipoColegiacionType.I.equals(tipoColegiacionType)){
+                    cenColegiado.setComunitario("1");
+                }else {
+                    cenColegiado.setComunitario("0");
+                }
                 cenColegiado.setIdinstitucion(idInstitucion);
-                cenColegiado.setIdpersona(Long.valueOf(colegiado.getIdPersona()));
+                cenColegiado.setIdpersona(colegiado.getIdpersona());
                 //Ponemos la marca inscrito a 0 en CEN_COLEGIADO
                 affectedRows += cenColegiadoExtendsMapper.updateByPrimaryKeySelective(cenColegiado);
                 //Updateamos el estado en CEN_DATOSCOLEGIALESESTADO
@@ -392,7 +466,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.name());
                 errorType.setDescripcion("El colegiado no tiene el estado BAJA COLEGIAL");
                 errorType.setXmlRequest("Sin error XML");
-                log.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / El colegiado " + colegiado.getnColegiado() + " no tiene el estado BAJA COLEGIAL");
+                log.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / El colegiado " + colegiado.getNcolegiado() + " no tiene el estado BAJA COLEGIAL");
             }
         }
         return affectedRows;
@@ -560,7 +634,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                     //Si no ha aparecido como cliente en ninguna institucion, buscamos en la institucion general (2000)
                     log.info("SincronizacionEXEAServiceImpl.insertarDatosPersonales() / No ha aparecido como cliente en ninguna institucion, buscamos en la general 2000");
                     ejemploCliente = new CenClienteExample();
-                    ejemploCliente.createCriteria().andIdpersonaEqualTo(busqueda.get(0).getIdpersona()).andIdinstitucionEqualTo(Short.valueOf("2000"));
+                    ejemploCliente.createCriteria().andIdpersonaEqualTo(busqueda.get(0).getIdpersona()).andIdinstitucionEqualTo(Short.valueOf(SigaConstants.InstitucionGeneral));
                     List<CenCliente> clienteExistente2 = cenClienteExtendsMapper.selectByExample(ejemploCliente);
                     if (!clienteExistente2.isEmpty()){
                         log.info("SincronizacionEXEAServiceImpl.insertarDatosPersonales() / Se ha encontrado en la institucion 2000 en CEN_CLIENTE, actualizamos");
@@ -684,7 +758,11 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             direccion.setCodigopostal(localizacionType.getNacional().getCodigoPostal());
             direccion.setIdprovincia(localizacionType.getNacional().getProvincia().getCodigoProvincia());
 
-            if(UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getCodigoPoblacion())
+            if(!UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getCodigoPoblacion())){
+
+                direccion.setIdpoblacion(localizacionType.getNacional().getPoblacion().getCodigoPoblacion());
+
+            } else if(UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getCodigoPoblacion())
                 && !UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion())){
 
                 direccion.setIdpoblacion(getIdPoblacionFromDescripcion(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion()));
@@ -729,7 +807,12 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             direccion.setTelefono2(localizacionType.getContacto().getTelefono2().getStringValue());
         }
 
-        direccion.setMovil(localizacionType.getContacto().getMovil().getStringValue());
+        if(localizacionType.getContacto() != null
+                && localizacionType.getContacto().getMovil() != null
+                && !UtilidadesString.esCadenaVacia(localizacionType.getContacto().getMovil().getStringValue())) {
+            direccion.setMovil(localizacionType.getContacto().getMovil().getStringValue());
+        }
+
         direccion.setUsumodificacion(0);
         direccion.setPreferente("ECS");
 
@@ -896,6 +979,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 datosColegiales.setIdpersona(idPersona);
                 datosColegiales.setUsumodificacion(0);
                 datosColegiales.setObservaciones("Tramitada alta por expediente de colegiacion EXEA");
+                //Asociamos el expediente de EXEA al colegiado
                 datosColegiales.setNumExpediente(numExpediente);
                 affectedRows += cenDatoscolegialesestadoExtendsMapper.insert(datosColegiales );
 
@@ -931,12 +1015,13 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
      * @param idInstitucion
      * @return
      */
+    @Transactional
     private Short insertarDatosBancarios(BancoType datosBancarios, Long idPersona, Short idInstitucion, DatosPersonalesType datosPersonalesType){
 
         log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() - INICIO");
-        String titularCuenta = datosPersonalesType.getNombre().toUpperCase() + " " + datosPersonalesType.getApellido1();
+        String titularCuenta = datosPersonalesType.getNombre().toUpperCase() + " " + datosPersonalesType.getApellido1().toUpperCase();
         if(!UtilidadesString.esCadenaVacia(datosPersonalesType.getApellido2())){
-            titularCuenta += " " + datosPersonalesType.getApellido2();
+            titularCuenta += " " + datosPersonalesType.getApellido2().toUpperCase();
         }
         CenCuentasbancarias cuenta = new CenCuentasbancarias();
         Short idCuenta = Short.valueOf(cenCuentasbancariasExtendsMapper.selectMaxID(idPersona, idInstitucion).getIdMax().toString());
@@ -945,10 +1030,12 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         cuenta.setFechamodificacion(new Date());
         cuenta.setIdinstitucion(idInstitucion);
         cuenta.setIdpersona(idPersona);
-        cuenta.setNumerocuenta(datosBancarios.getBanco());
+        //cuenta.setNumerocuenta(datosBancarios.getBanco()); No hay numero de cuenta en la peticion
         cuenta.setTitular(titularCuenta);
         cuenta.setIban(datosBancarios.getIBAN());
+        cuenta.setUsumodificacion(0);
 
+        //Si es IBAN espaniol, rellenamos datos adicionales
         if (cuenta.getIban().startsWith("ES")) {
             log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Cuenta bancaria espaniola");
             cuenta.setCboCodigo(datosBancarios.getIBAN().substring(4, 8));
@@ -961,7 +1048,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         cenBancosExample.createCriteria().andBicEqualTo(datosBancarios.getBIC())
                 .andNombreEqualTo(datosBancarios.getBanco());
         List<CenBancos> cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
-
+        //Buscamos el banco cen CEN_BANCOS, y si no esta registrado, lo insertamos
         if (null != cenBancos && !cenBancos.isEmpty()) {
             log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Banco existente en BBDD");
             cuenta.setCboCodigo(cenBancos.get(0).getCodigo()); // Tanto si es ext o esp tiene cod en cenBancos
@@ -981,6 +1068,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Banco Espaniol");
                 record.setCodigo(datosBancarios.getIBAN().substring(4, 8));
                 record.setNombre(datosBancarios.getBanco());
+
             }
 
             record.setBic(datosBancarios.getBIC());
@@ -995,11 +1083,11 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             }
 
             record.setUsumodificacion(0);
-            log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Insertamos el banco");
-            cenBancosExtendsMapper.insert(record);
-
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Insertamos el banco si no existe con el codigo formado");
+            if(cenBancosExtendsMapper.selectByPrimaryKey(record.getCodigo()) == null) {
+                cenBancosExtendsMapper.insert(record);
+            }
             cuenta.setCboCodigo(record.getCodigo());
-
         }
         log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() / Insertamos cuenta bancaria");
         cenCuentasbancariasExtendsMapper.insertSelective(cuenta);
@@ -1052,7 +1140,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
      * Metodo para buscar el ID Pais desde su codigo ISO, que es el que recibiremos en la peticion
      *
      * @param ISOPais
-     * @return
+     * @
      */
     private String getIdPaisFromCodISO(String ISOPais){
         String idPais = "";
