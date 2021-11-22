@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.FacFacturacionprogramadaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacFacturacionprogramadaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -47,4 +48,10 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
     })
     List<FacFacturacionprogramadaItem> getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramada, Short idInstitucion, String idioma, Integer rownum);
 
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "comboFacturaciones")
+    @Results({
+            @Result(column = "id", property = "value", jdbcType = JdbcType.NUMERIC),
+            @Result(column = "descripcion", property = "label", jdbcType = JdbcType.VARCHAR)
+    })
+    List<ComboItem> comboFacturaciones(Short idInstitucion);
 }

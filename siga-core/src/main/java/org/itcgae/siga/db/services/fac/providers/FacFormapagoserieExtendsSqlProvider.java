@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.FacFormapagoserieSqlProvider;
 
 public class FacFormapagoserieExtendsSqlProvider extends FacFormapagoserieSqlProvider {
 
-    public String getFormasPagosSerie(String idSerieFacturacion, Short idInstitucion, String idioma) {
+    public String comboFormasPagosSerie(String idSerieFacturacion, Short idInstitucion, String idioma) {
         SQL sql = new SQL();
 
         // Select

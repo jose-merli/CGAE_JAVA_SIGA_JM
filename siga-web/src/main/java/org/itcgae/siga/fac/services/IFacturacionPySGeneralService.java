@@ -1,12 +1,8 @@
 package org.itcgae.siga.fac.services;
 
-import java.util.List;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem2;
 
 public interface IFacturacionPySGeneralService {
 
@@ -32,9 +28,9 @@ public interface IFacturacionPySGeneralService {
 
 	public ComboDTO comboPlantillasEnvio(HttpServletRequest request) throws Exception;
 
-	public ComboDTO getFormasPagosDisponiblesSeries(HttpServletRequest request) throws Exception;
+	public ComboDTO comboFormasPagoFactura(HttpServletRequest request) throws Exception;
 
-	public ComboDTO getFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
+	public ComboDTO comboFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 
 	public ComboDTO comboModelosComunicacion(HttpServletRequest request) throws Exception;
 
@@ -43,7 +39,11 @@ public interface IFacturacionPySGeneralService {
 	public ComboDTO comboEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 
     public ComboDTO comboEstadosFact(String tipo, HttpServletRequest request) throws Exception;
-	
+
+    public ComboDTO comboEstadosFacturas(HttpServletRequest request) throws Exception;
+
+    public ComboDTO comboFacturaciones(HttpServletRequest request) throws Exception;
+
 	public ComboDTO parametrosSEPA(String idInstitucion, HttpServletRequest request) throws Exception;
 
 }

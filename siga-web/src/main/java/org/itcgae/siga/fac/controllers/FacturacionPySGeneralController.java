@@ -1,10 +1,5 @@
 package org.itcgae.siga.fac.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.fac.services.IFacturacionPySGeneralService;
@@ -15,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/facturacionPyS/general")
@@ -201,12 +198,12 @@ public class FacturacionPySGeneralController {
 		}
 	}
 
-	@GetMapping(value = "/getFormasPagosDisponiblesSeries")
-	ResponseEntity<ComboDTO> getFormasPagosDisponiblesSeries(HttpServletRequest request) {
+	@GetMapping(value = "/comboFormasPagoFactura")
+	ResponseEntity<ComboDTO> comboFormasPagoFactura(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {
-			response = facturacionGeneralService.getFormasPagosDisponiblesSeries(request);
+			response = facturacionGeneralService.comboFormasPagoFactura(request);
 
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
@@ -216,12 +213,12 @@ public class FacturacionPySGeneralController {
 		}
 	}
 
-	@GetMapping(value = "/getFormasPagosSerie")
-	ResponseEntity<ComboDTO> getFormasPagosSerie(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+	@GetMapping(value = "/comboFormasPagosSerie")
+	ResponseEntity<ComboDTO> comboFormasPagosSerie(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 		
 		try {
-			response = facturacionGeneralService.getFormasPagosSerie(idSerieFacturacion, request);
+			response = facturacionGeneralService.comboFormasPagosSerie(idSerieFacturacion, request);
 
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
@@ -334,4 +331,33 @@ public class FacturacionPySGeneralController {
 		}
 	}
 
+	@GetMapping(value = "/comboEstadosFacturas")
+	ResponseEntity<ComboDTO> comboEstadosFacturas(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboEstadosFacturas(request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/comboFacturaciones")
+	ResponseEntity<ComboDTO> comboFacturaciones(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboFacturaciones(request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

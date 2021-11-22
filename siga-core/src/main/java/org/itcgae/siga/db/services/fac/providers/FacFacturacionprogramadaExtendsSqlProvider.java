@@ -160,4 +160,22 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         return sqlGlobal.toString();
     }
 
+    public String comboFacturaciones(Short idInstitucion) {
+        SQL sql = new SQL();
+
+        // Select
+        sql.SELECT("idprogramacion || '-' || idseriefacturacion id, descripcion");
+
+        // From
+        sql.FROM("fac_facturacionprogramada f");
+
+        // Where
+        sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+        sql.WHERE("f.visible = 'S'");
+
+        // Order by
+        sql.ORDER_BY("idprogramacion, idseriefacturacion");
+
+        return sql.toString();
+    }
 }
