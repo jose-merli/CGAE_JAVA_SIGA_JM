@@ -32,9 +32,13 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
         @Result(column = "fecharealgeneracion", property = "fechaRealGeneracion", jdbcType = JdbcType.DATE),
         @Result(column = "fechaconfirmacion", property = "fechaConfirmacion", jdbcType = JdbcType.DATE),
         @Result(column = "idestadopdf", property = "idEstadoPDF", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "estadopdf", property = "estadoPDF", jdbcType = JdbcType.VARCHAR),
         @Result(column = "idestadoconfirmacion", property = "idEstadoConfirmacion", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "estadoconfirmacion", property = "estadoConfirmacion", jdbcType = JdbcType.VARCHAR),
         @Result(column = "idestadoenvio", property = "idEstadoEnvio", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "estadoenvio", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
         @Result(column = "idestadotraspaso", property = "idEstadoTraspaso", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "estadotraspaso", property = "estadoTraspaso", jdbcType = JdbcType.VARCHAR),
         @Result(column = "archivarfact", property = "archivarFact", jdbcType = JdbcType.VARCHAR),
         @Result(column = "usumodificacion", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
         @Result(column = "nombrefichero", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
@@ -43,7 +47,17 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
         @Result(column = "traspasofacturas", property = "traspasoFacturas", jdbcType = JdbcType.VARCHAR),
         @Result(column = "traspaso_platilla", property = "traspasoPlatilla", jdbcType = JdbcType.VARCHAR),
         @Result(column = "traspaso_codauditoria_def", property = "traspasoCodAuditoriaDef", jdbcType = JdbcType.VARCHAR),
-        @Result(column = "importe", property = "importe", jdbcType = JdbcType.VARCHAR)
+        @Result(column = "importe", property = "importe", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "fechapresentacion", property = "fechaPresentacion", jdbcType = JdbcType.DATE),
+        @Result(column = "fecharecibosprimeros", property = "fechaRecibosPrimeros", jdbcType = JdbcType.DATE),
+        @Result(column = "fecharecibosrecurrentes", property = "fechaRecibosRecurrentes", jdbcType = JdbcType.DATE),
+        @Result(column = "fechareciboscor1", property = "fechaRecibosCOR1", jdbcType = JdbcType.DATE),
+        @Result(column = "fecharecibosb2b", property = "fechaRecibosB2B", jdbcType = JdbcType.DATE),
+        @Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.DATE),
+        @Result(column = "idmodelofactura", property = "idModeloFactura", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "idmodelorectificativa", property = "idModeloRectificativa", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "modelofactura", property = "modeloFactura", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "modelorectificativa", property = "modeloRectificativa", jdbcType = JdbcType.VARCHAR)
     })
     List<FacFacturacionprogramadaItem> getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramada, Short idInstitucion, String idioma, Integer rownum);
 

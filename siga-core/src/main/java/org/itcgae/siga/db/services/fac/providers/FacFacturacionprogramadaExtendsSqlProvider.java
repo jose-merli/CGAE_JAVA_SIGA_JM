@@ -47,6 +47,16 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.SELECT("facprog.traspaso_plantilla");
         sql.SELECT("facprog.traspaso_codauditoria_def");
         sql.SELECT("SUM(f.imptotal) AS importe");
+        sql.SELECT("facprog.fechapresentacion");
+        sql.SELECT("facprog.fecharecibosprimeros");
+        sql.SELECT("facprog.fecharecibosrecurrentes");
+        sql.SELECT("facprog.fechareciboscor1");
+        sql.SELECT("facprog.fecharecibosb2b");
+        sql.SELECT("facprog.fechamodificacion");
+        sql.SELECT("seriefac.idmodelofactura");
+        sql.SELECT("seriefac.idmodelorectificativa");
+        sql.SELECT("( SELECT c.nombre FROM mod_modelocomunicacion c WHERE c.idmodelocomunicacion = seriefac.idmodelofactura ) modelofactura");
+        sql.SELECT("( SELECT c.nombre FROM mod_modelocomunicacion c WHERE c.idmodelocomunicacion = seriefac.idmodelorectificativa ) modelorectificativa");
 
         // From
         sql.FROM("fac_facturacionprogramada facprog");
@@ -147,6 +157,14 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.GROUP_BY("facprog.traspasofacturas");
         sql.GROUP_BY("facprog.traspaso_plantilla");
         sql.GROUP_BY("facprog.traspaso_codauditoria_def");
+        sql.GROUP_BY("fechapresentacion");
+        sql.GROUP_BY("fecharecibosprimeros");
+        sql.GROUP_BY("fecharecibosrecurrentes");
+        sql.GROUP_BY("fechareciboscor1");
+        sql.GROUP_BY("fecharecibosb2b");
+        sql.GROUP_BY("fechamodificacion");
+        sql.GROUP_BY("seriefac.idmodelofactura");
+        sql.GROUP_BY("seriefac.idmodelorectificativa");
 
         // Order by
         sql.ORDER_BY("fecharealgeneracion DESC");
