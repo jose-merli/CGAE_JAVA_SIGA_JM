@@ -910,21 +910,21 @@ public class SigaConstants {
 	
 	// CARGA MASIVA COMPRAS
 
-	public static final String COMP_NCOLEGIADO = "Nº COLEGIADO";
-	public static final String COMP_NIF = "NIF";
-	public static final String COMP_APELLIDOS_CLI = "APELLIDOS CLIENTE";
-	public static final String COMP_NOMBRE_CLI = "NOMBRE CLIENTE";
-	public static final String COMP_CANT_PROD = "CANTIDAD PRODUCTO";
-	public static final String COMP_NOMBRE_PROD = "NOMBRE PRODUCTO";
-	public static final String COMP_COD_PROD = "CODIGO PRODUCTO";
-	public static final String COMP_FECHA_COMP = "FECHA COMPRA";
+	public static final String CP_NCOLEGIADO = "Nº COLEGIADO";
+	public static final String CP_NIF = "NIF";
+	public static final String CP_APELLIDOS_CLI = "APELLIDOS CLIENTE";
+	public static final String CP_NOMBRE_CLI = "NOMBRE CLIENTE";
+	public static final String CP_CANT_PROD = "CANTIDAD PRODUCTO";
+	public static final String CP_NOMBRE_PROD = "NOMBRE PRODUCTO";
+	public static final String CP_COD_PROD = "CODIGO PRODUCTO";
+	public static final String CP_FECHA_COMP = "FECHA COMPRA";
 
-	public static final String nombreFicheroModeloCOMP = "PlantillaMasivaCompras";
+	public static final String nombreFicheroModeloCP = "PlantillaMasivaCompras";
 
-	public static final List<String> CAMPOSMODEL_COMP = Arrays.asList(COMP_NCOLEGIADO, COMP_NIF, COMP_APELLIDOS_CLI, COMP_NOMBRE_CLI,
-			COMP_CANT_PROD, COMP_NOMBRE_PROD, COMP_COD_PROD, COMP_FECHA_COMP);
-	public static final List<String> CAMPOSLOGCOMP = Arrays.asList(COMP_NCOLEGIADO, COMP_NIF, COMP_APELLIDOS_CLI, COMP_NOMBRE_CLI,
-			COMP_CANT_PROD, COMP_NOMBRE_PROD, COMP_COD_PROD, COMP_FECHA_COMP, ERRORES);
+	public static final List<String> CAMPOSMODEL_CP = Arrays.asList(CP_NCOLEGIADO, CP_NIF, CP_APELLIDOS_CLI, CP_NOMBRE_CLI,
+			CP_CANT_PROD, CP_NOMBRE_PROD, CP_COD_PROD, CP_FECHA_COMP);
+	public static final List<String> CAMPOSLOGCP = Arrays.asList(CP_NCOLEGIADO, CP_NIF, CP_APELLIDOS_CLI, CP_NOMBRE_CLI,
+			CP_CANT_PROD, CP_NOMBRE_PROD, CP_COD_PROD, CP_FECHA_COMP, ERRORES);
 
 	// AGENDA
 	public static final long CALENDARIO_GENERAL = 1;
