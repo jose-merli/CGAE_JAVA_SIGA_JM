@@ -889,14 +889,14 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 		return res;
 	}
 
-	private ResponseEntity<InputStreamResource> getZipFile(List<CargaMasivaComprasItem> cargaMasivaCopmrasItem,
+	private ResponseEntity<InputStreamResource> getZipFile(List<CargaMasivaComprasItem> cargaMasivaComprasItem,
 			Short idInstitucion) {
 		// TODO Auto-generated method stub
 		
 		HttpHeaders headersClassique = new HttpHeaders();
 		headersClassique.setContentType(MediaType.parseMediaType("application/zip"));
 
-		headersClassique.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=CargaMasivaProcuradores.zip");
+		headersClassique.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=CargaMasivaCompras.zip");
 		headersClassique.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
 		
 		ByteArrayOutputStream byteArrayOutputStream = null;
@@ -911,8 +911,8 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 		int ficherosEncontrados = 0;
 				
 		try {
-			for (CargaMasivaComprasItem doc : cargaMasivaCopmrasItem) {
-					LOGGER.debug("descargarFicheros() -> Sebusca el fichero original");
+			for (CargaMasivaComprasItem doc : cargaMasivaComprasItem) {
+					LOGGER.debug("descargarFicheros() -> Se busca el fichero original");
 					String pathClassique = getDirectorioFichero(idInstitucion);
 					pathClassique += File.separator + idInstitucion + "_" + doc.getIdFicheroLog() + "." + SigaConstants.tipoExcelXls;
 					
