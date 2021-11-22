@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
-@Primary
+//@Primary
 public interface ScsTipoActuacionAsistenciaExtendsMapper extends ScsActuacionasistenciaMapper{
 
 	@SelectProvider(type=ScsTipoactuacionAsistenciaSqlExtendsProvider.class, method="selectTiposActuacionasistencia")
