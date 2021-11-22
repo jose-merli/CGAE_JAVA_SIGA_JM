@@ -12,6 +12,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
+import org.itcgae.siga.DTO.fac.FiltroCargaMasivaCompras;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
 import org.itcgae.siga.DTO.fac.FiltrosSuscripcionesItem;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
@@ -853,7 +854,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("MAX(IDPETICION) + 1");
+		sql.SELECT("MAX(IDPETICION) + 1 as Id");
 		
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION");
 		
@@ -863,7 +864,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 	}
 	
 	
-	public String listadoCargaMasivaCompras(CargaMasivaComprasBusquedaItem cargaMasivaItem, Short idInstitucion) {
+	public String listadoCargaMasivaCompras(FiltroCargaMasivaCompras cargaMasivaItem, Short idInstitucion) {
 		SQL sql = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -882,13 +883,19 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.FROM("adm_usuarios usu");
 		sql.WHERE("cm.USUMODIFICACION = usu.idusuario");
 		sql.WHERE("cm.idinstitucion = usu.idinstitucion");
-		sql.WHERE("cm.tipocarga = 'COMP'");
+		sql.WHERE("cm.tipocarga = 'CP'");
 		sql.WHERE("cm.idinstitucion = " + idInstitucion.toString());
 		
-		if(cargaMasivaItem.getFechaCarga() != null) {
-			String fechaCarga = "";
-			fechaCarga = dateFormat.format(cargaMasivaItem.getFechaCarga());
-			sql.WHERE("TRUNC(fechacarga) <= TO_DATE('" + fechaCarga + "', 'DD/MM/RRRR')");
+		if(cargaMasivaItem.getFechaCargaDesde() != null) {
+			String fechaCargaDesde = "";
+			fechaCargaDesde = dateFormat.format(cargaMasivaItem.getFechaCargaDesde());
+			sql.WHERE("TRUNC(fechacarga) >= TO_DATE('" + fechaCargaDesde + "', 'DD/MM/RRRR')");
+		}
+		
+		if(cargaMasivaItem.getFechaCargaHasta() != null) {
+			String fechaCargaHasta = "";
+			fechaCargaHasta = dateFormat.format(cargaMasivaItem.getFechaCargaHasta());
+			sql.WHERE("TRUNC(fechacarga) <= TO_DATE('" + fechaCargaHasta + "', 'DD/MM/RRRR')");
 		}
 		
 		sql.WHERE("rownum <= 200");

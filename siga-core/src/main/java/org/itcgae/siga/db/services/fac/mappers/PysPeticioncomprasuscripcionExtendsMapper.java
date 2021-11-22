@@ -10,6 +10,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
+import org.itcgae.siga.DTO.fac.FiltroCargaMasivaCompras;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
 import org.itcgae.siga.DTO.fac.FiltrosSuscripcionesItem;
@@ -213,6 +214,6 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		@Result(column = "NUMREGISTROSERRONEOS", property = "numRegistrosErroneos", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "usuario", jdbcType = JdbcType.VARCHAR)
 	})
-	List<CargaMasivaComprasItem> listadoCargaMasivaCompras(CargaMasivaComprasBusquedaItem cargaMasivaItem, Short idInstitucion);
+	List<CargaMasivaComprasItem> listadoCargaMasivaCompras(FiltroCargaMasivaCompras cargaMasivaItem, Short idInstitucion);
 	
 }

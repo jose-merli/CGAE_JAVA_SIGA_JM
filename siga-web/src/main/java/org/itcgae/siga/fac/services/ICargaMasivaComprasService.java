@@ -9,6 +9,7 @@ import org.apache.poi.EncryptedDocumentException;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasDTO;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
+import org.itcgae.siga.DTO.fac.FiltroCargaMasivaCompras;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,6 @@ public interface ICargaMasivaComprasService {
 	public ResponseEntity<InputStreamResource> descargarFicheros(List<CargaMasivaComprasItem> cargaMasivaComprasItem,
 			HttpServletRequest request);
 
-	public CargaMasivaComprasDTO listado(CargaMasivaComprasBusquedaItem cargaMasivaItem, HttpServletRequest request);
+	public CargaMasivaComprasDTO listado(FiltroCargaMasivaCompras cargaMasivaItem, HttpServletRequest request);
 
 }

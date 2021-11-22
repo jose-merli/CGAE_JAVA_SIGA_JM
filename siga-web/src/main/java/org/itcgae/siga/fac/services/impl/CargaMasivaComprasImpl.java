@@ -36,6 +36,7 @@ import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasDTO;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
 import org.itcgae.siga.DTO.fac.CargaMasivaDatosCompItem;
+import org.itcgae.siga.DTO.fac.FiltroCargaMasivaCompras;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
@@ -149,8 +150,8 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 	}
 
 	private ByteArrayInputStream crearExcel() {
-		List<String> cabeceraExcel = Arrays.asList(SigaConstants.COMP_NCOLEGIADO, SigaConstants.COMP_NIF, SigaConstants.COMP_APELLIDOS_CLI, SigaConstants.COMP_NOMBRE_CLI,
-				SigaConstants.COMP_CANT_PROD, SigaConstants.COMP_NOMBRE_PROD, SigaConstants.COMP_COD_PROD, SigaConstants.COMP_FECHA_COMP);
+		List<String> cabeceraExcel = Arrays.asList(SigaConstants.CP_NCOLEGIADO, SigaConstants.CP_NIF, SigaConstants.CP_APELLIDOS_CLI, SigaConstants.CP_NOMBRE_CLI,
+				SigaConstants.CP_CANT_PROD, SigaConstants.CP_NOMBRE_PROD, SigaConstants.CP_COD_PROD, SigaConstants.CP_FECHA_COMP);
 		try (Workbook workbook = new HSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 			Sheet sheet = workbook.createSheet("Modelo Carga Masiva Compras");
 
@@ -192,7 +193,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 	}
 	
 	@Override
-	public CargaMasivaComprasDTO listado(CargaMasivaComprasBusquedaItem cargaMasivaItem,
+	public CargaMasivaComprasDTO listado(FiltroCargaMasivaCompras cargaMasivaItem,
 			HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		String token = request.getHeader("Authorization");
@@ -435,9 +436,9 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 					
 					int result = 0;
 					try {
-						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCOMP, datosLog);
+						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCP, datosLog);
 
-						cenCargamasivacv.setTipocarga("COMP");
+						cenCargamasivacv.setTipocarga("CP");
 						cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
 						cenCargamasivacv.setNombrefichero(nombreFichero);
 						cenCargamasivacv.setNumregistros(CargaMasivaDatosCompItems.size());
@@ -584,19 +585,19 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 		LOGGER.debug(dateLog + " --> Inicio CargaMasivaComprasServiceImpl convertItemtoHashCompra");
 		Hashtable<String, Object> e = new Hashtable<String, Object>();
 		
-		e.put(SigaConstants.COMP_NCOLEGIADO, cargaMasivaDatosCompItem.getNumColegiadoCliente() != null ? cargaMasivaDatosCompItem.getNumColegiadoCliente() : "");
+		e.put(SigaConstants.CP_NCOLEGIADO, cargaMasivaDatosCompItem.getNumColegiadoCliente() != null ? cargaMasivaDatosCompItem.getNumColegiadoCliente() : "");
 
-		e.put(SigaConstants.COMP_NIF, cargaMasivaDatosCompItem.getNifCifCliente() != null ? cargaMasivaDatosCompItem.getNifCifCliente() : "");
+		e.put(SigaConstants.CP_NIF, cargaMasivaDatosCompItem.getNifCifCliente() != null ? cargaMasivaDatosCompItem.getNifCifCliente() : "");
 		
-		e.put(SigaConstants.COMP_APELLIDOS_CLI, cargaMasivaDatosCompItem.getApellidosCliente() != null ? cargaMasivaDatosCompItem.getApellidosCliente() : "");
+		e.put(SigaConstants.CP_APELLIDOS_CLI, cargaMasivaDatosCompItem.getApellidosCliente() != null ? cargaMasivaDatosCompItem.getApellidosCliente() : "");
 
-		e.put(SigaConstants.COMP_NOMBRE_CLI, cargaMasivaDatosCompItem.getNombreCliente() != null ? cargaMasivaDatosCompItem.getNombreCliente() : "");
+		e.put(SigaConstants.CP_NOMBRE_CLI, cargaMasivaDatosCompItem.getNombreCliente() != null ? cargaMasivaDatosCompItem.getNombreCliente() : "");
 
-		e.put(SigaConstants.COMP_CANT_PROD, cargaMasivaDatosCompItem.getCantidadProducto() != null ? cargaMasivaDatosCompItem.getCantidadProducto() : "");
+		e.put(SigaConstants.CP_CANT_PROD, cargaMasivaDatosCompItem.getCantidadProducto() != null ? cargaMasivaDatosCompItem.getCantidadProducto() : "");
 
-		e.put(SigaConstants.COMP_NOMBRE_PROD, cargaMasivaDatosCompItem.getNombreProducto() != null ? cargaMasivaDatosCompItem.getNombreProducto() : "");
+		e.put(SigaConstants.CP_NOMBRE_PROD, cargaMasivaDatosCompItem.getNombreProducto() != null ? cargaMasivaDatosCompItem.getNombreProducto() : "");
 
-		e.put(SigaConstants.COMP_COD_PROD, cargaMasivaDatosCompItem.getCodigoProducto() != null ? cargaMasivaDatosCompItem.getCodigoProducto() : "");
+		e.put(SigaConstants.CP_COD_PROD, cargaMasivaDatosCompItem.getCodigoProducto() != null ? cargaMasivaDatosCompItem.getCodigoProducto() : "");
 		
 		String fechaCompra = "";
 		
@@ -604,7 +605,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 			fechaCompra = df2.format(cargaMasivaDatosCompItem.getFechaCompra());
 		}
 		
-		e.put(SigaConstants.COMP_FECHA_COMP, cargaMasivaDatosCompItem.getFechaCompra() != null ? fechaCompra : "");
+		e.put(SigaConstants.CP_FECHA_COMP, cargaMasivaDatosCompItem.getFechaCompra() != null ? fechaCompra : "");
 		
 		e.put(SigaConstants.ERRORES, cargaMasivaDatosCompItem.getErrores() != null ? cargaMasivaDatosCompItem.getErrores() : "");
 		
@@ -665,12 +666,12 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 			CargaMasivaDatosCompItem.setIdInstitucion(idInstitucion);
 			errorLinea = new StringBuffer();
 			
-			if(hashtable.get(SigaConstants.COMP_NIF)!=null && !hashtable.get(SigaConstants.COMP_NIF).toString().equals("") &&
-					!hashtable.get(SigaConstants.COMP_NIF).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.COMP_NIF).toString().equals("Requerido")){
+			if(hashtable.get(SigaConstants.CP_NIF)!=null && !hashtable.get(SigaConstants.CP_NIF).toString().equals("") &&
+					!hashtable.get(SigaConstants.CP_NIF).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.CP_NIF).toString().equals("Requerido")){
 
 				LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna NIF CLIENTE");
 
-				CargaMasivaDatosCompItem.setNifCifCliente(hashtable.get(SigaConstants.COMP_NIF).toString());
+				CargaMasivaDatosCompItem.setNifCifCliente(hashtable.get(SigaConstants.CP_NIF).toString());
 
 				CenPersonaExample personaExample = new CenPersonaExample();
 
@@ -682,9 +683,9 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 					errorLinea.append("Cliente no encontrado por Nif. ");
 				}
 			}
-			else if(hashtable.get(SigaConstants.COMP_NCOLEGIADO)!=null && !hashtable.get(SigaConstants.COMP_NCOLEGIADO).toString().equals("") &&
-					!hashtable.get(SigaConstants.COMP_NCOLEGIADO).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.COMP_NCOLEGIADO).toString().equals("Requerido")){
-				CargaMasivaDatosCompItem.setNumColegiadoCliente(hashtable.get(SigaConstants.COMP_NCOLEGIADO).toString());
+			else if(hashtable.get(SigaConstants.CP_NCOLEGIADO)!=null && !hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("") &&
+					!hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("Requerido")){
+				CargaMasivaDatosCompItem.setNumColegiadoCliente(hashtable.get(SigaConstants.CP_NCOLEGIADO).toString());
 
 				CenColegiadoExample colegiadoExample = new CenColegiadoExample();
 
@@ -701,41 +702,41 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 			}
 		
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna APELLIDOS CLIENTE");
-			if (hashtable.get(SigaConstants.COMP_APELLIDOS_CLI) != null && !hashtable.get(SigaConstants.COMP_APELLIDOS_CLI).toString().equals("") &&
-				!hashtable.get(SigaConstants.COMP_APELLIDOS_CLI).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.COMP_APELLIDOS_CLI).toString().equals("Requerido")) {
-				CargaMasivaDatosCompItem.setApellidosCliente(hashtable.get(SigaConstants.COMP_APELLIDOS_CLI).toString());
+			if (hashtable.get(SigaConstants.CP_APELLIDOS_CLI) != null && !hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString().equals("") &&
+				!hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString().equals("Requerido")) {
+				CargaMasivaDatosCompItem.setApellidosCliente(hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString());
 			}else{
 				errorLinea.append("Es obligatorio introducir los apellidos del cliente. ");
 			}
 			
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna NOMBRE CLIENTE");
-			if (hashtable.get(SigaConstants.COMP_NOMBRE_CLI) != null && !hashtable.get(SigaConstants.COMP_NOMBRE_CLI).toString().equals("") &&
-				!hashtable.get(SigaConstants.COMP_NOMBRE_CLI).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.COMP_NOMBRE_CLI).toString().equals("Requerido")) {
-				CargaMasivaDatosCompItem.setApellidosCliente(hashtable.get(SigaConstants.COMP_APELLIDOS_CLI).toString());
+			if (hashtable.get(SigaConstants.CP_NOMBRE_CLI) != null && !hashtable.get(SigaConstants.CP_NOMBRE_CLI).toString().equals("") &&
+				!hashtable.get(SigaConstants.CP_NOMBRE_CLI).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.CP_NOMBRE_CLI).toString().equals("Requerido")) {
+				CargaMasivaDatosCompItem.setApellidosCliente(hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString());
 			}else{
 				errorLinea.append("Es obligatorio introducir el nombre del cliente. ");
 			}
 			
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna CANTIDAD PRODUCTO");
-			if(hashtable.get(SigaConstants.COMP_CANT_PROD)!=null && !hashtable.get(SigaConstants.COMP_CANT_PROD).toString().equals("") &&
-				!hashtable.get(SigaConstants.COMP_CANT_PROD).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.COMP_CANT_PROD).toString().equals("Requerido")){
-				CargaMasivaDatosCompItem.setCantidadProducto(hashtable.get(SigaConstants.COMP_CANT_PROD).toString());
+			if(hashtable.get(SigaConstants.CP_CANT_PROD)!=null && !hashtable.get(SigaConstants.CP_CANT_PROD).toString().equals("") &&
+				!hashtable.get(SigaConstants.CP_CANT_PROD).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.CP_CANT_PROD).toString().equals("Requerido")){
+				CargaMasivaDatosCompItem.setCantidadProducto(hashtable.get(SigaConstants.CP_CANT_PROD).toString());
 			}else{
 				errorLinea.append("Es obligatorio introducir la cantidad del producto. ");
 			}
 			
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna NOMBRE CLIENTE");
-			if (hashtable.get(SigaConstants.COMP_NOMBRE_PROD) != null && !hashtable.get(SigaConstants.COMP_NOMBRE_PROD).toString().equals("") &&
-				!hashtable.get(SigaConstants.COMP_NOMBRE_PROD).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.COMP_NOMBRE_PROD).toString().equals("Requerido")) {
-				CargaMasivaDatosCompItem.setApellidosCliente(hashtable.get(SigaConstants.COMP_APELLIDOS_CLI).toString());
+			if (hashtable.get(SigaConstants.CP_NOMBRE_PROD) != null && !hashtable.get(SigaConstants.CP_NOMBRE_PROD).toString().equals("") &&
+				!hashtable.get(SigaConstants.CP_NOMBRE_PROD).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.CP_NOMBRE_PROD).toString().equals("Requerido")) {
+				CargaMasivaDatosCompItem.setApellidosCliente(hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString());
 			}else{
 				errorLinea.append("Es obligatorio introducir el nombre del producto. ");
 			}
 			
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna CODIGO PRODUCTO");
-			if(hashtable.get(SigaConstants.COMP_COD_PROD)!=null && !hashtable.get(SigaConstants.COMP_COD_PROD).toString().equals("") &&
-			   !hashtable.get(SigaConstants.COMP_COD_PROD).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.COMP_COD_PROD).toString().equals("Requerido")){
-				CargaMasivaDatosCompItem.setCodigoProducto(hashtable.get(SigaConstants.COMP_COD_PROD).toString());
+			if(hashtable.get(SigaConstants.CP_COD_PROD)!=null && !hashtable.get(SigaConstants.CP_COD_PROD).toString().equals("") &&
+			   !hashtable.get(SigaConstants.CP_COD_PROD).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.CP_COD_PROD).toString().equals("Requerido")){
+				CargaMasivaDatosCompItem.setCodigoProducto(hashtable.get(SigaConstants.CP_COD_PROD).toString());
 				
 				//Se comprueba si existe un producto con el codigo introducido
 				PysProductosinstitucionExample productoInsExample = new PysProductosinstitucionExample();
@@ -760,10 +761,10 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 			}
 			
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna FECHA COMPRA");
-			if(hashtable.get(SigaConstants.COMP_FECHA_COMP)!=null && !hashtable.get(SigaConstants.COMP_FECHA_COMP).toString().equals("") &&
-					!hashtable.get(SigaConstants.COMP_FECHA_COMP).toString().equals("dd/mm/yyyy") && !hashtable.get(SigaConstants.COMP_FECHA_COMP).toString().equals("Requerido")){
+			if(hashtable.get(SigaConstants.CP_FECHA_COMP)!=null && !hashtable.get(SigaConstants.CP_FECHA_COMP).toString().equals("") &&
+					!hashtable.get(SigaConstants.CP_FECHA_COMP).toString().equals("dd/mm/yyyy") && !hashtable.get(SigaConstants.CP_FECHA_COMP).toString().equals("Requerido")){
 				try {
-					CargaMasivaDatosCompItem.setFechaCompra(new SimpleDateFormat("dd-MM-yyyy").parse(hashtable.get(SigaConstants.COMP_FECHA_COMP).toString()));
+					CargaMasivaDatosCompItem.setFechaCompra(new SimpleDateFormat("dd-MM-yyyy").parse(hashtable.get(SigaConstants.CP_FECHA_COMP).toString()));
 				} catch (ParseException e) {
 					errorLinea.append("Fecha de compra. Debe ser dd/mm/yyyy. ");
 				}

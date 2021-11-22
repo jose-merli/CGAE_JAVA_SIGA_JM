@@ -12,6 +12,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasDTO;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
+import org.itcgae.siga.DTO.fac.FiltroCargaMasivaCompras;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.fac.services.ICargaMasivaComprasService;
@@ -49,7 +50,7 @@ public class CargaMasivaComprasController {
 	}
 	
 	@RequestMapping(value = "/listado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<CargaMasivaComprasDTO> listado(@RequestBody CargaMasivaComprasBusquedaItem cargaMasivaItem, HttpServletRequest request) {
+	ResponseEntity<CargaMasivaComprasDTO> listado(@RequestBody FiltroCargaMasivaCompras cargaMasivaItem, HttpServletRequest request) {
 		LOGGER.debug("Entra en el método listado de Carga Masiva Procuradores");
 		CargaMasivaComprasDTO response = iCargaMasivaCompras.listado(cargaMasivaItem, request);
 		LOGGER.debug("Termina el método listado de Carga Masiva Procuradores");
