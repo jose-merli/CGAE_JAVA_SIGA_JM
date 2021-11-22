@@ -583,7 +583,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			// Logica
 			String idioma = usuario.getIdlenguaje();
-			comboItems = facFormapagoserieExtendsMapper.comboFormasPagosSerie(idSerieFacturacion,
+			comboItems = facFormapagoserieExtendsMapper.getFormasPagosSerie(idSerieFacturacion,
 					usuario.getIdinstitucion(), idioma);
 
 			LOGGER.debug(

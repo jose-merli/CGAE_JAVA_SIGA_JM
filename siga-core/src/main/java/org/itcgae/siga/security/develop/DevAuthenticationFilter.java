@@ -1,5 +1,12 @@
 package org.itcgae.siga.security.develop;
 
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
@@ -13,12 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 
 public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
@@ -46,10 +47,10 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			throws AuthenticationException {
 		try{
 			LOGGER.info("Se accede por los combos");
-			String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
-			String nombre = "Jesus"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
-//			String dni = (String) request.getHeader("CAS-username");
-//			String nombre = (String) request.getHeader("CAS-displayName");
+//			String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
+//			String nombre = "Jesus"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
+			String dni = (String) request.getHeader("CAS-username");
+			String nombre = (String) request.getHeader("CAS-displayName");
 
 			String grupo = "";
 			String institucion = request.getParameter("location");

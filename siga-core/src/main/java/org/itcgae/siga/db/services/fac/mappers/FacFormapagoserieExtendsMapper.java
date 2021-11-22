@@ -16,11 +16,11 @@ import java.util.List;
 @Primary
 public interface FacFormapagoserieExtendsMapper extends FacFormapagoserieMapper {
 
-    @SelectProvider(type = FacFormapagoserieExtendsSqlProvider.class, method = "comboFormasPagosSerie")
+    @SelectProvider(type = FacFormapagoserieExtendsSqlProvider.class, method = "getFormasPagosSerie")
     @Results({
             @Result(column = "idformapago", property = "value", jdbcType = JdbcType.NUMERIC),
             @Result(column = "descripcion", property = "label", jdbcType = JdbcType.VARCHAR)
     })
-    List<ComboItem> comboFormasPagosSerie(String idSerieFacturacion, Short idInstitucion, String idioma);
+    List<ComboItem> getFormasPagosSerie(String idSerieFacturacion, Short idInstitucion, String idioma);
 
 }
