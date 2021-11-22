@@ -4,11 +4,9 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.scs.FacturacionDTO;
-import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
-import org.itcgae.siga.DTOs.scs.FacturacionItem;
-import org.itcgae.siga.DTOs.scs.PagosjgDTO;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -152,5 +150,11 @@ public class FacturacionController {
                                           HttpServletRequest request) {
         PagosjgDTO response = facturacionServices.datosPagos(idFacturacion, request);
         return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/facturacionsjcs/getFacturacionesPorAsunto")
+    ResponseEntity<FacturacionesAsuntoDTO> getFacturacionesPorAsunto(@RequestBody ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request) {
+        FacturacionesAsuntoDTO response = facturacionServices.getFacturacionesPorAsunto(scsActuaciondesigna, request);
+        return new ResponseEntity<FacturacionesAsuntoDTO>(response, HttpStatus.OK);
     }
 }

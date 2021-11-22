@@ -4,10 +4,8 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.scs.FacturacionDTO;
-import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
-import org.itcgae.siga.DTOs.scs.FacturacionItem;
-import org.itcgae.siga.DTOs.scs.PagosjgDTO;
+import org.itcgae.siga.DTOs.scs.*;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -45,4 +43,7 @@ public interface IFacturacionSJCSServices {
     public PagosjgDTO datosPagos(String idFacturacion, HttpServletRequest request);
 
     public void ejecutaFacturacionSJCS();
+
+    public FacturacionesAsuntoDTO getFacturacionesPorAsunto(ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request);
+
 }

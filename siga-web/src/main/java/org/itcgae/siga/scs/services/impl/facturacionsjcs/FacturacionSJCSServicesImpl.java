@@ -28,7 +28,6 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Date;
 import java.util.*;
@@ -1880,5 +1879,73 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             con.close();
             con = null;
         }
+    }
+
+    @Override
+    public FacturacionesAsuntoDTO getFacturacionesPorAsunto(ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request) {
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Entrada al servicio para obtener las facturaciones, pagos y movimientos varios por asunto");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        FacturacionesAsuntoDTO facturacionesAsuntoDTO = new FacturacionesAsuntoDTO();
+        List<DatosMovimientoVarioDTO> datosMovimientoVarioDTOList = new ArrayList<>();
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionDesigna(idInstitucion, scsActuaciondesigna);
+
+                    for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
+
+                        List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdFacturacion());
+                        fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+
+                        datosMovimientoVarioDTOList.addAll(fcsFacturacionJGExtendsMapper.getDatosMovimientoVarioAsuntoPorFacturacion(idInstitucion, fac.getIdFacturacion()));
+                    }
+
+                    facturacionesAsuntoDTO.setDatosFacturacionAsuntoDTOList(datosFacturacionAsuntoDTOList);
+
+                    for (DatosMovimientoVarioDTO movimiento : datosMovimientoVarioDTOList) {
+                        List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, movimiento.getIdMovimiento());
+                        movimiento.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+                    }
+
+                    facturacionesAsuntoDTO.setDatosMovimientoVarioDTOList(datosMovimientoVarioDTOList);
+
+                } else {
+                    LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                            "No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Se ha producido un error al intentar obtener las facturaciones," +
+                    " pagos y movimientos varios del asunto", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        facturacionesAsuntoDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por asunto");
+
+        return facturacionesAsuntoDTO;
     }
 }

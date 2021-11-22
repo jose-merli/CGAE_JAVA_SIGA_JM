@@ -1,19 +1,17 @@
 package org.itcgae.siga.DTOs.scs;
 
-import java.util.List;
-
-import org.itcgae.siga.db.entities.CenPersona;
+import java.util.Date;
 
 import lombok.Data;
 
 @Data
 public class Impreso190Item {
 	String anio;
-	int telefonoContacto;
+	String telefonoContacto;
 	String nombreContacto;
 	String apellido1Contacto;
 	String apellido2Contacto;
-	int telefono;
+	String telefono;
 	String nombrePersona;
 	String nombre;
 	String apellidos1;
@@ -34,6 +32,9 @@ public class Impreso190Item {
 	String nomFichero;
 	String nifcif;
 	String idtipoidentificacion;
-	
+	String extension;
+	String idFichero;
+	String idGenFichero;
+	Date fechageneracion;
 
 }
