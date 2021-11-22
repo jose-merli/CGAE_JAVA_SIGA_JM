@@ -66,7 +66,7 @@ public class PagoSJCSController {
 
     @PostMapping("/ejecutarPagoSJCS")
     ResponseEntity<InsertResponseDTO> ejecutarPagoSJCS(@RequestBody PagosjgItem pagosjgItem, HttpServletRequest request) {
-        InsertResponseDTO response = iPagoSJCSService.ejecutarPagoSJCS(pagosjgItem.getIdPagosjg(), request);
+        InsertResponseDTO response = iPagoSJCSService.ejecutarPagoSJCS(pagosjgItem.getIdPagosjg(), false, request);
         return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
     }
 
@@ -159,9 +159,15 @@ public class PagoSJCSController {
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/deshacerCierre")
-    ResponseEntity<UpdateResponseDTO> deshacerCierre(@RequestParam String idPago, HttpServletRequest request) {
-        UpdateResponseDTO response = iPagoSJCSService.deshacerCierre(idPago, request);
+    @PostMapping("/deshacerCierre")
+    ResponseEntity<UpdateResponseDTO> deshacerCierre(@RequestBody PagosjgItem pagosjgItem, HttpServletRequest request) {
+        UpdateResponseDTO response = iPagoSJCSService.deshacerCierre(pagosjgItem.getIdPagosjg(), request);
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/simularPagoSJCS")
+    ResponseEntity<InsertResponseDTO> simularPagoSJCS(@RequestBody PagosjgItem pagosjgItem, HttpServletRequest request) {
+        InsertResponseDTO response = iPagoSJCSService.ejecutarPagoSJCS(pagosjgItem.getIdPagosjg(), true, request);
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
     }
 }

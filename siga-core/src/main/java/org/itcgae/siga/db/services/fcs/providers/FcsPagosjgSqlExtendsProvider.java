@@ -781,4 +781,23 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         return query.toString();
     }
 
+    public String getFechaEstadoPago(Short idInstitucion, Integer idPago) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("MAX(FECHAESTADO)");
+        subQuery.FROM("FCS_PAGOS_ESTADOSPAGOS");
+        subQuery.WHERE("IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("IDPAGOSJG = " + idPago);
+
+        SQL query = new SQL();
+        query.SELECT("FPE.FECHAESTADO");
+        query.FROM("FCS_PAGOSJG FP");
+        query.JOIN("FCS_PAGOS_ESTADOSPAGOS FPE ON FP.IDINSTITUCION = FPE.IDINSTITUCION AND FP.IDPAGOSJG = FPE.IDPAGOSJG");
+        query.WHERE("FPE.IDINSTITUCION = " + idInstitucion);
+        query.WHERE("FPE.IDPAGOSJG = " + idPago);
+        query.WHERE("FPE.FECHAESTADO = ( " + subQuery.toString() + " )");
+
+
+        return query.toString();
+    }
 }

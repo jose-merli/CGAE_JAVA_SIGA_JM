@@ -15,6 +15,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.*;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -45,7 +46,7 @@ public class EjecucionPlsPago {
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Turnos de Justicia Gratuita. Error en PL = " + (String) resultado[3],
-                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoTurnosSJCS"));
+                    "messages.factSJCS.error.pagoTurnosSJCS");
         }
 
         return resultado;
@@ -68,7 +69,7 @@ public class EjecucionPlsPago {
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Guardias de Justicia Gratuita. Error en PL = " + (String) resultado[3],
-                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoGuardiasSJCS"));
+                    "messages.factSJCS.error.pagoGuardiasSJCS");
         }
 
         return resultado;
@@ -91,7 +92,7 @@ public class EjecucionPlsPago {
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Expedientes SOJ de Justicia Gratuita. Error en PL = " + (String) resultado[3],
-                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoExpedientesSogSJCS"));
+                    "messages.factSJCS.error.pagoExpedientesSogSJCS");
         }
 
         return resultado;
@@ -114,7 +115,7 @@ public class EjecucionPlsPago {
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Expedientes EJG de Justicia Gratuita. Error en PL = " + (String) resultado[3],
-                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoExpedientesEjgSJCS"));
+                    "messages.factSJCS.error.pagoExpedientesEjgSJCS");
         }
 
         return resultado;
@@ -199,7 +200,7 @@ public class EjecucionPlsPago {
             }
 
         } catch (Exception e) {
-            throw new FacturacionSJCSException("Error al exportar datos", e, utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.exportDatos"));
+            throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
         }
 
         // Resultado del PL
@@ -230,10 +231,33 @@ public class EjecucionPlsPago {
             }
 
         } catch (Exception e) {
-            throw new FacturacionSJCSException("Error al exportar datos", e, utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.exportDatos"));
+            throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
         }
 
         // Resultado del PL
+        return resultado[0];
+    }
+
+    public String ejecutarPLDeshacerCierre(Short idInstitucion, Date fechaPago) throws Exception {
+
+        String[] resultado;
+
+        try {
+
+            Object[] param_in = new Object[2];
+            param_in[0] = idInstitucion;
+            param_in[1] = fechaPago;
+
+            resultado = callPLProcedure("{call PROC_FACSJCS_DESCIERREPAGO (?,?,?,?)}", 2, param_in);
+
+            if (!resultado[0].equalsIgnoreCase("0")) {
+                LOGGER.error("Error en PL = " + (String) resultado[1]);
+            }
+
+        } catch (Exception e) {
+            throw new Exception("Error al ejecutar el PL de deshacer cierre", e);
+        }
+
         return resultado[0];
     }
 
@@ -288,8 +312,13 @@ public class EjecucionPlsPago {
 
             // input Parameters
             for (int i = 0; i < size; i++) {
-
-                cs.setString(i + 1, (String) inParameters[i]);
+                if (inParameters[i] instanceof Date) {
+                    cs.setDate(i + 1, new java.sql.Date(((Date) inParameters[i]).getTime()));
+                } else if (inParameters[i] instanceof Short) {
+                    cs.setShort(i + 1, (Short) inParameters[i]);
+                } else {
+                    cs.setString(i + 1, (String) inParameters[i]);
+                }
             }
             // output Parameters
             for (int i = 0; i < outParameters; i++) {

@@ -1,13 +1,15 @@
 package org.itcgae.siga.db.services.fcs.providers;
 
-import java.text.SimpleDateFormat;
-
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgSqlProvider;
+
+import java.text.SimpleDateFormat;
 
 public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvider {
 
@@ -393,7 +395,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
     }
 
     public String buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion,
-                                          Integer tamMax) {
+                                          Integer tamMax, boolean letrado) {
 
         SQL sql = new SQL();
         SQL sqlOrder = new SQL();
@@ -470,7 +472,9 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("fac.idinstitucion = importes.idinstitucion");
         sql.WHERE("fac.idinstitucion = grupo.idinstitucion");
         sql.WHERE("fac.idfacturacion = grupo.idfacturacion");
-        sql.WHERE("fac.visible = '1'");
+        if (letrado) {
+            sql.WHERE("fac.visible = '1'");
+        }
         sql.WHERE("fac.idinstitucion = " + idInstitucion);
 
         if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
@@ -687,7 +691,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
         sql.FROM("(" + sql2 + ")");
         sql.WHERE("totalimportesjcs > 0");
-        sql.WHERE("1 = 1");
 
         if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
 
@@ -833,6 +836,102 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
     }
 
+    public String getFacturacionesPorActuacionDesigna(Short idInstitucion, ScsActuaciondesigna scsActuaciondesigna) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("IDFACTURACION");
+        subQuery.FROM("FCS_FACT_ACTUACIONDESIGNA F");
+        subQuery.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("F.NUMEROASUNTO = " + scsActuaciondesigna.getNumeroasunto());
+        subQuery.WHERE("F.NUMERO = " + scsActuaciondesigna.getNumero());
+        subQuery.WHERE("F.ANIO = " + scsActuaciondesigna.getAnio());
+        subQuery.WHERE("F.IDTURNO = " + scsActuaciondesigna.getIdturno());
+
+        SQL sql = new SQL();
+        sql.SELECT("IDFACTURACION");
+        sql.SELECT("FAC.NOMBRE");
+        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDFACTURACION IN (" + subQuery.toString() + ")");
+
+        return sql.toString();
+    }
+
+    public String getDatosPagoAsuntoPorFacturacion(Short idInstitucion, String idFacturacion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("IDPAGOSJG");
+        sql.SELECT("NOMBRE");
+        sql.SELECT("'Pago' TIPO");
+        sql.SELECT("NVL(IMPORTEPAGADO, 0) IMPORTE");
+        sql.FROM("FCS_PAGOSJG");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDFACTURACION = " + idFacturacion);
+
+        return sql.toString();
+    }
+
+    public String getDatosMovimientoVarioAsuntoPorFacturacion(Short idInstitucion, String idFacturacion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("IDMOVIMIENTO");
+        sql.SELECT("DESCRIPCION");
+        sql.SELECT("'Movimiento Vario' TIPO");
+        sql.SELECT("NVL(CANTIDAD, 0) IMPORTE");
+        sql.FROM("FCS_MOVIMIENTOSVARIOS");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDFACTURACION = " + idFacturacion);
+
+        return sql.toString();
+    }
+
+    public String getDatosPagoAsuntoPorMovimientoVario(Short idInstitucion, String idMovimiento) {
+
+        SQL sql = new SQL();
+        sql.SELECT("P.IDPAGOSJG");
+        sql.SELECT("P.NOMBRE");
+        sql.SELECT("'Pago' TIPO");
+        sql.SELECT("NVL(P.IMPORTEPAGADO, 0) IMPORTE");
+        sql.FROM("FCS_APLICA_MOVIMIENTOSVARIOS AMV");
+        sql.JOIN("FCS_PAGOSJG P ON P.IDINSTITUCION = AMV.IDINSTITUCION AND P.IDPAGOSJG = AMV.IDPAGOSJG");
+        sql.WHERE("AMV.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("AMV.IDMOVIMIENTO = " + idMovimiento);
+
+        SQL sqlGroup = new SQL();
+        sqlGroup.SELECT("*");
+        sqlGroup.FROM("(" + sql.toString() + ")");
+        sqlGroup.GROUP_BY("IDPAGOSJG");
+        sqlGroup.GROUP_BY("NOMBRE");
+        sqlGroup.GROUP_BY("TIPO");
+        sqlGroup.GROUP_BY("IMPORTE");
+
+        return sqlGroup.toString();
+    }
+
+    public String getFacturacionesPorEJG(Short idInstitucion, ScsEjg scsEjg) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("IDFACTURACION");
+        subQuery.FROM("FCS_FACT_ASISTENCIA F");
+        subQuery.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("F.IDTIPOEJG = " + scsEjg.getIdtipoejg());
+        subQuery.WHERE("F.ANIO = " + scsEjg.getAnio());
+        subQuery.WHERE("F.NUMERO = " + scsEjg.getNumero());
+
+        SQL sql = new SQL();
+        sql.SELECT("FAC.IDFACTURACION");
+        sql.SELECT("FAC.NOMBRE");
+        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("NVL(FAC.IMPORTETOTAL, 0) IMPORTE");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FAC.IDFACTURACION IN (" + subQuery.toString() + ")");
+
+        return sql.toString();
+    }
+    
     public String facturacionesPorEstadoEjecucionTiempoLimite(String idInstitucion, Integer tiempoMaximo) {
         SQL sql = new SQL();
         SQL sql2 = new SQL();

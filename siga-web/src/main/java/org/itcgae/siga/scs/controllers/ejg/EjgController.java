@@ -564,7 +564,7 @@ public class EjgController {
 
 	// [ sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero,
 	// ejg.tipoEJG, this.generalBody.apellidos.concat(",", this.generalBody.nombre)]
-	@RequestMapping(value = "/gestion-ejg/updateRepresentanteContrarioEJGEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/gestion-ejg/updateRepresentanteContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateRepresentanteContrarioEJG(@RequestBody String[] item,
 			HttpServletRequest request) {
 		ScsContrariosejg contrario = new ScsContrariosejg();
@@ -573,6 +573,11 @@ public class EjgController {
 		contrario.setIdtipoejg(Short.parseShort(item[3]));
 		contrario.setNumero(Long.parseLong(item[2]));
 		contrario.setNombrerepresentanteejg(item[4]);
+		
+		if (item[5] != null) {
+			contrario.setIdrepresentanteejg(Long.parseLong(item[5]));
+		}
+		
 		UpdateResponseDTO response = gestionEJG.updateRepresentanteContrarioEJG(contrario, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);

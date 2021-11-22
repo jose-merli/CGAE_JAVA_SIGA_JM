@@ -35,7 +35,7 @@ public interface IPagoSJCSService {
     DeleteResponseDTO deleteConceptoPago(List<ConceptoPagoItem> listaConceptoPagoItem,
                                          HttpServletRequest request);
 
-    InsertResponseDTO ejecutarPagoSJCS(String idPago, HttpServletRequest request);
+    InsertResponseDTO ejecutarPagoSJCS(String idPago, boolean simular, HttpServletRequest request);
 
     ComboDTO comboPropTranferenciaSepa(HttpServletRequest request);
 

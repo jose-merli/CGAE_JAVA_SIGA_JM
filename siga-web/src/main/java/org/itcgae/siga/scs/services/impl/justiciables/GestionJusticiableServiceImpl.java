@@ -2473,27 +2473,47 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					//Seleccionamos el familiar que vamos a modificar
 					ScsUnidadfamiliarejgKey uniKey = new ScsUnidadfamiliarejgKey();
-
-					uniKey.setAnio(Short.parseShort(datos.getUf_anio()));
+					
+					//SIGARNV-2449@DTT.JAMARTIN@01/10/2021@INICIO
+					if(datos.getUf_anio() != null) {
+						uniKey.setAnio(Short.parseShort(datos.getUf_anio()));
+					}
+					
 					uniKey.setIdinstitucion(idInstitucion);
-					uniKey.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
-					uniKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));	
-					uniKey.setNumero(Long.parseLong(datos.getUf_numero()));
-
+					
+					if(datos.getUf_idPersona() != null) {
+						uniKey.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
+					}
+					if(datos.getUf_idTipoejg() != null) {
+						uniKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
+					}
+					if(datos.getUf_numero()  != null) {
+						uniKey.setNumero(Long.parseLong(datos.getUf_numero()));
+					}
+					//SIGARNV-2449@DTT.JAMARTIN@01/10/2021@FIN
+					
 					ScsUnidadfamiliarejg familiar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(uniKey);
 
 					//Se comprueban y modifican los valores asociados a solicitante y rol
 					
 					ScsEjgKey ejgKey = new ScsEjgKey();
 					
-					ejgKey.setAnio(Short.parseShort(datos.getUf_anio()));
+					//SIGARNV-2449@DTT.JAMARTIN@01/10/2021@INICIO
+					if(datos.getUf_anio() != null) {
+						ejgKey.setAnio(Short.parseShort(datos.getUf_anio()));
+					}
 					ejgKey.setIdinstitucion(idInstitucion);
-					ejgKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
-					ejgKey.setNumero(Long.parseLong(datos.getUf_numero()));
+					
+					if(datos.getUf_idTipoejg() != null) {
+						ejgKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
+					}
+					if(datos.getUf_numero() != null) {
+						ejgKey.setNumero(Long.parseLong(datos.getUf_numero()));
+					}
 					
 					ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 					
-					if(familiar.getEncalidadde() != null && datos.getUf_enCalidad() != null) {
+					if( familiar != null && familiar.getEncalidadde() != null && datos.getUf_enCalidad() != null) {
 						//En el caso que se le cambie el rol a un solicitante principal
 						if( familiar.getEncalidadde().equals("3") && !datos.getUf_enCalidad().equals("3")) {
 							ejg.setIdpersonajg(null);
@@ -2507,43 +2527,49 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 								ejg.setIdpersonajg(Long.parseLong(datos.getUf_idPersona()));
 								if(response==1) response = scsEjgMapper.updateByPrimaryKey(ejg);
 							}
-							familiar.setSolicitante((short) 1);
+							if( familiar != null) {
+								familiar.setSolicitante((short) 1);
+							}
 						}
 						//En el caso que se seleccione el rol de "Unidad familiar"
 						else {
-							familiar.setSolicitante((short) 0);
+							if( familiar != null) {
+								familiar.setSolicitante((short) 0);
+							}
 						}
 					}
 					
 					//Modificamos el familiar
-					familiar.setEncalidadde(datos.getUf_enCalidad());
-					if(datos.getIncapacitado() != null) familiar.setIncapacitado(datos.getIncapacitado());
-					if(datos.getCircunsExcep() != null) familiar.setCircunstanciasExcepcionales(datos.getCircunsExcep());
-
-					familiar.setIdtipogrupolab(datos.getIdTipoGrupoLab());
-					familiar.setIdparentesco(datos.getIdParentesco());
-					
-					familiar.setIdtipoingreso(datos.getIdTipoIngreso());
-					familiar.setDescripcioningresosanuales(datos.getDescrIngrAnuales());
-					familiar.setImporteingresosanuales(datos.getImpIngrAnuales());
-					familiar.setBienesinmuebles(datos.getBienesInmu());
-					familiar.setImportebienesinmuebles(datos.getImpBienesInmu());
-					familiar.setBienesmuebles(datos.getBienesMu());
-					familiar.setImportebienesmuebles(datos.getImpBienesMu());
-					familiar.setOtrosbienes(datos.getOtrosBienes());
-					familiar.setImporteotrosbienes(datos.getImpOtrosBienes());		
-
-					familiar.setObservaciones(datos.getObservaciones());
-
-					familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
-					familiar.setFechamodificacion(new Date());
-
-					//Actualizamos la entrada
-					if(response == 1) response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);	
+					if( familiar != null) {
+						familiar.setEncalidadde(datos.getUf_enCalidad());
+						if(datos.getIncapacitado() != null) familiar.setIncapacitado(datos.getIncapacitado());
+						if(datos.getCircunsExcep() != null) familiar.setCircunstanciasExcepcionales(datos.getCircunsExcep());
+	
+						familiar.setIdtipogrupolab(datos.getIdTipoGrupoLab());
+						familiar.setIdparentesco(datos.getIdParentesco());
 						
-					
-					
-					
+						familiar.setIdtipoingreso(datos.getIdTipoIngreso());
+						familiar.setDescripcioningresosanuales(datos.getDescrIngrAnuales());
+						familiar.setImporteingresosanuales(datos.getImpIngrAnuales());
+						familiar.setBienesinmuebles(datos.getBienesInmu());
+						familiar.setImportebienesinmuebles(datos.getImpBienesInmu());
+						familiar.setBienesmuebles(datos.getBienesMu());
+						familiar.setImportebienesmuebles(datos.getImpBienesMu());
+						familiar.setOtrosbienes(datos.getOtrosBienes());
+						familiar.setImporteotrosbienes(datos.getImpOtrosBienes());		
+	
+						familiar.setObservaciones(datos.getObservaciones());
+	
+						familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+						familiar.setFechamodificacion(new Date());
+	
+						//Actualizamos la entrada
+						if(response == 1) {
+							response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);	
+						}
+					}
+					//SIGARNV-2449@DTT.JAMARTIN@01/10/2021@FIN
+
 				} catch (Exception e) {
 					LOGGER.error(e);
 					error.setCode(500);

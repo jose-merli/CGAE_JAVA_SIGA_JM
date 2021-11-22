@@ -1233,7 +1233,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 	
 	private void CheckGrupoOrden (CargaMasivaDatosITItem cargaMasivaDatosITItem, StringBuffer errorLinea, Short idInstitucion, Hashtable<String, Object> hashtable, Vector<Hashtable<String, Object>> datos) {
 		//Comprobamos que la guardia esta en un grupo. Se cambian los valores pero no se añade un error para que no impida su posible insercion
-		List<CargaMasivaDatosITItem> group = scsInscripcionguardiaExtendsMapper.searchGrupoGuardia(idInstitucion, cargaMasivaDatosITItem.getIdGuardia());
+		List<CargaMasivaDatosITItem> group = scsInscripcionguardiaExtendsMapper.searchGrupoGuardia(idInstitucion, cargaMasivaDatosITItem.getIdGuardia(), null);
 		if(group.isEmpty()) {
 			cargaMasivaDatosITItem.setOrden("Error");
 			cargaMasivaDatosITItem.setGrupo("Error");

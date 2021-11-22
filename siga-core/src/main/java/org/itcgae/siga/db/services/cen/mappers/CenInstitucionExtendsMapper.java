@@ -94,5 +94,11 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 			})
 	List<ComboItem> getComboInstitucionesCol(String idInstitucion); 
 	
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getComboInstitucionesNombre")
+	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
+		 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
+			})
+	List<ComboItem> getComboInstitucionesNombre(); 
+	
 	
 }

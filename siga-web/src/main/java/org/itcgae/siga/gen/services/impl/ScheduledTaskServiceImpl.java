@@ -70,12 +70,4 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 		fichaEventosService.generateNotificationsAuto();
 		//LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> SALE generateNotificationAuto");
 	}
-	
-	@Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
-	@Override
-	public void ejecutaFacturacionSJCS() {
-		LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
-		facturacionServices.ejecutaFacturacionSJCS();
-		LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
-	}
 }
