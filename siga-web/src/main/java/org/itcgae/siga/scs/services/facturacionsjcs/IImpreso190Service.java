@@ -19,5 +19,5 @@ public interface IImpreso190Service {
 	
 	Impreso190DTO searchImpreso190(int anio, HttpServletRequest request) throws Exception;
 
-	Impreso190DTO deleteImpreso190(Impreso190Item impreso190Item, HttpServletRequest request);
+	Impreso190DTO deleteImpreso190(List<Impreso190Item> impreso190Item, HttpServletRequest request);
 }
