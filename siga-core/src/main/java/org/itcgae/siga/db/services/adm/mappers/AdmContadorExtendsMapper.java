@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
 import org.itcgae.siga.DTOs.adm.ParametroItem;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.services.adm.providers.AdmContadorSqlExtendsProvider;
 import org.itcgae.siga.db.services.adm.providers.GenParametrosSqlExtendsProvider;
@@ -78,4 +79,17 @@ public interface AdmContadorExtendsMapper extends AdmContadorMapper{
 		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 	})
 	List<ParametroItem> getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO);
+
+	@SelectProvider(type = GenParametrosSqlExtendsProvider.class, method = "getSiguienteNumContador")
+	@Results({
+			@Result(column = "CONTADOR", property = "contador", jdbcType = JdbcType.DECIMAL)
+	})
+	Long getSiguienteNumContador(AdmContador contador);
+
+	@SelectProvider(type = GenParametrosSqlExtendsProvider.class, method = "comprobarUnicidadContador")
+	@Results({
+			@Result(column = "CONTADOR", property = "contador", jdbcType = JdbcType.DECIMAL)
+	})
+	Long comprobarUnicidadContador(AdmContador contador, int contadorSiguiente);
+
 }

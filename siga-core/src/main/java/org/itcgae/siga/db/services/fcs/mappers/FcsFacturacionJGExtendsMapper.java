@@ -208,4 +208,25 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 			@Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboFacturaciones(String idInstitucion);
 
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "facturacionesPorEstadoEjecucionTiempoLimite")
+	@Results({ @Result(column = "IDFACTURACION", property = "idfacturacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHADESDE", property = "fechadesde", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAHASTA", property = "fechahasta", jdbcType = JdbcType.DATE),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPORTETOTAL", property = "importetotal", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPORTEOFICIO", property = "importeoficio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPORTEGUARDIA", property = "importeguardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPORTESOJ", property = "importesoj", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPORTEEJG", property = "importeejg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PREVISION", property = "prevision", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "REGULARIZACION", property = "regularizacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.DATE),
+			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFACTURACION_REGULARIZA", property = "idfacturacionRegulariza", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREFISICO", property = "nombrefisico", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDECOMCOLA", property = "idecomcola", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.VARCHAR) })
+	List<FcsFacturacionjg> facturacionesPorEstadoEjecucionTiempoLimite(String idInstitucion, Integer tiempoMaximo);
 }

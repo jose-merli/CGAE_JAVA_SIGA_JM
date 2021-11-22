@@ -17,6 +17,7 @@ import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -129,6 +130,18 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     @Autowired
     private AdmConfigMapper admConfigMapper;
 
+    @Autowired
+    private GenPropertiesMapper genPropertiesMapper;
+    
+    @Autowired
+    private FcsTrazaErrorEjecucionMapper fcsTrazaErrorEjecucionMapper;
+
+    @Autowired
+    private FcsTrazaErrorEjecucionExtendsMapper fcsTrazaErrorEjecucionExtendsMapper;
+    
+    @Autowired
+    private IFacturacionSJCSZombiService iFacturacionSJCSZombiService;
+    
     @Override
     public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
@@ -1821,11 +1834,20 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             + (String) resultado[2]);
                 }
             } catch (IOException | NamingException | SQLException e) {
-                LOGGER.error(
+               LOGGER.error(
                         "Error en PL al ejecutar la regularización de Turnos de Oficio = " + (String) resultado[2]);
-                throw new Exception("Ha ocurrido un error al ejecutar la regularización de Turnos de Oficio", e);
+               FcsTrazaErrorEjecucion record = new FcsTrazaErrorEjecucion();
+               int currentSeq =  fcsTrazaErrorEjecucionExtendsMapper.selectSQ();
+               record.setIderror((long) (currentSeq + 1));
+               record.setIdinstitucion(item.getIdinstitucion());
+               record.setIdfacturacion(item.getIdfacturacion());
+               record.setIdoperacion("1");
+               record.setDescripcion( "Error en PL al ejecutar la regularización de Turnos de Oficio");
+               record.setFechamodificacion(new Date());
+               record.setUsumodificacion(0);
+               fcsTrazaErrorEjecucionMapper.insert(record);
+               throw new Exception("Ha ocurrido un error al ejecutar la regularización de Turnos de Oficio", e);
             }
-
             importeOficio = new Double(resultado[0].replaceAll(",", "."));
             importeTotal += importeOficio.doubleValue();
 
@@ -1843,9 +1865,18 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 }
             } catch (IOException | NamingException | SQLException e) {
                 LOGGER.error("Error en PL al ejecutar la regularización de Guardias = " + (String) resultado[2]);
+                FcsTrazaErrorEjecucion record = new FcsTrazaErrorEjecucion();
+                int currentSeq =  fcsTrazaErrorEjecucionExtendsMapper.selectSQ();
+                record.setIderror((long) (currentSeq + 1));
+                record.setIdinstitucion(item.getIdinstitucion());
+                record.setIdfacturacion(item.getIdfacturacion());
+                record.setIdoperacion("2");
+                record.setDescripcion( "Error en PL al ejecutar la regularización de Guardias");
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(0);
+                fcsTrazaErrorEjecucionMapper.insert(record);
                 throw new Exception("Ha ocurrido un error al ejecutar la regularización de Guardias", e);
             }
-
             importeGuardia = new Double((String) resultado[0].replaceAll(",", "."));
             importeTotal += importeGuardia.doubleValue();
 
@@ -1862,6 +1893,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 }
             } catch (IOException | NamingException | SQLException e) {
                 LOGGER.error("Error en PL al ejecutar la regularización de SOJ = " + (String) resultado[2]);
+                FcsTrazaErrorEjecucion record = new FcsTrazaErrorEjecucion();
+                int currentSeq =  fcsTrazaErrorEjecucionExtendsMapper.selectSQ();
+                record.setIderror((long) (currentSeq + 1));
+                record.setIdinstitucion(item.getIdinstitucion());
+                record.setIdfacturacion(item.getIdfacturacion());
+                record.setIdoperacion("3");
+                record.setDescripcion( "Error en PL al ejecutar la regularización de SOJ");
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(0);
+                fcsTrazaErrorEjecucionMapper.insert(record);
                 throw new Exception("Ha ocurrido un error al ejecutar la regularización de SOJ", e);
             }
 
@@ -1882,6 +1923,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 }
             } catch (IOException | NamingException | SQLException e) {
                 LOGGER.error("Error en PL al ejecutar la regularización de EJG= " + (String) resultado[2]);
+                FcsTrazaErrorEjecucion record = new FcsTrazaErrorEjecucion();
+                int currentSeq =  fcsTrazaErrorEjecucionExtendsMapper.selectSQ();
+                record.setIderror((long) (currentSeq + 1));
+                record.setIdinstitucion(item.getIdinstitucion());
+                record.setIdfacturacion(item.getIdfacturacion());
+                record.setIdoperacion("4");
+                record.setDescripcion( "Error en PL al ejecutar la regularización de EJG");
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(0);
+                fcsTrazaErrorEjecucionMapper.insert(record);
                 throw new Exception("Ha ocurrido un error al ejecutar la regularización de EJG", e);
             }
 
@@ -1938,6 +1989,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     param_in_facturacion);
             if (!resultado[2].equalsIgnoreCase("Fin correcto ")) {
                 LOGGER.error("Error en PL = " + (String) resultado[2]);
+                FcsTrazaErrorEjecucion record = new FcsTrazaErrorEjecucion();
+                int currentSeq =  fcsTrazaErrorEjecucionExtendsMapper.selectSQ();
+                record.setIderror((long) (currentSeq + 1));
+                record.setIdinstitucion(itemFac.getIdinstitucion());
+                record.setIdfacturacion(itemFac.getIdfacturacion());
+                record.setIdoperacion("5");
+                record.setDescripcion( "Ha ocurrido un error al ejecutar la facturación de Turnos de Oficio");
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(0);
+                fcsTrazaErrorEjecucionMapper.insert(record);
                 throw new Exception("Ha ocurrido un error al ejecutar la facturación de Turnos de Oficio: "
                         + (String) resultado[2]);
             }
@@ -1957,6 +2018,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     param_in_facturacion);
             if (!resultado[2].equalsIgnoreCase("El proceso:PROC_FCS_FACTURAR_GUARDIAS ha finalizado correctamente")) {
                 LOGGER.error("Error en PL = " + (String) resultado[2]);
+                FcsTrazaErrorEjecucion record = new FcsTrazaErrorEjecucion();
+                int currentSeq =  fcsTrazaErrorEjecucionExtendsMapper.selectSQ();
+                record.setIderror((long) (currentSeq + 1));
+                record.setIdinstitucion(itemFac.getIdinstitucion());
+                record.setIdfacturacion(itemFac.getIdfacturacion());
+                record.setIdoperacion("6");
+                record.setDescripcion( "Ha ocurrido un error al ejecutar la facturación de Guardias");
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(0);
+                fcsTrazaErrorEjecucionMapper.insert(record);
                 throw new Exception(
                         "Ha ocurrido un error al ejecutar la facturación de Guardias: " + (String) resultado[2]);
             }
@@ -1976,6 +2047,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     param_in_facturacion);
             if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
                 LOGGER.error("Error en PL = " + (String) resultado[2]);
+                FcsTrazaErrorEjecucion record = new FcsTrazaErrorEjecucion();
+                int currentSeq =  fcsTrazaErrorEjecucionExtendsMapper.selectSQ();
+                record.setIderror((long) (currentSeq + 1));
+                record.setIdinstitucion(itemFac.getIdinstitucion());
+                record.setIdfacturacion(itemFac.getIdfacturacion());
+                record.setIdoperacion("7");
+                record.setDescripcion( "Ha ocurrido un error al ejecutar la facturación de Expedientes de Orientación Jurídica");
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(0);
+                fcsTrazaErrorEjecucionMapper.insert(record);
                 throw new Exception(
                         "Ha ocurrido un error al ejecutar la facturación de Expedientes de Orientación Jurídica: "
                                 + (String) resultado[2]);
@@ -1996,6 +2077,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     param_in_facturacion);
             if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
                 LOGGER.error("Error en PL = " + (String) resultado[2]);
+                FcsTrazaErrorEjecucion record = new FcsTrazaErrorEjecucion();
+                int currentSeq =  fcsTrazaErrorEjecucionExtendsMapper.selectSQ();
+                record.setIderror((long) (currentSeq + 1));
+                record.setIdinstitucion(itemFac.getIdinstitucion());
+                record.setIdfacturacion(itemFac.getIdfacturacion());
+                record.setIdoperacion("8");
+                record.setDescripcion( "Ha ocurrido un error al ejecutar la facturación de Expedientes de Justicia Gratuita");
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(0);
+                fcsTrazaErrorEjecucionMapper.insert(record);
                 throw new Exception(
                         "Ha ocurrido un error al ejecutar la facturación de Expedientes de Justicia Gratuita: "
                                 + (String) resultado[2]);
@@ -2141,6 +2232,108 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             con.close();
             con = null;
         }
+    }
+
+    @Override
+    public void ejecutaFacturacionesSJCSBloqueadas() {
+        if (isAlguienEjecutando()) {
+            LOGGER.debug(
+                    "YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+            return;
+        }
+        procesarFacturacionesSJCSBloqueadas();
+
+
+        try {} catch (Exception e) {
+            throw e;
+        } finally {
+            setNadieEjecutando();
+        }
+    }
+
+    private void procesarFacturacionesSJCSBloqueadas() {
+
+        CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+        exampleInstitucion.setDistinct(true);
+        exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();
+
+        List<CenInstitucion> listaInstituciones = institucionMapper.selectByExample(exampleInstitucion);
+
+        for (CenInstitucion institucion : listaInstituciones) {
+            facturacionesBloqueadasEnEjecucion(institucion);
+        }
+
+    }
+
+    private void facturacionesBloqueadasEnEjecucion(CenInstitucion institucion) {
+        LOGGER.info("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
+
+        //Recuperamos el tiempo estimado como bloqueo
+        GenPropertiesKey propertiesPK = new GenPropertiesKey();
+        propertiesPK.setFichero("SIGA");
+        propertiesPK.setParametro("facturacion.programacionAutomatica.maxMinutosEnEjecucion");
+        GenProperties tiempoMaximoMinutos = genPropertiesMapper.selectByPrimaryKey(propertiesPK);
+
+        List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
+                .facturacionesPorEstadoEjecucionTiempoLimite(institucion.getIdinstitucion().toString(), Integer.parseInt(tiempoMaximoMinutos.getValor()));
+
+        for (FcsFacturacionjg item : listaFacturaciones) {
+
+            try {
+                // Insertamos el estado ABIERTA para las facturaciones en ejecucion
+                insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
+                        item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
+
+                // Localizamos donde se quedó el proceso de cierre y dehacemos lo hasta ahora modificado(conceptoErroneo puede ser Turno/Guardia/EJG/SOJ)
+                FcsTrazaErrorEjecucion conceptoErroneo = localizadaEstadoFacturacionBloqueadaEnEjecucion(item);
+                if(conceptoErroneo != null) {
+                	if("1".equals(conceptoErroneo.getIdoperacion())) {
+                		iFacturacionSJCSZombiService.deshacerRegularTurnosOfi(conceptoErroneo);
+                    }else if("2".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularGuardias(conceptoErroneo);
+                    }else if("3".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularSOJ(conceptoErroneo);
+                    }else if("4".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularEJG(conceptoErroneo);
+                    }else if("5".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerTurnosOfi(conceptoErroneo);
+                    }else if("6".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerGuardias(conceptoErroneo);
+                    }else if("7".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerSOJ(conceptoErroneo);
+                    }else if("8".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerEJG(conceptoErroneo);
+                    }
+                }
+                
+
+            } catch (Exception e) {
+                LOGGER.error(e);
+                actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
+                        item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
+                insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
+                        item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
+            }
+        }
+
+        LOGGER.info("SALE -> FacturacionSJCSServicesImpl.facturacionesBloqueadas(): " + listaFacturaciones.toString());
+    }
+
+    public FcsTrazaErrorEjecucion localizadaEstadoFacturacionBloqueadaEnEjecucion(FcsFacturacionjg facturacionBloqueadaEnEjecucion){
+        //Comprobamos si ha ejecutado el primer paso de la facturaciones de guardias
+        FcsTrazaErrorEjecucionExample record = new FcsTrazaErrorEjecucionExample();
+        record.createCriteria().andIdfacturacionEqualTo(facturacionBloqueadaEnEjecucion.getIdfacturacion()).andIdinstitucionEqualTo(facturacionBloqueadaEnEjecucion.getIdinstitucion());
+        List<FcsTrazaErrorEjecucion> estadosEjecucion = fcsTrazaErrorEjecucionMapper.selectByExample(record);
+        long actual = 0;
+        FcsTrazaErrorEjecucion estadoError = null;
+        for(FcsTrazaErrorEjecucion factError: estadosEjecucion) {
+        	long actualAux = factError.getIderror();
+        	if(actualAux > actual) {
+        		estadoError = factError;
+        	}
+        }
+
+        return estadoError;
     }
 
 }

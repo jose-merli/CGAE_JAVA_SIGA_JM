@@ -1169,4 +1169,5 @@ public class SigaConstants {
 	public static final String PARAMETRO_CLAVE_CERTIFICADOS_DIGITALES = "CLAVE_CERTIFICADOS_DIGITALES";
 	public static final String FILE_SEP = System.getProperty("file.separator");
 
+	public static final String SOJ = "SOJ";
 }

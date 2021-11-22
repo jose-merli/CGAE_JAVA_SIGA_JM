@@ -46,4 +46,6 @@ public interface IFacturacionSJCSServices {
 	public PagosjgDTO datosPagos(String idFacturacion, HttpServletRequest request);
 
 	public void ejecutaFacturacionSJCS();
+
+	public void ejecutaFacturacionesSJCSBloqueadas();
 }

@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.adm.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
+import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.mappers.GenParametrosSqlProvider;
 
@@ -179,5 +180,42 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		
 		return sql.toString();
 	}
-	
+
+	public String getSiguienteNumContador(AdmContador contador){
+		SQL sql = new SQL();
+
+		sql.SELECT("max (" + contador.getIdcampocontador() + ")+1 CONTADOR");
+
+		sql.FROM(contador.getIdtabla());
+
+		sql.WHERE("IDINSTITUCION = " + contador.getIdinstitucion() + " and " +
+				contador.getIdcampoprefijo() + "= " + contador.getPrefijo() +" and " +
+				contador.getIdcamposufijo() + "= " + contador.getSufijo() );
+
+		return sql.toString();
+	}
+
+	public String comprobarUnicidadContador(AdmContador contador, int contadorSiguiente){
+		SQL sql = new SQL();
+
+		sql.SELECT(contador.getIdcampocontador() + " CONTADOR");
+
+		sql.FROM(contador.getIdtabla());
+
+		sql.WHERE("IDINSTITUCION = " + contador.getIdinstitucion() + " and " +
+				contador.getIdcampocontador() + "= " + contadorSiguiente);
+
+		if(contador.getPrefijo() != null && !contador.getPrefijo().equals("") ){
+			sql.WHERE(contador.getIdcampoprefijo() + " = " + contador.getPrefijo());
+		}else{
+			sql.WHERE(contador.getIdcampoprefijo() + " IS NULL " );
+		}
+
+		if(contador.getSufijo() != null && !contador.getSufijo().equals("") ){
+			sql.WHERE(contador.getIdcamposufijo() + " = " + contador.getSufijo());
+		}else{
+			sql.WHERE(contador.getIdcamposufijo() + " IS NULL " );
+		}
+		return sql.toString();
+	}
 }
