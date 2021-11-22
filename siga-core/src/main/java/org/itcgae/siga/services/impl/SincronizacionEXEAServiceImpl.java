@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.rmi.CORBA.Util;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -84,6 +85,12 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
     @Autowired
     private CenBancosExtendsMapper cenBancosExtendsMapper;
+
+    @Autowired
+    private CenSancionExtendsMapper cenSancionExtendsMapper;
+
+    @Autowired
+    private CenTiposancionExtendsMapper cenTiposancionExtendsMapper;
 
     /**
      * Metodo que recibe una peticion {@link ObtenerNumColegiacionResponseDocument} y, tras varias validaciones, devuelve o no el proximo numero de colegiado
@@ -389,6 +396,99 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
         log.info("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / RESPONSE: " + responseDocument.xmlText());
         log.info("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() - FIN");
+        return responseDocument;
+    }
+
+    /**
+     * Servicio encargado de dar de alta una sancion
+     *
+     * @param requestDocument
+     * @param ipCliente
+     * @return
+     * @throws SigaExceptions
+     */
+    @Override
+    @Transactional(rollbackFor = SigaExceptions.class)
+    public AltaSancionResponseDocument altaSancion(AltaSancionRequestDocument requestDocument, String ipCliente) throws SigaExceptions {
+
+        log.info("SincronizacionEXEAServiceImpl.altaSancion() - INICIO");
+        log.info("SincronizacionEXEAServiceImpl.altaSancion() / REQUEST : " + requestDocument.xmlText());
+
+        AltaSancionResponseDocument responseDocument =  AltaSancionResponseDocument.Factory.newInstance();
+        AltaSancionResponseDocument.AltaSancionResponse response = responseDocument.addNewAltaSancionResponse();
+        AltaSancionRequestDocument.AltaSancionRequest request = requestDocument.getAltaSancionRequest();
+        int affectedRows = 0;
+
+        try{
+            wsCommons.validaPeticion(request,response,true);
+            //El codigo de colegio es el codigo externo de la institucion, buscamos el idinstitucion real
+            CenInstitucion institucion = wsCommons.buscarColegio(request.getSancion().getDatosSancion().getColegioConsejo().getCodigoColegio());
+            Short idInstitucion = null;
+            if(institucion != null){
+                idInstitucion = institucion.getIdinstitucion();
+                log.info("SincronizacionEXEAServiceImpl.altaSancion() / Colegio encontrado: " + request.getSancion().getDatosSancion().getColegioConsejo().getCodigoColegio() + " - " + idInstitucion);
+            }else{
+                ErrorType errorType = response.addNewError();
+                errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.COLEGIO_NOVALIDO.name());
+                errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.COLEGIO_NOVALIDO.getMensajeError());
+                errorType.setXmlRequest("Sin error XML");
+                log.error("SincronizacionEXEAServiceImpl.altaSancion() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getSancion().getDatosSancion().getColegioConsejo().getCodigoColegio());
+            }
+            if(idInstitucion != null) {
+
+                String identificacion;
+                Long idPersona;
+
+                if (!UtilidadesString.esCadenaVacia(request.getSancion().getIdentificacionColegiado().getNIF())) {
+                    identificacion = request.getSancion().getIdentificacionColegiado().getNIF();
+                    log.info("SincronizacionEXEAServiceImpl.altaSancion() / Informado NIF: " + identificacion);
+                } else if (!UtilidadesString.esCadenaVacia(request.getSancion().getIdentificacionColegiado().getNIE())) {
+                    identificacion = request.getSancion().getIdentificacionColegiado().getNIE();
+                    log.info("SincronizacionEXEAServiceImpl.altaSancion() / Informado NIE: " + identificacion);
+                } else {
+                    identificacion = request.getSancion().getIdentificacionColegiado().getPasaporte();
+                    log.info("SincronizacionEXEAServiceImpl.altaSancion() / Informado Pasaporte: " + identificacion);
+                }
+
+                idPersona = cenPersonaExtendsMapper.getIdPersonaWithNif(identificacion);
+
+                if(idPersona != null){
+
+                    affectedRows += insertarDatosSancion(request, response, idInstitucion, idPersona);
+
+                    if(affectedRows > 0){
+
+                        response.setNumeroExpediente(request.getNumeroExpediente());
+                        log.info("SincronizacionEXEAServiceImpl.altaSancion() / Sancion creada satisfactoriamente, informamos numero de expediente en la respuesta");
+
+                    }else if(response.getError() == null){
+
+                        ErrorType errorType = response.addNewError();
+                        errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.name());
+                        errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.getMensajeError());
+                        log.error("SincronizacionEXEAServiceImpl.altaSancion() / Hubo un error creando la sancion");
+
+                    }
+
+                }else{
+                    ErrorType errorType = response.addNewError();
+                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.COLEGIADO_NOENCONTRADO.name());
+                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.COLEGIADO_NOENCONTRADO.getMensajeError());
+                    errorType.setXmlRequest("Sin error XML");
+                    log.error("SincronizacionEXEAServiceImpl.altaSancion() / ERROR: No se ha encontrado al colegiado con identificacion " + identificacion);
+                }
+
+            }
+
+        }catch (ValidationException validationException) {
+            log.error("SincronizacionEXEAServiceImpl.altaSancion() / Error: XML NO VALIDO", validationException);
+        } catch (Exception e){
+            log.error("SincronizacionEXEAServiceImpl.altaSancion() / ERROR NO CONTROLADO", e);
+            throw new SigaExceptions(e,e.getMessage());
+        }
+
+        log.info("SincronizacionEXEAServiceImpl.altaSancion() / RESPONSE : " + responseDocument.xmlText());
+        log.info("SincronizacionEXEAServiceImpl.altaSancion() - FIN");
         return responseDocument;
     }
 
@@ -1094,6 +1194,125 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
         log.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() - FIN");
         return idCuenta;
+    }
+
+    /**
+     * Metodo encargado de insertar los datos de la sancion
+     *
+     * @param request
+     * @param idInstitucion
+     * @param idPersona
+     * @return
+     */
+    @Transactional
+    private int insertarDatosSancion(AltaSancionRequestDocument.AltaSancionRequest request, AltaSancionResponseDocument.AltaSancionResponse response, Short idInstitucion, Long idPersona){
+        log.info("SincronizacionEXEAServiceImpl.insertarDatosSancion() - INICIO");
+        int affectedRows = 0;
+        CenSancion cenSancion = new CenSancion();
+        NewIdDTO idSancion = cenSancionExtendsMapper
+                .getMaxIdSancion(String.valueOf(idInstitucion), String.valueOf(idPersona));
+        Short idTipoSancion = getIdSancionFromCdgoExt(request.getSancion().getDatosSancion().getTipoSancion(), response);
+
+        if(idTipoSancion != null) {
+
+            if (idSancion == null) {
+                cenSancion.setIdsancion((long) 1);
+            } else {
+                int idS = Integer.parseInt(idSancion.getNewId()) + 1;
+                cenSancion.setIdsancion((long) idS);
+            }
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosSancion() / ID generado para la sancion: " + cenSancion.getIdsancion());
+            cenSancion.setIdpersona(idPersona);
+            cenSancion.setIdinstitucion(idInstitucion);
+            cenSancion.setIdinstitucionsancion(idInstitucion);
+            cenSancion.setIdtiposancion(idTipoSancion);
+            cenSancion.setRefcolegio(request.getSancion().getDatosSancion().getRefSancion());
+            cenSancion.setFechaacuerdo(request.getSancion().getDatosSancion().getFechaAcuerdo().getTime());
+            cenSancion.setFechainicio(request.getSancion().getDatosSancion().getFechaInicio().getTime());
+            cenSancion.setNumExpediente(request.getNumeroExpediente());
+
+            if(request.getSancion().getDatosSancion().getFechaFin() != null){
+                cenSancion.setFechafin(request.getSancion().getDatosSancion().getFechaFin().getTime());
+            }
+
+            if(request.getSancion().getDatosSancion().getDatosFirmeza() != null
+                && request.getSancion().getDatosSancion().getDatosFirmeza().getFecha() != null){
+
+                cenSancion.setFechafirmeza(request.getSancion().getDatosSancion().getDatosFirmeza().getFecha().getTime());
+
+            }
+
+            if(request.getSancion().getDatosSancion().getDatosFirmeza() != null
+                    && request.getSancion().getDatosSancion().getDatosFirmeza().getCheck() != null){
+
+                cenSancion.setChkfirmeza(request.getSancion().getDatosSancion().getDatosFirmeza().getCheck().toString());
+
+            }
+            cenSancion.setChkarchivada(SigaConstants.DB_FALSE);
+            cenSancion.setChkrehabilitado(SigaConstants.DB_FALSE);
+            cenSancion.setUsumodificacion(0);
+            cenSancion.setFechamodificacion(new Date());
+            cenSancion.setTexto(request.getSancion().getDatosSancion().getTexto());
+            cenSancion.setObservaciones(request.getSancion().getDatosSancion().getObservaciones());
+
+            log.info("SincronizacionEXEAServiceImpl.insertarDatosSancion() / Insertamos en la institucion " + idInstitucion + " y para el colegiado con idpersona " + idPersona);
+            affectedRows += cenSancionExtendsMapper.insert(cenSancion);
+
+            //Si no es firme, se crea una para la institucion general
+            //FIXME: REVISAR ESTO, YA QUE EN EL XSD SOLO DEJA INFORMAR O FECHA FIRMEZA O EL CHECK FIRMEZA
+            if(request.getSancion().getDatosSancion().getDatosFirmeza() == null
+                    || (request.getSancion().getDatosSancion().getDatosFirmeza().getFecha() != null
+                    && TipoBoolean.X_0.equals(request.getSancion().getDatosSancion().getDatosFirmeza().getCheck())
+                    && !SigaConstants.InstitucionGeneral.equals(idInstitucion.toString()))){
+
+                CenSancion sancionInstitucionGeneral = cenSancion;
+
+                sancionInstitucionGeneral.setIdsancionorigen(cenSancion.getIdsancion());
+                sancionInstitucionGeneral.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
+                sancionInstitucionGeneral.setIdinstitucionsancion(idInstitucion);
+                sancionInstitucionGeneral.setIdinstitucionorigen(idInstitucion);
+
+                log.info("SincronizacionEXEAServiceImpl.insertarDatosSancion() / Insertamos en la institucion 2000");
+
+                affectedRows += cenSancionExtendsMapper.insertSelective(sancionInstitucionGeneral);
+
+            }
+
+        }else{
+            ErrorType errorType = response.addNewError();
+            errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.name());
+            errorType.setDescripcion("Tipo de sancion no encontrada en el sistema");
+            errorType.setXmlRequest("Sin error XML");
+            log.error("SincronizacionEXEAServiceImpl.insertarDatosSancion() / Tipo de sancion no encontrada en el sistema, devolvemos error");
+        }
+        return  affectedRows;
+    }
+
+    private Short getIdSancionFromCdgoExt(AltaSancionRequestDocument.AltaSancionRequest.Sancion.DatosSancion.TipoSancion tipoSancion, AltaSancionResponseDocument.AltaSancionResponse response){
+        Short idSancion = null;
+        List<CenTiposancion> tipoSanciones;
+        if(!UtilidadesString.esCadenaVacia(tipoSancion.getCodigo())){
+
+            CenTiposancionExample cenTiposancionExample = new CenTiposancionExample();
+            cenTiposancionExample.createCriteria().andCodigoextEqualTo(tipoSancion.getCodigo());
+
+            tipoSanciones = cenTiposancionExtendsMapper.selectByExample(cenTiposancionExample);
+
+            if(tipoSanciones != null
+                && !tipoSanciones.isEmpty()){
+
+                idSancion = tipoSanciones.get(0).getIdtiposancion();
+
+            }else{
+                ErrorType errorType = response.addNewError();
+                errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.SANCION_NOENCONTRADA.name());
+                errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.SANCION_NOENCONTRADA.getMensajeError());
+                errorType.setXmlRequest("Sin error XML");
+                log.error("SincronizacionEXEAServiceImpl.getIdSancionFromCdgoExt() - TIPO DE SANCION NO ENCONTRADA");
+            }
+        }
+
+        return idSancion;
     }
 
     /**

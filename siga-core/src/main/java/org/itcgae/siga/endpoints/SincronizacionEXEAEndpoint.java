@@ -1,9 +1,6 @@
 package org.itcgae.siga.endpoints;
 
-import com.exea.sincronizacion.redabogacia.AltaColegiadoRequestDocument;
-import com.exea.sincronizacion.redabogacia.AltaColegiadoResponseDocument;
-import com.exea.sincronizacion.redabogacia.ObtenerNumColegiacionRequestDocument;
-import com.exea.sincronizacion.redabogacia.ObtenerNumColegiacionResponseDocument;
+import com.exea.sincronizacion.redabogacia.*;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.services.ISincronizacionEXEAService;
 import org.slf4j.Logger;
@@ -60,8 +57,26 @@ public class SincronizacionEXEAEndpoint {
             LOGGER.info("IP desde la que se recibe la peticion: "+ ipCliente);
 
         }catch (Exception e){
-            LOGGER.info("Imposible obtener la url de conexion de acceso a obtenerNumColegiacion");
+            LOGGER.info("Imposible obtener la url de conexion de acceso a aprobarAltaColegiado");
         }
         return service.aprobarAltaColegiado(peticion, ipCliente);
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "altaSancionRequest")
+    @ResponsePayload
+    public AltaSancionResponseDocument altaSancion(@RequestPayload AltaSancionRequestDocument peticion) throws SigaExceptions {
+        LOGGER.info("Entra en ws altaSancion");
+
+        TransportContext ctx = TransportContextHolder.getTransportContext();
+
+        try {
+            HttpServletConnection connection = (HttpServletConnection) ctx.getConnection();
+            ipCliente = connection.getHttpServletRequest().getRemoteAddr();
+            LOGGER.info("IP desde la que se recibe la peticion: "+ ipCliente);
+
+        }catch (Exception e){
+            LOGGER.info("Imposible obtener la url de conexion de acceso a altaSancion");
+        }
+        return service.altaSancion(peticion, ipCliente);
     }
 }

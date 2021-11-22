@@ -25,6 +25,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import com.exea.sincronizacion.redabogacia.AltaColegiadoResponseDocument;
+import com.exea.sincronizacion.redabogacia.AltaSancionResponseDocument;
 import com.exea.sincronizacion.redabogacia.ObtenerNumColegiacionResponseDocument;
 import org.apache.xmlbeans.XmlObject;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
@@ -264,19 +265,34 @@ public class WSCommons {
 				errorType.setXmlError("Sin error xml");
 			}
 		}else if(xmlObjectResponse instanceof ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse){
+
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse) xmlObjectResponse).addNewError();
-			errorType.setCodigo("FORMATO_NOVALIDO");
+			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
 			errorType.setDescripcion(message);
+
 			if(xmlObjectRequest != null){
 				errorType.setXmlRequest(xmlObjectRequest.xmlText());
 			}
+
 		}else if(xmlObjectResponse instanceof AltaColegiadoResponseDocument.AltaColegiadoResponse){
+
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((AltaColegiadoResponseDocument.AltaColegiadoResponse) xmlObjectResponse).addNewError();
-			errorType.setCodigo("FORMATO_NOVALIDO");
+			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
 			errorType.setDescripcion(message);
 			if(xmlObjectRequest != null){
 				errorType.setXmlRequest(xmlObjectRequest.xmlText());
 			}
+
+		}else if(xmlObjectResponse instanceof AltaSancionResponseDocument.AltaSancionResponse){
+
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((AltaSancionResponseDocument.AltaSancionResponse) xmlObjectResponse).addNewError();
+			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+			errorType.setDescripcion(message);
+
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+
 		}
 
 		throw new ValidationException(message);
