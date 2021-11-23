@@ -286,7 +286,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		if (ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
 			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.anioacta = " + ejgItem.getAnnioActa();
 		if (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")
-			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.numeroacta = " + ejgItem.getNumActa();
+			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.numeroacta = '" + ejgItem.getNumActa() + "'";
 		condicionAnnioNumActas = condicionAnnioNumActas + "))";
 
 		String condicionNumRegRemesa = " (EXISTS (SELECT 1 FROM cajg_ejgremesa ejgremesa, cajg_remesa remesa"

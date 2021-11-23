@@ -90,7 +90,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboJuzgados(String idInstitucion) {
+	public String comboJuzgados(Short idInstitucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("IDJUZGADO");
