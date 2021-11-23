@@ -378,7 +378,7 @@ public class ColegiadosSJCSItem {
 		this.nComunitario = nComunitario;
 	}
 	
-	
+
 
 	/**
 	 * @return the tieneGuardia

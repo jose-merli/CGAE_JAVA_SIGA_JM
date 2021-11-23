@@ -35,7 +35,12 @@
 <!-- 			<generatedKey column="IDCURSO"  -->
 <!--  				sqlStatement="SELECT SEQ_FORCURSO.NEXTVAL FROM DUAL" /> -->
 <!-- 		</table>   -->
-		
+		<table schema="USCGAE" tableName="SCS_PROG_CALENDARIOS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
+<!-- 		<table schema="USCGAE" tableName="ENV_DOCUMENTOS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>-->
 		<table schema="USCGAE" tableName="ECOM_COLA_PARAMETROS">
 			<property name="ignoreQualifiersAtRuntime" value="true" />
 		</table>

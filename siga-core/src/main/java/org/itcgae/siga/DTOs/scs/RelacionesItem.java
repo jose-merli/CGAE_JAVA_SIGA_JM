@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class RelacionesItem {
+
     private String sjcs;
     private String idinstitucion;
     private String anio;
@@ -31,7 +32,51 @@ public class RelacionesItem {
     private Date fechaasunto;
     private String dilnigproc;
     private String idpersonajg;
+    private String numEjg;
+    private String dictamenObs;
+    private String idFundamentoCalif;
+    private String idGuardia;
+    private String idTipoDictamenEJG;
 
+    public String getIdTipoDictamenEJG() {
+        return idTipoDictamenEJG;
+    }
+
+    public void setIdTipoDictamenEJG(String idTipoDictamenEJG) {
+        this.idTipoDictamenEJG = idTipoDictamenEJG;
+    }
+
+    public String getDictamenObs() {
+        return dictamenObs;
+    }
+
+    public void setDictamenObs(String dictamenObs) {
+        this.dictamenObs = dictamenObs;
+    }
+
+    public String getIdFundamentoCalif() {
+        return idFundamentoCalif;
+    }
+
+    public void setIdFundamentoCalif(String idFundamentoCalif) {
+        this.idFundamentoCalif = idFundamentoCalif;
+    }
+
+    public String getIdGuardia() {
+        return idGuardia;
+    }
+
+    public void setIdGuardia(String idGuardia) {
+        this.idGuardia = idGuardia;
+    }
+
+    public String getNumEjg() {
+        return numEjg;
+    }
+
+    public void setNumEjg(String numEjg) {
+        this.numEjg = numEjg;
+    }
 
     public String getSjcs() {
         return sjcs;
@@ -321,6 +366,5 @@ public class RelacionesItem {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 
 }

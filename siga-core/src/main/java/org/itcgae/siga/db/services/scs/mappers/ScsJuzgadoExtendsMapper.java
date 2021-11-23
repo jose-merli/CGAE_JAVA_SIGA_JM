@@ -56,14 +56,21 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 	
 	
 	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "comboJuzgado")
-	@Results({ 
+	@Results({
 		@Result(column = "IDJUZGADO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> comboJuzgado(Short idLenguaje, Short idInstitucion);
 	
+	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "comboJuzgadoCdgoExt")
+	@Results({
+		@Result(column = "CODIGOEXT", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboJuzgadoCdgoExt(Short idLenguaje, Short idInstitucion);
+
 	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "comboJuzgados")
-	@Results({ 
+	@Results({
 		@Result(column = "IDJUZGADO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
@@ -77,4 +84,11 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 	})
 	List<JuzgadoItem> comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion);
 	
+	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "getJuzgadosByIdTurno")
+	@Results({
+		@Result(column = "idjuzgado", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> getJuzgadosByIdTurno(Short idInstitucion, String idTurno);
+
 }

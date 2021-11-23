@@ -23,6 +23,7 @@ import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
 
@@ -162,6 +163,45 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sqlPpal.WHERE("ROWNUM <= " + tamMax);
 		
 		return sqlPpal.toString();
+	}
+	
+	public String busquedaDesignaActual(ScsDesignaKey key){
+		String sql = "";
+		
+		try {
+			sql =   "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
+						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
+						+ "  des.fechaestado fechaestado,juzgado.nombre as nombrejuzgado,  turno.nombre,";
+			sql +=  " colegiado.ncolegiado, persona.idpersona, persona.nombre as nombrepersona, persona.APELLIDOS1 as apellido1persona, persona.APELLIDOS2 as apellido2persona";
+			
+			sql +=  " FROM scs_designa             des\r\n"; 
+			sql +=  "   LEFT OUTER JOIN scs_designasletrado     l ON l.anio = des.anio\r\n" + 
+					"                                  AND l.numero = des.numero\r\n" + 
+					"                                  AND l.idinstitucion = des.idinstitucion\r\n" + 
+					"                                  AND l.idturno = des.idturno\r\n" + 
+					"    LEFT OUTER JOIN cen_colegiado           colegiado ON colegiado.idinstitucion = l.idinstitucion\r\n" + 
+					"                                    AND colegiado.idpersona = l.idpersona\r\n" + 
+					"    LEFT OUTER JOIN cen_persona             persona ON l.idpersona = persona.idpersona\r\n";
+			sql += 	"    JOIN scs_turno               turno ON des.idturno = turno.idturno\r\n" + 
+					"                            AND des.idinstitucion = turno.idinstitucion\r\n" + 
+					"    LEFT OUTER JOIN scs_juzgado             juzgado ON des.idjuzgado = juzgado.idjuzgado\r\n" + 
+					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n";
+			sql += 	" where des.IDINSTITUCION = " + key.getIdinstitucion() ;
+			sql += 	" AND des.idTurno = " + key.getIdturno();
+			sql += 	" AND des.anio = " + key.getAnio();
+			sql += 	" and des.numero = " + key.getNumero();
+			sql += 	" and (l.Fechadesigna is null or";
+			sql += 	" l.Fechadesigna = (SELECT MAX(LET2.Fechadesigna) FROM SCS_DESIGNASLETRADO LET2";
+			sql += 	" WHERE l.IDINSTITUCION = LET2.IDINSTITUCION AND l.IDTURNO = LET2.IDTURNO";
+			sql += 	" AND l.ANIO = LET2.ANIO AND l.NUMERO = LET2.NUMERO";
+			sql += 	" AND TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)))";
+			
+		} catch (Exception e) {
+			throw e;
+		}
+
+		return sql;
 	}
 
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {

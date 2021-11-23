@@ -45,6 +45,8 @@ public class TurnosItem {
 	private String idordenacioncolas;
 	private String orden;
 	private String nombrepartidosjudiciales;
+	private String numeroInscritos;
+	private String partidoJudicial;
 	private String idinstitucion;
 	private String fechavalidacion;
 	private String fechasolicitud;
@@ -64,7 +66,19 @@ public class TurnosItem {
 	private String idcomboguardias;
 	private String nombreguardia;
 	private String fechabajaguardia;
-	
+
+	public String getPartidoJudicial() {
+		return partidoJudicial;
+	}
+	public void setPartidoJudicial(String partidoJudicial) {
+		this.partidoJudicial = partidoJudicial;
+	}
+	public String getNumeroInscritos() {
+		return numeroInscritos;
+	}
+	public void setNumeroInscritos(String numeroInscritos) {
+		this.numeroInscritos = numeroInscritos;
+	}
 	
 	public String getFechavalidacion() {
 		return fechavalidacion;
@@ -428,8 +442,4 @@ public class TurnosItem {
 		this.fechabajaguardia = fechabajaguardia;
 	}
 
-
-
-	
-	
 }
