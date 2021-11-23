@@ -27,9 +27,6 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
     private Logger LOGGER = Logger.getLogger(LineaanticipoServiceImpl.class);
 
     @Autowired
-    private PysLineaanticipoExtendsMapper lineaanticipoMapper;
-
-    @Autowired
     private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
     @Autowired
@@ -52,9 +49,9 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
         if (institutionId != null) {
             AdmUsuariosExample userQuery = new AdmUsuariosExample();
             userQuery.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(institutionId);
-            LOGGER.info("getFichaCompraSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+            LOGGER.info("listarMonederos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
             List<AdmUsuarios> users = admUsuariosExtendsMapper.selectByExample(userQuery);
-            LOGGER.info("getFichaCompraSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+            LOGGER.info("listarMonederos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 
             if (users != null && !users.isEmpty()) {
@@ -63,15 +60,23 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
                     CenPersonaExample peopleQuery = new CenPersonaExample();
                     peopleQuery.createCriteria().andNifcifEqualTo(dni);
                     List<CenPersona> people = cenPersonaMapper.selectByExample(peopleQuery);
-                    Long personId = people.get(0).getIdpersona();
-                    List<MonederoDTO> walletDTOs = lineaanticipoExtendsMapper.selectByPersonIdAndCreationDate(institutionId, personId, filtroMonederoItem);
+                    filtroMonederoItem.setIdPersonaColegiado(people.get(0).getIdpersona().toString());
+                    List<MonederoDTO> walletDTOs = lineaanticipoExtendsMapper.selectByPersonIdAndCreationDate(institutionId, filtroMonederoItem);
                     ListaMonederoDTO walletListDTO = new ListaMonederoDTO();
                     walletListDTO.setMonederoItems(walletDTOs);
                     error.setCode(200);
                     walletListDTO.setError(error);
 
                     return walletListDTO;
+                }
+                else {
+                	List<MonederoDTO> walletDTOs = lineaanticipoExtendsMapper.selectByPersonIdAndCreationDate(institutionId, filtroMonederoItem);
+                    ListaMonederoDTO walletListDTO = new ListaMonederoDTO();
+                    walletListDTO.setMonederoItems(walletDTOs);
+                    error.setCode(200);
+                    walletListDTO.setError(error);
 
+                    return walletListDTO;
                 }
             }
         }

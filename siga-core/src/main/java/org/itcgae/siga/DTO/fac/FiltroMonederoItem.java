@@ -6,6 +6,8 @@ import java.util.Date;
 
 @Data
 public class FiltroMonederoItem {
+	
+	private String idPersonaColegiado;
 
     private Date fechaDesde;
     private Date fechaHasta;
@@ -21,6 +23,12 @@ public class FiltroMonederoItem {
 	}
 	public void setFechaHasta(Date fechaHasta) {
 		this.fechaHasta = fechaHasta;
+	}
+	public String getIdPersonaColegiado() {
+		return idPersonaColegiado;
+	}
+	public void setIdPersonaColegiado(String idPersonaColegiado) {
+		this.idPersonaColegiado = idPersonaColegiado;
 	}
 
 }
