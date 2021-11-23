@@ -836,7 +836,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
 				for(MultipartFile file : docs) {
 	
-					String fileNameOriginal = file.getName();
+					String fileNameOriginal = file.getOriginalFilename().split(";")[0];
 					String fName = Long.toString(System.currentTimeMillis());
 	
 					try {
@@ -846,7 +846,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 						SIGAHelper.addPerm777(serverFile);
 	
-						serverFile = new File(serverFile, fName);
+						serverFile = new File(serverFile, fileNameOriginal);
 						LOGGER.info("uploadFile() -> Ruta del fichero subido: " + serverFile.getAbsolutePath());
 						if (serverFile.exists()) {
 							LOGGER.error("Ya existe el fichero: " + serverFile.getAbsolutePath());
