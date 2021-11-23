@@ -48,13 +48,16 @@ public class FacFacturacionprogramadaItem {
     private String descripcion;
     private String nombreAbreviado;
     private Date fechaProgramacion;
-    private String archivarFact;
+    private Boolean archivarFact;
     private String usuModificacion;
     private Date fechaModificacion;
     private String nombreFichero;
     private String logError;
     private String logTraspaso;
-    private String traspasoFacturas;
+    private Boolean traspasoFacturas;
+    private Boolean generaPDF;
+    private Boolean envio;
+    private String idTipoPlantillaMail;
     private String traspasoPlatilla;
     private String traspasoCodAuditoriaDef;
 
@@ -349,14 +352,6 @@ public class FacFacturacionprogramadaItem {
         this.fechaProgramacion = fechaProgramacion;
     }
 
-    public String getArchivarFact() {
-        return archivarFact;
-    }
-
-    public void setArchivarFact(String archivarFact) {
-        this.archivarFact = archivarFact;
-    }
-
     public String getUsuModificacion() {
         return usuModificacion;
     }
@@ -387,14 +382,6 @@ public class FacFacturacionprogramadaItem {
 
     public void setLogTraspaso(String logTraspaso) {
         this.logTraspaso = logTraspaso;
-    }
-
-    public String getTraspasoFacturas() {
-        return traspasoFacturas;
-    }
-
-    public void setTraspasoFacturas(String traspasoFacturas) {
-        this.traspasoFacturas = traspasoFacturas;
     }
 
     public String getTraspasoPlatilla() {
@@ -493,6 +480,46 @@ public class FacFacturacionprogramadaItem {
         this.modeloRectificativa = modeloRectificativa;
     }
 
+    public Boolean getArchivarFact() {
+        return archivarFact;
+    }
+
+    public void setArchivarFact(Boolean archivarFact) {
+        this.archivarFact = archivarFact;
+    }
+
+    public Boolean getTraspasoFacturas() {
+        return traspasoFacturas;
+    }
+
+    public void setTraspasoFacturas(Boolean traspasoFacturas) {
+        this.traspasoFacturas = traspasoFacturas;
+    }
+
+    public Boolean getEnvio() {
+        return envio;
+    }
+
+    public void setEnvio(Boolean envio) {
+        this.envio = envio;
+    }
+
+    public String getIdTipoPlantillaMail() {
+        return idTipoPlantillaMail;
+    }
+
+    public void setIdTipoPlantillaMail(String idTipoPlantillaMail) {
+        this.idTipoPlantillaMail = idTipoPlantillaMail;
+    }
+
+    public Boolean getGeneraPDF() {
+        return generaPDF;
+    }
+
+    public void setGeneraPDF(Boolean generaPDF) {
+        this.generaPDF = generaPDF;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -540,6 +567,9 @@ public class FacFacturacionprogramadaItem {
                 Objects.equals(logError, that.logError) &&
                 Objects.equals(logTraspaso, that.logTraspaso) &&
                 Objects.equals(traspasoFacturas, that.traspasoFacturas) &&
+                Objects.equals(generaPDF, that.generaPDF) &&
+                Objects.equals(envio, that.envio) &&
+                Objects.equals(idTipoPlantillaMail, that.idTipoPlantillaMail) &&
                 Objects.equals(traspasoPlatilla, that.traspasoPlatilla) &&
                 Objects.equals(traspasoCodAuditoriaDef, that.traspasoCodAuditoriaDef) &&
                 Objects.equals(fechaPresentacion, that.fechaPresentacion) &&
@@ -555,7 +585,7 @@ public class FacFacturacionprogramadaItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idSerieFacturacion, compraSuscripcion, fechaInicioServicios, fechaInicioProductos, fechaFinServicios, fechaFinProductos, fechaCompraSuscripcionDesde, fechaCompraSuscripcionHasta, importe, importeDesde, importeHasta, idEstadoConfirmacion, estadoConfirmacion, idEstadoPDF, estadoPDF, idEstadoEnvio, estadoEnvio, idEstadoTraspaso, estadoTraspaso, fechaPrevistaGeneracion, fechaPrevistaGeneracionDesde, fechaPrevistaGeneracionHasta, fechaPrevistaConfirm, fechaPrevistaConfirmDesde, fechaPrevistaConfirmHasta, fechaRealGeneracion, fechaRealGeneracionDesde, fechaRealGeneracionHasta, fechaConfirmacion, fechaConfirmacionDesde, fechaConfirmacionHasta, idProgramacion, descripcion, nombreAbreviado, fechaProgramacion, archivarFact, usuModificacion, fechaModificacion, nombreFichero, logError, logTraspaso, traspasoFacturas, traspasoPlatilla, traspasoCodAuditoriaDef, fechaPresentacion, fechaRecibosPrimeros, fechaRecibosRecurrentes, fechaRecibosCOR1, fechaRecibosB2B, idModeloFactura, idModeloRectificativa, modeloFactura, modeloRectificativa);
+        return Objects.hash(idSerieFacturacion, compraSuscripcion, fechaInicioServicios, fechaInicioProductos, fechaFinServicios, fechaFinProductos, fechaCompraSuscripcionDesde, fechaCompraSuscripcionHasta, importe, importeDesde, importeHasta, idEstadoConfirmacion, estadoConfirmacion, idEstadoPDF, estadoPDF, idEstadoEnvio, estadoEnvio, idEstadoTraspaso, estadoTraspaso, fechaPrevistaGeneracion, fechaPrevistaGeneracionDesde, fechaPrevistaGeneracionHasta, fechaPrevistaConfirm, fechaPrevistaConfirmDesde, fechaPrevistaConfirmHasta, fechaRealGeneracion, fechaRealGeneracionDesde, fechaRealGeneracionHasta, fechaConfirmacion, fechaConfirmacionDesde, fechaConfirmacionHasta, idProgramacion, descripcion, nombreAbreviado, fechaProgramacion, archivarFact, usuModificacion, fechaModificacion, nombreFichero, logError, logTraspaso, traspasoFacturas, generaPDF, envio, idTipoPlantillaMail, traspasoPlatilla, traspasoCodAuditoriaDef, fechaPresentacion, fechaRecibosPrimeros, fechaRecibosRecurrentes, fechaRecibosCOR1, fechaRecibosB2B, idModeloFactura, idModeloRectificativa, modeloFactura, modeloRectificativa);
     }
 
     @Override
@@ -596,13 +626,16 @@ public class FacFacturacionprogramadaItem {
                 ", descripcion='" + descripcion + '\'' +
                 ", nombreAbreviado='" + nombreAbreviado + '\'' +
                 ", fechaProgramacion=" + fechaProgramacion +
-                ", archivarFact='" + archivarFact + '\'' +
+                ", archivarFact=" + archivarFact +
                 ", usuModificacion='" + usuModificacion + '\'' +
                 ", fechaModificacion=" + fechaModificacion +
                 ", nombreFichero='" + nombreFichero + '\'' +
                 ", logError='" + logError + '\'' +
                 ", logTraspaso='" + logTraspaso + '\'' +
-                ", traspasoFacturas='" + traspasoFacturas + '\'' +
+                ", traspasoFacturas=" + traspasoFacturas +
+                ", generaPDF=" + generaPDF +
+                ", envio=" + envio +
+                ", idTipoPlantillaMail='" + idTipoPlantillaMail + '\'' +
                 ", traspasoPlatilla='" + traspasoPlatilla + '\'' +
                 ", traspasoCodAuditoriaDef='" + traspasoCodAuditoriaDef + '\'' +
                 ", fechaPresentacion=" + fechaPresentacion +
