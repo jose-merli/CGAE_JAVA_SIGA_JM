@@ -636,4 +636,17 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		
 		return sql1.toString();
 	}
+	
+	public String comboTurnosInscritoLetrado(Short idInstitucion, String idPersona) {
+		SQL sql = new SQL();
+		sql.SELECT("t.IDTURNO", "t.NOMBRE");
+		sql.FROM("SCS_TURNO t");
+		sql.INNER_JOIN("scs_inscripcionturno IT ON t.idturno =  IT.IDTURNO AND t.idinstitucion = it.idinstitucion");
+		sql.WHERE("t.idinstitucion = "+idInstitucion,
+				"it.fechabaja is null",
+				"it.fechavalidacion is not null",
+				"it.idpersona = '"+idPersona+"'");
+		
+		return sql.toString();
+	}
 }
