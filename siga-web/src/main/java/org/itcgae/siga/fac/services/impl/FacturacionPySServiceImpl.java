@@ -46,6 +46,8 @@ import org.itcgae.siga.db.entities.FacClienincluidoenseriefactur;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
 import org.itcgae.siga.db.entities.FacFacturaExample;
+import org.itcgae.siga.db.entities.FacFacturacionprogramada;
+import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
@@ -1355,7 +1357,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	public FacFacturacionprogramadaDTO getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) throws Exception {
-
 		FacFacturacionprogramadaDTO itemsDTO = new FacFacturacionprogramadaDTO();
 		List<FacFacturacionprogramadaItem> items;
 		Error error = new Error();
@@ -1381,6 +1382,40 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("getFacturacionesProgramadas() -> Salida del servicio para obtener el listado de facturaciones programadas");
 
 		return itemsDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems, HttpServletRequest request) throws Exception {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("archivarFacturaciones() -> Entrada al servicio para archivar/desarchivar facturaciones programadas");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info(
+					"archivarFacturaciones() / facFacturacionprogramadaExtendsMapper.updateByPrimaryKeySelective() -> Entrada a facFacturacionprogramadaExtendsMapper para archivar/desarchivar facturaciones programadas");
+
+			// Logica
+			for (FacFacturacionprogramadaItem item : facturacionProgramadaItems) {
+				FacFacturacionprogramada record = new FacFacturacionprogramada();
+				record.setIdinstitucion(usuario.getIdinstitucion());
+				record.setIdprogramacion(Long.parseLong(item.getIdProgramacion()));
+				record.setIdseriefacturacion(Long.parseLong(item.getIdSerieFacturacion()));
+
+				record.setArchivarfact(item.getArchivarFact() ? "1" : "0");
+				facFacturacionprogramadaExtendsMapper.updateByPrimaryKeySelective(record);
+			}
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("archivarFacturaciones() -> Salida del servicio para archivar/desarchivar facturaciones programadas");
+
+		return updateResponseDTO;
 	}
 
 }

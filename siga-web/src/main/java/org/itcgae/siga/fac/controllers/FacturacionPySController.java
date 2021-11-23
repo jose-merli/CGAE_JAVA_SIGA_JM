@@ -303,10 +303,29 @@ public class FacturacionPySController {
 
 		try {
 			response = facturacionService.getFacturacionesProgramadas(facturacionProgramadaItem, request);
+
+			if(response.getFacturacionprogramadaItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
 			return new ResponseEntity<FacFacturacionprogramadaDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<FacFacturacionprogramadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/archivarFacturaciones")
+	ResponseEntity<UpdateResponseDTO> archivarFacturaciones(@RequestBody List<FacFacturacionprogramadaItem> facturacionProgramadaItems,
+																			HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+
+		try {
+			response = facturacionService.archivarFacturaciones(facturacionProgramadaItems, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
