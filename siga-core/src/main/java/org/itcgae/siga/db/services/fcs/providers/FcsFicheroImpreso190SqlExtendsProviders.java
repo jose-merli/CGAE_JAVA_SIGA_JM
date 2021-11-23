@@ -24,4 +24,20 @@ public class FcsFicheroImpreso190SqlExtendsProviders extends FcsFicheroImpreso19
 		return sql.toString();
 	}
 	
+	public String getConfImpreso190(Short idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION,"
+				+ "ANIO,"
+				+ "NOMBREFICHERO,"
+				+ "NOMBRE,"
+				+ "APELLIDO1,"
+				+ "APELLIDO2,"
+				+ "TELEFONO,"
+				+ "FECHAMODIFICACION");
+		
+		sql.FROM("FCS_CONF_IMPRESO190");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
+	}
+	
 }

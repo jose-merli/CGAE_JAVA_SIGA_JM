@@ -125,7 +125,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 	@Override
 	@Transactional
-	public Impreso190DTO impreso190generar(Impreso190Item impreso190Item, HttpServletRequest request) throws Exception {
+	public Impreso190DTO impreso190generar(Impreso190Item impreso190Item, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -135,115 +135,133 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		String codigoProvincia;
 		String sDirectorio;
 		int responseUpImpreso;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				if (usuarios != null && usuarios.size() > 0) {
 
-			if (usuarios != null && usuarios.size() > 0) {
+					sDirectorio = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
 
-				sDirectorio = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
+					// primero genera los insert y updates a la base de datos
+					CenPersona datosInstitucion = cenPersonaExtendsMapper
+							.getDatosInstitucionForImpreso190(idInstitucion.toString());
+					codigoProvincia = cenDireccionesExtendsMapper.getIdProvinciaImpreso190(
+							datosInstitucion.getIdpersona().toString(), idInstitucion.toString(),
+							SigaConstants.TIPO_DIRECCION_FACTURACION);
 
-				// primero genera los insert y updates a la base de datos
-				CenPersona datosInstitucion = cenPersonaExtendsMapper
-						.getDatosInstitucionForImpreso190(idInstitucion.toString());
-				codigoProvincia = cenDireccionesExtendsMapper.getIdProvinciaImpreso190(
-						datosInstitucion.getIdpersona().toString(), idInstitucion.toString(),
-						SigaConstants.TIPO_DIRECCION_FACTURACION);
+					FcsConfImpreso190Example impresoExample = new FcsConfImpreso190Example();
+					impresoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+					List<FcsConfImpreso190> confImpreso = fcsConfImpreso190Mapper.selectByExample(impresoExample);
 
-				FcsConfImpreso190Example impresoExample = new FcsConfImpreso190Example();
-				impresoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-				List<FcsConfImpreso190> confImpreso = fcsConfImpreso190Mapper.selectByExample(impresoExample);
+					// se comprueba que el nombre del fichero sea unico.
+					FcsFicheroImpreso190Example ficheroExample = new FcsFicheroImpreso190Example();
+					ficheroExample.createCriteria().andNombreFicheroEqualTo(impreso190Item.getNomFicheroOriginal());
 
-				if (!confImpreso.isEmpty() || confImpreso != null) {
-					FcsConfImpreso190 modImpreso = new FcsConfImpreso190();
-					modImpreso.setIdinstitucion(confImpreso.get(0).getIdinstitucion());
-					modImpreso.setNombrefichero(impreso190Item.getNomFicheroOriginal());
-					modImpreso.setAnio(Short.parseShort(impreso190Item.getAnio()));
-					modImpreso.setNombre(impreso190Item.getNombreContacto());
-					modImpreso.setApellido1(impreso190Item.getApellido1Contacto());
-					modImpreso.setApellido2(impreso190Item.getApellido2Contacto());
-					modImpreso.setTelefono(impreso190Item.getTelefonoContacto());
-					modImpreso.setIdprovincia(codigoProvincia);
-					modImpreso.setFechamodificacion(new Date());
-					modImpreso.setUsumodificacion(usuarios.get(0).getIdusuario());
+					List<FcsFicheroImpreso190> existFichero = fcsFicheroImpreso190ExtendsMapper
+							.selectByExample(ficheroExample);
+					if (existFichero.isEmpty() || existFichero == null) {
+						// a continuacion genera el fichero. Si la generacion del fichero falla se hace
+						// un rollback con el transactioanal y no hace la insercion en BBDD
 
-					// siempre hace el update, aunque no llegue a guardar el fichero.
-					int impresoUpdate = fcsConfImpreso190Mapper.updateByPrimaryKeySelective(modImpreso);
-					if (impresoUpdate != 0) {
+						sNombreFichero = impreso190Item.getNomFicheroOriginal();
 
-						// obtener new idFichero
+						new File(sDirectorio + File.separator + idInstitucion).mkdir();
 
-						NewIdDTO idFichero = genFicheroExtendsMapper
-								.selectMaxIdFicheroByIdInstitucion(idInstitucion.toString());
+						String sNombreCompletoFichero = sDirectorio + File.separator + idInstitucion
+								+ File.separator + sNombreFichero;
+						File fichero = new File(sNombreCompletoFichero);
 						
-						Long newid = Long.parseLong(idFichero.getNewId());
+						fichero = generarImpreso190(impreso190Item, idInstitucion.toString());
 
-						GenFichero addFichero = new GenFichero();
-						addFichero.setIdfichero( newid + 1);
-						addFichero.setIdinstitucion(idInstitucion);
-						addFichero.setExtension("txt");
-						addFichero.setDescripcion("Impreso 190");
-						addFichero.setDirectorio(sDirectorio + File.separator + idInstitucion);
-						addFichero.setFechamodificacion(new Date());
-						addFichero.setUsumodificacion(usuarios.get(0).getIdusuario());
+						if (fichero != null) {
+							if (fichero.getName().indexOf(".zip") != -1) {
+								error.setCode(400);
+								error.setDescription("facturacionSJCS.impreso190.impresoErrorLog");
 
-						int impresoUp = genFicheroExtendsMapper.insertSelective(addFichero);
-						if (impresoUp != 0) {
-							FcsFicheroImpreso190 impreso190 = new FcsFicheroImpreso190();
-							impreso190.setAnio(Short.parseShort(impreso190Item.getAnio()));
-							impreso190.setIdinstitucion(idInstitucion);
-							impreso190.setNombreFichero(impreso190Item.getNomFicheroOriginal());
-							impreso190.setTelefono(impreso190Item.getTelefonoContacto());
-							impreso190.setNombre(impreso190Item.getNombreContacto());
-							impreso190.setApellido1(impreso190Item.getApellido1Contacto());
-							impreso190.setApellido2(impreso190Item.getApellido2Contacto());
-							impreso190.setFechagenerarion(new Date());
-							impreso190.setIdGenFichero(addFichero.getIdfichero());
-							impreso190.setUsumodificacion(usuarios.get(0).getIdusuario());
-							impreso190.setFechamodificacion(new Date());
+							} else if (fichero.getName().indexOf(".190") != -1) {
 
-							responseUpImpreso = fcsFicheroImpreso190ExtendsMapper.insertSelective(impreso190);
+								if (!confImpreso.isEmpty() || confImpreso != null) {
+									FcsConfImpreso190 modImpreso = new FcsConfImpreso190();
+									modImpreso.setIdinstitucion(confImpreso.get(0).getIdinstitucion());
+									modImpreso.setNombrefichero(impreso190Item.getNomFicheroOriginal());
+									modImpreso.setAnio(Short.parseShort(impreso190Item.getAnio()));
+									modImpreso.setNombre(impreso190Item.getNombreContacto());
+									modImpreso.setApellido1(impreso190Item.getApellido1Contacto());
+									modImpreso.setApellido2(impreso190Item.getApellido2Contacto());
+									modImpreso.setTelefono(impreso190Item.getTelefonoContacto());
+									modImpreso.setIdprovincia(codigoProvincia);
+									modImpreso.setFechamodificacion(new Date());
+									modImpreso.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-							if (responseUpImpreso != 0) {
-								// a continuacion genera el fichero. Si la generacion del fichero falla se hace
-								// un rollback con el transactioanal y no hace la insercion en BBDD
+									// siempre hace el update, aunque no llegue a guardar el fichero.
+									int impresoUpdate = fcsConfImpreso190Mapper.updateByPrimaryKeySelective(modImpreso);
+									if (impresoUpdate != 0) {
 
-								sNombreFichero = impreso190Item.getNomFicheroOriginal();
+										// obtener new idFichero
 
-								new File(sDirectorio + File.separator + idInstitucion).mkdir();
+										NewIdDTO idFichero = genFicheroExtendsMapper
+												.selectMaxIdFicheroByIdInstitucion(idInstitucion.toString());
 
-								String sNombreCompletoFichero = sDirectorio + File.separator + idInstitucion
-										+ File.separator + sNombreFichero;
-								File fichero = new File(sNombreCompletoFichero);
+										Long newid = Long.parseLong(idFichero.getNewId());
 
-								fichero = generarImpreso190(impreso190Item, idInstitucion.toString());
+										GenFichero addFichero = new GenFichero();
+										addFichero.setIdfichero(newid + 1);
+										addFichero.setIdinstitucion(idInstitucion);
+										addFichero.setExtension("txt");
+										addFichero.setDescripcion("Impreso 190");
+										addFichero.setDirectorio(sDirectorio + File.separator + idInstitucion);
+										addFichero.setFechamodificacion(new Date());
+										addFichero.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-								if (fichero != null) {
-									if (fichero.getName().indexOf(".zip") != -1) {
-										error.setCode(400);
-										error.setDescription("facturacionSJCS.impreso190.impresoErrorLog");
-									} else if (fichero.getName().indexOf(".190") != -1) {
+										int impresoUp = genFicheroExtendsMapper.insertSelective(addFichero);
+										if (impresoUp != 0) {
+											FcsFicheroImpreso190 impreso190 = new FcsFicheroImpreso190();
+											impreso190.setAnio(Short.parseShort(impreso190Item.getAnio()));
+											impreso190.setIdinstitucion(idInstitucion);
+											impreso190.setNombreFichero(impreso190Item.getNomFicheroOriginal());
+											impreso190.setTelefono(impreso190Item.getTelefonoContacto());
+											impreso190.setNombre(impreso190Item.getNombreContacto());
+											impreso190.setApellido1(impreso190Item.getApellido1Contacto());
+											impreso190.setApellido2(impreso190Item.getApellido2Contacto());
+											impreso190.setFechagenerarion(new Date());
+											impreso190.setIdGenFichero(addFichero.getIdfichero());
+											impreso190.setUsumodificacion(usuarios.get(0).getIdusuario());
+											impreso190.setFechamodificacion(new Date());
 
-										error.setCode(200);
-										error.setDescription("facturacionSJCS.impreso190.impresoGenerado");
+											responseUpImpreso = fcsFicheroImpreso190ExtendsMapper.insertSelective(impreso190);
 
-									} else {
+											if (responseUpImpreso != 0) {
+												error.setCode(200);
+												error.setDescription("facturacionSJCS.impreso190.impresoGenerado");
+											}
 
+										}
 									}
-								} else {
-									error.setCode(500);
-									error.setDescription("general.mensaje.error.bbdd");
 								}
+
 							}
+						} else {
+							error.setCode(500);
+							error.setDescription("impreso190.mensajeError.impresoSinPagos");
 
 						}
+						
+					} else {
+						error.setCode(400);
+						error.setDescription("impreso190.mensajeError.impresoDuplicado");
 					}
-				}
 
+				}
 			}
+
+		} catch (Exception e) {
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
 		}
 
 		impreso190DTO.setError(error);
@@ -282,7 +300,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 		List<FacAbono> abonos = facAbonoExtendsMapper.getPagosCerrados(Short.parseShort(idinstitucion),
 				dataEntry.getAnio());
-		if (abonos != null || abonos.size() > 0) {
+		if (!abonos.isEmpty()) {
 			for (int i = 0; i < abonos.size(); i++) {
 				sPagos += abonos.get(i).getIdpagosjg().toString();
 				if (i < abonos.size() - 1)
@@ -292,7 +310,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 			// obtener el IRPF para cada uno de los pagos realizados
 			List<Impreso190Item> pagoColegiado = fcsPagoColegiadoExtendsMapper.getIrpfPagos(idinstitucion, sPagos);
 
-			if (pagoColegiado != null || pagoColegiado.size() > 0) {
+			if (!pagoColegiado.isEmpty()) {
 				for (Impreso190Item pagoCol : pagoColegiado) {
 					String idPersona = pagoCol.getIdPersonaImpreso();
 					Double importeIrpfPersona = Double.parseDouble(pagoCol.getTotalImporteIrpf());
@@ -362,89 +380,90 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 					}
 
 				}
-			}
 
-		}
+				// realizo la generaci�n del directorio y del fichero:
+				String sNombreFichero = dataEntry.getNomFicheroOriginal();
+				if (dataEntry.getNomFicheroOriginal() != "" && dataEntry.getNomFicheroOriginal().indexOf(".190") < 0) {
+					sNombreFichero = dataEntry.getNomFicheroOriginal() + ".190";
+				}
+				// String sDirectorio = getDirectorioFichero(Short.parseShort(idinstitucion));
+				String sDirectorio = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idinstitucion);
+				String sCamino = sDirectorio + File.separator + idinstitucion;
 
-		// realizo la generaci�n del directorio y del fichero:
-		String sNombreFichero = dataEntry.getNomFicheroOriginal();
-		if (dataEntry.getNomFicheroOriginal() != "" && dataEntry.getNomFicheroOriginal().indexOf(".190") < 0) {
-			sNombreFichero = dataEntry.getNomFicheroOriginal() + ".190";
-		}
-		// String sDirectorio = getDirectorioFichero(Short.parseShort(idinstitucion));
-		String sDirectorio = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idinstitucion);
-		String sCamino = sDirectorio + File.separator + idinstitucion;
+				// LOG_IMPRESO190_[IDINSTITUCION]_[A�O]_[FECHA_EJECUCION]
+				Calendar cal = Calendar.getInstance();
+				Date hora = cal.getTime();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMMMM-dd_hh:mm:ss");
+				String fechaEjecucion = sdf.format(hora);
+				String sNombreLog = "IMPRESO190_" + dataEntry.getAnio() + ".log.xls";
 
-		// LOG_IMPRESO190_[IDINSTITUCION]_[A�O]_[FECHA_EJECUCION]
-		Calendar cal = Calendar.getInstance();
-		Date hora = cal.getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMMMM-dd_hh:mm:ss");
-		String fechaEjecucion = sdf.format(hora);
-		String sNombreLog = "IMPRESO190_" + dataEntry.getAnio() + ".log.xls";
+				new File(sCamino).mkdirs();
 
-		new File(sCamino).mkdirs();
+				String sNombreCompletoFichero = sCamino + File.separator + sNombreFichero;
+				String sNombreFicheroErrorLog = sCamino + File.separator + sNombreLog;
+				String sNombreFicheroZip = sCamino + File.separator + sNombreFichero + ".zip";
 
-		String sNombreCompletoFichero = sCamino + File.separator + sNombreFichero;
-		String sNombreFicheroErrorLog = sCamino + File.separator + sNombreLog;
-		String sNombreFicheroZip = sCamino + File.separator + sNombreFichero + ".zip";
+				// Generamos el fichero 190 si no ha habido ningun error:
+				if (!hayError) {
+					fichero = generarModelo190(sNombreCompletoFichero, dataEntry, irpfs, importes, datosInstitucion,
+							datos, irpfTotal, importeTotal, clavesM190);
+				} else {
+					fichero190 = generarModelo190(sNombreCompletoFichero, dataEntry, irpfs, importes, datosInstitucion,
+							datos, irpfTotal, importeTotal, clavesM190);
+					ficheroErrores = generarLogImpreso190(sNombreFicheroErrorLog, vErrores);
 
-		// Generamos el fichero 190 si no ha habido ningun error:
-		if (!hayError) {
-			fichero = generarModelo190(sNombreCompletoFichero, dataEntry, irpfs, importes, datosInstitucion, datos,
-					irpfTotal, importeTotal, clavesM190);
-		} else {
-			fichero190 = generarModelo190(sNombreCompletoFichero, dataEntry, irpfs, importes, datosInstitucion, datos,
-					irpfTotal, importeTotal, clavesM190);
-			ficheroErrores = generarLogImpreso190(sNombreFicheroErrorLog, vErrores);
+//								FileInputStream inputImpreso190 = null;
+//								FileInputStream inputFicheroErrores = null;
+					ZipOutputStream outZIP = null;
+					FileInputStream in = null;
 
-//						FileInputStream inputImpreso190 = null;
-//						FileInputStream inputFicheroErrores = null;
-			ZipOutputStream outZIP = null;
-			FileInputStream in = null;
+					// Genero un .ZIP con los ficheros de log de errores y el informe 190 de los que
+					// he podido generar:
+//									inputImpreso190 = new FileInputStream(fichero190);
+//									inputFicheroErrores = new FileInputStream(ficheroErrores);
 
-			// Genero un .ZIP con los ficheros de log de errores y el informe 190 de los que
-			// he podido generar:
-//							inputImpreso190 = new FileInputStream(fichero190);
-//							inputFicheroErrores = new FileInputStream(ficheroErrores);
+					outZIP = new ZipOutputStream(new FileOutputStream(sNombreFicheroZip));
+					byte[] buf = new byte[1024];
 
-			outZIP = new ZipOutputStream(new FileOutputStream(sNombreFicheroZip));
-			byte[] buf = new byte[1024];
+					for (int i = 0; i < 2; i++) {
+						String fileName = "";
+						in = null;
+						if (i == 0) { // Para a�adir el impreso 190
+							fileName = sNombreFichero;
+							in = new FileInputStream(fichero190);
+						} else { // Para a�adir el log
+							fileName = sNombreLog;
+							in = new FileInputStream(ficheroErrores);
+						}
 
-			for (int i = 0; i < 2; i++) {
-				String fileName = "";
-				in = null;
-				if (i == 0) { // Para a�adir el impreso 190
-					fileName = sNombreFichero;
-					in = new FileInputStream(fichero190);
-				} else { // Para a�adir el log
-					fileName = sNombreLog;
-					in = new FileInputStream(ficheroErrores);
+						outZIP.putNextEntry(new ZipEntry(fileName));
+
+						// Transfer bytes from the file to the ZIP file
+						int len;
+						while ((len = in.read(buf)) > 0) {
+							outZIP.write(buf, 0, len);
+						}
+
+						// Complete the entry
+						outZIP.closeEntry();
+						in.close();
+					}
+					outZIP.close();
+
+					fichero = new File(sNombreFicheroZip);
+
+					/*
+					 * if (inputImpreso190!=null) inputImpreso190.close(); if
+					 * (inputFicheroErrores!=null) inputFicheroErrores.close();
+					 */ if (outZIP != null)
+						outZIP.close();
+					if (in != null)
+						in.close();
+					throw new Exception("Error en FcsFacturacionJG.generarImpreso190() al crear el .ZIP");
+
 				}
 
-				outZIP.putNextEntry(new ZipEntry(fileName));
-
-				// Transfer bytes from the file to the ZIP file
-				int len;
-				while ((len = in.read(buf)) > 0) {
-					outZIP.write(buf, 0, len);
-				}
-
-				// Complete the entry
-				outZIP.closeEntry();
-				in.close();
 			}
-			outZIP.close();
-
-			fichero = new File(sNombreFicheroZip);
-
-			/*
-			 * if (inputImpreso190!=null) inputImpreso190.close(); if
-			 * (inputFicheroErrores!=null) inputFicheroErrores.close();
-			 */ if (outZIP != null)
-				outZIP.close();
-			if (in != null)
-				in.close();
-			throw new Exception("Error en FcsFacturacionJG.generarImpreso190() al crear el .ZIP");
 
 		}
 
@@ -488,7 +507,8 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 																					// declarante (nombre de la
 																					// institucion)
 
-			linea += SigaConstants.TIPO_SOPORTE_TELEMATICO; // 58: tipo de soporte. En siga classique lo intruducia directamente en el front por una constante
+			linea += SigaConstants.TIPO_SOPORTE_TELEMATICO; // 58: tipo de soporte. En siga classique lo intruducia
+															// directamente en el front por una constante
 			linea += UtilidadesImpreso190.formatea(impreso190Item.getTelefonoContacto(), 9, true); // 59-67: telefono de
 																									// contacto
 
@@ -759,6 +779,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<InputStreamResource> impreso190descargar(List<Impreso190Item> listaimpreso190,
 			HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
@@ -785,36 +806,37 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 			if (usuarios != null && !usuarios.isEmpty() && !listaimpreso190.isEmpty()) {
 
 				if (listaimpreso190.size() == 1) {
-					
-					//TODO Obtener el fichero a descargar por el id, ¿posibilidad de ficheros que se llamen igual en un mismo año?
-					
+
+					// TODO Obtener el fichero a descargar por el id, ¿posibilidad de ficheros que
+					// se llamen igual en un mismo año?
+
 					FcsFicheroImpreso190Key i190key = new FcsFicheroImpreso190Key();
-					
+
 					i190key.setIdfichero(Long.parseLong(listaimpreso190.get(0).getIdFichero()));
 					i190key.setIdinstitucion(idInstitucion);
-					
+
 					FcsFicheroImpreso190 impreso190 = fcsFicheroImpreso190ExtendsMapper.selectByPrimaryKey(i190key);
-					
-					if(impreso190 != null) {
-						String path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
-						path += File.separator + idInstitucion + File.separator
-								+ impreso190.getNombreFichero();
+
+					if (impreso190 != null) {
+						String path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190,
+								idInstitucion.toString());
+						path += File.separator + idInstitucion + File.separator + impreso190.getNombreFichero();
 
 						File file = new File(path);
 						if (!file.exists()) {
-					
+
 							Impreso190Item genImpreso = new Impreso190Item();
 							genImpreso.setAnio(impreso190.getAnio().toString());
 							genImpreso.setNombreContacto(impreso190.getNombre());
 							genImpreso.setApellido1Contacto(impreso190.getApellido1());
 							genImpreso.setApellido2Contacto(impreso190.getApellido2());
 							genImpreso.setNomFicheroOriginal(impreso190.getNombreFichero());
-							
+
 							gen = generarImpreso(genImpreso, idInstitucion, usuarios.get(0).getIdusuario());
 							if (gen == true) {
-								path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
-								path += File.separator + idInstitucion + File.separator
-										+ impreso190.getNombreFichero();
+								path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190,
+										idInstitucion.toString());
+								path += File.separator + idInstitucion + File.separator + impreso190.getNombreFichero();
 								file = new File(path);
 							}
 						}
@@ -826,15 +848,13 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 						headers.set("Content-Disposition",
 								"attachment; filename=\"" + impreso190.getNombreFichero() + ".txt" + "\"");
 						headers.setContentLength(file.length());
-					}else {
+					} else {
 						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
 								HttpStatus.FORBIDDEN);
 					}
 
-					
-
 				} else {
-					fileStream = getZipFileImpreso190(listaimpreso190, idInstitucion,usuarios.get(0).getIdusuario());
+					fileStream = getZipFileImpreso190(listaimpreso190, idInstitucion, usuarios.get(0).getIdusuario());
 
 					headers.setContentType(MediaType.parseMediaType("application/zip"));
 					headers.set("Content-Disposition", "attachment; filename=\"Impresos_190.zip\"");
@@ -886,7 +906,8 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		return mime;
 	}
 
-	private InputStream getZipFileImpreso190(List<Impreso190Item> listaImpreso190Item, Short idInstitucion,int idusuario) throws Exception {
+	private InputStream getZipFileImpreso190(List<Impreso190Item> listaImpreso190Item, Short idInstitucion,
+			int idusuario) throws Exception {
 
 		ByteArrayOutputStream byteArrayOutputStream = null;
 		boolean gen = false;
@@ -899,12 +920,12 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 			for (Impreso190Item doc : listaImpreso190Item) {
 
 				FcsFicheroImpreso190Key i190key = new FcsFicheroImpreso190Key();
-				
+
 				i190key.setIdfichero(Long.parseLong(doc.getIdFichero()));
 				i190key.setIdinstitucion(idInstitucion);
-				
+
 				FcsFicheroImpreso190 impreso190 = fcsFicheroImpreso190ExtendsMapper.selectByPrimaryKey(i190key);
-				
+
 				zipOutputStream.putNextEntry(new ZipEntry(impreso190.getNombreFichero() + ".txt"));
 				String path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
 				path += File.separator + idInstitucion + File.separator + impreso190.getNombreFichero();
@@ -919,8 +940,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 					gen = generarImpreso(genImpreso, idInstitucion, idusuario);
 					if (gen == true) {
 						path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
-						path += File.separator + idInstitucion + File.separator
-								+ genImpreso.getNomFicheroOriginal();
+						path += File.separator + idInstitucion + File.separator + genImpreso.getNomFicheroOriginal();
 						file = new File(path);
 					}
 				}
@@ -948,6 +968,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 	}
 
 	@Override
+	@Transactional
 	public Impreso190DTO searchImpreso190(int anio, HttpServletRequest request) throws Exception {
 		Error error = new Error();
 		LOGGER.info(
@@ -976,9 +997,9 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 				LOGGER.info(
 						"DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
 
-				 impresos = fcsFicheroImpreso190ExtendsMapper.getImpreso190(anio, idInstitucion);
+				impresos = fcsFicheroImpreso190ExtendsMapper.getImpreso190(anio, idInstitucion);
 				impreso190DTO.setImpreso190Item(impresos);
-				
+
 				error.setCode(200);
 				impreso190DTO.setError(error);
 
@@ -996,7 +1017,6 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		boolean generado = false;
 		sDirectorio = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
 
-		
 		CenPersona datosInstitucion = cenPersonaExtendsMapper
 				.getDatosInstitucionForImpreso190(idInstitucion.toString());
 		codigoProvincia = cenDireccionesExtendsMapper.getIdProvinciaImpreso190(
@@ -1006,8 +1026,6 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		FcsConfImpreso190Example impresoExample = new FcsConfImpreso190Example();
 		impresoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
 		List<FcsConfImpreso190> confImpreso = fcsConfImpreso190Mapper.selectByExample(impresoExample);
-
-	
 
 		sNombreFichero = impreso190Item.getNomFicheroOriginal();
 
@@ -1035,7 +1053,9 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 	}
 
 	@Override
-	public Impreso190DTO deleteImpreso190(List<Impreso190Item> impreso190Item, HttpServletRequest request) {
+	@Transactional
+	public Impreso190DTO deleteImpreso190(List<Impreso190Item> impreso190Item, HttpServletRequest request)
+			throws Exception {
 		Error error = new Error();
 		Impreso190DTO impreso190DTO = new Impreso190DTO();
 		String token = request.getHeader("Authorization");
@@ -1060,57 +1080,102 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 				LOGGER.info(
 						"Impreso190ServiceImpl.deleteImpreso190() -> Entrada a servicio para eliminar el impreso190");
 
-			for(Impreso190Item impreso : impreso190Item) {
-				
-				FcsFicheroImpreso190Key i190key = new FcsFicheroImpreso190Key();
-				
-				i190key.setIdfichero(Long.parseLong(impreso.getIdFichero()));
-				i190key.setIdinstitucion(idInstitucion);
-				
-				FcsFicheroImpreso190 impreso190 = fcsFicheroImpreso190ExtendsMapper.selectByPrimaryKey(i190key);
-				
-				if(impreso != null) {
-					String path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190, idInstitucion.toString());
-					path += File.separator + idInstitucion + File.separator
-							+ impreso190.getNombreFichero();
+				for (Impreso190Item impreso : impreso190Item) {
 
-					File file = new File(path);
-					if(file.exists()) {
-						file.delete();
-						
-					}
-					
-					int delimpreso190 = fcsFicheroImpreso190ExtendsMapper.deleteByPrimaryKey(i190key);
-					
-					if(delimpreso190 != 0) {
-						GenFicheroKey genFichero = new GenFicheroKey();
-						genFichero.setIdfichero(impreso190.getIdGenFichero());
-						genFichero.setIdinstitucion(idInstitucion);
-						GenFichero fichero = genFicheroExtendsMapper.selectByPrimaryKey(genFichero);
-						if(fichero != null) {
-							response = genFicheroExtendsMapper.deleteByPrimaryKey(fichero);
-						}else {
-							error.setCode(500);
-							error.setDescription("general.mensaje.error.bbdd");
-							impreso190DTO.setError(error);
+					FcsFicheroImpreso190Key i190key = new FcsFicheroImpreso190Key();
+
+					i190key.setIdfichero(Long.parseLong(impreso.getIdFichero()));
+					i190key.setIdinstitucion(idInstitucion);
+
+					FcsFicheroImpreso190 impreso190 = fcsFicheroImpreso190ExtendsMapper.selectByPrimaryKey(i190key);
+
+					if (impreso != null) {
+						String path = getDirectorioFichero("FCS", SigaConstants.PATH_IMPRESO190,
+								idInstitucion.toString());
+						path += File.separator + idInstitucion + File.separator + impreso190.getNombreFichero();
+
+						File file = new File(path);
+						if (file.exists()) {
+							file.delete();
+
 						}
-						
+
+						int delimpreso190 = fcsFicheroImpreso190ExtendsMapper.deleteByPrimaryKey(i190key);
+
+						if (delimpreso190 != 0) {
+							GenFicheroKey genFichero = new GenFicheroKey();
+							genFichero.setIdfichero(impreso190.getIdGenFichero());
+							genFichero.setIdinstitucion(idInstitucion);
+							GenFichero fichero = genFicheroExtendsMapper.selectByPrimaryKey(genFichero);
+							if (fichero != null) {
+								response = genFicheroExtendsMapper.deleteByPrimaryKey(fichero);
+							} else {
+								error.setCode(500);
+								error.setDescription("general.mensaje.error.bbdd");
+								impreso190DTO.setError(error);
+							}
+
+						}
 					}
+
+					if (response != 0) {
+						error.setCode(200);
+						error.setDescription("facturacionSJCS.impreso190.impreso190Eliminar");
+						impreso190DTO.setError(error);
+					} else {
+						error.setCode(400);
+						error.setDescription("general.mensaje.error.bbdd");
+						impreso190DTO.setError(error);
+						throw new Exception("Error no se ha podido eliminar");
+					}
+
 				}
-				
-				if(response != 0) {
-					error.setCode(200);
-					error.setDescription("facturacionSJCS.impreso190.impreso190Eliminar");
-					impreso190DTO.setError(error);
-				}else {
-					error.setCode(400);
-					error.setDescription("general.mensaje.error.bbdd");
-					impreso190DTO.setError(error);
-				}
-				
+
 			}
-				
-				
+		}
+
+		return impreso190DTO;
+	}
+
+	@Override
+	@Transactional
+	public Impreso190DTO getConfImpreso190(HttpServletRequest request) throws Exception {
+		Error error = new Error();
+		Impreso190DTO impreso190DTO = new Impreso190DTO();
+		List<Impreso190Item> confImpreso190 = new ArrayList<Impreso190Item>();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"Impreso190ServiceImpl.deleteImpreso190() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"Impreso190ServiceImpl.deleteImpreso190() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"Impreso190ServiceImpl.deleteImpreso190() -> Entrada a servicio para eliminar el impreso190");
+
+				confImpreso190 = fcsFicheroImpreso190ExtendsMapper.getConfImpreso190(idInstitucion);
+
+				if (!confImpreso190.isEmpty()) {
+					impreso190DTO.setImpreso190Item(confImpreso190);
+					error.setCode(200);
+					impreso190DTO.setError(error);
+				} else {
+					error.setCode(400);
+					error.description("impreso190.mensajeError.impresoConfNoEncontrado");
+					impreso190DTO.setError(error);
+					throw new Exception("Error en FcsFacturacionJG.generarModelo190()");
+				}
 
 			}
 		}

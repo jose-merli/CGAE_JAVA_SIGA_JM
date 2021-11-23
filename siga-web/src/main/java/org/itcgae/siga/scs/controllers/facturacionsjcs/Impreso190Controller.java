@@ -64,4 +64,14 @@ public class Impreso190Controller {
         }
 	}
 	
+	@RequestMapping(value = "/facturacionsjcs/searchConfImpreso190",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Impreso190DTO> getConfImpreso190(HttpServletRequest request) throws Exception {
+		Impreso190DTO response = iImpreso190Service.getConfImpreso190(request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
+	
 }
