@@ -36,6 +36,12 @@ public interface ScsAcreditacionExtendsMapper extends ScsAcreditacionMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> getAcreditaciones(String idInstitucion, String idProcedimiento);
+
+	@SelectProvider(type = ScsAcreditacionSqlExtendsProvider.class, method = "getIDAcreditaciones")
+	@Results({
+			@Result(column = "IDACREDITACION", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<String> getIDAcreditaciones(String idInstitucion, String idFacturacion);
 	
 	
 }

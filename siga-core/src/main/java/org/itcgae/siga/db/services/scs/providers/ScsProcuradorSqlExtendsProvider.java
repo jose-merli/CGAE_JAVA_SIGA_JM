@@ -38,9 +38,9 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = procurador.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = procurador.IDPOBLACION");
 		sql.JOIN("CEN_COLEGIOPROCURADOR ON CEN_COLEGIOPROCURADOR.IDCOLPROCURADOR = PROCURADOR.IDCOLPROCURADOR");
-		if(idInstitucion != 2000) {
-			sql.WHERE("procurador.idinstitucion = '" + idInstitucion + "'");
-		}
+		//if(idInstitucion != 2000) {
+		//	sql.WHERE("procurador.idinstitucion = '" + idInstitucion + "'");
+		//}
 
 
 		if (procuradorItem.getNombre() != null && procuradorItem.getNombre() != "") {

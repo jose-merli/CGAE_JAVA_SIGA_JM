@@ -46,4 +46,6 @@ public interface IFacturacionSJCSServices {
 
     public FacturacionesAsuntoDTO getFacturacionesPorAsunto(ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request);
 
+	public void ejecutaFacturacionesSJCSBloqueadas();
+
 }

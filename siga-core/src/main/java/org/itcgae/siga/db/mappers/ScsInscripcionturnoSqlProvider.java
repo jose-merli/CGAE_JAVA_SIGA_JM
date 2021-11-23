@@ -7,6 +7,7 @@ import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample.Criteria;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample.Criterion;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
+import org.itcgae.siga.db.entities.ScsInscripcionturnoKey;
 
 public class ScsInscripcionturnoSqlProvider {
 
@@ -414,4 +415,19 @@ public class ScsInscripcionturnoSqlProvider {
             sql.WHERE(sb.toString());
         }
     }
+    
+    
+    public String selectByPrimaryKeyDate(ScsInscripcionturnoKey key, String fs){
+    	
+    	 SQL sql = new SQL();
+    	 sql.SELECT("*");
+         sql.FROM("SCS_INSCRIPCIONTURNO");
+         sql.WHERE("IDINSTITUCION = " + key.getIdinstitucion());
+         sql.WHERE("IDPERSONA = " + key.getIdpersona());
+         sql.WHERE("IDTURNO = " + key.getIdturno());
+         sql.WHERE("FECHASOLICITUD >= '" + fs + "'");
+         
+         return sql.toString();
+     }
+   
 }

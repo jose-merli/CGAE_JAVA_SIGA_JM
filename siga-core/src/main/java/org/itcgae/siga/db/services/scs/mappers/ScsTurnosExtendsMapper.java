@@ -9,9 +9,11 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.db.mappers.ScsTurnoMapper;
+import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
@@ -63,9 +65,14 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "IDTIPOTURNO", property = "idtipoturno", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "VISIBLEMOVIL", property = "visiblemovil", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
+			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "NLETRADOS", property = "nletrados", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombrepartidosjudiciales", property = "nombrepartidosjudiciales", jdbcType = JdbcType.VARCHAR),})
 	List<TurnosItem> busquedaTurnos(TurnosItem turnosItem, Short idInstitucion);
 
+	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "getObligatoriedadByTurno")
+	int getObligatoriedadByTurno(Short idInstitucion, String idTurno);
+	
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "busquedaFichaTurnos")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
 			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
@@ -107,11 +114,25 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 	@Results({ @Result(column = "IDORDENACIONCOLAS", property = "newId", jdbcType = JdbcType.VARCHAR) })
 	NewIdDTO getIdOrdenacion(Short idInstitucion);
 
+	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "resumenTurnoColaGuardia")
+	@Results({ @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDSUBZONA", property = "idzubzona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDZONA", property = "idzona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE_MATERIA", property = "materia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE_ZONA", property = "zona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROINSCRITOSTURNO", property = "numeroInscritos", jdbcType = JdbcType.VARCHAR), })
+	List<TurnosItem> resumenTurnoColaGuardia(String idTurno, String idInstitucion);
+
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "comboTurnosBusqueda")
 	@Results({ @Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboTurnosBusqueda(Short idInstitucion, String pantalla);
 
+	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "comboEstados")
+	@Results({ @Result(column = "VALOR", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VALOR", property = "label", jdbcType = JdbcType.VARCHAR), })
+	List<ComboItem> comboEstados(Short idInstitucion);
+	
 	/**
 	 * updateUltimoGuardias
 	 *

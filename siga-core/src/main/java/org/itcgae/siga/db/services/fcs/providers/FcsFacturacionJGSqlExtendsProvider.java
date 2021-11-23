@@ -931,5 +931,43 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
         return sql.toString();
     }
+    
+    public String facturacionesPorEstadoEjecucionTiempoLimite(String idInstitucion, Integer tiempoMaximo) {
+        SQL sql = new SQL();
+        SQL sql2 = new SQL();
+
+        sql.SELECT("FAC.IDFACTURACION");
+        sql.SELECT("FAC.IDINSTITUCION");
+        sql.SELECT("FAC.FECHADESDE");
+        sql.SELECT("FAC.FECHAHASTA");
+        sql.SELECT("FAC.NOMBRE");
+        sql.SELECT("FAC.IMPORTETOTAL");
+        sql.SELECT("FAC.IMPORTEOFICIO");
+        sql.SELECT("FAC.IMPORTEGUARDIA");
+        sql.SELECT("FAC.IMPORTESOJ");
+        sql.SELECT("FAC.IMPORTEEJG");
+        sql.SELECT("FAC.PREVISION");
+        sql.SELECT("FAC.REGULARIZACION");
+        sql.SELECT("FAC.FECHAMODIFICACION");
+        sql.SELECT("FAC.USUMODIFICACION");
+        sql.SELECT("FAC.IDFACTURACION_REGULARIZA");
+        sql.SELECT("FAC.NOMBREFISICO");
+        sql.SELECT("FAC.IDECOMCOLA");
+        sql.SELECT("FAC.VISIBLE");
+        sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.JOIN(
+                "FCS_FACT_ESTADOSFACTURACION E ON (FAC.IDINSTITUCION = E.IDINSTITUCION AND FAC.IDFACTURACION = E.IDFACTURACION)");
+        sql.WHERE("E.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("E.IDESTADOFACTURACION = " + ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo());
+        sql.WHERE("F.FECHAMODIFICACION = " + "SYSDATE - " + tiempoMaximo + "/1440");
+        sql2.SELECT("MAX(EST2.IDORDENESTADO)");
+        sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
+        sql2.WHERE("EST2.IDINSTITUCION = E.IDINSTITUCION");
+        sql2.WHERE("EST2.IDFACTURACION = E.IDFACTURACION");
+        sql.WHERE("E.IDORDENESTADO = (" + sql2.toString() + ")");
+
+        return sql.toString();
+    }
 
 }

@@ -34,6 +34,8 @@ public interface ComboService {
 	
 	public ComboDTO comboGuardiasNoGrupo(HttpServletRequest request, String idTurno);
 	
+	public ComboDTO comboGuardiasGrupo(HttpServletRequest request, String idTurno);
+	
 	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, String idordenacioncolas);
 
 	public ComboDTO comboGuardiasUpdate(HttpServletRequest request, String idTurno);
@@ -51,6 +53,16 @@ public interface ComboService {
 	public ComboDTO comboComisaria(HttpServletRequest request);
 
 	public ComboDTO comboJuzgado(HttpServletRequest request);
+	
+	public ComboDTO comboComisariaCdgoExt(HttpServletRequest request);
+
+	public ComboDTO comboJuzgadoCdgoExt(HttpServletRequest request);
+
+	public ComboDTO comboListasGuardias(HttpServletRequest request, String idTurno);
+
+	public ComboDTO comboEstados(HttpServletRequest request);
+
+	public ComboDTO comboConjuntoGuardias(HttpServletRequest request);
 	
 	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request);
 	
@@ -75,4 +87,22 @@ public interface ComboService {
 	public ComboDTO comboAcreditacionesPorModulo(HttpServletRequest request, String idModulo, String idTurno);
 	
 	public ComboDTO comboTipoDocumentacionDesigna(HttpServletRequest request);
+	
+	public ComboDTO comboTurnosInscritoLetrado(HttpServletRequest request, String idPersona);
+	
+	public ComboDTO comboGuardiasInscritoLetrado(HttpServletRequest request, String idPersona, String idTurno);
+	
+	public ComboDTO comboEstadosAsistencia(HttpServletRequest request);
+	
+	public ComboDTO comboTipoDocAsistencia(HttpServletRequest request);
+
+	public ComboDTO comboAsociadoAsistencia(HttpServletRequest request, String anioNumero);
+
+	public ComboDTO comboCosteFijo(HttpServletRequest request, String anioNumero, String idTipoActuacion);
+
+	public ComboDTO comboTipoActuacionAsistencia(HttpServletRequest request, String anioNumero, String idTipoAsistencia);
+
+	public ComboDTO comboOrigenContacto(HttpServletRequest request);
+
+	public ComboDTO comboGuardiasNoBaja(HttpServletRequest request, String idTurno);
 }

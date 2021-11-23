@@ -59,7 +59,8 @@ public class InscripcionesItem {
 	public String nifcif;
 	public String telefono;
 	public String movil;
-
+	public String descripcion_obligatoriedad;
+	
 	public String getTelefono() {
 		return telefono;
 	}
