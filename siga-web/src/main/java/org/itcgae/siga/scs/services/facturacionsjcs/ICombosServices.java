@@ -18,4 +18,12 @@ public interface ICombosServices {
 	public ComboDTO comboPagoEstados(HttpServletRequest request);
 	
 	public ComboDTO comboFacturaciones(HttpServletRequest request);	
+	
+	public ComboDTO comboFactMovimientos(HttpServletRequest request);
+	
+	public ComboDTO comboAplicadoEnPago(HttpServletRequest request);
+	
+	public ComboDTO comboAgrupacionEnTurnos(HttpServletRequest request);
+
+	public ComboDTO comboTiposMovimientos(HttpServletRequest request);
 }

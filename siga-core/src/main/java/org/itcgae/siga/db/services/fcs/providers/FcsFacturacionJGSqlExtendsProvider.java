@@ -832,5 +832,43 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
 
     }
+    
+    public String comboFactMovimientos(String idInstitucion) {
+
+    	SQL subquery2 = new SQL();
+    	subquery2.SELECT("MAX(EST2.IDORDENESTADO)");
+    	subquery2.FROM("FCS_FACT_ESTADOSFACTURACION EST2");
+    	subquery2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+    	subquery2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+    	
+        SQL sql = new SQL();
+        sql.SELECT("F.IDFACTURACION AS id");
+        sql.SELECT("TO_CHAR(F.FECHADESDE, 'DD/MM/YYYY') || '-' || TO_CHAR(F.FECHAHASTA, 'DD/MM/YYYY') || ' - ' || F.NOMBRE AS DESCRIPCION");
+        sql.FROM("FCS_FACTURACIONJG F");
+        sql.FROM("FCS_FACT_ESTADOSFACTURACION EST");
+        sql.WHERE("F.IDINSTITUCION = '" + idInstitucion + "'");
+        sql.WHERE("(F.PREVISION IS NULL OR F.PREVISION='0')");
+        sql.WHERE("F.IDINSTITUCION = EST.IDINSTITUCION");
+        sql.WHERE("F.IDFACTURACION = EST.IDFACTURACION");
+        sql.WHERE("EST.IDORDENESTADO = ("+subquery2+")");
+        sql.WHERE("EST.IDESTADOFACTURACION IN (20,30)");
+        sql.ORDER_BY("F.FECHADESDE DESC");
+
+        return sql.toString();
+    }
+    
+    public String comboAgrupacionEnTurnos(String idInstitucion) {
+
+    	
+        SQL sql = new SQL();
+        sql.SELECT("IDGRUPOFACTURACION as ID");
+        sql.SELECT("substr(f_siga_getrecurso (NOMBRE,1),0,25) as DESCRIPCION");
+        sql.FROM("SCS_GRUPOFACTURACION");
+        sql.WHERE("IDINSTITUCION ='" + idInstitucion + "'");
+        sql.ORDER_BY("DESCRIPCION");
+
+        return sql.toString();
+    }
+
 
 }

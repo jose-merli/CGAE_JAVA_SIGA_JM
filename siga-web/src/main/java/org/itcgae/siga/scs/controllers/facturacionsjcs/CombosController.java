@@ -61,4 +61,28 @@ public class CombosController {
    		ComboDTO response = combosServices.comboColegiosProcuradores(request);
    		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
    	}
+    
+    @RequestMapping(value="/combo/comboFactMovimientos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ComboDTO> comboFactMovimientos(HttpServletRequest request) {
+   		ComboDTO response = combosServices.comboFactMovimientos(request);
+   		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+   	}
+    
+    @RequestMapping(value="/combo/comboAplicadoEnPago", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ComboDTO> comboAplicadoEnPago(HttpServletRequest request) {
+   		ComboDTO response = combosServices.comboAplicadoEnPago(request);
+   		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+   	}
+    
+    @RequestMapping(value="/combo/comboAgrupacionEnTurnos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ComboDTO> comboAgrupacionEnTurnos(HttpServletRequest request) {
+   		ComboDTO response = combosServices.comboAgrupacionEnTurnos(request);
+   		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+   	}
+    
+    @RequestMapping(value="/combo/comboTiposMovimientos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ComboDTO> comboTiposMovimientos(HttpServletRequest request) {
+   		ComboDTO response = combosServices.comboTiposMovimientos(request);
+   		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+   	}
 }

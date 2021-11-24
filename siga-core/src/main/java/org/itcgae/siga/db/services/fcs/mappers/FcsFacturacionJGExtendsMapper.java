@@ -207,5 +207,18 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboFacturaciones(String idInstitucion);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "comboFactMovimientos")
+	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> comboFactMovimientos(String idInstitucion);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "comboAgrupacionEnTurnos")
+	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> comboAgrupacionEnTurnos(String idInstitucion);
+	
+	
+	
 
 }

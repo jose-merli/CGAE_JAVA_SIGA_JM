@@ -780,4 +780,16 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
 
         return query.toString();
     }
+    
+    public String comboAplicadoEnPago (String idinstitucion) {
+    	
+    	SQL sql = new SQL();
+    	
+    	sql.SELECT("FCS_PAGOSJG.IDPAGOSJG AS ID");
+    	sql.SELECT("substr(to_char(fcs_pagosjg.fechadesde,'dd/mm/yyyy') || '-' ||  to_char(fcs_pagosjg.fechahasta,'dd/mm/yyyy') || ' - ' || fcs_pagosjg.NOMBRE,0,80) AS DESCRIPCION");
+    	sql.FROM("FCS_PAGOSJG");
+    	sql.WHERE("FCS_PAGOSJG.IDINSTITUCION = "+idinstitucion);
+    	sql.ORDER_BY("FCS_PAGOSJG.FECHADESDE DESC");
+    	return sql.toString();
+    }
 }
