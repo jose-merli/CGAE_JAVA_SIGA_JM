@@ -1,15 +1,28 @@
 package org.itcgae.siga.fac.controllers;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.itcgae.siga.DTO.fac.*;
+import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
+import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
+import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
+import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
+import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
+import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
+import org.itcgae.siga.DTO.fac.FicherosDevolucionesDTO;
+import org.itcgae.siga.DTO.fac.FicherosDevolucionesItem;
+import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
+import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
+import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
+import org.itcgae.siga.DTO.fac.UsosSufijosItem;
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +34,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/facturacionPyS")
@@ -310,4 +326,41 @@ public class FacturacionPySController {
 		}
 	}
 
+	@PostMapping(value = "/getFicherosTransferencias")
+	ResponseEntity<FicherosAbonosDTO> getFicherosTransferencias(@RequestBody FicherosAbonosItem item,
+																	HttpServletRequest request) {
+		FicherosAbonosDTO response = new FicherosAbonosDTO();
+
+		try {
+			response = facturacionService.getFicherosTransferencias(item, request);
+
+			if(response.getFicherosTransferenciasItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<FicherosAbonosDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FicherosAbonosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/getFicherosDevoluciones")
+	ResponseEntity<FicherosDevolucionesDTO> getFicherosDevoluciones(@RequestBody FicherosDevolucionesItem item,
+														  HttpServletRequest request) {
+		FicherosDevolucionesDTO response = new FicherosDevolucionesDTO();
+
+		try {
+			response = facturacionService.getFicherosDevoluciones(item, request);
+
+			if(response.getFicherosDevolucionesItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<FicherosDevolucionesDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FicherosDevolucionesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
