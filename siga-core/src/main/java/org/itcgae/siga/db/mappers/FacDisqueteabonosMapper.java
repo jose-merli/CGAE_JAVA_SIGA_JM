@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.mappers;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Insert;
@@ -15,8 +17,6 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisqueteabonosExample;
 import org.itcgae.siga.db.entities.FacDisqueteabonosKey;
-
-import java.util.List;
 
 public interface FacDisqueteabonosMapper {
     /**
