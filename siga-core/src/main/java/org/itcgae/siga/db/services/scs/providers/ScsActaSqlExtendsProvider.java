@@ -200,5 +200,52 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		LOGGER.info("*******************comprobarBorrarActas********************" + sql.toString());
 		return sql.toString();
 	}
+	
+	public String getNuevoNumActaComp(String idInstitucion, String anio, String sufijo) {
+		SQL sql = new SQL();
+		sql.SELECT(
+				"NVL(MAX(to_number(regexp_replace(NUMEROACTA, '\\\\D', ''))),0)  AS NUMEROACTA");
+		sql.FROM("SCS_ACTACOMISION");
+		sql.WHERE("IDINSTITUCION =" + idInstitucion);
+		sql.WHERE("ANIOACTA =" + anio);
+		sql.WHERE("NUMEROACTA LIKE '%"+sufijo+"%'");
+
+		LOGGER.info("*******************getNuevoNumActa con Sufijo********************" + sql.toString());
+		return sql.toString();
+	}
+	public String getNuevoNumActaAuxComp(String idInstitucion, String anio, String sufijo) {
+		SQL sql = new SQL();
+		sql.SELECT(
+				"NVL(MAX(NUMEROACTA), 0) AS NUMEROACTA ");
+		sql.FROM("SCS_ACTACOMISION");
+		sql.WHERE("IDINSTITUCION =" + idInstitucion);
+		sql.WHERE("ANIOACTA =" + anio);
+		sql.WHERE("NUMEROACTA LIKE '%"+sufijo+"%'");
+
+		LOGGER.info("*******************getNuevoNumActaAux con Sufijo********************" + sql.toString());
+		return sql.toString();
+	}
+	public String getNuevoNumActaSimple(String idInstitucion, String anio) {
+		SQL sql = new SQL();
+		sql.SELECT(
+				"NVL(MAX(TO_NUMBER(NUMEROACTA )), 0) AS NUMEROACTA");
+		sql.FROM("SCS_ACTACOMISION");
+		sql.WHERE("IDINSTITUCION =" + idInstitucion);
+		sql.WHERE("ANIOACTA =" + anio);
+
+		LOGGER.info("*******************getNuevoNumActa sin Sufijo********************" + sql.toString());
+		return sql.toString();
+	}
+	public String getNuevoNumActaAuxSimple(String idInstitucion, String anio) {
+		SQL sql = new SQL();
+		sql.SELECT(
+				"NVL(MAX(NUMEROACTA ), 0) AS NUMEROACTA");
+		sql.FROM("SCS_ACTACOMISION");
+		sql.WHERE("IDINSTITUCION =" + idInstitucion);
+		sql.WHERE("ANIOACTA =" + anio);
+
+		LOGGER.info("*******************getNuevoNumActaAux sin Sufijo********************" + sql.toString());
+		return sql.toString();
+	}
 
 }

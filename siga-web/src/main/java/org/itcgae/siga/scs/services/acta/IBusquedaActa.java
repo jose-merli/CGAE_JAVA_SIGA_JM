@@ -33,5 +33,9 @@ public interface IBusquedaActa {
 	public ScsActacomision getActa(ActasItem actasItem, HttpServletRequest request);
 
 	public DeleteResponseDTO borrarActas(List<ActasItem> actasItem, HttpServletRequest request) throws SigaExceptions;
+
+	public String getNumActa(HttpServletRequest request) throws SigaExceptions;
+	
+	public String getNumActa(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions;
 	
 }

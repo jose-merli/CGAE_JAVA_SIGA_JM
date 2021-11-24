@@ -44,6 +44,21 @@ public class ActaController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/filtros-acta/getNumActa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> getNumActa(@RequestBody ActasItem actasItem, HttpServletRequest request)
+			throws SigaExceptions {
+		String response = actas.getNumActa(actasItem, request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-acta/getNumActa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> getNumActa( HttpServletRequest request)
+			throws SigaExceptions {
+		String response = actas.getNumActa(request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
+	
+	
 	@RequestMapping(value = "/filtros-acta/getActa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ScsActacomision> getActa(@RequestBody ActasItem actasItem, HttpServletRequest request)
 			throws SigaExceptions {

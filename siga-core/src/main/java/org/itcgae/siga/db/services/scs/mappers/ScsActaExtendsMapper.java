@@ -54,6 +54,21 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 	@Results({ @Result(column = "valor", property = "valor", jdbcType = JdbcType.VARCHAR)})
 	String comboSufijoActa(Short idInstitucion);
 
+	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "getNuevoNumActaComp")
+	@Results({ @Result(column = "NUMEROACTA", property = "NUMEROACTA", jdbcType = JdbcType.VARCHAR)})
+	String getNuevoNumActaComp(String idInstitucion, String anio, String sufijo);
+	
+	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "getNuevoNumActaAuxComp")
+	@Results({ @Result(column = "NUMEROACTA", property = "NUMEROACTA", jdbcType = JdbcType.VARCHAR)})
+	String getNuevoNumActaAuxComp(String idInstitucion, String anio, String sufijo);
+
+	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "getNuevoNumActaSimple")
+	@Results({ @Result(column = "NUMEROACTA", property = "NUMEROACTA", jdbcType = JdbcType.VARCHAR)})
+	String getNuevoNumActaSimple(String idInstitucion, String anio) ;
+	
+	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "getNuevoNumActaAuxSimple")
+	@Results({ @Result(column = "NUMEROACTA", property = "NUMEROACTA", jdbcType = JdbcType.VARCHAR)})
+	String getNuevoNumActaAuxSimple(String idInstitucion, String anio);
 //
 //	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "guardarActa")
 //	int guardarActa(ActasItem actasItem);

@@ -23,6 +23,7 @@ import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 
@@ -358,7 +359,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 				// Obtenemos el combo de sufijos para el acta
 
 				String combo = scsActaExtendsMapper.comboSufijoActa(idInstitucion);
-				if(!combo.isEmpty()) {
+				if(combo != null && !combo.isEmpty()) {
 					String [] listCombo = combo.split(","); 
 					for(String valor : listCombo) {
 						ComboItem itemA = new ComboItem();
@@ -1401,6 +1402,92 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		return acta;
 	}
 
+	@Override
+	public String getNumActa( HttpServletRequest request) throws SigaExceptions {
+		LOGGER.info("comboSufijoActa() -> Entrada al servicio para obtener el colegiado");
+
+		String token = request.getHeader("Authorization");
+
+
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ActasItem acta = new ActasItem();
+		
+		if(idInstitucion != null) {
+		
+		String anio = getAnioHoy();
+
+		String combo = scsActaExtendsMapper.comboSufijoActa(idInstitucion);
+		if(!combo.isEmpty() && combo != null) {
+			String [] listCombo = combo.split(","); 
+			acta.setNumeroacta(getNumeroActaSufijo(idInstitucion.toString(), anio, listCombo[0]));
+
+		}else {
+			acta.setNumeroacta(getNumeroActa(idInstitucion.toString(), anio));
+		}
+		
+		}
+		
+		return acta.getNumeroacta();
+	}
+	
+	@Override
+	public String getNumActa(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
+
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ActasItem acta = new ActasItem();
+		
+		if(idInstitucion != null) {
+
+		acta.setNumeroacta(getNumeroActaSufijo(idInstitucion.toString(), actasItem.getAnioacta(), actasItem.getSufijo()));
+
+		}	
+		
+		return acta.getNumeroacta();
+	}
+	
+	private String getAnioHoy() {
+		Date date = new Date();
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy");
+        String anio = formato.format(date);
+        return anio;
+	}
+	
+	private String getNumeroActa(String idInstitucion, String anio) {
+		String numActa;
+		int nextNum;
+		try {
+			numActa = scsActaExtendsMapper.getNuevoNumActaSimple(idInstitucion,anio );
+			nextNum = Integer.parseInt(numActa)+1;
+		}catch(Exception e) {
+			numActa = scsActaExtendsMapper.getNuevoNumActaAuxSimple(idInstitucion,anio );
+			nextNum = Integer.parseInt(numActa)+1;
+		}
+		return String.valueOf(nextNum);
+		
+	}
+	
+	private String getNumeroActaSufijo(String idInstitucion, String anio, String sufijo) {
+		String numActa;
+		int nextNum;
+		try {
+			numActa = scsActaExtendsMapper.getNuevoNumActaComp(idInstitucion,anio,sufijo );
+			numActa = UtilidadesString.replaceAllIgnoreCase(numActa, sufijo, "");
+			nextNum = Integer.parseInt(numActa)+1;
+		}catch(Exception e) {
+			numActa = scsActaExtendsMapper.getNuevoNumActaAuxComp(idInstitucion,anio,sufijo );
+			numActa = UtilidadesString.replaceAllIgnoreCase(numActa, sufijo, "");
+			nextNum = Integer.parseInt(numActa)+1;
+		}
+		return String.valueOf(nextNum);
+		
+	}
+	
 	/**
 	 * @param idInstitucion
 	 * @param usuario
@@ -1712,5 +1799,8 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		return listaEjgActa;
 	}
+
+
+	
 
 }
