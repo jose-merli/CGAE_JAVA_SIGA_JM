@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.services.impl.ejg.acta;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -320,7 +321,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		List<ComboItem> comboItems = null;
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
 		// Si la institucion del token es nula, no ejecutaremos nada del código
 
@@ -356,8 +357,22 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 				// Obtenemos el combo de sufijos para el acta
 
-				comboItems = scsActaExtendsMapper.comboSufijoActa(idInstitucion);
+				String combo = scsActaExtendsMapper.comboSufijoActa(idInstitucion);
+				if(!combo.isEmpty()) {
+					String [] listCombo = combo.split(","); 
+					for(String valor : listCombo) {
+						ComboItem itemA = new ComboItem();
+						itemA.setLabel(valor);
+						itemA.setValue(valor);
+						comboItems.add(itemA);
+					}
+				}else {
+					error.setCode(404);
+					error.setDescription("Empty");
 
+					LOGGER.warn("comboSufijoActa() -> Combo vacio.");
+				}
+				
 				LOGGER.info(
 						"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener el combo de sufijos para actas");
 
@@ -365,13 +380,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 					comboDTO.setCombooItems(comboItems);
 
-				} else {
-
-					error.setCode(500);
-
-					error.setDescription("El listado de combos es nulo");
-
-				}
+				} 
 			}
 
 		} else {
