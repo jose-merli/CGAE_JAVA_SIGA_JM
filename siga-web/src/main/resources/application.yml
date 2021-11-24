@@ -22,3 +22,6 @@ application:
     /pagosjcs/saveConfigFichAbonos: [ 622 ]
     /retenciones/deleteRetenciones: [ 630 ]
     /retenciones/saveOrUpdateRetencion: [ 63B ]
+    /facturacionsjcs/impreso190generar: [613]
+    /facturacionsjcs/impreso190descargar: [613]
+    /facturacionsjcs/deleteImpreso190: [613]

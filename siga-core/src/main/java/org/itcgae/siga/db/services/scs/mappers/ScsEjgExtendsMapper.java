@@ -80,9 +80,10 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
+			@Result(column = "numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
 
 	})
 	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string, Integer tamMaximo, String idLenguaje);
@@ -108,8 +109,9 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "SOLONOMBRESOLIC", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombreletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "dictamen", property = "dictamenSing", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "resolucion", property = "resolucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "resolauto", property = "impugnacionDesc", jdbcType = JdbcType.VARCHAR),
@@ -149,7 +151,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "idTipoDictamenEJG", property = "idTipoDictamen", jdbcType = JdbcType.INTEGER),
 			@Result(column = "IDFUNDAMENTOCALIF", property = "fundamentoCalif", jdbcType = JdbcType.INTEGER),
 			@Result(column = "observacionesDictamen", property = "dictamen", jdbcType = JdbcType.CLOB),
-			@Result(column = "identificadords", property = "identificadords", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "identificadords", property = "identificadords", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR)})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getDictamen")
@@ -238,7 +241,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDSJCS", property = "idsjcs", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPERSONAJG", property = "idpersonajg", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IDPERSONAJG", property = "idpersonajg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechadesignacion", property = "fechaDesignacion", jdbcType = JdbcType.TIMESTAMP),
 
 	})
 	List<RelacionesItem> getRelacionesEJG(EjgItem item);

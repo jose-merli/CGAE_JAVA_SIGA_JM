@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Date;
+
 import lombok.Data;
 
 @Data
@@ -32,5 +34,7 @@ public class Impreso190Item {
 	String idtipoidentificacion;
 	String extension;
 	String idFichero;
+	String idGenFichero;
+	Date fechageneracion;
 
 }

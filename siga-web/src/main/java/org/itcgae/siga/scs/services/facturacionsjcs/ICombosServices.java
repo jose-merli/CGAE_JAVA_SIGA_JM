@@ -27,4 +27,12 @@ public interface ICombosServices {
     ComboDTO getComboColegios(HttpServletRequest request);
     
     ComboDTO getComboGrupoFacturacionByColegio(String idColegio, HttpServletRequest request);
+ 
+    ComboDTO comboFactMovimientos(HttpServletRequest request);
+	
+	ComboDTO comboAplicadoEnPago(HttpServletRequest request);
+	
+	ComboDTO comboAgrupacionEnTurnos(HttpServletRequest request);
+
+	ComboDTO comboTiposMovimientos(HttpServletRequest request);
 }

@@ -54,4 +54,24 @@ public class Impreso190Controller {
         }
 	}
 	
+	@RequestMapping(value = "/facturacionsjcs/deleteImpreso190",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Impreso190DTO> deleteImpreso190(@RequestBody List<Impreso190Item> impreso190Item, HttpServletRequest request) throws Exception {
+		Impreso190DTO response = iImpreso190Service.deleteImpreso190(impreso190Item, request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/searchConfImpreso190",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Impreso190DTO> getConfImpreso190(HttpServletRequest request) throws Exception {
+		Impreso190DTO response = iImpreso190Service.getConfImpreso190(request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Impreso190DTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
+	
 }

@@ -24,8 +24,8 @@ public class ScsExpedienteEconomicoSqlExtendsProvider extends ScsEejgPeticionesS
 		
 		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("eejg.anio = '" + ejgItem.getAnnio() + "'");
-		if(ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
-			sql.WHERE("eejg.numero = '" + ejgItem.getNumEjg() + "'");
+		if(ejgItem.getNumero() != null && ejgItem.getNumero() != "")
+			sql.WHERE("eejg.numero = '" + ejgItem.getNumero() + "'");
 //		sql.WHERE("eejg.numero='4556'");
 		if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
 			sql.WHERE("eejg.idtipoejg = '" + ejgItem.getTipoEJG() + "'");

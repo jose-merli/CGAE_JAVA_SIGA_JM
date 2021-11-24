@@ -53,4 +53,7 @@ public interface IFacturacionSJCSServices {
     public FacturacionesAsuntoDTO getFacturacionesPorGuardia(ScsCabeceraguardias guardia, HttpServletRequest request);
 
     public FacturacionesAsuntoDTO getFacturacionesPorEJG(ScsEjg ejg, HttpServletRequest request);
+	
+    public void ejecutaFacturacionesSJCSBloqueadas();
+
 }

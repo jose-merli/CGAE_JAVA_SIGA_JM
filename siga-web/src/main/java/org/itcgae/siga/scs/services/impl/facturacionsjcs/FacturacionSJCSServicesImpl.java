@@ -18,6 +18,7 @@ import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -129,6 +130,18 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     @Autowired
     private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
+    
+    @Autowired
+    private GenPropertiesMapper genPropertiesMapper;
+    
+    @Autowired
+    private FcsTrazaErrorEjecucionMapper fcsTrazaErrorEjecucionMapper;
+
+    @Autowired
+    private FcsTrazaErrorEjecucionExtendsMapper fcsTrazaErrorEjecucionExtendsMapper;
+    
+    @Autowired
+    private IFacturacionSJCSZombiService iFacturacionSJCSZombiService;
 
     @Autowired
     private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
@@ -2415,5 +2428,106 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por EJG");
 
         return facturacionesAsuntoDTO;
+    }
+    
+    public void ejecutaFacturacionesSJCSBloqueadas() {
+        if (isAlguienEjecutando()) {
+            LOGGER.debug(
+                    "YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+            return;
+        }
+        procesarFacturacionesSJCSBloqueadas();
+
+
+        try {} catch (Exception e) {
+            throw e;
+        } finally {
+            setNadieEjecutando();
+        }
+    }
+
+    private void procesarFacturacionesSJCSBloqueadas() {
+
+        CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+        exampleInstitucion.setDistinct(true);
+        exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();
+
+        List<CenInstitucion> listaInstituciones = institucionMapper.selectByExample(exampleInstitucion);
+
+        for (CenInstitucion institucion : listaInstituciones) {
+            facturacionesBloqueadasEnEjecucion(institucion);
+        }
+
+    }
+
+    private void facturacionesBloqueadasEnEjecucion(CenInstitucion institucion) {
+        LOGGER.info("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
+
+        //Recuperamos el tiempo estimado como bloqueo
+        GenPropertiesKey propertiesPK = new GenPropertiesKey();
+        propertiesPK.setFichero("SIGA");
+        propertiesPK.setParametro("facturacion.programacionAutomatica.maxMinutosEnEjecucion");
+        GenProperties tiempoMaximoMinutos = genPropertiesMapper.selectByPrimaryKey(propertiesPK);
+
+        List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
+                .facturacionesPorEstadoEjecucionTiempoLimite(institucion.getIdinstitucion().toString(), Integer.parseInt(tiempoMaximoMinutos.getValor()));
+
+        for (FcsFacturacionjg item : listaFacturaciones) {
+
+            try {
+                // Insertamos el estado ABIERTA para las facturaciones en ejecucion
+                insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
+                        item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
+
+                // Localizamos donde se quedó el proceso de cierre y dehacemos lo hasta ahora modificado(conceptoErroneo puede ser Turno/Guardia/EJG/SOJ)
+                FcsTrazaErrorEjecucion conceptoErroneo = localizadaEstadoFacturacionBloqueadaEnEjecucion(item);
+                if(conceptoErroneo != null) {
+                	if("1".equals(conceptoErroneo.getIdoperacion())) {
+                		iFacturacionSJCSZombiService.deshacerRegularTurnosOfi(conceptoErroneo);
+                    }else if("2".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularGuardias(conceptoErroneo);
+                    }else if("3".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularSOJ(conceptoErroneo);
+                    }else if("4".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularEJG(conceptoErroneo);
+                    }else if("5".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerTurnosOfi(conceptoErroneo);
+                    }else if("6".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerGuardias(conceptoErroneo);
+                    }else if("7".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerSOJ(conceptoErroneo);
+                    }else if("8".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerEJG(conceptoErroneo);
+                    }
+                }
+                
+
+            } catch (Exception e) {
+                LOGGER.error(e);
+                actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
+                        item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
+                insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
+                        item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
+            }
+        }
+
+        LOGGER.info("SALE -> FacturacionSJCSServicesImpl.facturacionesBloqueadas(): " + listaFacturaciones.toString());
+    }
+
+    public FcsTrazaErrorEjecucion localizadaEstadoFacturacionBloqueadaEnEjecucion(FcsFacturacionjg facturacionBloqueadaEnEjecucion){
+        //Comprobamos si ha ejecutado el primer paso de la facturaciones de guardias
+        FcsTrazaErrorEjecucionExample record = new FcsTrazaErrorEjecucionExample();
+        record.createCriteria().andIdfacturacionEqualTo(facturacionBloqueadaEnEjecucion.getIdfacturacion()).andIdinstitucionEqualTo(facturacionBloqueadaEnEjecucion.getIdinstitucion());
+        List<FcsTrazaErrorEjecucion> estadosEjecucion = fcsTrazaErrorEjecucionMapper.selectByExample(record);
+        long actual = 0;
+        FcsTrazaErrorEjecucion estadoError = null;
+        for(FcsTrazaErrorEjecucion factError: estadosEjecucion) {
+        	long actualAux = factError.getIderror();
+        	if(actualAux > actual) {
+        		estadoError = factError;
+        	}
+        }
+
+        return estadoError;
     }
 }
