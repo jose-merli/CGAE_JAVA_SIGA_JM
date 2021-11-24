@@ -1,5 +1,14 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
@@ -7,6 +16,7 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
@@ -39,6 +49,7 @@ import org.itcgae.siga.db.entities.FacClienincluidoenseriefactur;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
 import org.itcgae.siga.db.entities.FacFacturaExample;
+import org.itcgae.siga.db.entities.FacFacturacionEliminar;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
@@ -81,16 +92,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 @Service
 public class FacturacionPySServiceImpl implements IFacturacionPySService {
+
+	private static final String RET_OK = "0";
 
 	private Logger LOGGER = Logger.getLogger(FacturacionPySServiceImpl.class);
 
@@ -1393,6 +1398,51 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	public DeleteResponseDTO eliminarFacturacion(FacFacturacionEliminarItem fac, HttpServletRequest request)
+			throws Exception {
+		LOGGER.info("eliminarFacturacion() -> Entrada al servicio para eliminar facturación");
+
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+		FacFacturacionEliminar facElim = new FacFacturacionEliminar();
+		Error error = new Error(); 
+		error.setCode(0);	
+		deleteResponseDTO.setError(error);
+		
+		
+		if (usuario != null) {
+			facElim.setIdInstitucion(usuario.getIdinstitucion());
+			facElim.setIdUsuarioModificacion(usuario.getIdusuario());
+		}
+		
+		facElim.setIdProgramacion(fac.getIdProgramacion());
+		facElim.setIdSerieFacturacion(fac.getIdSerieFacturacion());
+		try {
+			facFacturaMapper.eliminarFacturacion(facElim);
+			if(facElim!=null&&!facElim.getCodRetorno().equals(RET_OK)) {
+				Integer ret;
+				try {
+					ret = Integer.valueOf(facElim.getCodRetorno());
+				} catch (Exception e) {
+					ret = -3;
+				}
+				error.setCode(ret);	
+				error.setDescription(facElim.getDatosError());	} else {
+					// TODO: borrado de ficheros
+				}
+		} catch (Exception e) {
+			error.setCode(-3);
+			error.setDescription("error:" + e);;
+		}
+		
+		
+		deleteResponseDTO.setStatus(HttpStatus.OK.toString());
+
+		LOGGER.info("eliminarFacturacion() -> Salida del servicio para eliminar facturación");
+		
+		return deleteResponseDTO;
+	}
+	
 	public FicherosAbonosDTO getFicherosTransferencias(FicherosAbonosItem item, HttpServletRequest request)
 			throws Exception {
 		FicherosAbonosDTO ficherosAbonosDTO = new FicherosAbonosDTO();
