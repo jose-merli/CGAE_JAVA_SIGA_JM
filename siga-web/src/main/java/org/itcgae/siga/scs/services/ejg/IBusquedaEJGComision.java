@@ -59,6 +59,8 @@ public interface IBusquedaEJGComision {
 
 	UpdateResponseDTO borrarActaAnio(List<EjgItem> ejgItem, HttpServletRequest request);
 
+	String obligatorioFundamento(HttpServletRequest request);
+
 
 
 	

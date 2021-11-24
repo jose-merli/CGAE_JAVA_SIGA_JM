@@ -21,6 +21,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.ScsActacomision;
 import org.itcgae.siga.db.entities.ScsActacomisionKey;
 import org.itcgae.siga.db.entities.ScsEjg;
@@ -29,6 +30,7 @@ import org.itcgae.siga.db.entities.ScsEjgActaExample;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.ScsActacomisionMapper;
 import org.itcgae.siga.db.mappers.ScsEjgActaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
@@ -64,6 +66,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	private ScsEjgMapper scsEjgMapper;
 	@Autowired
 	GestionEJGServiceImpl gestionEJGServiceImpl;
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 
 	@Override
 	public ComboDTO comboDictamen(HttpServletRequest request) {
@@ -786,10 +790,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 													+ scsEstadoEjg.getAnio() + " numero -> " + scsEstadoEjg.getNumero()
 													+ " idEstadoporEjg ->" + scsEstadoEjg.getIdestadoejg());
 
-									scsEstadoEjg.setObservaciones(
-											scsEstadoEjg.getObservaciones() + " Expediente excluido del acta "
-													+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+									if(scsEstadoEjg.getObservaciones() != null) {
+										scsEstadoEjg.setObservaciones(
+												scsEstadoEjg.getObservaciones() + " Expediente excluido del acta "
+														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+									}else {
+										scsEstadoEjg.setObservaciones(
+												"Expediente excluido del acta "
+														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
 
+									}
+								
 									LOGGER.info(scsEstadoEjg.getObservaciones());
 
 									resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
@@ -806,9 +817,15 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					}
 					LOGGER.info("Seteando las observaciones");
 
-					scsEstadoEjg.setObservaciones(
-							scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
-									+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
+					if(scsEstadoEjg.getObservaciones() != null) {
+						scsEstadoEjg.setObservaciones(
+								scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
+										+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
+					}else {
+						scsEstadoEjg.setObservaciones(
+								"Expediente incluido masivamente en el acta "
+										+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
+					}
 
 					LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
 
@@ -910,10 +927,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 								LOGGER.info("El estado que voy a actualizar es:   " + scsEstadoEjg.getIdestadoejg());
 
-								scsEstadoEjg.setObservaciones(
-										scsEstadoEjg.getObservaciones() + "Expediente excluido masivamente del acta "
-												+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-
+								
+								 if(scsEstadoEjg.getObservaciones() != null) {
+									 scsEstadoEjg.setObservaciones( 
+											 scsEstadoEjg.getObservaciones() + " Expediente excluido masivamente del acta " + acta.getAnioacta() + "/" +
+									  acta.getNumeroacta());
+								 }else {
+									 scsEstadoEjg.setObservaciones( 
+											 "Expediente excluido masivamente del acta " + acta.getAnioacta() + "/" +
+									  acta.getNumeroacta());
+								 }
+								 
 								acta.setFecharesolucion(new Date());
 
 								scsActacomisionMapper.updateByPrimaryKey(acta);
@@ -921,6 +945,9 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 								LOGGER.info("VOY A BORRAR A  " + listaEjgAsociadosActa.size());
 
 								resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
+								
+								updateResponseDTO.setStatus(SigaConstants.OK);
+								
 								if (resultado == 0) {
 									throw (new SigaExceptions(
 											"Error no se ha podido borrar la relacion entre el Ejg y acta"));
@@ -1122,16 +1149,11 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 							scsEstadoejgMapper.insert(scsEstadoEjg);
 
-							try {
-								gestionEJGServiceImpl.triggersEjgUpdatesPonente(resolEjg, usuario, idInstitucion);
-							} catch (Exception e) {
-								LOGGER.info("No se ha podido ejecutar el triggersEjgUpdatesPonente");
-								throw new SigaExceptions("No se ha podido ejecutar el triggersEjgUpdatesPonente");
-							}
-
 							int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
 
 							LOGGER.info("Respuesta al actualizar" + response);
+							
+							updateResponseDTO.setStatus(SigaConstants.OK);
 
 						} else {
 							error.setCode(500);
@@ -1399,6 +1421,51 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		return scsEjgItem;
 
+	}
+
+	@Override
+	public String obligatorioFundamento(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		GenParametros parametro = new GenParametros();
+		
+		if(idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			LOGGER.debug(
+					"obligatorioFundamento() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			
+			LOGGER.debug(
+					"obligatorioFundamento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			LOGGER.debug(
+					"obligatorioFundamento() / genParametrosMapper.selectByPrimaryKey() -> Entrada a GenParametrosMapper para obtener el valor de la VALIDACION DE OBLIGATORIEDAD PARA RESOLUCION de la institucion logeada");
+		
+			GenParametrosKey key = new GenParametrosKey();
+
+			key.setIdinstitucion(idInstitucion);
+			key.setModulo("SCS");
+			key.setParametro("VALIDAR_OBLIGATORIEDAD_RESOLUCION");
+
+			parametro = genParametrosMapper.selectByPrimaryKey(key);
+			
+			if(parametro == null) {
+				key.setIdinstitucion(new Short("0"));
+				parametro = genParametrosMapper.selectByPrimaryKey(key);	
+			}
+			
+			LOGGER.debug(
+					"obligatorioFundamento() / genParametrosMapper.selectByPrimaryKey() -> Salida a GenParametrosMapper para obtener el valor de la VALIDACION DE OBLIGATORIEDAD PARA RESOLUCION de la institucion logeada");
+		
+		}
+		
+		return parametro.getValor();
 	}
 
 }
