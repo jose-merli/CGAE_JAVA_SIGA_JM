@@ -46,4 +46,6 @@ public interface IFacturacionPySGeneralService {
 
 	public ComboDTO parametrosSEPA(String idInstitucion, HttpServletRequest request) throws Exception;
 
+    public ComboDTO parametrosCONTROL(String idInstitucion, HttpServletRequest request) throws Exception;
+
 }

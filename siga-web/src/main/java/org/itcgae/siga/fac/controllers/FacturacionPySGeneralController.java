@@ -272,6 +272,20 @@ public class FacturacionPySGeneralController {
 		}
 	}
 
+	@GetMapping(value = "/parametrosCONTROL")
+	ResponseEntity<ComboDTO> parametrosCONTROL(@RequestParam String idInstitucion, HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.parametrosCONTROL(idInstitucion, request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GetMapping(value = "/comboEstadosFacturacion")
 	ResponseEntity<ComboDTO> comboEstadosFacturacion(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
