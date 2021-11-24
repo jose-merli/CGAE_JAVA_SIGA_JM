@@ -11,15 +11,17 @@ import org.itcgae.siga.db.services.scs.mappers.ScsAcreditacionExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class FacturacionSJCSZombiServiceImpl implements IFacturacionSJCSZombiService {
 
-    private Logger LOGGER = Logger.getLogger(FacturacionSJCSServicesImpl.class);
+    private Logger LOGGER = Logger.getLogger(FacturacionSJCSZombiServiceImpl.class);
 
     @Autowired
     FcsHistoricoAcreditacionExtendsMapper fcsHistoricoAcreditacionExtendsMapper;

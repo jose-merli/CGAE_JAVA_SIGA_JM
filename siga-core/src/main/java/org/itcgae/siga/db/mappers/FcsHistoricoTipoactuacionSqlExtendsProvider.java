@@ -4,7 +4,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 public class FcsHistoricoTipoactuacionSqlExtendsProvider {
 
-    public String delete(String idInstitucion, String idFacturacion) {
+    public String deleteByAcreditacionProc(String idInstitucion, String idFacturacion) {
         SQL sql = new SQL();
         sql.DELETE_FROM("FCS_HISTORICO_TIPOACTUACION");
 

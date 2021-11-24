@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Service
-@Primary
+
 public interface IFacturacionSJCSZombiService {
 
     public FacturacionDTO deshacerTurnosOfi(FcsTrazaErrorEjecucion facturacionItem);

@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
-@Primary
 public interface ScsAcreditacionExtendsMapper extends ScsAcreditacionMapper{
 
 	@SelectProvider(type = ScsAcreditacionSqlExtendsProvider.class, method = "searchAcreditaciones")
@@ -39,7 +38,7 @@ public interface ScsAcreditacionExtendsMapper extends ScsAcreditacionMapper{
 
 	@SelectProvider(type = ScsAcreditacionSqlExtendsProvider.class, method = "getIDAcreditaciones")
 	@Results({
-			@Result(column = "IDACREDITACION", property = "value", jdbcType = JdbcType.VARCHAR)
+			//@Result(column = "IDACREDITACION", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<String> getIDAcreditaciones(String idInstitucion, String idFacturacion);
 	
