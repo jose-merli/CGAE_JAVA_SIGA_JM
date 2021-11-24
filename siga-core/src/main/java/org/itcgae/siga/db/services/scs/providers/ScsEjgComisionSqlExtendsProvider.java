@@ -275,8 +275,11 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		String fechaPonenteHast;
 		String fechaResolucionDesd;
 		String fechaResolucionHast;
+		String resolucion;
 		SQL sql = new SQL();
 
+		resolucion = "(SELECT F_SIGA_GETRECURSO(tipores.DESCRIPCION, 1) from SCS_TIPORESOLUCION tipores where tipores.codigo = ejg.idtiporatificacionejg) RESOLUCION";
+		
 		String condicionAnnioNumActas = " (EXISTS (SELECT 1 FROM scs_ejg_acta ejgacta, scs_actacomision ac"
 				+ " WHERE ejgacta.idinstitucionacta = ac.idinstitucion" + " AND ejgacta.idacta = ac.idacta"
 				+ " AND   ejgacta.anioacta = ac.anioacta" + " AND   ejgacta.idinstitucionejg = ejg.idinstitucion"
@@ -326,6 +329,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
 		sql.SELECT("ejg.idpersonajg");
 		sql.SELECT("perjg.NIF");
+		sql.SELECT(resolucion);
 
 		// from
 		sql.FROM("scs_ejg ejg");
