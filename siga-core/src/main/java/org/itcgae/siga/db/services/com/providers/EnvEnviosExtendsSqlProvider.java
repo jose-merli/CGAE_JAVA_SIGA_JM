@@ -149,9 +149,8 @@ public class EnvEnviosExtendsSqlProvider {
 	public String selectMaxIDEnvio(Short idInstitucion) {
 
 		SQL sql = new SQL();
-		sql.SELECT("MAX(IDENVIO) AS IDMAX");
-		sql.FROM("ENV_ENVIOS");
-		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.SELECT("TO_NUMBER(TO_CHAR(SYSDATE, 'YYYY') || SEQ_ENV_ENVIOS.CURRVAL) AS IDMAX");
+		sql.FROM("DUAL");
 		return sql.toString();
 	}
 
