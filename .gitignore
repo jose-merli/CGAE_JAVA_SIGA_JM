@@ -575,6 +575,7 @@ siga-core/target/
 .metadata/
 .sonarlint/
 siga-web/.sts4-cache/
+siga-core/.sts4-cache/
 .idea/
 siga-parent.iml
 siga-core/siga-core.iml
