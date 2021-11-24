@@ -24,6 +24,7 @@ import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
 import org.itcgae.siga.fac.services.ITiposProductosService;
+import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,12 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CgaeAuthenticationProvider authenticationProvider;
 
+	
+	//Datos tabla pantalla Maestros --> Tipos Productos
 	@Override
 	public ListadoTipoProductoDTO searchTiposProductos(HttpServletRequest request) {
 		ListadoTipoProductoDTO listadoTipoProductoDTO = new ListadoTipoProductoDTO();
@@ -99,120 +105,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		return listadoTipoProductoDTO;
 	}
 	
-	@Override
-	public ComboDTO searchTiposProductosByIdCategoria(HttpServletRequest request, String idCategoria) {
-		ComboDTO comboDTO = new ComboDTO();
-		Error error = new Error();
-
-		LOGGER.info("searchTiposProductosByIdCategoria() -> Entrada al servicio para recuperar el combo de productos segun categoria");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"searchTiposProductosByIdCategoria() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"searchTiposProductosByIdCategoria() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"searchTiposProductosByIdCategoria() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoria() -> Entrada a pysTiposProductosExtendsMapper para obtener el combo de productos segun categoria");
-
-					String idioma = usuarios.get(0).getIdlenguaje();
-					List<ComboItem> listaComboTiposProductos = pysTiposProductosExtendsMapper
-							.searchTiposProductosByIdCategoria(idioma, idInstitucion, idCategoria);
-
-					LOGGER.info(
-							"searchTiposProductosByIdCategoria() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoria() -> Salida de pysTiposProductosExtendsMapper para obtener el combo de productos segun categoria");
-
-					if (listaComboTiposProductos != null && listaComboTiposProductos.size() > 0) {
-						comboDTO.setCombooItems(listaComboTiposProductos);
-					}
-				}
-
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"TiposProductosServiceImpl.searchTiposProductosByIdCategoria() -> Se ha producido un error al obtener el combo de productos segun categoria",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		comboDTO.setError(error);
-
-		LOGGER.info("searchTiposProductosByIdCategoria() -> Salida del servicio para obtener el combo de productos segun categoria");
-
-		return comboDTO;
-	}
-	
-	@Override
-	public ComboDTO searchTiposProductosByIdCategoriaMultiple(HttpServletRequest request, String idCategoria) {
-		ComboDTO comboDTO = new ComboDTO();
-		Error error = new Error();
-
-		LOGGER.debug("searchTiposProductosByIdCategoriaMultiple() -> Entrada al servicio para recuperar el combo de productos segun varias categorias");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"searchTiposProductosByIdCategoriaMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"searchTiposProductosByIdCategoriaMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"searchTiposProductosByIdCategoriaMultiple() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoriaMultiple() -> Entrada a pysTiposProductosExtendsMapper para obtener el combo de productos segun varias categorias");
-
-					String idioma = usuarios.get(0).getIdlenguaje();
-					List<ComboItem> listaComboTiposProductos = pysTiposProductosExtendsMapper
-							.searchTiposProductosByIdCategoriaMultiple(idioma, idInstitucion, idCategoria);
-
-					LOGGER.info(
-							"searchTiposProductosByIdCategoriaMultiple() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoriaMultiple() -> Salida de pysTiposProductosExtendsMapper para obtener el combo de productos segun varias categorias");
-
-					if (listaComboTiposProductos != null && listaComboTiposProductos.size() > 0) {
-						comboDTO.setCombooItems(listaComboTiposProductos);
-					}
-				}
-
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"TiposProductosServiceImpl.searchTiposProductosByIdCategoriaaMultiple() -> Se ha producido un error al obtener el combo de productos segun varias categorias",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		comboDTO.setError(error);
-
-		LOGGER.debug("searchTiposProductosByIdCategoriaMultiple() -> Salida del servicio para obtener el combo de productos segun varias categorias");
-
-		return comboDTO;
-	}
-	
+	//Datos con historico (incluidos registros con fechabaja != null) tabla pantalla Maestros --> Tipos Productos
 	@Override
 	public ListadoTipoProductoDTO searchTiposProductosHistorico(HttpServletRequest request) {
 		ListadoTipoProductoDTO listadoTipoProductoDTO = new ListadoTipoProductoDTO();
@@ -270,6 +163,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		return listadoTipoProductoDTO;
 	}
 	
+	//Obtiene los datos del combo categoria de productos (PYS_TIPOSPRODUCTOS)
 	@Override
 	public ComboDTO comboTiposProductos(HttpServletRequest request) {
 		ComboDTO comboDTO = new ComboDTO();
@@ -327,155 +221,70 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		return comboDTO;
 	}
 	
+	//Metodo que crea y edita tipos de productos (PYS_PRODUCTOS)
 	@Override
-	public InsertResponseDTO crearProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request) {
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-		int status = 0;
+	public DeleteResponseDTO crearEditarProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request) throws Exception {
 		
-
-		LOGGER.info("crearProducto() -> Entrada al servicio para crear un tipo de producto");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"crearProducto() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"crearProducto() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"crearProducto() / pysTiposProductosExtendsMapper.crearProducto() -> Entrada a pysTiposProductosExtendsMapper para crear un tipo de producto");
-
-					NewIdDTO idOrdenacion = pysTiposProductosExtendsMapper.getIndiceMaxProducto(listadoProductos.getTiposProductosItems(), idInstitucion);
-					PysProductos producto = new PysProductos();
-			
-					
-					producto.setIdinstitucion(idInstitucion);
-					producto.setIdtipoproducto(Short.parseShort(String.valueOf(listadoProductos.getTiposProductosItems().get(0).getIdtipoproducto())));
-					producto.setIdproducto(Long.parseLong(idOrdenacion.getNewId().toString()));
-					producto.setDescripcion(listadoProductos.getTiposProductosItems().get(0).getDescripcion());
-					producto.setFechamodificacion(new Date());
-					producto.setUsumodificacion(usuarios.get(0).getIdusuario());
-					producto.setFechabaja(null);
-					
-					
-					status = pysProductosMapper.insert(producto);
-					
-					if(status == 0) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-					}else if(status == 1) {
-						insertResponseDTO.setStatus(SigaConstants.OK);
-					}
-					
-
-					LOGGER.info(
-							"crearProducto() / pysTiposProductosExtendsMapper.crearProducto() -> Salida de pysTiposProductosExtendsMapper para crear un tipo de producto");
-				}
-
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"TiposProductosServiceImpl.crearProducto() -> Se ha producido un error al crear un tipo de producto",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		
-		insertResponseDTO.setError(error);
-
-		LOGGER.info("crearProducto() -> Salida del servicio para crear un tipo de producto");
-
-		return insertResponseDTO;
-	}
-	
-	@Override
-	public DeleteResponseDTO modificarProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		Error error = new Error();
+		//Obtenemos la informacion del usuario logeado
+		AdmUsuarios usuario = new AdmUsuarios();
 		int status = 0;
 		
 
-		LOGGER.info("modificarProducto() -> Entrada al servicio para modificar un tipo de producto");
+		LOGGER.info("crearEditarProducto() -> Entrada al servicio para crear/modificar un tipo de producto (PYS_PRODUCTOS)");
 
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"modificarProducto() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"modificarProducto() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"modificarProducto() / pysTiposProductosExtendsMapper.modificarProducto() -> Entrada a pysTiposProductosExtendsMapper para modificar un tipo de producto");
-					
-					for (TiposProductosItem producto : listadoProductos.getTiposProductosItems()) {
-						PysProductos productoMyBatis = new PysProductos();
-						
-						
-						productoMyBatis.setIdinstitucion(idInstitucion);
-						productoMyBatis.setIdtipoproducto(Short.parseShort(String.valueOf(producto.getIdtipoproducto())));
-						productoMyBatis.setIdproducto(new Long(producto.getIdproducto()));
-						productoMyBatis.setDescripcion(producto.getDescripcion());
-						productoMyBatis.setFechamodificacion(new Date());
-						productoMyBatis.setUsumodificacion(usuarios.get(0).getIdusuario());
-						productoMyBatis.setFechabaja(null);
-						
-						status = pysProductosMapper.updateByPrimaryKey(productoMyBatis);
-					}
-					
-					
-					if(status == 0) {
-						deleteResponseDTO.setStatus(SigaConstants.KO);
-					}else if(status == 1) {
-						deleteResponseDTO.setStatus(SigaConstants.OK);
-					}
-					
-
-					LOGGER.info(
-							"modificarProducto() / pysTiposProductosExtendsMapper.modificarProducto() -> Salida de pysTiposProductosExtendsMapper para modificar un tipo de producto");
-				}
-
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"TiposProductosServiceImpl.modificarProducto() -> Se ha producido un error al modificar un tipo de producto",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
+		usuario = authenticationProvider.checkAuthentication(request);
 		
-		deleteResponseDTO.setError(error);
+		if (usuario != null) {
 
-		LOGGER.info("modificarProducto() -> Salida del servicio para modificar un tipo de producto");
-
+			LOGGER.info(
+				"crearEditarProducto() / pysProductosMapper.crearEditarProducto() -> Entrada a pysProductosMapper para crear/modificar un tipo de producto (PYS_PRODUCTOS)");
+					
+			for (TiposProductosItem tipoProducto : listadoProductos.getTiposProductosItems()) {
+				
+				PysProductos tipoProductoMyBattis = new PysProductos();
+						
+				tipoProductoMyBattis.setIdinstitucion(usuario.getIdinstitucion());
+				tipoProductoMyBattis.setIdtipoproducto(Short.parseShort(String.valueOf(tipoProducto.getIdtipoproducto())));
+				
+				if(tipoProducto.isNuevo()) {
+					NewIdDTO idOrdenacion = pysTiposProductosExtendsMapper.getIndiceMaxProducto(listadoProductos.getTiposProductosItems(), usuario.getIdinstitucion());
+					tipoProductoMyBattis.setIdproducto(Long.parseLong(idOrdenacion.getNewId().toString()));
+				}else {
+					tipoProductoMyBattis.setIdproducto(new Long(tipoProducto.getIdproducto()));
+				}
+				tipoProductoMyBattis.setDescripcion(tipoProducto.getDescripcion());
+				tipoProductoMyBattis.setFechamodificacion(new Date());
+				tipoProductoMyBattis.setUsumodificacion(usuario.getIdusuario());
+				
+				if(tipoProducto.isNuevo()) {		
+					status = pysProductosMapper.insertSelective(tipoProductoMyBattis);
+				}else {
+					status = pysProductosMapper.updateByPrimaryKeySelective(tipoProductoMyBattis);
+				}
+				
+				if(status == 0) {				
+					deleteResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.info(
+							"Actualizacion/insercion fallida del tipo de producto con id: " + tipoProducto.getIdproducto() + ", descripcion: " + tipoProducto.getDescripcion());
+				}else if(status == 1) {
+					LOGGER.info(
+						"crearEditarProducto() / pysProductosMapper.crearEditarProducto() -> Actualizacion/insercion exitosa del tipo de producto con id: " + tipoProducto.getIdproducto() + ", descripcion: " + tipoProducto.getDescripcion());
+					deleteResponseDTO.setStatus(SigaConstants.OK);
+				}
+				
+			}	
+					
+			LOGGER.info(
+					"crearEditarProducto() / pysProductosMapper.crearEditarProducto() -> Salida de pysProductosMapper para crear/modificar un tipo de producto (PYS_PRODUCTOS)");
+		}
+		
+		LOGGER.info("crearEditarProducto() -> Salida del servicio para crear/modificar un tipo de producto (PYS_PRODUCTOS)");
+		
 		return deleteResponseDTO;
 	}
-
+	
+	//Realiza un borrado logico (establecer fechabaja = new Date()) o lo reactiva en caso de que esta inhabilitado.
 	@Override
 	public ProductoDTO activarDesactivarProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request) {
 		ProductoDTO productoDTO = new ProductoDTO();
@@ -540,5 +349,118 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		return productoDTO;
 	}
 
+	@Override
+	public ComboDTO searchTiposProductosByIdCategoria(HttpServletRequest request, String idCategoria) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("searchTiposProductosByIdCategoria() -> Entrada al servicio para recuperar el combo de productos segun categoria");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"searchTiposProductosByIdCategoria() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTiposProductosByIdCategoria() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"searchTiposProductosByIdCategoria() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoria() -> Entrada a pysTiposProductosExtendsMapper para obtener el combo de productos segun categoria");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboTiposProductos = pysTiposProductosExtendsMapper
+							.searchTiposProductosByIdCategoria(idioma, idInstitucion, idCategoria);
+
+					LOGGER.info(
+							"searchTiposProductosByIdCategoria() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoria() -> Salida de pysTiposProductosExtendsMapper para obtener el combo de productos segun categoria");
+
+					if (listaComboTiposProductos != null && listaComboTiposProductos.size() > 0) {
+						comboDTO.setCombooItems(listaComboTiposProductos);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.searchTiposProductosByIdCategoria() -> Se ha producido un error al obtener el combo de productos segun categoria",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("searchTiposProductosByIdCategoria() -> Salida del servicio para obtener el combo de productos segun categoria");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO searchTiposProductosByIdCategoriaMultiple(HttpServletRequest request, String idCategoria) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.debug("searchTiposProductosByIdCategoriaMultiple() -> Entrada al servicio para recuperar el combo de productos segun varias categorias");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"searchTiposProductosByIdCategoriaMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTiposProductosByIdCategoriaMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"searchTiposProductosByIdCategoriaMultiple() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoriaMultiple() -> Entrada a pysTiposProductosExtendsMapper para obtener el combo de productos segun varias categorias");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboTiposProductos = pysTiposProductosExtendsMapper
+							.searchTiposProductosByIdCategoriaMultiple(idioma, idInstitucion, idCategoria);
+
+					LOGGER.info(
+							"searchTiposProductosByIdCategoriaMultiple() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoriaMultiple() -> Salida de pysTiposProductosExtendsMapper para obtener el combo de productos segun varias categorias");
+
+					if (listaComboTiposProductos != null && listaComboTiposProductos.size() > 0) {
+						comboDTO.setCombooItems(listaComboTiposProductos);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.searchTiposProductosByIdCategoriaaMultiple() -> Se ha producido un error al obtener el combo de productos segun varias categorias",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.debug("searchTiposProductosByIdCategoriaMultiple() -> Salida del servicio para obtener el combo de productos segun varias categorias");
+
+		return comboDTO;
+	}
 
 }
