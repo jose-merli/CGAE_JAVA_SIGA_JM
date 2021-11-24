@@ -170,5 +170,10 @@ public class EjgComisionController {
 		ComboDTO response = busquedaEJGComision.comboGuardias(request, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	@RequestMapping(value = "/filtros-ejg/obligatorioFundamento", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> obligatorioFundamento(HttpServletRequest request) {
+		String response = busquedaEJGComision.obligatorioFundamento(request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
 
 }
