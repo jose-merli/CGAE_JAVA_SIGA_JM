@@ -238,7 +238,7 @@ public class EjecucionPlsPago {
         return resultado[0];
     }
 
-    public String ejecutarPLDeshacerCierre(Short idInstitucion, Date fechaPago) throws FacturacionSJCSException {
+    public String ejecutarPLDeshacerCierre(Short idInstitucion, Date fechaPago) throws Exception {
 
         String[] resultado;
 
@@ -255,7 +255,7 @@ public class EjecucionPlsPago {
             }
 
         } catch (Exception e) {
-            throw new FacturacionSJCSException("Error al ejecutar el PL de deshacer cierre", e);
+            throw new Exception("Error al ejecutar el PL de deshacer cierre", e);
         }
 
         return resultado[0];

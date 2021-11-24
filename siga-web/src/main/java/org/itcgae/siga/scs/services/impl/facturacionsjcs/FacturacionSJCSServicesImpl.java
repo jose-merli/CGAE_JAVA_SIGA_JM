@@ -17,6 +17,7 @@ import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,6 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Date;
 import java.util.*;
@@ -129,6 +129,18 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     @Autowired
     private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
+    
+    @Autowired
+    private GenPropertiesMapper genPropertiesMapper;
+    
+    @Autowired
+    private FcsTrazaErrorEjecucionMapper fcsTrazaErrorEjecucionMapper;
+
+    @Autowired
+    private FcsTrazaErrorEjecucionExtendsMapper fcsTrazaErrorEjecucionExtendsMapper;
+    
+    @Autowired
+    private IFacturacionSJCSZombiService iFacturacionSJCSZombiService;
 
     @Override
     public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
@@ -1880,5 +1892,174 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             con.close();
             con = null;
         }
+    }
+
+    @Override
+    public FacturacionesAsuntoDTO getFacturacionesPorAsunto(ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request) {
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Entrada al servicio para obtener las facturaciones, pagos y movimientos varios por asunto");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        FacturacionesAsuntoDTO facturacionesAsuntoDTO = new FacturacionesAsuntoDTO();
+        List<DatosMovimientoVarioDTO> datosMovimientoVarioDTOList = new ArrayList<>();
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionDesigna(idInstitucion, scsActuaciondesigna);
+
+                    for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
+
+                        List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdFacturacion());
+                        fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+
+                        datosMovimientoVarioDTOList.addAll(fcsFacturacionJGExtendsMapper.getDatosMovimientoVarioAsuntoPorFacturacion(idInstitucion, fac.getIdFacturacion()));
+                    }
+
+                    facturacionesAsuntoDTO.setDatosFacturacionAsuntoDTOList(datosFacturacionAsuntoDTOList);
+
+                    for (DatosMovimientoVarioDTO movimiento : datosMovimientoVarioDTOList) {
+                        List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, movimiento.getIdMovimiento());
+                        movimiento.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+                    }
+
+                    facturacionesAsuntoDTO.setDatosMovimientoVarioDTOList(datosMovimientoVarioDTOList);
+
+                } else {
+                    LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                            "No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Se ha producido un error al intentar obtener las facturaciones," +
+                    " pagos y movimientos varios del asunto", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        facturacionesAsuntoDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por asunto");
+
+        return facturacionesAsuntoDTO;
+    }
+    
+    public void ejecutaFacturacionesSJCSBloqueadas() {
+        if (isAlguienEjecutando()) {
+            LOGGER.debug(
+                    "YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+            return;
+        }
+        procesarFacturacionesSJCSBloqueadas();
+
+
+        try {} catch (Exception e) {
+            throw e;
+        } finally {
+            setNadieEjecutando();
+        }
+    }
+
+    private void procesarFacturacionesSJCSBloqueadas() {
+
+        CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+        exampleInstitucion.setDistinct(true);
+        exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();
+
+        List<CenInstitucion> listaInstituciones = institucionMapper.selectByExample(exampleInstitucion);
+
+        for (CenInstitucion institucion : listaInstituciones) {
+            facturacionesBloqueadasEnEjecucion(institucion);
+        }
+
+    }
+
+    private void facturacionesBloqueadasEnEjecucion(CenInstitucion institucion) {
+        LOGGER.info("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
+
+        //Recuperamos el tiempo estimado como bloqueo
+        GenPropertiesKey propertiesPK = new GenPropertiesKey();
+        propertiesPK.setFichero("SIGA");
+        propertiesPK.setParametro("facturacion.programacionAutomatica.maxMinutosEnEjecucion");
+        GenProperties tiempoMaximoMinutos = genPropertiesMapper.selectByPrimaryKey(propertiesPK);
+
+        List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
+                .facturacionesPorEstadoEjecucionTiempoLimite(institucion.getIdinstitucion().toString(), Integer.parseInt(tiempoMaximoMinutos.getValor()));
+
+        for (FcsFacturacionjg item : listaFacturaciones) {
+
+            try {
+                // Insertamos el estado ABIERTA para las facturaciones en ejecucion
+                insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
+                        item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
+
+                // Localizamos donde se quedó el proceso de cierre y dehacemos lo hasta ahora modificado(conceptoErroneo puede ser Turno/Guardia/EJG/SOJ)
+                FcsTrazaErrorEjecucion conceptoErroneo = localizadaEstadoFacturacionBloqueadaEnEjecucion(item);
+                if(conceptoErroneo != null) {
+                	if("1".equals(conceptoErroneo.getIdoperacion())) {
+                		iFacturacionSJCSZombiService.deshacerRegularTurnosOfi(conceptoErroneo);
+                    }else if("2".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularGuardias(conceptoErroneo);
+                    }else if("3".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularSOJ(conceptoErroneo);
+                    }else if("4".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerRegularEJG(conceptoErroneo);
+                    }else if("5".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerTurnosOfi(conceptoErroneo);
+                    }else if("6".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerGuardias(conceptoErroneo);
+                    }else if("7".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerSOJ(conceptoErroneo);
+                    }else if("8".equals(conceptoErroneo.getIdoperacion())) {
+                    	iFacturacionSJCSZombiService.deshacerEJG(conceptoErroneo);
+                    }
+                }
+                
+
+            } catch (Exception e) {
+                LOGGER.error(e);
+                actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
+                        item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
+                insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
+                        item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
+            }
+        }
+
+        LOGGER.info("SALE -> FacturacionSJCSServicesImpl.facturacionesBloqueadas(): " + listaFacturaciones.toString());
+    }
+
+    public FcsTrazaErrorEjecucion localizadaEstadoFacturacionBloqueadaEnEjecucion(FcsFacturacionjg facturacionBloqueadaEnEjecucion){
+        //Comprobamos si ha ejecutado el primer paso de la facturaciones de guardias
+        FcsTrazaErrorEjecucionExample record = new FcsTrazaErrorEjecucionExample();
+        record.createCriteria().andIdfacturacionEqualTo(facturacionBloqueadaEnEjecucion.getIdfacturacion()).andIdinstitucionEqualTo(facturacionBloqueadaEnEjecucion.getIdinstitucion());
+        List<FcsTrazaErrorEjecucion> estadosEjecucion = fcsTrazaErrorEjecucionMapper.selectByExample(record);
+        long actual = 0;
+        FcsTrazaErrorEjecucion estadoError = null;
+        for(FcsTrazaErrorEjecucion factError: estadosEjecucion) {
+        	long actualAux = factError.getIderror();
+        	if(actualAux > actual) {
+        		estadoError = factError;
+        	}
+        }
+
+        return estadoError;
     }
 }

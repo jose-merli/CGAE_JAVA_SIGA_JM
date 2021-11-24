@@ -18,6 +18,9 @@ public interface IGeneracionDocumentosService {
 
 	public DatosDocumentoItem generarExcel(String string, String pathFicheroSalida, String nombreFicheroSalida,	List<List<Map<String, Object>>> listaDatosExcel, ArrayList<String> nombresConsultasDatos) throws Exception;
 
+	public DatosDocumentoItem generarExcelGeneracionCalendario(String pathFicheroSalida, String nombreFicheroSalida,
+			List<List<Map<String, Object>>> listaDatosExcel) throws Exception;
+	
 	public DatosDocumentoItem generarFO(String plantilla, String rutaTmp, String nombreFicheroSalida,
 			List<Map<String, Object>> resultDatos) throws IOException, Exception;
 	

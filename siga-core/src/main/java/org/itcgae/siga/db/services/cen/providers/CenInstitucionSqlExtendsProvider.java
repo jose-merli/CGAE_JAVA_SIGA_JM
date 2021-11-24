@@ -439,5 +439,14 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		return sql.toString();
 	}
 	
+	public String getComboInstitucionesNombre() {
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("NOMBRE");
+		sql.FROM("CEN_INSTITUCION");
+		sql.ORDER_BY("NOMBRE");
+		return sql.toString();
+	}
+	
     
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.scs.services.guardia.SaltosCompGuardiasService;
@@ -52,4 +53,10 @@ public class SaltosCompGuardiasController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/isGrupo", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> isGrupo(
+			@RequestBody BusquedaLetradosGuardiaDTO letradoGuardiaItem, HttpServletRequest request) {
+		String grupo = saltosCompGuardiasService.isGrupo(letradoGuardiaItem);
+		return new ResponseEntity<>(grupo, HttpStatus.OK);
+	}
 }
