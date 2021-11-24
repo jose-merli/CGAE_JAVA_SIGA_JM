@@ -960,7 +960,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
                 "FCS_FACT_ESTADOSFACTURACION E ON (FAC.IDINSTITUCION = E.IDINSTITUCION AND FAC.IDFACTURACION = E.IDFACTURACION)");
         sql.WHERE("E.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("E.IDESTADOFACTURACION = " + ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo());
-        sql.WHERE("F.FECHAMODIFICACION = " + "SYSDATE - " + tiempoMaximo + "/1440");
+        sql.WHERE("FAC.FECHAMODIFICACION = " + "SYSDATE - " + tiempoMaximo + "/1440");
         sql2.SELECT("MAX(EST2.IDORDENESTADO)");
         sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
         sql2.WHERE("EST2.IDINSTITUCION = E.IDINSTITUCION");
