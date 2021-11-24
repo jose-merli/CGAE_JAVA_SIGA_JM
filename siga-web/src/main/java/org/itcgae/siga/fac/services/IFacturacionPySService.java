@@ -4,12 +4,30 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.*;
+import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
+import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
+import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
+import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
+import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
+import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
+import org.itcgae.siga.DTO.fac.FicherosDevolucionesDTO;
+import org.itcgae.siga.DTO.fac.FicherosDevolucionesItem;
+import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
+import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
+import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
+import org.itcgae.siga.DTO.fac.UsosSufijosItem;
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface IFacturacionPySService {
 
@@ -65,7 +83,14 @@ public interface IFacturacionPySService {
 	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request) throws Exception;
 
     public FacFacturacionprogramadaDTO getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) throws Exception;
+    
+	public DeleteResponseDTO eliminarFacturacion(FacFacturacionEliminarItem fac,
+			HttpServletRequest request) throws Exception;
 
+	public FicherosAbonosDTO getFicherosTransferencias(FicherosAbonosItem item, HttpServletRequest request) throws Exception;
+
+	public FicherosDevolucionesDTO getFicherosDevoluciones(FicherosDevolucionesItem item, HttpServletRequest request) throws Exception;
+	
 	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems, HttpServletRequest request) throws Exception;
 
 }
