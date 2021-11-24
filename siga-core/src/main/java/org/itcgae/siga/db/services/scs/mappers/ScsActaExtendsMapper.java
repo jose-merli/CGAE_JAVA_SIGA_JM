@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
+
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -12,7 +13,11 @@ import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsActaSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgComisionSqlExtendsProvider;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
+@Service
+@Primary
 public interface ScsActaExtendsMapper extends ScsEjgMapper {
 
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "busquedaActas")
@@ -46,9 +51,8 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 	String comprobarGuardarActaSufijo(ActasItem actasItem, Short idInstitucion);
 
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "comboSufijoActa")
-	@Results({ @Result(column = "valor", property = "value", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "valor", property = "label", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> comboSufijoActa(Short idInstitucion);
+	@Results({ @Result(column = "valor", property = "valor", jdbcType = JdbcType.VARCHAR)})
+	String comboSufijoActa(Short idInstitucion);
 
 //
 //	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "guardarActa")
