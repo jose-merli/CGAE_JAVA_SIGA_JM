@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActasDTO;
 import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.ScsActacomision;
 import org.itcgae.siga.scs.services.acta.IBusquedaActa;
 
@@ -86,4 +87,10 @@ public class ActaController {
 		return new ResponseEntity<ActasDTO>(response, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/filtros-acta/getAbreviatura", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CenInstitucion> getAbreviatura(HttpServletRequest request)
+			throws SigaExceptions {
+		CenInstitucion response = actas.getAbreviatura(request);
+		return new ResponseEntity<CenInstitucion>(response, HttpStatus.OK);
+	}
 }
