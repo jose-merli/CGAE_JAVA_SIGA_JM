@@ -44,5 +44,19 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
 
         return query.toString();
     }
+    
+    public String selectMaxIdLinea(Short idInstitucion, Long idPersona) {
+    	SQL query = new SQL();
+    	
+    	query.SELECT("nvl(MAX(idLinea), 0) as id");
+    	
+    	query.FROM("PYS_LINEAANTICIPO lineas");
+    	
+    	query.WHERE("idpersona = "+idPersona);
+    	query.WHERE("idInstitucion = "+idInstitucion);
+    	
+    	return query.toString();
+    	
+    }
 
 }
