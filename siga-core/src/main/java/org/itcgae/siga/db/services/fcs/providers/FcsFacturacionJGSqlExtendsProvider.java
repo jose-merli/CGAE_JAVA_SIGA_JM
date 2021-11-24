@@ -5,8 +5,7 @@ import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.ScsActuaciondesigna;
-import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgSqlProvider;
 
 import java.text.SimpleDateFormat;
@@ -859,6 +858,98 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
     }
 
+    public String getFacturacionesPorAsistencia(Short idInstitucion, ScsAsistencia scsAsistencia) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("IDFACTURACION");
+        subQuery.FROM("FCS_FACT_ASISTENCIA F");
+        subQuery.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("F.ANIO = " + scsAsistencia.getAnio());
+        subQuery.WHERE("F.NUMERO = " + scsAsistencia.getNumero());
+
+        SQL sql = new SQL();
+        sql.SELECT("IDFACTURACION");
+        sql.SELECT("FAC.NOMBRE");
+        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDFACTURACION IN (" + subQuery.toString() + ")");
+
+        return sql.toString();
+    }
+
+    public String getFacturacionesPorActuacionAsistencia(Short idInstitucion, ScsActuacionasistencia scsActuacionasistencia) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("IDFACTURACION");
+        subQuery.FROM("FCS_FACT_ASISTENCIA F");
+        subQuery.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("F.ANIO = " + scsActuacionasistencia.getAnio());
+        subQuery.WHERE("F.NUMERO = " + scsActuacionasistencia.getNumero());
+        subQuery.WHERE("F.IDACTUACION = " + scsActuacionasistencia.getIdactuacion());
+
+        SQL sql = new SQL();
+        sql.SELECT("IDFACTURACION");
+        sql.SELECT("FAC.NOMBRE");
+        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDFACTURACION IN (" + subQuery.toString() + ")");
+
+        return sql.toString();
+    }
+
+    public String getFacturacionesPorGuardia(Short idInstitucion, ScsCabeceraguardias scsCabeceraguardias) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("IDFACTURACION");
+        subQuery.FROM("FCS_FACT_APUNTE F");
+        subQuery.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("F.IDTURNO = " + scsCabeceraguardias.getIdturno());
+        subQuery.WHERE("F.IDGUARDIA = " + scsCabeceraguardias.getIdguardia());
+        subQuery.WHERE("F.IDPERSONA = " + scsCabeceraguardias.getIdpersona());
+        if (null != scsCabeceraguardias.getFechainicio()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            String fechaF = dateFormat.format(scsCabeceraguardias.getFechainicio());
+            subQuery.WHERE("F.FECHAINICIO = TO_DATE('" + fechaF + "', 'DD/MM/YYYY hh24:mi:ss')");
+        }
+
+        SQL sql = new SQL();
+        sql.SELECT("IDFACTURACION");
+        sql.SELECT("FAC.NOMBRE");
+        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDFACTURACION IN (" + subQuery.toString() + ")");
+
+        return sql.toString();
+    }
+
+    public String getFacturacionesPorEJG(Short idInstitucion, ScsEjg scsEjg) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("IDFACTURACION");
+        subQuery.FROM("FCS_FACT_EJG F");
+        subQuery.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("F.IDTIPOEJG = " + scsEjg.getIdtipoejg());
+        subQuery.WHERE("F.ANIO = " + scsEjg.getAnio());
+        subQuery.WHERE("F.NUMERO = " + scsEjg.getNumero());
+
+        SQL sql = new SQL();
+        sql.SELECT("FAC.IDFACTURACION");
+        sql.SELECT("FAC.NOMBRE");
+        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("NVL(FAC.IMPORTETOTAL, 0) IMPORTE");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FAC.IDFACTURACION IN (" + subQuery.toString() + ")");
+
+        return sql.toString();
+    }
+
     public String getDatosPagoAsuntoPorFacturacion(Short idInstitucion, String idFacturacion) {
 
         SQL sql = new SQL();
@@ -867,20 +958,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("'Pago' TIPO");
         sql.SELECT("NVL(IMPORTEPAGADO, 0) IMPORTE");
         sql.FROM("FCS_PAGOSJG");
-        sql.WHERE("IDINSTITUCION = " + idInstitucion);
-        sql.WHERE("IDFACTURACION = " + idFacturacion);
-
-        return sql.toString();
-    }
-
-    public String getDatosMovimientoVarioAsuntoPorFacturacion(Short idInstitucion, String idFacturacion) {
-
-        SQL sql = new SQL();
-        sql.SELECT("IDMOVIMIENTO");
-        sql.SELECT("DESCRIPCION");
-        sql.SELECT("'Movimiento Vario' TIPO");
-        sql.SELECT("NVL(CANTIDAD, 0) IMPORTE");
-        sql.FROM("FCS_MOVIMIENTOSVARIOS");
         sql.WHERE("IDINSTITUCION = " + idInstitucion);
         sql.WHERE("IDFACTURACION = " + idFacturacion);
 
@@ -908,28 +985,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sqlGroup.GROUP_BY("IMPORTE");
 
         return sqlGroup.toString();
-    }
-
-    public String getFacturacionesPorEJG(Short idInstitucion, ScsEjg scsEjg) {
-
-        SQL subQuery = new SQL();
-        subQuery.SELECT("IDFACTURACION");
-        subQuery.FROM("FCS_FACT_ASISTENCIA F");
-        subQuery.WHERE("F.IDINSTITUCION = " + idInstitucion);
-        subQuery.WHERE("F.IDTIPOEJG = " + scsEjg.getIdtipoejg());
-        subQuery.WHERE("F.ANIO = " + scsEjg.getAnio());
-        subQuery.WHERE("F.NUMERO = " + scsEjg.getNumero());
-
-        SQL sql = new SQL();
-        sql.SELECT("FAC.IDFACTURACION");
-        sql.SELECT("FAC.NOMBRE");
-        sql.SELECT("'Facturación' TIPO");
-        sql.SELECT("NVL(FAC.IMPORTETOTAL, 0) IMPORTE");
-        sql.FROM("FCS_FACTURACIONJG FAC");
-        sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
-        sql.WHERE("FAC.IDFACTURACION IN (" + subQuery.toString() + ")");
-
-        return sql.toString();
     }
 
 }

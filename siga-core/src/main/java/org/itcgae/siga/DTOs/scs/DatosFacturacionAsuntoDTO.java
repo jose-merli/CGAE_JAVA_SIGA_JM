@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class DatosFacturacionAsuntoDTO {
 
-    private String idFacturacion;
+    private String idObjeto;
     private String nombre;
     private String tipo;
     private String importe;

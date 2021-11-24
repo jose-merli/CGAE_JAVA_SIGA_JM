@@ -8,8 +8,8 @@ import java.util.List;
 @Data
 public class DatosMovimientoVarioDTO {
 
-    private String idMovimiento;
-    private String descripcion;
+    private String idObjeto;
+    private String nombre;
     private String tipo;
     private String importe;
     private List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = new ArrayList<>();

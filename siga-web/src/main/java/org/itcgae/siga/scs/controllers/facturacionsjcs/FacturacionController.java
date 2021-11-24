@@ -6,7 +6,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -152,9 +152,33 @@ public class FacturacionController {
         return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/facturacionsjcs/getFacturacionesPorAsunto")
-    ResponseEntity<FacturacionesAsuntoDTO> getFacturacionesPorAsunto(@RequestBody ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request) {
-        FacturacionesAsuntoDTO response = facturacionServices.getFacturacionesPorAsunto(scsActuaciondesigna, request);
+    @PostMapping("/facturacionsjcs/getFacturacionesPorAsuntoActuacionDesigna")
+    ResponseEntity<FacturacionesAsuntoDTO> getFacturacionesPorAsuntoActuacionDesigna(@RequestBody ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request) {
+        FacturacionesAsuntoDTO response = facturacionServices.getFacturacionesPorAsuntoActuacionDesigna(scsActuaciondesigna, request);
+        return new ResponseEntity<FacturacionesAsuntoDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/facturacionsjcs/getFacturacionesPorAsuntoAsistencia")
+    ResponseEntity<FacturacionesAsuntoDTO> getFacturacionesPorAsuntoAsistencia(@RequestBody ScsAsistencia scsAsistencia, HttpServletRequest request) {
+        FacturacionesAsuntoDTO response = facturacionServices.getFacturacionesPorAsuntoAsistencia(scsAsistencia, request);
+        return new ResponseEntity<FacturacionesAsuntoDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/facturacionsjcs/getFacturacionesPorAsuntoActuacionAsistencia")
+    ResponseEntity<FacturacionesAsuntoDTO> getFacturacionesPorAsuntoActuacionAsistencia(@RequestBody ScsActuacionasistencia scsActuacionasistencia, HttpServletRequest request) {
+        FacturacionesAsuntoDTO response = facturacionServices.getFacturacionesPorAsuntoActuacionAsistencia(scsActuacionasistencia, request);
+        return new ResponseEntity<FacturacionesAsuntoDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/facturacionsjcs/getFacturacionesPorGuardia")
+    ResponseEntity<FacturacionesAsuntoDTO> getFacturacionesPorGuardia(@RequestBody ScsCabeceraguardias scsCabeceraguardias, HttpServletRequest request) {
+        FacturacionesAsuntoDTO response = facturacionServices.getFacturacionesPorGuardia(scsCabeceraguardias, request);
+        return new ResponseEntity<FacturacionesAsuntoDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/facturacionsjcs/getFacturacionesPorEJG")
+    ResponseEntity<FacturacionesAsuntoDTO> getFacturacionesPorEJG(@RequestBody ScsEjg scsEjg, HttpServletRequest request) {
+        FacturacionesAsuntoDTO response = facturacionServices.getFacturacionesPorEJG(scsEjg, request);
         return new ResponseEntity<FacturacionesAsuntoDTO>(response, HttpStatus.OK);
     }
 }

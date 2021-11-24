@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class DatosPagoAsuntoDTO {
 
-    private String idPago;
+    private String idObjeto;
     private String nombre;
     private String tipo;
     private String importe;

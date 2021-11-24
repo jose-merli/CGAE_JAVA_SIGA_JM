@@ -10,6 +10,6 @@ import java.util.List;
 public class FacturacionesAsuntoDTO {
 
     private List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = new ArrayList<>();
-    private List<DatosMovimientoVarioDTO> datosMovimientoVarioDTOList = new ArrayList<>();
+    private DatosMovimientoVarioDTO datosMovimientoVarioDTO;
     private Error error = null;
 }

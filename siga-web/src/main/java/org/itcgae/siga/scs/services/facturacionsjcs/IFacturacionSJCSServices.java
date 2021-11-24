@@ -5,7 +5,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.scs.*;
-import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -44,6 +44,13 @@ public interface IFacturacionSJCSServices {
 
     public void ejecutaFacturacionSJCS();
 
-    public FacturacionesAsuntoDTO getFacturacionesPorAsunto(ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request);
+    public FacturacionesAsuntoDTO getFacturacionesPorAsuntoActuacionDesigna(ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request);
 
+    public FacturacionesAsuntoDTO getFacturacionesPorAsuntoAsistencia(ScsAsistencia scsAsistencia, HttpServletRequest request);
+
+    public FacturacionesAsuntoDTO getFacturacionesPorAsuntoActuacionAsistencia(ScsActuacionasistencia scsActuacionasistencia, HttpServletRequest request);
+
+    public FacturacionesAsuntoDTO getFacturacionesPorGuardia(ScsCabeceraguardias guardia, HttpServletRequest request);
+
+    public FacturacionesAsuntoDTO getFacturacionesPorEJG(ScsEjg ejg, HttpServletRequest request);
 }

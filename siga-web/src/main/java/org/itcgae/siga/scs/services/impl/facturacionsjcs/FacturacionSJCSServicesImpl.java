@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -128,6 +129,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     @Autowired
     private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
+
+    @Autowired
+    private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
+
+    @Autowired
+    private ScsCabeceraguardiasMapper scsCabeceraguardiasMapper;
 
     @Override
     public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
@@ -1882,16 +1889,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
     @Override
-    public FacturacionesAsuntoDTO getFacturacionesPorAsunto(ScsActuaciondesigna scsActuaciondesigna, HttpServletRequest request) {
+    public FacturacionesAsuntoDTO getFacturacionesPorAsuntoActuacionDesigna(ScsActuaciondesigna actuacion, HttpServletRequest request) {
 
-        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Entrada al servicio para obtener las facturaciones, pagos y movimientos varios por asunto");
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> Entrada al servicio para obtener las facturaciones, pagos y movimientos varios por actuacion designa");
 
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         Error error = new Error();
         FacturacionesAsuntoDTO facturacionesAsuntoDTO = new FacturacionesAsuntoDTO();
-        List<DatosMovimientoVarioDTO> datosMovimientoVarioDTOList = new ArrayList<>();
+
         try {
 
             if (null != idInstitucion) {
@@ -1899,52 +1906,513 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
                 exampleUsuarios.createCriteria().andNifEqualTo(dni)
                         .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() / admUsuariosExtendsMapper.selectByExample() -> " +
                         "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
                 List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() / admUsuariosExtendsMapper.selectByExample() -> " +
                         "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
                 if (null != usuarios && !usuarios.isEmpty()) {
 
-                    List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionDesigna(idInstitucion, scsActuaciondesigna);
+                    if (null != actuacion.getIdturno() && null != actuacion.getAnio() && null != actuacion.getNumero() && null != actuacion.getNumeroasunto()) {
+                        ScsActuaciondesignaKey scsActuaciondesignaKey = new ScsActuaciondesigna();
+                        scsActuaciondesignaKey.setIdinstitucion(idInstitucion);
+                        scsActuaciondesignaKey.setIdturno(actuacion.getIdturno());
+                        scsActuaciondesignaKey.setAnio(actuacion.getAnio());
+                        scsActuaciondesignaKey.setNumero(actuacion.getNumero());
+                        scsActuaciondesignaKey.setNumeroasunto(actuacion.getNumeroasunto());
 
-                    for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> scsActuaciondesignaMapper.selectByPrimaryKey() -> ENTRA: Obtenemos la actuacion");
+                        ScsActuaciondesigna scsActuaciondesigna = scsActuaciondesignaMapper.selectByPrimaryKey(scsActuaciondesignaKey);
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> scsActuaciondesignaMapper.selectByPrimaryKey() -> SALE: Obtenemos la actuacion");
 
-                        List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdFacturacion());
-                        fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+                        // Si tiene un movimiento vario asociado lo obtenemos
+                        if (null != scsActuaciondesigna && null != scsActuaciondesigna.getIdmovimiento()) {
+                            FcsMovimientosvariosKey fcsMovimientosvariosKey = new FcsMovimientosvariosKey();
+                            fcsMovimientosvariosKey.setIdinstitucion(idInstitucion);
+                            fcsMovimientosvariosKey.setIdmovimiento(scsActuaciondesigna.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> ENTRA: Obtenemos el movimiento vario");
+                            FcsMovimientosvarios fcsMovimientosvarios = fcsMovimientosvariosMapper.selectByPrimaryKey(fcsMovimientosvariosKey);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> SALE: Obtenemos el movimiento vario");
 
-                        datosMovimientoVarioDTOList.addAll(fcsFacturacionJGExtendsMapper.getDatosMovimientoVarioAsuntoPorFacturacion(idInstitucion, fac.getIdFacturacion()));
+                            DatosMovimientoVarioDTO datosMovimientoVarioDTO = new DatosMovimientoVarioDTO();
+                            datosMovimientoVarioDTO.setIdObjeto(fcsMovimientosvarios.getIdmovimiento().toString());
+                            datosMovimientoVarioDTO.setNombre(fcsMovimientosvarios.getDescripcion());
+                            datosMovimientoVarioDTO.setTipo("Movimiento vario");
+                            datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
+
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+                            List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> SALE: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+                            datosMovimientoVarioDTO.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+
+                            facturacionesAsuntoDTO.setDatosMovimientoVarioDTO(datosMovimientoVarioDTO);
+                        }
+
+                        if (null != scsActuaciondesigna) {
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionDesigna() -> ENTRA: Obtenemos las facturaciones asociadas a la actuación");
+                            List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionDesigna(idInstitucion, scsActuaciondesigna);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionDesigna() -> SALE: Obtenemos las facturaciones asociadas a la actuación");
+
+                            for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto());
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+                            }
+
+                            facturacionesAsuntoDTO.setDatosFacturacionAsuntoDTOList(datosFacturacionAsuntoDTOList);
+                        }
+
+                    } else {
+                        error.setDescription("general.message.camposObligatorios");
+                        throw new Exception("Alguno de los campos obligatorios no está relleno");
                     }
-
-                    facturacionesAsuntoDTO.setDatosFacturacionAsuntoDTOList(datosFacturacionAsuntoDTOList);
-
-                    for (DatosMovimientoVarioDTO movimiento : datosMovimientoVarioDTOList) {
-                        List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, movimiento.getIdMovimiento());
-                        movimiento.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
-                    }
-
-                    facturacionesAsuntoDTO.setDatosMovimientoVarioDTOList(datosMovimientoVarioDTOList);
 
                 } else {
-                    LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() / admUsuariosExtendsMapper.selectByExample() -> " +
+                    LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() / admUsuariosExtendsMapper.selectByExample() -> " +
                             "No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
                 }
 
             } else {
-                LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> idInstitucion del token nula");
+                LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> idInstitucion del token nula");
             }
 
         } catch (Exception e) {
-            LOGGER.error("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Se ha producido un error al intentar obtener las facturaciones," +
-                    " pagos y movimientos varios del asunto", e);
+            LOGGER.error("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> Se ha producido un error al intentar obtener las facturaciones," +
+                    " pagos y movimientos varios de actuacion designa", e);
             error.setCode(500);
-            error.setDescription("general.mensaje.error.bbdd");
+            if (UtilidadesString.esCadenaVacia(error.getDescription())) {
+                error.setDescription("general.mensaje.error.bbdd");
+            }
         }
 
         facturacionesAsuntoDTO.setError(error);
 
-        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsunto() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por asunto");
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por actuacion designa");
+
+        return facturacionesAsuntoDTO;
+    }
+
+    @Override
+    public FacturacionesAsuntoDTO getFacturacionesPorAsuntoAsistencia(ScsAsistencia asistencia, HttpServletRequest request) {
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> Entrada al servicio para obtener las facturaciones, pagos y movimientos varios por Asistencia");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        FacturacionesAsuntoDTO facturacionesAsuntoDTO = new FacturacionesAsuntoDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (null != asistencia.getAnio() && null != asistencia.getNumero()) {
+                        ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+                        scsAsistenciaKey.setIdinstitucion(idInstitucion);
+                        scsAsistenciaKey.setAnio(asistencia.getAnio());
+                        scsAsistenciaKey.setNumero(asistencia.getNumero());
+
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> scsAsistenciaMapper.selectByPrimaryKey() -> ENTRA: Obtenemos la asistencia");
+                        ScsAsistencia scsAsistencia = scsAsistenciaMapper.selectByPrimaryKey(scsAsistenciaKey);
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> scsAsistenciaMapper.selectByPrimaryKey() -> ENTRA: Obtenemos la asistencia");
+
+                        // Si tiene un movimiento vario asociado lo obtenemos
+                        if (null != scsAsistencia && null != scsAsistencia.getIdmovimiento()) {
+                            FcsMovimientosvariosKey fcsMovimientosvariosKey = new FcsMovimientosvariosKey();
+                            fcsMovimientosvariosKey.setIdinstitucion(idInstitucion);
+                            fcsMovimientosvariosKey.setIdmovimiento(scsAsistencia.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> ENTRA: Obtenemos el movimiento vario");
+                            FcsMovimientosvarios fcsMovimientosvarios = fcsMovimientosvariosMapper.selectByPrimaryKey(fcsMovimientosvariosKey);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> SALE: Obtenemos el movimiento vario");
+
+                            DatosMovimientoVarioDTO datosMovimientoVarioDTO = new DatosMovimientoVarioDTO();
+                            datosMovimientoVarioDTO.setIdObjeto(fcsMovimientosvarios.getIdmovimiento().toString());
+                            datosMovimientoVarioDTO.setNombre(fcsMovimientosvarios.getDescripcion());
+                            datosMovimientoVarioDTO.setTipo("Movimiento vario");
+                            datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
+
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+                            List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> SALE: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+                            datosMovimientoVarioDTO.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+
+                            facturacionesAsuntoDTO.setDatosMovimientoVarioDTO(datosMovimientoVarioDTO);
+                        }
+
+                        if (null != scsAsistencia) {
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorAsistencia() -> ENTRA: Obtenemos las facturaciones asociadas a la asistencia");
+                            List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorAsistencia(idInstitucion, scsAsistencia);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorAsistencia() -> SALE: Obtenemos las facturaciones asociadas a la asistencia");
+
+                            for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto());
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+                            }
+
+                            facturacionesAsuntoDTO.setDatosFacturacionAsuntoDTOList(datosFacturacionAsuntoDTOList);
+                        }
+
+                    } else {
+                        error.setDescription("general.message.camposObligatorios");
+                        throw new Exception("Alguno de los campos obligatorios no está relleno");
+                    }
+
+                } else {
+                    LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                            "No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> Se ha producido un error al intentar obtener las facturaciones," +
+                    " pagos y movimientos varios de la asistencia", e);
+            error.setCode(500);
+            if (UtilidadesString.esCadenaVacia(error.getDescription())) {
+                error.setDescription("general.mensaje.error.bbdd");
+            }
+        }
+
+        facturacionesAsuntoDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por Asistencia");
+
+        return facturacionesAsuntoDTO;
+    }
+
+    @Override
+    public FacturacionesAsuntoDTO getFacturacionesPorAsuntoActuacionAsistencia(ScsActuacionasistencia actuacion, HttpServletRequest request) {
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> Entrada al servicio para obtener las facturaciones, pagos y movimientos varios por actuacion asistencia");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        FacturacionesAsuntoDTO facturacionesAsuntoDTO = new FacturacionesAsuntoDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (null != actuacion.getAnio() && null != actuacion.getNumero() && null != actuacion.getIdactuacion()) {
+                        ScsActuacionasistenciaKey scsActuacionasistenciaKey = new ScsActuacionasistencia();
+                        scsActuacionasistenciaKey.setIdinstitucion(idInstitucion);
+                        scsActuacionasistenciaKey.setAnio(actuacion.getAnio());
+                        scsActuacionasistenciaKey.setNumero(actuacion.getNumero());
+                        scsActuacionasistenciaKey.setIdactuacion(actuacion.getIdactuacion());
+
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> scsActuacionasistenciaMapper.selectByPrimaryKey() -> ENTRA: Obtenemos la actuación asistencia");
+                        ScsActuacionasistencia scsActuacionasistencia = scsActuacionasistenciaMapper.selectByPrimaryKey(scsActuacionasistenciaKey);
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> scsActuacionasistenciaMapper.selectByPrimaryKey() -> ENTRA: Obtenemos la actuación asistencia");
+
+                        // Si tiene un movimiento vario asociado lo obtenemos
+                        if (null != scsActuacionasistencia && null != scsActuacionasistencia.getIdmovimiento()) {
+                            FcsMovimientosvariosKey fcsMovimientosvariosKey = new FcsMovimientosvariosKey();
+                            fcsMovimientosvariosKey.setIdinstitucion(idInstitucion);
+                            fcsMovimientosvariosKey.setIdmovimiento(scsActuacionasistencia.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> ENTRA: Obtenemos el movimiento vario");
+                            FcsMovimientosvarios fcsMovimientosvarios = fcsMovimientosvariosMapper.selectByPrimaryKey(fcsMovimientosvariosKey);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> SALE: Obtenemos el movimiento vario");
+
+                            DatosMovimientoVarioDTO datosMovimientoVarioDTO = new DatosMovimientoVarioDTO();
+                            datosMovimientoVarioDTO.setIdObjeto(fcsMovimientosvarios.getIdmovimiento().toString());
+                            datosMovimientoVarioDTO.setNombre(fcsMovimientosvarios.getDescripcion());
+                            datosMovimientoVarioDTO.setTipo("Movimiento vario");
+                            datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
+
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+                            List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> SALE: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+                            datosMovimientoVarioDTO.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+
+                            facturacionesAsuntoDTO.setDatosMovimientoVarioDTO(datosMovimientoVarioDTO);
+                        }
+
+                        if (null != scsActuacionasistencia) {
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionAsistencia() -> ENTRA: Obtenemos las facturaciones asociadas a la actuación asistencia");
+                            List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionAsistencia(idInstitucion, scsActuacionasistencia);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionAsistencia() -> SALE: Obtenemos las facturaciones asociadas a la actuación asistencia");
+
+                            for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto());
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+                            }
+
+                            facturacionesAsuntoDTO.setDatosFacturacionAsuntoDTOList(datosFacturacionAsuntoDTOList);
+                        }
+
+                    } else {
+                        error.setDescription("general.message.camposObligatorios");
+                        throw new Exception("Alguno de los campos obligatorios no está relleno");
+                    }
+
+                } else {
+                    LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                            "No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> Se ha producido un error al intentar obtener las facturaciones," +
+                    " pagos y movimientos varios de la actuacion asistencia", e);
+            error.setCode(500);
+            if (UtilidadesString.esCadenaVacia(error.getDescription())) {
+                error.setDescription("general.mensaje.error.bbdd");
+            }
+        }
+
+        facturacionesAsuntoDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por actuacion asistencia");
+
+        return facturacionesAsuntoDTO;
+    }
+
+    @Override
+    public FacturacionesAsuntoDTO getFacturacionesPorGuardia(ScsCabeceraguardias guardia, HttpServletRequest request) {
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> Entrada al servicio para obtener las facturaciones, pagos y movimientos varios por guardia");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        FacturacionesAsuntoDTO facturacionesAsuntoDTO = new FacturacionesAsuntoDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (null != guardia.getFechainicio() && null != guardia.getIdguardia() && null != guardia.getIdturno() && null != guardia.getIdpersona()) {
+                        ScsCabeceraguardiasKey scsCabeceraguardiasKey = new ScsCabeceraguardiasKey();
+                        scsCabeceraguardiasKey.setIdinstitucion(idInstitucion);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(guardia.getFechainicio());
+                        calendar.add(Calendar.HOUR, -1);
+                        scsCabeceraguardiasKey.setFechainicio(calendar.getTime());
+                        scsCabeceraguardiasKey.setIdguardia(guardia.getIdguardia());
+                        scsCabeceraguardiasKey.setIdturno(guardia.getIdturno());
+                        scsCabeceraguardiasKey.setIdpersona(guardia.getIdpersona());
+
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> scsCabeceraguardiasMapper.selectByPrimaryKey() -> ENTRA: Obtenemos la guardia");
+                        ScsCabeceraguardias scsCabeceraguardias = scsCabeceraguardiasMapper.selectByPrimaryKey(scsCabeceraguardiasKey);
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> scsCabeceraguardiasMapper.selectByPrimaryKey() -> ENTRA: Obtenemos la guardia");
+
+                        // Si tiene un movimiento vario asociado lo obtenemos
+                        if (null != scsCabeceraguardias && null != scsCabeceraguardias.getIdmovimiento()) {
+                            FcsMovimientosvariosKey fcsMovimientosvariosKey = new FcsMovimientosvariosKey();
+                            fcsMovimientosvariosKey.setIdinstitucion(idInstitucion);
+                            fcsMovimientosvariosKey.setIdmovimiento(scsCabeceraguardias.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> ENTRA: Obtenemos el movimiento vario");
+                            FcsMovimientosvarios fcsMovimientosvarios = fcsMovimientosvariosMapper.selectByPrimaryKey(fcsMovimientosvariosKey);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> SALE: Obtenemos el movimiento vario");
+
+                            DatosMovimientoVarioDTO datosMovimientoVarioDTO = new DatosMovimientoVarioDTO();
+                            datosMovimientoVarioDTO.setIdObjeto(fcsMovimientosvarios.getIdmovimiento().toString());
+                            datosMovimientoVarioDTO.setNombre(fcsMovimientosvarios.getDescripcion());
+                            datosMovimientoVarioDTO.setTipo("Movimiento vario");
+                            datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
+
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+                            List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> SALE: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+                            datosMovimientoVarioDTO.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+
+                            facturacionesAsuntoDTO.setDatosMovimientoVarioDTO(datosMovimientoVarioDTO);
+                        }
+
+                        if (null != scsCabeceraguardias) {
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorGuardia() -> ENTRA: Obtenemos las facturaciones asociadas a la guardia");
+                            List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorGuardia(idInstitucion, scsCabeceraguardias);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorGuardia() -> SALE: Obtenemos las facturaciones asociadas a la guardia");
+
+                            for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto());
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+                            }
+
+                            facturacionesAsuntoDTO.setDatosFacturacionAsuntoDTOList(datosFacturacionAsuntoDTOList);
+                        }
+
+                    } else {
+                        error.setDescription("general.message.camposObligatorios");
+                        throw new Exception("Alguno de los campos obligatorios no está relleno");
+                    }
+
+                } else {
+                    LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() / admUsuariosExtendsMapper.selectByExample() -> " +
+                            "No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> Se ha producido un error al intentar obtener las facturaciones," +
+                    " pagos y movimientos varios de la guardia", e);
+            error.setCode(500);
+            if (UtilidadesString.esCadenaVacia(error.getDescription())) {
+                error.setDescription("general.mensaje.error.bbdd");
+            }
+        }
+
+        facturacionesAsuntoDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por guardia");
+
+        return facturacionesAsuntoDTO;
+    }
+
+    @Override
+    public FacturacionesAsuntoDTO getFacturacionesPorEJG(ScsEjg ejg, HttpServletRequest request) {
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> Entrada al servicio para obtener las facturaciones, pagos y movimientos varios por EJG");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        FacturacionesAsuntoDTO facturacionesAsuntoDTO = new FacturacionesAsuntoDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (null != ejg.getIdtipoejg() && null != ejg.getAnio() && null != ejg.getNumero()) {
+                        ScsEjgKey scsEjgKey = new ScsEjgKey();
+                        scsEjgKey.setIdinstitucion(idInstitucion);
+                        scsEjgKey.setIdtipoejg(ejg.getIdtipoejg());
+                        scsEjgKey.setAnio(ejg.getAnio());
+                        scsEjgKey.setNumero(ejg.getNumero());
+
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> scsEjgMapper.selectByPrimaryKey() -> ENTRA: Obtenemos el EJG");
+                        ScsEjg scsEjg = scsEjgMapper.selectByPrimaryKey(scsEjgKey);
+                        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> scsEjgMapper.selectByPrimaryKey() -> ENTRA: Obtenemos el EJG");
+
+                        // Si tiene un movimiento vario asociado lo obtenemos
+//                        if (null != scsEjg && null != scsEjg.getIdmovimiento()) {
+//                            FcsMovimientosvariosKey fcsMovimientosvariosKey = new FcsMovimientosvariosKey();
+//                            fcsMovimientosvariosKey.setIdinstitucion(idInstitucion);
+//                            fcsMovimientosvariosKey.setIdmovimiento(scsEjg.getIdmovimiento());
+//                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> ENTRA: Obtenemos el movimiento vario");
+//                            FcsMovimientosvarios fcsMovimientosvarios = fcsMovimientosvariosMapper.selectByPrimaryKey(fcsMovimientosvariosKey);
+//                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsMovimientosvariosMapper.selectByPrimaryKey() -> SALE: Obtenemos el movimiento vario");
+//
+//                            DatosMovimientoVarioDTO datosMovimientoVarioDTO = new DatosMovimientoVarioDTO();
+//                            datosMovimientoVarioDTO.setIdMovimiento(fcsMovimientosvarios.getIdmovimiento().toString());
+//                            datosMovimientoVarioDTO.setDescripcion(fcsMovimientosvarios.getDescripcion());
+//                            datosMovimientoVarioDTO.setTipo("Movimiento vario");
+//                            datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
+//
+//                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+//                            List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString());
+//                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> SALE: Obtenemos los pagos donde se ha aplicado el movimiento vario");
+//                            datosMovimientoVarioDTO.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+//
+//                            facturacionesAsuntoDTO.setDatosMovimientoVarioDTO(datosMovimientoVarioDTO);
+//                        }
+
+                        if (null != scsEjg) {
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG() -> ENTRA: Obtenemos las facturaciones asociadas a la guardia");
+                            List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG(idInstitucion, scsEjg);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG() -> SALE: Obtenemos las facturaciones asociadas a la guardia");
+
+                            for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto());
+                                LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
+                            }
+
+                            facturacionesAsuntoDTO.setDatosFacturacionAsuntoDTOList(datosFacturacionAsuntoDTOList);
+                        }
+
+                    } else {
+                        error.setDescription("general.message.camposObligatorios");
+                        throw new Exception("Alguno de los campos obligatorios no está relleno");
+                    }
+
+                } else {
+                    LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() / admUsuariosExtendsMapper.selectByExample() -> " +
+                            "No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> Se ha producido un error al intentar obtener las facturaciones," +
+                    " pagos y movimientos varios del EJG", e);
+            error.setCode(500);
+            if (UtilidadesString.esCadenaVacia(error.getDescription())) {
+                error.setDescription("general.mensaje.error.bbdd");
+            }
+        }
+
+        facturacionesAsuntoDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> Salida del servicio para obtener las facturaciones, pagos y movimientos varios por EJG");
 
         return facturacionesAsuntoDTO;
     }
