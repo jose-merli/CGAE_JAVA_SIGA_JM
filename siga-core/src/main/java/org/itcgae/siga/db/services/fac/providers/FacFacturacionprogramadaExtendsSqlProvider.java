@@ -31,22 +31,35 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.SELECT("facprog.fechaconfirmacion");
         sql.SELECT("facprog.fecharealgeneracion");
         sql.SELECT("facprog.idestadoconfirmacion");
-        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadoenvio ) estadoconfirmacion");
+        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadoconfirmacion ) estadoconfirmacion");
         sql.SELECT("facprog.idestadopdf");
-        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadoenvio ) estadopdf");
+        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadopdf ) estadopdf");
         sql.SELECT("facprog.idestadoenvio");
         sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadoenvio ) estadoenvio");
         sql.SELECT("facprog.idestadotraspaso");
-        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadoenvio ) estadotraspaso");
+        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadotraspaso ) estadotraspaso");
         sql.SELECT("facprog.archivarfact");
         sql.SELECT("facprog.usumodificacion");
         sql.SELECT("facprog.nombrefichero");
         sql.SELECT("facprog.logerror");
         sql.SELECT("facprog.logtraspaso");
         sql.SELECT("facprog.traspasofacturas");
+        sql.SELECT("facprog.generapdf");
+        sql.SELECT("facprog.envio");
+        sql.SELECT("facprog.idtipoplantillamail");
         sql.SELECT("facprog.traspaso_plantilla");
         sql.SELECT("facprog.traspaso_codauditoria_def");
         sql.SELECT("SUM(f.imptotal) AS importe");
+        sql.SELECT("facprog.fechapresentacion");
+        sql.SELECT("facprog.fecharecibosprimeros");
+        sql.SELECT("facprog.fecharecibosrecurrentes");
+        sql.SELECT("facprog.fechareciboscor1");
+        sql.SELECT("facprog.fecharecibosb2b");
+        sql.SELECT("facprog.fechamodificacion");
+        sql.SELECT("seriefac.idmodelofactura");
+        sql.SELECT("seriefac.idmodelorectificativa");
+        sql.SELECT("( SELECT c.nombre FROM mod_modelocomunicacion c WHERE c.idmodelocomunicacion = seriefac.idmodelofactura ) modelofactura");
+        sql.SELECT("( SELECT c.nombre FROM mod_modelocomunicacion c WHERE c.idmodelocomunicacion = seriefac.idmodelorectificativa ) modelorectificativa");
 
         // From
         sql.FROM("fac_facturacionprogramada facprog");
@@ -145,8 +158,19 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.GROUP_BY("facprog.logerror");
         sql.GROUP_BY("facprog.logtraspaso");
         sql.GROUP_BY("facprog.traspasofacturas");
+        sql.GROUP_BY("facprog.generapdf");
+        sql.GROUP_BY("facprog.envio");
+        sql.GROUP_BY("facprog.idtipoplantillamail");
         sql.GROUP_BY("facprog.traspaso_plantilla");
         sql.GROUP_BY("facprog.traspaso_codauditoria_def");
+        sql.GROUP_BY("facprog.fechapresentacion");
+        sql.GROUP_BY("facprog.fecharecibosprimeros");
+        sql.GROUP_BY("facprog.fecharecibosrecurrentes");
+        sql.GROUP_BY("facprog.fechareciboscor1");
+        sql.GROUP_BY("facprog.fecharecibosb2b");
+        sql.GROUP_BY("facprog.fechamodificacion");
+        sql.GROUP_BY("seriefac.idmodelofactura");
+        sql.GROUP_BY("seriefac.idmodelorectificativa");
 
         // Order by
         sql.ORDER_BY("fecharealgeneracion DESC");

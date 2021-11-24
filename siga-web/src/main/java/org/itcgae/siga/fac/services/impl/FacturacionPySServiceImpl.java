@@ -40,7 +40,6 @@ import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
-import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
@@ -146,8 +145,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
 
+	@Autowired
 	private FacDisqueteabonosExtendsMapper facDisqueteabonosExtendsMapper;
 
+	@Autowired
 	private FacDisquetedevolucionesExtendsMapper facDisquetedevolucionesExtendsMapper;
 
 	@Override
@@ -1456,7 +1457,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		usuario = authenticationProvider.checkAuthentication(request);
 
 		if (usuario != null) {
-			LOGGER.info("archivarFacturaciones() / facFacturacionprogramadaExtendsMapper.updateByPrimaryKeySelective() -> Entrada a facFacturacionprogramadaExtendsMapper para archivar/desarchivar facturaciones programadas");
+			LOGGER.info(
+					"archivarFacturaciones() / facFacturacionprogramadaExtendsMapper.updateByPrimaryKeySelective() -> Entrada a facFacturacionprogramadaExtendsMapper para archivar/desarchivar facturaciones programadas");
 
 			// Logica
 			for (FacFacturacionprogramadaItem item : facturacionProgramadaItems) {

@@ -21,13 +21,13 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
 
         //sumatorio de remesas
         totalRemesa.SELECT("SUM (importeabonado)");
-        totalRemesa.FROM("fac_abonoincluidoendisquete fi");
-        totalRemesa.WHERE("fi.idinstitucion = c.idinstitucion AND fi.iddisqueteabono = c.iddisqueteabono");
+        totalRemesa.FROM("fac_abonoincluidoendisquete");
+        totalRemesa.WHERE("idinstitucion = c.idinstitucion AND iddisqueteabono = c.iddisqueteabono");
 
         //sumatorio numero de recibos
         numRecibos.SELECT("COUNT (1)");
-        numRecibos.FROM("fac_abonoincluidoendisquete fi");
-        numRecibos.WHERE("fi.idinstitucion = c.idinstitucion AND fi.iddisqueteabono = c.iddisqueteabono");
+        numRecibos.FROM("fac_abonoincluidoendisquete");
+        numRecibos.WHERE("idinstitucion = c.idinstitucion AND iddisqueteabono = c.iddisqueteabono");
 
         principal.SELECT("c.idinstitucion,c.iddisqueteabono, c.fecha, b.cod_banco, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
                 + "c.fechamodificacion, c.idsufijo,( s.sufijo || ' - ' || s.concepto ) sufijo, ("+totalRemesa.toString()+") AS totalimporte, ("+numRecibos.toString()+") AS numfacturas");
@@ -37,8 +37,8 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
         principal.INNER_JOIN("fac_bancoinstitucion b ON (c.idinstitucion=b.idinstitucion AND c.bancos_codigo=b.bancos_codigo)");
         principal.LEFT_OUTER_JOIN("fac_sufijo s ON (s.idinstitucion=c.idinstitucion AND s.idsufijo=c.idsufijo)");
 
-        principal.WHERE("c.idinstitucion="+idInstitucion);
-        principal.WHERE("c.fcs='0'");
+        //principal.WHERE("c.idinstitucion="+idInstitucion);
+        //principal.WHERE("c.fcs='0'");
 
         //CUENTA BANCARIA
         if(item.getBancosCodigo()!=null) {
@@ -70,22 +70,22 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
 
         //importe total desde
         if(item.getImporteTotalDesde()!=null && !item.getImporteTotalDesde().isEmpty()) {
-            sql.WHERE("total_remesa>=to_number("+item.getImporteTotalDesde()+",'99999999999999999.99')");
+            sql.WHERE("totalimporte>=to_number("+item.getImporteTotalDesde()+",'99999999999999999.99')");
         }
 
         //importe total hasta
         if(item.getImporteTotalHasta()!=null && !item.getImporteTotalHasta().isEmpty()) {
-            sql.WHERE("total_remesa<=to_number("+item.getImporteTotalHasta()+",'99999999999999999.99')");
+            sql.WHERE("totalimporte<=to_number("+item.getImporteTotalHasta()+",'99999999999999999.99')");
         }
 
         //numrecibos desde
         if(item.getNumRecibosDesde()!=null && !item.getNumRecibosDesde().isEmpty()) {
-            sql.WHERE("numRecibos >= "+item.getNumRecibosDesde());
+            sql.WHERE("numfacturas >= "+item.getNumRecibosDesde());
         }
 
         //numrecibos hasta
         if(item.getNumRecibosHasta()!=null && !item.getNumRecibosHasta().isEmpty()) {
-            sql.WHERE("numRecibos <= "+item.getNumRecibosHasta());
+            sql.WHERE("numfacturas <= "+item.getNumRecibosHasta());
         }
 
         return sql.toString();
