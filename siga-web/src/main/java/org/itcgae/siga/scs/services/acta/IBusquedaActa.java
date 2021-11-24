@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActasDTO;
 import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.ScsActacomision;
 
 
@@ -37,5 +38,6 @@ public interface IBusquedaActa {
 	public String getNumActa(HttpServletRequest request) throws SigaExceptions;
 	
 	public String getNumActa(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions;
+	public CenInstitucion getAbreviatura(HttpServletRequest request);
 	
 }

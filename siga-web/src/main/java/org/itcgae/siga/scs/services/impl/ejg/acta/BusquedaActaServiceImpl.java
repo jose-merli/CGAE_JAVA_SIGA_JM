@@ -26,7 +26,8 @@ import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsActacomision;
 import org.itcgae.siga.db.entities.ScsActacomisionKey;
@@ -41,6 +42,7 @@ import org.itcgae.siga.db.entities.ScsEjgResolucionKey;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.entities.ScsEstadoejgKey;
+import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.ScsActacomisionMapper;
 import org.itcgae.siga.db.mappers.ScsEjgActaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
@@ -82,6 +84,9 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 	@Autowired
 	private ScsEjgResolucionMapper scsEjgResolucionMapper;
+	
+	@Autowired
+	private CenInstitucionMapper cenInstitucionMapper;
 
 	@Autowired
 	GestionEJGServiceImpl gestionEJGServiceImpl;
@@ -1800,7 +1805,42 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		return listaEjgActa;
 	}
 
+	@Override
+	public CenInstitucion getAbreviatura(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
 
-	
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		CenInstitucion institucion = new CenInstitucion();
+
+		// Si la institucion del token es nula, no ejecutaremos nada del código
+
+		if (null != idInstitucion) {
+
+			// Vamos a obtener el usuario para poder sacar sus datos y usarlos en el método
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"abrirActa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"abrirActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				
+				institucion = cenInstitucionMapper.selectByPrimaryKey(idInstitucion);
+				
+			}
+		}
+
+		return institucion;
+	}
 
 }
