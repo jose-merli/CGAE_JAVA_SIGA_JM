@@ -4,12 +4,26 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.*;
+import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
+import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
+import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
+import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
+import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
+import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
+import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
+import org.itcgae.siga.DTO.fac.UsosSufijosItem;
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -307,6 +321,21 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<FacFacturacionprogramadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	@PostMapping(value = "/eliminarFacturacion")
+	ResponseEntity<DeleteResponseDTO> eliminarFacturacion(@RequestBody FacFacturacionEliminarItem facturacionEliminar,
+			HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = this.facturacionService.eliminarFacturacion(facturacionEliminar, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
