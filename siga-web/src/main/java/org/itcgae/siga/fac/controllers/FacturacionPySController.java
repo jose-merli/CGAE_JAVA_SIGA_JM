@@ -13,8 +13,12 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
+import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
+import org.itcgae.siga.DTO.fac.FicherosDevolucionesDTO;
+import org.itcgae.siga.DTO.fac.FicherosDevolucionesItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
@@ -317,6 +321,11 @@ public class FacturacionPySController {
 
 		try {
 			response = facturacionService.getFacturacionesProgramadas(facturacionProgramadaItem, request);
+
+			if(response.getFacturacionprogramadaItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
 			return new ResponseEntity<FacFacturacionprogramadaDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -336,6 +345,57 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/getFicherosTransferencias")
+	ResponseEntity<FicherosAbonosDTO> getFicherosTransferencias(@RequestBody FicherosAbonosItem item,
+																	HttpServletRequest request) {
+		FicherosAbonosDTO response = new FicherosAbonosDTO();
+
+		try {
+			response = facturacionService.getFicherosTransferencias(item, request);
+
+			if(response.getFicherosTransferenciasItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<FicherosAbonosDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FicherosAbonosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/getFicherosDevoluciones")
+	ResponseEntity<FicherosDevolucionesDTO> getFicherosDevoluciones(@RequestBody FicherosDevolucionesItem item,
+														  HttpServletRequest request) {
+		FicherosDevolucionesDTO response = new FicherosDevolucionesDTO();
+
+		try {
+			response = facturacionService.getFicherosDevoluciones(item, request);
+
+			if(response.getFicherosDevolucionesItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<FicherosDevolucionesDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FicherosDevolucionesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	@PostMapping(value = "/archivarFacturaciones")
+	ResponseEntity<UpdateResponseDTO> archivarFacturaciones(@RequestBody List<FacFacturacionprogramadaItem> facturacionProgramadaItems,
+																			HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+
+		try {
+			response = facturacionService.archivarFacturaciones(facturacionProgramadaItems, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
