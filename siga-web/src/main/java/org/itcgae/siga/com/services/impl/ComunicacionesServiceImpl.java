@@ -537,7 +537,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
             	}
             	
             	//Se recupera el id del nuevo envio introducido
-            	Long newIdEnvio = Long.valueOf(envEnviosExtendsMapper.selectMaxIDEnvio().getNewId())-1;
+            	Long newIdEnvio = Long.valueOf(envEnviosExtendsMapper.selectMaxIDEnvio(idInstitucion).getNewId())-1;
             	
 
             	LOGGER.info(
