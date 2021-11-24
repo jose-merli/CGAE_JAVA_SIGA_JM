@@ -1417,7 +1417,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					ret = -3;
 				}
 				error.setCode(ret);	
-				error.setDescription(facElim.getDatosError());			}
+				error.setDescription(facElim.getDatosError());	} else {
+					// TODO: borrado de ficheros
+				}
 		} catch (Exception e) {
 			error.setCode(-3);
 			error.setDescription("error:" + e);;
