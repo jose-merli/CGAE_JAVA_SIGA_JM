@@ -219,8 +219,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					CenPersona cenPersona = cenPersonaExtendsMapper
 							.selectByPrimaryKey(Long.valueOf(colegiadoItem.getIdPersona()));
 					
-					CenPersona cenPersonaAnterior = cenPersonaExtendsMapper
-							.selectByPrimaryKey(Long.valueOf(colegiadoItem.getIdPersona()));
+					CenPersona cenPersonaAnterior = mapCenPersona(cenPersona);
 
 					etiquetaUpdateDTO.setIdPersona(colegiadoItem.getIdPersona());
 
@@ -2140,5 +2139,63 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		LOGGER.info(
 				"verifyPerson() -> Salida al servicio para verificar si la persona logueada está en la tabla cen_colegiado");
 		return stringDTO;
+	}
+	
+	private CenPersona mapCenPersona(CenPersona persona) {
+		CenPersona nuevaPersona = new CenPersona();
+		
+		if (persona.getApellidos1() != null) {
+			nuevaPersona.setApellidos1(persona.getApellidos1());
+		}
+		
+		if (persona.getApellidos2() != null) {
+			nuevaPersona.setApellidos2(persona.getApellidos2());
+		}
+		
+		if (persona.getFallecido() != null) {
+			nuevaPersona.setFallecido(persona.getFallecido());
+		}
+		
+		if (persona.getFechamodificacion() != null) {
+			nuevaPersona.setFechamodificacion(persona.getFechamodificacion());
+		}
+		
+		if (persona.getFechanacimiento() != null) {
+			nuevaPersona.setFechanacimiento(persona.getFechanacimiento());
+		}
+		
+		if (persona.getIdestadocivil() != null) {
+			nuevaPersona.setIdestadocivil(persona.getIdestadocivil());
+		}
+		
+		if (persona.getIdpersona() != null) {
+			nuevaPersona.setIdpersona(persona.getIdpersona());
+		}
+		
+		if (persona.getIdtipoidentificacion() != null) {
+			nuevaPersona.setIdtipoidentificacion(persona.getIdtipoidentificacion());
+		}
+		
+		if (persona.getNaturalde() != null) {
+			nuevaPersona.setNaturalde(persona.getNaturalde());
+		}
+		
+		if (persona.getNifcif() != null) {
+			nuevaPersona.setNifcif(persona.getNifcif());
+		}
+		
+		if (persona.getNombre() != null) {
+			nuevaPersona.setNombre(persona.getNombre());
+		}
+		
+		if (persona.getSexo() != null) {
+			nuevaPersona.setSexo(persona.getSexo());
+		}
+		
+		if (persona.getUsumodificacion() != null) {
+			nuevaPersona.setUsumodificacion(persona.getUsumodificacion());
+		}
+		
+		return nuevaPersona;
 	}
 }
