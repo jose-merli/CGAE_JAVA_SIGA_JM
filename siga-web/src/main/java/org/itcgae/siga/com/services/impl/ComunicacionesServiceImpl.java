@@ -541,7 +541,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
             	
 
             	LOGGER.info(
-                        "ComunicacionesServiceImpl.saveNuevaComm() / envCamposEnviosMapper.insert() -> Entrada a envCamposEnviosMapper para insertar los valores de los campos de un nuevo envio asociado a la nueva comunicación");
+                        "ComunicacionesServiceImpl.saveNuevaComm() / envCamposEnviosMapper.insert() -> Entrada a envCamposEnviosMapper para insertar los valores de los campos de un nuevo envio asociado a la nueva comunicación. Id Envío: " + newIdEnvio);
 
             	//Vamos a utilizar los campos de valores genericos definidos en la tabla ENV_CAMPOS e introduciremos valores para ellos asociados
             	//Con nuestro envio además del asunto y el cuerpo en la tabla ENV_CAMPOSENVIOS
