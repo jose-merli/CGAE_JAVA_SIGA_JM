@@ -4,10 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-/*import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;*/
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -15,16 +11,6 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-/*import org.redabogacia.accesscontrol.crl.exception.CrlCommunicationException;
-import org.redabogacia.accesscontrol.crl.exception.CrlOutOfDateException;
-import org.redabogacia.accesscontrol.crl.exception.CrlRevokedException;
-import org.redabogacia.accesscontrol.ocsp.exception.OcspRevokedException;
-import org.redabogacia.accesscontrol.ocsp.exception.OcspUnknownException;
-import org.redabogacia.accesscontrol.security.CertificateAuthValidatorDefault;
-import org.redabogacia.accesscontrol.security.exception.AuthenticationFailedException;
-import org.redabogacia.accesscontrol.security.exception.ConfigException;
-import org.redabogacia.accesscontrol.security.exception.DamagedOrModifiedCertificateException;
-import org.redabogacia.accesscontrol.security.exception.UnrecognizedCAException;*/
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;

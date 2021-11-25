@@ -1,17 +1,18 @@
 package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
+import java.util.List;
 
 public class FiltrosCompraProductosItem {
 		private String idPersona;
 		private Date fechaSolicitudDesde;
 		private Date fechaSolicitudHasta;
 	    private String nSolicitud;
-	    private String idCategoria;
-	    private String idTipoProducto;
+	    private List<String> idCategoria;
+	    private List<String> idTipoProducto;
 	    private String descProd;
-	    private String idEstadoSolicitud;
-	    private String idEstadoFactura; //Actualmente estados: En revisión, Pendiente de pago, Pagada, Devuelta, Anulada pendiente de abono, Anulada
+	    private List<String> idEstadoSolicitud;
+	    private List<String> idEstadoFactura; //Actualmente estados: En revisión, Pendiente de pago, Pagada, Devuelta, Anulada pendiente de abono, Anulada
 		
 	    public String getIdpersona() {
 			return idPersona;
@@ -37,16 +38,16 @@ public class FiltrosCompraProductosItem {
 		public void setnSolicitud(String nSolicitud) {
 			this.nSolicitud = nSolicitud;
 		}
-		public String getIdCategoria() {
+		public List<String> getIdCategoria() {
 			return idCategoria;
 		}
-		public void setIdCategoria(String idCategoria) {
+		public void setIdCategoria(List<String> idCategoria) {
 			this.idCategoria = idCategoria;
 		}
-		public String getIdTipoProducto() {
+		public List<String> getIdTipoProducto() {
 			return idTipoProducto;
 		}
-		public void setIdTipoProducto(String idTipoProducto) {
+		public void setIdTipoProducto(List<String> idTipoProducto) {
 			this.idTipoProducto = idTipoProducto;
 		}
 		public String getDescProd() {
@@ -55,16 +56,16 @@ public class FiltrosCompraProductosItem {
 		public void setDescProd(String descProd) {
 			this.descProd = descProd;
 		}
-		public String getIdEstadoSolicitud() {
+		public List<String> getIdEstadoSolicitud() {
 			return idEstadoSolicitud;
 		}
-		public void setIdEstadoSolicitud(String idEstadoSolicitud) {
+		public void setIdEstadoSolicitud(List<String> idEstadoSolicitud) {
 			this.idEstadoSolicitud = idEstadoSolicitud;
 		}
-		public String getIdEstadoFactura() {
+		public List<String> getIdEstadoFactura() {
 			return idEstadoFactura;
 		}
-		public void setIdEstadoFactura(String idEstadoFactura) {
+		public void setIdEstadoFactura(List<String> idEstadoFactura) {
 			this.idEstadoFactura = idEstadoFactura;
 		}
 }
