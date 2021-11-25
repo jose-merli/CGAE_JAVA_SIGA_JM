@@ -26,6 +26,7 @@ import org.itcgae.siga.db.mappers.PysServiciosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
 import org.itcgae.siga.fac.services.ITiposServiciosService;
+import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,10 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 	@Autowired
 	PysServiciosExtendsMapper pysServiciosExtendsMapper;
 	
+    @Autowired
+    private CgaeAuthenticationProvider authenticationProvider;
+	
+	//Datos tabla pantalla Maestros --> Tipos Servicios
 	@Override
 	public ListadoTipoServicioDTO searchTiposServicios(HttpServletRequest request) {
 		ListadoTipoServicioDTO listadoTipoServicioDTO = new ListadoTipoServicioDTO();
@@ -100,6 +105,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		return listadoTipoServicioDTO;
 	}
 
+	//Datos con historico (incluidos registros con fechabaja != null) tabla pantalla Maestros --> Tipos Servicios
 	@Override
 	public ListadoTipoServicioDTO searchTiposServiciosHistorico(HttpServletRequest request) {
 		ListadoTipoServicioDTO listadoTipoServicioDTO = new ListadoTipoServicioDTO();
@@ -157,6 +163,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		return listadoTipoServicioDTO;
 	}
 
+	//Obtiene los datos del combo categoria de servicios (PYS_TIPOSERVICIOS)
 	@Override
 	public ComboDTO comboTiposServicios(HttpServletRequest request) {
 		ComboDTO comboDTO = new ComboDTO();
@@ -213,7 +220,135 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 		return comboDTO;
 	}
+	
+    //Metodo que crea y edita tipos de servicios (PYS_SERVICIOS)
+    @Override
+    public DeleteResponseDTO crearEditarServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request) throws Exception {
+        
+        DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+        //Obtenemos la informacion del usuario logeado
+        AdmUsuarios usuario = new AdmUsuarios();
+        int status = 0;
+        
 
+        LOGGER.info("crearEditarServicio() -> Entrada al servicio para crear/modificar un tipo de servicio (PYS_SERVICIOS)");
+
+        usuario = authenticationProvider.checkAuthentication(request);
+        
+        if (usuario != null) {
+
+            LOGGER.info(
+                "crearEditarServicio() / pysServiciosMapper.crearEditarServicio() -> Entrada a pysServiciosMapper para crear/modificar un tipo de servicio (PYS_SERVICIOS)");
+                    
+            for (TiposServiciosItem tipoServicio : listadoServicios.getTiposServiciosItems()) {
+                
+                PysServicios tipoServicioMyBattis = new PysServicios();
+                        
+                tipoServicioMyBattis.setIdinstitucion(usuario.getIdinstitucion());
+                tipoServicioMyBattis.setIdtiposervicios(Short.parseShort(String.valueOf(tipoServicio.getIdtiposervicios())));
+                
+                if(tipoServicio.isNuevo()) {
+                    NewIdDTO idOrdenacion = pysServiciosExtendsMapper.getIndiceMaxTipoServicio(tipoServicio.getIdtiposervicios(), usuario.getIdinstitucion());
+                    tipoServicioMyBattis.setIdservicio(Long.parseLong(idOrdenacion.getNewId().toString()));
+                }else {
+                	tipoServicioMyBattis.setIdservicio(new Long(tipoServicio.getIdservicio()));
+                }
+                tipoServicioMyBattis.setDescripcion(tipoServicio.getDescripcion());
+                tipoServicioMyBattis.setFechamodificacion(new Date());
+                tipoServicioMyBattis.setUsumodificacion(usuario.getIdusuario());
+                
+                if(tipoServicio.isNuevo()) {        
+                    status = pysServiciosMapper.insertSelective(tipoServicioMyBattis);
+                }else {
+                    status = pysServiciosMapper.updateByPrimaryKeySelective(tipoServicioMyBattis);
+                }
+                
+                if(status == 0) {                
+                    deleteResponseDTO.setStatus(SigaConstants.KO);
+                    LOGGER.info(
+                            "Actualizacion/insercion fallida del tipo de servicio con id: " + tipoServicio.getIdservicio() + ", descripcion: " + tipoServicio.getDescripcion());
+                }else if(status == 1) {
+                    LOGGER.info(
+                        "crearEditarServicio() / pysServiciosMapper.crearEditarServicio() -> Actualizacion/insercion exitosa del tipo de servicio con id: " + tipoServicio.getIdservicio() + ", descripcion: " + tipoServicio.getDescripcion());
+                    deleteResponseDTO.setStatus(SigaConstants.OK);
+                }
+                
+            }    
+                    
+            LOGGER.info(
+                    "crearEditarServicio() / pysServiciosMapper.crearEditarServicio() -> Salida de pysServiciosMapper para crear/modificar un tipo de servicio (PYS_SERVICIOS)");
+        }
+        
+        LOGGER.info("crearEditarServicio() -> Salida del servicio para crear/modificar un tipo de servicio (PYS_SERVICIOS)");
+        
+        return deleteResponseDTO;
+    }
+    
+    //Realiza un borrado logico (establecer fechabaja = new Date()) o lo reactiva en caso de que esta inhabilitado.
+	@Override
+	public ServicioDTO activarDesactivarServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request) {
+		ServicioDTO servicioDTO = new ServicioDTO();
+		Error error = new Error();
+		int status = 0;
+		
+
+		LOGGER.info("activarDesactivarServicio() -> Entrada al servicio para activar/desactivar tipos de servicios");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"activarDesactivarServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"activarDesactivarServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"activarDesactivarServicio() / pysServiciosExtendsMapper.activarDesactivarServicio() -> Entrada a pysServiciosExtendsMapper para activar/desactivar tipos de servicios");
+
+					for (TiposServiciosItem servicio : listadoServicios.getTiposServiciosItems()) {
+						status = pysServiciosExtendsMapper
+								.activarDesactivarServicio(usuarios.get(0), idInstitucion, servicio);
+					}
+					
+					if(status == 0) {
+						servicioDTO.setStatus(SigaConstants.KO);
+					}else if(status == 1) {
+						servicioDTO.setStatus(SigaConstants.OK);
+					}
+					
+
+					LOGGER.info(
+							"activarDesactivarServicio() / pysServiciosExtendsMapper.activarDesactivarServicio() -> Salida de pysServiciosExtendsMapper para activar/desactivar tipos de servicios");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposServiciosServiceImpl.activarDesactivarServicio() -> Se ha producido un error al activar/desactivar tipos de servicios",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		
+		servicioDTO.setError(error);
+
+		LOGGER.info("activarDesactivarServicio() -> Salida del servicio para activar/desactivar tipos de servicios");
+
+		return servicioDTO;
+	}
+	
 	@Override
 	public ComboDTO searchTiposServiciosByIdCategoria(HttpServletRequest request, String idCategoria) {
 		ComboDTO comboDTO = new ComboDTO();
@@ -328,215 +463,6 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		return comboDTO;
 	}
 	
-	@Override
-	public InsertResponseDTO crearServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request) {
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-		int status = 0;
-		
-
-		LOGGER.info("crearServicio() -> Entrada al servicio para crear un tipo de servicio");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"crearServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"crearServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"crearServicio() / pysServiciosExtendsMapper.crearProducto() -> Entrada a pysServiciosExtendsMapper para crear un tipo de servicio");
-
-					NewIdDTO idOrdenacion = pysServiciosExtendsMapper.getIndiceMaxServicio(listadoServicios.getTiposServiciosItems(), idInstitucion);
-					PysServicios servicio = new PysServicios();
-			
-					
-					servicio.setIdinstitucion(idInstitucion);
-					servicio.setIdtiposervicios(Short.parseShort(String.valueOf(listadoServicios.getTiposServiciosItems().get(0).getIdtiposervicios())));
-					servicio.setIdservicio(Long.parseLong(idOrdenacion.getNewId().toString()));
-					servicio.setDescripcion(listadoServicios.getTiposServiciosItems().get(0).getDescripcion());
-					servicio.setFechamodificacion(new Date());
-					servicio.setUsumodificacion(usuarios.get(0).getIdusuario());
-					servicio.setFechabaja(null);
-					
-					status = pysServiciosMapper.insert(servicio);
-					
-					if(status == 0) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-					}else if(status == 1) {
-						insertResponseDTO.setStatus(SigaConstants.OK);
-					}
-					
-					LOGGER.info(
-							"crearServicio() / pysServiciosExtendsMapper.crearServicio() -> Salida de pysServiciosExtendsMapper para crear un tipo de servicio");
-				}
-
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"TiposServiciosServiceImpl.crearServicio() -> Se ha producido un error al crear un tipo de servicio",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-		
-		insertResponseDTO.setError(error);
-
-		LOGGER.info("crearServicio() -> Salida del servicio para crear un tipo de servicio");
-
-		return insertResponseDTO;
-	}
-
-	@Override
-	public DeleteResponseDTO modificarServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request) {
-		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		Error error = new Error();
-		int status = 0;
-		
-
-		LOGGER.info("modificarServicio() -> Entrada al servicio para modificar un tipo de servicio");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"modificarServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"modificarServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"modificarServicio() / pysServiciosExtendsMapper.modificarServicio() -> Entrada a pysServiciosExtendsMapper para modificar un tipo de servicio");
-					
-					for (TiposServiciosItem servicio : listadoServicios.getTiposServiciosItems()) {
-						PysServicios servicioMyBatis = new PysServicios();
-						
-						
-						servicioMyBatis.setIdinstitucion(idInstitucion);
-						servicioMyBatis.setIdtiposervicios(Short.parseShort(String.valueOf(servicio.getIdtiposervicios())));
-						servicioMyBatis.setIdservicio(new Long(servicio.getIdservicio()));
-						servicioMyBatis.setDescripcion(servicio.getDescripcion());
-						servicioMyBatis.setFechamodificacion(new Date());
-						servicioMyBatis.setUsumodificacion(usuarios.get(0).getIdusuario());
-						servicioMyBatis.setFechabaja(null);
-						
-						status = pysServiciosMapper.updateByPrimaryKey(servicioMyBatis);
-					}
-					
-					
-					if(status == 0) {
-						deleteResponseDTO.setStatus(SigaConstants.KO);
-					}else if(status == 1) {
-						deleteResponseDTO.setStatus(SigaConstants.OK);
-					}
-					
-
-					LOGGER.info(
-							"modificarServicio() / pysServiciosExtendsMapper.modificarServicio() -> Salida de pysServiciosExtendsMapper para modificar un tipo de servicio");
-				}
-
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"TiposServiciosServiceImpl.modificarServicio() -> Se ha producido un error al modificar un tipo de servicio",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		
-		deleteResponseDTO.setError(error);
-
-		LOGGER.info("modificarServicio() -> Salida del servicio para modificar un tipo de servicio");
-
-		return deleteResponseDTO;
-	}
-	
-	@Override
-	public ServicioDTO activarDesactivarServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request) {
-		ServicioDTO servicioDTO = new ServicioDTO();
-		Error error = new Error();
-		int status = 0;
-		
-
-		LOGGER.info("activarDesactivarServicio() -> Entrada al servicio para activar/desactivar tipos de servicios");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"activarDesactivarServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"activarDesactivarServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"activarDesactivarServicio() / pysServiciosExtendsMapper.activarDesactivarServicio() -> Entrada a pysServiciosExtendsMapper para activar/desactivar tipos de servicios");
-
-					for (TiposServiciosItem servicio : listadoServicios.getTiposServiciosItems()) {
-						status = pysServiciosExtendsMapper
-								.activarDesactivarServicio(usuarios.get(0), idInstitucion, servicio);
-					}
-					
-					if(status == 0) {
-						servicioDTO.setStatus(SigaConstants.KO);
-					}else if(status == 1) {
-						servicioDTO.setStatus(SigaConstants.OK);
-					}
-					
-
-					LOGGER.info(
-							"activarDesactivarServicio() / pysServiciosExtendsMapper.activarDesactivarServicio() -> Salida de pysServiciosExtendsMapper para activar/desactivar tipos de servicios");
-				}
-
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"TiposServiciosServiceImpl.activarDesactivarServicio() -> Se ha producido un error al activar/desactivar tipos de servicios",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		
-		servicioDTO.setError(error);
-
-		LOGGER.info("activarDesactivarServicio() -> Salida del servicio para activar/desactivar tipos de servicios");
-
-		return servicioDTO;
-	}
 
 }
 

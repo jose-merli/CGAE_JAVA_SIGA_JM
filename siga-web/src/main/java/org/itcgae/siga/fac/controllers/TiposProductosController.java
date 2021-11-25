@@ -60,7 +60,7 @@ public class TiposProductosController {
 		}	
 	}
 	
-	//Realiza un borrado logico (establecer fechabaja = new Date()) o lo reactiva en caso de que esta inhabilitado.
+	//Realiza un borrado logico (establecer fechabaja = new Date()) o lo reactiva en caso de que este inhabilitado.
 	@PostMapping(value="/pys/activarDesactivarProducto")
 	ResponseEntity<ProductoDTO> activarDesactivarProducto(@RequestBody ListadoTipoProductoDTO listadoProductos, HttpServletRequest request){
 		ProductoDTO response = tiposProductosService.activarDesactivarProducto(listadoProductos, request);
