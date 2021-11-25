@@ -43,7 +43,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		}
 
 		if (actasItem.getNumeroacta() != null) {
-			sql.WHERE("ACT.NUMEROACTA LIKE'" + actasItem.getNumeroacta() + "'");
+			sql.WHERE("ACT.NUMEROACTA LIKE'%" + actasItem.getNumeroacta() + "%'");
 		}
 
 		if (fechaResolucion != "0") {
