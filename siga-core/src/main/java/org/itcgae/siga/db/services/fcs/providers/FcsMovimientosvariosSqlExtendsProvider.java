@@ -74,26 +74,27 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         sql.LEFT_OUTER_JOIN("fcs_pagosjg ON fcs_aplica_movimientosvarios.idinstitucion = fcs_pagosjg.idinstitucion AND fcs_aplica_movimientosvarios.idpagosjg = fcs_pagosjg.idpagosjg");
         sql.LEFT_OUTER_JOIN("fcs_facturacionjg ON fcs_movimientosvarios.idinstitucion = fcs_facturacionjg.idinstitucion AND fcs_movimientosvarios.idfacturacion = fcs_facturacionjg.idfacturacion");
         sql.LEFT_OUTER_JOIN("scs_grupofacturacion ON fcs_movimientosvarios.idinstitucion = scs_grupofacturacion.idinstitucion AND fcs_movimientosvarios.idgrupofacturacion = scs_grupofacturacion.idgrupofacturacion");
+        sql.LEFT_OUTER_JOIN("fcs_movimientosvarios_tipo ON fcs_movimientosvarios.idinstitucion = fcs_movimientosvarios_tipo.idinstitucion AND fcs_movimientosvarios.idtipomovimiento = fcs_movimientosvarios_tipo.idtipomovimiento");
         sql.WHERE("fcs_movimientosvarios.idinstitucion = "+idInstitucion);
         
         if(!movimientoItem.isHistorico()) {
-        	sql.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery+") )  >= 0");
+        	sql.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery+") )  != 0"); //??ponía >=0
         }
         
         if(movimientoItem.getNif() != null && movimientoItem.getNif() != "") {
-        	sql.WHERE("REGEXP_LIKE ( cen_persona.nifcif,'"+movimientoItem.getNif()+"')");
+        	//sql.WHERE("REGEXP_LIKE ( cen_persona.nifcif,'"+movimientoItem.getNif()+"')");
         }
         
         if(movimientoItem.getNcolegiado() != null && movimientoItem.getNcolegiado() != "") {
-        	sql.WHERE("REGEXP_LIKE ( cen_colegiado.ncolegiado,'^[0]{0,}"+movimientoItem.getNcolegiado()+"$')");
+        	//sql.WHERE("REGEXP_LIKE ( cen_colegiado.ncolegiado,'^[0]{0,}"+movimientoItem.getNcolegiado()+"$')");
         }
         
         if(movimientoItem.getDescripcion() != null && movimientoItem.getDescripcion() != "") {
-            sql.WHERE("REGEXP_LIKE ( fcs_movimientosvarios.descripcion,'"+movimientoItem.getDescripcion()+"')");
+           // sql.WHERE("REGEXP_LIKE ( fcs_movimientosvarios.descripcion,'"+movimientoItem.getDescripcion()+"')");
         }
         
         if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
-           // sql.WHERE("fcs_movimientosvarios.descripcion movimiento ='"+movimientoItem.getDescripcion()+"'");
+           // sql.WHERE("fcs_movimientosvarios.idtipomovimiento ='"+movimientoItem.getTipo()+"'");
         }
         
         if(movimientoItem.getCertificacion() != null && movimientoItem.getCertificacion() != "") {
@@ -101,31 +102,31 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         }
         
         if(movimientoItem.getIdAplicadoEnPago() != null && movimientoItem.getIdAplicadoEnPago() != "") {
-            sql.WHERE("fcs_aplica_movimientosvarios.idpagosjg ="+movimientoItem.getIdAplicadoEnPago());
+           // sql.WHERE("fcs_aplica_movimientosvarios.idpagosjg ="+movimientoItem.getIdAplicadoEnPago());
         }
         
         if(movimientoItem.getFechaApDesde() != null) {
-           // sql.WHERE("fcs_pagosjg.fechadesde >='"+movimientoItem.getIdAplicadoEnPago()+"'");
+          //  sql.WHERE("fcs_pagosjg.fechadesde >='"+movimientoItem.getFechaApDesde()+"'");
         }
         
         if(movimientoItem.getFechaApHasta() != null) {
-            //sql.WHERE("fcs_pagosjg.fechahasta <='"+movimientoItem.getIdAplicadoEnPago()+"'");
+           // sql.WHERE("fcs_pagosjg.fechahasta <='"+movimientoItem.getFechaApHasta()+"'");
         }
         
         if(movimientoItem.getIdFacturacion() != null && movimientoItem.getIdFacturacion() != "") {
-            sql.WHERE("fcs_movimientosvarios.idfacturacion ="+movimientoItem.getIdFacturacion());
+           // sql.WHERE("fcs_movimientosvarios.idfacturacion ="+movimientoItem.getIdFacturacion());
         }
         
         if(movimientoItem.getIdGrupoFacturacion() != null && movimientoItem.getIdGrupoFacturacion() != "") {
-            sql.WHERE("fcs_movimientosvarios.idgrupofacturacion ="+movimientoItem.getIdGrupoFacturacion());
+           // sql.WHERE("fcs_movimientosvarios.idgrupofacturacion ="+movimientoItem.getIdGrupoFacturacion());
         }
         
         if(movimientoItem.getIdConcepto() != null && movimientoItem.getIdConcepto() != "") {
-          //  sql.WHERE("fcs_movimientosvarios.idhitogeneral ="+movimientoItem.getIdConcepto());
+          // sql.WHERE("fcs_movimientosvarios.idhitogeneral ="+movimientoItem.getIdConcepto());
         }
         
         if(movimientoItem.getIdPartidaPresupuestaria() != null && movimientoItem.getIdPartidaPresupuestaria() != "") {
-          //  sql.WHERE("fcs_movimientosvarios.idpartidapresupuestaria ="+movimientoItem.getIdPartidaPresupuestaria());
+          // sql.WHERE("fcs_movimientosvarios.idpartidapresupuestaria ="+movimientoItem.getIdPartidaPresupuestaria());
         }
         
         sql.WHERE("ROWNUM <= 200");

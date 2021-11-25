@@ -10,7 +10,6 @@ public class MovimientosVariosFacturacionItem {
 	private String idAplicadoEnPago;
 	private Date fechaApDesde;
 	private Date fechaApHasta;
-	private String idFacturacionApInicial;
 	private String idConcepto;
     private String idPartidaPresupuestaria;
     private String ncolegiado;
@@ -123,12 +122,6 @@ public class MovimientosVariosFacturacionItem {
 	}
 	public void setFechaApHasta(Date fechaApHasta) {
 		this.fechaApHasta = fechaApHasta;
-	}
-	public String getIdFacturacionApInicial() {
-		return idFacturacionApInicial;
-	}
-	public void setIdFacturacionApInicial(String idFacturacionApInicial) {
-		this.idFacturacionApInicial = idFacturacionApInicial;
 	}
 	public String getIdConcepto() {
 		return idConcepto;
