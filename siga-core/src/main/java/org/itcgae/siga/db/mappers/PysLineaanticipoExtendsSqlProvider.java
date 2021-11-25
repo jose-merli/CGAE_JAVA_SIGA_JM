@@ -11,12 +11,16 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
     public String selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SQL query = new SQL();
-        query.SELECT("anti.fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", "anti.idanticipo", "anti.descripcion", "anti.importeinicial as importe_inicial", "sum(nvl(linea.importeanticipado, 0)) as importe_usado")
-                .FROM("pys_anticipoletrado anti", "CEN_PERSONA pers")
-                .LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona");
+        query.SELECT("FIRST_VALUE(anti.fecha) OVER (ORDER BY anti.fecha) as fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", 
+        		"linea.idLinea", 
+        		"FIRST_VALUE(anti.descripcion) OVER (ORDER BY anti.fecha) as descripcion", "anti.importeinicial as importe_inicial", "sum(nvl(linea.importeanticipado, 0)) as importe_usado", 
+        		"anti.importeinicial - sum(nvl(linea.importeanticipado, 0))as importe_restante" );
+       query.FROM("pys_anticipoletrado anti");
+                
+       query.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = anti.idpersona");
+       query.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona");
 
-        query.WHERE("pers.idpersona = anti.idpersona").AND()
-                .WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)").AND()
+        query.WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)").AND()
                 .WHERE("anti.idinstitucion = " + institutionId);
 
         if (filter.getFechaDesde() != null ){

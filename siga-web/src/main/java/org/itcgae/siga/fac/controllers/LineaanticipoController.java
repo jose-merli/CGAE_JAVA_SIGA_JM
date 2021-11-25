@@ -4,6 +4,7 @@ package org.itcgae.siga.fac.controllers;
 import org.itcgae.siga.DTO.fac.FichaMonederoItem;
 import org.itcgae.siga.DTO.fac.FiltroMonederoItem;
 import org.itcgae.siga.DTO.fac.ListaMonederoDTO;
+import org.itcgae.siga.DTO.fac.ListaMovimientosMonederoDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -39,6 +40,18 @@ public class LineaanticipoController {
 		}
 		else {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+    }
+    
+    @GetMapping(value = "/pys/getListaMovimientosMonedero")
+    ResponseEntity<ListaMovimientosMonederoDTO> getListaMovimientosMonedero(HttpServletRequest request, String idLinea, String idPersona) throws Exception {
+
+    	ListaMovimientosMonederoDTO response = walletService.getListaMovimientosMonedero(request, idLinea, idPersona);
+		if (response.getError() == null) {
+			return new ResponseEntity<ListaMovimientosMonederoDTO>(response, HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<ListaMovimientosMonederoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
     }
 
