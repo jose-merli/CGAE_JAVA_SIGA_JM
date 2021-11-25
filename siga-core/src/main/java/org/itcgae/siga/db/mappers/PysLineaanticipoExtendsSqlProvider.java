@@ -11,12 +11,16 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
     public String selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SQL query = new SQL();
-        query.SELECT("anti.fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", "anti.idanticipo", "anti.descripcion", "anti.importeinicial as importe_inicial", "sum(nvl(linea.importeanticipado, 0)) as importe_usado")
-                .FROM("pys_anticipoletrado anti", "CEN_PERSONA pers")
-                .LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona");
+        query.SELECT("FIRST_VALUE(anti.fecha) OVER (ORDER BY anti.fecha) as fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", 
+        		"linea.idLinea", 
+        		"FIRST_VALUE(anti.descripcion) OVER (ORDER BY anti.fecha) as descripcion", "anti.importeinicial as importe_inicial", "sum(nvl(linea.importeanticipado, 0)) as importe_usado", 
+        		"anti.importeinicial - sum(nvl(linea.importeanticipado, 0))as importe_restante" );
+       query.FROM("pys_anticipoletrado anti");
+                
+       query.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = anti.idpersona");
+       query.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona");
 
-        query.WHERE("pers.idpersona = anti.idpersona").AND()
-                .WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)").AND()
+        query.WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)").AND()
                 .WHERE("anti.idinstitucion = " + institutionId);
 
         if (filter.getFechaDesde() != null ){
@@ -37,12 +41,15 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         	query.WHERE("pers.idpersona = "+filter.getIdPersonaColegiado());
         }
 
-        query.GROUP_BY("anti.idanticipo", "anti.FECHA", "pers.NIFCIF", "pers.idpersona", "anti.idanticipo", "pers.APELLIDOS1", "pers.APELLIDOS2", "pers.NOMBRE", "anti.descripcion", "anti.importeinicial", "linea.importeanticipado");
+        query.GROUP_BY("linea.idLinea", "anti.FECHA", "pers.NIFCIF", "pers.idpersona", "anti.idanticipo", "pers.APELLIDOS1", "pers.APELLIDOS2", "pers.NOMBRE", "anti.descripcion", "anti.importeinicial", "linea.importeanticipado");
         query.ORDER_BY("anti.FECHA desc")
         ;
+        
+        String sql = "select a.fecha, a.nifcif, a.idpersona, a.nombre_completo, a.idlinea, a.descripcion, sum(a.importe_inicial) as importe_inicial, sum(a.importe_usado) as importe_usado , sum(a.importe_inicial)- sum(a.importe_usado) as importe_restante from( \r\n"+ query + ") a \r\n"
+        		+ "group by fecha, nifcif, idpersona, nombre_completo, idlinea, descripcion";
 
 
-        return query.toString();
+        return sql;
     }
     
     public String selectMaxIdLinea(Short idInstitucion, Long idPersona) {
@@ -57,6 +64,35 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
     	
     	return query.toString();
     	
+    }
+    
+    public String getListaMovimientosMonedero(Short idInstitucion, String idLinea, String idPersona) {
+    	
+    	SQL query = new SQL();
+    	
+    	query.SELECT("anti.fecha"); 
+    	query.SELECT("anti.descripcion as concepto"); 
+    	query.SELECT("anti.CTACONTABLE as cuentacontable "); 
+    	query.SELECT("anti.importeinicial"); 
+    	query.SELECT("linea.liquidacion");
+    	query.SELECT("linea.idfactura"); 
+    	query.SELECT("linea.NUMEROLINEA as nlineafactura"); 
+    	query.SELECT("servAnti.idservicio"); 
+    	query.SELECT("servAnti.idserviciosinstitucion"); 
+    	query.SELECT("servAnti.idtiposervicios"); 
+    	query.SELECT("0 as nuevo");
+
+    	query.FROM("pys_lineaanticipo linea"); 
+    	query.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = linea.idpersona");
+        query.LEFT_OUTER_JOIN("pys_anticipoletrado anti on linea.idpersona = pers.idpersona and (linea.idanticipo = anti.idanticipo or linea.idanticipo is null) and linea.idinstitucion = anti.idinstitucion");
+        query.LEFT_OUTER_JOIN("pys_servicioanticipo servAnti on servAnti.IDINSTITUCION = linea.idInstitucion and servAnti.IDPERSONA = linea.idPersona and servAnti.IDANTICIPO = anti.idanticipo");
+
+        query.WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)");
+        query.WHERE("linea.idinstitucion = " + idInstitucion);
+        query.WHERE("linea.idPersona = " + idPersona);
+        query.WHERE("linea.idLinea = " + idLinea);
+    	
+    	return query.toString();
     }
 
 }

@@ -5,6 +5,7 @@ import org.itcgae.siga.DTO.fac.FichaMonederoItem;
 import org.itcgae.siga.DTO.fac.FiltroMonederoItem;
 import org.itcgae.siga.DTO.fac.ListaMonederoDTO;
 import org.itcgae.siga.DTO.fac.ListaMonederosItem;
+import org.itcgae.siga.DTO.fac.ListaMovimientosMonederoDTO;
 import org.itcgae.siga.DTO.fac.ListaMovimientosMonederoItem;
 import org.itcgae.siga.DTO.fac.MonederoDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -132,18 +133,18 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 
         if (idInstitucion != null) {
             LOGGER.debug(
-                    "UpdateResponseDTO.updateMovimientosMonedero() -> Entrada para obtener información del usuario logeado");
+                    "LineaanticipoServiceImpl.updateMovimientosMonedero() -> Entrada para obtener información del usuario logeado");
 
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
             List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
             LOGGER.debug(
-                    "UpdateResponseDTO.updateMovimientosMonedero() -> Salida de obtener información del usuario logeado");
+                    "LineaanticipoServiceImpl.updateMovimientosMonedero() -> Salida de obtener información del usuario logeado");
 
             if (usuarios != null && usuarios.size() > 0) {
                 LOGGER.debug(
-                        "UpdateResponseDTO.updateMovimientosMonedero() -> Entrada para cambiar los movimientos del monedero");
+                        "LineaanticipoServiceImpl.updateMovimientosMonedero() -> Entrada para cambiar los movimientos del monedero");
                 // Para que la etiqueta @Transactional funcione adecuadamente debe recibir una
                 // excepcion
 //				try {
@@ -300,10 +301,47 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
             }
         }
 
-        LOGGER.info("UpdateResponseDTO.updateMovimientosMonedero() -> Salida del servicio.");
+        LOGGER.info("LineaanticipoServiceImpl.updateMovimientosMonedero() -> Salida del servicio.");
         
         responsedto.setStatus(SigaConstants.OK);//HttpStatus.OK
 
         return responsedto;
     }
+
+	@Override
+	public ListaMovimientosMonederoDTO getListaMovimientosMonedero(HttpServletRequest request, String idLinea, String idPersona) {
+		ListaMovimientosMonederoDTO responsedto = new ListaMovimientosMonederoDTO();
+	        
+	        Error error = new Error();
+
+	        String token = request.getHeader("Authorization");
+	        String dni = UserTokenUtils.getDniFromJWTToken(token);
+	        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+	        if (idInstitucion != null) {
+	            LOGGER.debug(
+	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> Entrada para obtener información del usuario logeado");
+
+	            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+	            LOGGER.debug(
+	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> Salida de obtener información del usuario logeado");
+
+	            if (usuarios != null && usuarios.size() > 0) {
+	            	try {
+	            		List<ListaMovimientosMonederoItem> movimientosMonedero = pysLineaanticipoExtendsMapper.getListaMovimientosMonedero(idInstitucion, idLinea, idPersona);
+	            		responsedto.setListaMovimientosMonederoItem(movimientosMonedero);
+	            	}catch(Exception e) {
+	            		 LOGGER.error(
+	     	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> Entrada para obtener información del usuario logeado");
+	            		 error.setCode(500);
+	            		 responsedto.setError(error);
+	            	}
+	            }
+	            
+	        }
+		return responsedto;
+	}
 }
