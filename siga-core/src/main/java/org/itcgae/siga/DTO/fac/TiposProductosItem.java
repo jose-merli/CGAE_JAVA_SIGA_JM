@@ -1,22 +1,26 @@
 package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 
 public class TiposProductosItem {
-	private int idtipoproducto;
-	private int idproducto;
-	private String descripcion;
-	@JsonFormat(pattern = "dd/MM/yyyy")
+	private int idtipoproducto; //Categoria
+	private int idproducto; //Tipo
+	private String descripcion; //Nombre tipo
 	private Date fechamodificacion;
 	private String usumodificacion;
-	private int idinstitucion;
 	private String descripciontipo;
-	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechabaja;
+	boolean nuevo;
 	
+	public boolean isNuevo() {
+		return nuevo;
+	}
+
+	public void setNuevo(boolean nuevo) {
+		this.nuevo = nuevo;
+	}
+
 	public int getIdtipoproducto() {
 		return idtipoproducto;
 	}
@@ -73,28 +77,12 @@ public class TiposProductosItem {
 		this.usumodificacion = usumodificacion;
 	}
 
-	public int getIdinstitucion() {
-		return idinstitucion;
-	}
-
-	public void setIdinstitucion(int idinstitucion) {
-		this.idinstitucion = idinstitucion;
-	}
-
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
-		result = prime * result + ((descripciontipo == null) ? 0 : descripciontipo.hashCode());
-		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
-		result = prime * result + ((fechamodificacion == null) ? 0 : fechamodificacion.hashCode());
-		result = prime * result + idinstitucion;
-		result = prime * result + idproducto;
-		result = prime * result + idtipoproducto;
-		result = prime * result + ((usumodificacion == null) ? 0 : usumodificacion.hashCode());
-		return result;
+		return Objects.hash(descripcion, descripciontipo, fechabaja, fechamodificacion, idproducto, idtipoproducto,
+				nuevo, usumodificacion);
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -104,46 +92,20 @@ public class TiposProductosItem {
 		if (getClass() != obj.getClass())
 			return false;
 		TiposProductosItem other = (TiposProductosItem) obj;
-		if (descripcion == null) {
-			if (other.descripcion != null)
-				return false;
-		} else if (!descripcion.equals(other.descripcion))
-			return false;
-		if (descripciontipo == null) {
-			if (other.descripciontipo != null)
-				return false;
-		} else if (!descripciontipo.equals(other.descripciontipo))
-			return false;
-		if (fechabaja == null) {
-			if (other.fechabaja != null)
-				return false;
-		} else if (!fechabaja.equals(other.fechabaja))
-			return false;
-		if (fechamodificacion == null) {
-			if (other.fechamodificacion != null)
-				return false;
-		} else if (!fechamodificacion.equals(other.fechamodificacion))
-			return false;
-		if (idinstitucion != other.idinstitucion)
-			return false;
-		if (idproducto != other.idproducto)
-			return false;
-		if (idtipoproducto != other.idtipoproducto)
-			return false;
-		if (usumodificacion == null) {
-			if (other.usumodificacion != null)
-				return false;
-		} else if (!usumodificacion.equals(other.usumodificacion))
-			return false;
-		return true;
+		return Objects.equals(descripcion, other.descripcion) && Objects.equals(descripciontipo, other.descripciontipo)
+				&& Objects.equals(fechabaja, other.fechabaja)
+				&& Objects.equals(fechamodificacion, other.fechamodificacion) && idproducto == other.idproducto
+				&& idtipoproducto == other.idtipoproducto && nuevo == other.nuevo
+				&& Objects.equals(usumodificacion, other.usumodificacion);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "TiposProductosItem [idtipoproducto=" + idtipoproducto + ", idproducto=" + idproducto + ", descripcion="
 				+ descripcion + ", fechamodificacion=" + fechamodificacion + ", usumodificacion=" + usumodificacion
-				+ ", idinstitucion=" + idinstitucion + ", descripciontipo=" + descripciontipo + ", fechabaja="
-				+ fechabaja + "]";
+				+ ", descripciontipo=" + descripciontipo + ", fechabaja=" + fechabaja + ", nuevo=" + nuevo + "]";
 	}
+
+	
 	
 }
