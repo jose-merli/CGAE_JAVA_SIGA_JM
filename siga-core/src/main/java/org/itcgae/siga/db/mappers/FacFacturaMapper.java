@@ -18,6 +18,7 @@ import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturacionEliminar;
+import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 
@@ -228,15 +229,7 @@ public interface FacFacturaMapper {
 			"and IDFACTURA = #{idfactura,jdbcType=VARCHAR}" })
 	int updateByPrimaryKey(FacFactura record);
 	
-//	
-//	 PROCEDURE ELIMINARFACTURACION   (
-//		        P_IDINSTITUCION IN NUMBER,
-//		        P_IDSERIEFACTURACION IN NUMBER,
-//		        P_IDPROGRAMACION IN NUMBER,
-//		        P_USUMODIFICACION IN NUMBER,
-//		        P_CODRETORNO OUT VARCHAR2,
-//		        P_DATOSERROR OUT VARCHAR2);
-	
+
 	@Update(value = "{CALL PKG_SIGA_FACTURACION.ELIMINARFACTURACION ("
 					+ "#{idInstitucion,mode=IN},"
 					+ "#{idSerieFacturacion, mode=IN},"
@@ -248,5 +241,24 @@ public interface FacFacturaMapper {
 	@ResultType(FacFacturacionEliminar.class)
 	void eliminarFacturacion(FacFacturacionEliminar facturaEliminar);
 	 //I put this field void because I don't need this method return nothing.
+	
+	@Update(value = "{CALL PKG_SIGA_CARGOS.PRESENTACION ("
+			+ "#{idInstitucion,mode=IN},"
+			+ "#{idSerieFacturacion, mode=IN},"
+			+ "#{idProgramacion, mode=IN},"	
+			+ "#{fechaPresentacion, mode=IN},"
+			+ "#{fechaCargoFRST, mode=IN},"
+			+ "#{fechaCargoRCUR, mode=IN},"
+			+ "#{fechaCargoCOR1, mode=IN},"
+			+ "#{fechaCargoB2B, mode=IN},"
+			+ "#{pathFichero, mode=IN},"
+			+ "#{idUsuarioModificacion, mode=IN},"
+			+ "#{idIdioma, mode=IN, jdbcType=VARCHAR},"
+			+ "#{nFicheros, mode=OUT, jdbcType=VARCHAR},"
+			+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
+			+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
+	@Options(statementType = StatementType.CALLABLE)
+	@ResultType(FacPresentacionAdeudos.class)
+	void presentacionAdeudos(FacPresentacionAdeudos presAdeudos);
 	
 }
