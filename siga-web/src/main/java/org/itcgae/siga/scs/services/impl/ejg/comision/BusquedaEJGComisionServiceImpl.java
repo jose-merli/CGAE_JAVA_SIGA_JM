@@ -776,7 +776,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 							ScsActacomision acta = new ScsActacomision();
 
-							if (scsEjgActa.getIdinstitucionacta() == idInstitucion) {
+							if (scsEjgActa.getIdinstitucionacta().toString().equals(idInstitucion.toString())) {
 
 								acta = obtenerActa(scsEjgActa, idInstitucion);
 
@@ -1003,10 +1003,12 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
 
 					LOGGER.info("intentamos conseguir el estado del ejg");
+					
+					//compruebo si es obligatorio el fundamento juridico
+					String comprbarJuramentoJuridico = obligatorioFundamento(request);
 
 					// uso tipo dictamen para traer los datos de la resolucion
-
-					if (ejgItem.getIdTipoDictamen() != null && ejgItem.getFundamentoJuridico() != null) {
+					if (ejgItem.getIdTipoDictamen() != null && (ejgItem.getFundamentoJuridico() != null || comprbarJuramentoJuridico.equals("0")) ) {
 
 						int response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
 
@@ -1016,7 +1018,9 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 											+ " asociada a un EJG"));
 
 						scsEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
+						if(ejgItem.getFundamentoJuridico() != null) {
 						scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+						}
 					}
 
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL -> ");
@@ -1130,7 +1134,12 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 							scsEjg.setFechapresentacionponente(ejgItem.getFechaPonenteDesd());
 							scsEjg.setIdponente(Integer.valueOf(ejgItem.getPonente()));
-
+							scsEjg.setIdinstitucionponente(Short.valueOf(ejgItem.getidInstitucion()));
+							
+							//obtengo el ponente
+							String nombrePonente = obtenerPonente(token, ejgItem.getPonente().toString());
+							scsEjg.setObservaciones(scsEjg.getObservaciones() +" "+ nombrePonente);
+							
 							ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
 
 							scsEstadoEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
@@ -1143,6 +1152,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							scsEstadoEjg.setAutomatico("0");
 							scsEstadoEjg.setIdestadoejg(Short.valueOf("20"));
 							scsEstadoEjg.setIdestadoporejg(obtenerUltimoEstadoEjg(scsEjg, idInstitucion) + 1);
+							
+							
 
 							scsEstadoEjg.setObservaciones(scsEjgComisionExtendsMapper
 									.getEtiquetasPonente(Short.valueOf(usuarios.get(0).getIdlenguaje())));
@@ -1466,6 +1477,29 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		}
 		
 		return parametro.getValor();
+	}
+	public String obtenerPonente(String token, String idPonente) {
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<ComboItem> comboItems = null;
+		String nombrePonenete = null;
+		
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		
+		comboItems = scsEjgComisionExtendsMapper
+				.comboPonenteComision(Short.valueOf(usuarios.get(0).getIdlenguaje()), idInstitucion.toString());
+		
+		for(int i=0; i<comboItems.size();i++) {
+			ComboItem ponente = comboItems.get(i);
+			if(idPonente.equals(ponente.getValue())) {
+				nombrePonenete = ponente.getLabel();
+			}
+			
+		}
+		return nombrePonenete;
 	}
 
 }
