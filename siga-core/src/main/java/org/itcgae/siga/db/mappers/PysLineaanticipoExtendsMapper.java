@@ -33,8 +33,8 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
             @Result(column="IMPORTE_INICIAL", property="importeInicial", jdbcType=JdbcType.DECIMAL),
             @Result(column="IMPORTE_RESTANTE", property="importeRestante", jdbcType=JdbcType.DECIMAL),
             @Result(column="IMPORTE_USADO", property="importeUsado", jdbcType=JdbcType.DECIMAL),
-            @Result(column="ID_PERSONA", property="idPersona", jdbcType=JdbcType.DECIMAL),
-            @Result(column="ID_ANTICIPO", property="idAnticipo", jdbcType=JdbcType.DECIMAL)
+            @Result(column="IDPERSONA", property="idPersona", jdbcType=JdbcType.DECIMAL),
+            @Result(column="IDLINEA", property="idLinea", jdbcType=JdbcType.DECIMAL)
     })
     List<ListaMonederosItem> selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter);
     
