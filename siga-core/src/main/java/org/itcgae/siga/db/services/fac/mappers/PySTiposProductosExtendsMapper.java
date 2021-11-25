@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 	
+	//Datos tabla pantalla Maestros --> Tipos Productos
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "searchTiposProductos")
 	@Results({ 
 		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
@@ -33,6 +34,7 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		}) 
 	List<TiposProductosItem> searchTiposProductos(String idioma, Short idInstitucion);
 	
+	//Datos con historico (incluidos registros con fechabaja != null) tabla pantalla Maestros --> Tipos Productos
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "searchTiposProductosHistorico")
 	@Results({ 
 		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
@@ -42,6 +44,32 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE)
 		}) 
 	List<TiposProductosItem> searchTiposProductosHistorico(String idioma, Short idInstitucion);
+	
+	//Obtiene los datos del combo categoria de productos (PYS_TIPOSPRODUCTOS)
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "comboTiposProductos")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> comboTiposProductos(String idioma);
+	
+	//Realiza un borrado logico (establecer fechabaja = new Date()) o lo reactiva en caso de que esta inhabilitado.
+	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "activarDesactivarProducto")
+	int activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto);
+	
+	//Obtiene el siguiente id a establecer a la hora de crear un nuevo tipo producto (idproducto - PYS_PRODUCTOS)
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "getIndiceMaxTipoProducto")
+	@Results({ 
+		@Result(column = "IDPRODUCTO", property = "newId", jdbcType = JdbcType.NUMERIC)
+		}) 
+	NewIdDTO getIndiceMaxTipoProducto(int idtipoproducto, Short idInstitucion);
+	
+	//Obtiene el siguiente id a establecer a la hora de crear un nuevo tipo producto (idproducto - PYS_PRODUCTOS) //REVISAR EN QUE SITIOS SE USA
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "getIndiceMaxProducto")
+	@Results({ 
+		@Result(column = "IDPRODUCTO", property = "newId", jdbcType = JdbcType.NUMERIC)
+		}) 
+	NewIdDTO getIndiceMaxProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion);
 	
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "searchListadoProductosBuscador")
 	@Results({
@@ -81,19 +109,6 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "borradoFisicoProductosIdentificador")
 	int borradoFisicoProductosIdentificador(ListaProductosItem producto, Short idInstitucion);
 	
-	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "getIndiceMaxProducto")
-	@Results({ 
-		@Result(column = "IDPRODUCTO", property = "newId", jdbcType = JdbcType.NUMERIC)
-		}) 
-	NewIdDTO getIndiceMaxProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion);
-	
-	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "comboTiposProductos")
-	@Results({ 
-		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
-		}) 
-	List<ComboItem> comboTiposProductos(String idioma);
-	
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "searchTiposProductosByIdCategoria")
 	@Results({ 
 		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
@@ -107,9 +122,6 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> searchTiposProductosByIdCategoriaMultiple(String idioma, Short idInstitucion, String idCategoria);
-	
-	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "activarDesactivarProducto")
-	int activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto);
 	
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "obtenerCodigosPorColegio")
 	List<String> obtenerCodigosPorColegio(Short idInstitucion);
