@@ -61,8 +61,6 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	        String dni = UserTokenUtils.getDniFromJWTToken(token);
 	        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 	        MovimientosVariosFacturacionDTO movimientos = new MovimientosVariosFacturacionDTO();
-	        //List<GenParametros> tamMax = null;
-	       // Integer tamMaximo = null;
 	        Error error = new Error();
 	        
 
@@ -72,25 +70,25 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 	                exampleUsuarios.createCriteria().andNifEqualTo(dni)
 	                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	                LOGGER.info(
+	                LOGGER.debug(
 	                        "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 	                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	                LOGGER.info(
+	                LOGGER.debug(
 	                        "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 	                if (null != usuarios && usuarios.size() > 0) {
 	                    AdmUsuarios usuario = usuarios.get(0);
 	                    usuario.setIdinstitucion(idInstitucion);
 	               
-	                    LOGGER.info(
-	                            "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / fcsMovimientosvariosExtendsMapper.buscarMovimientosVarios() -> Entrada a fcsMovimientosvariosExtendsMapper para obtener las facturaciones");
+	                    LOGGER.debug(
+	                            "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / fcsMovimientosvariosExtendsMapper.buscarMovimientosVarios() -> Entrada a fcsMovimientosvariosExtendsMapper para obtener los movimientos varios");
 	                    List<MovimientosVariosFacturacionItem> movimientosItems = fcsMovimientosvariosExtendsMapper
 	                            .buscarMovimientosVarios(facturacionItem, idInstitucion.toString());
                
 
 	                    movimientos.setFacturacionItem(movimientosItems);
-	                    LOGGER.info(
-	                            "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / fcsMovimientosvariosExtendsMapper.buscarMovimientosVarios() -> Salida a fcsMovimientosvariosExtendsMapper para obtener las facturaciones");
+	                    LOGGER.debug(
+	                            "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / fcsMovimientosvariosExtendsMapper.buscarMovimientosVarios() -> Salida a fcsMovimientosvariosExtendsMapper para obtener los movimientos varios");
 	                } else {
 	                    LOGGER.warn(
 	                            "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -102,15 +100,15 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
 	        } catch (Exception e) {
 	            LOGGER.error(
-	                    "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() -> Se ha producido un error al buscar las facturaciones",
+	                    "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() -> Se ha producido un error al buscar los movimientos varios",
 	                    e);
 	            error.setCode(500);
 	            error.setDescription("general.mensaje.error.bbdd");
 	        }
 
 	        movimientos.setError(error);
-	        LOGGER.info(
-	                "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() -> Salida del servicio para obtener las facturaciones");
+	        LOGGER.debug(
+	                "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() -> Salida del servicio para obtener los movimientos varios");
 
 	        return movimientos;
 	    }
@@ -118,7 +116,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	    @Transactional
 	    public DeleteResponseDTO deleteMovimientosVarios(List<MovimientosVariosFacturacionItem>  movimientos, HttpServletRequest request) throws Exception {
 	    	
-	    	LOGGER.info("<MovimientosVariosFactServiceImpl.deleteMovimientosVarios() -> Entrada");
+	    	LOGGER.debug("<MovimientosVariosFactServiceImpl.deleteMovimientosVarios() -> Entrada");
 	    	
 	    	String token = request.getHeader("Authorization");
 	    	boolean borradoCorrecto = false;
@@ -135,10 +133,10 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 	            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-	            LOGGER.info(
+	            LOGGER.debug(
 	                    "MovimientosVariosFactServiceImpl.deleteMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 	            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	            LOGGER.info(
+	            LOGGER.debug(
 	                    "MovimientosVariosFactServiceImpl.deleteMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 	            if (null != usuarios && usuarios.size() > 0) {
@@ -171,7 +169,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 											 fin=fcsMovimientosvariosExtendsMapper.quitaMovimientoVarioAsociado(nombreTabla,idInstitucion.toString(),mov.getIdMovimiento());
 												
 												if(fin==0) {
-													throw new Exception ("Error al ejecutar el 'actualizaMovimientosVarios' en B.D.");
+													throw new Exception ("Error al ejecutar el 'quitaMovimientoVarioAsociado' en B.D. donde actualiza el idmovimiento de la actuación asociada a null para eliminar luego ese movimiento");
 												}
 											}
 											
@@ -194,7 +192,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 												 fin=fcsMovimientosvariosExtendsMapper.quitaMovimientoVarioAsociado(nombreTabla,idInstitucion.toString(),mov.getIdMovimiento());
 												
 												if(fin==0) {
-													throw new Exception ("Error al ejecutar el 'actualizaMovimientosVarios' en B.D.");
+													throw new Exception ("Error al ejecutar el 'quitaMovimientoVarioAsociado' en B.D. donde actualiza el idmovimiento de la actuación asociada a null para eliminar luego ese movimiento");
 												}
 											}
 											
@@ -218,7 +216,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 												  fin=fcsMovimientosvariosExtendsMapper.quitaMovimientoVarioAsociado(nombreTabla,idInstitucion.toString(),mov.getIdMovimiento());
 												
 												if(fin==0) {
-													throw new Exception ("Error al ejecutar el 'actualizaMovimientosVarios' en B.D.");
+													throw new Exception ("Error al ejecutar el 'quitaMovimientoVarioAsociado' en B.D. donde actualiza el idmovimiento de la actuación asociada a null para eliminar luego ese movimiento");
 												}
 											}
 											
@@ -241,10 +239,10 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 											}else {
 					                        	LOGGER.debug("MovimientosVariosFactServiceImpl.quitaMovimientoVarioAsociado() ->Entrada para actualizar el idMovimiento a null de una tabla relacionada con FCS_MOVIMIENTOSVARIOS antes de eliminarlo");
 												 fin=fcsMovimientosvariosExtendsMapper.quitaMovimientoVarioAsociado(nombreTabla,idInstitucion.toString(),mov.getIdMovimiento());
-						                        LOGGER.debug("MovimientosVariosFactServiceImpl.quitaMovimientoVarioAsociado() ->Salida con los datos actualizados");
+						                        LOGGER.debug("MovimientosVariosFactServiceImpl.quitaMovimientoVarioAsociado() ->Salida");
 
 												if(fin==0) {
-													throw new Exception ("Error al ejecutar el 'actualizaMovimientosVarios' en B.D.");
+													throw new Exception ("Error al ejecutar el 'quitaMovimientoVarioAsociado' en B.D. donde actualiza el idmovimiento de la actuación asociada a null para eliminar luego ese movimiento");
 												}
 											}
 											
@@ -319,7 +317,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	    @Transactional
 	    public InsertResponseDTO saveDatosGenMovimientosVarios(MovimientosVariosFacturacionItem movimiento, HttpServletRequest request) {
 	    	
-	    	LOGGER.info("<MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> Entrada");
+	    	LOGGER.debug("<MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> Entrada");
 	    	
 	    	String token = request.getHeader("Authorization");
 	    	String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -351,7 +349,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	                    Long newid = Long.parseLong(idMovimiento.getNewId());
 	                    
 							if (movimiento != null) {	
-								 LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Insertar nuevo cliente en el movimiento");
+								 LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Insertar Datos Generales a un nuevo movimiento");
 
 								 FcsMovimientosvarios record = new FcsMovimientosvarios();
 				                    record.setFechamodificacion(new Date());
@@ -378,19 +376,18 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 				                    //falta certificación 
 				                    response = fcsMovimientosVariosMapper.insertSelective(record);
 				                    
-								//response=fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios(movimiento, idInstitucion.toString());													
 										
 
 								if(response==1) {
-									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Salida con el movimiento ya insertado");
+									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Salida con los datos ya insertados");
 								}else {
-									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Salida sin haber insertado el movimiento");
+									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Salida sin haber insertado los datos");
 								}
 							}
 
 	                } catch (Exception e) {
 	                    LOGGER.error(
-	                            "MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> ERROR al eliminar los conceptos de la facturacion.",
+	                            "MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> ERROR al insertar los datos generales en el nuevo movimiento.",
 	                            e);
 	                    error.setCode(400);
 	                    error.setDescription("general.mensaje.error.bbdd");
@@ -423,7 +420,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	    @Transactional
 		public UpdateResponseDTO updateDatosGenMovimientosVarios(MovimientosVariosFacturacionItem movimiento,
 				HttpServletRequest request) {
-			LOGGER.info("<MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> Entrada");
+	    	LOGGER.debug("<MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> Entrada");
 	    	
 	    	String token = request.getHeader("Authorization");
 	    	boolean insertadoCorrectamente = false;
@@ -453,7 +450,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 					
 							if (movimiento != null) {	
 		
-							 LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Modificar el cliente en el movimiento");
+							 LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Modificar los datos generales de un movimiento");
 							 FcsMovimientosvarios movimientoItem= new FcsMovimientosvarios();
 
 			                    movimientoItem.setFechamodificacion(new Date());
@@ -479,19 +476,17 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 			                    
 			                    //falta la certificación
 			                    response = fcsMovimientosVariosMapper.updateByPrimaryKeySelective(movimientoItem);
-								
-			                    //response=fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios(movimiento, idInstitucion.toString());	
-								
+																
 								if(response==1) {
-									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Salida con el movimiento ya modificados");
+									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Salida con los datos generales ya modificados");
 								}else {
-									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Salida sin haber modificado el movimiento");
+									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Salida sin haber modificado los datos generales");
 								}
 							}
 
 	                } catch (Exception e) {
 	                    LOGGER.error(
-	                            "MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> ERROR al eliminar los conceptos de la facturacion.",
+	                            "MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> ERROR al actualizar los datos generales.",
 	                            e);
 	                    error.setCode(400);
 	                    error.setDescription("general.mensaje.error.bbdd");
@@ -524,7 +519,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	    @Transactional
 	    public InsertResponseDTO saveCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimiento, HttpServletRequest request) {
 	    	
-	    	LOGGER.info("<MovimientosVariosFactServiceImpl.saveCriteriosMovimientosVarios() -> Entrada");
+	    	LOGGER.debug("<MovimientosVariosFactServiceImpl.saveCriteriosMovimientosVarios() -> Entrada");
 	    	
 	    	String token = request.getHeader("Authorization");
 	    	String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -556,7 +551,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	                    Long newid = Long.parseLong(idMovimiento.getNewId());
 					
 							if (movimiento != null) {	
-								 LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveCriteriosMovimientosVarios() -> Insertar nuevo cliente en el movimiento");
+								 LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveCriteriosMovimientosVarios() -> Insertar datos de la tarjeta criterios de aplicación en un nuevo movimiento");
 
 								 FcsMovimientosvarios record = new FcsMovimientosvarios();
 				                    record.setFechamodificacion(new Date());
@@ -595,15 +590,15 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 										
 
 								if(response==1) {
-									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveCriteriosMovimientosVarios() -> Salida con el movimiento ya insertado");
+									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveCriteriosMovimientosVarios() -> Salida con los datos ya insertados");
 								}else {
-									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveCriteriosMovimientosVarios() -> Salida sin haber insertado el movimiento");
+									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveCriteriosMovimientosVarios() -> Salida sin haber insertado los datos");
 								}
 							}
 
 	                } catch (Exception e) {
 	                    LOGGER.error(
-	                            "MovimientosVariosFactServiceImpl.saveCriteriosMovimientosVarios() -> ERROR al eliminar los conceptos de la facturacion.",
+	                            "MovimientosVariosFactServiceImpl.saveCriteriosMovimientosVarios() -> ERROR al insertar los datos de la tarjeta criterios de aplicación.",
 	                            e);
 	                    error.setCode(400);
 	                    error.setDescription("general.mensaje.error.bbdd");
@@ -636,7 +631,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	    @Transactional
 		public UpdateResponseDTO updateCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimiento,
 				HttpServletRequest request) {
-			LOGGER.info("<MovimientosVariosFactServiceImpl.updateCriteriosMovimientosVarios() -> Entrada");
+	    	LOGGER.debug("<MovimientosVariosFactServiceImpl.updateCriteriosMovimientosVarios() -> Entrada");
 	    	
 	    	String token = request.getHeader("Authorization");
 	    	boolean insertadoCorrectamente = false;
@@ -666,7 +661,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 					
 							if (movimiento != null) {	
 		
-							 LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateCriteriosMovimientosVarios() -> Modificar el cliente en el movimiento");
+							 LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateCriteriosMovimientosVarios() -> Modificar los datos en el movimiento");
 							 FcsMovimientosvarios movimientoItem= new FcsMovimientosvarios();
 
 							 	movimientoItem.setFechamodificacion(new Date());
@@ -684,18 +679,17 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 		                
 			                    response = fcsMovimientosVariosMapper.updateByPrimaryKeySelective(movimientoItem);
 								
-			                    //response=fcsMovimientosvariosExtendsMapper.updateCriteriosMovimientosVarios(movimiento, idInstitucion.toString());	
 								
 								if(response==1) {
-									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateCriteriosMovimientosVarios() -> Salida con el movimiento ya modificados");
+									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateCriteriosMovimientosVarios() -> Salida con los datos ya modificados");
 								}else {
-									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateCriteriosMovimientosVarios() -> Salida sin haber modificado el movimiento");
+									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateCriteriosMovimientosVarios() -> Salida sin haber modificado los datos");
 								}
 							}
 
 	                } catch (Exception e) {
 	                    LOGGER.error(
-	                            "MovimientosVariosFactServiceImpl.updateCriteriosMovimientosVarios() -> ERROR al eliminar los conceptos de la facturacion.",
+	                            "MovimientosVariosFactServiceImpl.updateCriteriosMovimientosVarios() -> ERROR al modificar los datos del movimiento.",
 	                            e);
 	                    error.setCode(400);
 	                    error.setDescription("general.mensaje.error.bbdd");
@@ -741,25 +735,25 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 	                exampleUsuarios.createCriteria().andNifEqualTo(dni)
 	                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	                LOGGER.info(
+	                LOGGER.debug(
 	                        "MovimientosVariosFactServiceImpl.getListadoPagos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 	                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	                LOGGER.info(
+	                LOGGER.debug(
 	                        "MovimientosVariosFactServiceImpl.getListadoPagos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 	                if (null != usuarios && usuarios.size() > 0) {
 	                    AdmUsuarios usuario = usuarios.get(0);
 	                    usuario.setIdinstitucion(idInstitucion);
 	               
-	                    LOGGER.info(
-	                            "MovimientosVariosFactServiceImpl.getListadoPagos() / fcsMovimientosvariosExtendsMapper.getListadoPagos() -> Entrada a fcsMovimientosvariosExtendsMapper para obtener las facturaciones");
+	                    LOGGER.debug(
+	                            "MovimientosVariosFactServiceImpl.getListadoPagos() / fcsMovimientosvariosExtendsMapper.getListadoPagos() -> Entrada a fcsMovimientosvariosExtendsMapper para obtener el listado de pagos");
 	                    List<MovimientosVariosFacturacionItem> pagos = fcsMovimientosvariosExtendsMapper
 	                            .getListadoPagos(facturacionItem, idInstitucion.toString());
                
 
 	                    movimientos.setFacturacionItem(pagos);
-	                    LOGGER.info(
-	                            "MovimientosVariosFactServiceImpl.getListadoPagos() / fcsMovimientosvariosExtendsMapper.getListadoPagos() -> Salida a fcsMovimientosvariosExtendsMapper para obtener las facturaciones");
+	                    LOGGER.debug(
+	                            "MovimientosVariosFactServiceImpl.getListadoPagos() / fcsMovimientosvariosExtendsMapper.getListadoPagos() -> Salida a fcsMovimientosvariosExtendsMapper para obtener el listado de pagos");
 	                } else {
 	                    LOGGER.warn(
 	                            "MovimientosVariosFactServiceImpl.getListadoPagos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -771,15 +765,15 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
 	        } catch (Exception e) {
 	            LOGGER.error(
-	                    "MovimientosVariosFactServiceImpl.getListadoPagos() -> Se ha producido un error al buscar las facturaciones",
+	                    "MovimientosVariosFactServiceImpl.getListadoPagos() -> Se ha producido un error al buscar los pagos",
 	                    e);
 	            error.setCode(500);
 	            error.setDescription("general.mensaje.error.bbdd");
 	        }
 
 	        movimientos.setError(error);
-	        LOGGER.info(
-	                "MovimientosVariosFactServiceImpl.getListadoPagos() -> Salida del servicio para obtener las facturaciones");
+	        LOGGER.debug(
+	                "MovimientosVariosFactServiceImpl.getListadoPagos() -> Salida del servicio para obtener los pagos");
 
 	        return movimientos;
 	    }
@@ -787,7 +781,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 		@Transactional
 	    public InsertResponseDTO saveClienteMovimientosVarios(MovimientosVariosFacturacionItem movimiento, HttpServletRequest request) {
 	    	
-	    	LOGGER.info("<MovimientosVariosFactServiceImpl.saveClienteMovimientosVarios() -> Entrada");
+			LOGGER.debug("<MovimientosVariosFactServiceImpl.saveClienteMovimientosVarios() -> Entrada");
 	    	
 	    	String token = request.getHeader("Authorization");
 	    	String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -839,9 +833,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 				                    
 
 				                    response = fcsMovimientosVariosMapper.insertSelective(record);
-				                    
-								//response=fcsMovimientosvariosExtendsMapper.saveClienteMovimientosVarios(movimiento, idInstitucion.toString());													
-										
+				                    										
 
 								if(response==1) {
 									LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveClienteMovimientosVarios() -> Salida con el movimiento ya insertado");
@@ -852,7 +844,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
 	                } catch (Exception e) {
 	                    LOGGER.error(
-	                            "MovimientosVariosFactServiceImpl.saveClienteMovimientosVarios() -> ERROR al eliminar los conceptos de la facturacion.",
+	                            "MovimientosVariosFactServiceImpl.saveClienteMovimientosVarios() -> ERROR al insertar los datos del colegiado en un nuevo movimiento.",
 	                            e);
 	                    error.setCode(400);
 	                    error.setDescription("general.mensaje.error.bbdd");
@@ -885,7 +877,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 	    @Transactional
 		public UpdateResponseDTO updateClienteMovimientosVarios(MovimientosVariosFacturacionItem movimiento,
 				HttpServletRequest request) {
-			LOGGER.info("<MovimientosVariosFactServiceImpl.updateClienteMovimientosVarios() -> Entrada");
+	    	LOGGER.debug("<MovimientosVariosFactServiceImpl.updateClienteMovimientosVarios() -> Entrada");
 	    	
 	    	String token = request.getHeader("Authorization");
 	    	boolean insertadoCorrectamente = false;
@@ -932,7 +924,6 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 		                
 			                    response = fcsMovimientosVariosMapper.updateByPrimaryKeySelective(movimientoItem);
 								
-			                    //response=fcsMovimientosvariosExtendsMapper.updateClienteMovimientosVarios(movimiento, idInstitucion.toString());	
 								
 								if(response==1) {
 									LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateClienteMovimientosVarios() -> Salida con el movimiento ya modificados");
@@ -943,7 +934,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
 	                } catch (Exception e) {
 	                    LOGGER.error(
-	                            "MovimientosVariosFactServiceImpl.updateClienteMovimientosVarios() -> ERROR al eliminar los conceptos de la facturacion.",
+	                            "MovimientosVariosFactServiceImpl.updateClienteMovimientosVarios() -> ERROR al modificar los datos del colegiado del movimiento.",
 	                            e);
 	                    error.setCode(400);
 	                    error.setDescription("general.mensaje.error.bbdd");
