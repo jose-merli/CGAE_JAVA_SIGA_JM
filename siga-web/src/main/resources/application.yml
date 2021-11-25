@@ -20,3 +20,4 @@ application:
     /pys/aprobarSuscripcion: [39H]
 
     /cargaMasivaCompras/cargarFichero: [39A]
+    /pys/updateMovimientosMonedero: [52]
