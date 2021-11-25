@@ -100,6 +100,13 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> searchTiposProductosByIdCategoria(String idioma, Short idInstitucion, String idCategoria);
+
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "searchTiposProductosByIdCategoriaMultiple")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> searchTiposProductosByIdCategoriaMultiple(String idioma, Short idInstitucion, String idCategoria);
 	
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "activarDesactivarProducto")
 	int activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto);
