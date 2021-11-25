@@ -19,7 +19,7 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         subquery.FROM("fcs_aplica_movimientosvarios aplica");
         subquery.WHERE("fcs_aplica_movimientosvarios.idinstitucion = aplica.idinstitucion");
         subquery.WHERE("fcs_aplica_movimientosvarios.idmovimiento = aplica.idmovimiento");
-        subquery.WHERE("aplica.idaplicacion <= fcs_aplica_movimientosvarios.idaplicacion");
+        subquery.WHERE("aplica.idaplicacion <= fcs_aplica_movimientosvarios.idaplicacion"); // ??
         
         SQL subquery3 = new SQL();
         subquery3.SELECT("MAX(estado.fechaestado)");
@@ -77,11 +77,19 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         sql.WHERE("fcs_movimientosvarios.idinstitucion = "+idInstitucion);
         
         if(!movimientoItem.isHistorico()) {
-        	sql.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery+") )  != 0");
+        	sql.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery+") )  >= 0");
+        }
+        
+        if(movimientoItem.getNif() != null && movimientoItem.getNif() != "") {
+        	sql.WHERE("REGEXP_LIKE ( cen_persona.nifcif,'"+movimientoItem.getNif()+"')");
+        }
+        
+        if(movimientoItem.getNcolegiado() != null && movimientoItem.getNcolegiado() != "") {
+        	sql.WHERE("REGEXP_LIKE ( cen_colegiado.ncolegiado,'^[0]{0,}"+movimientoItem.getNcolegiado()+"$')");
         }
         
         if(movimientoItem.getDescripcion() != null && movimientoItem.getDescripcion() != "") {
-            sql.WHERE("fcs_movimientosvarios.descripcion ='"+movimientoItem.getDescripcion()+"'");
+            sql.WHERE("REGEXP_LIKE ( fcs_movimientosvarios.descripcion,'"+movimientoItem.getDescripcion()+"')");
         }
         
         if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
@@ -93,36 +101,31 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         }
         
         if(movimientoItem.getIdAplicadoEnPago() != null && movimientoItem.getIdAplicadoEnPago() != "") {
-            sql.WHERE("fcs_aplica_movimientosvarios.idpagosjg ='"+movimientoItem.getIdAplicadoEnPago()+"'");
+            sql.WHERE("fcs_aplica_movimientosvarios.idpagosjg ="+movimientoItem.getIdAplicadoEnPago());
         }
         
         if(movimientoItem.getFechaApDesde() != null) {
-            sql.WHERE("fcs_pagosjg.fechadesde >='"+movimientoItem.getIdAplicadoEnPago()+"'");
+           // sql.WHERE("fcs_pagosjg.fechadesde >='"+movimientoItem.getIdAplicadoEnPago()+"'");
         }
         
         if(movimientoItem.getFechaApHasta() != null) {
-            sql.WHERE("fcs_pagosjg.fechahasta <='"+movimientoItem.getIdAplicadoEnPago()+"'");
+            //sql.WHERE("fcs_pagosjg.fechahasta <='"+movimientoItem.getIdAplicadoEnPago()+"'");
         }
         
         if(movimientoItem.getIdFacturacion() != null && movimientoItem.getIdFacturacion() != "") {
-            sql.WHERE("fcs_movimientosvarios.idfacturacion ='"+movimientoItem.getIdFacturacion()+"'");
+            sql.WHERE("fcs_movimientosvarios.idfacturacion ="+movimientoItem.getIdFacturacion());
         }
         
         if(movimientoItem.getIdGrupoFacturacion() != null && movimientoItem.getIdGrupoFacturacion() != "") {
-            sql.WHERE("fcs_movimientosvarios.idgrupofacturacion ='"+movimientoItem.getIdGrupoFacturacion()+"'");
+            sql.WHERE("fcs_movimientosvarios.idgrupofacturacion ="+movimientoItem.getIdGrupoFacturacion());
         }
         
         if(movimientoItem.getIdConcepto() != null && movimientoItem.getIdConcepto() != "") {
-            sql.WHERE("fcs_movimientosvarios.idhitogeneral ='"+movimientoItem.getIdConcepto()+"'");
+          //  sql.WHERE("fcs_movimientosvarios.idhitogeneral ="+movimientoItem.getIdConcepto());
         }
         
         if(movimientoItem.getIdPartidaPresupuestaria() != null && movimientoItem.getIdPartidaPresupuestaria() != "") {
-            sql.WHERE("fcs_movimientosvarios.idpartidapresupuestaria ='"+movimientoItem.getIdPartidaPresupuestaria()+"'");
-        }
-        
-        //mirar si esto está bien
-        if(movimientoItem.getIdPersona() != null && movimientoItem.getIdPersona() != "") {
-            sql.WHERE("fcs_movimientosvarios.idpersona ='"+movimientoItem.getIdPersona()+"'");
+          //  sql.WHERE("fcs_movimientosvarios.idpartidapresupuestaria ="+movimientoItem.getIdPartidaPresupuestaria());
         }
         
         sql.WHERE("ROWNUM <= 200");
