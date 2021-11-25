@@ -15,6 +15,8 @@ import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
+import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -417,7 +419,19 @@ public class FacturacionPySController {
 	}
 	
 	
-	
+	@PostMapping(value = "/regenerarPresentacionAdeudos")
+	ResponseEntity<FacRegenerarPresentacionAdeudosDTO> regenerarPresentacionAdeudos(@RequestBody FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,
+																			HttpServletRequest request) {
+		FacRegenerarPresentacionAdeudosDTO response = new FacRegenerarPresentacionAdeudosDTO();
+
+		try {
+			response = facturacionService.regenerarPresentacionAdeudos(regenerarPresentacionAdeudoItem, request);
+			return new ResponseEntity<FacRegenerarPresentacionAdeudosDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacRegenerarPresentacionAdeudosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
 
 }
