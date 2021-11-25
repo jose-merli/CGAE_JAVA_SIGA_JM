@@ -11,6 +11,7 @@ import org.itcgae.siga.db.mappers.PysProductosSqlProvider;
 
 public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider{
 
+	//Datos tabla pantalla Maestros --> Tipos Productos
 	public String searchTiposProductos(String idioma, Short idInstitucion) {
 		SQL sql = new SQL();
 
@@ -34,6 +35,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		return sql.toString();
 	}
 	
+	//Datos con historico (incluidos registros con fechabaja != null) tabla pantalla Maestros --> Tipos Productos
 	public String searchTiposProductosHistorico(String idioma, Short idInstitucion) {
 		SQL sql = new SQL();
 
@@ -53,6 +55,69 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.ORDER_BY("pp.IDPRODUCTO");
 		sql.ORDER_BY("pp.IDINSTITUCION");
 
+		return sql.toString();
+	}
+	
+	//Obtiene los datos del combo categoria de productos (PYS_TIPOSPRODUCTOS)
+	public String comboTiposProductos(String idioma) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDTIPOPRODUCTO AS ID");
+		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
+		
+		sql.FROM("PYS_TIPOSPRODUCTOS");
+		
+		sql.ORDER_BY("DESCRIPCION");
+		
+		return sql.toString();
+	}
+	
+	//Realiza un borrado logico (establecer fechabaja = new Date()) o lo reactiva en caso de que esta inhabilitado.
+	public String activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto) {
+		SQL sql = new SQL();
+		
+		sql.UPDATE("PYS_PRODUCTOS");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '"+ usuario.getIdusuario() + "'");
+		
+		if(producto.getFechabaja() != null) {
+			sql.SET("FECHABAJA = NULL");
+		}
+		else{
+			sql.SET("FECHABAJA = SYSDATE");
+		}
+		
+		sql.WHERE("IDPRODUCTO = '" + producto.getIdproducto() + "'");
+		sql.WHERE("IDTIPOPRODUCTO = '" + producto.getIdtipoproducto() + "'");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+		return sql.toString();
+	}
+	
+	//Obtiene el siguiente id a establecer a la hora de crear un nuevo tipo producto (idproducto - PYS_PRODUCTOS)
+		public String getIndiceMaxTipoProducto(int idtipoproducto, Short idInstitucion) {
+			SQL sql = new SQL();
+			
+			sql.SELECT("NVL((MAX(IDPRODUCTO) + 1),1) AS IDPRODUCTO");
+			
+			sql.FROM("PYS_PRODUCTOS");
+			
+			sql.WHERE("IDTIPOPRODUCTO ='" + idtipoproducto + "'");;
+			sql.WHERE("IDINSTITUCION ='" + idInstitucion + "'");
+			
+			return sql.toString();
+		}
+	
+	//Obtiene el siguiente id a establecer a la hora de crear un nuevo tipo producto (idproducto - PYS_PRODUCTOS) //REVISAR EN QUE SITIOS SE USA
+	public String getIndiceMaxProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("NVL((MAX(IDPRODUCTO) + 1),1) AS IDPRODUCTO");
+		
+		sql.FROM("PYS_PRODUCTOS");
+		
+		sql.WHERE("IDTIPOPRODUCTO ='" + listadoProductos.get(0).getIdtipoproducto() + "'");;
+		sql.WHERE("IDINSTITUCION ='" + idInstitucion + "'");
+		
 		return sql.toString();
 	}
 	
@@ -167,52 +232,6 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 				+ "tiva.fechabaja, PRIN.SOLICITARBAJA");
 
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
-		
-		return sql.toString();
-	}
-	
-	public String comboTiposProductos(String idioma) {
-		SQL sql = new SQL();
-		
-		sql.SELECT("IDTIPOPRODUCTO AS ID");
-		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
-		
-		sql.FROM("PYS_TIPOSPRODUCTOS");
-		
-		sql.ORDER_BY("DESCRIPCION");
-		
-		return sql.toString();
-	}
-	
-	public String activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto) {
-		SQL sql = new SQL();
-		
-		sql.UPDATE("PYS_PRODUCTOS");
-		sql.SET("FECHAMODIFICACION = SYSDATE");
-		sql.SET("USUMODIFICACION = '"+ usuario.getIdusuario() + "'");
-		
-		if(producto.getFechabaja() != null) {
-			sql.SET("FECHABAJA = NULL");
-		}
-		else{
-			sql.SET("FECHABAJA = SYSDATE");
-		}
-		
-		sql.WHERE("IDPRODUCTO = '" + producto.getIdproducto() + "'");
-		sql.WHERE("IDTIPOPRODUCTO = '" + producto.getIdtipoproducto() + "'");
-		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
-		return sql.toString();
-	}
-	
-	public String getIndiceMaxProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion) {
-		SQL sql = new SQL();
-		
-		sql.SELECT("NVL((MAX(IDPRODUCTO) + 1),1) AS IDPRODUCTO");
-		
-		sql.FROM("PYS_PRODUCTOS");
-		
-		sql.WHERE("IDTIPOPRODUCTO ='" + listadoProductos.get(0).getIdtipoproducto() + "'");;
-		sql.WHERE("IDINSTITUCION ='" + idInstitucion + "'");
 		
 		return sql.toString();
 	}

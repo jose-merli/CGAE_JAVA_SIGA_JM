@@ -248,7 +248,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 				tipoProductoMyBattis.setIdtipoproducto(Short.parseShort(String.valueOf(tipoProducto.getIdtipoproducto())));
 				
 				if(tipoProducto.isNuevo()) {
-					NewIdDTO idOrdenacion = pysTiposProductosExtendsMapper.getIndiceMaxProducto(listadoProductos.getTiposProductosItems(), usuario.getIdinstitucion());
+					NewIdDTO idOrdenacion = pysTiposProductosExtendsMapper.getIndiceMaxTipoProducto(tipoProducto.getIdtipoproducto(), usuario.getIdinstitucion());
 					tipoProductoMyBattis.setIdproducto(Long.parseLong(idOrdenacion.getNewId().toString()));
 				}else {
 					tipoProductoMyBattis.setIdproducto(new Long(tipoProducto.getIdproducto()));
