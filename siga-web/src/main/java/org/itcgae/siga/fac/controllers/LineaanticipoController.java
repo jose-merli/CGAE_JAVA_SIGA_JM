@@ -1,8 +1,12 @@
 package org.itcgae.siga.fac.controllers;
 
 
+import org.itcgae.siga.DTO.fac.FichaMonederoItem;
 import org.itcgae.siga.DTO.fac.FiltroMonederoItem;
 import org.itcgae.siga.DTO.fac.ListaMonederoDTO;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.fac.services.ILineaanticipoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +28,18 @@ public class LineaanticipoController {
     ResponseEntity<ListaMonederoDTO> getMonederos(HttpServletRequest request, @RequestBody FiltroMonederoItem filtroMonederoItem) {
         ListaMonederoDTO response = walletService.listarMonederos(request, filtroMonederoItem);
         return new ResponseEntity<>(response, response.getError().getCode() == HttpStatus.OK.value() ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    @PostMapping(value = "/pys/updateMovimientosMonedero")
+    ResponseEntity<UpdateResponseDTO> updateMovimientosMonedero(HttpServletRequest request, @RequestBody FichaMonederoItem fichaMonederoItem) throws Exception {
+
+    	UpdateResponseDTO response = walletService.updateMovimientosMonedero(request, fichaMonederoItem);
+		if (response.getStatus().equals(SigaConstants.OK)) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
     }
 
 
