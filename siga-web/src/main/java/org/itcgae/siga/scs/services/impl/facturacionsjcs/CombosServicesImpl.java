@@ -7,17 +7,9 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-<<<<<<< HEAD
-import org.itcgae.siga.db.services.fcs.mappers.FcsEstadosFacturacionExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsHitoGeneralExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsMovimientosvariosExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsPagosjgExtendsMapper;
-=======
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.*;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupofacturacionExtendsMapper;
->>>>>>> 6ebe4d345cb9cffad9c9a42cb8b55bb5ecaad3d9
 import org.itcgae.siga.scs.services.facturacionsjcs.ICombosServices;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,15 +40,15 @@ public class CombosServicesImpl implements ICombosServices {
 
     @Autowired
     private FcsDestinatariosRetencionesExtendsMapper fcsDestinatariosRetencionesExtendsMapper;
-    
+
     @Autowired
     private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
-    
+
     @Autowired
     private ScsGrupofacturacionExtendsMapper scsGrupofacturacionExtendsMapper;
-  	
-	@Autowired
-	private FcsMovimientosvariosExtendsMapper fcsMovimientosvariosExtendsMapper;
+
+    @Autowired
+    private FcsMovimientosvariosExtendsMapper fcsMovimientosvariosExtendsMapper;
 
     public ComboDTO comboFactEstados(HttpServletRequest request) {
 
@@ -463,259 +455,259 @@ public class CombosServicesImpl implements ICombosServices {
         return comboDTO;
     }
 
-	@Override
-	public ComboDTO getComboColegios(HttpServletRequest request) {
-		 LOGGER.info("CombosServicesImpl.getColegios() -> Entrada al servicio para obtener el combo de colegios");
+    @Override
+    public ComboDTO getComboColegios(HttpServletRequest request) {
+        LOGGER.info("CombosServicesImpl.getColegios() -> Entrada al servicio para obtener el combo de colegios");
 
-	        String token = request.getHeader("Authorization");
-	        String dni = UserTokenUtils.getDniFromJWTToken(token);
-	        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	        Error error = new Error();
-	        ComboDTO comboDTO = new ComboDTO();
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        ComboDTO comboDTO = new ComboDTO();
 
-	        try {
+        try {
 
-	            if (null != idInstitucion) {
-	                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	                exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+            if (null != idInstitucion) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
-	                LOGGER.info("CombosServicesImpl.getColegios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                LOGGER.info("CombosServicesImpl.getColegios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-	                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-	                LOGGER.info("CombosServicesImpl.getColegios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+                LOGGER.info("CombosServicesImpl.getColegios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-	                if (null != usuarios && !usuarios.isEmpty()) {
+                if (null != usuarios && !usuarios.isEmpty()) {
 
-	                    LOGGER.info("CombosServicesImpl.getColegios() / fcsDestinatariosRetencionesExtendsMapper.getComboDestinatarios() -> Entrada para obtener el combo de destinatarios");
+                    LOGGER.info("CombosServicesImpl.getColegios() / fcsDestinatariosRetencionesExtendsMapper.getComboDestinatarios() -> Entrada para obtener el combo de destinatarios");
 
-	                    List<ComboItem> comboItems = cenInstitucionExtendsMapper.getComboInstitucionesNombre();
-	                    comboDTO.setCombooItems(comboItems);
+                    List<ComboItem> comboItems = cenInstitucionExtendsMapper.getComboInstitucionesNombre();
+                    comboDTO.setCombooItems(comboItems);
 
-	                    LOGGER.info("CombosServicesImpl.getColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Salida de obtener el combo de colegios");
-	                } else {
-	                    LOGGER.warn("CombosServicesImpl.getColegios()) / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
-	                }
-	            } else {
-	                LOGGER.warn("CombosServicesImpl.getColegios() -> idInstitucion del token nula");
-	            }
+                    LOGGER.info("CombosServicesImpl.getColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Salida de obtener el combo de colegios");
+                } else {
+                    LOGGER.warn("CombosServicesImpl.getColegios()) / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+                }
+            } else {
+                LOGGER.warn("CombosServicesImpl.getColegios() -> idInstitucion del token nula");
+            }
 
-	        } catch (Exception e) {
-	            error.setCode(500);
-	            error.setDescription("general.message.error.realiza.accion");
-	        }
+        } catch (Exception e) {
+            error.setCode(500);
+            error.setDescription("general.message.error.realiza.accion");
+        }
 
-	        comboDTO.setError(error);
+        comboDTO.setError(error);
 
-	        LOGGER.info("CombosServicesImpl.getColegios() -> Salida del servicio para obtener el combo de colegios");
+        LOGGER.info("CombosServicesImpl.getColegios() -> Salida del servicio para obtener el combo de colegios");
 
-	        return comboDTO;
-	}
+        return comboDTO;
+    }
 
-	@Override
-	public ComboDTO getComboGrupoFacturacionByColegio(String idColegio, HttpServletRequest request) {
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComboDTO comboGrupoFact = new ComboDTO();
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+    @Override
+    public ComboDTO getComboGrupoFacturacionByColegio(String idColegio, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ComboDTO comboGrupoFact = new ComboDTO();
+        if (idInstitucion != null) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getComboGrupoFacturacionByColegio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+            LOGGER.info(
+                    "getComboGrupoFacturacionByColegio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getComboGrupoFacturacionByColegio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+            LOGGER.info(
+                    "getComboGrupoFacturacionByColegio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info(
-						"getComboGrupoFacturacionByColegio() -> Entrada para obtener la información de los distintos grupos de facturacion");
+            if (usuarios != null && usuarios.size() > 0) {
+                LOGGER.info(
+                        "getComboGrupoFacturacionByColegio() -> Entrada para obtener la información de los distintos grupos de facturacion");
 
-				comboGrupoFact.setCombooItems(scsGrupofacturacionExtendsMapper
-						.getComboGrupoFacturacion(idColegio, usuarios.get(0).getIdlenguaje()));
+                comboGrupoFact.setCombooItems(scsGrupofacturacionExtendsMapper
+                        .getComboGrupoFacturacion(idColegio, usuarios.get(0).getIdlenguaje()));
 
-				LOGGER.info("getComboGrupoFacturacionByColegio() -> Salida ya con los datos recogidos");
+                LOGGER.info("getComboGrupoFacturacionByColegio() -> Salida ya con los datos recogidos");
 
-			}
-		}
-		return comboGrupoFact;
+            }
+        }
+        return comboGrupoFact;
 
-	}
-	
-	public ComboDTO comboFactMovimientos(HttpServletRequest request) {
+    }
 
-		LOGGER.info("comboFactMovimientos() -> Entrada del servicio para obtener las facturaciones");
+    public ComboDTO comboFactMovimientos(HttpServletRequest request) {
 
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		ComboDTO comboFact = new ComboDTO();
+        LOGGER.info("comboFactMovimientos() -> Entrada del servicio para obtener las facturaciones");
 
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			
-			LOGGER.info("comboFactMovimientos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			
-			LOGGER.info("comboFactMovimientos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
+        ComboDTO comboFact = new ComboDTO();
 
-				LOGGER.info("comboFactMovimientos() / fcsFacturacionJGExtendsMapper.comboFactMovimientos() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
-				
-				List<ComboItem> comboItems = fcsFacturacionJGExtendsMapper.comboFactMovimientos(idInstitucion.toString());
-				comboFact.setCombooItems(comboItems);
-				
-				LOGGER.info("comboFactMovimientos() / fcsFacturacionJGExtendsMapper.comboFactMovimientos() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
-			} else {
-				LOGGER.warn("comboFactMovimientos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "+ dni + " e idInstitucion = " + idInstitucion);
-			}
-		} else {
-			LOGGER.warn("comboFactMovimientos() -> idInstitucion del token nula");
-		}
-		
-		LOGGER.info("comboFactMovimientos() -> Salida del servicio para obtener los estados de los pagos");
-		
-		return comboFact;
-	}
-	
-	public ComboDTO comboAplicadoEnPago(HttpServletRequest request) {
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
-		LOGGER.info("comboFactMovimientos() -> Entrada del servicio para obtener las facturaciones");
+            LOGGER.info("comboFactMovimientos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		ComboDTO comboFact = new ComboDTO();
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			
-			LOGGER.info("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			
-			LOGGER.info("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+            LOGGER.info("comboFactMovimientos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
 
-				LOGGER.info("comboAplicadoEnPago() / FcsPagosjgExtendsMapper.comboAplicadoEnPago() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
-				
-				List<ComboItem> comboItems = fcsPagosjgExtendsMapper.comboAplicadoEnPago(idInstitucion.toString());
-				comboFact.setCombooItems(comboItems);
-				
-				LOGGER.info("comboAplicadoEnPago() / FcsPagosjgExtendsMapper.comboAplicadoEnPago() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
-			} else {
-				LOGGER.warn("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "+ dni + " e idInstitucion = " + idInstitucion);
-			}
-		} else {
-			LOGGER.warn("comboAplicadoEnPago() -> idInstitucion del token nula");
-		}
-		
-		LOGGER.info("comboAplicadoEnPago() -> Salida del servicio para obtener los estados de los pagos");
-		
-		return comboFact;
-	}
-	
-	public ComboDTO comboAgrupacionEnTurnos(HttpServletRequest request) {
+                LOGGER.info("comboFactMovimientos() / fcsFacturacionJGExtendsMapper.comboFactMovimientos() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
 
-		LOGGER.info("comboAgrupacionEnTurnos() -> Entrada del servicio para obtener las facturaciones");
+                List<ComboItem> comboItems = fcsFacturacionJGExtendsMapper.comboFactMovimientos(idInstitucion.toString());
+                comboFact.setCombooItems(comboItems);
 
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		ComboDTO comboFact = new ComboDTO();
+                LOGGER.info("comboFactMovimientos() / fcsFacturacionJGExtendsMapper.comboFactMovimientos() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
+            } else {
+                LOGGER.warn("comboFactMovimientos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("comboFactMovimientos() -> idInstitucion del token nula");
+        }
 
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			
-			LOGGER.info("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			
-			LOGGER.info("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+        LOGGER.info("comboFactMovimientos() -> Salida del servicio para obtener los estados de los pagos");
 
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
+        return comboFact;
+    }
 
-				LOGGER.info("comboAgrupacionEnTurnos() / FcsPagosjgExtendsMapper.comboAgrupacionEnTurnos() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
-				
-				List<ComboItem> comboItems = fcsFacturacionJGExtendsMapper.comboAgrupacionEnTurnos(idInstitucion.toString());
-				comboFact.setCombooItems(comboItems);
-				
-				LOGGER.info("comboAgrupacionEnTurnos() / FcsPagosjgExtendsMapper.comboAgrupacionEnTurnos() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
-			} else {
-				LOGGER.warn("comboAgrupacionEnTurnos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "+ dni + " e idInstitucion = " + idInstitucion);
-			}
-		} else {
-			LOGGER.warn("comboAgrupacionEnTurnos() -> idInstitucion del token nula");
-		}
-		
-		LOGGER.info("comboAgrupacionEnTurnos() -> Salida del servicio para obtener los estados de los pagos");
-		
-		return comboFact;
-	}
-	
-	public ComboDTO comboTiposMovimientos(HttpServletRequest request) {
+    public ComboDTO comboAplicadoEnPago(HttpServletRequest request) {
 
-		LOGGER.info("comboTiposMovimientos() -> Entrada del servicio para obtener las facturaciones");
+        LOGGER.info("comboFactMovimientos() -> Entrada del servicio para obtener las facturaciones");
 
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		ComboDTO comboFTipos = new ComboDTO();
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			
-			LOGGER.info("comboTiposMovimientos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			
-			LOGGER.info("comboTiposMovimientos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+        ComboDTO comboFact = new ComboDTO();
 
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
-				LOGGER.info("comboTiposMovimientos() / FcsMovimientosvariosExtendsMapper.comboTiposMovimientos() -> Entrada a FcsMovimientosvariosExtendsMapper para obtener los tipos ");
-				
-				List<ComboItem> comboItems = fcsMovimientosvariosExtendsMapper.comboTiposMovimientos(idInstitucion.toString());
-				comboFTipos.setCombooItems(comboItems);
+            LOGGER.info("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            LOGGER.info("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
+
+                LOGGER.info("comboAplicadoEnPago() / FcsPagosjgExtendsMapper.comboAplicadoEnPago() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
+
+                List<ComboItem> comboItems = fcsPagosjgExtendsMapper.comboAplicadoEnPago(idInstitucion.toString());
+                comboFact.setCombooItems(comboItems);
+
+                LOGGER.info("comboAplicadoEnPago() / FcsPagosjgExtendsMapper.comboAplicadoEnPago() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
+            } else {
+                LOGGER.warn("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("comboAplicadoEnPago() -> idInstitucion del token nula");
+        }
+
+        LOGGER.info("comboAplicadoEnPago() -> Salida del servicio para obtener los estados de los pagos");
+
+        return comboFact;
+    }
+
+    public ComboDTO comboAgrupacionEnTurnos(HttpServletRequest request) {
+
+        LOGGER.info("comboAgrupacionEnTurnos() -> Entrada del servicio para obtener las facturaciones");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+        ComboDTO comboFact = new ComboDTO();
+
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+            LOGGER.info("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            LOGGER.info("comboAplicadoEnPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
+
+                LOGGER.info("comboAgrupacionEnTurnos() / FcsPagosjgExtendsMapper.comboAgrupacionEnTurnos() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
+
+                List<ComboItem> comboItems = fcsFacturacionJGExtendsMapper.comboAgrupacionEnTurnos(idInstitucion.toString());
+                comboFact.setCombooItems(comboItems);
+
+                LOGGER.info("comboAgrupacionEnTurnos() / FcsPagosjgExtendsMapper.comboAgrupacionEnTurnos() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
+            } else {
+                LOGGER.warn("comboAgrupacionEnTurnos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("comboAgrupacionEnTurnos() -> idInstitucion del token nula");
+        }
+
+        LOGGER.info("comboAgrupacionEnTurnos() -> Salida del servicio para obtener los estados de los pagos");
+
+        return comboFact;
+    }
+
+    public ComboDTO comboTiposMovimientos(HttpServletRequest request) {
+
+        LOGGER.info("comboTiposMovimientos() -> Entrada del servicio para obtener las facturaciones");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+        ComboDTO comboFTipos = new ComboDTO();
+
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+            LOGGER.info("comboTiposMovimientos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            LOGGER.info("comboTiposMovimientos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
+
+                LOGGER.info("comboTiposMovimientos() / FcsMovimientosvariosExtendsMapper.comboTiposMovimientos() -> Entrada a FcsMovimientosvariosExtendsMapper para obtener los tipos ");
+
+                List<ComboItem> comboItems = fcsMovimientosvariosExtendsMapper.comboTiposMovimientos(idInstitucion.toString());
+                comboFTipos.setCombooItems(comboItems);
 				
 				/*for(ComboItem combo : comboItems) {
 					String descripcion = (combo.getLabel()).substring(0, (combo.getLabel()).length() -3);
 					 combo.setLabel(descripcion);
 				}*/
-				
-				LOGGER.info("comboTiposMovimientos() / FcsMovimientosvariosExtendsMapper.comboTiposMovimientos() -> Salida a FcsMovimientosvariosExtendsMapper para obtener los tipos");
-			} else {
-				LOGGER.warn("comboTiposMovimientos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "+ dni + " e idInstitucion = " + idInstitucion);
-			}
-		} else {
-			LOGGER.warn("comboTiposMovimientos() -> idInstitucion del token nula");
-		}
-		
-		LOGGER.info("comboTiposMovimientos() -> Salida del servicio para obtener los tipos");
-		
-		return comboFTipos;
-	}
-	
+
+                LOGGER.info("comboTiposMovimientos() / FcsMovimientosvariosExtendsMapper.comboTiposMovimientos() -> Salida a FcsMovimientosvariosExtendsMapper para obtener los tipos");
+            } else {
+                LOGGER.warn("comboTiposMovimientos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("comboTiposMovimientos() -> idInstitucion del token nula");
+        }
+
+        LOGGER.info("comboTiposMovimientos() -> Salida del servicio para obtener los tipos");
+
+        return comboFTipos;
+    }
+
 }
