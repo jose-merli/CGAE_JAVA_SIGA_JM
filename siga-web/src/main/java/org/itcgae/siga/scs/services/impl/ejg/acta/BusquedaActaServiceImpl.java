@@ -1417,20 +1417,22 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		ActasItem acta = new ActasItem();
+		int aux = 1;
+		acta.setNumeroacta(String.valueOf(aux));
 		
 		if(idInstitucion != null) {
 		
 		String anio = getAnioHoy();
 
 		String combo = scsActaExtendsMapper.comboSufijoActa(idInstitucion);
-		if(!combo.isEmpty() && combo != null) {
-			String [] listCombo = combo.split(","); 
-			acta.setNumeroacta(getNumeroActaSufijo(idInstitucion.toString(), anio, listCombo[0]));
-
-		}else {
-			acta.setNumeroacta(getNumeroActa(idInstitucion.toString(), anio));
-		}
-		
+			if(combo != null) {
+				if( !combo.isEmpty()  ) {
+					String [] listCombo = combo.split(","); 
+					acta.setNumeroacta(getNumeroActaSufijo(idInstitucion.toString(), anio, listCombo[0]));
+				}else {
+					acta.setNumeroacta(getNumeroActa(idInstitucion.toString(), anio));
+				}
+			}
 		}
 		
 		return acta.getNumeroacta();
