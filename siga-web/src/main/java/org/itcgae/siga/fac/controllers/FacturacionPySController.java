@@ -13,6 +13,8 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -398,5 +400,24 @@ public class FacturacionPySController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	@PostMapping(value = "/presentacionAdeudos")
+	ResponseEntity<FacPresentacionAdeudosDTO> presentacionAdeudos(@RequestBody FacPresentacionAdeudosItem presentacionAdeudoItem,
+																			HttpServletRequest request) {
+		FacPresentacionAdeudosDTO response = new FacPresentacionAdeudosDTO();
+
+		try {
+			response = facturacionService.presentacionAdeudos(presentacionAdeudoItem, request);
+			return new ResponseEntity<FacPresentacionAdeudosDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacPresentacionAdeudosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	
+	
 
 }

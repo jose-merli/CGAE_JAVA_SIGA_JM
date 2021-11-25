@@ -19,6 +19,8 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -53,6 +55,7 @@ import org.itcgae.siga.db.entities.FacFacturacionEliminar;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
+import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
 import org.itcgae.siga.db.entities.FacSeriefacturacionBancoExample;
@@ -1528,5 +1531,45 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		return updateResponseDTO;
 	}
+
+	@Override
+	public FacPresentacionAdeudosDTO presentacionAdeudos(FacPresentacionAdeudosItem presAdeuItem,
+			HttpServletRequest request) throws Exception {
+		LOGGER.info("presentacionAdeudos() -> Entrada al servicio para presentar adeudos");
+
+		FacPresentacionAdeudosDTO presentacionAdeudosDTO = new FacPresentacionAdeudosDTO();
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+		FacPresentacionAdeudos presAdeudos = new FacPresentacionAdeudos(presAdeuItem, usuario);
+		Error error = new Error(); 
+		error.setCode(0);	
+		presentacionAdeudosDTO.setError(error);
+		
+		try {
+			facFacturaMapper.presentacionAdeudos(presAdeudos);
+			if(!presAdeudos.getCodRetorno().equals(RET_OK)) {
+				Integer ret;
+				try {
+					ret = Integer.valueOf(presAdeudos.getCodRetorno());
+				} catch (Exception e) {
+					ret = -3;
+				}
+				error.setCode(ret);	
+				error.setDescription(presAdeudos.getDatosError());	} else {
+					// TODO: borrado de ficheros
+			}
+			List<FacPresentacionAdeudosItem> lPresAdeudo = new ArrayList<>();
+			presAdeuItem.setnFicheros(presAdeudos.getnFicheros());
+			lPresAdeudo.add(presAdeuItem);
+			presentacionAdeudosDTO.setFacPresentacionAdeudosItems(lPresAdeudo);			
+		} catch (Exception e) {
+			error.setCode(-3);
+			error.setDescription("error:" + e);;
+		}
+		
+		LOGGER.info("eliminarFacturacion() -> Salida del servicio para eliminar facturación");
+		
+		return presentacionAdeudosDTO;
+	}
+	
 
 }
