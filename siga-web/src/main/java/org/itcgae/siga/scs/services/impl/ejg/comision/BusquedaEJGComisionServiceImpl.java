@@ -1354,7 +1354,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
 				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
-				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumejg())).andFechabajaIsNull();
 
 		estadoejgExample.setOrderByClause("IDESTADOPOREJG DESC");
 
