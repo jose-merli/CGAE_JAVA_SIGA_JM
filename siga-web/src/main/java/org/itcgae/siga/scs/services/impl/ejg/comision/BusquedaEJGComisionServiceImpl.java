@@ -1009,6 +1009,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 					// uso tipo dictamen para traer los datos de la resolucion
 					if (ejgItem.getIdTipoDictamen() != null && (ejgItem.getFundamentoJuridico() != null || comprbarJuramentoJuridico.equals("0")) ) {
+						
+						if(scsEjg.getFecharesolucioncajg() == null) {
+							scsEjg.setFecharesolucioncajg(new Date());
+						}
 
 						int response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
 

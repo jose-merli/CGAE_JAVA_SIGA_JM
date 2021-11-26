@@ -728,8 +728,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 				if (!listaEjgActa.isEmpty()) {
 
-					// recorreremos toda la lista para sacar los ejg que esten asociados al acata
-					// para tratarlos
+					// recorreremos toda la lista para sacar los ejg que esten asociados al acta para tratarlos
 					for (ScsEjgActa scsEjgActa : listaEjgActa) {
 
 						// Obtenemos el ejg
@@ -743,16 +742,16 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 							// Obtendremos los objetos resolucion asociados al ejg para modificarlo
 							ScsEjgResolucion scsEjgResolucionItem = obtenerEjgResolucion(ejgItem);
 
-							// Solo nos interesaran los ejg que tengan el tipo ratificacion 4 o 6
+							// Solo nos interesaran los ejg que tengan el tipo ratificacion 0 o 5
 							if (scsEjgResolucionItem != null
 									&& scsEjgResolucionItem.getIdtiporatificacionejg() != null) {
-								if (scsEjgResolucionItem.getIdtiporatificacionejg() == Short.valueOf("4")) {
+								if (scsEjgResolucionItem.getIdtiporatificacionejg() == Short.valueOf("0")) {
 
 									LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
 											+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
 											+ scsEjgActa.getNumeroejg());
 
-									LOGGER.info("Si el ejg es 4");
+									LOGGER.info("Si el ejg es 0");
 
 									// Buscaremos el estado de ese ejg
 									ScsEstadoejgExample exampleEstado = new ScsEstadoejgExample();
@@ -760,17 +759,19 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 									exampleEstado.createCriteria().andIdinstitucionEqualTo(ejgItem.getIdinstitucion())
 											.andIdtipoejgEqualTo(ejgItem.getIdtipoejg())
 											.andAnioEqualTo(ejgItem.getAnio()).andNumeroEqualTo(ejgItem.getNumero())
-											.andIdestadoporejgEqualTo(Long.valueOf("9"));
+											.andIdestadoejgEqualTo(Short.valueOf("9"));
 
 									exampleEstado.setOrderByClause("FECHAMODIFICACION DESC");
 
 									List<ScsEstadoejg> listaEstadoEjg = scsEstadoejgMapper
 											.selectByExample(exampleEstado);
-
-									LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
+									
 									// Sacaremos el primer elemento ya que sera el ultimo registro actualizado, por
 									// lo cual sera el que este activo
 									if (!listaEstadoEjg.isEmpty()) {
+										
+										LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
+										
 										ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
 
 										LOGGER.info("Añadiendo observaciones");
@@ -785,13 +786,19 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 										if (response == 0) {
 											throw new SigaExceptions("No se han actualizado el estado del ejg");
 										}
+										
+										response = borrarActa(acta, ejgItem);
+
+										if (response == 0) {
+											throw new SigaExceptions("No se han podido borrar la relacion entre el acta y el ejg");
+										}
 
 										updateResponseDTO.setStatus(SigaConstants.OK);
 									}
 
-								} else if (ejgItem.getNumeroresolucion() == "6") {
+								} else if (scsEjgResolucionItem.getIdtiporatificacionejg() == Short.valueOf("5")) {
 
-									LOGGER.info("Si el ejg es 6");
+									LOGGER.info("Si el ejg es 5");
 
 									LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
 											+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
@@ -802,46 +809,49 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 									exampleEstado.createCriteria().andIdinstitucionEqualTo(ejgItem.getIdinstitucion())
 											.andIdtipoejgEqualTo(ejgItem.getIdtipoejg())
 											.andAnioEqualTo(ejgItem.getAnio()).andNumeroEqualTo(ejgItem.getNumero())
-											.andIdestadoporejgEqualTo(Long.valueOf("21"));
+											.andIdestadoejgEqualTo(Short.valueOf("21"));
 									exampleEstado.setOrderByClause("FECHAMODIFICACION DESC");
 									LOGGER.info("Se busca el estado ejg");
 
 									List<ScsEstadoejg> listaEstadoEjg = scsEstadoejgMapper
 											.selectByExample(exampleEstado);
 
-									LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
+									if(!listaEstadoEjg.isEmpty()) {
+										LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
 
-									// Sacaremos el primer elemento ya que sera el ultimo registro actualizado, por
-									// lo cual sera el que este activo
-									ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
-
-									LOGGER.info("Añadiendo observaciones");
-
-									scsEstadoejg.setObservaciones("Expediente pendiente de la CAJG. Se retira del acta "
-											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-
-									LOGGER.info("Updateando el estado ejg");
-
-									response = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoejg);
-
-									if (response == 0) {
-										throw new SigaExceptions("No se han actualizado el estado del ejg");
+										// Sacaremos el primer elemento ya que sera el ultimo registro actualizado, por
+										// lo cual sera el que este activo
+										ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
+		
+										LOGGER.info("Añadiendo observaciones");
+		
+										scsEstadoejg.setObservaciones("Expediente pendiente de la CAJG. Se retira del acta "
+												+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+		
+										LOGGER.info("Updateando el estado ejg");
+		
+										response = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoejg);
+										
+										if (response == 0) {
+											throw new SigaExceptions("No se han actualizado el estado del ejg");
+										}
+										
+										response = borrarActa(acta, ejgItem);
+		
+										if (response == 0) {
+											throw new SigaExceptions("No se han podido borrar la relacion entre el acta y el ejg");
+										}
+		
+										updateResponseDTO.setStatus(SigaConstants.OK);
 									}
-
-									updateResponseDTO.setStatus(SigaConstants.OK);
+									
 
 								}
 
 							}
 
 						}
-
-						response = borrarActa(acta, ejgItem);
-
-						if (response == 0) {
-							throw new SigaExceptions("No se han podido borrar la relacion entre el acta y el ejg");
-						}
-
+						
 						LOGGER.info("Seteando las observaciones");
 
 						acta.setObservaciones(pendientes);
