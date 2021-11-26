@@ -61,6 +61,8 @@ public interface IBusquedaEJGComision {
 
 	String obligatorioFundamento(HttpServletRequest request);
 
+	EjgDTO busquedaEJGActaComision(EjgItem ejgItem, HttpServletRequest request);
+
 
 
 	
