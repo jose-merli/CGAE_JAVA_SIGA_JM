@@ -102,7 +102,8 @@ public interface ScsBaremosGuardiaMapper {
 	@Result(column = "SIMPLE_O_IMPORTE_INDIVIDUAL", property = "simpleOImporteIndividual", jdbcType = JdbcType.DECIMAL),
 	@Result(column = "NAPARTIR", property = "naPartir", jdbcType = JdbcType.INTEGER),
 	@Result(column = "MAXIMO", property = "maximo", jdbcType = JdbcType.DECIMAL),
-	@Result(column = "POR_DIA", property = "porDia", jdbcType = JdbcType.VARCHAR)
+	@Result(column = "POR_DIA", property = "porDia", jdbcType = JdbcType.VARCHAR),
+	@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
 })
 List<BaremosRequestItem> searchBaremosGuardia(BaremosGuardiaItem baremosGuardiaItem, Short idinstitucion);
 }

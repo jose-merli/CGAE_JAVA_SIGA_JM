@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTO.scs;
 
+import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -19,6 +20,9 @@ public class BaremosRequestItem {
 	String idTurno;
 	String idGuardia;
 	String nomTurno;
+	Date fechabaja;
+	boolean historico;
+	int keyForTabla;
 	
 	List<GuardiasItem> guardiasObj;
 }
