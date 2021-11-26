@@ -236,6 +236,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		//String idUltimoEstado = "";
+		if(ejgItem.getAnnio() == null) {
+			int anioActa = new Date().getYear();
+			ejgItem.setAnnio(String.valueOf(anioActa));
+		}
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -757,10 +761,20 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					LOGGER.info("intentamos conseguir el ejg");
 
 					ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+					
+					boolean isMismoActa = false;
+					
+					if(scsEjg.getIdacta() != null && String.valueOf(scsEjg.getIdacta()).equals(ejgItem.getNumActa())) {
+						isMismoActa = true;
+					}
+					
+					LOGGER.info("la comprobacion sobre si es el mismo ponente es:"+isMismoActa);
+					
+					if (!isMismoActa) {
 
 					LOGGER.info("intentamos conseguir el estado del ejg");
 
-					scsEstadoEjg = obtenerEstadoEjg(scsEjg, idInstitucion);
+					scsEstadoEjg = obtenerEstadoEjg(scsEjg, idInstitucion, (short) 9);
 
 					List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(scsEjg, idInstitucion);
 
@@ -810,22 +824,23 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 												"Error no se ha podido borrar la relacion entre el Ejg y acta"));
 									}
 								}
+								LOGGER.info("Seteando las observaciones");
+
+								if(scsEstadoEjg.getObservaciones() != null) {
+									scsEstadoEjg.setObservaciones(
+											scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
+													+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+								}else {
+									scsEstadoEjg.setObservaciones(
+											"Expediente incluido masivamente en el acta "
+													+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+								}
 							}
 
 						}
 
 					}
-					LOGGER.info("Seteando las observaciones");
-
-					if(scsEstadoEjg.getObservaciones() != null) {
-						scsEstadoEjg.setObservaciones(
-								scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
-										+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
-					}else {
-						scsEstadoEjg.setObservaciones(
-								"Expediente incluido masivamente en el acta "
-										+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
-					}
+					
 
 					LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
 
@@ -867,7 +882,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					if (resultado == 0) {
 						throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
 					}
-
+				}
 				}
 			} catch (SigaExceptions e) {
 				if (error.getCode() == null) {
@@ -909,7 +924,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 					LOGGER.info("intentamos conseguir el estado del ejg");
 
-					scsEstadoEjg = obtenerEstadoEjg(scsEjg, idInstitucion);
+					scsEstadoEjg = obtenerEstadoEjg(scsEjg, idInstitucion, (short) 9);
 
 					List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(scsEjg, idInstitucion);
 
@@ -1110,23 +1125,32 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 				for (EjgItem ejgItem : ejgItems) {
 
 					ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+					
+					boolean isMismoPonente = false;
+					if(scsEjg.getIdponente() != null && String.valueOf(scsEjg.getIdponente()).equals(ejgItem.getPonente())) {
+						isMismoPonente = true;
+					}
+					
+					LOGGER.info("la comprobacion sobre si es el mismo ponente es:"+isMismoPonente);
+					
+					if (!isMismoPonente) {
 
-					ScsEstadoejg scsEstadoEjg = new ScsEstadoejg();
+					
 
 					LOGGER.info("intentamos conseguir el estado del ejg " + ejgItem.getBis());
-
+/*
 					if (ejgItem.getBis()) {
 						LOGGER.info("Si hay que borrar entramos aqui");
 						ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
-					} else {
+					} else {*/
 						if (ejgItem.getPonente() != null && ejgItem.getFechaPonenteDesd() != null && scsEjg != null) {
-
+/*
 							ResolucionEJGItem resolEjg = new ResolucionEJGItem();
 							resolEjg.setAnio(scsEjg.getAnio());
 							resolEjg.setIdTipoEJG(scsEjg.getIdtipoejg());
 							resolEjg.setNumero(scsEjg.getNumero());
 							resolEjg.setFechaPresentacionPonente(ejgItem.getFechaPonenteDesd());
-							resolEjg.setIdPonente(Integer.valueOf(ejgItem.getPonente()));
+							resolEjg.setIdPonente(Integer.valueOf(ejgItem.getPonente()));*/
 
 							LOGGER.info(
 									"Datos del ponente que vamos a actualizar primero la fecha y despues el id ponente "
@@ -1136,12 +1160,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							scsEjg.setIdponente(Integer.valueOf(ejgItem.getPonente()));
 							scsEjg.setIdinstitucionponente(Short.valueOf(ejgItem.getidInstitucion()));
 							
-							//obtengo el ponente
-							String nombrePonente = obtenerPonente(token, ejgItem.getPonente().toString());
-							scsEjg.setObservaciones(scsEjg.getObservaciones() +" "+ nombrePonente);
+							int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
+							
+							
 							
 							ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
 
+							//obtengo el ponente
+							String nombrePonente = obtenerPonente(token, ejgItem.getPonente().toString());
+							
+							ScsEstadoejg scsEstadoEjg = new ScsEstadoejg();
+							
 							scsEstadoEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
 							scsEstadoEjg.setIdtipoejg(scsEjg.getIdtipoejg());
 							scsEstadoEjg.setAnio(scsEjg.getAnio());
@@ -1151,16 +1180,16 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							scsEstadoEjg.setUsumodificacion(0);
 							scsEstadoEjg.setAutomatico("0");
 							scsEstadoEjg.setIdestadoejg(Short.valueOf("20"));
-							scsEstadoEjg.setIdestadoporejg(obtenerUltimoEstadoEjg(scsEjg, idInstitucion) + 1);
-							
-							
+							scsEstadoEjg.setIdestadoporejg(obtenerUltimoEstadoPorEjg(scsEjg, idInstitucion) + 1);
 
 							scsEstadoEjg.setObservaciones(scsEjgComisionExtendsMapper
-									.getEtiquetasPonente(Short.valueOf(usuarios.get(0).getIdlenguaje())));
-
+									.getEtiquetasPonente(Short.valueOf(usuarios.get(0).getIdlenguaje()))+" "+ nombrePonente);
+								
+								
 							scsEstadoejgMapper.insert(scsEstadoEjg);
+							
 
-							int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
+							
 
 							LOGGER.info("Respuesta al actualizar" + response);
 							
@@ -1172,6 +1201,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 
 						}
+					
 					}
 				}
 			} else {
@@ -1303,7 +1333,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		return acta;
 	}
 
-	private ScsEstadoejg obtenerEstadoEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
+	private ScsEstadoejg obtenerEstadoEjg(ScsEjg scsEjg, Short idInstitucion, Short estado) throws SigaExceptions {
 
 		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
 
@@ -1311,7 +1341,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
 				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
-				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull().andIdestadoejgEqualTo(estado);
 
 		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
 
@@ -1340,8 +1370,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		}
 		return scsEstadoejg;
 	}
-
-	private Long obtenerUltimoEstadoEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
+	
+	private Long obtenerUltimoEstadoPorEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
 
 		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
 
@@ -1349,7 +1379,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
 				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
-				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero()));
 
 		estadoejgExample.setOrderByClause("IDESTADOPOREJG DESC");
 
