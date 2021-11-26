@@ -2706,6 +2706,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
         LOGGER.info("GestionEJGServiceImpl.guardarResolucion() -> Salida del servicio.");
 
+        responsedto.setStatus(SigaConstants.OK);
         return responsedto;
     }
 
