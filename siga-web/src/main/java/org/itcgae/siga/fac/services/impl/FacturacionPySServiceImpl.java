@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -99,6 +100,7 @@ import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -1651,4 +1653,101 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		
 		return presentacionAdeudosDTO;
 	}
+
+	@Override
+	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facItem, HttpServletRequest request) throws Exception {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		insertResponseDTO.setError(error);
+		
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+		
+		FacFacturacionprogramada facProg= creaFacturacionProgramadaDesdeItem(facItem, usuario);
+
+		LOGGER.info("insertarProgramacionFactura() -> Entrada al servicio para crear una programación de factura");
+
+		if (usuario != null) {
+				facFacturacionprogramadaExtendsMapper.insertSelective(facProg);
+		}
+
+		LOGGER.info("insertarProgramacionFactura() -> Salida del servicio para crear una programación de factura");
+
+		
+		return insertResponseDTO;
+	}
+
+	private FacFacturacionprogramada creaFacturacionProgramadaDesdeItem(FacFacturacionprogramadaItem facItem, AdmUsuarios usuario) {
+		FacFacturacionprogramada fac = new FacFacturacionprogramada();
+		
+		fac.setIdprogramacion(string2Long(facItem.getIdProgramacion()));
+		fac.setIdseriefacturacion(string2Long(facItem.getIdSerieFacturacion()));
+
+//		Campos sin correspondencia en facItem
+//		fac.setConfdeudor(facItem.get);
+//		fac.setConfingresos(facItem.get);
+//		fac.setCtaclientes(facItem.get);
+//		fac.setCtaingresos(facItem.get);
+//		fac.setFechacargo(facItem.get);
+//		fac.setIdprevision(facItem.get);
+//		fac.setIdtipoenvios(facItem.get);
+		
+		fac.setDescripcion(facItem.getDescripcion());
+		fac.setEnvio(boolToString10(facItem.getEnvio()));
+
+		fac.setFechaconfirmacion(facItem.getFechaConfirmacion());
+		fac.setFechafinproductos(facItem.getFechaFinProductos());
+		fac.setFechafinservicios(facItem.getFechaFinServicios());
+		fac.setFechainicioproductos(facItem.getFechaInicioProductos());
+		fac.setFechainicioservicios(facItem.getFechaInicioServicios());
+		fac.setFechamodificacion(facItem.getFechaModificacion());
+		fac.setFechapresentacion(facItem.getFechaPresentacion());
+		fac.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
+		fac.setFechaprevistageneracion(facItem.getFechaPrevistaGeneracion());
+		fac.setFechaprogramacion(facItem.getFechaProgramacion());
+		fac.setFecharealgeneracion(facItem.getFechaRealGeneracion());
+		fac.setFecharecibosb2b(facItem.getFechaRecibosB2B());
+		fac.setFechareciboscor1(facItem.getFechaRecibosCOR1());
+		fac.setFecharecibosprimeros(facItem.getFechaRecibosPrimeros());
+		fac.setFecharecibosrecurrentes(facItem.getFechaRecibosRecurrentes());
+		fac.setGenerapdf(boolToString10(facItem.getGeneraPDF()));
+		fac.setIdestadoconfirmacion(string2Short(facItem.getIdEstadoConfirmacion()));
+		fac.setIdestadoenvio(string2Short(facItem.getIdEstadoEnvio()));
+		fac.setIdestadopdf(string2Short(facItem.getIdEstadoPDF()));
+		fac.setIdestadotraspaso(string2Short(facItem.getIdEstadoTraspaso()));
+
+		fac.setIdtipoplantillamail(string2Integer(facItem.getIdTipoPlantillaMail()));
+		fac.setLogerror(facItem.getLogError());
+		fac.setLogtraspaso(facItem.getLogTraspaso());
+		fac.setNombrefichero(facItem.getNombreFichero());
+		fac.setTraspasoCodauditoriaDef(facItem.getTraspasoCodAuditoriaDef());
+		fac.setTraspasofacturas(boolToString10(facItem.getTraspasoFacturas()));
+		fac.setTraspasoPlantilla(facItem.getTraspasoPlatilla());
+		
+		if(usuario!=null) {
+			fac.setUsumodificacion(usuario.getIdusuario());
+			fac.setIdinstitucion(usuario.getIdinstitucion());
+		}
+		
+		return fac;
+	}
+	
+	private Short string2Short(String val) {
+		return val!=null?Short.valueOf(val):null;	
+	};
+	
+	
+	private Long string2Long (String val) {
+		return val!=null?Long.valueOf(val):null;	
+	};
+	
+	private Integer string2Integer(String val) {
+		return val!=null?Integer.valueOf(val):null;	
+	}
+	
+	private String boolToString10(Boolean b) {
+		return b?"1":"0";
+	};
+	
+
 }

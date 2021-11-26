@@ -39,11 +39,11 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getAbonos")
 	@Results({
 			@Result(column = "idfactura", property = "idFactura", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "fechaemision", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fecha", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "facturacion", property = "facturacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ncolegiado", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nifcif", property = "numeroIdentificacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "apellidos1", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "apellidos", property = "apellidos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombreinst", property = "nombreInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "imptotal", property = "importefacturado", jdbcType = JdbcType.VARCHAR),
