@@ -18,3 +18,5 @@ application:
     /pys/actualizarServicioSuscripcion: [39E]
     /pys/anularSuscripcion: [39F]
     /pys/aprobarSuscripcion: [39H]
+
+    /cargaMasivaCompras/cargarFichero: [39A]

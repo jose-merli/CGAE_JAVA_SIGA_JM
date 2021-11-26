@@ -137,15 +137,16 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 							else if(compraProductos.getFechaDenegada() != null) compraProductos.setIdEstadoSolicitud("2");
 							else compraProductos.setIdEstadoSolicitud("1");
 							
-							List<ListaProductosCompraItem> productosCompra = gestionFichaCompraSuscripcionServiceImpl.getListaProductosCompra(request, compraProductos.getnSolicitud()).getListaProductosCompraItems();
-							
-							Float totalCompra = (float) 0;
-							for(ListaProductosCompraItem productoCompra : productosCompra) {
-								//(prodSol.VALOR*prodSol.cantidad)*(1+TIVA.VALOR/100)
-								totalCompra =  ((Float.parseFloat(productoCompra.getPrecioUnitario())*Float.parseFloat(productoCompra.getCantidad()))*(1+(Float.parseFloat(productoCompra.getValorIva())/100)));
-							}
-							
-							compraProductos.setImporte(totalCompra.toString());
+							//REVISAR
+//							List<ListaProductosCompraItem> productosCompra = gestionFichaCompraSuscripcionServiceImpl.getListaProductosCompra(request, compraProductos.getnSolicitud()).getListaProductosCompraItems();
+//							
+//							Float totalCompra = (float) 0;
+//							for(ListaProductosCompraItem productoCompra : productosCompra) {
+//								//(prodSol.VALOR*prodSol.cantidad)*(1+TIVA.VALOR/100)
+//								totalCompra =  ((Float.parseFloat(productoCompra.getPrecioUnitario())*Float.parseFloat(productoCompra.getCantidad()))*(1+(Float.parseFloat(productoCompra.getValorIva())/100)));
+//							}
+//							
+//							compraProductos.setImporte(totalCompra.toString());
 						
 						}
 						

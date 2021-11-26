@@ -1,21 +1,28 @@
 package org.itcgae.siga.db.mappers;
 
 import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
+import org.itcgae.siga.db.entities.FacFacturacionEliminar;
+import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
+import org.itcgae.siga.db.entities.FacRegenerarPresentacionAdeudos;
 
 public interface FacFacturaMapper {
 
@@ -223,4 +230,55 @@ public interface FacFacturaMapper {
 			"where IDINSTITUCION = #{idinstitucion,jdbcType=DECIMAL}",
 			"and IDFACTURA = #{idfactura,jdbcType=VARCHAR}" })
 	int updateByPrimaryKey(FacFactura record);
+	
+
+	@Update(value = "{CALL PKG_SIGA_FACTURACION.ELIMINARFACTURACION ("
+					+ "#{idInstitucion,mode=IN},"
+					+ "#{idSerieFacturacion, mode=IN},"
+					+ "#{idProgramacion, mode=IN},"
+					+ "#{idUsuarioModificacion, mode=IN},"
+					+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
+					+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
+	@Options(statementType = StatementType.CALLABLE)
+	@ResultType(FacFacturacionEliminar.class)
+	void eliminarFacturacion(FacFacturacionEliminar facturaEliminar);
+	 //I put this field void because I don't need this method return nothing.
+	
+	@Update(value = "{CALL PKG_SIGA_CARGOS.PRESENTACION ("
+			+ "#{idInstitucion,mode=IN},"
+			+ "#{idSerieFacturacion, mode=IN},"
+			+ "#{idProgramacion, mode=IN},"	
+			+ "#{fechaPresentacion, mode=IN},"
+			+ "#{fechaCargoFRST, mode=IN},"
+			+ "#{fechaCargoRCUR, mode=IN},"
+			+ "#{fechaCargoCOR1, mode=IN},"
+			+ "#{fechaCargoB2B, mode=IN},"
+			+ "#{pathFichero, mode=IN},"
+			+ "#{idUsuarioModificacion, mode=IN},"
+			+ "#{idIdioma, mode=IN, jdbcType=VARCHAR},"
+			+ "#{nFicheros, mode=OUT, jdbcType=VARCHAR},"
+			+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
+			+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
+	@Options(statementType = StatementType.CALLABLE)
+	@ResultType(FacPresentacionAdeudos.class)
+	void presentacionAdeudos(FacPresentacionAdeudos presAdeudos);
+	
+	
+	@Update(value = "{CALL PKG_SIGA_CARGOS.REGENERAR_PRESENTACION ("
+			+ "#{idInstitucion,mode=IN},"
+			+ "#{idDisqueteCargos, mode=IN},"
+			+ "#{fechaPresentacion, mode=IN},"
+			+ "#{fechaCargoFRST, mode=IN},"
+			+ "#{fechaCargoRCUR, mode=IN},"
+			+ "#{fechaCargoCOR1, mode=IN},"
+			+ "#{fechaCargoB2B, mode=IN},"
+			+ "#{pathFichero, mode=IN},"
+			+ "#{idIdioma, mode=IN, jdbcType=VARCHAR},"
+			+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
+			+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
+	@Options(statementType = StatementType.CALLABLE)
+	@ResultType(FacRegenerarPresentacionAdeudos.class)
+	void regenerarPresentacionAdeudos(FacRegenerarPresentacionAdeudos presAdeudos);
+	
+	
 }

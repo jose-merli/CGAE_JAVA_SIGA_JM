@@ -1,15 +1,19 @@
 package org.itcgae.siga.db.mappers;
 
 import org.apache.ibatis.annotations.Result;
+
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FiltroMonederoItem;
+import org.itcgae.siga.DTO.fac.ListaMonederosItem;
 import org.itcgae.siga.DTO.fac.MonederoDTO;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 @Primary
 public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
@@ -30,8 +34,13 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
             @Result(column="IMPORTE_RESTANTE", property="importeRestante", jdbcType=JdbcType.DECIMAL),
             @Result(column="IMPORTE_USADO", property="importeUsado", jdbcType=JdbcType.DECIMAL),
             @Result(column="ID_PERSONA", property="idPersona", jdbcType=JdbcType.DECIMAL),
-            @Result(column="ID_ANTICIPO", property="idAnticipo", jdbcType=JdbcType.DECIMAL),
-
+            @Result(column="ID_ANTICIPO", property="idAnticipo", jdbcType=JdbcType.DECIMAL)
     })
-    List<MonederoDTO> selectByPersonIdAndCreationDate(Short institutionId, Long personId, FiltroMonederoItem filter);
+    List<ListaMonederosItem> selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter);
+    
+    @SelectProvider(type=PysLineaanticipoExtendsSqlProvider.class, method="selectMaxIdLinea")
+    @Results({
+            @Result(column="ID", property="newId", jdbcType=JdbcType.VARCHAR)
+    })
+    NewIdDTO selectMaxIdLinea(Short idInstitution, Long idPersona);
 }

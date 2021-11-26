@@ -1,15 +1,24 @@
 package org.itcgae.siga.fac.controllers;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
+import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -36,9 +45,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/facturacionPyS")
@@ -332,6 +338,21 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacFacturacionprogramadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	@PostMapping(value = "/eliminarFacturacion")
+	ResponseEntity<DeleteResponseDTO> eliminarFacturacion(@RequestBody FacFacturacionEliminarItem facturacionEliminar,
+			HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = this.facturacionService.eliminarFacturacion(facturacionEliminar, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@PostMapping(value = "/getFicherosTransferencias")
 	ResponseEntity<FicherosAbonosDTO> getFicherosTransferencias(@RequestBody FicherosAbonosItem item,
@@ -384,6 +405,37 @@ public class FacturacionPySController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	@PostMapping(value = "/presentacionAdeudos")
+	ResponseEntity<FacPresentacionAdeudosDTO> presentacionAdeudos(@RequestBody FacPresentacionAdeudosItem presentacionAdeudoItem,
+																			HttpServletRequest request) {
+		FacPresentacionAdeudosDTO response = new FacPresentacionAdeudosDTO();
+
+		try {
+			response = facturacionService.presentacionAdeudos(presentacionAdeudoItem, request);
+			return new ResponseEntity<FacPresentacionAdeudosDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacPresentacionAdeudosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	@PostMapping(value = "/regenerarPresentacionAdeudos")
+	ResponseEntity<FacRegenerarPresentacionAdeudosDTO> regenerarPresentacionAdeudos(@RequestBody FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,
+																			HttpServletRequest request) {
+		FacRegenerarPresentacionAdeudosDTO response = new FacRegenerarPresentacionAdeudosDTO();
+
+		try {
+			response = facturacionService.regenerarPresentacionAdeudos(regenerarPresentacionAdeudoItem, request);
+			return new ResponseEntity<FacRegenerarPresentacionAdeudosDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacRegenerarPresentacionAdeudosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 
 	@PostMapping(value = "/getFacturas")
 	ResponseEntity<FacturaDTO> getFacturas(@RequestBody FacturaItem item,
