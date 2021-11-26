@@ -100,6 +100,8 @@ public interface IFacturacionPySService {
 	public FacPresentacionAdeudosDTO presentacionAdeudos(FacPresentacionAdeudosItem presentacionAdeudoItem,	HttpServletRequest request) throws Exception;
 	
 	public FacRegenerarPresentacionAdeudosDTO regenerarPresentacionAdeudos(FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,	HttpServletRequest request) throws Exception;
+	
+	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg, HttpServletRequest request) throws Exception;
 
 
 }
