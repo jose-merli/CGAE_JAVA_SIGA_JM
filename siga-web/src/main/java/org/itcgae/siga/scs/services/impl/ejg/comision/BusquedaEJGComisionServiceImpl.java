@@ -736,6 +736,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO editarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -978,6 +979,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO editarResolucionFundamento(List<EjgItem> ejgItems, HttpServletRequest request)
 			throws Exception {
 
