@@ -49,6 +49,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 				
 				List<BaremosRequestItem> lBaremos = baremosGuardiaMapper.searchBaremosGuardia(baremosGuardiaItem,idInstitucion);
+				int keyForTabla = 0;
 				for(BaremosRequestItem baremo: lBaremos) {
 					List<GuardiasItem> guar = new ArrayList<GuardiasItem>();
 					GuardiasItem guardiaLaborables = new GuardiasItem();
@@ -57,13 +58,23 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					guardiaLaborables.setNombre(baremo.getGuardias() + " - LABORABLES");
 					guardiaLaborables.setIdGuardia(baremo.getIdGuardia());
 					guardiaLaborables.setDiasGuardia(dias[0]);
+					guardiaLaborables.setFechabaja(baremo.getFechabaja());
 					
 					guardiaFestivos.setNombre(baremo.getGuardias() + " - FESTIVOS");
 					guardiaFestivos.setIdGuardia(baremo.getIdGuardia());
 					guardiaFestivos.setDiasGuardia(dias[1]);
+					guardiaFestivos.setFechabaja(baremo.getFechabaja());
+					
 					guar.add(guardiaLaborables);
 					guar.add(guardiaFestivos);
 					baremo.setGuardiasObj(guar);
+					/*
+					 * Damos un Key a cada registro para poder crear el desplegable de cada fila en la tabla.
+					 * Este valor no se almacena en BBDD. Solo se utiliza para cuando se haga click se despliegue 
+					 * las guardias correspondientes. Antes se utilizaba el IdTurno pero este puede ser el mismo para 
+					 * varias guardias con distintos Baremos. De esta manera se evita que se despliegue otro registros.
+					 */
+					baremo.setKeyForTabla(keyForTabla++);
 				}
 				error.setCode(200);
 				baremosRequestDTO.setBaremosRequestItems(lBaremos);

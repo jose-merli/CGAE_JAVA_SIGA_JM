@@ -17,6 +17,7 @@ public class BaremosGuardiaItem {
 	String idFacturaciones[];
 	String idTurnos[];
    String idGuardias[];
+   boolean historico;
  
 //	public String getGuardias() {
 //		return guardias;

@@ -39,6 +39,7 @@ public class ScsBaremosGuardiaSqlProvider {
 		sql.SELECT("	hit.idturno,"
 				+ "		 tur.NOMBRE AS NOMBRETURNO,"
 				+ "		hit.idguardia,"
+				+ "		gua.fechabaja,"
 				+ "	LISTAGG( "
 				+ "        gua.nombre, "
 				+ "        ',' "
@@ -326,6 +327,13 @@ public class ScsBaremosGuardiaSqlProvider {
 				if(facturaciones != "") {
 					sql.WHERE("hit.idfacturacion IN( " + facturaciones +")");
 				}
+				if(baremosGuardiaItem.isHistorico() == false) {
+					sql.WHERE("gua.fechabaja is null");
+				}else {
+					sql.WHERE("gua.fechabaja is not null");
+				}
+				
+				
 				sql.GROUP_BY("hit.idinstitucion,"
 						+ "    hit.idturno,"
 						+ "    hit.idguardia,"
@@ -338,7 +346,8 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "    hit.diasaplicables,"
 						+ "    hit.agrupar,"
 						+ "    hit.idhito,"
-						+ "    tur.NOMBRE");
+						+ "    tur.NOMBRE,"
+						+ "   gua.fechabaja");
 				sql.ORDER_BY("2, 1");
 		return sql.toString();
 	}
