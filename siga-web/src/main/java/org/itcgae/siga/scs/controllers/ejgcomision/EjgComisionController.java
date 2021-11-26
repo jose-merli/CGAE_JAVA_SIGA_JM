@@ -74,6 +74,12 @@ public class EjgComisionController {
 		EjgDTO response = busquedaEJGComision.busquedaEJG(ejgItem, request);
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/filtros-ejg/busquedaEJGActaComision", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgDTO> busquedaEJGActaComision(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		EjgDTO response = busquedaEJGComision.busquedaEJGActaComision(ejgItem, request);
+		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/filtros-ejg/editarActaAnio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> editarActaAnio(@RequestBody List<EjgItem> ejgItem,

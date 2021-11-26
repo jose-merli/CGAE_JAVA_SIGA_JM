@@ -740,6 +740,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO editarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -848,7 +849,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 					LOGGER.info("Creando la nueva relacion acta y ejg");
 
-					scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumero()));
+					scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumejg()));
 					scsEjgActaNuevo.setIdtipoejg(scsEjg.getIdtipoejg());
 					scsEjgActaNuevo.setAnioejg(scsEjg.getAnio());
 					scsEjgActaNuevo.setIdinstitucionejg(idInstitucion);
@@ -993,6 +994,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO editarResolucionFundamento(List<EjgItem> ejgItems, HttpServletRequest request)
 			throws Exception {
 
@@ -1013,7 +1015,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 				LOGGER.info("intentamos conseguir el ejg");
 				for (EjgItem ejgItem : ejgItems) {
 
-					LOGGER.info("INFORMACION DEL EJG QUE HE ENVIADO SUPUESTAMENTE " + ejgItem.getNumero());
+					LOGGER.info("INFORMACION DEL EJG QUE HE ENVIADO SUPUESTAMENTE " + ejgItem.getNumEjg());
 
 					ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
 
@@ -1034,8 +1036,11 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 						scsEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
 						if(ejgItem.getFundamentoJuridico() != null) {
-						scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+							scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
 						}
+//						else {
+//							scsEjg.setIdfundamentojuridico(null);
+//						}
 					}
 
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL -> ");
@@ -1043,7 +1048,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idtipoejg -> " + scsEjg.getIdtipoejg());
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idinstitucion-> "
 							+ scsEjg.getIdinstitucion());
-					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumero());
+					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumejg());
 
 					scsEjgMapper.updateByPrimaryKey(scsEjg);
 					updateResponseDTO.setStatus(SigaConstants.OK);
@@ -1148,7 +1153,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							ResolucionEJGItem resolEjg = new ResolucionEJGItem();
 							resolEjg.setAnio(scsEjg.getAnio());
 							resolEjg.setIdTipoEJG(scsEjg.getIdtipoejg());
-							resolEjg.setNumero(scsEjg.getNumero());
+							resolEjg.setNumero(Long.valueOf(scsEjg.getNumejg()));
 							resolEjg.setFechaPresentacionPonente(ejgItem.getFechaPonenteDesd());
 							resolEjg.setIdPonente(Integer.valueOf(ejgItem.getPonente()));*/
 
@@ -1270,10 +1275,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		ScsEjgActaExample scsEjgActaExample = new ScsEjgActaExample();
 
-		LOGGER.info("datos ejg a buscar " + scsEjg.getAnio() + " " + scsEjg.getNumero() + " " + scsEjg.getIdtipoejg());
+		LOGGER.info("datos ejg a buscar " + scsEjg.getAnio() + " " + scsEjg.getNumejg() + " " + scsEjg.getIdtipoejg());
 
 		scsEjgActaExample.createCriteria().andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
-				.andNumeroejgEqualTo(Long.valueOf(scsEjg.getNumero())).andIdinstitucionejgEqualTo(idInstitucion)
+				.andNumeroejgEqualTo(Long.valueOf(scsEjg.getNumejg())).andIdinstitucionejgEqualTo(idInstitucion)
 				.andIdinstitucionactaEqualTo(idInstitucion).andAnioejgEqualTo(Short.valueOf(scsEjg.getAnio()));
 
 		List<ScsEjgActa> listaEjgAsociadosActa = scsEjgActaMapper.selectByExample(scsEjgActaExample);
@@ -1293,7 +1298,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		resolEjg.setIdTipoEJG(ejgItem.getIdtipoejg());
 
-		resolEjg.setNumero(ejgItem.getNumero());
+		resolEjg.setNumero(Long.valueOf(ejgItem.getNumejg()));
 
 		resolEjg.setIdTiporatificacionEJG(ejgItem.getIdtiporatificacionejg());
 
@@ -1443,7 +1448,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		ejgkey.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
 
-		ejgkey.setNumero(Long.valueOf(ejgItem.getNumero()));
+		ejgkey.setNumero(Long.valueOf(ejgItem.getNumEjg()));
 
 		LOGGER.info("EJGKEY: anio idinstitucion tipoejg numero " + ejgkey.getAnio().toString() + " "
 				+ ejgkey.getIdinstitucion().toString() + " " + ejgkey.getIdtipoejg().toString() + " "
@@ -1530,6 +1535,74 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			
 		}
 		return nombrePonenete;
+	}
+
+	@Override
+	public EjgDTO busquedaEJGActaComision(EjgItem ejgItem, HttpServletRequest request) {
+		LOGGER.info("busquedaEJGActaComision() -> Entrada al servicio para obtener el colegiado");
+		Error error = new Error();
+		EjgDTO ejgDTO = new EjgDTO();
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		//String idUltimoEstado = "";
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"busquedaEJGActaComision() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"busquedaEJGActaComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (usuarios != null && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				LOGGER.info(
+						"busquedaEJGActaComision() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+				LOGGER.info(
+						"busquedaEJGActaComision() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				LOGGER.info(
+						"busquedaEJGActaComision() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
+				if (tamMax != null) {
+					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+				} else {
+					tamMaximo = null;
+				}
+
+				//idUltimoEstado = scsEjgComisionExtendsMapper.idUltimoEstado(ejgItem, idInstitucion.toString());
+
+				LOGGER.info(
+						"busquedaEJGActaComision() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
+				ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGActaComision(ejgItem,
+						idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje()));
+				LOGGER.info(
+						"busquedaEJGActaComision() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
+				if (ejgDTO.getEjgItems() != null && tamMaximo != null && ejgDTO.getEjgItems().size() > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo
+							+ " resultados, pero se muestran sólo los " + tamMaximo
+							+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					ejgDTO.setError(error);
+				}
+			}
+		} else {
+			LOGGER.warn("busquedaEJGActaComision() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
+		return ejgDTO;
 	}
 
 }

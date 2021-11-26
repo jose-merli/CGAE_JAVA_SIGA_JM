@@ -487,7 +487,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 						&& ((actualizar == true
 								&& actasItem.getAnioacta() != String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))
 								|| actualizar == false)
-						&& actasItem.getFechareunion() != null && actasItem.getFecharesolucion() != null
+						&& actasItem.getFechareunion() != null && actasItem.getNumeroacta() != null
 						&& scsActaExtendsMapper.comprobarGuardarActaSufijo(actasItem, idInstitucion) == null
 						&& scsActaExtendsMapper.comprobarGuardarActaPonente(actasItem, idInstitucion) != null) {
 
@@ -514,32 +514,31 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					acta.setIdinstitucion(idInstitucion);
 
 //
-					if (actasItem.getNumeroacta() != null && actasItem.getSufijo() != null) {
-						LOGGER.info("DENTRO DE NUMERO ACTA");
-						LOGGER.info("VAMOS A OBTENER EL NUMERO DEL ACTA");
-
-						List<String> numActa = scsActaExtendsMapper.obtenerNumActa(actasItem,
-								Short.valueOf(actasItem.getIdacta()));
-
-						if (!numActa.isEmpty() && numActa.contains(actasItem.getNumeroacta() + actasItem.getSufijo())) {
-
-							throw new SigaExceptions(
-									"Ya existe un acta con ese numero, por favor introduzca uno mas grande");
-						} else {
-							//acta.setNumeroacta(actasItem.getNumeroacta());
+					if(actasItem.getSufijo() != null){
+						String aux = scsActaExtendsMapper.comprobarNumeroActa(getAnioHoy(),actasItem.getNumeroacta() + actasItem.getSufijo(),idInstitucion);
+						if(aux != null){
+							error.setCode(404);
+							error.setDescription("InvalidNumActa");
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setError(error);
+							return insertResponseDTO;
+						}else {
 							acta.setNumeroacta(actasItem.getNumeroacta() + actasItem.getSufijo());
 						}
-					} else if (actasItem.getNumeroacta() != null && actasItem.getSufijo() == null) {
-						List<String> numActa = scsActaExtendsMapper.obtenerNumActa(actasItem,
-								Short.valueOf(actasItem.getIdacta()));
-
-						if (!numActa.isEmpty() && numActa.contains(actasItem.getNumeroacta())) {
-
-							throw new SigaExceptions(
-									"Ya existe un acta con ese numero, por favor introduzca uno mas grande");
-						} else {
+					}
+					
+					if(actasItem.getSufijo() == null){
+						String aux = scsActaExtendsMapper.comprobarNumeroActa(getAnioHoy(),actasItem.getNumeroacta(),idInstitucion);	
+						if(aux != null){
+							error.setCode(404);
+							error.setDescription("InvalidNumActa");
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setError(error);
+							return insertResponseDTO;
+						}else {
 							acta.setNumeroacta(actasItem.getNumeroacta());
 						}
+						acta.setNumeroacta(actasItem.getNumeroacta());	
 					}
 
 					if (actasItem.getHorainicio() != null) {
@@ -617,7 +616,10 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 								+ acta.getAnioacta() + " " + acta.getIdinstitucion());
 						response = scsActacomisionMapper.updateByPrimaryKey(acta);
 						if (response == 0) {
-							throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
+							error.setCode(404);
+							error.setDescription("InvalidUpdate");
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setError(error);
 						}
 						insertResponseDTO.setStatus(SigaConstants.OK);
 
@@ -626,7 +628,10 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 						response = scsActacomisionMapper.insert(acta);
 
 						if (response == 0) {
-							throw new SigaExceptions("Ha ocurrido un error a la hora de guardar el acta");
+							error.setCode(404);
+							error.setDescription("InvalidInsert");
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setError(error);
 						}
 
 						insertResponseDTO.setStatus(SigaConstants.OK);
@@ -635,7 +640,10 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					response = scsActacomisionMapper.updateByPrimaryKey(acta);
 
 					if (response == 0) {
-						throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
+						error.setCode(404);
+						error.setDescription("InvalidUpdate");
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						insertResponseDTO.setError(error);
 					}
 					LOGGER.info(
 							"guardarActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para guardar el acta");
@@ -1186,7 +1194,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 											+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = "
 											+ ejgItem.getIdtipoejg() + " NUMERO = " + ejgItem.getNumero());
 
-									if (ejgItem.getIdfundamentojuridico() == null) {
+									if (ejgItem.getIdtiporatificacionejg() == null) {
 
 										// Buscamos el estado del ejg remitido comision y le añadimos a la observacion
 										// esta informacion
@@ -1215,6 +1223,16 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 												}
 											}
 										}
+										
+										ejgItem.setAnioacta(null);
+										ejgItem.setIdinstitucionacta(null);
+										
+										response = scsEjgMapper.updateByPrimaryKey(ejgItem);
+										
+										if (response == 0)
+											throw (new Exception(
+													"Error al actuaizar el EJG"));
+										
 										LOGGER.info(
 												"*****************datos que se van a borrar de la tabla ejgacta ACTA **************"
 														+ acta.getIdacta() + " " + acta.getAnioacta() + " "
