@@ -37,8 +37,8 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
         principal.INNER_JOIN("fac_bancoinstitucion b ON (c.idinstitucion=b.idinstitucion AND c.bancos_codigo=b.bancos_codigo)");
         principal.LEFT_OUTER_JOIN("fac_sufijo s ON (s.idinstitucion=c.idinstitucion AND s.idsufijo=c.idsufijo)");
 
-        //principal.WHERE("c.idinstitucion="+idInstitucion);
-        //principal.WHERE("c.fcs='0'");
+        principal.WHERE("c.idinstitucion="+idInstitucion);
+        principal.WHERE("c.fcs='0'");
 
         //CUENTA BANCARIA
         if(item.getBancosCodigo()!=null) {

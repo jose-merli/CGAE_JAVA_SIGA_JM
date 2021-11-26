@@ -8,6 +8,8 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTO.fac.FacturaDTO;
+import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -368,6 +370,7 @@ public class FacturacionPySController {
 			return new ResponseEntity<FicherosDevolucionesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	@PostMapping(value = "/archivarFacturaciones")
 	ResponseEntity<UpdateResponseDTO> archivarFacturaciones(@RequestBody List<FacFacturacionprogramadaItem> facturacionProgramadaItems,
 																			HttpServletRequest request) {
@@ -382,4 +385,22 @@ public class FacturacionPySController {
 		}
 	}
 
+	@PostMapping(value = "/getFacturas")
+	ResponseEntity<FacturaDTO> getFacturas(@RequestBody FacturaItem item,
+										   HttpServletRequest request) {
+		FacturaDTO response = new FacturaDTO();
+
+		try {
+			response = facturacionService.getFacturas(item, request);
+
+			if(response.getFacturasItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<FacturaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacturaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

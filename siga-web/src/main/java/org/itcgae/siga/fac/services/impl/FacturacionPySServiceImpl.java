@@ -9,6 +9,8 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
+import org.itcgae.siga.DTO.fac.FacturaDTO;
+import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -68,6 +70,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacDisqueteabonosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacDisquetecargosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacDisquetedevolucionesExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
@@ -150,6 +153,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacDisquetedevolucionesExtendsMapper facDisquetedevolucionesExtendsMapper;
+
+	@Autowired
+	private FacFacturaExtendsMapper facFacturaExtendsMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1479,4 +1485,33 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return updateResponseDTO;
 	}
 
+	@Override
+	public FacturaDTO getFacturas(FacturaItem item, HttpServletRequest request)
+			throws Exception {
+		FacturaDTO facturaDTO = new FacturaDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getFacturas() -> Entrada al servicio para obtener las facturas");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> obteniendo las facturas");
+
+			List<FacturaItem> items = facFacturaExtendsMapper.getFacturas(item,
+					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+
+			items.addAll(facFacturaExtendsMapper.getAbonos(item,
+					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
+
+			facturaDTO.setFacturasItems(items);
+		}
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
+
+		return facturaDTO;
+	}
 }

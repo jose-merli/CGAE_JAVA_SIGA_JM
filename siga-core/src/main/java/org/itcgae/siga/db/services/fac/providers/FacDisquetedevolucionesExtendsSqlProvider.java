@@ -31,7 +31,7 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		principal.INNER_JOIN("fac_facturaincluidaendisquete id ON (lin.idinstitucion = id.idinstitucion AND lin.iddisquetecargos = id.iddisquetecargos AND lin.idfacturaincluidaendisquete = id.idfacturaincluidaendisquete)");
 		principal.INNER_JOIN("fac_bancoinstitucion b ON (c.idinstitucion=b.idinstitucion AND c.bancos_codigo=b.bancos_codigo)");
 
-		//principal.WHERE("c.idinstitucion="+idInstitucion);
+		principal.WHERE("c.idinstitucion="+idInstitucion);
 
 		//CUENTA BANCARIA
 		if(item.getBancosCodigo()!=null) {
