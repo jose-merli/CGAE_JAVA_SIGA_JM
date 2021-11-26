@@ -43,7 +43,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		}
 
 		if (actasItem.getNumeroacta() != null) {
-			sql.WHERE("ACT.NUMEROACTA LIKE'" + actasItem.getNumeroacta() + "'");
+			sql.WHERE("ACT.NUMEROACTA LIKE'%" + actasItem.getNumeroacta() + "%'");
 		}
 
 		if (fechaResolucion != "0") {
@@ -70,13 +70,14 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		return sql.toString();
 	}
 
-	public String obtenerNumActa(ActasItem actasItem, Short idInstitucion) {
+	public String comprobarNumeroActa(String anioHoy, String numeroActa, Short idInstitucion) {
 
 		SQL sql = new SQL();
 		sql.SELECT("NUMEROACTA");
 		sql.FROM("SCS_ACTACOMISION");
-		sql.WHERE("ANIOACTA = " + actasItem.getAnioacta());
-		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("ANIOACTA = '" + anioHoy +"'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion+"'");
+		sql.WHERE("NUMEROACTA = '"+numeroActa+"'");
 		LOGGER.info("*******************obtenerNumActa********************" + sql.toString());
 		return sql.toString();
 	}
