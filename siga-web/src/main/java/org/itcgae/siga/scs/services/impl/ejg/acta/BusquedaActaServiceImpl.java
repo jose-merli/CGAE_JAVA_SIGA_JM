@@ -1186,7 +1186,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 											+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = "
 											+ ejgItem.getIdtipoejg() + " NUMERO = " + ejgItem.getNumero());
 
-									if (ejgItem.getIdfundamentojuridico() == null) {
+									if (ejgItem.getIdtiporatificacionejg() == null) {
 
 										// Buscamos el estado del ejg remitido comision y le añadimos a la observacion
 										// esta informacion
@@ -1215,6 +1215,16 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 												}
 											}
 										}
+										
+										ejgItem.setAnioacta(null);
+										ejgItem.setIdinstitucionacta(null);
+										
+										response = scsEjgMapper.updateByPrimaryKey(ejgItem);
+										
+										if (response == 0)
+											throw (new Exception(
+													"Error al actuaizar el EJG"));
+										
 										LOGGER.info(
 												"*****************datos que se van a borrar de la tabla ejgacta ACTA **************"
 														+ acta.getIdacta() + " " + acta.getAnioacta() + " "
