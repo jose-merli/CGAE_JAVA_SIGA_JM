@@ -8,7 +8,7 @@ application:
     /facturacionsjcs/saveFacturacion: [601]
     /facturacionsjcs/updateFacturacion: [601]
 
-     # Permisos para el módulo de ProductosYServicios
+     # Inicio permisos para el módulo de ProductosYServicios
     /pys/solicitarCompra: [39A]
     /pys/aprobarCompra: [39B]
     /pys/denegarPeticion: [39]
@@ -20,3 +20,11 @@ application:
     /pys/aprobarSuscripcion: [39H]
 
     /cargaMasivaCompras/cargarFichero: [39A]
+
+    # Permisos Maestros --> Tipos Productos y Maestros --> Tipos Servicios
+    /pys/crearEditarProducto: [402]
+    /pys/activarDesactivarProducto: [403]
+    /pys/crearEditarServicio: [404]
+    /pys/activarDesactivarServicio: [405]
+
+    # Fin permisos para el módulo de ProductosYServicios
