@@ -423,7 +423,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		boolean actualizar = true;
 
-		int response;
+		int response = 0;
 
 		ScsActacomision acta = null;
 
@@ -513,33 +513,35 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					// Tengo que cambiarlo
 					acta.setIdinstitucion(idInstitucion);
 
-//
-					if(actasItem.getSufijo() != null){
-						String aux = scsActaExtendsMapper.comprobarNumeroActa(getAnioHoy(),actasItem.getNumeroacta() + actasItem.getSufijo(),idInstitucion);
-						if(aux != null){
-							error.setCode(404);
-							error.setDescription("InvalidNumActa");
-							insertResponseDTO.setStatus(SigaConstants.KO);
-							insertResponseDTO.setError(error);
-							return insertResponseDTO;
-						}else {
-							acta.setNumeroacta(actasItem.getNumeroacta() + actasItem.getSufijo());
+					if(!actualizar) {
+						if(actasItem.getSufijo() != null){
+							String aux = scsActaExtendsMapper.comprobarNumeroActa(getAnioHoy(),actasItem.getNumeroacta() + actasItem.getSufijo(),idInstitucion);
+							if(aux != null){
+								error.setCode(404);
+								error.setDescription("InvalidNumActa");
+								insertResponseDTO.setStatus(SigaConstants.KO);
+								insertResponseDTO.setError(error);
+								return insertResponseDTO;
+							}else {
+								acta.setNumeroacta(actasItem.getNumeroacta() + actasItem.getSufijo());
+							}
+						}
+						
+						if(actasItem.getSufijo() == null){
+							String aux = scsActaExtendsMapper.comprobarNumeroActa(getAnioHoy(),actasItem.getNumeroacta(),idInstitucion);	
+							if(aux != null){
+								error.setCode(404);
+								error.setDescription("InvalidNumActa");
+								insertResponseDTO.setStatus(SigaConstants.KO);
+								insertResponseDTO.setError(error);
+								return insertResponseDTO;
+							}else {
+								acta.setNumeroacta(actasItem.getNumeroacta());
+							}
+							acta.setNumeroacta(actasItem.getNumeroacta());	
 						}
 					}
 					
-					if(actasItem.getSufijo() == null){
-						String aux = scsActaExtendsMapper.comprobarNumeroActa(getAnioHoy(),actasItem.getNumeroacta(),idInstitucion);	
-						if(aux != null){
-							error.setCode(404);
-							error.setDescription("InvalidNumActa");
-							insertResponseDTO.setStatus(SigaConstants.KO);
-							insertResponseDTO.setError(error);
-							return insertResponseDTO;
-						}else {
-							acta.setNumeroacta(actasItem.getNumeroacta());
-						}
-						acta.setNumeroacta(actasItem.getNumeroacta());	
-					}
 
 					if (actasItem.getHorainicio() != null) {
 						//acta.setHorainicioreunion(actasItem.getHorainicio());
@@ -612,14 +614,28 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 					// Actualizamos o creamos dependiendo del booleano
 					if (actualizar == true) {
-						LOGGER.info("ACTUALIZA " + acta.getIdacta() + " " + acta.getNumeroacta() + " "
-								+ acta.getAnioacta() + " " + acta.getIdinstitucion());
-						response = scsActacomisionMapper.updateByPrimaryKey(acta);
+						try {
+							if(actasItem.getFecharesolucion() != null) cerrarActaFuncion(acta,actasItem,response,usuario);
+							
+							LOGGER.info("ACTUALIZA " + acta.getIdacta() + " " + acta.getNumeroacta() + " "+ acta.getAnioacta() + " " + acta.getIdinstitucion());
+							
+							if(actasItem.getObservaciones() != null)response = scsActacomisionMapper.updateByPrimaryKeyWithBLOBs(acta);
+							else response = scsActacomisionMapper.updateByPrimaryKey(acta);
+							
+							
+						}catch(Exception e) {
+							error.setCode(404);
+							error.setDescription("InvalidUpdate");
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setError(error);
+							return insertResponseDTO;
+						}
 						if (response == 0) {
 							error.setCode(404);
 							error.setDescription("InvalidUpdate");
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							insertResponseDTO.setError(error);
+							return insertResponseDTO;
 						}
 						insertResponseDTO.setStatus(SigaConstants.OK);
 
@@ -632,18 +648,19 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 							error.setDescription("InvalidInsert");
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							insertResponseDTO.setError(error);
+							return insertResponseDTO;
 						}
 
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
 
-					response = scsActacomisionMapper.updateByPrimaryKey(acta);
 
 					if (response == 0) {
 						error.setCode(404);
 						error.setDescription("InvalidUpdate");
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						insertResponseDTO.setError(error);
+						return insertResponseDTO;
 					}
 					LOGGER.info(
 							"guardarActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para guardar el acta");
@@ -1180,172 +1197,18 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 						actasItem.setFecharesolucion(new Date());
 					}
 
-					List<ScsEjgActa> listaEjgActa = obtenerEjgActa(acta);
-
-					LOGGER.info("Lista de ejgasociados conseguida");
-
-					if (!listaEjgActa.isEmpty()) {
-
-						LOGGER.info("*****************lista de ejg asociados al acta no es nula************** "
-								+ listaEjgActa.size());
-
-						for (ScsEjgActa scsEjgActa : listaEjgActa) {
-
-							List<ScsEjg> ejgItemLista = obtenerListaEjg(scsEjgActa);
-
-							if (!ejgItemLista.isEmpty()) {
-
-								LOGGER.info("*****************tamaño de la lista de ejg asociados al acta**************"
-										+ ejgItemLista.size());
-
-								for (ScsEjg ejgItem : ejgItemLista) {
-
-									LOGGER.info("DATOS DEL EJG NADA MAS EMPEZAR EL FOR =  " + ejgItem.getIdinstitucion()
-											+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = "
-											+ ejgItem.getIdtipoejg() + " NUMERO = " + ejgItem.getNumero());
-
-									if (ejgItem.getIdtiporatificacionejg() == null) {
-
-										// Buscamos el estado del ejg remitido comision y le añadimos a la observacion
-										// esta informacion
-										LOGGER.info(
-												"*****************si el idfundamentojuridico es nulo**************");
-
-										List<ScsEstadoejg> listaEstadosEjg = obtenerEstadosEjg(ejgItem,
-												ejgItem.getIdinstitucion());
-
-										if (!listaEstadosEjg.isEmpty()) {
-											LOGGER.info(
-													"*****************tamaño de la lista de estados ejg ************** "
-															+ listaEstadosEjg.size());
-
-											for (ScsEstadoejg estado : listaEstadosEjg) {
-
-												if (estado.getIdestadoejg() == 9) {
-													LOGGER.info("*****************el estado es 9 ************** ");
-													estado.setObservaciones(estado.getObservaciones()
-															+ "Expediente sin Resolución. Se retira del acta "
-															+ ejgItem.getAnio() + "/" + ejgItem.getNumejg());
-													response = scsEstadoejgMapper.updateByPrimaryKey(estado);
-													if (response == 0)
-														throw (new Exception(
-																"Error al eliminar el dictamen asociado al EJG"));
-												}
-											}
-										}
-										
-										ejgItem.setAnioacta(null);
-										ejgItem.setIdinstitucionacta(null);
-										
-										response = scsEjgMapper.updateByPrimaryKey(ejgItem);
-										
-										if (response == 0)
-											throw (new Exception(
-													"Error al actuaizar el EJG"));
-										
-										LOGGER.info(
-												"*****************datos que se van a borrar de la tabla ejgacta ACTA **************"
-														+ acta.getIdacta() + " " + acta.getAnioacta() + " "
-														+ acta.getIdinstitucion());
-										LOGGER.info(
-												"*****************datos que se van a borrar de la tabla ejgacta EJG ************** =  "
-														+ ejgItem.getIdinstitucion() + " ANIO EJG = "
-														+ ejgItem.getAnio() + " idtipoeEJG = " + ejgItem.getIdtipoejg()
-														+ " NUMERO = " + ejgItem.getNumero());
-
-										response = borrarActa(acta, ejgItem);
-
-										LOGGER.info("RESPONSE " + response);
-
-										LOGGER.info("borro la relacion ejgacta");
-
-									} else {
-
-										LOGGER.info("el fundamento juridico no es nulo");
-
-										response = actualizarFecharesolucioncajg(ejgItem.getIdinstitucion(), usuario,
-												ejgItem);
-
-										if (response == 0)
-											throw (new Exception(
-													"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
-															+ " asociada a un EJG"));
-
-										ejgItem.setFecharesolucioncajg(actasItem.getFecharesolucion());
-
-										response = scsEjgMapper.updateByPrimaryKey(ejgItem);
-
-										if (response == 0) {
-											throw (new Exception(
-													"No se ha podido actualizar el objeto ejg con la nueva observacion y la nueva fecha resolucion"));
-										}
-
-										LOGGER.info(
-												"VALORES PARA BUSCAR EL ESTADO DEL EJG =  " + ejgItem.getIdinstitucion()
-														+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = "
-														+ ejgItem.getIdtipoejg() + " NUMERO = " + ejgItem.getNumero());
-
-										List<ScsEstadoejg> listaEstadosEjg = obtenerEstadosEjg(ejgItem,
-												ejgItem.getIdinstitucion());
-
-										LOGGER.info("CUANTOS ESTADOS TIENE ESTE EJG? " + listaEstadosEjg.size());
-
-										for (ScsEstadoejg ScsEstadoejg : listaEstadosEjg) {
-											LOGGER.info("ESTOS SON LOS DATOS DEL ESTADO EJG ");
-
-											LOGGER.info("VALORES DENTRO DEL FOR PARA VER LOS DATOS DEL ESTADO EJG =  "
-													+ ScsEstadoejg.getIdinstitucion() + " ANIO EJG = "
-													+ ScsEstadoejg.getAnio() + " idtipoeEJG = "
-													+ ScsEstadoejg.getIdtipoejg() + " NUMERO = "
-													+ ScsEstadoejg.getNumero() + " IDESTADOPOREJG = "
-													+ ScsEstadoejg.getIdestadoporejg());
-										}
-
-										if (!listaEstadosEjg.isEmpty()) {
-
-											LOGGER.info("CREAMOS EL ESTADO ");
-
-											response = crearEstado(actasItem, ejgItem, listaEstadosEjg);
-
-											if (response == 0) {
-												throw (new SigaExceptions("No se ha podido actualizar el estado"));
-											}
-
-											LOGGER.info("updateando el estado ejg");
-
-										}
-
-										LOGGER.info("Datos ejg anio ->" + ejgItem.getAnio() + " idinstitucion -> "
-												+ ejgItem.getIdinstitucion() + " idtipoejg ->" + ejgItem.getIdtipoejg()
-												+ " numeroejg->" + ejgItem.getNumejg());
-
-										LOGGER.info("Datos acta anio ->" + acta.getAnioacta() + " idinstitucion -> "
-												+ acta.getIdinstitucion() + " idtipoejg ->" + acta.getIdacta());
-
-										response = borrarActa(acta, ejgItem);
-
-										if (response == 0) {
-											throw (new Exception("No se ha podido borrar el acta"));
-										}
-
-									}
-
-								}
-
-							}
-						}
-					}
-
+					cerrarActaFuncion(acta, actasItem,response,usuario);
+					
 					// Ponemos fecha de hoy para el cierre
 					acta.setFecharesolucion(actasItem.getFecharesolucion());
 					scsActacomisionMapper.updateByPrimaryKey(acta);
 					updateResponseDTO.setStatus(SigaConstants.OK);
+				}else {
+					error.setCode(500);
+					error.setDescription("El acta ya esta cerrada");
+					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
-			} else {
-				error.setCode(500);
-				error.setDescription("El acta ya esta cerrada");
-				updateResponseDTO.setStatus(SigaConstants.KO);
-			}
+			} 
 			LOGGER.info(
 					"cerrarActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de Actas");
 
@@ -1360,6 +1223,165 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		return updateResponseDTO;
 	}
 
+	private void cerrarActaFuncion(ScsActacomision acta,ActasItem actasItem , int response , AdmUsuarios usuario ) throws Exception {
+		
+		List<ScsEjgActa> listaEjgActa = obtenerEjgActa(acta);
+
+		LOGGER.info("Lista de ejgasociados conseguida");
+
+		if (!listaEjgActa.isEmpty()) {
+
+			LOGGER.info("*****************lista de ejg asociados al acta no es nula************** "
+					+ listaEjgActa.size());
+
+			for (ScsEjgActa scsEjgActa : listaEjgActa) {
+
+				List<ScsEjg> ejgItemLista = obtenerListaEjg(scsEjgActa);
+
+				if (!ejgItemLista.isEmpty()) {
+
+					LOGGER.info("*****************tamaño de la lista de ejg asociados al acta**************"
+							+ ejgItemLista.size());
+
+					for (ScsEjg ejgItem : ejgItemLista) {
+
+						LOGGER.info("DATOS DEL EJG NADA MAS EMPEZAR EL FOR =  " + ejgItem.getIdinstitucion()
+								+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = "
+								+ ejgItem.getIdtipoejg() + " NUMERO = " + ejgItem.getNumero());
+
+						if (ejgItem.getIdtiporatificacionejg() == null) {
+
+							// Buscamos el estado del ejg remitido comision y le añadimos a la observacion
+							// esta informacion
+							LOGGER.info(
+									"*****************si el idfundamentojuridico es nulo**************");
+
+							List<ScsEstadoejg> listaEstadosEjg = obtenerEstadosEjg(ejgItem,
+									ejgItem.getIdinstitucion());
+
+							if (!listaEstadosEjg.isEmpty()) {
+								LOGGER.info(
+										"*****************tamaño de la lista de estados ejg ************** "
+												+ listaEstadosEjg.size());
+
+								for (ScsEstadoejg estado : listaEstadosEjg) {
+
+									if (estado.getIdestadoejg() == 9) {
+										LOGGER.info("*****************el estado es 9 ************** ");
+										estado.setObservaciones(estado.getObservaciones()
+												+ "Expediente sin Resolución. Se retira del acta "
+												+ ejgItem.getAnio() + "/" + ejgItem.getNumejg());
+										response = scsEstadoejgMapper.updateByPrimaryKey(estado);
+										if (response == 0)
+											throw (new Exception(
+													"Error al eliminar el dictamen asociado al EJG"));
+									}
+								}
+							}
+							
+							ejgItem.setAnioacta(null);
+							ejgItem.setIdinstitucionacta(null);
+							
+							response = scsEjgMapper.updateByPrimaryKey(ejgItem);
+							
+							if (response == 0)
+								throw (new Exception(
+										"Error al actuaizar el EJG"));
+							
+							LOGGER.info(
+									"*****************datos que se van a borrar de la tabla ejgacta ACTA **************"
+											+ acta.getIdacta() + " " + acta.getAnioacta() + " "
+											+ acta.getIdinstitucion());
+							LOGGER.info(
+									"*****************datos que se van a borrar de la tabla ejgacta EJG ************** =  "
+											+ ejgItem.getIdinstitucion() + " ANIO EJG = "
+											+ ejgItem.getAnio() + " idtipoeEJG = " + ejgItem.getIdtipoejg()
+											+ " NUMERO = " + ejgItem.getNumero());
+
+							response = borrarActa(acta, ejgItem);
+
+							LOGGER.info("RESPONSE " + response);
+
+							LOGGER.info("borro la relacion ejgacta");
+
+						} else {
+
+							LOGGER.info("el fundamento juridico no es nulo");
+
+							response = actualizarFecharesolucioncajg(ejgItem.getIdinstitucion(), usuario,
+									ejgItem);
+
+							if (response == 0)
+								throw (new Exception(
+										"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
+												+ " asociada a un EJG"));
+
+							ejgItem.setFecharesolucioncajg(actasItem.getFecharesolucion());
+
+							response = scsEjgMapper.updateByPrimaryKey(ejgItem);
+
+							if (response == 0) {
+								throw (new Exception(
+										"No se ha podido actualizar el objeto ejg con la nueva observacion y la nueva fecha resolucion"));
+							}
+
+							LOGGER.info(
+									"VALORES PARA BUSCAR EL ESTADO DEL EJG =  " + ejgItem.getIdinstitucion()
+											+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = "
+											+ ejgItem.getIdtipoejg() + " NUMERO = " + ejgItem.getNumero());
+
+							List<ScsEstadoejg> listaEstadosEjg = obtenerEstadosEjg(ejgItem,
+									ejgItem.getIdinstitucion());
+
+							LOGGER.info("CUANTOS ESTADOS TIENE ESTE EJG? " + listaEstadosEjg.size());
+
+							for (ScsEstadoejg ScsEstadoejg : listaEstadosEjg) {
+								LOGGER.info("ESTOS SON LOS DATOS DEL ESTADO EJG ");
+
+								LOGGER.info("VALORES DENTRO DEL FOR PARA VER LOS DATOS DEL ESTADO EJG =  "
+										+ ScsEstadoejg.getIdinstitucion() + " ANIO EJG = "
+										+ ScsEstadoejg.getAnio() + " idtipoeEJG = "
+										+ ScsEstadoejg.getIdtipoejg() + " NUMERO = "
+										+ ScsEstadoejg.getNumero() + " IDESTADOPOREJG = "
+										+ ScsEstadoejg.getIdestadoporejg());
+							}
+
+							if (!listaEstadosEjg.isEmpty()) {
+
+								LOGGER.info("CREAMOS EL ESTADO ");
+
+								response = crearEstado(actasItem, ejgItem, listaEstadosEjg);
+
+								if (response == 0) {
+									throw (new SigaExceptions("No se ha podido actualizar el estado"));
+								}
+
+								LOGGER.info("updateando el estado ejg");
+
+							}
+
+							LOGGER.info("Datos ejg anio ->" + ejgItem.getAnio() + " idinstitucion -> "
+									+ ejgItem.getIdinstitucion() + " idtipoejg ->" + ejgItem.getIdtipoejg()
+									+ " numeroejg->" + ejgItem.getNumejg());
+
+							LOGGER.info("Datos acta anio ->" + acta.getAnioacta() + " idinstitucion -> "
+									+ acta.getIdinstitucion() + " idtipoejg ->" + acta.getIdacta());
+
+							response = borrarActa(acta, ejgItem);
+
+							if (response == 0) {
+								throw (new Exception("No se ha podido borrar el acta"));
+							}
+
+						}
+
+					}
+
+				}
+			}
+		}
+	}
+	
 	@Override
 	public ScsActacomision getActa(ActasItem actasItem, HttpServletRequest request) {
 
