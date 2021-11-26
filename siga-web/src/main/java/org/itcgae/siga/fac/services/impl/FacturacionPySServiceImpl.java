@@ -1406,6 +1406,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public DeleteResponseDTO eliminarFacturacion(FacFacturacionEliminarItem fac, HttpServletRequest request)
 			throws Exception {
 		LOGGER.info("eliminarFacturacion() -> Entrada al servicio para eliminar facturación");
@@ -1450,7 +1451,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		
 		return deleteResponseDTO;
 	}
-	
+
+	@Override
 	public FicherosAbonosDTO getFicherosTransferencias(FicherosAbonosItem item, HttpServletRequest request)
 			throws Exception {
 		FicherosAbonosDTO ficherosAbonosDTO = new FicherosAbonosDTO();
@@ -1504,6 +1506,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return ficherosDevolucionesDTO;
 	}
 
+	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();

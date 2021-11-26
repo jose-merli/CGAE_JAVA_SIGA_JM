@@ -12,6 +12,7 @@ import org.itcgae.siga.db.entities.FacSufijo;
 import org.itcgae.siga.db.entities.FacSufijoExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.PysProductos;
@@ -803,6 +804,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		return comboDTO;
 	}
 
+	@Override
 	public ComboDTO parametrosSEPA(String idInstitucion, HttpServletRequest request) throws Exception {
 		ComboDTO comboDTO = new ComboDTO();
 		
@@ -899,6 +901,56 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		LOGGER.debug("parametrosSEPA() -> Salida del servicio");
 
 		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO parametrosCONTROL(String idInstitucion, HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboItem item = new ComboItem();
+
+		AdmUsuarios usuario = new AdmUsuarios();
+		GenParametrosExample example = new GenParametrosExample();
+		List<GenParametros> parametros;
+		short institucion;
+
+		LOGGER.debug("parametrosCONTROL() -> Entrada al servicio para recuperar los valores de los parámetros");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+
+			if(idInstitucion==null) {
+				institucion=Short.parseShort(idInstitucion);
+			}else {
+				institucion=usuario.getIdinstitucion();
+			}
+
+			comboItems.add(getParametro("CONTROL_EMISION_FACTURAS_SII", "FAC", institucion));
+			comboDTO.setCombooItems(comboItems);
+		}
+
+		LOGGER.debug("parametrosCONTROL() -> Salida del servicio");
+
+		return comboDTO;
+	}
+
+	public ComboItem getParametro(String parametro, String modulo, Short idIntritucion) {
+		ComboItem item = new ComboItem();
+		item.setLabel(parametro);
+
+		GenParametrosKey key = new GenParametros();
+		key.setIdinstitucion(idIntritucion);
+		key.setModulo(modulo);
+		key.setParametro(parametro);
+
+		GenParametros param = genParametrosMapper.selectByPrimaryKey(key);
+		if (param != null)
+			item.setValue(param.getValor());
+
+		return item;
 	}
 
 }
