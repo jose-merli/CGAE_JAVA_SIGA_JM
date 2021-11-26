@@ -833,7 +833,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 					LOGGER.info("Creando la nueva relacion acta y ejg");
 
-					scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumero()));
+					scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumejg()));
 					scsEjgActaNuevo.setIdtipoejg(scsEjg.getIdtipoejg());
 					scsEjgActaNuevo.setAnioejg(scsEjg.getAnio());
 					scsEjgActaNuevo.setIdinstitucionejg(idInstitucion);
@@ -998,7 +998,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 				LOGGER.info("intentamos conseguir el ejg");
 				for (EjgItem ejgItem : ejgItems) {
 
-					LOGGER.info("INFORMACION DEL EJG QUE HE ENVIADO SUPUESTAMENTE " + ejgItem.getNumero());
+					LOGGER.info("INFORMACION DEL EJG QUE HE ENVIADO SUPUESTAMENTE " + ejgItem.getNumEjg());
 
 					ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
 
@@ -1024,7 +1024,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idtipoejg -> " + scsEjg.getIdtipoejg());
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idinstitucion-> "
 							+ scsEjg.getIdinstitucion());
-					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumero());
+					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumejg());
 
 					scsEjgMapper.updateByPrimaryKey(scsEjg);
 					updateResponseDTO.setStatus(SigaConstants.OK);
@@ -1120,7 +1120,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							ResolucionEJGItem resolEjg = new ResolucionEJGItem();
 							resolEjg.setAnio(scsEjg.getAnio());
 							resolEjg.setIdTipoEJG(scsEjg.getIdtipoejg());
-							resolEjg.setNumero(scsEjg.getNumero());
+							resolEjg.setNumero(Long.valueOf(scsEjg.getNumejg()));
 							resolEjg.setFechaPresentacionPonente(ejgItem.getFechaPonenteDesd());
 							resolEjg.setIdPonente(Integer.valueOf(ejgItem.getPonente()));
 
@@ -1133,7 +1133,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 							ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
 
-							scsEstadoEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
+							scsEstadoEjg.setNumero(Long.valueOf(scsEjg.getNumejg()));
 							scsEstadoEjg.setIdtipoejg(scsEjg.getIdtipoejg());
 							scsEstadoEjg.setAnio(scsEjg.getAnio());
 							scsEstadoEjg.setIdinstitucion(Short.valueOf(idInstitucion));
@@ -1229,10 +1229,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		ScsEjgActaExample scsEjgActaExample = new ScsEjgActaExample();
 
-		LOGGER.info("datos ejg a buscar " + scsEjg.getAnio() + " " + scsEjg.getNumero() + " " + scsEjg.getIdtipoejg());
+		LOGGER.info("datos ejg a buscar " + scsEjg.getAnio() + " " + scsEjg.getNumejg() + " " + scsEjg.getIdtipoejg());
 
 		scsEjgActaExample.createCriteria().andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
-				.andNumeroejgEqualTo(Long.valueOf(scsEjg.getNumero())).andIdinstitucionejgEqualTo(idInstitucion)
+				.andNumeroejgEqualTo(Long.valueOf(scsEjg.getNumejg())).andIdinstitucionejgEqualTo(idInstitucion)
 				.andIdinstitucionactaEqualTo(idInstitucion).andAnioejgEqualTo(Short.valueOf(scsEjg.getAnio()));
 
 		List<ScsEjgActa> listaEjgAsociadosActa = scsEjgActaMapper.selectByExample(scsEjgActaExample);
@@ -1252,7 +1252,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		resolEjg.setIdTipoEJG(ejgItem.getIdtipoejg());
 
-		resolEjg.setNumero(ejgItem.getNumero());
+		resolEjg.setNumero(Long.valueOf(ejgItem.getNumejg()));
 
 		resolEjg.setIdTiporatificacionEJG(ejgItem.getIdtiporatificacionejg());
 
@@ -1300,7 +1300,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
 				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
-				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumejg())).andFechabajaIsNull();
 
 		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
 
@@ -1402,7 +1402,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		ejgkey.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
 
-		ejgkey.setNumero(Long.valueOf(ejgItem.getNumero()));
+		ejgkey.setNumero(Long.valueOf(ejgItem.getNumEjg()));
 
 		LOGGER.info("EJGKEY: anio idinstitucion tipoejg numero " + ejgkey.getAnio().toString() + " "
 				+ ejgkey.getIdinstitucion().toString() + " " + ejgkey.getIdtipoejg().toString() + " "
