@@ -2527,13 +2527,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 //                // Como se indica en el documento tecnico.
 //                ejg.setIdtiporatificacionejg(datos.getIdTiporatificacionEJG());
 //                ejg.setIdfundamentojuridico(datos.getIdFundamentoJuridico());
-//                ejg.setAniocajg(datos.getAnioCAJG());
-//                ejg.setNumeroCajg(datos.getNumeroCAJG());
+                ejg.setAniocajg(datos.getAnioCAJG());
+                ejg.setNumeroCajg(datos.getNumeroCAJG());
 //
 //                ejg.setIdponente(datos.getIdPonente());
 //                ejg.setFechapresentacionponente(datos.getFechaPresentacionPonente());
                 ejg.setFecharatificacion(datos.getFechaRatificacion());
-//                ejg.setFechanotificacion(datos.getFechaNotificacion());
+                ejg.setFechanotificacion(datos.getFechaNotificacion());
                 ejg.setIdorigencajg(datos.getIdOrigencajg());
                 ejg.setRefauto(datos.getRefAuto());
                 if (datos.getTurnadoRatificacion() == "true") {
@@ -2587,8 +2587,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 ejgResolucion.setFecharesolucioncajg(datos.getFechaResolucionCAJG());
 //                ejgResolucion.setIdtiporatificacionejg(datos.getIdTiporatificacionEJG());
 //                ejgResolucion.setIdfundamentojuridico(datos.getIdFundamentoJuridico());
-//                ejgResolucion.setAniocajg(datos.getAnioCAJG());
-//                ejgResolucion.setNumeroCajg(datos.getNumeroCAJG());
+                ejgResolucion.setAniocajg(datos.getAnioCAJG());
+                ejgResolucion.setNumeroCajg(datos.getNumeroCAJG());
 //
                 ejgResolucion.setRatificaciondictamen(datos.getRatificacionDictamen());
                 ejgResolucion.setNotascajg(datos.getNotasCAJG());
@@ -2599,7 +2599,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 //                // lo que se le asigna el mismo valor.
 //                ejgResolucion.setIdinstitucionponente(idInstitucion);
 //
-//                ejgResolucion.setFechanotificacion(datos.getFechaNotificacion());
+                ejgResolucion.setFechanotificacion(datos.getFechaNotificacion());
                 ejgResolucion.setFecharatificacion(datos.getFechaRatificacion());
                 ejgResolucion.setIdorigencajg(datos.getIdOrigencajg());
                 ejgResolucion.setRefauto(datos.getRefAuto());
