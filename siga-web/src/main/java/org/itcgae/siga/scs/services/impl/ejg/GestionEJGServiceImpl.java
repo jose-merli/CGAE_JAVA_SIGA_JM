@@ -2484,9 +2484,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 List<EjgItem> list = Arrays.asList(fichaEjg);
                 
                 //Se desplaza parte de la funcionalidad a los servicios del modulo de comisiones
-                busquedaEJGComisionServiceImpl.editarActaAnio(list, request);
-                busquedaEJGComisionServiceImpl.editarResolucionFundamento(list, request);
-                busquedaEJGComisionServiceImpl.editarPonente(list, request);
+                if(datos.getIdActa() != null) {
+                	busquedaEJGComisionServiceImpl.editarActaAnio(list, request);
+                }
+                if(datos.getIdFundamentoJuridico() != null) {
+                	busquedaEJGComisionServiceImpl.editarResolucionFundamento(list, request);
+                }
+                if(datos.getIdPonente() != null) {
+                	busquedaEJGComisionServiceImpl.editarPonente(list, request);
+                }
                 
               //Se terminan de introducir los datos que faltan en el EJG y su resolucion en el codigo antiguo
 //                datos.getTipoResolucionCAJG();//FALTA Y NO SE USABA EN EL ORIGINAL

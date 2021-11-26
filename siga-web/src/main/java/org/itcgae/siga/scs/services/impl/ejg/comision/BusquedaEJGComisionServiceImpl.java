@@ -1021,8 +1021,11 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 						scsEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
 						if(ejgItem.getFundamentoJuridico() != null) {
-						scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+							scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
 						}
+//						else {
+//							scsEjg.setIdfundamentojuridico(null);
+//						}
 					}
 
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL -> ");
