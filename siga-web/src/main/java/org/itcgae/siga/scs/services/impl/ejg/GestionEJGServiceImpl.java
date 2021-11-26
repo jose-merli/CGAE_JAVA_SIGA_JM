@@ -2487,11 +2487,20 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 if(datos.getIdActa() != null) {
                 	busquedaEJGComisionServiceImpl.editarActaAnio(list, request);
                 }
+                else {
+                	busquedaEJGComisionServiceImpl.borrarActaAnio(list, request);
+                }
                 if(datos.getIdFundamentoJuridico() != null) {
                 	busquedaEJGComisionServiceImpl.editarResolucionFundamento(list, request);
                 }
+                else {
+                	busquedaEJGComisionServiceImpl.borrarResolucionFundamento(list, request);
+                }
                 if(datos.getIdPonente() != null) {
                 	busquedaEJGComisionServiceImpl.editarPonente(list, request);
+                }
+                else {
+                	busquedaEJGComisionServiceImpl.borrarPonente(list, request);
                 }
                 
               //Se terminan de introducir los datos que faltan en el EJG y su resolucion en el codigo antiguo
