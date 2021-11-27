@@ -475,9 +475,9 @@ public class ScsCalendarioguardiasSqlProvider {
 		SQL sql = new SQL();
 			sql.SELECT("LOG_GENERACION_NAME");
 			sql.FROM("SCS_CALENDARIOGUARDIAS");
-			if (idCG != null && !idCG.isEmpty()) {
-				sql.WHERE("IDCALENDARIOGUARDIAS = " + idCG);
-			}
+//			if (idCG != null && !idCG.isEmpty()) {
+//				sql.WHERE("IDCALENDARIOGUARDIAS = " + idCG);
+//			}
 			if (idInstitucion != null && !idInstitucion.isEmpty()) {
 				sql.WHERE("IDINSTITUCION = " + idInstitucion);
 			}
@@ -499,7 +499,7 @@ public class ScsCalendarioguardiasSqlProvider {
 			return sql.toString();
 	   }
 	   
-	   public String getGeneracionEnProceso(String idProgCal) {
+	   public String getGeneracionEnProceso() {
 		   SQL sql = new SQL();
 			sql.SELECT("IDPROGCALENDARIO");
 			sql.FROM("SCS_PROG_CALENDARIOS PC");

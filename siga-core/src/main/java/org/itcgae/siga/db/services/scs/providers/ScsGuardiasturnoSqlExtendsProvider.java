@@ -67,7 +67,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sql.SELECT("SCS_GUARDIASTURNO.IDTURNO AS idturno");
 		sql.SELECT("SCS_GUARDIASTURNO.IDGUARDIA AS idguardia");
 		sql.SELECT("SCS_GUARDIASTURNO.NOMBRE AS nombre");
-
+		if (guardiaItem.getIdTipoGuardia() != null && guardiaItem.getIdTipoGuardia() != "")
 		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION AS tipodeguardia");
 
 		sql.SELECT("CASE \n" +
@@ -108,12 +108,12 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		sql.JOIN(
 				"SCS_TURNO ON SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO AND SCS_GUARDIASTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION");
-
+		if (guardiaItem.getIdTipoGuardia() != null && guardiaItem.getIdTipoGuardia() != "")
 		sql.JOIN("SCS_TIPOSGUARDIAS ON SCS_TIPOSGUARDIAS.IDTIPOGUARDIA = SCS_GUARDIASTURNO.IDTIPOGUARDIA");
-
-		sql.LEFT_OUTER_JOIN(
-				"GEN_RECURSOS_CATALOGOS ON GEN_RECURSOS_CATALOGOS.IDRECURSO = SCS_TIPOSGUARDIAS.DESCRIPCION AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = '"
-						+ idLenguaje + "'");
+		if (guardiaItem.getIdTipoGuardia() != null && guardiaItem.getIdTipoGuardia() != "") {
+			
+		}
+		
 
 		// JOINS
 
@@ -2062,11 +2062,11 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		SQL sql = new SQL();
         sql.SELECT("*");
         sql.FROM("( "  + subquery.toString() +  " )");
-        sql.WHERE("ROWNUM=1"); 
+        //sql.WHERE("ROWNUM=1"); 
 	return sql.toString();
 	}
 	
-	public String getCalGuardiavVector(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion){
+	public String getCalGuardiavVector(String idTurno, String idGuardia, String fechaDesde, String fechaHasta, String idInstitucion){
 //		SELECT IDINSTITUCION, IDTURNO, IDGUARDIA, IDCALENDARIOGUARDIAS, FECHAFIN, FECHAINICIO, OBSERVACIONES, FECHAMODIFICACION, USUMODIFICACION, 
 //		IDPERSONA_ULTIMOANTERIOR, IDGRUPOGUARDIA_ULTIMOANTERIOR, FECHASUSC_ULTIMOANTERIOR, IDTURNOPRINCIPAL, IDGUARDIAPRINCIPAL, IDCALENDARIOGUARDIASPRINCIPAL   
 //		FROM SCS_CALENDARIOGUARDIAS  
@@ -2077,20 +2077,20 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SELECT("IDINSTITUCION, IDTURNO, IDGUARDIA, IDCALENDARIOGUARDIAS, FECHAFIN, FECHAINICIO, OBSERVACIONES, FECHAMODIFICACION, USUMODIFICACION, " + 
 				"		IDPERSONA_ULTIMOANTERIOR, IDGRUPOGUARDIA_ULTIMOANTERIOR, FECHASUSC_ULTIMOANTERIOR, IDTURNOPRINCIPAL, IDGUARDIAPRINCIPAL, IDCALENDARIOGUARDIASPRINCIPAL   ");
 		sql.FROM("SCS_CALENDARIOGUARDIAS");
-		if(calendarioItem.getIdTurno() != null) {
-			sql.WHERE("IDTURNO = " + calendarioItem.getIdTurno());
+		if(idTurno != null) {
+			sql.WHERE("IDTURNO = " + idTurno);
 		}
-		if(calendarioItem.getIdGuardia() != null) {
-			sql.WHERE("IDGUARDIA = " + calendarioItem.getIdGuardia());
+		if(idGuardia != null) {
+			sql.WHERE("IDGUARDIA = " + idGuardia);
 		}
 		if(idInstitucion != null) {
 			sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		}
-		if(calendarioItem.getFechaDesde() != null) {
-			sql.WHERE("FECHAINICIO >= TO_DATE('" + calendarioItem.getFechaDesde() + "','DD/MM/YYYY')");
+		if(fechaDesde != null) {
+			sql.WHERE("FECHAINICIO >= TO_DATE('" + fechaDesde + "','DD/MM/YYYY')");
 		}
-		if(calendarioItem.getFechaHasta() != null) {
-			sql.WHERE("FECHAFIN <= TO_DATE('" + calendarioItem.getFechaHasta() + "','DD/MM/YYYY')");
+		if(fechaHasta != null) {
+			sql.WHERE("FECHAFIN <= TO_DATE('" + fechaHasta + "','DD/MM/YYYY')");
 		}
 		sql.ORDER_BY("IDINSTITUCION, IDTURNO, IDGUARDIA, IDCALENDARIOGUARDIAS");
         return sql.toString();
@@ -2487,7 +2487,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		SQL sql = new SQL();
 		sql.SELECT("*");
 		sql.FROM("( " + subquery + " )");
-		sql.WHERE("ROWNUM=1");
+//		sql.WHERE("ROWNUM=1");
 		return sql.toString();
 	}
 	
@@ -2796,7 +2796,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		"       Ins.Idturno, " +
 		"       Ins.Idguardia, " +
 		"       Per.Idpersona, " +
-		"       Ins.fechasuscripcion As Fechasuscripcion, "+
+		"       ins.fechasuscripcion As Fechasuscripcion, "+
 		"       TO_CHAR(TRUNC(Ins.fechavalidacion),'DD/MM/YYYY') As Fechavalidacion, "+
 	    "       TO_CHAR(trunc(Ins.fechabaja),'DD/MM/YYYY') As Fechabaja, "+
 	    
@@ -3134,83 +3134,39 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 	
 	
 	public String marcarSaltoCompensacion(Integer usuario, String idturno, ScsSaltoscompensaciones saltoCompensacion,String s_idpersona, String s_idinstitucion, String s_idturno, String s_idguardia,String s_saltocompensacion, String fechaCumplimiento) {
-		StringBuilder sql = new StringBuilder();
-		sql.append(" UPDATE ");
-		sql.append("SCS_SALTOSCOMPENSACIONES");
-		sql.append(" SET ");
-		sql.append("FECHACUMPLIMIENTO");
-		sql.append(" = ");
-		sql.append("TO_DATE( '" + fechaCumplimiento + "', dd/MM/yy)");
-		sql.append(", ");
-		sql.append("USUMODIFICACION");
-		sql.append(" = ");
-		sql.append(usuario.toString());
-		sql.append(",");
-		sql.append("FECHAMODIFICACION");
-		sql.append(" = SYSDATE  ");
-		if (saltoCompensacion.getIdguardia() != null) {
-			sql.append(" , ");
-			sql.append("IDCALENDARIOGUARDIAS");
-			sql.append(" = ");
-			sql.append(saltoCompensacion.getIdcalendarioguardias());
-			sql.append(" ");
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
+		sql.SET("FECHACUMPLIMIENTO = " + "TO_DATE( '" + fechaCumplimiento + "', 'dd/MM/yy')");
+		sql.SET("USUMODIFICACION = "+ usuario.toString());
+		sql.SET("FECHAMODIFICACION = "+ "SYSDATE");
+		if (saltoCompensacion.getIdcalendarioguardias() != null) {
+			sql.SET("IDCALENDARIOGUARDIAS = "+ saltoCompensacion.getIdcalendarioguardias().toString());
 		}
 		if (saltoCompensacion.getMotivos() != null && !saltoCompensacion.getMotivos().equals("")) {
-			sql.append(" , ");
-			sql.append("MOTIVOS");
-			sql.append(" = ");
-			sql.append("MOTIVOS");
-			sql.append(" || '");
-			sql.append(saltoCompensacion.getMotivos());
-			sql.append("' ");
+			sql.SET("MOTIVOS = " + "MOTIVOS || '" + saltoCompensacion.getMotivos() + "'");
 		}
+		sql.WHERE("IDINSTITUCION = " + s_idinstitucion);
 
-		
-		StringBuilder where = new StringBuilder();
-		where.append(" WHERE ");
-		where.append("IDINSTITUCION");
-		where.append("=");
-		where.append(s_idinstitucion);
 		if (idturno != null && !s_idturno.equals("")) {
-			where.append("   AND ");
-			where.append("IDTURNO");
-			where.append("=");
-			where.append(s_idturno);
+			sql.WHERE("IDTURNO = " + s_idturno);
 		}
-		where.append("   AND ");
-		where.append("IDGUARDIA");
 		if (s_idguardia != null && !s_idguardia.equals("")) {
-			where.append("=");
-			where.append(s_idguardia);
+			sql.WHERE("IDGUARDIA = " + s_idguardia);
 		} else {
-			where.append(" IS NULL ");
+			sql.WHERE("IDGUARDIA IS NULL");
 		}
 		if (s_idpersona != null && !s_idpersona.equals("")) {
-			where.append("   AND ");
-			where.append("IDPERSONA");
-			where.append("=");
-			where.append(s_idpersona);
+			sql.WHERE("IDPERSONA = " + s_idpersona);
 		}
 		if (s_saltocompensacion.charAt(0) != ' ') {
-			where.append("   AND ");
-			where.append("SALTOOCOMPENSACION");
-			where.append("= '");
-			where.append(s_saltocompensacion.charAt(0));
-			where.append("'");
+			sql.WHERE("SALTOOCOMPENSACION = '" + s_saltocompensacion.charAt(0) + "'");
 		}
-		where.append("   AND ");
-		where.append("FECHACUMPLIMIENTO");
-		where.append(" IS NULL ");
-		sql.append(where);
+		sql.WHERE("FECHACUMPLIMIENTO IS NULL");
 
 		if (saltoCompensacion.getIdsaltosturno() != null) {
-			sql.append(" AND ");
-			sql.append("IDSALTOSTURNO");
-			sql.append(" = '");
-			sql.append(saltoCompensacion.getIdsaltosturno());
+			sql.WHERE("IDSALTOSTURNO = " + saltoCompensacion.getIdsaltosturno());
 		}
-
-		sql.append(" AND rownum=1");
 		
 		return sql.toString();
 	}
@@ -3465,7 +3421,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SET("IDGRUPOGUARDIA_ULTIMO = " + sIdGrupoGuardiaColegiado_Ultimo);
 		}
 		if (sFechaSusc != null) {
-		sql.SET("FECHASUSCRIPCION_ULTIMO = '" + sFechaSusc + "'");
+		sql.SET("FECHASUSCRIPCION_ULTIMO = TO_DATE(' " + sFechaSusc + "', 'YYYY-MM-DD HH24:MI:SS')");
 		}
 		if (sIdpersona != null && sIdpersona != "null" && !sIdpersona.isEmpty() ) {
 		sql.SET("IDPERSONA_ULTIMO = " + sIdpersona);

@@ -950,6 +950,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 				try {
 					TurnosItem turnosItem = new TurnosItem();
 					turnosItem.setAbreviatura(cargaMasivaDatosITItem.getNombreTurno());
+					turnosItem.setNombre(cargaMasivaDatosITItem.getNombreTurno());
 					List<TurnosItem> listaTur = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
 		
 					cargaMasivaDatosITItem.setIdTurno(listaTur.get(0).getIdturno().toString());
@@ -974,7 +975,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 						andIdinstitucionEqualTo(idInstitucion);
 					List<ScsGuardiasturno> listaGuar = scsGuardiasTurnoExtendsMapper.selectByExample(guardiaExample);
 		
-					if(listaGuar.get(0).getIdturno().toString().equals(cargaMasivaDatosITItem.getIdTurno())) {
+					if(!listaGuar.get(0).getIdturno().toString().equals(cargaMasivaDatosITItem.getIdTurno())) {
 						errorLinea.append("No se ha encontrado una guardia con el nombre introducido en el turno asociado");
 						cargaMasivaDatosITItem.setNombreGuardia("Error");
 					}
