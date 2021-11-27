@@ -511,7 +511,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 
         
         if(inscripciones.getaFechaDe() != null) {
-        	sql.WHERE("ins.fechasuscripcion >= TO_DATE('" + inscripciones.getaFechaDe() + "','DD/MM/RRRR')");
+        	sql.WHERE("trunc(TO_DATE('" + inscripciones.getaFechaDe() + "','DD/MM/RRRR')) between trunc(ins.FECHAVALIDACION) and nvl(trunc(ins.FECHABAJA), '31/12/2999')");
         }
         
         if(inscripciones.getFechaDesde() != null) {
@@ -1405,34 +1405,91 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 				+ " AND scs_turno.fechabaja IS NULL"
 				+ " AND scs_inscripcionguardia.idpersona <> " + inscripcion.getIdpersona()
 				+ " AND scs_inscripcionguardia.idinstitucion = " + idInstitucion
-				+ " AND gen_recursos_catalogos.idlenguaje = 1"
+				+ " AND gen_recursos_catalogos.idlenguaje = " + admUsuarios.getIdlenguaje()
 		);
 		return sql.toString();
 	}
 	
 	public String inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia, String idpersona) {
 		SQL sql = new SQL();
-		sql.SELECT("scs_guardiasturno.idguardia AS idguardia",
-		"scs_guardiasturno.idturno AS idturno",
+		sql.SELECT("scs_inscripcionguardia.idguardia AS idguardia",
+		"scs_inscripcionguardia.idturno AS idturno",
 		"scs_grupoguardia.numerogrupo AS numerogrupo",
-		"DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado) AS colegiado",
-		"( DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado)"
-		+ "    || '/'"
-		+ "    || lpad(scs_grupoguardia.numerogrupo,3,'0') ) AS colegiado_grupo",
-		"( cen_persona.apellidos1"
-		+ "    || ' '"
-		+ "    || cen_persona.apellidos2"
-		+ "    || ', '"
-		+ "    || cen_persona.nombre ) AS letrado",
+		"(" + 
+		"        SELECT" + 
+		"            decode(cen_colegiado.comunitario, '1', cen_colegiado.ncomunitario, cen_colegiado.ncolegiado)" + 
+		"        FROM" + 
+		"            cen_colegiado" + 
+		"        WHERE" + 
+		"            cen_colegiado.idpersona = scs_inscripcionguardia.idpersona" + 
+		"            AND cen_colegiado.idinstitucion = scs_inscripcionguardia.idinstitucion" + 
+		"    ) AS colegiado",
+		"(" + 
+		"        SELECT" + 
+		"            decode(cen_colegiado.comunitario, '1', cen_colegiado.ncomunitario, cen_colegiado.ncolegiado)" + 
+		"            || '/'" + 
+		"            || lpad(scs_grupoguardia.numerogrupo, 3, '0')" + 
+		"        FROM" + 
+		"            cen_colegiado" + 
+		"        WHERE" + 
+		"            cen_colegiado.idpersona = scs_inscripcionguardia.idpersona" + 
+		"            AND cen_colegiado.idinstitucion = scs_inscripcionguardia.idinstitucion" + 
+		"    ) AS colegiado_grupo",
+		"(" + 
+		"        SELECT" + 
+		"            cen_persona.apellidos1" + 
+		"            || ' '" + 
+		"            || cen_persona.apellidos2" + 
+		"            || ', '" + 
+		"            || cen_persona.nombre" + 
+		"        FROM" + 
+		"            cen_persona" + 
+		"        WHERE" + 
+		"            cen_persona.idpersona = scs_inscripcionguardia.idpersona" + 
+		"    ) AS letrado",
 		"scs_turno.nombre AS nombre_turno",
 		"scs_turno.idzona AS idzona",
-		"scs_zona.nombre AS nombre_zona",
+		"(" + 
+		"        SELECT" + 
+		"            scs_zona.nombre" + 
+		"        FROM" + 
+		"            scs_zona" + 
+		"        WHERE" + 
+		"            scs_zona.idinstitucion = scs_turno.idinstitucion" + 
+		"            AND scs_zona.idzona = scs_turno.idzona" + 
+		"    ) AS nombre_zona",
 		"scs_turno.idsubzona AS idsubzona",
-		"scs_subzona.nombre AS nombre_subzona",
+		"(" + 
+		"        SELECT" + 
+		"            scs_subzona.nombre" + 
+		"        FROM" + 
+		"            scs_subzona" + 
+		"        WHERE" + 
+		"            scs_subzona.idinstitucion = scs_turno.idinstitucion" + 
+		"            AND scs_subzona.idzona = scs_turno.idzona" + 
+		"            AND scs_subzona.idsubzona = scs_turno.idsubzona" + 
+		"    ) AS nombre_subzona",
 		"scs_turno.idarea AS idarea",
-		"scs_area.nombre AS nombre_area",
+		"(" + 
+		"        SELECT" + 
+		"            scs_area.nombre" + 
+		"        FROM" + 
+		"            scs_area" + 
+		"        WHERE" + 
+		"            scs_area.idinstitucion = scs_turno.idinstitucion" + 
+		"            AND scs_area.idarea = scs_turno.idarea" + 
+		"    ) AS nombre_area",
 		"scs_turno.idmateria AS idmateria",
-		"scs_materia.nombre AS nombre_materia",
+		"(" + 
+		"        SELECT" + 
+		"            scs_materia.nombre" + 
+		"        FROM" + 
+		"            scs_materia" + 
+		"        WHERE" + 
+		"            scs_materia.idinstitucion = scs_turno.idinstitucion" + 
+		"            AND scs_materia.idmateria = scs_turno.idmateria" + 
+		"            AND scs_materia.idarea = scs_turno.idarea" + 
+		"    ) AS nombre_materia",
 		"scs_guardiasturno.nombre AS nombre_guardia",
 		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia",
 		"scs_turno.guardias AS obligatoriedad_inscripcion",
@@ -1442,25 +1499,19 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		//Left Join
 		sql.JOIN("scs_turno ON scs_turno.idinstitucion = scs_inscripcionguardia.idinstitucion AND scs_turno.idturno = scs_inscripcionguardia.idturno");
 		sql.JOIN("scs_guardiasturno ON scs_inscripcionguardia.idguardia = scs_guardiasturno.idguardia AND scs_inscripcionguardia.idinstitucion = scs_guardiasturno.idinstitucion AND scs_inscripcionguardia.idturno = scs_guardiasturno.idturno");
-		sql.JOIN("cen_persona ON cen_persona.idpersona = scs_inscripcionguardia.idpersona");
-		sql.JOIN("cen_colegiado ON cen_colegiado.idpersona = scs_inscripcionguardia.idpersona AND cen_colegiado.idinstitucion = scs_inscripcionguardia.idinstitucion");
-		sql.JOIN("scs_grupoguardia ON scs_guardiasturno.idguardia = scs_grupoguardia.idguardia");
-		sql.JOIN("scs_zona ON scs_zona.idinstitucion = scs_turno.idinstitucion AND scs_zona.idzona = scs_turno.idzona");
-		sql.JOIN("scs_subzona ON scs_subzona.idinstitucion = scs_turno.idinstitucion AND scs_subzona.idzona = scs_turno.idzona AND scs_subzona.idsubzona = scs_turno.idsubzona");
-		sql.JOIN("scs_area ON scs_area.idinstitucion = scs_turno.idinstitucion AND scs_area.idarea = scs_turno.idarea");
-		sql.JOIN("scs_materia ON scs_materia.idinstitucion = scs_turno.idinstitucion AND scs_materia.idmateria = scs_turno.idmateria AND scs_materia.idarea = scs_turno.idarea");
+		sql.LEFT_OUTER_JOIN("scs_grupoguardia ON scs_guardiasturno.idguardia = scs_grupoguardia.idguardia");
 		sql.JOIN("scs_tiposguardias ON scs_guardiasturno.idtipoguardia = scs_tiposguardias.idtipoguardia");
 		//Left Join
 		sql.JOIN("gen_recursos_catalogos ON scs_tiposguardias.descripcion = gen_recursos_catalogos.idrecurso");
 		
 		sql.WHERE(
-		"scs_guardiasturno.fechabaja IS NULL",
-		"scs_turno.fechabaja IS NULL",
-		"scs_inscripcionguardia.fechasuscripcion IS NOT NULL",
+		//"scs_guardiasturno.fechabaja IS NULL",
+		//"scs_turno.fechabaja IS NULL",
+		//"scs_inscripcionguardia.fechasuscripcion IS NOT NULL",
 		"scs_inscripcionguardia.idpersona = " + idpersona,
 		"scs_inscripcionguardia.idinstitucion = " + idInstitucion,
-		"scs_guardiasturno.IDGUARDIA = " + guardia,
-		"gen_recursos_catalogos.idlenguaje = 1");
+		"scs_inscripcionguardia.IDGUARDIA = " + guardia,
+		"gen_recursos_catalogos.idlenguaje = " + admUsuarios.getIdlenguaje());
 		return sql.toString();
 	}
 	

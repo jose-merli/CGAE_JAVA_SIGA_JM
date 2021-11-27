@@ -7949,9 +7949,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 				} else {
 					tamMaximo = null;
 				}
-
-				List<GuardiasItem> guardiasColegiado = scsCabeceraguardiasExtendsMapper
-						.busquedaGuardiasColegiado(guardiaItem, idInstitucion.toString());
+				
+				List<GuardiasItem> guardiasColegiado = scsCabeceraguardiasExtendsMapper.busquedaGuardiasColegiado(guardiaItem, idInstitucion.toString(),tamMaximo);
 
 				Date fechaActural = new Date();
 
