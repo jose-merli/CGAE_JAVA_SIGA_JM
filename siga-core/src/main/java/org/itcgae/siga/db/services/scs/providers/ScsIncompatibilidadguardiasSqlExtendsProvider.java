@@ -399,6 +399,11 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 	}
 	
 	public String checkIncompatibilidadesExists(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible) {
+		
+		SQL subquery = new SQL();
+		subquery.SELECT("IDTURNO");
+		subquery.FROM("SCS_GUARDIASTURNO");
+		subquery.WHERE("IDGUARDIA = " + idGuardiaIncompatible);
 		SQL sql = new SQL();
 		
 		/*Será necesario comprobar si ya existe dicha incompatibilidad, para ello realizaremos la siguiente consulta, 
@@ -410,14 +415,25 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 					
 		sql.WHERE("IDINSTITUCION = " + idInstitucion +
 				" AND ((IDTURNO IN ( " + idTurno + " )" +
-				" AND IDGUARDIA = " + idGuardia + 
-				" AND IDTURNO_INCOMPATIBLE = " + "'" + idTurnoIncompatible + "'" + 
-				" AND IDGUARDIA_INCOMPATIBLE = " + "'" + idGuardiaIncompatible + "'"  + ") " +
-				" OR (IDTURNO IN ( " + idTurnoIncompatible + " )" +
-				" AND IDGUARDIA = " + "'" + idGuardiaIncompatible + "'" +
-				" AND IDTURNO_INCOMPATIBLE = " + "'" + idTurno + "'" +
-				" AND IDGUARDIA_INCOMPATIBLE = " + idGuardia + ")) "
-					);
+				" AND IDGUARDIA = " + idGuardia );
+				if (idTurnoIncompatible != null) {
+					sql.WHERE(" IDTURNO_INCOMPATIBLE = " + "'" + idTurnoIncompatible + "'" );
+					sql.WHERE("IDGUARDIA_INCOMPATIBLE = " + "'" + idGuardiaIncompatible + "'"  + ") " +
+							" OR (IDTURNO IN ( " + idTurnoIncompatible + " )" +
+							" AND IDGUARDIA = " + "'" + idGuardiaIncompatible + "'" +
+							" AND IDTURNO_INCOMPATIBLE = " + "'" + idTurno + "'" +
+							" AND IDGUARDIA_INCOMPATIBLE = " + idGuardia + ")) "
+								);
+				}else {
+					sql.WHERE(" IDTURNO_INCOMPATIBLE IN " + "(" + subquery + ")" );
+					sql.WHERE("IDGUARDIA_INCOMPATIBLE = " + "'" + idGuardiaIncompatible + "'"  + ") " +
+							" OR (IDTURNO IN ( " + subquery + " )" +
+							" AND IDGUARDIA = " + "'" + idGuardiaIncompatible + "'" +
+							" AND IDTURNO_INCOMPATIBLE = " + "'" + idTurno + "'" +
+							" AND IDGUARDIA_INCOMPATIBLE = " + idGuardia + ")) "
+								);
+				}
+				
 		return sql.toString();
 	}
 	
@@ -505,7 +521,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 					
 		sql.FROM("SCS_GUARDIASTURNO");
 					
-		sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA = '" + idGuardiaInc + "'");
+		sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA IN (" + idGuardiaInc + ")");
 		
 		return sql.toString();
 	}
