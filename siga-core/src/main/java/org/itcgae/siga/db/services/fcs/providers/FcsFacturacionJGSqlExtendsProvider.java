@@ -834,15 +834,15 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
 
     }
-    
+
     public String comboFactMovimientos(String idInstitucion) {
 
-    	SQL subquery2 = new SQL();
-    	subquery2.SELECT("MAX(EST2.IDORDENESTADO)");
-    	subquery2.FROM("FCS_FACT_ESTADOSFACTURACION EST2");
-    	subquery2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
-    	subquery2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
-    	
+        SQL subquery2 = new SQL();
+        subquery2.SELECT("MAX(EST2.IDORDENESTADO)");
+        subquery2.FROM("FCS_FACT_ESTADOSFACTURACION EST2");
+        subquery2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+        subquery2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+
         SQL sql = new SQL();
         sql.SELECT("F.IDFACTURACION AS id");
         sql.SELECT("TO_CHAR(F.FECHADESDE, 'DD/MM/YYYY') || '-' || TO_CHAR(F.FECHAHASTA, 'DD/MM/YYYY') || ' - ' || F.NOMBRE AS DESCRIPCION");
@@ -852,16 +852,16 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("(F.PREVISION IS NULL OR F.PREVISION='0')");
         sql.WHERE("F.IDINSTITUCION = EST.IDINSTITUCION");
         sql.WHERE("F.IDFACTURACION = EST.IDFACTURACION");
-        sql.WHERE("EST.IDORDENESTADO = ("+subquery2+")");
+        sql.WHERE("EST.IDORDENESTADO = (" + subquery2 + ")");
         sql.WHERE("EST.IDESTADOFACTURACION IN (20,30)");
         sql.ORDER_BY("F.FECHADESDE DESC");
 
         return sql.toString();
     }
-    
+
     public String comboAgrupacionEnTurnos(String idInstitucion) {
 
-    	
+
         SQL sql = new SQL();
         sql.SELECT("IDGRUPOFACTURACION as ID");
         sql.SELECT("substr(f_siga_getrecurso (NOMBRE,1),0,25) as DESCRIPCION");
@@ -873,7 +873,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
     }
 
 
-    public String getFacturacionesPorActuacionDesigna(Short idInstitucion, ScsActuaciondesigna scsActuaciondesigna) {
+    public String getFacturacionesPorActuacionDesigna(Short idInstitucion, ScsActuaciondesigna scsActuaciondesigna, String literal) {
 
         SQL subQuery = new SQL();
         subQuery.SELECT("IDFACTURACION");
@@ -887,7 +887,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         SQL sql = new SQL();
         sql.SELECT("IDFACTURACION");
         sql.SELECT("FAC.NOMBRE");
-        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
@@ -896,7 +896,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
     }
 
-    public String getFacturacionesPorAsistencia(Short idInstitucion, ScsAsistencia scsAsistencia) {
+    public String getFacturacionesPorAsistencia(Short idInstitucion, ScsAsistencia scsAsistencia, String literal) {
 
         SQL subQuery = new SQL();
         subQuery.SELECT("IDFACTURACION");
@@ -908,7 +908,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         SQL sql = new SQL();
         sql.SELECT("IDFACTURACION");
         sql.SELECT("FAC.NOMBRE");
-        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
@@ -917,11 +917,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
     }
 
-    public String getFacturacionesPorActuacionAsistencia(Short idInstitucion, ScsActuacionasistencia scsActuacionasistencia) {
+    public String getFacturacionesPorActuacionAsistencia(Short idInstitucion, ScsActuacionasistencia scsActuacionasistencia, String literal) {
 
         SQL subQuery = new SQL();
         subQuery.SELECT("IDFACTURACION");
-        subQuery.FROM("FCS_FACT_ASISTENCIA F");
+        subQuery.FROM("FCS_FACT_ACTUACIONASISTENCIA F");
         subQuery.WHERE("F.IDINSTITUCION = " + idInstitucion);
         subQuery.WHERE("F.ANIO = " + scsActuacionasistencia.getAnio());
         subQuery.WHERE("F.NUMERO = " + scsActuacionasistencia.getNumero());
@@ -930,7 +930,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         SQL sql = new SQL();
         sql.SELECT("IDFACTURACION");
         sql.SELECT("FAC.NOMBRE");
-        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
@@ -939,7 +939,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
     }
 
-    public String getFacturacionesPorGuardia(Short idInstitucion, ScsCabeceraguardias scsCabeceraguardias) {
+    public String getFacturacionesPorGuardia(Short idInstitucion, ScsCabeceraguardias scsCabeceraguardias, String literal) {
 
         SQL subQuery = new SQL();
         subQuery.SELECT("IDFACTURACION");
@@ -957,7 +957,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         SQL sql = new SQL();
         sql.SELECT("IDFACTURACION");
         sql.SELECT("FAC.NOMBRE");
-        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
@@ -966,7 +966,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
     }
 
-    public String getFacturacionesPorEJG(Short idInstitucion, ScsEjg scsEjg) {
+    public String getFacturacionesPorEJG(Short idInstitucion, ScsEjg scsEjg, String literal) {
 
         SQL subQuery = new SQL();
         subQuery.SELECT("IDFACTURACION");
@@ -979,7 +979,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         SQL sql = new SQL();
         sql.SELECT("FAC.IDFACTURACION");
         sql.SELECT("FAC.NOMBRE");
-        sql.SELECT("'Facturación' TIPO");
+        sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(FAC.IMPORTETOTAL, 0) IMPORTE");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
@@ -987,7 +987,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
         return sql.toString();
     }
-    
+
     public String facturacionesPorEstadoEjecucionTiempoLimite(String idInstitucion, Integer tiempoMaximo) {
         SQL sql = new SQL();
         SQL sql2 = new SQL();
@@ -1026,12 +1026,12 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
     }
 
-    public String getDatosPagoAsuntoPorFacturacion(Short idInstitucion, String idFacturacion) {
+    public String getDatosPagoAsuntoPorFacturacion(Short idInstitucion, String idFacturacion, String literal) {
 
         SQL sql = new SQL();
         sql.SELECT("IDPAGOSJG");
         sql.SELECT("NOMBRE");
-        sql.SELECT("'Pago' TIPO");
+        sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTEPAGADO, 0) IMPORTE");
         sql.FROM("FCS_PAGOSJG");
         sql.WHERE("IDINSTITUCION = " + idInstitucion);
@@ -1040,12 +1040,12 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sql.toString();
     }
 
-    public String getDatosPagoAsuntoPorMovimientoVario(Short idInstitucion, String idMovimiento) {
+    public String getDatosPagoAsuntoPorMovimientoVario(Short idInstitucion, String idMovimiento, String literal) {
 
         SQL sql = new SQL();
         sql.SELECT("P.IDPAGOSJG");
         sql.SELECT("P.NOMBRE");
-        sql.SELECT("'Pago' TIPO");
+        sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(P.IMPORTEPAGADO, 0) IMPORTE");
         sql.FROM("FCS_APLICA_MOVIMIENTOSVARIOS AMV");
         sql.JOIN("FCS_PAGOSJG P ON P.IDINSTITUCION = AMV.IDINSTITUCION AND P.IDPAGOSJG = AMV.IDPAGOSJG");
