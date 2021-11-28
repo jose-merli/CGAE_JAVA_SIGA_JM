@@ -303,5 +303,4 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
 
         return sql.toString();
     }
-
 }

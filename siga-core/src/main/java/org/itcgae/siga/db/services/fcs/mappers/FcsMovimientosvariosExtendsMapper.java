@@ -104,6 +104,4 @@ public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosM
             @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDHITOGENERAL", property = "idConcepto", jdbcType = JdbcType.VARCHAR)})
     MovimientosVariosFacturacionItem getMovimientoVarioPorId(String idMovimiento, Short idInstitucion);
-
-
 }

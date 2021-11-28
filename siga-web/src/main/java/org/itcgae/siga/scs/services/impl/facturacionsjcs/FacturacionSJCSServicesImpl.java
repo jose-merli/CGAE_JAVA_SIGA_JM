@@ -152,6 +152,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     @Autowired
     private GenDiccionarioMapper genDiccionarioMapper;
 
+    @Autowired
+    private FcsAplicaMovimientosvariosMapper fcsAplicaMovimientosvariosMapper;
+
     @Override
     public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
@@ -1962,6 +1965,13 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             datosMovimientoVarioDTO.setTipo(literalMovimiento);
                             datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
 
+                            FcsAplicaMovimientosvariosExample fcsAplicaMovimientosvariosExample = new FcsAplicaMovimientosvariosExample();
+                            fcsAplicaMovimientosvariosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdmovimientoEqualTo(fcsMovimientosvarios.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsAplicaMovimientosvariosMapper.countByExample() -> ENTRA: Obtenemos el numero de aplicaciones del movimiento vario");
+                            long numAplicaciones = fcsAplicaMovimientosvariosMapper.countByExample(fcsAplicaMovimientosvariosExample);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsAplicaMovimientosvariosMapper.countByExample() -> SALE: Obtenemos el numero de aplicaciones del movimiento vario");
+                            datosMovimientoVarioDTO.setNumAplicaciones(numAplicaciones);
+
                             LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
                             List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString(), literalPago);
                             LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> SALE: Obtenemos los pagos donde se ha aplicado el movimiento vario");
@@ -2069,6 +2079,13 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             datosMovimientoVarioDTO.setNombre(fcsMovimientosvarios.getDescripcion());
                             datosMovimientoVarioDTO.setTipo(literalMovimiento);
                             datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
+
+                            FcsAplicaMovimientosvariosExample fcsAplicaMovimientosvariosExample = new FcsAplicaMovimientosvariosExample();
+                            fcsAplicaMovimientosvariosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdmovimientoEqualTo(fcsMovimientosvarios.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsAplicaMovimientosvariosMapper.countByExample() -> ENTRA: Obtenemos el numero de aplicaciones del movimiento vario");
+                            long numAplicaciones = fcsAplicaMovimientosvariosMapper.countByExample(fcsAplicaMovimientosvariosExample);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsAplicaMovimientosvariosMapper.countByExample() -> SALE: Obtenemos el numero de aplicaciones del movimiento vario");
+                            datosMovimientoVarioDTO.setNumAplicaciones(numAplicaciones);
 
                             LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
                             List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString(), literalPago);
@@ -2178,6 +2195,13 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             datosMovimientoVarioDTO.setNombre(fcsMovimientosvarios.getDescripcion());
                             datosMovimientoVarioDTO.setTipo(literalMovimiento);
                             datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
+
+                            FcsAplicaMovimientosvariosExample fcsAplicaMovimientosvariosExample = new FcsAplicaMovimientosvariosExample();
+                            fcsAplicaMovimientosvariosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdmovimientoEqualTo(fcsMovimientosvarios.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsAplicaMovimientosvariosMapper.countByExample() -> ENTRA: Obtenemos el numero de aplicaciones del movimiento vario");
+                            long numAplicaciones = fcsAplicaMovimientosvariosMapper.countByExample(fcsAplicaMovimientosvariosExample);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsAplicaMovimientosvariosMapper.countByExample() -> SALE: Obtenemos el numero de aplicaciones del movimiento vario");
+                            datosMovimientoVarioDTO.setNumAplicaciones(numAplicaciones);
 
                             LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
                             List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString(), literalPago);
@@ -2289,6 +2313,13 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             datosMovimientoVarioDTO.setTipo(literalMovimiento);
                             datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
 
+                            FcsAplicaMovimientosvariosExample fcsAplicaMovimientosvariosExample = new FcsAplicaMovimientosvariosExample();
+                            fcsAplicaMovimientosvariosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdmovimientoEqualTo(fcsMovimientosvarios.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsAplicaMovimientosvariosMapper.countByExample() -> ENTRA: Obtenemos el numero de aplicaciones del movimiento vario");
+                            long numAplicaciones = fcsAplicaMovimientosvariosMapper.countByExample(fcsAplicaMovimientosvariosExample);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsAplicaMovimientosvariosMapper.countByExample() -> SALE: Obtenemos el numero de aplicaciones del movimiento vario");
+                            datosMovimientoVarioDTO.setNumAplicaciones(numAplicaciones);
+
                             LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
                             List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString(), literalPago);
                             LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> SALE: Obtenemos los pagos donde se ha aplicado el movimiento vario");
@@ -2397,6 +2428,13 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             datosMovimientoVarioDTO.setNombre(fcsMovimientosvarios.getDescripcion());
                             datosMovimientoVarioDTO.setTipo(literalMovimiento);
                             datosMovimientoVarioDTO.setImporte(fcsMovimientosvarios.getCantidad().toString());
+
+                            FcsAplicaMovimientosvariosExample fcsAplicaMovimientosvariosExample = new FcsAplicaMovimientosvariosExample();
+                            fcsAplicaMovimientosvariosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdmovimientoEqualTo(fcsMovimientosvarios.getIdmovimiento());
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsAplicaMovimientosvariosMapper.countByExample() -> ENTRA: Obtenemos el numero de aplicaciones del movimiento vario");
+                            long numAplicaciones = fcsAplicaMovimientosvariosMapper.countByExample(fcsAplicaMovimientosvariosExample);
+                            LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsAplicaMovimientosvariosMapper.countByExample() -> SALE: Obtenemos el numero de aplicaciones del movimiento vario");
+                            datosMovimientoVarioDTO.setNumAplicaciones(numAplicaciones);
 
                             LOGGER.info("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario() -> ENTRA: Obtenemos los pagos donde se ha aplicado el movimiento vario");
                             List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorMovimientoVario(idInstitucion, fcsMovimientosvarios.getIdmovimiento().toString(), literalPago);
