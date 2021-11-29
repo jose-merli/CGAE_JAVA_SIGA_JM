@@ -12,5 +12,6 @@ public class DatosFacturacionAsuntoDTO {
     private String nombre;
     private String tipo;
     private String importe;
+    private String idPartidaPresupuestaria;
     private List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = new ArrayList<>();
 }

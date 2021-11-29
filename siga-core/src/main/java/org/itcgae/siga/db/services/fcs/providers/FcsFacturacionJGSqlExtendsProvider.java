@@ -889,9 +889,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("FAC.NOMBRE");
         sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
+        sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("IDFACTURACION IN (" + subQuery.toString() + ")");
+        sql.ORDER_BY("IDINSTITUCION, IDFACTURACION");
 
         return sql.toString();
     }
@@ -910,9 +912,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("FAC.NOMBRE");
         sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
+        sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("IDFACTURACION IN (" + subQuery.toString() + ")");
+        sql.ORDER_BY("IDINSTITUCION, IDFACTURACION");
 
         return sql.toString();
     }
@@ -932,9 +936,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("FAC.NOMBRE");
         sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
+        sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("IDFACTURACION IN (" + subQuery.toString() + ")");
+        sql.ORDER_BY("IDINSTITUCION, IDFACTURACION");
 
         return sql.toString();
     }
@@ -959,9 +965,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("FAC.NOMBRE");
         sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(IMPORTETOTAL, 0) IMPORTE");
+        sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("IDFACTURACION IN (" + subQuery.toString() + ")");
+        sql.ORDER_BY("IDINSTITUCION, IDFACTURACION");
 
         return sql.toString();
     }
@@ -981,9 +989,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("FAC.NOMBRE");
         sql.SELECT("'" + literal + "' TIPO");
         sql.SELECT("NVL(FAC.IMPORTETOTAL, 0) IMPORTE");
+        sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
         sql.FROM("FCS_FACTURACIONJG FAC");
         sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FAC.IDFACTURACION IN (" + subQuery.toString() + ")");
+        sql.ORDER_BY("IDINSTITUCION, IDFACTURACION");
 
         return sql.toString();
     }
@@ -1063,4 +1073,14 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         return sqlGroup.toString();
     }
 
+    public String getAgrupacionDeTurnosPorTurno(Short idInstitucion, String idTurno) {
+
+        SQL sql = new SQL();
+        sql.SELECT("IDGRUPOFACTURACION");
+        sql.FROM("SCS_TURNO");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDTURNO = " + idTurno);
+
+        return sql.toString();
+    }
 }

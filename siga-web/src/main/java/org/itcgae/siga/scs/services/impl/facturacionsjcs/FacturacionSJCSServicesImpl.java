@@ -2600,4 +2600,53 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
         return estadoError;
     }
+
+    @Override
+    public StringDTO getAgrupacionDeTurnosPorTurno(String idTurno, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getAgrupacionDeTurnosPorTurno() -> Entrada al servicio para obtener la agrupacion de turno");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        StringDTO stringDTO = new StringDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getAgrupacionDeTurnosPorTurno() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getAgrupacionDeTurnosPorTurno() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && usuarios.size() > 0) {
+
+                    String idAgrupacion = fcsFacturacionJGExtendsMapper.getAgrupacionDeTurnosPorTurno(idInstitucion, idTurno);
+                    stringDTO.setValor(idAgrupacion);
+
+                } else {
+                    LOGGER.warn(
+                            "FacturacionSJCSServicesImpl.getAgrupacionDeTurnosPorTurno() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+            } else {
+                LOGGER.warn("FacturacionSJCSServicesImpl.getAgrupacionDeTurnosPorTurno() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.getAgrupacionDeTurnosPorTurno() -> Se ha producido un error al obtener la agrupacion de turno",
+                    e);
+        }
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getAgrupacionDeTurnosPorTurno() -> Salida del servicio para obtener la agrupacion de turno");
+
+        return stringDTO;
+    }
 }

@@ -181,4 +181,10 @@ public class FacturacionController {
         FacturacionesAsuntoDTO response = facturacionServices.getFacturacionesPorEJG(scsEjg, request);
         return new ResponseEntity<FacturacionesAsuntoDTO>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/facturacionsjcs/getAgrupacionDeTurnosPorTurno")
+    ResponseEntity<StringDTO> getAgrupacionDeTurnosPorTurno(@RequestParam String idTurno, HttpServletRequest request) {
+        StringDTO response = facturacionServices.getAgrupacionDeTurnosPorTurno(idTurno, request);
+        return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+    }
 }
