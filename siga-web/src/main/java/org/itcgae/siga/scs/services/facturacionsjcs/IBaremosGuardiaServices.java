@@ -9,5 +9,6 @@ import org.itcgae.siga.DTO.scs.BaremosRequestDTO;
 public interface IBaremosGuardiaServices {
 	
 	public BaremosRequestDTO searchBaremosGuardia(BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request);
+	public BaremosGuardiaDTO getGuardiasByConf(BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request);
 	
 }

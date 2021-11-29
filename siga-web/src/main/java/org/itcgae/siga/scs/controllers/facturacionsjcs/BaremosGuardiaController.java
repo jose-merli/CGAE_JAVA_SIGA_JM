@@ -36,4 +36,15 @@ public class BaremosGuardiaController {
         }
 	}
 	
+	@RequestMapping(value = "/getGuardiasByConf",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BaremosGuardiaDTO> getGuardiasByConf(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
+		BaremosGuardiaDTO response = baremosGuardiaServices.getGuardiasByConf(baremosGuardiaItem, request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
+	
+	
 }

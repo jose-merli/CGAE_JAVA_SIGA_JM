@@ -13,6 +13,8 @@ import org.itcgae.siga.DTO.scs.BaremosRequestItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.db.entities.ScsBaremosGuardiaKey;
+import org.itcgae.siga.db.entities.ScsHitofacturable;
+import org.itcgae.siga.db.entities.ScsHitofacturableguardia;
 import org.itcgae.siga.db.services.scs.mappers.ScsBaremosGuardiaMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IBaremosGuardiaServices;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -27,6 +29,12 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
     @Autowired
     private ScsBaremosGuardiaMapper baremosGuardiaMapper;
+    
+    @Autowired
+    private ScsHitofacturableguardia scsHitofacturableguardia;
+    
+    @Autowired
+    private ScsHitofacturable scsHitofacturable;
 
     @Override
     @Transactional
@@ -92,6 +100,40 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
         return baremosRequestDTO;
     }
+
+	@Override
+	@Transactional
+	public BaremosGuardiaDTO getGuardiasByConf(BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
+		BaremosGuardiaDTO baremosGuardiaDTO = new BaremosGuardiaDTO();
+    	Error error = new Error();
+
+        LOGGER.info("searchBaremosGuardia() -> Entrada del servicio para obtener baremos guardia ");
+
+        String token = request.getHeader("Authorization");
+//        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+       
+		
+			if (idInstitucion != null) {
+			
+				
+				
+				error.setCode(200);
+				//baremosGuardiaDTO.setBaremosGuardiaItems();
+
+			} else {
+				LOGGER.warn("searchBaremosGuardia() -> idInstitucion del token nula");
+				error.setCode(500);
+				error.setDescription("general.mensaje.error.bbdd");
+			}
+		
+        
+			baremosGuardiaDTO.setError(error);
+
+        LOGGER.info("searchBaremosGuardia() -> Salida del servicio para obtener baremos guardia");
+
+        return baremosGuardiaDTO;
+	}
 
 
 }
