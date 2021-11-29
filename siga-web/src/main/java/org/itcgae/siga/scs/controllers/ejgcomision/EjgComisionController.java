@@ -181,5 +181,16 @@ public class EjgComisionController {
 		String response = busquedaEJGComision.obligatorioFundamento(request);
 		return new ResponseEntity<String>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/busqueda-ejg-comision/asociarEJGActa", method = RequestMethod.POST)
+	ResponseEntity<UpdateResponseDTO> asociarEJGActa(HttpServletRequest request, @RequestBody EjgItem ejgItem) throws SigaExceptions {
+		UpdateResponseDTO response = busquedaEJGComision.asociarEJGActa(ejgItem, request);
+		if(response.getStatus().equals("200")) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 }
