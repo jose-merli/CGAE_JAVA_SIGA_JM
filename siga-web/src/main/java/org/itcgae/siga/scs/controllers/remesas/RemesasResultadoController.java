@@ -59,7 +59,7 @@ public class RemesasResultadoController {
 	}
 	
 	@RequestMapping(value = "/guardarRemesaResultado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestParam int idRemesa,
+	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestParam int idRemesaResolucion,
 													@RequestParam("observaciones") String observaciones,
 													@RequestParam("nombreFichero") String nombreFichero,
 													@RequestParam("fechaCarga") String fechaCarga,
@@ -68,8 +68,8 @@ public class RemesasResultadoController {
 		LOGGER.info("----ENTRA METODO GUARDAR RESULTADO-----");
 		RemesasResolucionItem remesasResolucionItem = new RemesasResolucionItem();
 		
-		if(idRemesa != 0) {
-			remesasResolucionItem.setIdRemesa(idRemesa);
+		if(idRemesaResolucion != 0) {
+			remesasResolucionItem.setIdRemesaResolucion(idRemesaResolucion);
 		}
 		remesasResolucionItem.setObservaciones(observaciones);
 		remesasResolucionItem.setNombreFichero(nombreFichero);

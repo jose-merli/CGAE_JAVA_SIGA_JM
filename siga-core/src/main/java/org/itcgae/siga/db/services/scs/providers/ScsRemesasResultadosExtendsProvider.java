@@ -63,7 +63,7 @@ public class ScsRemesasResultadosExtendsProvider {
 		}
 		
 		if(remesasResultadoItem.getNombreFichero() != null && !remesasResultadoItem.getNombreFichero().isEmpty()) {
-			sql.WHERE("REMR.NOMBREFICHERO = '" + remesasResultadoItem.getNombreFichero() + "'");
+			sql.WHERE("REMR.NOMBREFICHERO LIKE '%" + remesasResultadoItem.getNombreFichero() + "%'");
 		}
 		
 		if(remesasResultadoItem.getFechaRemesaDesde() != null) {

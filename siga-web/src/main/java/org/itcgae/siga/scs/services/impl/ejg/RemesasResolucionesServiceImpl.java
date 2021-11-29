@@ -465,8 +465,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 					"guardarRemesaResoluciones() / cajgProcedimientoremesaresolMapper.selectByExample() -> Salida de cajgProcedimientoremesaresolMapper para obtener información del procedimiento");
 			Iterator<String> itr = request.getFileNames();
 			MultipartFile file = request.getFile(itr.next());
-			String fileName = file.getOriginalFilename();
-			boolean conFichero = (!fileName.isEmpty()) ? true : false; 					
+			String fileName = file.getOriginalFilename();					
 			RemesasResolucionItem remesaResolucionID = new RemesasResolucionItem();
 			remesaResolucionID = scsRemesasResolucionesExtendsMapper.getMaxIdRemesaResolucion(idInstitucion);
 			
@@ -475,205 +474,102 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 				path = getDirectorioFicheroRemesa(idInstitucion,remesaResolucionID.getIdRemesaResolucion());
 			}
 			
-			
-			
-			if(remesasResolucionItem.getIdRemesaResolucion() == 0) {
-				try {
-					
-					LOGGER.info(
-							"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion");
-					
-					//1- Insert en la tabla CAJG_REMESARESOLUCION
-					CajgRemesaresolucion remesaResolucion = new CajgRemesaresolucion(); 
-					
-					AdmContador adm = gestorContadores.getContador(idInstitucion,nombreContador);
-					
-					remesaResolucion.setIdremesaresolucion(Long.valueOf(remesaResolucionID.getIdRemesaResolucion()));
-					remesaResolucion.setIdinstitucion(idInstitucion);
-					remesaResolucion.setPrefijo(adm.getPrefijo());
-					remesaResolucion.setSufijo(adm.getSufijo());
-					remesaResolucion.setNumero(String.valueOf(adm.getContador()+1));
-					remesaResolucion.setFechacarga(new Date());
-					remesaResolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
-					remesaResolucion.setObservaciones(remesasResolucionItem.getObservaciones());
-					remesaResolucion.setNombrefichero((conFichero) ? fileName : "");
-					remesaResolucion.setFechamodificacion(new Date());
-					remesaResolucion.setUsumodificacion(usuarios.get(0).getIdusuario());
-					remesaResolucion.setLoggenerado(new Short("1"));
-					remesaResolucion.setIdtiporemesa((short)remesasResolucionItem.getIdRemesaResolucion());
-					
-					response = cajgRemesaresolucionMapper.insert(remesaResolucion);
-					
-					//Actualizar contador.
-					
-					//gestorContadores.setContador(adm,remesaResolucion.getNumero());
-					
-					LOGGER.info(
-							"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion");
-					
-					
-					if(response == 1 && conFichero) {
-						
-						LOGGER.debug("guardarRemesaResoluciones() -> Guardar el archivo");	 
-						 
-						if(guardarFichero(path,file)) {
-							
-							//2- Insertar fichero en Tabla CAJG_REMESARESOLUCIONFICHERO  UN registro por LINEA.
-							
-							LOGGER.info(
-									"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
-							
-							insertRemesaResolucionFichero(idInstitucion, remesaResolucionID,file,path);
-							
-							
-							LOGGER.info(
-									"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
-							
-						
-							LOGGER.info(
-									"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a la llamada al PL");
-							
-							//3 Llamamos al PL
-								response = invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesaResolucionID, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
-							
-							LOGGER.info(
-									"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
-							
-							guardarZip(path,file, fileName);
-							
-							produceLog = generaLog(path,fileName , idInstitucion, remesaResolucionID);
-							
-							if(!produceLog) {
-								remesaResolucion.setLoggenerado(new Short("0"));
-								 cajgRemesaresolucionMapper.updateByPrimaryKeySelective(remesaResolucion);
-							}
-							
-						}	
-					}
-		
-				}catch (Exception e) {
-					response = 0;
-					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					updateResponseDTO.setStatus(SigaConstants.KO);
 
-				}if(response==1 && !conFichero) {
-					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
-					error.setCode(200);
-					error.setDescription("Inserted");
-					updateResponseDTO.setStatus(SigaConstants.OK);
-					updateResponseDTO.setError(error);
-				}
-				if (response == 0) {
-					error.setCode(400);
-					if (error.getDescription() == null) {
-						error.setDescription("No se ha añadido la remesa resolucion");
-					}
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					updateResponseDTO.setError(error);
-				} if(response == 1 &&  conFichero) {
-					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
-					error.setCode(200);
-					error.setDescription("Inserted");
-					updateResponseDTO.setStatus(SigaConstants.OK);
-					updateResponseDTO.setError(error);
-				}
+			try {
+				
+				LOGGER.info(
+						"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion");
+				
+				//1- Insert en la tabla CAJG_REMESARESOLUCION
+				CajgRemesaresolucion remesaResolucion = new CajgRemesaresolucion(); 
+				
+				AdmContador adm = gestorContadores.getContador(idInstitucion,nombreContador);
+				
+				remesaResolucion.setIdremesaresolucion(Long.valueOf(remesaResolucionID.getIdRemesaResolucion()));
+				remesaResolucion.setIdinstitucion(idInstitucion);
+				remesaResolucion.setPrefijo(adm.getPrefijo());
+				remesaResolucion.setSufijo(adm.getSufijo());
+				remesaResolucion.setNumero(String.valueOf(adm.getContador()+1));
+				remesaResolucion.setFechacarga(new Date());
+				remesaResolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
+				remesaResolucion.setObservaciones(remesasResolucionItem.getObservaciones());
+				remesaResolucion.setNombrefichero( fileName );
+				remesaResolucion.setFechamodificacion(new Date());
+				remesaResolucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+				remesaResolucion.setLoggenerado(new Short("1"));
+				remesaResolucion.setIdtiporemesa((short)remesasResolucionItem.getIdRemesaResolucion());
+				
+				response = cajgRemesaresolucionMapper.insert(remesaResolucion);
+				
+				//Actualizar contador.
+				
+				gestorContadores.setContador(adm,remesaResolucion.getNumero());
+				
+				LOGGER.info(
+						"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion");
+				
+				
+				if(response == 1) {
 					
-			}//Fin Guardar - Inicio Actualizar
-			else {
-				try {
-					LOGGER.info(
-							"guardarRemesaResoluciones() / cajgRemesaresolucionMapper.selectByPrimaryKey(example) -> Entrada a cajgRemesaresolucionMapper para buscar la remesaResolucion a actualizar");
-					
-					CajgRemesaresolucionKey remesaResolucionKey = new CajgRemesaresolucionKey();
-					remesaResolucionKey.setIdinstitucion(idInstitucion);
-					remesaResolucionKey.setIdremesaresolucion(Long.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
-					
-					CajgRemesaresolucion cajgRemesaresolucion = cajgRemesaresolucionMapper.selectByPrimaryKey(remesaResolucionKey);
-					
-					LOGGER.info(
-							"guardarRemesaResoluciones() / cajgRemesaresolucionMapper.selectByPrimaryKey(example) -> Entrada a cajgRemesaresolucionMapper para buscar la remesaResolucion a actualizar");
-					
-					if(cajgRemesaresolucion != null) {
+					LOGGER.debug("guardarRemesaResoluciones() -> Guardar el archivo");	 
+					 
+					if(guardarFichero(path,file)) {
+						
+						//2- Insertar fichero en Tabla CAJG_REMESARESOLUCIONFICHERO  UN registro por LINEA.
+						
 						LOGGER.info(
-								"guardarRemesaResoluciones() / cajgRemesaresolucionMapper.updateByPrimaryKeySelective(example) -> Entrada a cajgRemesaresolucionMapper para actulizar la remesaResolucion");
+								"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
 						
-						cajgRemesaresolucion.setFechamodificacion(new Date());
-						cajgRemesaresolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
-						cajgRemesaresolucion.setObservaciones(remesasResolucionItem.getObservaciones());
-						if(conFichero) {
-							cajgRemesaresolucion.setNombrefichero(fileName);
-						}
-						response = cajgRemesaresolucionMapper.updateByPrimaryKeySelective(cajgRemesaresolucion);
+						insertRemesaResolucionFichero(idInstitucion, remesaResolucionID,file,path);
 						
-						if(conFichero) {
-								if(guardarFichero(path,file)) {
-								
-								LOGGER.info(
-										"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
-								
-									insertRemesaResolucionFichero(idInstitucion, remesasResolucionItem,file,path);
-								
-								
-								LOGGER.info(
-										"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
-								
-							
-								guardarZip(path,file, fileName);
-								
-								
-									
-								}							
-						}
+						
+						LOGGER.info(
+								"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
+						
+					
 						LOGGER.info(
 								"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a la llamada al PL");
 						
 						//3 Llamamos al PL
-						response = 	invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesasResolucionItem, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
-					
-						produceLog = generaLog(path,fileName , idInstitucion, remesaResolucionID);
-						
-						if(!produceLog) {
-							cajgRemesaresolucion.setLoggenerado(new Short("0"));
-							 cajgRemesaresolucionMapper.updateByPrimaryKey(cajgRemesaresolucion);
-						}
-					
+							response = invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesaResolucionID, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
 						
 						LOGGER.info(
 								"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
 						
-					}
-				}catch (Exception e) {
-					response = 0;
-					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					updateResponseDTO.setError(error);
-
-				}if(response==1 && !conFichero) {
-					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
-					error.setCode(200);
-					error.setDescription("Updated");
-					updateResponseDTO.setStatus(SigaConstants.OK);
-					updateResponseDTO.setError(error);
+						guardarZip(path,file, fileName);
+						
+						produceLog = generaLog(path,fileName , idInstitucion, remesaResolucionID);
+						
+						if(!produceLog) {
+							remesaResolucion.setLoggenerado(new Short("0"));
+							 cajgRemesaresolucionMapper.updateByPrimaryKeySelective(remesaResolucion);
+						}
+						
+					}	
 				}
-				if (response == 0) {
-					error.setCode(400);
-					if (error.getDescription() == null) {
-						error.setDescription("No se ha actualizado la remesa resolucion");
-					}
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					updateResponseDTO.setError(error);
-				} if(response == 1 &&  conFichero) {
-					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
-					error.setCode(200);
-					error.setDescription("Updated");
-					updateResponseDTO.setStatus(SigaConstants.OK);
-					updateResponseDTO.setError(error);
-				}
+	
+			}catch (Exception e) {
+				response = 0;
+				error.setCode(400);
+				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				updateResponseDTO.setStatus(SigaConstants.KO);
 
-				
 			}
+			if (response == 0) {
+				error.setCode(400);
+				if (error.getDescription() == null) {
+					error.setDescription("No se ha añadido la remesa resolucion");
+				}
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				updateResponseDTO.setError(error);
+			} if(response == 1 ) {
+				updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
+				error.setCode(200);
+				error.setDescription("Inserted");
+				updateResponseDTO.setStatus(SigaConstants.OK);
+				updateResponseDTO.setError(error);
+			}
+					
 				
 		}//Fin IF idInstitucion
 		return updateResponseDTO;
@@ -908,7 +804,93 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 		return true ;	
 		
 	}
+
+	@Override
+	public UpdateResponseDTO actualizarRemesaResolucion(RemesasResolucionItem remesasResolucionItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"actualizarRemesaResolucion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"actualizarRemesaResolucion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+
+			LOGGER.info(
+					"actualizarRemesaResolucion() / cajgProcedimientoremesaresolMapper.selectByExample() -> Entrada a cajgProcedimientoremesaresolMapper para obtener información del procedimiento");
 	
+			try {
+				LOGGER.info(
+						"actualizarRemesaResolucion() / cajgRemesaresolucionMapper.selectByPrimaryKey(example) -> Entrada a cajgRemesaresolucionMapper para buscar la remesaResolucion a actualizar");
+				
+				CajgRemesaresolucionKey remesaResolucionKey = new CajgRemesaresolucionKey();
+				remesaResolucionKey.setIdinstitucion(idInstitucion);
+				remesaResolucionKey.setIdremesaresolucion(Long.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
+				
+				CajgRemesaresolucion cajgRemesaresolucion = cajgRemesaresolucionMapper.selectByPrimaryKey(remesaResolucionKey);
+				
+				LOGGER.info(
+						"guardarRemesaResoluciones() / cajgRemesaresolucionMapper.selectByPrimaryKey(example) -> Entrada a cajgRemesaresolucionMapper para buscar la remesaResolucion a actualizar");
+				
+				if(cajgRemesaresolucion != null) {
+					LOGGER.info(
+							"guardarRemesaResoluciones() / cajgRemesaresolucionMapper.updateByPrimaryKeySelective(example) -> Entrada a cajgRemesaresolucionMapper para actulizar la remesaResolucion");
+					
+					cajgRemesaresolucion.setObservaciones(remesasResolucionItem.getObservaciones());
+					cajgRemesaresolucion.setFechamodificacion(new Date());
+					cajgRemesaresolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
+					cajgRemesaresolucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+					response = cajgRemesaresolucionMapper.updateByPrimaryKeySelective(cajgRemesaresolucion);
+				}
+			}catch (Exception e) {
+				response = 0;
+				error.setCode(400);
+				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				updateResponseDTO.setError(error);
+
+			}
+			if (response == 0) {
+				error.setCode(400);
+				error.setDescription("No se ha actualizado la remesa resolucion");
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				updateResponseDTO.setError(error);
+			} if(response == 1 ) {
+				updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
+				error.setCode(200);
+				error.setDescription("Updated");
+				updateResponseDTO.setStatus(SigaConstants.OK);
+				updateResponseDTO.setError(error);
+			}	
+				
+		}//Fin IF idInstitucion
+		return updateResponseDTO;
+	}
+    
+    @Override
+    public AdmContador recuperarDatosContador(HttpServletRequest request){
+    	
+    	String token = request.getHeader("Authorization");
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        String nombreContador = scsRemesasResolucionesExtendsMapper.contador(idInstitucion.toString(),"1");
+		AdmContador adm = gestorContadores.getContador(idInstitucion,nombreContador);
+
+		return adm;
+    }
+    
 	
 
 }

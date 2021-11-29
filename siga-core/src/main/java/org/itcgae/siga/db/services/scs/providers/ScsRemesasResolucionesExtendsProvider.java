@@ -107,7 +107,7 @@ public class ScsRemesasResolucionesExtendsProvider {
 		sql.SELECT("idoperacion");
 		sql.FROM("ecom_operacion_tipoaccion");
 		sql.WHERE("tipo_pcajg = " + tipoCAJG);
-		sql.WHERE("idtipoaccionremesa = 1");
+		sql.WHERE("idtipoaccionremesa = 3");
 
 		LOGGER.info(sql.toString());
 		return sql.toString();

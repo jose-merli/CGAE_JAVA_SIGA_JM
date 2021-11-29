@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResolucionDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
+import org.itcgae.siga.db.entities.AdmContador;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +32,10 @@ public interface IRemesasResoluciones {
 
 	UpdateResponseDTO guardarRemesaResolucion(RemesasResolucionItem remesasResolucionItem,
 			MultipartHttpServletRequest request);
+
+	UpdateResponseDTO actualizarRemesaResolucion(RemesasResolucionItem remesasResolucionItem,
+			HttpServletRequest request);
+
+	AdmContador recuperarDatosContador(HttpServletRequest request);
 
 }

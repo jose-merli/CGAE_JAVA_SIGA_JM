@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.controllers.remesas;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,6 +15,7 @@ import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResolucionDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
+import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.EcomOperacionTipoaccion;
 import org.itcgae.siga.scs.services.ejg.IRemesasResoluciones;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,22 +77,22 @@ public class RemesasResolucionesController {
 													@RequestParam("idTipoRemesa") int idTipoRemesa,
 													@RequestParam("nombreFichero") String nombreFichero,
 													@RequestParam("fechaResolucion") String fechaResolucion,
-													MultipartHttpServletRequest  request){
+													@RequestParam(required=false) MultipartHttpServletRequest  request) throws IllegalStateException, IOException{
 		LOGGER.info("----ENTRA METODO GUARDAR RESOLUCION-----");
 		RemesasResolucionItem remesasResolucionItem = new RemesasResolucionItem();
+		
 		remesasResolucionItem.setIdTipoRemesa(idTipoRemesa);
-		if(idRemesaResolucion != 0) {
-			remesasResolucionItem.setIdRemesa(idRemesaResolucion);
-		}
+		if(idRemesaResolucion != 0) remesasResolucionItem.setIdRemesa(idRemesaResolucion);
+		if(observaciones.length() == 0) observaciones = null;
 		remesasResolucionItem.setObservaciones(observaciones);
-		remesasResolucionItem.setNombreFichero(nombreFichero);
-	
+		
 		try {
 			Date dateC = new SimpleDateFormat("dd/mm/yyyy").parse(fechaResolucion);
 			remesasResolucionItem.setFechaResolucion(dateC);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+		
 		UpdateResponseDTO response = remesasResoluciones.guardarRemesaResolucion(remesasResolucionItem,  request);
 		
 		LOGGER.info("----SALIDA METODO GUARDAR RESOLUCION-----");
@@ -100,5 +102,22 @@ public class RemesasResolucionesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/actualizarRemesaResolucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizarRemesaResolucion(@RequestBody RemesasResolucionItem remesasResolucionItem, HttpServletRequest request) {
+		LOGGER.info("----ENTRA METODO ACTUALIZAR RESOLUCION-----");
+		
+		UpdateResponseDTO response = remesasResoluciones.actualizarRemesaResolucion(remesasResolucionItem,  request);
+		
+		LOGGER.info("----SALIDA METODO ACTUALIZAR RESOLUCION-----");
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
+	@RequestMapping(value = "/recuperarDatosContador", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<AdmContador> recuperarDatosContador(HttpServletRequest request) {
+		AdmContador response = remesasResoluciones.recuperarDatosContador(request);
+		return new ResponseEntity<AdmContador>(response, HttpStatus.OK);
+	}
 }

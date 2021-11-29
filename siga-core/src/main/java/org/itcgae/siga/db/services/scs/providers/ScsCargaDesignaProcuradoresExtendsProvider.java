@@ -95,7 +95,7 @@ public class ScsCargaDesignaProcuradoresExtendsProvider {
 		sql.SELECT("idoperacion");
 		sql.FROM("ecom_operacion_tipoaccion");
 		sql.WHERE("tipo_pcajg = " + tipoCAJG);
-		sql.WHERE("idtipoaccionremesa = 2");
+		sql.WHERE("idtipoaccionremesa = 4");
 
 		LOGGER.info(sql.toString());
 		return sql.toString();
