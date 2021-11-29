@@ -1267,6 +1267,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
 
 					LOGGER.info("Respuesta al borrar el ponente" + response);
+					
+					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
 			} else {
 				error.setCode(500);
