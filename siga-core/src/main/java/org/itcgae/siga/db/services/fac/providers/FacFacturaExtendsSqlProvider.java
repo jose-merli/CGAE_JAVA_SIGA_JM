@@ -224,11 +224,11 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             abonos.WHERE("f.estado="+item.getEstado());
         }
 
-        //forma de pago o abono
-        if(item.getFormaCobroAbono()!=null && item.getFormaCobroAbono().equalsIgnoreCase("E")) {
+        //forma de pago abono
+        if(item.getFormaCobroAbono()!=null && (item.getFormaCobroAbono().equalsIgnoreCase("E") || item.getFormaCobroAbono().equalsIgnoreCase("A"))) {
             abonos.WHERE("f.IMPTOTALABONADOEFECTIVO > 0");
         }
-        if(item.getFormaCobroAbono()!=null && item.getFormaCobroAbono().equalsIgnoreCase("B")) {
+        if(item.getFormaCobroAbono()!=null && (item.getFormaCobroAbono().equalsIgnoreCase("B") || item.getFormaCobroAbono().equalsIgnoreCase("A"))) {
             abonos.WHERE("f.IMPTOTALABONADOPORBANCO > 0");
         }
 
