@@ -72,7 +72,8 @@ public class ScsContrariosejgSqlExtendsProvider extends ScsContrariosejgSqlProvi
 				+ "                                          AND persona.idinstitucion = scs_contrariosejg.idinstitucion\r\n"
 				+ "        WHERE\r\n" + "            ( scs_contrariosejg.anio = " + item.getAnnio() + "\r\n"
 				+ "              AND scs_contrariosejg.numero = " + item.getNumero() + "\r\n"
-				+ "              AND scs_contrariosejg.idinstitucion = " + idInstitucion + "\r\n";
+				+ "              AND scs_contrariosejg.idinstitucion = " + idInstitucion + "\r\n"
+				+ "              AND scs_contrariosejg.idtipoejg = " + item.getTipoEJG() + "\r\n";
 		if (!historico) {
 			from += " AND scs_contrariosejg.fechabaja is null \r\n";
 		}

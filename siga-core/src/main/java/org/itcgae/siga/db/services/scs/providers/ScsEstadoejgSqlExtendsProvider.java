@@ -76,9 +76,8 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
         sql.FROM("scs_estadoejg estado");
         sql.INNER_JOIN("scs_maestroestadosejg maestro on (estado.idestadoejg=maestro.idestadoejg)");
         sql.INNER_JOIN("gen_recursos_catalogos recursos on (maestro.descripcion=recursos.idrecurso)");
- 
+        sql.INNER_JOIN("cen_persona persona on (estado.usumodificacion=persona.idpersona)");
         sql.INNER_JOIN("adm_usuarios usuario ON (estado.usumodificacion = usuario.idusuario and estado.idinstitucion = usuario.idinstitucion)");
-        //sql.INNER_JOIN("cen_persona persona on (estado.usumodificacion=persona.idpersona)");
 
         if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
             sql.WHERE("estado.anio = '" + ejgItem.getAnnio() + "'");

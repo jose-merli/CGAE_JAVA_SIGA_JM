@@ -922,6 +922,38 @@ public class SigaConstants {
 	public static final List<String> CAMPOSLOG_PD = Arrays.asList(PD_CODIGODESIGNAABOGADO, PD_NUMEJG, PD_NUMCOLPROCURADOR,
 			PD_FECHADESIGPROCURADOR, PD_NUMDESIGNAPROCURADOR, PD_OBSERVACIONES, ERRORES);
 
+	// CARGA MASIVA INSCRIPCIONES - Guardia
+		public static final String TURNO = "TURNO";
+		public static final String GUARDIAFIELD = "GUARDIA";
+		public static final String NCOLEGIADO = "Nº COLEGIADO";
+		public static final String FECHAEFECTIVA = "FECHA EFECTIVA";
+		public static final String TIPO = "TIPO";
+		public static final String GRUPO = "GRUPO";
+		public static final String ORDEN = "ORDEN";
+
+		public static final String nombreFicheroModeloI = "PlantillaMasivaDatosI";
+
+		public static final List<String> CAMPOSMODEL_I = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAEFECTIVA, TIPO, GRUPO, ORDEN);
+		public static final List<String> CAMPOSLOGI = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO, FECHAEFECTIVA,
+				TIPO, GRUPO, ORDEN, ERRORES);
+		// CARGA MASIVA GRUPOS COLA - Guardia
+		public static final String nombreFicheroModeloGC = "PlantillaMasivaDatosGC";
+		public static final List<String> CAMPOSMODEL_GC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				 GRUPO, ORDEN);
+		public static final List<String> CAMPOSLOGGC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				 GRUPO, ORDEN, ERRORES);
+		// CARGA MASIVA CALENDARIOS - Guardia
+
+		public static final String FECHAI = "FECHA INICIO";
+		public static final String FECHAF = "FECHA FIN";
+
+		public static final String nombreFicheroModeloC = "PlantillaMasivaDatosC";
+
+		public static final List<String> CAMPOSMODEL_C = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAI, FECHAF);
+		public static final List<String> CAMPOSLOGC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAI, FECHAF, ERRORES);
 	// AGENDA
 	public static final long CALENDARIO_GENERAL = 1;
 	public static final long CALENDARIO_LABORAL = 2;
@@ -1001,8 +1033,10 @@ public class SigaConstants {
 
 	public static String DATEST_FORMAT_MIN = "dd/MM/yyyy HH:mm";
 	public static String DATEST_FORMAT_MIN_SEC = "dd/MM/yyyy HH:mm:ss";
+	public static String DATEST_FORMAT_ONLYDATE = "dd/MM/yyyy";
 
 	public static DateFormat DATE_FORMAT_MIN = new SimpleDateFormat(DATEST_FORMAT_MIN);
+	public static DateFormat DATE_FORMAT = new SimpleDateFormat(DATEST_FORMAT_ONLYDATE);
 
 	public static String[] columnsExcelLogEnvios = new String[] { "ENVIO", "DESCRIPCION", "FECHA ENVÍO", "REMITENTE",
 			"CORREO REMITENTE", "NIF/CIF", "NOMBRE", "APELLIDO 1", "APELLIDO 2", "MOVIL", "CORREO ELECTRONICO",
@@ -1099,6 +1133,9 @@ public class SigaConstants {
 
 	public static Integer USUMODIFICACION_0 = 0;
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
+	
+	public static final String TAM_MAX_CONSULTA_JG = "TAM_MAX_CONSULTA_JG";
+	
 
 	public static final String I_INFORMEFACTSJCS = "FACJ2";
 
@@ -1122,8 +1159,8 @@ public class SigaConstants {
 	//EEJG
 	public static String EEJG_IDSISTEMA ="";
 	public static String EEJG_URLWS ="";
-    public static String SIGAFRONT_VERSION = "202106111700";
-    public static String SIGAWEB_VERSION = "1.0.72_3";
+	public static String SIGAFRONT_VERSION = "202109071016";
+	public static String SIGAWEB_VERSION = "1.0.74_1";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";

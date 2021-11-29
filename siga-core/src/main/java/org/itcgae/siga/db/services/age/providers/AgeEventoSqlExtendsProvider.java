@@ -280,7 +280,4 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		
 		return sql.toString();
 	}
-		
-		
-		
 }
