@@ -50,6 +50,7 @@ import org.itcgae.siga.db.mappers.ScsEjgResolucionMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsActaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEjgActaExtendsMapper;
 import org.itcgae.siga.scs.services.acta.IBusquedaActa;
 import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
@@ -75,6 +76,9 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 	@Autowired
 	private ScsEjgActaMapper scsEjgActaMapper;
+	
+	@Autowired
+	private ScsEjgActaExtendsMapper scsEjgActaExtendsMapper;
 
 	@Autowired
 	private ScsEstadoejgMapper scsEstadoejgMapper;
@@ -615,7 +619,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					// Actualizamos o creamos dependiendo del booleano
 					if (actualizar == true) {
 						try {
-							if(actasItem.getFecharesolucion() != null) cerrarActaFuncion(acta,actasItem,response,usuario);
+							if(actasItem.getFecharesolucion() != null) cerrarActaFuncion(acta,actasItem,response,usuario, idInstitucion);
 							
 							LOGGER.info("ACTUALIZA " + acta.getIdacta() + " " + acta.getNumeroacta() + " "+ acta.getAnioacta() + " " + acta.getIdinstitucion());
 							
@@ -756,19 +760,15 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 							// Pendientes guardara el nombre de todos los ejg asociados a ese acta
 							pendientes += scsEjgActa.getAnioacta() + "/" + scsEjgActa.getNumeroejg() + ",";
 
-							// Obtendremos los objetos resolucion asociados al ejg para modificarlo
-							ScsEjgResolucion scsEjgResolucionItem = obtenerEjgResolucion(ejgItem);
-
-							// Solo nos interesaran los ejg que tengan el tipo ratificacion 0 o 5
-							if (scsEjgResolucionItem != null
-									&& scsEjgResolucionItem.getIdtiporatificacionejg() != null) {
-								if (scsEjgResolucionItem.getIdtiporatificacionejg() == Short.valueOf("0")) {
+							// Solo nos interesaran los ejg que tengan el tipo ratificacion 4 o 6
+							if (ejgItem.getIdtiporatificacionejg() != null) {
+								if (ejgItem.getIdtiporatificacionejg() == Short.valueOf("4")) {
 
 									LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
 											+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
 											+ scsEjgActa.getNumeroejg());
 
-									LOGGER.info("Si el ejg es 0");
+									LOGGER.info("Si el ejg es 4");
 
 									// Buscaremos el estado de ese ejg
 									ScsEstadoejgExample exampleEstado = new ScsEstadoejgExample();
@@ -813,9 +813,9 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 										updateResponseDTO.setStatus(SigaConstants.OK);
 									}
 
-								} else if (scsEjgResolucionItem.getIdtiporatificacionejg() == Short.valueOf("5")) {
+								} else if (ejgItem.getIdtiporatificacionejg() == Short.valueOf("6")) {
 
-									LOGGER.info("Si el ejg es 5");
+									LOGGER.info("Si el ejg es 6");
 
 									LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
 											+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
@@ -862,7 +862,6 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 										updateResponseDTO.setStatus(SigaConstants.OK);
 									}
 									
-
 								}
 
 							}
@@ -880,7 +879,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 						response = scsActacomisionMapper.updateByPrimaryKey(acta);
 
 						if (response == 0) {
-							throw new SigaExceptions("No se han actualizado el acta");
+							throw new SigaExceptions("No se ha actualizado el acta");
 						}
 						updateResponseDTO.setStatus(SigaConstants.OK);
 					}
@@ -1197,7 +1196,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 						actasItem.setFecharesolucion(new Date());
 					}
 
-					cerrarActaFuncion(acta, actasItem,response,usuario);
+					cerrarActaFuncion(acta, actasItem,response,usuario, idInstitucion);
 					
 					// Ponemos fecha de hoy para el cierre
 					acta.setFecharesolucion(actasItem.getFecharesolucion());
@@ -1223,7 +1222,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		return updateResponseDTO;
 	}
 
-	private void cerrarActaFuncion(ScsActacomision acta,ActasItem actasItem , int response , AdmUsuarios usuario ) throws Exception {
+	private void cerrarActaFuncion(ScsActacomision acta,ActasItem actasItem , int response , AdmUsuarios usuario, Short idInstitucion) throws Exception {
 		
 		List<ScsEjgActa> listaEjgActa = obtenerEjgActa(acta);
 
@@ -1367,10 +1366,10 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 							LOGGER.info("Datos acta anio ->" + acta.getAnioacta() + " idinstitucion -> "
 									+ acta.getIdinstitucion() + " idtipoejg ->" + acta.getIdacta());
 
-							response = borrarActa(acta, ejgItem);
+							response = scsEjgActaExtendsMapper.updateResolucion(actasItem, idInstitucion);
 
 							if (response == 0) {
-								throw (new Exception("No se ha podido borrar el acta"));
+								throw (new Exception("No se ha podido actualizar la relacion del ejg con el acta"));
 							}
 
 						}

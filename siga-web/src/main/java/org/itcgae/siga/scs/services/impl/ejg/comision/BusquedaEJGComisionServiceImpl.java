@@ -30,6 +30,8 @@ import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgActa;
 import org.itcgae.siga.db.entities.ScsEjgActaExample;
 import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsEjgResolucion;
+import org.itcgae.siga.db.entities.ScsEjgResolucionKey;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
@@ -48,6 +50,7 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.itcgae.siga.db.mappers.ScsEjgResolucionMapper;
 
 @Service
 public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
@@ -71,6 +74,9 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	GestionEJGServiceImpl gestionEJGServiceImpl;
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
+	
+	@Autowired
+	private ScsEjgResolucionMapper scsEjgResolucionMapper;
 
 	@Override
 	public ComboDTO comboDictamen(HttpServletRequest request) {
@@ -744,19 +750,25 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO editarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) {
+	public UpdateResponseDTO editarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) throws SigaExceptions {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
 
 		int resultado;
 
 		LOGGER.info("Entra en el metodo editarActaAnio con la institucion " + idInstitucion);
 
 		if (idInstitucion != null) {
-			try {
+//			try {
 
 				for (EjgItem ejgItem : ejgItems) {
 
@@ -844,9 +856,22 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						}
 
 					}
-					
+					LOGGER.info("Seteando las observaciones");
 
-					LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
+					if(scsEstadoEjg != null) {
+						if(scsEstadoEjg.getObservaciones() != null) {
+							scsEstadoEjg.setObservaciones(
+									scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
+											+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
+						}else {
+							scsEstadoEjg.setObservaciones(
+									"Expediente incluido masivamente en el acta "
+											+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
+						}
+	
+						LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
+					}
+					
 
 					ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
 
@@ -860,11 +885,11 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					scsEjgActaNuevo.setAnioacta(Short.valueOf(ejgItem.getAnnioActa()));
 					scsEjgActaNuevo.setIdacta(Long.valueOf(ejgItem.getNumActa()));
 					scsEjgActaNuevo.setFechamodificacion(new Date());
-					scsEjgActaNuevo.setUsumodificacion(0);
+					scsEjgActaNuevo.setUsumodificacion(usuarios.get(0).getIdusuario());
 					scsEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
 					scsEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
-					scsEjg.setUsumodificacion(0);
-					scsEjg.setUsucreacion(0);
+					scsEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+					scsEjg.setFechamodificacion(new Date());
 
 					LOGGER.info("Guardando");
 
@@ -881,20 +906,48 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						throw (new SigaExceptions("Error no se ha podido actualizar el ejg"));
 					}
 
-					resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
-
-					if (resultado == 0) {
-						throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
+					if(scsEstadoEjg != null) {
+						resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+	
+						if (resultado == 0) {
+							throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
+						}
+					}
+					
+					LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
+					
+					ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
+					
+					resolKey.setAnio(scsEjg.getAnio());
+					resolKey.setIdinstitucion(idInstitucion);
+					resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
+					resolKey.setNumero(Long.valueOf(scsEjg.getNumejg()));
+					
+					ScsEjgResolucion resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
+					
+					//Se comprueba si el EJG tiene una resolucion asociada
+					if(resolEjg != null) {
+						resolEjg.setAnioacta(scsEjg.getAnioacta());
+						resolEjg.setIdacta(scsEjg.getIdacta());
+						resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						resolEjg.setFechamodificacion(new Date());
+						
+						scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
+						
+						if (resultado == 0) {
+							throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+						}
 					}
 				}
 				}
-			} catch (SigaExceptions e) {
-				if (error.getCode() == null) {
-					error.setCode(500);
-				}
-				error.setDescription(e.getMsg());
-				updateResponseDTO.setStatus(SigaConstants.KO);
-			}
+				//Se comenta para que el @Transactional funcione adecuadamente
+//			} catch (SigaExceptions e) {
+//				if (error.getCode() == null) {
+//					error.setCode(500);
+//				}
+//				error.setDescription(e.getMsg());
+//				updateResponseDTO.setStatus(SigaConstants.KO);
+//			}
 		} else {
 			error.setCode(500);
 			error.setDescription("El idInstitucion es nulo");
@@ -1269,6 +1322,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
 
 					LOGGER.info("Respuesta al borrar el ponente" + response);
+					
+					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
 			} else {
 				error.setCode(500);
@@ -1441,7 +1496,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		if (!estadoejgObject.isEmpty()) {
 			scsEstadoejg = estadoejgObject.get(0);
 		} else {
-			throw new SigaExceptions("No existen estados para este ejg");
+			scsEstadoejg = null;
+//			throw new SigaExceptions("No existen estados para este ejg");
 		}
 		return scsEstadoejg;
 	}
@@ -1518,7 +1574,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		ejgkey.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
 
-		ejgkey.setNumero(Long.valueOf(ejgItem.getNumEjg()));
+		ejgkey.setNumero(Long.valueOf(ejgItem.getNumero()));
 
 		LOGGER.info("EJGKEY: anio idinstitucion tipoejg numero " + ejgkey.getAnio().toString() + " "
 				+ ejgkey.getIdinstitucion().toString() + " " + ejgkey.getIdtipoejg().toString() + " "
@@ -1672,6 +1728,44 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return ejgDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO asociarEJGActa(EjgItem ejgItem, HttpServletRequest request) throws SigaExceptions {
+		LOGGER.info("asociarEJGActa() -> Entrada al servicio para asociar un EJG con un acta");
+		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"asociarEJGActa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"asociarEJGActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (usuarios != null && usuarios.size() > 0) {
+				
+				LOGGER.info(
+						"asociarEJGActa() / editarActaAnio() -> Entrada a editarActaAnio() para modificar las tablas relacionadas.");
+                
+                List<EjgItem> list = Arrays.asList(ejgItem);
+				
+				this.editarActaAnio(list, request);
+				
+				LOGGER.info(
+						"asociarEJGActa() / editarActaAnio() -> Salida de editarActaAnio() para modificar las tablas relacionadas");
+				
+				responseDTO.setStatus("200");
+			}
+		} else {
+			LOGGER.warn("asociarEJGActa() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("asociarEJGActa() -> Salida del servicio para obtener los de grupos de clientes");
+		return responseDTO;
 	}
 
 }

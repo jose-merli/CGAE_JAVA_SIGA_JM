@@ -66,6 +66,8 @@ public interface IBusquedaEJGComision {
 
 	EjgDTO busquedaEJGActaComision(EjgItem ejgItem, HttpServletRequest request);
 
+	UpdateResponseDTO asociarEJGActa(EjgItem ejgItem, HttpServletRequest request) throws SigaExceptions;
+
 
 
 	
