@@ -222,7 +222,7 @@ public interface ScsCalendarioguardiasMapper {
 	@SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "getGeneracionEnProceso")
 	@Results(
 			)
-	String getGeneracionEnProceso();
+	List<String> getGeneracionEnProceso();
 	
 	@SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "getGenerado")
 	@Results(

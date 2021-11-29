@@ -575,7 +575,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		 @Result(column = "IDGUARDIAPRINCIPAL", property = "idguardiaprincipal", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "FECHASUSCRIPCION_ULTIMO", property = "fechasuscripcion_ultimo", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "IDGRUPOGUARDIA_ULTIMO", property = "idgrupoguardia_ultimo", jdbcType = JdbcType.VARCHAR)})
-	 HcoConfProgCalendariosItem getNextGuardiaProgramadaNoGenerada(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion);
+	 List<HcoConfProgCalendariosItem> getNextGuardiaProgramadaNoGenerada(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion);
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getCalGuardiavVector")
 	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
@@ -594,7 +594,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		 @Result(column = "IDTURNOPRINCIPAL", property = "idturnoprincipal", jdbcType = JdbcType.DECIMAL),
 		 @Result(column = "IDGUARDIAPRINCIPAL", property = "idguardiaprincipal", jdbcType = JdbcType.DECIMAL),
 		 @Result(column = "IDCALENDARIOGUARDIASPRINCIPAL", property = "idcalendarioguardiasprincipal", jdbcType = JdbcType.DECIMAL)})
-	 List<GuardiasCalendarioItem> getCalGuardiavVector(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion);
+	 List<GuardiasCalendarioItem> getCalGuardiavVector(String idTurno, String idGuardia, String fechaDesde, String fechaHasta, String idInstitucion);
 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="cabGuardiavVector")
 	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
@@ -859,7 +859,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		 @Result(column = "FECHASUSCRIPCION_ULTIMO", property = "fechasuscripcion_ultimo", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "IDGRUPOGUARDIA_ULTIMO", property = "idgrupoguardia_ultimo", jdbcType = JdbcType.VARCHAR)})
 	 
-	 HcoConfProgCalendariosItem getNextGuardiaConfigurada(String idInstitucion, String idProgCalendario);
+	 List<HcoConfProgCalendariosItem> getNextGuardiaConfigurada(String idInstitucion, String idProgCalendario);
 	 
 	 
 	 
@@ -1002,7 +1002,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 				@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.DECIMAL),
 				@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.DECIMAL),
 				@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.DECIMAL),
-				@Result(column = "FECHASUSCRIPCION", property = "fechaSuscripcion", jdbcType = JdbcType.DATE),
+				@Result(column = "FECHASUSCRIPCION", property = "fechaSuscripcion", jdbcType = JdbcType.TIMESTAMP),
 				@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.DATE),
 				@Result(column = "FECHASOLICITUDBAJA", property = "fechaSolicitudBaja", jdbcType = JdbcType.DATE),
 				@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),

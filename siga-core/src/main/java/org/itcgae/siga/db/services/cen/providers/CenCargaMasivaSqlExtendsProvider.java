@@ -31,6 +31,6 @@ public class CenCargaMasivaSqlExtendsProvider extends CenCargamasivaSqlProvider 
 		sql.WHERE(" rownum <= 200");
 		sql.ORDER_BY("ca.fechacarga desc");
 		
-		return sql.toString();
+		return sql.toString(); 
 	}
 }
