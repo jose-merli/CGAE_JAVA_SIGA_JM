@@ -13,6 +13,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         SQL numComunicaciones = new SQL();
         SQL ultComunicacion = new SQL();
+        SQL facturasPendientes = new SQL();
         SQL adeudos = new SQL();
         SQL devoluciones = new SQL();
         SQL facturas = new SQL();
@@ -20,6 +21,19 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String fecha;
+
+        //num facturas pendientes
+        if(item.getFacturasPendientesDesde() != null || item.getFacturasPendientesHasta() != null){
+            facturasPendientes.SELECT("IDPERSONA");
+            facturasPendientes.FROM("FAC_FACTURA");
+            facturasPendientes.WHERE("IDINSTITUCION="+idInstitucion);
+            facturasPendientes.GROUP_BY("IDPERSONA");
+            facturasPendientes.HAVING("SUM(IMPTOTALPORPAGAR)>0");
+            if(item.getFacturasPendientesHasta() != null)
+                facturasPendientes.HAVING("COUNT(IMPTOTALPORPAGAR) <=to_number(" + item.getFacturasPendientesHasta() + ",'99999999999999999')");
+            if(item.getFacturasPendientesDesde() != null)
+                facturasPendientes.HAVING("COUNT(IMPTOTALPORPAGAR) >=to_number(" + item.getFacturasPendientesDesde() + ",'99999999999999999')");
+        }
 
         //num comunicaciones
         numComunicaciones.SELECT("COUNT(1)");
@@ -49,6 +63,10 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         //filtros
         facturas.WHERE("f.idinstitucion =" + idInstitucion);
 
+        if(item.getFacturasPendientesDesde() != null || item.getFacturasPendientesHasta() != null) {
+            facturas.WHERE("c.idpersona IN (" + facturasPendientes.toString() + ")");
+        }
+
         //numero factura
         if (item.getNumeroFactura() != null) {
             facturas.WHERE("UPPER(f.numerofactura) LIKE UPPER('%"+item.getNumeroFactura()+"%')");
@@ -60,8 +78,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //forma de pago o abono
-        if (item.getFormaCobroAbono() != null) {
-            facturas.WHERE("f.idformapago=" + item.getFormaCobroAbono());
+        if (item.getFormaCobroFactura() != null) {
+            facturas.WHERE("f.idformapago=" + item.getFormaCobroFactura());
         }
 
         //fecha emision
@@ -76,10 +94,10 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //importe facturado
         if (item.getImportefacturadoDesde() != null && !item.getImportefacturadoDesde().isEmpty()) {
-            facturas.WHERE("f.importetotal>=to_number(" + item.getImportefacturadoDesde() + ",'99999999999999999.99')");
+            facturas.WHERE("f.imptotal>=to_number(" + item.getImportefacturadoDesde() + ",'99999999999999999.99')");
         }
         if (item.getImportefacturadoHasta() != null && !item.getImportefacturadoHasta().isEmpty()) {
-            facturas.WHERE("f.importetotal<=to_number(" + item.getImportefacturadoHasta() + ",'99999999999999999.99')");
+            facturas.WHERE("f.imptotal<=to_number(" + item.getImportefacturadoHasta() + ",'99999999999999999.99')");
         }
 
         //contabilizado SI('S') NO('N')
@@ -207,8 +225,19 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //forma de pago o abono
-        if(item.getFormaCobroAbono()!=null) {
-            //abonos.WHERE("f.idformapago="+item.getFormaCobroAbono());
+        if(item.getFormaCobroAbono()!=null && item.getFormaCobroAbono().equalsIgnoreCase("E")) {
+            abonos.WHERE("f.IMPTOTALABONADOEFECTIVO > 0");
+        }
+        if(item.getFormaCobroAbono()!=null && item.getFormaCobroAbono().equalsIgnoreCase("B")) {
+            abonos.WHERE("f.IMPTOTALABONADOPORBANCO > 0");
+        }
+
+        //importe facturado
+        if(item.getImportefacturadoDesde()!=null && !item.getImportefacturadoDesde().isEmpty()) {
+            abonos.WHERE("f.IMPTOTAL>=to_number("+item.getImportefacturadoDesde()+",'99999999999999999.99')");
+        }
+        if(item.getImportefacturadoHasta()!=null && !item.getImportefacturadoHasta().isEmpty()) {
+            abonos.WHERE("f.IMPTOTAL<=to_number("+item.getImportefacturadoHasta()+",'99999999999999999.99')");
         }
 
         //fecha emision
@@ -219,14 +248,6 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         if(item.getFechaEmisionHasta()!=null) {
             fecha = dateFormat.format(item.getFechaEmisionHasta());
             abonos.WHERE("f.fecha <= TO_DATE('"+fecha+"', 'DD/MM/YYYY')");
-        }
-
-        //importe facturado
-        if(item.getImportefacturadoDesde()!=null && !item.getImportefacturadoDesde().isEmpty()) {
-            abonos.WHERE("f.IMPTOTAL>=to_number("+item.getImportefacturadoDesde()+",'99999999999999999.99')");
-        }
-        if(item.getImportefacturadoHasta()!=null && !item.getImportefacturadoHasta().isEmpty()) {
-            abonos.WHERE("f.IMPTOTAL<=to_number("+item.getImportefacturadoHasta()+",'99999999999999999.99')");
         }
 
         //contabilizado SI('S') NO('N')

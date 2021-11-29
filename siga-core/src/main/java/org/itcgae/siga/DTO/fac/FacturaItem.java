@@ -11,7 +11,8 @@ public class FacturaItem {
 	String idInstitucion;
 	String numeroFactura;
 	String estado;
-	String formaCobroAbono;
+	String formaCobroFactura;
+	String formaCobroAbono;//Efectivo 'E', Banco 'B'
 	String numeroAbonoSJCS;
 	Date fechaEmision;
 	Date fechaEmisionDesde;
