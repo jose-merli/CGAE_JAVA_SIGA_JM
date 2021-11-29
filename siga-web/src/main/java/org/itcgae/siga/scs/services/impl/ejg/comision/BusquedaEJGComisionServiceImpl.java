@@ -28,6 +28,7 @@ import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgActa;
 import org.itcgae.siga.db.entities.ScsEjgActaExample;
 import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -1026,6 +1027,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 					// uso tipo dictamen para traer los datos de la resolucion
 					if (ejgItem.getIdTipoDictamen() != null && (ejgItem.getFundamentoJuridico() != null || comprbarJuramentoJuridico.equals("0")) ) {
+						
+						if(scsEjg.getFecharesolucioncajg() == null) {
+							scsEjg.setFecharesolucioncajg(new Date());
+						}
 
 						int response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
 
@@ -1050,7 +1055,14 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							+ scsEjg.getIdinstitucion());
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumejg());
 
-					scsEjgMapper.updateByPrimaryKey(scsEjg);
+					ScsEjgWithBLOBs ejgBlobs = (ScsEjgWithBLOBs) scsEjg;
+					
+					int response = scsEjgMapper.updateByPrimaryKeySelective(ejgBlobs);
+					
+					if (response == 0)
+						throw (new Exception(
+								"Error en al actualizar el EJG"));
+					
 					updateResponseDTO.setStatus(SigaConstants.OK);
 
 					LOGGER.info(

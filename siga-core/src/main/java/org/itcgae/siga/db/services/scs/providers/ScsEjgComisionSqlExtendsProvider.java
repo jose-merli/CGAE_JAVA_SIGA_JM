@@ -675,7 +675,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		String resolucion;
 		SQL sql = new SQL();
 
-		resolucion = "(SELECT F_SIGA_GETRECURSO(tipores.DESCRIPCION, 1) from SCS_TIPORESOLUCION tipores where tipores.codigo = ejg.idtiporatificacionejg) RESOLUCION";
+		resolucion = "(SELECT F_SIGA_GETRECURSO(tipores.DESCRIPCION, 1) from SCS_TIPORESOLUCION tipores where tipores.IDTIPORESOLUCION = ejg.idtiporatificacionejg) RESOLUCION";
 		
 		String condicionAnnioNumActas = " (EXISTS (SELECT 1 FROM scs_ejg_acta ejgacta, scs_actacomision ac"
 				+ " WHERE ejgacta.idinstitucionacta = ac.idinstitucion" + " AND ejgacta.idacta = ac.idacta"
