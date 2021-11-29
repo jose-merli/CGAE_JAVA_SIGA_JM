@@ -1460,7 +1460,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		ejgkey.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
 
-		ejgkey.setNumero(Long.valueOf(ejgItem.getNumEjg()));
+		ejgkey.setNumero(Long.valueOf(ejgItem.getNumero()));
 
 		LOGGER.info("EJGKEY: anio idinstitucion tipoejg numero " + ejgkey.getAnio().toString() + " "
 				+ ejgkey.getIdinstitucion().toString() + " " + ejgkey.getIdtipoejg().toString() + " "
