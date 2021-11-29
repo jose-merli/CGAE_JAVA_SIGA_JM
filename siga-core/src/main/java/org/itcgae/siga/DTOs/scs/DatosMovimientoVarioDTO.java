@@ -12,5 +12,6 @@ public class DatosMovimientoVarioDTO {
     private String nombre;
     private String tipo;
     private String importe;
+    private long numAplicaciones;
     private List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = new ArrayList<>();
 }
