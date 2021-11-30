@@ -16,6 +16,8 @@ import org.itcgae.siga.db.entities.ScsBaremosGuardiaKey;
 import org.itcgae.siga.db.entities.ScsHitofacturable;
 import org.itcgae.siga.db.entities.ScsHitofacturableguardia;
 import org.itcgae.siga.db.services.scs.mappers.ScsBaremosGuardiaMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableguardiaExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IBaremosGuardiaServices;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +33,10 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
     private ScsBaremosGuardiaMapper baremosGuardiaMapper;
     
     @Autowired
-    private ScsHitofacturableguardia scsHitofacturableguardia;
+    private ScsHitofacturableguardiaExtendsMapper scsHitofacturableguardiaExtendsMapper;
     
     @Autowired
-    private ScsHitofacturable scsHitofacturable;
+    private ScsHitofacturableExtendsMapper scsHitofacturableExtendsMapper;
 
     @Override
     @Transactional
