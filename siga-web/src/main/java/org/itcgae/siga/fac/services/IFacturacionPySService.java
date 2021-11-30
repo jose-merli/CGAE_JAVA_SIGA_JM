@@ -1,9 +1,5 @@
 package org.itcgae.siga.fac.services;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
@@ -13,12 +9,13 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
-import org.itcgae.siga.DTO.fac.FacturaDTO;
-import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
+import org.itcgae.siga.DTO.fac.FacturaDTO;
+import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -34,6 +31,9 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public interface IFacturacionPySService {
 
@@ -92,5 +92,11 @@ public interface IFacturacionPySService {
 	public FacRegenerarPresentacionAdeudosDTO regenerarPresentacionAdeudos(FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,	HttpServletRequest request) throws Exception;
 	
 	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg, HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO guardarObservacionesFactura(FacturaItem item, HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO guardarObservacionesAbono(FacturaItem item, HttpServletRequest request) throws Exception;
+
+	public FacturaLineaDTO getLineasFactura(FacturaItem item, HttpServletRequest request) throws Exception;
 
 }

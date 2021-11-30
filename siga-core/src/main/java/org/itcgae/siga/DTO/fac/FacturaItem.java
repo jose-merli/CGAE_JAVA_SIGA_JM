@@ -32,7 +32,6 @@ public class FacturaItem {
 	String numeroColegiado;
 	String numeroIdentificacion;
 	String apellidos;
-	//String apellidos2;
 	String nombre;
 
 	String facturasPendientesDesde;
@@ -48,4 +47,11 @@ public class FacturaItem {
 	Date ultimaComunicacion;
 	String nombreInstitucion;
 
+	//Actualizar observaciones factura
+	String observacionesFactura;
+	String observacionesFicheroFactura;
+
+	//Actualizar observaciones abono
+	String observacionesAbono;
+	String MotivosAbono;
 }
