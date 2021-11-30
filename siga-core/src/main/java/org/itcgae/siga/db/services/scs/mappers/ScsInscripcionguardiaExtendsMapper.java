@@ -174,7 +174,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "FECHADENEGACION", property = "fechadenegacion", jdbcType = JdbcType.DATE),
 		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHASUSCRIPCION", property = "fechaSol", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "FECHASUSCRIPCION", property = "fechaSol", jdbcType = JdbcType.VARCHAR),
 	})
 	List<BusquedaInscripcionItem> getListadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion);
 	

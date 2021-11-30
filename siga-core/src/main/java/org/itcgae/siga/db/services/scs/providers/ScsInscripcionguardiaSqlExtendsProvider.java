@@ -409,7 +409,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "        END"
 				+ "    ) estado");
 		
-		sql.SELECT("tur.nombre nombreturno");
+		sql.SELECT("tur.nombre nombre");
 		sql.SELECT("tur.abreviatura abreviatura");
 		sql.SELECT("tur.validarinscripciones");	
 		sql.SELECT("tur.validarjustificaciones");
@@ -422,24 +422,24 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		
 		sql.SELECT("per.apellidos1 || DECODE(per.apellidos2,NULL,'',' ' || per.apellidos2) || ', ' || per.nombre apellidosnombre");
 		sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
-		sql.SELECT("per.nombre");
-		sql.SELECT("per.apellidos1");
+		//sql.SELECT("per.nombre");
+		sql.SELECT("per.apellidos1 as apellidos");
 		sql.SELECT("per.apellidos2");
 		sql.SELECT("ins.idinstitucion");
 		sql.SELECT("ins.idpersona");
 		sql.SELECT("ins.idturno");
-		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS') AS fechasuscripcion");
-		sql.SELECT("ins.observacionessuscripcion");
+		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS') AS fechasolicitud");
+		sql.SELECT("ins.observacionessuscripcion AS observacionessolicitud");
 		sql.SELECT("ins.fechavalidacion");
 		sql.SELECT("ins.observacionesvalidacion");
 		sql.SELECT("ins.fechasolicitudbaja");
 		sql.SELECT("ins.observacionesbaja");
-		sql.SELECT("ins.fechabaja");
+		//sql.SELECT("ins.fechabaja");
 		sql.SELECT("ins.observacionesvalbaja");
 		sql.SELECT("ins.fechadenegacion");
 		sql.SELECT("ins.observacionesdenegacion");
-		sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
-		sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechavalidacion),'dd/mm/yyyy') fechavalidacion");
+		//sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
+		//sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechavalidacion),'dd/mm/yyyy') fechavalidacion");
 		sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechabaja),'dd/mm/yyyy') fechabaja");
 		sql.SELECT("DECODE(tur.guardias,0,'Obligatorias',DECODE(tur.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
 

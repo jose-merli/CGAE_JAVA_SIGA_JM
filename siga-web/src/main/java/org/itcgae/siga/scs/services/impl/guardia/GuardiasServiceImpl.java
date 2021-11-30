@@ -7785,7 +7785,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				inscripciones = scsInscripcionguardiaExtendsMapper.getListadoInscripciones(inscripcionesBody,
 						idInstitucion.toString());
 
-				for (BusquedaInscripcionItem inscrip : inscripciones) {
+/*				for (BusquedaInscripcionItem inscrip : inscripciones) {
 					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					Date fechaSolicitud;
 					try {
@@ -7796,7 +7796,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						e.printStackTrace();
 					}
 
-				}
+				}*/
 
 				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
 			}

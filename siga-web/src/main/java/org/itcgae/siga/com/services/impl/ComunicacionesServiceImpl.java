@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -15,10 +14,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
@@ -31,21 +28,16 @@ import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.com.services.IComunicacionesService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
-import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.constants.SigaConstants.ENVIOS_MASIVOS_LOG_EXTENSION;
 import org.itcgae.siga.commons.constants.SigaConstants.GEN_PARAMETROS;
 import org.itcgae.siga.commons.utils.SIGAHelper;
-import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.EcomCola;
-import org.itcgae.siga.db.entities.EcomColaExample;
 import org.itcgae.siga.db.entities.EcomColaParametros;
 import org.itcgae.siga.db.entities.EnvCamposenvios;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
@@ -55,14 +47,8 @@ import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
-import org.itcgae.siga.db.entities.ScsDocumentacionejg;
-import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsJuzgado;
 import org.itcgae.siga.db.entities.ScsJuzgadoKey;
-import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
-import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
 import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
@@ -70,7 +56,6 @@ import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
-import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsJuzgadoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
@@ -83,7 +68,6 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -118,12 +102,6 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	private IPFDService pfdService;	
 	
 	@Autowired
-	private IEnviosMasivosService _enviosMasivosService;
-
-	@Autowired
-	private GenPropertiesMapper genPropertiesMapper;
-	
-	@Autowired
 	private EnvEnviosExtendsMapper envEnviosExtendsMapper;
 
 	@Autowired
@@ -131,9 +109,6 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private EnvDocumentosMapper envDocumentosMapper;
-	
-	@Autowired
-	private FicherosServiceImpl ficherosServiceImpl;
 	
 	@Autowired
 	private EcomColaParametrosMapper ecomColaParametrosMapper;
@@ -727,9 +702,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-        int response = 0;
-
-            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+        AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
             LOGGER.info(
                     "ComunicacionesServiceImpl.subirDocumentosNewComm() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
@@ -837,7 +810,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 				for(MultipartFile file : docs) {
 	
 					String fileNameOriginal = file.getOriginalFilename().split(";")[0];
-					String fName = Long.toString(System.currentTimeMillis());
+					Long.toString(System.currentTimeMillis());
 	
 					try {
 	
