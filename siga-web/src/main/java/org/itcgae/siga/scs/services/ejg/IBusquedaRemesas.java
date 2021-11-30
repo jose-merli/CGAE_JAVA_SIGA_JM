@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.scs.RemesaAccionItem;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.springframework.core.io.InputStreamResource;
 
@@ -39,7 +40,7 @@ public interface IBusquedaRemesas {
 
 	CheckAccionesRemesasDTO getAcciones(RemesasItem remesasItem, HttpServletRequest request);
 
-	InsertResponseDTO ejecutaOperacionRemesa(RemesaAccionItem remesaAccionItem, HttpServletRequest request);
+	InsertResponseDTO ejecutaOperacionRemesa(RemesaAccionItem remesaAccionItem, HttpServletRequest request) throws SigaExceptions;
 
 	InputStreamResource descargarLogErrores(RemesaAccionItem remesaAccionItem, HttpServletRequest request);
 	
