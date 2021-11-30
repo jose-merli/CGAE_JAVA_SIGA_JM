@@ -434,7 +434,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.SELECT("ins.observacionesvalidacion");
 		sql.SELECT("ins.fechasolicitudbaja");
 		sql.SELECT("ins.observacionesbaja");
-		//sql.SELECT("ins.fechabaja");
+		sql.SELECT("ins.fechabaja");
 		sql.SELECT("ins.observacionesvalbaja");
 		sql.SELECT("ins.fechadenegacion");
 		sql.SELECT("ins.observacionesdenegacion");
