@@ -1373,37 +1373,35 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		
 	}
 	
+	@Override
 	public InputStreamResource descargarLogErrores(RemesaAccionItem remesaAccionItem, HttpServletRequest request){
 		
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		byte[] buf = {};
 		ByteArrayInputStream byteInput = new ByteArrayInputStream(buf);
+			
+		CajgEjgremesaExample cajgEjgremesaExample = new CajgEjgremesaExample();
+		cajgEjgremesaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdremesaEqualTo(Long.valueOf(remesaAccionItem.getIdRemesa()));
 		
-		//if(validarAccion(remesaAccionItem, request, "Descargar Log")) {
+		List<CajgEjgremesa> listaCajgEjgremesas = cajgEjgremesaExtendsMapper.selectByExample(cajgEjgremesaExample);
+		
+		if (listaCajgEjgremesas != null && listaCajgEjgremesas.size() > 0) {
+			List<Long> listIdejgremesa = new ArrayList<Long>();
 			
-			CajgEjgremesaExample cajgEjgremesaExample = new CajgEjgremesaExample();
-			cajgEjgremesaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdremesaEqualTo(Long.valueOf(remesaAccionItem.getIdRemesa()));
-			
-			List<CajgEjgremesa> listaCajgEjgremesas = cajgEjgremesaExtendsMapper.selectByExample(cajgEjgremesaExample);
-			
-			if (listaCajgEjgremesas != null && listaCajgEjgremesas.size() > 0) {
-				List<Long> listIdejgremesa = new ArrayList<Long>();
-				
-				for (CajgEjgremesa cajgEjgremesa : listaCajgEjgremesas) {
-					listIdejgremesa.add(cajgEjgremesa.getIdejgremesa());
-				}
-				
-				CajgRespuestaEjgremesaExample cajgRespuestaEjgremesaExample = new CajgRespuestaEjgremesaExample();
-				cajgRespuestaEjgremesaExample.createCriteria().andIdejgremesaIn(listIdejgremesa);
-			
-				List<CajgRespuestaEjgremesa> respuestaEjgRemesa = cajgRespuestaEjgremesaMapper.selectByExample(cajgRespuestaEjgremesaExample);
-				
-				if(respuestaEjgRemesa != null && respuestaEjgRemesa.size() > 0) {
-					byteInput = crearExcel(respuestaEjgRemesa, listaCajgEjgremesas, remesaAccionItem.getIdRemesa());
-				}
+			for (CajgEjgremesa cajgEjgremesa : listaCajgEjgremesas) {
+				listIdejgremesa.add(cajgEjgremesa.getIdejgremesa());
 			}
-		//}
+			
+			CajgRespuestaEjgremesaExample cajgRespuestaEjgremesaExample = new CajgRespuestaEjgremesaExample();
+			cajgRespuestaEjgremesaExample.createCriteria().andIdejgremesaIn(listIdejgremesa);
+		
+			List<CajgRespuestaEjgremesa> respuestaEjgRemesa = cajgRespuestaEjgremesaMapper.selectByExample(cajgRespuestaEjgremesaExample);
+			
+			if(respuestaEjgRemesa != null && respuestaEjgRemesa.size() > 0) {
+				byteInput = crearExcel(respuestaEjgRemesa, listaCajgEjgremesas, remesaAccionItem.getIdRemesa());
+			}
+		}
 
 		return new InputStreamResource(byteInput);
 		
