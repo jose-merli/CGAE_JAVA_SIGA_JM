@@ -387,7 +387,6 @@ public class ScsRemesasExtendsProvider {
 		}
 
 		sql.WHERE("ejgremesa.idinstitucion = " + idInstitucion.toString());
-		sql.WHERE("ROWNUM <= 200");
 
 		LOGGER.info(sql.toString());
 
