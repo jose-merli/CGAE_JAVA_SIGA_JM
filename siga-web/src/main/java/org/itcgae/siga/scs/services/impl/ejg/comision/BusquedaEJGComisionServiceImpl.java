@@ -29,9 +29,11 @@ import org.itcgae.siga.db.entities.ScsActacomisionKey;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgActa;
 import org.itcgae.siga.db.entities.ScsEjgActaExample;
+import org.itcgae.siga.db.entities.ScsEjgActaKey;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgResolucion;
 import org.itcgae.siga.db.entities.ScsEjgResolucionKey;
+import org.itcgae.siga.db.entities.ScsEjgResolucionWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
@@ -788,157 +790,178 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					
 					if (!isMismoActa) {
 
-					LOGGER.info("intentamos conseguir el estado del ejg");
-
-					scsEstadoEjg = obtenerEstadoEjg(scsEjg, idInstitucion, (short) 9);
-
-					List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(scsEjg, idInstitucion);
-
-					if (!listaEjgAsociadosActa.isEmpty()) {
-
-						LOGGER.info("La lista tiene este tamaño " + listaEjgAsociadosActa.size());
-
-						for (ScsEjgActa scsEjgActa : listaEjgAsociadosActa) {
-
-							LOGGER.info("Si borrar es 0 entro en el for " + listaEjgAsociadosActa.size());
-
-							LOGGER.info("ID DEL ACTA EN LA RELACION EJGACTA = " + scsEjgActa.getIdinstitucionacta());
-
-							ScsActacomision acta = new ScsActacomision();
-
-							if (scsEjgActa.getIdinstitucionacta().toString().equals(idInstitucion.toString())) {
-
-								acta = obtenerActa(scsEjgActa, idInstitucion);
-
-								if (acta.getFecharesolucion() == null) {
-
-									LOGGER.info("La fecha resolucion del acta es nula");
-
-									LOGGER.info(
-											"Datos del scsEstadoEjg -> idInstitucion " + scsEstadoEjg.getIdinstitucion()
-													+ " idTipoEjg -> " + scsEstadoEjg.getIdtipoejg() + " anio -> "
-													+ scsEstadoEjg.getAnio() + " numero -> " + scsEstadoEjg.getNumero()
-													+ " idEstadoporEjg ->" + scsEstadoEjg.getIdestadoejg());
-
+						LOGGER.info("intentamos conseguir el estado del ejg");
+	
+						scsEstadoEjg = obtenerEstadoEjg(scsEjg, idInstitucion, (short) 9);
+	
+						List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(scsEjg, idInstitucion);
+	
+						if (!listaEjgAsociadosActa.isEmpty()) {
+	
+							LOGGER.info("La lista tiene este tamaño " + listaEjgAsociadosActa.size());
+	
+							for (ScsEjgActa scsEjgActa : listaEjgAsociadosActa) {
+	
+								LOGGER.info("Si borrar es 0 entro en el for " + listaEjgAsociadosActa.size());
+	
+								LOGGER.info("ID DEL ACTA EN LA RELACION EJGACTA = " + scsEjgActa.getIdinstitucionacta());
+	
+								ScsActacomision acta = new ScsActacomision();
+	
+								if (scsEjgActa.getIdinstitucionacta().toString().equals(idInstitucion.toString())) {
+	
+									acta = obtenerActa(scsEjgActa, idInstitucion);
+	
+									if (acta.getFecharesolucion() == null) {
+	
+										LOGGER.info("La fecha resolucion del acta es nula");
+	
+										LOGGER.info(
+												"Datos del scsEstadoEjg -> idInstitucion " + scsEstadoEjg.getIdinstitucion()
+														+ " idTipoEjg -> " + scsEstadoEjg.getIdtipoejg() + " anio -> "
+														+ scsEstadoEjg.getAnio() + " numero -> " + scsEstadoEjg.getNumero()
+														+ " idEstadoporEjg ->" + scsEstadoEjg.getIdestadoejg());
+	
+										if(scsEstadoEjg.getObservaciones() != null) {
+											scsEstadoEjg.setObservaciones(
+													scsEstadoEjg.getObservaciones() + " Expediente excluido del acta "
+															+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+										}else {
+											scsEstadoEjg.setObservaciones(
+													"Expediente excluido del acta "
+															+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+	
+										}
+									
+										LOGGER.info(scsEstadoEjg.getObservaciones());
+	
+										resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
+	
+										if (resultado == 0) {
+											throw (new SigaExceptions(
+													"Error no se ha podido borrar la relacion entre el Ejg y acta"));
+										}
+									}
+									LOGGER.info("Seteando las observaciones");
+	
 									if(scsEstadoEjg.getObservaciones() != null) {
 										scsEstadoEjg.setObservaciones(
-												scsEstadoEjg.getObservaciones() + " Expediente excluido del acta "
+												scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
 														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
 									}else {
 										scsEstadoEjg.setObservaciones(
-												"Expediente excluido del acta "
+												"Expediente incluido masivamente en el acta "
 														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-
-									}
-								
-									LOGGER.info(scsEstadoEjg.getObservaciones());
-
-									resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
-
-									if (resultado == 0) {
-										throw (new SigaExceptions(
-												"Error no se ha podido borrar la relacion entre el Ejg y acta"));
 									}
 								}
-								LOGGER.info("Seteando las observaciones");
-
-								if(scsEstadoEjg.getObservaciones() != null) {
-									scsEstadoEjg.setObservaciones(
-											scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
-													+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-								}else {
-									scsEstadoEjg.setObservaciones(
-											"Expediente incluido masivamente en el acta "
-													+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-								}
+	
 							}
-
+	
 						}
-
-					}
-					LOGGER.info("Seteando las observaciones");
-
-					if(scsEstadoEjg != null) {
-						if(scsEstadoEjg.getObservaciones() != null) {
-							scsEstadoEjg.setObservaciones(
-									scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
-											+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
-						}else {
-							scsEstadoEjg.setObservaciones(
-									"Expediente incluido masivamente en el acta "
-											+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
+						LOGGER.info("Seteando las observaciones");
+	
+						if(scsEstadoEjg != null) {
+							if(scsEstadoEjg.getObservaciones() != null) {
+								scsEstadoEjg.setObservaciones(
+										scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
+												+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
+							}else {
+								scsEstadoEjg.setObservaciones(
+										"Expediente incluido masivamente en el acta "
+												+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
+							}
+		
+							LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
+						}
+						
+	
+						ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
+	
+						LOGGER.info("Creando la nueva relacion acta y ejg");
+	
+						scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumejg()));
+						scsEjgActaNuevo.setIdtipoejg(scsEjg.getIdtipoejg());
+						scsEjgActaNuevo.setAnioejg(scsEjg.getAnio());
+						scsEjgActaNuevo.setIdinstitucionejg(idInstitucion);
+						scsEjgActaNuevo.setIdinstitucionacta(idInstitucion);
+						scsEjgActaNuevo.setAnioacta(Short.valueOf(ejgItem.getAnnioActa()));
+						scsEjgActaNuevo.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+						scsEjgActaNuevo.setFechamodificacion(new Date());
+						scsEjgActaNuevo.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+						scsEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
+						scsEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsEjg.setFechamodificacion(new Date());
+	
+						LOGGER.info("Guardando");
+						
+						
+						resultado = scsEjgActaMapper.insert(scsEjgActaNuevo);
+							
+						if (resultado == 0) {
+							throw (new SigaExceptions("Error no se ha podido crear la relacion entre el Ejg y acta"));
 						}
 	
-						LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
-					}
-					
-
-					ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
-
-					LOGGER.info("Creando la nueva relacion acta y ejg");
-
-					scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumejg()));
-					scsEjgActaNuevo.setIdtipoejg(scsEjg.getIdtipoejg());
-					scsEjgActaNuevo.setAnioejg(scsEjg.getAnio());
-					scsEjgActaNuevo.setIdinstitucionejg(idInstitucion);
-					scsEjgActaNuevo.setIdinstitucionacta(idInstitucion);
-					scsEjgActaNuevo.setAnioacta(Short.valueOf(ejgItem.getAnnioActa()));
-					scsEjgActaNuevo.setIdacta(Long.valueOf(ejgItem.getNumActa()));
-					scsEjgActaNuevo.setFechamodificacion(new Date());
-					scsEjgActaNuevo.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
-					scsEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
-					scsEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsEjg.setFechamodificacion(new Date());
-
-					LOGGER.info("Guardando");
-
-					resultado = scsEjgActaMapper.insert(scsEjgActaNuevo);
-
-					updateResponseDTO.setStatus(SigaConstants.OK);
-					if (resultado == 0) {
-						throw (new SigaExceptions("Error no se ha podido crear la relacion entre el Ejg y acta"));
-					}
-
-					resultado = scsEjgMapper.updateByPrimaryKey(scsEjg);
-
-					if (resultado == 0) {
-						throw (new SigaExceptions("Error no se ha podido actualizar el ejg"));
-					}
-
-					if(scsEstadoEjg != null) {
-						resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+						resultado = scsEjgMapper.updateByPrimaryKey(scsEjg);
 	
 						if (resultado == 0) {
-							throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
+							throw (new SigaExceptions("Error no se ha podido actualizar el ejg"));
 						}
-					}
-					
-					LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
-					
-					ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
-					
-					resolKey.setAnio(scsEjg.getAnio());
-					resolKey.setIdinstitucion(idInstitucion);
-					resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
-					resolKey.setNumero(Long.valueOf(scsEjg.getNumejg()));
-					
-					ScsEjgResolucion resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
-					
-					//Se comprueba si el EJG tiene una resolucion asociada
-					if(resolEjg != null) {
-						resolEjg.setAnioacta(scsEjg.getAnioacta());
-						resolEjg.setIdacta(scsEjg.getIdacta());
-						resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
-						resolEjg.setFechamodificacion(new Date());
-						
-						scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
-						
-						if (resultado == 0) {
-							throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+	
+						if(scsEstadoEjg != null) {
+							resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+		
+							if (resultado == 0) {
+								throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
+							}
 						}
+						
+//						LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
+//						
+//						ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
+//						
+//						resolKey.setAnio(scsEjg.getAnio());
+//						resolKey.setIdinstitucion(idInstitucion);
+//						resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
+//						resolKey.setNumero(Long.valueOf(scsEjg.getNumejg()));
+//						
+//						ScsEjgResolucionWithBLOBs resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
+//						
+//						//Se comprueba si el EJG tiene una resolucion asociada
+//						if(resolEjg != null) {
+//							resolEjg.setAnioacta(scsEjg.getAnioacta());
+//							resolEjg.setIdacta(scsEjg.getIdacta());
+//							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+//							resolEjg.setFechamodificacion(new Date());
+//							
+//							scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
+//							
+//							if (resultado == 0) {
+//								throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+//							}
+//						}
+//						else {
+//							
+//							resolEjg = new ScsEjgResolucionWithBLOBs();
+//							
+//							resolEjg.setAnioacta(scsEjg.getAnioacta());
+//							resolEjg.setIdacta(scsEjg.getIdacta());
+//							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+//							resolEjg.setFechamodificacion(new Date());
+//							
+//
+//							resolEjg.setAnio(scsEjg.getAnio());
+//							resolEjg.setIdinstitucion(idInstitucion);
+//							resolEjg.setIdtipoejg(scsEjg.getIdtipoejg());
+//							resolEjg.setNumero(Long.valueOf(scsEjg.getNumejg()));
+//							
+//							scsEjgResolucionMapper.insert(resolEjg);
+//							
+//							if (resultado == 0) {
+//								throw (new SigaExceptions("Error no se ha podido insertar la resolucion del Ejg"));
+//							}
+//						}
 					}
-				}
 				}
 				//Se comenta para que el @Transactional funcione adecuadamente
 //			} catch (SigaExceptions e) {
@@ -952,6 +975,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			error.setCode(500);
 			error.setDescription("El idInstitucion es nulo");
 		}
+		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info("guardarEditarSelecionados() -> Salida del servicio para obtener los tipos ejg");
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
