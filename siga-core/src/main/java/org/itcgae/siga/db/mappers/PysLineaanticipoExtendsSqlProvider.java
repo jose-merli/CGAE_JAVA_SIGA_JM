@@ -9,12 +9,13 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
 
 
     public String selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter) {
+    	
+    	
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SQL query = new SQL();
-        query.SELECT("FIRST_VALUE(anti.fecha) OVER (ORDER BY anti.fecha) as fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", 
-        		"linea.idLinea", 
-        		"FIRST_VALUE(anti.descripcion) OVER (ORDER BY anti.fecha) as descripcion", "anti.importeinicial as importe_inicial", "sum(nvl(linea.importeanticipado, 0)) as importe_usado", 
-        		"anti.importeinicial - sum(nvl(linea.importeanticipado, 0))as importe_restante" );
+        query.SELECT("min(anti.fecha) as fecha, pers.nifcif, pers.idpersona, (pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo, linea.idlinea, --(select a.descripcion from a where a.roworder = 1),  \r\n"
+        		+ "anti.descripcion,\r\n"
+        		+ "sum(anti.importeinicial) as importe_inicial, sum(nvl(linea.importeanticipado, 0)) as importe_usado , sum(anti.importeinicial)- sum(nvl(linea.importeanticipado, 0)) as importe_restante" );
        query.FROM("pys_anticipoletrado anti");
                 
        query.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = anti.idpersona");
@@ -41,14 +42,11 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         	query.WHERE("pers.idpersona = "+filter.getIdPersonaColegiado());
         }
 
-        query.GROUP_BY("linea.idLinea", "anti.FECHA", "pers.NIFCIF", "pers.idpersona", "anti.idanticipo", "pers.APELLIDOS1", "pers.APELLIDOS2", "pers.NOMBRE", "anti.descripcion", "anti.importeinicial", "linea.importeanticipado");
-        query.ORDER_BY("anti.FECHA desc");
+        query.GROUP_BY("pers.nifcif, pers.idpersona, linea.idlinea, (pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre)\r\n"
+        		+ "    	, anti.descripcion");
+        query.ORDER_BY("min(anti.FECHA) desc");
         
-        String sql = "select a.fecha, a.nifcif, a.idpersona, a.nombre_completo, a.idlinea, a.descripcion, sum(a.importe_inicial) as importe_inicial, sum(a.importe_usado) as importe_usado , sum(a.importe_inicial)- sum(a.importe_usado) as importe_restante from( \r\n"+ query + ") a \r\n"
-        		+ "group by fecha, nifcif, idpersona, nombre_completo, idlinea, descripcion";
-
-
-        return sql;
+        return query.toString();
         
         
         
