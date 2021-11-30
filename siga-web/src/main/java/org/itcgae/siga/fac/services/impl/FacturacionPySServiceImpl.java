@@ -48,6 +48,7 @@ import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturacionEliminar;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
+import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
 import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
@@ -1438,7 +1439,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				} catch (Exception e) {
 					ret = -3;
 				}
-				error.setCode(ret);	
+				error.setCode(ret);
 				error.setDescription(facElim.getDatosError());	} else {
 					// TODO: borrado de ficheros
 				}
@@ -1659,13 +1660,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		
 		// Conseguimos información del usuario logeado
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
-		
-		FacFacturacionprogramada facProg= creaFacturacionProgramadaDesdeItem(facItem, usuario);
 
 		LOGGER.info("insertarProgramacionFactura() -> Entrada al servicio para crear una programación de factura");
 
 		if (usuario != null) {
+				FacFacturacionprogramada facProg = creaFacturacionProgramadaDesdeItem(facItem, usuario);
 				facFacturacionprogramadaExtendsMapper.insertSelective(facProg);
+
+				insertResponseDTO.setId(facProg.getIdprogramacion().toString());
 		}
 
 		LOGGER.info("insertarProgramacionFactura() -> Salida del servicio para crear una programación de factura");
@@ -1676,9 +1678,42 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private FacFacturacionprogramada creaFacturacionProgramadaDesdeItem(FacFacturacionprogramadaItem facItem, AdmUsuarios usuario) {
 		FacFacturacionprogramada fac = new FacFacturacionprogramada();
-		
-		fac.setIdprogramacion(string2Long(facItem.getIdProgramacion()));
+
+		String idProgramacion = facFacturacionprogramadaExtendsMapper.getNextIdFacturacionProgramada(usuario.getIdinstitucion(), Long.parseLong(facItem.getIdSerieFacturacion())).getNewId();
+
+		fac.setUsumodificacion(usuario.getIdusuario());
+		fac.setFechamodificacion(new Date());
+		fac.setFechaprogramacion(new Date());
+
+		// Clave primaria
+		fac.setIdprogramacion(string2Long(idProgramacion));
 		fac.setIdseriefacturacion(string2Long(facItem.getIdSerieFacturacion()));
+		fac.setIdinstitucion(usuario.getIdinstitucion());
+
+		// Comprobamos que la descripción sea única
+		if (!UtilidadesString.esCadenaVacia(facItem.getDescripcion())) {
+			FacFacturacionprogramadaExample descUnica = new FacFacturacionprogramadaExample();
+			descUnica.createCriteria()
+					.andIdseriefacturacionEqualTo(string2Long(facItem.getIdSerieFacturacion()))
+					.andIdinstitucionEqualTo(usuario.getIdinstitucion())
+					.andDescripcionEqualTo(facItem.getDescripcion().trim());
+			long descCount = facFacturacionprogramadaExtendsMapper.countByExample(descUnica);
+
+			if (descCount > 0) {
+				fac.setDescripcion(facItem.getDescripcion().trim() + " [" + idProgramacion + "]");
+			} else {
+				fac.setDescripcion(facItem.getDescripcion().trim());
+			}
+		}
+
+		// Tarjeta de datos generales
+		fac.setFechainicioproductos(facItem.getFechaInicioProductos());
+		fac.setFechafinproductos(facItem.getFechaFinProductos());
+		fac.setFechainicioservicios(facItem.getFechaInicioServicios());
+		fac.setFechafinservicios(facItem.getFechaFinServicios());
+		fac.setFechaprevistageneracion(facItem.getFechaPrevistaGeneracion());
+		fac.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
+
 
 //		Campos sin correspondencia en facItem
 //		fac.setConfdeudor(facItem.get);
@@ -1688,43 +1723,77 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 //		fac.setFechacargo(facItem.get);
 //		fac.setIdprevision(facItem.get);
 //		fac.setIdtipoenvios(facItem.get);
-		
-		fac.setDescripcion(facItem.getDescripcion());
-		fac.setEnvio(boolToString10(facItem.getEnvio()));
 
-		fac.setFechaconfirmacion(facItem.getFechaConfirmacion());
-		fac.setFechafinproductos(facItem.getFechaFinProductos());
-		fac.setFechafinservicios(facItem.getFechaFinServicios());
-		fac.setFechainicioproductos(facItem.getFechaInicioProductos());
-		fac.setFechainicioservicios(facItem.getFechaInicioServicios());
-		fac.setFechamodificacion(facItem.getFechaModificacion());
-		fac.setFechapresentacion(facItem.getFechaPresentacion());
-		fac.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
-		fac.setFechaprevistageneracion(facItem.getFechaPrevistaGeneracion());
-		fac.setFechaprogramacion(facItem.getFechaProgramacion());
-		fac.setFecharealgeneracion(facItem.getFechaRealGeneracion());
-		fac.setFecharecibosb2b(facItem.getFechaRecibosB2B());
-		fac.setFechareciboscor1(facItem.getFechaRecibosCOR1());
-		fac.setFecharecibosprimeros(facItem.getFechaRecibosPrimeros());
-		fac.setFecharecibosrecurrentes(facItem.getFechaRecibosRecurrentes());
-		fac.setGenerapdf(boolToString10(facItem.getGeneraPDF()));
-		fac.setIdestadoconfirmacion(string2Short(facItem.getIdEstadoConfirmacion()));
-		fac.setIdestadoenvio(string2Short(facItem.getIdEstadoEnvio()));
-		fac.setIdestadopdf(string2Short(facItem.getIdEstadoPDF()));
-		fac.setIdestadotraspaso(string2Short(facItem.getIdEstadoTraspaso()));
+		// Recuperamos la serie de facturación para copiar las columnas
+		FacSeriefacturacionKey serieKey = new FacSeriefacturacionKey();
+		serieKey.setIdinstitucion(usuario.getIdinstitucion());
+		serieKey.setIdseriefacturacion(Long.parseLong(facItem.getIdSerieFacturacion()));
 
-		fac.setIdtipoplantillamail(string2Integer(facItem.getIdTipoPlantillaMail()));
-		fac.setLogerror(facItem.getLogError());
-		fac.setLogtraspaso(facItem.getLogTraspaso());
-		fac.setNombrefichero(facItem.getNombreFichero());
-		fac.setTraspasoCodauditoriaDef(facItem.getTraspasoCodAuditoriaDef());
-		fac.setTraspasofacturas(boolToString10(facItem.getTraspasoFacturas()));
-		fac.setTraspasoPlantilla(facItem.getTraspasoPlatilla());
-		
-		if(usuario!=null) {
-			fac.setUsumodificacion(usuario.getIdusuario());
-			fac.setIdinstitucion(usuario.getIdinstitucion());
+		FacSeriefacturacion seriefacturacion = facSeriefacturacionExtendsMapper.selectByPrimaryKey(serieKey);
+
+		// Copiar columnas de serie de facturación
+		fac.setConfdeudor(seriefacturacion.getConfdeudor());
+		fac.setConfingresos(seriefacturacion.getConfingresos());
+		fac.setCtaclientes(seriefacturacion.getCtaclientes());
+		fac.setCtaingresos(seriefacturacion.getCtaingresos());
+
+
+		// Datos de la tarjeta generación de ficheros
+		fac.setGenerapdf(seriefacturacion.getGenerarpdf());
+		// seriefacturacion.getIdmodelofactura();
+		// seriefacturacion.getIdmodelorectificativa();
+		if (!UtilidadesString.esCadenaVacia(seriefacturacion.getGenerarpdf()) && seriefacturacion.getGenerarpdf().equals("1")) {
+			fac.setIdestadopdf(Short.parseShort("7")); // Pendiente
+		} else {
+			fac.setIdestadopdf(Short.parseShort("5")); // No aplica
 		}
+
+		// Datos de la tarjeta envío facturas
+		fac.setEnvio(seriefacturacion.getEnviofacturas());
+		fac.setIdtipoplantillamail(seriefacturacion.getIdtipoplantillamail());
+		fac.setIdtipoenvios(seriefacturacion.getIdtipoenvios());
+		if (!UtilidadesString.esCadenaVacia(seriefacturacion.getEnviofacturas()) && seriefacturacion.getEnviofacturas().equals("1")) {
+			fac.setIdestadoenvio(Short.parseShort("13")); // Pendiente
+		} else {
+			fac.setIdestadoenvio(Short.parseShort("11")); // No aplica
+		}
+
+		// Datos de la tarjeta generación de traspasos
+		fac.setTraspasofacturas(seriefacturacion.getTraspasofacturas());
+		fac.setTraspasoPlantilla(seriefacturacion.getTraspasoPlantilla());
+		fac.setTraspasoCodauditoriaDef(seriefacturacion.getTraspasoCodauditoriaDef());
+		if (!UtilidadesString.esCadenaVacia(seriefacturacion.getTraspasofacturas()) && seriefacturacion.getTraspasofacturas().equals("1")) {
+			fac.setIdestadotraspaso(Short.parseShort("24")); // Pendiente
+		} else {
+			fac.setIdestadotraspaso(Short.parseShort("22")); // No aplica
+		}
+
+		fac.setArchivarfact(boolToString10(false)); //Desarchivada por defecto
+		fac.setIdestadoconfirmacion(Short.parseShort("18")); // Generación programada
+		fac.setVisible("S");
+
+		// fac.setFechaconfirmacion(facItem.getFechaConfirmacion());
+		// fac.setFechamodificacion(facItem.getFechaModificacion());
+		// fac.setFechapresentacion(facItem.getFechaPresentacion());
+		// fac.setFechaprogramacion(facItem.getFechaProgramacion());
+		// fac.setFecharealgeneracion(facItem.getFechaRealGeneracion());
+		// fac.setFecharecibosb2b(facItem.getFechaRecibosB2B());
+		// fac.setFechareciboscor1(facItem.getFechaRecibosCOR1());
+		// fac.setFecharecibosprimeros(facItem.getFechaRecibosPrimeros());
+		// fac.setFecharecibosrecurrentes(facItem.getFechaRecibosRecurrentes());
+		// fac.setGenerapdf(boolToString10(facItem.getGeneraPDF()));
+		// fac.setIdestadoenvio(string2Short(facItem.getIdEstadoEnvio()));
+		// fac.setIdestadopdf(string2Short(facItem.getIdEstadoPDF()));
+		// fac.setIdestadotraspaso(string2Short(facItem.getIdEstadoTraspaso()));
+
+		// fac.setIdtipoplantillamail(string2Integer(facItem.getIdTipoPlantillaMail()));
+		// fac.setLogerror(facItem.getLogError());
+		// fac.setLogtraspaso(facItem.getLogTraspaso());
+		// fac.setNombrefichero(facItem.getNombreFichero());
+		// fac.setTraspasoCodauditoriaDef(facItem.getTraspasoCodAuditoriaDef());
+		// fac.setTraspasofacturas(boolToString10(facItem.getTraspasoFacturas()));
+		// fac.setTraspasoPlantilla(facItem.getTraspasoPlatilla());
+
 		
 		return fac;
 	}
