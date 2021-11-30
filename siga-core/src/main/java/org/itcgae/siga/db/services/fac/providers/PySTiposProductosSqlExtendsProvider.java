@@ -153,6 +153,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		return sql.toString();
 	}
 	
+	//Obtiene la informacion de los productos al darle a buscar en Facturacion --> Productos para rellenar la tabla.
 	public String searchListadoProductosBuscador(String idioma, Short idInstitucion, FiltroProductoItem filtroProductoItem) {
 		SQL sql = new SQL();
 		
@@ -204,8 +205,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 			sql.WHERE(" PRIN.IDPRODUCTO = '" + filtroProductoItem.getTipo() + "'");
 		
 		if(filtroProductoItem.getProducto() != null && filtroProductoItem.getProducto() != "")
-			sql.WHERE(" regexp_like(PRIN.DESCRIPCION,'" + filtroProductoItem.getProducto() + "')");
-		
+			sql.WHERE("  upper(prin.descripcion) like upper('%" + filtroProductoItem.getProducto() + "%')");
 		if(filtroProductoItem.getFormaPago() != null && filtroProductoItem.getFormaPago() != "") {
 			sql.WHERE(" fopa2.idinstitucion = prin.idinstitucion");
 			sql.WHERE(" fopa2.idtipoproducto = prin.idtipoproducto");

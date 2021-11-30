@@ -5,11 +5,16 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.PrecioServicioItem;
+import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.PysFormapagoMapper;
 import org.itcgae.siga.db.services.fac.providers.PySTipoFormaPagoSqlExtendsProvider;
+import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +50,10 @@ public interface PySTipoFormaPagoExtendsMapper extends PysFormapagoMapper{
 		@Result(column = "idPeriodicidad", property = "idPeriodicidad", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<PrecioServicioItem> comboPreciosServicio(String idioma);
+	
+	//Realiza un borrado fisico de las formas de pago de un producto
+	@UpdateProvider(type = PySTipoFormaPagoSqlExtendsProvider.class, method = "borradoFisicoFormasPagoByProducto")
+	int borradoFisicoFormasPagoByProducto(ListaProductosItem producto,Short idInstitucion);
 	
 	
 }

@@ -29,4 +29,10 @@ application:
     /pys/crearEditarServicio: [404]
     /pys/activarDesactivarServicio: [405]
 
+    # Permisos Productos
+    /pys/nuevoProducto: [406]
+    /pys/editarProducto: [406]
+    /pys/reactivarBorradoFisicoLogicoProductos: [407]
+    /pys/formasPagoProducto: [408]    
+
     # Fin permisos para el módulo de ProductosYServicios

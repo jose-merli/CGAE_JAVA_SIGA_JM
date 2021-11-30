@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.fac.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
 
 public class PySTipoFormaPagoSqlExtendsProvider {
 	
@@ -49,5 +50,19 @@ public class PySTipoFormaPagoSqlExtendsProvider {
 	
 	public String comboPreciosServicio(String idioma) {
 		return "";
+	}
+	
+	//Realiza un borrado fisico de las formas de pago de un producto
+	public String borradoFisicoFormasPagoByProducto(ListaProductosItem producto,Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.DELETE_FROM(" PYS_FORMAPAGOPRODUCTO");
+		
+		sql.WHERE(" IDTIPOPRODUCTO = " + producto.getIdtipoproducto());
+		sql.WHERE(" IDPRODUCTO = " + producto.getIdproducto());
+		sql.WHERE(" IDPRODUCTOINSTITUCION = " +  producto.getIdproductoinstitucion());
+		sql.WHERE(" IDINSTITUCION = " + idInstitucion);
+				
+		return sql.toString();
 	}
 }

@@ -71,6 +71,7 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		}) 
 	NewIdDTO getIndiceMaxProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion);
 	
+	//Obtiene la informacion de los productos al darle a buscar en Facturacion --> Productos para rellenar la tabla.
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "searchListadoProductosBuscador")
 	@Results({
 		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
@@ -94,18 +95,23 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		}) 
 	List<ListaProductosItem> searchListadoProductosBuscador(String idioma, Short idInstitucion, FiltroProductoItem filtroProductoItem);
 	
+	//Comprueba si un producto tiene usos para saber si se ha de borrar logicamente o fisicamente
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "comprobarUsoProducto")
 	List<Integer> comprobarUsoProducto(ListaProductosItem producto, Short idInstitucion);
 	
+	//Comprueba si un producto tiene solicitudes de compra para saber si se ha de borrar logicamente o fisicamente
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "comprobarSolicitudProducto")
 	List<Integer> comprobarSolicitudProducto(ListaProductosItem producto, Short idInstitucion);
 	
+	//Borra logicamente un producto (establecer fecha de baja a dia de hoy)
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "borradoLogicoProductos")
 	int borradoLogicoProductos(AdmUsuarios usuario, ListaProductosItem producto, Short idInstitucion);
 	
+	//Borra fisicamente un producto (cuando no tiene ni usos ni solicitudes de compra)
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "borradoFisicoProductosRegistro")
 	int borradoFisicoProductosRegistro(ListaProductosItem producto, Short idInstitucion);
 	
+	//Borra el identificador del producto cuando se realiza un borrado fisico del producto (cuando no tiene ni usos ni solicitudes de compra).
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "borradoFisicoProductosIdentificador")
 	int borradoFisicoProductosIdentificador(ListaProductosItem producto, Short idInstitucion);
 	
@@ -123,6 +129,7 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		}) 
 	List<ComboItem> searchTiposProductosByIdCategoriaMultiple(String idioma, Short idInstitucion, String idCategoria);
 	
+	//Obtiene los codigos de productos existentes en un colegio para su uso por ejemplo en validar que en ficha producto a la hora de crear/editar no se introduzca un codigo ya existente (para saber como esta formado el codigo revisar la documentacion)
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "obtenerCodigosPorColegio")
 	List<String> obtenerCodigosPorColegio(Short idInstitucion);
 }
