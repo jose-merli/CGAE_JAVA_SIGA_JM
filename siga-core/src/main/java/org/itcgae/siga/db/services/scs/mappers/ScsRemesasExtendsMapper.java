@@ -88,7 +88,7 @@ public interface ScsRemesasExtendsMapper {
 		@Result(column = "INCIDENCIAS_ANTES_ENVIO", property = "incidenciasAntesEnvio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "INCIDENCIAS_DESPUES_ENVIO", property = "incidenciasDespuesEnvio", jdbcType = JdbcType.NUMERIC)
 	})
-	List<EJGRemesaItem> getEJGRemesa(RemesasItem remesasItem, Short idInstitucion);
+	List<EJGRemesaItem> getEJGRemesa(RemesasItem remesasItem, Short idInstitucion, String idLenguaje);
 	
 	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "getAcciones")
 	@Results({
