@@ -18,7 +18,7 @@ public class ScsActacomisionSqlExtendsProvider extends ScsActacomisionSqlProvide
 		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 		//Esta comprobacion se realiza para que la consulta solo seleccione actas abiertas de la institucion
 		//además de la ultima acta al EJG que se selecciona siempre.
-		if(idActa!=null) {
+		if(idActa!=null && !idActa.equals("undefined")) {
 			sql.WHERE("(fechaResolucion is null OR (anioacta = '"+anioActa+"' and idacta = '" +idActa+ "'))");
 		}
 		else {
