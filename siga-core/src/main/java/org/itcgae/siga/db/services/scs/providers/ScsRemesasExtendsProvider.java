@@ -308,7 +308,7 @@ public class ScsRemesasExtendsProvider {
 		return sql.toString();
 	}
 
-	public String getEJGRemesa(RemesasItem remesasItem, Short idInstitucion) {
+	public String getEJGRemesa(RemesasItem remesasItem, Short idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		SQL nuevaRemesa = new SQL();
 		SQL estadoRemesa = new SQL();
@@ -353,7 +353,7 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("ejg.anio ANIOEJG");
 		sql.SELECT("ejg.numero NUMEROEJG");
 		sql.SELECT("guardia.descripcion TURNO_GUARDIA_EJG");
-		sql.SELECT("tipoejg.descripcion ESTADOEJG");
+		sql.SELECT("F_SIGA_GETRECURSO(tipoejg.descripcion, " + idLenguaje + ") ESTADOEJG");
 		sql.SELECT("persona.nombre || ' ' || persona.apellidos1 || ' ' || persona.apellidos2 SOLICITANTE");
 		sql.SELECT("(" + nuevaRemesa.toString() + ") NUEVAREMESA");
 		sql.SELECT("DECODE( (" + estadoRemesa.toString() + "), 1, 'Incidencias validacion', "

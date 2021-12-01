@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,6 +22,7 @@ import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -52,7 +54,10 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.GestorContadores;
+import org.itcgae.siga.commons.utils.ReadProperties;
+import org.itcgae.siga.commons.utils.SIGAReferences;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -103,8 +108,13 @@ import org.itcgae.siga.db.services.scs.mappers.ScsRemesasExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.mockito.internal.util.SimpleMockitoLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -755,7 +765,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 			LOGGER.debug("Id remesa -> " + remesasItem.getIdRemesa());
 
-			ejgRemesaItems = scsRemesasExtendsMapper.getEJGRemesa(remesasItem, idInstitucion);
+			ejgRemesaItems = scsRemesasExtendsMapper.getEJGRemesa(remesasItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 
 			for (int i = 0; i < ejgRemesaItems.size(); i++) {
 				String incidencias = ejgRemesaItems.get(i).getNumIncidencias() + "/"
@@ -976,7 +986,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	}
 
 	@Override
-	public InsertResponseDTO ejecutaOperacionRemesa(RemesaAccionItem remesaAccionItem, HttpServletRequest request) {
+	public InsertResponseDTO ejecutaOperacionRemesa(RemesaAccionItem remesaAccionItem, HttpServletRequest request) throws SigaExceptions {
 		// TODO Auto-generated method stub
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1011,15 +1021,25 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			
 			GenRecursos gr = genRecursosMapper.selectByPrimaryKey(grKey);
 
-			if (remesaAccionItem.getAccion() == 1 || remesaAccionItem.getAccion() == 2) {
-				validar = validarAccion(remesaAccionItem, request, remesaAccionItem.getDescripcion());
-				
+			validar = validarAccion(remesaAccionItem, request, remesaAccionItem.getDescripcion());
+			
+			if (remesaAccionItem.getAccion() != 8) {
 				if(validar) {
 					insertResponseDTO = validaEnviaExpedientes(idInstitucion, remesaAccionItem, parametro.getValor(), gr.getDescripcion(), request, usuarios.get(0).getUsumodificacion());
 				}else {
 					LOGGER.error("Error al validar la remesa. No cumple los requisitos");
 					error.setCode(200);
 					error.setDescription("Error al validar la remesa. No cumple los requisitos.");
+					insertResponseDTO.setStatus(SigaConstants.OK);
+					insertResponseDTO.setError(error);
+				}
+			}else {
+				if(validar) {
+					descargar(idInstitucion, parametro.getValor(), remesaAccionItem, request);
+				}else {
+					LOGGER.error("Error al descargar la remesa. No cumple los requisitos");
+					error.setCode(200);
+					error.setDescription("Error al descargar la remesa. No cumple los requisitos.");
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setError(error);
 				}
@@ -1033,7 +1053,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		return insertResponseDTO;
 	}
 
-	private boolean validarAccion(RemesaAccionItem remesaAccionItem, HttpServletRequest request, String accion) {
+	public boolean validarAccion(RemesaAccionItem remesaAccionItem, HttpServletRequest request, String accion) {
 		RemesasBusquedaItem remesa = new RemesasBusquedaItem();
 		remesa.setIdRemesa(remesaAccionItem.getIdRemesa());
 		EstadoRemesaDTO estadoRemesa = listadoEstadoRemesa(remesa, request);
@@ -1054,8 +1074,119 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		}
 		return false;
 	}
+	
+	public ResponseEntity<InputStreamResource> descargar(Short idInstitucion, String pcajg, RemesaAccionItem remesaAccionItem, HttpServletRequest request) throws SigaExceptions {
+	
+		byte[] buf = {};
+		ByteArrayInputStream byteInput = new ByteArrayInputStream(buf);
+		ResponseEntity<InputStreamResource> res = new ResponseEntity<InputStreamResource>(new InputStreamResource(byteInput), null, HttpStatus.NO_CONTENT);
+		
+		if (pcajg.equals("3") || pcajg.equals("6")) {
+			 res = getFicheroXML(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
+		} else {
+			res = getFichero(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
+		}
+		
+		return res;
+	}
+	
+	public ResponseEntity<InputStreamResource> getFicheroXML(String idInstitucion, String idRemesa) throws SigaExceptions {
+		
+		byte[] buf = {};
+		File file = new File(getRutaFicheroZIP(Integer.parseInt(idInstitucion), Integer.parseInt(idRemesa)));
+		InputStream fileStream = new ByteArrayInputStream(buf);
+		ResponseEntity<InputStreamResource> res = null;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.parseMediaType("application/xml"));
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+		headers.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
+		
+		try {
+			fileStream = new FileInputStream(file);
 
-	private InsertResponseDTO validaEnviaExpedientes(Short idinstitucion, RemesaAccionItem remesaAccionItem, String tipoPCAJG, String mensajeValidando, HttpServletRequest request, Integer usuModificacion) {
+			if(fileStream.available() > 0) {	
+				headers.setContentLength(file.length());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+			}else {
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.NO_CONTENT);
+			}
+		} catch (IOException e) {
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.NO_CONTENT);
+		}
+		
+		return res;
+	}
+	
+	public String getNombreRutaZIPconXMLs(int idInstitucion, int idRemesa) {
+		return getDirXML(idInstitucion, idRemesa) + File.separator + idInstitucion + "_" + idRemesa;
+	}
+	
+	public String getRutaFicheroZIP(int idInstitucion, int idRemesa) {
+		return getNombreRutaZIPconXMLs(idInstitucion, idRemesa) + ".zip";
+	}
+
+	public String getDirXML(int idInstitucion, int idRemesa) {
+		String keyPathFicheros = "cajg.directorioFisicoCAJG";		
+		String keyPath2 = "cajg.directorioCAJGJava";				
+	    ReadProperties p= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
+		String pathFichero = p.returnProperty(keyPathFicheros) + p.returnProperty(keyPath2);
+		return pathFichero + File.separator + idInstitucion  + File.separator + idRemesa + File.separator + "xml";
+	}
+	
+	public ResponseEntity<InputStreamResource> getFichero(String idInstitucion, String idRemesa) throws SigaExceptions {
+		File file = null;
+	    ReadProperties rp= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
+		String rutaAlmacen = rp.returnProperty("cajg.directorioFisicoCAJG") + rp.returnProperty("cajg.directorioCAJGJava");
+		byte[] buf = {};
+		InputStream fileStream = new ByteArrayInputStream(buf);
+		ResponseEntity<InputStreamResource> res = null;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.parseMediaType("application/xml"));
+		
+		rutaAlmacen += File.separator + idInstitucion;
+		rutaAlmacen += File.separator + idRemesa;
+		
+		File dir = new File(rutaAlmacen);
+		if (dir.exists()) {
+			if (dir.listFiles() != null && dir.listFiles().length > 0) {
+				int numFicheros = 0;
+				for (int i = 0; i < dir.listFiles().length ; i++) {
+					if (dir.listFiles()[i].isFile() && dir.listFiles()[i].getName().endsWith(".zip")){
+						file = dir.listFiles()[i];
+						numFicheros++;
+					}
+				}
+									
+				if (numFicheros > 1) {
+					SigaExceptions e = new SigaExceptions("cajg.error.masDe1zip");
+					throw e;
+				}
+				
+				headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+			}
+		}
+			
+		headers.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
+		
+		try {
+			fileStream = new FileInputStream(file);
+
+			if(fileStream.available() > 0) {	
+				headers.setContentLength(file.length());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+			}else {
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.NO_CONTENT);
+			}
+		} catch (IOException e) {
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.NO_CONTENT);
+		}
+		
+		return res;
+	}
+
+	public InsertResponseDTO validaEnviaExpedientes(Short idinstitucion, RemesaAccionItem remesaAccionItem, String tipoPCAJG, String mensajeValidando, HttpServletRequest request, Integer usuModificacion) {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		LOGGER.debug("Insertando un nuevo registro para la validación o envío de datos de una remesa de envío.");

@@ -77,7 +77,7 @@ public class RemesasResolucionesController {
 													@RequestParam("idTipoRemesa") int idTipoRemesa,
 													@RequestParam("nombreFichero") String nombreFichero,
 													@RequestParam("fechaResolucion") String fechaResolucion,
-													@RequestParam(required=false) MultipartHttpServletRequest  request) throws IllegalStateException, IOException{
+													MultipartHttpServletRequest  request) throws IllegalStateException, IOException{
 		LOGGER.info("----ENTRA METODO GUARDAR RESOLUCION-----");
 		RemesasResolucionItem remesasResolucionItem = new RemesasResolucionItem();
 		

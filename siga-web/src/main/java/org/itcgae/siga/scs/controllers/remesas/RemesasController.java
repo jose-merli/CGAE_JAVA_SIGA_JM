@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorItem;
 import org.itcgae.siga.DTOs.scs.CheckAccionesRemesasDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
@@ -18,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.RemesaAccionItem;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +122,7 @@ public class RemesasController {
 	}
 	
 	@RequestMapping(value = "/ejecutaOperacionRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> ejecutaOperacionRemesa(@RequestBody RemesaAccionItem remesaAccionItem, HttpServletRequest request) {
+	ResponseEntity<InsertResponseDTO> ejecutaOperacionRemesa(@RequestBody RemesaAccionItem remesaAccionItem, HttpServletRequest request) throws SigaExceptions {
 		LOGGER.debug("Entra en el método ejecutaOperacionRemesa");
 		InsertResponseDTO response = busquedaRemesas.ejecutaOperacionRemesa(remesaAccionItem, request);
 		LOGGER.debug("Termina el método ejecutaOperacionRemesa");

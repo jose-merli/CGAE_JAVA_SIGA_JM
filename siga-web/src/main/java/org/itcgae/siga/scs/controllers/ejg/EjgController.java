@@ -267,8 +267,8 @@ public class EjgController {
 
 	// comboActaAnnio
 	@RequestMapping(value = "/gestion-ejg/comboActaAnnio", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboActaAnnio(String idActa, HttpServletRequest request) {
-		ComboDTO response = gestionEJG.comboActaAnnio(idActa, request);
+	ResponseEntity<ComboDTO> comboActaAnnio(String idActa, String anioActa, HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboActaAnnio(idActa, anioActa, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 

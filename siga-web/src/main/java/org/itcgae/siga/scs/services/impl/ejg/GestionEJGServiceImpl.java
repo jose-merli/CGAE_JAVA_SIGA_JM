@@ -1067,7 +1067,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     }
 
     @Override
-    public ComboDTO comboActaAnnio(String idActa, HttpServletRequest request) {
+    public ComboDTO comboActaAnnio(String idActa, String anioActa, HttpServletRequest request) {
         // TODO Auto-generated method stub
         // Conseguimos información del usuario logeado
         String token = request.getHeader("Authorization");
@@ -1087,7 +1087,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
             if (usuarios != null && usuarios.size() > 0) {
                 LOGGER.info(
                         "comboActaAnnio() / scsActacomisionExtendsMapper.getActaAnnio() -> Entrada a scsActacomisionExtendsMapper para obtener los combo");
-                comboItems = scsActacomisionExtendsMapper.getActaAnnio(idInstitucion.toString(), idActa);
+                comboItems = scsActacomisionExtendsMapper.getActaAnnio(idInstitucion.toString(), idActa, anioActa);
                 LOGGER.info(
                         "comboActaAnnio() / scsActacomisionExtendsMapper.getActaAnnio() -> Salida a scsActacomisionExtendsMapper para obtener los combo");
                 if (comboItems != null) {
@@ -2490,13 +2490,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 else {
                 	busquedaEJGComisionServiceImpl.borrarActaAnio(list, request);
                 }
-                if(datos.getIdFundamentoJuridico() != null) {
+                if(datos.getIdFundamentoJuridico() != null && datos.getIdTiporatificacionEJG() != null) {
                 	busquedaEJGComisionServiceImpl.editarResolucionFundamento(list, request);
                 }
                 else {
                 	busquedaEJGComisionServiceImpl.borrarResolucionFundamento(list, request);
                 }
-                if(datos.getIdPonente() != null) {
+                if(datos.getIdPonente() != null && datos.getFechaPresentacionPonente() != null) {
                 	busquedaEJGComisionServiceImpl.editarPonente(list, request);
                 }
                 else {
