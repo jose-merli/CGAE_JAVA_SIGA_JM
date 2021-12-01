@@ -46,7 +46,7 @@ public interface ScsRemesasResolucionesExtendsMapper {
 	@Results({
 		@Result(column = "IDREMESARESOLUCIONFICHERO", property = "idremesaresolucionfichero", jdbcType = JdbcType.INTEGER)
 	})
-	CajgRemesaresolucionfichero getMaxIdRemesaResolucionFichero(Short idInstitucion);
+	CajgRemesaresolucionfichero getMaxIdRemesaResolucionFichero();
 
 	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "ecomOperacionTipoAccion")
 	@Results({
