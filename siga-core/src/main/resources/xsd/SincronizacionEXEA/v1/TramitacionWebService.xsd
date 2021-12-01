@@ -1,0 +1,240 @@
+<xs:schema xmlns:tns="http://server.ws.services.ispac.tdw.ieci" elementFormDefault="unqualified" targetNamespace="http://server.ws.services.ispac.tdw.ieci" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="anexarDocsExpediente" type="tns:anexarDocsExpediente"/>
+	<xs:element name="anexarDocsExpedienteElectronico" type="tns:anexarDocsExpedienteElectronico"/>
+	<xs:element name="anexarDocsExpedienteElectronicoResponse" type="tns:anexarDocsExpedienteElectronicoResponse"/>
+	<xs:element name="anexarDocsExpedienteResponse" type="tns:anexarDocsExpedienteResponse"/>
+	<xs:element name="aportarDatosDocsExpediente" type="tns:aportarDatosDocsExpediente"/>
+	<xs:element name="aportarDatosDocsExpedienteElectronico" type="tns:aportarDatosDocsExpedienteElectronico"/>
+	<xs:element name="aportarDatosDocsExpedienteElectronicoResponse" type="tns:aportarDatosDocsExpedienteElectronicoResponse"/>
+	<xs:element name="aportarDatosDocsExpedienteResponse" type="tns:aportarDatosDocsExpedienteResponse"/>
+	<xs:element name="archivarExpedientes" type="tns:archivarExpedientes"/>
+	<xs:element name="archivarExpedientesResponse" type="tns:archivarExpedientesResponse"/>
+	<xs:element name="booleano" type="tns:booleano"/>
+	<xs:element name="cadena" type="tns:cadena"/>
+	<xs:element name="cambiarEstadoAdministrativo" type="tns:cambiarEstadoAdministrativo"/>
+	<xs:element name="cambiarEstadoAdministrativoResponse" type="tns:cambiarEstadoAdministrativoResponse"/>
+	<xs:element name="crearExpediente" type="tns:crearExpediente"/>
+	<xs:element name="crearExpedienteElectronico" type="tns:crearExpedienteElectronico"/>
+	<xs:element name="crearExpedienteElectronicoResponse" type="tns:crearExpedienteElectronicoResponse"/>
+	<xs:element name="crearExpedienteResponse" type="tns:crearExpedienteResponse"/>
+	<xs:element name="entero" type="tns:entero"/>
+	<xs:element name="establecerDatosRegistroEntidad" type="tns:establecerDatosRegistroEntidad"/>
+	<xs:element name="establecerDatosRegistroEntidadResponse" type="tns:establecerDatosRegistroEntidadResponse"/>
+	<xs:element name="moverExpedienteAFase" type="tns:moverExpedienteAFase"/>
+	<xs:element name="moverExpedienteAFaseResponse" type="tns:moverExpedienteAFaseResponse"/>
+	<xs:element name="retornoServicio" type="tns:retornoServicio"/>
+	<xs:complexType name="archivarExpedientes">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="numExp" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="archivarExpedientesResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:retornoServicio"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="retornoServicio">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="returnCode" type="xs:string"/>
+			<xs:element minOccurs="0" name="errorCode" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="aportarDatosDocsExpediente">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="numExp" type="xs:string"/>
+			<xs:element minOccurs="0" name="numeroRegistro" type="xs:string"/>
+			<xs:element minOccurs="0" name="fechaRegistro" type="xs:dateTime"/>
+			<xs:element minOccurs="0" name="xmlDatosEspecificos" type="xs:string"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="documento" type="tns:documentoExpediente"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="documentoExpediente">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="code" type="xs:string"/>
+			<xs:element minOccurs="0" name="content" type="xs:base64Binary"/>
+			<xs:element minOccurs="0" name="extension" type="xs:string"/>
+			<xs:element minOccurs="0" name="id" type="xs:string"/>
+			<xs:element name="lenght" type="xs:int"/>
+			<xs:element minOccurs="0" name="location" type="xs:string"/>
+			<xs:element minOccurs="0" name="name" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="aportarDatosDocsExpedienteResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:booleano"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="booleano">
+		<xs:complexContent>
+			<xs:extension base="tns:retornoServicio">
+				<xs:sequence>
+					<xs:element name="valor" type="xs:boolean"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="crearExpedienteElectronico">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="datosComunes" type="tns:datosComunesExpediente"/>
+			<xs:element minOccurs="0" name="xmlDatosEspecificos" type="xs:string"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="documento" type="tns:documentoExpedienteElectronico"/>
+			<xs:element minOccurs="0" name="sistemaOrigen" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="datosComunesExpediente">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="fechaRegistro" type="xs:dateTime"/>
+			<xs:element minOccurs="0" name="idOrganismo" type="xs:string"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="interesados" nillable="true" type="tns:interesadoExpediente"/>
+			<xs:element minOccurs="0" name="numeroRegistro" type="xs:string"/>
+			<xs:element minOccurs="0" name="tipoAsunto" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="interesadoExpediente">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="apellido1" type="xs:string"/>
+			<xs:element minOccurs="0" name="apellido2" type="xs:string"/>
+			<xs:element minOccurs="0" name="indPrincipal" type="xs:string"/>
+			<xs:element minOccurs="0" name="mobilePhone" type="xs:string"/>
+			<xs:element minOccurs="0" name="name" type="xs:string"/>
+			<xs:element minOccurs="0" name="nifcif" type="xs:string"/>
+			<xs:element minOccurs="0" name="notificationAddressType" type="xs:string"/>
+			<xs:element minOccurs="0" name="phone" type="xs:string"/>
+			<xs:element minOccurs="0" name="placeCity" type="xs:string"/>
+			<xs:element minOccurs="0" name="postalAddress" type="xs:string"/>
+			<xs:element minOccurs="0" name="postalCode" type="xs:string"/>
+			<xs:element minOccurs="0" name="regionCountry" type="xs:string"/>
+			<xs:element minOccurs="0" name="telematicAddress" type="xs:string"/>
+			<xs:element minOccurs="0" name="thirdPartyId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="documentoExpedienteElectronico">
+		<xs:complexContent>
+			<xs:extension base="tns:documentoExpediente">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="estadoElaboracionEni" type="xs:string"/>
+					<xs:element minOccurs="0" name="fechaCapturaEni" type="xs:dateTime"/>
+					<xs:element minOccurs="0" name="firmaEni" type="xs:base64Binary"/>
+					<xs:element minOccurs="0" name="idDocumentoOrigenEni" type="xs:string"/>
+					<xs:element minOccurs="0" name="identificadorEni" type="xs:string"/>
+					<xs:element minOccurs="0" name="nombreFormatoEni" type="xs:string"/>
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="organoEni" nillable="true" type="xs:string"/>
+					<xs:element minOccurs="0" name="origenEni" type="xs:string"/>
+					<xs:element minOccurs="0" name="tipoDocumentoEni" type="xs:string"/>
+					<xs:element minOccurs="0" name="tipoFirmaEni" type="xs:string"/>
+					<xs:element minOccurs="0" name="versionNtiEni" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="crearExpedienteElectronicoResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:cadena"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cadena">
+		<xs:complexContent>
+			<xs:extension base="tns:retornoServicio">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="valor" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="anexarDocsExpedienteElectronico">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="numExp" type="xs:string"/>
+			<xs:element minOccurs="0" name="numeroRegistro" type="xs:string"/>
+			<xs:element minOccurs="0" name="fechaRegistro" type="xs:dateTime"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="documento" type="tns:documentoExpedienteElectronico"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="anexarDocsExpedienteElectronicoResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:booleano"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="crearExpediente">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="datosComunes" type="tns:datosComunesExpediente"/>
+			<xs:element minOccurs="0" name="xmlDatosEspecificos" type="xs:string"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="documento" type="tns:documentoExpediente"/>
+			<xs:element minOccurs="0" name="sistemaOrigen" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="crearExpedienteResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:cadena"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="anexarDocsExpediente">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="numExp" type="xs:string"/>
+			<xs:element minOccurs="0" name="numeroRegistro" type="xs:string"/>
+			<xs:element minOccurs="0" name="fechaRegistro" type="xs:dateTime"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="documento" type="tns:documentoExpediente"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="anexarDocsExpedienteResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:booleano"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="aportarDatosDocsExpedienteElectronico">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="numExp" type="xs:string"/>
+			<xs:element minOccurs="0" name="numeroRegistro" type="xs:string"/>
+			<xs:element minOccurs="0" name="fechaRegistro" type="xs:dateTime"/>
+			<xs:element minOccurs="0" name="xmlDatosEspecificos" type="xs:string"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="documento" type="tns:documentoExpedienteElectronico"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="aportarDatosDocsExpedienteElectronicoResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:booleano"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cambiarEstadoAdministrativo">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="numExp" type="xs:string"/>
+			<xs:element minOccurs="0" name="estadoAdministrativo" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cambiarEstadoAdministrativoResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:booleano"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="establecerDatosRegistroEntidad">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="nombreEntidad" type="xs:string"/>
+			<xs:element minOccurs="0" name="numExp" type="xs:string"/>
+			<xs:element minOccurs="0" name="xmlDatosEspecificos" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="establecerDatosRegistroEntidadResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:entero"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="entero">
+		<xs:complexContent>
+			<xs:extension base="tns:retornoServicio">
+				<xs:sequence>
+					<xs:element name="valor" type="xs:int"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="moverExpedienteAFase">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="numExp" type="xs:string"/>
+			<xs:element minOccurs="0" name="idFaseCatalogo" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="moverExpedienteAFaseResponse">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="return" type="tns:booleano"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

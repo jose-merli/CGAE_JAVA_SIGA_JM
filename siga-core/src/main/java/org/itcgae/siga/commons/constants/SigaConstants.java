@@ -1152,9 +1152,14 @@ public class SigaConstants {
 	public static final String ACREDITACION_TIPO_FIN = "2";
 	public static final String ACREDITACION_TIPO_COMPLETA = "3";
 
-	//Expedientes
+	//Expedientes - INICIO
 	public static final String RECURSO_MENU_EXP_EXEA = "menu.expedientesexea";
 	public static final String PARAM_MENU_EXEA_ACTIVO = "EXPEDIENTES_EXEA_ACTIVOS";
+	public static final String ID_APLICACION_PARAM = "ID_APLICACION";
+	public static final String ID_SEDE_PARAM = "ID_SEDE";
+	public static final String EXPEDIENTE_ACEPTADO_EXEA = "Aceptado";
+	public static final String EXPEDIENTE_DENEGADO_EXEA = "Rechazado";
+	public static final short SANCION_EN_SUSPENSO = 8;
 
 	public enum ERROR_SINCRONIZACION_EXEA {
 		FORMATO_NOVALIDO("Formato XML de petición no correcto."),
@@ -1183,5 +1188,7 @@ public class SigaConstants {
 			return mensajeError;
 		}
 	}
+
+	//Expedientes - FIN
 
 }

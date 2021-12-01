@@ -24,9 +24,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import com.exea.sincronizacion.redabogacia.AltaColegiadoResponseDocument;
-import com.exea.sincronizacion.redabogacia.AltaSancionResponseDocument;
-import com.exea.sincronizacion.redabogacia.ObtenerNumColegiacionResponseDocument;
+import com.exea.sincronizacion.redabogacia.*;
 import org.apache.xmlbeans.XmlObject;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
@@ -286,6 +284,26 @@ public class WSCommons {
 		}else if(xmlObjectResponse instanceof AltaSancionResponseDocument.AltaSancionResponse){
 
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((AltaSancionResponseDocument.AltaSancionResponse) xmlObjectResponse).addNewError();
+			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+			errorType.setDescripcion(message);
+
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+
+		}else if(xmlObjectResponse instanceof UpdateEstadoExpedienteResponseDocument.UpdateEstadoExpedienteResponse){
+
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((UpdateEstadoExpedienteResponseDocument.UpdateEstadoExpedienteResponse) xmlObjectResponse).addNewError();
+			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+			errorType.setDescripcion(message);
+
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+
+		}else if(xmlObjectResponse instanceof ActualizacionSancionResponseDocument.ActualizacionSancionResponse){
+
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((ActualizacionSancionResponseDocument.ActualizacionSancionResponse) xmlObjectResponse).addNewError();
 			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
 			errorType.setDescripcion(message);
 

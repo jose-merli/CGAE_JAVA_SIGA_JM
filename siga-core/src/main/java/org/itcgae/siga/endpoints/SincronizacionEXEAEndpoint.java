@@ -39,7 +39,7 @@ public class SincronizacionEXEAEndpoint {
             LOGGER.info("IP desde la que se recibe la peticion: "+ ipCliente);
 
         }catch (Exception e){
-            LOGGER.info("Imposible obtener la url de conexion de acceso a obtenerNumColegiacion");
+            LOGGER.error("Imposible obtener la url de conexion de acceso a obtenerNumColegiacion");
         }
         return service.getNumColegiacion(peticion, ipCliente);
     }
@@ -57,7 +57,7 @@ public class SincronizacionEXEAEndpoint {
             LOGGER.info("IP desde la que se recibe la peticion: "+ ipCliente);
 
         }catch (Exception e){
-            LOGGER.info("Imposible obtener la url de conexion de acceso a aprobarAltaColegiado");
+            LOGGER.error("Imposible obtener la url de conexion de acceso a aprobarAltaColegiado");
         }
         return service.aprobarAltaColegiado(peticion, ipCliente);
     }
@@ -75,8 +75,46 @@ public class SincronizacionEXEAEndpoint {
             LOGGER.info("IP desde la que se recibe la peticion: "+ ipCliente);
 
         }catch (Exception e){
-            LOGGER.info("Imposible obtener la url de conexion de acceso a altaSancion");
+            LOGGER.error("Imposible obtener la url de conexion de acceso a altaSancion");
         }
         return service.altaSancion(peticion, ipCliente);
     }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "updateEstadoExpedienteRequest")
+    @ResponsePayload
+    public UpdateEstadoExpedienteResponseDocument updateEstadoExpediente(@RequestPayload UpdateEstadoExpedienteRequestDocument peticion) throws SigaExceptions {
+        LOGGER.info("Entra en ws updateEstadoExpediente");
+
+        TransportContext ctx = TransportContextHolder.getTransportContext();
+
+        try {
+            HttpServletConnection connection = (HttpServletConnection) ctx.getConnection();
+            ipCliente = connection.getHttpServletRequest().getRemoteAddr();
+            LOGGER.info("IP desde la que se recibe la peticion: "+ ipCliente);
+
+        }catch (Exception e){
+            LOGGER.error("Imposible obtener la url de conexion de acceso a updateEstadoExpediente");
+        }
+        return service.updateEstadoExpediente(peticion, ipCliente);
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "actualizacionSancionRequest")
+    @ResponsePayload
+    public ActualizacionSancionResponseDocument actualizarSancion(@RequestPayload ActualizacionSancionRequestDocument peticion) throws SigaExceptions {
+        LOGGER.info("Entra en ws actualizarSancion");
+
+        TransportContext ctx = TransportContextHolder.getTransportContext();
+
+        try {
+            HttpServletConnection connection = (HttpServletConnection) ctx.getConnection();
+            ipCliente = connection.getHttpServletRequest().getRemoteAddr();
+            LOGGER.info("IP desde la que se recibe la peticion: "+ ipCliente);
+
+        }catch (Exception e){
+            LOGGER.error("Imposible obtener la url de conexion de acceso a actualizarSancion");
+        }
+        return service.actualizarSancion(peticion, ipCliente);
+    }
+
+
 }

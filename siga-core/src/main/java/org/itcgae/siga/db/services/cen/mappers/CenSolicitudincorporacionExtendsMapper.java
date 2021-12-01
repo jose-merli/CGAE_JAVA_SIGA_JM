@@ -10,13 +10,14 @@ import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.cen.providers.CenSolicitudincorporacionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface CenSolicitudincorporacionExtendsMapper {
+public interface CenSolicitudincorporacionExtendsMapper extends CenSolicitudincorporacionMapper {
 
 	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "selectSolicitudes")
 	@Results({ @Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
