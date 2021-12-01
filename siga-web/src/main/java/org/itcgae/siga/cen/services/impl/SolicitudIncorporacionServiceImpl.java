@@ -994,6 +994,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenPersonaExample ejemplo = new CenPersonaExample();
 		ejemplo.createCriteria().andNifcifEqualTo(solicitud.getNumeroidentificador());
+		
 		List <CenPersona> busqueda = _cenPersonaMapper.selectByExample(ejemplo);
 		
 		if(busqueda.isEmpty()) {
@@ -1016,6 +1017,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 			_cenPersonaMapper.insert(datosPersonales);
 			return datosPersonales.getIdpersona();
+			
 		}else {
 			
 			CenClienteExample ejemploCliente = new CenClienteExample();
@@ -1024,24 +1026,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			
 			List<CenCliente> clienteExistente = _cenClienteMapper.selectByExample(ejemploCliente);
 			
-			if(clienteExistente.size() > 1) {
-				int numeroAparicionesSiga = 0;
-				CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
-				exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();
-				//Colegios de SIGA
-				List<CenInstitucion> instituciones =_cenInstitucionMapper.selectByExample(exampleInstitucion);
-				List<Short> idInstituciones = new ArrayList<Short>();
-				for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
-					CenInstitucion string = (CenInstitucion) iterator.next();
-					idInstituciones.add(string.getIdinstitucion());
-				}
-				for (Iterator<CenCliente> iterator = clienteExistente.iterator(); iterator.hasNext();) {
-					CenCliente cenCliente = (CenCliente) iterator.next();
-					if (idInstituciones.contains(cenCliente.getIdinstitucion()) && !cenCliente.getIdinstitucion().equals(usuario.getIdinstitucion())) {
-						numeroAparicionesSiga++;
-					}					
-				}
-				if (numeroAparicionesSiga < 1) {
+			
+			if (clienteExistente.size() == 1) {
+				if (clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
 					CenPersona personaUpdate = busqueda.get(0);
 					personaUpdate.setNombre(solicitud.getNombre());
 					personaUpdate.setApellidos1(solicitud.getApellido1());
@@ -1055,11 +1042,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					personaUpdate.setSexo(solicitud.getSexo());
 					personaUpdate.setUsumodificacion(usuario.getIdusuario());
 					_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
-				}
-				return busqueda.get(0).getIdpersona();
-			}else{
-				if (clienteExistente.size() == 1) {
-					if (clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
+				}else{
+						
+					CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+					exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull().andIdinstitucionEqualTo(clienteExistente.get(0).getIdinstitucion());
+					//Colegios de SIGA
+					List<CenInstitucion> instituciones =_cenInstitucionMapper.selectByExample(exampleInstitucion);
+					if (instituciones.isEmpty()) {
 						CenPersona personaUpdate = busqueda.get(0);
 						personaUpdate.setNombre(solicitud.getNombre());
 						personaUpdate.setApellidos1(solicitud.getApellido1());
@@ -1073,33 +1062,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						personaUpdate.setSexo(solicitud.getSexo());
 						personaUpdate.setUsumodificacion(usuario.getIdusuario());
 						_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
-					}else{
-						
-						CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
-						exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull().andIdinstitucionEqualTo(clienteExistente.get(0).getIdinstitucion());
-						//Colegios de SIGA
-						List<CenInstitucion> instituciones =_cenInstitucionMapper.selectByExample(exampleInstitucion);
-						if (instituciones.isEmpty()) {
-							CenPersona personaUpdate = busqueda.get(0);
-							personaUpdate.setNombre(solicitud.getNombre());
-							personaUpdate.setApellidos1(solicitud.getApellido1());
-							personaUpdate.setApellidos2(solicitud.getApellido2());
-							personaUpdate.setFechamodificacion(new Date());
-							personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
-							personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
-							personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
-							personaUpdate.setNaturalde(solicitud.getNaturalde());
-							personaUpdate.setNifcif(solicitud.getNumeroidentificador());
-							personaUpdate.setSexo(solicitud.getSexo());
-							personaUpdate.setUsumodificacion(usuario.getIdusuario());
-							_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
-						}
 					}
+				}
 					
-				}else{
-					ejemploCliente = new CenClienteExample();
-					ejemploCliente.createCriteria().andIdpersonaEqualTo(busqueda.get(0).getIdpersona()).andIdinstitucionEqualTo(Short.valueOf("2000"));
-					List<CenCliente> clienteExistente2 = _cenClienteMapper.selectByExample(ejemploCliente);
+			}else{
+				ejemploCliente = new CenClienteExample();
+				ejemploCliente.createCriteria().andIdpersonaEqualTo(busqueda.get(0).getIdpersona()).andIdinstitucionEqualTo(Short.valueOf("2000"));
+				List<CenCliente> clienteExistente2 = _cenClienteMapper.selectByExample(ejemploCliente);
 					if (!clienteExistente2.isEmpty()){
 						CenPersona personaUpdate = busqueda.get(0);
 						personaUpdate.setNombre(solicitud.getNombre());
@@ -1114,11 +1083,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						personaUpdate.setSexo(solicitud.getSexo());
 						personaUpdate.setUsumodificacion(usuario.getIdusuario());
 						_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
-						
+							
 					}
-					
+						
 				}
-			}
+			
 			return busqueda.get(0).getIdpersona();
 		}
 		
