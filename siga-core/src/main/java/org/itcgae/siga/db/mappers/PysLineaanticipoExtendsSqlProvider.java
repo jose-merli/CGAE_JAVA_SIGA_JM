@@ -109,5 +109,150 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
     	
     	return query.toString();
     }
+    
+public String getListaServiciosMonedero(Short idInstitucion, String idLinea, String idPersona) {
+    	
+    	SQL query = new SQL();
+    	
+    	query.SELECT("servAnti.fechaModificacion"); 
+    	query.SELECT("servin.descripcion"); 
+    	query.SELECT("  DECODE(\r\n"
+				+ " valor_minimo,\r\n"
+				+ " NULL,\r\n"
+				+ " 'Sin precio',\r\n"
+				+ " (valor_minimo\r\n"
+				+ "  || '/'\r\n"
+				+ " || f_siga_getrecurso(\r\n"
+				+ " perio_min.descripcion,\r\n"
+				+ " 1\r\n"
+				+ " )\r\n"
+				+ " || ' - '\r\n"
+				+ " || valor_maximo\r\n"
+				+ " || '/'\r\n"
+				+ " || f_siga_getrecurso(\r\n"
+				+ " perio_max.descripcion,\r\n"
+				+ " 1\r\n"
+				+ " ) )\r\n"
+				+ " ) precio");
+    	
+    	query.FROM("pys_lineaanticipo linea");
+    	query.INNER_JOIN("(\r\n"
+    			+ "	        SELECT\r\n"
+    			+ "	            MIN(precioserv_min.valor) valor_minimo,\r\n"
+    			+ "	            MIN(precioserv_min.idperiodicidad) id_periodicidad_minima,\r\n"
+    			+ "	            MAX(precioserv_max.valor) valor_maximo,\r\n"
+    			+ "	            MAX(precioserv_max.idperiodicidad) id_periodicidad_maxima,\r\n"
+    			+ "	            servin.idinstitucion,\r\n"
+    			+ "	            servin.idservicio,\r\n"
+    			+ "	            servin.idtiposervicios,\r\n"
+    			+ "	            servin.idserviciosinstitucion\r\n"
+    			+ "	        FROM\r\n"
+    			+ "	            pys_serviciosinstitucion servin,\r\n"
+    			+ "	            pys_preciosservicios precioserv_min,\r\n"
+    			+ "	            pys_periodicidad perio_min,\r\n"
+    			+ "	            pys_preciosservicios precioserv_max,\r\n"
+    			+ "	            pys_periodicidad perio_max\r\n"
+    			+ "	        WHERE  precioserv_min.idservicio (+) = servin.idservicio\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                precioserv_min.idtiposervicios (+) = servin.idtiposervicios\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                precioserv_min.idserviciosinstitucion (+) = servin.idserviciosinstitucion\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                precioserv_min.idinstitucion (+) = servin.idinstitucion\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                perio_min.idperiodicidad (+) = precioserv_min.idperiodicidad\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                ( precioserv_min.valor / perio_min.periodosmes ) = (\r\n"
+    			+ "	                    SELECT\r\n"
+    			+ "	                        MIN(precioserv.valor / perio.periodosmes)\r\n"
+    			+ "	                    FROM\r\n"
+    			+ "	                        pys_preciosservicios precioserv,\r\n"
+    			+ "	                        pys_periodicidad perio\r\n"
+    			+ "	                    WHERE\r\n"
+    			+ "	                            precioserv.idservicio (+) = servin.idservicio\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv.idtiposervicios (+) = servin.idtiposervicios\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv.idserviciosinstitucion (+) = servin.idserviciosinstitucion\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv.idinstitucion (+) = servin.idinstitucion\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            perio.idperiodicidad (+) = precioserv.idperiodicidad\r\n"
+    			+ "	                )\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                precioserv_max.idservicio (+) = servin.idservicio\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                precioserv_max.idtiposervicios (+) = servin.idtiposervicios\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                precioserv_max.idserviciosinstitucion (+) = servin.idserviciosinstitucion\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                precioserv_max.idinstitucion (+) = servin.idinstitucion\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                perio_max.idperiodicidad (+) = precioserv_max.idperiodicidad\r\n"
+    			+ "	            AND\r\n"
+    			+ "	                ( precioserv_max.valor / perio_max.periodosmes ) = (\r\n"
+    			+ "	                    SELECT\r\n"
+    			+ "	                        MAX(precioserv.valor / perio.periodosmes)\r\n"
+    			+ "	                    FROM\r\n"
+    			+ "	                        pys_preciosservicios precioserv,\r\n"
+    			+ "	                        pys_periodicidad perio\r\n"
+    			+ "	                    WHERE\r\n"
+    			+ "	                            precioserv.idservicio (+) = servin.idservicio\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv.idtiposervicios (+) = servin.idtiposervicios\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv.idserviciosinstitucion (+) = servin.idserviciosinstitucion\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv.idinstitucion (+) = servin.idinstitucion\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            perio.idperiodicidad (+) = precioserv.idperiodicidad\r\n"
+    			+ "	                )\r\n"
+    			+ "	        GROUP BY\r\n"
+    			+ "	            servin.idinstitucion,\r\n"
+    			+ "	            servin.idservicio,\r\n"
+    			+ "	            servin.idtiposervicios,\r\n"
+    			+ "	            servin.idserviciosinstitucion\r\n"
+    			+ "	        UNION\r\n"
+    			+ "	        SELECT\r\n"
+    			+ "	            NULL,\r\n"
+    			+ "	            NULL,\r\n"
+    			+ "	            NULL,\r\n"
+    			+ "	            NULL,\r\n"
+    			+ "	            servin.idinstitucion,\r\n"
+    			+ "	            servin.idservicio,\r\n"
+    			+ "	            servin.idtiposervicios,\r\n"
+    			+ "	            servin.idserviciosinstitucion\r\n"
+    			+ "	        FROM\r\n"
+    			+ "	            pys_serviciosinstitucion servin\r\n"
+    			+ "	        WHERE NOT\r\n"
+    			+ "	                EXISTS (\r\n"
+    			+ "	                    SELECT\r\n"
+    			+ "	                        1\r\n"
+    			+ "	                    FROM\r\n"
+    			+ "	                        pys_preciosservicios precioserv_min\r\n"
+    			+ "	                    WHERE\r\n"
+    			+ "	                            precioserv_min.idservicio = servin.idservicio\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv_min.idtiposervicios = servin.idtiposervicios\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv_min.idserviciosinstitucion = servin.idserviciosinstitucion\r\n"
+    			+ "	                        AND\r\n"
+    			+ "	                            precioserv_min.idinstitucion = servin.idinstitucion\r\n"
+    			+ "	                )\r\n"
+    			+ "	    ) a on a.idinstitucion = linea.idinstitucion");
+    	query.LEFT_OUTER_JOIN(" pys_periodicidad perio_min on perio_min.idperiodicidad = a.id_periodicidad_minima");
+    	query.LEFT_OUTER_JOIN(" pys_periodicidad perio_max on perio_max.idperiodicidad = a.id_periodicidad_maxima");
+    	query.INNER_JOIN("pys_anticipoletrado anti on anti.idinstitucion = linea.idinstitucion and anti.idPersona = linea.idPersona");
+    	query.INNER_JOIN("pys_servicioanticipo servAnti on servAnti.IDINSTITUCION = linea.idInstitucion and servAnti.IDPERSONA = linea.idPersona and servAnti.IDANTICIPO = anti.idanticipo");
+		
+    	query.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = linea.idpersona");
+        query.INNER_JOIN(" pys_serviciosinstitucion servin on servin.idtiposervicios = servAnti.idtiposervicios and "+
+				"servin.idserviciosinstitucion = servAnti.idserviciosinstitucion and "+
+				"servin.idservicio = servAnti.idservicio");
+        
+        query.WHERE("linea.idPersona = "+ idPersona +" and linea.idinstitucion = " + idInstitucion + "  and linea.idLinea = "+idLinea);
+    	
+    	return query.toString();
+    }
 
 }

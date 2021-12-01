@@ -7,6 +7,8 @@ import org.itcgae.siga.DTO.fac.ListaMonederoDTO;
 import org.itcgae.siga.DTO.fac.ListaMonederosItem;
 import org.itcgae.siga.DTO.fac.ListaMovimientosMonederoDTO;
 import org.itcgae.siga.DTO.fac.ListaMovimientosMonederoItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosMonederoDTO;
+import org.itcgae.siga.DTO.fac.ListaServiciosMonederoItem;
 import org.itcgae.siga.DTO.fac.MonederoDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -335,7 +337,44 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 	            		responsedto.setListaMovimientosMonederoItem(movimientosMonedero);
 	            	}catch(Exception e) {
 	            		 LOGGER.error(
-	     	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> Entrada para obtener información del usuario logeado");
+	     	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> error al obtener la lista de movimientos de un monedero");
+	            		 error.setCode(500);
+	            		 responsedto.setError(error);
+	            	}
+	            }
+	            
+	        }
+		return responsedto;
+	}
+	
+	@Override
+	public ListaServiciosMonederoDTO getListaServiciosMonedero(HttpServletRequest request, String idLinea, String idPersona) {
+		ListaServiciosMonederoDTO responsedto = new ListaServiciosMonederoDTO();
+	        
+	        Error error = new Error();
+
+	        String token = request.getHeader("Authorization");
+	        String dni = UserTokenUtils.getDniFromJWTToken(token);
+	        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+	        if (idInstitucion != null) {
+	            LOGGER.debug(
+	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> Entrada para obtener información del usuario logeado");
+
+	            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+	            LOGGER.debug(
+	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> Salida de obtener información del usuario logeado");
+
+	            if (usuarios != null && usuarios.size() > 0) {
+	            	try {
+	            		List<ListaServiciosMonederoItem> serviciosMonedero = pysLineaanticipoExtendsMapper.getListaServiciosMonedero(idInstitucion, idLinea, idPersona);
+	            		responsedto.setListaServiciosMonederoItems(serviciosMonedero);
+	            	}catch(Exception e) {
+	            		 LOGGER.error(
+	     	                    "LineaanticipoServiceImpl.getListaServiciosMonedero() -> error al obterner los servicios asociados al monedero");
 	            		 error.setCode(500);
 	            		 responsedto.setError(error);
 	            	}
