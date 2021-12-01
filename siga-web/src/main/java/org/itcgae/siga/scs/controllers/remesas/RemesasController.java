@@ -140,4 +140,9 @@ public class RemesasController {
 		return new ResponseEntity<InputStreamResource>(response, header, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/descargar", method = RequestMethod.POST, produces = "application/zip")
+	ResponseEntity<InputStreamResource> descargar(@RequestBody RemesaAccionItem remesaAccionItem, HttpServletRequest request) throws SigaExceptions {
+		return busquedaRemesas.descargar(remesaAccionItem, request);
+	}
+	
 }

@@ -96,6 +96,7 @@ import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.EcomOperacionMapper;
 import org.itcgae.siga.db.mappers.EcomOperacionTipoaccionMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -176,6 +177,9 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	
 	@Autowired
     private GestorContadores gestor;
+	
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
 
 	@Override
 	public ComboDTO comboEstado(HttpServletRequest request) {
@@ -1033,16 +1037,6 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setError(error);
 				}
-			}else {
-				if(validar) {
-					descargar(idInstitucion, parametro.getValor(), remesaAccionItem, request);
-				}else {
-					LOGGER.error("Error al descargar la remesa. No cumple los requisitos");
-					error.setCode(200);
-					error.setDescription("Error al descargar la remesa. No cumple los requisitos.");
-					insertResponseDTO.setStatus(SigaConstants.OK);
-					insertResponseDTO.setError(error);
-				}
 			}
 
 			LOGGER.debug(
@@ -1075,17 +1069,54 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		return false;
 	}
 	
-	public ResponseEntity<InputStreamResource> descargar(Short idInstitucion, String pcajg, RemesaAccionItem remesaAccionItem, HttpServletRequest request) throws SigaExceptions {
+	@Override
+	public ResponseEntity<InputStreamResource> descargar(RemesaAccionItem remesaAccionItem, HttpServletRequest request) throws SigaExceptions {
 	
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		GenParametros parametro = new GenParametros();
+		boolean validar = false;
 		byte[] buf = {};
 		ByteArrayInputStream byteInput = new ByteArrayInputStream(buf);
 		ResponseEntity<InputStreamResource> res = new ResponseEntity<InputStreamResource>(new InputStreamResource(byteInput), null, HttpStatus.NO_CONTENT);
-		
-		if (pcajg.equals("3") || pcajg.equals("6")) {
-			 res = getFicheroXML(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
-		} else {
-			res = getFichero(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.debug(
+					"descargar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+
+			LOGGER.debug(
+					"descargar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
+
+			LOGGER.debug(
+					"descargar() / ScsRemesasExtendsMapper.descargar() -> Entrada a ScsRemesasExtendsMapper para descargar la remesa");
+			
+			parametro = getTipoPCAJG(request);
+
+			validar = validarAccion(remesaAccionItem, request, remesaAccionItem.getDescripcion());
+			
+			if (remesaAccionItem.getAccion() == 8) {
+				if(validar) {
+					if (parametro.getValor().equals("3") || parametro.getValor().equals("6")) {
+						 res = getFicheroXML(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
+					} else {
+						res = getFichero(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
+					}
+				}else {
+					LOGGER.error("Error al descargar la remesa. No cumple los requisitos");
+					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(byteInput), null, HttpStatus.BAD_REQUEST);
+				}
+			}
 		}
+		
+		LOGGER.debug(
+				"descargar() / ScsRemesasExtendsMapper.descargar() -> Salida a ScsRemesasExtendsMapper para descargar la remesa");
 		
 		return res;
 	}
@@ -1098,7 +1129,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		ResponseEntity<InputStreamResource> res = null;
 		
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.parseMediaType("application/xml"));
+		headers.setContentType(MediaType.parseMediaType("application/zip"));
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
 		headers.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
 		
@@ -1109,10 +1140,10 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				headers.setContentLength(file.length());
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 			}else {
-				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.NO_CONTENT);
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), null, HttpStatus.NO_CONTENT);
 			}
 		} catch (IOException e) {
-			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.NO_CONTENT);
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), null, HttpStatus.NO_CONTENT);
 		}
 		
 		return res;
@@ -1127,23 +1158,19 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	}
 
 	public String getDirXML(int idInstitucion, int idRemesa) {
-		String keyPathFicheros = "cajg.directorioFisicoCAJG";		
-		String keyPath2 = "cajg.directorioCAJGJava";				
-	    ReadProperties p= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
-		String pathFichero = p.returnProperty(keyPathFicheros) + p.returnProperty(keyPath2);
+		String pathFichero = getDirectorioFichero();
 		return pathFichero + File.separator + idInstitucion  + File.separator + idRemesa + File.separator + "xml";
 	}
 	
 	public ResponseEntity<InputStreamResource> getFichero(String idInstitucion, String idRemesa) throws SigaExceptions {
 		File file = null;
-	    ReadProperties rp= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
-		String rutaAlmacen = rp.returnProperty("cajg.directorioFisicoCAJG") + rp.returnProperty("cajg.directorioCAJGJava");
+		String rutaAlmacen = getDirectorioFichero();
 		byte[] buf = {};
 		InputStream fileStream = new ByteArrayInputStream(buf);
 		ResponseEntity<InputStreamResource> res = null;
 		
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.parseMediaType("application/xml"));
+		headers.setContentType(MediaType.parseMediaType("application/zip"));
 		
 		rutaAlmacen += File.separator + idInstitucion;
 		rutaAlmacen += File.separator + idRemesa;
@@ -1160,30 +1187,48 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				}
 									
 				if (numFicheros > 1) {
-					SigaExceptions e = new SigaExceptions("cajg.error.masDe1zip");
-					throw e;
+					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), null, HttpStatus.PARTIAL_CONTENT);
+				}else {
+					headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+					headers.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
+					
+					try {
+						fileStream = new FileInputStream(file);
+						headers.setContentLength(file.length());
+						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+					} catch (IOException e) {
+						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), null, HttpStatus.NO_CONTENT);
+					}
 				}
 				
-				headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+			}else {
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), null, HttpStatus.NO_CONTENT);
 			}
 		}
 			
-		headers.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
-		
-		try {
-			fileStream = new FileInputStream(file);
-
-			if(fileStream.available() > 0) {	
-				headers.setContentLength(file.length());
-				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
-			}else {
-				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.NO_CONTENT);
-			}
-		} catch (IOException e) {
-			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.NO_CONTENT);
-		}
-		
 		return res;
+	}
+	
+	private String getDirectorioFichero() {
+		Date dateLog = new Date();
+		LOGGER.debug(dateLog + " --> Inicio ScsRemesasExtendsMapper getDirectorioFichero");
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("cajg.directorioFisicoCAJG");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String pathCV = genPropertiesPath.get(0).getValor(); 
+		
+		StringBuffer directorioFichero = new StringBuffer(pathCV);
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("cajg.directorioCAJGJava");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+
+		LOGGER.debug(dateLog + " --> Fin ScsRemesasExtendsMapper getDirectorioFichero");
+		return directorioFichero.toString();
 	}
 
 	public InsertResponseDTO validaEnviaExpedientes(Short idinstitucion, RemesaAccionItem remesaAccionItem, String tipoPCAJG, String mensajeValidando, HttpServletRequest request, Integer usuModificacion) {
