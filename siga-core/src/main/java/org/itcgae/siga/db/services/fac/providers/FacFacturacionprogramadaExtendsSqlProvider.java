@@ -47,6 +47,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.SELECT("facprog.generapdf");
         sql.SELECT("facprog.envio");
         sql.SELECT("facprog.idtipoplantillamail");
+        sql.SELECT("( SELECT c.nombre FROM env_plantillasenvios c WHERE c.idinstitucion = facprog.idinstitucion AND c.idplantillaenvios = facprog.idtipoplantillamail AND c.idtipoenvios = facprog.idtipoenvios ) tipoplantillamail");
         sql.SELECT("facprog.traspaso_plantilla");
         sql.SELECT("facprog.traspaso_codauditoria_def");
         sql.SELECT("SUM(f.imptotal) AS importe");
@@ -134,6 +135,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
             sql.WHERE("facprog.fechaconfirmacion <= TO_DATE('"+ dateFormat.format(facturacionProgramada.getFechaConfirmacionHasta()) + "','DD/MM/YYYY hh24:mi:ss')");
 
         // Group by
+        sql.GROUP_BY("facprog.idinstitucion");
         sql.GROUP_BY("facprog.idprogramacion");
         sql.GROUP_BY("facprog.idseriefacturacion");
         sql.GROUP_BY("facprog.descripcion");
@@ -160,6 +162,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.GROUP_BY("facprog.traspasofacturas");
         sql.GROUP_BY("facprog.generapdf");
         sql.GROUP_BY("facprog.envio");
+        sql.GROUP_BY("facprog.idtipoenvios");
         sql.GROUP_BY("facprog.idtipoplantillamail");
         sql.GROUP_BY("facprog.traspaso_plantilla");
         sql.GROUP_BY("facprog.traspaso_codauditoria_def");

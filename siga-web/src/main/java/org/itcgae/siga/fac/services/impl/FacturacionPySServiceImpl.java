@@ -45,10 +45,12 @@ import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefactur;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
+import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturacionEliminar;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
+import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
 import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
@@ -1676,6 +1678,145 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return insertResponseDTO;
 	}
 
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO actualizarProgramacionFactura(FacFacturacionprogramadaItem facItem, HttpServletRequest request) throws Exception {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		updateResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("actualizarProgramacionFactura() -> Entrada al servicio para actualizar una programación de factura");
+
+		if (usuario != null) {
+			// Clave primaria
+			FacFacturacionprogramadaKey key = new FacFacturacionprogramadaKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIdprogramacion(string2Long(facItem.getIdProgramacion()));
+			key.setIdseriefacturacion(string2Long(facItem.getIdSerieFacturacion()));
+
+			FacFacturacionprogramada record = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
+
+			actualizarProgramacionDesdeItem(record, facItem);
+
+			facFacturacionprogramadaExtendsMapper.updateByPrimaryKey(record);
+
+			updateResponseDTO.setId(record.getIdprogramacion().toString());
+		}
+
+		LOGGER.info("actualizarProgramacionFactura() -> Salida del servicio para actualizar una programación de factura");
+
+
+		return updateResponseDTO;
+	}
+
+
+	private void actualizarProgramacionDesdeItem(FacFacturacionprogramada record, FacFacturacionprogramadaItem facItem) {
+		if (record.getIdestadoconfirmacion() != null && (
+					record.getIdestadoconfirmacion() == string2Short("20") // Generación con errores
+					|| record.getIdestadoconfirmacion() == string2Short("2") // Generada
+					|| record.getIdestadoconfirmacion() == string2Short("21") // Confirmación con errores
+				)) {
+
+			// Tarjeta de generación de fichero de adeudos
+			record.setFechapresentacion(facItem.getFechaPresentacion());
+			record.setFecharecibosprimeros(facItem.getFechaRecibosPrimeros());
+			record.setFecharecibosrecurrentes(facItem.getFechaRecibosRecurrentes());
+			record.setFechareciboscor1(facItem.getFechaRecibosCOR1());
+			record.setFecharecibosb2b(facItem.getFechaRecibosB2B());
+		}
+
+		// Procesos automáticos
+		if (record.getIdestadoconfirmacion() != null && (
+					record.getIdestadoconfirmacion() == string2Short("18") // Generada programada
+					|| record.getIdestadoconfirmacion() == string2Short("20") // Generación con errores
+					|| record.getIdestadoconfirmacion() == string2Short("2") // Generada
+					|| record.getIdestadoconfirmacion() == string2Short("19") // Generando
+					|| record.getIdestadoconfirmacion() == string2Short("21") // Confirmación con errores
+					|| record.getIdestadoconfirmacion() == string2Short("3") // Confirmada
+				)) {
+
+			// Datos de la tarjeta generación de ficheros
+			record.setGenerapdf(facItem.getGeneraPDF() ? "1" : "0");
+			// seriefacturacion.getIdmodelofactura();
+			// seriefacturacion.getIdmodelorectificativa();
+
+			if (record.getIdestadoconfirmacion() == string2Short("3") && record.getIdestadopdf() != null ||
+					record.getIdestadopdf() == string2Short("5") // Confirmada y no aplica
+					&& record.getIdestadopdf() == string2Short("10")) { // Confirmada y finalizada con errores
+				if (facItem.getGeneraPDF()) {
+					record.setIdestadopdf(Short.parseShort("7")); // Pendiente
+				} else {
+					record.setIdestadopdf(Short.parseShort("5")); // No aplica
+				}
+			}
+
+			// Datos de la tarjeta envío facturas
+			record.setEnvio(facItem.getEnvio() ? "1" : "0");
+			if (!UtilidadesString.esCadenaVacia(facItem.getIdTipoPlantillaMail())) {
+				record.setIdtipoplantillamail(string2Integer(facItem.getIdTipoPlantillaMail()));
+				record.setIdtipoenvios(Short.parseShort("1"));
+			} else {
+				record.setIdtipoplantillamail(null);
+				record.setIdtipoenvios(null);
+			}
+
+
+			if (record.getIdestadoconfirmacion() == string2Short("3") && record.getIdestadoenvio() != null ||
+					record.getIdestadoenvio() == string2Short("11") // Confirmada y no aplica
+					&& record.getIdestadoenvio() == string2Short("16")) { // Confirmada y finalizada con errores
+				if (facItem.getEnvio()) {
+					record.setIdestadoenvio(Short.parseShort("13")); // Pendiente
+				} else {
+					record.setIdestadoenvio(Short.parseShort("11")); // No aplica
+				}
+			}
+
+			// Datos de la tarjeta generación de traspasos
+			record.setTraspasofacturas(facItem.getTraspasoFacturas() ? "1" : "0");
+			record.setTraspasoPlantilla(facItem.getTraspasoPlatilla());
+			record.setTraspasoCodauditoriaDef(facItem.getTraspasoCodAuditoriaDef());
+
+			if (record.getIdestadoconfirmacion() == string2Short("3") && record.getIdestadotraspaso() != null ||
+					record.getIdestadotraspaso() == string2Short("22") // Confirmada y no aplica
+					&& record.getIdestadotraspaso() == string2Short("27")) { // Confirmada y finalizada con errores
+				if (facItem.getTraspasoFacturas()) {
+					record.setIdestadotraspaso(Short.parseShort("24")); // Pendiente
+				} else {
+					record.setIdestadotraspaso(Short.parseShort("22")); // No aplica
+				}
+			}
+		}
+
+		if (record.getIdestadoconfirmacion() != null && (
+				record.getIdestadoconfirmacion() == string2Short("20") // Generación con errores
+				|| record.getIdestadoconfirmacion() == string2Short("2") // Generada
+		)) {
+
+			// Datos generales
+
+			if (facItem.getFechaPrevistaConfirm() != null)
+				record.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
+		}
+
+		if (record.getIdestadoconfirmacion() != null && facItem.getEsDatosGenerales() && (
+					record.getIdestadoconfirmacion() == string2Short("20") // Confirmación con errores
+					|| record.getIdestadoconfirmacion() == string2Short("2") // Generada
+			)) {
+
+			// Datos generales -> Fecha de confirmación
+			if (facItem.getFechaPrevistaConfirm() != null) {
+				record.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
+				record.setIdestadoconfirmacion(string2Short("1")); // Confirmación programada
+			} else {
+				record.setIdestadoconfirmacion(string2Short("18")); // Generación programada
+			}
+		}
+	}
+
+
 	private FacFacturacionprogramada creaFacturacionProgramadaDesdeItem(FacFacturacionprogramadaItem facItem, AdmUsuarios usuario) {
 		FacFacturacionprogramada fac = new FacFacturacionprogramada();
 
@@ -1771,29 +1912,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		fac.setArchivarfact(boolToString10(false)); //Desarchivada por defecto
 		fac.setIdestadoconfirmacion(Short.parseShort("18")); // Generación programada
 		fac.setVisible("S");
-
-		// fac.setFechaconfirmacion(facItem.getFechaConfirmacion());
-		// fac.setFechamodificacion(facItem.getFechaModificacion());
-		// fac.setFechapresentacion(facItem.getFechaPresentacion());
-		// fac.setFechaprogramacion(facItem.getFechaProgramacion());
-		// fac.setFecharealgeneracion(facItem.getFechaRealGeneracion());
-		// fac.setFecharecibosb2b(facItem.getFechaRecibosB2B());
-		// fac.setFechareciboscor1(facItem.getFechaRecibosCOR1());
-		// fac.setFecharecibosprimeros(facItem.getFechaRecibosPrimeros());
-		// fac.setFecharecibosrecurrentes(facItem.getFechaRecibosRecurrentes());
-		// fac.setGenerapdf(boolToString10(facItem.getGeneraPDF()));
-		// fac.setIdestadoenvio(string2Short(facItem.getIdEstadoEnvio()));
-		// fac.setIdestadopdf(string2Short(facItem.getIdEstadoPDF()));
-		// fac.setIdestadotraspaso(string2Short(facItem.getIdEstadoTraspaso()));
-
-		// fac.setIdtipoplantillamail(string2Integer(facItem.getIdTipoPlantillaMail()));
-		// fac.setLogerror(facItem.getLogError());
-		// fac.setLogtraspaso(facItem.getLogTraspaso());
-		// fac.setNombrefichero(facItem.getNombreFichero());
-		// fac.setTraspasoCodauditoriaDef(facItem.getTraspasoCodAuditoriaDef());
-		// fac.setTraspasofacturas(boolToString10(facItem.getTraspasoFacturas()));
-		// fac.setTraspasoPlantilla(facItem.getTraspasoPlatilla());
-
 		
 		return fac;
 	}
