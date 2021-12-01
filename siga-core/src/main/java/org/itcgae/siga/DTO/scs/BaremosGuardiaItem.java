@@ -18,6 +18,14 @@ public class BaremosGuardiaItem {
 	String idTurnos[];
    String idGuardias[];
    boolean historico;
+   String precioHito;
+   String idInstitucion;
+   String idHito;
+   String nomturno;
+   String nomguardia;
+   String idTurno;
+   String idGuardia;
+   String idhitoconfiguracion;
  
 //	public String getGuardias() {
 //		return guardias;

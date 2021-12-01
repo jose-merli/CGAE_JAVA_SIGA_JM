@@ -23,6 +23,7 @@ public class BaremosRequestItem {
 	Date fechabaja;
 	boolean historico;
 	int keyForTabla;
+	String idhitoconfiguracion;
 	
 	List<GuardiasItem> guardiasObj;
 }
