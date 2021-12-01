@@ -94,7 +94,6 @@ public class ScsRemesasResolucionesExtendsProvider {
 
 		sql.SELECT("MAX(IDREMESARESOLUCIONFICHERO)+1 as IDREMESARESOLUCIONFICHERO");
 		sql.FROM("cajg_remesaresolucionfichero");
-		sql.WHERE("idinstitucion = " + idInstitucion.toString());
 
 		LOGGER.info(sql.toString());
 		return sql.toString();

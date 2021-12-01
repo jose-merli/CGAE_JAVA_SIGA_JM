@@ -206,10 +206,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
             for (RemesasResolucionItem doc : listaRemesasResolucionItem) {
             	
                 if (doc.getNombreFichero() != null) {
-                	 String extension = doc.getNombreFichero()
-	                          .substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
-	                          .toLowerCase();
-                String nextEntry = "RemesasResoluciones-" + doc.getIdRemesaResolucion() + extension;
+                String nextEntry = "RemesasResoluciones-" + doc.getIdRemesaResolucion() + ".zip";
                 InputStream fileS = getZipFileRemesaResoluciones(doc,idInstitucion);
                   zipOutputStream.putNextEntry(new ZipEntry(nextEntry));
                   IOUtils.copy(fileS, zipOutputStream);
@@ -254,6 +251,8 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 	                String nextEntry = nombreFichero + extension;                
                     String path = getDirectorioFicheroRemesa(idInstitucion,remesasResolucionItem.getIdRemesaResolucion());
                     path += File.separator + nombreFichero + extension;      
+                    LOGGER.info("Buscando Fichero = " +nombreFichero + extension);
+                    LOGGER.info("Ruta Completa de Fichero = " + path);
                     File file = new File(path);
                     if(file.exists() && !file.isDirectory()) {
                   	  zipOutputStream.putNextEntry(new ZipEntry(nextEntry));
@@ -307,14 +306,15 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
         genPropertiesExampleP.createCriteria().andParametroEqualTo("cajg.directorioFisicoCAJG");
         List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
         String path = genPropertiesPath.get(0).getValor();
-        
+        LOGGER.info("getDirectorioFicheroRemesaResoluciones -> Path CAJG : "+path);
         GenPropertiesExample genPropertiesExamplePG = new GenPropertiesExample();
         genPropertiesExamplePG.createCriteria().andParametroEqualTo("cajg.directorioCAJGJava");
         List<GenProperties> genPropertiesPathP = genPropertiesMapper.selectByExample(genPropertiesExamplePG);
         path += genPropertiesPathP.get(0).getValor();
+        LOGGER.info("getDirectorioFicheroRemesaResoluciones -> Path CAJG JAVA : "+ genPropertiesPathP.get(0).getValor());
+        LOGGER.info("getDirectorioFicheroRemesaResoluciones -> Path CAJG/JAVA : "+path);
         path += File.separator + idInstitucion + File.separator + "remesaResoluciones";		
         path += File.separator + idRemesaResolucion;
-        
         LOGGER.info("getDirectorioFicheroRemesa() -> Path del directorio de ficheros Remesa  = " + path);
         
         return path;
@@ -484,12 +484,12 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 				CajgRemesaresolucion remesaResolucion = new CajgRemesaresolucion(); 
 				
 				AdmContador adm = gestorContadores.getContador(idInstitucion,nombreContador);
-				
+				String numeroResolucion = String.valueOf(adm.getContador()+1);
 				remesaResolucion.setIdremesaresolucion(Long.valueOf(remesaResolucionID.getIdRemesaResolucion()));
 				remesaResolucion.setIdinstitucion(idInstitucion);
 				remesaResolucion.setPrefijo(adm.getPrefijo());
 				remesaResolucion.setSufijo(adm.getSufijo());
-				remesaResolucion.setNumero(String.valueOf(adm.getContador()+1));
+				remesaResolucion.setNumero(arregloNumero(numeroResolucion));
 				remesaResolucion.setFechacarga(new Date());
 				remesaResolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
 				remesaResolucion.setObservaciones(remesasResolucionItem.getObservaciones());
@@ -497,13 +497,13 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 				remesaResolucion.setFechamodificacion(new Date());
 				remesaResolucion.setUsumodificacion(usuarios.get(0).getIdusuario());
 				remesaResolucion.setLoggenerado(new Short("1"));
-				remesaResolucion.setIdtiporemesa((short)remesasResolucionItem.getIdRemesaResolucion());
+				remesaResolucion.setIdtiporemesa((short)remesasResolucionItem.getIdTipoRemesa());
 				
 				response = cajgRemesaresolucionMapper.insert(remesaResolucion);
 				
 				//Actualizar contador.
 				
-				gestorContadores.setContador(adm,remesaResolucion.getNumero());
+				gestorContadores.setContador(adm,numeroResolucion,false);
 				
 				LOGGER.info(
 						"guardarRemesaResoluciones() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion");
@@ -579,6 +579,17 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 		String nombreFichero = nameFile.substring(0, nameFile.lastIndexOf("."));
 		return nombreFichero;
 	}
+	
+	private String arregloNumero(String num) {
+		if(num.length() < 5) {
+			String ceros = "";
+			for(; (num.length() + ceros.length()) < 5;) {
+				ceros += "0";
+			}
+			num = ceros + num;
+		}
+		return num;
+	}
 	private boolean generaLog(String path,String nombreFichero, Short idInstitucion,
 			RemesasResolucionItem remesaResolucionID) throws IOException {
 		
@@ -641,7 +652,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 	private void insertRemesaResolucionFichero(Short idInstitucion, RemesasResolucionItem remesaResolucionID, MultipartFile  fileIn,String path ) {
 
 		CajgRemesaresolucionfichero remesaResolucionFicheroID = new CajgRemesaresolucionfichero();
-		remesaResolucionFicheroID = scsRemesasResolucionesExtendsMapper.getMaxIdRemesaResolucionFichero(idInstitucion);
+		remesaResolucionFicheroID = scsRemesasResolucionesExtendsMapper.getMaxIdRemesaResolucionFichero();
 		Long idRemesaResolucionFichero = remesaResolucionFicheroID.getIdremesaresolucionfichero();
 		FileInputStream fis;
 

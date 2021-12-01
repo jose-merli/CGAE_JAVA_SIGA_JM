@@ -842,9 +842,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 													"Error no se ha podido borrar la relacion entre el Ejg y acta"));
 										}
 									}
-									LOGGER.info("Seteando las observaciones");
 	
-									if(scsEstadoEjg.getObservaciones() != null) {
+									/*if(scsEstadoEjg.getObservaciones() != null) {
 										scsEstadoEjg.setObservaciones(
 												scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
 														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
@@ -852,34 +851,35 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 										scsEstadoEjg.setObservaciones(
 												"Expediente incluido masivamente en el acta "
 														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-									}
+									}*/
 								}
 	
 							}
 	
 						}
 						LOGGER.info("Seteando las observaciones");
-	
-						if(scsEstadoEjg != null) {
-							if(scsEstadoEjg.getObservaciones() != null) {
-								scsEstadoEjg.setObservaciones(
-										scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
-												+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
-							}else {
-								scsEstadoEjg.setObservaciones(
-										"Expediente incluido masivamente en el acta "
-												+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
-							}
-		
-							LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
-						}
 						
+						ScsEjgActa scsEjgActa = new ScsEjgActa();
+						scsEjgActa.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+						scsEjgActa.setIdinstitucionacta(idInstitucion);
+						scsEjgActa.setAnioacta(Short.valueOf(ejgItem.getAnnioActa()));
+						ScsActacomision acta = obtenerActa(scsEjgActa, idInstitucion);
+	
+						if(scsEstadoEjg.getObservaciones() != null) {
+							scsEstadoEjg.setObservaciones(
+									scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
+											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+						}else {
+							scsEstadoEjg.setObservaciones(
+									"Expediente incluido masivamente en el acta "
+											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+						}
 	
 						ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
 	
 						LOGGER.info("Creando la nueva relacion acta y ejg");
 	
-						scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumejg()));
+						scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumero()));
 						scsEjgActaNuevo.setIdtipoejg(scsEjg.getIdtipoejg());
 						scsEjgActaNuevo.setAnioejg(scsEjg.getAnio());
 						scsEjgActaNuevo.setIdinstitucionejg(idInstitucion);
@@ -889,6 +889,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						scsEjgActaNuevo.setFechamodificacion(new Date());
 						scsEjgActaNuevo.setUsumodificacion(usuarios.get(0).getIdusuario());
 						scsEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+						scsEjg.setIdinstitucionacta(idInstitucion);
 						scsEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
 						scsEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
 						scsEjg.setFechamodificacion(new Date());
@@ -1034,17 +1035,24 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 									  acta.getNumeroacta());
 								 }
 								 
-								acta.setFecharesolucion(new Date());
+								//acta.setFecharesolucion(new Date());
+								
+								scsEjg.setIdacta(null);
+								scsEjg.setAnioacta(null);
+								scsEjg.setIdinstitucionacta(null);
 
-								scsActacomisionMapper.updateByPrimaryKey(acta);
+								//scsActacomisionMapper.updateByPrimaryKey(acta);
 
 								LOGGER.info("VOY A BORRAR A  " + listaEjgAsociadosActa.size());
 
 								resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
 								
+								scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+								scsEjgMapper.updateByPrimaryKey(scsEjg);
+								
 								updateResponseDTO.setStatus(SigaConstants.OK);
 								
-								if (resultado == 0) {
+								/*if (resultado == 0) {
 									throw (new SigaExceptions(
 											"Error no se ha podido borrar la relacion entre el Ejg y acta"));
 								}
@@ -1053,6 +1061,12 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 								if (resultado == 0) {
 									throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
 								}
+
+								resultado = scsEjgMapper.updateByPrimaryKey(scsEjg);
+
+								if (resultado == 0) {
+									throw (new SigaExceptions("Error no se ha podido actualizar el ejg"));
+													}*/
 
 							}
 						}
@@ -1095,7 +1109,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 				LOGGER.info("intentamos conseguir el ejg");
 				for (EjgItem ejgItem : ejgItems) {
 
-					LOGGER.info("INFORMACION DEL EJG QUE HE ENVIADO SUPUESTAMENTE " + ejgItem.getNumEjg());
+					LOGGER.info("INFORMACION DEL EJG QUE HE ENVIADO SUPUESTAMENTE " + ejgItem.getNumero());
 
 					ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
 
@@ -1107,9 +1121,9 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					// uso tipo dictamen para traer los datos de la resolucion
 					if (ejgItem.getIdTipoDictamen() != null && (ejgItem.getFundamentoJuridico() != null || comprbarJuramentoJuridico.equals("0")) ) {
 						
-						if(scsEjg.getFecharesolucioncajg() == null) {
+						/*if(scsEjg.getFecharesolucioncajg() == null) {
 							scsEjg.setFecharesolucioncajg(new Date());
-						}
+						}*/
 
 						int response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
 
@@ -1132,7 +1146,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idtipoejg -> " + scsEjg.getIdtipoejg());
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idinstitucion-> "
 							+ scsEjg.getIdinstitucion());
-					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumejg());
+					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumero());
 
 					ScsEjgWithBLOBs ejgBlobs = (ScsEjgWithBLOBs) scsEjg;
 					
@@ -1424,10 +1438,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		ScsEjgActaExample scsEjgActaExample = new ScsEjgActaExample();
 
-		LOGGER.info("datos ejg a buscar " + scsEjg.getAnio() + " " + scsEjg.getNumejg() + " " + scsEjg.getIdtipoejg());
+		LOGGER.info("datos ejg a buscar " + scsEjg.getAnio() + " " + scsEjg.getNumero() + " " + scsEjg.getIdtipoejg());
 
 		scsEjgActaExample.createCriteria().andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
-				.andNumeroejgEqualTo(Long.valueOf(scsEjg.getNumejg())).andIdinstitucionejgEqualTo(idInstitucion)
+				.andNumeroejgEqualTo(Long.valueOf(scsEjg.getNumero())).andIdinstitucionejgEqualTo(idInstitucion)
 				.andIdinstitucionactaEqualTo(idInstitucion).andAnioejgEqualTo(Short.valueOf(scsEjg.getAnio()));
 
 		List<ScsEjgActa> listaEjgAsociadosActa = scsEjgActaMapper.selectByExample(scsEjgActaExample);
@@ -1447,7 +1461,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		resolEjg.setIdTipoEJG(ejgItem.getIdtipoejg());
 
-		resolEjg.setNumero(Long.valueOf(ejgItem.getNumejg()));
+		resolEjg.setNumero(Long.valueOf(ejgItem.getNumero()));
 
 		resolEjg.setIdTiporatificacionEJG(ejgItem.getIdtiporatificacionejg());
 

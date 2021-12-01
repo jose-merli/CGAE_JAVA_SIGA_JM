@@ -39,27 +39,27 @@ public class ScsRemesasResultadosExtendsProvider {
 		sql.LEFT_OUTER_JOIN("CAJG_REMESA REM ON REM.IDINSTITUCION = REMR.IDINSTITUCION");
 		
 		if(remesasResultadoItem.getNumRemesaPrefijo() != null && !remesasResultadoItem.getNumRemesaPrefijo().isEmpty()) {
-			sql.WHERE("REM.PREFIJO = '" + remesasResultadoItem.getNumRemesaPrefijo() + "'");
+			sql.WHERE("REM.PREFIJO LIKE '%" + remesasResultadoItem.getNumRemesaPrefijo() + "%'");
 		}
 		
 		if(remesasResultadoItem.getNumRemesaNumero() != null && !remesasResultadoItem.getNumRemesaNumero().isEmpty()) {
-			sql.WHERE("REM.NUMERO = '" + remesasResultadoItem.getNumRemesaNumero() + "'");
+			sql.WHERE("REM.NUMERO LIKE '%" + remesasResultadoItem.getNumRemesaNumero() + "%'");
 		}
 		
 		if(remesasResultadoItem.getNumRemesaSufijo() != null && !remesasResultadoItem.getNumRemesaSufijo().isEmpty()) {
-			sql.WHERE("REM.SUFIJO = '" + remesasResultadoItem.getNumRemesaSufijo() + "'");
+			sql.WHERE("REM.SUFIJO LIKE '%" + remesasResultadoItem.getNumRemesaSufijo() + "%'");
 		}
 		
 		if(remesasResultadoItem.getNumRegistroPrefijo() != null && !remesasResultadoItem.getNumRegistroPrefijo().isEmpty()) {
-			sql.WHERE("REMR.PREFIJO = '" + remesasResultadoItem.getNumRegistroPrefijo() + "'");
+			sql.WHERE("REMR.PREFIJO LIKE '%" + remesasResultadoItem.getNumRegistroPrefijo() + "%'");
 		}
 		
 		if(remesasResultadoItem.getNumRegistroNumero() != null && !remesasResultadoItem.getNumRegistroNumero().isEmpty()) {
-			sql.WHERE("REMR.NUMERO = '" + remesasResultadoItem.getNumRegistroNumero() + "'");
+			sql.WHERE("REMR.NUMERO LIKE '%" + remesasResultadoItem.getNumRegistroNumero() + "%'");
 		}
 		
 		if(remesasResultadoItem.getNumRegistroSufijo() != null && !remesasResultadoItem.getNumRegistroSufijo().isEmpty()) {
-			sql.WHERE("REMR.SUFIJO = '" + remesasResultadoItem.getNumRegistroSufijo() + "'");
+			sql.WHERE("REMR.SUFIJO LIKE '%" + remesasResultadoItem.getNumRegistroSufijo() + "%'");
 		}
 		
 		if(remesasResultadoItem.getNombreFichero() != null && !remesasResultadoItem.getNombreFichero().isEmpty()) {
@@ -93,7 +93,7 @@ public class ScsRemesasResultadosExtendsProvider {
 		sql.WHERE("REMR.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("REMR.IDTIPOREMESA = 3");
 		sql.WHERE("REM.IDINSTITUCION = REMR.IDINSTITUCION");
-		sql.WHERE("REM.IDREMESA = REMR.IDREMESA");
+		sql.WHERE("REM.IDREMESA = REMR.IDREMESA");//BORRAR PARA MOSTRAR ERRONEOS, IDREMESA TENDREA VALOR CON PROCEDIMIENTO CORRECTO, SINO, NO.
 		sql.WHERE("ROWNUM <= 200");
 		
 		sql.ORDER_BY("REMR.IDREMESARESOLUCION DESC");
