@@ -428,7 +428,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.SELECT("ins.idinstitucion");
 		sql.SELECT("ins.idpersona");
 		sql.SELECT("ins.idturno");
-		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS') AS fechasolicitud");
+		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS') AS fechasuscripcion");
 		sql.SELECT("ins.observacionessuscripcion AS observacionessolicitud");
 		sql.SELECT("ins.fechavalidacion");
 		sql.SELECT("ins.observacionesvalidacion");

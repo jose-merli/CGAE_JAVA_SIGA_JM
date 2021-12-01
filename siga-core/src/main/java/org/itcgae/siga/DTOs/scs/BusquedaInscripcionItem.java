@@ -19,7 +19,7 @@ public class BusquedaInscripcionItem {
 	private String apellidos2;
 	private int idinstitucion;
 	private String idpersona;
-	private String fechasolicitud;
+	private Date fechasolicitud;
 	private String observacionessolicitud;
 	private Date fechavalidacion;
 	private String observacionesvalidacion;
@@ -138,11 +138,11 @@ public class BusquedaInscripcionItem {
 	public void setIdpersona(String idpersona) {
 		this.idpersona = idpersona;
 	}
-	public String getFechasolicitud() {
+	public Date getFechasolicitud() {
 		return fechasolicitud;
 	}
-	public void setFechasolicitud(String fechasolicitud) {
-		this.fechasolicitud = fechasolicitud;
+	public void setFechasolicitud(Date fechaSolicitud2) {
+		this.fechasolicitud = fechaSolicitud2;
 	}
 	public String getObservacionessolicitud() {
 		return observacionessolicitud;
