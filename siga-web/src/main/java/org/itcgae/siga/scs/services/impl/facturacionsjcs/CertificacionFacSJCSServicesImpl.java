@@ -1,5 +1,9 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import java.io.File;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -10,6 +14,10 @@ import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +45,10 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private EcomColaParametrosMapper ecomColaParametrosMapper;
+
+    @Autowired
+    private GenPropertiesMapper genPropertiesMapper;
+
 
     @Override
     public InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request) {
@@ -201,4 +213,60 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             throw e;
         }
     }
+
+
+    @Override
+	public File getInforme(String idFacturacion, String tipoFichero, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        
+        
+        File fichero = null;
+        
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getInforme() -> Entrada al servicio para obtener el fichero de informe");
+        
+
+        
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getInformeCAM() -> Salida del servicio para obtener el fichero de informe");
+        
+		return fichero;
+
+	}
+	
+	
+	private File getInformeCAM(Short idInstitucion, String idFacturacion, String tipoFichero, HttpServletRequest request) {
+		  String rutaFichero = getRutaFicheroSalida(String.valueOf(idInstitucion), idFacturacion);
+	     
+		  File fichero = null;
+		  
+		  
+	      		
+//        
+//    	protected String getDirectorioSalida(String directorio, String idInstitucion, String idFacturacion) {
+//    		ReadProperties rp = new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
+//    		String rutaAlm = rp.returnProperty("informes.directorioFisicoSalidaInformesJava")
+//    			+ ClsConstants.FILE_SEP
+//    			+ directorio + ClsConstants.FILE_SEP
+//    			+ (idInstitucion.equals("0") ? "2000" : idInstitucion) + ClsConstants.FILE_SEP
+//    			+ idFacturacion + ClsConstants.FILE_SEP; 
+//    		return rutaAlm;
+//    	}
+        
+        return fichero;
+       
+	}
+	
+	private String getRutaFicheroSalida(String idInstitucion, String idFacturacion) {
+		GenPropertiesKey key = new GenPropertiesKey();
+		key.setFichero(SigaConstants.FICHERO_SIGA);
+		key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+		
+		GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
+		
+		String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator +  idFacturacion + SigaConstants.pathSeparator;
+		
+		return rutaTmp;
+	}
 }
