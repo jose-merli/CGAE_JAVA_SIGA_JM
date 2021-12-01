@@ -1,7 +1,5 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
-import java.util.List;
-
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -11,11 +9,15 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.db.mappers.ScsHitofacturableguardiaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsHitofacturableguardiaSqlExtendsProvider;
+import org.springframework.stereotype.Service;
 
-public interface ScsHitofacturableguardiaExtendsMapper extends ScsHitofacturableguardiaMapper{
+import java.util.List;
 
-	@SelectProvider(type = ScsHitofacturableguardiaSqlExtendsProvider.class, method = "getBaremos")
-	@Results({ 
+@Service
+public interface ScsHitofacturableguardiaExtendsMapper extends ScsHitofacturableguardiaMapper {
+
+    @SelectProvider(type = ScsHitofacturableguardiaSqlExtendsProvider.class, method = "getBaremos")
+    @Results({
 //		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PRECIO", property = "value", jdbcType = JdbcType.VARCHAR),
