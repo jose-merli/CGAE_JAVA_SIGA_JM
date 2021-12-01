@@ -2490,13 +2490,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 else {
                 	busquedaEJGComisionServiceImpl.borrarActaAnio(list, request);
                 }
-                if(datos.getIdFundamentoJuridico() != null) {
+                if(datos.getIdFundamentoJuridico() != null && datos.getIdTiporatificacionEJG() != null) {
                 	busquedaEJGComisionServiceImpl.editarResolucionFundamento(list, request);
                 }
                 else {
                 	busquedaEJGComisionServiceImpl.borrarResolucionFundamento(list, request);
                 }
-                if(datos.getIdPonente() != null) {
+                if(datos.getIdPonente() != null && datos.getFechaPresentacionPonente() != null) {
                 	busquedaEJGComisionServiceImpl.editarPonente(list, request);
                 }
                 else {
