@@ -103,5 +103,4 @@ public interface IFacturacionPySService {
 	
 	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg, HttpServletRequest request) throws Exception;
 
-
 }

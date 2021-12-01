@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -97,7 +96,6 @@ import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -1711,7 +1709,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	private String boolToString10(Boolean b) {
 		return b?"1":"0";
-	};
+	}
 	
 
 }
