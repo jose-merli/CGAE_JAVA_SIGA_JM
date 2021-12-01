@@ -842,9 +842,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 													"Error no se ha podido borrar la relacion entre el Ejg y acta"));
 										}
 									}
-									LOGGER.info("Seteando las observaciones");
 	
-									if(scsEstadoEjg.getObservaciones() != null) {
+									/*if(scsEstadoEjg.getObservaciones() != null) {
 										scsEstadoEjg.setObservaciones(
 												scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
 														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
@@ -852,52 +851,31 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 										scsEstadoEjg.setObservaciones(
 												"Expediente incluido masivamente en el acta "
 														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-									}
+									}*/
 								}
 	
 							}
 	
 						}
-
-					}
-					
-
-					ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
-
-					LOGGER.info("Creando la nueva relacion acta y ejg");
-
-					scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumero()));
-					scsEjgActaNuevo.setIdtipoejg(scsEjg.getIdtipoejg());
-					scsEjgActaNuevo.setAnioejg(scsEjg.getAnio());
-					scsEjgActaNuevo.setIdinstitucionejg(idInstitucion);
-					scsEjgActaNuevo.setIdinstitucionacta(idInstitucion);
-					scsEjgActaNuevo.setAnioacta(Short.valueOf(ejgItem.getAnnioActa()));
-					scsEjgActaNuevo.setIdacta(Long.valueOf(ejgItem.getNumActa()));
-					scsEjgActaNuevo.setFechamodificacion(new Date());
-					scsEjgActaNuevo.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
-					scsEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
-					scsEjg.setIdinstitucionacta(idInstitucion);
-					scsEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsEjg.setFechamodificacion(new Date());
-
-					LOGGER.info("Guardando");
-
-					resultado = scsEjgActaMapper.insert(scsEjgActaNuevo);
-
-					updateResponseDTO.setStatus(SigaConstants.OK);
-					if (resultado == 0) {
-						throw (new SigaExceptions("Error no se ha podido crear la relacion entre el Ejg y acta"));
-					}
-
-					resultado = scsEjgMapper.updateByPrimaryKey(scsEjg);
-
-					if (resultado == 0) {
-						throw (new SigaExceptions("Error no se ha podido actualizar el ejg"));
-					}
-
-					if(scsEstadoEjg != null) {
-						resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+						LOGGER.info("Seteando las observaciones");
+						
+						ScsEjgActa scsEjgActa = new ScsEjgActa();
+						scsEjgActa.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+						scsEjgActa.setIdinstitucionacta(idInstitucion);
+						scsEjgActa.setAnioacta(Short.valueOf(ejgItem.getAnnioActa()));
+						ScsActacomision acta = obtenerActa(scsEjgActa, idInstitucion);
+	
+						if(scsEstadoEjg.getObservaciones() != null) {
+							scsEstadoEjg.setObservaciones(
+									scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
+											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+						}else {
+							scsEstadoEjg.setObservaciones(
+									"Expediente incluido masivamente en el acta "
+											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+						}
+	
+						ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
 	
 						LOGGER.info("Creando la nueva relacion acta y ejg");
 	
@@ -911,6 +889,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						scsEjgActaNuevo.setFechamodificacion(new Date());
 						scsEjgActaNuevo.setUsumodificacion(usuarios.get(0).getIdusuario());
 						scsEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+						scsEjg.setIdinstitucionacta(idInstitucion);
 						scsEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
 						scsEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
 						scsEjg.setFechamodificacion(new Date());
@@ -1056,21 +1035,24 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 									  acta.getNumeroacta());
 								 }
 								 
-								acta.setFecharesolucion(new Date());
+								//acta.setFecharesolucion(new Date());
 								
 								scsEjg.setIdacta(null);
 								scsEjg.setAnioacta(null);
 								scsEjg.setIdinstitucionacta(null);
 
-								scsActacomisionMapper.updateByPrimaryKey(acta);
+								//scsActacomisionMapper.updateByPrimaryKey(acta);
 
 								LOGGER.info("VOY A BORRAR A  " + listaEjgAsociadosActa.size());
 
 								resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
 								
+								scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+								scsEjgMapper.updateByPrimaryKey(scsEjg);
+								
 								updateResponseDTO.setStatus(SigaConstants.OK);
 								
-								if (resultado == 0) {
+								/*if (resultado == 0) {
 									throw (new SigaExceptions(
 											"Error no se ha podido borrar la relacion entre el Ejg y acta"));
 								}
@@ -1084,7 +1066,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 								if (resultado == 0) {
 									throw (new SigaExceptions("Error no se ha podido actualizar el ejg"));
-													}
+													}*/
 
 							}
 						}
