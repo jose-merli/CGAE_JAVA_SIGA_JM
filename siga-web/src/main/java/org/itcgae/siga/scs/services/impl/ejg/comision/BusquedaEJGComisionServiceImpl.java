@@ -1070,8 +1070,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 							}
 						}
+					}else {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setDescription("Empty");
 					}
-
 				}
 			} catch (SigaExceptions e) {
 				if (error.getCode() == null) {
@@ -1355,6 +1357,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
 
 					scsEjg.setIdponente(null);
+					scsEjg.setIdinstitucionponente(null);
 					scsEjg.setFechapresentacionponente(null);
 
 					int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
