@@ -1066,7 +1066,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 									throw (new SigaExceptions("Error no se ha podido eliminar una relacionEJG-Acta (borrarActaAnio)"));
 								}
 								
-								/*if (resultado == 0) {
+								if (resultado == 0) {
 									throw (new SigaExceptions(
 											"Error no se ha podido borrar la relacion entre el Ejg y acta"));
 								}
