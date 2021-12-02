@@ -74,7 +74,7 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 		@Result(column = "IDJUZGADO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> comboJuzgados(String idInstitucion);
+	List<ComboItem> comboJuzgados(Short idInstitucion);
 	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "comboJuzgadoDesignaciones")
 	@Results({
 		@Result(column = "CODIGOEXT2", property = "codigoExt2", jdbcType = JdbcType.VARCHAR),

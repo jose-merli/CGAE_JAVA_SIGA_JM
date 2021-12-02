@@ -829,7 +829,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				LOGGER.info(
 						"comboJuzgados() / scsJuzgadoextendsMapper.getResoluciones() -> Entrada a scsImpugnacionEjgextendsMapper para obtener los combo");
 
-				comboItems = scsJuzgadoextendsMapper.comboJuzgados(idInstitucion.toString());
+				comboItems = scsJuzgadoextendsMapper.comboJuzgados(idInstitucion);
 
 				LOGGER.info(
 						"comboJuzgados() / scsJuzgadoextendsMapper.getResoluciones() -> Salida a scsImpugnacionEjgextendsMapper para obtener los combo");

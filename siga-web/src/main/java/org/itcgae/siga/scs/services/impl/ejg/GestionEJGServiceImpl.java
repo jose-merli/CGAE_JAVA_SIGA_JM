@@ -2451,7 +2451,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 	fichaEjg.setNumActa(null);
                 }
                 
-                fichaEjg.setAnnioActa(datos.getIdAnnioActa());
+                if(datos.getAnnioActa() != null) {
+                	fichaEjg.setAnnioActa(datos.getAnnioActa().toString());
+	            }
+	            else {
+	            	fichaEjg.setNumActa(null);
+	            }
                 
                 if(datos.getIdFundamentoJuridico() != null) {
                 	fichaEjg.setFundamentoJuridico(datos.getIdFundamentoJuridico().toString());
@@ -2490,7 +2495,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 else {
                 	busquedaEJGComisionServiceImpl.borrarActaAnio(list, request);
                 }
-                if(datos.getIdFundamentoJuridico() != null && datos.getIdTiporatificacionEJG() != null) {
+                //Se tiene esta comprobacion ya que algunas instituciones 
+                //No permiten guardar una resolucion sin
+                if((datos.getIdFundamentoJuridico() != null || busquedaEJGComisionServiceImpl.obligatorioFundamento(request).equals("0")) && datos.getIdTiporatificacionEJG() != null) {
                 	busquedaEJGComisionServiceImpl.editarResolucionFundamento(list, request);
                 }
                 else {

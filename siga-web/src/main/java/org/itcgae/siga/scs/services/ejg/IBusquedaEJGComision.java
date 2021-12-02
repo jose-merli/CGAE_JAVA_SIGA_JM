@@ -60,7 +60,7 @@ public interface IBusquedaEJGComision {
 
 	UpdateResponseDTO borrarPonente(List<EjgItem> ejgItem, HttpServletRequest request) throws SigaExceptions;
 
-	UpdateResponseDTO borrarActaAnio(List<EjgItem> ejgItem, HttpServletRequest request);
+	UpdateResponseDTO borrarActaAnio(List<EjgItem> ejgItem, HttpServletRequest request) throws SigaExceptions;
 
 	String obligatorioFundamento(HttpServletRequest request);
 
