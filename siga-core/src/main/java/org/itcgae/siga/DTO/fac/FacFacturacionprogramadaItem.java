@@ -58,6 +58,7 @@ public class FacFacturacionprogramadaItem {
     private Boolean generaPDF;
     private Boolean envio;
     private String idTipoPlantillaMail;
+    private String tipoPlantillaMail;
     private String traspasoPlatilla;
     private String traspasoCodAuditoriaDef;
 
@@ -71,6 +72,24 @@ public class FacFacturacionprogramadaItem {
     private String idModeloRectificativa;
     private String modeloFactura;
     private String modeloRectificativa;
+
+    private Boolean esDatosGenerales;
+
+    public String getTipoPlantillaMail() {
+        return tipoPlantillaMail;
+    }
+
+    public void setTipoPlantillaMail(String tipoPlantillaMail) {
+        this.tipoPlantillaMail = tipoPlantillaMail;
+    }
+
+    public Boolean getEsDatosGenerales() {
+        return esDatosGenerales;
+    }
+
+    public void setEsDatosGenerales(Boolean esDatosGenerales) {
+        this.esDatosGenerales = esDatosGenerales;
+    }
 
     public String getIdSerieFacturacion() {
         return idSerieFacturacion;
@@ -570,6 +589,7 @@ public class FacFacturacionprogramadaItem {
                 Objects.equals(generaPDF, that.generaPDF) &&
                 Objects.equals(envio, that.envio) &&
                 Objects.equals(idTipoPlantillaMail, that.idTipoPlantillaMail) &&
+                Objects.equals(tipoPlantillaMail, that.tipoPlantillaMail) &&
                 Objects.equals(traspasoPlatilla, that.traspasoPlatilla) &&
                 Objects.equals(traspasoCodAuditoriaDef, that.traspasoCodAuditoriaDef) &&
                 Objects.equals(fechaPresentacion, that.fechaPresentacion) &&
@@ -580,12 +600,13 @@ public class FacFacturacionprogramadaItem {
                 Objects.equals(idModeloFactura, that.idModeloFactura) &&
                 Objects.equals(idModeloRectificativa, that.idModeloRectificativa) &&
                 Objects.equals(modeloFactura, that.modeloFactura) &&
-                Objects.equals(modeloRectificativa, that.modeloRectificativa);
+                Objects.equals(modeloRectificativa, that.modeloRectificativa) &&
+                Objects.equals(esDatosGenerales, that.esDatosGenerales);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idSerieFacturacion, compraSuscripcion, fechaInicioServicios, fechaInicioProductos, fechaFinServicios, fechaFinProductos, fechaCompraSuscripcionDesde, fechaCompraSuscripcionHasta, importe, importeDesde, importeHasta, idEstadoConfirmacion, estadoConfirmacion, idEstadoPDF, estadoPDF, idEstadoEnvio, estadoEnvio, idEstadoTraspaso, estadoTraspaso, fechaPrevistaGeneracion, fechaPrevistaGeneracionDesde, fechaPrevistaGeneracionHasta, fechaPrevistaConfirm, fechaPrevistaConfirmDesde, fechaPrevistaConfirmHasta, fechaRealGeneracion, fechaRealGeneracionDesde, fechaRealGeneracionHasta, fechaConfirmacion, fechaConfirmacionDesde, fechaConfirmacionHasta, idProgramacion, descripcion, nombreAbreviado, fechaProgramacion, archivarFact, usuModificacion, fechaModificacion, nombreFichero, logError, logTraspaso, traspasoFacturas, generaPDF, envio, idTipoPlantillaMail, traspasoPlatilla, traspasoCodAuditoriaDef, fechaPresentacion, fechaRecibosPrimeros, fechaRecibosRecurrentes, fechaRecibosCOR1, fechaRecibosB2B, idModeloFactura, idModeloRectificativa, modeloFactura, modeloRectificativa);
+        return Objects.hash(idSerieFacturacion, compraSuscripcion, fechaInicioServicios, fechaInicioProductos, fechaFinServicios, fechaFinProductos, fechaCompraSuscripcionDesde, fechaCompraSuscripcionHasta, importe, importeDesde, importeHasta, idEstadoConfirmacion, estadoConfirmacion, idEstadoPDF, estadoPDF, idEstadoEnvio, estadoEnvio, idEstadoTraspaso, estadoTraspaso, fechaPrevistaGeneracion, fechaPrevistaGeneracionDesde, fechaPrevistaGeneracionHasta, fechaPrevistaConfirm, fechaPrevistaConfirmDesde, fechaPrevistaConfirmHasta, fechaRealGeneracion, fechaRealGeneracionDesde, fechaRealGeneracionHasta, fechaConfirmacion, fechaConfirmacionDesde, fechaConfirmacionHasta, idProgramacion, descripcion, nombreAbreviado, fechaProgramacion, archivarFact, usuModificacion, fechaModificacion, nombreFichero, logError, logTraspaso, traspasoFacturas, generaPDF, envio, idTipoPlantillaMail, tipoPlantillaMail, traspasoPlatilla, traspasoCodAuditoriaDef, fechaPresentacion, fechaRecibosPrimeros, fechaRecibosRecurrentes, fechaRecibosCOR1, fechaRecibosB2B, idModeloFactura, idModeloRectificativa, modeloFactura, modeloRectificativa, esDatosGenerales);
     }
 
     @Override
@@ -636,6 +657,7 @@ public class FacFacturacionprogramadaItem {
                 ", generaPDF=" + generaPDF +
                 ", envio=" + envio +
                 ", idTipoPlantillaMail='" + idTipoPlantillaMail + '\'' +
+                ", tipoPlantillaMail='" + tipoPlantillaMail + '\'' +
                 ", traspasoPlatilla='" + traspasoPlatilla + '\'' +
                 ", traspasoCodAuditoriaDef='" + traspasoCodAuditoriaDef + '\'' +
                 ", fechaPresentacion=" + fechaPresentacion +
@@ -647,6 +669,7 @@ public class FacFacturacionprogramadaItem {
                 ", idModeloRectificativa='" + idModeloRectificativa + '\'' +
                 ", modeloFactura='" + modeloFactura + '\'' +
                 ", modeloRectificativa='" + modeloRectificativa + '\'' +
+                ", esDatosGenerales=" + esDatosGenerales +
                 '}';
     }
 }

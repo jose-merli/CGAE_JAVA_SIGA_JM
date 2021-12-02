@@ -50,6 +50,7 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
         @Result(column = "generapdf", property = "generaPDF", jdbcType = JdbcType.BOOLEAN),
         @Result(column = "envio", property = "envio", jdbcType = JdbcType.BOOLEAN),
         @Result(column = "idtipoplantillamail", property = "idTipoPlantillaMail", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "tipoplantillamail", property = "tipoPlantillaMail", jdbcType = JdbcType.VARCHAR),
         @Result(column = "traspaso_platilla", property = "traspasoPlatilla", jdbcType = JdbcType.VARCHAR),
         @Result(column = "traspaso_codauditoria_def", property = "traspasoCodAuditoriaDef", jdbcType = JdbcType.VARCHAR),
         @Result(column = "importe", property = "importe", jdbcType = JdbcType.VARCHAR),
