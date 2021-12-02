@@ -843,7 +843,7 @@ public class ProductosServiceImpl implements IProductosService{
 				if(producto.getCodigoext() != null) {
 					productoInstitucion.setCodigoext(producto.getCodigoext());
 				}else {
-					productoInstitucion.setCodigoext(producto.getIdtipoproducto() + "|" + producto.getIdproducto() + "|" + producto.getIdproductoinstitucion());
+					productoInstitucion.setCodigoext(producto.getIdtipoproducto() + "|" + producto.getIdproducto() + "|" + Long.parseLong(idOrdenacion.getNewId()));
 				}
 					
 				productoInstitucion.setCodigoTraspasonav(null);//No aplica
@@ -868,7 +868,7 @@ public class ProductosServiceImpl implements IProductosService{
 					
 
 				LOGGER.info(
-					"nuevoProducto() / pysProductosInstitucionMapper.crearProducto() -> Salida de pysProductosInstitucionMapper para crear un producto");
+					"nuevoProducto() / pysProductosInstitucionMapper.nuevoProducto() -> Salida de pysProductosInstitucionMapper para crear un producto");
 			}
 
 		}
