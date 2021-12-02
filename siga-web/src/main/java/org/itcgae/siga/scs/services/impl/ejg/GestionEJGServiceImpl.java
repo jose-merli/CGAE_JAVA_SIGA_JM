@@ -2451,7 +2451,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 	fichaEjg.setNumActa(null);
                 }
                 
-                fichaEjg.setAnnioActa(datos.getIdAnnioActa());
+                if(datos.getAnnioActa() != null) {
+                	fichaEjg.setAnnioActa(datos.getAnnioActa().toString());
+	            }
+	            else {
+	            	fichaEjg.setNumActa(null);
+	            }
                 
                 if(datos.getIdFundamentoJuridico() != null) {
                 	fichaEjg.setFundamentoJuridico(datos.getIdFundamentoJuridico().toString());

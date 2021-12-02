@@ -932,9 +932,9 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						//Se comprueba si el EJG tiene una resolucion asociada
 						if(resolEjg != null) {
 
-							resolEjg.setFechapresentacionponente(null);
-							resolEjg.setIdponente(null);
-							resolEjg.setIdinstitucionponente(null);
+							resolEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+							resolEjg.setIdinstitucionacta(idInstitucion);
+							resolEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
 							
 							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
 							resolEjg.setFechamodificacion(new Date());
@@ -948,10 +948,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						else {
 							
 							resolEjg = new ScsEjgResolucionWithBLOBs();
-							
-							resolEjg.setFechapresentacionponente(null);
-							resolEjg.setIdponente(null);
-							resolEjg.setIdinstitucionponente(null);
+
+							resolEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+							resolEjg.setIdinstitucionacta(idInstitucion);
+							resolEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
 							
 
 							resolEjg.setAnio(scsEjg.getAnio());
@@ -990,19 +990,27 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO borrarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) {
+	public UpdateResponseDTO borrarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) throws SigaExceptions {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 
 		int resultado;
 
 		LOGGER.info("Entra en el metodo editarActaAnio con la institucion " + idInstitucion);
 
 		if (idInstitucion != null) {
-			try {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+//			try {
 				for (EjgItem ejgItem : ejgItems) {
 
 					ScsEstadoejg scsEstadoEjg;
@@ -1054,26 +1062,76 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 								resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
 								
-								scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
-								scsEjgMapper.updateByPrimaryKey(scsEjg);
-								
-								updateResponseDTO.setStatus(SigaConstants.OK);
-								
-								/*if (resultado == 0) {
-									throw (new SigaExceptions(
-											"Error no se ha podido borrar la relacion entre el Ejg y acta"));
+								if (resultado == 0) {
+									throw (new SigaExceptions("Error no se ha podido eliminar una relacionEJG-Acta (borrarActaAnio)"));
 								}
+								
 								resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
-
+								
 								if (resultado == 0) {
-									throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
+									throw (new SigaExceptions("Error no se ha podido actualizar un estado de un Ejg (borrarActaAnio)"));
 								}
-
+								
 								resultado = scsEjgMapper.updateByPrimaryKey(scsEjg);
-
+								
 								if (resultado == 0) {
-									throw (new SigaExceptions("Error no se ha podido actualizar el ejg"));
-													}*/
+									throw (new SigaExceptions("Error no se ha podido actualizar un Ejg (borrarActaAnio)"));
+								}
+								
+								
+								LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
+								
+								ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
+								
+								resolKey.setAnio(scsEjg.getAnio());
+								resolKey.setIdinstitucion(idInstitucion);
+								resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
+								resolKey.setNumero(Long.valueOf(scsEjg.getNumero()));
+								
+								ScsEjgResolucionWithBLOBs resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
+								
+								//Se comprueba si el EJG tiene una resolucion asociada
+								if(resolEjg != null) {
+
+									resolEjg.setIdacta(null);
+									resolEjg.setIdinstitucionacta(null);
+									resolEjg.setAnioacta(null);
+									
+									resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+									resolEjg.setFechamodificacion(new Date());
+									
+									resultado = scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
+									
+									if (resultado == 0) {
+										throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+									}
+								}
+								else {
+									
+									resolEjg = new ScsEjgResolucionWithBLOBs();
+
+									resolEjg.setIdacta(null);
+									resolEjg.setIdinstitucionacta(null);
+									resolEjg.setAnioacta(null);
+									
+
+									resolEjg.setAnio(scsEjg.getAnio());
+									resolEjg.setIdinstitucion(idInstitucion);
+									resolEjg.setIdtipoejg(scsEjg.getIdtipoejg());
+									resolEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
+									
+									resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+									resolEjg.setFechamodificacion(new Date());
+									
+									resultado = scsEjgResolucionMapper.insert(resolEjg);
+									
+									if (resultado == 0) {
+										throw (new SigaExceptions("Error no se ha podido insertar la resolucion del Ejg"));
+									}
+								}
+								
+
+								updateResponseDTO.setStatus(SigaConstants.OK);
 
 							}
 						}
@@ -1082,13 +1140,14 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						error.setDescription("Empty");
 					}
 				}
-			} catch (SigaExceptions e) {
-				if (error.getCode() == null) {
-					error.setCode(500);
-				}
-				error.setDescription(e.getMsg());
-				updateResponseDTO.setStatus(SigaConstants.KO);
 			}
+//			} catch (SigaExceptions e) {
+//				if (error.getCode() == null) {
+//					error.setCode(500);
+//				}
+//				error.setDescription(e.getMsg());
+//				updateResponseDTO.setStatus(SigaConstants.KO);
+//			}
 
 			LOGGER.info("guardarEditarSelecionados() -> Salida del servicio para obtener los tipos ejg");
 			updateResponseDTO.setError(error);
