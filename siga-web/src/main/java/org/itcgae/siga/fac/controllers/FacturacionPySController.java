@@ -501,8 +501,8 @@ public class FacturacionPySController {
 		}
 	}
 
-	@PostMapping(value = "/getLineasFactura")
-	ResponseEntity<FacturaLineaDTO> getLineasFactura(@RequestBody String idFactura,
+	@GetMapping(value = "/getLineasFactura")
+	ResponseEntity<FacturaLineaDTO> getLineasFactura(@RequestParam String idFactura,
 										   HttpServletRequest request) {
 		FacturaLineaDTO response = new FacturaLineaDTO();
 
@@ -520,8 +520,8 @@ public class FacturacionPySController {
 		}
 	}
 
-    @PostMapping(value = "/getLineasAbono")
-    ResponseEntity<FacturaLineaDTO> getLineasAbono(@RequestBody String idAbono,
+    @GetMapping(value = "/getLineasAbono")
+    ResponseEntity<FacturaLineaDTO> getLineasAbono(@RequestParam String idAbono,
                                                      HttpServletRequest request) {
         FacturaLineaDTO response = new FacturaLineaDTO();
 
@@ -569,8 +569,8 @@ public class FacturacionPySController {
         }
     }
 
-	@PostMapping(value = "/getComunicacionCobro")
-	ResponseEntity<ComunicacionCobroDTO> getComunicacionCobro(@RequestBody String idFactura,
+	@GetMapping(value = "/getComunicacionCobro")
+	ResponseEntity<ComunicacionCobroDTO> getComunicacionCobro(@RequestParam String idFactura,
 													 HttpServletRequest request) {
 		ComunicacionCobroDTO response = new ComunicacionCobroDTO();
 
