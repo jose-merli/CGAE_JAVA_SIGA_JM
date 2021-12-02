@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.controllers;
 
+import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
@@ -567,4 +568,23 @@ public class FacturacionPySController {
             return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+	@PostMapping(value = "/getComunicacionCobro")
+	ResponseEntity<ComunicacionCobroDTO> getComunicacionCobro(@RequestBody String idFactura,
+													 HttpServletRequest request) {
+		ComunicacionCobroDTO response = new ComunicacionCobroDTO();
+
+		try {
+			response = facturacionService.getComunicacionCobro(idFactura, request);
+
+			if(response.getComunicacionCobroItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<ComunicacionCobroDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComunicacionCobroDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

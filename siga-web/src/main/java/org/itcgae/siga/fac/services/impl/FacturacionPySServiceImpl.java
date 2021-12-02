@@ -1,6 +1,8 @@
 package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
+import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
@@ -42,6 +44,8 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
 import org.itcgae.siga.db.entities.CenSucursalesExample;
+import org.itcgae.siga.db.entities.EnvComunicacionmorosos;
+import org.itcgae.siga.db.entities.EnvComunicacionmorososExample;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.entities.FacAbonoKey;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
@@ -50,7 +54,6 @@ import org.itcgae.siga.db.entities.FacClienincluidoenseriefactur;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
 import org.itcgae.siga.db.entities.FacFactura;
-import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacFacturacionEliminar;
@@ -83,6 +86,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
+import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
 import org.itcgae.siga.db.mappers.FacAbonoMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
@@ -197,6 +201,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
+
+	@Autowired
+	private EnvComunicacionmorososMapper envComunicacionmorososMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1831,6 +1838,47 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("guardarLineasAbono() -> Salida del servicio para guardar las lineas de una factura");
 
 		return updateResponseDTO;
+	}
+
+	@Override
+	public ComunicacionCobroDTO getComunicacionCobro(String idFactura, HttpServletRequest request)
+			throws Exception {
+		ComunicacionCobroDTO comunicacionCobroDTO = new ComunicacionCobroDTO();
+		List<ComunicacionCobroItem> items = new ArrayList<>();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getLineasFactura() -> Entrada al servicio para obtener las lineas de la factura");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("FacturacionPySServiceImpl.getLineasFactura() -> obteniendo las lineas de la factura");
+
+			EnvComunicacionmorososExample example = new EnvComunicacionmorososExample();
+			example.createCriteria()
+					.andIdfacturaEqualTo(idFactura)
+					.andIdinstitucionEqualTo(usuario.getIdinstitucion());
+			example.setOrderByClause("IDENVIO");
+
+			List<EnvComunicacionmorosos> result = envComunicacionmorososMapper.selectByExample(example);
+
+			for (EnvComunicacionmorosos env : result) {
+				ComunicacionCobroItem item = new ComunicacionCobroItem();
+				item.setDocumento(env.getDescripcion());
+				item.setFechaEnvio(env.getFechaEnvio());
+				item.setOrden(String.valueOf(env.getIdenvio()));
+				items.add(item);
+			}
+
+			comunicacionCobroDTO.setComunicacionCobroItems(items);
+		}
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getLineasFactura() -> Salida del servicio  para obtener las lineas de la factura");
+
+		return comunicacionCobroDTO;
 	}
 
 	@Override
