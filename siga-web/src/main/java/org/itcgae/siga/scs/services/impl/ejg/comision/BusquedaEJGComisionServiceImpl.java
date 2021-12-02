@@ -1050,8 +1050,6 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 								scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
 								scsEjgMapper.updateByPrimaryKey(scsEjg);
 								
-								updateResponseDTO.setStatus(SigaConstants.OK);
-								
 								/*if (resultado == 0) {
 									throw (new SigaExceptions(
 											"Error no se ha podido borrar la relacion entre el Ejg y acta"));
@@ -1070,9 +1068,6 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 							}
 						}
-					}else {
-						updateResponseDTO.setStatus(SigaConstants.KO);
-						error.setDescription("Empty");
 					}
 				}
 			} catch (SigaExceptions e) {
@@ -1085,6 +1080,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 			LOGGER.info("guardarEditarSelecionados() -> Salida del servicio para obtener los tipos ejg");
 			updateResponseDTO.setError(error);
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 		return updateResponseDTO;
 	}
