@@ -682,7 +682,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ " WHERE ejgacta.idinstitucionacta = ac.idinstitucion" + " AND ejgacta.idacta = ac.idacta"
 				+ " AND   ejgacta.anioacta = ac.anioacta" + " AND   ejgacta.idinstitucionejg = ejg.idinstitucion"
 				+ " AND   ejgacta.anioejg = ejg.anio" + " AND   ejgacta.idtipoejg = ejg.idtipoejg"
-				+ " AND   ejgacta.numeroejg = ejg.numejg" + " AND   ac.idinstitucion = " + idInstitucion;
+				+ " AND   ejgacta.numeroejg = ejg.numero" + " AND   ac.idinstitucion = " + idInstitucion;
 
 		if (ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
 			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.anioacta = " + ejgItem.getAnnioActa();
