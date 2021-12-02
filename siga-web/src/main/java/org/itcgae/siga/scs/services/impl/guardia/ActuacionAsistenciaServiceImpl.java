@@ -131,7 +131,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             //Buscamos el nombre de comisaria/Juzgado
                             if(scsActuacionasistencia.getIdjuzgado() != null){
 
-                                List<ComboItem> juzgados = scsJuzgadoExtendsMapper.comboJuzgados(idInstitucion.toString());
+                                List<ComboItem> juzgados = scsJuzgadoExtendsMapper.comboJuzgados(idInstitucion);
                                 if(juzgados != null && !juzgados.isEmpty()){
                                    String juzgadoDesc =  juzgados.stream().filter(juzgado -> juzgado.getValue().equals(scsActuacionasistencia.getIdjuzgado().toString())).findFirst().orElse(new ComboItem()).getLabel();
                                    actuacionAsistenciaItem.setComisariaJuzgado(juzgadoDesc);
