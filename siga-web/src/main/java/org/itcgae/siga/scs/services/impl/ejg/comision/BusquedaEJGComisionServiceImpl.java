@@ -888,6 +888,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						scsEjgActaNuevo.setIdacta(Long.valueOf(ejgItem.getNumActa()));
 						scsEjgActaNuevo.setFechamodificacion(new Date());
 						scsEjgActaNuevo.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
 						scsEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
 						scsEjg.setIdinstitucionacta(idInstitucion);
 						scsEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
@@ -917,51 +918,56 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							}
 						}
 						
-//						LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
-//						
-//						ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
-//						
-//						resolKey.setAnio(scsEjg.getAnio());
-//						resolKey.setIdinstitucion(idInstitucion);
-//						resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
-//						resolKey.setNumero(Long.valueOf(scsEjg.getNumejg()));
-//						
-//						ScsEjgResolucionWithBLOBs resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
-//						
-//						//Se comprueba si el EJG tiene una resolucion asociada
-//						if(resolEjg != null) {
-//							resolEjg.setAnioacta(scsEjg.getAnioacta());
-//							resolEjg.setIdacta(scsEjg.getIdacta());
-//							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
-//							resolEjg.setFechamodificacion(new Date());
-//							
-//							scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
-//							
-//							if (resultado == 0) {
-//								throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
-//							}
-//						}
-//						else {
-//							
-//							resolEjg = new ScsEjgResolucionWithBLOBs();
-//							
-//							resolEjg.setAnioacta(scsEjg.getAnioacta());
-//							resolEjg.setIdacta(scsEjg.getIdacta());
-//							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
-//							resolEjg.setFechamodificacion(new Date());
-//							
-//
-//							resolEjg.setAnio(scsEjg.getAnio());
-//							resolEjg.setIdinstitucion(idInstitucion);
-//							resolEjg.setIdtipoejg(scsEjg.getIdtipoejg());
-//							resolEjg.setNumero(Long.valueOf(scsEjg.getNumejg()));
-//							
-//							scsEjgResolucionMapper.insert(resolEjg);
-//							
-//							if (resultado == 0) {
-//								throw (new SigaExceptions("Error no se ha podido insertar la resolucion del Ejg"));
-//							}
-//						}
+						LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
+						
+						ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
+						
+						resolKey.setAnio(scsEjg.getAnio());
+						resolKey.setIdinstitucion(idInstitucion);
+						resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
+						resolKey.setNumero(Long.valueOf(scsEjg.getNumero()));
+						
+						ScsEjgResolucionWithBLOBs resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
+						
+						//Se comprueba si el EJG tiene una resolucion asociada
+						if(resolEjg != null) {
+
+							resolEjg.setFechapresentacionponente(null);
+							resolEjg.setIdponente(null);
+							resolEjg.setIdinstitucionponente(null);
+							
+							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+							resolEjg.setFechamodificacion(new Date());
+							
+							resultado = scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
+							
+							if (resultado == 0) {
+								throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+							}
+						}
+						else {
+							
+							resolEjg = new ScsEjgResolucionWithBLOBs();
+							
+							resolEjg.setFechapresentacionponente(null);
+							resolEjg.setIdponente(null);
+							resolEjg.setIdinstitucionponente(null);
+							
+
+							resolEjg.setAnio(scsEjg.getAnio());
+							resolEjg.setIdinstitucion(idInstitucion);
+							resolEjg.setIdtipoejg(scsEjg.getIdtipoejg());
+							resolEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
+							
+							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+							resolEjg.setFechamodificacion(new Date());
+							
+							resultado = scsEjgResolucionMapper.insert(resolEjg);
+							
+							if (resultado == 0) {
+								throw (new SigaExceptions("Error no se ha podido insertar la resolucion del Ejg"));
+							}
+						}
 					}
 				}
 				//Se comenta para que el @Transactional funcione adecuadamente
@@ -983,6 +989,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO borrarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1138,9 +1145,70 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						if(ejgItem.getFundamentoJuridico() != null) {
 							scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
 						}
-//						else {
-//							scsEjg.setIdfundamentojuridico(null);
-//						}
+						else {
+							scsEjg.setIdfundamentojuridico(null);
+						}
+						
+
+
+						LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
+						
+						ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
+						
+						resolKey.setAnio(scsEjg.getAnio());
+						resolKey.setIdinstitucion(idInstitucion);
+						resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
+						resolKey.setNumero(Long.valueOf(scsEjg.getNumero()));
+						
+						ScsEjgResolucionWithBLOBs resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
+						
+						//Se comprueba si el EJG tiene una resolucion asociada
+						if(resolEjg != null) {
+							resolEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
+							if(ejgItem.getFundamentoJuridico() != null) {
+								resolEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+							}
+							else {
+								resolEjg.setIdfundamentojuridico(null);
+							}
+							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+							resolEjg.setFechamodificacion(new Date());
+							
+							response = scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
+							
+							if (response == 0) {
+								throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+							}
+						}
+						else {
+							
+							resolEjg = new ScsEjgResolucionWithBLOBs();
+							
+							if(ejgItem.getFundamentoJuridico() != null) {
+								resolEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+							}
+							else {
+								resolEjg.setIdfundamentojuridico(null);
+							}
+							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+							resolEjg.setFechamodificacion(new Date());
+							
+
+							resolEjg.setAnio(scsEjg.getAnio());
+							resolEjg.setIdinstitucion(idInstitucion);
+							resolEjg.setIdtipoejg(scsEjg.getIdtipoejg());
+							resolEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
+							
+							resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+							resolEjg.setFechamodificacion(new Date());
+							
+							response = scsEjgResolucionMapper.insert(resolEjg);
+							
+							if (response == 0) {
+								throw (new SigaExceptions("Error no se ha podido insertar la resolucion del Ejg"));
+							}
+						}
+						
 					}
 
 					LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL -> ");
@@ -1154,9 +1222,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					
 					int response = scsEjgMapper.updateByPrimaryKeySelective(ejgBlobs);
 					
-					if (response == 0)
+					if (response == 0) {
 						throw (new Exception(
 								"Error en al actualizar el EJG"));
+					}
 					
 					updateResponseDTO.setStatus(SigaConstants.OK);
 
@@ -1174,6 +1243,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO borrarResolucionFundamento(List<EjgItem> ejgItems, HttpServletRequest request)
 			throws Exception {
 
@@ -1182,9 +1252,15 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
+		
+		
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		
+		
+		int response = 0;
+		
 		if (usuarios != null && usuarios.size() > 0) {
 
 			AdmUsuarios usuario = usuarios.get(0);
@@ -1201,7 +1277,69 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					scsEjg.setIdtiporatificacionejg(null);
 					scsEjg.setIdfundamentojuridico(null);
 
-					scsEjgMapper.updateByPrimaryKey(scsEjg);
+					response = scsEjgMapper.updateByPrimaryKey(scsEjg);
+
+					if (response == 0) {
+						throw (new SigaExceptions("Error no se ha podido actualizar el Ejg"));
+					}
+					
+					LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
+					
+					ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
+					
+					resolKey.setAnio(scsEjg.getAnio());
+					resolKey.setIdinstitucion(idInstitucion);
+					resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
+					resolKey.setNumero(Long.valueOf(scsEjg.getNumero()));
+					
+					ScsEjgResolucionWithBLOBs resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
+					
+					//Se comprueba si el EJG tiene una resolucion asociada
+					if(resolEjg != null) {
+						resolEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
+						if(ejgItem.getFundamentoJuridico() != null) {
+							resolEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+						}
+						else {
+							resolEjg.setIdfundamentojuridico(null);
+						}
+						resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						resolEjg.setFechamodificacion(new Date());
+						
+						response = scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
+						
+						if (response == 0) {
+							throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+						}
+					}
+					else {
+						
+						resolEjg = new ScsEjgResolucionWithBLOBs();
+						
+						if(ejgItem.getFundamentoJuridico() != null) {
+							resolEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+						}
+						else {
+							resolEjg.setIdfundamentojuridico(null);
+						}
+						resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						resolEjg.setFechamodificacion(new Date());
+						
+
+						resolEjg.setAnio(scsEjg.getAnio());
+						resolEjg.setIdinstitucion(idInstitucion);
+						resolEjg.setIdtipoejg(scsEjg.getIdtipoejg());
+						resolEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
+						
+						resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						resolEjg.setFechamodificacion(new Date());
+						
+						response = scsEjgResolucionMapper.insert(resolEjg);
+						
+						if (response == 0) {
+							throw (new SigaExceptions("Error no se ha podido insertar la resolucion del Ejg"));
+						}
+					}
 
 					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
@@ -1274,7 +1412,9 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 							
 							int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
 							
-							
+							if (response == 0) {
+								throw (new SigaExceptions("Error no se ha podido actualizar el ponente del Ejg"));
+							}
 							
 							ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
 
@@ -1298,9 +1438,63 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 									.getEtiquetasPonente(Short.valueOf(usuarios.get(0).getIdlenguaje()))+" "+ nombrePonente);
 								
 								
-							scsEstadoejgMapper.insert(scsEstadoEjg);
+							response = scsEstadoejgMapper.insert(scsEstadoEjg);
+							
+							if (response == 0) {
+								throw (new SigaExceptions("Error no se ha podido insertar un nuevo estado al Ejg (Ponente)"));
+							}
 							
 
+							LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
+							
+							ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
+							
+							resolKey.setAnio(scsEjg.getAnio());
+							resolKey.setIdinstitucion(idInstitucion);
+							resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
+							resolKey.setNumero(Long.valueOf(scsEjg.getNumero()));
+							
+							ScsEjgResolucionWithBLOBs resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
+							
+							//Se comprueba si el EJG tiene una resolucion asociada
+							if(resolEjg != null) {
+
+								resolEjg.setFechapresentacionponente(ejgItem.getFechaPonenteDesd());
+								resolEjg.setIdponente(Integer.valueOf(ejgItem.getPonente()));
+								resolEjg.setIdinstitucionponente(Short.valueOf(ejgItem.getidInstitucion()));
+								
+								resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+								resolEjg.setFechamodificacion(new Date());
+								
+								response = scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
+								
+								if (response == 0) {
+									throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+								}
+							}
+							else {
+								
+								resolEjg = new ScsEjgResolucionWithBLOBs();
+								
+								resolEjg.setFechapresentacionponente(ejgItem.getFechaPonenteDesd());
+								resolEjg.setIdponente(Integer.valueOf(ejgItem.getPonente()));
+								resolEjg.setIdinstitucionponente(Short.valueOf(ejgItem.getidInstitucion()));
+								
+
+								resolEjg.setAnio(scsEjg.getAnio());
+								resolEjg.setIdinstitucion(idInstitucion);
+								resolEjg.setIdtipoejg(scsEjg.getIdtipoejg());
+								resolEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
+								
+								resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+								resolEjg.setFechamodificacion(new Date());
+								
+								response = scsEjgResolucionMapper.insert(resolEjg);
+								
+								if (response == 0) {
+									throw (new SigaExceptions("Error no se ha podido insertar la resolucion del Ejg"));
+								}
+							}
 							
 
 							LOGGER.info("Respuesta al actualizar" + response);
@@ -1361,6 +1555,61 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					scsEjg.setFechapresentacionponente(null);
 
 					int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
+					
+					if (response == 0) {
+						throw (new SigaExceptions("Error no se ha podido actualizar el ponente del Ejg"));
+					}
+					
+					LOGGER.info("Se busca y se actualiza la resolucion asociada al ejg");
+					
+					ScsEjgResolucionKey resolKey = new ScsEjgResolucionKey();
+					
+					resolKey.setAnio(scsEjg.getAnio());
+					resolKey.setIdinstitucion(idInstitucion);
+					resolKey.setIdtipoejg(scsEjg.getIdtipoejg());
+					resolKey.setNumero(Long.valueOf(scsEjg.getNumero()));
+					
+					ScsEjgResolucionWithBLOBs resolEjg = scsEjgResolucionMapper.selectByPrimaryKey(resolKey);
+					
+					//Se comprueba si el EJG tiene una resolucion asociada
+					if(resolEjg != null) {
+
+						resolEjg.setFechapresentacionponente(null);
+						resolEjg.setIdponente(null);
+						resolEjg.setIdinstitucionponente(null);
+						
+						resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						resolEjg.setFechamodificacion(new Date());
+						
+						response = scsEjgResolucionMapper.updateByPrimaryKey(resolEjg);
+						
+						if (response == 0) {
+							throw (new SigaExceptions("Error no se ha podido actualizar la resolucion del Ejg"));
+						}
+					}
+					else {
+						
+						resolEjg = new ScsEjgResolucionWithBLOBs();
+						
+						resolEjg.setFechapresentacionponente(null);
+						resolEjg.setIdponente(null);
+						resolEjg.setIdinstitucionponente(null);
+						
+
+						resolEjg.setAnio(scsEjg.getAnio());
+						resolEjg.setIdinstitucion(idInstitucion);
+						resolEjg.setIdtipoejg(scsEjg.getIdtipoejg());
+						resolEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
+						
+						resolEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						resolEjg.setFechamodificacion(new Date());
+						
+						response = scsEjgResolucionMapper.insert(resolEjg);
+						
+						if (response == 0) {
+							throw (new SigaExceptions("Error no se ha podido insertar la resolucion del Ejg"));
+						}
+					}
 
 					LOGGER.info("Respuesta al borrar el ponente" + response);
 					
