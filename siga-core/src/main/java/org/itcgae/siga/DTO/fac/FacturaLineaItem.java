@@ -5,12 +5,15 @@ import lombok.Data;
 @Data
 public class FacturaLineaItem {
 
+	String idFactura;
+	String numeroLinea;
 	String descripcion;
 	String precioUnitario;
 	String cantidad;
-	String importeNeto;//precioUnitario * cantidad
+	String importeNeto;
 	String tipoIVA;
-	String importeIVA;//precioUnitario * cantidad * iva
-	String importeTotal;//importeNeto + importeIVA
+	String idTipoIVA;
+	String importeIVA;
+	String importeTotal;
 	String importeAnticipado;
 }

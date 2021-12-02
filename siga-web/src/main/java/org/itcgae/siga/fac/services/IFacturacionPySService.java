@@ -16,6 +16,7 @@ import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
+import org.itcgae.siga.DTO.fac.FacturaLineaItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -93,10 +94,14 @@ public interface IFacturacionPySService {
 	
 	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg, HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO guardarObservacionesFactura(FacturaItem item, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO guardaDatosFactura(FacturaItem item, HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO guardarObservacionesAbono(FacturaItem item, HttpServletRequest request) throws Exception;
+	public FacturaLineaDTO getLineasFactura(String idFactura, HttpServletRequest request) throws Exception;
 
-	public FacturaLineaDTO getLineasFactura(FacturaItem item, HttpServletRequest request) throws Exception;
+	public FacturaLineaDTO getLineasAbono(String idAbono, HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO guardarLineasFactura(FacturaLineaItem item, HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO guardarLineasAbono(FacturaLineaItem item, HttpServletRequest request) throws Exception;
 
 }

@@ -54,8 +54,13 @@ import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacFacturacionEliminar;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
+import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
+import org.itcgae.siga.db.entities.FacLineaabono;
+import org.itcgae.siga.db.entities.FacLineaabonoKey;
+import org.itcgae.siga.db.entities.FacLineafactura;
+import org.itcgae.siga.db.entities.FacLineafacturaKey;
 import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
 import org.itcgae.siga.db.entities.FacRegenerarPresentacionAdeudos;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
@@ -72,12 +77,15 @@ import org.itcgae.siga.db.entities.FacTiposproduincluenfactuKey;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfact;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactExample;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.FacAbonoMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -88,6 +96,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacDisquetedevolucionesExtendsMap
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacLineaabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineafacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
@@ -180,6 +189,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacLineafacturaExtendsMapper facLineafacturaExtendsMapper;
+
+	@Autowired
+	private FacLineaabonoExtendsMapper facLineaabonoExtendsMapper;
+
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1452,7 +1467,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				} catch (Exception e) {
 					ret = -3;
 				}
-				error.setCode(ret);	
+				error.setCode(ret);
 				error.setDescription(facElim.getDatosError());	} else {
 					// TODO: borrado de ficheros
 				}
@@ -1589,7 +1604,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	public UpdateResponseDTO guardarObservacionesFactura(FacturaItem item, HttpServletRequest request)
+	public UpdateResponseDTO guardaDatosFactura(FacturaItem item, HttpServletRequest request)
 			throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
@@ -1604,19 +1619,40 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacFacturaExtendsMapper.updateByPrimaryKey -> guardando las observaciones de una factura");
 
-			FacFacturaKey key = new FacFacturaKey();
-			key.setIdfactura(item.getIdFactura());
-			key.setIdinstitucion(usuario.getIdinstitucion());
-			FacFactura updateItem  = facFacturaExtendsMapper.selectByPrimaryKey(key);
+			if(item.getTipo().equalsIgnoreCase("FACTURA")) {
 
-			if(item.getObservacionesFactura()!=null)
-				updateItem.setObservaciones(item.getObservacionesFactura());
-			if(item.getObservacionesFicheroFactura()!=null)
-				updateItem.setObservinforme(item.getObservacionesFicheroFactura());
+				FacFacturaKey key = new FacFacturaKey();
+				key.setIdfactura(item.getIdFactura());
+				key.setIdinstitucion(usuario.getIdinstitucion());
+				FacFactura updateItem  = facFacturaExtendsMapper.selectByPrimaryKey(key);
 
-			facFacturaExtendsMapper.updateByPrimaryKey(updateItem);
+				if(item.getObservacionesFactura()!=null)
+					updateItem.setObservaciones(item.getObservacionesFactura());
+				if(item.getObservacionesFicheroFactura()!=null)
+					updateItem.setObservinforme(item.getObservacionesFicheroFactura());
 
-			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
+				facFacturaExtendsMapper.updateByPrimaryKey(updateItem);
+
+				updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
+			}
+
+			if(item.getTipo().equalsIgnoreCase("ABONO")) {
+
+				FacAbonoKey key = new FacAbonoKey();
+				key.setIdabono(Long.valueOf(item.getIdFactura()));
+				key.setIdinstitucion(usuario.getIdinstitucion());
+				FacAbono updateItem  = facAbonoMapper.selectByPrimaryKey(key);
+
+				if(item.getObservacionesAbono()!=null)
+					updateItem.setObservaciones(item.getObservacionesAbono());
+				if(item.getMotivosAbono()!=null)
+					updateItem.setMotivos(item.getMotivosAbono());
+
+				facAbonoMapper.updateByPrimaryKey(updateItem);
+
+				updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
+			}
+
 		}
 
 		LOGGER.info("guardarObservacionesFactura() -> Salida del servicio para guardar las observaciones de una factura");
@@ -1625,43 +1661,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	public UpdateResponseDTO guardarObservacionesAbono(FacturaItem item, HttpServletRequest request)
-			throws Exception {
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		AdmUsuarios usuario = new AdmUsuarios();
-		List<FacturaItem> items = new ArrayList<>();
-
-		LOGGER.info(
-				"FacturacionPySServiceImpl.guardarObservacionesFactura() -> Entrada al servicio para guardar las observaciones de una factura");
-
-		// Conseguimos información del usuario logeado
-		usuario = authenticationProvider.checkAuthentication(request);
-
-		if (usuario != null) {
-			LOGGER.info("FacFacturaExtendsMapper.updateByPrimaryKey -> guardando las observaciones de una factura");
-
-			FacAbonoKey key = new FacAbonoKey();
-			key.setIdabono(Long.valueOf(item.getIdFactura()));
-			key.setIdinstitucion(usuario.getIdinstitucion());
-			FacAbono updateItem  = facAbonoMapper.selectByPrimaryKey(key);
-
-			if(item.getObservacionesAbono()!=null)
-				updateItem.setObservaciones(item.getObservacionesAbono());
-			if(item.getMotivosAbono()!=null)
-				updateItem.setMotivos(item.getMotivosAbono());
-
-			facAbonoMapper.updateByPrimaryKey(updateItem);
-
-			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
-		}
-
-		LOGGER.info("guardarObservacionesFactura() -> Salida del servicio para guardar las observaciones de una factura");
-
-		return updateResponseDTO;
-	}
-
-	@Override
-	public FacturaLineaDTO getLineasFactura(FacturaItem item, HttpServletRequest request)
+	public FacturaLineaDTO getLineasFactura(String idFactura, HttpServletRequest request)
 			throws Exception {
 		FacturaLineaDTO facturaLineaDTO = new FacturaLineaDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
@@ -1675,7 +1675,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getLineasFactura() -> obteniendo las lineas de la factura");
 
-			List<FacturaLineaItem> items = facLineafacturaExtendsMapper.getLineasFactura(item.getIdFactura(),
+			List<FacturaLineaItem> items = facLineafacturaExtendsMapper.getLineasFactura(idFactura,
 					usuario.getIdinstitucion().toString());
 
 			facturaLineaDTO.setFacturasLineasItems(items);
@@ -1685,6 +1685,150 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				"FacturacionPySServiceImpl.getLineasFactura() -> Salida del servicio  para obtener las lineas de la factura");
 
 		return facturaLineaDTO;
+	}
+
+	@Override
+	public FacturaLineaDTO getLineasAbono(String idAbono, HttpServletRequest request)
+			throws Exception {
+		FacturaLineaDTO facturaLineaDTO = new FacturaLineaDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getLineasAbono() -> Entrada al servicio para obtener las lineas de la factura");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("FacturacionPySServiceImpl.getLineasAbono() -> obteniendo las lineas de la factura");
+
+			List<FacturaLineaItem> items = facLineaabonoExtendsMapper.getLineasAbono(idAbono,
+					usuario.getIdinstitucion().toString());
+
+			facturaLineaDTO.setFacturasLineasItems(items);
+		}
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getLineasAbono() -> Salida del servicio  para obtener las lineas de la factura");
+
+		return facturaLineaDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO guardarLineasFactura(FacturaLineaItem item, HttpServletRequest request)
+			throws Exception {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.guardarLineasFactura() -> Entrada al servicio para guardar las lineas de una factura");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("FacFacturaExtendsMapper.updateByPrimaryKey -> guardando las lineas de una factura");
+
+			GenParametrosKey genKey = new GenParametros();
+			genKey.setIdinstitucion(usuario.getIdinstitucion());
+			genKey.setModulo("FAC");
+
+			genKey.setParametro("MODIFICAR_DESCRIPCION");
+			boolean modificarDescripcion = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+
+			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
+			boolean modificarImporteUnitario = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+
+			genKey.setParametro("MODIFICAR_IVA");
+			boolean modificarIVA = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+
+			FacLineafacturaKey key = new FacLineafacturaKey();
+			key.setIdfactura(item.getIdFactura());
+			key.setNumerolinea(Long.valueOf(item.getNumeroLinea()));
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			FacLineafactura updateItem  = facLineafacturaExtendsMapper.selectByPrimaryKey(key);
+
+			if(modificarDescripcion && item.getDescripcion() != null){
+				updateItem.setDescripcion(item.getDescripcion());
+			}
+
+			if(modificarImporteUnitario && item.getPrecioUnitario() != null){
+				updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
+			}
+
+			if(modificarIVA && item.getTipoIVA() != null){
+				updateItem.setIdtipoiva(Integer.valueOf(item.getIdTipoIVA()));
+			}
+
+			if(item.getCantidad() != null){
+				updateItem.setCantidad(Integer.valueOf(item.getCantidad()));
+			}
+
+			if(item.getImporteAnticipado() != null){
+				updateItem.setImporteanticipado(BigDecimal.valueOf(Double.parseDouble(item.getImporteAnticipado())));
+			}
+
+			facLineafacturaExtendsMapper.updateByPrimaryKey(updateItem);
+
+			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
+		}
+
+		LOGGER.info("guardarLineasFactura() -> Salida del servicio para guardar las lineas de una factura");
+
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO guardarLineasAbono(FacturaLineaItem item, HttpServletRequest request)
+			throws Exception {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.guardarLineasAbono() -> Entrada al servicio para guardar las lineas de una factura");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("FacFacturaExtendsMapper.updateByPrimaryKey -> guardando las lineas de una factura");
+
+			GenParametrosKey genKey = new GenParametros();
+			genKey.setIdinstitucion(usuario.getIdinstitucion());
+			genKey.setModulo("FAC");
+
+			genKey.setParametro("MODIFICAR_DESCRIPCION");
+			boolean modificarDescripcion = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+
+			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
+			boolean modificarImporteUnitario = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+
+			FacLineaabonoKey key = new FacLineaabonoKey();
+			key.setIdabono(Long.valueOf(item.getIdFactura()));
+			key.setNumerolinea(Long.valueOf(item.getNumeroLinea()));
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			FacLineaabono updateItem  = facLineaabonoExtendsMapper.selectByPrimaryKey(key);
+
+			if(modificarDescripcion && item.getDescripcion() != null){
+				updateItem.setDescripcionlinea(item.getDescripcion());
+			}
+
+			if(modificarImporteUnitario && item.getPrecioUnitario() != null){
+				updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
+			}
+
+			if(item.getCantidad() != null){
+				updateItem.setCantidad(Integer.valueOf(item.getCantidad()));
+			}
+
+			facLineaabonoExtendsMapper.updateByPrimaryKey(updateItem);
+
+			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
+		}
+
+		LOGGER.info("guardarLineasAbono() -> Salida del servicio para guardar las lineas de una factura");
+
+		return updateResponseDTO;
 	}
 
 	@Override
@@ -1772,13 +1916,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		
 		// Conseguimos información del usuario logeado
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
-		
-		FacFacturacionprogramada facProg= creaFacturacionProgramadaDesdeItem(facItem, usuario);
 
 		LOGGER.info("insertarProgramacionFactura() -> Entrada al servicio para crear una programación de factura");
 
 		if (usuario != null) {
+				FacFacturacionprogramada facProg = creaFacturacionProgramadaDesdeItem(facItem, usuario);
 				facFacturacionprogramadaExtendsMapper.insertSelective(facProg);
+
+				insertResponseDTO.setId(facProg.getIdprogramacion().toString());
 		}
 
 		LOGGER.info("insertarProgramacionFactura() -> Salida del servicio para crear una programación de factura");
@@ -1789,9 +1934,42 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private FacFacturacionprogramada creaFacturacionProgramadaDesdeItem(FacFacturacionprogramadaItem facItem, AdmUsuarios usuario) {
 		FacFacturacionprogramada fac = new FacFacturacionprogramada();
-		
-		fac.setIdprogramacion(string2Long(facItem.getIdProgramacion()));
+
+		String idProgramacion = facFacturacionprogramadaExtendsMapper.getNextIdFacturacionProgramada(usuario.getIdinstitucion(), Long.parseLong(facItem.getIdSerieFacturacion())).getNewId();
+
+		fac.setUsumodificacion(usuario.getIdusuario());
+		fac.setFechamodificacion(new Date());
+		fac.setFechaprogramacion(new Date());
+
+		// Clave primaria
+		fac.setIdprogramacion(string2Long(idProgramacion));
 		fac.setIdseriefacturacion(string2Long(facItem.getIdSerieFacturacion()));
+		fac.setIdinstitucion(usuario.getIdinstitucion());
+
+		// Comprobamos que la descripción sea única
+		if (!UtilidadesString.esCadenaVacia(facItem.getDescripcion())) {
+			FacFacturacionprogramadaExample descUnica = new FacFacturacionprogramadaExample();
+			descUnica.createCriteria()
+					.andIdseriefacturacionEqualTo(string2Long(facItem.getIdSerieFacturacion()))
+					.andIdinstitucionEqualTo(usuario.getIdinstitucion())
+					.andDescripcionEqualTo(facItem.getDescripcion().trim());
+			long descCount = facFacturacionprogramadaExtendsMapper.countByExample(descUnica);
+
+			if (descCount > 0) {
+				fac.setDescripcion(facItem.getDescripcion().trim() + " [" + idProgramacion + "]");
+			} else {
+				fac.setDescripcion(facItem.getDescripcion().trim());
+			}
+		}
+
+		// Tarjeta de datos generales
+		fac.setFechainicioproductos(facItem.getFechaInicioProductos());
+		fac.setFechafinproductos(facItem.getFechaFinProductos());
+		fac.setFechainicioservicios(facItem.getFechaInicioServicios());
+		fac.setFechafinservicios(facItem.getFechaFinServicios());
+		fac.setFechaprevistageneracion(facItem.getFechaPrevistaGeneracion());
+		fac.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
+
 
 //		Campos sin correspondencia en facItem
 //		fac.setConfdeudor(facItem.get);
@@ -1801,43 +1979,77 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 //		fac.setFechacargo(facItem.get);
 //		fac.setIdprevision(facItem.get);
 //		fac.setIdtipoenvios(facItem.get);
-		
-		fac.setDescripcion(facItem.getDescripcion());
-		fac.setEnvio(boolToString10(facItem.getEnvio()));
 
-		fac.setFechaconfirmacion(facItem.getFechaConfirmacion());
-		fac.setFechafinproductos(facItem.getFechaFinProductos());
-		fac.setFechafinservicios(facItem.getFechaFinServicios());
-		fac.setFechainicioproductos(facItem.getFechaInicioProductos());
-		fac.setFechainicioservicios(facItem.getFechaInicioServicios());
-		fac.setFechamodificacion(facItem.getFechaModificacion());
-		fac.setFechapresentacion(facItem.getFechaPresentacion());
-		fac.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
-		fac.setFechaprevistageneracion(facItem.getFechaPrevistaGeneracion());
-		fac.setFechaprogramacion(facItem.getFechaProgramacion());
-		fac.setFecharealgeneracion(facItem.getFechaRealGeneracion());
-		fac.setFecharecibosb2b(facItem.getFechaRecibosB2B());
-		fac.setFechareciboscor1(facItem.getFechaRecibosCOR1());
-		fac.setFecharecibosprimeros(facItem.getFechaRecibosPrimeros());
-		fac.setFecharecibosrecurrentes(facItem.getFechaRecibosRecurrentes());
-		fac.setGenerapdf(boolToString10(facItem.getGeneraPDF()));
-		fac.setIdestadoconfirmacion(string2Short(facItem.getIdEstadoConfirmacion()));
-		fac.setIdestadoenvio(string2Short(facItem.getIdEstadoEnvio()));
-		fac.setIdestadopdf(string2Short(facItem.getIdEstadoPDF()));
-		fac.setIdestadotraspaso(string2Short(facItem.getIdEstadoTraspaso()));
+		// Recuperamos la serie de facturación para copiar las columnas
+		FacSeriefacturacionKey serieKey = new FacSeriefacturacionKey();
+		serieKey.setIdinstitucion(usuario.getIdinstitucion());
+		serieKey.setIdseriefacturacion(Long.parseLong(facItem.getIdSerieFacturacion()));
 
-		fac.setIdtipoplantillamail(string2Integer(facItem.getIdTipoPlantillaMail()));
-		fac.setLogerror(facItem.getLogError());
-		fac.setLogtraspaso(facItem.getLogTraspaso());
-		fac.setNombrefichero(facItem.getNombreFichero());
-		fac.setTraspasoCodauditoriaDef(facItem.getTraspasoCodAuditoriaDef());
-		fac.setTraspasofacturas(boolToString10(facItem.getTraspasoFacturas()));
-		fac.setTraspasoPlantilla(facItem.getTraspasoPlatilla());
-		
-		if(usuario!=null) {
-			fac.setUsumodificacion(usuario.getIdusuario());
-			fac.setIdinstitucion(usuario.getIdinstitucion());
+		FacSeriefacturacion seriefacturacion = facSeriefacturacionExtendsMapper.selectByPrimaryKey(serieKey);
+
+		// Copiar columnas de serie de facturación
+		fac.setConfdeudor(seriefacturacion.getConfdeudor());
+		fac.setConfingresos(seriefacturacion.getConfingresos());
+		fac.setCtaclientes(seriefacturacion.getCtaclientes());
+		fac.setCtaingresos(seriefacturacion.getCtaingresos());
+
+
+		// Datos de la tarjeta generación de ficheros
+		fac.setGenerapdf(seriefacturacion.getGenerarpdf());
+		// seriefacturacion.getIdmodelofactura();
+		// seriefacturacion.getIdmodelorectificativa();
+		if (!UtilidadesString.esCadenaVacia(seriefacturacion.getGenerarpdf()) && seriefacturacion.getGenerarpdf().equals("1")) {
+			fac.setIdestadopdf(Short.parseShort("7")); // Pendiente
+		} else {
+			fac.setIdestadopdf(Short.parseShort("5")); // No aplica
 		}
+
+		// Datos de la tarjeta envío facturas
+		fac.setEnvio(seriefacturacion.getEnviofacturas());
+		fac.setIdtipoplantillamail(seriefacturacion.getIdtipoplantillamail());
+		fac.setIdtipoenvios(seriefacturacion.getIdtipoenvios());
+		if (!UtilidadesString.esCadenaVacia(seriefacturacion.getEnviofacturas()) && seriefacturacion.getEnviofacturas().equals("1")) {
+			fac.setIdestadoenvio(Short.parseShort("13")); // Pendiente
+		} else {
+			fac.setIdestadoenvio(Short.parseShort("11")); // No aplica
+		}
+
+		// Datos de la tarjeta generación de traspasos
+		fac.setTraspasofacturas(seriefacturacion.getTraspasofacturas());
+		fac.setTraspasoPlantilla(seriefacturacion.getTraspasoPlantilla());
+		fac.setTraspasoCodauditoriaDef(seriefacturacion.getTraspasoCodauditoriaDef());
+		if (!UtilidadesString.esCadenaVacia(seriefacturacion.getTraspasofacturas()) && seriefacturacion.getTraspasofacturas().equals("1")) {
+			fac.setIdestadotraspaso(Short.parseShort("24")); // Pendiente
+		} else {
+			fac.setIdestadotraspaso(Short.parseShort("22")); // No aplica
+		}
+
+		fac.setArchivarfact(boolToString10(false)); //Desarchivada por defecto
+		fac.setIdestadoconfirmacion(Short.parseShort("18")); // Generación programada
+		fac.setVisible("S");
+
+		// fac.setFechaconfirmacion(facItem.getFechaConfirmacion());
+		// fac.setFechamodificacion(facItem.getFechaModificacion());
+		// fac.setFechapresentacion(facItem.getFechaPresentacion());
+		// fac.setFechaprogramacion(facItem.getFechaProgramacion());
+		// fac.setFecharealgeneracion(facItem.getFechaRealGeneracion());
+		// fac.setFecharecibosb2b(facItem.getFechaRecibosB2B());
+		// fac.setFechareciboscor1(facItem.getFechaRecibosCOR1());
+		// fac.setFecharecibosprimeros(facItem.getFechaRecibosPrimeros());
+		// fac.setFecharecibosrecurrentes(facItem.getFechaRecibosRecurrentes());
+		// fac.setGenerapdf(boolToString10(facItem.getGeneraPDF()));
+		// fac.setIdestadoenvio(string2Short(facItem.getIdEstadoEnvio()));
+		// fac.setIdestadopdf(string2Short(facItem.getIdEstadoPDF()));
+		// fac.setIdestadotraspaso(string2Short(facItem.getIdEstadoTraspaso()));
+
+		// fac.setIdtipoplantillamail(string2Integer(facItem.getIdTipoPlantillaMail()));
+		// fac.setLogerror(facItem.getLogError());
+		// fac.setLogtraspaso(facItem.getLogTraspaso());
+		// fac.setNombrefichero(facItem.getNombreFichero());
+		// fac.setTraspasoCodauditoriaDef(facItem.getTraspasoCodAuditoriaDef());
+		// fac.setTraspasofacturas(boolToString10(facItem.getTraspasoFacturas()));
+		// fac.setTraspasoPlantilla(facItem.getTraspasoPlatilla());
+
 		
 		return fac;
 	}

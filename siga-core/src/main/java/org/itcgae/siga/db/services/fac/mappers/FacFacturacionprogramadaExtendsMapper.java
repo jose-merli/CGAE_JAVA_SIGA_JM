@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.FacFacturacionprogramadaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacFacturacionprogramadaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -64,6 +65,10 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
         @Result(column = "modelorectificativa", property = "modeloRectificativa", jdbcType = JdbcType.VARCHAR)
     })
     List<FacFacturacionprogramadaItem> getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramada, Short idInstitucion, String idioma, Integer rownum);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNextIdFacturacionProgramada")
+    @Results({ @Result(column = "idprogramacion", property = "newId", jdbcType = JdbcType.VARCHAR) })
+    NewIdDTO getNextIdFacturacionProgramada(Short idInstitucion, Long idSerieFacturacion);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "comboFacturaciones")
     @Results({

@@ -65,8 +65,8 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.FROM("fac_facturacionprogramada facprog");
 
         // Joins
-        sql.INNER_JOIN("fac_seriefacturacion seriefac ON ( facprog.idinstitucion = seriefac.idinstitucion AND facprog.idseriefacturacion = seriefac.idseriefacturacion )");
-        sql.INNER_JOIN("fac_factura f ON ( f.idinstitucion = facprog.idinstitucion AND f.idseriefacturacion = facprog.idseriefacturacion AND f.idprogramacion = facprog.idprogramacion )");
+        sql.LEFT_OUTER_JOIN("fac_seriefacturacion seriefac ON ( facprog.idinstitucion = seriefac.idinstitucion AND facprog.idseriefacturacion = seriefac.idseriefacturacion )");
+        sql.LEFT_OUTER_JOIN("fac_factura f ON ( f.idinstitucion = facprog.idinstitucion AND f.idseriefacturacion = facprog.idseriefacturacion AND f.idprogramacion = facprog.idprogramacion )");
 
         //Where
         sql.WHERE("facprog.idinstitucion = seriefac.idinstitucion");
@@ -76,7 +76,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
 
         // Buscar por idprogramacion
         if (!UtilidadesString.esCadenaVacia(facturacionProgramada.getIdProgramacion()))
-            sql.WHERE("seriefac.idprogramacion = " + facturacionProgramada.getIdProgramacion());
+            sql.WHERE("facprog.idprogramacion = " + facturacionProgramada.getIdProgramacion());
 
         // Filtros
 
@@ -187,6 +187,17 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
             sqlGlobal.WHERE("importe <= to_number('" + facturacionProgramada.getImporteHasta() + "', '99999999999999999.99')");
 
         return sqlGlobal.toString();
+    }
+
+    public String getNextIdFacturacionProgramada(Short idInstitucion, Long idSerieFacturacion) {
+        SQL sql = new SQL();
+
+        sql.SELECT("(NVL(MAX(fp.idprogramacion),0) + 1) as idprogramacion");
+        sql.FROM("fac_facturacionprogramada fp");
+        sql.WHERE("fp.idinstitucion = " + idInstitucion);
+        sql.WHERE("fp.idseriefacturacion = " + idSerieFacturacion);
+
+        return sql.toString();
     }
 
     public String comboFacturaciones(Short idInstitucion) {

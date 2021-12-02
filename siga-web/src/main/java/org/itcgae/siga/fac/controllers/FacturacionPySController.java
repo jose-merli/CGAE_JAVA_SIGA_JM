@@ -16,6 +16,7 @@ import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
+import org.itcgae.siga.DTO.fac.FacturaLineaItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -472,28 +473,13 @@ public class FacturacionPySController {
 	}
 
 
-	@PostMapping(value = "/guardarObservacionesFactura")
-	ResponseEntity<UpdateResponseDTO> guardarObservacionesFactura(@RequestBody FacturaItem item, HttpServletRequest request) {
+	@PostMapping(value = "/guardaDatosFactura")
+	ResponseEntity<UpdateResponseDTO> guardaDatosFactura(@RequestBody FacturaItem item, HttpServletRequest request) {
 
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
 		try {
-			response = facturacionService.guardarObservacionesFactura(item, request);
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.getMessage()));
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-
-	@PostMapping(value = "/guardarObservacionesAbono")
-	ResponseEntity<UpdateResponseDTO> guardarObservacionesAbono(@RequestBody FacturaItem item, HttpServletRequest request) {
-
-		UpdateResponseDTO response = new UpdateResponseDTO();
-
-		try {
-			response = facturacionService.guardarObservacionesAbono(item, request);
+			response = facturacionService.guardaDatosFactura(item, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -502,12 +488,12 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/getLineasFactura")
-	ResponseEntity<FacturaLineaDTO> getLineasFactura(@RequestBody FacturaItem item,
+	ResponseEntity<FacturaLineaDTO> getLineasFactura(@RequestBody String idFactura,
 										   HttpServletRequest request) {
 		FacturaLineaDTO response = new FacturaLineaDTO();
 
 		try {
-			response = facturacionService.getLineasFactura(item, request);
+			response = facturacionService.getLineasFactura(idFactura, request);
 
 			if(response.getFacturasLineasItems().size()==200) {
 				response.setError(UtilidadesString.creaInfoResultados());
@@ -519,4 +505,53 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+    @PostMapping(value = "/getLineasAbono")
+    ResponseEntity<FacturaLineaDTO> getLineasAbono(@RequestBody String idAbono,
+                                                     HttpServletRequest request) {
+        FacturaLineaDTO response = new FacturaLineaDTO();
+
+        try {
+            response = facturacionService.getLineasAbono(idAbono, request);
+
+            if(response.getFacturasLineasItems().size()==200) {
+                response.setError(UtilidadesString.creaInfoResultados());
+            }
+
+            return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/guardarLineasFactura")
+    ResponseEntity<UpdateResponseDTO> guardarLineasFactura(@RequestBody FacturaLineaItem item,
+                                                     HttpServletRequest request) {
+
+        UpdateResponseDTO response = new UpdateResponseDTO();
+
+        try {
+            response = facturacionService.guardarLineasFactura(item, request);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/guardarLineasAbono")
+    ResponseEntity<UpdateResponseDTO> guardarLineasAbono(@RequestBody FacturaLineaItem item,
+                                                   HttpServletRequest request) {
+
+        UpdateResponseDTO response = new UpdateResponseDTO();
+
+        try {
+            response = facturacionService.guardarLineasAbono(item, request);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

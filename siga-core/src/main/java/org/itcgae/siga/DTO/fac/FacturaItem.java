@@ -47,6 +47,8 @@ public class FacturaItem {
 	Date ultimaComunicacion;
 	String nombreInstitucion;
 
+	String importePagado;
+
 	//Actualizar observaciones factura
 	String observacionesFactura;
 	String observacionesFicheroFactura;
