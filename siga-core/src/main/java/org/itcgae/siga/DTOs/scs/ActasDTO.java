@@ -10,24 +10,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ActasDTO {
 
-	private List<ActasItem> actasItem = new ArrayList<ActasItem>();
+	private List<ActasItem> actasItems = new ArrayList<ActasItem>();
 	private Error error = null;
 
 	/**
 	 * 
 	 **/
-	public ActasDTO actasItem(List<ActasItem> actasItem) {
-		this.actasItem = actasItem;
+	public ActasDTO actasItems(List<ActasItem> actasItems) {
+		this.actasItems = actasItems;
 		return this;
 	}
 
-	@JsonProperty("actasItem")
-	public List<ActasItem> getAreasItems() {
-		return actasItem;
+	@JsonProperty("actasItems")
+	public List<ActasItem> getActasItems() {
+		return actasItems;
 	}
 
-	public void setAreasItems(List<ActasItem> areasItems) {
-		this.actasItem = areasItems;
+	public void setActasItems(List<ActasItem> actasItems) {
+		this.actasItems = actasItems;
 	}
 
 	/**
@@ -56,20 +56,20 @@ public class ActasDTO {
 			return false;
 		}
 		ActasDTO actasDTO = (ActasDTO) o;
-		return Objects.equals(this.actasItem, actasDTO.actasItem) && Objects.equals(this.error, actasDTO.error);
+		return Objects.equals(this.actasItems, actasDTO.actasItems) && Objects.equals(this.error, actasDTO.error);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(actasItem, error);
+		return Objects.hash(actasItems, error);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("class areasDTO {\n");
+		sb.append("class actasDTO {\n");
 
-		sb.append("    areasItems: ").append(toIndentedString(actasItem)).append("\n");
+		sb.append("    actasItems: ").append(toIndentedString(actasItems)).append("\n");
 		sb.append("    error: ").append(toIndentedString(error)).append("\n");
 		sb.append("}");
 		return sb.toString();
@@ -85,4 +85,9 @@ public class ActasDTO {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+
+	public void actasItem(List<ActasItem> busquedaActas) {
+		this.actasItems = busquedaActas;
+	}
+
 }

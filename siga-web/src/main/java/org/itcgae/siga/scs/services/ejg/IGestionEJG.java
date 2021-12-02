@@ -53,7 +53,7 @@ public interface IGestionEJG {
 
 	ComboDTO comboOrigen(HttpServletRequest request);
 
-	ComboDTO comboActaAnnio(String idActa, HttpServletRequest request);
+	ComboDTO comboActaAnnio(String idActa, String anioActa, HttpServletRequest request);
 
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request);
 

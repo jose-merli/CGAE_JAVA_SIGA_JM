@@ -75,7 +75,6 @@ import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
-import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
@@ -102,19 +101,12 @@ import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsAsistencia;
-import org.itcgae.siga.db.entities.ScsAsistenciaKey;
-import org.itcgae.siga.db.entities.ScsContrariosasistencia;
-import org.itcgae.siga.db.entities.ScsContrariosasistenciaExample;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
-import org.itcgae.siga.db.entities.ScsContrariosdesignaExample;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsContrariosejgExample;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
-import org.itcgae.siga.db.entities.ScsDefendidosdesignaExample;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
-import org.itcgae.siga.db.entities.ScsDelitosasistencia;
-import org.itcgae.siga.db.entities.ScsDelitosasistenciaExample;
 import org.itcgae.siga.db.entities.ScsDelitosdesigna;
 import org.itcgae.siga.db.entities.ScsDelitosdesignaExample;
 import org.itcgae.siga.db.entities.ScsDelitosejg;
@@ -145,14 +137,8 @@ import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsProcedimientosKey;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
-import org.itcgae.siga.db.entities.ScsSoj;
-import org.itcgae.siga.db.entities.ScsSojKey;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
-import org.itcgae.siga.db.entities.ScsTipodictamenejgExample;
-import org.itcgae.siga.db.entities.ScsTiporesolauto;
-import org.itcgae.siga.db.entities.ScsTiporesolautoExample;
 import org.itcgae.siga.db.entities.ScsTiporesolucion;
-import org.itcgae.siga.db.entities.ScsTiporesolucionExample;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
@@ -171,7 +157,6 @@ import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosejgMapper;
-import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaprocuradorMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
@@ -184,7 +169,6 @@ import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
-import org.itcgae.siga.db.mappers.ScsTiporesolautoMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -277,7 +261,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
 
 	@Autowired
-	private ScsDesignaMapper scsDesignaMapper;
+	private ScsDesignacionesExtendsMapper scsDesignaMapper;
 
 	@Autowired
 	private ScsSaltoscompensacionesMapper scsSaltoscompensacionesMapper;
@@ -3279,7 +3263,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				unLetrado = alLetradosOrdenados.get(punteroUltimo);
 
 				scsDesignacionesExtendsMapper.cambiarUltimoCola(unLetrado.getIdinstitucion().toString(),
-						unLetrado.getIdturno().toString(), unLetrado.getIdpersona().toString(),
+						unLetrado.getIdTurno().toString(), unLetrado.getIdpersona().toString(),
 						unLetrado.getInscripcionTurno().getFechasolicitud(), usuario);
 
 			}
@@ -3604,7 +3588,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				letradoSeleccionado.setIdpersona(elem.getIdpersona());
 				letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
 				letradoSeleccionado.setIdSaltoCompensacion(elem.getIdSaltoCompensacion());
-				letradoSeleccionado.setIdturno(elem.getIdturno());
+				letradoSeleccionado.setIdTurno(elem.getIdTurno());
 				letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
 				letradoSeleccionado.setSaltoocompensacion("C");
 				alLetradosCompensados.add(letradoSeleccionado);
@@ -4624,9 +4608,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public ScsDesigna busquedaDesignaActual(ScsDesigna item, HttpServletRequest request) {
+	public DesignaItem busquedaDesignaActual(ScsDesigna item, HttpServletRequest request) {
 		LOGGER.info("DesignacionesServiceImpl.busquedaDesigna() -> Entrada al servicio servicio");
-		ScsDesigna designa = null;
+		List<DesignaItem> designasList = null;
+		DesignaItem designa = null;
 		// List<GenParametros> tamMax = null;
 		// Integer tamMaximo = null;
 
@@ -4647,22 +4632,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-//			GenParametrosExample genParametrosExample = new GenParametrosExample();
-//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-//			LOGGER.info(
-//					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-//			LOGGER.info(
-//					"DesignacionesServiceImpl.busquedaDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			if (tamMax != null) {
-//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-//			} else {
-//				tamMaximo = null;
-//			}
-
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
 						"DesignacionesServiceImpl.busquedaDesigna -> Entrada a servicio para la busqueda de contrarios");
@@ -4675,7 +4644,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					key.setIdturno(item.getIdturno());
 					key.setNumero(item.getNumero());
 
-					designa = scsDesignaMapper.selectByPrimaryKey(key);
+					designasList = scsDesignaMapper.busquedaDesignaActual(key);
+					if(designasList!= null && ! designasList.isEmpty()) {
+						designa = designasList.get(0);
+					}
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.busquedaDesigna -> Salida del servicio");
@@ -4723,7 +4695,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 					for (ListaLetradosDesignaItem letrado : listaLetrados) {
 						String Fecha = formatter.format(letrado.getFechaDesignacion());
-						String fechaDesginacion = Fecha;
 					}
 
 				} catch (Exception e) {

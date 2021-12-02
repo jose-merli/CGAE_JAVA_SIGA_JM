@@ -251,4 +251,11 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL),
 	        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP) })
 	    List<InscripcionesItem> obtenerColegiadoInscritoTurno(Short idInstitucion, String idTurno, String idPersona);
+	 
+	 @SelectProvider(type = ScsInscripcionesTurnoSqlExtendsProvider.class, method = "comboTurnosInscritoLetrado")
+		@Results({
+			@Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+		})
+		List<ComboItem> comboTurnosInscritoLetrado(Short idInstitucion, String idPersona);
 }

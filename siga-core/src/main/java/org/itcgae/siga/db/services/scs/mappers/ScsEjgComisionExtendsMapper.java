@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsActaSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgComisionSqlExtendsProvider;
 
 public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
@@ -32,16 +33,43 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NOMBREletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
+			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER),
+			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<EjgItem> busquedaEJGComision(String idUltimoEstado, EjgItem ejgItem, String string, Integer tamMaximo, String idLenguaje);
+	List<EjgItem> busquedaEJGComision(EjgItem ejgItem, String string, Integer tamMaximo,
+			String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "busquedaEJGActaComision")
+	@Results({
+
+			@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numejg", property = "numEjg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idInstitucion", property = "idInstitucion", jdbcType = JdbcType.INTEGER),
+			@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TURNOGUARDIA", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaapertura", property = "fechaApertura", jdbcType = JdbcType.DATE),
+			@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER),
+			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR)
+
+	})
+	List<EjgItem> busquedaEJGActaComision(EjgItem ejgItem, String string, Integer tamMaximo,
+			String idLenguaje);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "comboColegioEjgComision")
 	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
 	List<ComboItem> comboColegioEjgComision(String idinstitucion);
-	
+
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "idUltimoEstado")
 	@Results({})
 	String idUltimoEstado(EjgItem ejgItem, String idinstitucion);
@@ -99,32 +127,34 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 	List<ComboItem> comboAnioActa(Short idInstitucion);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "comboResolucion")
-	@Results({ 
-			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> comboResolucion(Short idLenguaje,String idInstitucionp);
+	List<ComboItem> comboResolucion(Short idLenguaje, String idInstitucionp);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "obligatoriedadResolucion")
-	@Results({ 
-			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> obligatoriedadResolucion(Short idInstitucion);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "comboPresidente")
-	@Results({ 
-			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboPresidente(String string);
+
+	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "getEtiquetasPonente")
+	@Results({ @Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR) })
+	String getEtiquetasPonente(Short idLenguaje);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "busquedaActas")
 	@Results({
 
 			@Result(column = "ANIOACTA", property = "anio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROACTA", property = "acta", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPRESIDENTE", property = "presidente", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDSECRETARIO", property = "secretario", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAREUNION", property = "fechaReunion", jdbcType = JdbcType.DATE),
-			@Result(column = "FECHARESOLUCION", property = "fechaResolucion", jdbcType = JdbcType.DATE)
+			@Result(column = "IDPRESIDENTE", property = "Idpresidente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDSECRETARIO", property = "Idsecretario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAREUNION", property = "fechareunion", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHARESOLUCION", property = "fecharesolucion", jdbcType = JdbcType.DATE)
 	})
 	List<ActasItem> busquedaActas(ActasItem actasItem);
+
 }

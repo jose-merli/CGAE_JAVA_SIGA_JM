@@ -6,9 +6,10 @@ public class RemesasItem {
 	
 	private int idRemesa;
 	private int idInstitucion;
-	private int prefijo;
-	private int numero; 
-	private int sufijo;
+	private String prefijo;
+	private String numero; 
+	private String sufijo;
+	private String nRegistro;
 	private String descripcion;
 	private Date fechaGeneracion;
 	private Date fechaEnvio;
@@ -16,6 +17,9 @@ public class RemesasItem {
 	private String estado;
 	private int incidenciasEJG;
 	private int totalEJG;
+	private String incidencias;
+	private String comboIncidencia;
+	private boolean informacionEconomica;
 	
 	public int getIdRemesa() {
 		return idRemesa;
@@ -24,37 +28,37 @@ public class RemesasItem {
 	public void setIdRemesa(int idRemesa) {
 		this.idRemesa = idRemesa;
 	}
-	
-	public int getidInstitucion() {
-		return idInstitucion;
-	}
 
-	public void setidInstitucion(int idInstitucion) {
-		this.idInstitucion = idInstitucion;
-	}
-
-	public int getPrefijo() {
+	public String getPrefijo() {
 		return prefijo;
 	}
 	
-	public void setPrefijo(int prefijo) {
+	public void setPrefijo(String prefijo) {
 		this.prefijo = prefijo;
 	}
 	
-	public int getNumero() {
+	public String getNumero() {
 		return numero;
 	}
 	
-	public void setNumero(int numero) {
+	public void setNumero(String numero) {
 		this.numero = numero;
 	}
 	
-	public int getSufijo() {
+	public String getSufijo() {
 		return sufijo;
 	}
 	
-	public void setSufijo(int sufijo) {
+	public void setSufijo(String sufijo) {
 		this.sufijo = sufijo;
+	}
+
+	public String getnRegistro() {
+		return nRegistro;
+	}
+
+	public void setnRegistro(String nRegistro) {
+		this.nRegistro = nRegistro;
 	}
 	
 	public String getDescripcion() {
@@ -112,5 +116,29 @@ public class RemesasItem {
 	public void setTotalEJG(int totalEJG) {
 		this.totalEJG = totalEJG;
 	}
-		
+
+	public String getIncidencias() {
+		return incidencias;
+	}
+
+	public void setIncidencias(String incidencias) {
+		this.incidencias = incidencias;
+	}
+
+	public String getComboIncidencia() {
+		return comboIncidencia;
+	}
+
+	public void setComboIncidencia(String comboIncidencia) {
+		this.comboIncidencia = comboIncidencia;
+	}
+
+	public boolean isInformacionEconomica() {
+		return informacionEconomica;
+	}
+
+	public void setInformacionEconomica(boolean informacionEconomica) {
+		this.informacionEconomica = informacionEconomica;
+	}
+	
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.itcgae.siga.DTOs.gen.Error;
 
 public class RelacionesDTO {
 	  private List<RelacionesItem> relacionesItem = new ArrayList<RelacionesItem>();

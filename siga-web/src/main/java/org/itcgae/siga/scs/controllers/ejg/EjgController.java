@@ -30,6 +30,7 @@ import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
@@ -266,8 +267,8 @@ public class EjgController {
 
 	// comboActaAnnio
 	@RequestMapping(value = "/gestion-ejg/comboActaAnnio", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboActaAnnio(String idActa, HttpServletRequest request) {
-		ComboDTO response = gestionEJG.comboActaAnnio(idActa, request);
+	ResponseEntity<ComboDTO> comboActaAnnio(String idActa, String anioActa, HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboActaAnnio(idActa, anioActa, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
@@ -430,7 +431,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> guardarResolucion(@RequestBody ResolucionEJGItem datos,
 			HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.guardarResolucion(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -564,7 +565,7 @@ public class EjgController {
 
 	// [ sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero,
 	// ejg.tipoEJG, this.generalBody.apellidos.concat(",", this.generalBody.nombre)]
-	@RequestMapping(value = "/gestion-ejg/updateRepresentanteContrarioEJGEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/gestion-ejg/updateRepresentanteContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateRepresentanteContrarioEJG(@RequestBody String[] item,
 			HttpServletRequest request) {
 		ScsContrariosejg contrario = new ScsContrariosejg();
@@ -573,6 +574,11 @@ public class EjgController {
 		contrario.setIdtipoejg(Short.parseShort(item[3]));
 		contrario.setNumero(Long.parseLong(item[2]));
 		contrario.setNombrerepresentanteejg(item[4]);
+		
+		if (item[5] != null) {
+			contrario.setIdrepresentanteejg(Long.parseLong(item[5]));
+		}
+		
 		UpdateResponseDTO response = gestionEJG.updateRepresentanteContrarioEJG(contrario, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);

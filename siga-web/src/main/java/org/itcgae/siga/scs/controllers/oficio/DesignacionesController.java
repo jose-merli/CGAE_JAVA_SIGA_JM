@@ -654,7 +654,7 @@ public class DesignacionesController {
 	
 //	[ designa.ano,  designa.idTurno, designa.numero]
 	@RequestMapping(value = "/designas/busquedaDesignacionActual", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ScsDesigna>  busquedaDesignaActual(
+	ResponseEntity<DesignaItem>  busquedaDesignaActual(
 //			@RequestBody ScsDesigna designa,
 			@RequestBody String[] item,
 			HttpServletRequest request) {
@@ -662,13 +662,13 @@ public class DesignacionesController {
 		String ano = item[0].substring(1, 5);
 		designa.setAnio((short) Integer.parseInt(ano));
 		designa.setIdturno(Integer.parseInt(item[1]));
-		designa.setNumero((long) Integer.parseInt(item[2]));
-		ScsDesigna response = designacionesService.busquedaDesignaActual(designa, request);
+        designa.setNumero((long) Integer.parseInt(item[2]));
+        DesignaItem response = designacionesService.busquedaDesignaActual(designa, request);
 		if (response != null) {
-			return new ResponseEntity<ScsDesigna>(response, HttpStatus.OK);
+			return new ResponseEntity<DesignaItem>(response, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<ScsDesigna>(
-					new ScsDesigna(), HttpStatus.OK);
+			return new ResponseEntity<DesignaItem>(
+					new DesignaItem(), HttpStatus.OK);
 		}
 	}
 	
