@@ -93,7 +93,7 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
         if(!ejgItem.isHistorico())
         	sql.WHERE("estado.fechabaja is null");
         
-        sql.ORDER_BY("trunc(estado.fechainicio) desc, E.IDESTADOPOREJG DESC");
+        sql.ORDER_BY("trunc(estado.fechainicio) desc, estado.IDESTADOPOREJG DESC");
         
         return sql.toString();
     }
