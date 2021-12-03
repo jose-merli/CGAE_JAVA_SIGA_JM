@@ -51,6 +51,7 @@ import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsActaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgActaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.scs.services.acta.IBusquedaActa;
 import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
@@ -82,6 +83,9 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 	@Autowired
 	private ScsEstadoejgMapper scsEstadoejgMapper;
+	
+	@Autowired
+	private ScsEstadoejgExtendsMapper scsEstadoejgExtendsMapper;
 
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
@@ -804,6 +808,16 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 											throw new SigaExceptions("No se han actualizado el estado del ejg");
 										}
 										
+										ejgItem.setIdacta(null);
+										ejgItem.setAnioacta(null);
+										ejgItem.setIdinstitucionacta(null);
+										
+										response = scsEjgMapper.updateByPrimaryKey(ejgItem);
+										
+										if (response == 0) {
+											throw (new SigaExceptions("Error al actuaizar el EJG"));
+										}
+										
 										response = borrarActa(acta, ejgItem);
 
 										if (response == 0) {
@@ -820,47 +834,49 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 									LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
 											+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
 											+ scsEjgActa.getNumeroejg());
+									
+									LOGGER.debug("Se busca el ultimo idestadoejg == 20 y se pone fechabaja");
+									
+									ponerFechaBajaEstadosEjg(ejgItem, idInstitucion);
 
-									ScsEstadoejgExample exampleEstado = new ScsEstadoejgExample();
+									ScsEstadoejg scsEstadoejg = new ScsEstadoejg();
+									
+									scsEstadoejg.setAnio(ejgItem.getAnio());
+									scsEstadoejg.setIdinstitucion(idInstitucion);
+									scsEstadoejg.setIdtipoejg(ejgItem.getIdtipoejg());
+									scsEstadoejg.setNumero(ejgItem.getNumero());
+									scsEstadoejg.setObservaciones("Expediente retirado del acta "
+											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+									scsEstadoejg.setIdestadoejg(Short.valueOf("21"));
+									scsEstadoejg.setIdestadoporejg(obtenerUltimoEstadoPorEjg(ejgItem, idInstitucion)+1);
+									scsEstadoejg.setFechainicio(new Date());
+									scsEstadoejg.setFechamodificacion(new Date());
+									scsEstadoejg.setAutomatico("0");
+									scsEstadoejg.setUsumodificacion(usuario.getUsumodificacion());
 
-									exampleEstado.createCriteria().andIdinstitucionEqualTo(ejgItem.getIdinstitucion())
-											.andIdtipoejgEqualTo(ejgItem.getIdtipoejg())
-											.andAnioEqualTo(ejgItem.getAnio()).andNumeroEqualTo(ejgItem.getNumero())
-											.andIdestadoejgEqualTo(Short.valueOf("21"));
-									exampleEstado.setOrderByClause("FECHAMODIFICACION DESC");
-									LOGGER.info("Se busca el estado ejg");
+									response = scsEstadoejgMapper.insert(scsEstadoejg);
 
-									List<ScsEstadoejg> listaEstadoEjg = scsEstadoejgMapper
-											.selectByExample(exampleEstado);
-
-									if(!listaEstadoEjg.isEmpty()) {
-										LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
-
-										// Sacaremos el primer elemento ya que sera el ultimo registro actualizado, por
-										// lo cual sera el que este activo
-										ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
-		
-										LOGGER.info("Añadiendo observaciones");
-		
-										scsEstadoejg.setObservaciones("Expediente pendiente de la CAJG. Se retira del acta "
-												+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-		
-										LOGGER.info("Updateando el estado ejg");
-		
-										response = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoejg);
-										
-										if (response == 0) {
-											throw new SigaExceptions("No se han actualizado el estado del ejg");
-										}
-										
-										response = borrarActa(acta, ejgItem);
-		
-										if (response == 0) {
-											throw new SigaExceptions("No se han podido borrar la relacion entre el acta y el ejg");
-										}
-		
-										updateResponseDTO.setStatus(SigaConstants.OK);
+									if (response == 0) {
+										throw new SigaExceptions("No se ha insertado el estado \"Devuelto Colegio\" del ejg");
 									}
+									
+									ejgItem.setIdacta(null);
+									ejgItem.setAnioacta(null);
+									ejgItem.setIdinstitucionacta(null);
+									
+									response = scsEjgMapper.updateByPrimaryKey(ejgItem);
+									
+									if (response == 0) {
+										throw (new SigaExceptions("Error al actuaizar el EJG"));
+									}
+									
+									response = borrarActa(acta, ejgItem);
+	
+									if (response == 0) {
+										throw new SigaExceptions("No se han podido borrar la relacion entre el acta y el ejg");
+									}
+	
+									updateResponseDTO.setStatus(SigaConstants.OK);
 									
 								}
 
@@ -904,6 +920,65 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		updateResponseDTO.setError(error);
 
 		return updateResponseDTO;
+	}
+	
+	private Long obtenerUltimoEstadoPorEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
+
+		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
+
+		LOGGER.info("Datos para filtrar el estado ejg " + scsEjg.getAnio() + " ");
+
+		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
+				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero()));
+
+		estadoejgExample.setOrderByClause("IDESTADOPOREJG DESC");
+
+		List<ScsEstadoejg> estadoejgObject;
+
+		try {
+			estadoejgObject = scsEstadoejgMapper.selectByExample(estadoejgExample);
+			LOGGER.info("AQUI BUSCANDO EL ESTADO DEL EJG PARA SABER EL TAMAÑO " + estadoejgObject.size());
+
+		} catch (Exception e) {
+			LOGGER.info("No se encuentra el estado para el ejg seleccionado");
+			throw new SigaExceptions("No se encuentra el estado para el ejg seleccionado");
+		}
+
+		return estadoejgObject.get(0).getIdestadoporejg();
+	}
+	
+	private int ponerFechaBajaEstadosEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
+
+		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
+
+		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
+				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
+
+		estadoejgExample.setOrderByClause("IDESTADOPOREJG DESC");
+
+		List<ScsEstadoejg> estadoejgObject;
+
+		try {
+			estadoejgObject = scsEstadoejgMapper.selectByExample(estadoejgExample);
+		} catch (Exception e) {
+			LOGGER.info("No se encuentran los estaodos para este ejg");
+			throw new SigaExceptions("No se encuentran los estaodos para este ejg");
+
+		}
+
+		if (!estadoejgObject.isEmpty()) {
+			LOGGER.info("tamaño de la lista " + estadoejgObject.size());
+			for (ScsEstadoejg scsEstadoejg : estadoejgObject) {
+				if (scsEstadoejg.getIdestadoejg() == 21) {
+					scsEstadoejg.setFechabaja(new Date());
+					int resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoejg);
+					LOGGER.info("Se ha actualizado la fecha de baja? " + resultado);
+				}
+			}
+		}
+		return estadoejgObject.size();
 	}
 
 	@Override
@@ -1278,6 +1353,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 								}
 							}
 							
+							ejgItem.setIdacta(null);
 							ejgItem.setAnioacta(null);
 							ejgItem.setIdinstitucionacta(null);
 							
