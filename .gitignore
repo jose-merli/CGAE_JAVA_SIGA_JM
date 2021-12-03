@@ -581,3 +581,5 @@ siga-parent.iml
 siga-core/siga-core.iml
 siga-web/siga-web.iml
 .gradle/
+siga-core/src/main/resources/rebel-remote.xml
+siga-web/src/main/resources/rebel-remote.xml
