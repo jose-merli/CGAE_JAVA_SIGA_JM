@@ -761,12 +761,14 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 						if (ejgItem != null) {
 
-							// Pendientes guardara el nombre de todos los ejg asociados a ese acta
-							pendientes += scsEjgActa.getAnioacta() + "/" + scsEjgActa.getNumeroejg() + ",";
-
 							// Solo nos interesaran los ejg que tengan el tipo ratificacion 4 o 6
 							if (ejgItem.getIdtiporatificacionejg() != null) {
 								if (ejgItem.getIdtiporatificacionejg() == Short.valueOf("4")) {
+									
+									LOGGER.debug("Se añade el EJG: " + "E" + ejgItem.getAnio() + "/" + ejgItem.getNumejg() +" a la variable pendiente");
+									
+									// Pendientes guardara el nombre de todos los ejg asociados a ese acta
+									pendientes += "E" + ejgItem.getAnio() + "/" + ejgItem.getNumejg() + ",";
 
 									LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
 											+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
@@ -837,6 +839,11 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 									
 									LOGGER.debug("Se busca el ultimo idestadoejg == 20 y se pone fechabaja");
 									
+									LOGGER.debug("Se añade el EJG: " + "E" + ejgItem.getAnio() + "/" + ejgItem.getNumejg() +" a la variable pendiente");
+									
+									// Pendientes guardara el nombre de todos los ejg asociados a ese acta
+									pendientes += "E" + ejgItem.getAnio() + "/" + ejgItem.getNumejg() + ",";
+									
 									ponerFechaBajaEstadosEjg(ejgItem, idInstitucion);
 
 									ScsEstadoejg scsEstadoejg = new ScsEstadoejg();
@@ -886,7 +893,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 						
 						LOGGER.info("Seteando las observaciones");
 
-						acta.setObservaciones(pendientes);
+						acta.setPendientes(pendientes);
 
 						error.setDescription(acta.getPendientes());
 
