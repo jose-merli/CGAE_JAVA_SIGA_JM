@@ -549,6 +549,8 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 				}
 	
 			}catch (Exception e) {
+				LOGGER.error(
+						"guardarRemesaResoluciones() / " + e.getMessage());
 				response = 0;
 				error.setCode(400);
 				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");

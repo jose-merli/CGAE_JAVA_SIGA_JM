@@ -79,19 +79,63 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
         sql.LEFT_OUTER_JOIN("cen_persona persona on (estado.usumodificacion=persona.idpersona)");
         sql.LEFT_OUTER_JOIN("adm_usuarios usuario ON (estado.usumodificacion = usuario.idusuario and estado.idinstitucion = usuario.idinstitucion)");
 
-        if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
+        if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "") {
             sql.WHERE("estado.anio = '" + ejgItem.getAnnio() + "'");
-        if(ejgItem.getNumero() != null && ejgItem.getNumero() != "")
+        }
+        if(ejgItem.getNumero() != null && ejgItem.getNumero() != "") {
             sql.WHERE ("estado.numero = '"+ ejgItem.getNumero() + "'");
-        if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
+        }
+        if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "") {
             sql.WHERE ("estado.idtipoejg = '" + ejgItem.getTipoEJG() + "'");
+        }
         sql.WHERE ("recursos.idlenguaje = '" + idLenguaje + "'");
         sql.WHERE ("estado.idinstitucion = '" + idInstitucion + "'");
         if(!ejgItem.isHistorico())
         	sql.WHERE("estado.fechabaja is null");
         
-        sql.ORDER_BY("estado.fechainicio desc");
+        sql.ORDER_BY("trunc(estado.fechainicio) desc, E.IDESTADOPOREJG DESC");
+        
         return sql.toString();
+    }
+    
+    public String getUltEstadoEjg(EjgItem ejgItem, String idInstitucion) {
+    	
+    	SQL sql = new SQL();
+		
+    	//FALTARIA AÑADIR LA VISIBILIDAD DE LA COMISION PARA ESE ESTADO
+    	sql.SELECT("estado.fechainicio," + 
+        		" estado.fechamodificacion," + 
+        		" estado.idestadoejg," + 
+        		" recursos.descripcion," + 
+        		" estado.observaciones," + 
+        		" estado.automatico," +
+        		" estado.anio,"+
+        		" estado.IDINSTITUCION,"+
+        		" estado.IDTIPOEJG,"+
+        		" estado.numero,"+
+        		" estado.FECHABAJA,"+
+        		"estado.IDESTADOPOREJG,"+
+        		" maestro.visiblecomision," + 
+        		" NULL nombre," + 
+        		" NULL apellidos1," + 
+        		" NULL apellidos2," +
+        		" usuario.descripcion AS usuariomod");
+    	
+    	sql.FROM("scs_estadoejg estado");
+        sql.INNER_JOIN("scs_maestroestadosejg maestro on (estado.idestadoejg=maestro.idestadoejg)");
+        sql.INNER_JOIN("gen_recursos_catalogos recursos on (maestro.descripcion=recursos.idrecurso)");
+        sql.LEFT_OUTER_JOIN("cen_persona persona on (estado.usumodificacion=persona.idpersona)");
+        sql.LEFT_OUTER_JOIN("adm_usuarios usuario ON (estado.usumodificacion = usuario.idusuario and estado.idinstitucion = usuario.idinstitucion)");
+
+        sql.WHERE("estado.idestadoporejg = F_SIGA_GET_ULTIMOESTADOPOREJG("+ idInstitucion +",\r\n"
+        		+ ejgItem.getTipoEJG()+",\r\n"
+        		+ ejgItem.getAnnio()+",\r\n"
+        		+ ejgItem.getNumero()+") ");
+        sql.WHERE("estado.IDINSTITUCION = "+idInstitucion+" and estado.IDTIPOEJG= "+ ejgItem.getTipoEJG() 
+        +"  and estado.ANIO = "+ ejgItem.getAnnio()+ " and estado.NUMERO = "+ ejgItem.getNumero());
+        
+        return sql.toString();
+    
     }
 
 }

@@ -397,6 +397,8 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 					}
 		
 				}catch (Exception e) {
+					LOGGER.error(
+							"guardarRemesaResultado() / " + e.getMessage());
 					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
@@ -439,19 +441,20 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 		List<LogRemesaResolucionItem> resultadoLogresultadoLog = scsRemesasResolucionesExtendsMapper.logRemesaResoluciones(String.valueOf(idInstitucion), String.valueOf(remesaResolucionID.getIdRemesaResolucion()));
 		MessageFormat messageFormat;
 		String [] params;
-		if(!resultadoLogresultadoLog.isEmpty()) {
+		if(resultadoLogresultadoLog != null && !resultadoLogresultadoLog.isEmpty()) {
 			File logFile = getLogFile(path, nombreFichero);
 			FileWriter fileWriter = new FileWriter(logFile);
 			BufferedWriter bw = new BufferedWriter(fileWriter);
 			
 			  for (LogRemesaResolucionItem log : resultadoLogresultadoLog) {
-				  params = log.getParametrosError().split(",");
-				  messageFormat = new MessageFormat(log.getDescripcion());
-				  
-	            	bw.write("[Línea:" + log.getNumeroLinea() + "] " +
-	            			"[" +log.getCodigo() + "] " + messageFormat.format(params));
-	            	bw.newLine();
-	            }
+					  if(log.getParametrosError() == null) log.setParametrosError("");
+					  params = log.getParametrosError().split(","); 
+					  messageFormat = new MessageFormat(log.getDescripcion());
+					  
+		            	bw.write("[Línea:" + log.getNumeroLinea() + "] " +
+		            			"[" +log.getCodigo() + "] " + messageFormat.format(params));
+		            	bw.newLine();
+		            }
 			 bw.flush();
 			 bw.close();
 			return true;

@@ -1550,14 +1550,14 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		String anio = getAnioHoy();
 
 		String combo = scsActaExtendsMapper.comboSufijoActa(idInstitucion);
-			if(combo != null) {
-				if( !combo.isEmpty()  ) {
-					String [] listCombo = combo.split(","); 
-					acta.setNumeroacta(getNumeroActaSufijo(idInstitucion.toString(), anio, listCombo[0]));
-				}else {
-					acta.setNumeroacta(getNumeroActa(idInstitucion.toString(), anio));
-				}
+
+			if( combo != null && !combo.isEmpty()  ) {
+				String [] listCombo = combo.split(","); 
+				acta.setNumeroacta(getNumeroActaSufijo(idInstitucion.toString(), anio, listCombo[0]));
+			}else {
+				acta.setNumeroacta(getNumeroActa(idInstitucion.toString(), anio));
 			}
+			
 		}
 		
 		return acta.getNumeroacta();
