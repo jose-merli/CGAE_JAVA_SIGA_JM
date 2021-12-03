@@ -79,18 +79,21 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
         sql.LEFT_OUTER_JOIN("cen_persona persona on (estado.usumodificacion=persona.idpersona)");
         sql.LEFT_OUTER_JOIN("adm_usuarios usuario ON (estado.usumodificacion = usuario.idusuario and estado.idinstitucion = usuario.idinstitucion)");
 
-        if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
+        if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "") {
             sql.WHERE("estado.anio = '" + ejgItem.getAnnio() + "'");
-        if(ejgItem.getNumero() != null && ejgItem.getNumero() != "")
+        }
+        if(ejgItem.getNumero() != null && ejgItem.getNumero() != "") {
             sql.WHERE ("estado.numero = '"+ ejgItem.getNumero() + "'");
-        if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
+        }
+        if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "") {
             sql.WHERE ("estado.idtipoejg = '" + ejgItem.getTipoEJG() + "'");
+        }
         sql.WHERE ("recursos.idlenguaje = '" + idLenguaje + "'");
         sql.WHERE ("estado.idinstitucion = '" + idInstitucion + "'");
         if(!ejgItem.isHistorico())
         	sql.WHERE("estado.fechabaja is null");
         
-        sql.ORDER_BY("estado.fechainicio desc");
+        sql.ORDER_BY("trunc(estado.fechainicio) desc, E.IDESTADOPOREJG DESC");
         return sql.toString();
     }
 

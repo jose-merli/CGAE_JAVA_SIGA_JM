@@ -1945,6 +1945,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                         record.setFechabaja(new Date());
                         record.setFechamodificacion(new Date());
                         record.setUsumodificacion(usuarios.get(0).getIdusuario());
+                        
                         response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
 
                         if (response != 1) {
