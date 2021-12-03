@@ -376,7 +376,7 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/parametrosLINEAS")
-	ResponseEntity<ComboDTO> parametrosLINEAS(@RequestParam String idInstitucion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> parametrosLINEAS(@RequestParam(required = false) String idInstitucion, HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {

@@ -958,11 +958,11 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		ComboDTO comboDTO = new ComboDTO();
 
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		ComboItem item = new ComboItem();
+		ComboItem item1 = new ComboItem();
+		ComboItem item2 = new ComboItem();
+		ComboItem item3 = new ComboItem();
 
 		AdmUsuarios usuario = new AdmUsuarios();
-		GenParametrosExample example = new GenParametrosExample();
-		List<GenParametros> parametros;
 		short institucion;
 
 		LOGGER.debug("parametrosCONTROL() -> Entrada al servicio para recuperar los valores de los parámetros");
@@ -979,23 +979,23 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			}
 
 			GenParametrosKey genKey = new GenParametros();
-			genKey.setIdinstitucion(usuario.getIdinstitucion());
+			genKey.setIdinstitucion(institucion);
 			genKey.setModulo("FAC");
 
 			genKey.setParametro("MODIFICAR_DESCRIPCION");
-			item.setLabel("MODIFICAR_DESCRIPCION");
-			item.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
-			comboItems.add(item);
+			item1.setLabel("MODIFICAR_DESCRIPCION");
+			item1.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			comboItems.add(item1);
 
 			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
-			item.setLabel("MODIFICAR_IMPORTE_UNITARIO");
-			item.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
-			comboItems.add(item);
+			item2.setLabel("MODIFICAR_IMPORTE_UNITARIO");
+			item2.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			comboItems.add(item2);
 
 			genKey.setParametro("MODIFICAR_IVA");
-			item.setLabel("MODIFICAR_IVA");
-			item.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
-			comboItems.add(item);
+			item3.setLabel("MODIFICAR_IVA");
+			item3.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			comboItems.add(item3);
 
 			comboDTO.setCombooItems(comboItems);
 		}
