@@ -416,6 +416,35 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		return sql.toString();
 	}
 
+	public String selectRetencionesColegial(PersonaSearchDTO personaSearchDto, String idLenguaje, String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("PER.IDPERSONA AS IDPERSONA");
+		sql.SELECT("TO_CHAR(IRPF.FECHAINICIO, 'DD/MM/YYYY') AS FECHAINICIO");
+		sql.SELECT("TO_CHAR(IRPF.FECHAFIN, 'DD/MM/YYYY') AS FECHAFIN");
+		sql.SELECT("IRPF.IDRETENCION AS IDRETENCION");
+		sql.SELECT("RET.RETENCION AS RETENCION");
+		sql.SELECT("RET.DESCRIPCION AS RECURSO");
+		sql.SELECT("CAT.DESCRIPCION AS DESCRIPCION");
+		sql.FROM("CEN_CLIENTE COL");
+		sql.INNER_JOIN("CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
+		sql.INNER_JOIN(
+				"SCS_RETENCIONESIRPF IRPF ON (IRPF.IDPERSONA = COL.IDPERSONA AND IRPF.IDINSTITUCION = COL.IDINSTITUCION)");
+		sql.INNER_JOIN("SCS_MAESTRORETENCIONES RET ON RET.IDRETENCION = IRPF.IDRETENCION");
+
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = RET.DESCRIPCION AND CAT.IDLENGUAJE = '" + idLenguaje + "')");
+
+		sql.WHERE("PER.IDPERSONA = '" + personaSearchDto.getIdPersona() + "'");
+		if(idInstitucion != "2000") {
+			sql.WHERE("IRPF.IDINSTITUCION = '" + idInstitucion + "'");
+		}
+		sql.ORDER_BY("FECHAINICIO DESC");
+
+		
+
+		return sql.toString();
+	}
+	
 	public String disassociatePerson(AdmUsuarios usuario, DesasociarPersonaDTO desasociarPersona) {
 		SQL sql = new SQL();
 
