@@ -650,7 +650,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					} else {
 						LOGGER.info("INSERTA");
 						response = scsActacomisionMapper.insert(acta);
-
+						insertResponseDTO.setId(acta.getIdacta().toString());
 						if (response == 0) {
 							error.setCode(404);
 							error.setDescription("InvalidInsert");
