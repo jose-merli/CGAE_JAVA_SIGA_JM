@@ -1263,9 +1263,7 @@ public class SigaConstants {
 
 		public void setCodigoExt(String codigoExt) {
 			this.codigoExt = codigoExt;
-		}
-		
-		
+		}		
 	}
     
 }

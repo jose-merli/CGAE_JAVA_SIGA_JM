@@ -1,6 +1,12 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
 import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,26 +14,30 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucionExt;
+import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.EcomColaParametros;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
+import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
 import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
-import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesKey;
-import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
-
 @Service
 public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSService {
+	
+	private static Map<Short,String> mapaInstituciones=null;
 
     private Logger LOGGER = Logger.getLogger(CertificacionFacSJCSServicesImpl.class);
 
@@ -45,9 +55,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private EcomColaParametrosMapper ecomColaParametrosMapper;
-
+ 
     @Autowired
-    private GenPropertiesMapper genPropertiesMapper;
+    private CenInstitucionExtendsMapper institucionesMapper;
+    
+    @Autowired
+    private CertificacionFacSJCSServicesCAMHelper camHelper;
 
 
     @Override
@@ -127,20 +140,34 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_CAT_VALIDA_JUSTIFICACION.getId(), usuario);
             estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
         }
-
-        String idOrdenEstado = fcsFactEstadosfacturacionExtendsMapper.getIdordenestadoMaximo(idInstitucion, idFacturacion);
-        FcsFactEstadosfacturacion fcsFactEstadosfacturacion = new FcsFactEstadosfacturacion();
-        fcsFactEstadosfacturacion.setIdinstitucion(idInstitucion);
-        fcsFactEstadosfacturacion.setIdfacturacion(Integer.valueOf(idFacturacion));
-        fcsFactEstadosfacturacion.setIdestadofacturacion(Short.valueOf(String.valueOf(estadoFuturo)));
-        fcsFactEstadosfacturacion.setIdordenestado(Short.valueOf(idOrdenEstado));
-        fcsFactEstadosfacturacion.setFechaestado(new Date());
-        fcsFactEstadosfacturacion.setFechamodificacion(new Date());
-        fcsFactEstadosfacturacion.setUsumodificacion(usuario.getIdusuario());
+        
+        if (esCAM(idInstitucion)) {
+        	/* en el caso de la CAM el fichero ya se ha generado previamente al ejecutar informe
+        	 *  averiguar qué implicaciones tiene en el estado en el caso de la CAM
+        	 */
+        	
+        }
+        
+        if(!esCAM(idInstitucion)) {
+        	actualizarEstadoFacturacion(usuario, idInstitucion, idFacturacion, estadoFuturo);
+        }
 
     }
 
-    private int getTipoCAJG(Short idInstitucion) {
+    private void actualizarEstadoFacturacion(AdmUsuarios usuario, Short idInstitucion, String idFacturacion, int estadoFuturo) {
+    	 String idOrdenEstado = fcsFactEstadosfacturacionExtendsMapper.getIdordenestadoMaximo(idInstitucion, idFacturacion);
+         FcsFactEstadosfacturacion fcsFactEstadosfacturacion = new FcsFactEstadosfacturacion();
+         fcsFactEstadosfacturacion.setIdinstitucion(idInstitucion);
+         fcsFactEstadosfacturacion.setIdfacturacion(Integer.valueOf(idFacturacion));
+         fcsFactEstadosfacturacion.setIdestadofacturacion(Short.valueOf(String.valueOf(estadoFuturo)));
+         fcsFactEstadosfacturacion.setIdordenestado(Short.valueOf(idOrdenEstado));
+         fcsFactEstadosfacturacion.setFechaestado(new Date());
+         fcsFactEstadosfacturacion.setFechamodificacion(new Date());
+         fcsFactEstadosfacturacion.setUsumodificacion(usuario.getIdusuario());
+         fcsFactEstadosfacturacionExtendsMapper.insert(fcsFactEstadosfacturacion);
+	}
+
+	private int getTipoCAJG(Short idInstitucion) {
 
         int response = 1;
 
@@ -213,6 +240,20 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             throw e;
         }
     }
+    
+    
+    private Boolean esGalicia(Short idInstitucion) {
+    	return SigaConstants.Consejos.C_GALEGA.getCodigoExt().equals(getCodExtColegio(idInstitucion));
+    }
+    
+    private Boolean esCAM(Short idInstitucion) {
+    	return  SigaConstants.Consejos.C_MADRID.getCodigoExt().equals(getCodExtColegio(idInstitucion));
+    }
+    
+    
+    private Boolean esCatalunya(Short idInstitucion) {
+    	return  SigaConstants.Consejos.C_CATALUNYA.getCodigoExt().equals(getCodExtColegio(idInstitucion));
+    }
 
 
     @Override
@@ -226,7 +267,10 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         LOGGER.info(
                 "FacturacionSJCSServicesImpl.getInforme() -> Entrada al servicio para obtener el fichero de informe");
         
-
+        
+        
+        
+        fichero = camHelper.getInformeCAM(idInstitucion, idFacturacion, tipoFichero, request);
         
         LOGGER.info(
                 "FacturacionSJCSServicesImpl.getInformeCAM() -> Salida del servicio para obtener el fichero de informe");
@@ -236,37 +280,21 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 	}
 	
 	
-	private File getInformeCAM(Short idInstitucion, String idFacturacion, String tipoFichero, HttpServletRequest request) {
-		  String rutaFichero = getRutaFicheroSalida(String.valueOf(idInstitucion), idFacturacion);
-	     
-		  File fichero = null;
-		  
-		  
-	      		
-//        
-//    	protected String getDirectorioSalida(String directorio, String idInstitucion, String idFacturacion) {
-//    		ReadProperties rp = new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
-//    		String rutaAlm = rp.returnProperty("informes.directorioFisicoSalidaInformesJava")
-//    			+ ClsConstants.FILE_SEP
-//    			+ directorio + ClsConstants.FILE_SEP
-//    			+ (idInstitucion.equals("0") ? "2000" : idInstitucion) + ClsConstants.FILE_SEP
-//    			+ idFacturacion + ClsConstants.FILE_SEP; 
-//    		return rutaAlm;
-//    	}
-        
-        return fichero;
-       
+	public String getCodExtColegio(Short idInstitucion) {
+		String colegio = null;
+		
+		if(mapaInstituciones==null) {
+			mapaInstituciones = institucionesMapper.getInstitucionesConColegios().stream().collect(
+					Collectors.toMap(CenInstitucionExt::getIdinstitucion, CenInstitucionExt::getCodigoExtColegio));
+		}
+		
+		colegio = mapaInstituciones.get(idInstitucion);
+
+		return colegio;
 	}
 	
-	private String getRutaFicheroSalida(String idInstitucion, String idFacturacion) {
-		GenPropertiesKey key = new GenPropertiesKey();
-		key.setFichero(SigaConstants.FICHERO_SIGA);
-		key.setParametro(SigaConstants.parametroRutaSalidaInformes);
-		
-		GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
-		
-		String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator +  idFacturacion + SigaConstants.pathSeparator;
-		
-		return rutaTmp;
-	}
+
+	
+
+	
 }
