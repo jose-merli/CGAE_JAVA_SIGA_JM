@@ -41,7 +41,7 @@ public class PySTipoIvaSqlExtendsProvider extends PysTipoivaSqlProvider{
 
 		sql.FROM("pys_tipoiva p");
 
-		sql.WHERE("p.idtipoiva NOT IN ( SELECT p2.idtipoiva FROM pys_tipoiva p2 WHERE upper(p2.descripcion) LIKE '%DEROGADO%' AND p2.fechabaja IS NOT NULL )");
+		sql.WHERE("p.idtipoiva NOT IN ( SELECT p2.idtipoiva FROM pys_tipoiva p2 WHERE upper(p2.descripcion) LIKE '%DEROGADO%')");
 
 		return sql.toString();
 	}
