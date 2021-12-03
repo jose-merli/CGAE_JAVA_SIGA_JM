@@ -237,6 +237,12 @@ public class EjgController {
 		EstadoEjgDTO response = gestionEJG.getEstados(ejgItem, request);
 		return new ResponseEntity<EstadoEjgDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/gestion-ejg/getUltEstadoEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EstadoEjgDTO> getUltEstadoEjg(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		EstadoEjgDTO response = gestionEJG.getUltEstadoEjg(ejgItem, request);
+		return new ResponseEntity<EstadoEjgDTO>(response, HttpStatus.OK);
+	}
 
 	// Documentos
 	@RequestMapping(value = "/gestion-ejg/getDocumentos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

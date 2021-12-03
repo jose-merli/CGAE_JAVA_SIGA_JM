@@ -919,14 +919,50 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 AdmUsuarios usuario = usuarios.get(0);
                 usuario.setIdinstitucion(idInstitucion);
                 LOGGER.info(
-                        "getEstados() / scsEjgExtendsMapper.getEstados() -> Entrada a scsEstadoejgExtendsMapper para obtener los estados del EJG");
+                        "getEstados() / scsEstadoejgExtendsMapper.getEstados() -> Entrada a scsEstadoejgExtendsMapper para obtener los estados del EJG");
                 estadoEjgDTO.setEstadoEjgItems(scsEstadoejgExtendsMapper.getEstados(ejgItem, idInstitucion.toString(),
                         usuarios.get(0).getIdlenguaje().toString()));
                 LOGGER.info(
-                        "getEstados() / scsEjgExtendsMapper.getEstados() -> Salida de scsEstadoejgExtendsMapper para obtener los estados del EJG");
+                        "getEstados() / scsEstadoejgExtendsMapper.getEstados() -> Salida de scsEstadoejgExtendsMapper para obtener los estados del EJG");
             } else {
                LOGGER.warn(
                         "getEstados() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                                + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("getEstados() -> idInstitucion del token nula");
+        }
+        return estadoEjgDTO;
+    }
+    
+    @Override
+    public EstadoEjgDTO getUltEstadoEjg(EjgItem ejgItem, HttpServletRequest request) {
+        // TODO Auto-generated method stub
+        LOGGER.info("getUltEstadoEjg() -> Entrada al servicio para obtener el colegiado");
+        EstadoEjgDTO estadoEjgDTO = new EstadoEjgDTO();
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            LOGGER.info(
+                    "getUltEstadoEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+            LOGGER.info(
+                    "getUltEstadoEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
+                LOGGER.info(
+                        "getUltEstadoEjg() / scsEstadoejgExtendsMapper.getUltEstadoEjg() -> Entrada a scsEstadoejgExtendsMapper para obtener el ultimo estado del EJG");
+                estadoEjgDTO.setEstadoEjgItems(Arrays.asList(scsEstadoejgExtendsMapper.getUltEstadoEjg(ejgItem, idInstitucion.toString())));
+                LOGGER.info(
+                        "getUltEstadoEjg() / scsEstadoejgExtendsMapper.getUltEstadoEjg() -> Salida de scsEstadoejgExtendsMapper para obtener el ultimo estado del EJG");
+            } else {
+               LOGGER.warn(
+                        "getUltEstadoEjg() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
                                 + dni + " e idInstitucion = " + idInstitucion);
             }
         } else {
