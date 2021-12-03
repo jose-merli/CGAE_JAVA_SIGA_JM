@@ -1,9 +1,6 @@
 package org.itcgae.siga.fac.controllers;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
+import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
@@ -13,12 +10,14 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
-import org.itcgae.siga.DTO.fac.FacturaDTO;
-import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
+import org.itcgae.siga.DTO.fac.FacturaDTO;
+import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
+import org.itcgae.siga.DTO.fac.FacturaLineaItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -45,6 +44,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/facturacionPyS")
@@ -481,6 +483,108 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<FacturaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+
+	@PostMapping(value = "/guardaDatosFactura")
+	ResponseEntity<UpdateResponseDTO> guardaDatosFactura(@RequestBody FacturaItem item, HttpServletRequest request) {
+
+		UpdateResponseDTO response = new UpdateResponseDTO();
+
+		try {
+			response = facturacionService.guardaDatosFactura(item, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/getLineasFactura")
+	ResponseEntity<FacturaLineaDTO> getLineasFactura(@RequestParam String idFactura,
+										   HttpServletRequest request) {
+		FacturaLineaDTO response = new FacturaLineaDTO();
+
+		try {
+			response = facturacionService.getLineasFactura(idFactura, request);
+
+			if(response.getFacturasLineasItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+    @GetMapping(value = "/getLineasAbono")
+    ResponseEntity<FacturaLineaDTO> getLineasAbono(@RequestParam String idAbono,
+                                                     HttpServletRequest request) {
+        FacturaLineaDTO response = new FacturaLineaDTO();
+
+        try {
+            response = facturacionService.getLineasAbono(idAbono, request);
+
+            if(response.getFacturasLineasItems().size()==200) {
+                response.setError(UtilidadesString.creaInfoResultados());
+            }
+
+            return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/guardarLineasFactura")
+    ResponseEntity<UpdateResponseDTO> guardarLineasFactura(@RequestBody FacturaLineaItem item,
+                                                     HttpServletRequest request) {
+
+        UpdateResponseDTO response = new UpdateResponseDTO();
+
+        try {
+            response = facturacionService.guardarLineasFactura(item, request);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/guardarLineasAbono")
+    ResponseEntity<UpdateResponseDTO> guardarLineasAbono(@RequestBody FacturaLineaItem item,
+                                                   HttpServletRequest request) {
+
+        UpdateResponseDTO response = new UpdateResponseDTO();
+
+        try {
+            response = facturacionService.guardarLineasAbono(item, request);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+	@GetMapping(value = "/getComunicacionCobro")
+	ResponseEntity<ComunicacionCobroDTO> getComunicacionCobro(@RequestParam String idFactura,
+													 HttpServletRequest request) {
+		ComunicacionCobroDTO response = new ComunicacionCobroDTO();
+
+		try {
+			response = facturacionService.getComunicacionCobro(idFactura, request);
+
+			if(response.getComunicacionCobroItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<ComunicacionCobroDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComunicacionCobroDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

@@ -1,12 +1,13 @@
 package org.itcgae.siga.db.mappers;
 
-import java.util.List;
-import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.FacLineafactura;
+import org.itcgae.siga.db.entities.FacLineafacturaExample;
 import org.itcgae.siga.db.entities.FacLineafacturaExample.Criteria;
 import org.itcgae.siga.db.entities.FacLineafacturaExample.Criterion;
-import org.itcgae.siga.db.entities.FacLineafacturaExample;
+
+import java.util.List;
+import java.util.Map;
 
 public class FacLineafacturaSqlProvider {
     /**
