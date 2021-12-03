@@ -53,7 +53,7 @@ public class ScsRemesasResolucionesExtendsProvider {
 		if(remesasResolucionItem.getFechaResolucionHasta() != null) {
 			String fechaResolucionHasta = "";
 			fechaResolucionHasta = dateFormat.format(remesasResolucionItem.getFechaResolucionHasta());
-			sql.WHERE("TRUNC(RES.FECHARESOLUCION) >= TO_DATE('" + fechaResolucionHasta + "', 'DD/MM/RRRR')");
+			sql.WHERE("TRUNC(RES.FECHARESOLUCION) <= TO_DATE('" + fechaResolucionHasta + "', 'DD/MM/RRRR')");
 		}
 				
 		if(remesasResolucionItem.getFechaCargaDesde() != null) {
