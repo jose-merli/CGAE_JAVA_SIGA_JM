@@ -953,4 +953,55 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		return item;
 	}
 
+	@Override
+	public ComboDTO parametrosLINEAS(String idInstitucion, HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboItem item = new ComboItem();
+
+		AdmUsuarios usuario = new AdmUsuarios();
+		GenParametrosExample example = new GenParametrosExample();
+		List<GenParametros> parametros;
+		short institucion;
+
+		LOGGER.debug("parametrosCONTROL() -> Entrada al servicio para recuperar los valores de los parámetros");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+
+			if(idInstitucion!=null) {
+				institucion=Short.parseShort(idInstitucion);
+			}else {
+				institucion=usuario.getIdinstitucion();
+			}
+
+			GenParametrosKey genKey = new GenParametros();
+			genKey.setIdinstitucion(usuario.getIdinstitucion());
+			genKey.setModulo("FAC");
+
+			genKey.setParametro("MODIFICAR_DESCRIPCION");
+			item.setLabel("MODIFICAR_DESCRIPCION");
+			item.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			comboItems.add(item);
+
+			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
+			item.setLabel("MODIFICAR_IMPORTE_UNITARIO");
+			item.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			comboItems.add(item);
+
+			genKey.setParametro("MODIFICAR_IVA");
+			item.setLabel("MODIFICAR_IVA");
+			item.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			comboItems.add(item);
+
+			comboDTO.setCombooItems(comboItems);
+		}
+
+		LOGGER.debug("parametrosCONTROL() -> Salida del servicio");
+
+		return comboDTO;
+	}
 }

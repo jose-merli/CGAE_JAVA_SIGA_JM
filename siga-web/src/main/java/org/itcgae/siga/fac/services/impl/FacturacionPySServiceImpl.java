@@ -37,6 +37,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
@@ -87,7 +88,6 @@ import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
-import org.itcgae.siga.db.mappers.FacAbonoMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
@@ -95,6 +95,7 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacDisqueteabonosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacDisquetecargosExtendsMapper;
@@ -191,7 +192,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private FacFacturaExtendsMapper facFacturaExtendsMapper;
 
 	@Autowired
-	private FacAbonoMapper facAbonoMapper;
+	private FacAbonoExtendsMapper facAbonoExtendsMapper;
 
 	@Autowired
 	private FacLineafacturaExtendsMapper facLineafacturaExtendsMapper;
@@ -1600,7 +1601,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			List<FacturaItem> items = facFacturaExtendsMapper.getFacturas(item,
 					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 
-			items.addAll(facFacturaExtendsMapper.getAbonos(item,
+			items.addAll(facAbonoExtendsMapper.getAbonos(item,
 					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
 
 			facturaDTO.setFacturasItems(items);
@@ -1608,6 +1609,47 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		LOGGER.info(
 				"FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
+
+		return facturaDTO;
+	}
+
+	@Override
+	public FacturaDTO getFactura(String idFactura, String tipo, HttpServletRequest request)
+			throws Exception {
+		FacturaDTO facturaDTO = new FacturaDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getFactura() -> Entrada al servicio para obtener los detalles de la factura");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("FacturacionPySServiceImpl.getFactura() -> obteniendo los detalles de la factura");
+
+			if(tipo.equalsIgnoreCase("FACTURA")){
+				List<FacturaItem> items = facFacturaExtendsMapper.getFactura(idFactura,
+						usuario.getIdinstitucion().toString());
+
+				facturaDTO.setFacturasItems(items);
+			}
+
+			if(tipo.equalsIgnoreCase("ABONO")){
+				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idFactura,
+						usuario.getIdinstitucion().toString());
+
+				facturaDTO.setFacturasItems(items);
+			}
+
+		}
+
+		if(facturaDTO.getFacturasItems() == null || facturaDTO.getFacturasItems().isEmpty()){
+			throw new SigaExceptions("No se encuentra la factura");
+		}
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getFactura() -> Salida del servicio  para obtener los detalles de la factura");
 
 		return facturaDTO;
 	}
@@ -1650,14 +1692,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				FacAbonoKey key = new FacAbonoKey();
 				key.setIdabono(Long.valueOf(item.getIdFactura()));
 				key.setIdinstitucion(usuario.getIdinstitucion());
-				FacAbono updateItem  = facAbonoMapper.selectByPrimaryKey(key);
+				FacAbono updateItem  = facAbonoExtendsMapper.selectByPrimaryKey(key);
 
 				if(item.getObservacionesAbono()!=null)
 					updateItem.setObservaciones(item.getObservacionesAbono());
 				if(item.getMotivosAbono()!=null)
 					updateItem.setMotivos(item.getMotivosAbono());
 
-				facAbonoMapper.updateByPrimaryKey(updateItem);
+				facAbonoExtendsMapper.updateByPrimaryKey(updateItem);
 
 				updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
 			}

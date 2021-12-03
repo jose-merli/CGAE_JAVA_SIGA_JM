@@ -88,7 +88,9 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems, HttpServletRequest request) throws Exception;
 
 	public FacturaDTO getFacturas(FacturaItem item, HttpServletRequest request) throws Exception;
-	
+
+	public FacturaDTO getFactura(String idFactura, String tipo, HttpServletRequest request) throws Exception;
+
 	public FacPresentacionAdeudosDTO presentacionAdeudos(FacPresentacionAdeudosItem presentacionAdeudoItem,	HttpServletRequest request) throws Exception;
 	
 	public FacRegenerarPresentacionAdeudosDTO regenerarPresentacionAdeudos(FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,	HttpServletRequest request) throws Exception;

@@ -486,6 +486,25 @@ public class FacturacionPySController {
 		}
 	}
 
+	@PostMapping(value = "/getFactura")
+	ResponseEntity<FacturaDTO> getFactura(@RequestParam String idFactura, @RequestParam String tipo,
+										   HttpServletRequest request) {
+		FacturaDTO response = new FacturaDTO();
+
+		try {
+			response = facturacionService.getFactura(idFactura, tipo, request);
+
+			if(response.getFacturasItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<FacturaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacturaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 
 	@PostMapping(value = "/guardaDatosFactura")
 	ResponseEntity<UpdateResponseDTO> guardaDatosFactura(@RequestBody FacturaItem item, HttpServletRequest request) {
