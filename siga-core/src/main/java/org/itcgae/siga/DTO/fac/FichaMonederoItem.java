@@ -14,6 +14,9 @@ public class FichaMonederoItem {
 
     //TARJETA MOVIMIENTOS
     private List<ListaMovimientosMonederoItem> movimientos;
+    
+    //TARJETA SERVICIOS
+    private List<ListaServiciosMonederoItem> servicios;
 
     private Short idLinea; //Identificador del monedero
     private String anioLinea;
@@ -88,5 +91,13 @@ public class FichaMonederoItem {
 
 	public void setAnioLinea(String anioLinea) {
 		this.anioLinea = anioLinea;
+	}
+
+	public List<ListaServiciosMonederoItem> getServicios() {
+		return servicios;
+	}
+
+	public void setServicios(List<ListaServiciosMonederoItem> servicios) {
+		this.servicios = servicios;
 	}
 }
