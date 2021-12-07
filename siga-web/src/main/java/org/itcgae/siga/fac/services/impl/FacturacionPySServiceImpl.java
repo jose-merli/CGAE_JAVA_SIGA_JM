@@ -56,6 +56,12 @@ import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefactur;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
+import org.itcgae.siga.db.entities.FacDisqueteabonos;
+import org.itcgae.siga.db.entities.FacDisqueteabonosKey;
+import org.itcgae.siga.db.entities.FacDisquetecargos;
+import org.itcgae.siga.db.entities.FacDisquetecargosKey;
+import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
+import org.itcgae.siga.db.entities.FacDisquetedevolucionesKey;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
@@ -1937,13 +1943,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.info(
-				"FacturacionPySServiceImpl.getEstadosPagos() -> Entrada al servicio para obtener las lineas de la factura");
+				"FacturacionPySServiceImpl.getEstadosPagos() -> Entrada al servicio para obtener el historico de la factura");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
 
 		if (usuario != null) {
-			LOGGER.info("FacturacionPySServiceImpl.getEstadosPagos() -> obteniendo las lineas de la factura");
+			LOGGER.info("FacturacionPySServiceImpl.getEstadosPagos() -> obteniendo el historico de la factura");
 
 			List<EstadosPagosItem> result = facHistoricofacturaMapper.getEstadosPagos(idFactura, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 
@@ -1951,9 +1957,167 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		}
 
 		LOGGER.info(
-				"FacturacionPySServiceImpl.getEstadosPagos() -> Salida del servicio  para obtener las lineas de la factura");
+				"FacturacionPySServiceImpl.getEstadosPagos() -> Salida del servicio  para obtener el historico de la factura");
 
 		return estadosPagosDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO actualizarFicheroAdeudos(FacDisquetecargos updateItem, HttpServletRequest request) throws Exception {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		updateResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("actualizarFicheroDevoluciones() -> Entrada al servicio para actualizar un fichero devoluciones");
+
+		if (usuario != null) {
+			// Clave primaria
+			FacDisquetecargosKey key = new FacDisquetecargosKey();
+			key.setIddisquetecargos(updateItem.getIddisquetecargos());
+			key.setIdinstitucion(usuario.getIdinstitucion());
+
+			FacDisquetecargos record = facDisquetecargosExtendsMapper.selectByPrimaryKey(key);
+
+			if(updateItem.getBancosCodigo()!=null)
+				record.setBancosCodigo(updateItem.getBancosCodigo());
+			if(updateItem.getFecharecibosb2b()!=null)
+				record.setFecharecibosb2b(updateItem.getFecharecibosb2b());
+			if(updateItem.getFechareciboscor1()!=null)
+				record.setFechareciboscor1(updateItem.getFechareciboscor1());
+			if(updateItem.getFecharecibosprimeros()!=null)
+				record.setFecharecibosprimeros(updateItem.getFecharecibosprimeros());
+			if(updateItem.getFecharecibosrecurrentes()!=null)
+				record.setFecharecibosrecurrentes(updateItem.getFecharecibosrecurrentes());
+			if(updateItem.getFechapresentacion()!=null)
+				record.setFechapresentacion(updateItem.getFechapresentacion());
+			if(updateItem.getEssepa()!=null)
+				record.setEssepa(updateItem.getEssepa());
+			if(updateItem.getFechacargo()!=null)
+				record.setFechacargo(updateItem.getFechacargo());
+			if(updateItem.getFechacreacion()!=null)
+				record.setFechacreacion(updateItem.getFechacreacion());
+			if(updateItem.getFechamodificacion()!=null)
+				record.setFechamodificacion(updateItem.getFechamodificacion());
+			if(updateItem.getIdsufijo()!=null)
+				record.setIdsufijo(updateItem.getIdsufijo());
+			if(updateItem.getNombrefichero()!=null)
+				record.setNombrefichero(updateItem.getNombrefichero());
+			if(updateItem.getNumerolineas()!=null)
+				record.setNumerolineas(updateItem.getNumerolineas());
+			if(updateItem.getUsumodificacion()!=null)
+				record.setUsumodificacion(updateItem.getUsumodificacion());
+			if(updateItem.getIdprogramacion()!=null)
+				record.setIdprogramacion(updateItem.getIdprogramacion());
+			if(updateItem.getIdseriefacturacion()!=null)
+				record.setIdseriefacturacion(updateItem.getIdseriefacturacion());
+			if(updateItem.getIdsufijo()!=null)
+				record.setIdsufijo(updateItem.getIdsufijo());
+
+			facDisquetecargosExtendsMapper.updateByPrimaryKey(record);
+
+			updateResponseDTO.setId(record.getIddisquetecargos().toString());
+		}
+
+		LOGGER.info("actualizarProgramacionFactura() -> Salida del servicio para actualizar un fichero devoluciones");
+
+
+		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request) throws Exception {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		updateResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("actualizarFicheroDevoluciones() -> Entrada al servicio para actualizar un fichero devoluciones");
+
+		if (usuario != null) {
+			// Clave primaria
+			FacDisqueteabonosKey key = new FacDisqueteabonosKey();
+			key.setIddisqueteabono(updateItem.getIddisqueteabono());
+			key.setIdinstitucion(usuario.getIdinstitucion());
+
+			FacDisqueteabonos record = facDisqueteabonosExtendsMapper.selectByPrimaryKey(key);
+
+			if(updateItem.getBancosCodigo()!=null)
+				record.setBancosCodigo(updateItem.getBancosCodigo());
+			if(updateItem.getFcs()!=null)
+				record.setFcs(updateItem.getFcs());
+			if(updateItem.getFecha()!=null)
+				record.setFecha(updateItem.getFecha());
+			if(updateItem.getFechaejecucion()!=null)
+				record.setFechaejecucion(updateItem.getFechaejecucion());
+			if(updateItem.getFechamodificacion()!=null)
+				record.setFechamodificacion(updateItem.getFechamodificacion());
+			if(updateItem.getIdsufijo()!=null)
+				record.setIdsufijo(updateItem.getIdsufijo());
+			if(updateItem.getNombrefichero()!=null)
+				record.setNombrefichero(updateItem.getNombrefichero());
+			if(updateItem.getNumerolineas()!=null)
+				record.setNumerolineas(updateItem.getNumerolineas());
+			if(updateItem.getUsumodificacion()!=null)
+				record.setUsumodificacion(updateItem.getUsumodificacion());
+
+			facDisqueteabonosExtendsMapper.updateByPrimaryKey(record);
+
+			updateResponseDTO.setId(record.getIddisqueteabono().toString());
+		}
+
+		LOGGER.info("actualizarProgramacionFactura() -> Salida del servicio para actualizar un fichero devoluciones");
+
+
+		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO actualizarFicheroDevoluciones(FacDisquetedevoluciones updateItem, HttpServletRequest request) throws Exception {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		updateResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("actualizarFicheroDevoluciones() -> Entrada al servicio para actualizar un fichero devoluciones");
+
+		if (usuario != null) {
+			// Clave primaria
+			FacDisquetedevolucionesKey key = new FacDisquetedevolucionesKey();
+			key.setIddisquetedevoluciones(updateItem.getIddisquetedevoluciones());
+			key.setIdinstitucion(usuario.getIdinstitucion());
+
+			FacDisquetedevoluciones record = facDisquetedevolucionesExtendsMapper.selectByPrimaryKey(key);
+
+			if(updateItem.getBancosCodigo()!=null)
+				record.setBancosCodigo(updateItem.getBancosCodigo());
+			if(updateItem.getFechageneracion()!=null)
+				record.setFechageneracion(updateItem.getFechageneracion());
+			if(updateItem.getFechamodificacion()!=null)
+				record.setFechamodificacion(updateItem.getFechamodificacion());
+			if(updateItem.getNombrefichero()!=null)
+				record.setNombrefichero(updateItem.getNombrefichero());
+			if(updateItem.getUsumodificacion()!=null)
+				record.setUsumodificacion(updateItem.getUsumodificacion());
+
+			facDisquetedevolucionesExtendsMapper.updateByPrimaryKey(record);
+
+			updateResponseDTO.setId(record.getIddisquetedevoluciones().toString());
+		}
+
+		LOGGER.info("actualizarProgramacionFactura() -> Salida del servicio para actualizar un fichero devoluciones");
+
+
+		return updateResponseDTO;
 	}
 
 	@Override

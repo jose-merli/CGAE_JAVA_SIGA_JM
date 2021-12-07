@@ -35,6 +35,9 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.FacDisqueteabonos;
+import org.itcgae.siga.db.entities.FacDisquetecargos;
+import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -626,4 +629,46 @@ public class FacturacionPySController {
 			return new ResponseEntity<EstadosPagosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+    @PostMapping(value = "/actualizarFicheroAdeudos")
+    ResponseEntity<UpdateResponseDTO> actualizarFicheroAdeudos(@RequestBody FacDisquetecargos item,
+                                                              HttpServletRequest request) {
+        UpdateResponseDTO response = new UpdateResponseDTO();
+
+        try {
+            response = this.facturacionService.actualizarFicheroAdeudos(item, request);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/actualizarFicheroDevoluciones")
+    ResponseEntity<UpdateResponseDTO> actualizarFicheroDevoluciones(@RequestBody FacDisquetedevoluciones item,
+                                                               HttpServletRequest request) {
+        UpdateResponseDTO response = new UpdateResponseDTO();
+
+        try {
+            response = this.facturacionService.actualizarFicheroDevoluciones(item, request);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/actualizarFicheroTranferencias")
+    ResponseEntity<UpdateResponseDTO> actualizarFicheroTranferencias(@RequestBody FacDisqueteabonos item,
+                                                               HttpServletRequest request) {
+        UpdateResponseDTO response = new UpdateResponseDTO();
+
+        try {
+            response = this.facturacionService.actualizarFicheroTranferencias(item, request);
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setError(UtilidadesString.creaError(e.getMessage()));
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
