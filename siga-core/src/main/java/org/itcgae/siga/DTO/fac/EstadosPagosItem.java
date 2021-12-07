@@ -7,7 +7,17 @@ import java.util.Date;
 @Data
 public class EstadosPagosItem {
 
-	String orden;
-	Date fechaEnvio;
-	String documento;
+	Date fechaModificaion;
+	String accion;
+	String estado;
+	String iban;
+	String impTotalPagado;
+	String impTotalPorPagar;
+	String IDSJCS;
+	String numeroFactura;
+	String idFactura;
+	String idCargos;
+	String idDevoluciones;
+	String numeroAbono;
+	String idAbono;
 }
