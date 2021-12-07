@@ -10,11 +10,16 @@ import org.itcgae.siga.DTO.scs.BaremosGuardiaDTO;
 import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
 import org.itcgae.siga.DTO.scs.BaremosRequestDTO;
 import org.itcgae.siga.DTO.scs.BaremosRequestItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsBaremosGuardiaKey;
 import org.itcgae.siga.db.entities.ScsHitofacturable;
 import org.itcgae.siga.db.entities.ScsHitofacturableguardia;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBaremosGuardiaMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableguardiaExtendsMapper;
@@ -37,6 +42,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
     
     @Autowired
     private ScsHitofacturableExtendsMapper scsHitofacturableExtendsMapper;
+    
+    @Autowired
+    private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
     @Override
     @Transactional
@@ -105,7 +113,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 	@Override
 	@Transactional
-	public BaremosGuardiaDTO getGuardiasByConf(BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
+	public BaremosGuardiaDTO getGuardiasByConf(HttpServletRequest request) {
 		BaremosGuardiaDTO baremosGuardiaDTO = new BaremosGuardiaDTO();
     	Error error = new Error();
 
@@ -118,10 +126,16 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 		
 			if (idInstitucion != null) {
 			
+				List<BaremosGuardiaItem> guardias = scsHitofacturableguardiaExtendsMapper.getGuardiasByConf(idInstitucion.toString());
 				
 				
-				error.setCode(200);
-				//baremosGuardiaDTO.setBaremosGuardiaItems();
+				if(guardias.isEmpty()) {
+					error.setCode(400);
+					error.description("general.message.error.realiza.accion");
+				}else {
+					error.setCode(200);
+					baremosGuardiaDTO.setBaremosGuardiaItems(guardias);
+				}
 
 			} else {
 				LOGGER.warn("searchBaremosGuardia() -> idInstitucion del token nula");
@@ -135,6 +149,30 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
         LOGGER.info("searchBaremosGuardia() -> Salida del servicio para obtener baremos guardia");
 
         return baremosGuardiaDTO;
+	}
+
+	@Override
+	public ComboDTO getTurnoForGuardia(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				
+				List<ComboItem> comboItems = scsHitofacturableguardiaExtendsMapper.getTurnoForGuardia(idInstitucion.toString());
+				error.setCode(200);
+				comboDTO.setError(error);
+				comboDTO.setCombooItems(comboItems);
+			}
+		}
+		return comboDTO;
 	}
 
 

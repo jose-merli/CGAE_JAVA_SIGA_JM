@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.scs.BaremosGuardiaDTO;
 import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
 import org.itcgae.siga.DTO.scs.BaremosRequestDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.Impreso190DTO;
 import org.itcgae.siga.scs.services.facturacionsjcs.IBaremosGuardiaServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +37,23 @@ public class BaremosGuardiaController {
         }
 	}
 	
-	@RequestMapping(value = "/getGuardiasByConf",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BaremosGuardiaDTO> getGuardiasByConf(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
-		BaremosGuardiaDTO response = baremosGuardiaServices.getGuardiasByConf(baremosGuardiaItem, request);
+	@RequestMapping(value = "/getGuardiasByConf",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BaremosGuardiaDTO> getGuardiasByConf(HttpServletRequest request) {
+		BaremosGuardiaDTO response = baremosGuardiaServices.getGuardiasByConf(request);
 		if (response.getError().getCode() == 200) {
             return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
+	
+	@RequestMapping(value = "/getTurnoForGuardia",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTurnoForGuardia(HttpServletRequest request) {
+		ComboDTO response = baremosGuardiaServices.getTurnoForGuardia(request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<ComboDTO>(response, HttpStatus.FORBIDDEN);
         }
 	}
 	

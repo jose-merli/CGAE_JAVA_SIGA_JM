@@ -36,7 +36,8 @@ public class ScsBaremosGuardiaSqlProvider {
 			}
 		
 		SQL sql = new SQL();
-		sql.SELECT("	hit.idturno,"
+		sql.SELECT("	tip.idhitoconfiguracion,"
+				+ "		hit.idturno,"
 				+ "		 tur.NOMBRE AS NOMBRETURNO,"
 				+ "		hit.idguardia,"
 				+ "		gua.fechabaja,"
@@ -347,7 +348,8 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "    hit.agrupar,"
 						+ "    hit.idhito,"
 						+ "    tur.NOMBRE,"
-						+ "   gua.fechabaja");
+						+ "   gua.fechabaja,"
+						+ "tip.idhitoconfiguracion");
 				sql.ORDER_BY("2, 1");
 		return sql.toString();
 	}

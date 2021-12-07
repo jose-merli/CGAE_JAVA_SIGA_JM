@@ -8,6 +8,8 @@ import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.db.entities.*;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.io.File;
 import java.util.List;
 
 public interface IFacturacionSJCSServices {
