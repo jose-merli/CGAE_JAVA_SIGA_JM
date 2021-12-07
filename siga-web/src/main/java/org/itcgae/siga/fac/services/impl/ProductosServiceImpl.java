@@ -1006,19 +1006,13 @@ public class ProductosServiceImpl implements IProductosService{
 				
 				for (ListaProductosItem producto : listadoProductos.getListaProductosItems()) {
 						
-					//Comprueba que haya alguna compra realizada
-					if(pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion) != null)
-						idPeticionDTO.setIdpeticionUso(pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion)); //Tener en cuenta que comprobarUsoProducto no devuelve solo un id si no uno por cada uso, por eso se usa una lista.
-						
 					//Comprueba que haya solicitud de compra
 					if(pysTiposProductosExtendsMapper.comprobarSolicitudProducto(producto, idInstitucion) != null)
 						idPeticionDTO.setIdpeticionSolicitud(pysTiposProductosExtendsMapper.comprobarSolicitudProducto(producto, idInstitucion)); //Tener en cuenta que comprobarSolicitudProducto no devuelve solo un id si no uno por cada solicitud, por eso se usa una lista.
-							
-						
-						
+											
 					//Borrado logico --> Actualizamos la fechabaja del producto a la actual (sysdate)
-						//Borrado fisico --> Eliminamos el registro del producto y posteriormente el identificador
-					if(idPeticionDTO.getIdpeticionUso().size() > 0 || idPeticionDTO.getIdpeticionSolicitud().size() > 0 ) { //Borrado logico ya que comprobarUsoProducto o comprobarSolicitudProducto devolvio resultado por lo que el producto tiene alguna compra o solicitud de compra
+						//Borrado fisico --> Eliminamos las formas de pago del producto, registro del producto y posteriormente el identificador
+					if(idPeticionDTO.getIdpeticionSolicitud().size() > 0 ) { //Borrado logico ya que comprobarSolicitudProducto devolvio resultado por lo que el producto tiene alguna compra o solicitud de compra
 						status = pysTiposProductosExtendsMapper.borradoLogicoProductos(usuarios.get(0), producto, idInstitucion);
 						if(status == 0) {
 							throw new Exception("No se pudo realizar la baja logica del producto");
@@ -1026,16 +1020,18 @@ public class ProductosServiceImpl implements IProductosService{
 							LOGGER.info(
 									"reactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.reactivarBorradoFisicoLogicoProductos() -> Baja logica del producto realizada con exito");
 						}
-					}else{ //Borrado fisico al no tener ninguna compra o solicitud de compra, es decir comprobarUsoProducto no devolvio nada.
-						//Borramos las formas de pago del producto
-				
-						statusBorradoFormasDePagoProducto = pysTipoFormaPagoExtendsMapper.borradoFisicoFormasPagoByProducto(producto, idInstitucion);
+					}else{ //Borrado fisico al no tener ninguna compra o solicitud de compra, es decir comprobarSolicitudProducto no devolvio nada.
+						//Borramos las formas de pago del producto (si es que las tiene)
 						
-						if(statusBorradoFormasDePagoProducto == 0) {
-							throw new Exception("No se pudo realizar el borrado de las formas de pago del producto");
-						}else if(statusBorradoFormasDePagoProducto == 1) {
-							LOGGER.info(
-									"reactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.reactivarBorradoFisicoLogicoProductos() -> Borrado de las formas de pago del producto realizado con exito");
+						if(producto.getNoFacturable().equals("0")) {
+							statusBorradoFormasDePagoProducto = pysTipoFormaPagoExtendsMapper.borradoFisicoFormasPagoByProducto(producto, idInstitucion);
+							
+							if(statusBorradoFormasDePagoProducto == 0) {
+								throw new Exception("No se pudo realizar el borrado de las formas de pago del producto");
+							}else if(statusBorradoFormasDePagoProducto == 1) {
+								LOGGER.info(
+										"reactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.reactivarBorradoFisicoLogicoProductos() -> Borrado de las formas de pago del producto realizado con exito");
+							}
 						}
 						
 						//Borramos el registro del producto
@@ -1047,14 +1043,17 @@ public class ProductosServiceImpl implements IProductosService{
 							LOGGER.info(
 									"reactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.reactivarBorradoFisicoLogicoProductos() -> Borrado fisico del producto realizado con exito");
 						}
-						//Borramos el identificador
-						statusBorradoIdentificador = pysTiposProductosExtendsMapper.borradoFisicoProductosIdentificador(producto, idInstitucion);
-							
-						if(statusBorradoIdentificador == 0) {
-							throw new Exception("No se pudo realizar el borrado del identificador");
-						}else if(statusBorradoIdentificador == 1) {
-							LOGGER.info(
-									"reactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.reactivarBorradoFisicoLogicoProductos() -> Borrado del identificador realizado con exito");
+						//Borramos el identificador en caso de que tuviera (si no se selecciono tipo de certificado a la hora de crearlo, no tendra)
+						
+						if(producto.getIdcontador() != null && !producto.getIdcontador().equals("")) {
+							statusBorradoIdentificador = pysTiposProductosExtendsMapper.borradoFisicoProductosIdentificador(producto, idInstitucion);
+								
+							if(statusBorradoIdentificador == 0) {
+								throw new Exception("No se pudo realizar el borrado del identificador");
+							}else if(statusBorradoIdentificador == 1) {
+								LOGGER.info(
+										"reactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.reactivarBorradoFisicoLogicoProductos() -> Borrado del identificador realizado con exito");
+							}
 						}
 					}
 				}
