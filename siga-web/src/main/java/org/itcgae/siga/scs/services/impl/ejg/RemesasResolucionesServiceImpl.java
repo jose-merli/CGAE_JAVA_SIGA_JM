@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -65,6 +66,7 @@ import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.EcomOperacionTipoaccion;
 import org.itcgae.siga.db.entities.EcomOperacionTipoaccionExample;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
@@ -74,6 +76,7 @@ import org.itcgae.siga.db.mappers.CajgRemesaresolucionficheroMapper;
 import org.itcgae.siga.db.mappers.EcomOperacionTipoaccionMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsCargaDesignaProcuradoresExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRemesasResolucionesExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IRemesasResoluciones;
@@ -129,6 +132,9 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 	
 	@Autowired
 	private ScsCargaDesignaProcuradoresExtendsMapper scsCarcaDesignaProcuradoresExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
     
 	@Override
 	public RemesaResolucionDTO buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem,
@@ -139,9 +145,24 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		RemesaResolucionDTO remesaResultadoDTO = new RemesaResolucionDTO();
 		List<RemesasResolucionItem> remesasResolucionesItem = null;
-		
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+		genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+		.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+		genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+
 		if(idInstitucion != null) {
-			remesasResolucionesItem = scsRemesasResolucionesExtendsMapper.buscarRemesasResoluciones(remesasResolucionItem, idInstitucion);
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = 200;
+			}
+			
+			remesasResolucionesItem = scsRemesasResolucionesExtendsMapper.buscarRemesasResoluciones(remesasResolucionItem, idInstitucion, tamMaximo);
 			if(remesasResolucionesItem != null ) {
 				remesaResultadoDTO.setRemesasResolucionItem(remesasResolucionesItem);
 			}

@@ -35,7 +35,7 @@ public interface ScsRemesasResultadoExtendsMapper {
 		@Result(column = "NUMEROREMESA", property = "numeroRemesa", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCIONREMESA", property = "descripcionRemesa", jdbcType = JdbcType.VARCHAR)
 	})
-	List<RemesasResultadoItem> buscarRemesasResultado(RemesasResultadoItem remesasBusquedaItem, Short idInstitucion);
+	List<RemesasResultadoItem> buscarRemesasResultado(RemesasResultadoItem remesasBusquedaItem, Short idInstitucion, int tamMaximo);
 	
 	@SelectProvider(type = ScsRemesasResultadosExtendsProvider.class, method = "buscarLineasFichero")
 	@Results({

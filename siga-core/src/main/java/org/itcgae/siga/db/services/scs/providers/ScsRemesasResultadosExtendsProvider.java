@@ -17,7 +17,7 @@ public class ScsRemesasResultadosExtendsProvider {
 	
 	private Logger LOGGER = Logger.getLogger(ScsRemesasResultadosExtendsProvider.class);
 	
-	public String  buscarRemesasResultado(RemesasResultadoItem remesasResultadoItem, Short idInstitucion) {
+	public String  buscarRemesasResultado(RemesasResultadoItem remesasResultadoItem, Short idInstitucion, int tamMaximo) {
 		SQL sql = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
@@ -94,8 +94,7 @@ public class ScsRemesasResultadosExtendsProvider {
 		sql.WHERE("REMR.IDTIPOREMESA = 3");
 		sql.WHERE("REM.IDINSTITUCION = REMR.IDINSTITUCION");
 		sql.WHERE("REM.IDREMESA = REMR.IDREMESA");//BORRAR PARA MOSTRAR ERRONEOS, IDREMESA TENDREA VALOR CON PROCEDIMIENTO CORRECTO, SINO, NO.
-		sql.WHERE("ROWNUM <= 200");
-		
+		sql.WHERE("ROWNUM <= " + tamMaximo);	
 		sql.ORDER_BY("REMR.IDREMESARESOLUCION DESC");
 		
 		LOGGER.info(sql.toString());

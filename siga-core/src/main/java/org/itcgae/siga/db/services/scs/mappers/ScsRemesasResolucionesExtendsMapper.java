@@ -34,7 +34,7 @@ public interface ScsRemesasResolucionesExtendsMapper {
 		@Result(column = "IDREMESA", property = "idRemesa", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "LOGGENERADO", property ="log", jdbcType = JdbcType.NUMERIC)
 	})
-	List<RemesasResolucionItem> buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem, int idInstitucion);
+	List<RemesasResolucionItem> buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem, int idInstitucion, int tamMaximo);
 	
 	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "getMaxIdRemesaResolucion")
 	@Results({
