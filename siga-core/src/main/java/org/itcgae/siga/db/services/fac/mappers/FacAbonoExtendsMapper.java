@@ -51,7 +51,7 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 			@Result(column = "IMPTOTALABONADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPPENDIENTEPORABONAR", property = "importeAdeudadoPendiente", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "OBSERVACIONES", property = "observacionesAbono", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "MOTIVOS", property = "MotivosAbono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "MOTIVOS", property = "motivosAbono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idCliente", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIFCIF", property = "numeroIdentificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
