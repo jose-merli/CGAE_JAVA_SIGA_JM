@@ -28,7 +28,7 @@ public class BaremosGuardiaController {
 	private IBaremosGuardiaServices baremosGuardiaServices;
 	
 	@RequestMapping(value = "/buscar",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BaremosRequestDTO> searchImpreso190(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
+	ResponseEntity<BaremosRequestDTO> searchBaremosGuardia(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
 		BaremosRequestDTO response = baremosGuardiaServices.searchBaremosGuardia(baremosGuardiaItem, request);
 		if (response.getError().getCode() == 200) {
             return new ResponseEntity<BaremosRequestDTO>(response, HttpStatus.OK);
@@ -54,6 +54,26 @@ public class BaremosGuardiaController {
             return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<ComboDTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
+	
+	@RequestMapping(value = "/nuevoBaremo",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BaremosGuardiaDTO> insertBaremosGuardia(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
+		BaremosGuardiaDTO response = baremosGuardiaServices.insertBaremo(baremosGuardiaItem, request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
+	
+	@RequestMapping(value = "/actualizarBaremo",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BaremosGuardiaDTO> updateBaremosGuardia(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
+		BaremosGuardiaDTO response = baremosGuardiaServices.updateBaremo(baremosGuardiaItem, request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.FORBIDDEN);
         }
 	}
 	
