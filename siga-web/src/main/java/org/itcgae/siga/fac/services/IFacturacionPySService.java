@@ -7,6 +7,7 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -110,4 +111,6 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO actualizarProgramacionFactura(FacFacturacionprogramadaItem facItem, HttpServletRequest request) throws Exception;
 
 	public ComunicacionCobroDTO getComunicacionCobro(String idFactura, HttpServletRequest request) throws Exception;
+
+	public EstadosPagosDTO getEstadosPagos(String idFactura, HttpServletRequest request) throws Exception;
 }

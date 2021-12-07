@@ -1,0 +1,41 @@
+package org.itcgae.siga.db.services.fac.providers;
+
+import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
+import org.itcgae.siga.db.mappers.FacDisqueteabonosSqlProvider;
+
+import java.text.SimpleDateFormat;
+
+
+public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSqlProvider {
+
+    public String getEstadosPagos(String idFactura, String idInstitucion, String idLenguaje) {
+
+        SQL sql = new SQL();
+
+        sql.SELECT("FH.FECHAMODIFICACION, F_SIGA_GETRECURSO(FT.NOMBRE,"+idLenguaje+") ACCION, "
+                +"GR.DESCRIPCION ESTADO, CC.IBAN, FH.IMPTOTALPAGADO, FH.IMPTOTALPORPAGAR,"
+                +"CASE WHEN FT.IDTIPOACCION = 10 THEN TO_CHAR(FA.IDPAGOSJG) END IDSJCS,"
+                +"CASE WHEN FT.IDTIPOACCION = 2 THEN FF.NUMEROFACTURA END NUMEROFACTURA,"
+                +"CASE WHEN FT.IDTIPOACCION = 2 THEN FF.IDFACTURA END IDFACTURA,"
+                +"CASE WHEN FT.IDTIPOACCION = 5 THEN TO_CHAR(FH.IDDISQUETECARGOS) END IDCARGOS,"
+                +"CASE WHEN FT.IDTIPOACCION = 6 THEN TO_CHAR(IDDISQUETEDEVOLUCIONES) END IDDEVOLUCIONES,"
+                +"CASE WHEN FT.IDTIPOACCION = 8 THEN FA.NUMEROABONO WHEN FT.IDTIPOACCION = 9 THEN FA.NUMEROABONO END NUMEROABONO,"
+                +"CASE WHEN FT.IDTIPOACCION = 8 THEN FA.IDABONO WHEN FT.IDTIPOACCION = 9 THEN FA.IDABONO END IDABONO");
+
+        sql.FROM("FAC_HISTORICOFACTURA FH");
+        sql.INNER_JOIN("FAC_TIPOSACCIONFACTURA FT ON (FT.IDTIPOACCION = FH.IDTIPOACCION)");
+        sql.INNER_JOIN("FAC_ESTADOFACTURA FE ON (FE.IDESTADO = FH.ESTADO)");
+        sql.INNER_JOIN("GEN_RECURSOS GR ON (GR.IDRECURSO = FE.DESCRIPCION AND GR.IDLENGUAJE = "+idLenguaje+")");
+        sql.LEFT_OUTER_JOIN("FAC_FACTURA FF ON (FF.IDINSTITUCION = FH.IDINSTITUCION AND FF.IDFACTURA = FH.IDFACTURA)");
+        sql.LEFT_OUTER_JOIN("FAC_ABONO FA ON (FA.IDINSTITUCION = FH.IDINSTITUCION AND FA.IDABONO = FH.IDABONO)");
+        sql.LEFT_OUTER_JOIN("CEN_CUENTASBANCARIAS CC ON (CC.IDCUENTA = FH.IDCUENTA AND CC.IDINSTITUCION = FH.IDINSTITUCION AND CC.IDPERSONA = FH.IDPERSONA)");
+
+        sql.WHERE("FH.IDINSTITUCION ="+idInstitucion);
+        sql.WHERE("FH.IDFACTURA ="+idFactura);
+
+        sql.ORDER_BY("FH.FECHAMODIFICACION");
+
+        return sql.toString();
+    }
+}

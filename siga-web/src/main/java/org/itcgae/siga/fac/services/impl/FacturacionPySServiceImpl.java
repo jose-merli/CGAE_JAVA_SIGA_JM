@@ -9,6 +9,8 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
+import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -103,6 +105,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacDisquetedevolucionesExtendsMap
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacHistoricofacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineaabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineafacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
@@ -205,6 +208,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private EnvComunicacionmorososMapper envComunicacionmorososMapper;
+
+	@Autowired
+	private FacHistoricofacturaExtendsMapper facHistoricofacturaMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1921,6 +1927,33 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				"FacturacionPySServiceImpl.getLineasFactura() -> Salida del servicio  para obtener las lineas de la factura");
 
 		return comunicacionCobroDTO;
+	}
+
+	@Override
+	public EstadosPagosDTO getEstadosPagos(String idFactura, HttpServletRequest request)
+			throws Exception {
+		EstadosPagosDTO estadosPagosDTO = new EstadosPagosDTO();
+		List<EstadosPagosItem> items = new ArrayList<>();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getEstadosPagos() -> Entrada al servicio para obtener las lineas de la factura");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("FacturacionPySServiceImpl.getEstadosPagos() -> obteniendo las lineas de la factura");
+
+			List<EstadosPagosItem> result = facHistoricofacturaMapper.getEstadosPagos(idFactura, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+
+			estadosPagosDTO.setEstadosPagosItems(result);
+		}
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getEstadosPagos() -> Salida del servicio  para obtener las lineas de la factura");
+
+		return estadosPagosDTO;
 	}
 
 	@Override

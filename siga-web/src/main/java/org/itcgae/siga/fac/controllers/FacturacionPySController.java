@@ -7,6 +7,7 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -604,6 +605,25 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ComunicacionCobroDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/getEstadosPagos")
+	ResponseEntity<EstadosPagosDTO> getEstadosPagos(@RequestParam String idFactura,
+													HttpServletRequest request) {
+		EstadosPagosDTO response = new EstadosPagosDTO();
+
+		try {
+			response = facturacionService.getEstadosPagos(idFactura, request);
+
+			if(response.getEstadosPagosItems().size()==200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<EstadosPagosDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<EstadosPagosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }
