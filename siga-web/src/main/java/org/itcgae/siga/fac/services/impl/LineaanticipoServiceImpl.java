@@ -26,6 +26,7 @@ import org.itcgae.siga.db.entities.PysLineaanticipo;
 import org.itcgae.siga.db.entities.PysLineaanticipoExample;
 import org.itcgae.siga.db.entities.PysLineaanticipoKey;
 import org.itcgae.siga.db.entities.PysServicioanticipo;
+import org.itcgae.siga.db.entities.PysServicioanticipoExample;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgActa;
 import org.itcgae.siga.db.entities.ScsEjgActaExample;
@@ -201,14 +202,14 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
                     
                     //1.c Se eliminan los servicios relacionados con el monedero (PYS_SERVICIOANTICIPO)
                     
-                    PysAnticipoletradoExample serviciosMonederoExample = new PysAnticipoletradoExample();
+                    PysServicioanticipoExample serviciosMonederoExample = new PysServicioanticipoExample();
                     
                     serviciosMonederoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(ficha.getIdPersona()).andIdanticipoIn(idAnticiposMonedero);
                     
-                    List<PysAnticipoletrado> servicios = pysAnticipoletradoMapper.selectByExample(serviciosMonederoExample);
+                    List<PysServicioanticipo> servicios = pysServicioanticipoMapper.selectByExample(serviciosMonederoExample);
                     
                     if(servicios != null && !servicios.isEmpty()) {
-                    	response = pysAnticipoletradoMapper.deleteByExample(serviciosMonederoExample);
+                    	response = pysServicioanticipoMapper.deleteByExample(serviciosMonederoExample);
                     	if(response == 0) {
                         	throw new SigaExceptions("Error al borrar los servicios del monedero en la BBDD.");
                         }
@@ -279,24 +280,24 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
                     
                     //2.c Se introduce fila en la tabla PYS_SERVICIOANTICIPO si es necesario
                     
-                    if(movimiento.getIdServicio() != null) {
-	                    PysServicioanticipo servicioAnticipo = new PysServicioanticipo(); 
-	                    
-	                    servicioAnticipo.setIdanticipo((short) idAnticipo);
-	                    servicioAnticipo.setIdpersona(ficha.getIdPersona());
-	                    servicioAnticipo.setIdservicio(movimiento.getIdServicio());
-	                    servicioAnticipo.setIdserviciosinstitucion(movimiento.getIdServiciosInstitucion());
-	                    servicioAnticipo.setIdtiposervicios(movimiento.getIdTipoServicios());
-	                    servicioAnticipo.setIdinstitucion(idInstitucion);
-	                    
-	                    servicioAnticipo.setFechamodificacion(new Date());
-	                    servicioAnticipo.setUsumodificacion(usuarios.get(0).getIdusuario());
-	                    
-	                    response = pysServicioanticipoMapper.insert(servicioAnticipo);
-	                    if(response == 0) {
-	                    	throw new SigaExceptions("Error al insertar un servicio relacionado con un anticipo en la BBDD.");
-	                    }
-                    }
+//                    if(movimiento.getIdServicio() != null) {
+//	                    PysServicioanticipo servicioAnticipo = new PysServicioanticipo(); 
+//	                    
+//	                    servicioAnticipo.setIdanticipo((short) idAnticipo);
+//	                    servicioAnticipo.setIdpersona(ficha.getIdPersona());
+//	                    servicioAnticipo.setIdservicio(movimiento.getIdServicio());
+//	                    servicioAnticipo.setIdserviciosinstitucion(movimiento.getIdServiciosInstitucion());
+//	                    servicioAnticipo.setIdtiposervicios(movimiento.getIdTipoServicios());
+//	                    servicioAnticipo.setIdinstitucion(idInstitucion);
+//	                    
+//	                    servicioAnticipo.setFechamodificacion(new Date());
+//	                    servicioAnticipo.setUsumodificacion(usuarios.get(0).getIdusuario());
+//	                    
+//	                    response = pysServicioanticipoMapper.insert(servicioAnticipo);
+//	                    if(response == 0) {
+//	                    	throw new SigaExceptions("Error al insertar un servicio relacionado con un anticipo en la BBDD.");
+//	                    }
+//                    }
                     
                     idAnticipo++;
                 }
@@ -381,6 +382,125 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 	            }
 	            
 	        }
+		return responsedto;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO updateServiciosMonedero(HttpServletRequest request, FichaMonederoItem ficha)
+			throws Exception {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"LineaanticipoServiceImpl.updateServiciosMonedero() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"LineaanticipoServiceImpl.updateServiciosMonedero() -> Salida de obtener información del usuario logeado");
+
+			List<PysServicioanticipo> servicios = new ArrayList<PysServicioanticipo>();
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"LineaanticipoServiceImpl.updateServiciosMonedero() -> Entrada para cambiar los movimientos del monedero");
+
+				// 1. Se eliminan los servicios relacionados con el monedero
+				// (PYS_SERVICIOANTICIPO)
+
+				PysServicioanticipoExample serviciosMonederoExample = new PysServicioanticipoExample();
+
+				serviciosMonederoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdpersonaEqualTo(ficha.getIdPersona());
+
+				servicios = pysServicioanticipoMapper.selectByExample(serviciosMonederoExample);
+
+				if (servicios != null && !servicios.isEmpty()) {
+					response = pysServicioanticipoMapper.deleteByExample(serviciosMonederoExample);
+					if (response == 0) {
+						throw new SigaExceptions("Error al borrar los servicios del monedero en la BBDD.");
+					}
+				}
+			}
+
+			// 2. Se comprueba que servicios se han mantenido para introducirlos de nuevo
+			// sin cambiar la fecha de edicion ni el usuario
+
+			// Comprobamos el id maximo de los anticipos asociados con esta persona
+			int idAnticipo = Integer.valueOf(
+					pysAnticipoletradoExtendsMapper.selectMaxIdAnticipo(idInstitucion, ficha.getIdPersona()).getNewId())
+					+ 1;
+
+			for (ListaServiciosMonederoItem servicioTarj : ficha.getServicios()) {
+				int i = 0;
+				while (i < servicios.size() && (!servicioTarj.getIdservicio().equals(servicios.get(i).getIdservicio())
+						&& !servicioTarj.getIdserviciosinstitucion()
+								.equals(servicios.get(i).getIdserviciosinstitucion())
+						&& !servicioTarj.getIdtiposervicios().equals(servicios.get(i).getIdtiposervicios()))) {
+					i++;
+				}
+
+				// Al salirse antes del bucle, significa que el servicio ya estaba asociado
+				// antes
+				if (i < servicios.size()) {
+					// 2.a Se introducen los servicios que se han mantenido
+
+					PysServicioanticipo servicioAnticipo = new PysServicioanticipo();
+
+					servicioAnticipo.setIdanticipo(servicios.get(i).getIdanticipo());
+					servicioAnticipo.setIdpersona(ficha.getIdPersona());
+					servicioAnticipo.setIdservicio(servicioTarj.getIdservicio());
+					servicioAnticipo.setIdserviciosinstitucion(servicioTarj.getIdserviciosinstitucion());
+					servicioAnticipo.setIdtiposervicios(servicioTarj.getIdtiposervicios());
+					servicioAnticipo.setIdinstitucion(idInstitucion);
+
+					servicioAnticipo.setFechamodificacion(servicios.get(i).getFechamodificacion());
+					servicioAnticipo.setUsumodificacion(servicios.get(i).getUsumodificacion());
+
+					response = pysServicioanticipoMapper.insert(servicioAnticipo);
+					if (response == 0) {
+						throw new SigaExceptions(
+								"Error al insertar un servicio relacionado con un anticipo en la BBDD.");
+					}
+				} else {
+					// 2.b Se introducen los servicios nuevos
+
+					PysServicioanticipo servicioAnticipo = new PysServicioanticipo();
+
+					servicioAnticipo.setIdanticipo((short) idAnticipo);
+					servicioAnticipo.setIdpersona(ficha.getIdPersona());
+					servicioAnticipo.setIdservicio(servicioTarj.getIdservicio());
+					servicioAnticipo.setIdserviciosinstitucion(servicioTarj.getIdserviciosinstitucion());
+					servicioAnticipo.setIdtiposervicios(servicioTarj.getIdtiposervicios());
+					servicioAnticipo.setIdinstitucion(idInstitucion);
+
+					servicioAnticipo.setFechamodificacion(new Date());
+					servicioAnticipo.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					response = pysServicioanticipoMapper.insert(servicioAnticipo);
+					if (response == 0) {
+						throw new SigaExceptions(
+								"Error al insertar un servicio relacionado con un anticipo en la BBDD.");
+					}
+
+					idAnticipo++;
+				}
+			}
+		}
+
+
+		LOGGER.info("LineaanticipoServiceImpl.updateServiciosMonedero() -> Salida del servicio.");
+
+		responsedto.setStatus(SigaConstants.OK);// HttpStatus.OK
+
 		return responsedto;
 	}
 }
