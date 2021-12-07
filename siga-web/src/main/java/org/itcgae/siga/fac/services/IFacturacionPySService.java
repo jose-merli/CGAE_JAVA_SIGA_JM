@@ -7,6 +7,7 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -33,6 +34,9 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.db.entities.FacDisqueteabonos;
+import org.itcgae.siga.db.entities.FacDisquetecargos;
+import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -110,4 +114,13 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO actualizarProgramacionFactura(FacFacturacionprogramadaItem facItem, HttpServletRequest request) throws Exception;
 
 	public ComunicacionCobroDTO getComunicacionCobro(String idFactura, HttpServletRequest request) throws Exception;
+
+	public EstadosPagosDTO getEstadosPagos(String idFactura, HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO actualizarFicheroAdeudos(FacDisquetecargos updateItem, HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO actualizarFicheroDevoluciones(FacDisquetedevoluciones updateItem, HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request) throws Exception;
+
 }
