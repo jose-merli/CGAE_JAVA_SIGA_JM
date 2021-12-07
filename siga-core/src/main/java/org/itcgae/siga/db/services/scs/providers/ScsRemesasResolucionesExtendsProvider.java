@@ -11,7 +11,7 @@ public class ScsRemesasResolucionesExtendsProvider {
 
 	private Logger LOGGER = Logger.getLogger(this.getClass());
 	
-	public String buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem, int idInstitucion) {
+	public String buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem, int idInstitucion, int tamMaximo) {
 		SQL sql = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
@@ -70,7 +70,7 @@ public class ScsRemesasResolucionesExtendsProvider {
 		
 		sql.WHERE("RES.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("RES.IDTIPOREMESA = 1");
-		sql.WHERE("ROWNUM <= 200");
+		sql.WHERE("ROWNUM <= " + tamMaximo);	
 		
 		sql.ORDER_BY("RES.IDREMESARESOLUCION DESC");
 		

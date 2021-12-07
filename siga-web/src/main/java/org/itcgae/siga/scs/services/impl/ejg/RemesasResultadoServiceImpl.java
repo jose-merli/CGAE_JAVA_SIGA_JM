@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.io.FileOutputStream;
 
@@ -123,6 +124,9 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 	@Autowired
 	private ScsRemesasResolucionesExtendsMapper scsRemesasResolucionesExtendsMapper;
 	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
 	@Override
 	public RemesaResultadoDTO buscarRemesasResultado(RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
 		LOGGER.info("getLabel() -> Entrada del servicio para obtener las remesas de resultados");
@@ -131,9 +135,24 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		RemesaResultadoDTO remesaResultadoDTO = new RemesaResultadoDTO();
 		List<RemesasResultadoItem> remesasResultadoItems = null;
-		
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+		genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+		.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+		genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+
 		if (idInstitucion != null) {
-			remesasResultadoItems = scsRemesasResultadoExtendsMapper.buscarRemesasResultado(remesasResultadoItem, idInstitucion);
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = 200;
+			}
+			
+			remesasResultadoItems = scsRemesasResultadoExtendsMapper.buscarRemesasResultado(remesasResultadoItem, idInstitucion, tamMaximo);
 			
 			if (remesasResultadoItems != null) {
 				remesaResultadoDTO.setRemesasResultadosItem(remesasResultadoItems);
