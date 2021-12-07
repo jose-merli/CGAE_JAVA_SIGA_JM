@@ -31,7 +31,7 @@ public interface ScsIntercambiosExtendsMapper {
 		@Result(column = "NUMREGISTROSERRONEOS", property = "numRegistrosErroneos", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "usuario", jdbcType = JdbcType.VARCHAR)
 	})
-	List<CargaMasivaProcuradorItem> listadoCargaMasivaProcuradores(CargaMasivaProcuradorBusquedaItem cargaMasivaItem, Short idInstitucion);
+	List<CargaMasivaProcuradorItem> listadoCargaMasivaProcuradores(CargaMasivaProcuradorBusquedaItem cargaMasivaItem, Short idInstitucion, Integer tamMaximo);
 	
 	@SelectProvider(type = ScsIntercambiosExtendsProvider.class, method = "getMaxIdEstadoPorEJG")
 	@Results({

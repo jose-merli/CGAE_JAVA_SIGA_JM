@@ -108,6 +108,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.SELECT("ejg.idpersonajg");
         sql.SELECT("perjg.NIF");
         sql.SELECT("col.NCOLEGIADO AS NCOLEGIADO");
+        
+        //REVISAR
+        sql.SELECT("GUARDIA.NOMBRE");
 
         // from
         sql.FROM("scs_ejg ejg");

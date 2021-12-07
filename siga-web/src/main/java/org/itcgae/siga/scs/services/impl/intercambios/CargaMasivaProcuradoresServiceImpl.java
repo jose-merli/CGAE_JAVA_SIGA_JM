@@ -52,6 +52,8 @@ import org.itcgae.siga.db.entities.CenCargamasiva;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenHistorico;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursos;
@@ -79,6 +81,7 @@ import org.itcgae.siga.db.mappers.ScsDesignaprocuradorMapper;
 import org.itcgae.siga.db.mappers.ScsProcuradorMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
@@ -148,6 +151,9 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 	@Autowired
 	private CenColegiadoMapper cenColegiadoMapper;
 	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
 	@Override
 	public InputStreamResource descargarModelo(HttpServletRequest request)
 			throws IOException, EncryptedDocumentException, InvalidFormatException {
@@ -205,6 +211,8 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		CargaMasivaProcuradorDTO cargaMasivaProcuradorDTO = new CargaMasivaProcuradorDTO();
 		List<CargaMasivaProcuradorItem> cargaMasivaProcurador = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -213,6 +221,26 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 					"listado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"buscarRemesas() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+			LOGGER.info(
+					"buscarRemesas() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			LOGGER.info(
+					"buscarRemesas() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
 
 			LOGGER.debug(
 					"listado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
@@ -221,7 +249,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 					"listado() / ScsRemesasExtendsMapper.buscarRemesas() -> Entrada a ScsIntercambiosExtendsMapper para obtener las Cargas Maivas de Procuradores");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				cargaMasivaProcurador = scsIntercambiosExtendsMapper.listadoCargaMasivaProcuradores(cargaMasivaItem, idInstitucion);
+				cargaMasivaProcurador = scsIntercambiosExtendsMapper.listadoCargaMasivaProcuradores(cargaMasivaItem, idInstitucion, tamMaximo);
 			}
 
 			LOGGER.debug(

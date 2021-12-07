@@ -26,7 +26,7 @@ public class ScsRemesasExtendsProvider {
 		return sql.toString();
 	}
 
-	public String buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion, String idLenguaje) {
+	public String buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
 		SQL subquery = new SQL();
 		SQL subquery1 = new SQL();
@@ -230,7 +230,8 @@ public class ScsRemesasExtendsProvider {
 			sql.WHERE("exists (" + subquery8.toString() + ")"); // año deEJG
 		}
 
-		sql.WHERE("ROWNUM <= 200");
+		if(tamMaximo != null)
+			sql.WHERE("ROWNUM <= " + tamMaximo);
 
 		LOGGER.info(sql.toString());
 

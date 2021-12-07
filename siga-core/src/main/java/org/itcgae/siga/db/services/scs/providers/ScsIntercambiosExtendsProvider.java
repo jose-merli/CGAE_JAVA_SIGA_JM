@@ -11,7 +11,7 @@ public class ScsIntercambiosExtendsProvider {
 	
 	private Logger LOGGER = Logger.getLogger(ScsRemesasExtendsProvider.class);
 	
-	public String listadoCargaMasivaProcuradores(CargaMasivaProcuradorBusquedaItem cargaMasivaItem, Short idInstitucion) {
+	public String listadoCargaMasivaProcuradores(CargaMasivaProcuradorBusquedaItem cargaMasivaItem, Short idInstitucion, Integer tamMaximo) {
 		SQL sql = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -39,7 +39,8 @@ public class ScsIntercambiosExtendsProvider {
 			sql.WHERE("TRUNC(fechacarga) <= TO_DATE('" + fechaCarga + "', 'DD/MM/RRRR')");
 		}
 		
-		sql.WHERE("rownum <= 200");
+		if(tamMaximo != null)
+			sql.WHERE("ROWNUM <= " + tamMaximo);
 		
 		LOGGER.debug(sql.toString());
 

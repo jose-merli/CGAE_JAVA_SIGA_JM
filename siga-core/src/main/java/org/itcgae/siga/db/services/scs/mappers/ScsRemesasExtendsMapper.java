@@ -45,7 +45,7 @@ public interface ScsRemesasExtendsMapper {
 		@Result(column = "TOTAL_EJG", property = "totalEJG", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "INCIDENCIAS", property = "incidencias", jdbcType = JdbcType.NUMERIC)
 	})
-	List<RemesasItem> buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion, String idLenguaje);
+	List<RemesasItem> buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion, Integer tamMaximo, String idLenguaje);
 	
 	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "isEstadoRemesaIniciada")
 	@Results({

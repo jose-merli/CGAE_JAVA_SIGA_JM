@@ -80,6 +80,7 @@ import org.itcgae.siga.db.entities.EcomOperacion;
 import org.itcgae.siga.db.entities.EcomOperacionTipoaccion;
 import org.itcgae.siga.db.entities.EcomOperacionTipoaccionExample;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
@@ -100,8 +101,10 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgEjgremesaExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgRemesaExtendsMapper;
+import org.itcgae.siga.db.services.cajg.mappers.CajgRespuestaEjgremesaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEejgPeticionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapper;
@@ -150,9 +153,15 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
 	@Autowired
 	private CajgRespuestaEjgremesaMapper cajgRespuestaEjgremesaMapper;
+	
+	@Autowired
+	private CajgRespuestaEjgremesaExtendsMapper cajgRespuestaEjgremesaExtendsMapper;
 	
 	@Autowired
 	private EcomColaMapper ecomColaMapper;
@@ -230,6 +239,8 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		RemesaBusquedaDTO remesaBusquedaDTO = new RemesaBusquedaDTO();
 		List<RemesasItem> remesasItems = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -238,6 +249,26 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					"buscarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"buscarRemesas() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+			LOGGER.info(
+					"buscarRemesas() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			LOGGER.info(
+					"buscarRemesas() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
 
 			LOGGER.debug(
 					"buscarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
@@ -249,7 +280,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					+ usuarios.get(0).getIdlenguaje() + " | fecha generacion -> "
 					+ remesasBusquedaItem.getFechaGeneracionDesde());
 
-			remesasItems = scsRemesasExtendsMapper.buscarRemesas(remesasBusquedaItem, idInstitucion,
+			remesasItems = scsRemesasExtendsMapper.buscarRemesas(remesasBusquedaItem, idInstitucion, tamMaximo, 
 					usuarios.get(0).getIdlenguaje());
 
 			String nRegistro;
@@ -1262,7 +1293,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			cajgRemesaKey.setIdinstitucion(idinstitucion);
 			cajgRemesaKey.setIdremesa(Long.valueOf(remesaAccionItem.getIdRemesa()));
 
-			insertResponseDTO = deleteCajgRespuestasRemesa(cajgRemesaKey);
+			insertResponseDTO = deleteCajgRespuestasRemesa(cajgRemesaKey, idinstitucion);
 
 			insertResponseDTO = insertaEstadoValidandoRemesa(cajgRemesaKey, mensajeValidando, request);
 
@@ -1304,7 +1335,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	}
 
 	@Transactional
-	public InsertResponseDTO deleteCajgRespuestasRemesa(CajgRemesa cajgRemesa){
+	public InsertResponseDTO deleteCajgRespuestasRemesa(CajgRemesa cajgRemesa, short idInstitucion){
 		// TODO Auto-generated method stub
 		int borrados = 0;
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
@@ -1316,24 +1347,10 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				throw new IllegalArgumentException("Se debe indicar el idinstitución e idremesa");
 			}
 			
-			CajgEjgremesaExample cajgEjgremesaExample = new CajgEjgremesaExample();
-			cajgEjgremesaExample.createCriteria().andIdinstitucionEqualTo(cajgRemesa.getIdinstitucion()).andIdremesaEqualTo(cajgRemesa.getIdremesa());
+			borrados = cajgRespuestaEjgremesaExtendsMapper.deleteConSelect(cajgRemesa.getIdremesa(), idInstitucion);
+			LOGGER.debug(String.format("Se han eliminado %s registros de la tabla CajgRespuestaEjgremesa asociados a la remesa %s y la institución %s", borrados, 
+					cajgRemesa.getIdremesa(), cajgRemesa.getIdinstitucion()));
 			
-			List<CajgEjgremesa> listaCajgEjgremesas = cajgEjgremesaExtendsMapper.selectByExample(cajgEjgremesaExample);
-			
-			if (listaCajgEjgremesas != null && listaCajgEjgremesas.size() > 0) {
-				List<Long> listIdejgremesa = new ArrayList<Long>();
-				
-				for (CajgEjgremesa cajgEjgremesa : listaCajgEjgremesas) {
-					listIdejgremesa.add(cajgEjgremesa.getIdejgremesa());
-				}
-				
-				CajgRespuestaEjgremesaExample cajgRespuestaEjgremesaExample = new CajgRespuestaEjgremesaExample();
-				cajgRespuestaEjgremesaExample.createCriteria().andIdejgremesaIn(listIdejgremesa);
-				borrados = cajgRespuestaEjgremesaMapper.deleteByExample(cajgRespuestaEjgremesaExample);
-				LOGGER.debug(String.format("Se han eliminado %s registros de la tabla CajgRespuestaEjgremesa asociados a la remesa %s y la institución %s", borrados, 
-						cajgRemesa.getIdremesa(), cajgRemesa.getIdinstitucion()));
-			}
 		}catch(Exception e) {
 			borrados = 0;
 			error.setCode(400);
