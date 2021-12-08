@@ -4,7 +4,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 public class CajgRespuestaEjgremesaExtendsProvider {
 
-	public String comboRemesa(Long idRemesa, Short idInstitucion) {
+	public String deleteConSelect(Long idRemesa, Short idInstitucion) {
 
 		SQL sql = new SQL();
 		SQL sql2 =new SQL();
