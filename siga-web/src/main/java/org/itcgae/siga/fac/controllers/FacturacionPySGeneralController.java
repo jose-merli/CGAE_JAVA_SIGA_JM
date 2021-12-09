@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.controllers;
 
 import org.itcgae.siga.DTO.fac.IVADTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.fac.services.IFacturacionPySGeneralService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -347,17 +348,17 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/comboEstadosFacturas")
-	ResponseEntity<ComboDTO> comboEstadosFacturas(HttpServletRequest request) {
-		ComboDTO response = new ComboDTO();
+	ResponseEntity<ComboDTO2> comboEstadosFacturas(HttpServletRequest request) {
+		ComboDTO2 response = new ComboDTO2();
 
 		try {
 			response = facturacionGeneralService.comboEstadosFacturas(request);
 
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<ComboDTO2>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
 			response.setError(UtilidadesString.creaError(e.getMessage()));
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ComboDTO2>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

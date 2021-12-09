@@ -21,7 +21,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         //select de abonos
         abonos.SELECT("'ABONO' tipo,f.idabono,f.numeroabono,f.idinstitucion,f.fecha fecha,"
                 + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,p.nombre nombre,(p.apellidos1 || ' ' || nvl(p.apellidos2, '')) apellidos,"
-                + "f.imptotal total,f.imppendienteporabonar pendiente,f.estado idestado,r.descripcion estado");
+                + "f.imptotal imptotal,f.imppendienteporabonar imptotalporpagar,f.estado idestado,r.descripcion estado");
 
         //joins
         abonos.FROM("fac_abono f");

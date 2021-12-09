@@ -1600,9 +1600,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			throws Exception {
 		FacturaDTO facturaDTO = new FacturaDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
+		List<FacturaItem> items = new ArrayList<>();
 
 		LOGGER.info(
-				"FacturacionPySServiceImpl.getFacturas() -> Entrada al servicio para obtener las facturas");
+		"FacturacionPySServiceImpl.getFacturas() -> Entrada al servicio para obtener las facturas");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
@@ -1610,9 +1611,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> obteniendo las facturas");
 
-			List<FacturaItem> items = facFacturaExtendsMapper.getFacturas(item,
-					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+			if(!((item.getEstadosFiltroFac() == null || item.getEstadosFiltroFac().isEmpty())
+					&& (item.getEstadosFiltroAb() != null && !item.getEstadosFiltroAb().isEmpty())))
+			items.addAll(facFacturaExtendsMapper.getFacturas(item,
+						usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
 
+			if(!((item.getEstadosFiltroAb() == null || item.getEstadosFiltroAb().isEmpty())
+					&& (item.getEstadosFiltroFac() != null && !item.getEstadosFiltroFac().isEmpty())))
 			items.addAll(facAbonoExtendsMapper.getAbonos(item,
 					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
 
