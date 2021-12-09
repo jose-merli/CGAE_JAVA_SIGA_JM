@@ -92,6 +92,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	private PysPreciosserviciosMapper pysPreciosServiciosMapper;
 	
 	
+	//Servicio que devuelve la informacion necesaria para la tabla en Facturacion --> Servicios.
 	@Override
 	public ListaServiciosDTO searchListadoServicios(HttpServletRequest request, FiltroServicioItem filtroServicioItem) {
 		ListaServiciosDTO listaServiciosDTO = new ListaServiciosDTO();
