@@ -956,13 +956,14 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	@Override
 	public ComboDTO parametrosLINEAS(String idInstitucion, HttpServletRequest request) throws Exception {
 		ComboDTO comboDTO = new ComboDTO();
-
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		ComboItem item1 = new ComboItem();
 		ComboItem item2 = new ComboItem();
 		ComboItem item3 = new ComboItem();
 
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
 		AdmUsuarios usuario = new AdmUsuarios();
+		GenParametros param = null;
 		short institucion;
 
 		LOGGER.debug("parametrosCONTROL() -> Entrada al servicio para recuperar los valores de los parámetros");
@@ -984,17 +985,20 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			genKey.setParametro("MODIFICAR_DESCRIPCION");
 			item1.setLabel("MODIFICAR_DESCRIPCION");
-			item1.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			param = genParametrosMapper.selectByPrimaryKey(genKey);
+			item1.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
 			comboItems.add(item1);
 
 			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
 			item2.setLabel("MODIFICAR_IMPORTE_UNITARIO");
-			item2.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			param = genParametrosMapper.selectByPrimaryKey(genKey);
+			item2.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
 			comboItems.add(item2);
 
 			genKey.setParametro("MODIFICAR_IVA");
 			item3.setLabel("MODIFICAR_IVA");
-			item3.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			param = genParametrosMapper.selectByPrimaryKey(genKey);
+			item3.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
 			comboItems.add(item3);
 
 			comboDTO.setCombooItems(comboItems);
