@@ -490,7 +490,7 @@ public class FacturacionPySController {
 		}
 	}
 
-	@PostMapping(value = "/getFactura")
+	@GetMapping(value = "/getFactura")
 	ResponseEntity<FacturaDTO> getFactura(@RequestParam String idFactura, @RequestParam String tipo,
 										   HttpServletRequest request) {
 		FacturaDTO response = new FacturaDTO();
