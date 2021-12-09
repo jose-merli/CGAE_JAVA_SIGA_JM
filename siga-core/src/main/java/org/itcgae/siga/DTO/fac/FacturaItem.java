@@ -81,7 +81,7 @@ public class FacturaItem {
 
 	//observaciones abono
 	String observacionesAbono;
-	String MotivosAbono;
+	String motivosAbono;
 
 	String facturasPendientesDesde;
 	String facturasPendientesHasta;
