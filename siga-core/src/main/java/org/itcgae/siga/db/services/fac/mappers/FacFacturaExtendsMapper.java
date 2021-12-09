@@ -21,7 +21,7 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "idfactura", property = "idFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fecha", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "facturacion", property = "facturacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ncolegiado", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ncolident", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nifcif", property = "numeroIdentificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "apellidos1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "apellidos2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
