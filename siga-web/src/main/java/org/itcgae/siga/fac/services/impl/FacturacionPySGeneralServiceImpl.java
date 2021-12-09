@@ -39,7 +39,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMa
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
-import org.itcgae.siga.db.services.fac.mappers.FactEstadosabonoExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacEstadosabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FactEstadosfacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
@@ -116,7 +116,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	private FactEstadosfacturaExtendsMapper factEstadosfacturaExtendsMapper;
 
 	@Autowired
-	private FactEstadosabonoExtendsMapper factEstadosabonoExtendsMapper;
+	private FacEstadosabonoExtendsMapper facEstadosabonoExtendsMapper;
 
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
@@ -772,7 +772,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			// Logica
 			comboItems = factEstadosfacturaExtendsMapper.comboEstadosFacturas(idioma);
-			comboItems.addAll(factEstadosabonoExtendsMapper.comboEstadosAbonos(idioma));
+			comboItems.addAll(facEstadosabonoExtendsMapper.comboEstadosAbonos(idioma));
 
 			comboDTO.setCombooItems(comboItems);
 
