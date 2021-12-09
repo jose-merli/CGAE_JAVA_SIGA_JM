@@ -40,7 +40,7 @@ public class ScsRemesasExtendsProvider {
 		SQL fechaGeneracion = new SQL();
 		SQL fechaEnvio = new SQL();
 		SQL fechaRecepcion = new SQL();
-		SQL fechamodificacion = new SQL();
+		SQL idestado = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		subquery.SELECT("fecharemesa");
@@ -148,10 +148,10 @@ public class ScsRemesasExtendsProvider {
 			fechaRecepcion.WHERE("TRUNC(est.fecharemesa) <= TO_DATE('" + fechaRecepcionHasta + "', 'DD/MM/RRRR')");
 		}
 
-		fechamodificacion.SELECT("MAX(fechamodificacion)");
-		fechamodificacion.FROM("cajg_remesaestados est2");
-		fechamodificacion.WHERE("est2.idinstitucion = rem.idinstitucion");
-		fechamodificacion.WHERE("est2.idremesa = rem.idremesa");
+		idestado.SELECT("MAX(idestado)");
+		idestado.FROM("cajg_remesaestados est2");
+		idestado.WHERE("est2.idinstitucion = rem.idinstitucion");
+		idestado.WHERE("est2.idremesa = rem.idremesa");
 
 		sql.SELECT("REM.IDREMESA IDREMESA");
 		sql.SELECT("REM.IDINSTITUCION IDINSTITUCION");
@@ -174,13 +174,15 @@ public class ScsRemesasExtendsProvider {
 		
 		sql.WHERE("est.idremesa = rem.idremesa");
 		
+		sql.WHERE("est.idinstitucion = rem.idinstitucion");
+		
 		if(remesasBusquedaItem.isInformacionEconomica()) {
 			sql.WHERE("rem.IDTIPOREMESA = 1");
 		}else {
 			sql.WHERE("(rem.IDTIPOREMESA = 0 or rem.IDTIPOREMESA is null)");
 		}
 
-		sql.WHERE("est.fechamodificacion = (" + fechamodificacion.toString() + ")");
+		sql.WHERE("est.idestado = (" + idestado.toString() + ")");
 
 		sql.WHERE("tipoest.idestado = est.idestado");
 
