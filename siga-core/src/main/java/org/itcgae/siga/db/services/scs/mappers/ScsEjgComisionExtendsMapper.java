@@ -139,7 +139,7 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "comboPresidente")
 	@Results({ @Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> comboPresidente(String string);
+	List<ComboItem> comboPresidente(String string, Short idInstitucion);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "getEtiquetasPonente")
 	@Results({ @Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR) })

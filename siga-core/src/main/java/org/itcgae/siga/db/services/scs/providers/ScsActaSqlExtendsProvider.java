@@ -32,7 +32,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 						+ "ACT.FECHAREUNION as FECHAREUNION, ACT.IDPRESIDENTE as IDPRESIDENTE, ACT.IDSECRETARIO as IDSECRETARIO,"
 						+ " f_siga_getrecurso(PRE.NOMBRE,1) AS NOMBREPRESIDENTE , f_siga_getrecurso(SEC.NOMBRE,1) AS NOMBRESECRETARIO   ");
 		sql.FROM("SCS_ACTACOMISION ACT, SCS_PONENTE PRE, SCS_PONENTE SEC");
-		sql.WHERE("ACT.IDINSTITUCION like '" + idInstitucion + "'");
+		sql.WHERE("ACT.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("PRE.IDPONENTE (+) = ACT.IDPRESIDENTE");
 		sql.WHERE("PRE.IDINSTITUCION (+) = ACT.IDINSTITUCION");
 		sql.WHERE("SEC.IDPONENTE (+) = ACT.IDSECRETARIO");
@@ -48,10 +48,10 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 
 		if (fechaResolucion != "0") {
 			LOGGER.info("*******************fechaResolucion********************" + fechaResolucion);
-			sql.WHERE("FECHARESOLUCION = '" + fechaResolucion + "'");
+			sql.WHERE("TRUNC(FECHARESOLUCION) = TO_DATE('" + fechaResolucion + "', 'DD/MM/RRRR')");
 		}
 		if (fechaReunion != "0") {
-			sql.WHERE("FECHAREUNION = '" + fechaReunion + "'");
+			sql.WHERE("TRUNC(FECHAREUNION) = TO_DATE('" + fechaReunion + "', 'DD/MM/RRRR')");
 		}
 
 		if (actasItem.getIdpresidente() != null) {

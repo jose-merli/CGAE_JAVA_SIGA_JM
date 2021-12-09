@@ -24,11 +24,12 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboPresidente(String idLenguaje) {
+	public String comboPresidente(String idLenguaje, Short idInstitucion) {
 
 		SQL sqlPresidente = new SQL();
 		sqlPresidente.SELECT("pon.IDPONENTE as value, f_siga_getrecurso(pon.nombre," + idLenguaje + ") as nombre");
 		sqlPresidente.FROM("scs_ponente pon");
+		sqlPresidente.WHERE("pon.idinstitucion = " + idInstitucion);
 		LOGGER.info("*******************comboPresidente********************" + sqlPresidente.toString());
 		return sqlPresidente.toString();
 	}
