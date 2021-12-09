@@ -95,6 +95,7 @@ public class FacturaItem {
 
 	String bancosCodigo;
 
-	List<String> estadosFiltro;
-	
+	List<String> estadosFiltroFac;
+	List<String> estadosFiltroAb;
+
 }

@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.IVADTO;
 import org.itcgae.siga.DTO.fac.IVAItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -37,6 +39,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMa
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FactEstadosabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FactEstadosfacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
@@ -111,6 +114,9 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private FactEstadosfacturaExtendsMapper factEstadosfacturaExtendsMapper;
+
+	@Autowired
+	private FactEstadosabonoExtendsMapper factEstadosabonoExtendsMapper;
 
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
@@ -747,11 +753,11 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	}
 
 	@Override
-	public ComboDTO comboEstadosFacturas(HttpServletRequest request) throws Exception {
-		ComboDTO comboDTO = new ComboDTO();
+	public ComboDTO2 comboEstadosFacturas(HttpServletRequest request) throws Exception {
+		ComboDTO2 comboDTO = new ComboDTO2();
 
 		AdmUsuarios usuario = new AdmUsuarios();
-		List<ComboItem> comboItems;
+		List<ComboItem2> comboItems;
 
 		LOGGER.debug("comboEstadosFacturas() -> Entrada al servicio para recuperar el combo de estados facturas");
 
@@ -766,6 +772,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			// Logica
 			comboItems = factEstadosfacturaExtendsMapper.comboEstadosFacturas(idioma);
+			comboItems.addAll(factEstadosabonoExtendsMapper.comboEstadosAbonos(idioma));
 
 			comboDTO.setCombooItems(comboItems);
 
