@@ -10,9 +10,9 @@ public class ListaServiciosMonederoItem {
 	private String precioPerio; //campo informativo que muestra lo que cuesta el servicio (mismo formato que la busqueda de servicios)
 	
 	//Clave primaria servicio
-	private Long idservicio;
-	private Short idtiposervicios;
-	private Long idserviciosinstitucion;
+	private Long idServicio;
+	private Short idTipoServicios;
+	private Long idServiciosInstitucion;
 	
 	
 	
@@ -34,23 +34,24 @@ public class ListaServiciosMonederoItem {
 	public void setPrecioPerio(String precioPerio) {
 		this.precioPerio = precioPerio;
 	}
-	public Long getIdservicio() {
-		return idservicio;
+	
+	public Long getIdServicio() {
+		return idServicio;
 	}
-	public void setIdservicio(Long idservicio) {
-		this.idservicio = idservicio;
+	public void setIdServicio(Long idServicio) {
+		this.idServicio = idServicio;
 	}
-	public Short getIdtiposervicios() {
-		return idtiposervicios;
+	public Short getIdTipoServicios() {
+		return idTipoServicios;
 	}
-	public void setIdtiposervicios(Short idtiposervicios) {
-		this.idtiposervicios = idtiposervicios;
+	public void setIdTipoServicios(Short idTipoServicios) {
+		this.idTipoServicios = idTipoServicios;
 	}
-	public Long getIdserviciosinstitucion() {
-		return idserviciosinstitucion;
+	public Long getIdServiciosInstitucion() {
+		return idServiciosInstitucion;
 	}
-	public void setIdserviciosinstitucion(Long idserviciosinstitucion) {
-		this.idserviciosinstitucion = idserviciosinstitucion;
+	public void setIdServiciosInstitucion(Long idServiciosInstitucion) {
+		this.idServiciosInstitucion = idServiciosInstitucion;
 	}
 
 }

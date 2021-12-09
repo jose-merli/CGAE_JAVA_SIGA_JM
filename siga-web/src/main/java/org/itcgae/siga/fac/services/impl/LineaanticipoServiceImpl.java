@@ -441,10 +441,10 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 
 			for (ListaServiciosMonederoItem servicioTarj : ficha.getServicios()) {
 				int i = 0;
-				while (i < servicios.size() && (!servicioTarj.getIdservicio().equals(servicios.get(i).getIdservicio())
-						&& !servicioTarj.getIdserviciosinstitucion()
+				while (i < servicios.size() && (!servicioTarj.getIdServicio().equals(servicios.get(i).getIdservicio())
+						&& !servicioTarj.getIdServiciosInstitucion()
 								.equals(servicios.get(i).getIdserviciosinstitucion())
-						&& !servicioTarj.getIdtiposervicios().equals(servicios.get(i).getIdtiposervicios()))) {
+						&& !servicioTarj.getIdTipoServicios().equals(servicios.get(i).getIdtiposervicios()))) {
 					i++;
 				}
 
@@ -457,9 +457,9 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 
 					servicioAnticipo.setIdanticipo(servicios.get(i).getIdanticipo());
 					servicioAnticipo.setIdpersona(ficha.getIdPersona());
-					servicioAnticipo.setIdservicio(servicioTarj.getIdservicio());
-					servicioAnticipo.setIdserviciosinstitucion(servicioTarj.getIdserviciosinstitucion());
-					servicioAnticipo.setIdtiposervicios(servicioTarj.getIdtiposervicios());
+					servicioAnticipo.setIdservicio(servicioTarj.getIdServicio());
+					servicioAnticipo.setIdserviciosinstitucion(servicioTarj.getIdServiciosInstitucion());
+					servicioAnticipo.setIdtiposervicios(servicioTarj.getIdTipoServicios());
 					servicioAnticipo.setIdinstitucion(idInstitucion);
 
 					servicioAnticipo.setFechamodificacion(servicios.get(i).getFechamodificacion());
@@ -477,9 +477,9 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 
 					servicioAnticipo.setIdanticipo((short) idAnticipo);
 					servicioAnticipo.setIdpersona(ficha.getIdPersona());
-					servicioAnticipo.setIdservicio(servicioTarj.getIdservicio());
-					servicioAnticipo.setIdserviciosinstitucion(servicioTarj.getIdserviciosinstitucion());
-					servicioAnticipo.setIdtiposervicios(servicioTarj.getIdtiposervicios());
+					servicioAnticipo.setIdservicio(servicioTarj.getIdServicio());
+					servicioAnticipo.setIdserviciosinstitucion(servicioTarj.getIdServiciosInstitucion());
+					servicioAnticipo.setIdtiposervicios(servicioTarj.getIdTipoServicios());
 					servicioAnticipo.setIdinstitucion(idInstitucion);
 
 					servicioAnticipo.setFechamodificacion(new Date());

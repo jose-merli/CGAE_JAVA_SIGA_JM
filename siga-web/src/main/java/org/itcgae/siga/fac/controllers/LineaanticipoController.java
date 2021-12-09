@@ -68,5 +68,16 @@ public class LineaanticipoController {
 		}
     }
 
+    @PostMapping(value = "/pys/updateServiciosMonedero")
+    ResponseEntity<UpdateResponseDTO> updateServiciosMonedero(HttpServletRequest request, @RequestBody FichaMonederoItem fichaMonederoItem) throws Exception {
+
+    	UpdateResponseDTO response = walletService.updateServiciosMonedero(request, fichaMonederoItem);
+		if (response.getStatus().equals(SigaConstants.OK)) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+    }
 
 }
