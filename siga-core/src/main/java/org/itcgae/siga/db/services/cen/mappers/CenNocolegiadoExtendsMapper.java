@@ -121,6 +121,18 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 	})
 	List<RetencionesItem> selectRetenciones(PersonaSearchDTO personaSearchDto, String idLenguaje, String idInstitucion);
 	
+	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectRetencionesColegial")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDRETENCION", property = "idRetencion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RETENCION", property = "porcentajeRetencion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RECURSO", property = "recursoRetencion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcionRetencion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<RetencionesItem> selectRetencionesColegial(PersonaSearchDTO personaSearchDto, String idLenguaje, String idInstitucion);
+	
 	@UpdateProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "disassociatePerson")
 	int disassociatePerson(AdmUsuarios usuario, DesasociarPersonaDTO desasociarPersona);
 	

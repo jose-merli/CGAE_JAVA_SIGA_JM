@@ -48,6 +48,11 @@ public class TarjetaDatosRetencionesController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "retenciones/searchRetencionColegiado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<RetencionesDTO> getRetencionesColegial(@RequestParam("numPagina") int numPagina,@RequestBody PersonaSearchDTO personaSearchDTO, HttpServletRequest request) { 
+		RetencionesDTO response = tarjetaDatosRetencionesService.getRetencionesColegial(numPagina,personaSearchDTO, request);
+		return new ResponseEntity<RetencionesDTO >(response, HttpStatus.OK);
+	}
 	
 	
 	

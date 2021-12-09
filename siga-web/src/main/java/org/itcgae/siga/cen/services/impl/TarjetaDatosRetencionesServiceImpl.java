@@ -275,5 +275,48 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 				"updateRetenciones() -> Salida del servicio para actualizar las retenciones asociadas a una persona jurídica");
 		return response;
 	}
+	
+	@Override
+	public RetencionesDTO getRetencionesColegial(int numPagina, PersonaSearchDTO personaSearchDTO, HttpServletRequest request) {
+		LOGGER.info("getRetencionesColegial() -> Entrada al servicio para buscar las retenciones de una persona jurídica");
+		RetencionesDTO retencionesDTO = new RetencionesDTO();
+		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+		retencionesDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		// Obtenemos el usuario que modifica
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"getRetencionesColegial() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"getRetencionesColegial() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		if (null != usuarios && usuarios.size() > 0) {
+			usuario = usuarios.get(0);
+
+			LOGGER.info(
+					"getRetencionesColegial() / cenNocolegiadoExtendsMapper.selectRetencionesColegial() -> Entrada a cenNocolegiadoExtendsMapper para obtener las retenciones de la persona jurídica indicada");
+			List<RetencionesItem> listaRetenciones = cenNocolegiadoExtendsMapper.selectRetencionesColegial(personaSearchDTO,
+					usuario.getIdlenguaje(), String.valueOf(idInstitucion));
+			LOGGER.info(
+					"getRetencionesColegial() / cenNocolegiadoExtendsMapper.selectRetencionesColegial() -> Salida de cenNocolegiadoExtendsMapper para obtener las retenciones de la persona jurídica indicada");
+
+			if (null != listaRetenciones && !listaRetenciones.isEmpty()) {
+				retencionesDTO.setRetencionesItemList(listaRetenciones);
+			} else {
+				retencionesDTO.getError().setDescription(
+						"No se han encontrado retenciones para el idPersona: " + personaSearchDTO.getIdPersona());
+			}
+		}
+
+		LOGGER.info("getRetencionesColegial() -> Salida del servicio para buscar las retenciones de una persona jurídica");
+
+		return retencionesDTO;
+	}
 
 }

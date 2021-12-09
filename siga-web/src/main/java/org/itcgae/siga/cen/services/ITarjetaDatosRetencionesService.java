@@ -15,4 +15,5 @@ public interface ITarjetaDatosRetencionesService {
 	public MaestroRetencionDTO getRetentionTypes(HttpServletRequest request);
 	public RetencionesDTO getRetenciones(int numPagina,PersonaSearchDTO personaSerachDTO, HttpServletRequest request);
 	public UpdateResponseDTO updateRetenciones(List<EtiquetaRetencionesDTO> etiquetaRetencionesDTO, String idPersona, HttpServletRequest request);
+	RetencionesDTO getRetencionesColegial(int numPagina, PersonaSearchDTO personaSearchDTO, HttpServletRequest request);
 }
