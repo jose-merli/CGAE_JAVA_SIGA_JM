@@ -51,4 +51,15 @@ public class ExpedientesEXEAController {
         return new ResponseEntity<ExpedienteDTO>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/{dniColegiado}")
+    public ResponseEntity<ExpedienteDTO> getExpedientesEXEAPersonalColegio(HttpServletRequest request, @PathVariable("dniColegiado") String dniColegiado) {
+        ExpedienteDTO response = null;
+        try {
+            response = expedientesEXEAService.getExpedientesEXEAPersonalColegio(request, dniColegiado);
+        }catch(Exception e) {
+            throw e;
+        }
+        return new ResponseEntity<ExpedienteDTO>(response, HttpStatus.OK);
+    }
+
 }

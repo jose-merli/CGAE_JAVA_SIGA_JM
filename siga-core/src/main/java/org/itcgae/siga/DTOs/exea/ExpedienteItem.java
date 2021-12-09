@@ -11,7 +11,16 @@ public class ExpedienteItem {
     private String estadoExpediente;
     private String relacion;
     private String fechaApertura;
+    private String idInstitucionTipoExpediente;
     private boolean exea;
+
+    public String getIdInstitucionTipoExpediente() {
+        return idInstitucionTipoExpediente;
+    }
+
+    public void setIdInstitucionTipoExpediente(String idInstitucionTipoExpediente) {
+        this.idInstitucionTipoExpediente = idInstitucionTipoExpediente;
+    }
 
     public String getIdTipoExpediente() {
         return idTipoExpediente;

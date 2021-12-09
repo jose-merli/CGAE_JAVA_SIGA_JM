@@ -1156,6 +1156,8 @@ public class SigaConstants {
 	public static final String RECURSO_MENU_EXP_EXEA = "menu.expedientesexea";
 	public static final String PARAM_MENU_EXEA_ACTIVO = "EXPEDIENTES_EXEA_ACTIVOS";
 	public static final String ID_APLICACION_PARAM = "ID_APLICACION";
+	public static final String EXEA_AUTENTICACION_URL_PARAM = "URL_EXEA_AUTENTICACION";
+	public static final String EXEA_SYNC_IP_PARAM = "EXEA_SYNC_IPS";
 	public static final String ID_SEDE_PARAM = "ID_SEDE";
 	public static final String EXPEDIENTE_ACEPTADO_EXEA = "Aceptado";
 	public static final String EXPEDIENTE_DENEGADO_EXEA = "Rechazado";

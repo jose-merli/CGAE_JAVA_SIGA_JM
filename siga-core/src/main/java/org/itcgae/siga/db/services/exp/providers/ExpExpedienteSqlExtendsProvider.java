@@ -11,7 +11,8 @@ public class ExpExpedienteSqlExtendsProvider extends ExpExpedienteSqlProvider {
         SQL.SELECT("e.numeroexpediente",
                 "e.anioexpediente as ANIOEXPEDIENTE",
                 "t.idtipoexpediente AS IDTIPOEXPEDIENTE",
-                "t.nombre                 AS tipoexpediente",
+                "t.nombre                 AS TIPOEXPEDIENTE",
+                "t.idinstitucion    AS IDINSTITUCIONTIPOEXPEDIENTE",
                 "es.nombre as estadoexpediente",
                 "TO_CHAR(e.fecha,'DD/MM/YYYY HH24:MI') as fechaapertura",
                 "'Denunciado' as relacion"); //Esta query es para traer expresamente los expedientes en los que el colegial es el denunciado, por lo que la relación sera siempre denunciado

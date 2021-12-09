@@ -21,6 +21,8 @@ public interface ExpExpedientesExtendsMapper extends ExpExpedienteMapper {
             @Result(column = "NUMEROEXPEDIENTE", property = "numExpediente", jdbcType = JdbcType.VARCHAR),
             @Result(column = "ANIOEXPEDIENTE", property = "anioExpediente", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDTIPOEXPEDIENTE", property = "idTipoExpediente", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDINSTITUCIONTIPOEXPEDIENTE", property = "idInstitucionTipoExpediente", jdbcType = JdbcType.VARCHAR),
+
     })
     List<ExpedienteItem> getExpedientesSigaColegiado(Short idInstitucion, String idPersona);
 }

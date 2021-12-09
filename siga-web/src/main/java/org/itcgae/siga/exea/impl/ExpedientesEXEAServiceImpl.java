@@ -1,5 +1,9 @@
 package org.itcgae.siga.exea.impl;
 
+import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeRequestDocument;
+import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeResponseDocument;
+import es.cgae.consultatramites.token.schema.UsuarioType;
+import ieci.tdw.ispac.services.ws.server.BusquedaAvanzadaDocument;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.exea.ExpedienteDTO;
@@ -21,9 +25,23 @@ import org.itcgae.siga.scs.services.impl.guardia.AsistenciaServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientExpedientesEXEA;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
 import java.util.List;
 
 @Service
@@ -139,7 +157,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         StringDTO stringDTO = new StringDTO();
         Error error = new Error();
-        String idAplicacion, idSede, cdgoExternoInstitucion;
+        String idAplicacion, idSede, cdgoExternoInstitucion, urlService;
         try {
             if (idInstitucion != null) {
                 AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -155,17 +173,36 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
                 if (usuarios != null && usuarios.size() > 0) {
 
+                    urlService = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.EXEA_AUTENTICACION_URL_PARAM, idInstitucion.toString()).getValor();
+
                     idSede = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.ID_SEDE_PARAM, idInstitucion.toString()).getValor();
 
                     idAplicacion = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.ID_APLICACION_PARAM, idInstitucion.toString()).getValor();
 
                     cdgoExternoInstitucion = cenInstitucionExtendsMapper.selectByPrimaryKey(idInstitucion).getCodigoext();
 
-                    if(!UtilidadesString.esCadenaVacia(idSede) && UtilidadesString.esCadenaVacia(idAplicacion)
+                    if(!UtilidadesString.esCadenaVacia(idSede) && !UtilidadesString.esCadenaVacia(idAplicacion)
                         && !"NULL".equals(idSede) && !"NULL".equals(idAplicacion)){
-                        //TODO: Llamada a EXEA obtencion token
-                        stringDTO.setValor("Bearer token valido");
+
+                        AutenticarUsuarioSedeRequestDocument requestDocument = AutenticarUsuarioSedeRequestDocument.Factory.newInstance();
+                        AutenticarUsuarioSedeRequestDocument.AutenticarUsuarioSedeRequest requestSede = requestDocument.addNewAutenticarUsuarioSedeRequest();
+                        requestSede.setCodInstitucion(cdgoExternoInstitucion);
+                        requestSede.setIdAplicacion(idAplicacion);
+                        requestSede.setIdSede(idSede);
+                        UsuarioType usuarioType = requestSede.addNewIdUsuario();
+                        usuarioType.setDNI(dni);
+
+                        LOGGER.info("getTokenLoginEXEA() / Request a EXEA: " + requestDocument.xmlText());
+
+                        AutenticarUsuarioSedeResponseDocument response = _clientExpedientesEXEA.autenticarUsuarioEXEA(requestDocument,urlService);
+
+                        if(response.getAutenticarUsuarioSedeResponse().getError() != null){
+                            stringDTO.setValor("Error al logar en EXEA: " + response.getAutenticarUsuarioSedeResponse().getError().getCodError() + " " + response.getAutenticarUsuarioSedeResponse().getError().getDesError());
+                        }else {
+                            stringDTO.setValor("Bearer " + response.getAutenticarUsuarioSedeResponse().getToken());
+                        }
                     }
+
                 }
             }
         }catch(Exception e){
@@ -175,6 +212,85 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             error.description("Error al obtener el token de EXEA");
         }
         return stringDTO;
+    }
+
+    @Override
+    public ExpedienteDTO getExpedientesEXEAPersonalColegio(HttpServletRequest request, String identificacionColegiado) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ExpedienteDTO expedienteDTO = new ExpedienteDTO();
+        Error error = new Error();
+        try {
+            if (idInstitucion != null) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "getExpedientesEXEAPersonalColegio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+                LOGGER.info(
+                        "getExpedientesEXEAPersonalColegio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (usuarios != null && usuarios.size() > 0) {
+
+                    BusquedaAvanzadaDocument busquedaAvanzadaDocument = BusquedaAvanzadaDocument.Factory.newInstance();
+                    BusquedaAvanzadaDocument.BusquedaAvanzada busquedaAvanzada = busquedaAvanzadaDocument.addNewBusquedaAvanzada();
+                    busquedaAvanzada.setDominio(0);
+                    String xmlBusqueda = getXMLBusquedaAvanzada(identificacionColegiado);
+                    if(!UtilidadesString.esCadenaVacia(xmlBusqueda)){
+                        busquedaAvanzada.setXmlBusqueda(xmlBusqueda);
+                    }
+
+                }
+            }
+        }catch(Exception e){
+            LOGGER.error("getExpedientesEXEAPersonalColegio() / ERROR: " + e.getMessage(), e);
+            error.setCode(500);
+            error.setMessage("Error al buscar los expedientes de EXEA");
+            error.description("Error al buscar los expedientes de EXEA");
+            expedienteDTO.setError(error);
+        }
+        return expedienteDTO;
+    }
+
+    private String getXMLBusquedaAvanzada(String dniColegiado) throws ParserConfigurationException, TransformerException {
+
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+        // root elements
+        Document doc = docBuilder.newDocument();
+        Element rootElement = doc.createElement("search");
+        doc.appendChild(rootElement);
+
+        Element entityElement = doc.createElement("entity");
+        rootElement.appendChild(entityElement);
+
+        Element nifFieldElement = doc.createElement("field");
+        entityElement.appendChild(nifFieldElement);
+
+        Element nameNifFieldElement = doc.createElement("name");
+        nameNifFieldElement.appendChild(doc.createTextNode("NIFCIFTITULAR"));
+        nifFieldElement.appendChild(nameNifFieldElement);
+
+        Element operatorNifFieldElement = doc.createElement("operator");
+        operatorNifFieldElement.appendChild(doc.createTextNode("="));
+        nifFieldElement.appendChild(operatorNifFieldElement);
+
+        Element valueNifFieldElement = doc.createElement("value");
+        valueNifFieldElement.appendChild(doc.createTextNode(dniColegiado));
+        nifFieldElement.appendChild(valueNifFieldElement);
+
+        StringWriter writer = new StringWriter();
+
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+
+        return writer.getBuffer().toString();
     }
 
 }

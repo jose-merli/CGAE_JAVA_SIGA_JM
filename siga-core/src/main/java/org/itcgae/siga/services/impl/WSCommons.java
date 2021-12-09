@@ -265,8 +265,14 @@ public class WSCommons {
 		}else if(xmlObjectResponse instanceof ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse){
 
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse) xmlObjectResponse).addNewError();
-			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
-			errorType.setDescripcion(message);
+
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
 
 			if(xmlObjectRequest != null){
 				errorType.setXmlRequest(xmlObjectRequest.xmlText());
@@ -275,8 +281,14 @@ public class WSCommons {
 		}else if(xmlObjectResponse instanceof AltaColegiadoResponseDocument.AltaColegiadoResponse){
 
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((AltaColegiadoResponseDocument.AltaColegiadoResponse) xmlObjectResponse).addNewError();
-			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
-			errorType.setDescripcion(message);
+
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
 			if(xmlObjectRequest != null){
 				errorType.setXmlRequest(xmlObjectRequest.xmlText());
 			}
@@ -284,8 +296,14 @@ public class WSCommons {
 		}else if(xmlObjectResponse instanceof AltaSancionResponseDocument.AltaSancionResponse){
 
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((AltaSancionResponseDocument.AltaSancionResponse) xmlObjectResponse).addNewError();
-			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
-			errorType.setDescripcion(message);
+
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
 
 			if(xmlObjectRequest != null){
 				errorType.setXmlRequest(xmlObjectRequest.xmlText());
@@ -294,8 +312,13 @@ public class WSCommons {
 		}else if(xmlObjectResponse instanceof UpdateEstadoExpedienteResponseDocument.UpdateEstadoExpedienteResponse){
 
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((UpdateEstadoExpedienteResponseDocument.UpdateEstadoExpedienteResponse) xmlObjectResponse).addNewError();
-			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
-			errorType.setDescripcion(message);
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
 
 			if(xmlObjectRequest != null){
 				errorType.setXmlRequest(xmlObjectRequest.xmlText());
@@ -304,8 +327,13 @@ public class WSCommons {
 		}else if(xmlObjectResponse instanceof ActualizacionSancionResponseDocument.ActualizacionSancionResponse){
 
 			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((ActualizacionSancionResponseDocument.ActualizacionSancionResponse) xmlObjectResponse).addNewError();
-			errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
-			errorType.setDescripcion(message);
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
 
 			if(xmlObjectRequest != null){
 				errorType.setXmlRequest(xmlObjectRequest.xmlText());

@@ -10,5 +10,6 @@ public interface ExpedientesEXEAService {
     public StringDTO isEXEActivoInstitucion(HttpServletRequest request);
     public ExpedienteDTO getExpedientesSIGAColegiado (HttpServletRequest request, String idPersona);
     public StringDTO getTokenLoginEXEA(HttpServletRequest request);
+    public ExpedienteDTO getExpedientesEXEAPersonalColegio(HttpServletRequest request, String identificacionColegiado);
 
 }

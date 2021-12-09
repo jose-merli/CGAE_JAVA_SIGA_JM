@@ -8,10 +8,7 @@ import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -19,6 +16,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import com.exea.sincronizacion.redabogacia.TipoColegiacionType;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
@@ -35,44 +33,8 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISolicitudIncorporacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmConfig;
-import org.itcgae.siga.db.entities.AdmConfigExample;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenBancos;
-import org.itcgae.siga.db.entities.CenBancosExample;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteExample;
-import org.itcgae.siga.db.entities.CenClienteKey;
-import org.itcgae.siga.db.entities.CenColacambioletrado;
-import org.itcgae.siga.db.entities.CenColegiado;
-import org.itcgae.siga.db.entities.CenColegiadoExample;
-import org.itcgae.siga.db.entities.CenColegiadoKey;
-import org.itcgae.siga.db.entities.CenCuentasbancarias;
-import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
-import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
-import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
-import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
-import org.itcgae.siga.db.entities.CenDirecciones;
-import org.itcgae.siga.db.entities.CenDireccionesKey;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
-import org.itcgae.siga.db.entities.CenNocolegiado;
-import org.itcgae.siga.db.entities.CenNocolegiadoKey;
-import org.itcgae.siga.db.entities.CenPais;
-import org.itcgae.siga.db.entities.CenPaisExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
-import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosKey;
-import org.itcgae.siga.db.mappers.AdmConfigMapper;
-import org.itcgae.siga.db.mappers.CenClienteMapper;
-import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
-import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
-import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
-import org.itcgae.siga.db.mappers.CenInstitucionMapper;
-import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
+import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
@@ -91,6 +53,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTipocolegiacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoidentificacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposolicitudExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
+import org.itcgae.siga.exea.services.ExpedientesEXEAService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -181,6 +144,12 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+
+	@Autowired
+	private CenReservaNcolegiadoMapper cenReservaNcolegiadoMapper;
+
+	@Autowired
+	private ExpedientesEXEAService expedientesEXEAService;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -331,8 +300,26 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					}
 					
 					List<CenColegiado> resultados = _cenColegiadoMapper.selectByExample(exampleColegiado);
+
+					boolean isActivoEXEA = SigaConstants.DB_TRUE.equals(expedientesEXEAService.isEXEActivoInstitucion(request).getValor());
+					boolean duplicadoEXEA = false;
+					if(isActivoEXEA){
+						CenReservaNcolegiadoExample cenReservaNcolegiadoExample = new CenReservaNcolegiadoExample();
+						cenReservaNcolegiadoExample.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andNcolegiadoEqualTo(solIncorporacionItem.getNumColegiado())
+								.andTipoNcolegiadoEqualTo("10".equals(tipoColegiacion) ? "E":"I")
+								.andEstadoIn(Arrays.asList("A","R"));
+
+						List<CenReservaNcolegiado> reservas = cenReservaNcolegiadoMapper.selectByExample(cenReservaNcolegiadoExample);
+
+						duplicadoEXEA = (reservas != null && !reservas.isEmpty());
+					}
+
 					if(resultados.size() > 0) {
 						solIncorporacionResult.setNumColegiado(resultados.get(0).getNcolegiado());
+					}else if (duplicadoEXEA){
+						solIncorporacionResult.setNumColegiado("Duplicado");
 					}else {
 						solIncorporacionResult.setNumColegiado("disponible");
 					}
@@ -1547,22 +1534,28 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			key.setModulo(SigaConstants.MODULO_CENSO);
 			key.setParametro(SigaConstants.PARAMETRO_CONTADOR_UNICO);
 			GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+			short tipoColegiacion = solicitud.getIdtipocolegiacion();
 			
 			String contadorUnico = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
 
 			StringDTO nColegiado = new StringDTO();
-			if (contadorUnico.equals("1")) {
-				nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiadoComunitario(String.valueOf(solicitud.getIdinstitucion()));
-			} else {
-				// 10 --> No Inscrito/Español
-				// 20 --> Inscrito/Comunitario
-				short tipoColegiacion = solicitud.getIdtipocolegiacion();
-				
-				if(tipoColegiacion == 10) {
-					nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(String.valueOf(solicitud.getIdinstitucion()));
-				}else if(tipoColegiacion == 20) {
-					nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNComunitario(String.valueOf(solicitud.getIdinstitucion()));
+			String numColegiadoRes = checkIfNColegiadoLiberado(tipoColegiacion, solicitud.getIdinstitucion());
+
+			if(UtilidadesString.esCadenaVacia(numColegiadoRes)) {
+				if (contadorUnico.equals("1")) {
+					nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiadoComunitario(String.valueOf(solicitud.getIdinstitucion()));
+				} else {
+					// 10 --> No Inscrito/Español
+					// 20 --> Inscrito/Comunitario
+
+					if (tipoColegiacion == 10) {
+						nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(String.valueOf(solicitud.getIdinstitucion()));
+					} else if (tipoColegiacion == 20) {
+						nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNComunitario(String.valueOf(solicitud.getIdinstitucion()));
+					}
 				}
+			}else{
+				nColegiado.setValor(numColegiadoRes);
 			}
 			
 			colegiado.setNcolegiado(nColegiado.getValor());
@@ -1842,6 +1835,44 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		MaxIdDto id = cenColacambioletradoMapper.selectNuevoId(idInstitucion, idPersona);
 		return id.idMax;
+	}
+
+	/**
+	 * Metodo que comprueba si hay algun numero de colegiado liberado antes de hacer un MAX+1
+	 *
+	 * @param tipoColegiacion
+	 * @param idInstitucion
+	 * @return
+	 */
+	private String checkIfNColegiadoLiberado(short tipoColegiacion, Short idInstitucion){
+		String numColegiado = "";
+
+		CenReservaNcolegiadoExample cenReservaNcolegiadoExample = new CenReservaNcolegiadoExample();
+
+		CenReservaNcolegiadoExample.Criteria criteria = cenReservaNcolegiadoExample.createCriteria()
+				.andEstadoEqualTo("L") //Estado Liberado
+				.andIdinstitucionEqualTo(idInstitucion);
+
+		if(tipoColegiacion == 20){
+			criteria.andTipoNcolegiadoEqualTo("I");
+		}else{
+			criteria.andTipoNcolegiadoEqualTo("E");
+		}
+
+		cenReservaNcolegiadoExample.setOrderByClause("NCOLEGIADO ASC");
+
+		List<CenReservaNcolegiado> numerosReservados = cenReservaNcolegiadoMapper.selectByExample(cenReservaNcolegiadoExample);
+
+		if(numerosReservados != null
+				&& !numerosReservados.isEmpty()){ //Se ha encontrado un numero liberado, lo marcamos como reservado, asociamos el expediente y lo devolvemos
+			CenReservaNcolegiado reserva = numerosReservados.get(0);
+			reserva.setEstado("R"); //Reservado
+
+			cenReservaNcolegiadoMapper.updateByPrimaryKey(reserva);
+
+			numColegiado = reserva.getNcolegiado();
+		}
+		return numColegiado;
 	}
 
 }

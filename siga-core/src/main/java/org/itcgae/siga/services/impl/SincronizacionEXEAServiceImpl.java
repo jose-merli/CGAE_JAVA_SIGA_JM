@@ -11,9 +11,11 @@ import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.CenReservaNcolegiadoMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.*;
+import org.itcgae.siga.db.services.exp.mappers.ExpProcedimientosExeaExtendsMapper;
 import org.itcgae.siga.exception.ValidationException;
 import org.itcgae.siga.services.ISincronizacionEXEAService;
 import org.apache.log4j.Logger;
@@ -100,6 +102,12 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
     @Autowired
     private AdmConfigMapper admConfigMapper;
 
+    @Autowired
+    private CenReservaNcolegiadoMapper cenReservaNcolegiadoMapper;
+
+    @Autowired
+    private ExpProcedimientosExeaExtendsMapper expProcedimientosExeaExtendsMapper;
+
     /**
      * Metodo que recibe una peticion {@link ObtenerNumColegiacionRequestDocument} y, tras varias validaciones, devuelve o no el proximo numero de colegiado
      *
@@ -135,6 +143,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 errorType.setXmlRequest("Sin error XML");
                 LOGGER.error("SincronizacionEXEAServiceImpl.getNumColegiacion() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getColegio().getCodigoColegio());
             }
+            wsCommons.comprobarIP(responseDocument.getObtenerNumColegiacionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
 
             if(idInstitucion != null) {
                 String identificacion = "";
@@ -178,27 +187,37 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 //Si no está dado de alta como colegiado procedemos a buscar, dependiendo del tipo de colegiacion, el proximo numero de colegiado
                 if (!yaDadoAlta) {
                     LOGGER.info("SincronizacionEXEAServiceImpl.getNumColegiacion() / No dado de alta, se procede a buscar nuevo numero de colegiado");
-                    // Comprobamos si para la institucion tiene un contador unico
-                    GenParametrosKey key = new GenParametrosKey();
-                    key.setIdinstitucion(idInstitucion);
-                    key.setModulo(SigaConstants.MODULO_CENSO);
-                    key.setParametro(SigaConstants.PARAMETRO_CONTADOR_UNICO);
-                    GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
 
-                    String contadorUnico = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
-                    //Si la institucion tiene un contador unico
-                    if (SigaConstants.DB_TRUE.equals(contadorUnico)) {
-                        nextNumColegiado = cenSolicitudincorporacionExtendsMapper.getMaxNColegiadoComunitario(idInstitucion.toString()).getValor();
-                        LOGGER.info("SincronizacionEXEAServiceImpl.getNumColegiacion() / La institucion tiene contador unico, devolvemos nColegiado o nComunitario - " + nextNumColegiado);
-                        //Ejerciente || No Ejerciente
-                    } else if (TipoColegiacionType.E.equals(request.getTipoSolicitud())
-                            || TipoColegiacionType.N.equals(request.getTipoSolicitud())) {
-                        nextNumColegiado = cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(idInstitucion.toString()).getValor();
-                        LOGGER.info("SincronizacionEXEAServiceImpl.getNumColegiacion() / El tipo de solicitud es Ejerciente/No Ejerciente, devolvemos siguiente numero de colegiado - "+ nextNumColegiado);
-                        //Inscrito
-                    } else if (TipoColegiacionType.I.equals(request.getTipoSolicitud())) {
-                        nextNumColegiado = cenSolicitudincorporacionExtendsMapper.getMaxNComunitario(idInstitucion.toString()).getValor();
-                        LOGGER.info("SincronizacionEXEAServiceImpl.getNumColegiacion() / El tipo de solicitud es de Inscrito, devolvemos siguiente numero de comunitario");
+                    nextNumColegiado = checkIfNColegiadoLiberado(request.getTipoSolicitud(), idInstitucion, request.getNumeroExpediente());
+
+                    //Si no hay ninguno liberado, buscamos el siguiente con MAX+1
+                    if(UtilidadesString.esCadenaVacia(nextNumColegiado)) {
+                        // Comprobamos si para la institucion tiene un contador unico
+                        GenParametrosKey key = new GenParametrosKey();
+                        key.setIdinstitucion(idInstitucion);
+                        key.setModulo(SigaConstants.MODULO_CENSO);
+                        key.setParametro(SigaConstants.PARAMETRO_CONTADOR_UNICO);
+                        GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+
+                        String contadorUnico = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
+                        //Si la institucion tiene un contador unico
+                        if (SigaConstants.DB_TRUE.equals(contadorUnico)) {
+                            nextNumColegiado = cenSolicitudincorporacionExtendsMapper.getMaxNColegiadoComunitario(idInstitucion.toString()).getValor();
+                            LOGGER.info("SincronizacionEXEAServiceImpl.getNumColegiacion() / La institucion tiene contador unico, devolvemos nColegiado o nComunitario - " + nextNumColegiado);
+                            //Ejerciente || No Ejerciente
+                        } else if (TipoColegiacionType.E.equals(request.getTipoSolicitud())
+                                || TipoColegiacionType.N.equals(request.getTipoSolicitud())) {
+                            nextNumColegiado = cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(idInstitucion.toString()).getValor();
+                            LOGGER.info("SincronizacionEXEAServiceImpl.getNumColegiacion() / El tipo de solicitud es Ejerciente/No Ejerciente, devolvemos siguiente numero de colegiado - " + nextNumColegiado);
+                            //Inscrito
+                        } else if (TipoColegiacionType.I.equals(request.getTipoSolicitud())) {
+                            nextNumColegiado = cenSolicitudincorporacionExtendsMapper.getMaxNComunitario(idInstitucion.toString()).getValor();
+                            LOGGER.info("SincronizacionEXEAServiceImpl.getNumColegiacion() / El tipo de solicitud es de Inscrito, devolvemos siguiente numero de comunitario");
+                        }
+
+                        reservarNColegiado(request.getTipoSolicitud(), idInstitucion, request.getNumeroExpediente(), nextNumColegiado);
+                    }else {
+                        reservarNColegiado(request.getTipoSolicitud(), idInstitucion, request.getNumeroExpediente(), nextNumColegiado);
                     }
 
                     ColegioType colegioType = response.addNewColegio();
@@ -260,6 +279,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 errorType.setXmlRequest("Sin error XML");
                 LOGGER.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getColegiado().getColegiacion().getColegio().getCodigoColegio());
             }
+            wsCommons.comprobarIP(responseDocument.getAltaColegiadoResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
             if(idInstitucion != null) {
                 if (UtilidadesString.esCadenaVacia(numColegiado)) {
 
@@ -471,6 +491,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 errorType.setXmlRequest("Sin error XML");
                 LOGGER.error("SincronizacionEXEAServiceImpl.altaSancion() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getSancion().getDatosSancion().getColegioConsejo().getCodigoColegio());
             }
+            wsCommons.comprobarIP(responseDocument.getAltaSancionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
             if(idInstitucion != null) {
 
                 String identificacion;
@@ -559,6 +580,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                 CenSolicitudincorporacion cenSolicitudincorporacion = solicitudes.get(0);
 
+                wsCommons.comprobarIP(responseDocument.getUpdateEstadoExpedienteResponse(), ipCliente, cenSolicitudincorporacion.getIdinstitucion(), SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
+
                 cenSolicitudincorporacion.setFechaestadosolicitud(request.getFechaEstado().getTime());
                 cenSolicitudincorporacion.setFechaestado(request.getFechaEstado().getTime());
                 cenSolicitudincorporacion.setFechamodificacion(new Date());
@@ -573,6 +596,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                     cenSolicitudincorporacion.setIdestado((short)30);
 
+                    liberarNumColegiado(request);
                 }
 
                 affectedRows += cenSolicitudincorporacionExtendsMapper.updateByPrimaryKey(cenSolicitudincorporacion);
@@ -637,6 +661,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 LOGGER.error("SincronizacionEXEAServiceImpl.actualizarSancion() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getSancion().getColegioConsejo().getCodigoColegio());
             }
 
+            wsCommons.comprobarIP(responseDocument.getActualizacionSancionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
+
             if(idInstitucion != null) {
 
                 CenSancionExample cenSancionExample = new CenSancionExample();
@@ -689,6 +715,110 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         LOGGER.info("SincronizacionEXEAServiceImpl.actualizarSancion() / RESPONSE : " + responseDocument.xmlText());
         LOGGER.info("SincronizacionEXEAServiceImpl.actualizarSancion() - FIN");
         return responseDocument;
+    }
+
+    /**
+     * Metodo que se encarga de liberar un numero de colegiado reservado en caso de que el tipo de expediente sea de colegiacion
+     *
+     * @param request
+     */
+    private void liberarNumColegiado(UpdateEstadoExpedienteRequestDocument.UpdateEstadoExpedienteRequest request){
+
+        ExpProcedimientosExeaExample expProcedimientosExeaExample = new ExpProcedimientosExeaExample();
+        expProcedimientosExeaExample.createCriteria().andCodPcdExeaEqualTo(request.getTipoExpediente()).andEsColegiacionEqualTo((short)1);
+
+        List<ExpProcedimientosExea> procedimientosExea = expProcedimientosExeaExtendsMapper.selectByExample(expProcedimientosExeaExample);
+
+        if(procedimientosExea != null && !procedimientosExea.isEmpty()){
+
+            CenReservaNcolegiadoExample cenReservaNcolegiadoExample = new CenReservaNcolegiadoExample();
+            cenReservaNcolegiadoExample.createCriteria().andNexpexeaEqualTo(request.getNumeroExpediente()).andEstadoEqualTo("R");
+
+            List<CenReservaNcolegiado> numerosColegiados = cenReservaNcolegiadoMapper.selectByExample(cenReservaNcolegiadoExample);
+
+            if(numerosColegiados != null && !numerosColegiados.isEmpty()){
+                CenReservaNcolegiado cenReservaNcolegiado = numerosColegiados.get(0);
+
+                cenReservaNcolegiado.setEstado("L");
+
+                cenReservaNcolegiadoMapper.updateByPrimaryKey(cenReservaNcolegiado);
+            }
+        }
+
+    }
+
+    /**
+     * Metodo que comprueba si hay algun numero de colegiado liberado antes de hacer un MAX+1
+     *
+     * @param tipoColegiacion
+     * @param idInstitucion
+     * @return
+     */
+    private String checkIfNColegiadoLiberado(TipoColegiacionType.Enum tipoColegiacion, Short idInstitucion, String numExpediente){
+        String numColegiado = "";
+
+        CenReservaNcolegiadoExample cenReservaNcolegiadoExample = new CenReservaNcolegiadoExample();
+
+        CenReservaNcolegiadoExample.Criteria criteria = cenReservaNcolegiadoExample.createCriteria()
+                                                                            .andEstadoEqualTo("L") //Estado Liberado
+                                                                            .andIdinstitucionEqualTo(idInstitucion);
+
+        if(TipoColegiacionType.I.equals(tipoColegiacion)){
+            criteria.andTipoNcolegiadoEqualTo("I");
+        }else{
+            criteria.andTipoNcolegiadoEqualTo("E");
+        }
+
+        cenReservaNcolegiadoExample.setOrderByClause("NCOLEGIADO ASC");
+
+       List<CenReservaNcolegiado> numerosReservados = cenReservaNcolegiadoMapper.selectByExample(cenReservaNcolegiadoExample);
+
+       if(numerosReservados != null
+            && !numerosReservados.isEmpty()){ //Se ha encontrado un numero liberado, lo marcamos como reservado, asociamos el expediente y lo devolvemos
+           CenReservaNcolegiado reserva = numerosReservados.get(0);
+           reserva.setEstado("R"); //Reservado
+           reserva.setNexpexea(numExpediente);
+
+           cenReservaNcolegiadoMapper.updateByPrimaryKey(reserva);
+
+           numColegiado = reserva.getNcolegiado();
+       }
+        return numColegiado;
+    }
+
+    /**
+     * Metodo que inserta el nuevo numero de colegiado como reservado
+     *
+     * @param tipoColegiacion
+     * @param idInstitucion
+     * @param numExpediente
+     * @param numColegiado
+     */
+    private void reservarNColegiado (TipoColegiacionType.Enum tipoColegiacion, Short idInstitucion, String numExpediente, String numColegiado){
+
+        CenReservaNcolegiadoKey cenReservaNcolegiadoKey = new CenReservaNcolegiadoKey();
+        cenReservaNcolegiadoKey.setIdinstitucion(idInstitucion);
+        cenReservaNcolegiadoKey.setNcolegiado(numColegiado);
+        cenReservaNcolegiadoKey.setTipoNcolegiado(TipoColegiacionType.I.equals(tipoColegiacion) ? "I":"E");
+
+        CenReservaNcolegiado reserva = cenReservaNcolegiadoMapper.selectByPrimaryKey(cenReservaNcolegiadoKey);
+
+        if(reserva != null){
+
+            reserva.setEstado("R");
+            reserva.setNexpexea(numExpediente);
+            cenReservaNcolegiadoMapper.updateByPrimaryKey(reserva);
+
+        }else {
+            CenReservaNcolegiado cenReservaNcolegiado = new CenReservaNcolegiado();
+            cenReservaNcolegiado.setIdinstitucion(idInstitucion);
+            cenReservaNcolegiado.setNexpexea(numExpediente);
+            cenReservaNcolegiado.setEstado("R");//Estado reservado
+            cenReservaNcolegiado.setNcolegiado(numColegiado);
+            cenReservaNcolegiado.setTipoNcolegiado(TipoColegiacionType.I.equals(tipoColegiacion) ? "I" : "E");
+
+            cenReservaNcolegiadoMapper.insert(cenReservaNcolegiado);
+        }
     }
 
     /**
@@ -1338,6 +1468,21 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             LOGGER.info("SincronizacionEXEAServiceImpl.insertarDatosColegiado() / Numero de colegiado obtenido: " + nColegiado);
         }else{
             nColegiado = numColegiado;
+
+            CenReservaNcolegiadoExample cenReservaNcolegiadoExample = new CenReservaNcolegiadoExample();
+            cenReservaNcolegiadoExample.createCriteria()
+                    .andNcolegiadoEqualTo(nColegiado)
+                    .andIdinstitucionEqualTo(idInstitucion)
+                    .andEstadoEqualTo("R")
+                    .andTipoNcolegiadoEqualTo(TipoColegiacionType.I.equals(colegiacionType.getTipoSolicitud()) ? "I":"E");
+
+            List<CenReservaNcolegiado> reservas = cenReservaNcolegiadoMapper.selectByExample(cenReservaNcolegiadoExample);
+
+            if(reservas != null && !reservas.isEmpty()){
+                CenReservaNcolegiado reservaNcolegiado = reservas.get(0);
+                reservaNcolegiado.setEstado("A");
+                affectedRows += cenReservaNcolegiadoMapper.updateByPrimaryKey(reservaNcolegiado);
+            }
         }
 
         colegiado.setUsumodificacion(0);
