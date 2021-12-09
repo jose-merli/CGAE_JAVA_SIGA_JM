@@ -1,6 +1,8 @@
 package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.IVADTO;
+import org.itcgae.siga.DTO.fac.IVAItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmContador;
@@ -685,10 +687,10 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	}
 
 	@Override
-	public ComboDTO comboTiposIVA(HttpServletRequest request) throws Exception {
-		ComboDTO comboDTO = new ComboDTO();
+	public IVADTO comboTiposIVA(HttpServletRequest request) throws Exception {
+		IVADTO comboDTO = new IVADTO();
 
-		List<ComboItem> comboItems;
+		List<IVAItem> comboItems;
 		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboTiposIVA() -> Entrada al servicio para recuperar el combo de tipos de IVA");
@@ -705,7 +707,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			// Logica
 			comboItems = pySTipoIvaExtendsMapper.comboTiposIVA(idioma);
 
-			comboDTO.setCombooItems(comboItems);
+			comboDTO.setIVAItems(comboItems);
 
 		}
 

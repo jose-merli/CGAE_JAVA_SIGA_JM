@@ -3,6 +3,7 @@ package org.itcgae.siga.DTO.fac;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class FacturaItem {
@@ -33,28 +34,30 @@ public class FacturaItem {
 	String importefacturadoDesde;
 	String importefacturadoHasta;
 
-	//importes ambos
-	String importeCaja;
-	String importeBanco;
-	String importePagado;
-
-	String importeAdeudadoPendiente;
 	String importeAdeudadoHasta;
 	String importeAdeudadoDesde;
 
 	//importes factura
 	String importeAnticipado;
 	String importeCompensado;
+	String importeCaja;
+	String importeBanco;
+	String importePagado;
+	String importeAdeudadoPendiente;
 
-	//importes Abono
-	String importeAnulado;
+	//importes abono
+	String importeAnuladoAb;
+	String importeCajaAb;
+	String importeBancoAb;
+	String importePagadoAb;
+	String importeAdeudadoPendienteAb;
 
 	//facturacion
 	String idFacturacion;
 	String idSerieFacturacion;
 	String serie;
 	String facturacion;
-	Date fechaEminionFacturacion;
+	Date fechaEmisionFacturacion;
 	String identificadorAdeudos;
 	String identificadorTransferencia;
 	String identificadorDevolucion;
@@ -72,6 +75,14 @@ public class FacturaItem {
 	String descripcionDeudor;
 	String abreviaturaDeudor;
 
+	//observaciones factura
+	String observacionesFactura;
+	String observacionesFicheroFactura;
+
+	//observaciones abono
+	String observacionesAbono;
+	String MotivosAbono;
+
 	String facturasPendientesDesde;
 	String facturasPendientesHasta;
 
@@ -82,11 +93,8 @@ public class FacturaItem {
 	Date ultimaComunicacion;
 	String nombreInstitucion;
 
-	//observaciones factura
-	String observacionesFactura;
-	String observacionesFicheroFactura;
+	String bancosCodigo;
 
-	//observaciones abono
-	String observacionesAbono;
-	String motivosAbono;
+	List<String> estadosFiltro;
+	
 }

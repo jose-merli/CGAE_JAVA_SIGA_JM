@@ -53,13 +53,18 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "IMPTOTALPAGADOPORBANCO", property = "importeBanco", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPTOTALPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPTOTALPORPAGAR", property = "importeAdeudadoPendiente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPANULADO", property = "importeAnuladoAb", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPTOTALABONADOEFECTIVO", property = "importeCajaAb", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPTOTALABONADOPORBANCO", property = "importeBancoAb", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPTOTALABONADO", property = "importePagadoAb", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPPENDIENTEPORABONAR", property = "importeAdeudadoPendienteAb", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "OBSERVACIONES", property = "observacionesFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "OBSERVINFORME", property = "observacionesFicheroFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDSERIEFACTURACION", property = "idSerieFacturacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPROGRAMACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREABREVIADO", property = "serie", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FACTURACION", property = "facturacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAMODIFICACION", property = "fechaEminionFacturacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAMODIFICACION", property = "fechaEmisionFacturacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idCliente", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIFCIF", property = "numeroIdentificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
@@ -67,7 +72,8 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "NCOLIDENT", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONADEUDOR", property = "idDeudor", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ACREEDOR_ID", property = "identificacionDeudor", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ACREEDOR_NOMBRE", property = "descripcionDeudor", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "ACREEDOR_NOMBRE", property = "descripcionDeudor", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturaItem> getFactura(String idFactura, String idInstitucion);
 }

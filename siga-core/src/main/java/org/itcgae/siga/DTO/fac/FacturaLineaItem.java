@@ -16,4 +16,5 @@ public class FacturaLineaItem {
 	String importeIVA;
 	String importeTotal;
 	String importeAnticipado;
+	String idCodigoBanco;
 }
