@@ -36,7 +36,7 @@ public class ScsIntercambiosExtendsProvider {
 		if(cargaMasivaItem.getFechaCarga() != null) {
 			String fechaCarga = "";
 			fechaCarga = dateFormat.format(cargaMasivaItem.getFechaCarga());
-			sql.WHERE("TRUNC(fechacarga) <= TO_DATE('" + fechaCarga + "', 'DD/MM/RRRR')");
+			sql.WHERE("TRUNC(fechacarga) = TO_DATE('" + fechaCarga + "', 'DD/MM/RRRR')");
 		}
 		
 		if(tamMaximo != null)
