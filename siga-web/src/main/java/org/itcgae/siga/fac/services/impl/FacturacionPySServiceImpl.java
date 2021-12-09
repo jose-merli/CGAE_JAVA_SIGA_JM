@@ -1787,6 +1787,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
+		GenParametros parametros = null;
 
 		LOGGER.info(
 				"FacturacionPySServiceImpl.guardarLineasFactura() -> Entrada al servicio para guardar las lineas de una factura");
@@ -1802,13 +1803,16 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			genKey.setModulo("FAC");
 
 			genKey.setParametro("MODIFICAR_DESCRIPCION");
-			boolean modificarDescripcion = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
+			boolean modificarDescripcion = !(parametros == null || parametros.getValor().equals("N"));
 
 			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
-			boolean modificarImporteUnitario = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
+			boolean modificarImporteUnitario = !(parametros == null || parametros.getValor().equals("N"));
 
 			genKey.setParametro("MODIFICAR_IVA");
-			boolean modificarIVA = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
+			boolean modificarIVA = !(parametros == null || parametros.getValor().equals("N"));
 
 			FacLineafacturaKey key = new FacLineafacturaKey();
 			key.setIdfactura(item.getIdFactura());
