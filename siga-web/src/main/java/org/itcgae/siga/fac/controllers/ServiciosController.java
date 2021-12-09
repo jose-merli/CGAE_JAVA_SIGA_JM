@@ -35,6 +35,7 @@ public class ServiciosController {
 	@Autowired 
 	private IServiciosService serviciosService;
 
+	//Servicio que devuelve la informacion necesaria para la tabla en Facturacion --> Servicios.
 	@PostMapping(value = "/pys/buscarServicios")
 	ResponseEntity<ListaServiciosDTO> listadoServicios(HttpServletRequest request, @RequestBody FiltroServicioItem filtroServicioItem) { 
 		ListaServiciosDTO response = serviciosService.searchListadoServicios(request, filtroServicioItem);
