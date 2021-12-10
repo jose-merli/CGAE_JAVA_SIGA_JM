@@ -815,7 +815,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	
 										if(scsEstadoEjg.getObservaciones() != null) {
 											scsEstadoEjg.setObservaciones(
-													scsEstadoEjg.getObservaciones() + " Expediente excluido del acta "
+													scsEstadoEjg.getObservaciones() + ". \n" 
+															+ " Expediente excluido del acta "
 															+ acta.getAnioacta() + "/" + acta.getNumeroacta());
 										}else {
 											scsEstadoEjg.setObservaciones(
@@ -858,7 +859,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	
 						if(scsEstadoEjg.getObservaciones() != null) {
 							scsEstadoEjg.setObservaciones(
-									scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
+									scsEstadoEjg.getObservaciones() + ". \n"
+											+ "Expediente incluido masivamente en el acta "
 											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
 						}else {
 							scsEstadoEjg.setObservaciones(
@@ -1033,7 +1035,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 								
 								 if(scsEstadoEjg.getObservaciones() != null) {
 									 scsEstadoEjg.setObservaciones( 
-											 scsEstadoEjg.getObservaciones() + " Expediente excluido masivamente del acta " + acta.getAnioacta() + "/" +
+											 scsEstadoEjg.getObservaciones() + ".  \n"
+											 		+ "Expediente excluido masivamente del acta " + acta.getAnioacta() + "/" +
 									  acta.getNumeroacta());
 								 }else {
 									 scsEstadoEjg.setObservaciones( 
