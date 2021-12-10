@@ -33,6 +33,13 @@ application:
     /pys/nuevoProducto: [406]
     /pys/editarProducto: [406]
     /pys/reactivarBorradoFisicoLogicoProductos: [407]
-    /pys/formasPagoProducto: [408]    
+    /pys/formasPagoProducto: [408]
+
+    # Permisos Servicios
+    /pys/nuevoServicio: [409]
+    /pys/reactivarBorradoFisicoLogicoServicios: [410]
+    /pys/formasPagoServicio: [411]
+    /pys/crearEditarPrecios: [413]
+    /pys/eliminarPrecios: [414]
 
     # Fin permisos para el módulo de ProductosYServicios
