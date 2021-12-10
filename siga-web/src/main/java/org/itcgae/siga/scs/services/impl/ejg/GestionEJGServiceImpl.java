@@ -2559,7 +2559,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 ejgKey.setIdtipoejg(datos.getIdTipoEJG());
                 ejgKey.setNumero(datos.getNumero());
 
-                ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+                ScsEjgWithBLOBs ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
 //                ejg.setIdacta(datos.getIdActa());
 //                ejg.setAnioacta(datos.getAnnioActa());
@@ -2589,6 +2589,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     ejg.setRequierenotificarproc("1");
                 } else
                     ejg.setRequierenotificarproc("0");
+                
+                ejg.setRatificaciondictamen(datos.getRatificacionDictamen());
 
                 // Se ejecuta el método de que sustituye los triggers asociados a la tabla
                 // SCS_EJG

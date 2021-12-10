@@ -942,8 +942,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
     public String getResolucion(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
         SQL sql = new SQL();
 
-        sql.SELECT("resolucion.idtiporatificacionejg," + " resolucion.idfundamentojuridico,"
-                + " resolucion.ratificaciondictamen," + " ejg.idorigencajg," + " ejg.aniocajg," + " ejg.numero_cajg,"
+        sql.SELECT("ejg.idtiporatificacionejg," + " ejg.idfundamentojuridico,"
+                + " ejg.ratificaciondictamen," + " ejg.idorigencajg," + " ejg.aniocajg," + " ejg.numero_cajg,"
                 + " ejg.idponente," + " ejg.fechapresentacionponente," + " ejg.fecharesolucioncajg,"
                 + " ejg.fecharatificacion," + " ejg.fechanotificacion," + " ejg.refauto," + " ejg.turnadoratificacion,"
                 + " ejg.requierenotificarproc," + " ejg.anioacta," + " ejg.idacta,"
