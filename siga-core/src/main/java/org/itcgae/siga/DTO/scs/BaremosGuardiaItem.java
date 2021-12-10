@@ -26,6 +26,9 @@ public class BaremosGuardiaItem {
    String idTurno;
    String idGuardia;
    String idhitoconfiguracion;
+   String agrupar;
+   String precioMin;
+   String precioMax;
  
 //	public String getGuardias() {
 //		return guardias;

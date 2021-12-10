@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.scs.BaremosGuardiaDTO;
@@ -57,9 +59,9 @@ public class BaremosGuardiaController {
         }
 	}
 	
-	@RequestMapping(value = "/nuevoBaremo",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BaremosGuardiaDTO> insertBaremosGuardia(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
-		BaremosGuardiaDTO response = baremosGuardiaServices.insertBaremo(baremosGuardiaItem, request);
+	@RequestMapping(value = "/saveBaremo",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BaremosGuardiaDTO> insertBaremosGuardia(@RequestBody List<BaremosGuardiaItem> baremosGuardiaItem, HttpServletRequest request) {
+		BaremosGuardiaDTO response = baremosGuardiaServices.saveBaremo(baremosGuardiaItem, request);
 		if (response.getError().getCode() == 200) {
             return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
         } else {
@@ -67,15 +69,12 @@ public class BaremosGuardiaController {
         }
 	}
 	
-	@RequestMapping(value = "/actualizarBaremo",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BaremosGuardiaDTO> updateBaremosGuardia(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
-		BaremosGuardiaDTO response = baremosGuardiaServices.updateBaremo(baremosGuardiaItem, request);
-		if (response.getError().getCode() == 200) {
-            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.FORBIDDEN);
-        }
-	}
+	
+	
+	
+	
+	
+	
 	
 	
 }
