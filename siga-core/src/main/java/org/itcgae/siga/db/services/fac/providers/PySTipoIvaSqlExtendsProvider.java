@@ -38,6 +38,7 @@ public class PySTipoIvaSqlExtendsProvider extends PysTipoivaSqlProvider{
 
 		sql.SELECT("p.idtipoiva");
 		sql.SELECT("f_siga_getrecurso (p.descripcion,'" + idioma + "') AS DESCRIPCION");
+		sql.SELECT("p.valor");
 
 		sql.FROM("pys_tipoiva p");
 

@@ -2,7 +2,9 @@ package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -35,6 +37,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMa
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacEstadosabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FactEstadosfacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
@@ -109,6 +112,9 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private FactEstadosfacturaExtendsMapper factEstadosfacturaExtendsMapper;
+
+	@Autowired
+	private FacEstadosabonoExtendsMapper facEstadosabonoExtendsMapper;
 
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
@@ -685,10 +691,10 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	}
 
 	@Override
-	public ComboDTO comboTiposIVA(HttpServletRequest request) throws Exception {
-		ComboDTO comboDTO = new ComboDTO();
+	public ComboDTO2 comboTiposIVA(HttpServletRequest request) throws Exception {
+		ComboDTO2 comboDTO = new ComboDTO2();
 
-		List<ComboItem> comboItems;
+		List<ComboItem2> comboItems;
 		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.debug("comboTiposIVA() -> Entrada al servicio para recuperar el combo de tipos de IVA");
@@ -745,11 +751,11 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	}
 
 	@Override
-	public ComboDTO comboEstadosFacturas(HttpServletRequest request) throws Exception {
-		ComboDTO comboDTO = new ComboDTO();
+	public ComboDTO2 comboEstadosFacturas(HttpServletRequest request) throws Exception {
+		ComboDTO2 comboDTO = new ComboDTO2();
 
 		AdmUsuarios usuario = new AdmUsuarios();
-		List<ComboItem> comboItems;
+		List<ComboItem2> comboItems;
 
 		LOGGER.debug("comboEstadosFacturas() -> Entrada al servicio para recuperar el combo de estados facturas");
 
@@ -764,6 +770,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			// Logica
 			comboItems = factEstadosfacturaExtendsMapper.comboEstadosFacturas(idioma);
+			comboItems.addAll(facEstadosabonoExtendsMapper.comboEstadosAbonos(idioma));
 
 			comboDTO.setCombooItems(comboItems);
 
@@ -956,13 +963,14 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	@Override
 	public ComboDTO parametrosLINEAS(String idInstitucion, HttpServletRequest request) throws Exception {
 		ComboDTO comboDTO = new ComboDTO();
-
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		ComboItem item1 = new ComboItem();
 		ComboItem item2 = new ComboItem();
 		ComboItem item3 = new ComboItem();
 
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
 		AdmUsuarios usuario = new AdmUsuarios();
+		GenParametros param = null;
 		short institucion;
 
 		LOGGER.debug("parametrosCONTROL() -> Entrada al servicio para recuperar los valores de los parámetros");
@@ -984,17 +992,20 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			genKey.setParametro("MODIFICAR_DESCRIPCION");
 			item1.setLabel("MODIFICAR_DESCRIPCION");
-			item1.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			param = genParametrosMapper.selectByPrimaryKey(genKey);
+			item1.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
 			comboItems.add(item1);
 
 			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
 			item2.setLabel("MODIFICAR_IMPORTE_UNITARIO");
-			item2.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			param = genParametrosMapper.selectByPrimaryKey(genKey);
+			item2.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
 			comboItems.add(item2);
 
 			genKey.setParametro("MODIFICAR_IVA");
 			item3.setLabel("MODIFICAR_IVA");
-			item3.setValue(genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N") ? "0" : "1");
+			param = genParametrosMapper.selectByPrimaryKey(genKey);
+			item3.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
 			comboItems.add(item3);
 
 			comboDTO.setCombooItems(comboItems);

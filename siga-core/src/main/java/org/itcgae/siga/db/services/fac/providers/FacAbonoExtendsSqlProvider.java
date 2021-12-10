@@ -21,7 +21,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         //select de abonos
         abonos.SELECT("'ABONO' tipo,f.idabono,f.numeroabono,f.idinstitucion,f.fecha fecha,"
                 + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,p.nombre nombre,(p.apellidos1 || ' ' || nvl(p.apellidos2, '')) apellidos,"
-                + "f.imptotal total,f.imppendienteporabonar pendiente,f.estado idestado,r.descripcion estado");
+                + "f.imptotal imptotal,f.imppendienteporabonar imptotalporpagar,f.estado idestado,r.descripcion estado");
 
         //joins
         abonos.FROM("fac_abono f");
@@ -130,10 +130,12 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
                 +"A.IMPTOTALIVA,A.IMPTOTAL IMPANULADO,A.IMPTOTALABONADOEFECTIVO,A.IMPTOTALABONADOPORBANCO,"
                 +"A.IMPTOTALABONADO,A.IMPPENDIENTEPORABONAR,A.OBSERVACIONES,A.MOTIVOS,P.IDPERSONA,P.NIFCIF,P.NOMBRE,"
                 +"(P.APELLIDOS1 || ' ' || NVL(P.APELLIDOS2, '')) APELLIDOS,NVL(COL.NCOLEGIADO,COL.NCOMUNITARIO) NCOLIDENT,"
-                +"A.IDPERSONADEUDOR,M.ACREEDOR_ID,M.ACREEDOR_NOMBRE");
+                +"A.IDPERSONADEUDOR,M.ACREEDOR_ID,M.ACREEDOR_NOMBRE,FF.IMPTOTALANTICIPADO,FF.IMPTOTALCOMPENSADO,FF.IMPTOTALPAGADOPORCAJA,"
+                + "FF.IMPTOTALPAGADOPORBANCO,FF.IMPTOTALPAGADO,FF.IMPTOTALPORPAGAR");
 
         query.FROM("FAC_ABONO A");
         query.INNER_JOIN("CEN_PERSONA P ON (P.IDPERSONA = A.IDPERSONA)");
+        query.INNER_JOIN("FAC_FACTURA FF ON (FF.IDFACTURA = A.IDFACTURA AND FF.IDINSTITUCION = A.IDINSTITUCION)");
         query.LEFT_OUTER_JOIN("CEN_MANDATOS_CUENTASBANCARIAS M ON (M.IDPERSONA = A.IDPERSONADEUDOR AND M.IDINSTITUCION = A.IDINSTITUCION AND M.IDMANDATO = 1)");
         query.LEFT_OUTER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = P.IDPERSONA AND COL.IDINSTITUCION = A.IDINSTITUCION)");
 

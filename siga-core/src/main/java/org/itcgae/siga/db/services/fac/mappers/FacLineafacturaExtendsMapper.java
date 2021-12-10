@@ -28,7 +28,8 @@ public interface FacLineafacturaExtendsMapper extends FacLineafacturaMapper {
 			@Result(column = "tipoIVA", property = "tipoIVA", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "importeIVA", property = "importeIVA", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "importeTotal", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IMPORTEANTICIPADO", property = "importeAnticipado", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IMPORTEANTICIPADO", property = "importeAnticipado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idCodigoBanco", property = "idCodigoBanco", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturaLineaItem> getLineasFactura(String idFactura, String idInstitucion);
 }

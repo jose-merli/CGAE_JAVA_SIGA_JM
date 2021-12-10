@@ -14,10 +14,12 @@ public class EstadosPagosItem {
 	String impTotalPagado;
 	String impTotalPorPagar;
 	String IDSJCS;
+	Boolean enlaceFactura;
 	String numeroFactura;
 	String idFactura;
 	String idCargos;
 	String idDevoluciones;
+	Boolean enlaceAbono;
 	String numeroAbono;
 	String idAbono;
 }

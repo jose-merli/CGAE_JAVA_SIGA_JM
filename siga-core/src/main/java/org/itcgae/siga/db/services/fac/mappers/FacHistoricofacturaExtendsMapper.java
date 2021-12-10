@@ -25,10 +25,12 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 			@Result(column = "IMPTOTALPAGADO", property = "impTotalPagado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPTOTALPORPAGAR", property = "impTotalPorPagar", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDSJCS", property = "IDSJCS", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ENLACEFACTURA", property = "enlaceFactura", jdbcType = JdbcType.BOOLEAN),
 			@Result(column = "NUMEROFACTURA", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDCARGOS", property = "idCargos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDDEVOLUCIONES", property = "idDevoluciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ENLACEABONO", property = "enlaceAbono", jdbcType = JdbcType.BOOLEAN),
 			@Result(column = "NUMEROABONO", property = "numeroAbono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
 	})
