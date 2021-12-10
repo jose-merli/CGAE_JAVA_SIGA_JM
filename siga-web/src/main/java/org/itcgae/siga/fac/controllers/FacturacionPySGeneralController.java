@@ -1,6 +1,5 @@
 package org.itcgae.siga.fac.controllers;
 
-import org.itcgae.siga.DTO.fac.IVADTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -246,17 +245,17 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/comboTiposIVA")
-	ResponseEntity<IVADTO> comboTiposIVA(HttpServletRequest request) {
-		IVADTO response = new IVADTO();
+	ResponseEntity<ComboDTO2> comboTiposIVA(HttpServletRequest request) {
+		ComboDTO2 response = new ComboDTO2();
 		
 		try {
 			response = facturacionGeneralService.comboTiposIVA(request);
 
-			return new ResponseEntity<IVADTO>(response, HttpStatus.OK);
+			return new ResponseEntity<ComboDTO2>(response, HttpStatus.OK);
 		} catch (Exception e) {
 
 			response.setError(UtilidadesString.creaError(e.getMessage()));
-			return new ResponseEntity<IVADTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ComboDTO2>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
