@@ -109,11 +109,22 @@ public class CertificacionFacSJCSServicesCAMHelper {
     private BufferedWriter bwError;
     private String cabeceraLog = null;
     
-	private void initIncidencias() {
+	private void initInforme() {
 		List<PCAJGAlcActIncidencia> lInc = incMapper.selectAll();
 		Predicate<PCAJGAlcActIncidencia> pIncNoImprimir = inc->inc.getIdTipoIncidencia().equals(PCAJG_ALC_ACT_TIPO_INCIDENCIA.NO_IMPRIMIR.getId());
 		mIncidencias = lInc.stream().filter(pIncNoImprimir.negate()).collect(Collectors.toMap(x->x.getCampo(), x->x));
 		sColumnasNoImprimir=lInc.stream().filter(pIncNoImprimir).map(x->x.getCampo().toUpperCase()).collect(Collectors.toSet());
+	}
+	
+	private void finalizaInforme() {
+		if(bwError!=null) {
+			try {
+				bwError.close();
+				bwError = null;
+			} catch (Exception e) {
+				LOGGER.error("Error al cerrar bwError:" + e);
+			};
+		}
 	}
   
     
@@ -168,7 +179,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
 		String rutaPadre;
 		String rutaFichero;
 		File fichero=null;
-		initIncidencias();
+		initInforme();
 		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -191,6 +202,8 @@ public class CertificacionFacSJCSServicesCAMHelper {
 		if(hayErrores) {
 			deleteFileSafeMode(fichero);
 		}
+		
+		finalizaInforme();
 		
 		return fichero;
 	}
@@ -314,7 +327,11 @@ private void actualizarContador(Short idInstitucion) {
 
 private boolean procesaFila(Short idInstitucion, String idFacturacion, BufferedWriter bw, Map<String, Object> mFila, boolean ultima, boolean hayErrores) throws IOException {
 	for(String col: mFila.keySet()) {
+		try {
 		hayErrores |= procesaColumna(idInstitucion, idFacturacion, bw,col, mFila.get(col));
+		} catch (Exception e) {
+			LOGGER.error("error al procesar la columna " + col);
+		}
 	}
 	if(!ultima) { bw.newLine();}
 	
@@ -324,7 +341,7 @@ private boolean procesaFila(Short idInstitucion, String idFacturacion, BufferedW
 
 private boolean procesaColumna(Short idInstitucion, String idFacturacion, BufferedWriter bw, String columna, Object oValor) throws IOException {
 	boolean hayErrores=false;
-	String valor = oValor.toString();
+	String valor = oValor!=null?oValor.toString():null;
 	String anioEJG = "", numEJG = "", desAnio = "", desNumero = "", numeroActuacion = "";
 	if (EJG_NUMERO.equalsIgnoreCase(columna)) {
 		numEJG = valor;
@@ -341,12 +358,12 @@ private boolean procesaColumna(Short idInstitucion, String idFacturacion, Buffer
 	hayErrores = valida(idInstitucion, idFacturacion, numEJG, anioEJG, desNumero, desAnio, numeroActuacion, columna, valor);
 	
 	if (imprimirColumna(columna)) {						
-		if (TOKEN_NL.equals(valor)) {
+		if (valor!=null&&TOKEN_NL.equals(valor)) {
 			bw.newLine();
 		} else if (CAB2_NUMERO_INTERCAMBIO.equalsIgnoreCase(columna)) {							
 			bw.write(utilidadesStringFormatea(++idIntercambio, longitudContador, true) + anyoSufijo);							
 		} else {
-			bw.write(valor);
+			bw.write(valor!=null?valor:"");
 		}
 	}
 	return hayErrores;
