@@ -24,5 +24,5 @@ public class EstadosPagosItem {
 	Boolean enlaceAbono;
 	String numeroAbono;
 	String idAbono;
-	String bancosCodigo;
+	String comentario;
 }

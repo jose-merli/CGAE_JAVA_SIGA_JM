@@ -40,8 +40,13 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //estados
-        if(item.getEstado()!=null) {
-            abonos.WHERE("f.estado="+item.getEstado());
+        if (item.getEstadosFiltroAb() != null) {
+            StringBuilder aux = new StringBuilder();
+            for (String s : item.getEstadosFiltroAb()) {
+                aux.append(s).append(",");
+            }
+            aux.deleteCharAt(aux.length()-1);
+            abonos.WHERE("f.estado in (" + aux + ")");
         }
 
         //forma de pago abono

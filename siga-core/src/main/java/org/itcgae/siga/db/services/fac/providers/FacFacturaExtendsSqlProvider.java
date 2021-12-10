@@ -73,8 +73,13 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //estados
-        if (item.getEstado() != null) {
-            facturas.WHERE("f.estado=" + item.getEstado());
+        if (item.getEstadosFiltroFac() != null) {
+            StringBuilder aux = new StringBuilder();
+            for (String s : item.getEstadosFiltroFac()) {
+                aux.append(s).append(",");
+            }
+            aux.deleteCharAt(aux.length()-1);
+            facturas.WHERE("f.estado in (" + aux + ")");
         }
 
         //forma de pago o abono
