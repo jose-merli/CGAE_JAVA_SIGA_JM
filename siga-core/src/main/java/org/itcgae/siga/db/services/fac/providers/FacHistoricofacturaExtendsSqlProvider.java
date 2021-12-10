@@ -10,7 +10,8 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
         SQL sql = new SQL();
 
-        sql.SELECT("FH.FECHAMODIFICACION, F_SIGA_GETRECURSO(FT.NOMBRE,"+idLenguaje+") ACCION, "
+        sql.SELECT("FH.FECHAMODIFICACION, F_SIGA_GETRECURSO(FT.NOMBRE,"+idLenguaje+") ACCION,"
+                +"FT.IDTIPOACCION, FH.ESTADO IDESTADO,"
                 +"GR.DESCRIPCION ESTADO, CC.IBAN, FH.IMPTOTALPAGADO, FH.IMPTOTALPORPAGAR,"
                 +"CASE WHEN FT.IDTIPOACCION = 10 THEN TO_CHAR(FA.IDPAGOSJG) END IDSJCS,"
                 +"CASE WHEN FT.IDTIPOACCION = 2 THEN '1' END ENLACEFACTURA,"

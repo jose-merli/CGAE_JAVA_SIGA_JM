@@ -71,6 +71,8 @@ import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
+import org.itcgae.siga.db.entities.FacHistoricofactura;
+import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineaabonoKey;
 import org.itcgae.siga.db.entities.FacLineafactura;
@@ -216,7 +218,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private EnvComunicacionmorososMapper envComunicacionmorososMapper;
 
 	@Autowired
-	private FacHistoricofacturaExtendsMapper facHistoricofacturaMapper;
+	private FacHistoricofacturaExtendsMapper facHistoricofacturaExtendsMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1956,7 +1958,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getEstadosPagos() -> obteniendo el historico de la factura");
 
-			List<EstadosPagosItem> result = facHistoricofacturaMapper.getEstadosPagos(idFactura, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+			List<EstadosPagosItem> result = facHistoricofacturaExtendsMapper.getEstadosPagos(idFactura, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 
 			estadosPagosDTO.setEstadosPagosItems(result);
 		}
@@ -1965,6 +1967,84 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				"FacturacionPySServiceImpl.getEstadosPagos() -> Salida del servicio  para obtener el historico de la factura");
 
 		return estadosPagosDTO;
+	}
+
+	@Override
+	public InsertResponseDTO insertarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		insertResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("insertarEstadosPagos() -> Entrada al servicio para crear una entrada al historico de factura");
+
+		if (usuario != null) {
+
+			//ultima entrada
+			FacHistoricofacturaExample example = new FacHistoricofacturaExample();
+			example.createCriteria()
+					.andIdinstitucionEqualTo(usuario.getIdinstitucion())
+					.andIdfacturaEqualTo(item.getIdFactura());
+			example.setOrderByClause("IDHISTORICO");
+
+			List<FacHistoricofactura> list = facHistoricofacturaExtendsMapper.selectByExample(example);
+
+			FacHistoricofactura facItem = list.get(list.size());
+
+			//pasamos parametros
+			facItem.setIdhistorico((short) (facItem.getIdhistorico()+1));
+
+			if(item.getFechaModificaion()!=null && item.getFechaModificaion().after(facItem.getFechamodificacion()))
+				facItem.setFechamodificacion(item.getFechaModificaion());
+			else
+				throw new SigaExceptions("La fecha tiene que ser valida y mayor que la del ultimo registro");
+
+			if(item.getIdAccion()!=null)
+				facItem.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
+			else
+				throw new SigaExceptions("Accion erronea");
+
+			if(item.getAccion().equalsIgnoreCase("7")){
+
+				facItem.setImptotalpagado(BigDecimal.valueOf(0));
+
+				if(list.get(list.size()).getEstado() == 8){
+					if(item.getIdEstado()!=null && (item.getIdEstado().equalsIgnoreCase("5") ||
+							item.getIdEstado().equalsIgnoreCase("6")))
+						facItem.setEstado(Short.valueOf(item.getIdEstado()));
+					else
+						throw new SigaExceptions("Estado invalido");
+				}
+				else {
+					if(item.getIdEstado()!=null && (item.getIdEstado().equalsIgnoreCase("5") ||
+							item.getIdEstado().equalsIgnoreCase("2")))
+						facItem.setEstado(Short.valueOf(item.getIdEstado()));
+					else
+						throw new SigaExceptions("Estado invalido");
+				}
+
+			}
+
+			if(item.getAccion().equalsIgnoreCase("4")){
+
+				facItem.setEstado(null);
+				facItem.setIdcuenta(null);
+
+				facItem.setImptotalpagado(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado())));
+				facItem.setImptotalporpagar(list.get(list.size()).getImptotalporpagar().subtract(facItem.getImptotalpagado()));
+			}
+
+			facHistoricofacturaExtendsMapper.insertSelective(facItem);
+
+			insertResponseDTO.setId(facItem.getIdfactura());
+		}
+
+		LOGGER.info("insertarEstadosPagos() -> Salida del servicio para crear una entrada al historico de factura");
+
+
+		return insertResponseDTO;
 	}
 
 	@Override

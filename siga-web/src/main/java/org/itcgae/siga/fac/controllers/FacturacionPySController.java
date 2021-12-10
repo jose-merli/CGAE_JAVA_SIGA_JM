@@ -8,6 +8,7 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
+import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -627,6 +628,20 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<EstadosPagosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/insertarEstadosPagos")
+	ResponseEntity<InsertResponseDTO> insertarEstadosPagos(@RequestParam EstadosPagosItem item,
+													HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionService.insertarEstadosPagos(item, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

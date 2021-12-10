@@ -19,7 +19,9 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 	@SelectProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "getEstadosPagos")
 	@Results({
 			@Result(column = "FECHAMODIFICACION", property = "fechaModificaion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOACCION", property = "idAccion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ACCION", property = "accion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IBAN", property = "iban", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPTOTALPAGADO", property = "impTotalPagado", jdbcType = JdbcType.VARCHAR),
@@ -33,6 +35,7 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 			@Result(column = "ENLACEABONO", property = "enlaceAbono", jdbcType = JdbcType.BOOLEAN),
 			@Result(column = "NUMEROABONO", property = "numeroAbono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOTAACCION", property = "notaAccion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<EstadosPagosItem> getEstadosPagos(String idFactura, String idInstitucion, String idLenguaje);
 }

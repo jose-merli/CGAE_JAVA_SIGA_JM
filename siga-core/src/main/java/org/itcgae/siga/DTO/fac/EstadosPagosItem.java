@@ -8,7 +8,9 @@ import java.util.Date;
 public class EstadosPagosItem {
 
 	Date fechaModificaion;
+	String idAccion;
 	String accion;
+	String idEstado;
 	String estado;
 	String iban;
 	String impTotalPagado;
@@ -22,4 +24,5 @@ public class EstadosPagosItem {
 	Boolean enlaceAbono;
 	String numeroAbono;
 	String idAbono;
+	String bancosCodigo;
 }
