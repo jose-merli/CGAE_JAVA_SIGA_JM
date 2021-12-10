@@ -283,6 +283,7 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("REM.IDINSTITUCION");
 		sql.SELECT("TO_CHAR(rem.FECHAMODIFICACION, 'dd/MM/yyyy HH24:MI:SS') FECHAMODIFICACION");
 		sql.SELECT("F_SIGA_GETRECURSO(tip.descripcion, " + idLenguaje + ") estado");
+		sql.SELECT("tip.idestado");
 		sql.FROM("cajg_remesaestados rem");
 		sql.FROM("cajg_tipoestadoremesa tip");
 		sql.WHERE("tip.idestado = rem.idestado");
@@ -292,7 +293,7 @@ public class ScsRemesasExtendsProvider {
 		}
 
 		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString());
-		sql.ORDER_BY("rem.FECHAMODIFICACION");
+		sql.ORDER_BY("tip.idestado asc");
 
 		LOGGER.info(sql.toString());
 
