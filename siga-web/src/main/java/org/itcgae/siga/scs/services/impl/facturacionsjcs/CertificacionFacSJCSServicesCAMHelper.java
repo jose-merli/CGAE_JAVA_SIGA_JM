@@ -4,19 +4,21 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorKey;
@@ -75,6 +77,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
 	private static final String TXT_EXT = ".txt";
 	private static final String UNDERSCORE = "_";
 	private static final String CONTADOR_CAM = "INTERCAMBIOICM";
+	private static final String DIRECTORIO_INCIDENCIAS = "informeIncidenciasWS";
 
     @Autowired
     private GenPropertiesMapper genPropertiesMapper;
@@ -98,9 +101,13 @@ public class CertificacionFacSJCSServicesCAMHelper {
     Map<String, PCAJGAlcActIncidencia> mIncidencias;
     Set<String> sColumnasNoImprimir;
     
-	String anyoSufijo;
-	Long idIntercambio;
-	Integer longitudContador;	
+    private AdmContador contadorOriginal;
+    private String anyoSufijo;
+    private Long idIntercambio;
+    private Integer longitudContador;	
+    private String idUsuario;
+    private BufferedWriter bwError;
+    private String cabeceraLog = null;
     
 	private void initIncidencias() {
 		List<PCAJGAlcActIncidencia> lInc = incMapper.selectAll();
@@ -110,16 +117,36 @@ public class CertificacionFacSJCSServicesCAMHelper {
 	}
   
     
-	private String getRutaFicheroSalida(Short idInstitucion, String idFacturacion) {
+	private String getRutaFicheroSalida(Short idInstitucion, String idFacturacion) {		
+		String rutaTmp = getRutaFicherosSiga() + SigaConstants.pathSeparator  + idInstitucion + SigaConstants.pathSeparator +  idFacturacion + SigaConstants.pathSeparator;
+		return rutaTmp;
+	}
+	
+	private String getRutaFicherosSiga() {
 		GenPropertiesKey key = new GenPropertiesKey();
 		key.setFichero(SigaConstants.FICHERO_SIGA);
 		key.setParametro(SigaConstants.parametroRutaSalidaInformes);
-		
 		GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
+		return  rutaFicherosSalida.getValor();
+	}
+	
+	private String getRutaFicheroIncidencias(Short idInstitucion, String idFacturacion) {
+		String ruta = getRutaFicherosSiga() + SigaConstants.pathSeparator + DIRECTORIO_INCIDENCIAS + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator +  idFacturacion + SigaConstants.pathSeparator; 			
+		return ruta;
+	}
+	
+	private File getFileInformeIncidencias(Short idInstitucion, String idFacturacion) throws IOException {
+		File f = null;
+		Path pFile = null;
+		pFile = Paths.get(getRutaFicheroIncidencias(idInstitucion, idFacturacion));
+
+		if(!Files.exists(pFile)) {
+			Files.createDirectories(pFile);
+		}
 		
-		String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator +  idFacturacion + SigaConstants.pathSeparator;
-		
-		return rutaTmp;
+		f= new File(pFile.toString(),"InformeIncididencias.csv");
+
+		return f;
 	}
 	
 	private String getNombreFicheroCAM(Short idInstitucion, String userName) {
@@ -136,83 +163,122 @@ public class CertificacionFacSJCSServicesCAMHelper {
 		return nombre;
 	}
    
-	public File getInformeCAM(Short idInstitucion, String idFacturacion, String tipoFichero, HttpServletRequest request) {
+	public File getInformeCAM(Short idInstitucion, String idFacturacion, String tipoFichero, HttpServletRequest request){
+		boolean hayErrores = false;
+		String rutaPadre;
 		String rutaFichero;
-		File fichero;
+		File fichero=null;
 		initIncidencias();
 		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		String idUsuario = getNombreUsuario(idInstitucion, dni);
+		idUsuario = getNombreUsuario(idInstitucion, dni);
 		
-		rutaFichero= getRutaFicheroSalida(idInstitucion, idFacturacion) + getNombreFicheroCAM(idInstitucion, idUsuario);
-		fichero = new File(rutaFichero);
-		boolean hayErrores = rellenaFichero(fichero, idInstitucion, idFacturacion, tipoFichero);
+		rutaPadre = getRutaFicheroSalida(idInstitucion, idFacturacion);
+		
+		try {
+			Path pPadre = Paths.get(rutaPadre);
+			deletePathWithContents(pPadre);
+			Files.createDirectories(pPadre);
+			rutaFichero = rutaPadre + getNombreFicheroCAM(idInstitucion, idUsuario);
+			fichero = new File(rutaFichero);
+			hayErrores =rellenaFichero(fichero, idInstitucion, idFacturacion, tipoFichero);
+		} catch (IOException e) {
+			LOGGER.error("error al obtener informe CAM:"+ e);
+			hayErrores = true;
+		}
+		
+		if(hayErrores) {
+			deleteFileSafeMode(fichero);
+		}
+		
 		return fichero;
 	}
 	
+	private void deleteFileSafeMode(File fichero) {
+		if(fichero!=null) {
+			try {
+				Files.deleteIfExists(fichero.toPath());
+			} catch (IOException e) {
+				LOGGER.error("error al borrar " + fichero.getName() + ": " + e) ;
+			}
+		}
+	}
+	
+	private void deletePathWithContents(Path pPadre) throws IOException {
+		Consumer<Path> deleteIfExists = p->{
+			try {
+				Files.deleteIfExists(p);
+			} catch (IOException e) {
+				LOGGER.error("error al borrar:" + e );
+			}
+		};
+		if(Files.exists(pPadre)) {
+			Files.list(pPadre).forEach(deleteIfExists);
+			Files.deleteIfExists(pPadre);
+		}
+	}
+
+
 	public String getNombreUsuario(Short idInstitucion, String dni) {
 		String nombreUsuario;
         AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
         exampleUsuarios.createCriteria()
           	.andNifEqualTo(dni)
-          	.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	            
+          	.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));	            
         List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-
-        return usuarios.get(0).getIdusuario().toString();   
+        nombreUsuario = usuarios.get(0).getIdusuario().toString();
+        return nombreUsuario;    
 	}
 	
 		
 
 
-private void escribeLog(Short idInstitucion, String idFacturacion, String texto) {
-//	if (bw == null) {
-//		FileWriter fileWriter = new FileWriter(getFileInformeIncidencias(idInstitucion, idFacturacion));
-//		bw = new BufferedWriter(fileWriter);
-//		if (cabeceraLog != null) {
-//			bw.write(cabeceraLog);
-//			bw.newLine();
-//		}
-//	}				
-//	
-//	bw.write(texto);
-//	bw.newLine();
-//	bw.flush();
+private void escribeLog(Short idInstitucion, String idFacturacion, String texto) throws IOException {
+	if (bwError == null) {
+		FileWriter fileWriter = new FileWriter(getFileInformeIncidencias(idInstitucion, idFacturacion));
+		bwError = new BufferedWriter(fileWriter);
+		if (cabeceraLog != null) {
+			bwError.write(cabeceraLog);
+			bwError.newLine();
+		}
+	}				
+	
+	bwError.write(texto);
+	bwError.newLine();
+	bwError.flush();
 }
 
 private String getTexto(String...valores) {
 	return String.join(";", valores);
 }
-
-
 	
 	
-private boolean rellenaFichero(File file, Short idInstitucion, String idFacturacion, String tipoFichero) {
+private boolean rellenaFichero(File file, Short idInstitucion, String idFacturacion, String idTipoFichero) {
 		boolean hayErrores = false;
 
 		inicializarContador(idInstitucion);
 		
-
-		List<Map<String,Object>> listaFilas = dMapper.selectByIdInstitucionAndIdFacturacion(idInstitucion,idFacturacion);
+		List<Map<String,Object>> listaFilas = dMapper.selectByIdInstitucionAndIdFacturacionAndIdTipoFichero(idInstitucion,idFacturacion, idTipoFichero);
 		
-		try (FileWriter fw = new FileWriter(file);
-				BufferedWriter bw = new BufferedWriter(fw);
-				){
-		
-			int numFila=1;
-
-			for (Map<String, Object> mFila : listaFilas) {
-				hayErrores|=procesaFila(idInstitucion,idFacturacion, bw, mFila, numFila==listaFilas.size(), hayErrores);
-				
+		try (FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw);) {
+			cabeceraLog = "AÑO EJG;NÚMERO EJG;AÑO DESIGNACIÓN;NUMERO DESIGNACIÓN;NÚMERO ACTUACIÓN;TIPO INCIDENCIA;INCIDENCIA";
+			
+			if (listaFilas.size() > 0) {
+				int numFila = 1;
+				for (Map<String, Object> mFila : listaFilas) {
+					hayErrores |= procesaFila(idInstitucion, idFacturacion, bw, mFila, numFila == listaFilas.size(),
+							hayErrores);
+				}
+			actualizarContador(idInstitucion);
+			} else {
+				escribeLog(idInstitucion, idFacturacion, "No se ha recuperado ningún registro. Revise que todas las designaciones están asociadas a un EJG.");
 			}
 			bw.flush();
 		} catch (Exception e) {
 			LOGGER.error("error en rellenaFichero: " + e);
 			hayErrores = true;
 		}
-		
 		return hayErrores;
 	}
 
@@ -221,10 +287,28 @@ private void inicializarContador(Short idInstitucion) {
 	AdmContadorKey cKey = new AdmContadorKey();
 	cKey.setIdcontador(CONTADOR_CAM);
 	cKey.setIdinstitucion(idInstitucion);
-	AdmContador contador = contadorMapper.selectByPrimaryKey(cKey);
-	anyoSufijo = contador.getIdcamposufijo();
-	idIntercambio = contador.getContador();
-	longitudContador = contador.getLongitudcontador();		
+	contadorOriginal = contadorMapper.selectByPrimaryKey(cKey);
+	anyoSufijo = contadorOriginal.getIdcamposufijo();
+	idIntercambio = contadorOriginal.getContador();
+	longitudContador = contadorOriginal.getLongitudcontador();		
+}
+
+private void actualizarContador(Short idInstitucion) {
+	AdmContadorKey cKey = new AdmContadorKey();
+	cKey.setIdcontador(CONTADOR_CAM);
+	cKey.setIdinstitucion(idInstitucion);
+	AdmContador contadorNuevo = contadorMapper.selectByPrimaryKey(cKey);
+	if(longitudContador>contadorNuevo.getLongitudcontador()) {
+		if(contadorNuevo.getPrefijo().equals(contadorOriginal.getPrefijo())&&
+		    contadorNuevo.getSufijo().equals(contadorOriginal.getSufijo())){
+			contadorNuevo.setContador(Long.valueOf(longitudContador));
+			contadorNuevo.setUsumodificacion(Integer.valueOf(idUsuario));
+			contadorNuevo.setFechamodificacion(new Date());
+			contadorMapper.updateByPrimaryKey(contadorNuevo);
+		}
+	}
+
+	
 }
 
 
@@ -290,7 +374,7 @@ private boolean imprimirColumna(String colName) {
 	return !sColumnasNoImprimir.contains(colName);
 }
 
-private boolean valida(Short idInstitucion, String idFacturacion, String numEJG, String anioEJG, String desNumero,	String desAnio, String numeroActuacion, String columna, String valor) {		
+private boolean valida(Short idInstitucion, String idFacturacion, String numEJG, String anioEJG, String desNumero,	String desAnio, String numeroActuacion, String columna, String valor) throws IOException {		
 	boolean hayError = false;
 	PCAJGAlcActIncidencia pcajgAlcActIncidencia = mIncidencias.get(columna);
 	
