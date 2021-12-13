@@ -2107,6 +2107,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				//historico fac
 				facHistoricoInsert.setIdformapago((short) 30);
+				facHistoricoInsert.setIdcuenta(null);
+				facHistoricoInsert.setIdcuentadeudor(null);
 
 				facHistoricoInsert.setImptotalpagadoporcaja(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado() + facHistoricoInsert.getImptotalpagadoporcaja())));
 				facHistoricoInsert.setImptotalpagadosolocaja(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado() + facHistoricoInsert.getImptotalpagadosolocaja())));
@@ -2161,6 +2163,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				facUpdate.setFechamodificacion(new Date());
 				facUpdate.setUsumodificacion(usuario.getUsumodificacion());
 				facUpdate.setEstado(facHistoricoInsert.getEstado());
+				facUpdate.setIdformapago(facHistoricoInsert.getIdformapago());
+				facUpdate.setIdcuenta(facHistoricoInsert.getIdcuenta());
+				facUpdate.setIdcuentadeudor(facHistoricoInsert.getIdcuentadeudor());
 
 				//saves
 				facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
@@ -2175,6 +2180,71 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 
 		return insertResponseDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		deleteResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("insertarEstadosPagos() -> Entrada al servicio para crear una entrada al historico de factura");
+
+		if (usuario != null && item.getIdAccion().equalsIgnoreCase("4")) {
+
+			//factura
+			FacFacturaKey facKey = new FacFacturaKey();
+			facKey.setIdinstitucion(usuario.getIdinstitucion());
+			facKey.setIdfactura(item.getIdFactura());
+			FacFactura facUpdate = facFacturaExtendsMapper.selectByPrimaryKey(facKey);
+
+			//ultima entrada
+			FacHistoricofacturaExample example = new FacHistoricofacturaExample();
+			example.createCriteria()
+					.andIdinstitucionEqualTo(usuario.getIdinstitucion())
+					.andIdfacturaEqualTo(item.getIdFactura());
+			example.setOrderByClause("IDHISTORICO");
+			List<FacHistoricofactura> facHistoricoList = facHistoricofacturaExtendsMapper.selectByExample(example);
+
+			FacHistoricofactura facHistorico = facHistoricoList.get(facHistoricoList.size()-2);
+
+			FacPagosporcajaExample examplePagos = new FacPagosporcajaExample();
+			examplePagos.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
+					.andIdinstitucionEqualTo(usuario.getIdinstitucion());
+			example.setOrderByClause("IDPAGOPORCAJA");
+
+			List<FacPagosporcaja> listPagos = facPagosporcajaMapper.selectByExample(examplePagos);
+
+			FacPagosporcaja pagosCajaDelete = listPagos.get(listPagos.size()-1);
+
+			//factura
+			facUpdate.setImptotalpagado(facUpdate.getImptotalpagado().add(facHistorico.getImptotalpagado()));
+			facUpdate.setImptotalpagadoporcaja(facUpdate.getImptotalpagadoporcaja().add(facHistorico.getImptotalpagado()));
+			facUpdate.setImptotalpagadosolocaja(facUpdate.getImptotalpagadosolocaja().add(facHistorico.getImptotalpagado()));
+			facUpdate.setImptotalporpagar(facUpdate.getImptotalporpagar().subtract(facHistorico.getImptotalpagado()));
+			facUpdate.setFechamodificacion(new Date());
+			facUpdate.setUsumodificacion(usuario.getUsumodificacion());
+			facUpdate.setEstado(facHistorico.getEstado());
+			facUpdate.setIdformapago(facHistorico.getIdformapago());
+			facUpdate.setIdcuenta(facHistorico.getIdcuenta());
+			facUpdate.setIdcuentadeudor(facHistorico.getIdcuentadeudor());
+
+			//saves
+			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+			facPagosporcajaMapper.deleteByPrimaryKey(pagosCajaDelete);
+			facHistoricofacturaExtendsMapper.deleteByPrimaryKey(facHistoricoList.get(facHistoricoList.size()-1));
+
+			deleteResponseDTO.setStatus(HttpStatus.OK.toString());
+		}
+
+		LOGGER.info("insertarEstadosPagos() -> Salida del servicio para crear una entrada al historico de factura");
+
+
+		return deleteResponseDTO;
 	}
 
 	@Override

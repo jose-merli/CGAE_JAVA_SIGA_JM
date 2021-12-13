@@ -645,6 +645,20 @@ public class FacturacionPySController {
 		}
 	}
 
+	@PostMapping(value = "/eliminarEstadosPagos")
+	ResponseEntity<DeleteResponseDTO> borrarCuentasBancarias(@RequestBody EstadosPagosItem item,
+															 HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = facturacionService.eliminarEstadosPagos(item, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
     @PostMapping(value = "/actualizarFicheroAdeudos")
     ResponseEntity<UpdateResponseDTO> actualizarFicheroAdeudos(@RequestBody FacDisquetecargos item,
                                                               HttpServletRequest request) {

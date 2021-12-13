@@ -83,13 +83,13 @@ public interface IFacturacionPySService {
 	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request) throws Exception;
 
     public FacFacturacionprogramadaDTO getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) throws Exception;
-    
+
 	public DeleteResponseDTO eliminarFacturacion(FacFacturacionEliminarItem fac, HttpServletRequest request) throws Exception;
 
 	public FicherosAbonosDTO getFicherosTransferencias(FicherosAbonosItem item, HttpServletRequest request) throws Exception;
 
 	public FicherosDevolucionesDTO getFicherosDevoluciones(FicherosDevolucionesItem item, HttpServletRequest request) throws Exception;
-	
+
 	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems, HttpServletRequest request) throws Exception;
 
 	public FacturaDTO getFacturas(FacturaItem item, HttpServletRequest request) throws Exception;
@@ -97,9 +97,9 @@ public interface IFacturacionPySService {
 	public FacturaDTO getFactura(String idFactura, String tipo, HttpServletRequest request) throws Exception;
 
 	public FacPresentacionAdeudosDTO presentacionAdeudos(FacPresentacionAdeudosItem presentacionAdeudoItem,	HttpServletRequest request) throws Exception;
-	
+
 	public FacRegenerarPresentacionAdeudosDTO regenerarPresentacionAdeudos(FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,	HttpServletRequest request) throws Exception;
-	
+
 	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg, HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO guardaDatosFactura(FacturaItem item, HttpServletRequest request) throws Exception;
@@ -111,7 +111,7 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO guardarLineasFactura(FacturaLineaItem item, HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO guardarLineasAbono(FacturaLineaItem item, HttpServletRequest request) throws Exception;
-	
+
 	public UpdateResponseDTO actualizarProgramacionFactura(FacFacturacionprogramadaItem facItem, HttpServletRequest request) throws Exception;
 
 	public ComunicacionCobroDTO getComunicacionCobro(String idFactura, HttpServletRequest request) throws Exception;
@@ -119,6 +119,8 @@ public interface IFacturacionPySService {
 	public EstadosPagosDTO getEstadosPagos(String idFactura, HttpServletRequest request) throws Exception;
 
 	public InsertResponseDTO insertarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
+
+	public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO actualizarFicheroAdeudos(FacDisquetecargos updateItem, HttpServletRequest request) throws Exception;
 
