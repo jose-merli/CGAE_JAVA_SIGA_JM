@@ -62,7 +62,8 @@ public class SigaConstants {
     public static String parametroRutaSalidaInformes = "informes.directorioFisicoSalidaInformesJava";
     public static String rutaPlantillaSinClase = "plantillasSinClase";
     public static String parametroSizePlantillas = "gen.ficheros.maxsize.bytes";
-
+    public static String parametroRutaAlmacenFicheros = "gen.ficheros.path"; 
+    
     public static String pathSeparator = "/";
 
     public static String nombreExcelConsulta = "ResultadoConsulta";
