@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTO.fac;
 
 import lombok.Data;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 
 import java.util.Date;
 import java.util.List;
@@ -97,5 +98,7 @@ public class FacturaItem {
 
 	List<String> estadosFiltroFac;
 	List<String> estadosFiltroAb;
+
+	List<ComboItem> cuentasBanco;
 
 }

@@ -208,6 +208,16 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		
 		return sql.toString();
 	}
+
+	public String getComboCuentas(String idPersona, String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDCUENTA,NUMEROCUENTA");
+		sql.FROM("CEN_CUENTASBANCARIAS");
+		sql.WHERE("IDPERSONA = '"+idPersona+"'");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql.ORDER_BY("IDCUENTA");
+		return sql.toString();
+	}
 }
 
 
