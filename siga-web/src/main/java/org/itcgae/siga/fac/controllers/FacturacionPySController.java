@@ -369,7 +369,7 @@ public class FacturacionPySController {
 		try {
 			response = facturacionService.getFicherosTransferencias(item, request);
 
-			if(response.getFicherosTransferenciasItems().size()==200) {
+			if(response.getFicherosAbonosItems().size()==200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
