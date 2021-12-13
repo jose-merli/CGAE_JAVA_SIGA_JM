@@ -25,4 +25,5 @@ public class EstadosPagosItem {
 	String numeroAbono;
 	String idAbono;
 	String comentario;
+	String cuentaBanco;
 }
