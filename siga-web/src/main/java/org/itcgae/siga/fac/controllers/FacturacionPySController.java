@@ -632,7 +632,7 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/insertarEstadosPagos")
-	ResponseEntity<InsertResponseDTO> insertarEstadosPagos(@RequestParam EstadosPagosItem item,
+	ResponseEntity<InsertResponseDTO> insertarEstadosPagos(@RequestBody EstadosPagosItem item,
 													HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 

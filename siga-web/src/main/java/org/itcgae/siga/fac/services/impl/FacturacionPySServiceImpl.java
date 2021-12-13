@@ -2013,7 +2013,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			example.setOrderByClause("IDHISTORICO");
 			List<FacHistoricofactura> list = facHistoricofacturaExtendsMapper.selectByExample(example);
 
-			FacHistoricofactura facItem = list.get(list.size());
+			FacHistoricofactura facItem = list.get(list.size()-1);
 
 			//pasamos parametros
 			facItem.setIdhistorico((short) (facItem.getIdhistorico()+1));
@@ -2021,22 +2021,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			facItem.setIdfactura(item.getIdFactura());
 			facItem.setFechamodificacion(new Date());
 			facItem.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
+			facItem.setUsumodificacion(usuario.getUsumodificacion());
+			facItem.setFechamodificacion(item.getFechaModificaion());
+			facItem.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
 
-			if(item.getFechaModificaion()!=null && item.getFechaModificaion().after(facItem.getFechamodificacion()))
-				facItem.setFechamodificacion(item.getFechaModificaion());
-			else
-				throw new SigaExceptions("La fecha tiene que ser valida y mayor que la del ultimo registro");
-
-			if(item.getIdAccion()!=null)
-				facItem.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
-			else
-				throw new SigaExceptions("Accion erronea");
-
-			if(item.getAccion().equalsIgnoreCase("7")){
+			if(item.getIdAccion().equalsIgnoreCase("7")){
 
 				facItem.setImptotalpagado(BigDecimal.valueOf(0));
 
-				if(list.get(list.size()).getEstado() == 8){
+				if(list.get(list.size()-1).getEstado() == 8){
 					if(item.getIdEstado()!=null && (item.getIdEstado().equalsIgnoreCase("5") ||
 							item.getIdEstado().equalsIgnoreCase("6")))
 						facItem.setEstado(Short.valueOf(item.getIdEstado()));
@@ -2071,7 +2064,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			//nuevo cobro
-			if(item.getAccion().equalsIgnoreCase("4")){
+			if(item.getIdAccion().equalsIgnoreCase("4")){
 
 				//historico fac
 				facItem.setIdformapago((short) 30);
@@ -2083,7 +2076,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				facItem.setImptotalpagadoporcaja(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado() + facItem.getImptotalpagadoporcaja())));
 				facItem.setImptotalpagadosolocaja(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado() + facItem.getImptotalpagadosolocaja())));
 				facItem.setImptotalpagado(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado())));
-				facItem.setImptotalporpagar(list.get(list.size()).getImptotalporpagar().subtract(facItem.getImptotalpagado()));
+				facItem.setImptotalporpagar(list.get(list.size()-1).getImptotalporpagar().subtract(facItem.getImptotalpagado()));
 
 				facItem.setIddisquetecargos(null);
 				facItem.setIdfacturaincluidaendisquete(null);
@@ -2105,7 +2098,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				List<FacPagosporcaja> listPagos = facPagosporcajaMapper.selectByExample(examplePagos);
 				if(!listPagos.isEmpty())
-					facItem.setIdpagoporcaja((short) (listPagos.get(listPagos.size()).getIdpagoporcaja() + 1));
+					facItem.setIdpagoporcaja((short) (listPagos.get(listPagos.size()-1).getIdpagoporcaja() + 1));
 				else
 					facItem.setIdpagoporcaja((short) 1);
 
@@ -2115,6 +2108,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				insert.setIdinstitucion(usuario.getIdinstitucion());
 				insert.setIdfactura(item.getIdFactura());
 				insert.setIdpagoporcaja(facItem.getIdpagoporcaja());
+				insert.setUsumodificacion(usuario.getUsumodificacion());
 
 				insert.setImporte(facItem.getImptotalpagado());
 				insert.setTarjeta("N");
@@ -2129,6 +2123,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				fac.setImptotalpagadoporcaja(fac.getImptotalpagadoporcaja().add(facItem.getImptotalpagado()));
 				fac.setImptotalpagadosolocaja(fac.getImptotalpagadosolocaja().add(facItem.getImptotalpagado()));
 				fac.setImptotalporpagar(fac.getImptotalporpagar().subtract(facItem.getImptotalpagado()));
+				fac.setFechamodificacion(new Date());
+				fac.setUsumodificacion(usuario.getUsumodificacion());
 
 				//saves
 				facFacturaExtendsMapper.updateByPrimaryKey(fac);
