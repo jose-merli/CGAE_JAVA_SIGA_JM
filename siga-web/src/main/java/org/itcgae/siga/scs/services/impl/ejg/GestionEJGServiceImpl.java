@@ -2631,7 +2631,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 //                ejgResolucion.setIdinstitucionacta(idInstitucion);
 //                ejgResolucion.setAnioacta(datos.getAnnioActa());
                 ejgResolucion.setFecharesolucioncajg(datos.getFechaResolucionCAJG());
-//                ejgResolucion.setIdtiporatificacionejg(datos.getIdTiporatificacionEJG());
+                ejgResolucion.setIdtiporatificacionejg(datos.getIdTiporatificacionEJG());
 //                ejgResolucion.setIdfundamentojuridico(datos.getIdFundamentoJuridico());
                 ejgResolucion.setAniocajg(datos.getAnioCAJG());
                 ejgResolucion.setNumeroCajg(datos.getNumeroCAJG());
