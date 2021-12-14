@@ -236,6 +236,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 				if (response != 0) {
 					error.setCode(200);
+					error.setDescription("messages.inserted.success");
 					baremosGuardiaDTO.setError(error);
 				} else {
 					error.setCode(400);
