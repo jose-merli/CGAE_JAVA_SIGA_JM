@@ -449,6 +449,13 @@ public class EjgController {
 		Boolean response = gestionEJG.getHabilitarActa(request);
 		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
 	}
+	
+	// GetHabilitarActa (Permiso en la tarjeta resolucion)
+	@RequestMapping(value = "/gestion-ejg/getEditResolEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> getEditResolEjg(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		Boolean response = gestionEJG.getEditResolEjg(ejgItem, request);
+		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+	}
 
 	// borrarRelacion
 	@RequestMapping(value = "/gestion-ejg/borrarRelacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

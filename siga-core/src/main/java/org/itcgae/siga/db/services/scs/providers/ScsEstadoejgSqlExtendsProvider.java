@@ -137,5 +137,25 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
         return sql.toString();
     
     }
+    
+    public String getEditResolEjg(EjgItem ejgItem, String idInstitucion) {
+    	
+    	SQL sql = new SQL();
+		
+    	sql.SELECT("maestro.EDITABLECOMISION");
+    	
+    	sql.FROM("scs_estadoejg estado");
+        sql.INNER_JOIN("scs_maestroestadosejg maestro on (estado.idestadoejg=maestro.idestadoejg)");
+
+        sql.WHERE("estado.idestadoporejg = F_SIGA_GET_ULTIMOESTADOPOREJG("+ idInstitucion +",\r\n"
+        		+ ejgItem.getTipoEJG()+",\r\n"
+        		+ ejgItem.getAnnio()+",\r\n"
+        		+ ejgItem.getNumero()+") ");
+        sql.WHERE("estado.IDINSTITUCION = "+idInstitucion+" and estado.IDTIPOEJG= "+ ejgItem.getTipoEJG() 
+        +"  and estado.ANIO = "+ ejgItem.getAnnio()+ " and estado.NUMERO = "+ ejgItem.getNumero());
+        
+        return sql.toString();
+    
+    }
 
 }

@@ -72,4 +72,10 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
           		@Result(column = "idestadoporejg", property = "idestadoporejg", jdbcType = JdbcType.VARCHAR),
           	})
             EstadoEjgItem getUltEstadoEjg(EjgItem ejgItem, String idInstitucion);
+            
+            @SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "getEditResolEjg")
+          	@Results({ 
+          		@Result(column = "EDITABLECOMISION",  jdbcType = JdbcType.VARCHAR)
+          	})
+            String getEditResolEjg(EjgItem ejgItem, String idInstitucion);
 }

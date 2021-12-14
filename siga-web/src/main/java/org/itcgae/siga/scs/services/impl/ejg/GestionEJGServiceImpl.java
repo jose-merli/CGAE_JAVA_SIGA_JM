@@ -1172,6 +1172,54 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         }
         return resolucion;
     }
+    
+    
+    @Override
+    public Boolean getEditResolEjg(EjgItem ejgItem, HttpServletRequest request) {
+    	
+    	LOGGER.info("getEditResolEjg() -> Entrada al servicio para obtener el colegiado");
+        ResolucionEJGItem resolucion = new ResolucionEJGItem();
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        
+        Boolean response = false;
+
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            LOGGER.info(
+                    "getEditResolEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+            LOGGER.info(
+                    "getEditResolEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
+                LOGGER.info(
+                        "getEditResolEjg() / ScsEstadoejgExtendsMapper.getEditResolEjg() -> Entrada a ScsEstadoejgExtendsMapper para obtener si la resolución es editable");
+                String resolEdit = scsEstadoejgExtendsMapper.getEditResolEjg(ejgItem, idInstitucion.toString());
+                
+                if(resolEdit.equals("1")) {
+                	response = true;
+                }
+                else {
+                	response = false;
+                }
+
+                LOGGER.info(
+                        "getEditResolEjg() / ScsEstadoejgExtendsMapper.getEditResolEjg() -> Salida de ScsEstadoejgExtendsMapper para obtener si la resolución es editable");
+            } else {
+                LOGGER.warn(
+                        "getEditResolEjg() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                                + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("getEditResolEjg() -> idInstitucion del token nula");
+        }
+        return response;
+    }
+    
 
     @Override
     public ComboDTO comboTipoExpediente(HttpServletRequest request) {

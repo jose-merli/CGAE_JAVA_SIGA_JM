@@ -177,4 +177,6 @@ public interface IGestionEJG {
 	DocushareDTO searchListDirEjg(int numPagina, DocuShareObjectVO docu, HttpServletRequest request) throws Exception;
 
 	EstadoEjgDTO getUltEstadoEjg(EjgItem ejgItem, HttpServletRequest request);
+
+	Boolean getEditResolEjg(EjgItem ejgItem, HttpServletRequest request);
 }
