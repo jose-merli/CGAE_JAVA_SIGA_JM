@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderDTO;
 import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasRuleDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
@@ -229,16 +230,6 @@ public class ConsultasController {
 	@GetMapping(value = "/pys/obtenerDatosConsulta")
 	ResponseEntity<ConstructorConsultasDTO> obtenerDatosConsulta(HttpServletRequest request, @RequestParam String idConsulta) { 
 		ConstructorConsultasDTO response = _consultasService.obtenerDatosConsulta(request, idConsulta);
-		if (response.getError() == null)
-			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	//JSON
-	@GetMapping(value = "/pys/obtenerConsultaJSON")
-	ResponseEntity<ConstructorConsultasDTO> obtenerConsultaJSON(HttpServletRequest request, @RequestParam String idConsulta) { 
-		ConstructorConsultasDTO response = _consultasService.obtenerConsultaJSON(request, idConsulta);
 		if (response.getError() == null)
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
 		else

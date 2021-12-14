@@ -42,6 +42,7 @@ import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasRuleDTO;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasRuleItem;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
@@ -2750,14 +2751,15 @@ public class ConsultasServiceImpl implements IConsultasService {
 		            	
 		            	String[] filtroSplit = criterio.getFiltro().split(" ");
 		            		            	
-		            	conCriterioConsultaInsertar.setIdcampo(Long.valueOf(filtroSplit[0]));
+		            	String idCampo = filtroSplit[0].substring(1);
+		            	conCriterioConsultaInsertar.setIdcampo(Long.valueOf(idCampo));
 		            		
 		            	LOGGER.info(
 								"constructorConsultas() / ConConsultaExtendsMapper.getIdOperacion() -> Entrada al servicio para obtener el idOperacion necesario para la insercion en con_criterioconsulta");
-		            	
+		           
 		            	//Segun el simbolo obtenido del constructor de consultas para realizar la insercion en con_critericonsultas necesitamos el idoperacion el cual depende del simbolo y del idcampo seleccionado en el constructor
 		            	if(!filtroSplit[1].equals("IS")) {
-		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(filtroSplit[0], filtroSplit[1].toLowerCase());
+		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(idCampo, filtroSplit[1].toLowerCase());
 		            		if(idoperacion != 0) {
 		            			conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
 		            		}else {
@@ -2769,7 +2771,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		            		}
 		            	}else{
 		            		String simbolo = filtroSplit[1] + " " + filtroSplit[2];
-		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(filtroSplit[0], simbolo.toLowerCase());
+		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(idCampo, simbolo.toLowerCase());
 		            		if(idoperacion != 0) {
 		            		conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
 		            		}else {
@@ -3323,13 +3325,12 @@ public class ConsultasServiceImpl implements IConsultasService {
   //FIN METODOS CONVERTIR SQL A OBJETO ENTENDIBLE PARA SU INSERCION EN CON_CRITERIOCONSULTA 
 
 	
-	//SQL
+	
 	@Override
 	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta) {
 		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
 		Error error = new Error();
-
-
+		
 		LOGGER.info("obtenerDatosConsulta() -> Entrada al servicio para precargar la consulta ya existente en el constructor de consultas");
 
 		// Conseguimos información del usuario logeado
@@ -3383,9 +3384,11 @@ public class ConsultasServiceImpl implements IConsultasService {
 //							if(constructorConsultasItem.getCampo().contains(" ")) {
 //								constructorConsultasItem.setCampo("'" + constructorConsultasItem.getCampo() + "'");
 //							}
+//							
+//							consulta = consulta + constructorConsultasItem.getCampo();
 							
 							//IDCAMPO
-							consulta = consulta + constructorConsultasItem.getIdcampo();
+							consulta = consulta + "A" + constructorConsultasItem.getIdcampo();
 							
 							//SIMBOLO
 							consulta = consulta + " " + constructorConsultasItem.getSimbolo().toUpperCase();
@@ -3436,84 +3439,6 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		
 		LOGGER.info("obtenerDatosConsulta() -> Salida del servicio para obtener los datos de la consulta necesarios para precargarla en el constructor de datos");
-
-		return constructorConsultasDTO;
-	}
-	
-	//JSON
-	@Override
-	public ConstructorConsultasDTO obtenerConsultaJSON(HttpServletRequest request, String idConsulta) {
-		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
-		ConstructorConsultasRuleDTO constructorConsultasRuleDTO = new ConstructorConsultasRuleDTO();
-		Error error = new Error();
-
-
-		LOGGER.info("obtenerConsultaJSON() -> Entrada al servicio para precargar la consulta ya existente en el constructor de consultas mediante un JSON");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			
-
-				LOGGER.info(
-						"obtenerConsultaJSON() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				
-
-				LOGGER.info(
-						"obtenerConsultaJSON() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"obtenerConsultaJSON() / ConConsultasExtendsMapper.obtenerConsultaJSON() -> Entrada a ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas mediante un JSON");
-
-					String idioma = usuarios.get(0).getIdlenguaje();
-					
-					//constructorConsultasDTO.setConstructorConsultasItem(_conConsultasExtendsMapper.obtenerDatosConsulta(idioma, idInstitucion, idConsulta));
-					constructorConsultasDTO.setConstructorConsultasItem(_conConsultasExtendsMapper.obtenerDatosConsulta(idioma, (short) 2005, idConsulta));
-					
-					List<ConstructorConsultasRuleDTO> listaConstructorConsultasRuleDTO = new ArrayList<ConstructorConsultasRuleDTO>();
-					int contadorSubRules = 0;
-					for (ConstructorConsultasItem constructorConsultasItem : constructorConsultasDTO.getConstructorConsultasItem()) {
-						
-						if(constructorConsultasItem.getAbrirparentesis().equals("1")) {
-							contadorSubRules++;
-							listaConstructorConsultasRuleDTO.add(new ConstructorConsultasRuleDTO());
-							//constructorConsultasRuleDTO.setRules2(new ConstructorConsultasRuleDTO())
-						}
-					}
-//					
-//					1		1	3000	TIPO COLEGIADO	igual a	'20'	
-//					2	Y		226	RESIDENTE	igual a	'1'	
-//					3	Y		3003	GRUPO CLIENTE	igual a	'18#2005'	1
-//					4	O	1	3000	TIPO COLEGIADO	igual a	'20'	
-//					5	Y		226	RESIDENTE	igual a	'1'	
-//					6	Y		3003	GRUPO CLIENTE	igual a	'0#2005'	1
-					
-					LOGGER.info(
-							"obtenerConsultaJSON() / ConConsultasExtendsMapper.obtenerConsultaJSON() -> Salida de ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas mediante un JSON");
-
-				}
-			}
-			
-		} catch (Exception e) {
-			LOGGER.error(
-					"ConsultasServiceImpl.obtenerConsultaJSON() -> Se ha producido un error al obtener los datos de la consulta necesarios para precargarla en el constructor de datos mediante un JSON",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			constructorConsultasDTO.setError(error);
-		}
-
-		
-		LOGGER.info("obtenerConsultaJSON() -> Salida del servicio para obtener los datos de la consulta necesarios para precargarla en el constructor de datos mediante un JSON");
 
 		return constructorConsultasDTO;
 	}
