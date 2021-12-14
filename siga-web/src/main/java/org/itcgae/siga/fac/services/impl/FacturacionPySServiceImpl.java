@@ -1542,7 +1542,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			List<FicherosAbonosItem> items = facDisqueteabonosExtendsMapper.getFicherosTransferencias(item,
 					usuario.getIdinstitucion().toString());
 
-			ficherosAbonosDTO.setFicherosTransferenciasItems(items);
+			ficherosAbonosDTO.setFicherosAbonosItems(items);
 		}
 
 		LOGGER.info(
