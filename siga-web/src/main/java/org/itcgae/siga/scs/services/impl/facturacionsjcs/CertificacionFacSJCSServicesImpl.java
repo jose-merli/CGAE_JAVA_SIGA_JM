@@ -7,9 +7,11 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
 import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
+import org.itcgae.siga.db.mappers.EcomOperacionMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSService {
+
+    private static final String IDFACTURACION = "IDFACTURACION";
 
     private static Map<Short, String> mapaInstituciones = null;
 
@@ -61,6 +65,9 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private FcsCertificacionesExtendsMapper fcsCertificacionesExtendsMapper;
+
+    @Autowired
+    private EcomOperacionMapper ecomOperacionMapper;
 
     @Override
     public InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request) {
@@ -200,7 +207,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     private void insertaColaFcsFacturacionJG(EcomCola ecomCola, FcsFacturacionjgKey fcsFacturacionjgKey, AdmUsuarios usuario) throws Exception {
 
         Map<String, String> parametros = new HashMap<String, String>();
-        parametros.put("IDFACTURACION", fcsFacturacionjgKey.getIdfacturacion().toString());
+        parametros.put(IDFACTURACION, fcsFacturacionjgKey.getIdfacturacion().toString());
         insertaColaConParametros(ecomCola, parametros, usuario);
     }
 
@@ -310,23 +317,29 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
         String token = request.getHeader("Authorization");
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+        Error error = new Error();
 
         if (fichero.getSize() == 0l) {
             updateResponseDTO.setStatus(SigaConstants.KO);
-            Error error = new Error();
             error.setDescription("message.cajg.ficheroValido");
             updateResponseDTO.setError(error);
         } else {
             try {
                 Path pFile = camHelper.subirFicheroCAM(idInstitucion, idFacturacion, fichero, request);
-//				 falta la llamada a ECOM con pFile 	
-                insertaEstadoFacturacion(camHelper.getUsuario(idInstitucion, token), idInstitucion, idFacturacion);
-                updateResponseDTO.setStatus(SigaConstants.OK);
+                if (!isEjecutandoFacturacion(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId())) {
+                    insertaEstadoFacturacion(camHelper.getUsuario(idInstitucion, token), idInstitucion, idFacturacion);
+                    envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId(), camHelper.getUsuario(idInstitucion, token));
+                    updateResponseDTO.setStatus(SigaConstants.OK);
+                } else {
+                    error.setCode(200);
+                    error.setDescription("La operación ya se está ejecutando para la facturación");
+                    updateResponseDTO.setStatus(SigaConstants.OK);
+                    updateResponseDTO.setError(error);
+                    LOGGER.error("La operación ya se está ejecutando para la facturación.");
+                }
             } catch (Exception e) {
                 LOGGER.error("error en subirFicheroCAM:" + e);
                 updateResponseDTO.setStatus(SigaConstants.KO);
-                Error error = new Error();
                 error.setDescription("messages.general.error");
                 updateResponseDTO.setError(error);
             }
@@ -352,6 +365,48 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             fcsFactEstadosfacturacion.setUsumodificacion(usuario.getIdusuario());
             fcsFactEstadosfacturacionExtendsMapper.insert(fcsFactEstadosfacturacion);
         }
+    }
+
+
+    private boolean isEjecutandoFacturacion(Short idinstitucion, String idFacturacion, int operacionCompruebaEnEjecucion) {
+        boolean ejecutandose = false;
+
+        EcomColaParametrosExample ecomColaParametrosExample = new EcomColaParametrosExample();
+
+        ecomColaParametrosExample.createCriteria().andClaveEqualTo(IDFACTURACION).andValorEqualTo(idFacturacion.toString());
+        List<EcomColaParametros> listaEcomColaParametros = ecomColaParametrosMapper.selectByExample(ecomColaParametrosExample);
+
+        if (listaEcomColaParametros != null && listaEcomColaParametros.size() > 0) {
+            LOGGER.debug("Posibles candidatos para ver si la facturación ha sido ejecutada o se está ejecutando");
+            List<Long> ids = new ArrayList<Long>();
+            for (EcomColaParametros ecomColaParametros : listaEcomColaParametros) {
+                ids.add(ecomColaParametros.getIdecomcola());
+            }
+
+            List<Short> listaEstados = new ArrayList<Short>();
+            listaEstados.add(ECOM_ESTADOSCOLA.INICIAL.getId());
+            listaEstados.add(ECOM_ESTADOSCOLA.EJECUTANDOSE.getId());
+            listaEstados.add(ECOM_ESTADOSCOLA.REINTENTANDO.getId());
+
+            EcomColaExample ecomColaExample = new EcomColaExample();
+            ecomColaExample.createCriteria().andIdinstitucionEqualTo(idinstitucion).andIdoperacionEqualTo(operacionCompruebaEnEjecucion).andIdestadocolaIn(listaEstados).andIdecomcolaIn(ids);
+            long count = ecomColaMapper.countByExample(ecomColaExample);
+            if (count > 0) {
+                ejecutandose = true;
+            } else {
+                EcomOperacion operacion = ecomOperacionMapper.selectByPrimaryKey(operacionCompruebaEnEjecucion);
+                ecomColaExample = new EcomColaExample();
+                ecomColaExample.createCriteria().andIdinstitucionEqualTo(idinstitucion).andIdoperacionEqualTo(operacionCompruebaEnEjecucion).andIdestadocolaEqualTo(ECOM_ESTADOSCOLA.ERROR.getId()).andReintentoLessThan(operacion.getMaxreintentos()).andIdecomcolaIn(ids);
+                count = ecomColaMapper.countByExample(ecomColaExample);
+                if (count > 0)
+                    ejecutandose = true;
+
+            }
+        }
+
+        LOGGER.debug("¿La facturación del colegio " + idinstitucion + " con idFacturacion " + idFacturacion + " está en ejecución? = '" + ejecutandose + "'");
+
+        return ejecutandose;
     }
 
     @Override

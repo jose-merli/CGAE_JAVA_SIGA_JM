@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.Impreso190DTO;
 import org.itcgae.siga.DTOs.scs.Impreso190Item;
@@ -18,9 +20,11 @@ public interface IImpreso190Service {
 	
 	public ResponseEntity<InputStreamResource> impreso190descargar(List<Impreso190Item> impreso190Item, HttpServletRequest request);
 	
-	Impreso190DTO searchImpreso190(int anio, HttpServletRequest request) throws Exception;
+	Impreso190DTO searchImpreso190(String anio, HttpServletRequest request) throws Exception;
 
 	Impreso190DTO deleteImpreso190(List<Impreso190Item> impreso190Item, HttpServletRequest request) throws Exception;
 	
 	Impreso190DTO getConfImpreso190(HttpServletRequest request) throws Exception;
+
+	ComboDTO getComboAnio(HttpServletRequest request);
 }
