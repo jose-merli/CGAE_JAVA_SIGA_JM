@@ -2131,6 +2131,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if(item.getIdAccion().equalsIgnoreCase("7") && (facHistoricoList.get(facHistoricoList.size()-1).getEstado() == 2 ||
 					facHistoricoList.get(facHistoricoList.size()-1).getEstado() == 4 || facHistoricoList.get(facHistoricoList.size()-1).getEstado() == 5)){
 
+				//historico fac
 				facHistoricoInsert.setIddisquetecargos(null);
 				facHistoricoInsert.setIdfacturaincluidaendisquete(null);
 				facHistoricoInsert.setIddisquetedevoluciones(null);
@@ -2264,6 +2265,65 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				//saves
 				facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
 				facPagosporcajaMapper.insert(pagosCajaInsert);
+				facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
+			}
+
+			//anular
+			if(item.getIdAccion().equalsIgnoreCase("8") && facHistoricoList.get(facHistoricoList.size()-1).getEstado() != 7
+					&& facHistoricoList.get(facHistoricoList.size()-1).getEstado() != 8){
+
+				//historico fac
+				facHistoricoInsert.setImptotalpagado(facUpdate.getImptotal());
+				facHistoricoInsert.setImptotalcompensado(facUpdate.getImptotal());
+				facHistoricoInsert.setImptotalporpagar(BigDecimal.valueOf(0));
+
+				facHistoricoInsert.setEstado((short) 8);
+
+				facHistoricoInsert.setIddisquetecargos(null);
+				facHistoricoInsert.setIdfacturaincluidaendisquete(null);
+				facHistoricoInsert.setIddisquetedevoluciones(null);
+				facHistoricoInsert.setIdrecibo(null);
+				facHistoricoInsert.setIdpagoporcaja(null);
+				facHistoricoInsert.setIdrenegociacion(null);
+				facHistoricoInsert.setIdabono(null);
+				facHistoricoInsert.setComisionidfactura(null);
+
+				//abono
+				FacAbono abonoInsert = new FacAbono();
+
+				abonoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
+				abonoInsert.setFecha(item.getFechaModificaion());
+				abonoInsert.setFechamodificacion(new Date());
+				abonoInsert.setContabilizada(facUpdate.getContabilizada());
+				abonoInsert.setIdpersona(facUpdate.getIdpersona());
+				abonoInsert.setUsumodificacion(usuario.getUsumodificacion());
+				abonoInsert.setIdcuenta(facUpdate.getIdcuenta());
+				abonoInsert.setMotivos(item.getComentario());
+				abonoInsert.setImptotalneto(facUpdate.getImptotalneto());
+				abonoInsert.setImptotaliva(facUpdate.getImptotaliva());
+				abonoInsert.setImptotal(facUpdate.getImptotal());
+				abonoInsert.setImptotalabonadoefectivo(BigDecimal.valueOf(0));
+				abonoInsert.setImptotalabonadoporbanco(BigDecimal.valueOf(0));
+				abonoInsert.setImptotalabonado(BigDecimal.valueOf(0));
+				abonoInsert.setImppendienteporabonar(facUpdate.getImptotalpagado());
+				abonoInsert.setIdpersonadeudor(facUpdate.getIdpersonadeudor());
+				abonoInsert.setIdcuentadeudor(facUpdate.getIdcuentadeudor());
+
+				abonoInsert.setIdabono(Long.valueOf(facAbonoExtendsMapper.getNewAbonoID(String.valueOf(usuario.getIdinstitucion())).get(0).getValue()));
+
+				abonoInsert.setEstado((short) 6);
+				abonoInsert.setNumeroabono("EJEMPLO");
+
+				facHistoricoInsert.setIdabono(abonoInsert.getIdabono());
+
+				//factura
+				facUpdate.setEstado((short) 8);
+				facUpdate.setImptotalpagado(facUpdate.getImptotal());
+				facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
+
+				//saves
+				facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+				facAbonoExtendsMapper.insert(abonoInsert);
 				facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 			}
 
