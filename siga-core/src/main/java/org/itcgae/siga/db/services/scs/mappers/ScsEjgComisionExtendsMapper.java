@@ -34,7 +34,8 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER),
-			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "EDITABLECOMISION", property = "editableComision", jdbcType = JdbcType.INTEGER)
 
 	})
 	List<EjgItem> busquedaEJGComision(EjgItem ejgItem, String string, Integer tamMaximo,

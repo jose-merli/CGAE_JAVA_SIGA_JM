@@ -141,6 +141,7 @@ public class EjgItem {
     private boolean ultimoEstado;
     
     private boolean informacionEconomica;
+    private int editableComision;
 
     /**
      *
@@ -1721,5 +1722,13 @@ public class EjgItem {
 	public void setInformacionEconomica(boolean informacionEconomica) {
 		this.informacionEconomica = informacionEconomica;
 	}
-    
+
+	public int getEditableComision() {
+		return editableComision;
+	}
+
+	public void setEditableComision(int editableComision) {
+		this.editableComision = editableComision;
+	}
+	    
 }

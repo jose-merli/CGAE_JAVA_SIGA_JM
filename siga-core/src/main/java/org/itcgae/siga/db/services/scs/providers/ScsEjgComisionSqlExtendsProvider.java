@@ -332,6 +332,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.idpersonajg");
 		sql.SELECT("perjg.NIF");
 		sql.SELECT(resolucion);
+		sql.SELECT("maestroestado.editablecomision as EDITABLECOMISION");
 
 		// from
 		sql.FROM("scs_ejg ejg");
