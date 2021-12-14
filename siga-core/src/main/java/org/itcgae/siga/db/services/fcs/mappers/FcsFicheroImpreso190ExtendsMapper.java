@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.Impreso190Item;
 import org.itcgae.siga.db.mappers.FcsFicheroImpreso190Mapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsFicheroImpreso190SqlExtendsProviders;
@@ -24,7 +25,7 @@ public interface FcsFicheroImpreso190ExtendsMapper extends FcsFicheroImpreso190M
             @Result(column = "APELLIDO2CONTACTO", property = "apellido2Contacto", jdbcType = JdbcType.VARCHAR),
             @Result(column = "FECHAGENERARION", property = "fechageneracion", jdbcType = JdbcType.VARCHAR),
        })
-    List<Impreso190Item> getImpreso190(int anio, Short idInstitucion);
+    List<Impreso190Item> getImpreso190(String anio, Short idInstitucion);
 	
 	@SelectProvider(type = FcsFicheroImpreso190SqlExtendsProviders.class, method = "getConfImpreso190")
     @Results({
@@ -38,5 +39,12 @@ public interface FcsFicheroImpreso190ExtendsMapper extends FcsFicheroImpreso190M
             @Result(column = "FECHAMODIFICACION", property = "fechageneracion", jdbcType = JdbcType.VARCHAR),
        })
     List<Impreso190Item> getConfImpreso190(Short idInstitucion);
+	
+	@SelectProvider(type = FcsFicheroImpreso190SqlExtendsProviders.class, method = "getComboAnio")
+	@Results({ 
+		@Result(column = "ANIO", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "ANIO2", property = "label", jdbcType = JdbcType.NUMERIC)
+	})
+	List<ComboItem> getComboAnio(Short idInstitucion);
 
 }

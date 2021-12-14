@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.Impreso190DTO;
@@ -45,7 +47,7 @@ public class Impreso190Controller {
 	}
 	
 	@RequestMapping(value = "/facturacionsjcs/searchImpreso190",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Impreso190DTO> searchImpreso190(@RequestBody int  anio, HttpServletRequest request) throws Exception {
+	ResponseEntity<Impreso190DTO> searchImpreso190(@RequestBody String  anio, HttpServletRequest request) throws Exception {
 		Impreso190DTO response = iImpreso190Service.searchImpreso190(anio, request);
 		if (response.getError().getCode() == 200) {
             return new ResponseEntity<Impreso190DTO>(response, HttpStatus.OK);
@@ -72,6 +74,12 @@ public class Impreso190Controller {
         } else {
             return new ResponseEntity<Impreso190DTO>(response, HttpStatus.FORBIDDEN);
         }
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/getComboAnioImpreso190",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getComboAnio(HttpServletRequest request) throws Exception {
+		ComboDTO response = iImpreso190Service.getComboAnio(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
 }
