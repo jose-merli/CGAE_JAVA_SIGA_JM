@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.FacAbonoMapper;
 import org.itcgae.siga.db.services.fac.providers.FacAbonoExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -24,8 +25,8 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 			@Result(column = "facturacion", property = "facturacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ncolident", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nifcif", property = "numeroIdentificacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "apellidos", property = "apellidos", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombreCompleto", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersona", property = "idCliente", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombreinst", property = "nombreInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "imptotal", property = "importefacturado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "imptotalporpagar", property = "importeAdeudadoPendiente", jdbcType = JdbcType.VARCHAR),
@@ -69,4 +70,10 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 			@Result(column = "ACREEDOR_NOMBRE", property = "descripcionDeudor", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturaItem> getAbono(String idFactura, String idInstitucion);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNewAbonoID")
+	@Results({
+			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getNewAbonoID(String idInstitucion);
 }

@@ -20,8 +20,8 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //select de abonos
         abonos.SELECT("'ABONO' tipo,f.idabono,f.numeroabono,f.idinstitucion,f.fecha fecha,"
-                + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,p.nombre nombre,(p.apellidos1 || ' ' || nvl(p.apellidos2, '')) apellidos,"
-                + "f.imptotal imptotal,f.imppendienteporabonar imptotalporpagar,f.estado idestado,r.descripcion estado");
+                + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' || p.nombre, p.nombre) nombreCompleto,"
+                + "f.imptotal imptotal,f.imppendienteporabonar imptotalporpagar,f.estado idestado,r.descripcion estado,p.idpersona");
 
         //joins
         abonos.FROM("fac_abono f");
@@ -146,6 +146,17 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
 
         query.WHERE("A.IDABONO ="+idFactura);
         query.WHERE("A.IDINSTITUCION ="+idInstitucion);
+
+        return query.toString();
+    }
+
+    public String getNewAbonoID(String idInstitucion) {
+
+        SQL query = new SQL();
+
+        query.SELECT("MAX(IDABONO)+1 AS ID");
+        query.FROM("FAC_ABONO fa");
+        query.WHERE("IDINSTITUCION ="+idInstitucion);
 
         return query.toString();
     }

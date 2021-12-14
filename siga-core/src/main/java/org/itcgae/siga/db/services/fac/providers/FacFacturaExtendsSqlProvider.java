@@ -47,9 +47,9 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //select de facturas
         facturas.SELECT("'FACTURA' tipo,f.idfactura,f.numerofactura,f.idinstitucion,f.fechaemision fecha,f.idprogramacion,fp.descripcion facturacion,"
-                + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,p.nombre,(p.apellidos1 || ' ' || nvl(p.apellidos2, '')) apellidos,"
+                + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' ||  p.nombre, p.nombre) nombreCompleto,"
                 + "f.imptotal,f.imptotalporpagar,f.estado idestado,r.descripcion estado, (" + numComunicaciones.toString() + ") numcomunicaciones,"
-                + "(" + ultComunicacion.toString() + ") ultcomunicacion");
+                + "(" + ultComunicacion.toString() + ") ultcomunicacion,p.idpersona");
 
         //joins
         facturas.FROM("fac_factura f");
