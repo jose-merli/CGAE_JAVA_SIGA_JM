@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,8 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class CertificacionFacSJCSServicesCAMHelper {
@@ -105,8 +108,9 @@ public class CertificacionFacSJCSServicesCAMHelper {
     private String anyoSufijo;
     private Long idIntercambio;
     private Integer longitudContador;	
-    private String idUsuario;
+    private Integer idUsuario;
     private BufferedWriter bwError;
+    private File fError;
     private String cabeceraLog = null;
     
 	private void initInforme() {
@@ -121,6 +125,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
 			try {
 				bwError.close();
 				bwError = null;
+				fError = null;
 			} catch (Exception e) {
 				LOGGER.error("Error al cerrar bwError:" + e);
 			};
@@ -128,18 +133,29 @@ public class CertificacionFacSJCSServicesCAMHelper {
 	}
   
     
-	private String getRutaFicheroSalida(Short idInstitucion, String idFacturacion) {		
-		String rutaTmp = getRutaFicherosSiga() + SigaConstants.pathSeparator  + idInstitucion + SigaConstants.pathSeparator +  idFacturacion + SigaConstants.pathSeparator;
+	private Path getRutaFicheroSalida(Short idInstitucion, String idFacturacion) {		
+		Path rutaTmp = getRutaFicherosSiga().resolve(String.valueOf(idInstitucion)).resolve(idFacturacion);
 		return rutaTmp;
 	}
 	
-	private String getRutaFicherosSiga() {
+	private Path getRutaFicherosSiga() {
 		GenPropertiesKey key = new GenPropertiesKey();
 		key.setFichero(SigaConstants.FICHERO_SIGA);
 		key.setParametro(SigaConstants.parametroRutaSalidaInformes);
 		GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
-		return  rutaFicherosSalida.getValor();
+		return  Paths.get(rutaFicherosSalida.getValor());
 	}
+	
+	
+	private Path getRutaAlmacenFichero(Short idInstitucion, String idFacturacion) {
+		GenPropertiesKey key = new GenPropertiesKey();
+		key.setFichero(SigaConstants.FICHERO_SIGA);
+		key.setParametro(SigaConstants.parametroRutaAlmacenFicheros);
+		GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
+		String rutaRaiz = rutaFicherosSalida.getValor();
+		return Paths.get(rutaRaiz,String.valueOf(idInstitucion),idFacturacion);
+	}
+	
 	
 	private String getRutaFicheroIncidencias(Short idInstitucion, String idFacturacion) {
 		String ruta = getRutaFicherosSiga() + SigaConstants.pathSeparator + DIRECTORIO_INCIDENCIAS + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator +  idFacturacion + SigaConstants.pathSeparator; 			
@@ -155,12 +171,12 @@ public class CertificacionFacSJCSServicesCAMHelper {
 			Files.createDirectories(pFile);
 		}
 		
-		f= new File(pFile.toString(),"InformeIncididencias.csv");
+		f=  pFile.resolve("InformeIncididencias.csv").toFile();
 
 		return f;
 	}
 	
-	private String getNombreFicheroCAM(Short idInstitucion, String userName) {
+	private String getNombreFicheroCAM(Short idInstitucion, Integer userName) {
 		final String PATTERN="ddMMYYYHHMMss";
 		
 
@@ -176,23 +192,23 @@ public class CertificacionFacSJCSServicesCAMHelper {
    
 	public File getInformeCAM(Short idInstitucion, String idFacturacion, String tipoFichero, HttpServletRequest request){
 		boolean hayErrores = false;
-		String rutaPadre;
-		String rutaFichero;
+		Path rutaPadre;
+		Path rutaFichero;
 		File fichero=null;
+		
 		initInforme();
 		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		idUsuario = getNombreUsuario(idInstitucion, dni);
+		idUsuario = getUsuario(idInstitucion, dni).getIdusuario();
 		
 		rutaPadre = getRutaFicheroSalida(idInstitucion, idFacturacion);
 		
 		try {
-			Path pPadre = Paths.get(rutaPadre);
-			deletePathWithContents(pPadre);
-			Files.createDirectories(pPadre);
-			rutaFichero = rutaPadre + getNombreFicheroCAM(idInstitucion, idUsuario);
-			fichero = new File(rutaFichero);
+			deletePathWithContents(rutaPadre);
+			Files.createDirectories(rutaPadre);
+			rutaFichero = rutaPadre.resolve(getNombreFicheroCAM(idInstitucion, idUsuario));
+			fichero = rutaFichero.toFile();
 			hayErrores =rellenaFichero(fichero, idInstitucion, idFacturacion, tipoFichero);
 		} catch (IOException e) {
 			LOGGER.error("error al obtener informe CAM:"+ e);
@@ -201,6 +217,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
 		
 		if(hayErrores) {
 			deleteFileSafeMode(fichero);
+			fichero = fError;
 		}
 		
 		finalizaInforme();
@@ -233,15 +250,13 @@ public class CertificacionFacSJCSServicesCAMHelper {
 	}
 
 
-	public String getNombreUsuario(Short idInstitucion, String dni) {
-		String nombreUsuario;
+	public AdmUsuarios getUsuario(Short idInstitucion, String dni) {
         AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
         exampleUsuarios.createCriteria()
           	.andNifEqualTo(dni)
           	.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));	            
         List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-        nombreUsuario = usuarios.get(0).getIdusuario().toString();
-        return nombreUsuario;    
+        return  usuarios.get(0);    
 	}
 	
 		
@@ -249,7 +264,9 @@ public class CertificacionFacSJCSServicesCAMHelper {
 
 private void escribeLog(Short idInstitucion, String idFacturacion, String texto) throws IOException {
 	if (bwError == null) {
-		FileWriter fileWriter = new FileWriter(getFileInformeIncidencias(idInstitucion, idFacturacion));
+		fError = getFileInformeIncidencias(idInstitucion, idFacturacion);
+		deleteFileSafeMode(fError);
+		FileWriter fileWriter = new FileWriter(fError);
 		bwError = new BufferedWriter(fileWriter);
 		if (cabeceraLog != null) {
 			bwError.write(cabeceraLog);
@@ -315,7 +332,7 @@ private void actualizarContador(Short idInstitucion) {
 		if(contadorNuevo.getPrefijo().equals(contadorOriginal.getPrefijo())&&
 		    contadorNuevo.getSufijo().equals(contadorOriginal.getSufijo())){
 			contadorNuevo.setContador(Long.valueOf(longitudContador));
-			contadorNuevo.setUsumodificacion(Integer.valueOf(idUsuario));
+			contadorNuevo.setUsumodificacion(idUsuario);
 			contadorNuevo.setFechamodificacion(new Date());
 			contadorMapper.updateByPrimaryKey(contadorNuevo);
 		}
@@ -411,6 +428,14 @@ private boolean valida(Short idInstitucion, String idFacturacion, String numEJG,
 	}
 	
 	return hayError;
+}
+
+public Path subirFicheroCAM(Short idInstitucion, String idFacturacion, MultipartFile fichero, MultipartHttpServletRequest request) throws Exception {
+	Path pRuta = getRutaAlmacenFichero(idInstitucion, idFacturacion);
+	Files.createDirectories(pRuta);
+	Path pFile =  pRuta.resolve(fichero.getOriginalFilename());
+	Files.copy(fichero.getInputStream(), pFile, StandardCopyOption.REPLACE_EXISTING);
+	return pFile;
 }
 
 	
