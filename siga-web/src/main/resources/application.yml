@@ -41,5 +41,6 @@ application:
     /pys/formasPagoServicio: [411]
     /pys/crearEditarPrecios: [413]
     /pys/eliminarPrecios: [414]
+    /pys/borrarSuscripcionesBajas: [415]
 
     # Fin permisos para el módulo de ProductosYServicios
