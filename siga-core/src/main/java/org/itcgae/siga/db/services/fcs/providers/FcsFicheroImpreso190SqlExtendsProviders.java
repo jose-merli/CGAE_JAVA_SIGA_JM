@@ -1,12 +1,12 @@
 package org.itcgae.siga.db.services.fcs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.scs.Impreso190Item;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsFicheroImpreso190SqlProvider;
 
 public class FcsFicheroImpreso190SqlExtendsProviders extends FcsFicheroImpreso190SqlProvider {
 
-	public String getImpreso190(int anio, Short idInstitucion) {
+	public String getImpreso190(String anio, Short idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT("IDFICHERO,"
 				+ "IDINSTITUCION,"
@@ -20,7 +20,11 @@ public class FcsFicheroImpreso190SqlExtendsProviders extends FcsFicheroImpreso19
 		
 		sql.FROM("FCS_FICHERO_IMPRESO190");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
-		sql.WHERE("ANIO = " + anio);
+		
+		if(!UtilidadesString.esCadenaVacia(anio) || anio.length() != 0) {
+			sql.WHERE("ANIO in (" + anio + ")");
+		}
+		
 		return sql.toString();
 	}
 	
@@ -37,6 +41,18 @@ public class FcsFicheroImpreso190SqlExtendsProviders extends FcsFicheroImpreso19
 		
 		sql.FROM("FCS_CONF_IMPRESO190");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
+	}
+	
+	public String getComboAnio(Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("DISTINCT ANIO");
+		sql.SELECT("ANIO ANIO2");
+		sql.FROM("FCS_FICHERO_IMPRESO190");
+		sql.WHERE("idinstitucion = " + idInstitucion);
+		sql.ORDER_BY("ANIO DESC");
+		
 		return sql.toString();
 	}
 	

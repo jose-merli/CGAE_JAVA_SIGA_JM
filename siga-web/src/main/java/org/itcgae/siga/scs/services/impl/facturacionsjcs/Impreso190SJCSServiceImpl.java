@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.CenPersonaItem;
@@ -969,7 +971,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 	@Override
 	@Transactional
-	public Impreso190DTO searchImpreso190(int anio, HttpServletRequest request) throws Exception {
+	public Impreso190DTO searchImpreso190(String anio, HttpServletRequest request) throws Exception {
 		Error error = new Error();
 		LOGGER.info(
 				"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio para buscar los contrarios asociados a una designacion.");
@@ -1181,6 +1183,41 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 		}
 
 		return impreso190DTO;
+	}
+
+	@Override
+	public ComboDTO getComboAnio(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.debug(
+					"getComboAnio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+
+			LOGGER.debug(
+					"getComboAnio() / fcsFicheroImpreso190ExtendsMapper.getComboAnio() -> Entrada a fcsFicheroImpreso190ExtendsMapper para obtener los combo");
+
+			comboItems = fcsFicheroImpreso190ExtendsMapper.getComboAnio(idInstitucion);
+
+			LOGGER.debug(
+					"getComboAnio() / fcsFicheroImpreso190ExtendsMapper.getComboAnio() -> Salida a fcsFicheroImpreso190ExtendsMapper para obtener los combo");
+
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
+			}
+
+		}
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener los años del combo año del impreso190");
+		return comboDTO;
 	}
 
 }
