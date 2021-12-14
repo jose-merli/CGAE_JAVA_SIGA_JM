@@ -116,6 +116,9 @@ public String getListaServiciosMonedero(Short idInstitucion, String idLinea, Str
     	
     	query.SELECT("servAnti.fechaModificacion"); 
     	query.SELECT("servin.descripcion"); 
+    	query.SELECT("servin.idServicio");
+    	query.SELECT("servin.idServiciosInstitucion");
+    	query.SELECT("servin.idTipoServicios");
     	query.SELECT("  DECODE(\r\n"
 				+ " valor_minimo,\r\n"
 				+ " NULL,\r\n"
@@ -136,7 +139,16 @@ public String getListaServiciosMonedero(Short idInstitucion, String idLinea, Str
 				+ " ) precio");
     	
     	query.FROM("pys_lineaanticipo linea");
-    	query.INNER_JOIN("(\r\n"
+    	query.LEFT_OUTER_JOIN(" pys_periodicidad perio_min on perio_min.idperiodicidad = a.id_periodicidad_minima");
+    	query.LEFT_OUTER_JOIN(" pys_periodicidad perio_max on perio_max.idperiodicidad = a.id_periodicidad_maxima");
+    	query.INNER_JOIN("pys_anticipoletrado anti on anti.idinstitucion = linea.idinstitucion and anti.idPersona = linea.idPersona");
+    	query.INNER_JOIN("pys_servicioanticipo servAnti on servAnti.IDINSTITUCION = linea.idInstitucion and servAnti.IDPERSONA = linea.idPersona and servAnti.IDANTICIPO = anti.idanticipo");
+		
+    	query.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = linea.idpersona");
+        query.INNER_JOIN(" pys_serviciosinstitucion servin on servin.idtiposervicios = servAnti.idtiposervicios and "+
+				"servin.idserviciosinstitucion = servAnti.idserviciosinstitucion and "+
+				"servin.idservicio = servAnti.idservicio and servin.idinstitucion = anti.idinstitucion");
+        query.INNER_JOIN("(\r\n"
     			+ "	        SELECT\r\n"
     			+ "	            MIN(precioserv_min.valor) valor_minimo,\r\n"
     			+ "	            MIN(precioserv_min.idperiodicidad) id_periodicidad_minima,\r\n"
@@ -239,16 +251,8 @@ public String getListaServiciosMonedero(Short idInstitucion, String idLinea, Str
     			+ "	                        AND\r\n"
     			+ "	                            precioserv_min.idinstitucion = servin.idinstitucion\r\n"
     			+ "	                )\r\n"
-    			+ "	    ) a on a.idinstitucion = linea.idinstitucion");
-    	query.LEFT_OUTER_JOIN(" pys_periodicidad perio_min on perio_min.idperiodicidad = a.id_periodicidad_minima");
-    	query.LEFT_OUTER_JOIN(" pys_periodicidad perio_max on perio_max.idperiodicidad = a.id_periodicidad_maxima");
-    	query.INNER_JOIN("pys_anticipoletrado anti on anti.idinstitucion = linea.idinstitucion and anti.idPersona = linea.idPersona");
-    	query.INNER_JOIN("pys_servicioanticipo servAnti on servAnti.IDINSTITUCION = linea.idInstitucion and servAnti.IDPERSONA = linea.idPersona and servAnti.IDANTICIPO = anti.idanticipo");
-		
-    	query.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = linea.idpersona");
-        query.INNER_JOIN(" pys_serviciosinstitucion servin on servin.idtiposervicios = servAnti.idtiposervicios and "+
-				"servin.idserviciosinstitucion = servAnti.idserviciosinstitucion and "+
-				"servin.idservicio = servAnti.idservicio");
+    			+ "	    ) a on a.idinstitucion = linea.idinstitucion and servin.idtiposervicios = a.idtiposervicios and servin.idserviciosinstitucion = a.idserviciosinstitucion and servin.idservicio = a.idservicio");
+    	
         
         query.WHERE("linea.idPersona = "+ idPersona +" and linea.idinstitucion = " + idInstitucion + "  and linea.idLinea = "+idLinea);
     	

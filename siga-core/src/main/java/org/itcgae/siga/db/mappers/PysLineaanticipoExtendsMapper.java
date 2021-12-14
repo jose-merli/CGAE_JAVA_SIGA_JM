@@ -66,9 +66,12 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
     
     @SelectProvider(type=PysLineaanticipoExtendsSqlProvider.class, method="getListaServiciosMonedero")
     @Results({
-            @Result(column="FECHA", property="fecha", jdbcType= JdbcType.TIMESTAMP),
-            @Result(column="NOMBRE", property="nombre", jdbcType=JdbcType.VARCHAR),
-            @Result(column="PRECIOPERIO", property="precioPerio", jdbcType=JdbcType.VARCHAR),
+            @Result(column="FECHAMODIFICACION", property="fecha", jdbcType= JdbcType.TIMESTAMP),
+            @Result(column="DESCRIPCION", property="nombre", jdbcType=JdbcType.VARCHAR),
+            @Result(column="PRECIO", property="precioPerio", jdbcType=JdbcType.VARCHAR),
+            @Result(column="IDSERVICIO", property="idServicio", jdbcType=JdbcType.VARCHAR),
+            @Result(column="IDSERVICIOSINSTITUCION", property="idServiciosInstitucion", jdbcType=JdbcType.VARCHAR),
+            @Result(column="IDTIPOSERVICIOS", property="idTipoServicios", jdbcType=JdbcType.VARCHAR),
     })
     List<ListaServiciosMonederoItem> getListaServiciosMonedero(Short idInstitucion, String idLinea, String idPersona);
 }

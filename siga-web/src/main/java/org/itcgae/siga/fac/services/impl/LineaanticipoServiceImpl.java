@@ -360,14 +360,14 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 
 	        if (idInstitucion != null) {
 	            LOGGER.debug(
-	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> Entrada para obtener información del usuario logeado");
+	                    "LineaanticipoServiceImpl.getListaServiciosMonedero() -> Entrada para obtener información del usuario logeado");
 
 	            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 	            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 	            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 	            LOGGER.debug(
-	                    "LineaanticipoServiceImpl.getListaMovimientosMonedero() -> Salida de obtener información del usuario logeado");
+	                    "LineaanticipoServiceImpl.getListaServiciosMonedero() -> Salida de obtener información del usuario logeado");
 
 	            if (usuarios != null && usuarios.size() > 0) {
 	            	try {
@@ -436,8 +436,7 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 
 			// Comprobamos el id maximo de los anticipos asociados con esta persona
 			int idAnticipo = Integer.valueOf(
-					pysAnticipoletradoExtendsMapper.selectMaxIdAnticipo(idInstitucion, ficha.getIdPersona()).getNewId())
-					+ 1;
+					pysAnticipoletradoExtendsMapper.selectMaxIdAnticipo(idInstitucion, ficha.getIdPersona()).getNewId());
 
 			for (ListaServiciosMonederoItem servicioTarj : ficha.getServicios()) {
 				int i = 0;
@@ -458,6 +457,7 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 					servicioAnticipo.setIdanticipo(servicios.get(i).getIdanticipo());
 					servicioAnticipo.setIdpersona(ficha.getIdPersona());
 					servicioAnticipo.setIdservicio(servicioTarj.getIdServicio());
+					
 					servicioAnticipo.setIdserviciosinstitucion(servicioTarj.getIdServiciosInstitucion());
 					servicioAnticipo.setIdtiposervicios(servicioTarj.getIdTipoServicios());
 					servicioAnticipo.setIdinstitucion(idInstitucion);
