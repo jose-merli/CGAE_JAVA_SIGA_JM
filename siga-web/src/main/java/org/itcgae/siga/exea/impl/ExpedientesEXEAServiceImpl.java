@@ -3,12 +3,13 @@ package org.itcgae.siga.exea.impl;
 import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeRequestDocument;
 import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeResponseDocument;
 import es.cgae.consultatramites.token.schema.UsuarioType;
-import ieci.tdw.ispac.services.ws.server.BusquedaAvanzadaDocument;
+import ieci.tdw.ispac.services.ws.server.*;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.exea.ExpedienteDTO;
 import org.itcgae.siga.DTOs.exea.ExpedienteItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.DocumentacionAsistenciaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -42,6 +43,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -254,6 +257,108 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             expedienteDTO.setError(error);
         }
         return expedienteDTO;
+    }
+
+    @Override
+    public ExpedienteDTO getDetalleExpedienteEXEA(HttpServletRequest request, String numExpedienteEXEA) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ExpedienteDTO expedienteDTO = new ExpedienteDTO();
+        Error error = new Error();
+        String urlService;
+        try {
+            if (idInstitucion != null) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "getDetalleExpedienteEXEA() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+                LOGGER.info(
+                        "getDetalleExpedienteEXEA() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (usuarios != null && usuarios.size() > 0) {
+
+                    if(!UtilidadesString.esCadenaVacia(numExpedienteEXEA)) {
+                        urlService = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.EXEA_WEBSERVICES_ADDIN_PARAM, idInstitucion.toString()).getValor();
+                        GetExpedienteDocument getExpedienteDocument = GetExpedienteDocument.Factory.newInstance();
+                        GetExpedienteDocument.GetExpediente getExpediente = getExpedienteDocument.addNewGetExpediente();
+                        getExpediente.setIdExp(numExpedienteEXEA);
+
+                        GetExpedienteResponseDocument responseDocument = _clientExpedientesEXEA.getDetalleExpedienteEXEA(getExpedienteDocument, urlService);
+
+                        if(responseDocument != null && responseDocument.getGetExpedienteResponse() != null){
+                            ExpedienteItem expedienteItem = fillExpedienteItem(responseDocument.getGetExpedienteResponse().getGetExpedienteReturn());
+                            expedienteDTO.setExpedienteItem(Arrays.asList(expedienteItem));
+                        }else{
+                            error.setCode(500);
+                            error.setDescription("Error al buscar el detalle del expediente");
+                            error.setMessage("Error al buscar el detalle del expediente");
+                            expedienteDTO.setError(error);
+                        }
+                    }else{
+                        error.setCode(500);
+                        error.setDescription("Identificador del expediente no informado");
+                        error.setMessage("Identificador del expediente no informado");
+                        expedienteDTO.setError(error);
+                    }
+
+                }
+            }
+        }catch(Exception e){
+            LOGGER.error("getDetalleExpedienteEXEA() / ERROR: " + e.getMessage(), e);
+            error.setCode(500);
+            error.setMessage("Error al buscar el detalle del expediente " + numExpedienteEXEA);
+            error.description("Error al buscar el detalle del expediente " + numExpedienteEXEA);
+            expedienteDTO.setError(error);
+        }
+        return expedienteDTO;
+    }
+
+    private ExpedienteItem fillExpedienteItem(Expediente expediente){
+        ExpedienteItem expedienteItem = new ExpedienteItem();
+        List<DocumentacionAsistenciaItem> documentacionTotal = new ArrayList<>();
+        expedienteItem.setNumExpediente(expediente.getInformacionBasica().getNumExp());
+        expedienteItem.setTipoExpediente(expediente.getAsunto());
+        expedienteItem.setFechaApertura(SigaConstants.DATE_FORMAT_MIN.format(expediente.getFechaInicio().getTime()));
+        expedienteItem.setDescInstitucion(expediente.getNombreOrgProductor());
+
+        if(expediente.getDocumentosFisicos() != null
+                && expediente.getDocumentosFisicos().sizeOfItemArray() > 0){
+
+            for (int i = 0; i < expediente.getDocumentosFisicos().sizeOfItemArray(); i++) {
+
+                DocFisico docFisico = expediente.getDocumentosFisicos().getItemArray(i);
+
+                DocumentacionAsistenciaItem documentacion = new DocumentacionAsistenciaItem();
+                documentacion.setNombreFichero(docFisico.getAsunto());
+                documentacion.setDescTipoDoc(docFisico.getTipoDocumento());
+                documentacionTotal.add(documentacion);
+            }
+
+        }
+
+        if(expediente.getDocumentosElectronicos() != null
+                && expediente.getDocumentosElectronicos().sizeOfItemArray() > 0){
+
+            for (int i = 0; i < expediente.getDocumentosElectronicos().sizeOfItemArray(); i++) {
+
+                DocElectronico docElectronico = expediente.getDocumentosElectronicos().getItemArray(i);
+
+                DocumentacionAsistenciaItem documentacion = new DocumentacionAsistenciaItem();
+                documentacion.setNombreFichero(docElectronico.getAsunto());
+                documentacion.setDescTipoDoc(docElectronico.getTipoDocumento());
+                documentacionTotal.add(documentacion);
+            }
+
+        }
+
+        expedienteItem.setDocumentos(documentacionTotal);
+
+        return expedienteItem;
     }
 
     private String getXMLBusquedaAvanzada(String dniColegiado) throws ParserConfigurationException, TransformerException {

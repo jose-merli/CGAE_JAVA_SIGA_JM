@@ -62,4 +62,15 @@ public class ExpedientesEXEAController {
         return new ResponseEntity<ExpedienteDTO>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/detalle")
+    public ResponseEntity<ExpedienteDTO> getDetalleExpedienteEXEA(HttpServletRequest request, @RequestParam("numExp") String numExpedienteEXEA) {
+        ExpedienteDTO response = null;
+        try {
+            response = expedientesEXEAService.getDetalleExpedienteEXEA(request, numExpedienteEXEA);
+        }catch(Exception e) {
+            throw e;
+        }
+        return new ResponseEntity<ExpedienteDTO>(response, HttpStatus.OK);
+    }
+
 }

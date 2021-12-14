@@ -1,5 +1,8 @@
 package org.itcgae.siga.DTOs.exea;
 
+import org.itcgae.siga.DTOs.scs.DocumentacionAsistenciaItem;
+
+import java.util.List;
 import java.util.Objects;
 
 public class ExpedienteItem {
@@ -13,6 +16,24 @@ public class ExpedienteItem {
     private String fechaApertura;
     private String idInstitucionTipoExpediente;
     private boolean exea;
+    private List<DocumentacionAsistenciaItem> documentos;
+    private String descInstitucion;
+
+    public List<DocumentacionAsistenciaItem> getDocumentos() {
+        return documentos;
+    }
+
+    public void setDocumentos(List<DocumentacionAsistenciaItem> documentos) {
+        this.documentos = documentos;
+    }
+
+    public String getDescInstitucion() {
+        return descInstitucion;
+    }
+
+    public void setDescInstitucion(String descInstitucion) {
+        this.descInstitucion = descInstitucion;
+    }
 
     public String getIdInstitucionTipoExpediente() {
         return idInstitucionTipoExpediente;
