@@ -250,4 +250,54 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 		return baremosGuardiaDTO;
 	}
 
+	@Override
+	public BaremosGuardiaDTO getBaremo(BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
+		BaremosGuardiaDTO baremosGuardiaDTO = new BaremosGuardiaDTO();
+		Error error = new Error();
+		List<BaremosGuardiaItem> listHitos = new ArrayList<BaremosGuardiaItem>();
+		LOGGER.info("searchBaremosGuardia() -> Entrada del servicio para obtener baremos guardia ");
+
+		String token = request.getHeader("Authorization");
+//        String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			ScsHitofacturableguardiaExample hfg = new ScsHitofacturableguardiaExample();
+			hfg.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+			.andIdturnoEqualTo(Integer.parseInt(baremosGuardiaItem.getIdTurno()))
+			.andIdguardiaEqualTo(Integer.parseInt(baremosGuardiaItem.getIdGuardia()))
+			.andFechamodificacionEqualTo(baremosGuardiaItem.getFechaMod());
+			
+			List<ScsHitofacturableguardia> hitos = scsHitofacturableguardiaExtendsMapper.selectByExample(hfg);
+			
+			for(ScsHitofacturableguardia hito:hitos) {
+				BaremosGuardiaItem hitoGuardia = new BaremosGuardiaItem();
+				//para obtener los hitos del baremo de la guardia y el importe, ya se obtiene los dias aplicar y el agrupar.
+				hitoGuardia.setIdHito(hito.getIdhito().toString());
+				hitoGuardia.setPrecioHito(hito.getPreciohito().toString());
+				
+			}
+
+			if (listHitos.isEmpty()) {
+				error.setCode(400);
+				error.description("general.message.error.realiza.accion");
+			} else {
+				error.setCode(200);
+				baremosGuardiaDTO.setBaremosGuardiaItems(listHitos);
+			}
+
+		} else {
+			LOGGER.warn("searchBaremosGuardia() -> idInstitucion del token nula");
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		baremosGuardiaDTO.setError(error);
+
+		LOGGER.info("searchBaremosGuardia() -> Salida del servicio para obtener baremos guardia");
+
+		return baremosGuardiaDTO;
+	}
+
 }

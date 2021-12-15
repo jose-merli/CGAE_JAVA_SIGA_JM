@@ -41,6 +41,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "		 tur.NOMBRE AS NOMBRETURNO,"
 				+ "		hit.idguardia,"
 				+ "		gua.fechabaja,"
+				+ "		hit.fechamodificacion,"
 				+ "	LISTAGG( "
 				+ "        gua.nombre, "
 				+ "        ',' "
@@ -349,7 +350,8 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "    hit.idhito,"
 						+ "    tur.NOMBRE,"
 						+ "   gua.fechabaja,"
-						+ "tip.idhitoconfiguracion");
+						+ "tip.idhitoconfiguracion,"
+						+ "hit.fechamodificacion");
 				sql.ORDER_BY("2, 1");
 		return sql.toString();
 	}
