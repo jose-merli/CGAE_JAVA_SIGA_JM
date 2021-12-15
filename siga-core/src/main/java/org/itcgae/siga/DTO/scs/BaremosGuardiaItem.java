@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTO.scs;
 
+import java.util.Date;
+
 import lombok.Data;
 
 @Data
@@ -29,6 +31,7 @@ public class BaremosGuardiaItem {
    String agrupar;
    String precioMin;
    String precioMax;
+   Date fechaMod;
  
 //	public String getGuardias() {
 //		return guardias;

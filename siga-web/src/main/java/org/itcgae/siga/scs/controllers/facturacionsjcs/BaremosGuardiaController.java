@@ -67,14 +67,17 @@ public class BaremosGuardiaController {
         } else {
             return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.FORBIDDEN);
         }
+		
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+	@RequestMapping(value = "/getBaremo",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BaremosGuardiaDTO> getBaremo(@RequestBody BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request) {
+		BaremosGuardiaDTO response = baremosGuardiaServices.getBaremo(baremosGuardiaItem, request);
+		if (response.getError().getCode() == 200) {
+            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.FORBIDDEN);
+        }
+	}
 	
 }
