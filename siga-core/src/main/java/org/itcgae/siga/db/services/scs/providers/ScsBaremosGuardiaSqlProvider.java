@@ -41,7 +41,6 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "		 tur.NOMBRE AS NOMBRETURNO,"
 				+ "		hit.idguardia,"
 				+ "		gua.fechabaja,"
-				+ "		hit.fechamodificacion,"
 				+ "	LISTAGG( "
 				+ "        gua.nombre, "
 				+ "        ',' "
@@ -216,10 +215,6 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "            AND "
 				+ "                hit2.idguardia = hit.idguardia "
 				+ "            AND "
-				+ "                hit2.diasaplicables = hit.diasaplicables "
-				+ "            AND "
-				+ "                hit2.agrupar = hit.agrupar "
-				+ "            AND "
 				+ "                hit2.idhito = "
 				+ "                    CASE hit.idhito "
 				+ "                        WHEN 7    THEN 7 "
@@ -350,8 +345,7 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "    hit.idhito,"
 						+ "    tur.NOMBRE,"
 						+ "   gua.fechabaja,"
-						+ "tip.idhitoconfiguracion,"
-						+ "hit.fechamodificacion");
+						+ "tip.idhitoconfiguracion");
 				sql.ORDER_BY("2, 1");
 		return sql.toString();
 	}

@@ -266,8 +266,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 			ScsHitofacturableguardiaExample hfg = new ScsHitofacturableguardiaExample();
 			hfg.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 			.andIdturnoEqualTo(Integer.parseInt(baremosGuardiaItem.getIdTurno()))
-			.andIdguardiaEqualTo(Integer.parseInt(baremosGuardiaItem.getIdGuardia()))
-			.andFechamodificacionEqualTo(baremosGuardiaItem.getFechaMod());
+			.andIdguardiaEqualTo(Integer.parseInt(baremosGuardiaItem.getIdGuardia()));
 			
 			List<ScsHitofacturableguardia> hitos = scsHitofacturableguardiaExtendsMapper.selectByExample(hfg);
 			
@@ -276,6 +275,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 				//para obtener los hitos del baremo de la guardia y el importe, ya se obtiene los dias aplicar y el agrupar.
 				hitoGuardia.setIdHito(hito.getIdhito().toString());
 				hitoGuardia.setPrecioHito(hito.getPreciohito().toString());
+				listHitos.add(hitoGuardia);
 				
 			}
 
