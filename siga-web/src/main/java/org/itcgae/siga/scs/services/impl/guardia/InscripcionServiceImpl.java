@@ -44,6 +44,7 @@ import org.itcgae.siga.db.entities.ScsGrupoguardiaExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
 import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
@@ -437,19 +438,28 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 				for (BusquedaInscripcionMod a : cambiarfechabody) {
 
-					if (a.getFechabaja() != null) {
-						FECHABAJA = formatter.format(a.getFechabaja());
-					}
-
-					if (a.getFechavalidacionNUEVA() != null) {
-						FECHAVALIDACIONNUEVA = formatter.format(a.getFechavalidacionNUEVA());
-					}
-
 					int usuario = usuarios.get(0).getIdusuario();
+					
+					ScsInscripcionguardiaExample example = new ScsInscripcionguardiaExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(a.getIdpersona()))
+							.andIdturnoEqualTo(Integer.valueOf(a.getIdturno())).andIdguardiaEqualTo(Integer.valueOf(a.getIdguardia()));
+								
+					List<ScsInscripcionguardia> listaInscripciones = inscripcionGuardiaExtensdsMapper.selectByExample(example);
 
-					inscripciones = inscripcionGuardiaExtensdsMapper.getCFechaInscripciones(a, idInstitucion.toString(),
-							FECHABAJA, FECHAVALIDACIONNUEVA, usuario);
-
+					ScsInscripcionguardia record = listaInscripciones.get(0);
+					
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuario);
+					
+					if (a.getFechabaja() != null) {
+						record.setFechabaja(a.getFechabaja());
+					}
+					
+					if (a.getFechavalidacionNUEVA() != null) {
+						record.setFechavalidacion(a.getFechavalidacionNUEVA());
+					}
+					
+					inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record );
 					if (inscripciones != 0)
 						contadorKO++;
 				}
