@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.facturacionsjcs;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.springframework.core.io.Resource;
@@ -19,4 +20,6 @@ public interface ICertificacionFacSJCSService {
     UpdateResponseDTO subirFicheroCAM(String idFacturacion, MultipartFile fichero, MultipartHttpServletRequest request);
 
     CertificacionesDTO buscarCertificaciones(BusquedaRetencionesRequestDTO busquedaRetencionesRequestDTO, HttpServletRequest request);
+
+    ComboDTO getComboEstadosCertificaciones(HttpServletRequest request);
 }
