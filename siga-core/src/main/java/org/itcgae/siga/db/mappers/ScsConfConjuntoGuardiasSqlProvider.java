@@ -109,7 +109,7 @@ public class ScsConfConjuntoGuardiasSqlProvider {
         SQL sql = new SQL();
  
             sql.SELECT("*");
-            if (!idConjuntoGuardia.isEmpty() && idConjuntoGuardia != null)
+            if (idConjuntoGuardia != null)
             sql.WHERE("IDCONJUNTOGUARDIA = " + idConjuntoGuardia);
             sql.FROM("SCS_CONF_CONJUNTO_GUARDIAS");
 

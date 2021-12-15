@@ -61,6 +61,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
 					"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 					"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,\r\n" + 
+					"				Ins.ORDEN AS ORDENINSC,\r\n" + 
 					"				Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado,\r\n" + 
 					"				Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
 					"				Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
@@ -242,7 +243,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"		WHERE\r\n" + 
 					"			tabla_nueva.orden <= tabla_nueva2.orden\r\n" + 
 					"		ORDER BY\r\n" + 
-					"			tabla_nueva.orden ASC) ) consulta_total  ORDER BY ORDEN");
+					"			tabla_nueva.orden ASC) ) consulta_total  ORDER BY ORDENINSC");
 		else 
 			sql.SELECT("ROWNUM AS orden_cola, consulta.* FROM (SELECT(CASE\r\n" + 
 					"                                 WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
@@ -591,7 +592,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 			sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
 		}
 		
-		if(inscripciones.getFechasolicitud() != null) {
+		if(inscripciones.getFechasolicitud() != null && FECHASOLICITUD != null) {
 			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
 		}
 		
@@ -622,7 +623,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 			sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
 		}
 		
-		if(inscripciones.getFechasolicitud() != null) {
+		if(inscripciones.getFechasolicitud() != null && FECHASOLICITUD != null) {
 			sql.WHERE("to_char(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
 		}
 		
@@ -655,7 +656,7 @@ public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscrip
 			sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
 		}
 		
-		if(inscripciones.getFechasolicitud() != null) {
+		if(inscripciones.getFechasolicitud() != null && FECHASOLICITUD != null && !FECHASOLICITUD.equals("null")) {
 			sql.WHERE("to_char(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
 		}
 		
@@ -1612,6 +1613,26 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		}
 		
 		
+		return sql.toString();
+	}
+	
+	
+	public String updateOrdenInscripciones(String idTurno, String idGuardia, String idPersona, String idInstitucion, String ordenBD) {
+		SQL sql = new SQL();
+		sql.UPDATE("SCS_INSCRIPCIONGUARDIA");
+		sql.SET("ORDEN = " + ordenBD);
+			if (idTurno != null) {
+				sql.WHERE("IDTURNO = " + idTurno);
+			}
+			if (idGuardia != null) {
+				sql.WHERE("IDGUARDIA = " + idGuardia);
+			}
+			if (idPersona != null) {
+				sql.WHERE("IDPERSONA = " + idPersona);
+			}
+			if (idTurno != null) {
+				sql.WHERE("IDINSTITUCION = " + idInstitucion);
+			}
 		return sql.toString();
 	}
 }

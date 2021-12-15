@@ -122,7 +122,7 @@ public interface GuardiasService {
 
 	public List<RangoFechasItem> getFechasProgramacionGuardia(String idGuardia, HttpServletRequest request);
 
-	public InsertResponseDTO insertGuardiaToConjunto(HttpServletRequest request, String idConjuntoGuardia, List<GuardiaCalendarioItem> item);
+	public InsertResponseDTO insertGuardiaToConjunto(HttpServletRequest request, String idConjuntoGuardia, String idTurno, String idGuardia, String fechaDesde, String fechaHasta, List<GuardiaCalendarioItem> item);
 
 	public InsertResponseDTO insertGuardiaToCalendar(Boolean update,HttpServletRequest request, String idCalendar,
 			List<GuardiaCalendarioItem> itemList);

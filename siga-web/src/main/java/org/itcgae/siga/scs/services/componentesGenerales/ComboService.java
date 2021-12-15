@@ -105,4 +105,6 @@ public interface ComboService {
 	public ComboDTO comboOrigenContacto(HttpServletRequest request);
 
 	public ComboDTO comboGuardiasNoBaja(HttpServletRequest request, String idTurno);
+
+	public ComboDTO comboTurnosDesignacion(HttpServletRequest request);
 }

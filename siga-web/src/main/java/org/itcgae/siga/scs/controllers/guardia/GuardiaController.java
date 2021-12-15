@@ -313,9 +313,10 @@ public class GuardiaController {
 
 	@PostMapping(value = "/addGuardiaConjunto", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertGuardiaToConjunto(
-			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, String idConjuntoGuardia,
+			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, @RequestParam String idConjuntoGuardia, @RequestParam String idTurno,
+			@RequestParam String idGuardia, @RequestParam String fechaDesde, @RequestParam String fechaHasta,
 			HttpServletRequest request) {
-		InsertResponseDTO response = guardiasService.insertGuardiaToConjunto(request, idConjuntoGuardia,
+		InsertResponseDTO response = guardiasService.insertGuardiaToConjunto(request, idConjuntoGuardia, idTurno, idGuardia, fechaDesde, fechaHasta,
 				guardiaCalendarioItemList);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
@@ -347,7 +348,13 @@ public class GuardiaController {
 	ResponseEntity<InsertResponseDTO> updateCalendarioProgramado(
 			@RequestBody DatosCalendarioProgramadoItem calendarioItem, HttpServletRequest request) {
 		InsertResponseDTO response = guardiasService.updateCalendarioProgramado(request, calendarioItem);
-		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		if (response.getStatus() == "OK") {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} else if (response.getStatus() == "ERRORASOCIADAS") {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.CONFLICT);
+		} else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PostMapping(value = "/newCalendarioProgramado", produces = MediaType.APPLICATION_JSON_VALUE)

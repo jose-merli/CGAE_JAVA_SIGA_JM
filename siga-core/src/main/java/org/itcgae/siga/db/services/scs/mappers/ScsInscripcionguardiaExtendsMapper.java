@@ -38,6 +38,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "NUMEROGRUPO", property="numeroGrupo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDGRUPOGUARDIACOLEGIADO", property = "idGrupoGuardiaColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ORDENGRUPO", property = "orden", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORDENINSC", property = "ordenBD", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
@@ -175,6 +176,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHASUSCRIPCION", property = "fechaSol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 	})
 	List<BusquedaInscripcionItem> getListadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion);
 	
@@ -355,5 +357,8 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
     @SelectProvider(type=ScsInscripcionguardiaSqlExtendsProvider.class, method="getColegiadosInscritosGuardia")
     @Results({})
     List<String> getColegiadosInscritosGuardia(ScsInscripcionguardiaKey key);
+    
+    @UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "updateOrdenInscripciones")
+	int updateOrdenInscripciones(String idTurno, String idGuardia, String idPersona, String idInstitucion, String ordenBD);
 
 }
