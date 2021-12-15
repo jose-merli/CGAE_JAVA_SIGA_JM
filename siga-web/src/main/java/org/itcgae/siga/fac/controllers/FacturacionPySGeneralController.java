@@ -260,7 +260,7 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/parametrosSEPA")
-	ResponseEntity<ComboDTO> parametrosSEPA(@RequestParam String idInstitucion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> parametrosSEPA(@RequestParam(required = false) String idInstitucion, HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {

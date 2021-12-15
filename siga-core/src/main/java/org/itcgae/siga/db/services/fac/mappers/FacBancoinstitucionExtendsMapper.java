@@ -35,6 +35,7 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 		@Result(column = "comisionimporte", property = "comisionImporte", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "comisiondescripcion", property = "comisionDescripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoiva", property = "idTipoIVA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "comisioncuentacontable", property = "comisionCuentaContable", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "configficherossecuencia", property = "configFicherosSecuencia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "configficherosesquema", property = "configFicherosEsquema", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "configlugaresquemasecuencia", property = "configLugaresQueMasSecuencia", jdbcType = JdbcType.VARCHAR),

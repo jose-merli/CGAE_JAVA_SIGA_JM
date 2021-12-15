@@ -830,7 +830,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		
 		if (usuario != null) {
 			
-			if(idInstitucion==null) {
+			if(idInstitucion!=null) {
 				institucion=Short.parseShort(idInstitucion);
 			}else {
 				institucion=usuario.getIdinstitucion();

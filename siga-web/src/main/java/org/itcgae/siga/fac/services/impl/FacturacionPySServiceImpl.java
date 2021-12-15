@@ -333,18 +333,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			// comprobar primero si la lista de cuentas bancarias viene vacia
 			if (UtilidadesString.esCadenaVacia(cuentaBancaria.getIBAN()) || cuentaBancaria.getIBAN().length() != 24) {
-				throw new Exception("El IBAN debe tener una longitud de 24 caracteres.");
+				throw new Exception("facturacion.cuentaBancaria.iban.invalid.longitud");
 			}
 
 			String iban = cuentaBancaria.getIBAN().replaceAll(" ", "").trim().toUpperCase();
 
 			// La cuenta debe ser española
 			if (!iban.substring(0, 2).equals("ES"))
-				throw new Exception("El IBAN debe pertenecer a una cuenta bancaria española.");
+				throw new Exception("facturacion.cuentaBancaria.iban.invalid.ES");
 
 			// Comprobar los dígitos de control
 			if (!validarIBAN(iban)) {
-				throw new Exception("El IBAN introducido es inválido.");
+				throw new Exception("censo.datosBancarios.mensaje.control.ibanIncorrecto");
 			}
 
 			String codBanco = iban.substring(4, 8);
@@ -355,13 +355,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			bancoExample.createCriteria().andCodigoEqualTo(codBanco);
 			List<CenBancos> bancos = cenBancosMapper.selectByExample(bancoExample);
 			if (bancos == null || bancos.isEmpty())
-				throw new Exception("El código del banco es incorrecto.");
+				throw new Exception("facturacion.cuentaBancaria.iban.invalid.banco");
 
 			// Conprobación de la sucursal
 			CenSucursalesExample sucursalesExample = new CenSucursalesExample();
 			sucursalesExample.createCriteria().andCodSucursalEqualTo(codSucursal);
 			if (bancos == null || bancos.isEmpty())
-				throw new Exception("El código de la sucursal es incorrecto.");
+				throw new Exception("facturacion.cuentaBancaria.iban.invalid.sucursal");
 
 			CuentasBancariasItem resultado = new CuentasBancariasItem();
 			resultado.setBIC(bancos.get(0).getBic());
@@ -420,6 +420,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			record.setFechamodificacion(new Date());
 			record.setUsumodificacion(usuario.getIdusuario());
 
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
+				record.setCuentacontabletarjeta(cuentaBancaria.getAsientoContable().trim());
+			} else {
+				record.setCuentacontabletarjeta(null);
+			}
+
 			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
 				record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
 			} else {
@@ -428,18 +434,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			// comprobar primero si la lista de cuentas bancarias viene vacia
 			if (UtilidadesString.esCadenaVacia(cuentaBancaria.getIBAN()) || cuentaBancaria.getIBAN().length() != 24) {
-				throw new Exception("El IBAN debe tener una longitud de 24 caracteres.");
+				throw new Exception("facturacion.cuentaBancaria.iban.invalid.longitud");
 			}
 
 			String iban = cuentaBancaria.getIBAN().replaceAll(" ", "").trim().toUpperCase();
 
 			// La cuenta debe ser española
 			if (!iban.substring(0, 2).equals("ES"))
-				throw new Exception("El IBAN debe pertenecer a una cuenta bancaria española.");
+				throw new Exception("facturacion.cuentaBancaria.iban.invalid.ES");
 
 			// Comprobar los dígitos de control
 			if (!validarIBAN(iban)) {
-				throw new Exception("El IBAN introducido es inválido.");
+				throw new Exception("censo.datosBancarios.mensaje.control.ibanIncorrecto");
 			}
 
 			String codBanco = iban.substring(4, 8);
@@ -452,13 +458,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			bancoExample.createCriteria().andCodigoEqualTo(codBanco);
 			List<CenBancos> bancos = cenBancosMapper.selectByExample(bancoExample);
 			if (bancos == null || bancos.isEmpty())
-				throw new Exception("El código del banco es incorrecto.");
+				throw new Exception("facturacion.cuentaBancaria.iban.invalid.banco");
 
 			// Conprobación de la sucursal
 			CenSucursalesExample sucursalesExample = new CenSucursalesExample();
 			sucursalesExample.createCriteria().andCodSucursalEqualTo(codSucursal);
 			if (bancos == null || bancos.isEmpty())
-				throw new Exception("El código de la sucursal es incorrecto.");
+				throw new Exception("facturacion.cuentaBancaria.iban.invalid.sucursal");
 
 			record.setIban(iban);
 			record.setCodBanco(codBanco);
@@ -504,6 +510,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			record.setFechamodificacion(new Date());
 			record.setUsumodificacion(usuario.getIdusuario());
 
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
+				record.setCuentacontabletarjeta(cuentaBancaria.getAsientoContable().trim());
+			} else {
+				record.setCuentacontabletarjeta(null);
+			}
+
 			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
 				record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
 			} else {
@@ -522,8 +534,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				record.setIdtipoiva(null);
 			}
 
-			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
-				record.setAsientocontable(cuentaBancaria.getAsientoContable().trim());
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionCuentaContable())) {
+				record.setComisioncuentacontable(cuentaBancaria.getComisionCuentaContable().trim());
 			} else {
 				record.setAsientocontable(null);
 			}

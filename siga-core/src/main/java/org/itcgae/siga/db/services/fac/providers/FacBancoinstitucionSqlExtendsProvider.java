@@ -84,6 +84,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.SELECT("bi.comisionimporte");
 		query.SELECT("bi.comisiondescripcion");
 		query.SELECT("bi.idtipoiva");
+		query.SELECT("bi.comisioncuentacontable");
 
 		query.SELECT("bi.configficherossecuencia");
 		query.SELECT("bi.configficherosesquema");
