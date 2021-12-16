@@ -16,5 +16,6 @@ public interface IBaremosGuardiaServices {
 	public ComboDTO getTurnoForGuardia(HttpServletRequest request);
 
 	public BaremosGuardiaDTO saveBaremo(List<BaremosGuardiaItem> baremosGuardiaItem, HttpServletRequest request);
+	public BaremosGuardiaDTO getBaremo(BaremosGuardiaItem baremosGuardiaItem, HttpServletRequest request);
 	
 }
