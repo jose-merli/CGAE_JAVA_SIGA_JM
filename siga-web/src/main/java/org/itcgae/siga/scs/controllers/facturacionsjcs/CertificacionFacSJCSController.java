@@ -1,11 +1,13 @@
 package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
+import org.itcgae.siga.DTOs.scs.CertificacionesItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/certificaciones")
@@ -75,6 +78,12 @@ public class CertificacionFacSJCSController {
     ResponseEntity<CertificacionesDTO> buscarCertificaciones(@RequestBody BusquedaRetencionesRequestDTO busquedaRetencionesRequestDTO, HttpServletRequest request) {
         CertificacionesDTO response = iCertificacionFacSJCSService.buscarCertificaciones(busquedaRetencionesRequestDTO, request);
         return new ResponseEntity<CertificacionesDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/eliminarCertificaciones")
+    ResponseEntity<DeleteResponseDTO> eliminarCertificaciones(@RequestBody List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
+        DeleteResponseDTO response = iCertificacionFacSJCSService.eliminarCertificaciones(certificacionesItemList, request);
+        return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
     }
 
 }

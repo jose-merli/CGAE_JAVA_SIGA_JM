@@ -7,6 +7,7 @@ import java.util.Date;
 @Data
 public class CertificacionesItem {
 
+    private String idCertificacion;
     private Date fechaDesde;
     private Date fechaHasta;
     private String periodo;

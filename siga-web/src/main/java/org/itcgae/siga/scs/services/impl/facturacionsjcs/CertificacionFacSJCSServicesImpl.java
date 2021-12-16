@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -12,10 +13,7 @@ import org.itcgae.siga.DTOs.scs.CertificacionesItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.EcomColaMapper;
-import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
-import org.itcgae.siga.db.mappers.EcomOperacionMapper;
-import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
@@ -71,6 +69,15 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private EcomOperacionMapper ecomOperacionMapper;
+
+    @Autowired
+    private FcsFactCertificacionesMapper fcsFactCertificacionesMapper;
+
+    @Autowired
+    private FcsMvariosCertificacionesMapper fcsMvariosCertificacionesMapper;
+
+    @Autowired
+    private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
 
     @Override
     public InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request) {
@@ -521,6 +528,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                     List<CertificacionesItem> certificacionesItemList = fcsCertificacionesExtendsMapper.buscarCertificaciones(busquedaRetencionesRequestDTO, tamMaximo, usuarios.get(0).getIdlenguaje());
                     LOGGER.info("CertificacionFacSJCSServicesImpl.buscarCertificaciones() -> fcsCertificacionesExtendsMapper.buscarCertificaciones() -> FIN consulta de la busqueda de certificaciones");
 
+                    if (null != certificacionesItemList && certificacionesItemList.size() > tamMaximo) {
+                        certificacionesItemList.remove(certificacionesItemList.size() - 1);
+                        error.setCode(200);
+                        error.setDescription("general.message.consulta.resultados");
+                    }
+
                     certificacionesDTO.setCertificacionesItemList(certificacionesItemList);
                 } else {
                     LOGGER.warn(
@@ -543,5 +556,99 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         LOGGER.info("CertificacionFacSJCSServicesImpl.buscarCertificaciones() -> Salida del servicio para la busqueda de certificaciones");
 
         return certificacionesDTO;
+    }
+
+    @Override
+    public DeleteResponseDTO eliminarCertificaciones(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> Entrada al servicio para la eliminacion de certificaciones");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+        deleteResponseDTO.setStatus(SigaConstants.OK);
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    List<CertificacionesItem> certisNoEliminar = new ArrayList<>();
+                    List<Short> idCertisEliminar = new ArrayList<>();
+
+                    // Si la certificación se encuentra en estado "ENVIANDO" no se puede eliminar
+                    certificacionesItemList.forEach(el -> {
+                        if (!el.getIdEstadoCertificacion().equalsIgnoreCase(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIANDO.getCodigo())) {
+                            idCertisEliminar.add(Short.valueOf(el.getIdCertificacion()));
+                        } else {
+                            certisNoEliminar.add(el);
+                        }
+                    });
+
+                    // Eliminamos los movimientos varios
+                    FcsMvariosCertificacionesExample fcsMvariosCertificacionesExample = new FcsMvariosCertificacionesExample();
+                    fcsMvariosCertificacionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcertificacionIn(idCertisEliminar);
+                    LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> fcsMvariosCertificacionesMapper.deleteByExample() -> INICIO eliminamos los movimientos varios");
+                    fcsMvariosCertificacionesMapper.deleteByExample(fcsMvariosCertificacionesExample);
+                    LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> fcsMvariosCertificacionesMapper.deleteByExample() -> FIN eliminamos los movimientos varios");
+
+                    // Eliminamos las facturaciones
+                    FcsFactCertificacionesExample fcsFactCertificacionesExample = new FcsFactCertificacionesExample();
+                    fcsFactCertificacionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcertificacionIn(idCertisEliminar);
+                    LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> fcsFactCertificacionesMapper.deleteByExample() -> INICIO eliminamos las facturaciones");
+                    fcsFactCertificacionesMapper.deleteByExample(fcsFactCertificacionesExample);
+                    LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> fcsFactCertificacionesMapper.deleteByExample() -> FIN eliminamos las facturaciones");
+
+                    // Eliminamos los estados de las certificaciones
+
+                    // Eliminamos las certificaciones
+                    FcsCertificacionesExample fcsCertificacionesExample = new FcsCertificacionesExample();
+                    fcsCertificacionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcertificacionIn(idCertisEliminar);
+                    LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> fcsCertificacionesExtendsMapper.deleteByExample() -> INICIO eliminamos las certificaciones");
+                    fcsCertificacionesExtendsMapper.deleteByExample(fcsCertificacionesExample);
+                    LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> fcsCertificacionesExtendsMapper.deleteByExample() -> FIN eliminamos las certificaciones");
+
+                    if (!certisNoEliminar.isEmpty()) {
+                        error.setCode(200);
+                        String cadena = utilidadesFacturacionSJCS.getMensajeIdioma(usuarios.get(0).getIdlenguaje(), "factSJCS.certificaciones.eliminar.error");
+                        cadena.replaceFirst("#1", String.valueOf(idCertisEliminar.size()));
+                        cadena.replaceFirst("#2", String.valueOf(certificacionesItemList.size()));
+                        error.setDescription(cadena);
+                    }
+
+                } else {
+                    LOGGER.warn(
+                            "CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> Se ha producido un error al intentar eliminar las certificaciones", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+            deleteResponseDTO.setStatus(SigaConstants.KO);
+        }
+
+        deleteResponseDTO.setError(error);
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.eliminarCertificaciones() -> Salida del servicio para la eliminacion de certificaciones");
+
+        return deleteResponseDTO;
     }
 }

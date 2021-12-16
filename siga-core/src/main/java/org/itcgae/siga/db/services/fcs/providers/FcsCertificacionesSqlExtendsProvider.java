@@ -12,6 +12,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
     public String buscarCertificaciones(BusquedaRetencionesRequestDTO busquedaRetencionesRequestDTO, Integer tamMax, String idLenguaje) {
 
         SQL sql1 = new SQL();
+        sql1.SELECT("CER.IDCERTIFICACION");
         sql1.SELECT("CER.FECHADESDE");
         sql1.SELECT("CER.FECHAHASTA");
         sql1.SELECT("(CER.FECHADESDE || ' - ' || CER.FECHAHASTA) AS PERIODO");
@@ -52,16 +53,16 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
             sql1.WHERE("UPPER(CER.NOMBRE) LIKE UPPER('%" + busquedaRetencionesRequestDTO.getNombre() + "%')");
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         if (busquedaRetencionesRequestDTO.getFechaDesde() != null) {
             String fechaF = dateFormat.format(busquedaRetencionesRequestDTO.getFechaDesde());
-            sql1.WHERE("CER.FECHADESDE >= TO_DATE('" + fechaF + "', 'DD/MM/YYYY hh24:mi:ss')");
+            sql1.WHERE("TRUNC(CER.FECHADESDE) >= TO_DATE('" + fechaF + "', 'DD/MM/YYYY')");
         }
 
         if (busquedaRetencionesRequestDTO.getFechaHasta() != null) {
             String fechaF = dateFormat.format(busquedaRetencionesRequestDTO.getFechaHasta());
-            sql1.WHERE("CER.FECHAHASTA <= TO_DATE('" + fechaF + "', 'DD/MM/YYYY hh24:mi:ss')");
+            sql1.WHERE("TRUNC(CER.FECHAHASTA) <= TO_DATE('" + fechaF + "', 'DD/MM/YYYY')");
         }
 
         SQL sql = new SQL();

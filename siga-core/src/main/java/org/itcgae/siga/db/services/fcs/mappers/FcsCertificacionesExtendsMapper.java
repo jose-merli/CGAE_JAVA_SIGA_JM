@@ -17,7 +17,8 @@ import java.util.List;
 public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMapper {
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "buscarCertificaciones")
-    @Results({@Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.TIMESTAMP),
+    @Results({@Result(column = "IDCERTIFICACION", property = "idCertificacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.TIMESTAMP),
             @Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.TIMESTAMP),
             @Result(column = "PERIODO", property = "periodo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
