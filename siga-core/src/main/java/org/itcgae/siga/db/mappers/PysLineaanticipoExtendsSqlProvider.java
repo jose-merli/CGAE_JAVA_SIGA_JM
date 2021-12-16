@@ -2,6 +2,7 @@ package org.itcgae.siga.db.mappers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FiltroMonederoItem;
+import org.itcgae.siga.db.entities.PysServicioanticipo;
 
 import java.text.SimpleDateFormat;
 
@@ -12,57 +13,74 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
     	
     	
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        SQL query = new SQL();
-        query.SELECT("min(anti.fecha) as fecha, pers.nifcif, pers.idpersona, (pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo, linea.idlinea, --(select a.descripcion from a where a.roworder = 1),  \r\n"
-        		+ "anti.descripcion,\r\n"
-        		+ "sum(anti.importeinicial) as importe_inicial, sum(nvl(linea.importeanticipado, 0)) as importe_usado , sum(anti.importeinicial)- sum(nvl(linea.importeanticipado, 0)) as importe_restante" );
-       query.FROM("pys_anticipoletrado anti");
+        
+        SQL subQuery = new SQL();
+        subQuery.SELECT("anti.idinstitucion,\r\n"
+        		+ "        		    MIN(anti.fecha) AS fecha,\r\n"
+        		+ "        		    pers.nifcif,\r\n"
+        		+ "        		   pers.idpersona,\r\n"
+        		+ "        		    ( pers.apellidos1\r\n"
+        		+ "        		      || ' '\r\n"
+        		+ "        		      || pers.apellidos2\r\n"
+        		+ "        		      || ', '\r\n"
+        		+ "        		      || pers.nombre ) AS nombre_completo,\r\n"
+        		+ "        		    linea.idlinea, \r\n"
+        		+ "        		    SUM(anti.importeinicial) AS importe_inicial,\r\n"
+        		+ "        		    SUM(nvl(linea.importeanticipado, 0)) AS importe_usado,\r\n"
+        		+ "        		    SUM(anti.importeinicial) - SUM(nvl(linea.importeanticipado, 0)) AS importe_restante" );
                 
-       query.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = anti.idpersona");
-       query.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona");
+       subQuery.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = anti.idpersona");
+       subQuery.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona and linea.idinstitucion = anti.idinstitucion");
 
-        query.WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)").AND()
-                .WHERE("anti.idinstitucion = " + institutionId);
+        subQuery.WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)");
+        subQuery.WHERE("anti.idinstitucion = " + institutionId);
 
         if (filter.getFechaDesde() != null ){
 
             String since = dateFormat.format(filter.getFechaDesde());
             
-            query.WHERE("TO_CHAR(anti.FECHA, 'DD/MM/YYYY') >= TO_DATE('" + since
+            subQuery.WHERE("TO_CHAR(anti.FECHA, 'DD/MM/YYYY') >= TO_DATE('" + since
                     + "','DD/MM/YYYY') ");
         }
         
         if(filter.getFechaHasta() != null) {
         	String until = dateFormat.format(filter.getFechaHasta());
-        	query.WHERE(" TO_CHAR(anti.FECHA, 'DD/MM/YYYY') <= TO_DATE('"
+        	subQuery.WHERE(" TO_CHAR(anti.FECHA, 'DD/MM/YYYY') <= TO_DATE('"
                     + until + "','DD/MM/YYYY')");
         }
         
         if(filter.getIdPersonaColegiado() != null) {
-        	query.WHERE("pers.idpersona = "+filter.getIdPersonaColegiado());
+        	subQuery.WHERE("pers.idpersona = "+filter.getIdPersonaColegiado());
         }
 
-        query.GROUP_BY("pers.nifcif, pers.idpersona, linea.idlinea, (pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre)\r\n"
-        		+ "    	, anti.descripcion");
-        query.ORDER_BY("min(anti.FECHA) desc");
+        subQuery.GROUP_BY("anti.idinstitucion,\r\n"
+        		+ "        		    pers.nifcif,\r\n"
+        		+ "        		    pers.idpersona,\r\n"
+        		+ "        		    linea.idlinea,\r\n"
+        		+ "        		    ( pers.apellidos1\r\n"
+        		+ "        		      || ' '\r\n"
+        		+ "        		      || pers.apellidos2\r\n"
+        		+ "        		      || ', '\r\n"
+        		+ "        		      || pers.nombre )");
+        
+        SQL query = new SQL();
+        
+        query.SELECT("consulta.*");
+        query.SELECT("select a.descripcion from pys_anticipoletrado a \r\n"
+        		+ "        		where a.idinstitucion = consulta.idinstitucion \r\n"
+        		+ "        		and a.idpersona = consulta.idpersona \r\n"
+        		+ "        		and a.idanticipo = (select MIN(idanticipo) from pys_anticipoletrado b \r\n"
+        		+ "        		inner join pys_lineaanticipo linea on  linea.idinstitucion = b.idinstitucion and b.idpersona = linea.idpersona "
+        		+ "and b.idanticipo = linea.idanticipo and linea.idlinea = consulta.idlinea\r\n"
+        		+ "        		where b.idinstitucion = consulta.idinstitucion \r\n"
+        		+ "        		and b.idpersona = consulta.idpersona) descripcion" );
+        
+        query.FROM("("+subQuery.toString()+ ") consulta");
+        
+        query.ORDER_BY("consulta.fecha desc");
         
         return query.toString();
-        
-        
-        
-        //REVISAR CONSULTA
-//        select min(anti.fecha) as fecha, pers.nifcif, pers.idpersona, (pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo, linea.idlinea, --(select a.descripcion from a where a.roworder = 1),  
-//        anti.descripcion,
-//        sum(anti.importeinicial) as importe_inicial, sum(nvl(linea.importeanticipado, 0)) as importe_usado , sum(anti.importeinicial)- sum(nvl(linea.importeanticipado, 0)) as importe_restante  
-//        FROM pys_anticipoletrado anti
-//        INNER JOIN CEN_PERSONA pers on pers.idpersona = anti.idpersona
-//        LEFT OUTER JOIN pys_lineaanticipo linea on linea.idpersona = pers.idpersona
-//        left outer join pys_anticipoletrado antiFirst on anti.idanticipo = antiFirst.idanticipo and anti.idanticipo = antiFirst.idanticipo
-//        WHERE ((linea.idanticipo = anti.idanticipo or linea.idanticipo is null)) 
-//        AND (anti.idinstitucion = 2005 AND TO_CHAR(anti.FECHA, 'DD/MM/YYYY') >= TO_DATE('26/11/2019','DD/MM/YYYY')  AND  TO_CHAR(anti.FECHA, 'DD/MM/YYYY') <= TO_DATE('26/11/2021','DD/MM/YYYY'))
-//        group by  pers.nifcif, pers.idpersona, linea.idlinea, (pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre)
-//        , anti.descripcion
-//        ORDER BY min(anti.FECHA) desc;
+
     }
     
     public String selectMaxIdLinea(Short idInstitucion, Long idPersona) {
@@ -258,5 +276,65 @@ public String getListaServiciosMonedero(Short idInstitucion, String idLinea, Str
     	
     	return query.toString();
     }
+
+	public String getMonederoServicio(PysServicioanticipo servicio ) {
+		
+		SQL subQuery = new SQL();
+        subQuery.SELECT("anti.idinstitucion,\r\n"
+        		+ "        		    MIN(anti.fecha) AS fecha,\r\n"
+        		+ "        		    pers.nifcif,\r\n"
+        		+ "        		   pers.idpersona,\r\n"
+        		+ "        		    ( pers.apellidos1\r\n"
+        		+ "        		      || ' '\r\n"
+        		+ "        		      || pers.apellidos2\r\n"
+        		+ "        		      || ', '\r\n"
+        		+ "        		      || pers.nombre ) AS nombre_completo,\r\n"
+        		+ "        		    linea.idlinea, \r\n"
+        		+ "        		    SUM(anti.importeinicial) AS importe_inicial,\r\n"
+        		+ "        		    SUM(nvl(linea.importeanticipado, 0)) AS importe_usado,\r\n"
+        		+ "        		    SUM(anti.importeinicial) - SUM(nvl(linea.importeanticipado, 0)) AS importe_restante" );
+                
+       subQuery.INNER_JOIN("CEN_PERSONA pers on pers.idpersona = anti.idpersona");
+       subQuery.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona and linea.idinstitucion = anti.idinstitucion");
+       subQuery.INNER_JOIN("PYS_SERVICIOANTICIPOS servAnti on servAnti.idpersona = pers.idPersona and servAnti.idAnticipo =  anti.idAnticipo");
+       
+        subQuery.WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)");
+        subQuery.WHERE("anti.idinstitucion = " + servicio.getIdinstitucion());
+        subQuery.WHERE("anti.idPersona = "+ servicio.getIdpersona());
+        subQuery.WHERE("servAnti.idServicio = "+ servicio.getIdservicio());
+        subQuery.WHERE("servAnti.idTipoServicios = "+ servicio.getIdtiposervicios());
+        subQuery.WHERE("servAnti.idServiciosInstitucion = "+ servicio.getIdserviciosinstitucion());
+
+        subQuery.GROUP_BY("anti.idinstitucion,\r\n"
+        		+ "        		    pers.nifcif,\r\n"
+        		+ "        		    pers.idpersona,\r\n"
+        		+ "        		    linea.idlinea,\r\n"
+        		+ "        		    ( pers.apellidos1\r\n"
+        		+ "        		      || ' '\r\n"
+        		+ "        		      || pers.apellidos2\r\n"
+        		+ "        		      || ', '\r\n"
+        		+ "        		      || pers.nombre )");
+        
+        SQL query = new SQL();
+        
+        query.SELECT("consulta.*");
+        query.SELECT("select a.descripcion from pys_anticipoletrado a \r\n"
+        		+ "        		where a.idinstitucion = consulta.idinstitucion \r\n"
+        		+ "        		and a.idpersona = consulta.idpersona \r\n"
+        		+ "        		and a.idanticipo = (select MIN(idanticipo) from pys_anticipoletrado b \r\n"
+        		+ "        		inner join pys_lineaanticipo linea on  linea.idinstitucion = b.idinstitucion and b.idpersona = linea.idpersona "
+        		+ "and b.idanticipo = linea.idanticipo and linea.idlinea = consulta.idlinea\r\n"
+        		+ "        		where b.idinstitucion = consulta.idinstitucion \r\n"
+        		+ "        		and b.idpersona = consulta.idpersona) descripcion" );
+        
+        query.FROM("("+subQuery.toString()+ ") consulta");
+        
+        query.WHERE("IMPORTE_RESTANTE > 0 and rownum <= 1");
+        
+        query.ORDER_BY("consulta.fecha desc");
+        
+        return query.toString();
+		
+	}
 
 }

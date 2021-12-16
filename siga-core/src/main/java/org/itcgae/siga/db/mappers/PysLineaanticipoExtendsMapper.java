@@ -6,11 +6,13 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FiltroMonederoItem;
+import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionItem;
 import org.itcgae.siga.DTO.fac.ListaMonederosItem;
 import org.itcgae.siga.DTO.fac.ListaMovimientosMonederoItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosMonederoItem;
 import org.itcgae.siga.DTO.fac.MonederoDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.db.entities.PysServicioanticipo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -74,4 +76,12 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
             @Result(column="IDTIPOSERVICIOS", property="idTipoServicios", jdbcType=JdbcType.VARCHAR),
     })
     List<ListaServiciosMonederoItem> getListaServiciosMonedero(Short idInstitucion, String idLinea, String idPersona);
+    
+    @SelectProvider(type=PysLineaanticipoExtendsSqlProvider.class, method="getMonederoServicio")
+    @Results({
+            @Result(column="IDLINEA", property="idLinea", jdbcType= JdbcType.VARCHAR),
+            @Result(column="IMPORTE_RESTANTE", property="importe", jdbcType=JdbcType.VARCHAR),
+            @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.VARCHAR)
+    })
+    ListaDescuentosPeticionItem getMonederoServicio(PysServicioanticipo servicio);
 }
