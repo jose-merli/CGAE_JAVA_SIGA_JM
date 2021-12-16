@@ -1,16 +1,24 @@
 package org.itcgae.siga.scs.services.facturacionsjcs;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.scs.*;
-import org.itcgae.siga.db.entities.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.io.File;
-import java.util.List;
+import org.itcgae.siga.DTOs.scs.FacturacionDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.FacturacionesAsuntoDTO;
+import org.itcgae.siga.DTOs.scs.PagosjgDTO;
+import org.itcgae.siga.db.entities.ScsActuacionasistencia;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.ScsAsistencia;
+import org.itcgae.siga.db.entities.ScsCabeceraguardias;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.springframework.core.io.Resource;
 
 public interface IFacturacionSJCSServices {
 
@@ -59,5 +67,7 @@ public interface IFacturacionSJCSServices {
     public void ejecutaFacturacionesSJCSBloqueadas();
 
     public StringDTO getAgrupacionDeTurnosPorTurno(String idTurno, HttpServletRequest request);
+
+	public Resource getFicheroErroresFacturacion(String idFacturacion, HttpServletRequest request) throws Exception;
 
 }
