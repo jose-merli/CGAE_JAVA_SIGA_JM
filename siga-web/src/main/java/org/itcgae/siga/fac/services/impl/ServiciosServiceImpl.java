@@ -47,6 +47,7 @@ import org.itcgae.siga.db.mappers.PysFormapagoserviciosMapper;
 import org.itcgae.siga.db.mappers.PysPreciosserviciosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PySTipoFormaPagoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposServiciosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysPreciosserviciosExtendsMapper;
@@ -90,6 +91,9 @@ public class ServiciosServiceImpl implements IServiciosService {
 	
 	@Autowired
 	private PysPreciosserviciosMapper pysPreciosServiciosMapper;
+	
+	@Autowired
+	private PySTipoFormaPagoExtendsMapper pysTipoFormaPagoExtendsMapper;
 	
 	
 	//Servicio que devuelve la informacion necesaria para la tabla en Facturacion --> Servicios.
@@ -182,13 +186,17 @@ public class ServiciosServiceImpl implements IServiciosService {
 		return listaServiciosDTO;
 	}
 
+	//Servicio que da de baja logica o lo reactiva (le establece fechabaja en la columna BD a null en caso de reactivar o la actual en caso de baja) al servicio en caso de que tenga usos existentes o lo borra fisicamente (elimina el registro de la bd) en caso de que no tenga ninguna.
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public DeleteResponseDTO reactivarBorradoFisicoLogicoServicios(ListaServiciosDTO listadoServicios, HttpServletRequest request) throws Exception {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
 		int status = 0;
+		int statusBorradoFormasDePagoServicio = 0;
+		int statusBorradoPreciosServicio= 0;
 		IdPeticionDTO idPeticionDTO = new IdPeticionDTO();
+		
 		
 
 		LOGGER.info("reactivarBorradoFisicoLogicoServicios() -> Entrada al servicio para borrar fisicamente o logicamente o reactivar un servicio");
@@ -198,7 +206,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		try {
+	
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -240,7 +248,30 @@ public class ServiciosServiceImpl implements IServiciosService {
 								deleteResponseDTO.setStatus(SigaConstants.OK);
 							}
 						}else{ //Borrado fisico al no tener ninguna solicitud, es decir comprobarUsoServicio no devolvio nada.
-							//Borramos el registro
+							
+							//Borramos las formas de pago del servicio (si es que las tiene)							
+							if(servicio.getNoFacturable().equals("0")) {
+								statusBorradoFormasDePagoServicio = pysTipoFormaPagoExtendsMapper.borradoFisicoFormasPagoByServicio(servicio, idInstitucion);
+								
+								if(statusBorradoFormasDePagoServicio == 0) {
+									throw new Exception("No se pudo realizar el borrado de las formas de pago del servicio");
+								}else if(statusBorradoFormasDePagoServicio == 1) {
+									LOGGER.info(
+											"reactivarBorradoFisicoLogicoServicios() / pysTipoFormaPagoExtendsMapper.reactivarBorradoFisicoLogicoProductos() -> Borrado de las formas de pago del servicio realizado con exito");
+								}
+							}
+							
+							//Borramos los precios del servicio (siempre tendra minimo uno ya que todos los servicios tienen un precio por defecto)
+							statusBorradoPreciosServicio = pysPreciosServiciosExtendsMapper.borradoFisicoPreciosByServicio(servicio, idInstitucion);
+							
+							if(statusBorradoPreciosServicio == 0) {
+								throw new Exception("No se pudo realizar el borrado de precios del servicio");
+							}else if(statusBorradoPreciosServicio == 1) {
+								LOGGER.info(
+										"reactivarBorradoFisicoLogicoServicios() / pysTipoFormaPagoExtendsMapper.borradoFisicoPreciosByServicio() -> Borrado de los precios del servicio realizado con exito");
+							}
+							
+							//Borramos el registro en pys_serviciosinstitucion
 							status = pysTiposServiciosExtendsMapper.borradoFisicoServiciosRegistro(servicio, idInstitucion);
 							
 							if(status == 0) {
@@ -257,14 +288,6 @@ public class ServiciosServiceImpl implements IServiciosService {
 				}
 
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"ServiciosServiceImpl.reactivarBorradoFisicoLogicoServicios() -> Se ha producido un error al borrar fisicamente o logicamente o reactivar un servicio",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
 		
 		deleteResponseDTO.setError(error);
 
@@ -330,7 +353,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO nuevoServicio(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -344,7 +367,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		try {
+		
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -376,6 +399,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 					servicioInstitucion.setAutomatico(servicio.getAutomatico());
 					servicioInstitucion.setIniciofinalponderado("P");
 					servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
+					servicioInstitucion.setNofacturable("1");
 					
 					if(servicio.getIdconsulta() != 0) {
 						String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
@@ -469,13 +493,6 @@ public class ServiciosServiceImpl implements IServiciosService {
 				}
 
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"ServiciosServiceImpl.nuevoServicio() -> Se ha producido un error al crear un servicio",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
 
 		
 		insertResponseDTO.setError(error);
@@ -674,62 +691,6 @@ public class ServiciosServiceImpl implements IServiciosService {
 		return servicioDetalleDTO;
 	}
 	
-//	@Override
-//	public ComboDTO comboCondicionSuscripcion(HttpServletRequest request, int idConsulta) {
-//		ComboDTO comboDTO = new ComboDTO();
-//		Error error = new Error();
-//
-//		LOGGER.info("comboCondicionSuscripcion() -> Entrada al servicio para recuperar el combo de condicion de suscripcion");
-//
-//		// Conseguimos información del usuario logeado
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//
-//		try {
-//			if (idInstitucion != null) {
-//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-//
-//				LOGGER.info(
-//						"comboCondicionSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//
-//				LOGGER.info(
-//						"comboCondicionSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				if (usuarios != null && !usuarios.isEmpty()) {
-//					LOGGER.info(
-//							"comboCondicionSuscripcion() / pysServiciosInstitucionExtendsMapper.comboCondicionSuscripcion() -> Entrada a pysServiciosInstitucionExtendsMapper para recuperar el combo de condicion de suscripcion");
-//
-//					String idioma = usuarios.get(0).getIdlenguaje();
-//					List<ComboItem> listaComboCondicionSuscripcion = pysServiciosInstitucionExtendsMapper
-//							.comboCondicionSuscripcion(idioma, idInstitucion, idConsulta);
-//
-//					LOGGER.info(
-//							"comboCondicionSuscripcion() / pysServiciosInstitucionExtendsMapper.comboCondicionSuscripcion() -> Salida de pysServiciosInstitucionExtendsMapper para recuperar el combo de condicion de suscripcion");
-//
-//					if (listaComboCondicionSuscripcion != null && listaComboCondicionSuscripcion.size() > 0) {
-//						comboDTO.setCombooItems(listaComboCondicionSuscripcion);
-//					}
-//				}
-//
-//			}
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"TiposServiciosServiceImpl.comboCondicionSuscripcion() -> Se ha producido un error al recuperar el combo de condicion de suscripcion",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//		}
-//
-//		comboDTO.setError(error);
-//
-//		LOGGER.info("comboCondicionSuscripcion() -> Salida del servicio para recuperar el combo de condicion de suscripcion");
-//
-//		return comboDTO;
-//	}
 	
 	@Override
 	public ComboDTO comboCondicionSuscripcion(HttpServletRequest request) {
@@ -789,7 +750,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO crearEditarFormaPago(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		NewIdDTO idServicioInstitucion = new NewIdDTO();
@@ -808,7 +769,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		try {
+		
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -991,13 +952,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 				}
 
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"ServiciosServiceImpl.crearEditarFormaPago() -> Se ha producido un error al crear/editar formas de pago y editar los campos restantes del servicio",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
+		
 
 		insertResponseDTO.setError(error);
 
@@ -1007,8 +962,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 
 	@Override
-	@Transactional
-	public DeleteResponseDTO borrarSuscripcionesBajas(BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) throws Exception {
+	public DeleteResponseDTO borrarSuscripcionesBajas(BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
 		int status = 0;

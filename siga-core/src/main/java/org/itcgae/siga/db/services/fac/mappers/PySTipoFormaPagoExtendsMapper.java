@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.PrecioServicioItem;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -54,6 +55,10 @@ public interface PySTipoFormaPagoExtendsMapper extends PysFormapagoMapper{
 	//Realiza un borrado fisico de las formas de pago de un producto
 	@UpdateProvider(type = PySTipoFormaPagoSqlExtendsProvider.class, method = "borradoFisicoFormasPagoByProducto")
 	int borradoFisicoFormasPagoByProducto(ListaProductosItem producto,Short idInstitucion);
+	
+	//Realiza un borrado fisico de las formas de pago de un servicio
+	@UpdateProvider(type = PySTipoFormaPagoSqlExtendsProvider.class, method = "borradoFisicoFormasPagoByServicio")
+	int borradoFisicoFormasPagoByServicio(ListaServiciosItem servicio,Short idInstitucion);
 	
 	
 }
