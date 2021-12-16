@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.services.facturacionsjcs;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public interface ICombosServices {
 
@@ -26,7 +27,7 @@ public interface ICombosServices {
     
     ComboDTO getComboColegios(HttpServletRequest request);
     
-    ComboDTO getComboGrupoFacturacionByColegio(String idColegio, HttpServletRequest request);
+    ComboDTO getComboGrupoFacturacionByColegios(List<String> idColegios, HttpServletRequest request);
  
     ComboDTO comboFactMovimientos(HttpServletRequest request);
 	

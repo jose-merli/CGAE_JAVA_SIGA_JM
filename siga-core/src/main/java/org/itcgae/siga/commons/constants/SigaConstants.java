@@ -62,8 +62,8 @@ public class SigaConstants {
     public static String parametroRutaSalidaInformes = "informes.directorioFisicoSalidaInformesJava";
     public static String rutaPlantillaSinClase = "plantillasSinClase";
     public static String parametroSizePlantillas = "gen.ficheros.maxsize.bytes";
-    public static String parametroRutaAlmacenFicheros = "gen.ficheros.path"; 
-    
+    public static String parametroRutaAlmacenFicheros = "gen.ficheros.path";
+
     public static String pathSeparator = "/";
 
     public static String nombreExcelConsulta = "ResultadoConsulta";
@@ -1240,7 +1240,7 @@ public class SigaConstants {
     public static final int TIPO_CAJG_XML_SANTIAGO = 6;
     public static final int TIPO_CAJG_CATALANES = 2;
 
-    	
+
 	public enum Consejos {
 		C_CATALUNYA ("AC0900"),
 				EUSKAL_K_ ("AC1600"),
@@ -1254,9 +1254,9 @@ public class SigaConstants {
 				C_ARAGON ("AC0200");
 
 		private String codigoExt;
-		
+
 		private Consejos(String codigoExt) {
-		this.codigoExt=codigoExt;	
+		this.codigoExt=codigoExt;
 		}
 
 		public String getCodigoExt() {
@@ -1265,7 +1265,29 @@ public class SigaConstants {
 
 		public void setCodigoExt(String codigoExt) {
 			this.codigoExt = codigoExt;
-		}		
+		}
 	}
-    
+
+    // Estados certificación
+    public enum ESTADO_CERTIFICACION {
+
+        ESTADO_CERTIFICACION_ABIERTA("1"),
+        ESTADO_CERTIFICACION_VALIDANDO("2"),
+        ESTADO_CERTIFICACION_NO_VALIDADA("3"),
+        ESTADO_CERTIFICACION_VALIDADA("4"),
+        ESTADO_CERTIFICACION_ENVIANDO("5"),
+        ESTADO_CERTIFICACION_ENVIO_CON_ERRORES("6"),
+        ESTADO_CERTIFICACION_CERRADA("7");
+
+        private String codigo;
+
+        ESTADO_CERTIFICACION(String codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getCodigo() {
+            return this.codigo;
+        }
+    }
+
 }

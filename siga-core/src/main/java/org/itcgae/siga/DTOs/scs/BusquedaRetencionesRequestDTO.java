@@ -8,12 +8,12 @@ import java.util.List;
 @Data
 public class BusquedaRetencionesRequestDTO {
 
-    private List<Short> idInstitucionList;
-    private List<Integer> idPartidaPresupuestariaList;
-    private List<Short> idGrupoFacturacionList;
-    private List<Short> idHitoGeneralList;
+    private List<String> idInstitucionList;
+    private List<String> idPartidaPresupuestariaList;
+    private List<String> idGrupoFacturacionList;
+    private List<String> idHitoGeneralList;
     private String nombre;
-    private List<Short> idEstadoCertificacionList;
+    private List<String> idEstadoCertificacionList;
     private Date fechaDesde;
     private Date fechaHasta;
 }

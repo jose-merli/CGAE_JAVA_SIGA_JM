@@ -1,28 +1,23 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
-import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
-import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.*;
-import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
-import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.*;
-import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
-import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
-import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
-import org.itcgae.siga.security.UserTokenUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.TreeSet;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -30,19 +25,130 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.*;
-import java.util.Date;
-import java.util.*;
-
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
+import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.DatosFacturacionAsuntoDTO;
+import org.itcgae.siga.DTOs.scs.DatosMovimientoVarioDTO;
+import org.itcgae.siga.DTOs.scs.DatosPagoAsuntoDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.FacturacionesAsuntoDTO;
+import org.itcgae.siga.DTOs.scs.PagosjgDTO;
+import org.itcgae.siga.DTOs.scs.PagosjgItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
+import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.FcsAplicaMovimientosvariosExample;
+import org.itcgae.siga.db.entities.FcsFactActuaciondesignaExample;
+import org.itcgae.siga.db.entities.FcsFactApunteExample;
+import org.itcgae.siga.db.entities.FcsFactEjgExample;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionExample;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
+import org.itcgae.siga.db.entities.FcsFactGuardiascolegiadoExample;
+import org.itcgae.siga.db.entities.FcsFactSojExample;
+import org.itcgae.siga.db.entities.FcsFacturacionEstadoEnvioExample;
+import org.itcgae.siga.db.entities.FcsFacturacionjg;
+import org.itcgae.siga.db.entities.FcsFacturacionjgExample;
+import org.itcgae.siga.db.entities.FcsHistoAcreditacionprocExample;
+import org.itcgae.siga.db.entities.FcsHistoTipoactcostefijoExample;
+import org.itcgae.siga.db.entities.FcsHistoricoAcreditacionExample;
+import org.itcgae.siga.db.entities.FcsHistoricoHitofactExample;
+import org.itcgae.siga.db.entities.FcsHistoricoProcedimientosExample;
+import org.itcgae.siga.db.entities.FcsHistoricoTipoactuacionExample;
+import org.itcgae.siga.db.entities.FcsHistoricoTipoasistcolegioExample;
+import org.itcgae.siga.db.entities.FcsMovimientosvarios;
+import org.itcgae.siga.db.entities.FcsMovimientosvariosExample;
+import org.itcgae.siga.db.entities.FcsMovimientosvariosKey;
+import org.itcgae.siga.db.entities.FcsTrazaErrorEjecucion;
+import org.itcgae.siga.db.entities.FcsTrazaErrorEjecucionExample;
+import org.itcgae.siga.db.entities.GenDiccionarioKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ScsActuacionasistencia;
+import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
+import org.itcgae.siga.db.entities.ScsActuacionasistenciaKey;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
+import org.itcgae.siga.db.entities.ScsAsistencia;
+import org.itcgae.siga.db.entities.ScsAsistenciaExample;
+import org.itcgae.siga.db.entities.ScsAsistenciaKey;
+import org.itcgae.siga.db.entities.ScsCabeceraguardias;
+import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgExample;
+import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
+import org.itcgae.siga.db.entities.ScsSoj;
+import org.itcgae.siga.db.entities.ScsSojExample;
+import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
+import org.itcgae.siga.db.mappers.FcsFactActuaciondesignaMapper;
+import org.itcgae.siga.db.mappers.FcsFactApunteMapper;
+import org.itcgae.siga.db.mappers.FcsFactEjgMapper;
+import org.itcgae.siga.db.mappers.FcsFactEstadosfacturacionMapper;
+import org.itcgae.siga.db.mappers.FcsFactGrupofactHitoMapper;
+import org.itcgae.siga.db.mappers.FcsFactGuardiascolegiadoMapper;
+import org.itcgae.siga.db.mappers.FcsFactSojMapper;
+import org.itcgae.siga.db.mappers.FcsFacturacionEstadoEnvioMapper;
+import org.itcgae.siga.db.mappers.FcsFacturacionjgMapper;
+import org.itcgae.siga.db.mappers.FcsHistoAcreditacionprocMapper;
+import org.itcgae.siga.db.mappers.FcsHistoTipoactcostefijoMapper;
+import org.itcgae.siga.db.mappers.FcsHistoricoAcreditacionMapper;
+import org.itcgae.siga.db.mappers.FcsHistoricoHitofactMapper;
+import org.itcgae.siga.db.mappers.FcsHistoricoProcedimientosMapper;
+import org.itcgae.siga.db.mappers.FcsHistoricoTipoactuacionMapper;
+import org.itcgae.siga.db.mappers.FcsHistoricoTipoasistcolegioMapper;
+import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
+import org.itcgae.siga.db.mappers.FcsPagosjgMapper;
+import org.itcgae.siga.db.mappers.FcsTrazaErrorEjecucionExtendsMapper;
+import org.itcgae.siga.db.mappers.FcsTrazaErrorEjecucionMapper;
+import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
+import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
+import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
+import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
+import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
+import org.itcgae.siga.db.mappers.ScsSojMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
+import org.itcgae.siga.exception.FacturacionSJCSException;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
+import org.itcgae.siga.security.UserTokenUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
-    private Logger LOGGER = Logger.getLogger(FacturacionSJCSServicesImpl.class);
+    private static final String TEXTO_REINTENTO = "Se ha perdido la ejecución de la facturación. Reintentamos la ejecución.";
+
+	private Logger LOGGER = Logger.getLogger(FacturacionSJCSServicesImpl.class);
 
     private static Boolean alguienEjecutando = Boolean.FALSE;
 
@@ -156,6 +262,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     @Autowired
     private FcsAplicaMovimientosvariosMapper fcsAplicaMovimientosvariosMapper;
+    
+    @Autowired
+    private LogErroresFacturacionSJCSHelper logErroresFacHelper;
 
     @Override
     public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
@@ -2535,6 +2644,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     private void facturacionesBloqueadasEnEjecucion(CenInstitucion institucion) {
         LOGGER.info("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
 
+
         //Recuperamos el tiempo estimado como bloqueo
         GenPropertiesKey propertiesPK = new GenPropertiesKey();
         propertiesPK.setFichero("SIGA");
@@ -2545,12 +2655,15 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 .facturacionesPorEstadoEjecucionTiempoLimite(institucion.getIdinstitucion().toString(), Integer.parseInt(tiempoMaximoMinutos.getValor()));
 
         for (FcsFacturacionjg item : listaFacturaciones) {
+            LogErroresFacturacionSJCS logErroresFac = logErroresFacHelper.getLogErroresFacturacion(item.getIdinstitucion(),item.getIdfacturacion().toString());
 
             try {
                 // Insertamos el estado ABIERTA para las facturaciones en ejecucion
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
-
+                
+                logErroresFac.logError(TEXTO_REINTENTO);
+                
                 // Localizamos donde se quedó el proceso de cierre y dehacemos lo hasta ahora modificado(conceptoErroneo puede ser Turno/Guardia/EJG/SOJ)
                 FcsTrazaErrorEjecucion conceptoErroneo = localizadaEstadoFacturacionBloqueadaEnEjecucion(item);
                 if (conceptoErroneo != null) {
@@ -2573,14 +2686,20 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     }
                 }
 
-
             } catch (Exception e) {
+            	logErroresFac.logError("excepción en facturacionesBloqueadasEnEjecucion:"+e);
                 LOGGER.error(e);
                 actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
                         item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             }
+            
+            try {
+				logErroresFac.writeAllErrors();
+			} catch (FacturacionSJCSException e) {
+				LOGGER.error("Error al ejecutar logErroresFac.writeAllErrors:" +e);
+			}
         }
 
         LOGGER.info("SALE -> FacturacionSJCSServicesImpl.facturacionesBloqueadas(): " + listaFacturaciones.toString());
@@ -2651,5 +2770,25 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
         return stringDTO;
     }
+
+	@Override
+	public Resource getFicheroErroresFacturacion(String idFacturacion, HttpServletRequest request) throws Exception {
+		Resource resource = null;
+	    String token = request.getHeader("Authorization");
+	    Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+	    
+		File file = logErroresFacHelper.getFileLogErroresFacturacion(idInstitucion, idFacturacion).toFile();
+
+		if (file != null) {
+			resource = new ByteArrayResource(Files.readAllBytes(file.toPath())) {
+				public String getFilename() {
+                    return file.getName();
+                }
+			};
+			
+		}
+
+		return resource;
+	}
 	
 }

@@ -21,6 +21,8 @@ import org.itcgae.siga.db.entities.ScsCabeceraguardias;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -202,5 +204,29 @@ public class FacturacionController {
         StringDTO response = facturacionServices.getAgrupacionDeTurnosPorTurno(idTurno, request);
         return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
     }
+    
+    @PostMapping(path = "/facturacionsjcs/getFicheroErroresFacturacion")
+    public ResponseEntity<Resource> getFicheroErroresFacturacion(@RequestParam("idFacturacion") String idFacturacion,  HttpServletRequest request)    {
+		ResponseEntity<Resource> response = null;
+		Resource resource = null;
+		Boolean error = false;
+
+		try {
+			resource = facturacionServices.getFicheroErroresFacturacion(idFacturacion, request);
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+			response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
+					.contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+		} catch (Exception e) {
+			error = true;
+		}
+
+		if (error) {
+			response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+
+		return response;
+	}
+    
     
 }

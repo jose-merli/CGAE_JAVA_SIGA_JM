@@ -505,7 +505,7 @@ public class CombosServicesImpl implements ICombosServices {
     }
 
     @Override
-    public ComboDTO getComboGrupoFacturacionByColegio(String idColegio, HttpServletRequest request) {
+    public ComboDTO getComboGrupoFacturacionByColegios(List<String> idColegios, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -527,7 +527,7 @@ public class CombosServicesImpl implements ICombosServices {
                         "getComboGrupoFacturacionByColegio() -> Entrada para obtener la información de los distintos grupos de facturacion");
 
                 comboGrupoFact.setCombooItems(scsGrupofacturacionExtendsMapper
-                        .getComboGrupoFacturacion(idColegio, usuarios.get(0).getIdlenguaje()));
+                        .grupoFacturacionByColegios(idColegios, usuarios.get(0).getIdlenguaje()));
 
                 LOGGER.info("getComboGrupoFacturacionByColegio() -> Salida ya con los datos recogidos");
 
