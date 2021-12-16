@@ -548,6 +548,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 						servicioInstitucion.setCuentacontable(servicio.getCuentacontable());
 						
 						servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
+						servicioInstitucion.setAutomatico(servicio.getAutomatico());
 						
 						if(servicio.getIdconsulta() != 0 && servicio.getIdconsulta() != servicio.getServiciooriginal().getIdconsulta()) {
 							String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
