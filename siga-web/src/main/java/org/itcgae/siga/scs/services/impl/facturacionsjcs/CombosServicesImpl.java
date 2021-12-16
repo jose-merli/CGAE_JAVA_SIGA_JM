@@ -709,5 +709,52 @@ public class CombosServicesImpl implements ICombosServices {
 
         return comboFTipos;
     }
+    
+    public ComboDTO comboCertificacionSJCS(HttpServletRequest request) {
+
+        LOGGER.info("comboCertificacionSJCS() -> Entrada del servicio para obtener las certificaciones");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+        ComboDTO comboFCertificacion = new ComboDTO();
+
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+            LOGGER.info("comboCertificacionSJCS() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            LOGGER.info("comboCertificacionSJCS() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
+
+                LOGGER.info("comboCertificacionSJCS() / FcsMovimientosvariosExtendsMapper.comboCertificacionSJCS() -> Entrada a FcsMovimientosvariosExtendsMapper para obtener las certificaciones ");
+
+                List<ComboItem> comboItems = fcsMovimientosvariosExtendsMapper.comboCertificacionSJCS(idInstitucion.toString());
+                comboFCertificacion.setCombooItems(comboItems);
+				
+				/*for(ComboItem combo : comboItems) {
+					String descripcion = (combo.getLabel()).substring(0, (combo.getLabel()).length() -3);
+					 combo.setLabel(descripcion);
+				}*/
+
+                LOGGER.info("comboCertificacionSJCS() / FcsMovimientosvariosExtendsMapper.comboCertificacionSJCS() -> Salida a FcsMovimientosvariosExtendsMapper para obtener las certificaciones");
+            } else {
+                LOGGER.warn("comboCertificacionSJCS() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("comboCertificacionSJCS() -> idInstitucion del token nula");
+        }
+
+        LOGGER.info("comboCertificacionSJCS() -> Salida del servicio para obtener los tipos");
+
+        return comboFCertificacion;
+    }
 
 }

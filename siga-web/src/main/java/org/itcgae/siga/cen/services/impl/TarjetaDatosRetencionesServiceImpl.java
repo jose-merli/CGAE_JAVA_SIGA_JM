@@ -260,7 +260,7 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
         return response;
     }
 
-    @Override
+   /* @Override
     public RetencionesDTO getRetencionesColegial(int numPagina, PersonaSearchDTO personaSearchDTO, HttpServletRequest request) {
         LOGGER.info("getRetencionesColegial() -> Entrada al servicio para buscar las retenciones de una persona jurídica");
         RetencionesDTO retencionesDTO = new RetencionesDTO();
@@ -289,21 +289,15 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
                     usuario.getIdlenguaje(), String.valueOf(idInstitucion));
             LOGGER.info(
                     "getRetencionesColegial() / cenNocolegiadoExtendsMapper.selectRetencionesColegial() -> Salida de cenNocolegiadoExtendsMapper para obtener las retenciones de la persona jurídica indicada");
-
-            if (null != listaRetenciones && !listaRetenciones.isEmpty()) {
-                retencionesDTO.setRetencionesItemList(listaRetenciones);
-            } else {
-                retencionesDTO.getError().setDescription(
-                        "No se han encontrado retenciones para el idPersona: " + personaSearchDTO.getIdPersona());
-            }
+            
         }
 
         LOGGER.info("getRetencionesColegial() -> Salida del servicio para buscar las retenciones de una persona jurídica");
 
         return retencionesDTO;
-    }
+    }*/
 
-    @Override
+   /* @Override
     public RetencionesDTO selectRetencionesColegialYSociedades(int numPagina, PersonaSearchDTO personaSearchDTO, HttpServletRequest request) {
 
         LOGGER.info("selectRetencionesColegialYSociedades() -> Entrada al servicio para buscar las retenciones de colegiado junto con sociedad");
@@ -358,6 +352,75 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
         LOGGER.info("selectRetencionesColegialYSociedades() -> Salida del servicio para buscar las retenciones de colegiado junto con sociedad");
 
         return retencionesDTO;
-    }
+    }*/
 
+	
+	@Override
+	public RetencionesDTO getLiquidacionSJCS(PersonaSearchDTO personaSearchDTO, HttpServletRequest request) {
+		LOGGER.info("getLiquidacionSJCS() -> Entrada al servicio para buscar el campo sociedad de una persona ? retención");
+		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+		
+		RetencionesDTO retencionDTO = new RetencionesDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		// Obtenemos el usuario que modifica
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"getLiquidacionSJCS() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"getLiquidacionSJCS() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		if (null != usuarios && usuarios.size() > 0) {
+			usuario = usuarios.get(0);
+
+			LOGGER.info(
+					"getLiquidacionSJCS() / cenNocolegiadoExtendsMapper.selectLiquidacionSJCS() -> Entrada a cenNocolegiadoExtendsMapper para obtener el valor de sociedad");
+			List<LiquidacionSJCSDTO> listaRetenciones = cenNocolegiadoExtendsMapper.selectLiquidacionSJCS(personaSearchDTO,idInstitucion.toString());
+			LOGGER.info(
+					"getLiquidacionSJCS() / cenNocolegiadoExtendsMapper.selectLiquidacionSJCS() -> Salida de cenNocolegiadoExtendsMapper para obtener el valor de sociedad");	
+
+			 if(listaRetenciones.size() >0 && listaRetenciones != null && !listaRetenciones.isEmpty()){
+	           //2º query
+	            	 LOGGER.info("selectRetencionesColegialYSociedades() -> cenNocolegiadoExtendsMapper.selectRetencionesColegialYSociedades() -> INICIO de la busqueda de  retenciones de colegiado junto con sociedad");
+	                 List<RetencionesItem> listaRetencionesColSoc = cenNocolegiadoExtendsMapper.selectRetencionesColegialYSociedades(personaSearchDTO,
+	                         usuarios.get(0).getIdlenguaje(), String.valueOf(idInstitucion),listaRetenciones);
+	                 LOGGER.info("selectRetencionesColegialYSociedades() -> cenNocolegiadoExtendsMapper.selectRetencionesColegialYSociedades() -> FIN de la busqueda de  retenciones de colegiado junto con sociedad");
+
+	                 if (null != listaRetencionesColSoc && !listaRetencionesColSoc.isEmpty()) {
+	                     retencionDTO.setRetencionesItemList(listaRetencionesColSoc);
+	                     retencionDTO.setActivo(true);
+	                 } else {
+	                	 retencionDTO.getError().setDescription(
+	                             "No se han encontrado retenciones para el idPersona: " + personaSearchDTO.getIdPersona());
+	                 }
+	                 
+	          }else{
+	            //query normal
+	        	  LOGGER.info(
+	                      "getRetencionesColegial() / cenNocolegiadoExtendsMapper.selectRetencionesColegial() -> Entrada a cenNocolegiadoExtendsMapper para obtener las retenciones de la persona jurídica indicada");
+	              List<RetencionesItem> listaRetencionesColegial = cenNocolegiadoExtendsMapper.selectRetencionesColegial(personaSearchDTO,
+	                      usuario.getIdlenguaje(), String.valueOf(idInstitucion));
+	              LOGGER.info(
+	                      "getRetencionesColegial() / cenNocolegiadoExtendsMapper.selectRetencionesColegial() -> Salida de cenNocolegiadoExtendsMapper para obtener las retenciones de la persona jurídica indicada");
+	              
+
+	                 if (null != listaRetencionesColegial && !listaRetencionesColegial.isEmpty()) {
+	                     retencionDTO.setRetencionesItemList(listaRetencionesColegial);
+	                     retencionDTO.setActivo(false);
+	                 } else {
+	                	 retencionDTO.getError().setDescription(
+	                             "No se han encontrado retenciones para el idPersona: " + personaSearchDTO.getIdPersona());
+	                 }
+	          }
+		}
+
+		LOGGER.info("getLiquidacionSJCS() -> Salida del servicio para buscar el valor de sociedad");
+
+		return retencionDTO;
+	}
 }

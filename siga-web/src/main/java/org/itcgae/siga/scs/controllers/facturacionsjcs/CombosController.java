@@ -109,5 +109,11 @@ public class CombosController {
    		ComboDTO response = combosServices.comboTiposMovimientos(request);
    		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
    	}
+    
+    @RequestMapping(value="/combo/comboCertificacionSJCS", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ComboDTO> comboCertificacionSJCS(HttpServletRequest request) {
+   		ComboDTO response = combosServices.comboCertificacionSJCS(request);
+   		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+   	}
 
 }

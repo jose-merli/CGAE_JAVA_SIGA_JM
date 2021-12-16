@@ -35,4 +35,6 @@ public interface ICombosServices {
 	ComboDTO comboAgrupacionEnTurnos(HttpServletRequest request);
 
 	ComboDTO comboTiposMovimientos(HttpServletRequest request);
+
+	ComboDTO comboCertificacionSJCS(HttpServletRequest request);
 }

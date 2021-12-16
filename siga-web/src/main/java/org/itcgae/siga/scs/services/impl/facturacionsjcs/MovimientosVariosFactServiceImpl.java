@@ -14,7 +14,9 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.FcsMovimientosvarios;
 import org.itcgae.siga.db.entities.FcsMovimientosvariosKey;
+import org.itcgae.siga.db.entities.FcsMvariosCertificaciones;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
+import org.itcgae.siga.db.mappers.FcsMvariosCertificacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsMovimientosvariosExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IMovimientosVariosFactServices;
@@ -50,6 +52,9 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
     @Autowired
     private FcsMovimientosvariosMapper fcsMovimientosVariosMapper;
+    
+    @Autowired 
+    private FcsMvariosCertificacionesMapper fcsMvariosCertificacionesMapper;
 
 
     public MovimientosVariosFacturacionDTO buscarMovimientosVarios(MovimientosVariosFacturacionItem facturacionItem, HttpServletRequest request) {
@@ -320,6 +325,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
         InsertResponseDTO insertResponse = new InsertResponseDTO();
         Error error = new Error();
         int response = 0;
+        int responseCert = 0;
 
 
         if (null != idInstitucion) {
@@ -359,21 +365,32 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                         record.setCantidad(new BigDecimal(movimiento.getCantidad()));
                         record.setContabilizado(" ");
 
-                        //record.setIdfacturacion(Integer.parseInt(movimiento.getIdFacturacion()));
-
-
                         record.setMotivo(movimiento.getMotivo());
 
                         if (movimiento.getTipo() != null) {
                             record.setIdtipomovimiento(Short.parseShort(movimiento.getTipo()));
                         }
-
-                        //falta certificación
+                 
                         response = fcsMovimientosVariosMapper.insertSelective(record);
 
 
                         if (response == 1) {
+                        	
+                        	NewIdDTO idCertificacion = fcsMovimientosvariosExtendsMapper.selectMaxIdCertificacionByIdInstitucion(idInstitucion.toString());
+
+                            Short newidCert = Short.parseShort(idCertificacion.getNewId());
+                            
                             LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Salida con los datos ya insertados");
+                            
+                            FcsMvariosCertificaciones insertCert = new FcsMvariosCertificaciones();
+                            insertCert.setIdmovimiento(Long.parseLong(movimiento.getIdPersona()));
+                            insertCert.setFechamodificacion(new Date());
+                            insertCert.setIdinstitucion(idInstitucion);
+                            insertCert.setUsumodificacion(usuarios.get(0).getIdusuario());
+                            insertCert.setIdcertificacion((short)(newidCert + 1));
+                            
+                            responseCert = fcsMvariosCertificacionesMapper.insert(insertCert);
+                            
                         } else {
                             LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Salida sin haber insertado los datos");
                         }
@@ -396,7 +413,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
             LOGGER.error("MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> idInstitucion del token nula");
         }
 
-        if (response == 0 && error.getDescription() == null) {
+        if (response == 0 && responseCert == 0 && error.getDescription() == null) {
             error.setCode(400);
             insertResponse.setStatus(SigaConstants.KO);
         } else if (error.getCode() == null) {
@@ -424,6 +441,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
         Error error = new Error();
         int ko = 0;
         int response = 0;
+        int responseCert = 0;
 
 
         if (null != idInstitucion) {
@@ -467,11 +485,29 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                         movimientoItem.setIdtipomovimiento(Short.parseShort(movimiento.getTipo()));
 
 
-                        //falta la certificación
                         response = fcsMovimientosVariosMapper.updateByPrimaryKeySelective(movimientoItem);
 
                         if (response == 1) {
                             LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Salida con los datos generales ya modificados");
+                  
+                            LOGGER.debug("fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective() -> Entrada para actualizar el dato de certificacion");
+                            FcsMvariosCertificaciones updCert = new FcsMvariosCertificaciones();
+                            updCert.setIdmovimiento(Long.parseLong(movimiento.getIdPersona()));
+                            updCert.setFechamodificacion(new Date());
+                            updCert.setIdinstitucion(idInstitucion);
+                            updCert.setUsumodificacion(usuarios.get(0).getIdusuario());
+                            updCert.setIdcertificacion(Short.parseShort(movimiento.getCertificacion()));
+                            
+                            responseCert = fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective(updCert);
+                           
+                           if(responseCert == 1) {
+                               LOGGER.debug("fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective() -> Salida con el dato de certificacion actualizado");
+
+                           }else {
+                               LOGGER.debug("fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective() -> Salida con el dato de certificacion sin actualizar ERROR");
+
+                           }
+
                         } else {
                             LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Salida sin haber modificado los datos generales");
                         }
@@ -494,7 +530,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
             LOGGER.error("MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> idInstitucion del token nula");
         }
 
-        if (response == 0 && error.getDescription() == null) {
+        if (response == 0 && responseCert == 0 && error.getDescription() == null) {
             error.setCode(400);
             updateResponse.setStatus(SigaConstants.KO);
         } else if (error.getCode() == null) {
