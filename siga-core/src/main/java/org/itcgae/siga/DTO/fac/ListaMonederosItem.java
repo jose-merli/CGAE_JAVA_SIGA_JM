@@ -13,7 +13,7 @@ public class ListaMonederosItem {
 	public BigDecimal importeRestante;
 	public BigDecimal importeUsado;
     public String idPersona;
-    public String idLinea;
+    public String idAnticipo;
     
 	public Date getFecha() {
 		return fecha;
@@ -63,11 +63,11 @@ public class ListaMonederosItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
-	public String getIdLinea() {
-		return idLinea;
+	public String getIdAnticipo() {
+		return idAnticipo;
 	}
-	public void setIdLinea(String idLinea) {
-		this.idLinea = idLinea;
+	public void setIdAnticipo(String idAnticipo) {
+		this.idAnticipo = idAnticipo;
 	}
 
 }

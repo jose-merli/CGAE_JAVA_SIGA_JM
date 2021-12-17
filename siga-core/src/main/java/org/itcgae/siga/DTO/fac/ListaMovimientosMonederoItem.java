@@ -10,15 +10,6 @@ public class ListaMovimientosMonederoItem {
 	private String cuentaContable;
 	private BigDecimal impOp;
 	private String impTotal;
-	private String liquidacion;
-	private String idFactura;
-	private Long nLineaFactura;
-	private String contabilizado;
-	
-	//Información del servicio asociado
-	private Long idServicio;
-	private Long idServiciosInstitucion;
-	private Short idTipoServicios;
 
 	private boolean nuevo; //Se utiliza para determinar si es editable o no en la tabla de movimientos de la ficha Monedero
 
@@ -68,62 +59,6 @@ public class ListaMovimientosMonederoItem {
 
 	public void setNuevo(boolean nuevo) {
 		this.nuevo = nuevo;
-	}
-
-	public String getLiquidacion() {
-		return liquidacion;
-	}
-
-	public void setLiquidacion(String liquidacion) {
-		this.liquidacion = liquidacion;
-	}
-
-	public String getIdFactura() {
-		return idFactura;
-	}
-
-	public void setIdFactura(String idFactura) {
-		this.idFactura = idFactura;
-	}
-
-	public Long getnLineaFactura() {
-		return nLineaFactura;
-	}
-
-	public void setnLineaFactura(Long nLineaFactura) {
-		this.nLineaFactura = nLineaFactura;
-	}
-
-	public String getContabilizado() {
-		return contabilizado;
-	}
-
-	public void setContabilizado(String contabilizado) {
-		this.contabilizado = contabilizado;
-	}
-
-	public Long getIdServicio() {
-		return idServicio;
-	}
-
-	public void setIdServicio(Long idServicio) {
-		this.idServicio = idServicio;
-	}
-
-	public Long getIdServiciosInstitucion() {
-		return idServiciosInstitucion;
-	}
-
-	public void setIdServiciosInstitucion(Long idServiciosInstitucion) {
-		this.idServiciosInstitucion = idServiciosInstitucion;
-	}
-
-	public Short getIdTipoServicios() {
-		return idTipoServicios;
-	}
-
-	public void setIdTipoServicios(Short idTipoServicios) {
-		this.idTipoServicios = idTipoServicios;
 	}
 
 }

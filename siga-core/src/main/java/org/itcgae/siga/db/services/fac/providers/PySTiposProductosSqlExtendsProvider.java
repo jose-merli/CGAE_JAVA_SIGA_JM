@@ -360,7 +360,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 				+ " PYS_COMPRA.IDTIPOPRODUCTO = prodSol.IDTIPOPRODUCTO\r\n"
 				+ " AND PYS_COMPRA.IDPRODUCTO = prodSol.IDPRODUCTO\r\n"
 				+ " AND PYS_COMPRA.IDPRODUCTOINSTITUCION = prodSol.idProductoInstitucion \r\n"
-				+ " AND PYS_PRODUCTOSINSTITUCION.IDINSTITUCION = prodSol.IDINSTITUCION \r\n"
+				+ " AND PYS_PETICIONCOMPRASUSCRIPCION.IDINSTITUCION = prodSol.IDINSTITUCION \r\n"
 				+ " AND PYS_PETICIONCOMPRASUSCRIPCION.IDPETICION = prodSol.IDPETICION");
 		
 		sql.JOIN("pys_tipoiva tiva on prodSol.idtipoiva = tiva.idtipoiva");

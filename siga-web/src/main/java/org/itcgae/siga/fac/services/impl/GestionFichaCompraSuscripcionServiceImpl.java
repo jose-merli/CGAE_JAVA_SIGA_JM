@@ -1530,53 +1530,65 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								"getDescuentosPeticion() / pysProductossolicitadosMapper.selectByExample() -> Salida de pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
 
 						
-						for(PysCompra compra : comprasPeticion) {
-							
-							if(compra.getNumerolinea() != null) {
-								numLineasPeticion.add(compra.getNumerolinea());
-							}
-							
-							
-						}
+//						for(PysCompra compra : comprasPeticion) {
+//							
+//							if(compra.getNumerolinea() != null) {
+//								numLineasPeticion.add(compra.getNumerolinea());
+//							}
+//							
+//							
+//						}
+//						
+//						if(!numLineasPeticion.isEmpty()) {
+//							// Se obtienen las lineas de anticipo asociadas a la peticion
+//							PysLineaanticipoExample lineaAnticipoExample = new PysLineaanticipoExample();
+//							
+//							lineaAnticipoExample.createCriteria().andNumerolineaIn(numLineasPeticion).andIdinstitucionEqualTo(idInstitucion);
+//							
+//							List<PysLineaanticipo> lineasPeticion = pysLineaAnticipoMapper.selectByExample(lineaAnticipoExample);
+//							
+//							List<Short> idAnticiposPeticion = new ArrayList<Short>();
+//							
+//							for(PysLineaanticipo linea : lineasPeticion) {
+//								idAnticiposPeticion.add(linea.getIdanticipo());
+//							}
+//	
+//							
+//							PysAnticipoletradoExample anticipoExample = new PysAnticipoletradoExample();
+//	
+//							anticipoExample.createCriteria()
+//									.andIdanticipoIn(idAnticiposPeticion)
+//									.andIdinstitucionEqualTo(idInstitucion);
+//	
+//							// Se obtienen los anticipos asociados a la peticion
+//							List<PysAnticipoletrado> anticiposPeticion = pysAnticipoLetradoMapper.selectByExample(anticipoExample);
+	
 						
-						if(!numLineasPeticion.isEmpty()) {
-							// Se obtienen las lineas de anticipo asociadas a la peticion
-							PysLineaanticipoExample lineaAnticipoExample = new PysLineaanticipoExample();
+						//Se obtiene el importe anticipado en las distintas compras
+							float anti = 0;
 							
-							lineaAnticipoExample.createCriteria().andNumerolineaIn(numLineasPeticion).andIdinstitucionEqualTo(idInstitucion);
-							
-							List<PysLineaanticipo> lineasPeticion = pysLineaAnticipoMapper.selectByExample(lineaAnticipoExample);
-							
-							List<Short> idAnticiposPeticion = new ArrayList<Short>();
-							
-							for(PysLineaanticipo linea : lineasPeticion) {
-								idAnticiposPeticion.add(linea.getIdanticipo());
+							for (PysCompra compra : comprasPeticion) {
+								
+								if(compra.getImporteanticipado() != null) {
+									anti += (float) compra.getImporteanticipado().doubleValue();
+								}
+								
 							}
-	
 							
-							PysAnticipoletradoExample anticipoExample = new PysAnticipoletradoExample();
+							ListaDescuentosPeticionItem descuentoPeticion = new ListaDescuentosPeticionItem();
 	
-							anticipoExample.createCriteria()
-									.andIdanticipoIn(idAnticiposPeticion)
-									.andIdinstitucionEqualTo(idInstitucion);
-	
-							// Se obtienen los anticipos asociados a la peticion
-							List<PysAnticipoletrado> anticiposPeticion = pysAnticipoLetradoMapper.selectByExample(anticipoExample);
+							descuentoPeticion.setIdPeticion(comprasPeticion.get(0).getIdpeticion().toString());
+							descuentoPeticion.setImporte(new BigDecimal(anti));
+							descuentoPeticion.setTipo("1"); //En el front se procesará y representará "Anticipo / Descuento"
 	
 							List<ListaDescuentosPeticionItem> descuentosListaPeticion = new ArrayList<ListaDescuentosPeticionItem>();
-	
-							for (PysAnticipoletrado anticipo : anticiposPeticion) {
-								ListaDescuentosPeticionItem descuentoPeticion = new ListaDescuentosPeticionItem();
-	
-								descuentoPeticion.setIdPeticion(comprasPeticion.get(0).getIdpeticion().toString());
-								descuentoPeticion.setImporte(anticipo.getImporteinicial());
-								descuentoPeticion.setTipo("1"); //En el front se procesará y representará "Anticipo / Descuento"
-	
+							
+							if(anti != 0) {
 								descuentosListaPeticion.add(descuentoPeticion);
 							}
-	
+							
 							listaDescuentosDTO.setListaDescuentosPeticionItem(descuentosListaPeticion);
-						}
+						
 					} else {
 						PysServiciossolicitadosExample serviciosExample = new PysServiciossolicitadosExample();
 
@@ -1879,7 +1891,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"saveAnticipo() / pysAnticipoLetradoMapper.insert() -> Salida de pysAnticipoLetradoMapper para insertar el nuevo anticipo de una solicitud");
 
 				LOGGER.info(
-						"getDescuentosPeticion() / pysCompraMapper.selectByExample() -> Entrada a pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+						"saveAnticipo() / pysCompraMapper.selectByExample() -> Entrada a pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
 
 				PysCompraExample compraExample = new PysCompraExample();
 
@@ -1890,7 +1902,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
 
 				LOGGER.info(
-						"getDescuentosPeticion() / pysCompraMapper.selectByExample() -> Salida de pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+						"saveAnticipo() / pysCompraMapper.selectByExample() -> Salida de pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
 
 				// Si la peticion tiene alguna compra asociada se extraen las facturas de las
 				// compras
@@ -2424,7 +2436,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				int i = 0;
 
-				float anti = anticipo.getImporte().shortValueExact();
+				float anti = (float) anticipo.getImporte().doubleValue();
 
 				// Recorremos las distintas compras asignando el anticipo hasta que se agote o
 				// hasta que no haya mas productos
@@ -2448,12 +2460,12 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				for (PysCompra compra : comprasPeticion) {
 					LOGGER.info(
-							"anadirAnticipoCompra() / pysCompraMapper.insert() -> Entrada a pysCompraMapper para actualizar el importe anticipado de una petición de compra");
+							"anadirAnticipoCompra() / pysCompraMapper.updateByPrimaryKey() -> Entrada a pysCompraMapper para actualizar el importe anticipado de una petición de compra");
 
 					response = pysCompraMapper.updateByPrimaryKey(compra);
 
 					LOGGER.info(
-							"anadirAnticipoCompra() / pysCompraMapper.insert() -> Salida de pysCompraMapper para actualizar el importe anticipado de una petición de compra");
+							"anadirAnticipoCompra() / pysCompraMapper.updateByPrimaryKey() -> Salida de pysCompraMapper para actualizar el importe anticipado de una petición de compra");
 
 					if (response == 0)
 						throw new Exception(

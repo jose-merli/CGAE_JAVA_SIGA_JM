@@ -18,8 +18,8 @@ public class FichaMonederoItem {
     //TARJETA SERVICIOS
     private List<ListaServiciosMonederoItem> servicios;
 
-    private Short idLinea; //Identificador del monedero
-    private String anioLinea;
+    private Short idAnticipo; //Identificador del monedero
+    private String anioAnticipo;
 
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -77,27 +77,27 @@ public class FichaMonederoItem {
 		this.movimientos = movimientos;
 	}
 
-	public Short getIdLinea() {
-		return idLinea;
-	}
-
-	public void setIdLinea(Short idLinea) {
-		this.idLinea = idLinea;
-	}
-
-	public String getAnioLinea() {
-		return anioLinea;
-	}
-
-	public void setAnioLinea(String anioLinea) {
-		this.anioLinea = anioLinea;
-	}
-
 	public List<ListaServiciosMonederoItem> getServicios() {
 		return servicios;
 	}
 
 	public void setServicios(List<ListaServiciosMonederoItem> servicios) {
 		this.servicios = servicios;
+	}
+
+	public Short getIdAnticipo() {
+		return idAnticipo;
+	}
+
+	public void setIdAnticipo(Short idAnticipo) {
+		this.idAnticipo = idAnticipo;
+	}
+
+	public String getAnioAnticipo() {
+		return anioAnticipo;
+	}
+
+	public void setAnioAnticipo(String anioAnticipo) {
+		this.anioAnticipo = anioAnticipo;
 	}
 }

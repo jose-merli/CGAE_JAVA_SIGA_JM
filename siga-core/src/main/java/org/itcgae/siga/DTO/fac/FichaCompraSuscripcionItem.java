@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTO.fac;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +30,6 @@ public class FichaCompraSuscripcionItem {
 	private String totalIVA;
 	private String impTotal;
 	private String pendPago;
-	private String impPagado;
     private String cuentaBancSelecc;
     private List<ListaProductosCompraItem> productos;
     
@@ -42,6 +42,10 @@ public class FichaCompraSuscripcionItem {
 
     //TARJETA FACTURACION
     private List<ListaFacturasPeticionItem> facturas;
+    
+    //TARJETA DESCUENTOS
+    private BigDecimal impAnti;
+    
     
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -181,12 +185,6 @@ public class FichaCompraSuscripcionItem {
 	public void setFacturas(List<ListaFacturasPeticionItem> facturas) {
 		this.facturas = facturas;
 	}
-	public String getImpPagado() {
-		return impPagado;
-	}
-	public void setImpPagado(String impPagado) {
-		this.impPagado = impPagado;
-	}
 	public List<ListaServiciosSuscripcionItem> getServicios() {
 		return servicios;
 	}
@@ -198,6 +196,12 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setaFechaDeServicio(Date aFechaDeServicio) {
 		this.aFechaDeServicio = aFechaDeServicio;
+	}
+	public BigDecimal getImpAnti() {
+		return impAnti;
+	}
+	public void setImpAnti(BigDecimal impAnti) {
+		this.impAnti = impAnti;
 	}
 
 }

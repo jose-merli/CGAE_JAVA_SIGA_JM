@@ -119,7 +119,6 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			//Obtenemos la cuenta bancaria
 			sql.SELECT("FIRST_VALUE(prodSol.idcuenta) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) as idCuentaBancSeleccionada");
 			
-				
 			sql.INNER_JOIN("pys_productossolicitados prodSol on prodSol.idinstitucion = pet.idinstitucion and prodSol.idpeticion = pet.idpeticion");
 			
 			
