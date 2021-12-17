@@ -256,6 +256,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 				+ " AND PYS_PRODUCTOSINSTITUCION.IDPRODUCTO = PYS_PRODUCTOS.IDPRODUCTO\r\n"
 				+ " AND PYS_PRODUCTOSINSTITUCION.IDINSTITUCION = PYS_PRODUCTOS.IDINSTITUCION");
 		
+		//REVISAR: ESA COLUMNA YA NO SE USA
 		sql.WHERE(" (PYS_PETICIONCOMPRASUSCRIPCION.IDESTADOPETICION = 10\r\n"
 				+ " OR PYS_PETICIONCOMPRASUSCRIPCION.IDESTADOPETICION = 20)");
 		
@@ -340,6 +341,34 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.FROM(" PYS_PRODUCTOSINSTITUCION");
 		
 		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+		
+		return sql.toString();
+	}
+	
+	public String getImpTotalesCompra(Short idInstitucion, Long idPeticion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT(" ROUND(((prodSol.VALOR*TIVA.VALOR/100)+prodSol.VALOR)*prodSol.cantidad, 2) as importeTotal");
+		
+		sql.FROM(" PYS_COMPRA");
+		
+		sql.JOIN(" PYS_PETICIONCOMPRASUSCRIPCION ON\r\n"
+				+ " PYS_COMPRA.IDPETICION = PYS_PETICIONCOMPRASUSCRIPCION.IDPETICION");
+		
+		sql.JOIN(" PYS_PRODUCTOSSOLICITADOS prodSol ON\r\n"
+				+ " PYS_COMPRA.IDTIPOPRODUCTO = prodSol.IDTIPOPRODUCTO\r\n"
+				+ " AND PYS_COMPRA.IDPRODUCTO = prodSol.IDPRODUCTO\r\n"
+				+ " AND PYS_COMPRA.IDPRODUCTOINSTITUCION = prodSol.idProductoInstitucion \r\n"
+				+ " AND PYS_PRODUCTOSINSTITUCION.IDINSTITUCION = prodSol.IDINSTITUCION \r\n"
+				+ " AND PYS_PETICIONCOMPRASUSCRIPCION.IDPETICION = prodSol.IDPETICION");
+		
+		sql.JOIN("pys_tipoiva tiva on prodSol.idtipoiva = tiva.idtipoiva");
+		
+		
+		
+		sql.WHERE(" PYS_PETICIONCOMPRASUSCRIPCION.IDINSTITUCION = '" + idInstitucion +"'");
+		sql.WHERE(" PYS_PETICIONCOMPRASUSCRIPCION.IDPETICION = '" + idPeticion +"'");
 		
 		return sql.toString();
 	}

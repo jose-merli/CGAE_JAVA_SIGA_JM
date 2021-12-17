@@ -132,4 +132,8 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 	//Obtiene los codigos de productos existentes en un colegio para su uso por ejemplo en validar que en ficha producto a la hora de crear/editar no se introduzca un codigo ya existente (para saber como esta formado el codigo revisar la documentacion)
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "obtenerCodigosPorColegio")
 	List<String> obtenerCodigosPorColegio(Short idInstitucion);
+	
+	//Se obtienen los importes totales de las compras de los distintos productos de la ficha
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "getImpTotalesCompra")
+	List<String> getImpTotalesCompra(Short idInstitucion, Long idPeticion);
 }

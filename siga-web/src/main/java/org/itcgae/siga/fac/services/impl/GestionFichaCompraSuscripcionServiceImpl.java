@@ -75,6 +75,7 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysAnticipoletradoMapper;
 import org.itcgae.siga.db.mappers.PysCompraMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
+import org.itcgae.siga.db.mappers.PysLineaanticipoExtendsMapper;
 import org.itcgae.siga.db.mappers.PysLineaanticipoMapper;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionMapper;
 import org.itcgae.siga.db.mappers.PysPreciosserviciosMapper;
@@ -173,6 +174,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	
 	@Autowired
 	private PysPreciosserviciosMapper pysPreciosserviciosMapper;
+	
+	@Autowired
+	private PysLineaanticipoExtendsMapper pysLineaanticipoExtendsMapper;
 	
 	
 	@Override
@@ -1182,30 +1186,41 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				
 				productoSolicitado.setFechamodificacion(new Date());
 				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
-
+				
+				//Se realiza una comprobación extra para comprobar el estado de la compra para saber los elementos que se pueden editar.
+				PysCompraExample compraExample = new PysCompraExample();
+				
+				compraExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
+				
+				
+				List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
+				
 				for (ListaProductosCompraItem producto : peticion.getProductos()) {
 					
 					productoSolicitado.setIdproducto((long) producto.getIdproducto());
 					productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
 					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-					if(producto.getPrecioUnitario()!=null) {
-						productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
-					}
-					else productoSolicitado.setValor(null);
-					productoSolicitado.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
-					
-					//REVISAR: 
-					productoSolicitado.setAceptado("A");
-					
-					productoSolicitado.setOrden(Short.valueOf(producto.getOrden()));
-					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
-					productoSolicitado.setFecharecepcionsolicitud(new Date());
-					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
-					//, por lo tanto, la actual.
-					productoSolicitado.setIdinstitucionorigen(idInstitucion);
+
 					productoSolicitado.setObservaciones(producto.getObservaciones());
 					
-					//productoSolicitado.set
+					//Se hace la comprobación extra para saber si la peticion de compra ha sido aceptada ya o no
+					if(comprasPeticion.isEmpty()) {
+						if(producto.getPrecioUnitario()!=null) {
+							productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
+						}
+						else productoSolicitado.setValor(null);
+						productoSolicitado.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
+						
+						//REVISAR: 
+						productoSolicitado.setAceptado("A");
+						
+						productoSolicitado.setOrden(Short.valueOf(producto.getOrden()));
+						productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
+						productoSolicitado.setFecharecepcionsolicitud(new Date());
+						//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
+						//, por lo tanto, la actual.
+						productoSolicitado.setIdinstitucionorigen(idInstitucion);
+					}
 
 					response = pysProductossolicitadosMapper.insert(productoSolicitado);
 					if (response == 0)
@@ -1364,9 +1379,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								ListaFacturasPeticionItem f = new ListaFacturasPeticionItem();
 								f.setFechaFactura(factura.getFechaemision());
 								f.setEstado(factura.getEstado());
-								f.setImporte(factura.getImptotal());// Preguntar sobre a que importe se refiere
+								f.setImporte(factura.getImptotal());// REVISAR: ¿Preguntar sobre a que importe se refiere
 								f.setnFactura(factura.getNumerofactura());
-								f.setTipo("Factura"); //Como se distingue una factura de una anulación?
+								f.setTipo("Factura"); //REVISAR ¿Como se distingue una factura de una anulación?
 								facturasListaPeticion.add(f);
 							}
 							
@@ -1428,7 +1443,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								f.setEstado(facturaPeticion.getEstado());
 								f.setImporte(facturaPeticion.getImptotal());
 								f.setnFactura(facturaPeticion.getNumerofactura());
-								f.setTipo("Factura"); // Como se distingue una factura de una anulación?
+								f.setTipo("Factura"); // REVISAR: ¿Como se distingue una factura de una anulación?
 								facturasListaPeticion.add(f);
 							}
 							
@@ -1480,24 +1495,40 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"getDescuentosPeticion() / pysCompraMapper.selectByExample() -> Entrada a pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+							"getDescuentosPeticion() / pysProductossolicitadosMapper.selectByExample() -> Entrada a pysProductossolicitadosMapper para recuperar los posibles productos solicitados asociados a la peticion");
 
-					PysCompraExample compraExample = new PysCompraExample();
+					PysProductossolicitadosExample productosExample = new PysProductossolicitadosExample();
 
-					compraExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud))
+					productosExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud))
 							.andIdinstitucionEqualTo(idInstitucion);
 
 					// Se comprueba si la peticion es de compra o de suscripcion
-					List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
+					List<PysProductossolicitados> productosPeticion = pysProductossolicitadosMapper.selectByExample(productosExample);
 
 					LOGGER.info(
-							"getDescuentosPeticion() / pysCompraMapper.selectByExample() -> Salida de pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+							"getDescuentosPeticion() / pysProductossolicitadosMapper.selectByExample() -> Salida de pysProductossolicitadosMapper para recuperar los posibles productos solicitados asociados a la peticion");
 
 					// Si la peticion tiene alguna compra asociada se extraen las facturas de las
 					// compras
-					if (!comprasPeticion.isEmpty()) {
+					if (!productosPeticion.isEmpty()) {
 						
 						List<Long> numLineasPeticion = new ArrayList<Long>();
+						
+						LOGGER.info(
+								"getDescuentosPeticion() / pysProductossolicitadosMapper.selectByExample() -> Entrada a pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+
+						
+						PysCompraExample comprasExample = new PysCompraExample();
+
+						comprasExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud))
+								.andIdinstitucionEqualTo(idInstitucion);
+
+						// Se comprueba si la peticion es de compra o de suscripcion
+						List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(comprasExample);
+						
+						LOGGER.info(
+								"getDescuentosPeticion() / pysProductossolicitadosMapper.selectByExample() -> Salida de pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+
 						
 						for(PysCompra compra : comprasPeticion) {
 							
@@ -1547,72 +1578,55 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							listaDescuentosDTO.setListaDescuentosPeticionItem(descuentosListaPeticion);
 						}
 					} else {
-						PysSuscripcionExample suscripcionExample = new PysSuscripcionExample();
+						PysServiciossolicitadosExample serviciosExample = new PysServiciossolicitadosExample();
 
-						suscripcionExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud))
+						serviciosExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud))
 								.andIdinstitucionEqualTo(idInstitucion);
 
 						LOGGER.info(
 								"getDescuentosPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
 
-						List<PysSuscripcion> suscripcionesPeticion = pysSuscripcionMapper
-								.selectByExample(suscripcionExample);
+						List<PysServiciossolicitados> serviciosPeticion = pysServiciossolicitadosMapper
+								.selectByExample(serviciosExample);
 
 						LOGGER.info(
 								"getDescuentosPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
 
 						// Si la peticion tiene alguna suscripcion asociada se extraen las facturas de
 						// las suscripciones
-						if (!suscripcionesPeticion.isEmpty()) {
-							
-							
+						if (!serviciosPeticion.isEmpty()) {
 
-							//Buscamos los anticipos asociados al servicio de la peticion
+							//Buscamos los monederos asociados al servicio de la peticion y a esa persona
 							List<PysServicioanticipo> serviciosAnticipo = new ArrayList<PysServicioanticipo>();
 							
 							PysServicioanticipoExample servicioAnticipoExample = new PysServicioanticipoExample();
 							
 							
-							for(PysSuscripcion suscripcion : suscripcionesPeticion) {
-								servicioAnticipoExample.createCriteria().andIdpersonaEqualTo(suscripcionesPeticion.get(0).getIdpersona()).andIdinstitucionEqualTo(idInstitucion)
-								.andIdservicioEqualTo(suscripcion.getIdservicio()).andIdserviciosinstitucionEqualTo(suscripcion.getIdserviciosinstitucion())
-								.andIdtiposerviciosEqualTo(suscripcion.getIdtiposervicios());
+							for(PysServiciossolicitados servicio : serviciosPeticion) {
+								servicioAnticipoExample.createCriteria().andIdpersonaEqualTo(serviciosPeticion.get(0).getIdpersona()).andIdinstitucionEqualTo(idInstitucion)
+								.andIdservicioEqualTo(servicio.getIdservicio()).andIdserviciosinstitucionEqualTo(servicio.getIdserviciosinstitucion())
+								.andIdtiposerviciosEqualTo(servicio.getIdtiposervicios());
 								
 								List<PysServicioanticipo> anticiposSuscripcion =  pysServicioanticipoMapper.selectByExample(servicioAnticipoExample);
 								serviciosAnticipo.addAll(anticiposSuscripcion);
 							}
 							
+							//Si hay un monedero asociado al servicio y a esa persona
 							if(!serviciosAnticipo.isEmpty()) {
 
-								List<Short> idAnticiposPeticion = new ArrayList<Short>();
-								
-								for(PysServicioanticipo servicioAnticipo: serviciosAnticipo) {
-									idAnticiposPeticion.add(servicioAnticipo.getIdanticipo());
-								}
-								
-								PysAnticipoletradoExample anticipoExample = new PysAnticipoletradoExample();
-	
-								anticipoExample.createCriteria()
-										.andIdanticipoIn(idAnticiposPeticion)
-										.andIdinstitucionEqualTo(idInstitucion);
-	
-								// Se obtienen los anticipos asociados a la peticion
-								List<PysAnticipoletrado> anticiposPeticion = pysAnticipoLetradoMapper.selectByExample(anticipoExample);
-	
 								List<ListaDescuentosPeticionItem> descuentosListaPeticion = new ArrayList<ListaDescuentosPeticionItem>();
 								
-								for (PysAnticipoletrado anticipo : anticiposPeticion) {
-									ListaDescuentosPeticionItem descuentoPeticion = new ListaDescuentosPeticionItem();
-	
-									descuentoPeticion.setIdAnticipo(anticipo.getIdanticipo());
-									descuentoPeticion.setIdPeticion(comprasPeticion.get(0).getIdpeticion().toString());
-									descuentoPeticion.setImporte(anticipo.getImporteinicial());
-									descuentoPeticion.setTipo("2"); //En el front se procesará y representará "Monedero"
-									descuentoPeticion.setDescripcion("Anticipo de la suscripcion de la solicitud nº "+nSolicitud);
-	
-									descuentosListaPeticion.add(descuentoPeticion);
-								}
-								
+								//Se debe comprobar si dichos monederos tienen saldo positivo y elegir uno
+								//Este es el monedero que se mostrara en la ficha
+								//REVISAR: 
+								ListaDescuentosPeticionItem monedero = pysLineaanticipoExtendsMapper.getMonederoServicio(serviciosAnticipo.get(0));
+
+								monedero.setIdPeticion(nSolicitud);
+								monedero.setTipo("2"); //En el front se procesará y representará como "Monedero"
+								monedero.setIdAnticipo(null);
+
+								descuentosListaPeticion.add(monedero);
+
 								listaDescuentosDTO.setListaDescuentosPeticionItem(descuentosListaPeticion);
 							}
 						}
@@ -2367,6 +2381,96 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		return insertResponseDTO;
 	}
 	
-	
+	@Override
+	@Transactional
+	public UpdateResponseDTO anadirAnticipoCompra(HttpServletRequest request, ListaDescuentosPeticionItem anticipo)
+			throws Exception {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("anadirAnticipoCompra() -> Entrada al servicio para añadir un anticipo a una compra");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"anadirAnticipoCompra() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"anadirAnticipoCompra() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				// Obtenemos las compras de los productose introducimos el nuevo anticipo
+				PysCompraExample comprasPeticionExample = new PysCompraExample();
+
+				comprasPeticionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdpeticionEqualTo(Long.valueOf(anticipo.getIdPeticion()));
+
+				List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(comprasPeticionExample);
+				// Obtenemos los importes totales de las distintas compras
+				List<String> importesCompras = pysTiposProductosExtendsMapper.getImpTotalesCompra(idInstitucion,
+						Long.valueOf(anticipo.getIdPeticion()));
+
+				int i = 0;
+
+				float anti = anticipo.getImporte().shortValueExact();
+
+				// Recorremos las distintas compras asignando el anticipo hasta que se agote o
+				// hasta que no haya mas productos
+				while (i < importesCompras.size() && anti > 0) {
+					float impTotalNetoCompra = Float.valueOf(importesCompras.get(i));
+					anti -= impTotalNetoCompra;
+
+					if (anti < 0) {
+						comprasPeticion.get(i).setImporteanticipado(new BigDecimal(impTotalNetoCompra + anti));
+					} else {
+						comprasPeticion.get(i).setImporteanticipado(new BigDecimal(impTotalNetoCompra));
+					}
+					i++;
+				}
+				// En el caso que se acabe el anticipo antes de asignar a todos,
+				// se reinicia el importe anticipado del resto de compras
+				while (i < importesCompras.size()) {
+					comprasPeticion.get(i).setImporteanticipado(new BigDecimal(0));
+					i++;
+				}
+
+				for (PysCompra compra : comprasPeticion) {
+					LOGGER.info(
+							"anadirAnticipoCompra() / pysCompraMapper.insert() -> Entrada a pysCompraMapper para actualizar el importe anticipado de una petición de compra");
+
+					response = pysCompraMapper.updateByPrimaryKey(compra);
+
+					LOGGER.info(
+							"anadirAnticipoCompra() / pysCompraMapper.insert() -> Salida de pysCompraMapper para actualizar el importe anticipado de una petición de compra");
+
+					if (response == 0)
+						throw new Exception(
+								"Error al actualizar el importe anticipado de una petición de compra en la BBDD.");
+				}
+
+			}
+		}
+
+		updateResponseDTO.setStatus("200");
+
+		updateResponseDTO.setError(error);
+		LOGGER.debug("anadirAnticipoCompra() -> Salida del servicio para actualizar el importe anticipado de una petición de compra");
+
+		return updateResponseDTO;
 	}
+	
+	
+}
 	

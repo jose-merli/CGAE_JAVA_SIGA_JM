@@ -197,4 +197,16 @@ public class GestionFichaCompraSuscripcionController {
 			return new ResponseEntity<ListaServiciosSuscripcionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PostMapping(value = "/pys/anadirAnticipoCompra")
+	ResponseEntity<UpdateResponseDTO> anadirAnticipoCompra(HttpServletRequest request, @RequestBody ListaDescuentosPeticionItem anticipo) throws Exception {
+		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.anadirAnticipoCompra(request, anticipo);
+		if(response.getStatus()=="200"){
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
+		else{
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 }
