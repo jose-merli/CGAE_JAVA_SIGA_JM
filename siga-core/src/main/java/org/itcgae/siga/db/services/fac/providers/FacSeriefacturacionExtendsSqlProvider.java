@@ -130,42 +130,28 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 
 	public String getConsultaUsoSufijo(int idInstitucion, String codigoBanco) {
 
-		String principal;
+		SQL principal = new SQL();
 		SQL pagos = new SQL();
 		SQL series = new SQL();
 
 		// Consulta de los pagos
 		pagos.SELECT("'PAGOS SJCS' tipo");
-		pagos.SELECT("sf.idseriefacturacion");
-		pagos.SELECT("sf.nombreabreviado abreviatura");
-		pagos.SELECT("sf.descripcion");
+		pagos.SELECT("p.IDPAGOSJG idseriefacturacion");
+		pagos.SELECT("p.abreviatura");
+		pagos.SELECT("p.NOMBRE descripcion");
 		pagos.SELECT("s.idsufijo");
 		pagos.SELECT("s.sufijo || ' - ' || s.concepto sufijo ");
 
 		// Subsonsulta 1 de los pagos
-		pagos.SELECT("( SELECT COUNT(1) " +
-				"FROM " +
-					"fcs_pagosjg p " +
-					"WHERE " +
-						"p.idinstitucion = sfb.idinstitucion " +
-						"AND " +
-						"p.bancos_codigo = sfb.bancos_codigo " +
-						"AND " +
-						"p.idpagosjg IN ( " +
-							"SELECT DISTINCT a.idpagosjg " +
-							"FROM fac_abono a " +
-							"WHERE " +
-								"a.idinstitucion = sf.idinstitucion " +
-								"AND " +
-								"a.estado NOT IN (SELECT idestado FROM fac_estadoabono WHERE UPPER(descripcion) LIKE '%PAGADO%')" +
-				")) num_pendientes");
+		pagos.SELECT("(SELECT DISTINCT  COUNT(a.idpagosjg) FROM fac_abono a " +
+				"WHERE a.IDPAGOSJG = p.IDPAGOSJG AND a.idinstitucion = p.idinstitucion " +
+					"AND a.estado NOT IN (SELECT idestado FROM fac_estadoabono " +
+						"WHERE UPPER(descripcion) LIKE '%PAGADO%')) num_pendientes");
 
-		pagos.FROM("fac_seriefacturacion sf");
-		pagos.INNER_JOIN("fac_seriefacturacion_banco sfb ON (sf.idinstitucion = sfb.idinstitucion " +
-				"AND sf.idseriefacturacion = sfb.idseriefacturacion)");
-		pagos.LEFT_OUTER_JOIN("fac_sufijo s ON (sfb.idinstitucion = s.idinstitucion " +
-				"AND sfb.idsufijo = s.idsufijo)");
-		pagos.WHERE("sf.idinstitucion = " + idInstitucion + " AND sfb.bancos_codigo = " + codigoBanco);
+		pagos.FROM("fcs_pagosjg p");
+		pagos.LEFT_OUTER_JOIN("fac_sufijo s ON (p.idinstitucion = s.idinstitucion " +
+				"AND p.idsufijo = s.idsufijo)");
+		pagos.WHERE("p.idinstitucion = " + idInstitucion + " AND p.bancos_codigo = " + codigoBanco);
 
 		// Consulta de los select
 		series.SELECT("'SERIE' tipo");
@@ -176,16 +162,11 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		series.SELECT("s.sufijo || ' - ' || s.concepto sufijo");
 
 		// Subsonsulta 1 de las series
-		series.SELECT("( " +
-				"SELECT COUNT(f.idfactura) " +
-				"FROM fac_factura f, fac_estadofactura ef " +
+		series.SELECT("(SELECT DISTINCT COUNT(f.idfactura) FROM fac_factura f, fac_estadofactura ef " +
 				"WHERE f.idinstitucion = sf.idinstitucion " +
 					"AND f.idseriefacturacion = sf.idseriefacturacion " +
-					"AND f.estado NOT IN ( " +
-						"SELECT idestado " +
-						"FROM fac_estadofactura " +
-						"WHERE upper(descripcion) LIKE '%PAGADO%' " +
-                        ")) num_pendientes"
+					"AND f.estado NOT IN ( SELECT idestado FROM fac_estadofactura " +
+						"WHERE upper(descripcion) LIKE '%PAGADO%')) num_pendientes"
 		);
 
 		series.FROM("fac_seriefacturacion sf");
@@ -195,9 +176,12 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 								"AND sfb.idsufijo = s.idsufijo)");
 		series.WHERE("sf.idinstitucion = " + idInstitucion + " AND sfb.bancos_codigo = " + codigoBanco);
 
-		principal = pagos + " UNION " + series;
+		principal.SELECT("*");
+		principal.FROM("(" + pagos + " UNION " + series + ")");
+		principal.ORDER_BY("tipo desc");
+		principal.ORDER_BY("abreviatura");
 
-		return principal;
+		return principal.toString();
 
 	}
 
