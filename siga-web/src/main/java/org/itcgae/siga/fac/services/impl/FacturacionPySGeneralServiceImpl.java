@@ -369,7 +369,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 				for (AdmContador contador : contadores) {
 					ComboItem comboItem = new ComboItem();
 					comboItem.setValue(contador.getIdcontador());
-					comboItem.setLabel(contador.getNombre());
+					comboItem.setLabel(contador.getIdcontador() + " (" + contador.getNombre() + ")");
 
 					comboItems.add(comboItem);
 				}
@@ -414,7 +414,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 				for (AdmContador contador : contadores) {
 					ComboItem comboItem = new ComboItem();
 					comboItem.setValue(contador.getIdcontador());
-					comboItem.setLabel(contador.getNombre());
+					comboItem.setLabel(contador.getIdcontador() + " (" + contador.getNombre() + ")");
 
 					comboItems.add(comboItem);
 				}

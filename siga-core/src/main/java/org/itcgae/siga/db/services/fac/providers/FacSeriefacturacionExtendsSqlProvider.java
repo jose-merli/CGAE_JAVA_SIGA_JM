@@ -24,10 +24,10 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.SELECT("s.idsufijo");
 		sql.SELECT("(s.sufijo || ' - ' || s.concepto ) sufijo");
 		sql.SELECT("s.idsufijo");
-		sql.SELECT("fp.idformapago");
-		sql.SELECT("( SELECT f_siga_getrecurso(descripcion,'" + idioma + "') "
-				+ "		FROM PYS_FORMAPAGO "
-				+ "		WHERE idformapago=fP.idformapago "
+		//sql.SELECT("fp.idformapago");
+		sql.SELECT("( SELECT COUNT(*) "
+				+ "		FROM fac_formapagoserie fp "
+				+ "		WHERE (fp.idinstitucion=sf.idinstitucion AND fp.idseriefacturacion=sf.idseriefacturacion) "
 				+ "	) formapago");
 		sql.SELECT("sf.generarpdf");
 		sql.SELECT("sf.idmodelofactura");
@@ -52,7 +52,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		// Joins
 		sql.INNER_JOIN("fac_seriefacturacion_banco sfb ON (sfb.idseriefacturacion = sf.idseriefacturacion AND sfb.idinstitucion = sf.idinstitucion)");
 		sql.INNER_JOIN("fac_bancoinstitucion bi ON (bi.bancos_codigo = sfb.bancos_codigo AND bi.idinstitucion = sf.idinstitucion)");
-		sql.LEFT_OUTER_JOIN("fac_formapagoserie fp ON (fp.idinstitucion=sf.idinstitucion AND fp.idseriefacturacion=sf.idseriefacturacion)");
+		// sql.LEFT_OUTER_JOIN("fac_formapagoserie fp ON (fp.idinstitucion=sf.idinstitucion AND fp.idseriefacturacion=sf.idseriefacturacion)");
 		sql.LEFT_OUTER_JOIN("fac_sufijo s ON (s.idsufijo = sfb.idsufijo AND s.idinstitucion = sf.idinstitucion)");
 		
 		// Where obligatorio
@@ -144,19 +144,21 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 
 		// Subsonsulta 1 de los pagos
 		pagos.SELECT("( SELECT COUNT(1) " +
-				"FROM fcs_pagosjg p " +
-				"WHERE p.idinstitucion = sfb.idinstitucion " +
-					"AND p.bancos_codigo = sfb.bancos_codigo " +
-					"AND p.idpagosjg IN ( " +
-						"SELECT DISTINCT a.idpagosjg " +
-						"FROM fac_abono a " +
-						"WHERE a.idinstitucion = sf.idinstitucion " +
-							"AND a.estado NOT IN ( " +
-								"SELECT idestado " +
-								"FROM fac_estadoabono " +
-								"WHERE UPPER(descripcion) LIKE '%PAGADO%') " +
-				")) num_pendientes"
-		);
+				"FROM " +
+					"fcs_pagosjg p " +
+					"WHERE " +
+						"p.idinstitucion = sfb.idinstitucion " +
+						"AND " +
+						"p.bancos_codigo = sfb.bancos_codigo " +
+						"AND " +
+						"p.idpagosjg IN ( " +
+							"SELECT DISTINCT a.idpagosjg " +
+							"FROM fac_abono a " +
+							"WHERE " +
+								"a.idinstitucion = sf.idinstitucion " +
+								"AND " +
+								"a.estado NOT IN (SELECT idestado FROM fac_estadoabono WHERE UPPER(descripcion) LIKE '%PAGADO%')" +
+				")) num_pendientes");
 
 		pagos.FROM("fac_seriefacturacion sf");
 		pagos.INNER_JOIN("fac_seriefacturacion_banco sfb ON (sf.idinstitucion = sfb.idinstitucion " +

@@ -421,9 +421,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			record.setUsumodificacion(usuario.getIdusuario());
 
 			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
-				record.setCuentacontabletarjeta(cuentaBancaria.getAsientoContable().trim());
+				record.setAsientocontable(cuentaBancaria.getAsientoContable().trim());
 			} else {
-				record.setCuentacontabletarjeta(null);
+				record.setAsientocontable(null);
 			}
 
 			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
@@ -510,11 +510,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			record.setFechamodificacion(new Date());
 			record.setUsumodificacion(usuario.getIdusuario());
 
-			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
-				record.setCuentacontabletarjeta(cuentaBancaria.getAsientoContable().trim());
-			} else {
-				record.setCuentacontabletarjeta(null);
-			}
+            if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
+                record.setAsientocontable(cuentaBancaria.getAsientoContable().trim());
+            } else {
+                record.setAsientocontable(null);
+            }
 
 			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
 				record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
@@ -836,6 +836,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				serieToUpdate.setIdNombreDescargaFac(Short.parseShort("1"));
 				serieToUpdate.setTraspasofacturas("0");
 				serieToUpdate.setIdcontador("FAC_GENERAL");
+                serieToUpdate.setIdcontadorAbonos("FAC_ABONOS_GENERAL");
 				serieToUpdate.setIdplantilla(1);
 
 				idSerieFacturacion = Long.parseLong(facSeriefacturacionExtendsMapper

@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTO.fac;
 
+import org.apache.xpath.operations.Bool;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 
 import java.util.Date;
@@ -21,7 +22,7 @@ public class SerieFacturacionItem {
 	private String sufijo;
 
 	private String idFormaPago;
-	private String formaPago;
+	private Boolean formaPago;
 
 	private Boolean generarPDF;
 	private String idModeloFactura;
@@ -92,6 +93,14 @@ public class SerieFacturacionItem {
 
 	public void setTraspasoCodAuditoriaDef(String traspasoCodAuditoriaDef) {
 		this.traspasoCodAuditoriaDef = traspasoCodAuditoriaDef;
+	}
+
+	public Boolean getFormaPago() {
+		return formaPago;
+	}
+
+	public void setFormaPago(Boolean formaPago) {
+		this.formaPago = formaPago;
 	}
 
 	public String getConfDeudor() {
@@ -212,14 +221,6 @@ public class SerieFacturacionItem {
 
 	public void setIdFormaPago(String idFormaPago) {
 		this.idFormaPago = idFormaPago;
-	}
-
-	public String getFormaPago() {
-		return formaPago;
-	}
-
-	public void setFormaPago(String formaPago) {
-		this.formaPago = formaPago;
 	}
 
 	public Boolean getGenerarPDF() {
@@ -404,7 +405,7 @@ public class SerieFacturacionItem {
 				", idSufijo='" + idSufijo + '\'' +
 				", sufijo='" + sufijo + '\'' +
 				", idFormaPago='" + idFormaPago + '\'' +
-				", formaPago='" + formaPago + '\'' +
+				", formaPago=" + formaPago +
 				", generarPDF=" + generarPDF +
 				", idModeloFactura='" + idModeloFactura + '\'' +
 				", idModeloRectificativa='" + idModeloRectificativa + '\'' +
