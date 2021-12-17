@@ -26,6 +26,7 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 		@Result(column = "cod_sucursal", property = "codSucursal", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechabaja", property = "fechaBaja", jdbcType = JdbcType.DATE),
 		@Result(column = "iban", property = "IBAN", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "asientocontable", property = "asientoContable", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "cuentacontabletarjeta", property = "cuentaContableTarjeta", jdbcType = JdbcType.VARCHAR),

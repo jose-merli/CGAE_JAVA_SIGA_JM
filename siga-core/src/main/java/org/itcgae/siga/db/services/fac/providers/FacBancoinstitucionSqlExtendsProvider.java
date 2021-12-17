@@ -18,7 +18,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.SELECT("bi.iban");
 
 		query.SELECT("cb.nombre");
-		// query.SELECT("bi.descripcion");
+		query.SELECT("bi.descripcion");
 		query.SELECT("bi.asientocontable");
 		query.SELECT("bi.cuentacontabletarjeta");
 		query.SELECT("cb.bic");

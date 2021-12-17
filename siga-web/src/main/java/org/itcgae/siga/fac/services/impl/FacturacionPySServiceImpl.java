@@ -420,13 +420,19 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			record.setFechamodificacion(new Date());
 			record.setUsumodificacion(usuario.getIdusuario());
 
-			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getDescripcion()) && cuentaBancaria.getDescripcion().trim().length() <= 40) {
+				record.setDescripcion(cuentaBancaria.getDescripcion().trim());
+			} else {
+				record.setDescripcion(null);
+			}
+
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable()) && cuentaBancaria.getAsientoContable().trim().length() <= 20) {
 				record.setAsientocontable(cuentaBancaria.getAsientoContable().trim());
 			} else {
 				record.setAsientocontable(null);
 			}
 
-			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta()) && cuentaBancaria.getCuentaContableTarjeta().trim().length() <= 20) {
 				record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
 			} else {
 				record.setCuentacontabletarjeta(null);
@@ -510,13 +516,19 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			record.setFechamodificacion(new Date());
 			record.setUsumodificacion(usuario.getIdusuario());
 
-            if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable())) {
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getDescripcion()) && cuentaBancaria.getDescripcion().trim().length() <= 40) {
+				record.setDescripcion(cuentaBancaria.getDescripcion().trim());
+			} else {
+				record.setDescripcion(null);
+			}
+
+            if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getAsientoContable()) && cuentaBancaria.getAsientoContable().trim().length() <= 20) {
                 record.setAsientocontable(cuentaBancaria.getAsientoContable().trim());
             } else {
                 record.setAsientocontable(null);
             }
 
-			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta())) {
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getCuentaContableTarjeta()) && cuentaBancaria.getCuentaContableTarjeta().trim().length() <= 20) {
 				record.setCuentacontabletarjeta(cuentaBancaria.getCuentaContableTarjeta().trim());
 			} else {
 				record.setCuentacontabletarjeta(null);
@@ -525,7 +537,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// Actualización de la tarjeta de comisión
 			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionImporte()))
 				record.setComisionimporte(new BigDecimal(cuentaBancaria.getComisionImporte()));
-			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionDescripcion()))
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionDescripcion()) && cuentaBancaria.getComisionDescripcion().trim().length() <= 255)
 				record.setComisiondescripcion(cuentaBancaria.getComisionDescripcion().trim());
 
 			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getIdTipoIVA())) {
@@ -534,7 +546,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				record.setIdtipoiva(null);
 			}
 
-			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionCuentaContable())) {
+			if (!UtilidadesString.esCadenaVacia(cuentaBancaria.getComisionCuentaContable()) && cuentaBancaria.getComisionCuentaContable().trim().length() <= 20) {
 				record.setComisioncuentacontable(cuentaBancaria.getComisionCuentaContable().trim());
 			} else {
 				record.setAsientocontable(null);
