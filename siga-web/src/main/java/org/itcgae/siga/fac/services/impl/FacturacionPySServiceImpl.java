@@ -301,6 +301,47 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO reactivarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
+													HttpServletRequest request) throws Exception {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("reactivarCuentasBancarias() -> Entrada al servicio para reactivar las cuentas bancarias");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info(
+					"reactivarCuentasBancarias() / facBancoInstitucionExtendsMapper.selectByPrimaryKey() -> Entrada a facBancoInstitucionExtendsMapper para eliminar la fecha de baja");
+
+			// Logica
+			for (CuentasBancariasItem cuenta : cuentasBancarias) {
+
+				FacBancoinstitucionKey cuentasbancariasKey = new FacBancoinstitucionKey();
+				cuentasbancariasKey.setIdinstitucion(usuario.getIdinstitucion());
+				cuentasbancariasKey.setBancosCodigo(cuenta.getBancosCodigo());
+
+				FacBancoinstitucion cuentaCambio = this.facBancoinstitucionExtendsMapper
+						.selectByPrimaryKey(cuentasbancariasKey);
+
+				if (cuentaCambio != null) {
+					cuentaCambio.setFechabaja(null);
+					this.facBancoinstitucionExtendsMapper.updateByPrimaryKey(cuentaCambio);
+				}
+			}
+		}
+
+		updateResponseDTO.setStatus(HttpStatus.OK.toString());
+
+		LOGGER.info("reactivarCuentasBancarias() -> Salida del servicio para reactivar las cuentas bancarias");
+
+		return updateResponseDTO;
+	}
+
+	@Override
 	public CuentasBancariasDTO getCuentasBancarias(String idCuenta, HttpServletRequest request) throws Exception {
 
 		CuentasBancariasDTO cuentasBancariasDTO = new CuentasBancariasDTO();
