@@ -1030,7 +1030,7 @@ public class ProductosServiceImpl implements IProductosService{
 								throw new Exception("No se pudo realizar el borrado de las formas de pago del producto");
 							}else if(statusBorradoFormasDePagoProducto == 1) {
 								LOGGER.info(
-										"reactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.reactivarBorradoFisicoLogicoProductos() -> Borrado de las formas de pago del producto realizado con exito");
+										"reactivarBorradoFisicoLogicoProductos() / pysTipoFormaPagoExtendsMapper.borradoFisicoFormasPagoByProducto() -> Borrado de las formas de pago del producto realizado con exito");
 							}
 						}
 						

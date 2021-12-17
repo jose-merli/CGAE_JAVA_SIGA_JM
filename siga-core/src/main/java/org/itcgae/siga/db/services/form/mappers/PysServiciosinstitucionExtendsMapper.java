@@ -67,13 +67,6 @@ public interface PysServiciosinstitucionExtendsMapper extends PysServiciosinstit
 	
 	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "obtenerFormasDePagoSecretariaByServicio")
 	List<Integer> obtenerFormasDePagoSecretariaByServicio(int idTipoServicio, int idServicio, int idServicioInstitucion, Short idInstitucion);
-
-//	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "comboCondicionSuscripcion")
-//	@Results({ 
-//		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
-//		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
-//		}) 
-//	List<ComboItem> comboCondicionSuscripcion(String idioma ,Short idInstitucion, int idConsulta);
 	
 	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "comboCondicionSuscripcion")
 	@Results({ 
