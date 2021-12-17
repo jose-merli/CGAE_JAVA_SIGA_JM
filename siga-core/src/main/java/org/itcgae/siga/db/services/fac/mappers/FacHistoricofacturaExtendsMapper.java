@@ -1,10 +1,15 @@
 package org.itcgae.siga.db.services.fac.mappers;
 
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
+import org.itcgae.siga.db.entities.FacFacturaDevolucion;
 import org.itcgae.siga.db.mappers.FacHistoricofacturaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacHistoricofacturaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -38,4 +43,17 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 			@Result(column = "NOTAACCION", property = "notaAccion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<EstadosPagosItem> getEstadosPagos(String idFactura, String idInstitucion, String idLenguaje);
+
+	@Update(value = "{CALL PKG_SIGA_CARGOS.DevolucionesManuales ("
+			+ "#{idInstitucion,mode=IN},"
+			+ "#{listaFacturas, mode=IN},"
+			+ "#{fechaDevolucion, mode=IN},"
+			+ "#{idIdioma, mode=IN},"
+			+ "#{usuModificacion, mode=IN},"
+			+ "#{codretorno, mode=OUT, jdbcType=VARCHAR},"
+			+ "#{datoserror, mode=OUT, jdbcType=VARCHAR},"
+			+ "#{listaIdDisquetesDevolucion, mode=OUT, jdbcType=VARCHAR})}")
+	@Options(statementType = StatementType.CALLABLE)
+	@ResultType(FacFacturaDevolucion.class)
+	FacFacturaDevolucion devolucionesManuales(FacFacturaDevolucion item);
 }

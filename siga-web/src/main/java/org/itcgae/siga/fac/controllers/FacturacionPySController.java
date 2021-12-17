@@ -20,6 +20,7 @@ import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
 import org.itcgae.siga.DTO.fac.FacturaLineaItem;
+import org.itcgae.siga.DTO.fac.FacturasIncluidasDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -700,4 +701,17 @@ public class FacturacionPySController {
             return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+	@GetMapping(value = "/getFacturasIncluidas")
+	ResponseEntity<FacturasIncluidasDTO> getFacturasIncluidas(@RequestParam String idFichero, @RequestParam String tipoFichero, HttpServletRequest request) {
+		FacturasIncluidasDTO response = new FacturasIncluidasDTO();
+
+		try {
+			response = facturacionService.getFacturasIncluidas(idFichero, tipoFichero, request);
+			return new ResponseEntity<FacturasIncluidasDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacturasIncluidasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
