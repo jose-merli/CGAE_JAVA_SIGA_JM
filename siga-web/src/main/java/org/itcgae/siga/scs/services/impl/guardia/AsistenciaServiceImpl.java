@@ -91,9 +91,6 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	private ScsActuacionasistenciaExtendsMapper scsActuacionasistenciaExtendsMapper;
 
 	@Autowired
-	private ScsBajasTemporalesExtendsMapper scsBajasTemporalesExtendsMapper;
-
-	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Autowired
@@ -164,6 +161,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	
 	@Autowired
 	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesExtendsMapper;
+
+	private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
+
 
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
@@ -3521,10 +3521,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						scsAsistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
 						scsAsistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
 						scsAsistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
+						scsAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsAsistencia.setFechamodificacion(new Date());
 						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
 
 						if ("S".equals(copiarDatos)) { // Pasamos los datos de la asistencia al EJG
-							affectedRows += updateEJGconAsistencia(scsAsistencia);
+							affectedRows += updateEJGconAsistencia(scsAsistencia, usuarios.get(0).getIdusuario());
 						}
 					}
 
@@ -4922,10 +4924,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * Metodo que copia los datos de la Asistencia al EJG
 	 *
 	 * @param scsAsistencia
+	 * @param usuario 
 	 * @return
 	 */
 	@Transactional
-	private int updateEJGconAsistencia(ScsAsistencia scsAsistencia) {
+	private int updateEJGconAsistencia(ScsAsistencia scsAsistencia, Integer usuario) {
 		int affectedRows = 0;
 		ScsEjgKey scsEjgKey = new ScsEjgKey();
 		scsEjgKey.setAnio(scsAsistencia.getEjganio());
@@ -4960,7 +4963,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			delitosejg.setNumero(scsEjg.getNumero());
 			delitosejg.setIdinstitucion(scsEjg.getIdinstitucion());
 			delitosejg.setIdtipoejg(scsEjg.getIdtipoejg());
-			delitosejg.setUsumodificacion(1);
+			delitosejg.setUsumodificacion(usuario);
 			delitosejg.setFechamodificacion(new Date());
 
 			for (ScsDelitosasistencia delitoAsistencia : delitosAsistencia) {
@@ -5002,7 +5005,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			newContrarioEjg.setIdtipoejg(scsEjg.getIdtipoejg());
 			newContrarioEjg.setIdinstitucion(scsEjg.getIdinstitucion());
 			newContrarioEjg.setFechamodificacion(new Date());
-			newContrarioEjg.setUsumodificacion(1);
+			newContrarioEjg.setUsumodificacion(usuario);
 
 			for (ScsContrariosasistencia contrario : contrarios) {
 				newContrarioEjg.setIdpersona(contrario.getIdpersona());
@@ -5013,7 +5016,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		// Copiamos datos restantes
 		scsEjg.setGuardiaturnoIdturno(scsAsistencia.getIdturno());
 		scsEjg.setGuardiaturnoIdguardia(scsAsistencia.getIdguardia());
-		scsEjg.setIdpersona(scsAsistencia.getIdpersonacolegiado());
+		//No se incluye el letrado como tramitador
+		//scsEjg.setIdpersona(scsAsistencia.getIdpersonacolegiado());
 		scsEjg.setIdpersonajg(scsAsistencia.getIdpersonajg());
 		scsEjg.setJuzgado(scsAsistencia.getJuzgado());
 		scsEjg.setJuzgadoidinstitucion(scsAsistencia.getJuzgadoidinstitucion());
@@ -5028,10 +5032,27 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		scsEjg.setNumerodiligencia(scsAsistencia.getNumerodiligencia());
 		scsEjg.setNig(scsAsistencia.getNig());
 		scsEjg.setIdpretension(scsAsistencia.getIdpretension());
-		scsEjg.setUsumodificacion(1);
+		scsEjg.setUsumodificacion(usuario);
 		scsEjg.setFechamodificacion(new Date());
 
 		affectedRows += scsEjgExtendsMapper.updateByPrimaryKey(scsEjg);
+		
+		//Creamos el solicitante en la unidad familiar
+		if(scsAsistencia.getIdpersonajg() != null) {
+			
+			ScsUnidadfamiliarejg record = new ScsUnidadfamiliarejg();
+			record.setAnio(scsEjg.getAnio());
+			record.setEncalidadde("SOLICITANTE");
+			record.setFechamodificacion(new Date());
+			record.setIdinstitucion(scsEjg.getIdinstitucion());
+			record.setIdpersona(scsAsistencia.getIdpersonajg());
+			record.setIdtipoejg(scsEjg.getIdtipoejg());
+			record.setNumero(scsEjg.getNumero());
+			record.setObservaciones("Copiado desde la asistencia: "+scsAsistencia.getAnio()+"/"+scsAsistencia.getNumero());
+			record.setSolicitante(new Short("1"));
+			record.setUsumodificacion(usuario);
+			affectedRows += scsUnidadfamiliarejgMapper.insert(record);
+		}
 
 		return affectedRows;
 	}
