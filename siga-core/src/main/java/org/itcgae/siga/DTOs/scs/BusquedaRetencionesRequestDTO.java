@@ -16,4 +16,5 @@ public class BusquedaRetencionesRequestDTO {
     private List<String> idEstadoCertificacionList;
     private Date fechaDesde;
     private Date fechaHasta;
+    private String idCertificacion;
 }

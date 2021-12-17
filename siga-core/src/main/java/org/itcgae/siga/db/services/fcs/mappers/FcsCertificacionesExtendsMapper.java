@@ -28,7 +28,9 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "SOJ", property = "soj", jdbcType = JdbcType.VARCHAR),
             @Result(column = "TOTAL", property = "total", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDESTADOCERTIFICACION", property = "idEstadoCertificacion", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)})
+            @Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBREPARTIDAPRESUPUESTARIA", property = "nombrePartidaPresupuestaria", jdbcType = JdbcType.VARCHAR)})
     List<CertificacionesItem> buscarCertificaciones(BusquedaRetencionesRequestDTO busquedaRetencionesRequestDTO, Integer tamMax, String idLenguaje);
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getComboEstadosCertificaciones")

@@ -19,5 +19,7 @@ public class CertificacionesItem {
     private String total;
     private String idEstadoCertificacion;
     private String estado;
+    private String idPartidaPresupuestaria;
+    private String nombrePartidaPresupuestaria;
 
 }
