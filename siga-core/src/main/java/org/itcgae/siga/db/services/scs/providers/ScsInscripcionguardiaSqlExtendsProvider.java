@@ -1619,6 +1619,7 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 	
 	public String updateOrdenInscripciones(String idTurno, String idGuardia, String idPersona, String idInstitucion, String ordenBD) {
 		SQL sql = new SQL();
+		if (ordenBD != null) {
 		sql.UPDATE("SCS_INSCRIPCIONGUARDIA");
 		sql.SET("ORDEN = " + ordenBD);
 			if (idTurno != null) {
@@ -1633,6 +1634,7 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 			if (idTurno != null) {
 				sql.WHERE("IDINSTITUCION = " + idInstitucion);
 			}
+		}
 		return sql.toString();
 	}
 }

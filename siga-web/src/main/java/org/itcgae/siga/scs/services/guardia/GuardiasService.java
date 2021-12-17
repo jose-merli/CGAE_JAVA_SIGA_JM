@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.guardia;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ import org.itcgae.siga.DTOs.scs.LetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.RangoFechasItem;
 import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
+import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -164,5 +166,10 @@ public interface GuardiasService {
 	UpdateResponseDTO validarInscripciones(BusquedaInscripcionItem validarBody, HttpServletRequest request);
 
 	public StringDTO getTipoDiaGuardia(HttpServletRequest var1, String var2, String var3);
+
+	public boolean validarIncompatibilidadGuardia(String idInstitucion, String idTurno, String idGuardia,
+			ArrayList arrayDiasGuardia, String idPersona);
+
+	public void insertarSaltoCompensacion(ScsSaltoscompensaciones salto) throws Exception;
 
 }

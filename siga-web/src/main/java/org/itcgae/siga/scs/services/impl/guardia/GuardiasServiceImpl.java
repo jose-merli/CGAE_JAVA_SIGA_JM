@@ -1797,10 +1797,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 								Long idGGC = null;
 								if (inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado() != null) {
 									idGGC = Long.valueOf(inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado());
+									ScsGrupoguardiacolegiadoExample grupoGuardiaColegiadoExample = new ScsGrupoguardiacolegiadoExample();
+									grupoGuardiaColegiadoExample.createCriteria().andIdgrupoguardiacolegiadoEqualTo(idGGC);
+									scsGrupoguardiacolegiadoExtendsMapper.deleteByExample(grupoGuardiaColegiadoExample);
 								}
-								ScsGrupoguardiacolegiadoExample grupoGuardiaColegiadoExample = new ScsGrupoguardiacolegiadoExample();
-								grupoGuardiaColegiadoExample.createCriteria().andIdgrupoguardiacolegiadoEqualTo(idGGC);
-								scsGrupoguardiacolegiadoExtendsMapper.deleteByExample(grupoGuardiaColegiadoExample);
+								
 
 							} else {
 								idGrupo += 1;
@@ -5662,6 +5663,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 	}
 
+	@Override
 	public void insertarSaltoCompensacion(ScsSaltoscompensaciones salto) throws Exception {
 		try {
 			salto.setUsumodificacion(usuModificacion1);
@@ -5953,6 +5955,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	// Comprueba si hay incompatibilidades de guardia en el calendario
+	@Override
 	public boolean validarIncompatibilidadGuardia(String idInstitucion, String idTurno, String idGuardia,
 			ArrayList arrayDiasGuardia, String idPersona) {
 

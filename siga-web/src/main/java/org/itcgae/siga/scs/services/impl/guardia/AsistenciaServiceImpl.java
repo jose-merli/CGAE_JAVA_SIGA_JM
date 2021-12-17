@@ -28,6 +28,7 @@ import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.scs.services.guardia.AsistenciaService;
+import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -44,6 +45,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -154,6 +158,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 	@Autowired
 	private GuardiasColegiadoServiceImpl guardiasColegiadoServiceImpl;
+	
+	@Autowired
+	private GuardiasService guardiasService;
+	
+	@Autowired
+	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesExtendsMapper;
 
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
@@ -1361,12 +1371,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	@Transactional
 	@Override
 	public InsertResponseDTO guardarAsistencia(HttpServletRequest request,
-			List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy) {
+			List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy, String isLetrado) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InsertResponseDTO insertResponse = new InsertResponseDTO();
 		Error error = new Error();
+		 
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1402,8 +1413,18 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							asistencia.setAnio(Short.valueOf(anioAsistencia));
 
 							// Validamos guardias colegiado
-							procesaGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion);
+							try {
+							procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
+							}catch(Exception e) {
+								if (e.equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
+									error.setCode(409);
+									error.setMessage("Error al guardar la asistencia: " + e);
+									error.description("Error al guardar la asistencia: " + e);
+								}
+							}
 
+							
+							comprobacionIncompatibilidades(tarjetaAsistenciaResponseItem, idInstitucion, usuarios.get(0));
 							int inserted = scsAsistenciaExtendsMapper.insertSelective(asistencia);
 
 							// Si viene de una preasistencia, la pasamos a confirmada
@@ -1494,6 +1515,20 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							} else {
 								scsAsistencia.setFechasolicitud(null);
 							}
+							
+							// Validamos guardias colegiado
+							try {
+							procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
+							}catch(Exception e) {
+								if (e.equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
+									error.setCode(409);
+									error.setMessage("Error al guardar la asistencia: " + e);
+									error.description("Error al guardar la asistencia: " + e);
+								}
+							}
+
+							
+							comprobacionIncompatibilidades(tarjetaAsistenciaResponseItem, idInstitucion, usuarios.get(0));
 							affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
 
 							if (affectedRows > 0) {
@@ -1518,10 +1553,150 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			error.setMessage("Error al guardar la asistencia: " + e);
 			error.description("Error al guardar la asistencia: " + e);
 			insertResponse.setError(error);
+			
+			if (error.getCode() == 409) {
+				insertResponse.setStatus("ERRORASOCIADAS");
+			}
 		}
 		return insertResponse;
 	}
 
+	private ArrayList<ArrayList<String>> obtenerPeriodosGuardia(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem, Integer idInstitucion) throws Exception {
+		// Variables
+		ArrayList arrayDiasGuardiaCGAE;
+		PeriodoEfectivoItem periodoEfectivo;
+		ArrayList<String> arrayDias;
+		Iterator iter;
+		Date fecha;
+		String sFecha;
+		SimpleDateFormat datef = new SimpleDateFormat("dd/MM/yyyy");
+
+		ArrayList<ArrayList<String>> listaFinal = new ArrayList<ArrayList<String>>();
+		GuardiasTurnoItem beanGuardiasTurno1 = null;
+		List<GuardiasTurnoItem> vGuardias = scsGuardiasturnoExtendsMapper.getAllDatosGuardia(idInstitucion.toString(), tarjetaAsistenciaResponseItem.getIdTurno().toString(),
+				tarjetaAsistenciaResponseItem.getIdGuardia().toString());
+			if (!vGuardias.isEmpty())
+				 beanGuardiasTurno1 = vGuardias.get(0);
+			List<String> vDiasFestivos1 = obtenerFestivosTurno(idInstitucion, Integer.parseInt(tarjetaAsistenciaResponseItem.getIdTurno()), tarjetaAsistenciaResponseItem.getFechaAsistencia(), new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+		try {
+			// generando la matriz de periodos
+			CalendarioAutomatico calendarioAutomatico = new CalendarioAutomatico(beanGuardiasTurno1, tarjetaAsistenciaResponseItem.getFechaAsistencia(),
+					tarjetaAsistenciaResponseItem.getFechaAsistencia(), vDiasFestivos1);
+			arrayDiasGuardiaCGAE = calendarioAutomatico.obtenerMatrizDiasGuardia();
+
+			// recorriendo lista de periodos para anhadir en cada periodo
+			// las fechas de dias de guardia en formato corto
+			for (int i = 0; i < arrayDiasGuardiaCGAE.size(); i++) {
+				periodoEfectivo = (PeriodoEfectivoItem) arrayDiasGuardiaCGAE.get(i);
+
+				// obteniendo los dis por cada periodo
+				arrayDias = new ArrayList<String>();
+				iter = periodoEfectivo.iterator();
+				while (iter.hasNext()) {
+					fecha = (Date) iter.next();
+					sFecha = datef.format(fecha);
+					arrayDias.add(sFecha);
+				}
+
+				// insertando lista de dias (en formato corto) para el generador posterior
+				// Nota: no se insertan los arrays de periodos vacios que si guarda el CGAE
+				if (!arrayDias.isEmpty())
+					listaFinal.add(arrayDias);
+			}
+
+			return listaFinal;
+
+		} catch (Exception e) {
+			throw new Exception(e + ": Excepcion al calcular la matriz de periodos de dias de guardias.");
+		}
+	}
+	
+	
+	
+	List<String> obtenerFestivosTurno(Integer idInstitucion, Integer idTurno, String fechaInicio, Date fechaFin)
+			throws Exception {
+		LocalDate date4 = ZonedDateTime
+				.parse(fechaFin.toString(), DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH))
+				.toLocalDate();
+		String OLD_FORMAT = "yyyy-MM-dd";
+		String NEW_FORMAT = "dd/MM/yyyy";
+		String fechaFinOk = changeDateFormat(OLD_FORMAT, NEW_FORMAT, date4.toString());
+		String fechaInicioOk = changeDateFormat("dd/MM/yyyy HH:mm", NEW_FORMAT, fechaInicio);
+		return scsGuardiasturnoExtendsMapper.getFestivosTurno(fechaInicioOk, fechaFinOk.toString(),
+				idInstitucion.toString(), Integer.toString(2000), idTurno.toString());
+	}
+	
+	private String changeDateFormat(String OLD_FORMAT, String NEW_FORMAT, String oldDateString) {
+		String newDateString;
+
+		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
+		Date d = null;
+		try {
+			d = sdf.parse(oldDateString);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		sdf.applyPattern(NEW_FORMAT);
+		newDateString = sdf.format(d);
+		return newDateString;
+	}
+	private void comprobacionIncompatibilidades(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem,
+			Short idInstitucion, AdmUsuarios usu) throws Exception {
+		ArrayList<ArrayList<String>> arrayPeriodosDiasGuardiaSJCS1 = new ArrayList();
+		ArrayList arrayDiasGuardia = new ArrayList();
+		// si el letrado no puede ser seleccionado por alguna incompatibilidad de la guardia, se deberá crear una compensación.
+		ArrayList<ArrayList<String>> listaDiasPeriodos = obtenerPeriodosGuardia(tarjetaAsistenciaResponseItem, (int)idInstitucion);
+		if (listaDiasPeriodos != null && !listaDiasPeriodos.isEmpty())
+			arrayPeriodosDiasGuardiaSJCS1.addAll(listaDiasPeriodos);
+		for (int i = 0; i < arrayPeriodosDiasGuardiaSJCS1.size(); i++) {
+			arrayDiasGuardia = (ArrayList<String>) arrayPeriodosDiasGuardiaSJCS1.get(i);
+		}
+		boolean incompatible = guardiasService.validarIncompatibilidadGuardia(idInstitucion.toString(), tarjetaAsistenciaResponseItem.getIdTurno(), tarjetaAsistenciaResponseItem.getIdGuardia(),
+				arrayDiasGuardia, tarjetaAsistenciaResponseItem.getIdLetradoGuardia());
+		if (incompatible) {
+			ScsSaltoscompensaciones salto = new ScsSaltoscompensaciones();
+			salto.setIdinstitucion(idInstitucion);
+			salto.setIdturno(Integer.parseInt(tarjetaAsistenciaResponseItem.getIdTurno()));
+			salto.setIdguardia(Integer.parseInt(tarjetaAsistenciaResponseItem.getIdGuardia()));
+			salto.setIdpersona(Long.parseLong(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+			salto.setSaltoocompensacion("S");
+			salto.setFecha(new Date());
+			salto.setMotivos("Añadiendo letrado con incompatibilidades en una Asistencia");
+			try {
+				LOGGER.info("El letrado no puede ser seleccionado por incompatibilidad de la guardia, se va a crear una compensación");
+				try {
+					salto.setUsumodificacion(usu.getIdusuario());
+					salto.setFechamodificacion(new Date());
+					java.util.Date date = new java.util.Date();
+					java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+					String fechaFormat = sdf.format(salto.getFecha());
+					Long idSaltosTurno = Long
+							.valueOf(getNuevoIdSaltosTurno(salto.getIdinstitucion().toString(), salto.getIdturno().toString()));
+					salto.setIdsaltosturno(idSaltosTurno);
+					scsSaltoscompensacionesExtendsMapper.insertManual(salto, fechaFormat);
+				} catch (Exception e) {
+					LOGGER.error("Error insertando nuevo salto/compensacion: " + e);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	
+	}
+	
+	public String getNuevoIdSaltosTurno(String idInstitucion, String idTurno) throws Exception {
+		String nuevoId = "";
+		try {
+			nuevoId = scsGuardiasturnoExtendsMapper.getNuevoId(idInstitucion, idTurno);
+			if (nuevoId == null)
+				nuevoId = "1";
+		} catch (Exception e) {
+			throw new Exception(e + ": Excepcion en ScsSaltosCompensacionesAdm.getNuevoIdSaltosTurno().");
+		}
+		return nuevoId;
+	}
 	@Override
 	public UpdateResponseDTO updateEstadoAsistencia(HttpServletRequest request,
 			List<TarjetaAsistenciaResponseItem> asistencias) {
@@ -1988,7 +2163,6 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		});
 
 	}
-
 	/**
 	 * Método que procesa las guardias de colegiado y las cabeceras de guardia al
 	 * crear una asistencia
@@ -2151,8 +2325,194 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								"procesaGuardiasColegiado() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
 					}
 				}
+	
 
 			}
+			
+			
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, "
+							+ e,
+					e);
+			throw new SigaExceptions(e,
+					"procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, "
+							+ e);
+		}
+
+	}
+
+	/**
+	 * Método que procesa las guardias de colegiado y las cabeceras de guardia al
+	 * crear una asistencia
+	 *
+	 *
+	 * @param tarjetaAsistenciaResponseItem
+	 */
+	private void procesaGuardiasColegiado2(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem,
+			Short idInstitucion, String isLetrado) throws SigaExceptions {
+
+		try {
+
+			int affectedRows = 0;
+			// Buscamos las guardias de colegiado para el letrado seleccionado
+			List<ScsGuardiascolegiado> guardiascolegiados = scsGuardiascolegiadoExtendsMapper
+					.getGuardiasColegiadoNoSustitucion(tarjetaAsistenciaResponseItem, idInstitucion);
+
+			// Si no hay guardias de colegiado creadas
+			if (guardiascolegiados == null || guardiascolegiados.isEmpty()) {
+
+				// Nos devuelve el idpersona de la persona que esta en guardia para esa fecha
+				guardiascolegiados = scsGuardiascolegiadoExtendsMapper
+						.getGuardiasColegiadoEnFecha(tarjetaAsistenciaResponseItem, idInstitucion);
+				// Buscamos sus respectivas guardias de colegiado
+				if (guardiascolegiados != null && !guardiascolegiados.isEmpty()) {
+					guardiascolegiados = scsGuardiascolegiadoExtendsMapper.getGuardiasColegiado(
+							tarjetaAsistenciaResponseItem, idInstitucion,
+							String.valueOf(guardiascolegiados.get(0).getIdpersona()));
+				}
+			}
+
+			// Si hay guardias de colegiado
+			if (guardiascolegiados != null && !guardiascolegiados.isEmpty()) {
+
+				ScsGuardiascolegiado firstGuardiaColegiado = guardiascolegiados.get(0);
+				ScsCabeceraguardias scsCabeceraguardias = new ScsCabeceraguardias();
+				scsCabeceraguardias.setIdpersona(firstGuardiaColegiado.getIdpersona());
+				scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+				scsCabeceraguardias.setIdinstitucion(idInstitucion);
+				scsCabeceraguardias.setFechainicio(firstGuardiaColegiado.getFechainicio());
+				scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+				scsCabeceraguardias = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(scsCabeceraguardias);
+
+				// Si el letrado estaba ya de guardia, validamos las cabeceras
+				if (firstGuardiaColegiado.getIdpersona().longValue() == Long
+						.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia())) {
+
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setUsumodificacion(0);
+					affectedRows += scsCabeceraguardiasExtendsMapper.updateByPrimaryKeySelective(scsCabeceraguardias);
+
+					if (affectedRows <= 0) {
+						LOGGER.error(
+								"procesaGuardiasColegiado() / El letrado de la asistencia estaba de guardia pero no se actualizo ninguna fila");
+					}
+
+					// Si no, lo aniadimos como refuerzo
+				} else {
+
+					// Recorremos para setear el idPersona del colegiado que tentemos que
+					// insertar(el que hace la asistencia)
+					for (ScsGuardiascolegiado scsGuardiascolegiado : guardiascolegiados) {
+						// Para cada guardia colegiado accedemos a sus cabeceras de guardia, a las que
+						// luego habra que setear del idPersona y ponerlo en la ultima posicion(por eso
+						// se ha obtenido el ultimo de la fila)
+
+						scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
+						scsGuardiascolegiado.setFacturado("N");
+						scsGuardiascolegiado.setIdfacturacion(null);
+						scsGuardiascolegiado.setPagado("N");
+						scsGuardiascolegiado
+								.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+						scsGuardiascolegiado.setFechamodificacion(new Date());
+						scsGuardiascolegiado.setUsumodificacion(0);
+
+					}
+
+					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					scsCabeceraguardias.setPosicion((short) (scsCabeceraguardias.getPosicion().shortValue() + 1));
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechavalidacion(new Date());
+					scsCabeceraguardias.setUsumodificacion(0);
+
+					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+					guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
+						scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+					});
+					if (affectedRows <= 0) {
+						LOGGER.error(
+								"procesaGuardiasColegiado() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
+					}
+				}
+				// No hay guardias de colegiado creadas para la fecha, se crean
+			} else {
+				if (!Boolean.parseBoolean(isLetrado)) {
+
+				ScsCalendarioguardiasExample example = new ScsCalendarioguardiasExample();
+
+				example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()))
+						.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
+						.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
+						.andFechainicioGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+
+				List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper
+						.selectByExample(example);
+
+				if (scsCalendarioguardias != null && !scsCalendarioguardias.isEmpty()) {
+
+					ScsGuardiascolegiado scsGuardiascolegiado = new ScsGuardiascolegiado();
+					scsGuardiascolegiado.setIdinstitucion(idInstitucion);
+					scsGuardiascolegiado.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+					scsGuardiascolegiado.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+					scsGuardiascolegiado.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
+							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsGuardiascolegiado.setFechafin(new SimpleDateFormat("dd/MM/yyyy")
+							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsGuardiascolegiado
+							.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					scsGuardiascolegiado.setDiasguardia((long) 1);
+					scsGuardiascolegiado.setDiasacobrar((long) 1);
+					scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
+
+					scsGuardiascolegiado.setReserva("N");
+					scsGuardiascolegiado.setFacturado("N");
+					scsGuardiascolegiado.setIdfacturacion(null);
+					scsGuardiascolegiado.setPagado("N");
+					scsGuardiascolegiado.setFechamodificacion(new Date());
+					scsGuardiascolegiado.setUsumodificacion(0);
+
+					ScsCabeceraguardias scsCabeceraguardias = new ScsCabeceraguardias();
+					scsCabeceraguardias.setIdinstitucion(idInstitucion);
+					scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+					scsCabeceraguardias.setIdcalendarioguardias(scsCalendarioguardias.get(0).getIdcalendarioguardias());
+
+					scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
+							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy")
+							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					scsCabeceraguardias.setPosicion((short) 1);
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setSustituto("0");
+					scsCabeceraguardias.setFechaalta(new Date());
+
+					// Las metemos validadas
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechavalidacion(new Date());
+					scsCabeceraguardias.setUsumodificacion(0);
+
+					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+					affectedRows += scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+
+					if (affectedRows <= 0) {
+						LOGGER.error(
+								"procesaGuardiasColegiado() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
+					}
+				}
+			}else {
+				throw new Exception("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar");
+			}
+
+			}
+			
+			
 
 		} catch (Exception e) {
 			LOGGER.error(

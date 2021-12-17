@@ -39,7 +39,7 @@ public interface AsistenciaService {
 	
 	public StringDTO getDefaultTipoAsistenciaColegio (HttpServletRequest request);
 	
-	public InsertResponseDTO guardarAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy);
+	public InsertResponseDTO guardarAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy, String isLetrado);
 
 	public UpdateResponseDTO updateEstadoAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
 	
