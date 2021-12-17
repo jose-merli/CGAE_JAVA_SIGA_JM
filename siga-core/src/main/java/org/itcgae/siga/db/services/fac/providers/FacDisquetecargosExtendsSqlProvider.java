@@ -1,11 +1,10 @@
 package org.itcgae.siga.db.services.fac.providers;
 
-import java.text.SimpleDateFormat;
-
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.db.mappers.FacDisquetecargosSqlProvider;
+
+import java.text.SimpleDateFormat;
 
 
 public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlProvider {
@@ -105,6 +104,24 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 			sql.WHERE("numRecibos <= "+item.getNumRecibosHasta());
 		}
 				
+		return sql.toString();
+	}
+
+	public String getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("gr.DESCRIPCION ESTADO, F_SIGA_GETRECURSO(pf.DESCRIPCION,"+idIdioma+") FORMAPAGO, "
+				+ "COUNT(*) NUMEROFACTURAS, SUM(ff.IMPTOTAL) IMPORTETOTAL, SUM(ff.IMPTOTALPORPAGAR) PENDIENTETOTAL");
+		sql.FROM("FAC_FACTURA ff");
+		sql.INNER_JOIN("FAC_FACTURAINCLUIDAENDISQUETE ff2 ON (ff.IDINSTITUCION = ff2.IDINSTITUCION AND ff.IDFACTURA = ff2.IDFACTURA)");
+		sql.LEFT_OUTER_JOIN("FAC_ESTADOFACTURA fe ON (ff.ESTADO = fe.IDESTADO)");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS gr ON (gr.IDLENGUAJE = "+idIdioma+" AND fe.DESCRIPCION = gr.IDRECURSO)");
+		sql.LEFT_OUTER_JOIN("PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
+		sql.WHERE("ff.IDINSTITUCION = "+idInstitucion);
+		sql.WHERE("ff2.IDDISQUETECARGOS ="+idFichero);
+		sql.GROUP_BY("gr.DESCRIPCION, pf.DESCRIPCION");
+
 		return sql.toString();
 	}
 }

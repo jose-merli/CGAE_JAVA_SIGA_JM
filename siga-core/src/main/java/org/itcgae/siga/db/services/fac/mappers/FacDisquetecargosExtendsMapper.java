@@ -1,16 +1,17 @@
 package org.itcgae.siga.db.services.fac.mappers;
 
-import java.util.List;
-
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.FacturasIncluidasItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.db.mappers.FacDisquetecargosMapper;
 import org.itcgae.siga.db.services.fac.providers.FacDisquetecargosExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Primary
@@ -43,4 +44,14 @@ public interface FacDisquetecargosExtendsMapper extends FacDisquetecargosMapper 
 		@Result(column = "FECHAMODIFICACION", property = "fechaUltimaModificacion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FicherosAdeudosItem> getFicherosAdeudos(FicherosAdeudosItem item, String idInstitucion);
+
+	@SelectProvider(type = FacDisquetecargosExtendsSqlProvider.class, method = "getFacturasIncluidas")
+	@Results({
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FORMAPAGO", property = "formaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROFACTURAS", property = "numeroFacturas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PENDIENTETOTAL", property = "pendienteTotal", jdbcType = JdbcType.VARCHAR)
+	})
+	List<FacturasIncluidasItem> getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma);
 }

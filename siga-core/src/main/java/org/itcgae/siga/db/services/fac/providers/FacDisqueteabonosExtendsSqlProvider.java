@@ -90,4 +90,22 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
 
         return sql.toString();
     }
+
+    public String getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma) {
+
+        SQL sql = new SQL();
+
+        sql.SELECT("gr.DESCRIPCION ESTADO,"
+                +"CASE WHEN ff.IDCUENTA IS NOT NULL THEN F_SIGA_GETRECURSO(540020,"+idIdioma+") WHEN ff.IDCUENTA IS NULL THEN F_SIGA_GETRECURSO(540030,"+idIdioma+") END FORMAPAGO,"
+                + "COUNT(*) NUMEROFACTURAS, SUM(ff.IMPTOTAL) IMPORTETOTAL, SUM(ff.IMPPENDIENTEPORABONAR) PENDIENTETOTAL");
+        sql.FROM("FAC_ABONO ff");
+        sql.INNER_JOIN("FAC_ABONOINCLUIDOENDISQUETE ff2 ON (ff.IDINSTITUCION = ff2.IDINSTITUCION AND ff.IDFACTURA = ff2.IDABONO)");
+        sql.LEFT_OUTER_JOIN("FAC_ESTADOFACTURA fe ON (ff.ESTADO = fe.IDESTADO)");
+        sql.LEFT_OUTER_JOIN("GEN_RECURSOS gr ON (gr.IDLENGUAJE = "+idIdioma+" AND fe.DESCRIPCION = gr.IDRECURSO)");
+        sql.WHERE("ff.IDINSTITUCION = "+idInstitucion);
+        sql.WHERE("ff2.IDDISQUETEABONO ="+idFichero);
+        sql.GROUP_BY("gr.DESCRIPCION,ff.IDCUENTA");
+
+        return sql.toString();
+    }
 }
