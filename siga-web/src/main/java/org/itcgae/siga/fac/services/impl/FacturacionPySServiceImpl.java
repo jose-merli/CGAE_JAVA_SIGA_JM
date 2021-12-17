@@ -2333,9 +2333,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				devolucion.setIdInstitucion(String.valueOf(usuario.getIdinstitucion()));
 				devolucion.setUsuModificacion(String.valueOf(usuario.getUsumodificacion()));
 
-				String listaFacturas = facHistoricoInsert.getIddisquetecargos()
-						+ facHistoricoInsert.getIdfacturaincluidaendisquete() + facHistoricoInsert.getIdfactura()
-						+ facHistoricoInsert.getIdrecibo() + item.getComentario();
+				String listaFacturas = facHistoricoInsert.getIddisquetecargos() + "||"
+						+ facHistoricoInsert.getIdfacturaincluidaendisquete() + "||" + facHistoricoInsert.getIdfactura() + "||"
+						+ facHistoricoInsert.getIdrecibo() + "||" + item.getComentario();
 
 				devolucion.setListaFacturas(listaFacturas);
 
@@ -2348,9 +2348,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				//saves
 				facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
-				//devolucion = facHistoricofacturaExtendsMapper.devolucionesManuales(devolucion);
 
-				/*
+				String[] resultado;
+
 				Object[] param_in_facturacion = new Object[5];
 				param_in_facturacion[0] = devolucion.getIdInstitucion();
 				param_in_facturacion[1] = devolucion.getListaFacturas();
@@ -2358,11 +2358,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				param_in_facturacion[3] = devolucion.getIdIdioma();
 				param_in_facturacion[4] = devolucion.getUsuModificacion();
 
-				String resultado[] = new String[3];
-				resultado = callPLProcedure("{CALL PKG_SIGA_CARGOS.DevolucionesManuales(?,?,?,?,?,?,?,?)}", 3, param_in_facturacion);
-				*/
+				try {
+					resultado = facHistoricofacturaExtendsMapper.devolucionesManuales(devolucion);
+				}
+				catch(Exception e){}
 
-				facHistoricoInsert.setIddisquetedevoluciones(Long.valueOf(devolucion.getListaIdDisquetesDevolucion()));
+				try {
+					resultado = facHistoricofacturaExtendsMapper.devolucionesManuales1(param_in_facturacion);
+				}
+				catch (Exception e){}
+
+				try {
+					resultado = callPLProcedure("{CALL PKG_SIGA_CARGOS.DevolucionesManuales(?,?,?,?,?,?,?,?)}", 3, param_in_facturacion);
+				}
+				catch (Exception e){}
+
+				//facHistoricoInsert.setIddisquetedevoluciones(Long.valueOf(resultado[1]));
 
 				facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 			}
