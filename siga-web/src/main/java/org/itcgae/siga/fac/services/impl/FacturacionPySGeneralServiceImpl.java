@@ -369,7 +369,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 				for (AdmContador contador : contadores) {
 					ComboItem comboItem = new ComboItem();
 					comboItem.setValue(contador.getIdcontador());
-					comboItem.setLabel(contador.getNombre());
+					comboItem.setLabel(contador.getIdcontador() + " (" + contador.getNombre() + ")");
 
 					comboItems.add(comboItem);
 				}
@@ -414,7 +414,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 				for (AdmContador contador : contadores) {
 					ComboItem comboItem = new ComboItem();
 					comboItem.setValue(contador.getIdcontador());
-					comboItem.setLabel(contador.getNombre());
+					comboItem.setLabel(contador.getIdcontador() + " (" + contador.getNombre() + ")");
 
 					comboItems.add(comboItem);
 				}
@@ -830,13 +830,28 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		
 		if (usuario != null) {
 			
-			if(idInstitucion==null) {
+			if(idInstitucion!=null) {
 				institucion=Short.parseShort(idInstitucion);
 			}else {
 				institucion=usuario.getIdinstitucion();
 			}
+
+			// Tipo ficheros (Ficha de cuentas bancarias)
+			item.setValue("SEPA_TIPO_FICHEROS");
+
+			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_TIPO_FICHEROS");
+			parametros = genParametrosMapper.selectByExample(example);
+
+			if (null != parametros && parametros.size() > 0) {
+				item.setLabel(parametros.get(0).getValor());
+			}else {
+				item.setLabel("0");
+			}
 			
 			//primeros recibos
+			item = new ComboItem();
+			example = new GenParametrosExample();
+
 			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_PRIMEROS_RECIBOS");
 			parametros = genParametrosMapper.selectByExample(example);
 			

@@ -22,6 +22,7 @@ public class CuentasBancariasItem {
 	private String comisionImporte;
 	private String comisionDescripcion;
 	private String idTipoIVA;
+	private String comisionCuentaContable;
 
 	private String configFicherosSecuencia;
 	private String configFicherosEsquema;
@@ -208,6 +209,14 @@ public class CuentasBancariasItem {
 		this.concepto = concepto;
 	}
 
+	public String getComisionCuentaContable() {
+		return comisionCuentaContable;
+	}
+
+	public void setComisionCuentaContable(String comisionCuentaContable) {
+		this.comisionCuentaContable = comisionCuentaContable;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -228,6 +237,7 @@ public class CuentasBancariasItem {
 				Objects.equals(comisionImporte, that.comisionImporte) &&
 				Objects.equals(comisionDescripcion, that.comisionDescripcion) &&
 				Objects.equals(idTipoIVA, that.idTipoIVA) &&
+				Objects.equals(comisionCuentaContable, that.comisionCuentaContable) &&
 				Objects.equals(configFicherosSecuencia, that.configFicherosSecuencia) &&
 				Objects.equals(configFicherosEsquema, that.configFicherosEsquema) &&
 				Objects.equals(configLugaresQueMasSecuencia, that.configLugaresQueMasSecuencia) &&
@@ -239,7 +249,7 @@ public class CuentasBancariasItem {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, concepto);
+		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, comisionCuentaContable, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, concepto);
 	}
 
 	@Override
@@ -260,11 +270,12 @@ public class CuentasBancariasItem {
 				", comisionImporte='" + comisionImporte + '\'' +
 				", comisionDescripcion='" + comisionDescripcion + '\'' +
 				", idTipoIVA='" + idTipoIVA + '\'' +
+				", comisionCuentaContable='" + comisionCuentaContable + '\'' +
 				", configFicherosSecuencia='" + configFicherosSecuencia + '\'' +
 				", configFicherosEsquema='" + configFicherosEsquema + '\'' +
 				", configLugaresQueMasSecuencia='" + configLugaresQueMasSecuencia + '\'' +
 				", configConceptoAmpliado='" + configConceptoAmpliado + '\'' +
-				", sjcs='" + sjcs + '\'' +
+				", sjcs=" + sjcs +
 				", idSufijoSjcs='" + idSufijoSjcs + '\'' +
 				", concepto='" + concepto + '\'' +
 				'}';

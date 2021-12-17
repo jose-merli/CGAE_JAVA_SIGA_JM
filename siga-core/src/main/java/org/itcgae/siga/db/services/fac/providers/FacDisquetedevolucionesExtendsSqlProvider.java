@@ -23,7 +23,7 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		numRecibos.WHERE("fi.idinstitucion = c.idinstitucion AND fi.iddisqueteabono = c.iddisquetedevoluciones");
 
 		//query principal
-		principal.SELECT("c.idinstitucion,c.iddisquetedevoluciones, c.FECHAGENERACION, b.cod_banco, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
+		principal.SELECT("c.idinstitucion,c.iddisquetedevoluciones, c.FECHAGENERACION, b.bancos_codigo, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
 				+ "c.fechamodificacion, id.importe, ("+numRecibos.toString()+") AS numfacturas");
 
 		principal.FROM("fac_disquetedevoluciones c");

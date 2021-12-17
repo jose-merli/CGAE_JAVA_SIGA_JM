@@ -24,44 +24,26 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.SELECT("cb.bic");
 
 		//Subconsulta 1
-		query.SELECT(
-				"((" +
-						"SELECT COUNT(1) " +
-						"FROM  fac_seriefacturacion_banco sfb " +
-						"WHERE sfb.bancos_codigo = bi.bancos_codigo " +
-						"AND sfb.idinstitucion = bi.idinstitucion " +
-						") +"
 
-						+
+		// Num. pagos
+		SQL pagos = new SQL();
+		SQL series = new SQL();
+		pagos.SELECT("count(*)");
+		pagos.FROM("fcs_pagosjg p");
+		pagos.LEFT_OUTER_JOIN("fac_sufijo s ON (p.idinstitucion = s.idinstitucion " +
+				"AND p.idsufijo = s.idsufijo)");
+		pagos.WHERE("p.idinstitucion = " + idInstitucion + " AND p.bancos_codigo = bi.bancos_codigo");
 
-						"((" +
-						"SELECT COUNT(1) " +
-						"FROM fcs_pagosjg p " +
-						"WHERE p.idinstitucion = bi.idinstitucion " +
-						"AND p.bancos_codigo = bi.bancos_codigo " +
-						"AND ( " +
-						"	SELECT COUNT(idpagosjg) " +
-						"	FROM fac_abono f" +
-						"	WHERE f.idpagosjg = p.idpagosjg " +
-						"	AND f.idinstitucion = p.idinstitucion) = 0" +
-						") +"
+		// Num. series
+		series.SELECT("count(*)");
+		series.FROM("fac_seriefacturacion sf");
+		series.INNER_JOIN("fac_seriefacturacion_banco sfb ON (sf.idinstitucion = sfb.idinstitucion " +
+				"AND sf.idseriefacturacion = sfb.idseriefacturacion)");
+		series.LEFT_OUTER_JOIN("fac_sufijo s ON (sfb.idinstitucion = s.idinstitucion " +
+				"AND sfb.idsufijo = s.idsufijo)");
+		series.WHERE("sf.idinstitucion = " + idInstitucion + " AND sfb.bancos_codigo = bi.bancos_codigo");
 
-						+
-
-						"(" +
-						"SELECT COUNT(1) " +
-						"FROM fcs_pagosjg fcs " +
-						"WHERE EXISTS ( " +
-						"	SELECT 1 " +
-						"	FROM fac_abono fac " +
-						"	WHERE fac.idinstitucion = fcs.idinstitucion " +
-						"	AND fac.idpagosjg = fcs.idpagosjg " +
-						"	AND fac.imppendienteporabonar > 0) " +
-						"AND fcs.idinstitucion = bi.idinstitucion " +
-						"AND fcs.bancos_codigo = bi.bancos_codigo " +
-						")) " +
-						") num_usos "
-		);
+		query.SELECT( "( (" + pagos.toString() + ") + (" + series.toString() + ") )" + "num_usos");
 
 		//Subconsulta 2
 		query.SELECT(
@@ -84,6 +66,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.SELECT("bi.comisionimporte");
 		query.SELECT("bi.comisiondescripcion");
 		query.SELECT("bi.idtipoiva");
+		query.SELECT("bi.comisioncuentacontable");
 
 		query.SELECT("bi.configficherossecuencia");
 		query.SELECT("bi.configficherosesquema");
