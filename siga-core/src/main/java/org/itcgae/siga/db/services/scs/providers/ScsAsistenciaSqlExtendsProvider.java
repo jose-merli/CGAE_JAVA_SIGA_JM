@@ -276,7 +276,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "    else '' end comisariaJuzgado");
 //		sql.SELECT("da.iddelito");
 		sql.FROM("scs_asistencia");
-		sql.INNER_JOIN("scs_actuacionasistencia aa on aa.idinstitucion = scs_asistencia.idinstitucion AND aa.anio = scs_asistencia.anio AND aa.numero = scs_asistencia.numero");
+		sql.LEFT_OUTER_JOIN("scs_actuacionasistencia aa on aa.idinstitucion = scs_asistencia.idinstitucion AND aa.anio = scs_asistencia.anio AND aa.numero = scs_asistencia.numero");
 		sql.LEFT_OUTER_JOIN("scs_personajg p on p.idpersona = scs_asistencia.idpersonajg AND p.idinstitucion = scs_asistencia.idinstitucion");
 //		sql.LEFT_OUTER_JOIN("scs_delitosasistencia da on scs_asistencia.anio = da.anio AND scs_asistencia.numero = da.numero AND scs_asistencia.idinstitucion = da.idinstitucion");
 		sql.WHERE("scs_asistencia.idinstitucion = " + idInstitucion);
@@ -288,7 +288,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.WHERE("scs_asistencia.idpersonacolegiado = '" + filtroAsistenciaItem.getIdLetradoGuardia() + "'");
 		sql.AND();
 		sql.WHERE("trunc(scs_asistencia.fechahora) = '"+filtroAsistenciaItem.getDiaGuardia() + "'");
-		sql.AND();
+		/*sql.AND();
 		sql.WHERE("EXISTS ("
 				+ "        SELECT"
 				+ "            1"
@@ -298,9 +298,12 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "                aa.idinstitucion = scs_asistencia.idinstitucion"
 				+ "            AND aa.anio = scs_asistencia.anio"
 				+ "            AND aa.numero = scs_asistencia.numero"
-				+ "    )");
-		sql.AND();
-		sql.WHERE("scs_asistencia.idtipoasistencia = '" + filtroAsistenciaItem.getIdTipoAsistencia() + "'");
+				+ "    )");*/
+		
+		if(filtroAsistenciaItem.getIdTipoAsistencia()!= null) {
+			sql.AND();
+			sql.WHERE("scs_asistencia.idtipoasistencia = '" + filtroAsistenciaItem.getIdTipoAsistencia() + "'");
+		}
 		if(!"".equals(filtroAsistenciaItem.getIdTipoAsistenciaColegiado())
 				&& filtroAsistenciaItem.getIdTipoAsistenciaColegiado() != null) {
 			sql.AND();

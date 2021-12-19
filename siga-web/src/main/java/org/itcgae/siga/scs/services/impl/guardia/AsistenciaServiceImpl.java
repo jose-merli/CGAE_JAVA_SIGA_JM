@@ -414,7 +414,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					List<GenProperties> properties = genPropertiesMapper.selectByExample(exampleProperties);
 
 					if (properties != null && !properties.isEmpty()) {
-						filtro.setIdTipoAsistencia(properties.get(0).getValor());
+						//filtro.setIdTipoAsistencia(properties.get(0).getValor());
 
 						List<TarjetaAsistenciaItem2> tarjetaAsistenciaItems = scsAsistenciaExtendsMapper
 								.searchAsistenciasExpress(filtro, idInstitucion);
