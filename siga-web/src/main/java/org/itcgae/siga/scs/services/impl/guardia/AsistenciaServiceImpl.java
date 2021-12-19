@@ -162,6 +162,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	@Autowired
 	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesExtendsMapper;
 
+	@Autowired
 	private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
 
 
