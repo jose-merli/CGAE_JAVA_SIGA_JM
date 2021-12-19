@@ -1315,8 +1315,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SELECT("HPC.IDINSTITUCION AS INSTITUCION, HPC.IDTURNO as idTurno, HPC.IDGUARDIA as idGuardia, PC.IDPROGCALENDARIO as idCalendarioProgramado,  PC.IDCONJUNTOGUARDIA AS idCalG,  PC.IDINSTITUCION  , TO_CHAR(PC.FECHAPROGRAMACION,'dd/MM/yyyy HH24:mi:ss') AS FECHAPROGRAMACION,  PC.FECHACALINICIO  AS fechaDesde,  PC.FECHACALFIN   AS fechaHasta   ,  PC.ESTADO AS estado, GG.DESCRIPCION AS listaGuardias, DECODE((" + sqlGenerado + "), 0, 'No', 'Si') AS GENERADO, COALESCE(PC.observaciones, '') AS OBSERVACIONES, ( " + sqlGuardia + " ) as guardia, ( " + sqlTurno + " ) as turno, ( " + sqlNumGuardias + " ) as numGuardias, ( " + sqlFact + " ) as facturado, ( " + sqlAs + " ) as asistenciasAsociadas");
 		
 		sql.FROM("scs_prog_calendarios pc" + 
-				"		inner join SCS_HCO_CONF_PROG_CALENDARIOS HPC on HPC.IDINSTITUCION = PC.IDINSTITUCION AND HPC.IDPROGCALENDARIO = PC.IDPROGCALENDARIO" + 
-				"		left join scs_conjuntoguardias gg ON gg.idinstitucion = pc.idinstitucion AND gg.idconjuntoguardia = pc.idconjuntoguardia");
+				"		left outer join SCS_HCO_CONF_PROG_CALENDARIOS HPC on HPC.IDINSTITUCION = PC.IDINSTITUCION AND (hpc.idprogcalendario = pc.idprogcalendario or hpc.idprogcalendario is null)" + 
+				"		left outer join scs_conjuntoguardias gg ON gg.idinstitucion = pc.idinstitucion AND ((gg.idconjuntoguardia = pc.idconjuntoguardia) or (pc.idconjuntoguardia is null))");
 
 		
 		
@@ -1344,15 +1344,17 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			}
 
 		if (calendarioItem.getIdTurno() != null && calendarioItem.getIdTurno() != "") {
-		sql.WHERE("hpc.IDTURNO IN ( " + calendarioItem.getIdTurno() + " )");
+		sql.WHERE("hpc.IDTURNO IN ( " + calendarioItem.getIdTurno() + " ) OR hpc.idturno is null");
 		}
 		if (calendarioItem.getIdGuardia() != null && calendarioItem.getIdGuardia() != "") {
-		sql.WHERE("hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+")");
+		sql.WHERE("hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+") OR hpc.IDGUARDIA is null");
 		}
 		if (idInstitucion != null && idInstitucion != "") {
 		sql.WHERE("PC.IDINSTITUCION = " + idInstitucion);
 		}
-		sql.WHERE("EXISTS (" + sql2 +" )");
+		
+		sql.WHERE("PC.IDCONJUNTOGUARDIA is null OR EXISTS (" + sql2 +" )");
+		
 		sql.ORDER_BY("PC.FECHACALINICIO desc, PC.FECHACALFIN desc, PC.FECHAPROGRAMACION desc");
 
 		
