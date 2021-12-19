@@ -666,7 +666,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardiaItem.setDescripcionFacturacion(guardia.getDescripcionfacturacion());
 						guardiaItem.setDescripcionPago(guardia.getDescripcionpago());
 						guardiaItem.setIdTurno(guardia.getIdturno() + "");
-						guardiaItem.setIdTipoGuardia(guardia.getIdtipoguardia().toString());
+						if(guardia.getIdtipoguardia()!=null) {
+							guardiaItem.setIdTipoGuardia(guardia.getIdtipoguardia().toString());
+						}else
+							guardiaItem.setIdTipoGuardia("");
 						guardiaItem.setIdGuardia(guardia.getIdguardia() + "");
 
 						// AQUI VEMOS SI ALGUNA GUARDIA ESTA VINCULADA Y SI ESTÁ SE LA AÑADIMOS AL
@@ -704,7 +707,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 						if (guardia.getDiasperiodo() != null)
 							guardiaItem.setDiasPeriodo(guardia.getDiasperiodo() + "");
 						guardiaItem.setRotarComponentes(guardia.getRotarcomponentes());
-						guardiaItem.setLetradosGuardia(guardia.getNumeroletradosguardia().toString());
+						if(guardia.getNumeroletradosguardia()!=null) {
+							guardiaItem.setLetradosGuardia(guardia.getNumeroletradosguardia().toString());
+						}else {
+							guardiaItem.setLetradosGuardia("0");
+						}
 						// Configuracion calendarios
 						if (guardia.getDiasguardia() != null)
 							guardiaItem.setDiasGuardia(guardia.getDiasguardia() + "");
