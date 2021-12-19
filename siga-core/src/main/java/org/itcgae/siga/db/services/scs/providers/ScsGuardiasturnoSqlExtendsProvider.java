@@ -1340,7 +1340,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("PC.FECHACALINICIO >= " + "TO_DATE('" + calendarioItem.getFechaCalendarioDesde()+ "','DD/MM/YYYY')");
 		}
 		if (calendarioItem.getFechaCalendarioHasta() != null && calendarioItem.getFechaCalendarioHasta() != "") {
-			sql.WHERE("PC.FECHACALINICIO <= " + "TO_DATE('" + calendarioItem.getFechaCalendarioHasta() + "','DD/MM/YYYY')");
+			sql.WHERE("PC.FECHACALFIN <= " + "TO_DATE('" + calendarioItem.getFechaCalendarioHasta() + "','DD/MM/YYYY')");
 			}
 
 		if (calendarioItem.getIdTurno() != null && calendarioItem.getIdTurno() != "") {
@@ -1353,7 +1353,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("PC.IDINSTITUCION = " + idInstitucion);
 		}
 		
-		sql.WHERE("PC.IDCONJUNTOGUARDIA is null OR EXISTS (" + sql2 +" )");
+		sql.WHERE("EXISTS (" + sql2 +" ) OR EXISTS( SELECT 1 FROM scs_prog_calendarios pc WHERE pc.idconjuntoguardia IS NULL)");
 		
 		sql.ORDER_BY("PC.FECHACALINICIO desc, PC.FECHACALFIN desc, PC.FECHAPROGRAMACION desc");
 
