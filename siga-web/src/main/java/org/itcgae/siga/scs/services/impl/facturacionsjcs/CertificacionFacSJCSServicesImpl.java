@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.db.entities.*;
@@ -65,12 +66,18 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private CertificacionFacSJCSServicesCAMHelper camHelper;
+    
+    @Autowired
+    private CertificacionFacSJCSServicesCatalunyaHelper cataHelper;
 
     @Autowired
     private FcsCertificacionesExtendsMapper fcsCertificacionesExtendsMapper;
 
     @Autowired
     private EcomOperacionMapper ecomOperacionMapper;
+    
+    @Autowired
+    private FacturacionSJCSHelper facturacionHelper;
 
     @Override
     public InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request) {
@@ -211,45 +218,8 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
         Map<String, String> parametros = new HashMap<String, String>();
         parametros.put(IDFACTURACION, fcsFacturacionjgKey.getIdfacturacion().toString());
-        insertaColaConParametros(ecomCola, parametros, usuario);
+        facturacionHelper.insertaColaConParametros(ecomCola, parametros, usuario);
     }
-
-    private void insertaColaConParametros(EcomCola ecomCola, Map<String, String> parametros, AdmUsuarios usuario) throws Exception {
-
-        insertartCola(ecomCola, usuario);
-
-        if (parametros != null) {
-            Iterator<String> it = parametros.keySet().iterator();
-
-            while (it.hasNext()) {
-                EcomColaParametros ecomColaParametros = new EcomColaParametros();
-                String clave = it.next();
-                String valor = parametros.get(clave);
-                ecomColaParametros.setIdecomcola(ecomCola.getIdecomcola());
-                ecomColaParametros.setClave(clave);
-                ecomColaParametros.setValor(valor);
-                if (ecomColaParametrosMapper.insert(ecomColaParametros) != 1) {
-                    throw new Exception("Error al insertar los parámetros de la cola.");
-                }
-            }
-        }
-    }
-
-    private int insertartCola(EcomCola ecomCola, AdmUsuarios usuario) {
-
-        try {
-            ecomCola.setIdestadocola(SigaConstants.ECOM_ESTADOSCOLA.INICIAL.getId());
-            ecomCola.setReintento(0);
-            ecomCola.setFechacreacion(new Date());
-            ecomCola.setUsumodificacion(usuario.getIdusuario());
-
-            return ecomColaMapper.insert(ecomCola);
-        } catch (Exception e) {
-            LOGGER.error(String.format("Se ha producido un error al insertar en la cola %s", ecomCola));
-            throw e;
-        }
-    }
-
 
     private Boolean esGalicia(Short idInstitucion) {
         return SigaConstants.Consejos.C_GALEGA.getCodigoExt().equals(getCodExtColegio(idInstitucion));
@@ -330,8 +300,8 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             try {
                 Path pFile = camHelper.subirFicheroCAM(idInstitucion, idFacturacion, fichero, request);
                 if (!isEjecutandoFacturacion(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId())) {
-                    insertaEstadoFacturacion(camHelper.getUsuario(idInstitucion, token), idInstitucion, idFacturacion);
-                    envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId(), camHelper.getUsuario(idInstitucion, token));
+                    insertaEstadoFacturacion(facturacionHelper.getUsuario(idInstitucion, token), idInstitucion, idFacturacion);
+                    envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId(), facturacionHelper.getUsuario(idInstitucion, token));
                     updateResponseDTO.setStatus(SigaConstants.OK);
                 } else {
                     error.setCode(200);
@@ -544,4 +514,30 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
         return certificacionesDTO;
     }
+
+	@Override
+	public UpdateResponseDTO validaCatalunya(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
+		 String token = request.getHeader("Authorization");
+	     String dni = UserTokenUtils.getDniFromJWTToken(token);
+	     Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		 UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		 Error error = new Error();
+		 updateResponseDTO.setError(error)
+		 ;
+		 AdmUsuarios admUsr =  facturacionHelper.getUsuario(idInstitucion, dni);
+		 
+		 try {
+			 cataHelper.valida(gestEcom, admUsr);
+			 updateResponseDTO.setStatus(SigaConstants.OK);
+		 } catch(Exception e) {
+			 LOGGER.error(e);
+			 error.setDescription(e.toString());
+			 updateResponseDTO.setStatus(SigaConstants.KO);
+		 }
+		 
+		 return updateResponseDTO;
+	}
+	
+	
+	
 }
