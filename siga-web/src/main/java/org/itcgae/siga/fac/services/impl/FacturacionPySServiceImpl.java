@@ -485,7 +485,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				FacBancoinstitucionExample uniqueExample = new FacBancoinstitucionExample();
 				uniqueExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
-					.andFechabajaIsNotNull()
+					.andFechabajaIsNull()
 					.andDescripcionEqualTo(record.getDescripcion().trim());
 
 				long found = facBancoinstitucionExtendsMapper.countByExample(uniqueExample);
@@ -590,7 +590,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				FacBancoinstitucionExample uniqueExample = new FacBancoinstitucionExample();
 				uniqueExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
 					.andBancosCodigoNotEqualTo(record.getBancosCodigo())
-					.andFechabajaIsNotNull()
+					.andFechabajaIsNull()
 					.andDescripcionEqualTo(record.getDescripcion().trim());
 
 				long found = facBancoinstitucionExtendsMapper.countByExample(uniqueExample);
