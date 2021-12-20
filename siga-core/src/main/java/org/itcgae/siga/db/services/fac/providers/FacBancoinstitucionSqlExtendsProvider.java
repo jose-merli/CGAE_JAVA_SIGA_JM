@@ -103,17 +103,4 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		return sql.toString();
 	}
 	
-	public String comboCuentasBancarias(Short idInstitucion) {
-		SQL query = new SQL();
-		
-		query.SELECT("bi.bancos_codigo");
-		query.SELECT("bi.descripcion CUENTA");
-		query.FROM("FAC_BANCOINSTITUCION bi");
-		query.WHERE("bi.fechabaja IS NULL");
-		query.WHERE("bi.idinstitucion=" + idInstitucion);
-		query.ORDER_BY("bi.bancos_codigo");
-		
-		return query.toString();
-	}
-	
 }
