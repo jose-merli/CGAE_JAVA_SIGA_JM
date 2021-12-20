@@ -7,6 +7,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -27,4 +28,6 @@ public interface ICertificacionFacSJCSService {
     ComboDTO getComboEstadosCertificaciones(HttpServletRequest request);
 
     DeleteResponseDTO eliminarCertificaciones(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request);
+
+    EstadoCertificacionDTO getEstadosCertificacion(String idCertificacion, HttpServletRequest request);
 }

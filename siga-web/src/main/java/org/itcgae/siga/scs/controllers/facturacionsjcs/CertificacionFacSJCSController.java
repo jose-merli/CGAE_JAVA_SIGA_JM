@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
@@ -84,6 +85,12 @@ public class CertificacionFacSJCSController {
     ResponseEntity<DeleteResponseDTO> eliminarCertificaciones(@RequestBody List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
         DeleteResponseDTO response = iCertificacionFacSJCSService.eliminarCertificaciones(certificacionesItemList, request);
         return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getEstadosCertificacion")
+    ResponseEntity<EstadoCertificacionDTO> getEstadosCertificacion(@RequestParam("idCertificacion") String idCertificacion, HttpServletRequest request) {
+        EstadoCertificacionDTO response = iCertificacionFacSJCSService.getEstadosCertificacion(idCertificacion, request);
+        return new ResponseEntity<EstadoCertificacionDTO>(response, HttpStatus.OK);
     }
 
 }

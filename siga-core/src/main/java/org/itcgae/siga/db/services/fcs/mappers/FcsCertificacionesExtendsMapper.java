@@ -7,6 +7,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
 import org.itcgae.siga.db.mappers.FcsCertificacionesMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsCertificacionesSqlExtendsProvider;
 import org.springframework.stereotype.Service;
@@ -37,4 +38,14 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
     @Results({@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
             @Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)})
     List<ComboItem> getComboEstadosCertificaciones(String idLenguaje);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getEstadosCertificacion")
+    @Results({@Result(column = "IDHISTORICO", property = "idHistorico", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDCERTIFICACION", property = "idCertificacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "PROCESO", property = "proceso", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)})
+    List<EstadoCertificacionItem> getEstadosCertificacion(String idCertificacion, Short idInstitucion, String idLenguaje);
 }

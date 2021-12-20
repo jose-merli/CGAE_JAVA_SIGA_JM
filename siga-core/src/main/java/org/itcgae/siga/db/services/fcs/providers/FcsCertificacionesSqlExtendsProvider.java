@@ -104,4 +104,23 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
+    public String getEstadosCertificacion(String idCertificacion, Short idInstitucion, String idLenguaje) {
+
+        SQL sql = new SQL();
+        sql.SELECT("H.IDHISTORICO");
+        sql.SELECT("H.IDCERTIFICACION");
+        sql.SELECT("H.IDINSTITUCION");
+        sql.SELECT("F_SIGA_GETRECURSO(H.PROCESO, " + idLenguaje + ") AS PROCESO");
+        sql.SELECT("H.FECHAESTADO");
+        sql.SELECT("H.IDESTADO");
+        sql.SELECT("F_SIGA_GETRECURSO(EST.DESCRIPCION, " + idLenguaje + ") AS ESTADO");
+        sql.FROM("FCS_CERTIFICACIONES_HISTORICO_ESTADO H");
+        sql.JOIN("FCS_ESTADOSCERTIFICACIONES EST ON H.IDESTADO = EST.IDESTADOCERTIFICACION");
+        sql.WHERE("H.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("H.IDCERTIFICACION = " + idCertificacion);
+        sql.ORDER_BY("H.FECHAESTADO DESC");
+
+        return sql.toString();
+    }
+
 }
