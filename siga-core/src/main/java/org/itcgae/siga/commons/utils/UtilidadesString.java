@@ -490,4 +490,23 @@ public class UtilidadesString {
 
 		return text;
 	}
+
+	public static String getCampoMultidioma (String campo, String idioma){
+		if (esCadenaVacia(campo)) return "";
+		if (esCadenaVacia(idioma)) idioma = "1";
+
+		String alias = campo;
+		int i = campo.indexOf(".");
+		if (i >= 0) {
+			alias = campo.substring(i+1);
+		}
+		return " F_SIGA_GETRECURSO (" + campo + "," + idioma + ") " + alias + " ";
+	}
+
+	public static String getCampoMultidiomaSimple (String campo, String idioma){
+		if (esCadenaVacia(campo)) return "";
+		if (esCadenaVacia(idioma)) idioma = "1";
+
+		return " F_SIGA_GETRECURSO (" + campo + "," + idioma + ")  ";
+	}
 }

@@ -70,6 +70,7 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		sql.SELECT("DIGITOCONTROL");
 		sql.SELECT("NUMEROCUENTA");
 		sql.SELECT("concat(CBO_CODIGO,concat(CODIGOSUCURSAL,concat(DIGITOCONTROL,DIGITOCONTROL))) AS BANCO");
+		sql.SELECT("NUM_REGISTRO");
 		
 		
 		sql.FROM("CEN_SOLICITUDINCORPORACION SOLICITUD");
