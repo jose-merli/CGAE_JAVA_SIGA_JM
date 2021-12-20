@@ -206,7 +206,7 @@ public class FacturacionController {
     }
     
     @PostMapping(path = "/facturacionsjcs/getFicheroErroresFacturacion")
-    public ResponseEntity<Resource> getFicheroErroresFacturacion(@RequestParam("idFacturacion") String idFacturacion,  HttpServletRequest request)    {
+    public ResponseEntity<Resource> getFicheroErroresFacturacion(@RequestBody String idFacturacion,  HttpServletRequest request)    {
 		ResponseEntity<Resource> response = null;
 		Resource resource = null;
 		Boolean error = false;
