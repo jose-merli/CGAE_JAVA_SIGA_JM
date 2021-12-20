@@ -38,6 +38,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "NUMEROGRUPO", property="numeroGrupo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDGRUPOGUARDIACOLEGIADO", property = "idGrupoGuardiaColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ORDENGRUPO", property = "orden", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORDENINSC", property = "ordenBD", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
@@ -175,75 +176,10 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHASUSCRIPCION", property = "fechaSol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 	})
 	List<BusquedaInscripcionItem> getListadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion);
 	
-	
-	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "ObjetoFrontValidarInscripcion")
-	@Results({ 
-		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "NOMBREGUARDIA", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
-		@Result(column = "OBSERVACIONESBAJA", property = "observacionesbaja", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.DATE),
-		@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.DATE),
-		@Result(column = "OBSERVACIONESVALIDACION", property = "observacionesvalidacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHADENEGACION", property = "fechadenegacion", jdbcType = JdbcType.DATE),
-		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHASUSCRIPCION", property = "fechasolicitud", jdbcType = JdbcType.DATE),
-	})
-	BusquedaInscripcionMod getObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones, String idInstitucion, String fECHASOLICITUD);
-	
-	
-	@DeleteProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "DeleteFKGrupoColegiado")
-	int getDeleteFKGrupoColegiado(BusquedaInscripcionMod inscripcion, String fECHASOLICITUD);
-	
-	@DeleteProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "DeleteObjetoFrontValidarInscripcion")
-	int getDeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripcion, String fECHASOLICITUD);
-	
-	@InsertProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "InsertObjetoValidarInscripcion")	
-	@Results({
-	})
-	int getInsertObjetoValidarInscripcion(BusquedaInscripcionMod inscripcion, int usuario, GrupoGuardiaColegiadoItem objetoFK, String FECHASOLICITUD, String FECHABAJA,String fECHADENEGACIONNUEVA, String fECHASOLICITUDBAJANUEVA, String fECHASOLICITUDNUEVA, String fECHAVALIDACIONNUEVA);
-
-	
-	@UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "validarDenegarSBajaCFechaInscripciones")
-	int getValidarDenegarSBajaCFechaInscripciones(BusquedaInscripcionMod inscripciones, String idInstitucion, String fECHABAJA,
-			String fECHADENEGACIONNUEVA, String fECHASOLICITUDNUEVA, String fECHASOLICITUDBAJANUEVA, String fECHAVALIDACIONNUEVA, String fECHAVALORALTA,
-			String fECHAVALORBAJA, int usuario);
-
-
-
-	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "ObjetoFKGrupoColegiado")
-	@Results({ 
-		@Result(column = "IDGRUPOGUARDIACOLEGIADO", property = "idgrupoguardiacolegiado", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "FECHASUSCRIPCION", property = "fechasuscripcion", jdbcType = JdbcType.DATE),
-		@Result(column = "IDGRUPOGUARDIA", property = "idgrupoguardia", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "ORDEN", property = "orden", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "FECHACREACION", property = "fechacreacion", jdbcType = JdbcType.DATE),
-		@Result(column = "USUCREACION", property = "usucreacion", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.DATE),
-		@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
-
-	})
-	GrupoGuardiaColegiadoItem getObjetoFKGrupoColegiado(BusquedaInscripcionMod a, String string, String fECHASOLICITUD);
-
-
-
-	@InsertProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "insertarObjetoFKGrupoColegiado")
-	int getInsertFKGrupoGuardiaColegiado(GrupoGuardiaColegiadoItem objetoFK, int usuario, String FECHASOLICITUD,String fECHASOLICITUDNUEVA, String fECHACREACIONNUEVA);
-
-
-
-
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getSaltoCompensacionesActivo")
 	@Results({ 
 	})
@@ -297,13 +233,6 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 
 	@UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "UpdateInscripcionGuardia")
 	int UpdateInscripcionGuardia(String string, String idturno, String idguardia,BusquedaInscripcionMod a, String fECHABAJA);
-
-
-
-	@UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "CFechaInscripciones")
-
-	int getCFechaInscripciones(BusquedaInscripcionMod a, String string, String fECHABAJA, String fECHAVALIDACIONNUEVA,
-			int usuario);
     
     @SelectProvider(type=ScsInscripcionguardiaSqlExtendsProvider.class, method="getInscripcionByTurnoGuardiaNcolegiado")
     @Results({
@@ -325,11 +254,6 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
         @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR)
     })
     List<ScsInscripcionguardia> getInscripcionByTurnoGuardiaNcolegiado(String usuModif, String idTurno, String idGuardia, String numColegiado);
-
-	@UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "DenegarInscripciones")
-	int getDegenarInscripcion(BusquedaInscripcionMod a, String string, String fECHADENEGACIONNUEVA, int usuario);
-
-
 
     @SelectProvider(type=ScsInscripcionguardiaSqlExtendsProvider.class, method="checkInscripcionesRangoFecha")
     @Results({
@@ -355,5 +279,8 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
     @SelectProvider(type=ScsInscripcionguardiaSqlExtendsProvider.class, method="getColegiadosInscritosGuardia")
     @Results({})
     List<String> getColegiadosInscritosGuardia(ScsInscripcionguardiaKey key);
+    
+    @UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "updateOrdenInscripciones")
+	int updateOrdenInscripciones(String idTurno, String idGuardia, String idPersona, String idInstitucion, String ordenBD);
 
 }

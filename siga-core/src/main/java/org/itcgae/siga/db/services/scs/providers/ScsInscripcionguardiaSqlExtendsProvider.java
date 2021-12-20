@@ -61,6 +61,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
 					"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 					"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,\r\n" + 
+					"				Ins.ORDEN AS ORDENINSC,\r\n" + 
 					"				Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado,\r\n" + 
 					"				Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
 					"				Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
@@ -242,7 +243,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"		WHERE\r\n" + 
 					"			tabla_nueva.orden <= tabla_nueva2.orden\r\n" + 
 					"		ORDER BY\r\n" + 
-					"			tabla_nueva.orden ASC) ) consulta_total  ORDER BY ORDEN");
+					"			tabla_nueva.orden ASC) ) consulta_total  ORDER BY ORDENINSC");
 		else 
 			sql.SELECT("ROWNUM AS orden_cola, consulta.* FROM (SELECT(CASE\r\n" + 
 					"                                 WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
@@ -409,7 +410,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "        END"
 				+ "    ) estado");
 		
-		sql.SELECT("tur.nombre nombreturno");
+		sql.SELECT("tur.nombre nombre");
 		sql.SELECT("tur.abreviatura abreviatura");
 		sql.SELECT("tur.validarinscripciones");	
 		sql.SELECT("tur.validarjustificaciones");
@@ -422,14 +423,14 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		
 		sql.SELECT("per.apellidos1 || DECODE(per.apellidos2,NULL,'',' ' || per.apellidos2) || ', ' || per.nombre apellidosnombre");
 		sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
-		sql.SELECT("per.nombre");
-		sql.SELECT("per.apellidos1");
+		//sql.SELECT("per.nombre");
+		sql.SELECT("per.apellidos1 as apellidos");
 		sql.SELECT("per.apellidos2");
 		sql.SELECT("ins.idinstitucion");
 		sql.SELECT("ins.idpersona");
 		sql.SELECT("ins.idturno");
-		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS') AS fechasuscripcion");
-		sql.SELECT("ins.observacionessuscripcion");
+		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH24:MI:SS') AS fechasuscripcion");
+		sql.SELECT("ins.observacionessuscripcion AS observacionessolicitud");
 		sql.SELECT("ins.fechavalidacion");
 		sql.SELECT("ins.observacionesvalidacion");
 		sql.SELECT("ins.fechasolicitudbaja");
@@ -438,8 +439,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.SELECT("ins.observacionesvalbaja");
 		sql.SELECT("ins.fechadenegacion");
 		sql.SELECT("ins.observacionesdenegacion");
-		sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
-		sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechavalidacion),'dd/mm/yyyy') fechavalidacion");
+		//sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
+		//sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechavalidacion),'dd/mm/yyyy') fechavalidacion");
 		sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechabaja),'dd/mm/yyyy') fechabaja");
 		sql.SELECT("DECODE(tur.guardias,0,'Obligatorias',DECODE(tur.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
 
@@ -523,7 +524,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
         }
         
         if(inscripciones.getnColegiado() != null) {
-        	sql.WHERE("col.ncolegiado = " + inscripciones.getnColegiado());
+        	sql.WHERE("(col.ncolegiado = " + inscripciones.getnColegiado() + " OR col.ncomunitario = " + inscripciones.getnColegiado() + ")");
         }
         
         sql.WHERE("ROWNUM <= 200");
@@ -566,173 +567,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				"ig.idturno = '"+idTurno+"'");
 		return sql.toString();
 	}
-	
-	public String ObjetoFKGrupoColegiado(BusquedaInscripcionMod inscripciones, String idInstitucion,String FECHASOLICITUD) {
-		
-		SQL sql = new SQL();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		
-		sql.SELECT("*");
-		sql.FROM("scs_grupoguardiacolegiado");
-		
-		if(idInstitucion != null) {
-			sql.WHERE("IDINSTITUCION ="+ idInstitucion);
-		}
-		
-		if(inscripciones.getIdpersona() != null) {
-			sql.WHERE("IDPERSONA ="+ inscripciones.getIdpersona());
-		}
-		
-		if(inscripciones.getIdturno() != null) {
-			sql.WHERE("IDTURNO ="+ inscripciones.getIdturno());
-		}
-		
-		if(inscripciones.getIdguardia() != null) {
-			sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
-		}
-		
-		if(inscripciones.getFechasolicitud() != null) {
-			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
-		}
-		
-		return sql.toString();
-	}
-	
-	public String ObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones, String idInstitucion, String FECHASOLICITUD) {
-		
-		SQL sql = new SQL();
-		//SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/YYYY HH24:MI:SS");
-		
-		sql.SELECT("*");
-		sql.FROM("scs_inscripcionguardia");
-		
-		if(idInstitucion != null) {
-			sql.WHERE("IDINSTITUCION ="+ idInstitucion);
-		}
-		
-		if(inscripciones.getIdpersona() != null) {
-			sql.WHERE("IDPERSONA ="+ inscripciones.getIdpersona());
-		}
-		
-		if(inscripciones.getIdturno() != null) {
-			sql.WHERE("IDTURNO ="+ inscripciones.getIdturno());
-		}
-		
-		if(inscripciones.getIdguardia() != null) {
-			sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
-		}
-		
-		if(inscripciones.getFechasolicitud() != null) {
-			sql.WHERE("to_char(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
-		}
-		
-		return sql.toString();
-	}
-	
-public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones, String FECHASOLICITUD) {
-		
-		SQL sql = new SQL();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		
-		int idIns=inscripciones.getIdinstitucion();
-		String idInstitucion=String.valueOf(idIns);
-				
-		sql.DELETE_FROM("scs_inscripcionguardia");
-		
-		if(idInstitucion != null && !idInstitucion.isEmpty()) {
-			sql.WHERE("IDINSTITUCION ="+ inscripciones.getIdinstitucion());
-		}
-		
-		if(inscripciones.getIdpersona() != null) {
-			sql.WHERE("IDPERSONA ="+ inscripciones.getIdpersona());
-		}
-		
-		if(inscripciones.getIdturno() != null) {
-			sql.WHERE("IDTURNO ="+ inscripciones.getIdturno());
-		}
-		
-		if(inscripciones.getIdguardia() != null) {
-			sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
-		}
-		
-		if(inscripciones.getFechasolicitud() != null) {
-			sql.WHERE("to_char(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
-		}
-		
-//		if(inscripciones.getFechabaja() != null) {
-//			sql.WHERE("TO_CHAR(FECHABAJA,'DD/MM/RRRR')= TO_DATE('"+FECHABAJA+"','DD,MM/RRRR')");
-//		}
-//		
-//		if(inscripciones.getObservacionessolicitud() != null) {
-//			sql.WHERE("OBSERVACIONESSUSCRIPCION ='"+inscripciones.getObservacionessolicitud()+"'");
-//		}
-//		
-//		if(inscripciones.getObservacionesbaja() != null) {
-//			sql.WHERE("OBSERVACIONESBAJA ='"+inscripciones.getObservacionesbaja()+"'");
-//		}
-//		
-//		if(inscripciones.getFechasolicitudbaja() != null) {
-//			sql.WHERE("TO_CHAR(FECHASOLICITUDBAJA,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUDBAJA+"','DD,MM/RRRR')");
-//		}
-//		
-//		if(inscripciones.getFechavalidacion() != null) {
-//			sql.WHERE("TO_CHAR(FECHAVALIDACION,'DD/MM/RRRR')= TO_DATE('"+FECHAVALIDACION+"','DD,MM/RRRR')");
-//		}
-//		
-//		if(inscripciones.getObservacionesvalidacion() != null) {
-//			sql.WHERE("OBSERVACIONESVALIDACION ='"+inscripciones.getObservacionesvalidacion()+"'");
-//		}
-//		
-//		if(inscripciones.getFechadenegacion() != null) {
-//			sql.WHERE("TO_CHAR(FECHADENEGACION,'DD/MM/RRRR')= TO_DATE('"+FECHADENEGACION+"','DD,MM/RRRR')");
-//		}
-//		
-//		if(inscripciones.getObservacionesdenegacion() != null) {
-//			sql.WHERE("OBSERVACIONESDENEGACION ='"+inscripciones.getObservacionesdenegacion()+"'");
-//		}
-//		
-//		if(inscripciones.getObservacionesvalbaja() != null) {
-//			sql.WHERE("OBSERVACIONESVALBAJA ='"+inscripciones.getObservacionesvalbaja()+"'");
-//		}
-		
-		return sql.toString();
-	}
 
-
-	public  String DeleteFKGrupoColegiado (BusquedaInscripcionMod inscripciones, String FECHASOLICITUD) {
-	// TODO Auto-generated method stub
-		
-		SQL sql = new SQL();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		
-		int idIns=inscripciones.getIdinstitucion();
-		String idInstitucion=String.valueOf(idIns);
-		
-		sql.DELETE_FROM("scs_grupoguardiacolegiado");
-		
-		if(idInstitucion != null && !idInstitucion.isEmpty()) {
-			sql.WHERE("IDINSTITUCION ="+ inscripciones.getIdinstitucion());
-		}
-		
-		if(inscripciones.getIdpersona() != null) {
-			sql.WHERE("IDPERSONA ="+ inscripciones.getIdpersona());
-		}
-		
-		if(inscripciones.getIdturno() != null) {
-			sql.WHERE("IDTURNO ="+ inscripciones.getIdturno());
-		}
-		
-		if(inscripciones.getIdguardia() != null) {
-			sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
-		}
-		
-		if(inscripciones.getFechasolicitud() != null) {
-			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
-		}
-		
-	return sql.toString();
-}
-	
 	public  String validarInscripcionesCampo (String idinstitucion, String idturno,String idguardia, String idpersona) {
 		// TODO Auto-generated method stub
 			
@@ -1039,286 +874,6 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		return sql.toString();
 	}
 	
-	public String InsertObjetoValidarInscripcion(BusquedaInscripcionMod inscripciones, int usuario, GrupoGuardiaColegiadoItem objetoFK, String FECHASOLICITUD,String FECHABAJA,
-			String FECHADENEGACIONNUEVA, String FECHASOLICITUDBAJANUEVA, String FECHASOLICITUDNUEVA, String FECHAVALIDACIONNUEVA) {
-	
-		SQL sql = new SQL();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        String today = formatter.format(new Date());
-        
-        int idIns=inscripciones.getIdinstitucion();
-		String idInstitucion=String.valueOf(idIns);
-				
-		sql.INSERT_INTO("scs_inscripcionguardia");
-
-		if(inscripciones.getIdpersona() != null) {
-			sql.VALUES("IDPERSONA", inscripciones.getIdpersona());
-		}
-		
-		if(idInstitucion != null && !idInstitucion.isEmpty()) {
-			sql.VALUES("IDINSTITUCION", "'" + inscripciones.getIdinstitucion() + "'");
-		}
-		
-		if(inscripciones.getIdturno() != null) {
-			sql.VALUES("IDTURNO", inscripciones.getIdturno());
-		}
-		
-		if(inscripciones.getIdguardia() != null) {
-			sql.VALUES("IDGUARDIA", inscripciones.getIdguardia());
-		}
-	
-		if(FECHASOLICITUDNUEVA != null) {
-			sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+FECHASOLICITUDNUEVA+"','DD/MM/YYYY HH:MI:SS')");
-		}else {
-			if(FECHASOLICITUD != null) {
-				sql.VALUES("FECHASUSCRIPCION", "TO_DATE('"+FECHASOLICITUD+"','DD/MM/YYYY HH:MI:SS')");
-			}
-		}
-		
-		if (today != null) {
-			sql.VALUES("FECHAMODIFICACION","TO_DATE('"+today+"','DD/MM/RRRR')");
-		}
-		
-		if(String.valueOf(usuario) != null) {
-			sql.VALUES("USUMODIFICACION", String.valueOf(usuario));
-		}
-		
-		if(FECHABAJA != null) {
-			sql.VALUES("FECHABAJA","TO_DATE('"+FECHABAJA+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionessolicitudNUEVA() != null) {
-			sql.VALUES("OBSERVACIONESSUSCRIPCION", "'"+inscripciones.getObservacionessolicitudNUEVA()+"'");
-		}
-		
-		if(inscripciones.getObservacionesbaja() != null) {
-			sql.VALUES("OBSERVACIONESBAJA", "'"+inscripciones.getObservacionesbaja()+"'");
-		}
-		
-		if(FECHASOLICITUDBAJANUEVA != null) {
-			sql.VALUES("FECHASOLICITUDBAJA","TO_DATE('"+FECHASOLICITUDBAJANUEVA+"','DD,MM/RRRR')");
-		}
-		
-		if(FECHAVALIDACIONNUEVA != null) {
-			sql.VALUES("FECHAVALIDACION","TO_DATE('"+FECHAVALIDACIONNUEVA+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionesvalidacionNUEVA() != null) {
-			sql.VALUES("OBSERVACIONESVALIDACION","'"+inscripciones.getObservacionesvalidacionNUEVA()+"'");
-		}
-		
-		if(FECHADENEGACIONNUEVA != null) {
-			sql.VALUES("FECHADENEGACION","TO_DATE('"+FECHADENEGACIONNUEVA+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionesdenegacionNUEVA() != null) {
-			sql.VALUES("OBSERVACIONESDENEGACION", "'"+inscripciones.getObservacionesdenegacionNUEVA()+"'");
-		}
-		
-		if(inscripciones.getObservacionesvalbajaNUEVA() != null) {
-			sql.VALUES("OBSERVACIONESVALBAJA", "'"+inscripciones.getObservacionesvalbajaNUEVA()+"'");
-		}
-		
-	return sql.toString();
-}
-	
-	public String CFechaInscripciones(BusquedaInscripcionMod inscripciones, String idInstitucion,String FECHABAJA,String FECHAVALIDACIONNUEVA,int usuario) {
-		SQL sql = new SQL();
-		
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        String today = formatter.format(new Date());
-        
-       
-		sql.UPDATE("scs_inscripcionguardia");
-		
-		
-		if (today != null) {
-			sql.SET("FECHAMODIFICACION = TO_DATE('"+today+"','DD,MM/RRRR')");
-		}
-		
-		sql.SET("USUMODIFICACION = "+usuario);
-		
-		if (FECHABAJA != null) {
-			sql.SET("FECHABAJA = TO_DATE('" + FECHABAJA+"','DD,MM/RRRR')");
-		}
-		
-		if (FECHAVALIDACIONNUEVA != null ) {
-			sql.SET("FECHAVALIDACION = TO_DATE('" +FECHAVALIDACIONNUEVA+"','DD,MM/RRRR')");
-		}
-
-		
-		sql.WHERE("IDINSTITUCION ="+ idInstitucion);
-		sql.WHERE("IDPERSONA ="+ inscripciones.getIdpersona());
-		sql.WHERE("IDTURNO ="+ inscripciones.getIdturno());
-		sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
-		
-		
-		return sql.toString();
-	}
-	
-	public String DenegarInscripciones(BusquedaInscripcionMod inscripciones, String idInstitucion,String FECHADENEGACIONNUEVA,int usuario) {
-		SQL sql = new SQL();
-		
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        String today = formatter.format(new Date());
-        
-       
-		sql.UPDATE("scs_inscripcionguardia");
-		
-		
-		if (today != null) {
-			sql.SET("FECHAMODIFICACION = TO_DATE('"+today+"','DD,MM/RRRR')");
-		}
-		
-		sql.SET("USUMODIFICACION = "+usuario);
-		
-		
-		if (FECHADENEGACIONNUEVA != null ) {
-			sql.SET("FECHADENEGACION = TO_DATE('" +FECHADENEGACIONNUEVA+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionesdenegacionNUEVA() != null) {
-			sql.SET("OBSERVACIONESDENEGACION = '"+inscripciones.getObservacionesdenegacionNUEVA()+"'");
-		}
-
-		
-		sql.WHERE("IDINSTITUCION ="+ idInstitucion);
-		sql.WHERE("IDPERSONA ="+ inscripciones.getIdpersona());
-		sql.WHERE("IDTURNO ="+ inscripciones.getIdturno());
-		sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
-		
-		
-		return sql.toString();
-	}
-
-
-	public String insertarObjetoFKGrupoColegiado(GrupoGuardiaColegiadoItem objetoFK,int usuario, String FECHASOLICITUD,String fECHASOLICITUDNUEVA,String FECHACREACIONNUEVA) {
-		// TODO Auto-generated method stub
-		SQL sql = new SQL();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        String today = formatter.format(new Date());
-        
-		
-		sql.INSERT_INTO("SCS_GRUPOGUARDIACOLEGIADO");
-
-		if(String.valueOf(objetoFK.getIdgrupoguardiacolegiado()) != null) {
-			sql.VALUES("IDGRUPOGUARDIACOLEGIADO",String.valueOf(objetoFK.getIdgrupoguardiacolegiado()));
-		}
-		
-		if(String.valueOf(objetoFK.getIdinstitucion()) != null ) {
-			sql.VALUES("IDINSTITUCION", "'"+String.valueOf(objetoFK.getIdinstitucion())+"'");
-		}
-		
-		if(String.valueOf(objetoFK.getIdturno()) != null) {
-			sql.VALUES("IDTURNO", String.valueOf(objetoFK.getIdturno()));
-		}
-		
-		if(String.valueOf(objetoFK.getIdguardia()) != null) {
-			sql.VALUES("IDGUARDIA", String.valueOf(objetoFK.getIdguardia()));
-		}
-		
-		if(String.valueOf(objetoFK.getIdpersona()) != null) {
-			sql.VALUES("IDPERSONA",String.valueOf(objetoFK.getIdpersona()));
-		}
-		
-		if(fECHASOLICITUDNUEVA != null) {
-			sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+fECHASOLICITUDNUEVA+"','DD/MM/YYYY HH:MI:SS')");
-		}else {
-			if(FECHASOLICITUD != null) {
-				sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+FECHASOLICITUD+"','DD/MM/YYYY HH:MI:SS')");
-			}
-		}
-		
-		if(String.valueOf(objetoFK.getIdgrupoguardia()) != null) {
-			sql.VALUES("IDGRUPOGUARDIA",String.valueOf(objetoFK.getIdgrupoguardia()));
-		}
-		
-		if(String.valueOf(objetoFK.getOrden()) != null) {
-			sql.VALUES("ORDEN",String.valueOf(objetoFK.getOrden()));
-		}
-		
-		if(objetoFK.getFechacreacion() != null) {
-			sql.VALUES("FECHACREACION","TO_DATE('"+FECHACREACIONNUEVA+"','DD,MM/RRRR')");
-		}
-		
-		if(String.valueOf(objetoFK.getUsucreacion()) != null) {
-			sql.VALUES("USUCREACION",String.valueOf(objetoFK.getUsucreacion()));
-		}
-		
-		
-		if (today != null) {
-			sql.VALUES("FECHAMODIFICACION","TO_DATE('"+today+"','DD,MM/RRRR')");
-		}
-		
-		if(String.valueOf(usuario) != null) {
-			sql.VALUES("USUMODIFICACION", String.valueOf(usuario));
-		}
-		
-		
-		return sql.toString();
-	}
-
-	public String validarDenegarSBajaCFechaInscripciones(BusquedaInscripcionMod inscripciones, String idInstitucion,String FECHABAJA,String FECHADENEGACIONNUEVA, String FECHASOLICITUDNUEVA,
-			String FECHASOLICITUDBAJANUEVA,String FECHAVALIDACIONNUEVA,String FECHAVALORALTA,String FECHAVALORBAJA,int usuario) {
-		SQL sql = new SQL();
-		
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        String today = formatter.format(new Date());
-        
-       
-		sql.UPDATE("scs_inscripcionguardia");
-		
-		
-		if (FECHASOLICITUDNUEVA != null ) {
-			sql.SET("FECHASUSCRIPCION = TO_DATE('" +FECHASOLICITUDNUEVA+"','DD,MM/RRRR')");
-		}
-		if (today != null) {
-			sql.SET("FECHAMODIFICACION = TO_DATE('"+today+"','DD,MM/RRRR')");
-		}
-		
-		sql.SET("USUMODIFICACION = "+usuario);
-		
-		if (FECHABAJA != null) {
-			sql.SET("FECHABAJA = TO_DATE('" + FECHABAJA+"','DD,MM/RRRR')");
-		}
-		if (inscripciones.getObservacionessolicitudNUEVA() != null) {
-			sql.SET("OBSERVACIONESSUSCRIPCION = '"+inscripciones.getObservacionessolicitudNUEVA()+"'");
-		}
-		if (inscripciones.getObservacionesbaja() != null ) {
-			sql.SET("OBSERVACIONESBAJA = '"+inscripciones.getObservacionesbaja()+"'");
-		}
-		
-		if (FECHASOLICITUDBAJANUEVA != null ) {
-			sql.SET("FECHASOLICITUDBAJA = TO_DATE('" +FECHASOLICITUDBAJANUEVA+"','DD,MM/RRRR')");
-		}
-		
-		if (FECHAVALIDACIONNUEVA != null ) {
-			sql.SET("FECHAVALIDACION = TO_DATE('" +FECHAVALIDACIONNUEVA+"','DD,MM/RRRR')");
-		}
-		if (inscripciones.getObservacionesvalidacionNUEVA() != null ) {
-			sql.SET("OBSERVACIONESVALIDACION = '"+inscripciones.getObservacionesvalidacionNUEVA()+"'");
-		}
-		if (FECHADENEGACIONNUEVA != null) {
-			sql.SET("FECHADENEGACION = TO_DATE('" +FECHADENEGACIONNUEVA+"','DD,MM/RRRR')");
-		}
-		if (inscripciones.getObservacionesdenegacionNUEVA() != null ) {
-			sql.SET("OBSERVACIONESDENEGACION = '"+inscripciones.getObservacionesdenegacionNUEVA()+"'");
-		}
-		if (inscripciones.getObservacionesvalbajaNUEVA() != null ) {
-			sql.SET("OBSERVACIONESVALBAJA = '"+inscripciones.getObservacionesvalbajaNUEVA()+"'");
-		}
-		
-		sql.WHERE("IDINSTITUCION ="+ idInstitucion);
-		sql.WHERE("IDPERSONA ="+ inscripciones.getIdpersona());
-		sql.WHERE("IDTURNO ="+ inscripciones.getIdturno());
-		sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
-		
-		
-		return sql.toString();
-	}
-	
-	
-	
 	public String insertarInscripcion(Short idInstitucion, BusquedaInscripcionItem inscripcion, AdmUsuarios admUsuarios) {
 		SQL sql = new SQL();
 
@@ -1612,6 +1167,28 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		}
 		
 		
+		return sql.toString();
+	}
+	
+	
+	public String updateOrdenInscripciones(String idTurno, String idGuardia, String idPersona, String idInstitucion, String ordenBD) {
+		SQL sql = new SQL();
+		if (ordenBD != null) {
+		sql.UPDATE("SCS_INSCRIPCIONGUARDIA");
+		sql.SET("ORDEN = " + ordenBD);
+			if (idTurno != null) {
+				sql.WHERE("IDTURNO = " + idTurno);
+			}
+			if (idGuardia != null) {
+				sql.WHERE("IDGUARDIA = " + idGuardia);
+			}
+			if (idPersona != null) {
+				sql.WHERE("IDPERSONA = " + idPersona);
+			}
+			if (idTurno != null) {
+				sql.WHERE("IDINSTITUCION = " + idInstitucion);
+			}
+		}
 		return sql.toString();
 	}
 }
