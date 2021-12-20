@@ -1165,6 +1165,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				}
 				productoSolicitado.setIdpersona(idPersona);
 				productoSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
+				
+				
 				//Si se ha seleccionado como forma de pago "No facturable"
 				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
 					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
@@ -1187,13 +1189,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				productoSolicitado.setFechamodificacion(new Date());
 				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
 				
-				//Se realiza una comprobación extra para comprobar el estado de la compra para saber los elementos que se pueden editar.
-				PysCompraExample compraExample = new PysCompraExample();
-				
-				compraExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
 				
 				
-				List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
+				int i = 0;
 				
 				for (ListaProductosCompraItem producto : peticion.getProductos()) {
 					
@@ -1202,6 +1200,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
 
 					productoSolicitado.setObservaciones(producto.getObservaciones());
+					
+					//Se realiza una comprobación extra para comprobar el estado de la compra para saber los elementos que se pueden editar.
+					PysCompraExample compraExample = new PysCompraExample();
+					
+					compraExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
+					
+					
+					List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
 					
 					//Se hace la comprobación extra para saber si la peticion de compra ha sido aceptada ya o no
 					if(comprasPeticion.isEmpty()) {
@@ -1220,9 +1226,20 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
 						//, por lo tanto, la actual.
 						productoSolicitado.setIdinstitucionorigen(idInstitucion);
+						
+						response = pysProductossolicitadosMapper.insert(productoSolicitado);
+					}
+					else {
+						productosViejos.get(i).setObservaciones(producto.getObservaciones());
+						
+						productosViejos.get(i).setFechamodificacion(new Date());
+						productosViejos.get(i).setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+						response = pysProductossolicitadosMapper.insert(productosViejos.get(i));
 					}
 
-					response = pysProductossolicitadosMapper.insert(productoSolicitado);
+					i++;
+					
 					if (response == 0)
 						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
 				}
