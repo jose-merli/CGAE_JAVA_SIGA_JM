@@ -155,7 +155,7 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/comboPlanificacion")
-	ResponseEntity<ComboDTO> comboPlanificacion(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> comboPlanificacion(@RequestParam(required = false) String idSerieFacturacion, HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {

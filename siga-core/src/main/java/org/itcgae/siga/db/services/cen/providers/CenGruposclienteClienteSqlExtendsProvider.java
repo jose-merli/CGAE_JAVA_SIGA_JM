@@ -168,7 +168,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.INNER_JOIN("CEN_PERSONA c ON ( c.idpersona = gcc.idpersona )");
 		
 		sql.WHERE("gcc.idinstitucion=" + idInstitucion);
-		//sql.WHERE("rownum <= " + 30);
+		sql.WHERE("rownum <= " + 30);
 		
 		sql.GROUP_BY("gcc.idpersona");
 		sql.GROUP_BY("c.nombre");

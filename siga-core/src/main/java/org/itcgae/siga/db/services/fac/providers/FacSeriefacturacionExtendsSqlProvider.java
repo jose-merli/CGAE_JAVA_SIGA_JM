@@ -73,17 +73,15 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 			sql.WHERE("sf.idseriefacturacion IN ( "
 					+ "SELECT DISTINCT tpf.idseriefacturacion "
 						+ "FROM fac_tiposproduincluenfactu tpf "
-						+ "INNER JOIN pys_tiposproductos tp ON ( tpf.idtipoproducto = tp.idtipoproducto ) "
 						+ "WHERE tpf.idinstitucion = sf.idinstitucion "
-							+ "AND tpf.idtipoproducto IN (" + String.join(", ", serieFacturacionItem.getIdTiposProductos()) + "))");
+							+ "AND (tpf.idtipoproducto || '-' || tpf.idproducto) IN (" + String.join(", ", serieFacturacionItem.getIdTiposProductos().stream().map(t -> "'" + t + "'").collect(Collectors.toList())) + "))");
 		
 		if (serieFacturacionItem.getIdTiposServicios() != null && !serieFacturacionItem.getIdTiposServicios().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
 					+ "SELECT DISTINCT tsf.idseriefacturacion "
 						+ "FROM fac_tiposservinclsenfact tsf "
-						+ "INNER JOIN pys_tiposervicios ts ON ( tsf.idtiposervicios = ts.idtiposervicios ) "
 						+ "WHERE tsf.idinstitucion = sf.idinstitucion "
-							+ "AND ts.idtiposervicios IN (" + String.join(", ", serieFacturacionItem.getIdTiposServicios()) + "))");
+							+ "AND (tsf.idtiposervicios || '-' || tsf.idservicio) IN (" + String.join(", ", serieFacturacionItem.getIdTiposServicios().stream().map(t -> "'" + t + "'").collect(Collectors.toList())) + "))");
 		
 		if (serieFacturacionItem.getIdEtiquetas() != null && !serieFacturacionItem.getIdEtiquetas().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
@@ -94,14 +92,10 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		
 		if (serieFacturacionItem.getIdConsultasDestinatarios() != null && !serieFacturacionItem.getIdConsultasDestinatarios().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
-						+ "SELECT ti.idseriefacturacion "
-							+ "FROM fac_tipocliincluidoenseriefac ti "
-							+ "WHERE ti.idinstitucion = sf.idinstitucion "
-								+ "AND ti.idgrupo IN ( "
-									+ "SELECT gcc.idgrupo "
-										+ "FROM cen_gruposcliente_cliente gcc "
-										+ "WHERE gcc.idinstitucion = sf.idinstitucion "
-											+ "AND idpersona IN (" + String.join(", ", serieFacturacionItem.getIdConsultasDestinatarios()) + ")))");
+						+ "SELECT csf.idseriefacturacion "
+							+ "FROM fac_clienincluidoenseriefactur csf "
+							+ "WHERE csf.idinstitucion = sf.idinstitucion "
+								+ "AND csf.idpersona IN (" + String.join(", ", serieFacturacionItem.getIdConsultasDestinatarios()) + ")))");
 		
 		if (serieFacturacionItem.getIdContadorFacturas() != null && serieFacturacionItem.getIdContadorFacturas() != "")
 			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getIdContadorFacturas() + "'");

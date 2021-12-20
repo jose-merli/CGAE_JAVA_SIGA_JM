@@ -449,8 +449,15 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			// Logica
 			FacSeriefacturacionExample exampleSerieFacturacion = new FacSeriefacturacionExample();
-			exampleSerieFacturacion.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
-					.andIdseriefacturacionNotEqualTo(Long.valueOf(idSerieFacturacion)).andFechabajaIsNull();
+
+			if (idSerieFacturacion == null) {
+				exampleSerieFacturacion.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andFechabajaIsNull();
+			} else {
+				exampleSerieFacturacion.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andIdseriefacturacionNotEqualTo(Long.valueOf(idSerieFacturacion)).andFechabajaIsNull();
+			}
+
 			exampleSerieFacturacion.setOrderByClause("descripcion");
 
 			List<FacSeriefacturacion> seriesFacturacion = facSeriefacturacionExtendsMapper
