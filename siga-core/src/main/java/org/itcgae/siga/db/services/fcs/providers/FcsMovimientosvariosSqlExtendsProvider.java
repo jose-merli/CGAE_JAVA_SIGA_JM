@@ -4,6 +4,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.MovimientosVariosFacturacionItem;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosSqlProvider;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -73,7 +74,11 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         sql.LEFT_OUTER_JOIN("fcs_pagosjg ON fcs_aplica_movimientosvarios.idinstitucion = fcs_pagosjg.idinstitucion AND fcs_aplica_movimientosvarios.idpagosjg = fcs_pagosjg.idpagosjg");
         sql.LEFT_OUTER_JOIN("fcs_facturacionjg ON fcs_movimientosvarios.idinstitucion = fcs_facturacionjg.idinstitucion AND fcs_movimientosvarios.idfacturacion = fcs_facturacionjg.idfacturacion");
         sql.LEFT_OUTER_JOIN("scs_grupofacturacion ON fcs_movimientosvarios.idinstitucion = scs_grupofacturacion.idinstitucion AND fcs_movimientosvarios.idgrupofacturacion = scs_grupofacturacion.idgrupofacturacion");
-       
+        
+        if (movimientoItem.getCertificacion() != null && movimientoItem.getCertificacion() != "") {
+            sql.INNER_JOIN(" FCS_MVARIOS_CERTIFICACIONES fmc ON fmc.IDINSTITUCION = fcs_movimientosvarios.IDINSTITUCION AND fmc.IDMOVIMIENTO = fcs_movimientosvarios.IDMOVIMIENTO");
+        }
+                
         if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
         	sql.INNER_JOIN("fcs_movimientosvarios_tipo ON fcs_movimientosvarios.idinstitucion = fcs_movimientosvarios_tipo.idinstitucion AND fcs_movimientosvarios.idtipomovimiento = fcs_movimientosvarios_tipo.idtipomovimiento");
         }
@@ -99,19 +104,28 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         }
 
         if (movimientoItem.getCertificacion() != null && movimientoItem.getCertificacion() != "") {
-            // sql.WHERE("fcs_movimientosvarios.descripcion movimiento ='"+movimientoItem.getDescripcion()+"'");
+            sql.WHERE("fmc.IDCERTIFICACION IN("+movimientoItem.getCertificacion()+")");
         }
         
         if(movimientoItem.getIdAplicadoEnPago() != null && movimientoItem.getIdAplicadoEnPago() != "") {
             sql.WHERE("fcs_aplica_movimientosvarios.idpagosjg IN("+movimientoItem.getIdAplicadoEnPago()+")");
         }
 
-        if (movimientoItem.getFechaApDesde() != null) {
-            sql.WHERE("fcs_pagosjg.fechadesde >='" + movimientoItem.getFechaApDesde() + "'");
-        }
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
+        
+        if (movimientoItem.getFechaApDesde() != null) {
+        	String fechaDesde = "";
+            
+            fechaDesde = dateFormat.format(movimientoItem.getFechaApDesde());
+            sql.WHERE("TRUNC(fcs_pagosjg.fechadesde) >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
+        }
+        
         if (movimientoItem.getFechaApHasta() != null) {
-            sql.WHERE("fcs_pagosjg.fechahasta <='" + movimientoItem.getFechaApHasta() + "'");
+        	 String fechaHasta = "";
+        	 
+        	fechaHasta = dateFormat.format(movimientoItem.getFechaApHasta());
+            sql.WHERE("TRUNC(fcs_pagosjg.fechahasta) <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
         }
         
         if(movimientoItem.getIdFacturacion() != null && movimientoItem.getIdFacturacion() != "") {
@@ -196,6 +210,18 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
 
         return sql.toString();
     }
+    
+    public String comboCertificacionSJCS(String idInstitucion) {
+
+
+        SQL sql = new SQL();
+        sql.SELECT("IDCERTIFICACION AS ID");
+        sql.SELECT("NOMBRE AS DESCRIPCION");
+        sql.FROM("FCS_CERTIFICACIONES ffc");
+        sql.WHERE("IDINSTITUCION ='" + idInstitucion + "'");
+
+        return sql.toString();
+    }
 
 
     public String saveClienteMovimientosVarios(MovimientosVariosFacturacionItem movimiento, String idInstitucion) {
@@ -271,6 +297,16 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         return sql.toString();
     }
 
+    public String selectMaxIdCertificacionByIdInstitucion(String idInstitucion) {
+        SQL sql = new SQL();
+
+        sql.SELECT("MAX(IDCERTIFICACION) as IDCERTIFICACION");
+        sql.FROM("FCS_MVARIOS_CERTIFICACIONES");
+        sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+        return sql.toString();
+    }
+    
     public String selectIdPersonaByNif(String nif) {
         SQL sql = new SQL();
 

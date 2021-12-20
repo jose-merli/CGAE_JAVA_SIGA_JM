@@ -39,16 +39,21 @@ public class TarjetaDatosRetencionesController {
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "retenciones/searchRetencionColegiado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@RequestMapping(value = "retenciones/searchRetencionColegiado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<RetencionesDTO> getRetencionesColegial(@RequestParam("numPagina") int numPagina, @RequestBody PersonaSearchDTO personaSearchDTO, HttpServletRequest request) {
         RetencionesDTO response = tarjetaDatosRetencionesService.getRetencionesColegial(numPagina, personaSearchDTO, request);
         return new ResponseEntity<RetencionesDTO>(response, HttpStatus.OK);
-    }
+    }*/
 
-    @RequestMapping(value = "retenciones/selectRetencionesColegialYSociedades", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@RequestMapping(value = "retenciones/selectRetencionesColegialYSociedades", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<RetencionesDTO> selectRetencionesColegialYSociedades(@RequestParam("numPagina") int numPagina, @RequestBody PersonaSearchDTO personaSearchDTO, HttpServletRequest request) {
         RetencionesDTO response = tarjetaDatosRetencionesService.selectRetencionesColegialYSociedades(numPagina, personaSearchDTO, request);
         return new ResponseEntity<RetencionesDTO>(response, HttpStatus.OK);
-    }
-
+    }*/
+	
+	@RequestMapping(value = "retenciones/searchLiquidacionSociedad", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<RetencionesDTO> getLiquidacionSJCS(@RequestBody PersonaSearchDTO personaSearchDTO, HttpServletRequest request) { 
+		RetencionesDTO response = tarjetaDatosRetencionesService.getLiquidacionSJCS(personaSearchDTO, request);
+		return new ResponseEntity<RetencionesDTO >(response, HttpStatus.OK);
+	}
 }

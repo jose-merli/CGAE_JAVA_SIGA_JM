@@ -35,6 +35,7 @@ public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosM
             @Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NOMBREFACTURACION", property = "nombrefacturacion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "PAGOASOCIADO", property = "nombrePago", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NOMBRETIPO", property = "nombretipo", jdbcType = JdbcType.VARCHAR)})
     List<MovimientosVariosFacturacionItem> buscarMovimientosVarios(MovimientosVariosFacturacionItem movimientoItem, String idInstitucion);
 
@@ -104,4 +105,17 @@ public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosM
             @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDHITOGENERAL", property = "idConcepto", jdbcType = JdbcType.VARCHAR)})
     MovimientosVariosFacturacionItem getMovimientoVarioPorId(String idMovimiento, Short idInstitucion);
+
+
+    @SelectProvider(type = FcsMovimientosvariosSqlExtendsProvider.class, method = "comboCertificacionSJCS")
+    @Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR)})
+    List<ComboItem> comboCertificacionSJCS(String idInstitucion);
+
+
+    @SelectProvider(type = FcsMovimientosvariosSqlExtendsProvider.class, method = "selectMaxIdCertificacionByIdInstitucion")
+    @Results({
+            @Result(column = "IDCERTIFICACION", property = "newId", jdbcType = JdbcType.VARCHAR)
+    })
+    NewIdDTO selectMaxIdCertificacionByIdInstitucion(String idInstitucion);
 }

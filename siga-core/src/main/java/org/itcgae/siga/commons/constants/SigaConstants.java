@@ -62,8 +62,8 @@ public class SigaConstants {
     public static String parametroRutaSalidaInformes = "informes.directorioFisicoSalidaInformesJava";
     public static String rutaPlantillaSinClase = "plantillasSinClase";
     public static String parametroSizePlantillas = "gen.ficheros.maxsize.bytes";
-    public static String parametroRutaAlmacenFicheros = "gen.ficheros.path"; 
-    
+    public static String parametroRutaAlmacenFicheros = "gen.ficheros.path";
+
     public static String pathSeparator = "/";
 
     public static String nombreExcelConsulta = "ResultadoConsulta";
@@ -1241,32 +1241,33 @@ public class SigaConstants {
     public static final int TIPO_CAJG_CATALANES = 2;
 
     	
-	public enum Consejos {
-		C_CATALUNYA ("AC0900"),
-				EUSKAL_K_ ("AC1600"),
-				C_ANDALUZ ("AC0100"),
-				C_VALENCI ("AC1500"),
-				C_GALEGA("AC1100"),
-				C_CASTILLA_Y_LEON ("AC0700"),
-				C_CASTILLA_LA_MANCHA ("AC0800"),
-				C_MADRID ("AC1200"),
-				C_CANARIO("AC0500"),
-				C_ARAGON ("AC0200");
+    public enum Consejos {
+        C_CATALUNYA("AC0900"),
+        EUSKAL_K_("AC1600"),
+        C_ANDALUZ("AC0100"),
+        C_VALENCI("AC1500"),
+        C_GALEGA("AC1100"),
+        C_CASTILLA_Y_LEON("AC0700"),
+        C_CASTILLA_LA_MANCHA("AC0800"),
+        C_MADRID("AC1200"),
+        C_CANARIO("AC0500"),
+        C_ARAGON("AC0200");
 
-		private String codigoExt;
-		
-		private Consejos(String codigoExt) {
-		this.codigoExt=codigoExt;	
-		}
+        private String codigoExt;
 
-		public String getCodigoExt() {
-			return codigoExt;
-		}
+        private Consejos(String codigoExt) {
+            this.codigoExt = codigoExt;
+        }
 
-		public void setCodigoExt(String codigoExt) {
-			this.codigoExt = codigoExt;
-		}		
-	}
+        public String getCodigoExt() {
+            return codigoExt;
+        }
+
+        public void setCodigoExt(String codigoExt) {
+            this.codigoExt = codigoExt;
+        }
+    }
+
 	
 	
 	public static enum OPERACION {
@@ -1375,4 +1376,45 @@ public class SigaConstants {
 		}
 	}
     
+
+    // Estados certificación
+    public enum ESTADO_CERTIFICACION {
+
+        ESTADO_CERTIFICACION_ABIERTA("1"),
+        ESTADO_CERTIFICACION_VALIDANDO("2"),
+        ESTADO_CERTIFICACION_NO_VALIDADA("3"),
+        ESTADO_CERTIFICACION_VALIDADA("4"),
+        ESTADO_CERTIFICACION_ENVIANDO("5"),
+        ESTADO_CERTIFICACION_ENVIO_CON_ERRORES("6"),
+        ESTADO_CERTIFICACION_CERRADA("7");
+
+        private String codigo;
+
+        ESTADO_CERTIFICACION(String codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getCodigo() {
+            return this.codigo;
+        }
+    }
+
+    // Procesos certificación
+    public enum PROCESO_CERTIFICACION {
+
+        PROCESO_CERTIFICACION_JUSTIFICACION("873016"),
+        PROCESO_CERTIFICACION_REINTEGRO("873017"),
+        PROCESO_CERTIFICACION_CERTIFICACION("873018");
+
+        private String recurso;
+
+        PROCESO_CERTIFICACION(String recurso) {
+            this.recurso = recurso;
+        }
+
+        public String getRecurso() {
+            return this.recurso;
+        }
+    }
+
 }

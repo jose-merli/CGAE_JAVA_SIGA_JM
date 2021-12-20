@@ -236,7 +236,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 				if (response != 0) {
 					error.setCode(200);
-					error.setDescription("messages.inserted.success");
+					error.setDescription("facturacionSJCS.baremos.baremoIsertado");
 					baremosGuardiaDTO.setError(error);
 				} else {
 					error.setCode(400);
@@ -275,6 +275,8 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 				//para obtener los hitos del baremo de la guardia y el importe, ya se obtiene los dias aplicar y el agrupar.
 				hitoGuardia.setIdHito(hito.getIdhito().toString());
 				hitoGuardia.setPrecioHito(hito.getPreciohito().toString());
+				hitoGuardia.setDias(hito.getDiasaplicables());
+				hitoGuardia.setAgrupar((hito.getAgrupar()));
 				listHitos.add(hitoGuardia);
 				
 			}

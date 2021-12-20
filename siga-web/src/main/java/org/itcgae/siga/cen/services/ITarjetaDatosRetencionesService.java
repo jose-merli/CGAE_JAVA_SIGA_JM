@@ -17,7 +17,10 @@ public interface ITarjetaDatosRetencionesService {
 
     public UpdateResponseDTO updateRetenciones(List<EtiquetaRetencionesDTO> etiquetaRetencionesDTO, String idPersona, HttpServletRequest request);
 
-    RetencionesDTO getRetencionesColegial(int numPagina, PersonaSearchDTO personaSearchDTO, HttpServletRequest request);
+    /*RetencionesDTO getRetencionesColegial(int numPagina, PersonaSearchDTO personaSearchDTO, HttpServletRequest request);
 
-    RetencionesDTO selectRetencionesColegialYSociedades(int numPagina, PersonaSearchDTO personaSearchDTO, HttpServletRequest request);
+    RetencionesDTO selectRetencionesColegialYSociedades(int numPagina, PersonaSearchDTO personaSearchDTO, HttpServletRequest request);*/
+
+	public RetencionesDTO getLiquidacionSJCS(PersonaSearchDTO personaSearchDTO, HttpServletRequest request);
+
 }

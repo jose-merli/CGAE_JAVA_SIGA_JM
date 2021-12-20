@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -8,6 +9,8 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
+import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
@@ -24,6 +27,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/certificaciones")
@@ -87,5 +91,17 @@ public class CertificacionFacSJCSController {
 		UpdateResponseDTO response = iCertificacionFacSJCSService.validaCatalunya(gestEcom,request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+
+    @PostMapping("/eliminarCertificaciones")
+    ResponseEntity<DeleteResponseDTO> eliminarCertificaciones(@RequestBody List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
+        DeleteResponseDTO response = iCertificacionFacSJCSService.eliminarCertificaciones(certificacionesItemList, request);
+        return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getEstadosCertificacion")
+    ResponseEntity<EstadoCertificacionDTO> getEstadosCertificacion(@RequestParam("idCertificacion") String idCertificacion, HttpServletRequest request) {
+        EstadoCertificacionDTO response = iCertificacionFacSJCSService.getEstadosCertificacion(idCertificacion, request);
+        return new ResponseEntity<EstadoCertificacionDTO>(response, HttpStatus.OK);
+    }
 
 }
