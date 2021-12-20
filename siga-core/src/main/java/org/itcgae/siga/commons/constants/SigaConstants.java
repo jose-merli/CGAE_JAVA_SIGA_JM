@@ -1241,32 +1241,32 @@ public class SigaConstants {
     public static final int TIPO_CAJG_CATALANES = 2;
 
 
-	public enum Consejos {
-		C_CATALUNYA ("AC0900"),
-				EUSKAL_K_ ("AC1600"),
-				C_ANDALUZ ("AC0100"),
-				C_VALENCI ("AC1500"),
-				C_GALEGA("AC1100"),
-				C_CASTILLA_Y_LEON ("AC0700"),
-				C_CASTILLA_LA_MANCHA ("AC0800"),
-				C_MADRID ("AC1200"),
-				C_CANARIO("AC0500"),
-				C_ARAGON ("AC0200");
+    public enum Consejos {
+        C_CATALUNYA("AC0900"),
+        EUSKAL_K_("AC1600"),
+        C_ANDALUZ("AC0100"),
+        C_VALENCI("AC1500"),
+        C_GALEGA("AC1100"),
+        C_CASTILLA_Y_LEON("AC0700"),
+        C_CASTILLA_LA_MANCHA("AC0800"),
+        C_MADRID("AC1200"),
+        C_CANARIO("AC0500"),
+        C_ARAGON("AC0200");
 
-		private String codigoExt;
+        private String codigoExt;
 
-		private Consejos(String codigoExt) {
-		this.codigoExt=codigoExt;
-		}
+        private Consejos(String codigoExt) {
+            this.codigoExt = codigoExt;
+        }
 
-		public String getCodigoExt() {
-			return codigoExt;
-		}
+        public String getCodigoExt() {
+            return codigoExt;
+        }
 
-		public void setCodigoExt(String codigoExt) {
-			this.codigoExt = codigoExt;
-		}
-	}
+        public void setCodigoExt(String codigoExt) {
+            this.codigoExt = codigoExt;
+        }
+    }
 
     // Estados certificación
     public enum ESTADO_CERTIFICACION {
@@ -1287,6 +1287,24 @@ public class SigaConstants {
 
         public String getCodigo() {
             return this.codigo;
+        }
+    }
+
+    // Procesos certificación
+    public enum PROCESO_CERTIFICACION {
+
+        PROCESO_CERTIFICACION_JUSTIFICACION("873016"),
+        PROCESO_CERTIFICACION_REINTEGRO("873017"),
+        PROCESO_CERTIFICACION_CERTIFICACION("873018");
+
+        private String recurso;
+
+        PROCESO_CERTIFICACION(String recurso) {
+            this.recurso = recurso;
+        }
+
+        public String getRecurso() {
+            return this.recurso;
         }
     }
 
