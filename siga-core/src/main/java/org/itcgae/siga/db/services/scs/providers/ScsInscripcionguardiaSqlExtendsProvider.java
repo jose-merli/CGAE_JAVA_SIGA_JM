@@ -429,7 +429,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.SELECT("ins.idinstitucion");
 		sql.SELECT("ins.idpersona");
 		sql.SELECT("ins.idturno");
-		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS') AS fechasuscripcion");
+		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH24:MI:SS') AS fechasuscripcion");
 		sql.SELECT("ins.observacionessuscripcion AS observacionessolicitud");
 		sql.SELECT("ins.fechavalidacion");
 		sql.SELECT("ins.observacionesvalidacion");
@@ -524,7 +524,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
         }
         
         if(inscripciones.getnColegiado() != null) {
-        	sql.WHERE("col.ncolegiado = " + inscripciones.getnColegiado());
+        	sql.WHERE("(col.ncolegiado = " + inscripciones.getnColegiado() + " OR col.ncomunitario = " + inscripciones.getnColegiado() + ")");
         }
         
         sql.WHERE("ROWNUM <= 200");

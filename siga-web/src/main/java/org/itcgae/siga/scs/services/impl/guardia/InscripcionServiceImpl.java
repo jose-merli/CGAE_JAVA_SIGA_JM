@@ -125,59 +125,63 @@ public class InscripcionServiceImpl implements InscripcionService {
 					
 					ScsInscripcionguardia objeto = inscripcionGuardiaExtensdsMapper.selectByPrimaryKey(key);
 					
-					
-					if(inscripcion.getFechasolicitudNUEVA() != null) {
-						objeto.setFechasuscripcion(inscripcion.getFechasolicitudNUEVA());
-					}else {
-						if(inscripcion.getFechasolicitud() != null) {
-							objeto.setFechasuscripcion(inscripcion.getFechasolicitud());
+					if(objeto!= null) {
+						/*if(inscripcion.getFechasolicitudNUEVA() != null) {
+							objeto.setFechasuscripcion(inscripcion.getFechasolicitudNUEVA());
+						}else {
+							if(inscripcion.getFechasolicitud() != null) {
+								objeto.setFechasuscripcion(inscripcion.getFechasolicitud());
+							}
+						}*/
+						
+						objeto.setFechamodificacion(new Date());
+						objeto.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+						if(inscripcion.getFechabaja() != null) {
+							objeto.setFechabaja(inscripcion.getFechabaja());
 						}
+						
+						/*if(inscripcion.getObservacionessolicitudNUEVA() != null) {
+							objeto.setObservacionessuscripcion(inscripcion.getObservacionessolicitudNUEVA());
+						}*/
+						
+						if(inscripcion.getObservacionesbaja() != null) {
+							objeto.setObservacionesbaja(inscripcion.getObservacionesbaja());
+						}
+						
+						if(inscripcion.getFechasolicitudbajaNUEVA() != null) {
+							objeto.setFechasolicitudbaja(inscripcion.getFechasolicitudbajaNUEVA());
+						}
+						
+						if(inscripcion.getObservacionesvalbajaNUEVA() != null) {
+							objeto.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
+						}
+						
+						if(inscripcion.getFechavalidacionNUEVA() != null) {
+							objeto.setFechavalidacion(inscripcion.getFechavalidacionNUEVA());
+						}
+						
+						if(inscripcion.getObservacionesvalidacionNUEVA() != null) {
+							objeto.setObservacionesvalidacion(inscripcion.getObservacionesvalidacionNUEVA());
+						}
+						
+						if(inscripcion.getFechadenegacionNUEVA() != null) {
+							objeto.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
+						}
+						
+						if(inscripcion.getObservacionesdenegacionNUEVA() != null) {
+							objeto.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
+						}
+						
+						if(inscripcion.getObservacionesvalbajaNUEVA() != null) {
+							objeto.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
+						}
+						
+						contadorKO = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(objeto);
+	
+						LOGGER.info(
+								"validarInscripciones() -> Salida ya con los datos actualizados y la inscripción validada");
 					}
-					
-					objeto.setFechamodificacion(new Date());
-					objeto.setUsumodificacion(usuarios.get(0).getIdusuario());
-					
-					if(inscripcion.getFechabaja() != null) {
-						objeto.setFechabaja(inscripcion.getFechabaja());
-					}
-					
-					if(inscripcion.getObservacionessolicitudNUEVA() != null) {
-						objeto.setObservacionessuscripcion(inscripcion.getObservacionessolicitudNUEVA());
-					}
-					
-					if(inscripcion.getObservacionesbaja() != null) {
-						objeto.setObservacionesbaja(inscripcion.getObservacionesbaja());
-					}
-					
-					if(inscripcion.getFechasolicitudbajaNUEVA() != null) {
-						objeto.setFechasolicitudbaja(inscripcion.getFechasolicitudbajaNUEVA());
-					}
-					
-					if(inscripcion.getFechavalidacionNUEVA() != null) {
-						objeto.setFechavalidacion(inscripcion.getFechavalidacionNUEVA());
-					}
-					
-					if(inscripcion.getObservacionesvalidacionNUEVA() != null) {
-						objeto.setObservacionesvalidacion(inscripcion.getObservacionesvalidacionNUEVA());
-					}
-					
-					if(inscripcion.getFechadenegacionNUEVA() != null) {
-						objeto.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
-					}
-					
-					if(inscripcion.getObservacionesdenegacionNUEVA() != null) {
-						objeto.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
-					}
-					
-					if(inscripcion.getObservacionesvalbajaNUEVA() != null) {
-						objeto.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
-					}
-					
-					contadorKO = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(objeto);
-
-					LOGGER.info(
-							"validarInscripciones() -> Salida ya con los datos actualizados y la inscripción validada");
-
 				}
 			}
 		}
@@ -219,6 +223,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 					
 					int usuario = usuarios.get(0).getIdusuario();
 
+					/*
 					ScsInscripcionguardiaExample example = new ScsInscripcionguardiaExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(a.getIdpersona()))
 							.andIdturnoEqualTo(Integer.valueOf(a.getIdturno())).andIdguardiaEqualTo(Integer.valueOf(a.getIdguardia()));
@@ -226,46 +231,57 @@ public class InscripcionServiceImpl implements InscripcionService {
 					List<ScsInscripcionguardia> listaInscripciones = inscripcionGuardiaExtensdsMapper.selectByExample(example);
 
 					ScsInscripcionguardia record = listaInscripciones.get(0);
+					*/
+					//Obtenemos la inscripcion
+					ScsInscripcionguardiaKey key = new ScsInscripcionguardiaKey();
+					key.setFechasuscripcion(a.getFechasolicitud());
+					key.setIdguardia(Integer.valueOf(a.getIdguardia()));
+					key.setIdinstitucion(idInstitucion);
+					key.setIdpersona(Long.valueOf(a.getIdpersona()));
+					key.setIdturno(Integer.valueOf(a.getIdturno()));
 					
-					record.setFechamodificacion(new Date());
-					record.setUsumodificacion(usuario);
+					ScsInscripcionguardia record = inscripcionGuardiaExtensdsMapper.selectByPrimaryKey(key);
 					
-					if (a.getFechasolicitudNUEVA() != null) {
-						record.setFechasuscripcion(a.getFechasolicitudNUEVA());
+					if(record!= null) {
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuario);
+						
+						if (a.getFechasolicitudNUEVA() != null) {
+							record.setFechasuscripcion(a.getFechasolicitudNUEVA());
+						}
+						
+						if (a.getFechabaja() != null) {
+							record.setFechabaja(a.getFechabaja());
+						}
+						if (a.getObservacionessolicitudNUEVA() != null) {
+							record.setObservacionessuscripcion(a.getObservacionessolicitudNUEVA());
+						}
+						if (a.getObservacionesbaja() != null ) {
+							record.setObservacionesbaja(a.getObservacionesbaja());
+						}
+						
+						if (a.getFechasolicitudbajaNUEVA() != null) {
+							record.setFechasolicitudbaja(a.getFechasolicitudbajaNUEVA());
+						}
+						
+						if (a.getFechavalidacionNUEVA() != null) {
+							record.setFechavalidacion(a.getFechavalidacionNUEVA());
+						}
+						if (a.getObservacionesvalidacionNUEVA() != null ) {
+							record.setObservacionesvalidacion(a.getObservacionesvalidacionNUEVA());
+						}
+						if (a.getFechadenegacionNUEVA() != null) {
+							record.setFechadenegacion(a.getFechadenegacionNUEVA());
+						}
+						if (a.getObservacionesdenegacionNUEVA() != null ) {
+							record.setObservacionesdenegacion(a.getObservacionesdenegacionNUEVA());
+						}
+						if (a.getObservacionesvalbajaNUEVA() != null ) {
+							record.setObservacionesvalbaja(a.getObservacionesvalbajaNUEVA());
+						}
+						
+						inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record);
 					}
-					
-					if (a.getFechabaja() != null) {
-						record.setFechabaja(a.getFechabaja());
-					}
-					if (a.getObservacionessolicitudNUEVA() != null) {
-						record.setObservacionessuscripcion(a.getObservacionessolicitudNUEVA());
-					}
-					if (a.getObservacionesbaja() != null ) {
-						record.setObservacionesbaja(a.getObservacionesbaja());
-					}
-					
-					if (a.getFechasolicitudbajaNUEVA() != null) {
-						record.setFechasolicitudbaja(a.getFechasolicitudbajaNUEVA());
-					}
-					
-					if (a.getFechavalidacionNUEVA() != null) {
-						record.setFechavalidacion(a.getFechavalidacionNUEVA());
-					}
-					if (a.getObservacionesvalidacionNUEVA() != null ) {
-						record.setObservacionesvalidacion(a.getObservacionesvalidacionNUEVA());
-					}
-					if (a.getFechadenegacionNUEVA() != null) {
-						record.setFechadenegacion(a.getFechadenegacionNUEVA());
-					}
-					if (a.getObservacionesdenegacionNUEVA() != null ) {
-						record.setObservacionesdenegacion(a.getObservacionesdenegacionNUEVA());
-					}
-					if (a.getObservacionesvalbajaNUEVA() != null ) {
-						record.setObservacionesvalbaja(a.getObservacionesvalbajaNUEVA());
-					}
-					
-					inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record );
-
 					if (inscripciones != 0) {
 						contadorKO++;
 					}
@@ -311,6 +327,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 					
 					int usuario = usuarios.get(0).getIdusuario();
 
+					/*
 					ScsInscripcionguardiaExample example = new ScsInscripcionguardiaExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(a.getIdpersona()))
 							.andIdturnoEqualTo(Integer.valueOf(a.getIdturno())).andIdguardiaEqualTo(Integer.valueOf(a.getIdguardia()));
@@ -318,22 +335,34 @@ public class InscripcionServiceImpl implements InscripcionService {
 					List<ScsInscripcionguardia> listaInscripciones = inscripcionGuardiaExtensdsMapper.selectByExample(example);
 
 					ScsInscripcionguardia record = listaInscripciones.get(0);
+					 */
+					//Obtenemos la inscripcion
+					ScsInscripcionguardiaKey key = new ScsInscripcionguardiaKey();
+					key.setFechasuscripcion(a.getFechasolicitud());
+					key.setIdguardia(Integer.valueOf(a.getIdguardia()));
+					key.setIdinstitucion(idInstitucion);
+					key.setIdpersona(Long.valueOf(a.getIdpersona()));
+					key.setIdturno(Integer.valueOf(a.getIdturno()));
 					
-					record.setFechamodificacion(new Date());
-					record.setUsumodificacion(usuario);
+					ScsInscripcionguardia record = inscripcionGuardiaExtensdsMapper.selectByPrimaryKey(key);
 					
-					if (a.getFechadenegacionNUEVA() != null) {
-						record.setFechadenegacion(a.getFechadenegacionNUEVA());
-						if(a.getObservacionesdenegacionNUEVA()!= null) {
-							record.setObservacionesdenegacion(a.getObservacionesdenegacionNUEVA());
+					if(record!= null) {
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuario);
+						
+						if (a.getFechadenegacionNUEVA() != null) {
+							record.setFechadenegacion(a.getFechadenegacionNUEVA());
+							if(a.getObservacionesdenegacionNUEVA()!= null) {
+								record.setObservacionesdenegacion(a.getObservacionesdenegacionNUEVA());
+							}
 						}
+						
+						inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record);
+						
 					}
-					
-					inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record );
-
+	
+					LOGGER.info("denegarInscripcion() -> Salida ya con los datos modificados");
 				}
-
-				LOGGER.info("denegarInscripcion() -> Salida ya con los datos modificados");
 			}
 		}
 
@@ -373,6 +402,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 					int usuario = usuarios.get(0).getIdusuario();
 					
+					/*
 					ScsInscripcionguardiaExample example = new ScsInscripcionguardiaExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(a.getIdpersona()))
 							.andIdturnoEqualTo(Integer.valueOf(a.getIdturno())).andIdguardiaEqualTo(Integer.valueOf(a.getIdguardia()));
@@ -380,27 +410,37 @@ public class InscripcionServiceImpl implements InscripcionService {
 					List<ScsInscripcionguardia> listaInscripciones = inscripcionGuardiaExtensdsMapper.selectByExample(example);
 
 					ScsInscripcionguardia record = listaInscripciones.get(0);
+					*/
+					//Obtenemos la inscripcion
+					ScsInscripcionguardiaKey key = new ScsInscripcionguardiaKey();
+					key.setFechasuscripcion(a.getFechasolicitud());
+					key.setIdguardia(Integer.valueOf(a.getIdguardia()));
+					key.setIdinstitucion(idInstitucion);
+					key.setIdpersona(Long.valueOf(a.getIdpersona()));
+					key.setIdturno(Integer.valueOf(a.getIdturno()));
 					
-					record.setFechamodificacion(new Date());
-					record.setUsumodificacion(usuario);
+					ScsInscripcionguardia record = inscripcionGuardiaExtensdsMapper.selectByPrimaryKey(key);
 					
-					if (a.getFechabaja() != null) {
-						record.setFechabaja(a.getFechabaja());
-						if(a.getObservacionessolicitudNUEVA()!= null) {
-							record.setObservacionesvalbaja(a.getObservacionessolicitudNUEVA());
+					if(record!= null) {
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuario);
+						
+						if (a.getFechabaja() != null) {
+							record.setFechabaja(a.getFechabaja());
+							if(a.getObservacionessolicitudNUEVA()!= null) {
+								record.setObservacionesvalbaja(a.getObservacionessolicitudNUEVA());
+							}
 						}
-					}
-					
-					if (a.getFechavalidacionNUEVA() != null) {
-						record.setFechavalidacion(a.getFechavalidacionNUEVA());
-						if(a.getObservacionessolicitudNUEVA()!= null) {
-							record.setObservacionesvalidacion(a.getObservacionessolicitudNUEVA());
+						
+						if (a.getFechavalidacionNUEVA() != null) {
+							record.setFechavalidacion(a.getFechavalidacionNUEVA());
+							if(a.getObservacionessolicitudNUEVA()!= null) {
+								record.setObservacionesvalidacion(a.getObservacionessolicitudNUEVA());
+							}
 						}
+						
+						inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record);
 					}
-					
-					
-					
-					inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record );
 					if (inscripciones != 0)
 						contadorKO++;
 				}
@@ -940,13 +980,13 @@ public class InscripcionServiceImpl implements InscripcionService {
 	}
 
 	@Override
-	public InscripcionesDisponiblesDTO inscripcionesDisponibles(BusquedaInscripcionItem inscripcion,
+    public InscripcionesDisponiblesDTO inscripcionesDisponibles(BusquedaInscripcionItem inscripcion,
 			HttpServletRequest request) {
 		LOGGER.info("inscripcionesDisponibles() -> Entrada para insertar inscripciones");
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		InscripcionesDisponiblesDTO inscripciones = new InscripcionesDisponiblesDTO();
+        InscripcionesDisponiblesDTO inscripciones = new InscripcionesDisponiblesDTO();
 		Error error = new Error();
 		try {
 			if (idInstitucion != null) {
