@@ -23,7 +23,7 @@ public interface FacDisqueteabonosExtendsMapper extends FacDisqueteabonosMapper 
 		@Result(column = "IDDISQUETEABONO", property = "idDisqueteAbono", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CUENTA_ENTIDAD", property = "cuentaEntidad", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "cod_banco", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numfacturas", property = "numRecibos", jdbcType = JdbcType.INTEGER),
 		@Result(column = "IDSUFIJO", property = "idSufijo", jdbcType = JdbcType.VARCHAR),
