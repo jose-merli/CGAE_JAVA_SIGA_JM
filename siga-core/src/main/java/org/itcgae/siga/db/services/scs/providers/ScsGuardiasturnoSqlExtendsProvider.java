@@ -1353,7 +1353,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("PC.IDINSTITUCION = " + idInstitucion);
 		}
 		
-		sql.WHERE("EXISTS (" + sql2 +" ) OR EXISTS( SELECT 1 FROM scs_prog_calendarios pc WHERE pc.idconjuntoguardia IS NULL)");
+		//sql.WHERE("EXISTS (" + sql2 +" ) OR EXISTS( SELECT 1 FROM scs_prog_calendarios pc WHERE pc.idconjuntoguardia IS NULL)");
 		
 		sql.ORDER_BY("PC.FECHACALINICIO desc, PC.FECHACALFIN desc, PC.FECHAPROGRAMACION desc");
 
