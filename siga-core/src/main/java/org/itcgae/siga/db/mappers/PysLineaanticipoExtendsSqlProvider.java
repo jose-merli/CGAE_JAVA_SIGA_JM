@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.mappers;
 
+import org.apache.log4j.Logger;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FiltroMonederoItem;
 import org.itcgae.siga.db.entities.PysServicioanticipo;
@@ -8,18 +9,18 @@ import java.text.SimpleDateFormat;
 
 public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvider {
 
+    private Logger LOGGER = Logger.getLogger(PysLineaanticipoExtendsSqlProvider.class);
 
 	public String selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SQL query = new SQL();
         query.SELECT("anti.fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", "anti.idanticipo", "anti.descripcion", "anti.importeinicial as importe_inicial"
-        		, "sum(nvl(linea.importeanticipado, 0)) as importe_usado", "sum(anti.importeinicial)- sum(nvl(linea.importeanticipado, 0)) as importe_restante")
-                .FROM("pys_anticipoletrado anti", "CEN_PERSONA pers")
-                .LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona");
+        		, "sum(nvl(linea.importeanticipado, 0)) as importe_usado", "anti.importeinicial- sum(nvl(linea.importeanticipado, 0)) as importe_restante");
+        query.FROM("pys_anticipoletrado anti");
+        query.INNER_JOIN("cen_persona pers on pers.idpersona = anti.idpersona");
+        query.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona and linea.idanticipo = anti.idanticipo");
 
-        query.WHERE("pers.idpersona = anti.idpersona").AND()
-                .WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)").AND()
-                .WHERE("anti.idinstitucion = " + institutionId);
+        query.WHERE("anti.idinstitucion = " + institutionId);
         
         if (filter.getFechaDesde() != null ){
 
@@ -39,9 +40,12 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         	query.WHERE("pers.idpersona = "+filter.getIdPersonaColegiado());
         }
 
-        query.GROUP_BY("anti.idanticipo", "anti.FECHA", "pers.NIFCIF", "pers.idpersona", "anti.idanticipo", "pers.APELLIDOS1", "pers.APELLIDOS2", "pers.NOMBRE", "anti.descripcion", "anti.importeinicial", "linea.importeanticipado");
+        query.GROUP_BY("anti.idanticipo", "anti.FECHA", "pers.NIFCIF", "pers.idpersona", "anti.idanticipo", "pers.APELLIDOS1", "pers.APELLIDOS2", "pers.NOMBRE", "anti.descripcion", "anti.importeinicial");
         
         query.ORDER_BY("anti.FECHA desc");
+        
+        LOGGER.info("CONSULTA DE LISTA DE BUSQUEDA DE MONEDEROS: \r\n" + query.toString());
+
 
 
         return query.toString();
@@ -89,7 +93,7 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
     	queryLineas.FROM("pys_anticipoletrado anti"); 
     	queryLineas.INNER_JOIN("pys_lineaanticipo linea on linea.idinstitucion = anti.idinstitucion and linea.idanticipo = anti.idanticipo "
     			+ "and linea.idpersona = anti.idpersona ");
-    	queryLineas.INNER_JOIN("pys_servicioanticipo servAnti on servAnti.IDINSTITUCION = linea.idInstitucion and servAnti.IDPERSONA = linea.idPersona and servAnti.IDANTICIPO = anti.idanticipo");
+    	queryLineas.LEFT_OUTER_JOIN("pys_servicioanticipo servAnti on servAnti.IDINSTITUCION = linea.idInstitucion and servAnti.IDPERSONA = linea.idPersona and servAnti.IDANTICIPO = anti.idanticipo");
     	queryLineas.LEFT_OUTER_JOIN("fac_facturacionsuscripcion factServ on linea.idinstitucion = factServ.idinstitucion and linea.numerolinea = factServ.numerolinea "
     			+ "and linea.idfactura = factServ.idfactura");
     	queryLineas.LEFT_OUTER_JOIN("pys_serviciosinstitucion servIns on servIns.idinstitucion = factServ.idinstitucion and factServ.idservicio = servIns.idservicio "
@@ -100,7 +104,9 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         queryLineas.WHERE("anti.idanticipo = " + idAnticipo);        
         
     	
-        String query =   "select * from (" +queryLineas.toString() +" order by fecha desc) UNION "+ queryAnti.toString();
+        String query =  queryLineas.toString() +" \r\n UNION \r\n"+ queryAnti.toString()+ " order by fecha desc";
+
+        LOGGER.info("CONSULTA DE LISTA DE BUSQUEDA DE MOVIMIENTOS DE UN MONEDERO: \r\n" + query.toString());
         
     	return query;
     }
@@ -249,7 +255,9 @@ public String getListaServiciosMonedero(Short idInstitucion, String idAnticipo, 
     	
         
         query.WHERE("anti.idPersona = "+ idPersona +" and anti.idinstitucion = " + idInstitucion + "  and anti.idAnticipo = "+idAnticipo);
-    	
+
+        LOGGER.info("CONSULTA DE LISTA DE BUSQUEDA DE SERVICIOS DE UN MONEDERO: \r\n" + query.toString());
+        
     	return query.toString();
     }
 
