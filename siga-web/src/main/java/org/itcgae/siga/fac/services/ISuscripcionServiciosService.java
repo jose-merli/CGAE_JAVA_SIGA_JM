@@ -8,5 +8,9 @@ import org.itcgae.siga.DTO.fac.ListaSuscripcionesDTO;
 public interface ISuscripcionServiciosService {
 
 	public ListaSuscripcionesDTO getListaSuscripciones(HttpServletRequest request, FiltrosSuscripcionesItem peticion);
+	
+	public void ejecutaSuscripcionesAutomaticas();
+
+	void actualizacionSuscripcionesPersona();
 
 }

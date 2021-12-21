@@ -65,6 +65,35 @@ public class EjecucionPlsServicios {
     }
     
     /**
+     * PL para el proceso de revision automatica de servicios de unainstitucion
+     */
+    public String[] ejecutarPL_RevisionAutomaticaServicios(short idInstitucion, AdmUsuarios usuario) throws Exception {
+
+        Object[] paramIn = new Object[6];
+    
+        java.util.Date utilDate = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+        
+        paramIn[0] = idInstitucion; // IDINSTITUCION
+        paramIn[1] = sqlDate; // FECHAPROCESO
+        paramIn[2] = usuario.getIdusuario(); // IDUSUARIO
+
+        String resultado[] = new String[2];
+
+        //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
+        //El segundo parametro el numero de parametros de salida del PL
+        resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_AUTO(?,?,?,?,?,?,?,?)}", 2, paramIn);
+
+        if (!resultado[0].equalsIgnoreCase("0")) {
+            LOGGER.error("Error en PL = " + (String) resultado[1]);
+            throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisón automática de servicios de una institución. Error en PL = " + (String) resultado[1]);
+        }
+
+        return resultado;
+    }
+    
+    
+    /**
      * PL para el proceso de baja de servicios
      */
     public String[] ejecutarPL_ServiciosAutomaticosProcesoBaja(short idInstitucion, int idTipoServicios, int idServicio, int idServiciosInstitucion, AdmUsuarios usuario) throws Exception {
@@ -130,7 +159,6 @@ public class EjecucionPlsServicios {
 
         return resultado;
     }
-
     
     /**
      * Recupera el datasource con los datos de conexión sacados del fichero de
