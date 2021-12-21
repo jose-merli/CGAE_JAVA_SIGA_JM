@@ -32,4 +32,8 @@ public interface ICertificacionFacSJCSService {
     DeleteResponseDTO eliminarCertificaciones(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request);
 
     EstadoCertificacionDTO getEstadosCertificacion(String idCertificacion, HttpServletRequest request);
+
+	Resource descargaErrorValidacion(GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request) throws Exception;
+
+	UpdateResponseDTO enviaRespuestaCICAC_ICA(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request);
 }

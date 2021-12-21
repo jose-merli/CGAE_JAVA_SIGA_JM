@@ -2,14 +2,19 @@ package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.ExcelHelper;
+import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.FcsJeCertEstado;
@@ -21,9 +26,13 @@ import org.itcgae.siga.db.entities.FcsJeDevEstadoExample;
 import org.itcgae.siga.db.entities.FcsJeIntercambios;
 import org.itcgae.siga.db.entities.FcsJeJustEstado;
 import org.itcgae.siga.db.entities.FcsJeJustEstadoExample;
+import org.itcgae.siga.db.entities.JeCertValerroneo;
 import org.itcgae.siga.db.entities.JeCertValerroneoExample;
+import org.itcgae.siga.db.entities.JeCertanexoValerroneo;
 import org.itcgae.siga.db.entities.JeCertanexoValerroneoExample;
+import org.itcgae.siga.db.entities.JeDevValerroneo;
 import org.itcgae.siga.db.entities.JeDevValerroneoExample;
+import org.itcgae.siga.db.entities.JeJusValerroneo;
 import org.itcgae.siga.db.entities.JeJusValerroneoExample;
 import org.itcgae.siga.db.mappers.FcsJeCertEstadoMapper;
 import org.itcgae.siga.db.mappers.FcsJeCertanexoEstadoMapper;
@@ -113,6 +122,23 @@ public class CertificacionFacSJCSServicesCatalunyaHelper {
 			throw new BusinessException("Excepcion en método valida", e);
 		}
 	}
+	
+	private GestionEconomicaCatalunyaItem getCabeceraIntercambio(Long idIntercambio) throws BusinessException {
+		GestionEconomicaCatalunyaItem  intercambio = null;
+		try {
+			Map<String, Object> map = new HashMap<String, Object>();
+		
+			map.put("idIntercambio", idIntercambio);
+			
+			intercambio = gestionEconomicaCatalunyaMapper.getCabeceraIntercambio(map);
+
+		} catch (Exception e) {
+			throw new BusinessException("Se ha producido un error al obtener getCabeceraIntercambio", e);
+		}
+
+		return intercambio;
+	}
+
 	
 	private void validaJustificacion(GestionEconomicaCatalunyaItem justificacionVo) throws Exception {
 		Long idJustificacion = justificacionVo.getIdJustificacion();
@@ -560,6 +586,255 @@ private String getNombreXmlAnexo(Long idCertificacionAnexo,short idEstado,boolea
 		return pDescarga.toString();	
 	}
 	
+	
+	public File descargaErrorValidacion (GestionEconomicaCatalunyaItem justificacionVo) throws BusinessException {
+		File log = null;
+		try {
+			GestionEconomicaCatalunyaItem intercambio = getCabeceraIntercambio(justificacionVo.getIdIntercambio());
+			justificacionVo.setAnio(intercambio.getAnio());
+			justificacionVo.setIdPeriodo(intercambio.getIdPeriodo());
+			justificacionVo.setIdInstitucion(intercambio.getIdInstitucion());
+			
+			log = getFileErroresValidacion(justificacionVo);
+//			request.setAttribute("nombreFichero", log.getName());
+//			request.setAttribute("rutaFichero", log.getPath());			
+//			request.setAttribute("borrarFichero", "false");			
+
+
+
+		}catch (BusinessException e){
+			throw new BusinessException("messages.general.error", e , new String[] {"modulo.gratuita"});
+		}
+		catch (Exception e){
+			throw new BusinessException("messages.general.error", e , new String[] {"modulo.gratuita"});
+
+		}
+		return log;
+	}
+	
+	
+public	File getFileErroresValidacion(GestionEconomicaCatalunyaItem justificacionVo) throws BusinessException {
+		GestionEnvioInformacionEconomicaCatalunyaService.TIPOINTERCAMBIO tipo = GestionEnvioInformacionEconomicaCatalunyaService.TIPOINTERCAMBIO
+				.getEnum(justificacionVo.getIdTipoIntercambio());
+
+		switch (tipo) {
+		case Justificaciones:
+			return getFileErroresValidacionJustificacion(justificacionVo);
+		case Devoluciones:
+			return getFileErroresValidacionDevolucion(justificacionVo);
+		case Certificaciones:
+			return getFileErroresValidacionCertificacionIca(justificacionVo);
+		case Anexos:
+			return getFileErroresValidacionCertificacionAnexo(justificacionVo);
+		default:
+			break;
+		}
+		return null;
+	}
+	
+private File getFileErroresValidacionJustificacion(GestionEconomicaCatalunyaItem itemVo)throws BusinessException{
+		String pathcompleto = getFilePath(TIPOINTERCAMBIO.Justificaciones, itemVo,true,true);
+		File jsutificaioneFile = new File(pathcompleto.toString());
+		if(jsutificaioneFile!=null && jsutificaioneFile.exists())
+			return jsutificaioneFile;
+		Long idJustificacion = itemVo.getIdJustificacion(); 
+
+		FcsJeJustEstadoExample justEstadoExample = new FcsJeJustEstadoExample();
+		justEstadoExample.createCriteria().andIdestadoEqualTo(GestionEnvioInformacionEconomicaCatalunyaService.ESTADOS_FCS_JE.VALIDADO_ERRONEO.getIdEstado()).andIdjustificacionEqualTo(idJustificacion);
+		List<FcsJeJustEstado> estadosList =  justEstadoMapper.selectByExample(justEstadoExample);
+		//Solo hay un estado de validado erroneo
+		FcsJeJustEstado estadoValidadoErroneo = estadosList.get(0);
+
+
+		JeJusValerroneoExample jeJusValerroneoExample = new JeJusValerroneoExample();
+		jeJusValerroneoExample.createCriteria().andIdjustestadoEqualTo(estadoValidadoErroneo.getIdjustestado());
+		List<JeJusValerroneo> jusValerroneoList =  jusValerroneoMapper.selectByExampleWithBLOBs(jeJusValerroneoExample);
+		//Solo hay un estado de validado erroneo
+		JeJusValerroneo jusValerroneo = jusValerroneoList.get(0);
+		String errorString = jusValerroneo.getDescerrorgenera();
+		
+		String[] errores = errorString.split("\n");
+		Vector<Hashtable<String, Object>> datos = new Vector<Hashtable<String,Object>>();
+		Hashtable<String, Object> datosColumnas = null;
+		
+		for (String linea : errores) {
+			datosColumnas = new Hashtable<String, Object>();
+			datosColumnas.put(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR, linea);
+			datos.add(datosColumnas);
+		}
+		
+		List<String> camposError = new ArrayList<String>(); 
+		camposError.add(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR);
+		byte[] bytesJustificaio = ExcelHelper.createExcelBytes(camposError, datos);
+		File logFile = SIGAServicesHelper.createFile(bytesJustificaio,jsutificaioneFile.getParent(),jsutificaioneFile.getName());
+		LOGGER.debug("Fin getFileErroresValidacionJustificacion");
+		
+		
+		return logFile;
+	}
+
+
+private  File getFileErroresValidacionDevolucion(GestionEconomicaCatalunyaItem itemVo) throws BusinessException {
+	String pathcompleto = getFilePath(TIPOINTERCAMBIO.Devoluciones, itemVo,true,true);
+	File jsutificaioneFile = new File(pathcompleto.toString());
+	if(jsutificaioneFile!=null && jsutificaioneFile.exists())
+		return jsutificaioneFile;
+	
+	Long idDevolucion = itemVo.getIdDevolucion(); 
+
+	FcsJeDevEstadoExample justEstadoExample = new FcsJeDevEstadoExample();
+	justEstadoExample.createCriteria().andIdestadoEqualTo(GestionEnvioInformacionEconomicaCatalunyaService.ESTADOS_FCS_JE.VALIDADO_ERRONEO.getIdEstado()).andIddevolucionEqualTo(idDevolucion);
+	List<FcsJeDevEstado> estadosList =  devEstadoMapper.selectByExample(justEstadoExample);
+	//Solo hay un estado de validado erroneo
+	FcsJeDevEstado estadoValidadoErroneo = estadosList.get(0);
+
+	JeDevValerroneoExample jeJusValerroneoExample = new JeDevValerroneoExample();
+	jeJusValerroneoExample.createCriteria().andIddevestadoEqualTo(estadoValidadoErroneo.getIddevestado());
+	List<JeDevValerroneo> jusValerroneoList =  jusDevValerroneoMapper.selectByExampleWithBLOBs(jeJusValerroneoExample);
+	//Solo hay un estado de validado erroneo
+	JeDevValerroneo jusValerroneo = jusValerroneoList.get(0);
+	String errorString = jusValerroneo.getDescerrorgeneral();
+	
+	String[] errores = errorString.split("\n");
+	Vector<Hashtable<String, Object>> datos = new Vector<Hashtable<String,Object>>();
+	Hashtable<String, Object> datosColumnas = null;
+	
+	for (String linea : errores) {
+		datosColumnas = new Hashtable<String, Object>();
+		datosColumnas.put(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR, linea);
+		datos.add(datosColumnas);
+	}
+	
+	List<String> camposError = new ArrayList<String>(); 
+	camposError.add(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR);
+	byte[] bytesJustificaio = ExcelHelper.createExcelBytes(camposError, datos);
+	
+	File logFile = SIGAServicesHelper.createFile(bytesJustificaio,jsutificaioneFile.getParent(),jsutificaioneFile.getName());
+	LOGGER.debug("Fin getFileErroresValidacionDevolucion");
+	
+	
+	return logFile;
+}
+
+private File getFileErroresValidacionCertificacionIca(GestionEconomicaCatalunyaItem certificacionVo) throws BusinessException {
+	String pathcompleto = getFilePath(TIPOINTERCAMBIO.Certificaciones, certificacionVo,true,true);
+	File jsutificaioneFile = new File(pathcompleto.toString());
+	if(jsutificaioneFile!=null && jsutificaioneFile.exists())
+		return jsutificaioneFile;
+	
+	Long idCertificacion = certificacionVo.getIdCertificacion(); 
+
+	FcsJeCertEstadoExample justEstadoExample = new FcsJeCertEstadoExample();
+	 justEstadoExample.createCriteria()
+	 .andIdestadoEqualTo(GestionEnvioInformacionEconomicaCatalunyaService.ESTADOS_FCS_JE.VALIDADO_ERRONEO.getIdEstado())
+	 .andIdcertificacionEqualTo(idCertificacion);
+	List<FcsJeCertEstado> estadosList =  certEstadoMapper.selectByExample(justEstadoExample);
+	//Solo hay un estado de validado erroneo
+	FcsJeCertEstado estadoValidadoErroneo = estadosList.get(0);
+
+	JeCertValerroneoExample jeJusValerroneoExample = new JeCertValerroneoExample();
+	jeJusValerroneoExample.createCriteria()
+	.andIdcertestadoEqualTo(estadoValidadoErroneo.getIdcertestado());
+	List<JeCertValerroneo> jusValerroneoList =  certValerroneoMapper.selectByExampleWithBLOBs(jeJusValerroneoExample);
+	//Solo hay un estado de validado erroneo
+	JeCertValerroneo jusValerroneo = jusValerroneoList.get(0);
+	String errorString = jusValerroneo.getDescerrorgeneral();
+	
+	String[] errores = errorString.split("\n");
+	Vector<Hashtable<String, Object>> datos = new Vector<Hashtable<String,Object>>();
+	Hashtable<String, Object> datosColumnas = null;
+	
+	for (String linea : errores) {
+				
+		
+		datosColumnas = new Hashtable<String, Object>();
+		datosColumnas.put(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR, linea);
+		datos.add(datosColumnas);
+		
+		
+	}
+	List<String> camposError = new ArrayList<String>(); 
+	camposError.add(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR);
+	byte[] bytesJustificaio = ExcelHelper.createExcelBytes(camposError, datos);
+	
+	File logFile = SIGAServicesHelper.createFile(bytesJustificaio,jsutificaioneFile.getParent(),jsutificaioneFile.getName());
+	LOGGER.debug("Fin getFileErroresValidacionCertificacionIca");
+	
+	
+	return logFile;
+}
+
+
+private File getFileErroresValidacionCertificacionAnexo(GestionEconomicaCatalunyaItem certificacionVo) throws BusinessException {
+	String pathcompleto = getFilePath(TIPOINTERCAMBIO.Anexos,certificacionVo, true,true);
+	File jsutificaioneFile = new File(pathcompleto.toString());
+	if(jsutificaioneFile!=null && jsutificaioneFile.exists())
+		return jsutificaioneFile;
+	
+	Long idCertificacion = certificacionVo.getIdCertificacionAnexo(); 
+
+	FcsJeCertanexoEstadoExample justEstadoExample = new FcsJeCertanexoEstadoExample();
+	justEstadoExample.createCriteria()
+	.andIdestadoEqualTo(GestionEnvioInformacionEconomicaCatalunyaService.ESTADOS_FCS_JE.VALIDADO_ERRONEO.getIdEstado())
+	.andIdcertificacionanexoEqualTo(idCertificacion);
+	List<FcsJeCertanexoEstado> estadosList =  certanexoEstadoMapper.selectByExample(justEstadoExample);
+	//Solo hay un estado de validado erroneo
+	FcsJeCertanexoEstado estadoValidadoErroneo = estadosList.get(0);
+
+	JeCertanexoValerroneoExample jeJusValerroneoExample = new JeCertanexoValerroneoExample();
+	jeJusValerroneoExample.createCriteria()
+	.andIdcertanexoestadoEqualTo(estadoValidadoErroneo.getIdcertificacionanexoestado());
+	List<JeCertanexoValerroneo> jusValerroneoList =  certAnexValerroneoMapper.selectByExampleWithBLOBs(jeJusValerroneoExample);
+	//Solo hay un estado de validado erroneo
+	JeCertanexoValerroneo jusValerroneo = jusValerroneoList.get(0);
+	String errorString = jusValerroneo.getDescerrorgeneral();
+	
+	String[] errores = errorString.split("\n");
+	Vector<Hashtable<String, Object>> datos = new Vector<Hashtable<String,Object>>();
+	Hashtable<String, Object> datosColumnas = null;
+	
+	for (String linea : errores) {
+				
+		
+		datosColumnas = new Hashtable<String, Object>();
+		datosColumnas.put(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR, linea);
+		datos.add(datosColumnas);
+		
+		
+	}
+	List<String> camposError = new ArrayList<String>(); 
+	camposError.add(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR);
+	byte[] bytesJustificaio = ExcelHelper.createExcelBytes(camposError, datos);
+	
+	File logFile = SIGAServicesHelper.createFile(bytesJustificaio,jsutificaioneFile.getParent(),jsutificaioneFile.getName());
+	LOGGER.debug("Fin getFileErroresValidacionCertificacionAnexo");
+	
+	
+	return logFile;
+}
+
+public void enviaRespuestaCICAC_ICA (GestionEconomicaCatalunyaItem justificacionVo) throws BusinessException {
+	try {
+		GestionEconomicaCatalunyaItem intercambio = getCabeceraIntercambio(justificacionVo.getIdIntercambio());
+		procesaRespuestasPendientes(intercambio);
+	}catch (BusinessException e){
+		throw new BusinessException("error en enviaRespuestaCICAC_ICA", e);
+	}
+	catch (Exception e){
+		throw new BusinessException("messages.general.error", e);
+	}
+}
+
+private void procesaRespuestasPendientes(GestionEconomicaCatalunyaItem gestionEconomicaCatalunyaVo)  throws Exception {
+	EcomCola ecomColaValidarJustificacion = new EcomCola();
+	ecomColaValidarJustificacion.setIdoperacion(SigaConstants.ECOM_OPERACION.CAT_ENVIA_RESP_JUSTIFICACION.getId());
+	ecomColaValidarJustificacion.setIdinstitucion(gestionEconomicaCatalunyaVo.getIdInstitucion());
+	Map<String, String> mapa = new HashMap<String, String>();
+	mapa.put(GestionEnvioInformacionEconomicaCatalunyaService.PARAM_ECOMCOLA_IDINTERCAMBIO, gestionEconomicaCatalunyaVo.getIdIntercambio().toString());
+	facHelper.insertaColaConParametros(ecomColaValidarJustificacion, mapa);
+
+}
+
 	
 }
 

@@ -1,5 +1,19 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -10,17 +24,41 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
 import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
-import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.*;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucionExt;
+import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.EcomColaExample;
+import org.itcgae.siga.db.entities.EcomColaParametros;
+import org.itcgae.siga.db.entities.EcomColaParametrosExample;
+import org.itcgae.siga.db.entities.EcomOperacion;
+import org.itcgae.siga.db.entities.FcsCertificacionesExample;
+import org.itcgae.siga.db.entities.FcsCertificacionesHistoricoEstadoExample;
+import org.itcgae.siga.db.entities.FcsFactCertificacionesExample;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
+import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
+import org.itcgae.siga.db.entities.FcsMvariosCertificacionesExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.mappers.EcomColaMapper;
+import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
+import org.itcgae.siga.db.mappers.EcomOperacionMapper;
+import org.itcgae.siga.db.mappers.FcsCertificacionesHistoricoEstadoMapper;
+import org.itcgae.siga.db.mappers.FcsFactCertificacionesMapper;
+import org.itcgae.siga.db.mappers.FcsMvariosCertificacionesMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +67,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSService {
@@ -717,5 +748,52 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
         return estadoCertificacionDTO;
     }
+
+	@Override
+	public Resource descargaErrorValidacion(GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request)
+			throws IOException {
+		Resource resource = null;
+
+		LOGGER.info("CertificacionFacSJCSServicesImpl.descargaErrorValidacion() -> Entrada al servicio para la descarga de errores de validacion");
+
+		File file = cataHelper.descargaErrorValidacion(gestionVo);
+
+		if (file != null) {
+			resource = new ByteArrayResource(Files.readAllBytes(file.toPath())) {
+				public String getFilename() {
+					return file.getName();
+				}
+			};
+
+		}
+
+		LOGGER.info("CertificacionFacSJCSServicesImpl.descargaErrorValidacion() -> Salida del servicio para la descarga de errores de validacion");
+
+		return resource;
+	}
+
+	@Override
+	public UpdateResponseDTO enviaRespuestaCICAC_ICA(GestionEconomicaCatalunyaItem gestEcom,
+			HttpServletRequest request) {
+		 UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		 Error error = new Error();
+		 updateResponseDTO.setError(error)
+		 ;
+		 
+		 try {
+			 cataHelper.enviaRespuestaCICAC_ICA(gestEcom);
+			 updateResponseDTO.setStatus(SigaConstants.OK);
+		 } catch(Exception e) {
+			 LOGGER.error(e);
+			 error.setDescription(e.toString());
+			 updateResponseDTO.setStatus(SigaConstants.KO);
+		 }
+		 
+		 return updateResponseDTO;
+	}
+	
+	
+	
+
 
 }
