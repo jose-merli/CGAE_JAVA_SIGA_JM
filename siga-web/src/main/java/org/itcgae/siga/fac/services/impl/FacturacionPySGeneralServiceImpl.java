@@ -23,8 +23,6 @@ import org.itcgae.siga.db.entities.FacSufijoExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
-import org.itcgae.siga.db.entities.ModModelocomunicacion;
-import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.PysProductos;
 import org.itcgae.siga.db.entities.PysProductosExample;
 import org.itcgae.siga.db.entities.PysServicios;
@@ -41,14 +39,14 @@ import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMap
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacEstadoconfirmfactExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacEstadosabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacMotivodevolucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
-import org.itcgae.siga.db.services.fac.mappers.FacEstadosabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FactEstadosfacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
@@ -135,6 +133,9 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private ConConsultasExtendsMapper conConsultasExtendsMapper;
+
+	@Autowired
+	private FacMotivodevolucionExtendsMapper facMotivodevolucionExtendsMapper;
 
 	@Override
 	public ComboDTO comboCuentasBancarias(HttpServletRequest request) throws Exception {
@@ -1105,6 +1106,35 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		}
 
 		LOGGER.debug("parametrosCONTROL() -> Salida del servicio");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboMotivosDevolucion(HttpServletRequest request) throws Exception {
+		ComboDTO comboDTO = new ComboDTO();
+
+		AdmUsuarios usuario = new AdmUsuarios();
+		List<ComboItem> comboItems;
+
+		LOGGER.debug("comboMotivosDevolucion() -> Entrada al servicio para recuperar el combo de motivos de devolucion");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"comboMotivosDevolucion() / facEstadoconfirmfactExtendsMapper.comboFormasPagoFactura() -> Entrada a facEstadoconfirmfactExtendsMapper para obtener combo de motivos de devolucion");
+
+			Short idInstitucion = usuario.getIdinstitucion();
+
+			// Logica
+			comboItems = facMotivodevolucionExtendsMapper.comboMotivosDevolucion(usuario.getIdlenguaje());
+
+			comboDTO.setCombooItems(comboItems);
+		}
+
+		LOGGER.debug("comboMotivosDevolucion() -> Salida del servicio recuperar el combo de motivos de devolucion");
 
 		return comboDTO;
 	}
