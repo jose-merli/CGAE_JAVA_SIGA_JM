@@ -102,6 +102,20 @@ public class FacturacionPySController {
 		}
 	}
 
+	@PostMapping(value = "/reactivarCuentasBancarias")
+	ResponseEntity<UpdateResponseDTO> reactivarCuentasBancarias(@RequestBody List<CuentasBancariasItem> cuentasBancarias,
+															 HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+
+		try {
+			response = this.facturacionService.reactivarCuentasBancarias(cuentasBancarias, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@PostMapping(value = "/validarIBANCuentaBancaria")
 	ResponseEntity<CuentasBancariasDTO> validarIBANCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
 															HttpServletRequest request) {

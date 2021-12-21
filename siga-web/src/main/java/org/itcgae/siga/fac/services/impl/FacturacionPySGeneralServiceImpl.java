@@ -8,6 +8,10 @@ import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.FacBancoinstitucion;
+import org.itcgae.siga.db.entities.FacBancoinstitucionExample;
+import org.itcgae.siga.db.entities.FacPlantillafacturacion;
+import org.itcgae.siga.db.entities.FacPlantillafacturacionExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionExample;
 import org.itcgae.siga.db.entities.FacSufijo;
@@ -22,6 +26,7 @@ import org.itcgae.siga.db.entities.PysProductosExample;
 import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
+import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -87,7 +92,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	private FacFormapagoserieExtendsMapper facFormapagoserieExtendsMapper;
 
 	@Autowired
-	private ModModeloComunicacionExtendsMapper modModeloComunicacionExtendsMapper;
+	private FacPlantillafacturacionMapper facPlantillafacturacionMapper;
 
 	@Autowired
 	FacSeriefacturacionMapper facSeriefacturacionMapper;
@@ -139,7 +144,17 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 					"comboCuentasBancarias() / facBancoInstitucionExtendsMapper.comboCuentasBancarias() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de cuentas bancarias");
 
 			// Logica
-			comboItems = facBancoinstitucionExtendsMapper.comboCuentasBancarias(usuario.getIdinstitucion());
+			FacBancoinstitucionExample bancoExample = new FacBancoinstitucionExample();
+			bancoExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion()).andFechabajaIsNull();
+			bancoExample.setOrderByClause("descripcion");
+
+			List<FacBancoinstitucion> cuentasBancarias = facBancoinstitucionExtendsMapper.selectByExample(bancoExample);
+			comboItems = cuentasBancarias.stream().map(m -> {
+				ComboItem item = new ComboItem();
+				item.setValue(String.valueOf(m.getBancosCodigo()));
+				item.setLabel(m.getDescripcion());
+				return item;
+			}).collect(Collectors.toList());
 			LOGGER.debug("comboCuentasBancarias() ->" + comboItems.toString());
 
 			// comprobar primero si la lista de cuentas bancarias viene vacia
@@ -452,8 +467,15 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			// Logica
 			FacSeriefacturacionExample exampleSerieFacturacion = new FacSeriefacturacionExample();
-			exampleSerieFacturacion.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
-					.andIdseriefacturacionNotEqualTo(Long.valueOf(idSerieFacturacion)).andFechabajaIsNull();
+
+			if (idSerieFacturacion == null) {
+				exampleSerieFacturacion.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andFechabajaIsNull();
+			} else {
+				exampleSerieFacturacion.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andIdseriefacturacionNotEqualTo(Long.valueOf(idSerieFacturacion)).andFechabajaIsNull();
+			}
+
 			exampleSerieFacturacion.setOrderByClause("descripcion");
 
 			List<FacSeriefacturacion> seriesFacturacion = facSeriefacturacionExtendsMapper
@@ -625,15 +647,15 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 					"comboModelosComunicacion() / modModeloComunicacionExtendsMapper.selectByExample() -> Entrada a modModeloComunicacionExtendsMapper para obtener los modelos de comunicación");
 
 			// Logica
-			ModModelocomunicacionExample modeloExample = new ModModelocomunicacionExample();
+			FacPlantillafacturacionExample modeloExample = new FacPlantillafacturacionExample();
 			modeloExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
-			modeloExample.setOrderByClause("nombre");
+			modeloExample.setOrderByClause("descripcion");
 
-			List<ModModelocomunicacion> modelos = modModeloComunicacionExtendsMapper.selectByExample(modeloExample);
+			List<FacPlantillafacturacion> modelos = facPlantillafacturacionMapper.selectByExample(modeloExample);
 			comboItems = modelos.stream().map(m -> {
 				ComboItem item = new ComboItem();
-				item.setValue(String.valueOf(m.getIdmodelocomunicacion()));
-				item.setLabel(m.getNombre());
+				item.setValue(String.valueOf(m.getIdplantilla()));
+				item.setLabel(m.getDescripcion());
 				return item;
 			}).collect(Collectors.toList());
 

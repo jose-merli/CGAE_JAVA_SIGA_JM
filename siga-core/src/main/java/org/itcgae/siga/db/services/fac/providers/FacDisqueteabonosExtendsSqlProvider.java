@@ -29,7 +29,7 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
         numRecibos.FROM("fac_abonoincluidoendisquete");
         numRecibos.WHERE("idinstitucion = c.idinstitucion AND iddisqueteabono = c.iddisqueteabono");
 
-        principal.SELECT("c.idinstitucion,c.iddisqueteabono, c.fecha, b.cod_banco, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
+        principal.SELECT("c.idinstitucion,c.iddisqueteabono, c.fecha, b.bancos_codigo, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
                 + "c.idsufijo,( s.sufijo || ' - ' || s.concepto ) sufijo, ("+totalRemesa.toString()+") AS totalimporte, ("+numRecibos.toString()+") AS numfacturas");
 
 

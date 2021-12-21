@@ -39,6 +39,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -49,7 +50,9 @@ public interface IFacturacionPySService {
 
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) throws Exception;
 
-    CuentasBancariasDTO validarIBANCuentaBancaria(CuentasBancariasItem cuentaBancaria, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO reactivarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) throws Exception;
+
+    public CuentasBancariasDTO validarIBANCuentaBancaria(CuentasBancariasItem cuentaBancaria, HttpServletRequest request) throws Exception;
 
     public InsertResponseDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria, HttpServletRequest request) throws Exception;
 
