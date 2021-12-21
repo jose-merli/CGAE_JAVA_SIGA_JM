@@ -467,7 +467,7 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 					liquidacion.setIdpersona(Long.valueOf(monedero.getIdPersona()));
 					liquidacion.setImporteanticipado(monedero.getImporteRestante());
 					liquidacion.setLiquidacion("1");
-					liquidacion.setConcepto("Liquidacion");
+//					liquidacion.setConcepto("Liquidacion");
 					
 					liquidacion.setUsumodificacion(usuarios.get(0).getIdusuario());
 					liquidacion.setFechamodificacion(new Date());

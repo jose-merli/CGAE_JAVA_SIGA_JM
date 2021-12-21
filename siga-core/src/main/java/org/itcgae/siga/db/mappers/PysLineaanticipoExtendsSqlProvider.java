@@ -85,7 +85,8 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         SQL queryLineas = new SQL();
         
         queryLineas.SELECT("linea.fechaefectiva as fecha"); 
-    	queryLineas.SELECT("servIns.DESCRIPCION as concepto"); 
+    	queryLineas.SELECT("CASE WHEN servIns.DESCRIPCION is null then 'Liquidacion' \r\n"
+    			+ "else servIns.DESCRIPCION end as concepto"); 
     	queryLineas.SELECT("'' as cuentacontable "); 
     	queryLineas.SELECT("-linea.importeanticipado as importe"); 
     	queryLineas.SELECT("0 as nuevo");
