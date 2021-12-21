@@ -1005,7 +1005,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 					} else {
 						LOGGER.info(
 								"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Setteo de los campos que se han introducido y el resto de datos por defecto");
-
 						guardia.setFechabaja(null);
 						guardia.setEnviocentralita((short) (guardiasItem.getEnvioCentralita() ? 1 : 0));
 						guardia.setFechamodificacion(new Date());
@@ -1028,8 +1027,34 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardia.setSeleccionfestivos("LMXJVSD");
 						guardia.setSeleccionlaborables("LMXJVSD");
 						guardia.setValidarjustificaciones("N");
-						guardia.setIdordenacioncolas(18033); // Esta puesto este id porque es el que tiene la conf por
-																// defecto.
+						
+						ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
+						if(guardiasItem.getFiltros()!=null) {
+							ordenacion.setAlfabeticoapellidos(Short.valueOf(guardiasItem.getFiltros().split(",")[0]));
+							ordenacion.setFechanacimiento(Short.valueOf(guardiasItem.getFiltros().split(",")[1]));
+							ordenacion.setNumerocolegiado(Short.valueOf(guardiasItem.getFiltros().split(",")[2]));
+							ordenacion.setAntiguedadcola(Short.valueOf(guardiasItem.getFiltros().split(",")[3]));
+							ordenacion.setOrdenacionmanual(Short.valueOf(guardiasItem.getFiltros().split(",")[4]));
+						}else {
+							ordenacion.setAlfabeticoapellidos(Short.valueOf("0"));
+							ordenacion.setFechanacimiento(Short.valueOf("0"));
+							ordenacion.setNumerocolegiado(Short.valueOf("0"));
+							ordenacion.setAntiguedadcola(Short.valueOf("0"));
+							ordenacion.setOrdenacionmanual(Short.valueOf("0"));
+						}
+						ordenacion.setFechamodificacion(new Date());
+						ordenacion.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+						NewIdDTO idOrdCola = scsOrdenacionColasExtendsMapper.getIdOrdenacion();
+
+						if (idOrdCola == null) {
+							ordenacion.setIdordenacioncolas((int) 1);
+						} else {
+							ordenacion.setIdordenacioncolas(Integer.parseInt(idOrdCola.getNewId()) + 1);
+						}
+						scsOrdenacionColasExtendsMapper.insert(ordenacion);
+						
+						guardia.setIdordenacioncolas(ordenacion.getIdordenacioncolas());
 					}
 					NewIdDTO idP = scsGuardiasturnoExtendsMapper.getIdGuardia();
 
