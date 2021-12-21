@@ -92,10 +92,10 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		
 		if (serieFacturacionItem.getIdConsultasDestinatarios() != null && !serieFacturacionItem.getIdConsultasDestinatarios().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
-						+ "SELECT csf.idseriefacturacion "
-							+ "FROM fac_clienincluidoenseriefactur csf "
+						+ "SELECT DISTINCT csf.idseriefacturacion "
+							+ "FROM fac_grupcritincluidosenserie csf "
 							+ "WHERE csf.idinstitucion = sf.idinstitucion "
-								+ "AND csf.idpersona IN (" + String.join(", ", serieFacturacionItem.getIdConsultasDestinatarios()) + ")))");
+								+ "AND csf.idgruposcriterios IN (" + String.join(", ", serieFacturacionItem.getIdConsultasDestinatarios()) + "))");
 		
 		if (serieFacturacionItem.getIdContadorFacturas() != null && serieFacturacionItem.getIdContadorFacturas() != "")
 			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getIdContadorFacturas() + "'");

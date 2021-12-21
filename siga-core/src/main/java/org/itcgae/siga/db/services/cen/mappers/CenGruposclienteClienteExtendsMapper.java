@@ -65,11 +65,5 @@ public interface CenGruposclienteClienteExtendsMapper extends CenGruposclienteCl
 	@UpdateProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "updateByExample")
 	int updateByExample(@Param("record") CenGruposclienteCliente record,
 			@Param("example") CenGruposclienteClienteExample example);
-	
-	@SelectProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "comboDestinatarios")
-	@Results({
-		@Result(column = "IDPERSONA", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "PERSONA", property = "label", jdbcType = JdbcType.VARCHAR)
-	})
-	List<ComboItem> comboDestinatarios(Short idInstitucion);
+
 }

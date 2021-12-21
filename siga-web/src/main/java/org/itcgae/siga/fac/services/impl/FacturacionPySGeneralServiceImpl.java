@@ -8,6 +8,8 @@ import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenGruposcriterios;
+import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionExample;
 import org.itcgae.siga.db.entities.FacPlantillafacturacion;
@@ -26,6 +28,7 @@ import org.itcgae.siga.db.entities.PysProductosExample;
 import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
+import org.itcgae.siga.db.mappers.CenGruposcriteriosMapper;
 import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
@@ -123,6 +126,9 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
+
+	@Autowired
+	private CenGruposcriteriosMapper cenGruposcriteriosMapper;
 
 	@Override
 	public ComboDTO comboCuentasBancarias(HttpServletRequest request) throws Exception {
@@ -342,10 +348,20 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		if (usuario != null) {
 			LOGGER.debug(
-					"comboDestinatarios() / facBancoInstitucionExtendsMapper.comboDestinatarios() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de destinatarios");
+					"comboDestinatarios() / cenGruposcriteriosMapper.selectByExample() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de destinatarios");
 
 			// Logica
-			comboItems = cenGruposclienteClienteExtendsMapper.comboDestinatarios(usuario.getIdinstitucion());
+			CenGruposcriteriosExample criterioExample = new CenGruposcriteriosExample();
+			criterioExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+			criterioExample.setOrderByClause("nombre");
+
+			List<CenGruposcriterios> gruposCriterios = cenGruposcriteriosMapper.selectByExample(criterioExample);
+			comboItems = gruposCriterios.stream().map(g -> {
+				ComboItem item = new ComboItem();
+				item.setValue(String.valueOf(g.getIdgruposcriterios()));
+				item.setLabel(g.getNombre());
+				return item;
+			}).collect(Collectors.toList());
 
 			comboDTO.setCombooItems(comboItems);
 		}
