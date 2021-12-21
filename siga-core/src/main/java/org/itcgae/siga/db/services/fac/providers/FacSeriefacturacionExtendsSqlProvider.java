@@ -95,7 +95,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 						+ "SELECT DISTINCT csf.idseriefacturacion "
 							+ "FROM fac_grupcritincluidosenserie csf "
 							+ "WHERE csf.idinstitucion = sf.idinstitucion "
-								+ "AND csf.idgruposcriterios IN (" + String.join(", ", serieFacturacionItem.getIdConsultasDestinatarios()) + "))");
+								+ "AND csf.idinstitucion_grup || '-' || csf.idgruposcriterios IN (" + String.join(", ", serieFacturacionItem.getIdConsultasDestinatarios().stream().map(t -> "'" + t + "'").collect(Collectors.toList())) + "))");
 		
 		if (serieFacturacionItem.getIdContadorFacturas() != null && serieFacturacionItem.getIdContadorFacturas() != "")
 			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getIdContadorFacturas() + "'");

@@ -36,6 +36,8 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
@@ -75,6 +77,12 @@ public interface IFacturacionPySService {
     public CreateResponseDTO nuevoDestinatariosSerie(DestinatariosSeriesItem destinatariosSeriesItem, HttpServletRequest request) throws Exception;
 
 	public DeleteResponseDTO eliminaDestinatariosSerie(List<DestinatariosSeriesItem> destinatariosSeriesItems, HttpServletRequest request) throws Exception;
+
+	public ConsultasDTO getConsultasSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
+
+	public CreateResponseDTO nuevaConsultaSerie(ConsultaDestinatarioItem consulta, HttpServletRequest request) throws Exception;
+
+	public DeleteResponseDTO eliminaConsultasSerie(List<ConsultaDestinatarioItem> consultas, HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request) throws Exception;
 

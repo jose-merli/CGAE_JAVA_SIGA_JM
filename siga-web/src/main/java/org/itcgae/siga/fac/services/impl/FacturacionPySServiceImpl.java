@@ -38,6 +38,9 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
+import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.utils.SigaExceptions;
@@ -49,6 +52,9 @@ import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
+import org.itcgae.siga.db.entities.CenGruposcriterios;
+import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
+import org.itcgae.siga.db.entities.CenGruposcriteriosKey;
 import org.itcgae.siga.db.entities.CenSucursalesExample;
 import org.itcgae.siga.db.entities.EnvComunicacionmorosos;
 import org.itcgae.siga.db.entities.EnvComunicacionmorososExample;
@@ -76,6 +82,9 @@ import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
+import org.itcgae.siga.db.entities.FacGrupcritincluidosenserie;
+import org.itcgae.siga.db.entities.FacGrupcritincluidosenserieExample;
+import org.itcgae.siga.db.entities.FacGrupcritincluidosenserieKey;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
@@ -107,6 +116,7 @@ import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
+import org.itcgae.siga.db.mappers.CenGruposcriteriosMapper;
 import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
@@ -126,6 +136,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacDisquetedevolucionesExtendsMap
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacGrupcritincluidosenserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacHistoricofacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineaabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineafacturaExtendsMapper;
@@ -255,6 +266,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
+
+	@Autowired
+	private CenGruposcriteriosMapper cenGruposcriteriosMapper;
+
+	@Autowired
+	private FacGrupcritincluidosenserieExtendsMapper facGrupcritincluidosenserieExtendsMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1335,6 +1352,123 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		}
 
 		LOGGER.info("eliminaDestinatariosSerie() -> Salida del servicio para eliminar destinatarios individuales de una serie");
+		return deleteResponseDTO;
+	}
+
+	@Override
+	public ConsultasDTO getConsultasSerie(String idSerieFacturacion, HttpServletRequest request)
+			throws Exception {
+		ConsultasDTO destinatariosSeriesDTO = new ConsultasDTO();
+
+		List<ConsultaItem> consultasItems;
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"getConsultasSerie() -> Entrada al servicio para recuperar los destinatarios de la serie de facturación");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"getDestinatariosSeries() / facGrupcritincluidosenserieExtendsMapper.getConsultasSerie() -> Entrada a facGrupcritincluidosenserieExtendsMapper para obtener las consultas disponibles de la serie");
+
+			// Logica
+			consultasItems = facGrupcritincluidosenserieExtendsMapper.getConsultasSerie(idSerieFacturacion, usuario.getIdinstitucion());
+
+			LOGGER.debug(
+					"getConsultasSerie() / facGrupcritincluidosenserieExtendsMapper.getConsultasSerie() -> Saliendo de facGrupcritincluidosenserieExtendsMapper para obtener las consultas disponibles de la serie");
+
+			destinatariosSeriesDTO.setConsultaItem(consultasItems);
+		}
+
+		LOGGER.info(
+				"getConsultasSerie() -> Salida del servicio para obtener las consultas de la serie de facturación");
+
+		return destinatariosSeriesDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public CreateResponseDTO nuevaConsultaSerie(ConsultaDestinatarioItem consulta, HttpServletRequest request) throws Exception {
+		LOGGER.info("nuevaConsultaSerie() -> Entrada al servicio para agregar una nueva consulta a una serie");
+
+		CreateResponseDTO createResponseDTO = new CreateResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			CenGruposcriteriosExample criterioExample = new CenGruposcriteriosExample();
+			criterioExample.createCriteria()
+					.andIdconsultaEqualTo(Long.parseLong(consulta.getIdConsulta()))
+					.andIdinstitucionEqualTo(Short.parseShort(consulta.getIdInstitucion()));
+
+			// Se borran las entradas de la tabla CenGruposcriterios en caso de que no se utilicen
+			List<CenGruposcriterios> foundGrupocriterios = cenGruposcriteriosMapper.selectByExample(criterioExample);
+
+			if (foundGrupocriterios == null || foundGrupocriterios.isEmpty()) {
+
+				CenGruposcriterios recordGruposCriterios = new CenGruposcriterios();
+				recordGruposCriterios.setIdgruposcriterios(null);
+				recordGruposCriterios.setFechamodificacion(new Date());
+				recordGruposCriterios.setUsumodificacion(usuario.getIdusuario());
+
+				CenGruposcriteriosKey criterioKey = new CenGruposcriteriosKey();
+				criterioKey.setIdinstitucion(Short.parseShort(consulta.getIdInstitucion()));
+				criterioKey.setIdgruposcriterios(Integer.parseInt(consulta.getIdConsulta()));
+
+				cenGruposcriteriosMapper.deleteByPrimaryKey(criterioKey);
+			}
+		}
+
+		LOGGER.info("nuevaConsultaSerie() -> Salida del servicio para agregar una nueva consulta a una serie");
+		return createResponseDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public DeleteResponseDTO eliminaConsultasSerie(List<ConsultaDestinatarioItem> consultas,
+												   HttpServletRequest request) throws Exception {
+		LOGGER.info("eliminaConsultasSerie() -> Entrada al servicio para eliminar consultas de destinatarios de una serie");
+
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			for (ConsultaDestinatarioItem consulta : consultas) {
+				FacGrupcritincluidosenserieExample grupoCriterioIncuidoExample = new FacGrupcritincluidosenserieExample();
+				grupoCriterioIncuidoExample.createCriteria()
+						.andIdgruposcriteriosEqualTo(Integer.parseInt(consulta.getIdConsulta()))
+						.andIdinstitucionEqualTo(Short.parseShort(consulta.getIdInstitucion()))
+						.andIdseriefacturacionEqualTo(Long.parseLong(consulta.getIdEnvio()));
+
+				facGrupcritincluidosenserieExtendsMapper.deleteByExample(grupoCriterioIncuidoExample);
+
+				FacGrupcritincluidosenserieExample criterioExample = new FacGrupcritincluidosenserieExample();
+				criterioExample.createCriteria()
+						.andIdgruposcriteriosEqualTo(Integer.parseInt(consulta.getIdConsulta()))
+						.andIdinstitucionEqualTo(Short.parseShort(consulta.getIdInstitucion()));
+
+				// Se borran las entradas de la tabla CenGruposcriterios en caso de que no se utilicen
+				long foundGrupocriterios = facGrupcritincluidosenserieExtendsMapper.countByExample(criterioExample);
+
+				if (foundGrupocriterios == 0) {
+					CenGruposcriteriosKey criterioKey = new CenGruposcriteriosKey();
+					criterioKey.setIdinstitucion(Short.parseShort(consulta.getIdInstitucion()));
+					criterioKey.setIdgruposcriterios(Integer.parseInt(consulta.getIdConsulta()));
+
+					cenGruposcriteriosMapper.deleteByPrimaryKey(criterioKey);
+				}
+			}
+
+		}
+
+		LOGGER.info("eliminaConsultasSerie() -> Salida del servicio para eliminar consultas de destinatarios de una serie");
 		return deleteResponseDTO;
 	}
 

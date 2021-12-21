@@ -22,6 +22,7 @@ public class CuentasBancariasItem {
 	private String comisionImporte;
 	private String comisionDescripcion;
 	private String idTipoIVA;
+	private String tipoIVA;
 	private String comisionCuentaContable;
 
 	private String configFicherosSecuencia;
@@ -31,6 +32,7 @@ public class CuentasBancariasItem {
 
 	private Boolean sjcs;
 	private String idSufijoSjcs;
+	private String sufijoSjcs;
 	private String concepto;
 
 	public String getBancosCodigo() {
@@ -217,6 +219,22 @@ public class CuentasBancariasItem {
 		this.comisionCuentaContable = comisionCuentaContable;
 	}
 
+	public String getTipoIVA() {
+		return tipoIVA;
+	}
+
+	public void setTipoIVA(String tipoIVA) {
+		this.tipoIVA = tipoIVA;
+	}
+
+	public String getSufijoSjcs() {
+		return sufijoSjcs;
+	}
+
+	public void setSufijoSjcs(String sufijoSjcs) {
+		this.sufijoSjcs = sufijoSjcs;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -237,6 +255,7 @@ public class CuentasBancariasItem {
 				Objects.equals(comisionImporte, that.comisionImporte) &&
 				Objects.equals(comisionDescripcion, that.comisionDescripcion) &&
 				Objects.equals(idTipoIVA, that.idTipoIVA) &&
+				Objects.equals(tipoIVA, that.tipoIVA) &&
 				Objects.equals(comisionCuentaContable, that.comisionCuentaContable) &&
 				Objects.equals(configFicherosSecuencia, that.configFicherosSecuencia) &&
 				Objects.equals(configFicherosEsquema, that.configFicherosEsquema) &&
@@ -244,12 +263,13 @@ public class CuentasBancariasItem {
 				Objects.equals(configConceptoAmpliado, that.configConceptoAmpliado) &&
 				Objects.equals(sjcs, that.sjcs) &&
 				Objects.equals(idSufijoSjcs, that.idSufijoSjcs) &&
+				Objects.equals(sufijoSjcs, that.sufijoSjcs) &&
 				Objects.equals(concepto, that.concepto);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, comisionCuentaContable, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, concepto);
+		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, tipoIVA, comisionCuentaContable, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, sufijoSjcs, concepto);
 	}
 
 	@Override
@@ -270,6 +290,7 @@ public class CuentasBancariasItem {
 				", comisionImporte='" + comisionImporte + '\'' +
 				", comisionDescripcion='" + comisionDescripcion + '\'' +
 				", idTipoIVA='" + idTipoIVA + '\'' +
+				", tipoIVA='" + tipoIVA + '\'' +
 				", comisionCuentaContable='" + comisionCuentaContable + '\'' +
 				", configFicherosSecuencia='" + configFicherosSecuencia + '\'' +
 				", configFicherosEsquema='" + configFicherosEsquema + '\'' +
@@ -277,6 +298,7 @@ public class CuentasBancariasItem {
 				", configConceptoAmpliado='" + configConceptoAmpliado + '\'' +
 				", sjcs=" + sjcs +
 				", idSufijoSjcs='" + idSufijoSjcs + '\'' +
+				", sufijoSjcs='" + sufijoSjcs + '\'' +
 				", concepto='" + concepto + '\'' +
 				'}';
 	}

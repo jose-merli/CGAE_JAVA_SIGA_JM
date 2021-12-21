@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.controllers;
 
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -184,6 +185,21 @@ public class FacturacionPySGeneralController {
 		}
 	}
 
+	@GetMapping(value = "/comboConsultas")
+	ResponseEntity<ComboConsultaInstitucionDTO> comboConsultas(HttpServletRequest request) {
+		ComboConsultaInstitucionDTO response = new ComboConsultaInstitucionDTO();
+
+		try {
+			response = facturacionGeneralService.comboConsultas(request);
+
+			return new ResponseEntity<ComboConsultaInstitucionDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboConsultaInstitucionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GetMapping(value = "/comboPlantillasEnvio")
 	ResponseEntity<ComboDTO> comboPlantillasEnvio(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
@@ -274,7 +290,7 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/parametrosCONTROL")
-	ResponseEntity<ComboDTO> parametrosCONTROL(@RequestParam String idInstitucion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> parametrosCONTROL(@RequestParam(required = false) String idInstitucion, HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {

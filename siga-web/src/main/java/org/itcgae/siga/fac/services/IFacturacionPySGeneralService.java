@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.services;
 
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO2;
 
@@ -26,6 +27,8 @@ public interface IFacturacionPySGeneralService {
 	public ComboDTO comboContadoresRectificativas(HttpServletRequest request) throws Exception;
 
 	public ComboDTO comboPlanificacion(String idSerieFacturacion, HttpServletRequest request) throws Exception;
+
+	public ComboConsultaInstitucionDTO comboConsultas(HttpServletRequest request) throws Exception;
 
 	public ComboDTO comboPlantillasEnvio(HttpServletRequest request) throws Exception;
 
