@@ -1,9 +1,12 @@
 package org.itcgae.siga.db.services.fac.providers;
 
-/*
+
+import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.mappers.FacMotivodevolucionSqlProvider;
+
 public class FacMotivodevolucionExtendsSqlProvider extends FacMotivodevolucionSqlProvider {
 
-    public String comboFacturaciones(String idLenguaje) {
+    public String comboMotivosDevolucion(String idLenguaje) {
         SQL sql = new SQL();
 
         // Select
@@ -15,4 +18,3 @@ public class FacMotivodevolucionExtendsSqlProvider extends FacMotivodevolucionSq
         return sql.toString();
     }
 }
-*/
