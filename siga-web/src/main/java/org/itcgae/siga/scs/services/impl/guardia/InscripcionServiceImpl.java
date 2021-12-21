@@ -998,8 +998,11 @@ public class InscripcionServiceImpl implements InscripcionService {
 				LOGGER.info(
 						"inscripcionesDisponibles() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 				if (usuarios != null && !usuarios.isEmpty()) {
-					List<GestionInscripcion> inscripcionesDisponibles = inscripcionGuardiaExtensdsMapper
-							.inscripcionesDisponibles(idInstitucion, usuarios.get(0), inscripcion);
+//					List<GestionInscripcion> inscripcionesDisponibles = inscripcionGuardiaExtensdsMapper
+//							.inscripcionesDisponibles(idInstitucion, usuarios.get(0), inscripcion);
+					
+					List<GestionInscripcion> inscripcionesDisponibles = inscripcionGuardiaExtensdsMapper.busquedaTarjetaInscripcionesGuardia(idInstitucion, usuarios.get(0), inscripcion);
+					
 					inscripciones.setAccion(inscripcionesDisponibles);
 				}
 			}

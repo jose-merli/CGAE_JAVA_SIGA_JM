@@ -4,7 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.ibatis.annotations.DeleteProvider;
+import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionMod;
 import org.itcgae.siga.DTOs.scs.GrupoGuardiaColegiadoItem;
@@ -965,6 +967,470 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		return sql.toString();
 	}
 	
+	
+	
+	
+
+	public String busquedaTarjetaInscripcionesGuardia(Short idInstitucion, AdmUsuarios admUsuarios, BusquedaInscripcionItem inscripcion) {
+
+		SQL sql = new SQL();
+		String where ="";
+		String select="";
+		//Inscripciones de turnos a secas, sin asignacion a ninguna guardia				
+		if(inscripcion.getIdguardia() == null && inscripcion.getIdturno() != null) {
+			select+=
+					 " scs_guardiasturno.idguardia   AS idguardia, " +
+								" scs_inscripcionguardia.idinstitucion   AS idinstitucion, "+
+							"scs_guardiasturno.nombre AS nombre_guardia, " +
+					"          SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + 
+					"          SCS_TURNO.IDZONA,\r\n" + 
+					"          SCS_ZONA.NOMBRE AS NOMBRE_ZONA,\r\n" + 
+					"          SCS_TURNO.IDSUBZONA,\r\n" + 
+					"          SCS_SUBZONA.NOMBRE AS NOMBRE_SUBZONA,\r\n" + 
+					"          SCS_TURNO.IDAREA,\r\n" + 
+					"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
+					"          SCS_TURNO.IDMATERIA,\r\n" + 
+					"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
+		            "          SCS_TURNO.IDTURNO,\r\n" + 
+		            "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION,  --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
+		    		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia, "+
+		    		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad " +
+					"FROM\r\n" + 
+					"          SCS_INSCRIPCIONGUARDIA\r\n" + 
+					"          JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONGUARDIA.IDINSTITUCION AND SCS_TURNO.IDTURNO = SCS_INSCRIPCIONGUARDIA.IDTURNO\r\n" + 
+					" 		   JOIN scs_guardiasturno ON scs_inscripcionguardia.idinstitucion = scs_guardiasturno.idinstitucion AND scs_inscripcionguardia.idturno = scs_guardiasturno.idturno"+
+					"          JOIN SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA\r\n" + 
+					"          JOIN SCS_SUBZONA ON SCS_SUBZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_SUBZONA.IDZONA = SCS_TURNO.IDZONA AND SCS_SUBZONA.IDSUBZONA = SCS_TURNO.IDSUBZONA\r\n" + 
+					"          JOIN SCS_AREA ON SCS_AREA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_AREA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
+					"          JOIN SCS_MATERIA ON SCS_MATERIA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_MATERIA.IDMATERIA = SCS_TURNO.IDMATERIA AND SCS_MATERIA.IDAREA = SCS_TURNO.IDAREA \r\n" + 
+					"          JOIN SCS_TIPOSGUARDIAS ON SCS_GUARDIASTURNO.IDTIPOGUARDIA = SCS_TIPOSGUARDIAS.IDTIPOGUARDIA\r\n" + 
+					"          LEFT JOIN GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO \r\n";
+			where +="          SCS_TURNO.IDINSTITUCION ='"+idInstitucion+"'\r\n" ;
+		}
+		else {
+			select+=
+					"*\r\n" + 
+					"  FROM (SELECT          " 
+					+ " scs_guardiasturno.idguardia   AS idguardia, " +
+					" scs_inscripcionguardia.idinstitucion   AS idinstitucion, "
+					+ "SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + 
+					" scs_guardiasturno.nombre  AS nombre_guardia, " +
+					"          SCS_TURNO.IDZONA,\r\n" + 
+					"          SCS_ZONA.NOMBRE AS NOMBRE_ZONA,\r\n" + 
+					"          SCS_TURNO.IDSUBZONA,\r\n" + 
+					"          SCS_SUBZONA.NOMBRE AS NOMBRE_SUBZONA,\r\n" + 
+					"          SCS_TURNO.IDAREA,\r\n" + 
+					"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
+					"          SCS_TURNO.IDMATERIA,\r\n" + 
+					"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
+					"          SCS_TURNO.IDTURNO,\r\n"+
+					"          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION,  --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
+		    		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia, "+
+		    		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad " +
+					"FROM\r\n" + 
+					"          SCS_INSCRIPCIONGUARDIA\r\n" + 
+					"          JOIN SCS_GUARDIASTURNO ON SCS_INSCRIPCIONGUARDIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND SCS_INSCRIPCIONGUARDIA.IDTURNO = SCS_GUARDIASTURNO.IDTURNO\r\n" + 
+					"          JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONGUARDIA.IDINSTITUCION AND SCS_TURNO.IDTURNO = SCS_INSCRIPCIONGUARDIA.IDTURNO\r\n" + 
+					"          JOIN SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA\r\n" + 
+					"          JOIN SCS_SUBZONA ON SCS_SUBZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_SUBZONA.IDZONA = SCS_TURNO.IDZONA AND SCS_SUBZONA.IDSUBZONA = SCS_TURNO.IDSUBZONA\r\n" + 
+					"          JOIN SCS_AREA ON SCS_AREA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_AREA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
+					"          JOIN SCS_MATERIA ON SCS_MATERIA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_MATERIA.IDMATERIA = SCS_TURNO.IDMATERIA AND SCS_MATERIA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
+					"          JOIN SCS_TIPOSGUARDIAS ON SCS_GUARDIASTURNO.IDTIPOGUARDIA = SCS_TIPOSGUARDIAS.IDTIPOGUARDIA\r\n" + 
+					"          LEFT JOIN GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO \r\n";
+					where +="          SCS_TURNO.IDINSTITUCION ='"+idInstitucion+"'";
+					//"          AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = '"+idLenguaje+"'\r\n" ;
+		}
+		if(inscripcion.getIdturno() == null) {
+				where +=
+				"          AND ( \r\n" + 
+				"          --Esté de baja\r\n" + 
+				"          (SCS_INSCRIPCIONGUARDIA.IDPERSONA = '"+inscripcion.getIdpersona()+"' AND SCS_INSCRIPCIONGUARDIA.FECHABAJA IS NOT NULL)\r\n"+ 
+				"          --está inscrito pero que tengan alguna guardia a la que no estén inscritos\r\n" + 
+				 ")"	;
+		}
+		else {
+			where+=
+			"          AND SCS_INSCRIPCIONGUARDIA.IDTURNO = '"+inscripcion.getIdturno()+"'" + 
+			"          AND SCS_INSCRIPCIONTURNO.IDPERSONA = '"+inscripcion.getIdpersona()+"'";
+		}
+		
+		sql.SELECT_DISTINCT(select);
+		sql.WHERE(where);
+		if(inscripcion.getIdturno() == null) {
+			sql.ORDER_BY("NOMBRE_TURNO)");
+		} else {
+			sql.ORDER_BY("NOMBRE_TURNO");
+		}
+		
+		String result1=sql.toString();
+		
+		SQL sql2 = new SQL();
+		String prevariables = "TURNOS_ASIGNADOS (IDTURNO, IDINSTITUCION) AS (SELECT DISTINCT SCS_INSCRIPCIONGUARDIA.IDTURNO, SCS_INSCRIPCIONGUARDIA.IDINSTITUCION\r\n"
+				+ "	FROM  SCS_INSCRIPCIONGUARDIA\r\n"
+				+ "    JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONGUARDIA.IDINSTITUCION AND SCS_TURNO.IDTURNO=SCS_INSCRIPCIONGUARDIA.IDTURNO\r\n"
+				+ "     WHERE SCS_TURNO.IDINSTITUCION = '"+idInstitucion+"' AND SCS_INSCRIPCIONGUARDIA.IDPERSONA='"+inscripcion.getIdpersona()+"' ),\r\n"
+				+ "    TURNOS_NO_ASIGNADOS (IDTURNO, IDINSTITUCION) AS(SELECT DISTINCT SCS_TURNO.IDTURNO, SCS_TURNO.IDINSTITUCION\r\n"
+				+ "	FROM  SCS_TURNO\r\n"
+				+ "    WHERE SCS_TURNO.IDINSTITUCION = '"+idInstitucion+"' AND IDTURNO NOT IN (\r\n"
+				+ "    SELECT IDTURNO FROM TURNOS_ASIGNADOS)), "
+				+ " guardia_asignados ( "
+				+ "	    idguardia, "
+				+ "	    idinstitucion "
+				+ "	) AS ( "
+				+ "	    SELECT DISTINCT "
+				+ "	        scs_inscripcionguardia.idguardia, "
+				+ "	        scs_inscripcionguardia.idinstitucion "
+				+ "	    FROM "
+				+ "	        scs_inscripcionguardia "
+				+ "	        JOIN scs_guardiasturno ON scs_guardiasturno.idinstitucion = scs_inscripcionguardia.idinstitucion "
+				+ "	                                  AND scs_guardiasturno.idguardia = scs_inscripcionguardia.idguardia "
+				+ "	    WHERE "
+				+ "	        scs_guardiasturno.idinstitucion = '"+ idInstitucion + "' "
+				+ "	        AND scs_inscripcionguardia.idpersona = '"+ inscripcion.getIdpersona() + "' "
+				+ "	), guardia_no_asignados ( "
+				+ "	    idguardia, "
+				+ "	    idinstitucion "
+				+ "	) AS ( "
+				+ "	    SELECT DISTINCT "
+				+ "	        scs_guardiasturno.idguardia, "
+				+ "	        scs_guardiasturno.idinstitucion "
+				+ "	    FROM "
+				+ "	        scs_guardiasturno "
+				+ "	    WHERE "
+				+ "	        scs_guardiasturno.idinstitucion = '"+ idInstitucion + "' "
+				+ "	        AND idguardia NOT IN ( "
+				+ "	            SELECT "
+				+ "	                idguardia "
+				+ "	            FROM "
+				+ "	                guardia_asignados "
+				+ "	        ) "
+				+ "	) ";
+		
+		sql2.SELECT("* \r\n" + 
+				"FROM(\r\n" +
+				"SELECT          "
+				+ " scs_guardiasturno.idguardia   AS idguardia, " +
+				"scs_guardiasturno.idinstitucion   AS idinstitucion, "+
+				"scs_guardiasturno.nombre AS nombre_guardia, "
+				+ "SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + 
+				"          SCS_TURNO.IDZONA,\r\n" + 
+				"          SCS_ZONA.NOMBRE AS NOMBRE_ZONA,\r\n" + 
+				"          SCS_TURNO.IDSUBZONA,\r\n" + 
+				"          SCS_SUBZONA.NOMBRE AS NOMBRE_SUBZONA,\r\n" + 
+				"          SCS_TURNO.IDAREA,\r\n" + 
+				"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
+				"          SCS_TURNO.IDMATERIA,\r\n" + 
+				"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
+				"          SCS_TURNO.IDTURNO,\r\n" +
+		        "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" +
+		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia, "+
+		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad " );
+		
+				sql2.FROM( 
+				"scs_guardiasturno\r\n"+
+						"			JOIN scs_turno ON scs_turno.idinstitucion = scs_guardiasturno.idinstitucion\r\n" + 
+						"                              AND scs_turno.idturno = scs_guardiasturno.idturno\r\n" + 
+				"          JOIN SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA\r\n" + 
+				"          JOIN SCS_SUBZONA ON SCS_SUBZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_SUBZONA.IDZONA = SCS_TURNO.IDZONA AND SCS_SUBZONA.IDSUBZONA = SCS_TURNO.IDSUBZONA\r\n" + 
+				"          JOIN SCS_AREA ON SCS_AREA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_AREA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
+				"          JOIN SCS_MATERIA ON SCS_MATERIA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_MATERIA.IDMATERIA = SCS_TURNO.IDMATERIA AND SCS_MATERIA.IDAREA = SCS_TURNO.IDAREA\r\n" +
+				"          JOIN SCS_TIPOSGUARDIAS ON SCS_GUARDIASTURNO.IDTIPOGUARDIA = SCS_TIPOSGUARDIAS.IDTIPOGUARDIA\r\n" + 
+				"          LEFT JOIN GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO \r\n"
+		
+						
+						);
+		sql2.WHERE("          SCS_TURNO.IDINSTITUCION ='"+idInstitucion+"'"+
+				"          AND SCS_TURNO.IDTURNO IN (\r\n"
+						+ "    SELECT IDTURNO FROM TURNOS_NO_ASIGNADOS)  AND scs_guardiasturno.idguardia IN (\r\n" + 
+						"                        SELECT\r\n" + 
+						"                            idguardia\r\n" + 
+						"                        FROM\r\n" + 
+						"                            guardia_no_asignados\r\n" + 
+						"                    )");
+		sql2.ORDER_BY("NOMBRE_TURNO)");
+		
+		String sql3 = "WITH " + prevariables+ "\r\n";
+			
+		//sql 1 Elementos de baja, sql2 turnos a los que no se ha solicitado y sql 3 turnos en los que se ha suscrito a parte de las guardias.
+		String final_result;
+		String sub_final_result;
+		if(inscripcion.getIdturno() == null && inscripcion.getIdpersona() != null) {
+		
+			sub_final_result =  sql2.toString() + " \r\n UNION \r\n " + result1;
+			final_result = sql3 + " \r\n " + "SELECT DISTINCT " +
+				    "scs_grupoguardia.numerogrupo AS numerogrupo, "+ 
+				    "decode(cen_colegiado.comunitario, '1', cen_colegiado.ncomunitario, cen_colegiado.ncolegiado) AS colegiado, "+
+				   " ( decode(cen_colegiado.comunitario, '1', cen_colegiado.ncomunitario, cen_colegiado.ncolegiado) "+
+				    "  || '/' "+
+				   "   || lpad(scs_grupoguardia.numerogrupo, 3, '0') ) AS colegiado_grupo, "+
+				   " ( cen_persona.apellidos1 "+
+				      "|| ' ' "+
+				      "|| cen_persona.apellidos2 "+ 
+				      "|| ', ' "+
+				      "|| cen_persona.nombre ) AS letrado, "+
+				    //"scs_inscripcionguardia.fechasuscripcion, "+
+				    "fullquery.idguardia, "+
+				    "nombre_guardia, "+
+				    "nombre_turno, "+
+				    "nombre_zona, "+
+				    "nombre_subzona, "+
+				    "nombre_area, "+
+				    "nombre_materia, "+
+				    "obligatoriedad_inscripcion, "+
+				   "fullquery.idturno, " +
+					"idzona, "+
+					"idsubzona, "+
+					"idarea, " +
+					"idmateria, "+
+				    "descripcion_tipo_guardia, " +
+				    "descripcion_obligatoriedad "+
+				"FROM "+
+				    "(" +  sub_final_result +  ") fullquery "
++ "LEFT OUTER JOIN scs_grupoguardia ON fullquery.idguardia = scs_grupoguardia.idguardia\r\n " +
+" LEFT OUTER JOIN cen_persona ON cen_persona.idpersona = '" + inscripcion.getIdpersona() + "'"  +
+" LEFT OUTER JOIN cen_colegiado ON cen_colegiado.idpersona = '" + inscripcion.getIdpersona() + "'"  +
+                      " AND cen_colegiado.idinstitucion = fullquery.idinstitucion";
+		} else { 
+			final_result=result1;
+		}
+		//SIGARNV-2009@DTT.JAMARTIN@05/08/2021@FIN	
+		return final_result;
+		}
+			
+	
+	
+	
+	
+	
+	
+	
+	
+	public String busquedaTarjetaInscripcionesGuardia2(Short idInstitucion, AdmUsuarios admUsuarios, BusquedaInscripcionItem inscripcion) {
+
+		SQL sql = new SQL();
+		String where ="";
+		String select="";
+		//Inscripciones de turnos a secas, sin asignacion a ninguna guardia				
+		if(inscripcion.getIdguardia() == null && inscripcion.getIdturno() != null) {
+			select+=
+					 " scs_guardiasturno.idguardia   AS idguardia, " +
+								" scs_inscripcionguardia.idinstitucion   AS idinstitucion, "+
+							"scs_guardiasturno.nombre AS nombre_guardia, " +
+					"          SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + 
+					"          SCS_TURNO.IDZONA,\r\n" + 
+					"          SCS_ZONA.NOMBRE AS NOMBRE_ZONA,\r\n" + 
+					"          SCS_TURNO.IDSUBZONA,\r\n" + 
+					"          SCS_SUBZONA.NOMBRE AS NOMBRE_SUBZONA,\r\n" + 
+					"          SCS_TURNO.IDAREA,\r\n" + 
+					"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
+					"          SCS_TURNO.IDMATERIA,\r\n" + 
+					"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
+		            "          SCS_TURNO.IDTURNO,\r\n" + 
+		            "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION,  --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
+		    		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia, "+
+		    		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad " +
+					"FROM\r\n" + 
+					"          SCS_INSCRIPCIONGUARDIA\r\n" + 
+					"          JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONGUARDIA.IDINSTITUCION AND SCS_TURNO.IDTURNO = SCS_INSCRIPCIONGUARDIA.IDTURNO\r\n" + 
+					" 		   JOIN scs_guardiasturno ON scs_inscripcionguardia.idinstitucion = scs_guardiasturno.idinstitucion AND scs_inscripcionguardia.idturno = scs_guardiasturno.idturno"+
+					"          JOIN SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA\r\n" + 
+					"          JOIN SCS_SUBZONA ON SCS_SUBZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_SUBZONA.IDZONA = SCS_TURNO.IDZONA AND SCS_SUBZONA.IDSUBZONA = SCS_TURNO.IDSUBZONA\r\n" + 
+					"          JOIN SCS_AREA ON SCS_AREA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_AREA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
+					"          JOIN SCS_MATERIA ON SCS_MATERIA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_MATERIA.IDMATERIA = SCS_TURNO.IDMATERIA AND SCS_MATERIA.IDAREA = SCS_TURNO.IDAREA \r\n" + 
+					"          JOIN SCS_TIPOSGUARDIAS ON SCS_GUARDIASTURNO.IDTIPOGUARDIA = SCS_TIPOSGUARDIAS.IDTIPOGUARDIA\r\n" + 
+					"          LEFT JOIN GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO \r\n";
+			where +="          SCS_TURNO.IDINSTITUCION ='"+idInstitucion+"'\r\n" ;
+		}
+		else {
+			select+=
+					"*\r\n" + 
+					"  FROM (SELECT          " 
+					+ " scs_guardiasturno.idguardia   AS idguardia, " +
+					" scs_inscripcionguardia.idinstitucion   AS idinstitucion, "
+					+ "SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + 
+					" scs_guardiasturno.nombre  AS nombre_guardia, " +
+					"          SCS_TURNO.IDZONA,\r\n" + 
+					"          SCS_ZONA.NOMBRE AS NOMBRE_ZONA,\r\n" + 
+					"          SCS_TURNO.IDSUBZONA,\r\n" + 
+					"          SCS_SUBZONA.NOMBRE AS NOMBRE_SUBZONA,\r\n" + 
+					"          SCS_TURNO.IDAREA,\r\n" + 
+					"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
+					"          SCS_TURNO.IDMATERIA,\r\n" + 
+					"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
+					"          SCS_TURNO.IDTURNO,\r\n"+
+					"          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION,  --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
+		    		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia, "+
+		    		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad " +
+					"FROM\r\n" + 
+					"          SCS_INSCRIPCIONGUARDIA\r\n" + 
+					"          JOIN SCS_GUARDIASTURNO ON SCS_INSCRIPCIONGUARDIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND SCS_INSCRIPCIONGUARDIA.IDTURNO = SCS_GUARDIASTURNO.IDTURNO\r\n" + 
+					"          JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONGUARDIA.IDINSTITUCION AND SCS_TURNO.IDTURNO = SCS_INSCRIPCIONGUARDIA.IDTURNO\r\n" + 
+					"          JOIN SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA\r\n" + 
+					"          JOIN SCS_SUBZONA ON SCS_SUBZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_SUBZONA.IDZONA = SCS_TURNO.IDZONA AND SCS_SUBZONA.IDSUBZONA = SCS_TURNO.IDSUBZONA\r\n" + 
+					"          JOIN SCS_AREA ON SCS_AREA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_AREA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
+					"          JOIN SCS_MATERIA ON SCS_MATERIA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_MATERIA.IDMATERIA = SCS_TURNO.IDMATERIA AND SCS_MATERIA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
+					"          JOIN SCS_TIPOSGUARDIAS ON SCS_GUARDIASTURNO.IDTIPOGUARDIA = SCS_TIPOSGUARDIAS.IDTIPOGUARDIA\r\n" + 
+					"          LEFT JOIN GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO \r\n";
+					where +="          SCS_TURNO.IDINSTITUCION ='"+idInstitucion+"'";
+					//"          AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = '"+idLenguaje+"'\r\n" ;
+		}
+		if(inscripcion.getIdturno() == null) {
+				where +=
+				"          AND ( \r\n" + 
+				"          --Esté de baja\r\n" + 
+				"          (SCS_INSCRIPCIONGUARDIA.IDPERSONA = '"+inscripcion.getIdpersona()+"' AND SCS_INSCRIPCIONGUARDIA.FECHABAJA IS NOT NULL)\r\n"+ 
+				"          --está inscrito pero que tengan alguna guardia a la que no estén inscritos\r\n" + 
+				 ")"	;
+		}
+		else {
+			where+=
+			"          AND SCS_INSCRIPCIONGUARDIA.IDTURNO = '"+inscripcion.getIdturno()+"'" + 
+			"          AND SCS_INSCRIPCIONTURNO.IDPERSONA = '"+inscripcion.getIdpersona()+"'";
+		}
+		
+		sql.SELECT_DISTINCT(select);
+		sql.WHERE(where);
+		if(inscripcion.getIdturno() == null) {
+			sql.ORDER_BY("NOMBRE_TURNO)");
+		} else {
+			sql.ORDER_BY("NOMBRE_TURNO");
+		}
+		
+		String result1=sql.toString();
+		
+		SQL sql2 = new SQL();
+		String prevariables = "TURNOS_ASIGNADOS (IDTURNO, IDINSTITUCION) AS (SELECT DISTINCT SCS_INSCRIPCIONGUARDIA.IDTURNO, SCS_INSCRIPCIONGUARDIA.IDINSTITUCION\r\n"
+				+ "	FROM  SCS_INSCRIPCIONGUARDIA\r\n"
+				+ "    JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONGUARDIA.IDINSTITUCION AND SCS_TURNO.IDTURNO=SCS_INSCRIPCIONGUARDIA.IDTURNO\r\n"
+				+ "     WHERE SCS_TURNO.IDINSTITUCION = '"+idInstitucion+"' AND SCS_INSCRIPCIONGUARDIA.IDPERSONA='"+inscripcion.getIdpersona()+"' ),\r\n"
+				+ "    TURNOS_NO_ASIGNADOS (IDTURNO, IDINSTITUCION) AS(SELECT DISTINCT SCS_TURNO.IDTURNO, SCS_TURNO.IDINSTITUCION\r\n"
+				+ "	FROM  SCS_TURNO\r\n"
+				+ "    WHERE SCS_TURNO.IDINSTITUCION = '"+idInstitucion+"' AND IDTURNO NOT IN (\r\n"
+				+ "    SELECT IDTURNO FROM TURNOS_ASIGNADOS)), "
+				+ " guardia_asignados ( "
+				+ "	    idguardia, "
+				+ "	    idinstitucion "
+				+ "	) AS ( "
+				+ "	    SELECT DISTINCT "
+				+ "	        scs_inscripcionguardia.idguardia, "
+				+ "	        scs_inscripcionguardia.idinstitucion "
+				+ "	    FROM "
+				+ "	        scs_inscripcionguardia "
+				+ "	        JOIN scs_guardiasturno ON scs_guardiasturno.idinstitucion = scs_inscripcionguardia.idinstitucion "
+				+ "	                                  AND scs_guardiasturno.idguardia = scs_inscripcionguardia.idguardia "
+				+ "	    WHERE "
+				+ "	        scs_guardiasturno.idinstitucion = '2005' "
+				+ "	        AND scs_inscripcionguardia.idpersona = '3500000039' "
+				+ "	), guardia_no_asignados ( "
+				+ "	    idguardia, "
+				+ "	    idinstitucion "
+				+ "	) AS ( "
+				+ "	    SELECT DISTINCT "
+				+ "	        scs_guardiasturno.idguardia, "
+				+ "	        scs_guardiasturno.idinstitucion "
+				+ "	    FROM "
+				+ "	        scs_guardiasturno "
+				+ "	    WHERE "
+				+ "	        scs_guardiasturno.idinstitucion = '2005' "
+				+ "	        AND idguardia NOT IN ( "
+				+ "	            SELECT "
+				+ "	                idguardia "
+				+ "	            FROM "
+				+ "	                guardia_asignados "
+				+ "	        ) "
+				+ "	) ";
+		
+		sql2.SELECT("* \r\n" + 
+				"FROM(\r\n" +
+				"SELECT          "
+				+ " scs_guardiasturno.idguardia   AS idguardia, " +
+				"scs_guardiasturno.idinstitucion   AS idinstitucion, "+
+				"scs_guardiasturno.nombre AS nombre_guardia, "
+				+ "SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + 
+				"          SCS_TURNO.IDZONA,\r\n" + 
+				"          SCS_ZONA.NOMBRE AS NOMBRE_ZONA,\r\n" + 
+				"          SCS_TURNO.IDSUBZONA,\r\n" + 
+				"          SCS_SUBZONA.NOMBRE AS NOMBRE_SUBZONA,\r\n" + 
+				"          SCS_TURNO.IDAREA,\r\n" + 
+				"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
+				"          SCS_TURNO.IDMATERIA,\r\n" + 
+				"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
+				"          SCS_TURNO.IDTURNO,\r\n" +
+		        "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" +
+		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia, "+
+		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad " );
+		
+				sql2.FROM( 
+				"scs_guardiasturno\r\n"+
+						"			JOIN scs_turno ON scs_turno.idinstitucion = scs_guardiasturno.idinstitucion\r\n" + 
+						"                              AND scs_turno.idturno = scs_guardiasturno.idturno\r\n" + 
+				"          JOIN SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA\r\n" + 
+				"          JOIN SCS_SUBZONA ON SCS_SUBZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_SUBZONA.IDZONA = SCS_TURNO.IDZONA AND SCS_SUBZONA.IDSUBZONA = SCS_TURNO.IDSUBZONA\r\n" + 
+				"          JOIN SCS_AREA ON SCS_AREA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_AREA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
+				"          JOIN SCS_MATERIA ON SCS_MATERIA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_MATERIA.IDMATERIA = SCS_TURNO.IDMATERIA AND SCS_MATERIA.IDAREA = SCS_TURNO.IDAREA\r\n" +
+				"          JOIN SCS_TIPOSGUARDIAS ON SCS_GUARDIASTURNO.IDTIPOGUARDIA = SCS_TIPOSGUARDIAS.IDTIPOGUARDIA\r\n" + 
+				"          LEFT JOIN GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO \r\n"
+		
+						
+						);
+		sql2.WHERE("          SCS_TURNO.IDINSTITUCION ='"+idInstitucion+"'"+
+				"          AND SCS_TURNO.IDTURNO IN (\r\n"
+						+ "    SELECT IDTURNO FROM TURNOS_NO_ASIGNADOS)  AND scs_guardiasturno.idguardia IN (\r\n" + 
+						"                        SELECT\r\n" + 
+						"                            idguardia\r\n" + 
+						"                        FROM\r\n" + 
+						"                            guardia_no_asignados\r\n" + 
+						"                    )");
+		sql2.ORDER_BY("NOMBRE_TURNO)");
+		
+		String sql3 = "WITH " + prevariables+ "\r\n";
+			
+		//sql 1 Elementos de baja, sql2 turnos a los que no se ha solicitado y sql 3 turnos en los que se ha suscrito a parte de las guardias.
+		String final_result;
+		String sub_final_result;
+		if(inscripcion.getIdturno() == null) {
+			sub_final_result =  sql2.toString() + " \r\n UNION \r\n " + result1;
+			final_result = sql3 + " \r\n " + "SELECT " +
+				    "scs_grupoguardia.numerogrupo AS numerogrupo, "+ 
+				    "decode(cen_colegiado.comunitario, '1', cen_colegiado.ncomunitario, cen_colegiado.ncolegiado) AS colegiado, "+
+				   " ( decode(cen_colegiado.comunitario, '1', cen_colegiado.ncomunitario, cen_colegiado.ncolegiado) "+
+				    "  || '/' "+
+				   "   || lpad(scs_grupoguardia.numerogrupo, 3, '0') ) AS colegiado_grupo, "+
+				   " ( cen_persona.apellidos1 "+
+				      "|| ' ' "+
+				      "|| cen_persona.apellidos2 "+ 
+				      "|| ', ' "+
+				      "|| cen_persona.nombre ) AS letrado, "+
+				    "scs_inscripcionguardia.fechasuscripcion, "+
+				    "idguardia, "+
+				    "nombre_guardia, "+
+				    "nombre_turno, "+
+				    "nombre_zona, "+
+				    "nombre_subzona, "+
+				    "nombre_area, "+
+				    "nombre_materia, "+
+				    "obligatoriedad_inscripcion, "+
+				   "idturno, " +
+					"idzona, "+
+					"idsubzona, "+
+					"idarea, " +
+					"idmateria, "+
+				    "descripcion_tipo_guardia, " +
+				    "descripcion_obligatoriedad "+
+				"FROM "+
+				    "(" +  sub_final_result +  ") fullquery "
+				    		+ "JOIN scs_inscripcionguardia ON scs_inscripcionguardia.idinstitucion = fullquery.idinstitucion\r\n" + 
+				    		"                                   AND scs_inscripcionguardia.idturno = fullquery.idturno\r\n" + 
+				    		"    JOIN scs_grupoguardia ON fullquery.idguardia = scs_grupoguardia.idguardia\r\n" + 
+				    		"    JOIN cen_persona ON cen_persona.idpersona = scs_inscripcionguardia.idpersona\r\n" + 
+				    		"    JOIN cen_colegiado ON cen_colegiado.idpersona = scs_inscripcionguardia.idpersona\r\n" + 
+				    		"                          AND cen_colegiado.idinstitucion = fullquery.idinstitucion";
+		} else { 
+			final_result=result1;
+		}
+		//SIGARNV-2009@DTT.JAMARTIN@05/08/2021@FIN	
+		return final_result;
+		}
 	public String inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia, String idpersona) {
 		SQL sql = new SQL();
 		sql.SELECT("scs_inscripcionguardia.idguardia AS idguardia",
@@ -1001,7 +1467,7 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		"            cen_persona" + 
 		"        WHERE" + 
 		"            cen_persona.idpersona = scs_inscripcionguardia.idpersona" + 
-		"    ) AS letrado",
+		"    ) AS letrado, ",
 		"scs_turno.nombre AS nombre_turno",
 		"scs_turno.idzona AS idzona",
 		"(" + 
