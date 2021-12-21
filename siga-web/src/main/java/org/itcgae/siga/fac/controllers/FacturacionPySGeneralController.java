@@ -389,4 +389,19 @@ public class FacturacionPySGeneralController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@GetMapping(value = "/comboMotivosDevolucion")
+	ResponseEntity<ComboDTO> comboMotivosDevolucion(HttpServletRequest request) {
+		ComboDTO response = new ComboDTO();
+
+		try {
+			response = facturacionGeneralService.comboMotivosDevolucion(request);
+
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

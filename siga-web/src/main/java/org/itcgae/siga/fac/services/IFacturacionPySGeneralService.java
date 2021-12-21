@@ -50,4 +50,6 @@ public interface IFacturacionPySGeneralService {
     public ComboDTO parametrosCONTROL(String idInstitucion, HttpServletRequest request) throws Exception;
 
 	public ComboDTO parametrosLINEAS(String idInstitucion, HttpServletRequest request) throws Exception;
+
+	public ComboDTO comboMotivosDevolucion(HttpServletRequest request) throws Exception;
 }
