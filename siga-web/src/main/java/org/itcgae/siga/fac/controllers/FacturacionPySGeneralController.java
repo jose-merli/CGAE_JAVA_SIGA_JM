@@ -1,5 +1,7 @@
 package org.itcgae.siga.fac.controllers;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO2;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/facturacionPyS/general")
@@ -83,7 +83,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboSeriesFacturacion")
 	ResponseEntity<ComboDTO> comboSeriesFacturacion(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
-		
+
 		try {
 			response = facturacionGeneralService.comboSeriesFacturacion(request);
 
@@ -98,7 +98,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboEtiquetas")
 	ResponseEntity<ComboDTO> comboEtiquetas(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
-		
+
 		try {
 			response = facturacionGeneralService.comboEtiquetas(request);
 
@@ -113,7 +113,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboDestinatarios")
 	ResponseEntity<ComboDTO> comboDestinatarios(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
-		
+
 		try {
 			response = facturacionGeneralService.comboDestinatarios(request);
 
@@ -156,7 +156,8 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/comboPlanificacion")
-	ResponseEntity<ComboDTO> comboPlanificacion(@RequestParam(required = false) String idSerieFacturacion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> comboPlanificacion(@RequestParam(required = false) String idSerieFacturacion,
+			HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {
@@ -231,9 +232,10 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/comboFormasPagosSerie")
-	ResponseEntity<ComboDTO> comboFormasPagosSerie(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> comboFormasPagosSerie(@RequestParam String idSerieFacturacion,
+			HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
-		
+
 		try {
 			response = facturacionGeneralService.comboFormasPagosSerie(idSerieFacturacion, request);
 
@@ -248,7 +250,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboModelosComunicacion")
 	ResponseEntity<ComboDTO> comboModelosComunicacion(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
-		
+
 		try {
 			response = facturacionGeneralService.comboModelosComunicacion(request);
 
@@ -263,7 +265,7 @@ public class FacturacionPySGeneralController {
 	@GetMapping(value = "/comboTiposIVA")
 	ResponseEntity<ComboDTO2> comboTiposIVA(HttpServletRequest request) {
 		ComboDTO2 response = new ComboDTO2();
-		
+
 		try {
 			response = facturacionGeneralService.comboTiposIVA(request);
 
@@ -276,7 +278,8 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/parametrosSEPA")
-	ResponseEntity<ComboDTO> parametrosSEPA(@RequestParam(required = false) String idInstitucion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> parametrosSEPA(@RequestParam(required = false) String idInstitucion,
+			HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {
@@ -290,7 +293,8 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/parametrosCONTROL")
-	ResponseEntity<ComboDTO> parametrosCONTROL(@RequestParam(required = false) String idInstitucion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> parametrosCONTROL(@RequestParam(required = false) String idInstitucion,
+			HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {
@@ -393,7 +397,8 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/parametrosLINEAS")
-	ResponseEntity<ComboDTO> parametrosLINEAS(@RequestParam(required = false) String idInstitucion, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> parametrosLINEAS(@RequestParam(required = false) String idInstitucion,
+			HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {

@@ -1,5 +1,11 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -35,7 +41,6 @@ import org.itcgae.siga.db.mappers.FacSufijoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -55,11 +60,6 @@ import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralService {
 
@@ -73,9 +73,6 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private CenGruposclienteExtendsMapper cenGruposclienteExtendsMapper;
-
-	@Autowired
-	private CenGruposclienteClienteExtendsMapper cenGruposclienteClienteExtendsMapper;
 
 	@Autowired
 	private AdmContadorMapper admContadorMapper;
@@ -106,7 +103,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private CgaeAuthenticationProvider authenticationProvider;
-	
+
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
 
@@ -205,7 +202,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 				for (PysProductos pysProductos : productos) {
 					ComboItem comboItem = new ComboItem();
 					// idtipoproducto-idproducto
-					comboItem.setValue(pysProductos.getIdtipoproducto().toString() + "-" + pysProductos.getIdproducto().toString());
+					comboItem.setValue(pysProductos.getIdtipoproducto().toString() + "-"
+							+ pysProductos.getIdproducto().toString());
 					comboItem.setLabel(pysProductos.getDescripcion());
 
 					comboItems.add(comboItem);
@@ -249,7 +247,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 				for (PysServicios pysServicios : servicios) {
 					ComboItem comboItem = new ComboItem();
 					// idtiposervicios-idservicio
-					comboItem.setValue(pysServicios.getIdtiposervicios().toString() + "-" + pysServicios.getIdservicio().toString());
+					comboItem.setValue(pysServicios.getIdtiposervicios().toString() + "-"
+							+ pysServicios.getIdservicio().toString());
 					comboItem.setLabel(pysServicios.getDescripcion());
 
 					comboItems.add(comboItem);
@@ -562,8 +561,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		List<ComboItemConsulta> comboItems;
 		AdmUsuarios usuario = new AdmUsuarios();
 
-		LOGGER.debug(
-				"comboConsultas() -> Entrada al servicio para recuperar las consultas disponibles");
+		LOGGER.debug("comboConsultas() -> Entrada al servicio para recuperar las consultas disponibles");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
@@ -572,10 +570,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			LOGGER.debug(
 					"comboConsultas() / conConsultasExtendsMapper.selectConsultasDisponibles() -> Entrada a conConsultasExtendsMapper para obtener las consultas disponibles");
 
-			// Logica
-			String idioma = usuario.getIdlenguaje();
-			comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(usuario.getIdinstitucion(),
-					1l, 1l);
+			comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(usuario.getIdinstitucion(), 1l, 1l);
 
 			LOGGER.debug(
 					"comboConsultas() / conConsultasExtendsMapper.selectConsultasDisponibles() -> Saliendo de conConsultasExtendsMapper para obtener las consultas disponibles");
@@ -625,8 +620,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		List<ComboItem> comboItems;
 		AdmUsuarios usuario = new AdmUsuarios();
 
-		LOGGER.debug(
-				"comboFormasPagoFactura() -> Entrada al servicio para recuperar todas las formas de pago");
+		LOGGER.debug("comboFormasPagoFactura() -> Entrada al servicio para recuperar todas las formas de pago");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
@@ -813,7 +807,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		if (usuario != null) {
 			LOGGER.debug(
-					"comboEstadosFact() / facEstadoconfirmfactExtendsMapper.comboEstados() -> Entrada a facEstadoconfirmfactExtendsMapper para obtener combo de estados con tipo=" + tipo);
+					"comboEstadosFact() / facEstadoconfirmfactExtendsMapper.comboEstados() -> Entrada a facEstadoconfirmfactExtendsMapper para obtener combo de estados con tipo="
+							+ tipo);
 
 			String idioma = usuario.getIdlenguaje();
 
@@ -867,7 +862,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		AdmUsuarios usuario = new AdmUsuarios();
 		List<ComboItem> comboItems;
 
-		LOGGER.debug("comboFacturaciones() -> Entrada al servicio para recuperar el combo de formas de pagos para facturas");
+		LOGGER.debug(
+				"comboFacturaciones() -> Entrada al servicio para recuperar el combo de formas de pagos para facturas");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
@@ -893,26 +889,26 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	@Override
 	public ComboDTO parametrosSEPA(String idInstitucion, HttpServletRequest request) throws Exception {
 		ComboDTO comboDTO = new ComboDTO();
-		
+
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		ComboItem item = new ComboItem();
-		
+
 		AdmUsuarios usuario = new AdmUsuarios();
 		GenParametrosExample example = new GenParametrosExample();
 		List<GenParametros> parametros;
 		short institucion;
-		
+
 		LOGGER.debug("parametrosSEPA() -> Entrada al servicio para recuperar los valores de los parámetros");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
-		
+
 		if (usuario != null) {
-			
-			if(idInstitucion != null) {
-				institucion=Short.parseShort(idInstitucion);
-			}else {
-				institucion=usuario.getIdinstitucion();
+
+			if (idInstitucion != null) {
+				institucion = Short.parseShort(idInstitucion);
+			} else {
+				institucion = usuario.getIdinstitucion();
 			}
 
 			// Tipo ficheros (Ficha de cuentas bancarias)
@@ -923,79 +919,83 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
-			}else {
+			} else {
 				item.setLabel("0");
 			}
-			
-			//primeros recibos
+
+			// primeros recibos
 			item = new ComboItem();
 			example = new GenParametrosExample();
 
-			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_PRIMEROS_RECIBOS");
+			example.createCriteria().andIdinstitucionEqualTo(institucion)
+					.andParametroEqualTo("SEPA_DIAS_HABILES_PRIMEROS_RECIBOS");
 			parametros = genParametrosMapper.selectByExample(example);
-			
+
 			item.setValue("SEPA_DIAS_HABILES_PRIMEROS_RECIBOS");
-			
+
 			if (null != parametros && parametros.size() > 0) {
-				
+
 				item.setLabel(parametros.get(0).getValor());
-			}else {
+			} else {
 				item.setLabel("0");
 			}
-			
+
 			comboItems.add(item);
-			
-			//recibosRecurrentes
+
+			// recibosRecurrentes
 			item = new ComboItem();
 			example = new GenParametrosExample();
-			
+
 			item.setValue("SEPA_DIAS_HABILES_RECIBOS_RECURRENTES");
-			
-			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_RECURRENTES");
+
+			example.createCriteria().andIdinstitucionEqualTo(institucion)
+					.andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_RECURRENTES");
 			parametros = genParametrosMapper.selectByExample(example);
-			
+
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
-			}else {
+			} else {
 				item.setLabel("0");
 			}
-			
+
 			comboItems.add(item);
-			
-			//recibos cor1
+
+			// recibos cor1
 			item = new ComboItem();
 			example = new GenParametrosExample();
-			
+
 			item.setValue("SEPA_DIAS_HABILES_RECIBOS_COR1");
-			
-			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_COR1");
+
+			example.createCriteria().andIdinstitucionEqualTo(institucion)
+					.andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_COR1");
 			parametros = genParametrosMapper.selectByExample(example);
-			
+
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
-			}else {
+			} else {
 				item.setLabel("0");
 			}
-			
+
 			comboItems.add(item);
-			
-			//recibos b2b
+
+			// recibos b2b
 			item = new ComboItem();
 			example = new GenParametrosExample();
-			
+
 			item.setValue("SEPA_DIAS_HABILES_RECIBOS_B2B");
-			
-			example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_B2B");
+
+			example.createCriteria().andIdinstitucionEqualTo(institucion)
+					.andParametroEqualTo("SEPA_DIAS_HABILES_RECIBOS_B2B");
 			parametros = genParametrosMapper.selectByExample(example);
-			
+
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
-			}else {
+			} else {
 				item.setLabel("0");
 			}
-			
+
 			comboItems.add(item);
-			
+
 			comboDTO.setCombooItems(comboItems);
 		}
 
@@ -1009,11 +1009,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		ComboDTO comboDTO = new ComboDTO();
 
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		ComboItem item = new ComboItem();
-
 		AdmUsuarios usuario = new AdmUsuarios();
-		GenParametrosExample example = new GenParametrosExample();
-		List<GenParametros> parametros;
 		short institucion;
 
 		LOGGER.debug("parametrosCONTROL() -> Entrada al servicio para recuperar los valores de los parámetros");
@@ -1023,10 +1019,10 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		if (usuario != null) {
 
-			if(idInstitucion != null) {
-				institucion=Short.parseShort(idInstitucion);
-			}else {
-				institucion=usuario.getIdinstitucion();
+			if (idInstitucion != null) {
+				institucion = Short.parseShort(idInstitucion);
+			} else {
+				institucion = usuario.getIdinstitucion();
 			}
 
 			comboItems.add(getParametro("CONTROL_EMISION_FACTURAS_SII", "FAC", institucion));
@@ -1074,10 +1070,10 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		if (usuario != null) {
 
-			if(idInstitucion != null) {
-				institucion=Short.parseShort(idInstitucion);
-			}else {
-				institucion=usuario.getIdinstitucion();
+			if (idInstitucion != null) {
+				institucion = Short.parseShort(idInstitucion);
+			} else {
+				institucion = usuario.getIdinstitucion();
 			}
 
 			GenParametrosKey genKey = new GenParametros();
@@ -1117,7 +1113,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		AdmUsuarios usuario = new AdmUsuarios();
 		List<ComboItem> comboItems;
 
-		LOGGER.debug("comboMotivosDevolucion() -> Entrada al servicio para recuperar el combo de motivos de devolucion");
+		LOGGER.debug(
+				"comboMotivosDevolucion() -> Entrada al servicio para recuperar el combo de motivos de devolucion");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
@@ -1126,11 +1123,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			LOGGER.debug(
 					"comboMotivosDevolucion() / facEstadoconfirmfactExtendsMapper.comboFormasPagoFactura() -> Entrada a facEstadoconfirmfactExtendsMapper para obtener combo de motivos de devolucion");
 
-			Short idInstitucion = usuario.getIdinstitucion();
-
-			// Logica
 			comboItems = facMotivodevolucionExtendsMapper.comboMotivosDevolucion(usuario.getIdlenguaje());
-
 			comboDTO.setCombooItems(comboItems);
 		}
 
