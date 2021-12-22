@@ -5256,7 +5256,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		newAsistencia.setIdpretension(scsAsistenciaOld.getIdpretension());
 		newAsistencia.setNig(scsAsistenciaOld.getNig());
 		newAsistencia.setNumeroprocedimiento(scsAsistenciaOld.getNumeroprocedimiento());
-		newAsistencia.setIdpersonajg(scsAsistenciaOld.getIdpersonajg());
+		//newAsistencia.setIdpersonajg(scsAsistenciaOld.getIdpersonajg());
 		newAsistencia.setDelitosimputados(scsAsistenciaOld.getDelitosimputados());
 
 		scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(newAsistencia);
