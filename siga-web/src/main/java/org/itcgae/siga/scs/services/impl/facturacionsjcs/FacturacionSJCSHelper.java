@@ -31,6 +31,9 @@ public class FacturacionSJCSHelper  {
 	private static AdmUsuarios USU_DEFAULT = null;
 
 	private Logger LOGGER = Logger.getLogger(FacturacionSJCSHelper.class);
+	
+	public static final String JE_ABOGADOS = "JEAbogados";
+
 
 	  @Autowired
 	  private EcomColaMapper ecomColaMapper; 
@@ -107,13 +110,18 @@ public class FacturacionSJCSHelper  {
 		
 		
 	public Path getRutaAlmacenFichero(Short idInstitucion) {
-			GenPropertiesKey key = new GenPropertiesKey();
-			key.setFichero(SigaConstants.FICHERO_SIGA);
-			key.setParametro(SigaConstants.parametroRutaAlmacenFicheros);
-			GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
-			String rutaRaiz = rutaFicherosSalida.getValor();
-			return Paths.get(rutaRaiz,String.valueOf(idInstitucion));
+			return getRutaAlmacenFichero().resolve(String.valueOf(idInstitucion));
 		}
+	
+	
+	public Path getRutaAlmacenFichero() {
+		GenPropertiesKey key = new GenPropertiesKey();
+		key.setFichero(SigaConstants.FICHERO_SIGA);
+		key.setParametro(SigaConstants.parametroRutaAlmacenFicheros);
+		GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
+		String rutaRaiz = rutaFicherosSalida.getValor();
+		return Paths.get(rutaRaiz);
+	}
 
 	
 }

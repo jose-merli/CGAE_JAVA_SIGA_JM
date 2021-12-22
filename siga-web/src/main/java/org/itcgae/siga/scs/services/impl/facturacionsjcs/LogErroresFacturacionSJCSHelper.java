@@ -12,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
@@ -29,8 +28,6 @@ public class LogErroresFacturacionSJCSHelper {
 	private static final String SUFIJO_LOG = ".log";
 
 	private static final String LOG_ERRORES_FACTURACION = "LogErroresFacturacion";
-
-	private static final String JE_ABOGADOS = "JEAbogados";
 
 	@Autowired
     private GenPropertiesMapper genPropertiesMapper;
@@ -119,7 +116,7 @@ public class LogErroresFacturacionSJCSHelper {
 		key.setParametro(SigaConstants.PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF);
 		GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
 		String rutaRaiz = rutaFicherosSalida.getValor();
-		return Paths.get(rutaRaiz,JE_ABOGADOS,String.valueOf(idInstitucion),LOG_ERRORES_FACTURACION, PREFIJO_LOG + idFacturacion + SUFIJO_LOG);
+		return Paths.get(rutaRaiz,FacturacionSJCSHelper.JE_ABOGADOS,String.valueOf(idInstitucion),LOG_ERRORES_FACTURACION, PREFIJO_LOG + idFacturacion + SUFIJO_LOG);
 	}
     
 

@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.DescargaCertificacionesXuntaItem;
 import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,4 +43,6 @@ public interface ICertificacionFacSJCSService {
 	Resource descargaErrorValidacion(GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request) throws Exception;
 
 	UpdateResponseDTO enviaRespuestaCICAC_ICA(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request);
+
+	Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) throws Exception;
 }
