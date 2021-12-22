@@ -1388,7 +1388,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 				sqlTurno.WHERE("t.FECHABAJA IS NULL");
 
 				SQL sqlNumGuardias = new SQL();
-				sqlNumGuardias.SELECT("COUNT(*) numGuardias FROM SCS_HCO_CONF_PROG_CALENDARIOS");
+				sqlNumGuardias.SELECT("COUNT(1) numGuardias FROM SCS_HCO_CONF_PROG_CALENDARIOS");
 				sqlNumGuardias.WHERE("IDPROGCALENDARIO = PC.IDPROGCALENDARIO");
 				sqlNumGuardias.WHERE("IDINSTITUCION = " + idInstitucion);
 				
@@ -1410,7 +1410,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 				sqlAs.WHERE("IDGUARDIA IN ( " + sqlGuardColeg + ")");
 				
 				SQL sqlGenerado = new SQL();
-				sqlGenerado.SELECT("COUNT (*) GUARDIAS");
+				sqlGenerado.SELECT("COUNT (1) GUARDIAS");
 				sqlGenerado.FROM("SCS_GUARDIASCOLEGIADO gc");
 				if (calendarioItem.getFechaCalendarioDesde() != null)
 				sqlGenerado.WHERE("FECHAINICIO >= TO_DATE('" + calendarioItem.getFechaCalendarioDesde() + "', 'dd/MM/yyyy')");
@@ -1418,8 +1418,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 				sqlGenerado.WHERE("FECHAFIN <= TO_DATE('" + calendarioItem.getFechaCalendarioHasta() + "', 'dd/MM/yyyy')");
 				
 				sqlGenerado.WHERE("pc.idinstitucion = gc.idinstitucion");
-				sqlGenerado.WHERE("hpc.idturno = gc.idturno");
-				sqlGenerado.WHERE("hpc.idguardia = gc.idguardia");
+				sqlGenerado.WHERE("cg.idturno = gc.idturno");
+				sqlGenerado.WHERE("cg.idguardia = gc.idguardia");
 		SQL sql = new SQL();
 		sql.SELECT("CG.IDINSTITUCION AS INSTITUCION, CG.IDTURNO as idTurno, CG.IDGUARDIA as idGuardia, PC.IDPROGCALENDARIO as idCalendarioProgramado,  PC.IDCONJUNTOGUARDIA AS idCalG,  PC.IDINSTITUCION  , TO_CHAR(PC.FECHAPROGRAMACION,'dd/MM/yyyy HH24:mi:ss') AS FECHAPROGRAMACION,  PC.FECHACALINICIO  AS fechaDesde,  PC.FECHACALFIN   AS fechaHasta   ,  PC.ESTADO AS estado, GG.DESCRIPCION AS listaGuardias, DECODE((" + sqlGenerado + "), 0, 'No', 'Si') AS GENERADO, COALESCE(PC.observaciones, '') AS OBSERVACIONES, ( " + sqlGuardia + " ) as guardia, ( " + sqlTurno + " ) as turno, ( " + sqlNumGuardias + " ) as numGuardias, ( " + sqlFact + " ) as facturado, ( " + sqlAs + " ) as asistenciasAsociadas, PC.FECHAMODIFICACION");
 		sql.FROM("scs_conjuntoguardias         gg JOIN scs_prog_calendarios         pc ON gg.idinstitucion = pc.idinstitucion "
