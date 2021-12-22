@@ -2268,7 +2268,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				errorLinea.append("Es obligatorio introducir el turno. ");
 				cargaMasivaDatosBTItem.setIdTurno(null);
 			}
-
+			if (errorLinea.toString().isEmpty()) {
 			// 1. Si la guardia de colegiado ya existe en el sistema, dará error.
 			List<String> idGuardiaList = scsGuardiasturnoExtendsMapper
 					.getIdGuardiaByName(cargaMasivaDatosBTItem.getIdGuardia());
@@ -2456,9 +2456,12 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								"Las fechas indicadas no se corresponden con la forma de generación del calendario");
 					}
 				}
+			
+			
 
 			} else {
 				errorLinea.append("La guardia de colegiado ya existe en el sistema");
+			}
 			}
 
 			if (!errorLinea.toString().isEmpty()) {
