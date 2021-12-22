@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
@@ -164,5 +165,24 @@ public class CertificacionFacSJCSController {
         return response;
     }
 	
+
+    @RequestMapping(value = "/buscarFactCertificaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<FacturacionDTO> buscarFacturaciones(@RequestBody String idCertificacion,
+                                                       HttpServletRequest request) {
+        FacturacionDTO response = iCertificacionFacSJCSService.getFactCertificaciones(idCertificacion, request);
+        return new ResponseEntity<FacturacionDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/saveFactCertificacion")
+    ResponseEntity<InsertResponseDTO> saveFactCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
+        InsertResponseDTO response = iCertificacionFacSJCSService.saveFactCertificacion(certificacionesItem, request);
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/delFactCertificacion")
+    ResponseEntity<DeleteResponseDTO> delFactCertificacion(@RequestBody List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
+        DeleteResponseDTO response = iCertificacionFacSJCSService.delFactCertificacion(certificacionesItemList, request);
+        return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
 
 }

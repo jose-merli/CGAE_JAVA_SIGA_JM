@@ -113,4 +113,16 @@ public class CombosController {
    		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
    	}
 
+    @RequestMapping(value="/combo/comboFactNull", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<ComboDTO> comboFactNull(HttpServletRequest request) {
+        ComboDTO response = combosServices.comboFactNull(request);
+        return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value="/combo/comboFactByPartidaPresu")
+    ResponseEntity<ComboDTO> comboFactByPartidaPresu(@RequestParam("idPartidaPresupuestaria") String idPartidaPresupuestaria, HttpServletRequest request) {
+        ComboDTO response = combosServices.comboFactByPartidaPresu(idPartidaPresupuestaria, request);
+        return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+    }
+
 }
