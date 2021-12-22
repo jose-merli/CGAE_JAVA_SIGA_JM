@@ -637,6 +637,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Boolean erroresExcel = false;
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -656,7 +657,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				for (CargaMasivaDatosITItem cargaMasivaDatosITItem : cargaMasivaDatosITItems) {
 
 					int result = -1;
-
+					cenCargamasivacv.setNumregistros(cargaMasivaDatosITItems.size());
 					// Si no se ha detectado errores leyendo el excel introducido
 					if (cargaMasivaDatosITItem.getErrores() == null) {
 						int z = 1;
@@ -807,6 +808,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						}
 
 					} else {
+						erroresExcel = true;
 						errores += cargaMasivaDatosITItem.getErrores();
 						error.setDescription(errores);
 						deleteResponseDTO.setError(error);
@@ -824,38 +826,38 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					error.setMessage("No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK);
 				} else {
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGI, datosLog);
-
-					cenCargamasivacv.setTipocarga("I");
-					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
-					cenCargamasivacv.setNombrefichero(nombreFichero);
-					cenCargamasivacv.setNumregistros(cargaMasivaDatosITItems.size());
-					cenCargamasivacv.setNumregistroserroneos(registrosErroneos);
-					cenCargamasivacv.setFechamodificacion(new Date());
-					cenCargamasivacv.setFechacarga(new Date());
-					cenCargamasivacv.setUsumodificacion(usuario.getIdusuario());
-
-					Long idFile = uploadFileLog(file.getBytes(), cenCargamasivacv, false);
-					Long idLogFile = uploadFileLog(bytesLog, cenCargamasivacv, true);
-
-					cenCargamasivacv.setIdfichero(idFile);
-					cenCargamasivacv.setIdficherolog(idLogFile);
-
-					int result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
-
-					if (result == 0) {
-						error.setCode(SigaConstants.CODE_400);
-						errores += "Error al insertar en cargas masivas";
-					}
-
-					LOGGER.info("uploadFileIT() -> Salida al servicio para subir un archivo");
-					deleteResponseDTO.setStatus(SigaConstants.OK);
-					error.setDescription(errores);
-					int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
-					error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
-							+ "<br/> Registros Erroneos: " + cenCargamasivacv.getNumregistroserroneos());
-					error.setCode(SigaConstants.CODE_200);
+						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGI, datosLog);
+	
+						cenCargamasivacv.setTipocarga("I");
+						cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
+						cenCargamasivacv.setNombrefichero(nombreFichero);
+						cenCargamasivacv.setNumregistros(cargaMasivaDatosITItems.size());
+						cenCargamasivacv.setNumregistroserroneos(registrosErroneos);
+						cenCargamasivacv.setFechamodificacion(new Date());
+						cenCargamasivacv.setFechacarga(new Date());
+						cenCargamasivacv.setUsumodificacion(usuario.getIdusuario());
+	
+						Long idFile = uploadFileLog(file.getBytes(), cenCargamasivacv, false);
+						Long idLogFile = uploadFileLog(bytesLog, cenCargamasivacv, true);
+	
+						cenCargamasivacv.setIdfichero(idFile);
+						cenCargamasivacv.setIdficherolog(idLogFile);
+	
+						int result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
+	
+						if (result == 0) {
+							error.setCode(SigaConstants.CODE_400);
+							errores += "Error al insertar en cargas masivas";
+						}
+					
 				}
+				LOGGER.info("uploadFileIT() -> Salida al servicio para subir un archivo");
+				deleteResponseDTO.setStatus(SigaConstants.OK);
+				error.setDescription(errores);
+				int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
+				error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
+						+ "<br/> Registros Erroneos: " + registrosErroneos);
+				error.setCode(SigaConstants.CODE_200);
 			}
 		}
 
@@ -2962,4 +2964,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 		return nuevoId;
 	} // getNuevoIdSaltoCompensacionGrupo()
+	
+	
+ 
 }
