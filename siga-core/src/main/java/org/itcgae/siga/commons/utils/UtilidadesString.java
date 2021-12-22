@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -454,36 +455,59 @@ public class UtilidadesString {
 		}
 		return retorno;
 	}
-	
+
 	public static Error creaError(String mensaje) {
 		Error error = new Error();
-		
+
 		error.setCode(500);
 		error.setDescription("general.mensaje.error.bbdd");
 		error.setMessage(mensaje);
-		
+
 		return error;
 	}
-	
+
 	public static Error creaInfoResultados() {
 		Error error = new Error();
-		
+
 		error.setMessage("general.message.consulta.resultados");
-		
+
 		return error;
 	}
-	
-	 /**
+
+	/**
 	 * Reemplaza una cadea de caracteres por otro
 	 * 
 	 * @param cadenaOld, cadena a reemplazar
 	 * @param cadenaNew, nueva cadea de caracteres
 	 */
-	public static String reemplazaString (String cadenaOld, String cadenaNew, String frase){
-		
+	public static String reemplazaString(String cadenaOld, String cadenaNew, String frase) {
+
 		final Pattern pattern = Pattern.compile(cadenaOld);
-		final Matcher matcher = pattern.matcher( frase );
+		final Matcher matcher = pattern.matcher(frase);
 		frase = matcher.replaceAll(cadenaNew);
 		return frase;
+	}
+
+	/**
+	 * funciona para validar el iban
+	 * 
+	 * @param cuenta
+	 * @return
+	 */
+	public static boolean validarIBAN(String cuenta) {
+		boolean esValido = cuenta != null && cuenta.length() == 24 && cuenta.substring(0, 2).equals("ES");
+
+		for (int i = 2; i < cuenta.length() && esValido; i++) {
+			esValido = Character.isDigit(cuenta.charAt(i));
+		}
+
+		if (esValido) {
+			BigInteger cuentaBancaria = new BigInteger(cuenta.substring(4, 24) + "1428" + cuenta.substring(2, 4));
+			Integer resto = cuentaBancaria.mod(new BigInteger("97")).intValue();
+
+			esValido = resto == 1;
+		}
+
+		return esValido;
 	}
 }
