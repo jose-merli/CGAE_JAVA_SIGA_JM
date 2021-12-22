@@ -36,6 +36,8 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
@@ -250,6 +252,48 @@ public class FacturacionPySController {
 
 		try {
 			response = facturacionService.eliminaDestinatariosSerie(destinatariosSeriesItems, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/getConsultasSerie")
+	ResponseEntity<ConsultasDTO> getConsultasSerie(@RequestParam String idSerieFacturacion,
+																  HttpServletRequest request) {
+		ConsultasDTO response = new ConsultasDTO();
+
+		try {
+			response = facturacionService.getConsultasSerie(idSerieFacturacion, request);
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/nuevaConsultaSerie")
+	ResponseEntity<CreateResponseDTO> nuevaConsultaSerieSerie(@RequestBody ConsultaDestinatarioItem consulta,
+															  HttpServletRequest request) {
+		CreateResponseDTO response = new CreateResponseDTO();
+
+		try {
+			response = facturacionService.nuevaConsultaSerie(consulta, request);
+			return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/eliminaConsultasSerie")
+	ResponseEntity<DeleteResponseDTO> eliminaConsultasSerie(@RequestBody List<ConsultaDestinatarioItem> consultas,
+																HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = facturacionService.eliminaConsultasSerie(consultas, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));

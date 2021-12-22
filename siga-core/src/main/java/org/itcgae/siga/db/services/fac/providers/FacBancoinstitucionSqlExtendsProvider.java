@@ -66,6 +66,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.SELECT("bi.comisionimporte");
 		query.SELECT("bi.comisiondescripcion");
 		query.SELECT("bi.idtipoiva");
+		query.SELECT("(SELECT pysTipoIVA.descripcion FROM pys_tipoiva pysTipoIVA WHERE pysTipoIVA.idtipoiva = bi.idtipoiva) tipoiva");
 		query.SELECT("bi.comisioncuentacontable");
 
 		query.SELECT("bi.configficherossecuencia");
@@ -74,6 +75,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.SELECT("bi.configconceptoampliado");
 
 		query.SELECT("bi.idsufijosjcs");
+		query.SELECT("(SELECT fs.sufijo || ' - ' || fs.concepto FROM fac_sufijo fs WHERE fs.idinstitucion = bi.idinstitucion AND fs.idsufijo = bi.idsufijosjcs) sufijosjcs");
 		query.SELECT("su.concepto");
 		query.SELECT("bi.sjcs");
 

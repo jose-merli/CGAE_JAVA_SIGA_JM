@@ -1,13 +1,17 @@
 package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItem2;
+import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenGruposcriterios;
+import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionExample;
 import org.itcgae.siga.db.entities.FacPlantillafacturacion;
@@ -24,6 +28,7 @@ import org.itcgae.siga.db.entities.PysProductosExample;
 import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
+import org.itcgae.siga.db.mappers.CenGruposcriteriosMapper;
 import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
@@ -32,6 +37,7 @@ import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacEstadoconfirmfactExtendsMapper;
@@ -121,6 +127,12 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
+
+	@Autowired
+	private CenGruposcriteriosMapper cenGruposcriteriosMapper;
+
+	@Autowired
+	private ConConsultasExtendsMapper conConsultasExtendsMapper;
 
 	@Autowired
 	private FacMotivodevolucionExtendsMapper facMotivodevolucionExtendsMapper;
@@ -343,10 +355,21 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		if (usuario != null) {
 			LOGGER.debug(
-					"comboDestinatarios() / facBancoInstitucionExtendsMapper.comboDestinatarios() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de destinatarios");
+					"comboDestinatarios() / cenGruposcriteriosMapper.selectByExample() -> Entrada a cenGruposcriteriosMapper para obtener el combo de destinatarios");
 
 			// Logica
-			comboItems = cenGruposclienteClienteExtendsMapper.comboDestinatarios(usuario.getIdinstitucion());
+			CenGruposcriteriosExample criterioExample = new CenGruposcriteriosExample();
+			criterioExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+			criterioExample.or().andIdinstitucionEqualTo(Short.parseShort("2000"));
+			criterioExample.setOrderByClause("nombre");
+
+			List<CenGruposcriterios> gruposCriterios = cenGruposcriteriosMapper.selectByExample(criterioExample);
+			comboItems = gruposCriterios.stream().map(g -> {
+				ComboItem item = new ComboItem();
+				item.setValue(String.valueOf(g.getIdinstitucion()) + "-" + String.valueOf(g.getIdgruposcriterios()));
+				item.setLabel(g.getNombre());
+				return item;
+			}).collect(Collectors.toList());
 
 			comboDTO.setCombooItems(comboItems);
 		}
@@ -528,6 +551,39 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		}
 
 		LOGGER.debug("getEtiquetasSerie() -> Salida del servicio para obtener las etiquetas de la serie");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboConsultaInstitucionDTO comboConsultas(HttpServletRequest request) throws Exception {
+		ComboConsultaInstitucionDTO comboDTO = new ComboConsultaInstitucionDTO();
+
+		List<ComboItemConsulta> comboItems;
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.debug(
+				"comboConsultas() -> Entrada al servicio para recuperar las consultas disponibles");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"comboConsultas() / conConsultasExtendsMapper.selectConsultasDisponibles() -> Entrada a conConsultasExtendsMapper para obtener las consultas disponibles");
+
+			// Logica
+			String idioma = usuario.getIdlenguaje();
+			comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(usuario.getIdinstitucion(),
+					1l, 1l);
+
+			LOGGER.debug(
+					"comboConsultas() / conConsultasExtendsMapper.selectConsultasDisponibles() -> Saliendo de conConsultasExtendsMapper para obtener las consultas disponibles");
+
+			comboDTO.setConsultas(comboItems);
+		}
+
+		LOGGER.debug("comboConsultas() -> Salida del servicio para obtener las consultas disponibles");
 
 		return comboDTO;
 	}
@@ -853,7 +909,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		
 		if (usuario != null) {
 			
-			if(idInstitucion!=null) {
+			if(idInstitucion != null) {
 				institucion=Short.parseShort(idInstitucion);
 			}else {
 				institucion=usuario.getIdinstitucion();
@@ -967,7 +1023,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		if (usuario != null) {
 
-			if(idInstitucion==null) {
+			if(idInstitucion != null) {
 				institucion=Short.parseShort(idInstitucion);
 			}else {
 				institucion=usuario.getIdinstitucion();
@@ -1018,7 +1074,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		if (usuario != null) {
 
-			if(idInstitucion!=null) {
+			if(idInstitucion != null) {
 				institucion=Short.parseShort(idInstitucion);
 			}else {
 				institucion=usuario.getIdinstitucion();
