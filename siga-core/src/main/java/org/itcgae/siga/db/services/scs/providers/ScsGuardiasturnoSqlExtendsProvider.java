@@ -1328,7 +1328,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("PC.IDCONJUNTOGUARDIA IN  (" +  calendarioItem.getIdConjuntoGuardia()+")");
 		}
 		if (calendarioItem.getEstado() != null && calendarioItem.getEstado() != "") {
-		sql.WHERE("PC.ESTADO IN (" + calendarioItem.getEstado()+")");
+		sql.WHERE("HPC.ESTADO IN (" + calendarioItem.getEstado()+")");
 		}
 
 		if (calendarioItem.getFechaProgramadaDesde() != null && calendarioItem.getFechaProgramadaDesde() != "") {

@@ -1755,7 +1755,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									scsActuacionasistenciaExample.createCriteria()
 											.andIdinstitucionEqualTo(idInstitucion)
 											.andAnioEqualTo(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()))
-											.andNumeroEqualTo(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()));
+											.andNumeroEqualTo(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()))
+											.andFacturadoEqualTo("0");
 
 									rowsUpdated += scsActuacionasistenciaExtendsMapper.updateByExampleSelective(
 											scsActuacionasistencia, scsActuacionasistenciaExample);
@@ -1818,8 +1819,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		TarjetaAsistenciaResponseDTO tarjetaAsistenciaResponseDTO = new TarjetaAsistenciaResponseDTO();
-		String anio = anioNumero.split("/")[0];
-		String numero = anioNumero.split("/")[1];
+		String anio = "";
+		String numero = "";
+		if(anioNumero != null && !anioNumero.isEmpty()) {
+			anio = anioNumero.split("/")[0];
+			numero = anioNumero.split("/")[1];
+		}
 		Error error = new Error();
 		try {
 			if (idInstitucion != null) {
@@ -4433,6 +4438,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							scsActuacionasistenciaKey.setIdinstitucion(idInstitucion);
 							scsActuacionasistencia = scsActuacionasistenciaExtendsMapper
 									.selectByPrimaryKey(scsActuacionasistenciaKey);
+							actuacion.setAnulada("0");
 
 							if (scsActuacionasistencia != null && "1".equals(scsActuacionasistencia.getFacturado())) {
 								facturada = true;
@@ -4440,8 +4446,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 						}
 						// Si no esta facturada anulamos
-						//CAMBIADO POR INCIDENCIA 2602
-//						if (!facturada) {
+
+						if (!facturada) {
 							scsActuacionasistencia.setIdactuacion(Long.valueOf(actuacion.getIdActuacion()));
 							scsActuacionasistencia.setAnio(Short.valueOf(anioNumero.split("/")[0]));
 							scsActuacionasistencia.setNumero(Long.valueOf(anioNumero.split("/")[1]));
@@ -4457,7 +4463,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 //							error.setDescription("No se puede anular una actuacion facturada");
 //							error.setMessage("No se puede anular una actuacion facturada");
 //							updateResponseDTO.setError(error);
-//						}
+						}
 					}
 					if (!facturada) {
 						if (affectedRows > 0) {
@@ -5256,7 +5262,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		newAsistencia.setIdpretension(scsAsistenciaOld.getIdpretension());
 		newAsistencia.setNig(scsAsistenciaOld.getNig());
 		newAsistencia.setNumeroprocedimiento(scsAsistenciaOld.getNumeroprocedimiento());
-		newAsistencia.setIdpersonajg(scsAsistenciaOld.getIdpersonajg());
+		//newAsistencia.setIdpersonajg(scsAsistenciaOld.getIdpersonajg());
 		newAsistencia.setDelitosimputados(scsAsistenciaOld.getDelitosimputados());
 
 		scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(newAsistencia);
