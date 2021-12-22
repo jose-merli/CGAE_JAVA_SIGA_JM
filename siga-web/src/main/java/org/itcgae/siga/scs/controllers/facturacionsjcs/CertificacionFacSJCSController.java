@@ -25,13 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -183,6 +177,17 @@ public class CertificacionFacSJCSController {
     ResponseEntity<DeleteResponseDTO> delFactCertificacion(@RequestBody List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
         DeleteResponseDTO response = iCertificacionFacSJCSService.delFactCertificacion(certificacionesItemList, request);
         return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/reabrirfacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<InsertResponseDTO> reabrirFacturacion(@RequestBody String idFacturacion,
+                                                         HttpServletRequest request) {
+        InsertResponseDTO response = iCertificacionFacSJCSService.reabrirFacturacion(idFacturacion, request);
+        if (response.getError().getCode() == 200) {
+            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+        }
     }
 
 }

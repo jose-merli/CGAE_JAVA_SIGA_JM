@@ -45,4 +45,6 @@ public interface ICertificacionFacSJCSService {
 	UpdateResponseDTO enviaRespuestaCICAC_ICA(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request);
 
 	Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) throws Exception;
+
+    public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request);
 }

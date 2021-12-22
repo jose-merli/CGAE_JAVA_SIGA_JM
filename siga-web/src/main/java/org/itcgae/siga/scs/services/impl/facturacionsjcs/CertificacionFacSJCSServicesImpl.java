@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
@@ -33,17 +34,12 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.EcomColaMapper;
-import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
-import org.itcgae.siga.db.mappers.EcomOperacionMapper;
-import org.itcgae.siga.db.mappers.FcsCertificacionesHistoricoEstadoMapper;
-import org.itcgae.siga.db.mappers.FcsFactCertificacionesMapper;
-import org.itcgae.siga.db.mappers.FcsMvariosCertificacionesMapper;
-import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -51,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -110,6 +107,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private CertificacionFacSJCSServicesXuntaHelper xuntaHelper;
+
+    @Autowired
+    private FcsFactEstadosfacturacionMapper fcsFactEstadosfacturacionMapper;
+
+    @Autowired
+    private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
 
     
     @Override
@@ -1038,9 +1041,92 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
 		return resource;
 	}
-	
-	
-	
+
+    @Override
+    public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        InsertResponseDTO insertResponse = new InsertResponseDTO();
+        org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+        insertResponse.setError(error);
+        int response = 0;
+
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            LOGGER.info(
+                    "getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+            LOGGER.info(
+                    "getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
+
+                LOGGER.info("reabrirFacturacion() -> Entrada para reabrir la facturacion");
+
+                // GUARDAR DATOAS DE LA FACTURACION
+                try {
+                    // HACEMOS INSERT DEL ESTADO ABIERTA
+                    LOGGER.info("reabrirFacturacion() -> Guardar datos para reabrir en fcsFactEstadosfacturacion");
+                    response = insertarEstado(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), idInstitucion,
+                            Integer.valueOf(idFacturacion), usuario.getIdusuario());
+
+                    LOGGER.info(
+                            "reabrirFacturacion() -> Salida guardar datos para reabrir en fcsFactEstadosfacturacion");
+                } catch (Exception e) {
+                    LOGGER.error("ERROR: FacturacionServicesImpl.reabrirFacturacion() >  Al reabrir la facturacion.",
+                            e);
+                    error.setCode(400);
+                    error.setDescription("general.mensaje.error.bbdd");
+                    insertResponse.setStatus(SigaConstants.KO);
+                }
+
+                LOGGER.info("reabrirFacturacion() -> Salida para reabrir la facturacion");
+            } else {
+                LOGGER.warn(
+                        "getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                                + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("getLabel() -> idInstitucion del token nula");
+        }
+
+        LOGGER.info("getLabel() -> Salida del servicio para rabrir las facturaciones");
+
+        if (response == 0 && error.getDescription() == null) {
+            error.setCode(400);
+            insertResponse.setStatus(SigaConstants.KO);
+        } else if (error.getCode() == null) {
+            error.setCode(200);
+            insertResponse.setStatus(SigaConstants.OK);
+        }
+
+        insertResponse.setError(error);
+
+        return insertResponse;
+    }
+
+    @Transactional
+    private int insertarEstado(Integer codigoEstado, Short idInstitucion, Integer idFacturacion, Integer usuario) {
+        NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(Short.valueOf(idInstitucion),
+                String.valueOf(idFacturacion));
+        Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId()) + 1);
+        Short idEstado = codigoEstado.shortValue();
+
+        FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
+        record.setIdinstitucion(Short.valueOf(idInstitucion));
+        record.setIdestadofacturacion(idEstado);
+        record.setIdfacturacion(Integer.valueOf(idFacturacion));
+        record.setFechaestado(new Date());
+        record.setFechamodificacion(new Date());
+        record.setUsumodificacion(usuario);
+        record.setIdordenestado(idOrdenEstado);
+
+        return fcsFactEstadosfacturacionMapper.insert(record);
+    }
 
 
 }
