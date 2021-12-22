@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -2200,7 +2201,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 									.getIdTurnoIncByIdGuardiaInc(idGuardiaIncompatible).stream().collect(Collectors.joining(","));;
 						}
 					}
-
+					List<String> idGuardiaIncpList = Arrays.asList(idGuardiaIncompatible.split("\\s*,\\s*"));
+					List<String> idTurnoIncpList = Arrays.asList(idTurnoIncompatible.split("\\s*,\\s*"));
+					for (int j = 0; j < idGuardiaIncpList.size(); j++) {
 					String pattern = "dd/MM/YY";
 					SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 					String fechaModificacion = simpleDateFormat.format(new Date());
@@ -2208,21 +2211,35 @@ public class GuardiasServiceImpl implements GuardiasService {
 							&& !incompatibilidad.getIdInstitucion().isEmpty() && idGuardia != null
 							&& !idGuardia.isEmpty() 
 							&& idGuardiaIncompatible != null && !idGuardiaIncompatible.isEmpty()) {
-						int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno,
+						int existe = 0;
+						if(idTurnoIncpList.size() > 1) {
+							List<String> idTurnoI = scsIncompatibilidadguardiasExtendsMapper
+									.getIdTurnoIncByIdGuardiaInc(idGuardiaIncpList.get(j));
+							 existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno,
+									incompatibilidad.getIdInstitucion(), idGuardia, idTurnoI.get(0),
+									idGuardiaIncpList.get(j));
+						}else {
+						 existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno,
 								incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible,
-								idGuardiaIncompatible);
+								idGuardiaIncpList.get(j));
+						}
 						if (existe == 2) {
+
 							// existe en ambas direcciones - la actualizamos
-							ScsIncompatibilidadguardias ig = new ScsIncompatibilidadguardias();
-							ig.setIdturno(Integer.parseInt(idTurno));
-							ig.setIdguardia(Integer.parseInt(idGuardia));
-							ig.setDiasseparacionguardias(Short.parseShort(incompatibilidad.getDiasSeparacionGuardias()));
-							ig.setIdturnoIncompatible(Integer.parseInt(idTurnoIncompatible));
-							ig.setIdguardiaIncompatible(Integer.parseInt(idGuardiaIncompatible.toString()));
-							ig.setMotivos(incompatibilidad.getMotivos());
-							ig.setFechamodificacion(new SimpleDateFormat("dd/MM/yyyy").parse((fechaModificacion)));
-							ig.setIdinstitucion(Short.parseShort(incompatibilidad.getIdInstitucion()));
-							scsIncompatibilidadguardiasExtendsMapper.updateByPrimaryKeySelective(ig);
+							List<String> idTurnoI = scsIncompatibilidadguardiasExtendsMapper
+									.getIdTurnoIncByIdGuardiaInc(idGuardiaIncpList.get(j));
+								ScsIncompatibilidadguardias ig = new ScsIncompatibilidadguardias();
+								ig.setIdturno(Integer.parseInt(idTurno));
+								ig.setIdguardia(Integer.parseInt(idGuardia));
+								ig.setDiasseparacionguardias(Short.parseShort(incompatibilidad.getDiasSeparacionGuardias()));
+								ig.setIdturnoIncompatible(Integer.parseInt(idTurnoI.get(0)));
+								ig.setIdguardiaIncompatible(Integer.parseInt(idGuardiaIncpList.get(j)));
+								ig.setMotivos(incompatibilidad.getMotivos());
+								ig.setFechamodificacion(new SimpleDateFormat("dd/MM/yyyy").parse((fechaModificacion)));
+								ig.setIdinstitucion(Short.parseShort(incompatibilidad.getIdInstitucion()));
+								scsIncompatibilidadguardiasExtendsMapper.updateByPrimaryKeySelective(ig);
+							
+
 //							scsIncompatibilidadguardiasExtendsMapper.updateIfExists(idTurno,
 //									incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible,
 //									idGuardiaIncompatible, incompatibilidad.getMotivos(),
@@ -2230,28 +2247,45 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 						if (existe == 0) {
 							// no existe - llamamos dos veces para guardar en ambas direcciones
-							List<String> idTurnoIncpList = Arrays.asList(idTurnoIncompatible.split("\\s*,\\s*"));
-							List<String> idGuardiaIncpList = Arrays.asList(idGuardiaIncompatible.split("\\s*,\\s*"));
-							for (int j = 0; j < idGuardiaIncpList.size(); j++) {
+							if(idTurnoIncpList.size() > 1) {
+								List<String> idTurnoI = scsIncompatibilidadguardiasExtendsMapper
+										.getIdTurnoIncByIdGuardiaInc(idGuardiaIncpList.get(j));
 							scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(
 									Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()),
-									Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncpList.get(j)),
+									Integer.parseInt(idGuardia), Integer.parseInt(idTurnoI.get(0)),
 									Integer.parseInt(idGuardiaIncpList.get(j)), usuarios.get(0).getIdusuario(),
 									incompatibilidad.getMotivos(),
 									Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
 							scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(
-									Integer.parseInt(idTurnoIncpList.get(j)),
+									Integer.parseInt(idTurnoI.get(0)),
 									Integer.parseInt(incompatibilidad.getIdInstitucion()),
 									Integer.parseInt(idGuardiaIncpList.get(j)), Integer.parseInt(idTurno),
 									Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(),
 									incompatibilidad.getMotivos(),
 									Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+							}else {
+								List<String> idTurnoI = scsIncompatibilidadguardiasExtendsMapper
+										.getIdTurnoIncByIdGuardiaInc(idGuardiaIncpList.get(j));
+								scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(
+										Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()),
+										Integer.parseInt(idGuardia), Integer.parseInt(idTurnoI.get(0)),
+										Integer.parseInt(idGuardiaIncpList.get(j)), usuarios.get(0).getIdusuario(),
+										incompatibilidad.getMotivos(),
+										Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+								scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(
+										Integer.parseInt(idTurnoI.get(0)),
+										Integer.parseInt(incompatibilidad.getIdInstitucion()),
+										Integer.parseInt(idGuardiaIncpList.get(j)), Integer.parseInt(idTurno),
+										Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(),
+										incompatibilidad.getMotivos(),
+										Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
 							}
 
 						}
 					} else {
 						response = 0;
 					}
+				}
 				}
 				LOGGER.info("saveIncompatibilidades() -> Salida ya con los datos recogidos");
 			}
