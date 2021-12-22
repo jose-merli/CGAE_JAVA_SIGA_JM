@@ -82,9 +82,7 @@ import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
-import org.itcgae.siga.db.entities.FacGrupcritincluidosenserie;
 import org.itcgae.siga.db.entities.FacGrupcritincluidosenserieExample;
-import org.itcgae.siga.db.entities.FacGrupcritincluidosenserieKey;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
@@ -158,12 +156,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -1991,7 +1989,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if(!(!filtrosSoloAbono && filtrosSoloFactura))
 
 				items.addAll(facAbonoExtendsMapper.getAbonos(item,
-					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
+					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje(), items.size()));
 
 			facturaDTO.setFacturasItems(items);
 		}

@@ -163,7 +163,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             devoluciones.SELECT("d.idfactura");
             devoluciones.FROM("FAC_LINEADEVOLUDISQBANCO b, fac_facturaincluidaendisquete d");
             devoluciones.WHERE("b.idinstitucion = f.idinstitucion AND d.idinstitucion=b.idinstitucion AND "
-                    + "d.idfacturaincluidaendisquete=b.idfacturaincluidaendisquete AND iddisquetedevoluciones=" + item.getIdentificadorDevolucion());
+                    + "d.idfacturaincluidaendisquete=b.idfacturaincluidaendisquete AND d.iddisquetecargos=b.iddisquetecargos"
+                    + " AND iddisquetedevoluciones=" + item.getIdentificadorDevolucion());
 
             facturas.WHERE("f.idfactura IN (" + devoluciones.toString() + ")");
         }
