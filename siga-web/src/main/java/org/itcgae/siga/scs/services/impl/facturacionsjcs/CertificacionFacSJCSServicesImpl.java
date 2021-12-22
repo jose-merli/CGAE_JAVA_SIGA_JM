@@ -24,6 +24,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.DescargaCertificacionesXuntaItem;
 import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
 import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
 import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
@@ -122,6 +123,10 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     @Autowired
     private FcsCertificacionesHistoricoEstadoMapper fcsCertificacionesHistoricoEstadoMapper;
 
+    @Autowired
+    private CertificacionFacSJCSServicesXuntaHelper xuntaHelper;
+
+    
     @Override
     public InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request) {
 
@@ -790,6 +795,29 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 		 }
 		 
 		 return updateResponseDTO;
+	}
+
+	@Override
+	public Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem,
+			HttpServletRequest request) throws Exception {
+		Resource resource = null;
+
+		LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Entrada al servicio para la descarga de certificaciones de la Xunta");
+
+		File file = xuntaHelper.generaFicheroCertificacionesXunta(descargaItem.getIdInstitucion(), descargaItem.getLIdFacturaciones());
+
+		if (file != null) {
+			resource = new ByteArrayResource(Files.readAllBytes(file.toPath())) {
+				public String getFilename() {
+					return file.getName();
+				}
+			};
+
+		}
+
+		LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Salida del servicio para la descarga de certificaciones de la Xunta");
+
+		return resource;
 	}
 	
 	

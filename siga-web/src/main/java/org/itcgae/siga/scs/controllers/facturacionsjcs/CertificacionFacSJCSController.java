@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.DescargaCertificacionesXuntaItem;
 import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
 import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -138,5 +139,30 @@ public class CertificacionFacSJCSController {
 		UpdateResponseDTO response = iCertificacionFacSJCSService.enviaRespuestaCICAC_ICA(gestEcom,request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	
+    @PostMapping(path = "/descargarCertificacionesXunta")
+    public ResponseEntity<Resource> descargarCertificacionesXunta(@RequestBody DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) {
+        ResponseEntity<Resource> response = null;
+        Resource resource = null;
+        Boolean error = false;
+
+        try {
+            resource = iCertificacionFacSJCSService.descargarCertificacionesXunta(descargaItem, request);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        } catch (Exception e) {
+            error = true;
+        }
+
+        if (error) {
+            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return response;
+    }
+	
 
 }
