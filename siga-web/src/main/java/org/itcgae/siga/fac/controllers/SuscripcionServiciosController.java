@@ -2,10 +2,9 @@ package org.itcgae.siga.fac.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
 import org.itcgae.siga.DTO.fac.FiltrosSuscripcionesItem;
-import org.itcgae.siga.DTO.fac.ListaCompraProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesDTO;
+import org.itcgae.siga.DTO.fac.RevisionAutLetradoItem;
 import org.itcgae.siga.fac.services.ISuscripcionServiciosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +37,13 @@ public class SuscripcionServiciosController {
 		ListaSuscripcionesDTO listaCompras = suscripcionServiciosService.getListaSuscripciones(request, peticion);
 		if(listaCompras.getError().getCode()==200)return new ResponseEntity<ListaSuscripcionesDTO>(listaCompras, HttpStatus.OK);
 		else return new ResponseEntity<ListaSuscripcionesDTO>(listaCompras, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/actualizacionSuscripcionesPersona")
+	void actualizacionSuscripcionesPersona(HttpServletRequest request, @RequestBody RevisionAutLetradoItem peticion) throws Exception{
+		suscripcionServiciosService.actualizacionSuscripcionesPersona(request, peticion);
+//		if(listaCompras.getError().getCode()==200)return new ResponseEntity<ListaSuscripcionesDTO>(listaCompras, HttpStatus.OK);
+//		else return new ResponseEntity<ListaSuscripcionesDTO>(listaCompras, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

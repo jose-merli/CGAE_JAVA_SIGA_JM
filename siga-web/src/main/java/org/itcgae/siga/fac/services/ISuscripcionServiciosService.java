@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.FiltrosSuscripcionesItem;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesDTO;
+import org.itcgae.siga.DTO.fac.RevisionAutLetradoItem;
 
 public interface ISuscripcionServiciosService {
 
@@ -11,6 +12,6 @@ public interface ISuscripcionServiciosService {
 	
 	public void ejecutaSuscripcionesAutomaticas();
 
-	void actualizacionSuscripcionesPersona();
+	public void actualizacionSuscripcionesPersona(HttpServletRequest request, RevisionAutLetradoItem peticion);
 
 }
