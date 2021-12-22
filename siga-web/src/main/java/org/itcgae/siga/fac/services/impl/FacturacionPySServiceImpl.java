@@ -1830,14 +1830,33 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> obteniendo las facturas");
 
-			if(!((item.getEstadosFiltroFac() == null || item.getEstadosFiltroFac().isEmpty())
-					&& (item.getEstadosFiltroAb() != null && !item.getEstadosFiltroAb().isEmpty())))
+			boolean filtrosSoloFactura =
+					item.getIdentificadorAdeudos()!=null
+					|| item.getIdentificadorDevolucion()!=null
+					|| item.getComunicacionesFacturasDesde()!=null
+					|| item.getComunicacionesFacturasHasta()!=null
+					|| item.getImporteAdeudadoDesde()!=null
+					|| item.getImporteAdeudadoHasta()!=null
+					|| item.getFacturacion()!=null
+					|| item.getSerie()!=null
+					|| item.getFormaCobroFactura()!=null
+					|| item.getEstadosFiltroFac()!=null
+					|| item.getFacturasPendientesHasta()!=null
+					|| item.getFacturasPendientesDesde()!=null;
+
+			boolean filtrosSoloAbono =
+					item.getIdentificadorTransferencia()!=null
+					|| item.getNumeroAbonoSJCS()!=null
+					||item.getFormaCobroAbono()!=null
+					|| item.getEstadosFiltroAb()!=null;
+
+			if(!(filtrosSoloAbono && !filtrosSoloFactura))
 			items.addAll(facFacturaExtendsMapper.getFacturas(item,
 						usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
 
-			if(!((item.getEstadosFiltroAb() == null || item.getEstadosFiltroAb().isEmpty())
-					&& (item.getEstadosFiltroFac() != null && !item.getEstadosFiltroFac().isEmpty())))
-			items.addAll(facAbonoExtendsMapper.getAbonos(item,
+			if(!(!filtrosSoloAbono && filtrosSoloFactura))
+
+				items.addAll(facAbonoExtendsMapper.getAbonos(item,
 					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
 
 			facturaDTO.setFacturasItems(items);
@@ -2238,31 +2257,46 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				abonoKey.setIdinstitucion(usuario.getIdinstitucion());
 				abonoKey.setIdabono(facHistoricoInsert.getIdabono());
 				FacAbono abonoUpdate = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
+
+				//renegociar
+				if(item.getIdAccion().equalsIgnoreCase("7") && (abonoUpdate.getEstado() == 6 || abonoUpdate.getEstado() == 5)){
+
+					renegociarAbono(item, facHistoricoInsert, abonoUpdate, usuario);
+				}
+
+				//nuevo abono
+				/**
+				 * Id accion abono por caja no existe
+ 				 */
+				if(item.getIdAccion().equalsIgnoreCase("10") && abonoUpdate.getEstado() == 6){
+
+					nuevoAbono(item, facHistoricoInsert, abonoUpdate, usuario);
+				}
 			}
 
 			//renegociar
-			if(item.getIdAccion().equalsIgnoreCase("7") && (facHistoricoList.get(facHistoricoList.size()-1).getEstado() == 2 ||
-					facHistoricoList.get(facHistoricoList.size()-1).getEstado() == 4 || facHistoricoList.get(facHistoricoList.size()-1).getEstado() == 5)){
+			if(item.getIdAccion().equalsIgnoreCase("7") && (facHistoricoInsert.getEstado() == 2 || facHistoricoInsert.getEstado() == 4 ||
+					facHistoricoInsert.getEstado() == 5)){
 
 				renegociarFactura(item, facHistoricoInsert, facUpdate, usuario);
 			}
 
 			//nuevo cobro
-			if(item.getIdAccion().equalsIgnoreCase("4") && facHistoricoList.get(facHistoricoList.size()-1).getEstado() == 2){
+			if(item.getIdAccion().equalsIgnoreCase("4") && facHistoricoInsert.getEstado() == 2){
 
 				nuevoCobroFactura(item, facHistoricoInsert, facUpdate, usuario);
 			}
 
 			//devolver
-			if(item.getIdAccion().equalsIgnoreCase("6") && facHistoricoList.get(facHistoricoList.size()-1).getEstado() == 1
-					&& facHistoricoList.get(facHistoricoList.size()-1).getIdtipoaccion() == 5) {
+			if(item.getIdAccion().equalsIgnoreCase("6") && facHistoricoInsert.getEstado() == 1
+					&& facHistoricoInsert.getIdtipoaccion() == 5) {
 
 				devolverFactura(item, facHistoricoInsert, facUpdate, usuario);
 			}
 
 			//anular
-			if(item.getIdAccion().equalsIgnoreCase("8") && facHistoricoList.get(facHistoricoList.size()-1).getEstado() != 7
-					&& facHistoricoList.get(facHistoricoList.size()-1).getEstado() != 8){
+			if(item.getIdAccion().equalsIgnoreCase("8") && facHistoricoInsert.getEstado() != 7
+					&& facHistoricoInsert.getEstado() != 8){
 
 				anularFactura(item, facHistoricoInsert, facUpdate, usuario);
 			}
@@ -2343,6 +2377,144 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
 
 		facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+		facRenegociacionMapper.insert(renegociacionInsert);
+		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
+	}
+
+	private void renegociarAbono(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacAbono abonoUpdate, AdmUsuarios usuario){
+		//historico fac
+		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
+
+		facHistoricoInsert.setIddisquetecargos(null);
+		facHistoricoInsert.setIdfacturaincluidaendisquete(null);
+		facHistoricoInsert.setIddisquetedevoluciones(null);
+		facHistoricoInsert.setIdrecibo(null);
+		facHistoricoInsert.setIdpagoporcaja(null);
+		facHistoricoInsert.setIdabono(null);
+		facHistoricoInsert.setComisionidfactura(null);
+
+		FacRenegociacionExample exampleRenegociacion = new FacRenegociacionExample();
+		exampleRenegociacion.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
+				.andIdinstitucionEqualTo(usuario.getIdinstitucion());
+		exampleRenegociacion.setOrderByClause("IDRENEGOCIACION");
+
+		List<FacRenegociacion> listRenegociacion = facRenegociacionMapper.selectByExample(exampleRenegociacion);
+		if(!listRenegociacion.isEmpty())
+			facHistoricoInsert.setIdrenegociacion((short) (listRenegociacion.get(listRenegociacion.size()-1).getIdrenegociacion() + 1));
+		else
+			facHistoricoInsert.setIdrenegociacion((short) 1);
+
+		if(facHistoricoInsert.getIdcuenta() == null)
+			facHistoricoInsert.setEstado((short) 2);
+		else
+			facHistoricoInsert.setEstado((short) 5);
+
+		if(item.getIdEstado().equalsIgnoreCase("2")){
+			facHistoricoInsert.setIdformapago((short) 30);
+			facHistoricoInsert.setEstado((short) 2);
+		}
+		else if(item.getIdEstado().equalsIgnoreCase("5")){
+			facHistoricoInsert.setIdformapago((short) 20);
+			facHistoricoInsert.setEstado((short) 5);
+
+			if(facHistoricoInsert.getIdpersonadeudor()!=null){
+				facHistoricoInsert.setIdpersona(facHistoricoInsert.getIdpersonadeudor());
+			}
+			facHistoricoInsert.setIdcuenta(Short.valueOf(item.getCuentaBanco()));
+		}
+
+		//renegociacion
+		FacRenegociacion renegociacionInsert = new FacRenegociacion();
+
+		renegociacionInsert.setIdfactura(facHistoricoInsert.getIdfactura());
+		renegociacionInsert.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
+		renegociacionInsert.setComentario(item.getComentario());
+		renegociacionInsert.setUsumodificacion(usuario.getUsumodificacion());
+		renegociacionInsert.setFecharenegociacion(new Date());
+		renegociacionInsert.setFechamodificacion(new Date());
+		renegociacionInsert.setIdcuenta(facHistoricoInsert.getIdcuenta());
+		renegociacionInsert.setImporte(facHistoricoInsert.getImptotalporpagar());
+		renegociacionInsert.setIdpersona(facHistoricoInsert.getIdpersona());
+		renegociacionInsert.setIdrenegociacion(facHistoricoInsert.getIdrenegociacion());
+
+		//abono
+		abonoUpdate.setEstado(Short.valueOf(item.getEstado()));
+		abonoUpdate.setIdpersona(facHistoricoInsert.getIdpersona());
+		abonoUpdate.setIdcuenta(facHistoricoInsert.getIdcuenta());
+		abonoUpdate.setIdpersonadeudor(facHistoricoInsert.getIdpersonadeudor());
+		abonoUpdate.setIdcuentadeudor(facHistoricoInsert.getIdcuentadeudor());
+		abonoUpdate.setFechamodificacion(new Date());
+		abonoUpdate.setUsumodificacion(usuario.getUsumodificacion());
+
+		facAbonoExtendsMapper.updateByPrimaryKey(abonoUpdate);
+		facRenegociacionMapper.insert(renegociacionInsert);
+		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
+	}
+
+	private void nuevoAbono(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacAbono abonoUpdate, AdmUsuarios usuario){
+		//historico fac
+		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
+
+		facHistoricoInsert.setIddisquetecargos(null);
+		facHistoricoInsert.setIdfacturaincluidaendisquete(null);
+		facHistoricoInsert.setIddisquetedevoluciones(null);
+		facHistoricoInsert.setIdrecibo(null);
+		facHistoricoInsert.setIdpagoporcaja(null);
+		facHistoricoInsert.setIdabono(null);
+		facHistoricoInsert.setComisionidfactura(null);
+
+		FacRenegociacionExample exampleRenegociacion = new FacRenegociacionExample();
+		exampleRenegociacion.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
+				.andIdinstitucionEqualTo(usuario.getIdinstitucion());
+		exampleRenegociacion.setOrderByClause("IDRENEGOCIACION");
+
+		List<FacRenegociacion> listRenegociacion = facRenegociacionMapper.selectByExample(exampleRenegociacion);
+		if(!listRenegociacion.isEmpty())
+			facHistoricoInsert.setIdrenegociacion((short) (listRenegociacion.get(listRenegociacion.size()-1).getIdrenegociacion() + 1));
+		else
+			facHistoricoInsert.setIdrenegociacion((short) 1);
+
+		if(facHistoricoInsert.getIdcuenta() == null)
+			facHistoricoInsert.setEstado((short) 2);
+		else
+			facHistoricoInsert.setEstado((short) 5);
+
+		if(item.getIdEstado().equalsIgnoreCase("2")){
+			facHistoricoInsert.setIdformapago((short) 30);
+			facHistoricoInsert.setEstado((short) 2);
+		}
+		else if(item.getIdEstado().equalsIgnoreCase("5")){
+			facHistoricoInsert.setIdformapago((short) 20);
+			facHistoricoInsert.setEstado((short) 5);
+
+			if(facHistoricoInsert.getIdpersonadeudor()!=null){
+				facHistoricoInsert.setIdpersona(facHistoricoInsert.getIdpersonadeudor());
+			}
+			facHistoricoInsert.setIdcuenta(Short.valueOf(item.getCuentaBanco()));
+		}
+
+		//renegociacion
+		FacRenegociacion renegociacionInsert = new FacRenegociacion();
+
+		renegociacionInsert.setIdfactura(facHistoricoInsert.getIdfactura());
+		renegociacionInsert.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
+		renegociacionInsert.setComentario(item.getComentario());
+		renegociacionInsert.setUsumodificacion(usuario.getUsumodificacion());
+		renegociacionInsert.setFecharenegociacion(new Date());
+		renegociacionInsert.setFechamodificacion(new Date());
+		renegociacionInsert.setIdcuenta(facHistoricoInsert.getIdcuenta());
+		renegociacionInsert.setImporte(facHistoricoInsert.getImptotalporpagar());
+		renegociacionInsert.setIdpersona(facHistoricoInsert.getIdpersona());
+		renegociacionInsert.setIdrenegociacion(facHistoricoInsert.getIdrenegociacion());
+
+		//abono
+		abonoUpdate.setImptotalabonado(abonoUpdate.getImptotalabonado().add(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
+		abonoUpdate.setImptotalabonadoefectivo(abonoUpdate.getImptotalabonadoefectivo().add(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
+		abonoUpdate.setImppendienteporabonar(abonoUpdate.getImppendienteporabonar().subtract(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
+		abonoUpdate.setFechamodificacion(new Date());
+		abonoUpdate.setUsumodificacion(usuario.getUsumodificacion());
+
+		facAbonoExtendsMapper.updateByPrimaryKey(abonoUpdate);
 		facRenegociacionMapper.insert(renegociacionInsert);
 		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 	}
