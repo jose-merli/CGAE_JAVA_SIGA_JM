@@ -98,7 +98,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 	public String getNextIdCuentaBancaria(Short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("(NVL(MAX(bi.bancos_codigo),0) + 1) as bancos_codigo");
+		sql.SELECT("(NVL(MAX(TO_NUMBER(bi.bancos_codigo)),0) + 1) as bancos_codigo");
 		sql.FROM("fac_bancoinstitucion bi");
 		sql.WHERE("bi.idinstitucion = " + idInstitucion);
 

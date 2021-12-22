@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 
 public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
 
-    public String getAbonos(FacturaItem item, String idInstitucion, String idLenguaje) {
+    public String getAbonos(FacturaItem item, String idInstitucion, String idLenguaje, Integer maxRows) {
 
         SQL transferencia = new SQL();
         SQL abonos = new SQL();
@@ -121,7 +121,12 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         sqlAbonos.SELECT("*");
         sqlAbonos.FROM("("+abonos.toString()+")");
 
-        sqlAbonos.WHERE("ROWNUM < 201");
+        if(maxRows == null || maxRows == 0 || maxRows > 201){
+            sqlAbonos.WHERE("ROWNUM < 201");
+        }
+        else {
+            sqlAbonos.WHERE("ROWNUM < " + (201 - maxRows));
+        }
 
         return sqlAbonos.toString();
     }

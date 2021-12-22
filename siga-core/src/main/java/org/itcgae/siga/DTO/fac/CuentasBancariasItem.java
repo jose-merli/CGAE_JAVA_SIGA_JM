@@ -13,6 +13,7 @@ public class CuentasBancariasItem {
 	private String IBAN;
 	private String nombre;
 	private String descripcion;
+	private Boolean descripcionRepetida;
 	private String asientoContable;
 	private String cuentaContableTarjeta;
 	private String BIC;
@@ -105,6 +106,14 @@ public class CuentasBancariasItem {
 
 	public void setCuentaContableTarjeta(String cuentaContableTarjeta) {
 		this.cuentaContableTarjeta = cuentaContableTarjeta;
+	}
+
+	public Boolean getDescripcionRepetida() {
+		return descripcionRepetida;
+	}
+
+	public void setDescripcionRepetida(Boolean descripcionRepetida) {
+		this.descripcionRepetida = descripcionRepetida;
 	}
 
 	public String getBIC() {
@@ -247,6 +256,7 @@ public class CuentasBancariasItem {
 				Objects.equals(IBAN, that.IBAN) &&
 				Objects.equals(nombre, that.nombre) &&
 				Objects.equals(descripcion, that.descripcion) &&
+				Objects.equals(descripcionRepetida, that.descripcionRepetida) &&
 				Objects.equals(asientoContable, that.asientoContable) &&
 				Objects.equals(cuentaContableTarjeta, that.cuentaContableTarjeta) &&
 				Objects.equals(BIC, that.BIC) &&
@@ -269,7 +279,7 @@ public class CuentasBancariasItem {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, tipoIVA, comisionCuentaContable, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, sufijoSjcs, concepto);
+		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, descripcionRepetida, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, tipoIVA, comisionCuentaContable, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, sufijoSjcs, concepto);
 	}
 
 	@Override
@@ -282,6 +292,7 @@ public class CuentasBancariasItem {
 				", IBAN='" + IBAN + '\'' +
 				", nombre='" + nombre + '\'' +
 				", descripcion='" + descripcion + '\'' +
+				", descripcionRepetida=" + descripcionRepetida +
 				", asientoContable='" + asientoContable + '\'' +
 				", cuentaContableTarjeta='" + cuentaContableTarjeta + '\'' +
 				", BIC='" + BIC + '\'' +
