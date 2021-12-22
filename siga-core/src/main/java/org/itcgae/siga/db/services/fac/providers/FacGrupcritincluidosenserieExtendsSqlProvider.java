@@ -13,7 +13,7 @@ public class FacGrupcritincluidosenserieExtendsSqlProvider extends FacGrupcritin
 		SQL sql = new SQL();
 		
 		sql.SELECT("con.idinstitucion");
-		sql.SELECT("con.idconsulta");
+		sql.SELECT("gc.idgruposcriterios idconsulta");
 		sql.SELECT("con.general");
 		sql.SELECT("con.descripcion");
 		sql.SELECT("con.observaciones");
@@ -31,6 +31,22 @@ public class FacGrupcritincluidosenserieExtendsSqlProvider extends FacGrupcritin
 
 		sql.ORDER_BY("con.descripcion");
 		
+		return sql.toString();
+	}
+
+	public String comboDestinatarios(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("(cg.IDINSTITUCION || '-' || cg.IDGRUPOSCRITERIOS) id");
+		sql.SELECT_DISTINCT("cg.NOMBRE");
+
+		sql.FROM("FAC_GRUPCRITINCLUIDOSENSERIE fg");
+		sql.INNER_JOIN("CEN_GRUPOSCRITERIOS cg ON (fg.IDINSTITUCION_GRUP=cg.IDINSTITUCION AND fg.IDGRUPOSCRITERIOS=cg.IDGRUPOSCRITERIOS)");
+
+		sql.WHERE("fg.idinstitucion = " + idInstitucion);
+
+		sql.ORDER_BY("cg.NOMBRE");
+
 		return sql.toString();
 	}
 

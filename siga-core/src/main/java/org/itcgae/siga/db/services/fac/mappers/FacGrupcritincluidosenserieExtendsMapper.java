@@ -7,6 +7,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.UsosSufijosItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.FacGrupcritincluidosenserieMapper;
@@ -36,5 +37,12 @@ public interface FacGrupcritincluidosenserieExtendsMapper extends FacGrupcritinc
 		@Result(column = "GENERAL", property = "generica", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ConsultaItem> getConsultasSerie(String idSerieFacturacion, Short idInstitucion);
+
+	@SelectProvider(type = FacGrupcritincluidosenserieExtendsSqlProvider.class, method = "comboDestinatarios")
+	@Results({
+			@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "id", property = "value", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboDestinatarios(Short idInstitucion);
 
 }

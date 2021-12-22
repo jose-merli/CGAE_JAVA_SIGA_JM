@@ -10,8 +10,6 @@ import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.CenGruposcriterios;
-import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionExample;
 import org.itcgae.siga.db.entities.FacPlantillafacturacion;
@@ -44,6 +42,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacEstadoconfirmfactExtendsMapper
 import org.itcgae.siga.db.services.fac.mappers.FacEstadosabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacGrupcritincluidosenserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacMotivodevolucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
@@ -133,6 +132,9 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private ConConsultasExtendsMapper conConsultasExtendsMapper;
+
+	@Autowired
+	private FacGrupcritincluidosenserieExtendsMapper facGrupcritincluidosenserieExtendsMapper;
 
 	@Autowired
 	private FacMotivodevolucionExtendsMapper facMotivodevolucionExtendsMapper;
@@ -355,21 +357,10 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		if (usuario != null) {
 			LOGGER.debug(
-					"comboDestinatarios() / cenGruposcriteriosMapper.selectByExample() -> Entrada a cenGruposcriteriosMapper para obtener el combo de destinatarios");
+					"comboDestinatarios() / facGrupcritincluidosenserieExtendsMapper.comboDestinatarios() -> Entrada a facGrupcritincluidosenserieExtendsMapper para obtener el combo de destinatarios");
 
 			// Logica
-			CenGruposcriteriosExample criterioExample = new CenGruposcriteriosExample();
-			criterioExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
-			criterioExample.or().andIdinstitucionEqualTo(Short.parseShort("2000"));
-			criterioExample.setOrderByClause("nombre");
-
-			List<CenGruposcriterios> gruposCriterios = cenGruposcriteriosMapper.selectByExample(criterioExample);
-			comboItems = gruposCriterios.stream().map(g -> {
-				ComboItem item = new ComboItem();
-				item.setValue(String.valueOf(g.getIdinstitucion()) + "-" + String.valueOf(g.getIdgruposcriterios()));
-				item.setLabel(g.getNombre());
-				return item;
-			}).collect(Collectors.toList());
+			comboItems = facGrupcritincluidosenserieExtendsMapper.comboDestinatarios(usuario.getIdinstitucion());
 
 			comboDTO.setCombooItems(comboItems);
 		}
@@ -926,6 +917,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			}else {
 				item.setLabel("0");
 			}
+
+			comboItems.add(item);
 			
 			//primeros recibos
 			item = new ComboItem();
