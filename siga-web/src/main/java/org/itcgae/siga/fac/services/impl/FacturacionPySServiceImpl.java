@@ -1995,18 +1995,17 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					|| item.getComunicacionesFacturasHasta() != null || item.getImporteAdeudadoDesde() != null
 					|| item.getImporteAdeudadoHasta() != null || item.getFacturacion() != null
 					|| item.getSerie() != null || item.getFormaCobroFactura() != null
-					|| item.getEstadosFiltroFac() != null || item.getFacturasPendientesHasta() != null
+					|| (item.getEstadosFiltroFac() != null && item.getEstadosFiltroFac().size() >0) || item.getFacturasPendientesHasta() != null
 					|| item.getFacturasPendientesDesde() != null;
 
 			boolean filtrosSoloAbono = item.getIdentificadorTransferencia() != null || item.getNumeroAbonoSJCS() != null
-					|| item.getFormaCobroAbono() != null || item.getEstadosFiltroAb() != null;
+					|| item.getFormaCobroAbono() != null || (item.getEstadosFiltroAb() != null && item.getEstadosFiltroAb().size() >0);
 
 			if (!(filtrosSoloAbono && !filtrosSoloFactura))
 				items.addAll(facFacturaExtendsMapper.getFacturas(item, usuario.getIdinstitucion().toString(),
 						usuario.getIdlenguaje()));
 
 			if (!(!filtrosSoloAbono && filtrosSoloFactura))
-
 				items.addAll(facAbonoExtendsMapper.getAbonos(item, usuario.getIdinstitucion().toString(),
 						usuario.getIdlenguaje(), items.size()));
 
