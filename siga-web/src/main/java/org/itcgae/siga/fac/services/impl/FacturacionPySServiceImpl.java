@@ -2615,62 +2615,32 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private void nuevoAbono(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacAbono abonoUpdate,
 			AdmUsuarios usuario) {
-		// historico fac
-		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
 
-		facHistoricoInsert.setIddisquetecargos(null);
-		facHistoricoInsert.setIdfacturaincluidaendisquete(null);
-		facHistoricoInsert.setIddisquetedevoluciones(null);
-		facHistoricoInsert.setIdrecibo(null);
-		facHistoricoInsert.setIdpagoporcaja(null);
-		facHistoricoInsert.setIdabono(null);
-		facHistoricoInsert.setComisionidfactura(null);
+		// abonos caja
+		FacPagoabonoefectivo abonoCajaInsert = new FacPagoabonoefectivo();
 
-		FacRenegociacionExample exampleRenegociacion = new FacRenegociacionExample();
-		exampleRenegociacion.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
+		FacPagoabonoefectivoExample exampleAbonos = new FacPagoabonoefectivoExample();
+		exampleAbonos.createCriteria().andIdabonoEqualTo(abonoUpdate.getIdabono())
 				.andIdinstitucionEqualTo(usuario.getIdinstitucion());
-		exampleRenegociacion.setOrderByClause("IDRENEGOCIACION");
+		exampleAbonos.setOrderByClause("IDPAGOABONO");
 
-		List<FacRenegociacion> listRenegociacion = facRenegociacionMapper.selectByExample(exampleRenegociacion);
-		if (!listRenegociacion.isEmpty())
-			facHistoricoInsert.setIdrenegociacion(
-					(short) (listRenegociacion.get(listRenegociacion.size() - 1).getIdrenegociacion() + 1));
+		List<FacPagoabonoefectivo> listPagos = facPagoabonoefectivoMapper.selectByExample(exampleAbonos);
+		if (!listPagos.isEmpty())
+			abonoCajaInsert.setIdpagoabono((short) (listPagos.get(listPagos.size() - 1).getIdpagoabono() + 1));
 		else
-			facHistoricoInsert.setIdrenegociacion((short) 1);
+			abonoCajaInsert.setIdpagoabono((short) 1);
 
-		if (facHistoricoInsert.getIdcuenta() == null)
-			facHistoricoInsert.setEstado((short) 2);
-		else
-			facHistoricoInsert.setEstado((short) 5);
+		abonoCajaInsert.setIdinstitucion(usuario.getIdinstitucion());
+		abonoCajaInsert.setIdabono(facHistoricoInsert.getIdabono());
 
-		if (item.getIdEstado().equalsIgnoreCase("2")) {
-			facHistoricoInsert.setIdformapago((short) 30);
-			facHistoricoInsert.setEstado((short) 2);
-		} else if (item.getIdEstado().equalsIgnoreCase("5")) {
-			facHistoricoInsert.setIdformapago((short) 20);
-			facHistoricoInsert.setEstado((short) 5);
-
-			if (facHistoricoInsert.getIdpersonadeudor() != null) {
-				facHistoricoInsert.setIdpersona(facHistoricoInsert.getIdpersonadeudor());
-			}
-			facHistoricoInsert.setIdcuenta(Short.valueOf(item.getCuentaBanco()));
-		}
-
-		// renegociacion
-		FacRenegociacion renegociacionInsert = new FacRenegociacion();
-
-		renegociacionInsert.setIdfactura(facHistoricoInsert.getIdfactura());
-		renegociacionInsert.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
-		renegociacionInsert.setComentario(item.getComentario());
-		renegociacionInsert.setUsumodificacion(usuario.getUsumodificacion());
-		renegociacionInsert.setFecharenegociacion(new Date());
-		renegociacionInsert.setFechamodificacion(new Date());
-		renegociacionInsert.setIdcuenta(facHistoricoInsert.getIdcuenta());
-		renegociacionInsert.setImporte(facHistoricoInsert.getImptotalporpagar());
-		renegociacionInsert.setIdpersona(facHistoricoInsert.getIdpersona());
-		renegociacionInsert.setIdrenegociacion(facHistoricoInsert.getIdrenegociacion());
+		abonoCajaInsert.setImporte(item.getImpTotalPagado());
+		abonoCajaInsert.setFechamodificacion(new Date());
+		abonoCajaInsert.setFecha(item.getFechaModificaion());
+		abonoCajaInsert.setUsumodificacion(usuario.getUsumodificacion());
+		abonoCajaInsert.setContabilizado(abonoUpdate.getContabilizada());
 
 		// abono
+		abonoUpdate.setIdfactura(facHistoricoInsert.getIdfactura());
 		abonoUpdate.setImptotalabonado(
 				abonoUpdate.getImptotalabonado().add(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
 		abonoUpdate.setImptotalabonadoefectivo(abonoUpdate.getImptotalabonadoefectivo()
@@ -2679,10 +2649,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				.subtract(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
 		abonoUpdate.setFechamodificacion(new Date());
 		abonoUpdate.setUsumodificacion(usuario.getUsumodificacion());
+		abonoUpdate.setIdcuenta(facHistoricoInsert.getIdcuenta());
+		abonoUpdate.setIdcuentadeudor(facHistoricoInsert.getIdcuentadeudor());
 
 		facAbonoExtendsMapper.updateByPrimaryKey(abonoUpdate);
-		facRenegociacionMapper.insert(renegociacionInsert);
-		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
+		facPagoabonoefectivoMapper.insert(abonoCajaInsert);
 	}
 
 	private void nuevoCobroFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
@@ -2844,6 +2815,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		FacAbono abonoInsert = new FacAbono();
 
 		abonoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
+		abonoInsert.setIdfactura(item.getIdFactura());
 		abonoInsert.setFecha(item.getFechaModificaion());
 		abonoInsert.setFechamodificacion(new Date());
 		abonoInsert.setContabilizada(facUpdate.getContabilizada());
