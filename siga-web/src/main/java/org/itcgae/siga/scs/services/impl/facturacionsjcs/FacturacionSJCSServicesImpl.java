@@ -24,6 +24,8 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
@@ -96,6 +98,7 @@ import org.itcgae.siga.db.mappers.ScsSojMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacAbonoSJCSExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -126,6 +129,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	@Autowired
 	private FcsHistoricoTipoactuacionMapper fcsHistoricoTipoactuacionMapper;
 	
+	@Autowired
+	private FacAbonoSJCSExtendsMapper facAbonoSJCSExtendsMapper;
+	 
 	@Autowired
 	FcsHistoricoTipoasistcolegioMapper fcsHistoricoTipoasistcolegioMapper;
 	
@@ -1945,6 +1951,23 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 			con.close();
 			con = null;
 		}
+	}
+
+	@Override
+	public FacAbonoDTO buscarAbonosSJCS(FacAbonoItem facAbonoItem, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		FacAbonoDTO facAbonoDTO = new FacAbonoDTO();
+		
+		if(null != idInstitucion) {
+	     /*            
+         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonos(facAbonoItem, idInstitucion.toString());
+         facAbonoDTO.setListaFacAbonoItem(listaFacAbonosItem);    
+	    */
+		}
+
+	    return facAbonoDTO;
 	}
 	
 }

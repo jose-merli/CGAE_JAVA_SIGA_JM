@@ -16,6 +16,8 @@ import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
+import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
+import org.itcgae.siga.DTO.fac.FacRegistroFichContaDTO;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
@@ -135,5 +137,12 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request) throws Exception;
 
 	public FacturasIncluidasDTO getFacturasIncluidas(String idFichero, String tipoFichero, HttpServletRequest request) throws Exception;
+	
+	public FacRegistroFichContaDTO search(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request) throws Exception;
+	
+	public FacRegistroFichContaDTO maxIdContabilidad(HttpServletRequest request)throws Exception;
+
+	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request);
+	
 
 }

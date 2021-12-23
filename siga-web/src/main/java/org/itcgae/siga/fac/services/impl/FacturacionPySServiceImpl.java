@@ -18,6 +18,8 @@ import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
+import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
+import org.itcgae.siga.DTO.fac.FacRegistroFichContaDTO;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
@@ -40,6 +42,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
@@ -86,6 +89,7 @@ import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
 import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
 import org.itcgae.siga.db.entities.FacRegenerarPresentacionAdeudos;
+import org.itcgae.siga.db.entities.FacRegistrofichconta;
 import org.itcgae.siga.db.entities.FacRenegociacion;
 import org.itcgae.siga.db.entities.FacRenegociacionExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
@@ -103,6 +107,7 @@ import org.itcgae.siga.db.entities.FacTiposservinclsenfact;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactExample;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
@@ -116,6 +121,7 @@ import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
@@ -129,12 +135,14 @@ import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacHistoricofacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineaabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineafacturaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacRegistroFichContaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposproduincluenfactuExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -154,6 +162,7 @@ import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -255,6 +264,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
+	
+	@Autowired
+	private FacRegistroFichContaExtendsMapper facRegistroFichContaExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -349,7 +364,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		List<CuentasBancariasItem> listaCuentasBancarias;
 		Error error = new Error();
 		AdmUsuarios usuario = new AdmUsuarios();
-
 		LOGGER.info("getCuentasBancarias() -> Entrada al servicio para recuperar el listado de cuentas bancarias");
 
 		// Conseguimos información del usuario logeado
@@ -2107,7 +2121,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if(modificarDescripcion && item.getDescripcion() != null){
 				updateItem.setDescripcionlinea(item.getDescripcion());
 			}
-
+ 
 			if(modificarImporteUnitario && item.getPrecioUnitario() != null){
 				updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
 			}
@@ -3209,4 +3223,99 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			con = null;
 		}
 	}
+	
+	@Override
+	public FacRegistroFichContaDTO search(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request)
+			throws Exception {
+		
+		LOGGER.info("Entrada Metodo: search()");
+		
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		FacRegistroFichContaDTO facRegistroFichContaDTO = new FacRegistroFichContaDTO();
+		List<FacRegistroFichConta> listaFacRegistroFichConta = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+		genParametrosExample.createCriteria().andModuloEqualTo("FAC").andParametroEqualTo("TAM_MAX_CONSULTA_FAC")
+		.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+		genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+		if(idInstitucion != null) {
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			if (tamMax != null && !tamMax.isEmpty()) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = 200;
+			}
+			LOGGER.info("Filtro: search()- Item:" + facRegistroFichConta.toString());
+			listaFacRegistroFichConta = facRegistroFichContaExtendsMapper.search(facRegistroFichConta, idInstitucion,tamMaximo);
+			if(listaFacRegistroFichConta != null) {
+				facRegistroFichContaDTO.setFacRegistroFichConta(listaFacRegistroFichConta);
+			}
+		}
+		LOGGER.info("Salida Metodo: search()");
+		return facRegistroFichContaDTO;
+	}
+
+	@Override
+	public FacRegistroFichContaDTO maxIdContabilidad(HttpServletRequest request) throws Exception {
+		
+		LOGGER.info("Entrada Metodo: search()");
+		
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		FacRegistroFichContaDTO facRegistroFichContaDTO = new FacRegistroFichContaDTO();
+		List<FacRegistroFichConta> listaFacRegistroFichConta = new ArrayList<FacRegistroFichConta>();
+		FacRegistroFichConta facRegistroFichConta = null;
+		
+		if(idInstitucion != null) {
+			
+			facRegistroFichConta = facRegistroFichContaExtendsMapper.getMaxIdFacRegistroFichConta( idInstitucion);
+			
+			if(facRegistroFichConta != null) {
+				listaFacRegistroFichConta.add(facRegistroFichConta);
+				facRegistroFichContaDTO.setFacRegistroFichConta(listaFacRegistroFichConta);
+			}
+		}
+		LOGGER.info("Salida Metodo: search()");
+		return facRegistroFichContaDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
+			HttpServletRequest request) {
+		
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if(idInstitucion != null) {
+			
+			FacRegistrofichconta beanRegistro = new FacRegistrofichconta();
+			beanRegistro.setIdcontabilidad(Long.valueOf(facRegistroFichConta.getIdContabilidad()));
+			beanRegistro.setFechacreacion(facRegistroFichConta.getFechaCreacion());
+			beanRegistro.setNombrefichero(facRegistroFichConta.getNombreFichero());
+			beanRegistro.setFechadesde(facRegistroFichConta.getFechaExportacionDesde());
+			beanRegistro.setFechahasta(facRegistroFichConta.getFechaExportacionHasta());
+			beanRegistro.setFechamodificacion(new Date());
+			beanRegistro.setEstado(new Short("1"));;
+			
+			int resultado = facRegistroFichContaExtendsMapper.insert(beanRegistro);
+			
+			if(resultado == 1) {
+				updateResponseDTO.setStatus(SigaConstants.CODE_200.toString());
+				updateResponseDTO.setId(beanRegistro.getIdcontabilidad().toString());
+			}else {
+				updateResponseDTO.setStatus(SigaConstants.CODE_400.toString());
+				updateResponseDTO.setId(beanRegistro.getIdcontabilidad().toString());
+			}
+			
+		}
+		
+		return updateResponseDTO;
+	}
+	
+	
 }

@@ -16,6 +16,8 @@ import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
+import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
+import org.itcgae.siga.DTO.fac.FacRegistroFichContaDTO;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
@@ -742,4 +744,45 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacturasIncluidasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PostMapping(value = "/searchExportacionContabilidad")
+	ResponseEntity<FacRegistroFichContaDTO> search( @RequestBody FacRegistroFichConta facRegistroFichConta, HttpServletRequest request) {
+		FacRegistroFichContaDTO response = new FacRegistroFichContaDTO();
+		try {
+			response = facturacionService.search(facRegistroFichConta, request);
+			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping(value = "/maxIdContabilidad")
+	ResponseEntity<FacRegistroFichContaDTO> maxIdContabilidad(HttpServletRequest request) {
+		FacRegistroFichContaDTO response = new FacRegistroFichContaDTO();
+		try {
+			response = facturacionService.maxIdContabilidad(request);
+			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping(value = "/guardarRegistroFichConta")
+	ResponseEntity<UpdateResponseDTO> guardarRegistroFichConta(@RequestBody FacRegistroFichConta facRegistroFichConta,
+			HttpServletRequest request) {
+
+		UpdateResponseDTO response = new UpdateResponseDTO();
+
+		try {
+			response = facturacionService.guardarRegistroFichConta(facRegistroFichConta, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
 }
