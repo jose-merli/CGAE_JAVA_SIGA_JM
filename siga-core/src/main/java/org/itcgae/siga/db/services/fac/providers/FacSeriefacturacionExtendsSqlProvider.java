@@ -16,7 +16,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.SELECT("sf.idinstitucion");
 		sql.SELECT("sf.idseriefacturacion");
 		sql.SELECT("bi.bancos_codigo");
-		sql.SELECT("bi.iban");
+		sql.SELECT("bi.descripcion iban");
 		sql.SELECT("sf.nombreabreviado");
 		sql.SELECT("sf.descripcion");
 		sql.SELECT("sf.observaciones");

@@ -27,6 +27,7 @@ public interface FacGrupcritincluidosenserieExtendsMapper extends FacGrupcritinc
 	@Results({
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCONSULTA", property = "idConsulta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCONSULTAANTERIOR", property = "idConsultaAnterior", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOCONSULTA", property = "tipoConsulta", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONES", property = "descripcion", jdbcType = JdbcType.VARCHAR),

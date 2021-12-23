@@ -42,6 +42,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
@@ -272,6 +273,20 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/getFinalidadConsultasSerie")
+	ResponseEntity<FinalidadConsultaDTO> getFinalidadConsultasSerie(@RequestParam ConsultaDestinatarioItem consulta,
+																	HttpServletRequest request) {
+		FinalidadConsultaDTO response = new FinalidadConsultaDTO();
+
+		try {
+			response = facturacionService.getFinalidadConsultasSerie(consulta, request);
+			return new ResponseEntity<FinalidadConsultaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FinalidadConsultaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
