@@ -2279,17 +2279,17 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			genKey.setIdinstitucion(usuario.getIdinstitucion());
 			genKey.setModulo("FAC");
 
-			genKey.setParametro("FACTURACION_MODIFICAR_DESCRIPCION");
+			genKey.setParametro("MODIFICAR_DESCRIPCION");
 			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarDescripcion = !(parametros == null || parametros.getValor().equals("N"));
+			boolean modificarDescripcion = !(parametros == null || parametros.getValor().equals("0"));
 
-			genKey.setParametro("FACTURACION_MODIFICAR_IMPORTE_UNITARIO");
+			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
 			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarImporteUnitario = !(parametros == null || parametros.getValor().equals("N"));
+			boolean modificarImporteUnitario = !(parametros == null || parametros.getValor().equals("0"));
 
-			genKey.setParametro("FACTURACION_MODIFICAR_IVA");
+			genKey.setParametro("MODIFICAR_IVA");
 			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarIVA = !(parametros == null || parametros.getValor().equals("N"));
+			boolean modificarIVA = !(parametros == null || parametros.getValor().equals("0"));
 
 			FacLineafacturaKey key = new FacLineafacturaKey();
 			key.setIdfactura(item.getIdFactura());
@@ -2345,10 +2345,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			genKey.setIdinstitucion(usuario.getIdinstitucion());
 			genKey.setModulo("FAC");
 
-			genKey.setParametro("FACTURACION_MODIFICAR_DESCRIPCION");
+			genKey.setParametro("MODIFICAR_DESCRIPCION");
 			boolean modificarDescripcion = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("0");
 
-			genKey.setParametro("FACTURACION_MODIFICAR_IMPORTE_UNITARIO");
+			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
 			boolean modificarImporteUnitario = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("0");
 
 			FacLineaabonoKey key = new FacLineaabonoKey();
