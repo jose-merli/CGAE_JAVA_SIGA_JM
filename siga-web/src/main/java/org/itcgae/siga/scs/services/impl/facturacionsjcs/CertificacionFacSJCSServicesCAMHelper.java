@@ -98,8 +98,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
     private VWSJE2003DesignaMapper dMapper;
     
     @Autowired
-    private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-
+    FacturacionSJCSHelper colaHelper;
     
     Map<String, PCAJGAlcActIncidencia> mIncidencias;
     Set<String> sColumnasNoImprimir;
@@ -200,7 +199,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
 		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		idUsuario = getUsuario(idInstitucion, dni).getIdusuario();
+		idUsuario = colaHelper.getUsuario(idInstitucion, dni).getIdusuario();
 		
 		rutaPadre = getRutaFicheroSalida(idInstitucion, idFacturacion);
 		
@@ -248,18 +247,6 @@ public class CertificacionFacSJCSServicesCAMHelper {
 			Files.deleteIfExists(pPadre);
 		}
 	}
-
-
-	public AdmUsuarios getUsuario(Short idInstitucion, String dni) {
-        AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-        exampleUsuarios.createCriteria()
-          	.andNifEqualTo(dni)
-          	.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));	            
-        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-        return  usuarios.get(0);    
-	}
-	
-		
 
 
 private void escribeLog(Short idInstitucion, String idFacturacion, String texto) throws IOException {

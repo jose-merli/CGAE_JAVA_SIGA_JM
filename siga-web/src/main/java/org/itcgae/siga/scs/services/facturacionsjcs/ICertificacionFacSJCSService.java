@@ -4,9 +4,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.*;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -26,5 +24,27 @@ public interface ICertificacionFacSJCSService {
 
     ComboDTO getComboEstadosCertificaciones(HttpServletRequest request);
 
+    UpdateResponseDTO validaCatalunya(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request);
+
     DeleteResponseDTO eliminarCertificaciones(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request);
+
+    EstadoCertificacionDTO getEstadosCertificacion(String idCertificacion, HttpServletRequest request);
+
+    InsertResponseDTO createOrUpdateCertificacion(CertificacionesItem certificacionesItem, HttpServletRequest request);
+
+    UpdateResponseDTO reabrirCertificacion(CertificacionesItem certificacionesItem, HttpServletRequest request);
+
+    FacturacionDTO getFactCertificaciones(String idCertificacion, HttpServletRequest request);
+
+    InsertResponseDTO saveFactCertificacion(CertificacionesItem certificacionesItem, HttpServletRequest request);
+
+    DeleteResponseDTO delFactCertificacion(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request);
+
+    Resource descargaErrorValidacion(GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request) throws Exception;
+
+    UpdateResponseDTO enviaRespuestaCICAC_ICA(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request);
+
+    Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) throws Exception;
+
+    public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request);
 }
