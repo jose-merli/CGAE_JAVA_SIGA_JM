@@ -173,9 +173,9 @@ public class CertificacionFacSJCSController {
     }
 
     @RequestMapping(value = "/reabrirfacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<InsertResponseDTO> reabrirFacturacion(@RequestBody String idFacturacion,
+    ResponseEntity<InsertResponseDTO> reabrirFacturacion(@RequestBody List<CertificacionesItem> certificacionesItemList,
                                                          HttpServletRequest request) {
-        InsertResponseDTO response = iCertificacionFacSJCSService.reabrirFacturacion(idFacturacion, request);
+        InsertResponseDTO response = iCertificacionFacSJCSService.reabrirFacturacion(certificacionesItemList, request);
         if (response.getError().getCode() == 200) {
             return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
         } else {
