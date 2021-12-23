@@ -1098,7 +1098,9 @@ public class SigaConstants {
         ECOM2_XUNTA_JE(18),
         ECOM2_CAT_VALIDA_JUSTIFICACION(69),
         CAT_ENVIA_RESP_JUSTIFICACION(74),
-        PCAJG_ALCALA_JE_FICHERO_ERROR(56);
+        PCAJG_ALCALA_JE_FICHERO_ERROR(56),
+    	XUNTA_ENVIO_JUSTIFICACION (27),
+		XUNTA_ENVIO_REINTEGROS (28);
 
         public static ECOM_OPERACION getEnum(Integer codigo) {
             for (ECOM_OPERACION sc : values()) {

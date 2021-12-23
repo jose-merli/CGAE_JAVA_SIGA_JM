@@ -5,12 +5,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
-import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
-import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
-import org.itcgae.siga.DTOs.scs.CertificacionesItem;
-import org.itcgae.siga.DTOs.scs.DescargaCertificacionesXuntaItem;
-import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -47,4 +41,6 @@ public interface ICertificacionFacSJCSService {
 	Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) throws Exception;
 
     public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request);
+
+	UpdateResponseDTO accionXuntaEnvios(EnvioXuntaItem envioItem, HttpServletRequest request);
 }

@@ -189,5 +189,12 @@ public class CertificacionFacSJCSController {
             return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
         }
     }
+    
+    
+    @PostMapping("/accionXuntaEnvios")
+    ResponseEntity<UpdateResponseDTO> accionXuntaEnvios(@RequestBody EnvioXuntaItem envioItem, HttpServletRequest request) {
+    	UpdateResponseDTO response = iCertificacionFacSJCSService.accionXuntaEnvios(envioItem, request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+    }
 
 }

@@ -22,25 +22,47 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
 import org.itcgae.siga.DTOs.scs.DescargaCertificacionesXuntaItem;
+import org.itcgae.siga.DTOs.scs.EnvioXuntaItem;
 import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
 import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
+import org.itcgae.siga.DTOs.scs.FacturacionDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
+import org.itcgae.siga.commons.constants.SigaConstants.OPERACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.*;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucionExt;
+import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.FcsCertificacionesExample;
+import org.itcgae.siga.db.entities.FcsCertificacionesHistoricoEstado;
+import org.itcgae.siga.db.entities.FcsCertificacionesHistoricoEstadoExample;
+import org.itcgae.siga.db.entities.FcsFactCertificaciones;
+import org.itcgae.siga.db.entities.FcsFactCertificacionesExample;
+import org.itcgae.siga.db.entities.FcsFactCertificacionesKey;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
+import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
+import org.itcgae.siga.db.entities.FcsMvariosCertificacionesExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.mappers.EcomColaMapper;
+import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
+import org.itcgae.siga.db.mappers.FcsCertificacionesHistoricoEstadoMapper;
+import org.itcgae.siga.db.mappers.FcsFactCertificacionesMapper;
+import org.itcgae.siga.db.mappers.FcsFactEstadosfacturacionMapper;
+import org.itcgae.siga.db.mappers.FcsMvariosCertificacionesMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
-import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,10 +108,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private FcsCertificacionesExtendsMapper fcsCertificacionesExtendsMapper;
-
-    @Autowired
-    private EcomOperacionMapper ecomOperacionMapper;
-    
+   
     @Autowired
     private FacturacionSJCSHelper facturacionHelper;
 
@@ -251,7 +270,6 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
 
     private void insertaColaFcsFacturacionJG(EcomCola ecomCola, FcsFacturacionjgKey fcsFacturacionjgKey, AdmUsuarios usuario) throws Exception {
-
         Map<String, String> parametros = new HashMap<String, String>();
         parametros.put(IDFACTURACION, fcsFacturacionjgKey.getIdfacturacion().toString());
         facturacionHelper.insertaColaConParametros(ecomCola, parametros, usuario);
@@ -283,7 +301,6 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             };
 
         }
-
         return resource;
     }
 
@@ -335,7 +352,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         } else {
             try {
                 Path pFile = camHelper.subirFicheroCAM(idInstitucion, idFacturacion, fichero, request);
-                if (!isEjecutandoFacturacion(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId())) {
+                if (!facturacionHelper.isEjecutandoOperacionFacturacion(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId())) {
                     insertaEstadoFacturacion(facturacionHelper.getUsuario(idInstitucion, token), idInstitucion, idFacturacion);
                     envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId(), facturacionHelper.getUsuario(idInstitucion, token));
                     updateResponseDTO.setStatus(SigaConstants.OK);
@@ -377,46 +394,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
 
 
-    private boolean isEjecutandoFacturacion(Short idinstitucion, String idFacturacion, int operacionCompruebaEnEjecucion) {
-        boolean ejecutandose = false;
-
-        EcomColaParametrosExample ecomColaParametrosExample = new EcomColaParametrosExample();
-
-        ecomColaParametrosExample.createCriteria().andClaveEqualTo(IDFACTURACION).andValorEqualTo(idFacturacion.toString());
-        List<EcomColaParametros> listaEcomColaParametros = ecomColaParametrosMapper.selectByExample(ecomColaParametrosExample);
-
-        if (listaEcomColaParametros != null && listaEcomColaParametros.size() > 0) {
-            LOGGER.debug("Posibles candidatos para ver si la facturación ha sido ejecutada o se está ejecutando");
-            List<Long> ids = new ArrayList<Long>();
-            for (EcomColaParametros ecomColaParametros : listaEcomColaParametros) {
-                ids.add(ecomColaParametros.getIdecomcola());
-            }
-
-            List<Short> listaEstados = new ArrayList<Short>();
-            listaEstados.add(ECOM_ESTADOSCOLA.INICIAL.getId());
-            listaEstados.add(ECOM_ESTADOSCOLA.EJECUTANDOSE.getId());
-            listaEstados.add(ECOM_ESTADOSCOLA.REINTENTANDO.getId());
-
-            EcomColaExample ecomColaExample = new EcomColaExample();
-            ecomColaExample.createCriteria().andIdinstitucionEqualTo(idinstitucion).andIdoperacionEqualTo(operacionCompruebaEnEjecucion).andIdestadocolaIn(listaEstados).andIdecomcolaIn(ids);
-            long count = ecomColaMapper.countByExample(ecomColaExample);
-            if (count > 0) {
-                ejecutandose = true;
-            } else {
-                EcomOperacion operacion = ecomOperacionMapper.selectByPrimaryKey(operacionCompruebaEnEjecucion);
-                ecomColaExample = new EcomColaExample();
-                ecomColaExample.createCriteria().andIdinstitucionEqualTo(idinstitucion).andIdoperacionEqualTo(operacionCompruebaEnEjecucion).andIdestadocolaEqualTo(ECOM_ESTADOSCOLA.ERROR.getId()).andReintentoLessThan(operacion.getMaxreintentos()).andIdecomcolaIn(ids);
-                count = ecomColaMapper.countByExample(ecomColaExample);
-                if (count > 0)
-                    ejecutandose = true;
-
-            }
-        }
-
-        LOGGER.debug("¿La facturación del colegio " + idinstitucion + " con idFacturacion " + idFacturacion + " está en ejecución? = '" + ejecutandose + "'");
-
-        return ejecutandose;
-    }
+  
 
     @Override
     public ComboDTO getComboEstadosCertificaciones(HttpServletRequest request) {
@@ -1113,7 +1091,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     private int insertarEstado(Integer codigoEstado, Short idInstitucion, Integer idFacturacion, Integer usuario) {
         NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(Short.valueOf(idInstitucion),
                 String.valueOf(idFacturacion));
-        Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId()) + 1);
+        Integer idOrdenEstado = (Integer.parseInt(idP.getNewId()) + 1);
         Short idEstado = codigoEstado.shortValue();
 
         FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
@@ -1123,10 +1101,44 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         record.setFechaestado(new Date());
         record.setFechamodificacion(new Date());
         record.setUsumodificacion(usuario);
-        record.setIdordenestado(idOrdenEstado);
+        record.setIdordenestado(idOrdenEstado.shortValue());
 
         return fcsFactEstadosfacturacionMapper.insert(record);
     }
+
+	@Override
+	public UpdateResponseDTO accionXuntaEnvios(EnvioXuntaItem envioItem, HttpServletRequest request) {
+		Short idInstitucion = envioItem.getIdInstitucion();
+		String idFacturacion = envioItem.getIdFacturacion();
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		Error error = new Error();
+		response.setError(error);
+		
+		try {        
+			OPERACION op = OPERACION.getEnum(envioItem.getCodigoOperacion());
+			switch (op) {
+			case XUNTA_ENVIO_JUSTIFICACION:
+				 xuntaHelper.envioJustificacion(idInstitucion, idFacturacion);
+				 response.setStatus(SigaConstants.OK);
+				break;
+				
+			case XUNTA_ENVIO_REINTEGROS:
+				xuntaHelper.envioReintegros(idInstitucion, idFacturacion);
+				 response.setStatus(SigaConstants.OK);
+				break;
+
+			default:
+				error.setDescription("operación no soportada");
+				response.setStatus(SigaConstants.KO);
+				break;
+			}
+        } catch (Exception e) {
+            response.setStatus(SigaConstants.KO);
+            error.setDescription("messages.general.error");
+            
+        }
+		return response;
+	}
 
 
 }
