@@ -140,7 +140,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	}
 	
 		
-	@Scheduled(cron = "${cron.pattern.scheduled.procesoServicios}")
+//	@Scheduled(cron = "${cron.pattern.scheduled.procesoServicios}")
 	@Override
 	public void ejecutaSuscripcionesAutomaticas() {
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaSuscripcionesAutomaticas --> ENTRA ejecutaSuscripcionesAutomaticas");
