@@ -1326,4 +1326,153 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         return updateResponseDTO;
     }
 
+    @Override
+    public MovimientosVariosAsoCerDTO getMvariosAsociadosCertificacion(String idCertificacion, HttpServletRequest request) {
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAsociadosCertificacion() -> Entrada al servicio para obtener los movimientos varios asociados a una certificacion");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        MovimientosVariosAsoCerDTO movimientosVariosAsoCerDTO = new MovimientosVariosAsoCerDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAsociadosCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAsociadosCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (!UtilidadesString.esCadenaVacia(idCertificacion)) {
+
+                        List<MovimientosVariosAsoCerItem> movimientosVariosAsoCerItemList = fcsCertificacionesExtendsMapper.getMvariosAsociadosCertificacion(idCertificacion, idInstitucion);
+                        List<Short> listaIdMovimientos = movimientosVariosAsoCerItemList.stream().map(el -> Short.valueOf(el.getIdMovimiento())).collect(Collectors.toList());
+                        List<AsuntoPorMovimientoItem> asuntoPorMovimientoItemList = new ArrayList<>();
+
+                        if (!listaIdMovimientos.isEmpty()) {
+                            asuntoPorMovimientoItemList.addAll(fcsCertificacionesExtendsMapper.getAsuntoActuacionDesignaPorMovimientos(idInstitucion, listaIdMovimientos));
+                            asuntoPorMovimientoItemList.addAll(fcsCertificacionesExtendsMapper.getAsuntoActuacionAsistenciaPorMovimientos(idInstitucion, listaIdMovimientos));
+                            asuntoPorMovimientoItemList.addAll(fcsCertificacionesExtendsMapper.getAsuntoAsistenciaPorMovimientos(idInstitucion, listaIdMovimientos));
+                            asuntoPorMovimientoItemList.addAll(fcsCertificacionesExtendsMapper.getAsuntoGuardiaPorMovimientos(idInstitucion, listaIdMovimientos));
+                        }
+
+                        if (!asuntoPorMovimientoItemList.isEmpty()) {
+                            asuntoPorMovimientoItemList.forEach(el -> {
+                                MovimientosVariosAsoCerItem movimiento = movimientosVariosAsoCerItemList.stream().filter(m -> m.getIdMovimiento().equals(el.toString())).findFirst().get();
+                                movimiento.setAsunto(el.getAsunto());
+                            });
+                        }
+
+                        movimientosVariosAsoCerDTO.setMovimientosVariosAsoCerItemList(movimientosVariosAsoCerItemList);
+                    } else {
+                        error.setDescription("general.message.error.realiza.accion");
+                        error.setCode(400);
+                    }
+
+                } else {
+                    LOGGER.warn(
+                            "CertificacionFacSJCSServicesImpl.getMvariosAsociadosCertificacion() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("CertificacionFacSJCSServicesImpl.getMvariosAsociadosCertificacion() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("CertificacionFacSJCSServicesImpl.getMvariosAsociadosCertificacion() -> Se ha producido un error al intentar obtener los movimientos varios asociados a una certificacion", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        movimientosVariosAsoCerDTO.setError(error);
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAsociadosCertificacion() -> Salida del servicio para obtener los movimientos varios asociados a una certificacion");
+
+        return movimientosVariosAsoCerDTO;
+    }
+
+    @Override
+    public MovimientosVariosApliCerDTO getMvariosAplicadosEnPagosEjecutadosPorPeriodo(Date fechaDesde, Date fechaHasta, HttpServletRequest request) {
+        LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() -> Entrada al servicio para obtener los movimientos varios aplicados en pagos ejecutados durante un periodo");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        MovimientosVariosApliCerDTO movimientosVariosApliCerDTO = new MovimientosVariosApliCerDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (fechaDesde != null && fechaHasta != null) {
+
+                        List<MovimientosVariosApliCerItem> movimientosVariosApliCerItemList = fcsCertificacionesExtendsMapper.getMvariosAplicadosEnPagosEjecutadosPorPeriodo(idInstitucion, fechaDesde, fechaHasta);
+                        List<Short> listaIdMovimientos = movimientosVariosApliCerItemList.stream().map(el -> Short.valueOf(el.getIdMovimiento())).collect(Collectors.toList());
+                        List<AsuntoPorMovimientoItem> asuntoPorMovimientoItemList = new ArrayList<>();
+
+                        if (!listaIdMovimientos.isEmpty()) {
+                            asuntoPorMovimientoItemList.addAll(fcsCertificacionesExtendsMapper.getAsuntoActuacionDesignaPorMovimientos(idInstitucion, listaIdMovimientos));
+                            asuntoPorMovimientoItemList.addAll(fcsCertificacionesExtendsMapper.getAsuntoActuacionAsistenciaPorMovimientos(idInstitucion, listaIdMovimientos));
+                            asuntoPorMovimientoItemList.addAll(fcsCertificacionesExtendsMapper.getAsuntoAsistenciaPorMovimientos(idInstitucion, listaIdMovimientos));
+                            asuntoPorMovimientoItemList.addAll(fcsCertificacionesExtendsMapper.getAsuntoGuardiaPorMovimientos(idInstitucion, listaIdMovimientos));
+                        }
+
+                        if (!asuntoPorMovimientoItemList.isEmpty()) {
+                            asuntoPorMovimientoItemList.forEach(el -> {
+                                MovimientosVariosApliCerItem movimiento = movimientosVariosApliCerItemList.stream().filter(m -> m.getIdMovimiento().equals(el.toString())).findFirst().get();
+                                movimiento.setAsunto(el.getAsunto());
+                            });
+                        }
+
+                        movimientosVariosApliCerDTO.setMovimientosVariosApliCerItemList(movimientosVariosApliCerItemList);
+
+                    } else {
+                        error.setDescription("general.message.error.realiza.accion");
+                        error.setCode(400);
+                    }
+
+                } else {
+                    LOGGER.warn(
+                            "CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() -> Se ha producido un error al intentar obtener obtener los movimientos varios aplicados en pagos ejecutados durante un periodo", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        movimientosVariosApliCerDTO.setError(error);
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() -> Salida del servicio para obtener los movimientos varios aplicados en pagos ejecutados durante un periodo");
+
+        return movimientosVariosApliCerDTO;
+    }
 }

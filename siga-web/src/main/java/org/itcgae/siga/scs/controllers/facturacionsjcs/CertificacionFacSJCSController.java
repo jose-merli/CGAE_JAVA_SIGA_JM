@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -193,6 +194,18 @@ public class CertificacionFacSJCSController {
     ResponseEntity<UpdateResponseDTO> reabrirCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
         UpdateResponseDTO response = iCertificacionFacSJCSService.reabrirCertificacion(certificacionesItem, request);
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getMvariosAsociadosCertificacion")
+    ResponseEntity<MovimientosVariosAsoCerDTO> getMvariosAsociadosCertificacion(@RequestParam("idCertificacion") String idCertificacion, HttpServletRequest request) {
+        MovimientosVariosAsoCerDTO response = iCertificacionFacSJCSService.getMvariosAsociadosCertificacion(idCertificacion, request);
+        return new ResponseEntity<MovimientosVariosAsoCerDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getMvariosAplicadosEnPagosEjecutadosPorPeriodo")
+    ResponseEntity<MovimientosVariosApliCerDTO> getMvariosAplicadosEnPagosEjecutadosPorPeriodo(@RequestParam("fechaDesde") Date fechaDesde, @RequestParam("fechaHasta") Date fechaHasta, HttpServletRequest request) {
+        MovimientosVariosApliCerDTO response = iCertificacionFacSJCSService.getMvariosAplicadosEnPagosEjecutadosPorPeriodo(fechaDesde, fechaHasta, request);
+        return new ResponseEntity<MovimientosVariosApliCerDTO>(response, HttpStatus.OK);
     }
 
 }

@@ -2,10 +2,13 @@ package org.itcgae.siga.db.services.fcs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsCertificacionesSqlProvider;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlProvider {
 
@@ -145,7 +148,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql.SELECT("P.NOMBRE");
         sql.SELECT("M.DESCRIPCION");
         sql.SELECT("M.FECHAALTA");
-        sql.SELECT("M.CANTIDAD AS IMPORTE");
+        sql.SELECT("NVL(M.CANTIDAD, 0) AS IMPORTE");
         sql.FROM("FCS_MVARIOS_CERTIFICACIONES MVC");
         sql.JOIN("FCS_MOVIMIENTOSVARIOS M ON M.IDINSTITUCION = MVC.IDINSTITUCION AND M.IDMOVIMIENTO = MVC.IDMOVIMIENTO");
         sql.JOIN("CEN_PERSONA P ON P.IDPERSONA = M.IDPERSONA");
@@ -256,6 +259,102 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql.FROM("FCS_FACTURACIONJG");
         sql.WHERE("IDINSTITUCION = " + idinstitucion);
         sql.WHERE("IDPARTIDAPRESUPUESTARIA IS NULL");
+        return sql.toString();
+    }
+
+    public String getMvariosAplicadosEnPagosEjecutadosPorPeriodo(Short idInstitucion, Date fechaDesde, Date fechaHasta) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("MAX(EST2.FECHAESTADO)");
+        subQuery.FROM("FCS_PAGOS_ESTADOSPAGOS EST2");
+        subQuery.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+        subQuery.WHERE("AND EST2.IDPAGOSJG = EST.IDPAGOSJG");
+
+        SQL sql = new SQL();
+        sql.SELECT("MOV.IDINSTITUCION");
+        sql.SELECT("MOV.IDMOVIMIENTO");
+        sql.SELECT("APM.IDPERSONA");
+        sql.SELECT("DECODE(COL.COMUNITARIO , '1', COL.NCOMUNITARIO, COL.NCOLEGIADO) AS NUMCOLEGIADO");
+        sql.SELECT("PER.APELLIDOS1");
+        sql.SELECT("PER.APELLIDOS2");
+        sql.SELECT("(PER.APELLIDOS1 || ' ' || PER.APELLIDOS2) AS APELLIDOS");
+        sql.SELECT("PER.NOMBRE");
+        sql.SELECT("MOV.DESCRIPCION");
+        sql.SELECT("MOV.FECHAALTA");
+        sql.SELECT("NVL(APM.IMPORTEAPLICADO, 0) AS IMPORTEAPLICADO");
+        sql.FROM("FCS_MOVIMIENTOSVARIOS MOV");
+        sql.JOIN("FCS_APLICA_MOVIMIENTOSVARIOS APM ON APM.IDINSTITUCION = MOV.IDINSTITUCION AND APM.IDMOVIMIENTO = MOV.IDMOVIMIENTO");
+        sql.JOIN("CEN_PERSONA PER ON APM.IDPERSONA = PER.IDPERSONA");
+        sql.JOIN("CEN_COLEGIADO COL ON COL.IDPERSONA = PER.IDPERSONA AND COL.IDINSTITUCION = APM.IDINSTITUCION");
+        sql.JOIN("FCS_PAGOSJG PAG ON PAG.IDINSTITUCION = APM.IDINSTITUCION AND PAG.IDPAGOSJG = APM.IDPAGOSJG");
+        sql.JOIN("FCS_PAGOS_ESTADOSPAGOS EST ON EST.IDINSTITUCION = PAG.IDINSTITUCION AND EST.IDPAGOSJG = PAG.IDPAGOSJG");
+        sql.WHERE("MOV.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("EST.FECHAESTADO = (" + subQuery.toString() + ")");
+        sql.WHERE("EST.IDESTADOPAGOSJG = " + SigaConstants.ESTADO_PAGO_EJECUTADO);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        if (fechaDesde != null) {
+            String fechaF = dateFormat.format(fechaDesde);
+            sql.WHERE("TRUNC(EST.FECHAESTADO) >= TO_DATE('" + fechaF + "', 'DD/MM/YYYY')");
+        }
+
+        if (fechaHasta != null) {
+            String fechaF = dateFormat.format(fechaHasta);
+            sql.WHERE("TRUNC(EST.FECHAESTADO) <= TO_DATE('" + fechaF + "', 'DD/MM/YYYY')");
+        }
+
+        return sql.toString();
+    }
+
+    public String getAsuntoActuacionDesignaPorMovimientos(Short idInstitucion, List<Short> idMovimientos) {
+
+        SQL sql = new SQL();
+        sql.SELECT("('Designación ' || AD.ANIO || '/' || AD.NUMERO || '/' || AD.NUMEROASUNTO || '-' || NVL(PRO.NOMBRE, '')) AS ASUNTO");
+        sql.SELECT("AD.IDMOVIMIENTO");
+        sql.FROM("SCS_ACTUACIONDESIGNA AD " +
+                "LEFT JOIN SCS_PROCEDIMIENTOS PRO ON PRO.IDINSTITUCION = AD.IDINSTITUCION AND PRO.IDPROCEDIMIENTO = AD.IDPROCEDIMIENTO");
+        sql.WHERE("AD.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("AD.IDMOVIMIENTO IN " + idMovimientos.toString().replace("[", "(").replace("]", ")"));
+
+        return sql.toString();
+    }
+
+    public String getAsuntoActuacionAsistenciaPorMovimientos(Short idInstitucion, List<Short> idMovimientos) {
+
+        SQL sql = new SQL();
+        sql.SELECT("('Actuación de asistencia ' || ANIO || '/' || NUMERO || '/' || NUMEROASUNTO) AS ASUNTO");
+        sql.SELECT("IDMOVIMIENTO");
+        sql.FROM("SCS_ACTUACIONASISTENCIA");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDMOVIMIENTO IN " + idMovimientos.toString().replace("[", "(").replace("]", ")"));
+
+        return sql.toString();
+    }
+
+    public String getAsuntoAsistenciaPorMovimientos(Short idInstitucion, List<Short> idMovimientos) {
+
+        SQL sql = new SQL();
+        sql.SELECT("('Asistencia ' || ANIO || '/' || NUMERO) AS ASUNTO");
+        sql.SELECT("IDMOVIMIENTO");
+        sql.FROM("SCS_ASISTENCIA");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDMOVIMIENTO IN " + idMovimientos.toString().replace("[", "(").replace("]", ")"));
+
+        return sql.toString();
+    }
+
+    public String getAsuntoGuardiaPorMovimientos(Short idInstitucion, List<Short> idMovimientos) {
+
+        SQL sql = new SQL();
+        sql.SELECT("('Guardia ' || C.FECHAINICIO || '.' || T.NOMBRE || '>' || G.NOMBRE) AS ASUNTO");
+        sql.SELECT("IDMOVIMIENTO");
+        sql.FROM("SCS_CABECERAGUARDIAS C");
+        sql.JOIN("SCS_TURNO T ON T.IDINSTITUCION = C.IDINSTITUCION AND T.IDTURNO = C.IDTURNO");
+        sql.JOIN("SCS_GUARDIASTURNO G ON G.IDINSTITUCION = C.IDINSTITUCION AND G.IDTURNO = C.IDTURNO AND G.IDGUARDIA = C.IDGUARDIA");
+        sql.WHERE("C.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("C.IDMOVIMIENTO IN " + idMovimientos.toString().replace("[", "(").replace("]", ")"));
+
         return sql.toString();
     }
 
