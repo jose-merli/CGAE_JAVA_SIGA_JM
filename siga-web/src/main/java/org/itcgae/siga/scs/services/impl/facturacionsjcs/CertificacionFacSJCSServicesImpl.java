@@ -100,6 +100,9 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     @Autowired
     private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
 
+    @Autowired
+    FcsPagosjgMapper fcsPagosjgMapper;
+
 
     @Override
     public InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request) {
@@ -1029,7 +1032,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
 
     @Override
-    public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request) {
+    public InsertResponseDTO reabrirFacturacion(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1037,6 +1040,8 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
         insertResponse.setError(error);
         int response = 0;
+        int numReopenDone = 0;
+        String factNoReabierta = "";
 
         if (null != idInstitucion) {
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1057,8 +1062,34 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                 try {
                     // HACEMOS INSERT DEL ESTADO ABIERTA
                     LOGGER.info("reabrirFacturacion() -> Guardar datos para reabrir en fcsFactEstadosfacturacion");
-                    response = insertarEstado(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), idInstitucion,
-                            Integer.valueOf(idFacturacion), usuario.getIdusuario());
+
+                    for(CertificacionesItem cert: certificacionesItemList){
+                        //comprobacion de si la facturacion tiene pagos asociados
+                        FcsPagosjgExample pagosAso = new FcsPagosjgExample();
+                        pagosAso.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturacionEqualTo(Integer.parseInt(cert.getIdFacturacion()));
+                        List<FcsPagosjg> pagos = fcsPagosjgMapper.selectByExample(pagosAso);
+
+                        if(pagos.isEmpty()){
+                            response += insertarEstado(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), idInstitucion,
+                            Integer.valueOf(cert.getIdFacturacion()), usuario.getIdusuario());
+                        }else{
+                            factNoReabierta += cert.getNombre() + "/";
+                        }
+                    }
+
+                    if(response == certificacionesItemList.size() && response != 0){
+                        error.setCode(200);
+                        error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.reabrirFact");
+                        insertResponse.setStatus(SigaConstants.OK);
+                    }else if(response != certificacionesItemList.size() && response != 0){
+                        error.setCode(200);
+                        error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.reabrirAlgunas" +" "+ factNoReabierta);
+                        insertResponse.setStatus(SigaConstants.OK);
+                    }else if(response == 0){
+                        error.setCode(400);
+                        error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.reabrirConPagos");
+                        insertResponse.setStatus(SigaConstants.KO);
+                    }
 
                     LOGGER.info(
                             "reabrirFacturacion() -> Salida guardar datos para reabrir en fcsFactEstadosfacturacion");
@@ -1081,14 +1112,6 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         }
 
         LOGGER.info("getLabel() -> Salida del servicio para rabrir las facturaciones");
-
-        if (response == 0 && error.getDescription() == null) {
-            error.setCode(400);
-            insertResponse.setStatus(SigaConstants.KO);
-        } else if (error.getCode() == null) {
-            error.setCode(200);
-            insertResponse.setStatus(SigaConstants.OK);
-        }
 
         insertResponse.setError(error);
 

@@ -46,5 +46,5 @@ public interface ICertificacionFacSJCSService {
 
     Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) throws Exception;
 
-    public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request);
+    public InsertResponseDTO reabrirFacturacion(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request);
 }

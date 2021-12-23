@@ -200,7 +200,9 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql2.SELECT("CASE WHEN (SELECT 1 FROM" +
                 "   fcs_fact_grupofact_hito hit WHERE" +
                 "   hit.idfacturacion = fac.idfacturacion AND" +
-                "    hit.idinstitucion = fac.idinstitucion ) is null then ' ' END AS GRUPOFACTURACION");
+                "    hit.idinstitucion = fac.idinstitucion " +
+                " group by hit.IDGRUPOFACTURACION" +
+                "  having COUNT(*)>0) is null then ' ' END AS GRUPOFACTURACION");
         sql2.SELECT("fac.idpartidapresupuestaria as PARTIDAPRESUPUESTARIA");
         sql2.SELECT("CASE WHEN fac.IMPORTEGUARDIA is null then '0' END AS GUARDIA");
         sql2.SELECT("CASE WHEN fac.IMPORTEOFICIO is null then '0' END as TURNO");
@@ -211,7 +213,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql2.FROM("FCS_FACTURACIONJG FAC");
         sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
         sql2.INNER_JOIN(
-                "FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION)");
+                "FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION AND EST.idestadofacturacion = '20')");
         sql2.INNER_JOIN(
                 "FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)");
 
@@ -238,24 +240,26 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
 
     public String comboFactByPartidaPresu(String idpartidapresupuestaria, String idinstitucion) {
         SQL sql = new SQL();
-        sql.SELECT("IDFACTURACION");
-        sql.SELECT("NOMBRE");
-        sql.FROM("FCS_FACTURACIONJG");
-        sql.WHERE("IDINSTITUCION = " + idinstitucion);
+        sql.SELECT("FAC.IDFACTURACION");
+        sql.SELECT("FAC.NOMBRE");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.JOIN("fcs_fact_estadosfacturacion est ON (  fac.idinstitucion = est.idinstitucion AND fac.idfacturacion = est.idfacturacion AND est.IDESTADOFACTURACION = '20')");
+        sql.WHERE("FAC.IDINSTITUCION = " + idinstitucion);
 
-        if (idpartidapresupuestaria != "sinPartida") {
-            sql.WHERE("IDPARTIDAPRESUPUESTARIA = " + idpartidapresupuestaria);
+        if (!idpartidapresupuestaria.equals("sinPartida")) {
+            sql.WHERE("FAC.IDPARTIDAPRESUPUESTARIA = " + idpartidapresupuestaria);
         }
         return sql.toString();
     }
 
     public String comboFactNull(String idinstitucion) {
         SQL sql = new SQL();
-        sql.SELECT("IDFACTURACION");
-        sql.SELECT("NOMBRE");
-        sql.FROM("FCS_FACTURACIONJG");
-        sql.WHERE("IDINSTITUCION = " + idinstitucion);
-        sql.WHERE("IDPARTIDAPRESUPUESTARIA IS NULL");
+        sql.SELECT("FAC.IDFACTURACION");
+        sql.SELECT("FAC.NOMBRE");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.JOIN("fcs_fact_estadosfacturacion est ON (  fac.idinstitucion = est.idinstitucion AND fac.idfacturacion = est.idfacturacion AND est.IDESTADOFACTURACION = '20')");
+        sql.WHERE("FAC.IDINSTITUCION = " + idinstitucion);
+        sql.WHERE("FAC.IDPARTIDAPRESUPUESTARIA IS NULL");
         return sql.toString();
     }
 
