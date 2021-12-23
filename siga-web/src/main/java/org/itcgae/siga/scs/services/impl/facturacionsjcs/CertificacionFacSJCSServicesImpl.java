@@ -1,5 +1,19 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -8,7 +22,16 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.*;
+import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
+import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
+import org.itcgae.siga.DTOs.scs.CertificacionesItem;
+import org.itcgae.siga.DTOs.scs.DescargaCertificacionesXuntaItem;
+import org.itcgae.siga.DTOs.scs.EnvioXuntaItem;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
+import org.itcgae.siga.DTOs.scs.FacturacionDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.OPERACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -16,9 +39,11 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucionExt;
 import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.FcsCertificaciones;
 import org.itcgae.siga.db.entities.FcsCertificacionesExample;
 import org.itcgae.siga.db.entities.FcsCertificacionesHistoricoEstado;
 import org.itcgae.siga.db.entities.FcsCertificacionesHistoricoEstadoExample;
+import org.itcgae.siga.db.entities.FcsCertificacionesKey;
 import org.itcgae.siga.db.entities.FcsFactCertificaciones;
 import org.itcgae.siga.db.entities.FcsFactCertificacionesExample;
 import org.itcgae.siga.db.entities.FcsFactCertificacionesKey;
@@ -30,6 +55,7 @@ import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
 import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
+import org.itcgae.siga.db.mappers.EcomOperacionMapper;
 import org.itcgae.siga.db.mappers.FcsCertificacionesHistoricoEstadoMapper;
 import org.itcgae.siga.db.mappers.FcsFactCertificacionesMapper;
 import org.itcgae.siga.db.mappers.FcsFactEstadosfacturacionMapper;
@@ -49,14 +75,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSService {
