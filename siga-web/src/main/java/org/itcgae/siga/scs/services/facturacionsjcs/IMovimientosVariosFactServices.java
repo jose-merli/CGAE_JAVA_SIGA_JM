@@ -22,17 +22,15 @@ public interface IMovimientosVariosFactServices {
     public MovimientosVariosFacturacionDTO getListadoPagos(MovimientosVariosFacturacionItem movimientos,
                                                            HttpServletRequest request);
 
-    public InsertResponseDTO saveDatosGenMovimientosVarios(MovimientosVariosFacturacionItem movimientos,
+    public InsertResponseDTO saveMovimientosVarios(MovimientosVariosFacturacionItem movimientos,
                                                            HttpServletRequest request);
 
-    public UpdateResponseDTO updateDatosGenMovimientosVarios(MovimientosVariosFacturacionItem movimientos,
+    public UpdateResponseDTO updateMovimientosVarios(MovimientosVariosFacturacionItem movimientos,
                                                              HttpServletRequest request);
 
-    public InsertResponseDTO saveCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimientos,
-                                                            HttpServletRequest request);
+    //public InsertResponseDTO saveCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimientos,HttpServletRequest request);
 
-    public UpdateResponseDTO updateCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimientos,
-                                                              HttpServletRequest request);
+    //public UpdateResponseDTO updateCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimientos,HttpServletRequest request);
 
     public MovimientosVariosFacturacionDTO getMovimientoVarioPorId(String idMovimiento, HttpServletRequest request);
 }

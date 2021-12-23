@@ -10,6 +10,7 @@ import org.itcgae.siga.db.mappers.FcsCertificacionesMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsCertificacionesSqlExtendsProvider;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -97,4 +98,44 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
     @Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)})
     List<ComboItem> comboFactNull(String idinstitucion);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getMvariosAplicadosEnPagosEjecutadosPorPeriodo")
+    @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "IMPORTEAPLICADO", property = "importeAplicado", jdbcType = JdbcType.NUMERIC)
+    })
+    List<MovimientosVariosApliCerItem> getMvariosAplicadosEnPagosEjecutadosPorPeriodo(Short idInstitucion, Date fechaDesde, Date fechaHasta);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getAsuntoActuacionDesignaPorMovimientos")
+    @Results({@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
+    })
+    List<AsuntoPorMovimientoItem> getAsuntoActuacionDesignaPorMovimientos(Short idInstitucion, List<Short> idMovimientos);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getAsuntoActuacionAsistenciaPorMovimientos")
+    @Results({@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
+    })
+    List<AsuntoPorMovimientoItem> getAsuntoActuacionAsistenciaPorMovimientos(Short idInstitucion, List<Short> idMovimientos);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getAsuntoAsistenciaPorMovimientos")
+    @Results({@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
+    })
+    List<AsuntoPorMovimientoItem> getAsuntoAsistenciaPorMovimientos(Short idInstitucion, List<Short> idMovimientos);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getAsuntoGuardiaPorMovimientos")
+    @Results({@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
+    })
+    List<AsuntoPorMovimientoItem> getAsuntoGuardiaPorMovimientos(Short idInstitucion, List<Short> idMovimientos);
+
 }

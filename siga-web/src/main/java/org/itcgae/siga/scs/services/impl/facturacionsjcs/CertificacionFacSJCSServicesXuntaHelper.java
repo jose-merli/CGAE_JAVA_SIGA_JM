@@ -5,8 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -15,6 +18,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.OPERACION;
+import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
+import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
+import org.itcgae.siga.db.mappers.FcsFactEstadosfacturacionMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +49,7 @@ public class CertificacionFacSJCSServicesXuntaHelper {
 	
 	@Autowired
 	private FacturacionSJCSHelper facHelper;
+	private FcsFactEstadosfacturacionMapper fcsFactEstadosfacturacionMapper; 
 	
 	public File generaFicheroCertificacionesXunta(Short idInstitucion, List<String> lFacturaciones) throws BusinessException{
 		File fCert=null;
@@ -92,7 +102,51 @@ public class CertificacionFacSJCSServicesXuntaHelper {
 	          Files.copy(files[i].toPath(), out);
 	          out.closeEntry();
 	        }
-	      } 
+	      }
+
+		public void envioJustificacion(Short idInstitucion, String idFacturacion)  throws Exception {
+			envioGenerico(idInstitucion,idFacturacion,OPERACION.XUNTA_ENVIO_JUSTIFICACION);
+		}
+
+		public void envioReintegros(Short idInstitucion, String idFacturacion)  throws Exception {
+			envioGenerico(idInstitucion,idFacturacion,OPERACION.XUNTA_ENVIO_REINTEGROS);
+		} 
+		
+		
+		
+		private void envioGenerico(Short idinstitucion, String idfacturacion, OPERACION operacion) throws Exception {
+			if (idinstitucion == null || idfacturacion == null) {
+				String error = "Los parámetros idinstitucion e idfacturación deben ser no nulos";
+				LOGGER.error(error);
+				throw new IllegalArgumentException(error);
+			}
+
+			LOGGER.debug(String.format("Se va a insertar un nuevo estado y solicitar e ecom el envío para el colegio %s e idFacturación %s", idinstitucion, idfacturacion));
+			FcsFactEstadosfacturacion fcsFactEstadosfacturacion = new FcsFactEstadosfacturacion();
+			fcsFactEstadosfacturacion.setIdinstitucion(idinstitucion);
+			fcsFactEstadosfacturacion.setIdfacturacion(Integer.valueOf(idfacturacion));	
+			fcsFactEstadosfacturacion.setIdestadofacturacion(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo().shortValue());
+			fcsFactEstadosfacturacion.setFechaestado(Calendar.getInstance().getTime());
+			fcsFactEstadosfacturacion.setFechamodificacion(Calendar.getInstance().getTime());
+			fcsFactEstadosfacturacion.setUsumodificacion(facHelper.getUsuarioAuto().getIdusuario());
+			 
+			if (fcsFactEstadosfacturacionMapper.insert(fcsFactEstadosfacturacion) != 1) {
+				String error = String.format("No se ha insertado o se ha insertado más de un estado en FcsFactEstadosfacturacion para el colegio %s e idfacturación %s", idinstitucion, idfacturacion);
+				LOGGER.error(error);
+				throw new BusinessException(error);
+			}
+			LOGGER.debug(String.format("Se ha insertado correctamente el nuevo estado para el colegio %s e idfacturacion %s", idinstitucion, idfacturacion));
+			
+			EcomCola ecomCola = new EcomCola();
+			ecomCola.setIdinstitucion(idinstitucion);
+			ecomCola.setIdoperacion(operacion.getId());	
+				
+			Map<String, String> mapa = new HashMap<String, String>();
+			mapa.put(FcsFacturacionjgKey.C_IDINSTITUCION, idinstitucion.toString());
+			mapa.put(FcsFacturacionjgKey.C_IDFACTURACION, idfacturacion.toString());		
+			
+			facHelper.insertaColaConParametros(ecomCola, mapa);
+		}
  
 	
 }

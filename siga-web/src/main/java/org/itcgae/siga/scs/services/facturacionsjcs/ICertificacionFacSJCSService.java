@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 public interface ICertificacionFacSJCSService {
@@ -47,4 +48,10 @@ public interface ICertificacionFacSJCSService {
     Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) throws Exception;
 
     public InsertResponseDTO reabrirFacturacion(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request);
+
+    MovimientosVariosAsoCerDTO getMvariosAsociadosCertificacion(String idCertificacion, HttpServletRequest request);
+
+    MovimientosVariosApliCerDTO getMvariosAplicadosEnPagosEjecutadosPorPeriodo(Date fechaDesde, Date fechaHasta, HttpServletRequest request);
+
+    UpdateResponseDTO accionXuntaEnvios(EnvioXuntaItem envioItem, HttpServletRequest request);
 }

@@ -36,6 +36,10 @@ public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosM
             @Result(column = "NOMBREFACTURACION", property = "nombrefacturacion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "PAGOASOCIADO", property = "nombrePago", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDCERTIFICACION", property = "certificacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDCONCEPTO", property = "idConcepto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDTIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NOMBRETIPO", property = "nombretipo", jdbcType = JdbcType.VARCHAR)})
     List<MovimientosVariosFacturacionItem> buscarMovimientosVarios(MovimientosVariosFacturacionItem movimientoItem, String idInstitucion);
 
@@ -103,6 +107,7 @@ public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosM
             @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDGRUPOFACTURACION", property = "idGrupoFacturacion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDCERTIFICACION", property = "certificacion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDHITOGENERAL", property = "idConcepto", jdbcType = JdbcType.VARCHAR)})
     MovimientosVariosFacturacionItem getMovimientoVarioPorId(String idMovimiento, Short idInstitucion);
 
