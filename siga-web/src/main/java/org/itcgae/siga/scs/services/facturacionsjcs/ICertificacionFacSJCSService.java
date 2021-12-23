@@ -52,4 +52,6 @@ public interface ICertificacionFacSJCSService {
     MovimientosVariosAsoCerDTO getMvariosAsociadosCertificacion(String idCertificacion, HttpServletRequest request);
 
     MovimientosVariosApliCerDTO getMvariosAplicadosEnPagosEjecutadosPorPeriodo(Date fechaDesde, Date fechaHasta, HttpServletRequest request);
+
+    UpdateResponseDTO accionXuntaEnvios(EnvioXuntaItem envioItem, HttpServletRequest request);
 }

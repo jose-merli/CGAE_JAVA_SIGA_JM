@@ -761,7 +761,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	
 	
 	    @Transactional
-		public DeleteResponseDTO eliminarLiquidacion(String idPersona,DatosLiquidacionIntegrantesSearchItem datosLiquidacion, HttpServletRequest request) {
+		public DeleteResponseDTO eliminarLiquidacion(List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacion, HttpServletRequest request) {
 			// TODO Auto-generated method stub
 			LOGGER.debug("eliminarLiquidacion() -> Entrada al servicio para eliminar el pago liquidado referente a una sociedad");
 
@@ -769,6 +769,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 			AdmUsuarios usuario = new AdmUsuarios();
 			int response = 0;
 			int updateSociedad = 0;
+			int responseUpdateFecha = 0;
 			
 			// Conseguimos información del usuario logeado
 			String token = request.getHeader("Authorization");
@@ -787,12 +788,50 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				if (null != usuarios && usuarios.size() > 0) {
 					LOGGER.debug(
 							"eliminarLiquidacion() / cenHistoricoLiquidacionsjcsMapper.deleteByPrimaryKey() -> Entrada a cenHistoricoLiquidacionsjcsMapper para borrar la liquidacion");
+					if(datosLiquidacion != null) {
+						
+						DatosLiquidacionIntegrantesSearchItem objetoNuevo = new DatosLiquidacionIntegrantesSearchItem();
+						DatosLiquidacionIntegrantesSearchItem objetoAnterior = new DatosLiquidacionIntegrantesSearchItem();
+							
+						for(DatosLiquidacionIntegrantesSearchItem Liquidacion: datosLiquidacion) {
+							
+							if(Liquidacion.isAnterior()) {
+								 objetoAnterior = new DatosLiquidacionIntegrantesSearchItem();
+								 objetoAnterior.setAnterior(Liquidacion.isAnterior());
+								 objetoAnterior.setFechaFin(Liquidacion.getFechaFin());
+								 objetoAnterior.setFechaInicio(Liquidacion.getFechaInicio());
+								 objetoAnterior.setFechaModificacion(Liquidacion.getFechaModificacion());
+								 objetoAnterior.setIdComponente(Liquidacion.getIdComponente());
+								 objetoAnterior.setIdHistorico(Liquidacion.getIdHistorico());
+								 objetoAnterior.setIdInstitucion(Liquidacion.getIdInstitucion());
+								 objetoAnterior.setIdPersona(Liquidacion.getIdPersona());
+								 objetoAnterior.setObservaciones(Liquidacion.getObservaciones());
+								 objetoAnterior.setSociedad(Liquidacion.getSociedad());
+								 objetoAnterior.setUsuModificacion(Liquidacion.getUsuModificacion());
+							}
+							
+							if(!Liquidacion.isAnterior()) {
+								 objetoNuevo = new DatosLiquidacionIntegrantesSearchItem();
+								 objetoNuevo.setAnterior(Liquidacion.isAnterior());
+								 objetoNuevo.setFechaFin(Liquidacion.getFechaFin());
+								 objetoNuevo.setFechaInicio(Liquidacion.getFechaInicio());
+								 objetoNuevo.setFechaModificacion(Liquidacion.getFechaModificacion());
+								 objetoNuevo.setIdComponente(Liquidacion.getIdComponente());
+								 objetoNuevo.setIdHistorico(Liquidacion.getIdHistorico());
+								 objetoNuevo.setIdInstitucion(Liquidacion.getIdInstitucion());
+								 objetoNuevo.setIdPersona(Liquidacion.getIdPersona());
+								 objetoNuevo.setObservaciones(Liquidacion.getObservaciones());
+								 objetoNuevo.setSociedad(Liquidacion.getSociedad());
+								 objetoNuevo.setUsuModificacion(Liquidacion.getUsuModificacion());
+							}
+						}
 					
+						
 					CenHistoricoLiquidacionsjcsKey datos = new CenHistoricoLiquidacionsjcsKey();
-					datos.setIdhistorico(Short.parseShort(datosLiquidacion.getIdHistorico()));
-					datos.setIdinstitucion(Short.parseShort(datosLiquidacion.getIdInstitucion()));
-					datos.setIdpersona(Long.parseLong(datosLiquidacion.getIdPersona()));
-					datos.setIdcomponente(Short.parseShort(datosLiquidacion.getIdComponente()));
+					datos.setIdhistorico(Short.parseShort(objetoNuevo.getIdHistorico()));
+					datos.setIdinstitucion(Short.parseShort(objetoNuevo.getIdInstitucion()));
+					datos.setIdpersona(Long.parseLong(objetoNuevo.getIdPersona()));
+					datos.setIdcomponente(Short.parseShort(objetoNuevo.getIdComponente()));
 					response = cenHistoricoLiquidacionsjcsMapper.deleteByPrimaryKey(datos);
 					
 					LOGGER.debug(
@@ -805,21 +844,33 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 						
 						updateRecord.setFechamodificacion(new Date());
 						
-						if(datosLiquidacion.getSociedad().equals("Alta")) {
+						if(objetoAnterior.getSociedad().equals("Alta")) {
 							updateRecord.setSociedad("0");
 						}else {
 							updateRecord.setSociedad("1");
 						}
 						
 						updateRecord.setIdinstitucion(idInstitucion);
-						updateRecord.setIdcomponente(Short.parseShort(datosLiquidacion.getIdComponente()));
-						updateRecord.setIdpersona(Long.parseLong(datosLiquidacion.getIdPersona()));
+						updateRecord.setIdcomponente(Short.parseShort(objetoAnterior.getIdComponente()));
+						updateRecord.setIdpersona(Long.parseLong(objetoAnterior.getIdPersona()));
 										
 						updateSociedad = cenComponentesMapper.updateByPrimaryKeySelective(updateRecord);
+						
+						if(updateSociedad == 1) {
+							
+							CenHistoricoLiquidacionsjcs updateFechaAnterior = new CenHistoricoLiquidacionsjcs();
+							updateFechaAnterior.setIdhistorico(Short.parseShort(objetoAnterior.getIdHistorico()));
+							updateFechaAnterior.setIdinstitucion(Short.parseShort(objetoAnterior.getIdInstitucion()));
+							updateFechaAnterior.setIdpersona(Long.parseLong(objetoAnterior.getIdPersona()));
+							updateFechaAnterior.setIdcomponente(Short.parseShort(objetoAnterior.getIdComponente()));
+							updateFechaAnterior.setFechafin(null);
+							responseUpdateFecha = cenHistoricoLiquidacionsjcsMapper.updateByPrimaryKeySelective(updateFechaAnterior);
+						}
 					}
+				}
 					
 					dpd.setStatus(SigaConstants.OK);
-					if (response == 0 || updateSociedad == 0) {
+					if (response == 0 || updateSociedad == 0 || responseUpdateFecha == 0) {
 						dpd.setStatus(SigaConstants.KO);
 						LOGGER.warn("eliminarLiquidacion() / cenHistoricoLiquidacionsjcsMapper.deleteByPrimaryKey() -> "
 								+ dpd.getStatus() + ". No se pudo eliminar la liquidacion");
@@ -910,9 +961,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					updateRecord.setFechamodificacion(new Date());
 					
 					if(objetoNuevo.getSociedad().equals("1")) {
-						updateRecord.setSociedad("0");
-					}else {
 						updateRecord.setSociedad("1");
+					}else {
+						updateRecord.setSociedad("0");
 					}
 					
 					updateRecord.setIdinstitucion(idInstitucion);
@@ -927,7 +978,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 						//primero hago un selectByExample para averiguar el idHistorico y para averiguar que existe
 						CenHistoricoLiquidacionsjcsExample select = new CenHistoricoLiquidacionsjcsExample();
 						
-						select.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcomponenteEqualTo(Short.parseShort(objetoAnterior.getIdComponente())).andObservacionesEqualTo(objetoAnterior.getObservaciones()).andIdpersonaEqualTo(Long.parseLong(objetoAnterior.getIdPersona())).andFechainicioEqualTo(objetoAnterior.getFechaInicio()).andUsumodificacionEqualTo(objetoAnterior.getUsuModificacion());
+						select.createCriteria().andIdhistoricoEqualTo(Short.parseShort(objetoAnterior.getIdHistorico())).andIdinstitucionEqualTo(idInstitucion).andIdcomponenteEqualTo(Short.parseShort(objetoAnterior.getIdComponente())).andIdpersonaEqualTo(Long.parseLong(objetoAnterior.getIdPersona())).andFechainicioEqualTo(objetoAnterior.getFechaInicio()).andUsumodificacionEqualTo(objetoAnterior.getUsuModificacion());
 						
 						List<CenHistoricoLiquidacionsjcs> objetoSelect = cenHistoricoLiquidacionsjcsMapper.selectByExample(select);
 						
@@ -988,7 +1039,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		}
 	    
 	    @Override
-		public Boolean buscarPagosColegiados(String idPersona,DatosLiquidacionIntegrantesSearchItem datosLiquidacion, HttpServletRequest request) {
+		public Boolean buscarPagosColegiados(DatosLiquidacionIntegrantesSearchItem datosLiquidacion, HttpServletRequest request) {
 			// TODO Auto-generated method stub
 			LOGGER.debug("buscarPagosColegiados() -> Entrada al servicio para la búsqueda de los pagos de un colegiado en un periodo de fecha");
 			int datosLiquidacionItem = 0;

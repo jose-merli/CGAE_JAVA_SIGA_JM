@@ -107,8 +107,8 @@ public class TarjetaDatosIntegrantesController {
 	}
 	
 		@RequestMapping(value = "tarjetaIntegrantes/eliminarLiquidacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<DeleteResponseDTO> eliminarLiquidacion( @RequestParam("idPersona") String idPersona,@RequestBody DatosLiquidacionIntegrantesSearchItem datosLiquidacionDTO, HttpServletRequest request) { 
-			DeleteResponseDTO response = tarjetaDatosIntegrantesService.eliminarLiquidacion(idPersona,datosLiquidacionDTO, request);
+		ResponseEntity<DeleteResponseDTO> eliminarLiquidacion(@RequestBody List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacionDTO, HttpServletRequest request) { 
+			DeleteResponseDTO response = tarjetaDatosIntegrantesService.eliminarLiquidacion(datosLiquidacionDTO, request);
 				return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		}
 	
@@ -120,8 +120,8 @@ public class TarjetaDatosIntegrantesController {
 	
 	
 		@RequestMapping(value = "tarjetaIntegrantes/buscarPagosColegiados", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<Boolean> buscarPagosColegiados( @RequestParam("idPersona") String idPersona,@RequestBody DatosLiquidacionIntegrantesSearchItem datosLiquidacionDTO, HttpServletRequest request) { 
-			Boolean response = tarjetaDatosIntegrantesService.buscarPagosColegiados(idPersona,datosLiquidacionDTO, request);
+		ResponseEntity<Boolean> buscarPagosColegiados(@RequestBody DatosLiquidacionIntegrantesSearchItem datosLiquidacionDTO, HttpServletRequest request) { 
+			Boolean response = tarjetaDatosIntegrantesService.buscarPagosColegiados(datosLiquidacionDTO, request);
 				return new ResponseEntity<Boolean>(response, HttpStatus.OK);
 		}
 }
