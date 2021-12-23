@@ -277,7 +277,7 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/getFinalidadConsultasSerie")
-	ResponseEntity<FinalidadConsultaDTO> getFinalidadConsultasSerie(@RequestParam ConsultaDestinatarioItem consulta,
+	ResponseEntity<FinalidadConsultaDTO> getFinalidadConsultasSerie(@RequestBody ConsultaDestinatarioItem consulta,
 																	HttpServletRequest request) {
 		FinalidadConsultaDTO response = new FinalidadConsultaDTO();
 
