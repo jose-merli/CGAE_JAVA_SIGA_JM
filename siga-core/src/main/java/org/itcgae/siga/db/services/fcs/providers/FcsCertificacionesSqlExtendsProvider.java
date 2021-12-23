@@ -268,7 +268,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         subQuery.SELECT("MAX(EST2.FECHAESTADO)");
         subQuery.FROM("FCS_PAGOS_ESTADOSPAGOS EST2");
         subQuery.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
-        subQuery.WHERE("AND EST2.IDPAGOSJG = EST.IDPAGOSJG");
+        subQuery.WHERE("EST2.IDPAGOSJG = EST.IDPAGOSJG");
 
         SQL sql = new SQL();
         sql.SELECT("MOV.IDINSTITUCION");
@@ -307,7 +307,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
-    public String getAsuntoActuacionDesignaPorMovimientos(Short idInstitucion, List<Short> idMovimientos) {
+    public String getAsuntoActuacionDesignaPorMovimientos(Short idInstitucion, List<Long> idMovimientos) {
 
         SQL sql = new SQL();
         sql.SELECT("('Designación ' || AD.ANIO || '/' || AD.NUMERO || '/' || AD.NUMEROASUNTO || '-' || NVL(PRO.NOMBRE, '')) AS ASUNTO");
@@ -320,7 +320,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
-    public String getAsuntoActuacionAsistenciaPorMovimientos(Short idInstitucion, List<Short> idMovimientos) {
+    public String getAsuntoActuacionAsistenciaPorMovimientos(Short idInstitucion, List<Long> idMovimientos) {
 
         SQL sql = new SQL();
         sql.SELECT("('Actuación de asistencia ' || ANIO || '/' || NUMERO || '/' || NUMEROASUNTO) AS ASUNTO");
@@ -332,7 +332,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
-    public String getAsuntoAsistenciaPorMovimientos(Short idInstitucion, List<Short> idMovimientos) {
+    public String getAsuntoAsistenciaPorMovimientos(Short idInstitucion, List<Long> idMovimientos) {
 
         SQL sql = new SQL();
         sql.SELECT("('Asistencia ' || ANIO || '/' || NUMERO) AS ASUNTO");
@@ -344,7 +344,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
-    public String getAsuntoGuardiaPorMovimientos(Short idInstitucion, List<Short> idMovimientos) {
+    public String getAsuntoGuardiaPorMovimientos(Short idInstitucion, List<Long> idMovimientos) {
 
         SQL sql = new SQL();
         sql.SELECT("('Guardia ' || C.FECHAINICIO || '.' || T.NOMBRE || '>' || G.NOMBRE) AS ASUNTO");

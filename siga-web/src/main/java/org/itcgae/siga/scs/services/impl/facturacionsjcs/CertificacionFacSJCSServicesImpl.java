@@ -1346,7 +1346,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                     if (!UtilidadesString.esCadenaVacia(idCertificacion)) {
 
                         List<MovimientosVariosAsoCerItem> movimientosVariosAsoCerItemList = fcsCertificacionesExtendsMapper.getMvariosAsociadosCertificacion(idCertificacion, idInstitucion);
-                        List<Short> listaIdMovimientos = movimientosVariosAsoCerItemList.stream().map(el -> Short.valueOf(el.getIdMovimiento())).collect(Collectors.toList());
+                        List<Long> listaIdMovimientos = movimientosVariosAsoCerItemList.stream().map(el -> Long.valueOf(el.getIdMovimiento())).collect(Collectors.toList());
                         List<AsuntoPorMovimientoItem> asuntoPorMovimientoItemList = new ArrayList<>();
 
                         if (!listaIdMovimientos.isEmpty()) {
@@ -1358,7 +1358,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                         if (!asuntoPorMovimientoItemList.isEmpty()) {
                             asuntoPorMovimientoItemList.forEach(el -> {
-                                MovimientosVariosAsoCerItem movimiento = movimientosVariosAsoCerItemList.stream().filter(m -> m.getIdMovimiento().equals(el.toString())).findFirst().get();
+                                MovimientosVariosAsoCerItem movimiento = movimientosVariosAsoCerItemList.stream().filter(m -> m.getIdMovimiento().equals(el.getIdMovimiento().toString())).findFirst().get();
                                 movimiento.setAsunto(el.getAsunto());
                             });
                         }
@@ -1393,7 +1393,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
 
     @Override
-    public MovimientosVariosApliCerDTO getMvariosAplicadosEnPagosEjecutadosPorPeriodo(Date fechaDesde, Date fechaHasta, HttpServletRequest request) {
+    public MovimientosVariosApliCerDTO getMvariosAplicadosEnPagosEjecutadosPorPeriodo(MovimientosVariosApliCerRequestDTO movimientosVariosApliCerRequestDTO, HttpServletRequest request) {
         LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() -> Entrada al servicio para obtener los movimientos varios aplicados en pagos ejecutados durante un periodo");
 
         String token = request.getHeader("Authorization");
@@ -1417,10 +1417,11 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                 if (null != usuarios && !usuarios.isEmpty()) {
 
-                    if (fechaDesde != null && fechaHasta != null) {
+                    if (movimientosVariosApliCerRequestDTO.getFechaDesde() != null && movimientosVariosApliCerRequestDTO.getFechaHasta() != null) {
 
-                        List<MovimientosVariosApliCerItem> movimientosVariosApliCerItemList = fcsCertificacionesExtendsMapper.getMvariosAplicadosEnPagosEjecutadosPorPeriodo(idInstitucion, fechaDesde, fechaHasta);
-                        List<Short> listaIdMovimientos = movimientosVariosApliCerItemList.stream().map(el -> Short.valueOf(el.getIdMovimiento())).collect(Collectors.toList());
+                        List<MovimientosVariosApliCerItem> movimientosVariosApliCerItemList = fcsCertificacionesExtendsMapper.getMvariosAplicadosEnPagosEjecutadosPorPeriodo(idInstitucion, movimientosVariosApliCerRequestDTO.getFechaDesde(),
+                                movimientosVariosApliCerRequestDTO.getFechaHasta());
+                        List<Long> listaIdMovimientos = movimientosVariosApliCerItemList.stream().map(el -> Long.valueOf(el.getIdMovimiento())).collect(Collectors.toList());
                         List<AsuntoPorMovimientoItem> asuntoPorMovimientoItemList = new ArrayList<>();
 
                         if (!listaIdMovimientos.isEmpty()) {
@@ -1432,7 +1433,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                         if (!asuntoPorMovimientoItemList.isEmpty()) {
                             asuntoPorMovimientoItemList.forEach(el -> {
-                                MovimientosVariosApliCerItem movimiento = movimientosVariosApliCerItemList.stream().filter(m -> m.getIdMovimiento().equals(el.toString())).findFirst().get();
+                                MovimientosVariosApliCerItem movimiento = movimientosVariosApliCerItemList.stream().filter(m -> m.getIdMovimiento().equals(el.getIdMovimiento().toString())).findFirst().get();
                                 movimiento.setAsunto(el.getAsunto());
                             });
                         }

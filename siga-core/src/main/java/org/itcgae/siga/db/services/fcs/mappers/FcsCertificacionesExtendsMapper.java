@@ -118,24 +118,24 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
     @Results({@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
     })
-    List<AsuntoPorMovimientoItem> getAsuntoActuacionDesignaPorMovimientos(Short idInstitucion, List<Short> idMovimientos);
+    List<AsuntoPorMovimientoItem> getAsuntoActuacionDesignaPorMovimientos(Short idInstitucion, List<Long> idMovimientos);
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getAsuntoActuacionAsistenciaPorMovimientos")
     @Results({@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
     })
-    List<AsuntoPorMovimientoItem> getAsuntoActuacionAsistenciaPorMovimientos(Short idInstitucion, List<Short> idMovimientos);
+    List<AsuntoPorMovimientoItem> getAsuntoActuacionAsistenciaPorMovimientos(Short idInstitucion, List<Long> idMovimientos);
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getAsuntoAsistenciaPorMovimientos")
     @Results({@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
     })
-    List<AsuntoPorMovimientoItem> getAsuntoAsistenciaPorMovimientos(Short idInstitucion, List<Short> idMovimientos);
+    List<AsuntoPorMovimientoItem> getAsuntoAsistenciaPorMovimientos(Short idInstitucion, List<Long> idMovimientos);
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getAsuntoGuardiaPorMovimientos")
     @Results({@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
     })
-    List<AsuntoPorMovimientoItem> getAsuntoGuardiaPorMovimientos(Short idInstitucion, List<Short> idMovimientos);
+    List<AsuntoPorMovimientoItem> getAsuntoGuardiaPorMovimientos(Short idInstitucion, List<Long> idMovimientos);
 
 }

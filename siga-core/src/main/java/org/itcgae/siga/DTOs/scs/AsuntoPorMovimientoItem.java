@@ -6,5 +6,5 @@ import lombok.Data;
 public class AsuntoPorMovimientoItem {
 
     private String asunto;
-    private Short idMovimiento;
+    private Long idMovimiento;
 }

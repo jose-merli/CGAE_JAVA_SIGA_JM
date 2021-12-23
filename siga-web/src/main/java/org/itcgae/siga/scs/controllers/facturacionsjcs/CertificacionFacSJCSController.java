@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -183,11 +182,11 @@ public class CertificacionFacSJCSController {
             return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
         }
     }
-    
-    
+
+
     @PostMapping("/accionXuntaEnvios")
     ResponseEntity<UpdateResponseDTO> accionXuntaEnvios(@RequestBody EnvioXuntaItem envioItem, HttpServletRequest request) {
-    	UpdateResponseDTO response = iCertificacionFacSJCSService.accionXuntaEnvios(envioItem, request);
+        UpdateResponseDTO response = iCertificacionFacSJCSService.accionXuntaEnvios(envioItem, request);
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
@@ -209,9 +208,9 @@ public class CertificacionFacSJCSController {
         return new ResponseEntity<MovimientosVariosAsoCerDTO>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/getMvariosAplicadosEnPagosEjecutadosPorPeriodo")
-    ResponseEntity<MovimientosVariosApliCerDTO> getMvariosAplicadosEnPagosEjecutadosPorPeriodo(@RequestParam("fechaDesde") Date fechaDesde, @RequestParam("fechaHasta") Date fechaHasta, HttpServletRequest request) {
-        MovimientosVariosApliCerDTO response = iCertificacionFacSJCSService.getMvariosAplicadosEnPagosEjecutadosPorPeriodo(fechaDesde, fechaHasta, request);
+    @PostMapping("/getMvariosAplicadosEnPagosEjecutadosPorPeriodo")
+    ResponseEntity<MovimientosVariosApliCerDTO> getMvariosAplicadosEnPagosEjecutadosPorPeriodo(@RequestBody MovimientosVariosApliCerRequestDTO movimientosVariosApliCerRequestDTO, HttpServletRequest request) {
+        MovimientosVariosApliCerDTO response = iCertificacionFacSJCSService.getMvariosAplicadosEnPagosEjecutadosPorPeriodo(movimientosVariosApliCerRequestDTO, request);
         return new ResponseEntity<MovimientosVariosApliCerDTO>(response, HttpStatus.OK);
     }
 
