@@ -37,12 +37,12 @@ public interface ITarjetaDatosIntegrantesService {
 
 	public DatosLiquidacionIntegrantesSearchDTO listadoHistoricoLiquidacion(DatosLiquidacionIntegrantesSearchItem datosLiquidacionDTO, HttpServletRequest request);
 
-	public DeleteResponseDTO eliminarLiquidacion(String idPersona,DatosLiquidacionIntegrantesSearchItem datosLiquidacionDTO, HttpServletRequest request);
+	public DeleteResponseDTO eliminarLiquidacion(List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacionDTO, HttpServletRequest request);
 
 	public InsertResponseDTO insertHistoricoLiquidacion(List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacionDTO,
 			HttpServletRequest request);
 
-	public Boolean buscarPagosColegiados(String idPersona,DatosLiquidacionIntegrantesSearchItem datosLiquidacionDTO,
+	public Boolean buscarPagosColegiados(DatosLiquidacionIntegrantesSearchItem datosLiquidacionDTO,
 			HttpServletRequest request);
 	
 	

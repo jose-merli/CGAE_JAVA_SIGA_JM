@@ -315,9 +315,9 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
 
     @Transactional
-    public InsertResponseDTO saveDatosGenMovimientosVarios(MovimientosVariosFacturacionItem movimiento, HttpServletRequest request) {
+    public InsertResponseDTO saveMovimientosVarios(MovimientosVariosFacturacionItem movimiento, HttpServletRequest request) {
 
-        LOGGER.debug("<MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> Entrada");
+        LOGGER.debug("<MovimientosVariosFactServiceImpl.saveMovimientosVarios() -> Entrada");
 
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -326,17 +326,17 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
         Error error = new Error();
         int response = 0;
         int responseCert = 0;
-
+        Long newid = Long.valueOf("0");
 
         if (null != idInstitucion) {
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
             LOGGER.debug(
-                    "MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                    "MovimientosVariosFactServiceImpl.saveMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
             List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
             LOGGER.debug(
-                    "MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+                    "MovimientosVariosFactServiceImpl.saveMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
             if (null != usuarios && usuarios.size() > 0) {
                 AdmUsuarios usuario = usuarios.get(0);
@@ -347,10 +347,10 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                     NewIdDTO idMovimiento = fcsMovimientosvariosExtendsMapper
                             .selectMaxIdMovimientoByIdInstitucion(idInstitucion.toString());
 
-                    Long newid = Long.parseLong(idMovimiento.getNewId());
+                     newid = Long.parseLong(idMovimiento.getNewId());
 
                     if (movimiento != null) {
-                        LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Insertar Datos Generales a un nuevo movimiento");
+                        LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Insertar Datos Generales a un nuevo movimiento");
 
                         FcsMovimientosvarios record = new FcsMovimientosvarios();
                         record.setFechamodificacion(new Date());
@@ -370,20 +370,42 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                         if (movimiento.getTipo() != null) {
                             record.setIdtipomovimiento(Short.parseShort(movimiento.getTipo()));
                         }
+                        
+                        if (movimiento.getIdGrupoFacturacion() != null) {
+                        	record.setIdgrupofacturacion(Short.parseShort(movimiento.getIdGrupoFacturacion()));
+                        }
+
+                        if (movimiento.getIdFacturacion() != null) {
+                        	record.setIdfacturacion(Integer.parseInt(movimiento.getIdFacturacion()));
+
+                        }
+
+                        if (movimiento.getIdConcepto() != null) {
+                        	record.setIdhitogeneral(Short.parseShort(movimiento.getIdConcepto()));
+                        }
+
+                        if (movimiento.getIdPartidaPresupuestaria() != null) {
+                        	record.setIdpartidapresupuestaria(Integer.parseInt(movimiento.getIdPartidaPresupuestaria()));
+                        }
+
                  
+                        
                         response = fcsMovimientosVariosMapper.insertSelective(record);
 
 
-                        if (response == 1) {
+                        if (response == 1 && movimiento.getCertificacion() != null && movimiento.getCertificacion() != "") {
                         	
                         	NewIdDTO idCertificacion = fcsMovimientosvariosExtendsMapper.selectMaxIdCertificacionByIdInstitucion(idInstitucion.toString());
-
-                            Short newidCert = Short.parseShort(idCertificacion.getNewId());
+                        	Short newidCert = 0;
+                        	
+                        	if(idCertificacion != null) {                       		
+                        		 newidCert = Short.parseShort(idCertificacion.getNewId());
+                        	}
                             
-                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Salida con los datos ya insertados");
+                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Salida con los datos ya insertados");
                             
                             FcsMvariosCertificaciones insertCert = new FcsMvariosCertificaciones();
-                            insertCert.setIdmovimiento(Long.parseLong(movimiento.getIdPersona()));
+                            insertCert.setIdmovimiento(newid + 1);
                             insertCert.setFechamodificacion(new Date());
                             insertCert.setIdinstitucion(idInstitucion);
                             insertCert.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -391,14 +413,14 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                             
                             responseCert = fcsMvariosCertificacionesMapper.insert(insertCert);
                             
-                        } else {
-                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveDatosGenMovimientosVarios() -> Salida sin haber insertado los datos");
+                        } else if(response == 0 || responseCert == 0){
+                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Salida sin haber insertado los datos");
                         }
                     }
 
                 } catch (Exception e) {
                     LOGGER.error(
-                            "MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> ERROR al insertar los datos generales en el nuevo movimiento.",
+                            "MovimientosVariosFactServiceImpl.saveMovimientosVarios() -> ERROR al insertar los datos generales en el nuevo movimiento.",
                             e);
                     error.setCode(400);
                     error.setDescription("general.mensaje.error.bbdd");
@@ -406,7 +428,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                 }
             } else {
                 LOGGER.error(
-                        "MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                        "MovimientosVariosFactServiceImpl.saveMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
                                 + dni + " e idInstitucion = " + idInstitucion);
             }
         } else {
@@ -418,20 +440,21 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
             insertResponse.setStatus(SigaConstants.KO);
         } else if (error.getCode() == null) {
             error.setCode(200);
+            insertResponse.setId(String.valueOf(newid + 1));
             insertResponse.setStatus(SigaConstants.OK);
         }
 
         insertResponse.setError(error);
 
-        LOGGER.debug("MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> Salida");
+        LOGGER.debug("MovimientosVariosFactServiceImpl.saveMovimientosVarios() -> Salida");
 
         return insertResponse;
     }
 
     @Transactional
-    public UpdateResponseDTO updateDatosGenMovimientosVarios(MovimientosVariosFacturacionItem movimiento,
+    public UpdateResponseDTO updateMovimientosVarios(MovimientosVariosFacturacionItem movimiento,
                                                              HttpServletRequest request) {
-        LOGGER.debug("<MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> Entrada");
+        LOGGER.debug("<MovimientosVariosFactServiceImpl.updateMovimientosVarios() -> Entrada");
 
         String token = request.getHeader("Authorization");
         boolean insertadoCorrectamente = false;
@@ -442,6 +465,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
         int ko = 0;
         int response = 0;
         int responseCert = 0;
+        int responseCert2 = 0;
 
 
         if (null != idInstitucion) {
@@ -449,20 +473,20 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
             LOGGER.debug(
-                    "MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                    "MovimientosVariosFactServiceImpl.updateMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
             List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
             LOGGER.debug(
-                    "MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+                    "MovimientosVariosFactServiceImpl.updateMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
             if (null != usuarios && usuarios.size() > 0) {
                 AdmUsuarios usuario = usuarios.get(0);
                 usuario.setIdinstitucion(idInstitucion);
-
+	
                 try {
 
                     if (movimiento != null) {
 
-                        LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Modificar los datos generales de un movimiento");
+                        LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateMovimientosVarios() -> Modificar los datos de un movimiento");
                         FcsMovimientosvarios movimientoItem = new FcsMovimientosvarios();
 
                         movimientoItem.setFechamodificacion(new Date());
@@ -479,20 +503,40 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
                         movimientoItem.setDescripcion(movimiento.getDescripcion());
                         movimientoItem.setCantidad(new BigDecimal(movimiento.getCantidad()));
-                        movimientoItem.setIdfacturacion(Integer.parseInt(movimiento.getIdFacturacion()));
                         movimientoItem.setMotivo(movimiento.getMotivo());
 
-                        movimientoItem.setIdtipomovimiento(Short.parseShort(movimiento.getTipo()));
+                        if(movimiento.getIdFacturacion() != null) {
+                        	 movimientoItem.setIdfacturacion(Integer.parseInt(movimiento.getIdFacturacion()));
+                        }
+                        
+                        if(movimiento.getTipo() != null) {
+                        	movimientoItem.setIdtipomovimiento(Short.parseShort(movimiento.getTipo()));
+                        }
+                        
+                        if(movimiento.getIdConcepto() != null) {
+                        	 movimientoItem.setIdhitogeneral(Short.parseShort(movimiento.getIdConcepto()));
+                        }
+                       
+                        if(movimiento.getIdGrupoFacturacion() != null) {
+                        	 movimientoItem.setIdgrupofacturacion(Short.parseShort(movimiento.getIdGrupoFacturacion()));
+                        }
+                       
+                        if(movimiento.getIdPartidaPresupuestaria() != null) {
+                        	  movimientoItem.setIdpartidapresupuestaria(Integer.parseInt(movimiento.getIdPartidaPresupuestaria()));
+                        }
+                       
+                      
+                        
 
 
                         response = fcsMovimientosVariosMapper.updateByPrimaryKeySelective(movimientoItem);
 
-                        if (response == 1) {
-                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Salida con los datos generales ya modificados");
+                        if (response == 1  && movimiento.getCertificacion() != null && movimiento.getCertificacion() != "") {
+                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateMovimientosVarios() -> Salida con los datos ya modificados");
                   
                             LOGGER.debug("fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective() -> Entrada para actualizar el dato de certificacion");
                             FcsMvariosCertificaciones updCert = new FcsMvariosCertificaciones();
-                            updCert.setIdmovimiento(Long.parseLong(movimiento.getIdPersona()));
+                            updCert.setIdmovimiento(Long.parseLong(movimiento.getIdMovimiento()));
                             updCert.setFechamodificacion(new Date());
                             updCert.setIdinstitucion(idInstitucion);
                             updCert.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -504,18 +548,36 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                                LOGGER.debug("fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective() -> Salida con el dato de certificacion actualizado");
 
                            }else {
-                               LOGGER.debug("fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective() -> Salida con el dato de certificacion sin actualizar ERROR");
+                               //insert
+                               LOGGER.debug("fcsMvariosCertificacionesMapper.insert() -> Entrada para insertar el dato de certificacion");
+
+                        	NewIdDTO idCertificacion = fcsMovimientosvariosExtendsMapper.selectMaxIdCertificacionByIdInstitucion(idInstitucion.toString());
+                           	Short newidCert = 0;
+                           	
+                           	if(idCertificacion != null) {                       		
+                           		 newidCert = Short.parseShort(idCertificacion.getNewId());
+                           	}
+                               
+                               FcsMvariosCertificaciones insertCert = new FcsMvariosCertificaciones();
+                               insertCert.setIdmovimiento(Long.parseLong(movimiento.getIdMovimiento()));
+                               insertCert.setFechamodificacion(new Date());
+                               insertCert.setIdinstitucion(idInstitucion);
+                               insertCert.setUsumodificacion(usuarios.get(0).getIdusuario());
+                               insertCert.setIdcertificacion((short)(newidCert + 1));
+                               
+                               responseCert2 = fcsMvariosCertificacionesMapper.insert(insertCert);
+                               LOGGER.debug("fcsMvariosCertificacionesMapper.insert() -> Salida con el dato de certificacion insertado");
 
                            }
 
-                        } else {
-                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateDatosGenMovimientosVarios() -> Salida sin haber modificado los datos generales");
+                        } else if(response == 0 && responseCert == 0 && responseCert2 == 0){
+                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.updateMovimientosVarios() -> Salida sin haber modificado los datos generales");
                         }
                     }
 
                 } catch (Exception e) {
                     LOGGER.error(
-                            "MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> ERROR al actualizar los datos generales.",
+                            "MovimientosVariosFactServiceImpl.updateMovimientosVarios() -> ERROR al actualizar los datos generales.",
                             e);
                     error.setCode(400);
                     error.setDescription("general.mensaje.error.bbdd");
@@ -523,14 +585,14 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                 }
             } else {
                 LOGGER.error(
-                        "MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                        "MovimientosVariosFactServiceImpl.updateMovimientosVarios() -> admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
                                 + dni + " e idInstitucion = " + idInstitucion);
             }
         } else {
-            LOGGER.error("MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> idInstitucion del token nula");
+            LOGGER.error("MovimientosVariosFactServiceImpl.updateMovimientosVarios() -> idInstitucion del token nula");
         }
 
-        if (response == 0 && responseCert == 0 && error.getDescription() == null) {
+        if ((response == 0 && responseCert == 0 && responseCert2 == 0) && (response == 1 && responseCert == 0 && responseCert2 == 0) && error.getDescription() == null) {
             error.setCode(400);
             updateResponse.setStatus(SigaConstants.KO);
         } else if (error.getCode() == null) {
@@ -540,12 +602,12 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
         updateResponse.setError(error);
 
-        LOGGER.debug("MovimientosVariosFactServiceImpl.updateDatosGenMovimientosVarios() -> Salida");
+        LOGGER.debug("MovimientosVariosFactServiceImpl.updateMovimientosVarios() -> Salida");
 
         return updateResponse;
     }
 
-    @Transactional
+    /*@Transactional
     public InsertResponseDTO saveCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimiento, HttpServletRequest request) {
 
         LOGGER.debug("<MovimientosVariosFactServiceImpl.saveCriteriosMovimientosVarios() -> Entrada");
@@ -654,10 +716,10 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
         LOGGER.debug("MovimientosVariosFactServiceImpl.saveCriteriosMovimientosVarios() -> Salida");
 
-        return insertResponse;
-    }
+        return insertResponse;	
+    }*/
 
-    @Transactional
+    /*@Transactional
     public UpdateResponseDTO updateCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimiento,
                                                               HttpServletRequest request) {
         LOGGER.debug("<MovimientosVariosFactServiceImpl.updateCriteriosMovimientosVarios() -> Entrada");
@@ -746,7 +808,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
         LOGGER.debug("MovimientosVariosFactServiceImpl.updateCriteriosMovimientosVarios() -> Salida");
 
         return updateResponse;
-    }
+    }*/
 
     @Override
     public MovimientosVariosFacturacionDTO getListadoPagos(MovimientosVariosFacturacionItem facturacionItem, HttpServletRequest request) {

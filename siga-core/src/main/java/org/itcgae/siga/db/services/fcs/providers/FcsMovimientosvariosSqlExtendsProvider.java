@@ -66,6 +66,10 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         sql.SELECT("f_siga_getrecurso(scs_grupofacturacion.nombre,1) nombregrupofacturacion");
         sql.SELECT("fcs_aplica_movimientosvarios.idaplicacion");
         sql.SELECT("fcs_movimientosvarios.motivo motivo");
+        sql.SELECT("fcs_movimientosvarios.idhitogeneral idconcepto");
+        sql.SELECT("fcs_movimientosvarios.idpartidapresupuestaria idpartidapresupuestaria");
+        sql.SELECT("fcs_movimientosvarios.idtipomovimiento idtipo");
+        sql.SELECT("fmc.idcertificacion idcertificacion");
 
         sql.FROM("fcs_movimientosvarios");
         sql.INNER_JOIN("cen_colegiado ON fcs_movimientosvarios.idinstitucion = cen_colegiado.idinstitucion AND fcs_movimientosvarios.idpersona = cen_colegiado.idpersona");
@@ -74,10 +78,8 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         sql.LEFT_OUTER_JOIN("fcs_pagosjg ON fcs_aplica_movimientosvarios.idinstitucion = fcs_pagosjg.idinstitucion AND fcs_aplica_movimientosvarios.idpagosjg = fcs_pagosjg.idpagosjg");
         sql.LEFT_OUTER_JOIN("fcs_facturacionjg ON fcs_movimientosvarios.idinstitucion = fcs_facturacionjg.idinstitucion AND fcs_movimientosvarios.idfacturacion = fcs_facturacionjg.idfacturacion");
         sql.LEFT_OUTER_JOIN("scs_grupofacturacion ON fcs_movimientosvarios.idinstitucion = scs_grupofacturacion.idinstitucion AND fcs_movimientosvarios.idgrupofacturacion = scs_grupofacturacion.idgrupofacturacion");
-        
-        if (movimientoItem.getCertificacion() != null && movimientoItem.getCertificacion() != "") {
-            sql.INNER_JOIN(" FCS_MVARIOS_CERTIFICACIONES fmc ON fmc.IDINSTITUCION = fcs_movimientosvarios.IDINSTITUCION AND fmc.IDMOVIMIENTO = fcs_movimientosvarios.IDMOVIMIENTO");
-        }
+        sql.LEFT_OUTER_JOIN("FCS_MVARIOS_CERTIFICACIONES fmc ON fmc.IDINSTITUCION = fcs_movimientosvarios.IDINSTITUCION AND fmc.IDMOVIMIENTO = fcs_movimientosvarios.IDMOVIMIENTO");
+
                 
         if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
         	sql.INNER_JOIN("fcs_movimientosvarios_tipo ON fcs_movimientosvarios.idinstitucion = fcs_movimientosvarios_tipo.idinstitucion AND fcs_movimientosvarios.idtipomovimiento = fcs_movimientosvarios_tipo.idtipomovimiento");
@@ -146,7 +148,7 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
 
         sql.WHERE("ROWNUM <= 200");
 
-        sql.ORDER_BY("nombre,orden,fecha_orden,idaplicacion DESC");
+        sql.ORDER_BY("nombre,orden,fecha_orden,idaplicacion ASC");
 
         return sql.toString();
     }
