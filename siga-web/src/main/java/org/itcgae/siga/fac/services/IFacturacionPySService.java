@@ -186,7 +186,5 @@ public interface IFacturacionPySService {
 
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request);
 	
-	public FacturasIncluidasDTO getFacturasIncluidas(String idFichero, String tipoFichero, HttpServletRequest request)
-			throws Exception;
 
 }
