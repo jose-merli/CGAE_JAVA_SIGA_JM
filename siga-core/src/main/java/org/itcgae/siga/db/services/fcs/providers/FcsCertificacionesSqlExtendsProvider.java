@@ -156,4 +156,107 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
+    public String getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax) {
+        SQL sql = new SQL();
+        SQL sql2 = new SQL();
+
+        sql.SELECT("IDINSTITUCION");
+        sql.SELECT("ABREVIATURA");
+        sql.SELECT("IDFACTURACION");
+        sql.SELECT("FECHADESDE");
+        sql.SELECT("FECHAHASTA");
+        sql.SELECT("NOMBRE");
+        sql.SELECT("REGULARIZACION");
+        sql.SELECT("DESESTADO");
+        sql.SELECT("IDESTADO");
+        sql.SELECT("FECHAESTADO");
+        sql.SELECT("IMPORTETOTAL");
+        sql.SELECT("IMPORTEPAGADO");
+        sql.SELECT("IMPORTETOTAL-IMPORTEPAGADO AS IMPORTEPENDIENTE");
+        sql.SELECT("GRUPOFACTURACION");
+        sql.SELECT("PARTIDAPRESUPUESTARIA");
+        sql.SELECT("GUARDIA");
+        sql.SELECT("TURNO");
+        sql.SELECT("IMPORTESOJ");
+        sql.SELECT("IMPORTEEJG");
+
+
+        sql2.SELECT("FAC.IDINSTITUCION");
+        sql2.SELECT("INS.ABREVIATURA");
+        sql2.SELECT("FAC.IDFACTURACION");
+        sql2.SELECT("FAC.FECHADESDE");
+        sql2.SELECT("FAC.FECHAHASTA");
+        sql2.SELECT("FAC.NOMBRE");
+        sql2.SELECT("DECODE(FAC.REGULARIZACION, '1', 'Si', 'No') AS REGULARIZACION");
+        sql2.SELECT("(SELECT F_SIGA_GETRECURSO(ESTADOS.DESCRIPCION, 1) DESCRIPCION "
+                + "FROM FCS_ESTADOSFACTURACION ESTADOS "
+                + "WHERE EST.IDESTADOFACTURACION = ESTADOS.IDESTADOFACTURACION) AS DESESTADO");
+        sql2.SELECT("EST.IDESTADOFACTURACION AS IDESTADO");
+        sql2.SELECT("EST.FECHAESTADO AS FECHAESTADO");
+        sql2.SELECT("NVL(FAC.IMPORTETOTAL, 0) AS IMPORTETOTAL");
+        sql2.SELECT("NVL(DECODE(EST.IDESTADOFACTURACION, 20, 0, " + "(SELECT SUM(P.IMPORTEPAGADO) "
+                + "FROM FCS_PAGOSJG P "
+                + "WHERE P.IDFACTURACION = FAC.IDFACTURACION AND P.IDINSTITUCION = FAC.IDINSTITUCION)),0) AS IMPORTEPAGADO");
+        sql2.SELECT("CASE WHEN (SELECT 1 FROM" +
+                "   fcs_fact_grupofact_hito hit WHERE" +
+                "   hit.idfacturacion = fac.idfacturacion AND" +
+                "    hit.idinstitucion = fac.idinstitucion ) is null then ' ' END AS GRUPOFACTURACION");
+        sql2.SELECT("fac.idpartidapresupuestaria as PARTIDAPRESUPUESTARIA");
+        sql2.SELECT("CASE WHEN fac.IMPORTEGUARDIA is null then '0' END AS GUARDIA");
+        sql2.SELECT("CASE WHEN fac.IMPORTEOFICIO is null then '0' END as TURNO");
+        sql2.SELECT("CASE WHEN fac.IMPORTESOJ is null then '0' END as IMPORTESOJ");
+        sql2.SELECT("CASE WHEN fac.IMPORTEEJG is null then '0' END as IMPORTEEJG");
+
+
+        sql2.FROM("FCS_FACTURACIONJG FAC");
+        sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
+        sql2.INNER_JOIN(
+                "FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION)");
+        sql2.INNER_JOIN(
+                "FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)");
+
+
+        sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");
+        sql2.WHERE("cert.IDCERTIFICACION = " + idCertificacion);
+
+
+        sql.FROM("(" + sql2.toString() + ") busqueda");
+        sql.ORDER_BY("busqueda.FECHADESDE ASC");
+        sql.ORDER_BY("busqueda.FECHAHASTA");
+        sql.ORDER_BY("busqueda.FECHAESTADO DESC");
+
+        SQL query = new SQL();
+        query.SELECT("*");
+        query.FROM("( " + sql.toString() + " )");
+
+        if (tamMax != null) {
+            Integer tamMaxNumber = tamMax + 1;
+            query.WHERE("ROWNUM <= " + tamMaxNumber);
+        }
+        return sql.toString();
+    }
+
+    public String comboFactByPartidaPresu(String idpartidapresupuestaria, String idinstitucion) {
+        SQL sql = new SQL();
+        sql.SELECT("IDFACTURACION");
+        sql.SELECT("NOMBRE");
+        sql.FROM("FCS_FACTURACIONJG");
+        sql.WHERE("IDINSTITUCION = " + idinstitucion);
+
+        if (idpartidapresupuestaria != "sinPartida") {
+            sql.WHERE("IDPARTIDAPRESUPUESTARIA = " + idpartidapresupuestaria);
+        }
+        return sql.toString();
+    }
+
+    public String comboFactNull(String idinstitucion) {
+        SQL sql = new SQL();
+        sql.SELECT("IDFACTURACION");
+        sql.SELECT("NOMBRE");
+        sql.FROM("FCS_FACTURACIONJG");
+        sql.WHERE("IDINSTITUCION = " + idinstitucion);
+        sql.WHERE("IDPARTIDAPRESUPUESTARIA IS NULL");
+        return sql.toString();
+    }
+
 }

@@ -38,4 +38,8 @@ public interface ICombosServices {
 	ComboDTO comboTiposMovimientos(HttpServletRequest request);
 
 	ComboDTO comboCertificacionSJCS(HttpServletRequest request);
+
+    ComboDTO comboFactByPartidaPresu(String idpartidapresupuestaria, HttpServletRequest request);
+
+    ComboDTO comboFactNull(HttpServletRequest request);
 }

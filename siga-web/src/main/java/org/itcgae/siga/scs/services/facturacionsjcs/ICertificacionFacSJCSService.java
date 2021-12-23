@@ -33,4 +33,18 @@ public interface ICertificacionFacSJCSService {
     InsertResponseDTO createOrUpdateCertificacion(CertificacionesItem certificacionesItem, HttpServletRequest request);
 
     UpdateResponseDTO reabrirCertificacion(CertificacionesItem certificacionesItem, HttpServletRequest request);
+
+    FacturacionDTO getFactCertificaciones(String idCertificacion, HttpServletRequest request);
+
+    InsertResponseDTO saveFactCertificacion(CertificacionesItem certificacionesItem, HttpServletRequest request);
+
+    DeleteResponseDTO delFactCertificacion(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request);
+
+    Resource descargaErrorValidacion(GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request) throws Exception;
+
+    UpdateResponseDTO enviaRespuestaCICAC_ICA(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request);
+
+    Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) throws Exception;
+
+    public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request);
 }

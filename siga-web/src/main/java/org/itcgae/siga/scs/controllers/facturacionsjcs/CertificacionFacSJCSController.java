@@ -97,6 +97,92 @@ public class CertificacionFacSJCSController {
         return new ResponseEntity<EstadoCertificacionDTO>(response, HttpStatus.OK);
     }
 
+
+    @PostMapping(path = "/descargaErrorValidacion")
+    public ResponseEntity<Resource> descargaErrorValidacion(@RequestBody GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request) {
+        ResponseEntity<Resource> response = null;
+        Resource resource = null;
+        Boolean error = false;
+
+        try {
+            resource = iCertificacionFacSJCSService.descargaErrorValidacion(gestionVo, request);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        } catch (Exception e) {
+            error = true;
+        }
+
+        if (error) {
+            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return response;
+    }
+
+    @PostMapping(value = "/enviaRespuestaCICAC_ICA", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdateResponseDTO> enviaRespuestaCICAC_ICA(
+            @RequestBody GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
+        UpdateResponseDTO response = iCertificacionFacSJCSService.enviaRespuestaCICAC_ICA(gestEcom, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @PostMapping(path = "/descargarCertificacionesXunta")
+    public ResponseEntity<Resource> descargarCertificacionesXunta(@RequestBody DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) {
+        ResponseEntity<Resource> response = null;
+        Resource resource = null;
+        Boolean error = false;
+
+        try {
+            resource = iCertificacionFacSJCSService.descargarCertificacionesXunta(descargaItem, request);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        } catch (Exception e) {
+            error = true;
+        }
+
+        if (error) {
+            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return response;
+    }
+
+
+    @RequestMapping(value = "/buscarFactCertificaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<FacturacionDTO> buscarFacturaciones(@RequestBody String idCertificacion,
+                                                       HttpServletRequest request) {
+        FacturacionDTO response = iCertificacionFacSJCSService.getFactCertificaciones(idCertificacion, request);
+        return new ResponseEntity<FacturacionDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/saveFactCertificacion")
+    ResponseEntity<InsertResponseDTO> saveFactCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
+        InsertResponseDTO response = iCertificacionFacSJCSService.saveFactCertificacion(certificacionesItem, request);
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/delFactCertificacion")
+    ResponseEntity<DeleteResponseDTO> delFactCertificacion(@RequestBody List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
+        DeleteResponseDTO response = iCertificacionFacSJCSService.delFactCertificacion(certificacionesItemList, request);
+        return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/reabrirfacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<InsertResponseDTO> reabrirFacturacion(@RequestBody String idFacturacion,
+                                                         HttpServletRequest request) {
+        InsertResponseDTO response = iCertificacionFacSJCSService.reabrirFacturacion(idFacturacion, request);
+        if (response.getError().getCode() == 200) {
+            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+        }
+    }
+
     @PostMapping("/createOrUpdateCertificacion")
     ResponseEntity<InsertResponseDTO> nuevaCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
         InsertResponseDTO response = iCertificacionFacSJCSService.createOrUpdateCertificacion(certificacionesItem, request);

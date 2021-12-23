@@ -30,6 +30,10 @@ public class FacturacionItem {
 	private String idConceptoOld;
 	private String observaciones;
 	private String nombreUsuModificacion;
+	private String importeOficio;
+	private String importeGuardia;
+	private String importeSoj;
+	private String importeEjg;
 
 	@JsonProperty("idGrupo")
 	public String getIdGrupo() {
@@ -252,6 +256,42 @@ public class FacturacionItem {
 		this.nombreUsuModificacion = nombreUsuModificacion;
 	}
 
+	@JsonProperty("importeOficio")
+	public String getImporteOficio() {
+		return importeOficio;
+	}
+
+	public void setImporteOficio(String importeOficio) {
+		this.importeOficio = importeOficio;
+	}
+
+	@JsonProperty("importeGuardia")
+	public String getImporteGuardia() {
+		return importeGuardia;
+	}
+
+	public void setImporteGuardia(String importeGuardia) {
+		this.importeGuardia = importeGuardia;
+	}
+
+	@JsonProperty("importeSoj")
+	public String getImporteSoj() {
+		return importeSoj;
+	}
+
+	public void setImporteSoj(String importeSoj) {
+		this.importeSoj = importeSoj;
+	}
+
+	@JsonProperty("importeEjg")
+	public String getImporteEjg() {
+		return importeEjg;
+	}
+
+	public void setImporteEjg(String importeEjg) {
+		this.importeEjg = importeEjg;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -280,6 +320,10 @@ public class FacturacionItem {
 		result = prime * result + ((prevision == null) ? 0 : prevision.hashCode());
 		result = prime * result + ((regularizacion == null) ? 0 : regularizacion.hashCode());
 		result = prime * result + ((visible == null) ? 0 : visible.hashCode());
+		result = prime * result + ((importeOficio == null) ? 0 : importeOficio.hashCode());
+		result = prime * result + ((importeGuardia == null) ? 0 : importeGuardia.hashCode());
+		result = prime * result + ((importeSoj == null) ? 0 : importeSoj.hashCode());
+		result = prime * result + ((importeEjg == null) ? 0 : importeEjg.hashCode());
 		return result;
 	}
 
@@ -412,6 +456,26 @@ public class FacturacionItem {
 				return false;
 		} else if (!visible.equals(other.visible))
 			return false;
+		if (importeOficio == null) {
+			if (other.importeOficio != null)
+				return false;
+		} else if (!importeOficio.equals(other.importeOficio))
+			return false;
+		if (importeGuardia == null) {
+			if (other.importeGuardia != null)
+				return false;
+		} else if (!importeGuardia.equals(other.importeGuardia))
+			return false;
+		if (importeSoj == null) {
+			if (other.importeSoj != null)
+				return false;
+		} else if (!importeSoj.equals(other.importeSoj))
+			return false;
+		if (importeEjg == null) {
+			if (other.importeEjg != null)
+				return false;
+		} else if (!importeEjg.equals(other.importeEjg))
+			return false;
 		return true;
 	}
 
@@ -425,6 +489,10 @@ public class FacturacionItem {
 				+ ", importePendiente=" + importePendiente + ", prevision=" + prevision + ", visible=" + visible
 				+ ", idGrupo=" + idGrupo + ", descGrupo=" + descGrupo + ", descConcepto=" + descConcepto
 				+ ", idGrupoOld=" + idGrupoOld + ", idConceptoOld=" + idConceptoOld + ", observaciones=" + observaciones
-				+ ", nombreUsuModificacion=" + nombreUsuModificacion + "]";
+				+ ", nombreUsuModificacion=" + nombreUsuModificacion
+				+ ", importeOficio=" + importeOficio
+				+ ", importeGuardia=" + importeGuardia
+				+ ", importeSoj=" + importeSoj
+				+ ", importeEjg=" + importeEjg+"]";
 	}
 }

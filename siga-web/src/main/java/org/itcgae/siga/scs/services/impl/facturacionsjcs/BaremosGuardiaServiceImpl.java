@@ -209,41 +209,46 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				ScsHitofacturableguardiaExample hfe = new ScsHitofacturableguardiaExample();
-				hfe.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdturnoEqualTo(Integer.parseInt(baremosGuardiaItem.get(0).getIdTurno()))
-						.andIdguardiaEqualTo(Integer.parseInt(baremosGuardiaItem.get(0).getIdGuardia()));
-
-				scsHitofacturableguardiaExtendsMapper.deleteByExample(hfe);
-
-				for (BaremosGuardiaItem baremo : baremosGuardiaItem) {
-
-					ScsHitofacturableguardia insertHito = new ScsHitofacturableguardia();
-
-					insertHito.setIdhito(Long.parseLong(baremo.getIdHito()));
-					insertHito.setIdinstitucion(idInstitucion);
-					insertHito.setIdguardia(Integer.parseInt(baremo.getIdGuardia()));
-					insertHito.setIdturno(Integer.parseInt(baremo.getIdTurno()));
-					insertHito.setPreciohito(new BigDecimal(baremo.getPrecioHito()));
-					insertHito.setAgrupar(baremo.getAgrupar());
-					insertHito.setDiasaplicables(baremo.getDias());
-					insertHito.setFechamodificacion(new Date());
-					insertHito.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-					response = scsHitofacturableguardiaExtendsMapper.insertSelective(insertHito);
-
-				}
-
-				if (response != 0) {
-					error.setCode(200);
-					error.setDescription("facturacionSJCS.baremos.baremoIsertado");
-					baremosGuardiaDTO.setError(error);
-				} else {
-					error.setCode(400);
+				if(!baremosGuardiaItem.isEmpty()) {
+					ScsHitofacturableguardiaExample hfe = new ScsHitofacturableguardiaExample();
+					hfe.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(Integer.parseInt(baremosGuardiaItem.get(0).getIdTurno()))
+							.andIdguardiaEqualTo(Integer.parseInt(baremosGuardiaItem.get(0).getIdGuardia()));
+	
+					scsHitofacturableguardiaExtendsMapper.deleteByExample(hfe);
+	
+					for (BaremosGuardiaItem baremo : baremosGuardiaItem) {
+	
+						ScsHitofacturableguardia insertHito = new ScsHitofacturableguardia();
+	
+						insertHito.setIdhito(Long.parseLong(baremo.getIdHito()));
+						insertHito.setIdinstitucion(idInstitucion);
+						insertHito.setIdguardia(Integer.parseInt(baremo.getIdGuardia()));
+						insertHito.setIdturno(Integer.parseInt(baremo.getIdTurno()));
+						insertHito.setPreciohito(new BigDecimal(baremo.getPrecioHito()));
+						insertHito.setAgrupar(baremo.getAgrupar());
+						insertHito.setDiasaplicables(baremo.getDias());
+						insertHito.setFechamodificacion(new Date());
+						insertHito.setUsumodificacion(usuarios.get(0).getIdusuario());
+	
+						response = scsHitofacturableguardiaExtendsMapper.insertSelective(insertHito);
+	
+					}
+	
+					if (response != 0) {
+						error.setCode(200);
+						error.setDescription("facturacionSJCS.baremos.baremoIsertado");
+						baremosGuardiaDTO.setError(error);
+					} else {
+						error.setCode(400);
+						error.setDescription("general.message.error.realiza.accion");
+						baremosGuardiaDTO.setError(error);
+					}
+				}else {
+					error.setCode(500);
 					error.setDescription("general.message.error.realiza.accion");
 					baremosGuardiaDTO.setError(error);
 				}
-
 			}
 		}
 
