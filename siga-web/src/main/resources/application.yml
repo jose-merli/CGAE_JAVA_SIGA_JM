@@ -21,7 +21,9 @@ application:
 
     /cargaMasivaCompras/cargarFichero: [39A]
 
-    /pys/updateMovimientosMonedero: [52]
+    /pys/liquidacionMonederos: [52A]
+    /pys/updateMovimientosMonedero: [52B]
+    /pys/updateServiciosMonedero: [52C]
 
     # Permisos Maestros --> Tipos Productos y Maestros --> Tipos Servicios
     /pys/crearEditarProducto: [402]
