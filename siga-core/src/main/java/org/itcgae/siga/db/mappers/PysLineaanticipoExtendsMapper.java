@@ -72,7 +72,7 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
     
     @SelectProvider(type=PysLineaanticipoExtendsSqlProvider.class, method="getMonederoServicio")
     @Results({
-            @Result(column="IDLINEA", property="idLinea", jdbcType= JdbcType.VARCHAR),
+            @Result(column="IdAnticipo", property="idAnticipo", jdbcType= JdbcType.VARCHAR),
             @Result(column="IMPORTE_RESTANTE", property="importe", jdbcType=JdbcType.VARCHAR),
             @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.VARCHAR)
     })

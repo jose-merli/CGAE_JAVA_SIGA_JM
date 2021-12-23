@@ -265,31 +265,26 @@ public String getListaServiciosMonedero(Short idInstitucion, String idAnticipo, 
 	public String getMonederoServicio(PysServicioanticipo servicio ) {
 		
 		SQL query = new SQL();
-        query.SELECT("anti.fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", "anti.idanticipo", "anti.descripcion", "anti.importeinicial as importe_inicial", 
-        		"sum(nvl(linea.importeanticipado, 0)) as importe_usado","sum(anti.importeinicial)- sum(nvl(linea.importeanticipado, 0)) as importe_restante")
-                .FROM("pys_anticipoletrado anti", "CEN_PERSONA pers")
-                .LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona");
-
-        query.WHERE("pers.idpersona = anti.idpersona");
-        query.WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)");
-
+		query.SELECT("anti.fecha", "anti.idanticipo", "anti.descripcion",
+        		"anti.importeinicial- sum(nvl(linea.importeanticipado, 0)) as importe_restante");
+        query.FROM("pys_anticipoletrado anti");
+        query.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = anti.idpersona and linea.idanticipo = anti.idanticipo");
+        query.INNER_JOIN("pys_servicioanticipo servAnti on servAnti.IDINSTITUCION = anti.idInstitucion and servAnti.IDPERSONA = anti.idPersona and servAnti.IDANTICIPO = anti.idanticipo");
+		
+        query.GROUP_BY("anti.idanticipo", "anti.FECHA", "anti.descripcion", "anti.importeinicial");
         
-        query.ORDER_BY("anti.FECHA desc");
-        query.WHERE("(linea.idanticipo = anti.idanticipo or linea.idanticipo is null)");
         query.WHERE("anti.idinstitucion = " + servicio.getIdinstitucion());
         query.WHERE("anti.idPersona = "+ servicio.getIdpersona());
         query.WHERE("servAnti.idServicio = "+ servicio.getIdservicio());
         query.WHERE("servAnti.idTipoServicios = "+ servicio.getIdtiposervicios());
         query.WHERE("servAnti.idServiciosInstitucion = "+ servicio.getIdserviciosinstitucion());
-
+        query.WHERE("rownum <= 1");
         
-        query.GROUP_BY("anti.idanticipo", "anti.FECHA", "pers.NIFCIF", "pers.idpersona", "anti.idanticipo", "pers.APELLIDOS1", "pers.APELLIDOS2", "pers.NOMBRE", "anti.descripcion", "anti.importeinicial", "linea.importeanticipado");
+        query.ORDER_BY("anti.fecha desc");
         
-        query.HAVING("sum(anti.importeinicial)- sum(nvl(linea.importeanticipado, 0)) > 0 and rownum <= 1");
+        LOGGER.info("CONSULTA DE LISTA DE BUSQUEDA DE SERVICIOS DE UN MONEDERO: \r\n" + "SELECT * from ("+query.toString()+") where importe_restante > 0");
         
-        query.ORDER_BY("consulta.fecha desc");
-        
-        return query.toString();
+        return "SELECT * from ("+query.toString()+") where importe_restante > 0";
 		
 	}
 

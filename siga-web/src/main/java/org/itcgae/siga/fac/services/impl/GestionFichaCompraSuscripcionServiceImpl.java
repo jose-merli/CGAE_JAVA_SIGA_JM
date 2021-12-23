@@ -44,6 +44,7 @@ import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacFacturacionsuscripcion;
 import org.itcgae.siga.db.entities.FacFacturacionsuscripcionExample;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.PysAnticipoletrado;
 import org.itcgae.siga.db.entities.PysAnticipoletradoExample;
@@ -424,13 +425,15 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	}
 
 	private GenParametros getParametroAprobarSolicitud(Short idInstitucion) {
-		GenParametrosKey genKey = new GenParametrosKey();
+		
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+        genParametrosExample.createCriteria().andModuloEqualTo("PYS").andParametroEqualTo("APROBAR_SOLICITUD_COMPRA")
+                .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+        genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-		genKey.setModulo("PYS");
-		genKey.setIdinstitucion(idInstitucion);
-		genKey.setParametro("APROBAR_SOLICITUD_COMPRA");
+        List<GenParametros> params = genParametrosMapper.selectByExample(genParametrosExample);
 
-		return genParametrosMapper.selectByPrimaryKey(genKey);
+		return params.get(0);
 	}
 
 	@Override
@@ -1613,16 +1616,16 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								.andIdinstitucionEqualTo(idInstitucion);
 
 						LOGGER.info(
-								"getDescuentosPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+								"getDescuentosPeticion() / pysServiciossolicitadosMapper.selectByExample() -> Entrada a pysServiciossolicitadosMapper para recuperar los servicios solicitados asociados a la peticion de suscripcion");
 
 						List<PysServiciossolicitados> serviciosPeticion = pysServiciossolicitadosMapper
 								.selectByExample(serviciosExample);
 
 						LOGGER.info(
-								"getDescuentosPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+								"getDescuentosPeticion() / pysServiciossolicitadosMapper.selectByExample() -> Entrada a pysServiciossolicitadosMapper para recuperar los servicios solicitados asociados a la peticion de suscripcion");
 
-						// Si la peticion tiene alguna suscripcion asociada se extraen las facturas de
-						// las suscripciones
+						// Si la peticion tiene algun servicio asociado se extrae el monedero del cliente
+						// si lo tuviera
 						if (!serviciosPeticion.isEmpty()) {
 
 							//Buscamos los monederos asociados al servicio de la peticion y a esa persona
@@ -1635,9 +1638,16 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								servicioAnticipoExample.createCriteria().andIdpersonaEqualTo(serviciosPeticion.get(0).getIdpersona()).andIdinstitucionEqualTo(idInstitucion)
 								.andIdservicioEqualTo(servicio.getIdservicio()).andIdserviciosinstitucionEqualTo(servicio.getIdserviciosinstitucion())
 								.andIdtiposerviciosEqualTo(servicio.getIdtiposervicios());
+								LOGGER.info(
+										"getDescuentosPeticion() / pysServicioanticipoMapper.selectByExample() -> Entrada a pysServicioanticipoMapper para comprobar si el cliente tiene algún monedero con los servicios solicitados asociados a la peticion de suscripcion");
+
 								
 								List<PysServicioanticipo> anticiposSuscripcion =  pysServicioanticipoMapper.selectByExample(servicioAnticipoExample);
 								serviciosAnticipo.addAll(anticiposSuscripcion);
+								
+								LOGGER.info(
+										"getDescuentosPeticion() / pysServicioanticipoMapper.selectByExample() -> Entrada a pysServicioanticipoMapper para comprobar si el cliente tiene algún monedero con los servicios solicitados asociados a la peticion de suscripcion");
+
 							}
 							
 							//Si hay un monedero asociado al servicio y a esa persona
@@ -1647,16 +1657,23 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								
 								//Se debe comprobar si dichos monederos tienen saldo positivo y elegir uno
 								//Este es el monedero que se mostrara en la ficha
-								//REVISAR: 
+								LOGGER.info(
+										"getDescuentosPeticion() / pysLineaanticipoExtendsMapper.getMonederoServicio() -> Entrada a pysServicioanticipoMapper para comprobar si el cliente tiene algún monedero con saldo con los servicios solicitados asociados a la peticion de suscripcion");
+ 
 								ListaDescuentosPeticionItem monedero = pysLineaanticipoExtendsMapper.getMonederoServicio(serviciosAnticipo.get(0));
 
-								monedero.setIdPeticion(nSolicitud);
-								monedero.setTipo("2"); //En el front se procesará y representará como "Monedero"
-								monedero.setIdAnticipo(null);
+								LOGGER.info(
+										"getDescuentosPeticion() / pysLineaanticipoExtendsMapper.getMonederoServicio() -> Entrada a pysServicioanticipoMapper para comprobar si el cliente tiene algún monedero con saldo con los servicios solicitados asociados a la peticion de suscripcion");
 
-								descuentosListaPeticion.add(monedero);
-
-								listaDescuentosDTO.setListaDescuentosPeticionItem(descuentosListaPeticion);
+								if(monedero != null) {
+									monedero.setIdPeticion(nSolicitud);
+									monedero.setTipo("2"); //En el front se procesará y representará como "Monedero"
+									monedero.setIdAnticipo(null);
+	
+									descuentosListaPeticion.add(monedero);
+	
+									listaDescuentosDTO.setListaDescuentosPeticionItem(descuentosListaPeticion);
+								}
 							}
 						}
 					}
