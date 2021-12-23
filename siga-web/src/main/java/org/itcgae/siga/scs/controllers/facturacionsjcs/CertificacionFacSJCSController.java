@@ -5,12 +5,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
-import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
-import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
-import org.itcgae.siga.DTOs.scs.CertificacionesItem;
-import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
@@ -23,8 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -84,13 +77,13 @@ public class CertificacionFacSJCSController {
         CertificacionesDTO response = iCertificacionFacSJCSService.buscarCertificaciones(busquedaRetencionesRequestDTO, request);
         return new ResponseEntity<CertificacionesDTO>(response, HttpStatus.OK);
     }
-    
-	@PostMapping(value = "/validaCatalunya", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UpdateResponseDTO> validaCatalunya(
-			@RequestBody GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
-		UpdateResponseDTO response = iCertificacionFacSJCSService.validaCatalunya(gestEcom,request);
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
+
+    @PostMapping(value = "/validaCatalunya", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdateResponseDTO> validaCatalunya(
+            @RequestBody GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
+        UpdateResponseDTO response = iCertificacionFacSJCSService.validaCatalunya(gestEcom, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @PostMapping("/eliminarCertificaciones")
     ResponseEntity<DeleteResponseDTO> eliminarCertificaciones(@RequestBody List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
@@ -102,6 +95,18 @@ public class CertificacionFacSJCSController {
     ResponseEntity<EstadoCertificacionDTO> getEstadosCertificacion(@RequestParam("idCertificacion") String idCertificacion, HttpServletRequest request) {
         EstadoCertificacionDTO response = iCertificacionFacSJCSService.getEstadosCertificacion(idCertificacion, request);
         return new ResponseEntity<EstadoCertificacionDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/createOrUpdateCertificacion")
+    ResponseEntity<InsertResponseDTO> nuevaCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
+        InsertResponseDTO response = iCertificacionFacSJCSService.createOrUpdateCertificacion(certificacionesItem, request);
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/reabrirCertificacion")
+    ResponseEntity<UpdateResponseDTO> reabrirCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
+        UpdateResponseDTO response = iCertificacionFacSJCSService.reabrirCertificacion(certificacionesItem, request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
 }

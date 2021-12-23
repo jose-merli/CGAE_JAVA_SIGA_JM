@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
 import org.itcgae.siga.DTOs.scs.CertificacionesItem;
 import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
+import org.itcgae.siga.DTOs.scs.MovimientosVariosAsoCerItem;
 import org.itcgae.siga.db.mappers.FcsCertificacionesMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsCertificacionesSqlExtendsProvider;
 import org.springframework.stereotype.Service;
@@ -48,4 +49,22 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
             @Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)})
     List<EstadoCertificacionItem> getEstadosCertificacion(String idCertificacion, Short idInstitucion, String idLenguaje);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getCurrentValueSequence")
+    Short getCurrentValueSequence(String sequence);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getMvariosAsociadosCertificacion")
+    @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDCERTIFICACION", property = "idCertificacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.NUMERIC)})
+    List<MovimientosVariosAsoCerItem> getMvariosAsociadosCertificacion(String idCertificacion, Short idInstitucion);
 }
