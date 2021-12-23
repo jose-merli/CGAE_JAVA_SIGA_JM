@@ -1,21 +1,11 @@
 package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
-import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesItem;
-import org.itcgae.siga.DTOs.scs.DescargaCertificacionesXuntaItem;
-import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
-import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
@@ -28,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/certificaciones")
@@ -84,13 +77,13 @@ public class CertificacionFacSJCSController {
         CertificacionesDTO response = iCertificacionFacSJCSService.buscarCertificaciones(busquedaRetencionesRequestDTO, request);
         return new ResponseEntity<CertificacionesDTO>(response, HttpStatus.OK);
     }
-    
-	@PostMapping(value = "/validaCatalunya", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UpdateResponseDTO> validaCatalunya(
-			@RequestBody GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
-		UpdateResponseDTO response = iCertificacionFacSJCSService.validaCatalunya(gestEcom,request);
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
+
+    @PostMapping(value = "/validaCatalunya", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdateResponseDTO> validaCatalunya(
+            @RequestBody GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
+        UpdateResponseDTO response = iCertificacionFacSJCSService.validaCatalunya(gestEcom, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @PostMapping("/eliminarCertificaciones")
     ResponseEntity<DeleteResponseDTO> eliminarCertificaciones(@RequestBody List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
@@ -103,8 +96,8 @@ public class CertificacionFacSJCSController {
         EstadoCertificacionDTO response = iCertificacionFacSJCSService.getEstadosCertificacion(idCertificacion, request);
         return new ResponseEntity<EstadoCertificacionDTO>(response, HttpStatus.OK);
     }
-    
-    
+
+
     @PostMapping(path = "/descargaErrorValidacion")
     public ResponseEntity<Resource> descargaErrorValidacion(@RequestBody GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request) {
         ResponseEntity<Resource> response = null;
@@ -127,15 +120,15 @@ public class CertificacionFacSJCSController {
 
         return response;
     }
-    
-	@PostMapping(value = "/enviaRespuestaCICAC_ICA", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UpdateResponseDTO> enviaRespuestaCICAC_ICA(
-			@RequestBody GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
-		UpdateResponseDTO response = iCertificacionFacSJCSService.enviaRespuestaCICAC_ICA(gestEcom,request);
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
-	
-	
+
+    @PostMapping(value = "/enviaRespuestaCICAC_ICA", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdateResponseDTO> enviaRespuestaCICAC_ICA(
+            @RequestBody GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
+        UpdateResponseDTO response = iCertificacionFacSJCSService.enviaRespuestaCICAC_ICA(gestEcom, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @PostMapping(path = "/descargarCertificacionesXunta")
     public ResponseEntity<Resource> descargarCertificacionesXunta(@RequestBody DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) {
         ResponseEntity<Resource> response = null;
@@ -158,7 +151,7 @@ public class CertificacionFacSJCSController {
 
         return response;
     }
-	
+
 
     @RequestMapping(value = "/buscarFactCertificaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<FacturacionDTO> buscarFacturaciones(@RequestBody String idCertificacion,
@@ -194,6 +187,18 @@ public class CertificacionFacSJCSController {
     @PostMapping("/accionXuntaEnvios")
     ResponseEntity<UpdateResponseDTO> accionXuntaEnvios(@RequestBody EnvioXuntaItem envioItem, HttpServletRequest request) {
     	UpdateResponseDTO response = iCertificacionFacSJCSService.accionXuntaEnvios(envioItem, request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/createOrUpdateCertificacion")
+    ResponseEntity<InsertResponseDTO> nuevaCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
+        InsertResponseDTO response = iCertificacionFacSJCSService.createOrUpdateCertificacion(certificacionesItem, request);
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/reabrirCertificacion")
+    ResponseEntity<UpdateResponseDTO> reabrirCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
+        UpdateResponseDTO response = iCertificacionFacSJCSService.reabrirCertificacion(certificacionesItem, request);
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 

@@ -15,7 +15,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql1.SELECT("CER.IDCERTIFICACION");
         sql1.SELECT("CER.FECHADESDE");
         sql1.SELECT("CER.FECHAHASTA");
-        sql1.SELECT("(CER.FECHADESDE || ' - ' || CER.FECHAHASTA) AS PERIODO");
+        sql1.SELECT("(CASE (CER.FECHADESDE || ' - ' || CER.FECHAHASTA) WHEN ' - ' THEN NULL ELSE ((CER.FECHADESDE || ' - ' || CER.FECHAHASTA)) END) AS PERIODO");
         sql1.SELECT("CER.NOMBRE");
         sql1.SELECT("SUM(NVL(F.IMPORTEOFICIO, 0)) AS TURNO");
         sql1.SELECT("SUM(NVL(F.IMPORTEGUARDIA , 0)) AS GUARDIA");
@@ -27,9 +27,9 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql1.SELECT("F.IDPARTIDAPRESUPUESTARIA");
         sql1.SELECT("P.NOMBREPARTIDA AS NOMBREPARTIDAPRESUPUESTARIA");
         sql1.FROM("FCS_CERTIFICACIONES CER");
-        sql1.JOIN("FCS_ESTADOSCERTIFICACIONES EST ON CER.IDESTADOCERTIFICACION = EST.IDESTADOCERTIFICACION");
-        sql1.JOIN("FCS_FACT_CERTIFICACIONES FC ON CER.IDINSTITUCION = FC.IDINSTITUCION AND CER.IDCERTIFICACION = FC.IDCERTIFICACION");
-        sql1.JOIN("FCS_FACTURACIONJG F ON F.IDINSTITUCION = FC.IDINSTITUCION AND F.IDFACTURACION = FC.IDFACTURACION " +
+        sql1.JOIN("FCS_ESTADOSCERTIFICACIONES EST ON CER.IDESTADOCERTIFICACION = EST.IDESTADOCERTIFICACION " +
+                "LEFT JOIN FCS_FACT_CERTIFICACIONES FC ON CER.IDINSTITUCION = FC.IDINSTITUCION AND CER.IDCERTIFICACION = FC.IDCERTIFICACION " +
+                "LEFT JOIN FCS_FACTURACIONJG F ON F.IDINSTITUCION = FC.IDINSTITUCION AND F.IDFACTURACION = FC.IDFACTURACION " +
                 "LEFT JOIN SCS_PARTIDAPRESUPUESTARIA P ON P.IDINSTITUCION = F.IDINSTITUCION AND P.IDPARTIDAPRESUPUESTARIA = F.IDPARTIDAPRESUPUESTARIA");
 
         if (!UtilidadesString.esCadenaVacia(busquedaRetencionesRequestDTO.getIdCertificacion())) {
@@ -123,7 +123,40 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
-    public String getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax){
+    public String getCurrentValueSequence(String sequence) {
+
+        SQL sql = new SQL();
+        sql.SELECT(sequence + ".CURRVAL");
+        sql.FROM("DUAL");
+        return sql.toString();
+    }
+
+    public String getMvariosAsociadosCertificacion(String idCertificacion, Short idInstitucion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("MVC.IDINSTITUCION");
+        sql.SELECT("MVC.IDCERTIFICACION");
+        sql.SELECT("MVC.IDMOVIMIENTO");
+        sql.SELECT("M.IDPERSONA");
+        sql.SELECT("DECODE(C.COMUNITARIO , '1', C.NCOMUNITARIO, C.NCOLEGIADO) NUMCOLEGIADO");
+        sql.SELECT("P.APELLIDOS1");
+        sql.SELECT("P.APELLIDOS2");
+        sql.SELECT("(P.APELLIDOS1 || ' ' || P.APELLIDOS2) AS APELLIDOS");
+        sql.SELECT("P.NOMBRE");
+        sql.SELECT("M.DESCRIPCION");
+        sql.SELECT("M.FECHAALTA");
+        sql.SELECT("M.CANTIDAD AS IMPORTE");
+        sql.FROM("FCS_MVARIOS_CERTIFICACIONES MVC");
+        sql.JOIN("FCS_MOVIMIENTOSVARIOS M ON M.IDINSTITUCION = MVC.IDINSTITUCION AND M.IDMOVIMIENTO = MVC.IDMOVIMIENTO");
+        sql.JOIN("CEN_PERSONA P ON P.IDPERSONA = M.IDPERSONA");
+        sql.JOIN("CEN_COLEGIADO C ON C.IDINSTITUCION = M.IDINSTITUCION AND C.IDPERSONA = P.IDPERSONA");
+        sql.WHERE("MVC.IDCERTIFICACION = " + idCertificacion);
+        sql.WHERE("MVC.IDINSTITUCION = " + idInstitucion);
+
+        return sql.toString();
+    }
+
+    public String getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax) {
         SQL sql = new SQL();
         SQL sql2 = new SQL();
 
@@ -183,10 +216,8 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
                 "FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)");
 
 
-
         sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");
-        sql2.WHERE("cert.IDCERTIFICACION = "+ idCertificacion);
-
+        sql2.WHERE("cert.IDCERTIFICACION = " + idCertificacion);
 
 
         sql.FROM("(" + sql2.toString() + ") busqueda");
@@ -205,20 +236,20 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
-    public String comboFactByPartidaPresu(String idpartidapresupuestaria,String idinstitucion){
+    public String comboFactByPartidaPresu(String idpartidapresupuestaria, String idinstitucion) {
         SQL sql = new SQL();
         sql.SELECT("IDFACTURACION");
         sql.SELECT("NOMBRE");
         sql.FROM("FCS_FACTURACIONJG");
         sql.WHERE("IDINSTITUCION = " + idinstitucion);
 
-        if(idpartidapresupuestaria != "sinPartida") {
+        if (idpartidapresupuestaria != "sinPartida") {
             sql.WHERE("IDPARTIDAPRESUPUESTARIA = " + idpartidapresupuestaria);
         }
         return sql.toString();
     }
 
-    public String comboFactNull(String idinstitucion){
+    public String comboFactNull(String idinstitucion) {
         SQL sql = new SQL();
         sql.SELECT("IDFACTURACION");
         sql.SELECT("NOMBRE");

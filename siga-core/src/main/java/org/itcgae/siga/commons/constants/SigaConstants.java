@@ -1420,4 +1420,6 @@ public class SigaConstants {
         }
     }
 
+    public static final String SEQUENCE_CERTIFICACIONES = "SEQ_FCS_CERTIFICACIONES";
+
 }

@@ -5,14 +5,9 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesItem;
-import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
-import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.db.mappers.FcsCertificacionesMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsCertificacionesSqlExtendsProvider;
-import org.itcgae.siga.db.services.fcs.providers.FcsFacturacionJGSqlExtendsProvider;
-import org.itcgae.siga.db.services.fcs.providers.FcsMovimientosvariosSqlExtendsProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,6 +47,24 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)})
     List<EstadoCertificacionItem> getEstadosCertificacion(String idCertificacion, Short idInstitucion, String idLenguaje);
 
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getCurrentValueSequence")
+    Short getCurrentValueSequence(String sequence);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getMvariosAsociadosCertificacion")
+    @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDCERTIFICACION", property = "idCertificacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.NUMERIC)})
+    List<MovimientosVariosAsoCerItem> getMvariosAsociadosCertificacion(String idCertificacion, Short idInstitucion);
+
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getFactCertificaciones")
     @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
@@ -84,6 +97,4 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
     @Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)})
     List<ComboItem> comboFactNull(String idinstitucion);
-
-
 }

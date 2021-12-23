@@ -1,19 +1,5 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -22,16 +8,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.BusquedaRetencionesRequestDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesDTO;
-import org.itcgae.siga.DTOs.scs.CertificacionesItem;
-import org.itcgae.siga.DTOs.scs.DescargaCertificacionesXuntaItem;
-import org.itcgae.siga.DTOs.scs.EnvioXuntaItem;
-import org.itcgae.siga.DTOs.scs.EstadoCertificacionDTO;
-import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
-import org.itcgae.siga.DTOs.scs.FacturacionDTO;
-import org.itcgae.siga.DTOs.scs.FacturacionItem;
-import org.itcgae.siga.DTOs.scs.GestionEconomicaCatalunyaItem;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.OPERACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -73,6 +50,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSService {
 
@@ -102,13 +87,16 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private CertificacionFacSJCSServicesCAMHelper camHelper;
-    
+
     @Autowired
     private CertificacionFacSJCSServicesCatalunyaHelper cataHelper;
 
     @Autowired
     private FcsCertificacionesExtendsMapper fcsCertificacionesExtendsMapper;
-   
+
+    @Autowired
+    private EcomOperacionMapper ecomOperacionMapper;
+
     @Autowired
     private FacturacionSJCSHelper facturacionHelper;
 
@@ -133,7 +121,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     @Autowired
     private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
 
-    
+
     @Override
     public InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request) {
 
@@ -535,31 +523,30 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         return certificacionesDTO;
     }
 
-	@Override
-	public UpdateResponseDTO validaCatalunya(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
-		 String token = request.getHeader("Authorization");
-	     String dni = UserTokenUtils.getDniFromJWTToken(token);
-	     Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		 UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		 Error error = new Error();
-		 updateResponseDTO.setError(error)
-		 ;
-		 AdmUsuarios admUsr =  facturacionHelper.getUsuario(idInstitucion, dni);
-		 
-		 try {
-			 cataHelper.valida(gestEcom, admUsr);
-			 updateResponseDTO.setStatus(SigaConstants.OK);
-		 } catch(Exception e) {
-			 LOGGER.error(e);
-			 error.setDescription(e.toString());
-			 updateResponseDTO.setStatus(SigaConstants.KO);
-		 }
-		 
-		 return updateResponseDTO;
-	}
-	
-	
-	
+    @Override
+    public UpdateResponseDTO validaCatalunya(GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+        Error error = new Error();
+        updateResponseDTO.setError(error)
+        ;
+        AdmUsuarios admUsr = facturacionHelper.getUsuario(idInstitucion, dni);
+
+        try {
+            cataHelper.valida(gestEcom, admUsr);
+            updateResponseDTO.setStatus(SigaConstants.OK);
+        } catch (Exception e) {
+            LOGGER.error(e);
+            error.setDescription(e.toString());
+            updateResponseDTO.setStatus(SigaConstants.KO);
+        }
+
+        return updateResponseDTO;
+    }
+
+
     @Override
     public DeleteResponseDTO eliminarCertificaciones(List<CertificacionesItem> certificacionesItemList, HttpServletRequest request) {
 
@@ -728,7 +715,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        FacturacionDTO facturacionDTO  = new FacturacionDTO ();
+        FacturacionDTO facturacionDTO = new FacturacionDTO();
         Error error = new Error();
         List<GenParametros> tamMax;
         Integer tamMaximo;
@@ -783,10 +770,10 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                 }
             }
         } catch (Exception e) {
-        LOGGER.error("CertificacionFacSJCSServicesImpl.getFactCertificaciones() -> Se ha producido un error al intentar obtener las facturaciones de certificaciones", e);
-        error.setCode(500);
-        error.setDescription("general.mensaje.error.bbdd");
-    }
+            LOGGER.error("CertificacionFacSJCSServicesImpl.getFactCertificaciones() -> Se ha producido un error al intentar obtener las facturaciones de certificaciones", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
         return facturacionDTO;
     }
 
@@ -822,11 +809,11 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                     FcsFactCertificaciones factCert = fcsFactCertificacionesMapper.selectByPrimaryKey(fck);
 
-                    if(factCert != null){
+                    if (factCert != null) {
                         error.setCode(400);
                         error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.errorFactAsociada");
                         insertResponseDTO.setStatus(SigaConstants.KO);
-                    }else{
+                    } else {
 
                         FcsFactCertificaciones fc = new FcsFactCertificaciones();
                         fc.setIdinstitucion(idInstitucion);
@@ -837,11 +824,11 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                         response = fcsFactCertificacionesMapper.insert(fc);
 
-                        if(response != 0){
+                        if (response != 0) {
                             error.setCode(200);
                             error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.factAsociada");
                             insertResponseDTO.setStatus(SigaConstants.OK);
-                        }else{
+                        } else {
                             error.setCode(400);
                             error.setDescription("general.mensaje.error.bbdd");
                             insertResponseDTO.setStatus(SigaConstants.KO);
@@ -893,43 +880,43 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
                 if (null != usuarios && !usuarios.isEmpty()) {
-                String idCertifacion = certificacionesItemList.get(0).getIdCertificacion();
-                FcsCertificacionesHistoricoEstadoExample cer = new FcsCertificacionesHistoricoEstadoExample();
-                cer.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcertificacionEqualTo(Short.parseShort(idCertifacion));
-                List<FcsCertificacionesHistoricoEstado> listEstados = fcsCertificacionesHistoricoEstadoMapper.selectByExample(cer);
-                for(FcsCertificacionesHistoricoEstado histCert: listEstados){
-                    if(histCert.getIdestado().equals(5)){
-                        enviado++;
-                    }
-                }
-
-                if(enviado == 0){
-                    for(CertificacionesItem cert: certificacionesItemList){
-
-                        // Eliminamos las facturaciones
-                        FcsFactCertificacionesExample fcsFactCertificacionesExample = new FcsFactCertificacionesExample();
-                        fcsFactCertificacionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-                                .andIdcertificacionEqualTo(Short.parseShort(cert.getIdCertificacion()))
-                                .andIdfacturacionEqualTo(Integer.parseInt(cert.getIdFacturacion()));
-
-                        respose += fcsFactCertificacionesMapper.deleteByExample(fcsFactCertificacionesExample);
-
+                    String idCertifacion = certificacionesItemList.get(0).getIdCertificacion();
+                    FcsCertificacionesHistoricoEstadoExample cer = new FcsCertificacionesHistoricoEstadoExample();
+                    cer.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcertificacionEqualTo(Short.parseShort(idCertifacion));
+                    List<FcsCertificacionesHistoricoEstado> listEstados = fcsCertificacionesHistoricoEstadoMapper.selectByExample(cer);
+                    for (FcsCertificacionesHistoricoEstado histCert : listEstados) {
+                        if (histCert.getIdestado().equals(5)) {
+                            enviado++;
+                        }
                     }
 
-                    if(respose != 0){
-                        error.setCode(200);
-                        error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.eliminado");
-                        deleteResponseDTO.setStatus(SigaConstants.OK);
-                    }else{
+                    if (enviado == 0) {
+                        for (CertificacionesItem cert : certificacionesItemList) {
+
+                            // Eliminamos las facturaciones
+                            FcsFactCertificacionesExample fcsFactCertificacionesExample = new FcsFactCertificacionesExample();
+                            fcsFactCertificacionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                                    .andIdcertificacionEqualTo(Short.parseShort(cert.getIdCertificacion()))
+                                    .andIdfacturacionEqualTo(Integer.parseInt(cert.getIdFacturacion()));
+
+                            respose += fcsFactCertificacionesMapper.deleteByExample(fcsFactCertificacionesExample);
+
+                        }
+
+                        if (respose != 0) {
+                            error.setCode(200);
+                            error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.eliminado");
+                            deleteResponseDTO.setStatus(SigaConstants.OK);
+                        } else {
+                            error.setCode(400);
+                            error.setDescription("general.mensaje.error.bbdd");
+                            deleteResponseDTO.setStatus(SigaConstants.KO);
+                        }
+                    } else {
                         error.setCode(400);
-                        error.setDescription("general.mensaje.error.bbdd");
+                        error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.errorEliminado");
                         deleteResponseDTO.setStatus(SigaConstants.KO);
                     }
-                }else{
-                    error.setCode(400);
-                    error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.errorEliminado");
-                    deleteResponseDTO.setStatus(SigaConstants.KO);
-                }
 
                 } else {
                     LOGGER.warn(
@@ -954,71 +941,72 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
         return deleteResponseDTO;
     }
-	@Override
-	public Resource descargaErrorValidacion(GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request)
-			throws IOException {
-		Resource resource = null;
 
-		LOGGER.info("CertificacionFacSJCSServicesImpl.descargaErrorValidacion() -> Entrada al servicio para la descarga de errores de validacion");
+    @Override
+    public Resource descargaErrorValidacion(GestionEconomicaCatalunyaItem gestionVo, HttpServletRequest request)
+            throws IOException {
+        Resource resource = null;
 
-		File file = cataHelper.descargaErrorValidacion(gestionVo);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.descargaErrorValidacion() -> Entrada al servicio para la descarga de errores de validacion");
 
-		if (file != null) {
-			resource = new ByteArrayResource(Files.readAllBytes(file.toPath())) {
-				public String getFilename() {
-					return file.getName();
-				}
-			};
+        File file = cataHelper.descargaErrorValidacion(gestionVo);
 
-		}
+        if (file != null) {
+            resource = new ByteArrayResource(Files.readAllBytes(file.toPath())) {
+                public String getFilename() {
+                    return file.getName();
+                }
+            };
 
-		LOGGER.info("CertificacionFacSJCSServicesImpl.descargaErrorValidacion() -> Salida del servicio para la descarga de errores de validacion");
+        }
 
-		return resource;
-	}
+        LOGGER.info("CertificacionFacSJCSServicesImpl.descargaErrorValidacion() -> Salida del servicio para la descarga de errores de validacion");
 
-	@Override
-	public UpdateResponseDTO enviaRespuestaCICAC_ICA(GestionEconomicaCatalunyaItem gestEcom,
-			HttpServletRequest request) {
-		 UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		 Error error = new Error();
-		 updateResponseDTO.setError(error)
-		 ;
-		 
-		 try {
-			 cataHelper.enviaRespuestaCICAC_ICA(gestEcom);
-			 updateResponseDTO.setStatus(SigaConstants.OK);
-		 } catch(Exception e) {
-			 LOGGER.error(e);
-			 error.setDescription(e.toString());
-			 updateResponseDTO.setStatus(SigaConstants.KO);
-		 }
-		 
-		 return updateResponseDTO;
-	}
+        return resource;
+    }
 
-	@Override
-	public Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem,
-			HttpServletRequest request) throws Exception {
-		Resource resource = null;
+    @Override
+    public UpdateResponseDTO enviaRespuestaCICAC_ICA(GestionEconomicaCatalunyaItem gestEcom,
+                                                     HttpServletRequest request) {
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+        Error error = new Error();
+        updateResponseDTO.setError(error)
+        ;
 
-		LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Entrada al servicio para la descarga de certificaciones de la Xunta");
+        try {
+            cataHelper.enviaRespuestaCICAC_ICA(gestEcom);
+            updateResponseDTO.setStatus(SigaConstants.OK);
+        } catch (Exception e) {
+            LOGGER.error(e);
+            error.setDescription(e.toString());
+            updateResponseDTO.setStatus(SigaConstants.KO);
+        }
 
-		File file = xuntaHelper.generaFicheroCertificacionesXunta(descargaItem.getIdInstitucion(), descargaItem.getLIdFacturaciones());
+        return updateResponseDTO;
+    }
 
-		if (file != null) {
-			resource = new ByteArrayResource(Files.readAllBytes(file.toPath())) {
-				public String getFilename() {
-					return file.getName();
-				}
-			};
+    @Override
+    public Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem,
+                                                  HttpServletRequest request) throws Exception {
+        Resource resource = null;
 
-		}
+        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Entrada al servicio para la descarga de certificaciones de la Xunta");
 
-		LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Salida del servicio para la descarga de certificaciones de la Xunta");
+        File file = xuntaHelper.generaFicheroCertificacionesXunta(descargaItem.getIdInstitucion(), descargaItem.getLIdFacturaciones());
 
-		return resource;
-	}
+        if (file != null) {
+            resource = new ByteArrayResource(Files.readAllBytes(file.toPath())) {
+                public String getFilename() {
+                    return file.getName();
+                }
+            };
+
+        }
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Salida del servicio para la descarga de certificaciones de la Xunta");
+
+        return resource;
+    }
 
     @Override
     public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request) {
@@ -1140,5 +1128,216 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 		return response;
 	}
 
+    @Override
+    public InsertResponseDTO createOrUpdateCertificacion(CertificacionesItem certificacionesItem, HttpServletRequest request) {
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> Entrada al servicio para crear una certificacion");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (certificacionesItem != null && !UtilidadesString.esCadenaVacia(certificacionesItem.getNombre())) {
+
+                        if (certificacionesItem.getIdCertificacion() == null) {
+
+                            FcsCertificaciones certificacion = new FcsCertificaciones();
+                            certificacion.setIdinstitucion(idInstitucion);
+                            certificacion.setIdestadocertificacion(Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ABIERTA.getCodigo()));
+                            certificacion.setNombre(certificacionesItem.getNombre());
+                            certificacion.setUsumodificacion(usuarios.get(0).getIdusuario());
+                            certificacion.setFechamodificacion(new Date());
+                            LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> INICIO de la query para insertar la certificacion");
+                            int response = fcsCertificacionesExtendsMapper.insertSelective(certificacion);
+                            LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> FIN de la query para insertar la certificacion");
+
+                            if (response == 1) {
+                                insertResponseDTO.setStatus(SigaConstants.OK);
+                                LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> fcsCertificacionesExtendsMapper.getCurrentValueSequence() -> INICIO de la query para obtener el idcertificacion");
+                                Short idCertificacion = fcsCertificacionesExtendsMapper.getCurrentValueSequence(SigaConstants.SEQUENCE_CERTIFICACIONES);
+                                LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> fcsCertificacionesExtendsMapper.getCurrentValueSequence() -> FIN de la query para obtener el idcertificacion");
+                                insertResponseDTO.setId(idCertificacion.toString());
+
+                                if (idCertificacion != null) {
+
+                                    FcsCertificacionesHistoricoEstado estado = new FcsCertificacionesHistoricoEstado();
+                                    estado.setIdcertificacion(idCertificacion);
+                                    estado.setIdinstitucion(idInstitucion);
+                                    estado.setFechaestado(new Date());
+                                    estado.setIdestado(Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ABIERTA.getCodigo()));
+                                    estado.setFechamodificacion(new Date());
+                                    estado.setUsumodificacion(usuarios.get(0).getIdusuario());
+                                    LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> INICIO de la query para insertar el estado de la certificacion");
+                                    fcsCertificacionesHistoricoEstadoMapper.insertSelective(estado);
+                                    LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> FIN de la query para insertar el estado de la certificacion");
+                                }
+                            } else {
+                                insertResponseDTO.setStatus(SigaConstants.KO);
+                                error.setDescription("general.message.error.realiza.accion");
+                                error.setCode(500);
+                            }
+
+                        } else {
+                            FcsCertificaciones certificacion = new FcsCertificaciones();
+                            certificacion.setIdinstitucion(idInstitucion);
+                            certificacion.setIdcertificacion(Short.valueOf(certificacionesItem.getIdCertificacion()));
+                            certificacion.setNombre(certificacionesItem.getNombre());
+                            certificacion.setFechamodificacion(new Date());
+                            certificacion.setUsumodificacion(usuarios.get(0).getIdusuario());
+                            int response = fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective(certificacion);
+
+                            if (response == 1) {
+                                insertResponseDTO.setStatus(SigaConstants.OK);
+                                insertResponseDTO.setId(certificacionesItem.getIdCertificacion());
+                            } else {
+                                insertResponseDTO.setStatus(SigaConstants.KO);
+                                error.setDescription("general.message.error.realiza.accion");
+                                error.setCode(500);
+                            }
+
+                        }
+
+
+                    } else {
+                        insertResponseDTO.setStatus(SigaConstants.KO);
+                        error.setDescription("general.message.camposObligatorios");
+                        error.setCode(400);
+                    }
+
+                } else {
+                    LOGGER.warn(
+                            "CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> Se ha producido un error al intentar crear una nueva certificacion", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        insertResponseDTO.setError(error);
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> Salida del servicio para crear una certificacion");
+
+        return insertResponseDTO;
+    }
+
+    @Override
+    public UpdateResponseDTO reabrirCertificacion(CertificacionesItem certificacionesItem, HttpServletRequest request) {
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.reabrirCertificacion() -> Entrada al servicio para reabrir una certificacion");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("CertificacionFacSJCSServicesImpl.reabrirCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("CertificacionFacSJCSServicesImpl.reabrirCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (certificacionesItem != null && !UtilidadesString.esCadenaVacia(certificacionesItem.getIdCertificacion())) {
+
+                        FcsCertificacionesKey fcsCertificacionesKey = new FcsCertificacionesKey();
+                        fcsCertificacionesKey.setIdinstitucion(idInstitucion);
+                        fcsCertificacionesKey.setIdcertificacion(Short.valueOf(certificacionesItem.getIdCertificacion()));
+
+                        FcsCertificaciones fcsCertificaciones = fcsCertificacionesExtendsMapper.selectByPrimaryKey(fcsCertificacionesKey);
+
+                        if (fcsCertificaciones != null) {
+
+                            if (fcsCertificaciones.getIdestadocertificacion().toString().equalsIgnoreCase(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo())) {
+
+                                FcsCertificacionesHistoricoEstado estado = new FcsCertificacionesHistoricoEstado();
+                                estado.setIdcertificacion(fcsCertificaciones.getIdcertificacion());
+                                estado.setIdinstitucion(fcsCertificaciones.getIdinstitucion());
+                                estado.setFechaestado(new Date());
+                                estado.setIdestado(Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo()));
+                                estado.setFechamodificacion(new Date());
+                                estado.setUsumodificacion(usuarios.get(0).getIdusuario());
+                                LOGGER.info("CertificacionFacSJCSServicesImpl.reabrirCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> INICIO de la query para insertar el estado de la certificacion");
+                                fcsCertificacionesHistoricoEstadoMapper.insertSelective(estado);
+                                LOGGER.info("CertificacionFacSJCSServicesImpl.reabrirCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> FIN de la query para insertar el estado de la certificacion");
+
+                                fcsCertificaciones.setIdestadocertificacion(Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo()));
+                                fcsCertificaciones.setFechamodificacion(new Date());
+                                fcsCertificaciones.setUsumodificacion(usuarios.get(0).getIdusuario());
+                                LOGGER.info("CertificacionFacSJCSServicesImpl.reabrirCertificacion() -> fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective() -> INICIO de la query para aztualizar la certificacion");
+                                fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective(fcsCertificaciones);
+                                LOGGER.info("CertificacionFacSJCSServicesImpl.reabrirCertificacion() -> fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective() -> FIN de la query para aztualizar la certificacion");
+
+                                updateResponseDTO.setStatus(SigaConstants.OK);
+                                updateResponseDTO.setId(certificacionesItem.getIdCertificacion());
+
+                            } else {
+                                updateResponseDTO.setStatus(SigaConstants.KO);
+                                error.setDescription("general.message.error.realiza.accion");
+                                error.setCode(500);
+                            }
+
+                        }
+
+                    } else {
+                        updateResponseDTO.setStatus(SigaConstants.KO);
+                        error.setDescription("general.message.camposObligatorios");
+                        error.setCode(400);
+                    }
+
+                } else {
+                    LOGGER.warn(
+                            "CertificacionFacSJCSServicesImpl.nuevaCertificacion() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("CertificacionFacSJCSServicesImpl.reabrirCertificacion() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("CertificacionFacSJCSServicesImpl.reabrirCertificacion() -> Se ha producido un error al intentar reabrir una certificacion", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        updateResponseDTO.setError(error);
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.reabrirCertificacion() -> Salida del servicio para reabrir una certificacion");
+
+        return updateResponseDTO;
+    }
 
 }
