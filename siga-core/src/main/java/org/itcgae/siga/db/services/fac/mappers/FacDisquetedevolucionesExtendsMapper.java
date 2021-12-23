@@ -21,13 +21,12 @@ public interface FacDisquetedevolucionesExtendsMapper extends FacDisquetedevoluc
 	@Results({
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDDISQUETEDEVOLUCIONES", property = "idDisqueteDevoluciones", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CUENTA_ENTIDAD", property = "cuentaEntidad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAGENERACION", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "importe", property = "facturacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "numfacturas", property = "numRecibos", jdbcType = JdbcType.INTEGER),
-		@Result(column = "FECHAMODIFICACION", property = "fechaUltimaModificacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IMPORTETOTAL", property = "facturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROFACTURAS", property = "numRecibos", jdbcType = JdbcType.INTEGER),
+		@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FicherosDevolucionesItem> getFicherosDevoluciones(FicherosDevolucionesItem item, String idInstitucion);
 

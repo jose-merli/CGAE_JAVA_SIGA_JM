@@ -1,14 +1,5 @@
 package org.itcgae.siga.fac.services.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
@@ -155,6 +146,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class FacturacionPySServiceImpl implements IFacturacionPySService {
@@ -1995,20 +1994,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					|| item.getComunicacionesFacturasHasta() != null || item.getImporteAdeudadoDesde() != null
 					|| item.getImporteAdeudadoHasta() != null || item.getFacturacion() != null
 					|| item.getSerie() != null || item.getFormaCobroFactura() != null
-					|| item.getEstadosFiltroFac() != null || item.getFacturasPendientesHasta() != null
+					|| (item.getEstadosFiltroFac() != null && item.getEstadosFiltroFac().size() > 0)
+					|| item.getFacturasPendientesHasta() != null
 					|| item.getFacturasPendientesDesde() != null;
 
 			boolean filtrosSoloAbono = item.getIdentificadorTransferencia() != null || item.getNumeroAbonoSJCS() != null
-					|| item.getFormaCobroAbono() != null || item.getEstadosFiltroAb() != null;
+					|| item.getFormaCobroAbono() != null || (item.getEstadosFiltroAb() != null && item.getEstadosFiltroAb().size() > 0);
 
-			if (!(filtrosSoloAbono && !filtrosSoloFactura))
+			if (!(filtrosSoloAbono && !filtrosSoloFactura)) {
 				items.addAll(facFacturaExtendsMapper.getFacturas(item, usuario.getIdinstitucion().toString(),
 						usuario.getIdlenguaje()));
+			}
 
-			if (!(!filtrosSoloAbono && filtrosSoloFactura))
-
+			if (!(!filtrosSoloAbono && filtrosSoloFactura)) {
 				items.addAll(facAbonoExtendsMapper.getAbonos(item, usuario.getIdinstitucion().toString(),
 						usuario.getIdlenguaje(), items.size()));
+			}
 
 			facturaDTO.setFacturasItems(items);
 		}
