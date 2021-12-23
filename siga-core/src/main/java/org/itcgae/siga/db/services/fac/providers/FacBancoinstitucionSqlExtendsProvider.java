@@ -66,6 +66,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.SELECT("bi.comisionimporte");
 		query.SELECT("bi.comisiondescripcion");
 		query.SELECT("bi.idtipoiva");
+		query.SELECT("(SELECT pysTipoIVA.descripcion FROM pys_tipoiva pysTipoIVA WHERE pysTipoIVA.idtipoiva = bi.idtipoiva) tipoiva");
 		query.SELECT("bi.comisioncuentacontable");
 
 		query.SELECT("bi.configficherossecuencia");
@@ -74,6 +75,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		query.SELECT("bi.configconceptoampliado");
 
 		query.SELECT("bi.idsufijosjcs");
+		query.SELECT("(SELECT fs.sufijo || ' - ' || fs.concepto FROM fac_sufijo fs WHERE fs.idinstitucion = bi.idinstitucion AND fs.idsufijo = bi.idsufijosjcs) sufijosjcs");
 		query.SELECT("su.concepto");
 		query.SELECT("bi.sjcs");
 
@@ -96,24 +98,11 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 	public String getNextIdCuentaBancaria(Short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("(NVL(MAX(bi.bancos_codigo),0) + 1) as bancos_codigo");
+		sql.SELECT("(NVL(MAX(TO_NUMBER(bi.bancos_codigo)),0) + 1) as bancos_codigo");
 		sql.FROM("fac_bancoinstitucion bi");
 		sql.WHERE("bi.idinstitucion = " + idInstitucion);
 
 		return sql.toString();
-	}
-	
-	public String comboCuentasBancarias(Short idInstitucion) {
-		SQL query = new SQL();
-		
-		query.SELECT("bi.bancos_codigo");
-		query.SELECT("bi.descripcion CUENTA");
-		query.FROM("FAC_BANCOINSTITUCION bi");
-		query.WHERE("bi.fechabaja IS NULL");
-		query.WHERE("bi.idinstitucion=" + idInstitucion);
-		query.ORDER_BY("bi.bancos_codigo");
-		
-		return query.toString();
 	}
 	
 }

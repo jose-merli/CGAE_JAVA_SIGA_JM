@@ -157,26 +157,5 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		applyWhere(sql, example, true);
 		return sql.toString();
 	}
-	
-	public String comboDestinatarios(Short idInstitucion) {
-		SQL sql = new SQL();
-		
-		sql.SELECT("gcc.idpersona");
-		sql.SELECT("( c.nombre || ' ' || c.apellidos1 || ' ' || c.apellidos2 ) as persona");
-		
-		sql.FROM("CEN_GRUPOSCLIENTE_CLIENTE gcc");
-		sql.INNER_JOIN("CEN_PERSONA c ON ( c.idpersona = gcc.idpersona )");
-		
-		sql.WHERE("gcc.idinstitucion=" + idInstitucion);
-		//sql.WHERE("rownum <= " + 30);
-		
-		sql.GROUP_BY("gcc.idpersona");
-		sql.GROUP_BY("c.nombre");
-		sql.GROUP_BY("c.apellidos1");
-		sql.GROUP_BY("c.apellidos2");
-		
-		sql.ORDER_BY("c.nombre");
-		
-		return sql.toString();
-	}
+
 }

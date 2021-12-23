@@ -29,7 +29,7 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
         numRecibos.FROM("fac_abonoincluidoendisquete");
         numRecibos.WHERE("idinstitucion = c.idinstitucion AND iddisqueteabono = c.iddisqueteabono");
 
-        principal.SELECT("c.idinstitucion,c.iddisqueteabono, c.fecha, b.cod_banco, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
+        principal.SELECT("c.idinstitucion,c.iddisqueteabono, c.fecha, b.bancos_codigo, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
                 + "c.idsufijo,( s.sufijo || ' - ' || s.concepto ) sufijo, ("+totalRemesa.toString()+") AS totalimporte, ("+numRecibos.toString()+") AS numfacturas");
 
 
@@ -99,7 +99,7 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
                 +"CASE WHEN ff.IDCUENTA IS NOT NULL THEN F_SIGA_GETRECURSO(540020,"+idIdioma+") WHEN ff.IDCUENTA IS NULL THEN F_SIGA_GETRECURSO(540030,"+idIdioma+") END FORMAPAGO,"
                 + "COUNT(*) NUMEROFACTURAS, SUM(ff.IMPTOTAL) IMPORTETOTAL, SUM(ff.IMPPENDIENTEPORABONAR) PENDIENTETOTAL");
         sql.FROM("FAC_ABONO ff");
-        sql.INNER_JOIN("FAC_ABONOINCLUIDOENDISQUETE ff2 ON (ff.IDINSTITUCION = ff2.IDINSTITUCION AND ff.IDFACTURA = ff2.IDABONO)");
+        sql.INNER_JOIN("FAC_ABONOINCLUIDOENDISQUETE ff2 ON (ff.IDINSTITUCION = ff2.IDINSTITUCION AND ff.IDABONO = ff2.IDABONO)");
         sql.LEFT_OUTER_JOIN("FAC_ESTADOFACTURA fe ON (ff.ESTADO = fe.IDESTADO)");
         sql.LEFT_OUTER_JOIN("GEN_RECURSOS gr ON (gr.IDLENGUAJE = "+idIdioma+" AND fe.DESCRIPCION = gr.IDRECURSO)");
         sql.WHERE("ff.IDINSTITUCION = "+idInstitucion);

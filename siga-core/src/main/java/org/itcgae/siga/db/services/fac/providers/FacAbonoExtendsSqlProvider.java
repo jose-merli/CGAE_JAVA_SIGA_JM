@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 
 public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
 
-    public String getAbonos(FacturaItem item, String idInstitucion, String idLenguaje) {
+    public String getAbonos(FacturaItem item, String idInstitucion, String idLenguaje, Integer maxRows) {
 
         SQL transferencia = new SQL();
         SQL abonos = new SQL();
@@ -121,7 +121,12 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         sqlAbonos.SELECT("*");
         sqlAbonos.FROM("("+abonos.toString()+")");
 
-        sqlAbonos.WHERE("ROWNUM < 201");
+        if(maxRows == null || maxRows == 0 || maxRows > 201){
+            sqlAbonos.WHERE("ROWNUM < 201");
+        }
+        else {
+            sqlAbonos.WHERE("ROWNUM < " + (201 - maxRows));
+        }
 
         return sqlAbonos.toString();
     }
@@ -140,7 +145,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
 
         query.FROM("FAC_ABONO A");
         query.INNER_JOIN("CEN_PERSONA P ON (P.IDPERSONA = A.IDPERSONA)");
-        query.INNER_JOIN("FAC_FACTURA FF ON (FF.IDFACTURA = A.IDFACTURA AND FF.IDINSTITUCION = A.IDINSTITUCION)");
+        query.LEFT_OUTER_JOIN("FAC_FACTURA FF ON (FF.IDFACTURA = A.IDFACTURA AND FF.IDINSTITUCION = A.IDINSTITUCION)");
         query.LEFT_OUTER_JOIN("CEN_MANDATOS_CUENTASBANCARIAS M ON (M.IDPERSONA = A.IDPERSONADEUDOR AND M.IDINSTITUCION = A.IDINSTITUCION AND M.IDMANDATO = 1)");
         query.LEFT_OUTER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = P.IDPERSONA AND COL.IDINSTITUCION = A.IDINSTITUCION)");
 

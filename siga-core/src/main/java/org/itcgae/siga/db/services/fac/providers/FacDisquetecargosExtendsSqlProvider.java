@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.fac.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FacDisquetecargosSqlProvider;
 
 import java.text.SimpleDateFormat;
@@ -73,6 +74,11 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		//facturacion
 		if(item.getFacturacion()!=null && !item.getFacturacion().trim().isEmpty()) {
 			principal.WHERE("UPPER(p.descripcion) LIKE UPPER('%"+item.getFacturacion().trim()+"%')");
+		}
+
+		// IdDisqueteCargos
+		if (!UtilidadesString.esCadenaVacia(item.getIdDisqueteCargos())) {
+			principal.WHERE("c.iddisquetecargos = " + item.getIdDisqueteCargos());
 		}
 		
 		//origen  -PENDIENTE POR PREGUNTAR A CLIENTE

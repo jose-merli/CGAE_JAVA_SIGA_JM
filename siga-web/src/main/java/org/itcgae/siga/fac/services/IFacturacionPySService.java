@@ -1,5 +1,9 @@
 package org.itcgae.siga.fac.services;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
@@ -38,47 +42,71 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 public interface IFacturacionPySService {
 
 	public CuentasBancariasDTO getCuentasBancarias(String idCuenta, HttpServletRequest request) throws Exception;
 
-	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) throws Exception;
+	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
+			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO reactivarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO reactivarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
+			HttpServletRequest request) throws Exception;
 
-    public CuentasBancariasDTO validarIBANCuentaBancaria(CuentasBancariasItem cuentaBancaria, HttpServletRequest request) throws Exception;
+	public CuentasBancariasDTO validarIBANCuentaBancaria(CuentasBancariasItem cuentaBancaria,
+			HttpServletRequest request) throws Exception;
 
-    public InsertResponseDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria, HttpServletRequest request) throws Exception;
+	public InsertResponseDTO insertaCuentaBancaria(CuentasBancariasItem cuentaBancaria, HttpServletRequest request)
+			throws Exception;
 
-	public UpdateResponseDTO actualizaCuentaBancaria(CuentasBancariasItem cuentaBancaria, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO actualizaCuentaBancaria(CuentasBancariasItem cuentaBancaria, HttpServletRequest request)
+			throws Exception;
 
-	public UpdateResponseDTO insertaActualizaSerie(List<UsosSufijosItem> usosSufijosItems, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO insertaActualizaSerie(List<UsosSufijosItem> usosSufijosItems, HttpServletRequest request)
+			throws Exception;
 
-	public SeriesFacturacionDTO getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, HttpServletRequest request) throws Exception;
+	public SeriesFacturacionDTO getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem,
+			HttpServletRequest request) throws Exception;
 
-	public DeleteResponseDTO eliminaSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) throws Exception;
+	public DeleteResponseDTO eliminaSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems,
+			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO reactivarSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO reactivarSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems,
+			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO guardarSerieFacturacion(SerieFacturacionItem serieFacturacion, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO guardarSerieFacturacion(SerieFacturacionItem serieFacturacion, HttpServletRequest request)
+			throws Exception;
 
-	public UpdateResponseDTO guardarEtiquetasSerieFacturacion(TarjetaPickListSerieDTO etiquetas, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO guardarEtiquetasSerieFacturacion(TarjetaPickListSerieDTO etiquetas,
+			HttpServletRequest request) throws Exception;
 
-	public DestinatariosSeriesDTO getDestinatariosSeries(String idSerieFacturacion, HttpServletRequest request) throws Exception;
+	public DestinatariosSeriesDTO getDestinatariosSeries(String idSerieFacturacion, HttpServletRequest request)
+			throws Exception;
 
-    public CreateResponseDTO nuevoDestinatariosSerie(DestinatariosSeriesItem destinatariosSeriesItem, HttpServletRequest request) throws Exception;
+	public CreateResponseDTO nuevoDestinatariosSerie(DestinatariosSeriesItem destinatariosSeriesItem,
+			HttpServletRequest request) throws Exception;
 
-	public DeleteResponseDTO eliminaDestinatariosSerie(List<DestinatariosSeriesItem> destinatariosSeriesItems, HttpServletRequest request) throws Exception;
+	public DeleteResponseDTO eliminaDestinatariosSerie(List<DestinatariosSeriesItem> destinatariosSeriesItems,
+			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request) throws Exception;
+	public ConsultasDTO getConsultasSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
+
+    public FinalidadConsultaDTO getFinalidadConsultasSerie(ConsultaDestinatarioItem consulta, HttpServletRequest request) throws Exception;
+
+    public CreateResponseDTO nuevaConsultaSerie(ConsultaDestinatarioItem consulta, HttpServletRequest request)
+			throws Exception;
+
+	public DeleteResponseDTO eliminaConsultasSerie(List<ConsultaDestinatarioItem> consultas, HttpServletRequest request)
+			throws Exception;
+
+	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request)
+			throws Exception;
 
 	public ContadorSeriesDTO getContadoresSerie(HttpServletRequest request) throws Exception;
 
@@ -86,29 +114,39 @@ public interface IFacturacionPySService {
 
 	public FicherosAdeudosDTO getFicherosAdeudos(FicherosAdeudosItem item, HttpServletRequest request) throws Exception;
 
-	public InsertResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request) throws Exception;
+	public InsertResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request)
+			throws Exception;
 
 	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request) throws Exception;
 
-    public FacFacturacionprogramadaDTO getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) throws Exception;
+	public FacFacturacionprogramadaDTO getFacturacionesProgramadas(
+			FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) throws Exception;
 
-	public DeleteResponseDTO eliminarFacturacion(FacFacturacionEliminarItem fac, HttpServletRequest request) throws Exception;
+	public DeleteResponseDTO eliminarFacturacion(FacFacturacionEliminarItem fac, HttpServletRequest request)
+			throws Exception;
 
-	public FicherosAbonosDTO getFicherosTransferencias(FicherosAbonosItem item, HttpServletRequest request) throws Exception;
+	public FicherosAbonosDTO getFicherosTransferencias(FicherosAbonosItem item, HttpServletRequest request)
+			throws Exception;
 
-	public FicherosDevolucionesDTO getFicherosDevoluciones(FicherosDevolucionesItem item, HttpServletRequest request) throws Exception;
+	public FicherosDevolucionesDTO getFicherosDevoluciones(FicherosDevolucionesItem item, HttpServletRequest request)
+			throws Exception;
 
-	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems,
+			HttpServletRequest request) throws Exception;
 
 	public FacturaDTO getFacturas(FacturaItem item, HttpServletRequest request) throws Exception;
 
 	public FacturaDTO getFactura(String idFactura, String tipo, HttpServletRequest request) throws Exception;
 
-	public FacPresentacionAdeudosDTO presentacionAdeudos(FacPresentacionAdeudosItem presentacionAdeudoItem,	HttpServletRequest request) throws Exception;
+	public FacPresentacionAdeudosDTO presentacionAdeudos(FacPresentacionAdeudosItem presentacionAdeudoItem,
+			HttpServletRequest request) throws Exception;
 
-	public FacRegenerarPresentacionAdeudosDTO regenerarPresentacionAdeudos(FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,	HttpServletRequest request) throws Exception;
+	public FacRegenerarPresentacionAdeudosDTO regenerarPresentacionAdeudos(
+			FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem, HttpServletRequest request)
+			throws Exception;
 
-	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg, HttpServletRequest request) throws Exception;
+	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg,
+			HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO guardaDatosFactura(FacturaItem item, HttpServletRequest request) throws Exception;
 
@@ -120,7 +158,8 @@ public interface IFacturacionPySService {
 
 	public UpdateResponseDTO guardarLineasAbono(FacturaLineaItem item, HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO actualizarProgramacionFactura(FacFacturacionprogramadaItem facItem, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO actualizarProgramacionFactura(FacFacturacionprogramadaItem facItem,
+			HttpServletRequest request) throws Exception;
 
 	public ComunicacionCobroDTO getComunicacionCobro(String idFactura, HttpServletRequest request) throws Exception;
 
@@ -130,11 +169,14 @@ public interface IFacturacionPySService {
 
 	public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO actualizarFicheroAdeudos(FacDisquetecargos updateItem, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO actualizarFicheroAdeudos(FacDisquetecargos updateItem, HttpServletRequest request)
+			throws Exception;
 
-	public UpdateResponseDTO actualizarFicheroDevoluciones(FacDisquetedevoluciones updateItem, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO actualizarFicheroDevoluciones(FacDisquetedevoluciones updateItem,
+			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request) throws Exception;
+	public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request)
+			throws Exception;
 
 	public FacturasIncluidasDTO getFacturasIncluidas(String idFichero, String tipoFichero, HttpServletRequest request) throws Exception;
 	
@@ -144,5 +186,7 @@ public interface IFacturacionPySService {
 
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request);
 	
+	public FacturasIncluidasDTO getFacturasIncluidas(String idFichero, String tipoFichero, HttpServletRequest request)
+			throws Exception;
 
 }

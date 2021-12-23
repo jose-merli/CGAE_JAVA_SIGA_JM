@@ -170,14 +170,15 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 		SQL sql = new SQL();
 
 		// Select
-		sql.SELECT("e.idplantillaenvios");
-		sql.SELECT("e.nombre");
+		sql.SELECT_DISTINCT("e.idplantillaenvios");
+		sql.SELECT_DISTINCT("e.nombre");
 
 		// From
 		sql.FROM("env_plantillasenvios e");
 
 		// Where
 		sql.WHERE("e.idinstitucion = " + idInstitucion);
+		sql.WHERE("e.antigua = 'N'");
 		sql.WHERE("e.idtipoenvios = ( SELECT  idtipoenvios FROM env_tipoenvios WHERE upper(f_siga_getrecurso(nombre, 1)) LIKE '%ELEC%NICO%' )");
 		sql.WHERE("fechabaja IS NULL");
 

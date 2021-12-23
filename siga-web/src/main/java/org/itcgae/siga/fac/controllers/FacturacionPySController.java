@@ -1,5 +1,9 @@
 package org.itcgae.siga.fac.controllers;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
@@ -38,6 +42,9 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
@@ -53,9 +60,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-
 @RestController
 @RequestMapping(value = "/facturacionPyS")
 public class FacturacionPySController {
@@ -64,7 +68,8 @@ public class FacturacionPySController {
 	private IFacturacionPySService facturacionService;
 
 	@GetMapping(value = "/getCuentasBancarias")
-	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(@RequestParam(required = false) String idCuenta, HttpServletRequest request) {
+	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(@RequestParam(required = false) String idCuenta,
+			HttpServletRequest request) {
 		CuentasBancariasDTO response = new CuentasBancariasDTO();
 
 		try {
@@ -105,8 +110,8 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/reactivarCuentasBancarias")
-	ResponseEntity<UpdateResponseDTO> reactivarCuentasBancarias(@RequestBody List<CuentasBancariasItem> cuentasBancarias,
-															 HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> reactivarCuentasBancarias(
+			@RequestBody List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
 		try {
@@ -120,7 +125,7 @@ public class FacturacionPySController {
 
 	@PostMapping(value = "/validarIBANCuentaBancaria")
 	ResponseEntity<CuentasBancariasDTO> validarIBANCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
-															HttpServletRequest request) {
+			HttpServletRequest request) {
 		CuentasBancariasDTO response = new CuentasBancariasDTO();
 
 		try {
@@ -132,23 +137,23 @@ public class FacturacionPySController {
 		}
 	}
 
-    @PostMapping(value = "/insertaCuentaBancaria")
-    ResponseEntity<InsertResponseDTO> insertaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
-															HttpServletRequest request) {
+	@PostMapping(value = "/insertaCuentaBancaria")
+	ResponseEntity<InsertResponseDTO> insertaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
+			HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 
-        try {
-            response = this.facturacionService.insertaCuentaBancaria(cuentaBancaria, request);
-            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+		try {
+			response = this.facturacionService.insertaCuentaBancaria(cuentaBancaria, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@PostMapping(value = "/actualizaCuentaBancaria")
 	ResponseEntity<UpdateResponseDTO> actualizaCuentaBancaria(@RequestBody CuentasBancariasItem cuentaBancaria,
-															HttpServletRequest request) {
+			HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
 		try {
@@ -162,7 +167,7 @@ public class FacturacionPySController {
 
 	@PostMapping(value = "/insertaActualizaSerie")
 	ResponseEntity<UpdateResponseDTO> insertaActualizaSerie(@RequestBody List<UsosSufijosItem> usosSufijos,
-															  HttpServletRequest request) {
+			HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
 		try {
@@ -232,8 +237,8 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/nuevoDestinatariosSerie")
-	ResponseEntity<CreateResponseDTO> nuevoDestinatariosSerie(@RequestBody DestinatariosSeriesItem destinatariosSeriesItem,
-																  HttpServletRequest request) {
+	ResponseEntity<CreateResponseDTO> nuevoDestinatariosSerie(
+			@RequestBody DestinatariosSeriesItem destinatariosSeriesItem, HttpServletRequest request) {
 		CreateResponseDTO response = new CreateResponseDTO();
 
 		try {
@@ -246,12 +251,68 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/eliminaDestinatariosSerie")
-	ResponseEntity<DeleteResponseDTO> eliminaDestinatariosSerie(@RequestBody List<DestinatariosSeriesItem> destinatariosSeriesItems,
-																  HttpServletRequest request) {
+	ResponseEntity<DeleteResponseDTO> eliminaDestinatariosSerie(
+			@RequestBody List<DestinatariosSeriesItem> destinatariosSeriesItems, HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
 			response = facturacionService.eliminaDestinatariosSerie(destinatariosSeriesItems, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/getConsultasSerie")
+	ResponseEntity<ConsultasDTO> getConsultasSerie(@RequestParam String idSerieFacturacion,
+			HttpServletRequest request) {
+		ConsultasDTO response = new ConsultasDTO();
+
+		try {
+			response = facturacionService.getConsultasSerie(idSerieFacturacion, request);
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/getFinalidadConsultasSerie")
+	ResponseEntity<FinalidadConsultaDTO> getFinalidadConsultasSerie(@RequestBody ConsultaDestinatarioItem consulta,
+																	HttpServletRequest request) {
+		FinalidadConsultaDTO response = new FinalidadConsultaDTO();
+
+		try {
+			response = facturacionService.getFinalidadConsultasSerie(consulta, request);
+			return new ResponseEntity<FinalidadConsultaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FinalidadConsultaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/nuevaConsultaSerie")
+	ResponseEntity<CreateResponseDTO> nuevaConsultaSerieSerie(@RequestBody ConsultaDestinatarioItem consulta,
+			HttpServletRequest request) {
+		CreateResponseDTO response = new CreateResponseDTO();
+
+		try {
+			response = facturacionService.nuevaConsultaSerie(consulta, request);
+			return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/eliminaConsultasSerie")
+	ResponseEntity<DeleteResponseDTO> eliminaConsultasSerie(@RequestBody List<ConsultaDestinatarioItem> consultas,
+			HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = facturacionService.eliminaConsultasSerie(consultas, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -314,11 +375,12 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/guardarContadorSerie")
-	ResponseEntity<InsertResponseDTO> guardarContadorSerie(@RequestBody ContadorSeriesItem contador, HttpServletRequest request) {
+	ResponseEntity<InsertResponseDTO> guardarContadorSerie(@RequestBody ContadorSeriesItem contador,
+			HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
-			 response = facturacionService.guardarContadorSerie(contador, request);
+			response = facturacionService.guardarContadorSerie(contador, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -333,11 +395,11 @@ public class FacturacionPySController {
 
 		try {
 			response = facturacionService.getFicherosAdeudos(item, request);
-			
-			if(response.getFicherosAdeudosItems().size()==200) {
+
+			if (response.getFicherosAdeudosItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
-			
+
 			return new ResponseEntity<FicherosAdeudosDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -359,14 +421,14 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/getFacturacionesProgramadas")
-	ResponseEntity<FacFacturacionprogramadaDTO> getFacturacionesProgramadas(@RequestBody FacFacturacionprogramadaItem facturacionProgramadaItem,
-															  HttpServletRequest request) {
+	ResponseEntity<FacFacturacionprogramadaDTO> getFacturacionesProgramadas(
+			@RequestBody FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) {
 		FacFacturacionprogramadaDTO response = new FacFacturacionprogramadaDTO();
 
 		try {
 			response = facturacionService.getFacturacionesProgramadas(facturacionProgramadaItem, request);
 
-			if(response.getFacturacionprogramadaItems().size()==200) {
+			if (response.getFacturacionprogramadaItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
@@ -376,8 +438,7 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacFacturacionprogramadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
+
 	@PostMapping(value = "/eliminarFacturacion")
 	ResponseEntity<DeleteResponseDTO> eliminarFacturacion(@RequestBody FacFacturacionEliminarItem facturacionEliminar,
 			HttpServletRequest request) {
@@ -394,13 +455,13 @@ public class FacturacionPySController {
 
 	@PostMapping(value = "/getFicherosTransferencias")
 	ResponseEntity<FicherosAbonosDTO> getFicherosTransferencias(@RequestBody FicherosAbonosItem item,
-																	HttpServletRequest request) {
+			HttpServletRequest request) {
 		FicherosAbonosDTO response = new FicherosAbonosDTO();
 
 		try {
 			response = facturacionService.getFicherosTransferencias(item, request);
 
-			if(response.getFicherosAbonosItems().size()==200) {
+			if (response.getFicherosAbonosItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
@@ -413,13 +474,13 @@ public class FacturacionPySController {
 
 	@PostMapping(value = "/getFicherosDevoluciones")
 	ResponseEntity<FicherosDevolucionesDTO> getFicherosDevoluciones(@RequestBody FicherosDevolucionesItem item,
-														  HttpServletRequest request) {
+			HttpServletRequest request) {
 		FicherosDevolucionesDTO response = new FicherosDevolucionesDTO();
 
 		try {
 			response = facturacionService.getFicherosDevoluciones(item, request);
 
-			if(response.getFicherosDevolucionesItems().size()==200) {
+			if (response.getFicherosDevolucionesItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
@@ -431,8 +492,8 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/archivarFacturaciones")
-	ResponseEntity<UpdateResponseDTO> archivarFacturaciones(@RequestBody List<FacFacturacionprogramadaItem> facturacionProgramadaItems,
-																			HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> archivarFacturaciones(
+			@RequestBody List<FacFacturacionprogramadaItem> facturacionProgramadaItems, HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
 		try {
@@ -443,11 +504,10 @@ public class FacturacionPySController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
+
 	@PostMapping(value = "/presentacionAdeudos")
-	ResponseEntity<FacPresentacionAdeudosDTO> presentacionAdeudos(@RequestBody FacPresentacionAdeudosItem presentacionAdeudoItem,
-																			HttpServletRequest request) {
+	ResponseEntity<FacPresentacionAdeudosDTO> presentacionAdeudos(
+			@RequestBody FacPresentacionAdeudosItem presentacionAdeudoItem, HttpServletRequest request) {
 		FacPresentacionAdeudosDTO response = new FacPresentacionAdeudosDTO();
 
 		try {
@@ -458,11 +518,11 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacPresentacionAdeudosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
+
 	@PostMapping(value = "/regenerarPresentacionAdeudos")
-	ResponseEntity<FacRegenerarPresentacionAdeudosDTO> regenerarPresentacionAdeudos(@RequestBody FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,
-																			HttpServletRequest request) {
+	ResponseEntity<FacRegenerarPresentacionAdeudosDTO> regenerarPresentacionAdeudos(
+			@RequestBody FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem,
+			HttpServletRequest request) {
 		FacRegenerarPresentacionAdeudosDTO response = new FacRegenerarPresentacionAdeudosDTO();
 
 		try {
@@ -473,11 +533,10 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacRegenerarPresentacionAdeudosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
+
 	@PostMapping(value = "/insertarProgramacionFactura")
-	 ResponseEntity<InsertResponseDTO>  insertarProgramacionFactura(@RequestBody FacFacturacionprogramadaItem facturacionProgramadaItem,
-																			HttpServletRequest request) {
+	ResponseEntity<InsertResponseDTO> insertarProgramacionFactura(
+			@RequestBody FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
@@ -490,8 +549,8 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/actualizarProgramacionFactura")
-	ResponseEntity<UpdateResponseDTO>  actualizarProgramacionFactura(@RequestBody FacFacturacionprogramadaItem facturacionProgramadaItem,
-																   HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> actualizarProgramacionFactura(
+			@RequestBody FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
 		try {
@@ -504,14 +563,13 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/getFacturas")
-	ResponseEntity<FacturaDTO> getFacturas(@RequestBody FacturaItem item,
-										   HttpServletRequest request) {
+	ResponseEntity<FacturaDTO> getFacturas(@RequestBody FacturaItem item, HttpServletRequest request) {
 		FacturaDTO response = new FacturaDTO();
 
 		try {
 			response = facturacionService.getFacturas(item, request);
 
-			if(response.getFacturasItems().size()==200) {
+			if (response.getFacturasItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
@@ -524,13 +582,13 @@ public class FacturacionPySController {
 
 	@GetMapping(value = "/getFactura")
 	ResponseEntity<FacturaDTO> getFactura(@RequestParam String idFactura, @RequestParam String tipo,
-										   HttpServletRequest request) {
+			HttpServletRequest request) {
 		FacturaDTO response = new FacturaDTO();
 
 		try {
 			response = facturacionService.getFactura(idFactura, tipo, request);
 
-			if(response.getFacturasItems().size()==200) {
+			if (response.getFacturasItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
@@ -540,7 +598,6 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacturaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
 
 	@PostMapping(value = "/guardaDatosFactura")
 	ResponseEntity<UpdateResponseDTO> guardaDatosFactura(@RequestBody FacturaItem item, HttpServletRequest request) {
@@ -557,14 +614,13 @@ public class FacturacionPySController {
 	}
 
 	@GetMapping(value = "/getLineasFactura")
-	ResponseEntity<FacturaLineaDTO> getLineasFactura(@RequestParam String idFactura,
-										   HttpServletRequest request) {
+	ResponseEntity<FacturaLineaDTO> getLineasFactura(@RequestParam String idFactura, HttpServletRequest request) {
 		FacturaLineaDTO response = new FacturaLineaDTO();
 
 		try {
 			response = facturacionService.getLineasFactura(idFactura, request);
 
-			if(response.getFacturasLineasItems().size()==200) {
+			if (response.getFacturasLineasItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
@@ -575,64 +631,63 @@ public class FacturacionPySController {
 		}
 	}
 
-    @GetMapping(value = "/getLineasAbono")
-    ResponseEntity<FacturaLineaDTO> getLineasAbono(@RequestParam String idAbono,
-                                                     HttpServletRequest request) {
-        FacturaLineaDTO response = new FacturaLineaDTO();
+	@GetMapping(value = "/getLineasAbono")
+	ResponseEntity<FacturaLineaDTO> getLineasAbono(@RequestParam String idAbono, HttpServletRequest request) {
+		FacturaLineaDTO response = new FacturaLineaDTO();
 
-        try {
-            response = facturacionService.getLineasAbono(idAbono, request);
+		try {
+			response = facturacionService.getLineasAbono(idAbono, request);
 
-            if(response.getFacturasLineasItems().size()==200) {
-                response.setError(UtilidadesString.creaInfoResultados());
-            }
+			if (response.getFacturasLineasItems().size() == 200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
 
-            return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+			return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacturaLineaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
-    @PostMapping(value = "/guardarLineasFactura")
-    ResponseEntity<UpdateResponseDTO> guardarLineasFactura(@RequestBody FacturaLineaItem item,
-                                                     HttpServletRequest request) {
+	@PostMapping(value = "/guardarLineasFactura")
+	ResponseEntity<UpdateResponseDTO> guardarLineasFactura(@RequestBody FacturaLineaItem item,
+			HttpServletRequest request) {
 
-        UpdateResponseDTO response = new UpdateResponseDTO();
+		UpdateResponseDTO response = new UpdateResponseDTO();
 
-        try {
-            response = facturacionService.guardarLineasFactura(item, request);
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+		try {
+			response = facturacionService.guardarLineasFactura(item, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
-    @PostMapping(value = "/guardarLineasAbono")
-    ResponseEntity<UpdateResponseDTO> guardarLineasAbono(@RequestBody FacturaLineaItem item,
-                                                   HttpServletRequest request) {
+	@PostMapping(value = "/guardarLineasAbono")
+	ResponseEntity<UpdateResponseDTO> guardarLineasAbono(@RequestBody FacturaLineaItem item,
+			HttpServletRequest request) {
 
-        UpdateResponseDTO response = new UpdateResponseDTO();
+		UpdateResponseDTO response = new UpdateResponseDTO();
 
-        try {
-            response = facturacionService.guardarLineasAbono(item, request);
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+		try {
+			response = facturacionService.guardarLineasAbono(item, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@GetMapping(value = "/getComunicacionCobro")
 	ResponseEntity<ComunicacionCobroDTO> getComunicacionCobro(@RequestParam String idFactura,
-													 HttpServletRequest request) {
+			HttpServletRequest request) {
 		ComunicacionCobroDTO response = new ComunicacionCobroDTO();
 
 		try {
 			response = facturacionService.getComunicacionCobro(idFactura, request);
 
-			if(response.getComunicacionCobroItems().size()==200) {
+			if (response.getComunicacionCobroItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
@@ -644,14 +699,13 @@ public class FacturacionPySController {
 	}
 
 	@GetMapping(value = "/getEstadosPagos")
-	ResponseEntity<EstadosPagosDTO> getEstadosPagos(@RequestParam String idFactura,
-													HttpServletRequest request) {
+	ResponseEntity<EstadosPagosDTO> getEstadosPagos(@RequestParam String idFactura, HttpServletRequest request) {
 		EstadosPagosDTO response = new EstadosPagosDTO();
 
 		try {
 			response = facturacionService.getEstadosPagos(idFactura, request);
 
-			if(response.getEstadosPagosItems().size()==200) {
+			if (response.getEstadosPagosItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
 			}
 
@@ -664,7 +718,7 @@ public class FacturacionPySController {
 
 	@PostMapping(value = "/insertarEstadosPagos")
 	ResponseEntity<InsertResponseDTO> insertarEstadosPagos(@RequestBody EstadosPagosItem item,
-													HttpServletRequest request) {
+			HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
@@ -678,7 +732,7 @@ public class FacturacionPySController {
 
 	@PostMapping(value = "/eliminarEstadosPagos")
 	ResponseEntity<DeleteResponseDTO> borrarCuentasBancarias(@RequestBody EstadosPagosItem item,
-															 HttpServletRequest request) {
+			HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
@@ -690,50 +744,51 @@ public class FacturacionPySController {
 		}
 	}
 
-    @PostMapping(value = "/actualizarFicheroAdeudos")
-    ResponseEntity<UpdateResponseDTO> actualizarFicheroAdeudos(@RequestBody FacDisquetecargos item,
-                                                              HttpServletRequest request) {
-        UpdateResponseDTO response = new UpdateResponseDTO();
+	@PostMapping(value = "/actualizarFicheroAdeudos")
+	ResponseEntity<UpdateResponseDTO> actualizarFicheroAdeudos(@RequestBody FacDisquetecargos item,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
 
-        try {
-            response = this.facturacionService.actualizarFicheroAdeudos(item, request);
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+		try {
+			response = this.facturacionService.actualizarFicheroAdeudos(item, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
-    @PostMapping(value = "/actualizarFicheroDevoluciones")
-    ResponseEntity<UpdateResponseDTO> actualizarFicheroDevoluciones(@RequestBody FacDisquetedevoluciones item,
-                                                               HttpServletRequest request) {
-        UpdateResponseDTO response = new UpdateResponseDTO();
+	@PostMapping(value = "/actualizarFicheroDevoluciones")
+	ResponseEntity<UpdateResponseDTO> actualizarFicheroDevoluciones(@RequestBody FacDisquetedevoluciones item,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
 
-        try {
-            response = this.facturacionService.actualizarFicheroDevoluciones(item, request);
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+		try {
+			response = this.facturacionService.actualizarFicheroDevoluciones(item, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
-    @PostMapping(value = "/actualizarFicheroTranferencias")
-    ResponseEntity<UpdateResponseDTO> actualizarFicheroTranferencias(@RequestBody FacDisqueteabonos item,
-                                                               HttpServletRequest request) {
-        UpdateResponseDTO response = new UpdateResponseDTO();
+	@PostMapping(value = "/actualizarFicheroTranferencias")
+	ResponseEntity<UpdateResponseDTO> actualizarFicheroTranferencias(@RequestBody FacDisqueteabonos item,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
 
-        try {
-            response = this.facturacionService.actualizarFicheroTranferencias(item, request);
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.setError(UtilidadesString.creaError(e.getMessage()));
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+		try {
+			response = this.facturacionService.actualizarFicheroTranferencias(item, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@GetMapping(value = "/getFacturasIncluidas")
-	ResponseEntity<FacturasIncluidasDTO> getFacturasIncluidas(@RequestParam String idFichero, @RequestParam String tipoFichero, HttpServletRequest request) {
+	ResponseEntity<FacturasIncluidasDTO> getFacturasIncluidas(@RequestParam String idFichero,
+			@RequestParam String tipoFichero, HttpServletRequest request) {
 		FacturasIncluidasDTO response = new FacturasIncluidasDTO();
 
 		try {
