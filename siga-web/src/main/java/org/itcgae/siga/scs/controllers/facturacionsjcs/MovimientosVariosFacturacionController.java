@@ -70,9 +70,9 @@ public class MovimientosVariosFacturacionController {
         return new ResponseEntity<MovimientosVariosFacturacionDTO>(response, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/movimientosVarios/saveDatosGenMovimientosVarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<InsertResponseDTO> saveDatosGenMovimientosVarios(@RequestBody MovimientosVariosFacturacionItem movimientos, HttpServletRequest request) throws Exception {
-        InsertResponseDTO response = movimientosVariosFactServices.saveDatosGenMovimientosVarios(movimientos, request);
+    @RequestMapping(value = "/movimientosVarios/saveMovimientosVarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<InsertResponseDTO> saveMovimientosVarios(@RequestBody MovimientosVariosFacturacionItem movimientos, HttpServletRequest request) throws Exception {
+        InsertResponseDTO response = movimientosVariosFactServices.saveMovimientosVarios(movimientos, request);
 
         if (response.getStatus() == SigaConstants.OK) {
             return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
@@ -82,9 +82,9 @@ public class MovimientosVariosFacturacionController {
 
     }
 
-    @RequestMapping(value = "/movimientosVarios/updateDatosGenMovimientosVarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<UpdateResponseDTO> updateDatosGenMovimientosVarios(@RequestBody MovimientosVariosFacturacionItem movimientos, HttpServletRequest request) throws Exception {
-        UpdateResponseDTO response = movimientosVariosFactServices.updateDatosGenMovimientosVarios(movimientos, request);
+    @RequestMapping(value = "/movimientosVarios/updateMovimientosVarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<UpdateResponseDTO> updateMovimientosVarios(@RequestBody MovimientosVariosFacturacionItem movimientos, HttpServletRequest request) throws Exception {
+        UpdateResponseDTO response = movimientosVariosFactServices.updateMovimientosVarios(movimientos, request);
 
         if (response.getStatus() == SigaConstants.OK) {
             return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -94,7 +94,7 @@ public class MovimientosVariosFacturacionController {
 
     }
 
-    @RequestMapping(value = "/movimientosVarios/saveCriteriosMovimientosVarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+   /* @RequestMapping(value = "/movimientosVarios/saveCriteriosMovimientosVarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<InsertResponseDTO> saveCriteriosMovimientosVarios(@RequestBody MovimientosVariosFacturacionItem movimientos, HttpServletRequest request) throws Exception {
         InsertResponseDTO response = movimientosVariosFactServices.saveCriteriosMovimientosVarios(movimientos, request);
 
@@ -116,7 +116,7 @@ public class MovimientosVariosFacturacionController {
             return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-    }
+    }*/
 
     @GetMapping("/movimientosVarios/getMovimientoVarioPorId")
     ResponseEntity<MovimientosVariosFacturacionDTO> getMovimientoVarioPorId(@RequestParam("idMovimiento") String idMovimiento, HttpServletRequest request) {
