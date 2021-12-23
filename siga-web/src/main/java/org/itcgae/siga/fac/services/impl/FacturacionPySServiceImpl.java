@@ -3588,77 +3588,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return b ? "1" : "0";
 	};
 
-	private DataSource getOracleDataSource() throws IOException, NamingException {
-		try {
 
-			LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
-
-			AdmConfigExample example = new AdmConfigExample();
-			example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
-			List<AdmConfig> config = admConfigMapper.selectByExample(example);
-			Context ctx = new InitialContext();
-			return (DataSource) ctx.lookup(config.get(0).getValor());
-		} catch (NamingException e) {
-			throw e;
-		}
-	}
-
-	private String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
-			throws IOException, NamingException, SQLException {
-		String result[] = null;
-
-		if (outParameters > 0)
-			result = new String[outParameters];
-		DataSource ds = getOracleDataSource();
-		Connection con = ds.getConnection();
-		try {
-			CallableStatement cs = con.prepareCall(functionDefinition);
-			int size = inParameters.length;
-
-			// input Parameters
-			for (int i = 0; i < size; i++) {
-
-				cs.setString(i + 1, (String) inParameters[i]);
-			}
-			// output Parameters
-			for (int i = 0; i < outParameters; i++) {
-				cs.registerOutParameter(i + size + 1, Types.VARCHAR);
-			}
-
-			for (int intento = 1; intento <= 2; intento++) {
-				try {
-					cs.execute();
-					break;
-
-				} catch (SQLTimeoutException tex) {
-					throw tex;
-
-				} catch (SQLException ex) {
-					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
-						// segunda vez deberia funcionar)
-						throw ex;
-					}
-				}
-
-			}
-
-			for (int i = 0; i < outParameters; i++) {
-				result[i] = cs.getString(i + size + 1);
-			}
-			cs.close();
-			return result;
-
-		} catch (SQLTimeoutException ex) {
-			return null;
-		} catch (SQLException ex) {
-			return null;
-		} catch (Exception e) {
-			return null;
-		} finally {
-			con.close();
-			con = null;
-		}
-	}
 	
 	@Override
 	public FacRegistroFichContaDTO search(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request)
