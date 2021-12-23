@@ -1,18 +1,5 @@
 package org.itcgae.siga.fac.services.impl;
 
-import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
@@ -103,6 +90,8 @@ import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineaabonoKey;
 import org.itcgae.siga.db.entities.FacLineafactura;
 import org.itcgae.siga.db.entities.FacLineafacturaKey;
+import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
+import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
 import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
 import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
@@ -130,6 +119,7 @@ import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
+import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
@@ -162,6 +152,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class FacturacionPySServiceImpl implements IFacturacionPySService {
@@ -247,6 +249,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacPagosporcajaMapper facPagosporcajaMapper;
+
+	@Autowired
+	private FacPagoabonoefectivoMapper facPagoabonoefectivoMapper;
 
 	@Autowired
 	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
@@ -2682,64 +2687,38 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 	}
 
+	/**
+	 * ¿Que se inseta en la table de fac_historico?
+	 */
 	private void nuevoAbono(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacAbono abonoUpdate,
 			AdmUsuarios usuario) {
-		// historico fac
-		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
 
-		facHistoricoInsert.setIddisquetecargos(null);
-		facHistoricoInsert.setIdfacturaincluidaendisquete(null);
-		facHistoricoInsert.setIddisquetedevoluciones(null);
-		facHistoricoInsert.setIdrecibo(null);
-		facHistoricoInsert.setIdpagoporcaja(null);
-		facHistoricoInsert.setIdabono(null);
-		facHistoricoInsert.setComisionidfactura(null);
+		// abonos caja
+		FacPagoabonoefectivo abonoCajaInsert = new FacPagoabonoefectivo();
 
-		FacRenegociacionExample exampleRenegociacion = new FacRenegociacionExample();
-		exampleRenegociacion.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
+		FacPagoabonoefectivoExample exampleAbonos = new FacPagoabonoefectivoExample();
+		exampleAbonos.createCriteria().andIdabonoEqualTo(abonoUpdate.getIdabono())
 				.andIdinstitucionEqualTo(usuario.getIdinstitucion());
-		exampleRenegociacion.setOrderByClause("IDRENEGOCIACION");
+		exampleAbonos.setOrderByClause("IDPAGOABONO");
 
-		List<FacRenegociacion> listRenegociacion = facRenegociacionMapper.selectByExample(exampleRenegociacion);
-		if (!listRenegociacion.isEmpty())
-			facHistoricoInsert.setIdrenegociacion(
-					(short) (listRenegociacion.get(listRenegociacion.size() - 1).getIdrenegociacion() + 1));
+		List<FacPagoabonoefectivo> listPagos = facPagoabonoefectivoMapper.selectByExample(exampleAbonos);
+		if (!listPagos.isEmpty())
+			abonoCajaInsert.setIdpagoabono((listPagos.get(listPagos.size() - 1).getIdpagoabono() + 1));
 		else
-			facHistoricoInsert.setIdrenegociacion((short) 1);
+			abonoCajaInsert.setIdpagoabono((long) 1);
 
-		if (facHistoricoInsert.getIdcuenta() == null)
-			facHistoricoInsert.setEstado((short) 2);
-		else
-			facHistoricoInsert.setEstado((short) 5);
+		abonoCajaInsert.setIdinstitucion(usuario.getIdinstitucion());
+		abonoCajaInsert.setIdabono(facHistoricoInsert.getIdabono());
 
-		if (item.getIdEstado().equalsIgnoreCase("2")) {
-			facHistoricoInsert.setIdformapago((short) 30);
-			facHistoricoInsert.setEstado((short) 2);
-		} else if (item.getIdEstado().equalsIgnoreCase("5")) {
-			facHistoricoInsert.setIdformapago((short) 20);
-			facHistoricoInsert.setEstado((short) 5);
-
-			if (facHistoricoInsert.getIdpersonadeudor() != null) {
-				facHistoricoInsert.setIdpersona(facHistoricoInsert.getIdpersonadeudor());
-			}
-			facHistoricoInsert.setIdcuenta(Short.valueOf(item.getCuentaBanco()));
-		}
-
-		// renegociacion
-		FacRenegociacion renegociacionInsert = new FacRenegociacion();
-
-		renegociacionInsert.setIdfactura(facHistoricoInsert.getIdfactura());
-		renegociacionInsert.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
-		renegociacionInsert.setComentario(item.getComentario());
-		renegociacionInsert.setUsumodificacion(usuario.getUsumodificacion());
-		renegociacionInsert.setFecharenegociacion(new Date());
-		renegociacionInsert.setFechamodificacion(new Date());
-		renegociacionInsert.setIdcuenta(facHistoricoInsert.getIdcuenta());
-		renegociacionInsert.setImporte(facHistoricoInsert.getImptotalporpagar());
-		renegociacionInsert.setIdpersona(facHistoricoInsert.getIdpersona());
-		renegociacionInsert.setIdrenegociacion(facHistoricoInsert.getIdrenegociacion());
+		abonoCajaInsert.setImporte(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado())));
+		abonoCajaInsert.setFechamodificacion(new Date());
+		abonoCajaInsert.setFecha(item.getFechaModificaion());
+		abonoCajaInsert.setUsumodificacion(usuario.getUsumodificacion());
+		abonoCajaInsert.setContabilizado(abonoUpdate.getContabilizada());
 
 		// abono
+		abonoUpdate.setObservaciones(item.getComentario());
+		abonoUpdate.setIdfactura(facHistoricoInsert.getIdfactura());
 		abonoUpdate.setImptotalabonado(
 				abonoUpdate.getImptotalabonado().add(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
 		abonoUpdate.setImptotalabonadoefectivo(abonoUpdate.getImptotalabonadoefectivo()
@@ -2748,10 +2727,16 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				.subtract(BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
 		abonoUpdate.setFechamodificacion(new Date());
 		abonoUpdate.setUsumodificacion(usuario.getUsumodificacion());
+		abonoUpdate.setIdcuenta(facHistoricoInsert.getIdcuenta());
+		abonoUpdate.setIdcuentadeudor(facHistoricoInsert.getIdcuentadeudor());
+
+		if (abonoUpdate.getImppendienteporabonar().compareTo(BigDecimal.valueOf(0)) > 0)
+			abonoUpdate.setEstado((short) 6);
+		else
+			abonoUpdate.setEstado((short) 1);
 
 		facAbonoExtendsMapper.updateByPrimaryKey(abonoUpdate);
-		facRenegociacionMapper.insert(renegociacionInsert);
-		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
+		facPagoabonoefectivoMapper.insert(abonoCajaInsert);
 	}
 
 	private void nuevoCobroFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
@@ -2913,6 +2898,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		FacAbono abonoInsert = new FacAbono();
 
 		abonoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
+		abonoInsert.setIdfactura(item.getIdFactura());
 		abonoInsert.setFecha(item.getFechaModificaion());
 		abonoInsert.setFechamodificacion(new Date());
 		abonoInsert.setContabilizada(facUpdate.getContabilizada());
