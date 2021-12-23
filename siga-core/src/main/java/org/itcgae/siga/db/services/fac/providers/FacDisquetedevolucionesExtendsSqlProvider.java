@@ -11,72 +11,64 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 
 	public String getFicherosDevoluciones(FicherosDevolucionesItem item, String idInstitucion) {
 		SQL principal = new SQL();
-		SQL numRecibos = new SQL();
 		SQL sql = new SQL();
 
 	    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String fecha;
 
-		//sumatorio numero de recibos
-		numRecibos.SELECT("COUNT (1)");
-		numRecibos.FROM("fac_abonoincluidoendisquete fi");
-		numRecibos.WHERE("fi.idinstitucion = c.idinstitucion AND fi.iddisqueteabono = c.iddisquetedevoluciones");
-
 		//query principal
-		principal.SELECT("c.idinstitucion,c.iddisquetedevoluciones, c.FECHAGENERACION, b.bancos_codigo, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
-				+ "c.fechamodificacion, id.importe, ("+numRecibos.toString()+") AS numfacturas");
-
-		principal.FROM("fac_disquetedevoluciones c");
-		principal.INNER_JOIN("fac_lineadevoludisqbanco lin ON (lin.idinstitucion = c.idinstitucion AND lin.iddisquetedevoluciones = c.iddisquetedevoluciones)");
-		principal.INNER_JOIN("fac_facturaincluidaendisquete id ON (lin.idinstitucion = id.idinstitucion AND lin.iddisquetecargos = id.iddisquetecargos AND lin.idfacturaincluidaendisquete = id.idfacturaincluidaendisquete)");
-		principal.INNER_JOIN("fac_bancoinstitucion b ON (c.idinstitucion=b.idinstitucion AND c.bancos_codigo=b.bancos_codigo)");
-
-		principal.WHERE("c.idinstitucion="+idInstitucion);
-
-		//CUENTA BANCARIA
-		if(item.getBancosCodigo()!=null) {
-			principal.WHERE("b.bancos_codigo="+item.getBancosCodigo());
-		}
-
-		//fecha creacion desde
-		if(item.getFechaCreacionDesde()!=null) {
-			fecha = dateFormat.format(item.getFechaCreacionDesde());
-			principal.WHERE("c.fechageneracion >= TO_DATE('"+fecha+"', 'DD/MM/YYYY')");
-		}
-
-		//fecha creacion hasta
-		if(item.getFechaCreacionHasta()!=null) {
-			fecha = dateFormat.format(item.getFechaCreacionHasta());
-			principal.WHERE("c.fechageneracion <= TO_DATE('"+fecha+"', 'DD/MM/YYYY')");
-		}
-
-		//origen  -PENDIENTE POR PREGUNTAR A CLIENTE
-
-		principal.ORDER_BY("c.iddisquetedevoluciones DESC");
+		principal.SELECT("fd.IDINSTITUCION, dd.IDDISQUETEDEVOLUCIONES, dd.FECHAGENERACION, b.COMISIONDESCRIPCION || ' (...' || SUBSTR(b.IBAN, -4) || ')' CUENTA_ENTIDAD,"
+				+ "COUNT(*) NUMEROFACTURAS, SUM(fd.IMPORTE) IMPORTETOTAL, dd.BANCOS_CODIGO, fs.SUFIJO");
+		principal.FROM("FAC_FACTURAINCLUIDAENDISQUETE fd");
+		principal.INNER_JOIN("FAC_LINEADEVOLUDISQBANCO lin ON (fd.IDINSTITUCION = lin.IDINSTITUCION "
+				+ "AND lin.IDFACTURAINCLUIDAENDISQUETE = fd.IDFACTURAINCLUIDAENDISQUETE AND lin.IDDISQUETECARGOS = fd.IDDISQUETECARGOS)");
+		principal.INNER_JOIN("FAC_DISQUETEDEVOLUCIONES dd  ON (fd.IDINSTITUCION = dd.IDINSTITUCION AND lin.IDDISQUETEDEVOLUCIONES = dd.IDDISQUETEDEVOLUCIONES)");
+		principal.INNER_JOIN("FAC_BANCOINSTITUCION b ON (fd.IDINSTITUCION = b.IDINSTITUCION AND dd.BANCOS_CODIGO = b.BANCOS_CODIGO)");
+		principal.LEFT_OUTER_JOIN("FAC_SUFIJO fs ON (fd.IDINSTITUCION = fs.IDINSTITUCION AND b.IDSUFIJOSJCS = fs.IDSUFIJO)");
+		principal.WHERE("fd.idinstitucion="+idInstitucion);
+		principal.GROUP_BY("fd.IDINSTITUCION, dd.IDDISQUETEDEVOLUCIONES, dd.FECHAGENERACION, b.COMISIONDESCRIPCION, b.IBAN, dd.BANCOS_CODIGO, fs.SUFIJO");
+		principal.ORDER_BY("dd.IDDISQUETEDEVOLUCIONES DESC");
 
 		//query completa
 		sql.SELECT("*");
 		sql.FROM("("+principal.toString()+")");
 		sql.WHERE("ROWNUM < 201");
 
+		//CUENTA BANCARIA
+		if(item.getBancosCodigo()!=null) {
+			sql.WHERE("BANCOS_CODIGO LIKE '%"+item.getBancosCodigo()+"%'");
+		}
+
+		//fecha creacion desde
+		if(item.getFechaCreacionDesde()!=null) {
+			fecha = dateFormat.format(item.getFechaCreacionDesde());
+			sql.WHERE("FECHAGENERACION >= TO_DATE('"+fecha+"', 'DD/MM/YYYY')");
+		}
+
+		//fecha creacion hasta
+		if(item.getFechaCreacionHasta()!=null) {
+			fecha = dateFormat.format(item.getFechaCreacionHasta());
+			sql.WHERE("FECHAGENERACION <= TO_DATE('"+fecha+"', 'DD/MM/YYYY')");
+		}
+
 		//importe total desde
 		if(item.getImporteTotalDesde()!=null && !item.getImporteTotalDesde().isEmpty()) {
-			sql.WHERE("importe>=to_number("+item.getImporteTotalDesde()+",'99999999999999999.99')");
+			sql.WHERE("IMPORTETOTAL >= TO_NUMBER("+item.getImporteTotalDesde()+",'99999999999999999.99')");
 		}
 
 		//importe total hasta
 		if(item.getImporteTotalHasta()!=null && !item.getImporteTotalHasta().isEmpty()) {
-			sql.WHERE("importe<=to_number("+item.getImporteTotalHasta()+",'99999999999999999.99')");
+			sql.WHERE("IMPORTETOTAL <= TO_NUMBER("+item.getImporteTotalHasta()+",'99999999999999999.99')");
 		}
 
 		//numrecibos desde
 		if(item.getNumRecibosDesde()!=null && !item.getNumRecibosDesde().isEmpty()) {
-			sql.WHERE("numfacturas >= "+item.getNumRecibosDesde());
+			sql.WHERE("NUMEROFACTURAS >= "+item.getNumRecibosDesde());
 		}
 
 		//numrecibos hasta
 		if(item.getNumRecibosHasta()!=null && !item.getNumRecibosHasta().isEmpty()) {
-			sql.WHERE("numfacturas <= "+item.getNumRecibosHasta());
+			sql.WHERE("NUMEROFACTURAS <= "+item.getNumRecibosHasta());
 		}
 
 		return sql.toString();
