@@ -806,12 +806,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 							formapagoExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
 									.andIdseriefacturacionEqualTo(idSerieFacturacion);
 
+							// Eliminamos las asociaciones con formas de pago
+							FacGrupcritincluidosenserieExample grupoCriterioExample = new FacGrupcritincluidosenserieExample();
+							grupoCriterioExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+									.andIdseriefacturacionEqualTo(idSerieFacturacion);
+
 							facSeriefacturacionBancoMapper.deleteByPrimaryKey(seriefacturacionBancoKey);
 							facTiposproduincluenfactuExtendsMapper.deleteByExample(prodExample);
 							facTiposservinclsenfactExtendsMapper.deleteByExample(servExample);
 							facTipocliincluidoenseriefacExtendsMapper.deleteByExample(etiqExample);
 							facClienincluidoenseriefacturMapper.deleteByExample(destExample);
 							facFormapagoserieExtendsMapper.deleteByExample(formapagoExample);
+							facGrupcritincluidosenserieExtendsMapper.deleteByExample(grupoCriterioExample);
 
 							facSeriefacturacionExtendsMapper.deleteByPrimaryKey(seriefacturacionKey);
 						} else {
@@ -1117,10 +1123,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				facSeriefacturacionBancoMapper.insert(serieBancoToUpdate);
 			}
 
+
 			// 8. Actualizar tipos de productos
 
 			if (serieFacturacion.getTiposProductos() != null) {
 				// 8.1. Primero eliminamos los tipos que ya no existan
+
 				List<ComboItem> productos = facTiposproduincluenfactuExtendsMapper.getTiposProductos(
 						idSerieFacturacion.toString(), usuario.getIdinstitucion(), usuario.getIdlenguaje());
 				for (ComboItem item : productos) {
@@ -1303,14 +1311,26 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		usuario = authenticationProvider.checkAuthentication(request);
 
 		if (usuario != null) {
-			FacClienincluidoenseriefactur record = new FacClienincluidoenseriefactur();
-			record.setUsumodificacion(usuario.getIdusuario());
-			record.setFechamodificacion(new Date());
+			FacClienincluidoenseriefacturKey key = new FacClienincluidoenseriefacturKey();
+			key.setIdinstitucion(Short.parseShort(destinatariosSeriesItem.getIdInstitucion()));
+			key.setIdseriefacturacion(Long.parseLong(destinatariosSeriesItem.getIdSerieFacturacion()));
+			key.setIdpersona(Long.parseLong(destinatariosSeriesItem.getIdPersona()));
 
-			record.setIdinstitucion(Short.parseShort(destinatariosSeriesItem.getIdInstitucion()));
-			record.setIdseriefacturacion(Long.parseLong(destinatariosSeriesItem.getIdSerieFacturacion()));
-			record.setIdpersona(Long.parseLong(destinatariosSeriesItem.getIdPersona()));
-			facClienincluidoenseriefacturMapper.insert(record);
+			FacClienincluidoenseriefactur foundClienincluidoenseriefactur = facClienincluidoenseriefacturMapper.selectByPrimaryKey(key);
+
+			if (foundClienincluidoenseriefactur == null) {
+				FacClienincluidoenseriefactur record = new FacClienincluidoenseriefactur();
+				record.setIdinstitucion(key.getIdinstitucion());
+				record.setIdseriefacturacion(key.getIdseriefacturacion());
+				record.setIdpersona(key.getIdpersona());
+				record.setUsumodificacion(usuario.getIdusuario());
+				record.setFechamodificacion(new Date());
+
+				facClienincluidoenseriefacturMapper.insert(record);
+			} else {
+				throw new Exception("facturacion.cuentaBancaria.destIndividuales.unico");
+			}
+
 		}
 
 		LOGGER.info(
