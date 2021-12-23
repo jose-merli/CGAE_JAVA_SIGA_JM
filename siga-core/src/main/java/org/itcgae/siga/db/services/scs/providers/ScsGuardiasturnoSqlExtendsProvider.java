@@ -1351,7 +1351,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+") OR hpc.IDGUARDIA is null");
 		}
 		
-		sql.WHERE("NOT EXISTS (" + sql2 + ")");
+		//sql.WHERE("NOT EXISTS (" + sql2 + ")");
 		
 		sql.ORDER_BY("PC.FECHACALINICIO desc, PC.FECHACALFIN desc, PC.FECHAPROGRAMACION desc");
 
