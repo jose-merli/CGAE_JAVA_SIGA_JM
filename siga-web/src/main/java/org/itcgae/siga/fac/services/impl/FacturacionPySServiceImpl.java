@@ -1,5 +1,18 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
@@ -41,6 +54,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.utils.SigaExceptions;
@@ -146,14 +160,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 @Service
 public class FacturacionPySServiceImpl implements IFacturacionPySService {
@@ -1389,6 +1397,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			consultasItems = facGrupcritincluidosenserieExtendsMapper.getConsultasSerie(idSerieFacturacion,
 					usuario.getIdinstitucion());
 
+			String idIdioma = usuario.getIdlenguaje();
+			if (consultasItems != null) {
+				consultasItems.forEach(c -> {
+					String objetivo = conConsultasExtendsMapper.SelectObjetivo(c.getIdObjetivo(), idIdioma);
+					c.setObjetivo(objetivo);
+				});
+			}
+
 			LOGGER.debug(
 					"getConsultasSerie() / facGrupcritincluidosenserieExtendsMapper.getConsultasSerie() -> Saliendo de facGrupcritincluidosenserieExtendsMapper para obtener las consultas disponibles de la serie");
 
@@ -1398,6 +1414,41 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("getConsultasSerie() -> Salida del servicio para obtener las consultas de la serie de facturación");
 
 		return destinatariosSeriesDTO;
+	}
+
+	@Override
+	public FinalidadConsultaDTO getFinalidadConsultasSerie(ConsultaDestinatarioItem consulta, HttpServletRequest request) throws Exception {
+		FinalidadConsultaDTO finalidadConsultaDTO = new FinalidadConsultaDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"getFinalidadConsultasSerie() -> Entrada al servicio para recuperar la finalidad de una consulta");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"getFinalidadConsultasSerie() / conConsultasExtendsMapper.SelectObjetivo() -> Entrada a conConsultasExtendsMapper para obtener la finalidad de una consulta");
+
+			// Logica
+			ConConsultaKey key = new ConConsultaKey();
+			key.setIdconsulta(Long.parseLong(consulta.getIdConsulta()));
+			key.setIdinstitucion(Short.parseShort(consulta.getIdInstitucion()));
+			ConConsulta conConsulta = conConsultasExtendsMapper.selectByPrimaryKey(key);
+
+			String objetivo = conConsultasExtendsMapper.SelectObjetivo(String.valueOf(conConsulta.getIdobjetivo()), String.valueOf(usuario.getIdlenguaje()));
+
+
+			LOGGER.debug(
+					"getFinalidadConsultasSerie() / conConsultasExtendsMapper.SelectObjetivo() -> Saliendo de conConsultasExtendsMapper para obtener las finalidad de una consulta");
+
+			finalidadConsultaDTO.setObjetivo(objetivo);
+		}
+
+		LOGGER.info("getFinalidadConsultasSerie() -> Salida del servicio para obtener la finalidad de una consulta");
+
+		return finalidadConsultaDTO;
 	}
 
 	@Override
@@ -1441,7 +1492,25 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					recordGruposCriterios.setFechamodificacion(new Date());
 					recordGruposCriterios.setUsumodificacion(usuario.getIdusuario());
 					recordGruposCriterios.setNombre(conConsulta.getDescripcion());
-					recordGruposCriterios.setSentencia(conConsulta.getSentencia());
+
+					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+					DocumentBuilder builder = factory.newDocumentBuilder();
+					Document doc = builder.parse(new ByteArrayInputStream(("<root>" + conConsulta.getSentencia() + "</root>")
+							.getBytes(StandardCharsets.UTF_8)));
+
+					List<String> partesSentencia = new ArrayList<>();
+					NodeList nodes = doc.getDocumentElement().getChildNodes();
+					for (int i = 0; i < nodes.getLength(); i++) {
+						String nodeContent = nodes.item(i).getTextContent();
+						if (nodeContent != null)
+							partesSentencia.add(nodeContent.trim());
+					}
+
+					if (partesSentencia.isEmpty()) {
+						recordGruposCriterios.setSentencia(conConsulta.getSentencia());
+					} else {
+						recordGruposCriterios.setSentencia(String.join(" \n", partesSentencia));
+					}
 
 					cenGruposcriteriosExtendsMapper.insertSelective(recordGruposCriterios);
 				}
@@ -2210,15 +2279,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			genKey.setIdinstitucion(usuario.getIdinstitucion());
 			genKey.setModulo("FAC");
 
-			genKey.setParametro("MODIFICAR_DESCRIPCION");
+			genKey.setParametro("FACTURACION_MODIFICAR_DESCRIPCION");
 			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
 			boolean modificarDescripcion = !(parametros == null || parametros.getValor().equals("N"));
 
-			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
+			genKey.setParametro("FACTURACION_MODIFICAR_IMPORTE_UNITARIO");
 			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
 			boolean modificarImporteUnitario = !(parametros == null || parametros.getValor().equals("N"));
 
-			genKey.setParametro("MODIFICAR_IVA");
+			genKey.setParametro("FACTURACION_MODIFICAR_IVA");
 			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
 			boolean modificarIVA = !(parametros == null || parametros.getValor().equals("N"));
 
@@ -2276,11 +2345,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			genKey.setIdinstitucion(usuario.getIdinstitucion());
 			genKey.setModulo("FAC");
 
-			genKey.setParametro("MODIFICAR_DESCRIPCION");
-			boolean modificarDescripcion = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+			genKey.setParametro("FACTURACION_MODIFICAR_DESCRIPCION");
+			boolean modificarDescripcion = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("0");
 
-			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
-			boolean modificarImporteUnitario = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("N");
+			genKey.setParametro("FACTURACION_MODIFICAR_IMPORTE_UNITARIO");
+			boolean modificarImporteUnitario = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("0");
 
 			FacLineaabonoKey key = new FacLineaabonoKey();
 			key.setIdabono(Long.valueOf(item.getIdFactura()));
