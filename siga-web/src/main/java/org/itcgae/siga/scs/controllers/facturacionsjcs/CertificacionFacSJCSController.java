@@ -173,14 +173,21 @@ public class CertificacionFacSJCSController {
     }
 
     @RequestMapping(value = "/reabrirfacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<InsertResponseDTO> reabrirFacturacion(@RequestBody String idFacturacion,
+    ResponseEntity<InsertResponseDTO> reabrirFacturacion(@RequestBody List<CertificacionesItem> certificacionesItemList,
                                                          HttpServletRequest request) {
-        InsertResponseDTO response = iCertificacionFacSJCSService.reabrirFacturacion(idFacturacion, request);
+        InsertResponseDTO response = iCertificacionFacSJCSService.reabrirFacturacion(certificacionesItemList, request);
         if (response.getError().getCode() == 200) {
             return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
         }
+    }
+
+
+    @PostMapping("/accionXuntaEnvios")
+    ResponseEntity<UpdateResponseDTO> accionXuntaEnvios(@RequestBody EnvioXuntaItem envioItem, HttpServletRequest request) {
+        UpdateResponseDTO response = iCertificacionFacSJCSService.accionXuntaEnvios(envioItem, request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
     @PostMapping("/createOrUpdateCertificacion")
@@ -193,6 +200,18 @@ public class CertificacionFacSJCSController {
     ResponseEntity<UpdateResponseDTO> reabrirCertificacion(@RequestBody CertificacionesItem certificacionesItem, HttpServletRequest request) {
         UpdateResponseDTO response = iCertificacionFacSJCSService.reabrirCertificacion(certificacionesItem, request);
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getMvariosAsociadosCertificacion")
+    ResponseEntity<MovimientosVariosAsoCerDTO> getMvariosAsociadosCertificacion(@RequestParam("idCertificacion") String idCertificacion, HttpServletRequest request) {
+        MovimientosVariosAsoCerDTO response = iCertificacionFacSJCSService.getMvariosAsociadosCertificacion(idCertificacion, request);
+        return new ResponseEntity<MovimientosVariosAsoCerDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/getMvariosAplicadosEnPagosEjecutadosPorPeriodo")
+    ResponseEntity<MovimientosVariosApliCerDTO> getMvariosAplicadosEnPagosEjecutadosPorPeriodo(@RequestBody MovimientosVariosApliCerRequestDTO movimientosVariosApliCerRequestDTO, HttpServletRequest request) {
+        MovimientosVariosApliCerDTO response = iCertificacionFacSJCSService.getMvariosAplicadosEnPagosEjecutadosPorPeriodo(movimientosVariosApliCerRequestDTO, request);
+        return new ResponseEntity<MovimientosVariosApliCerDTO>(response, HttpStatus.OK);
     }
 
 }

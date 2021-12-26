@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -9,14 +10,20 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.EcomColaExample;
 import org.itcgae.siga.db.entities.EcomColaParametros;
+import org.itcgae.siga.db.entities.EcomColaParametrosExample;
+import org.itcgae.siga.db.entities.EcomOperacion;
+import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
 import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
+import org.itcgae.siga.db.mappers.EcomOperacionMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +53,10 @@ public class FacturacionSJCSHelper  {
 	  
 	  @Autowired
 	  private GenPropertiesMapper genPropertiesMapper;
+	  
+	  @Autowired
+	  private EcomOperacionMapper ecomOperacionMapper;
+
 	 
 
 	  
@@ -121,6 +132,47 @@ public class FacturacionSJCSHelper  {
 		GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
 		String rutaRaiz = rutaFicherosSalida.getValor();
 		return Paths.get(rutaRaiz);
+	}
+
+	public boolean isEjecutandoOperacionFacturacion(Short idinstitucion, String idFacturacion, int operacionCompruebaEnEjecucion) {
+	        boolean ejecutandose = false;
+
+	        EcomColaParametrosExample ecomColaParametrosExample = new EcomColaParametrosExample();
+
+	        ecomColaParametrosExample.createCriteria().andClaveEqualTo(FcsFacturacionjgKey.C_IDFACTURACION).andValorEqualTo(idFacturacion.toString());
+	        List<EcomColaParametros> listaEcomColaParametros = ecomColaParametrosMapper.selectByExample(ecomColaParametrosExample);
+
+	        if (listaEcomColaParametros != null && listaEcomColaParametros.size() > 0) {
+	            LOGGER.debug("Posibles candidatos para ver si la facturación ha sido ejecutada o se está ejecutando");
+	            List<Long> ids = new ArrayList<Long>();
+	            for (EcomColaParametros ecomColaParametros : listaEcomColaParametros) {
+	                ids.add(ecomColaParametros.getIdecomcola());
+	            }
+
+	            List<Short> listaEstados = new ArrayList<Short>();
+	            listaEstados.add(ECOM_ESTADOSCOLA.INICIAL.getId());
+	            listaEstados.add(ECOM_ESTADOSCOLA.EJECUTANDOSE.getId());
+	            listaEstados.add(ECOM_ESTADOSCOLA.REINTENTANDO.getId());
+
+	            EcomColaExample ecomColaExample = new EcomColaExample();
+	            ecomColaExample.createCriteria().andIdinstitucionEqualTo(idinstitucion).andIdoperacionEqualTo(operacionCompruebaEnEjecucion).andIdestadocolaIn(listaEstados).andIdecomcolaIn(ids);
+	            long count = ecomColaMapper.countByExample(ecomColaExample);
+	            if (count > 0) {
+	                ejecutandose = true;
+	            } else {
+	                EcomOperacion operacion = ecomOperacionMapper.selectByPrimaryKey(operacionCompruebaEnEjecucion);
+	                ecomColaExample = new EcomColaExample();
+	                ecomColaExample.createCriteria().andIdinstitucionEqualTo(idinstitucion).andIdoperacionEqualTo(operacionCompruebaEnEjecucion).andIdestadocolaEqualTo(ECOM_ESTADOSCOLA.ERROR.getId()).andReintentoLessThan(operacion.getMaxreintentos()).andIdecomcolaIn(ids);
+	                count = ecomColaMapper.countByExample(ecomColaExample);
+	                if (count > 0)
+	                    ejecutandose = true;
+
+	            }
+	        }
+
+	        LOGGER.debug("¿La facturación del colegio " + idinstitucion + " con idFacturacion " + idFacturacion + " está en ejecución? = '" + ejecutandose + "'");
+
+	        return ejecutandose;
 	}
 
 	
