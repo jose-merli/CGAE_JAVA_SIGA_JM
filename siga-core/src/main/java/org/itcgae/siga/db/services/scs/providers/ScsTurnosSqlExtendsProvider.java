@@ -18,6 +18,22 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
 	}
+	
+	public String comboTurnosDesignacion(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDTURNO, NOMBRE");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("FECHABAJA IS NULL");
+		sql.WHERE("IDTIPOTURNO = '2' OR IDTIPOTURNO IS NULL");
+
+		sql.ORDER_BY("NOMBRE");
+		return sql.toString();
+	}
+	
+	
 
 	public String comboTurnosTipo(Short idInstitucion, String tipoturno) {
 
@@ -59,11 +75,17 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 				"scs_partidapresupuestaria partid ON partid.IDPARTIDAPRESUPUESTARIA = turnos.IDPARTIDAPRESUPUESTARIA and partid.idinstitucion = turnos.idinstitucion");
 		sql.INNER_JOIN("gen_recursos_catalogos cat ON  cat.IDRECURSO = grupof.nombre and cat.IDLENGUAJE= 1");
 		sql.WHERE("turnos.idinstitucion = '" + idInstitucion + "'");
-		if (turnosItem.getAbreviatura() != null && turnosItem.getAbreviatura().toString() != "") {
-			sql.WHERE("UPPER(turnos.abreviatura) like UPPER('%" + turnosItem.getAbreviatura() + "%')");
-		}
-		if (turnosItem.getNombre() != null && turnosItem.getNombre().toString() != "") {
-			sql.WHERE("UPPER(turnos.nombre) like UPPER('%" + turnosItem.getNombre() + "%')");
+		
+		if (turnosItem.getAbreviatura() != null && turnosItem.getAbreviatura().toString() != "" && turnosItem.getNombre() != null && turnosItem.getNombre().toString() != "") {
+			sql.WHERE("UPPER(turnos.abreviatura) like UPPER('%" + turnosItem.getAbreviatura() + "%') OR UPPER(turnos.nombre) like UPPER('%" + turnosItem.getNombre() + "%')");
+			
+		}else {
+			if (turnosItem.getAbreviatura() != null && turnosItem.getAbreviatura().toString() != "") {
+				sql.WHERE("UPPER(turnos.abreviatura) like UPPER('%" + turnosItem.getAbreviatura() + "%')");
+			}
+			if (turnosItem.getNombre() != null && turnosItem.getNombre().toString() != "") {
+				sql.WHERE("UPPER(turnos.nombre) like UPPER('%" + turnosItem.getNombre() + "%')");
+			}
 		}
 		if (turnosItem.getJurisdiccion() != null && turnosItem.getJurisdiccion() != "") {
 			String condturnos ="(";

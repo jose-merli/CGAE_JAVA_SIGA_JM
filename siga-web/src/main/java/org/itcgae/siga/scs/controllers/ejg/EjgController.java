@@ -30,6 +30,7 @@ import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
@@ -236,6 +237,12 @@ public class EjgController {
 		EstadoEjgDTO response = gestionEJG.getEstados(ejgItem, request);
 		return new ResponseEntity<EstadoEjgDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/gestion-ejg/getUltEstadoEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EstadoEjgDTO> getUltEstadoEjg(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		EstadoEjgDTO response = gestionEJG.getUltEstadoEjg(ejgItem, request);
+		return new ResponseEntity<EstadoEjgDTO>(response, HttpStatus.OK);
+	}
 
 	// Documentos
 	@RequestMapping(value = "/gestion-ejg/getDocumentos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -266,8 +273,8 @@ public class EjgController {
 
 	// comboActaAnnio
 	@RequestMapping(value = "/gestion-ejg/comboActaAnnio", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboActaAnnio(String idActa, HttpServletRequest request) {
-		ComboDTO response = gestionEJG.comboActaAnnio(idActa, request);
+	ResponseEntity<ComboDTO> comboActaAnnio(String idActa, String anioActa, HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboActaAnnio(idActa, anioActa, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
@@ -430,7 +437,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> guardarResolucion(@RequestBody ResolucionEJGItem datos,
 			HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.guardarResolucion(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -440,6 +447,13 @@ public class EjgController {
 	@RequestMapping(value = "/gestion-ejg/getHabilitarActa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Boolean> getHabilitarActa(HttpServletRequest request) {
 		Boolean response = gestionEJG.getHabilitarActa(request);
+		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+	}
+	
+	// GetHabilitarActa (Permiso en la tarjeta resolucion)
+	@RequestMapping(value = "/gestion-ejg/getEditResolEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> getEditResolEjg(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		Boolean response = gestionEJG.getEditResolEjg(ejgItem, request);
 		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
 	}
 

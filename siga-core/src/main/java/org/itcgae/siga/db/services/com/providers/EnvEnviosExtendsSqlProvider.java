@@ -1,5 +1,8 @@
 package org.itcgae.siga.db.services.com.providers;
 
+								  
+					  
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 
@@ -199,8 +202,15 @@ public class EnvEnviosExtendsSqlProvider {
                 "ENV_CAMPOSENVIOS CAMPOSENVIOSCUERPO ON (ENVIO.IDENVIO = CAMPOSENVIOSCUERPO.IDENVIO AND CAMPOSENVIOSCUERPO.IDINSTITUCION = ENVIO.IDINSTITUCION AND CAMPOSENVIOSCUERPO.IDCAMPO =2)");
         sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDINSTITUCION = '" + idInstitucion
                 + "' AND PLANTILLA.IDPLANTILLAENVIOS = ENVIO.IDPLANTILLAENVIOS AND PLANTILLA.IDTIPOENVIOS = ENVIO.IDTIPOENVIOS");
+																										
         sql.JOIN("MOD_MODELOCOMUNICACION MODELO ON MODELO.IDMODELOCOMUNICACION = ENVIO.IDMODELOCOMUNICACION");
         sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
+   
+		
+																													
+																												  
+   
+  
         sql.JOIN("ENV_DESTINATARIOS DEST ON DEST.IDENVIO = ENVIO.IDENVIO AND DEST.IDINSTITUCION = ENVIO.IDINSTITUCION");
         sql.LEFT_OUTER_JOIN(
                 "CEN_COLEGIADO COLEGIADO ON COLEGIADO.IDPERSONA = DEST.IDPERSONA AND COLEGIADO.IDINSTITUCION = ENVIO.IDINSTITUCION");
@@ -283,10 +293,11 @@ public class EnvEnviosExtendsSqlProvider {
         String fechaHoy = dateFormat.format(new Date());
         SQL sql = new SQL();
 
-        sql.SELECT("ENVIO.*");
-
+        sql.SELECT("ENVIO.*");					
+		
         sql.FROM("ENV_ENVIOS ENVIO");
 
+		
         sql.WHERE(
                 "ENVIO.IDESTADO = 4 AND (ENVIO.ENVIO = 'A' OR ENVIO.ENVIO = 'M') and nvl(ENVIO.fechaprogramada, SYSDATE -2) <= SYSDATE - 1");
         sql.ORDER_BY("ENVIO.FECHA DESC");
@@ -301,6 +312,8 @@ public class EnvEnviosExtendsSqlProvider {
         sql.SELECT("ENVIO.*");
         sql.FROM("ENV_ENVIOPROGRAMADO PROG");
         sql.JOIN("ENV_ENVIOS ENVIO ON ENVIO.IDENVIO = PROG.IDENVIO AND ENVIO.IDINSTITUCION = PROG.IDINSTITUCION");
+												   
+																																																			 				
 
         sql.WHERE(
                 "ENVIO.IDESTADO = 4 AND (ENVIO.ENVIO = 'A' OR ENVIO.ENVIO = 'M') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('"
@@ -319,10 +332,11 @@ public class EnvEnviosExtendsSqlProvider {
                 + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
         return cadenaWhere.toString();
 
+		
     }
-
+																						  																													 
     public String selectEnvioById(Short idInstitucion, String idLenguaje, String idEnvio) {
-
+																						  																												
         SQL sql = new SQL();
 
         sql.SELECT("ENVIO.IDINSTITUCION");
@@ -351,6 +365,7 @@ public class EnvEnviosExtendsSqlProvider {
                 + "' AND PLANTILLA.IDPLANTILLAENVIOS = ENVIO.IDPLANTILLAENVIOS AND PLANTILLA.IDTIPOENVIOS = ENVIO.IDTIPOENVIOS");
 
         sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion + "'");
+  
 
         // con este campo controlamos que sea de envios Masivos
         sql.WHERE("ENVIO.ENVIO = 'M'");
@@ -366,12 +381,11 @@ public class EnvEnviosExtendsSqlProvider {
 
         sql.SELECT("ENVIO.IDENVIO");
         sql.FROM("ENV_ENVIOS ENVIO");
-
         sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion + "' AND ENVIO.IDPLANTILLAENVIOS = " + idPlantillaEnvio);
 
         return sql.toString();
     }
-
+	
     public String obtenerDestinatarios(Short idInstitucion, String idEnvios) {
 
         SQL sql = new SQL();

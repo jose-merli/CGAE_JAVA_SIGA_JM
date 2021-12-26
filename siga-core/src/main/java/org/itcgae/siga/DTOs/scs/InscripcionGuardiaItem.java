@@ -7,6 +7,7 @@ public class InscripcionGuardiaItem {
 	private String numeroGrupo;
 	private String idGrupoGuardiaColegiado;
 	private String orden;
+	private String ordenBD;
 	private String nColegiado;
 	private String fechaValidacion;
 	private String fechabaja;
@@ -353,6 +354,14 @@ public class InscripcionGuardiaItem {
 
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
+	}
+
+	public String getOrdenBD() {
+		return ordenBD;
+	}
+
+	public void setOrdenBD(String ordenBD) {
+		this.ordenBD = ordenBD;
 	}
 
 }

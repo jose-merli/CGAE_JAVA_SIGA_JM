@@ -274,11 +274,11 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "    when aa.idjuzgado is not null"
 				+ "    then 'J'"
 				+ "    else '' end comisariaJuzgado");
-		sql.SELECT("da.iddelito");
+//		sql.SELECT("da.iddelito");
 		sql.FROM("scs_asistencia");
-		sql.INNER_JOIN("scs_actuacionasistencia aa on aa.idinstitucion = scs_asistencia.idinstitucion AND aa.anio = scs_asistencia.anio AND aa.numero = scs_asistencia.numero");
+		sql.LEFT_OUTER_JOIN("scs_actuacionasistencia aa on aa.idinstitucion = scs_asistencia.idinstitucion AND aa.anio = scs_asistencia.anio AND aa.numero = scs_asistencia.numero");
 		sql.LEFT_OUTER_JOIN("scs_personajg p on p.idpersona = scs_asistencia.idpersonajg AND p.idinstitucion = scs_asistencia.idinstitucion");
-		sql.LEFT_OUTER_JOIN("scs_delitosasistencia da on scs_asistencia.anio = da.anio AND scs_asistencia.numero = da.numero AND scs_asistencia.idinstitucion = da.idinstitucion");
+//		sql.LEFT_OUTER_JOIN("scs_delitosasistencia da on scs_asistencia.anio = da.anio AND scs_asistencia.numero = da.numero AND scs_asistencia.idinstitucion = da.idinstitucion");
 		sql.WHERE("scs_asistencia.idinstitucion = " + idInstitucion);
 		sql.AND();
 		sql.WHERE("scs_asistencia.idturno = '" + filtroAsistenciaItem.getIdTurno() + "'");
@@ -288,7 +288,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.WHERE("scs_asistencia.idpersonacolegiado = '" + filtroAsistenciaItem.getIdLetradoGuardia() + "'");
 		sql.AND();
 		sql.WHERE("trunc(scs_asistencia.fechahora) = '"+filtroAsistenciaItem.getDiaGuardia() + "'");
-		sql.AND();
+		/*sql.AND();
 		sql.WHERE("EXISTS ("
 				+ "        SELECT"
 				+ "            1"
@@ -298,9 +298,12 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "                aa.idinstitucion = scs_asistencia.idinstitucion"
 				+ "            AND aa.anio = scs_asistencia.anio"
 				+ "            AND aa.numero = scs_asistencia.numero"
-				+ "    )");
-		sql.AND();
-		sql.WHERE("scs_asistencia.idtipoasistencia = '" + filtroAsistenciaItem.getIdTipoAsistencia() + "'");
+				+ "    )");*/
+		
+		if(filtroAsistenciaItem.getIdTipoAsistencia()!= null) {
+			sql.AND();
+			sql.WHERE("scs_asistencia.idtipoasistencia = '" + filtroAsistenciaItem.getIdTipoAsistencia() + "'");
+		}
 		if(!"".equals(filtroAsistenciaItem.getIdTipoAsistenciaColegiado())
 				&& filtroAsistenciaItem.getIdTipoAsistenciaColegiado() != null) {
 			sql.AND();
@@ -309,6 +312,17 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.ORDER_BY("scs_asistencia.anio","scs_asistencia.numero","aa.idactuacion");
 
 		return sql.toString();
+	}
+	
+	public String getDelitosFromAsistencia(String anio, String numero, String institucion) {
+
+		SQL sql = new SQL();
+		sql.SELECT("da.iddelito");
+		sql.FROM("scs_delitosasistencia da");
+		sql.WHERE("da.anio = " + anio);
+		sql.WHERE("da.numero = " + numero);
+        sql.WHERE("da.idinstitucion = " + institucion);     
+        return sql.toString();
 	}
 	
 	
@@ -756,12 +770,19 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdEstadoAsistencia())){
 			SQL.WHERE("a.idestadoasistencia IN ("+filtroAsistenciaItem.getIdEstadoAsistencia()+")");
 		}
-		if("N".equals(filtroAsistenciaItem.getIdActuacionValidada())){
-			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'NO'");
-		}else if("S".equals(filtroAsistenciaItem.getIdActuacionValidada())){
-			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'SI'");
-		}else if("SA".equals(filtroAsistenciaItem.getIdActuacionValidada())){
-			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) is null");
+//		if("N".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+//			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'NO'");
+//		}else if("S".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+//			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'SI'");
+//		}else if("SA".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+//			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) is null");
+//		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdActuacionValidada()) && filtroAsistenciaItem.getIdActuacionValidada() != null && !filtroAsistenciaItem.getIdActuacionValidada().isEmpty()){ //Es un campo de scs_actuacionasistencia
+			if (filtroAsistenciaItem.getIdActuacionValidada().contains("SA")) {
+				SQL.WHERE("(UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) IN ("+ filtroAsistenciaItem.getIdActuacionValidada() +") OR F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero) IS NULL)");
+			}else {
+				SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) IN ("+ filtroAsistenciaItem.getIdActuacionValidada() +")");
+			}
 		}
 		if(UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdEstadoAsistido())){
 			SQL.LEFT_OUTER_JOIN("scs_personajg pjg on pjg.idinstitucion = a.idinstitucion and pjg.idpersona = a.idpersonajg");
@@ -893,7 +914,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdJuzgado())){ //Es un campo de scs_actuacionasistencia
 				SQL.WHERE("aa.idjuzgado IN ("+filtroAsistenciaItem.getIdJuzgado()+")");
 			}
-			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdTipoActuacion())){ //Es un campo de scs_actuacionasistencia
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdTipoActuacion()) && filtroAsistenciaItem.getIdTipoActuacion() != null && !filtroAsistenciaItem.getIdTipoActuacion().isEmpty()){ //Es un campo de scs_actuacionasistencia
 				SQL.WHERE("aa.IDTIPOACTUACION IN ("+filtroAsistenciaItem.getIdTipoActuacion()+")");
 			}
 

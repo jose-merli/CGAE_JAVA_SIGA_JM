@@ -53,7 +53,7 @@ public interface IGestionEJG {
 
 	ComboDTO comboOrigen(HttpServletRequest request);
 
-	ComboDTO comboActaAnnio(String idActa, HttpServletRequest request);
+	ComboDTO comboActaAnnio(String idActa, String anioActa, HttpServletRequest request);
 
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request);
 
@@ -175,4 +175,8 @@ public interface IGestionEJG {
 	ExpInsosDTO getDatosExpInsos(EjgItem ejgItem, HttpServletRequest request);
 
 	DocushareDTO searchListDirEjg(int numPagina, DocuShareObjectVO docu, HttpServletRequest request) throws Exception;
+
+	EstadoEjgDTO getUltEstadoEjg(EjgItem ejgItem, HttpServletRequest request);
+
+	Boolean getEditResolEjg(EjgItem ejgItem, HttpServletRequest request);
 }

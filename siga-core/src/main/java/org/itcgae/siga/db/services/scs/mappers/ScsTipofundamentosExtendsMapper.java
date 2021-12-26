@@ -53,5 +53,4 @@ public interface ScsTipofundamentosExtendsMapper extends ScsTipofundamentosMappe
 	})
 	List<ComboItem> comboFundamentoJurid(String idlenguaje, String string, String resolucion);
 	
-	
 }

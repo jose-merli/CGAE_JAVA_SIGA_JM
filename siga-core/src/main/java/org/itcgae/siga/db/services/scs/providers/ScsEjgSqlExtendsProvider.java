@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
@@ -10,6 +11,9 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
+	
+	private Logger LOGGER = Logger.getLogger(ScsEjgComisionSqlExtendsProvider.class);
+
 
     public String busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
         String dictamenCad = "";
@@ -104,6 +108,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.SELECT("ejg.idpersonajg");
         sql.SELECT("perjg.NIF");
         sql.SELECT("col.NCOLEGIADO AS NCOLEGIADO");
+        
+        //REVISAR
+        sql.SELECT("GUARDIA.NOMBRE");
 
         // from
         sql.FROM("scs_ejg ejg");
@@ -500,19 +507,31 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                     "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
             sql.WHERE("PET.ESTADO IN (" + String.join(",", ejgItem.getEstadosSolicitudExpEco()) + ")");
         }
-
-        sql.ORDER_BY("ejg.anio DESC, ejg.numejg DESC");
         
-        SQL sqlPpal = new SQL();
-		sqlPpal.SELECT("*");
-		sqlPpal.FROM("("+sql.toString()+") consulta");
-        if (tamMaximo != null) {
-            Integer tamMaxNumber = tamMaximo + 1;
-            sqlPpal.WHERE("rownum <= " + tamMaxNumber);
+        if (ejgItem.isInformacionEconomica()) {
+        	if (ejgItem.getEstadosSolicitudExpEco() == null || ejgItem.getEstadosSolicitudExpEco().length == 0) {
+	            sql.INNER_JOIN("SCS_EEJG_PETICIONES PET " +
+	                    "ON PET.ANIO = ejg.ANIO " +
+	                    "AND PET.NUMERO = ejg.NUMERO " +
+	                    "AND PET.IDINSTITUCION = ejg.IDINSTITUCION " +
+	                    "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
+        	}
+            sql.INNER_JOIN("SCS_EEJG_XML EXML " +
+                    "ON PET.IDPETICION = EXML.IDPETICION ");
+            sql.WHERE("EXML.IDXML IS NOT NULL");
         }
 
-        return sqlPpal.toString();
+        if (tamMaximo != null) {
+            Integer tamMaxNumber = tamMaximo + 1;
+            sql.WHERE("rownum <= " + tamMaxNumber);
 
+        }
+
+        sql.ORDER_BY("TURNO ASC, GUARDIA.NOMBRE ASC");
+        
+        LOGGER.info(sql.toString());
+
+        return sql.toString();
     }
 
     public String datosEJG(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
@@ -923,8 +942,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
     public String getResolucion(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
         SQL sql = new SQL();
 
-        sql.SELECT("resolucion.idtiporatificacionejg," + " resolucion.idfundamentojuridico,"
-                + " resolucion.ratificaciondictamen," + " ejg.idorigencajg," + " ejg.aniocajg," + " ejg.numero_cajg,"
+        sql.SELECT("ejg.idtiporatificacionejg," + " ejg.idfundamentojuridico,"
+                + " ejg.ratificaciondictamen," + " ejg.idorigencajg," + " ejg.aniocajg," + " ejg.numero_cajg,"
                 + " ejg.idponente," + " ejg.fechapresentacionponente," + " ejg.fecharesolucioncajg,"
                 + " ejg.fecharatificacion," + " ejg.fechanotificacion," + " ejg.refauto," + " ejg.turnadoratificacion,"
                 + " ejg.requierenotificarproc," + " ejg.anioacta," + " ejg.idacta,"
@@ -1554,13 +1573,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "') || ' ' ||\r\n" + "				           (Select f_Siga_Getrecurso(Nombre, '" + idLenguaje
                 + "')\r\n" + "				              From Scs_Ponente\r\n"
                 + "				             Where Idinstitucion = '" + idInstitucion + "'\r\n"
-                + "	                        And Idtipodictamenejg = " + idPonente + ") as observaciones");
+                + "	                        And  Idponente = " + idPonente + ") as observaciones");
 
         sql.FROM("Scs_Estadoejg");
-
         // Para coger solo un resultado
         sql.WHERE("ROWNUM = 1");
-
         return sql.toString();
     }
 

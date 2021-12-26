@@ -32,3 +32,12 @@ application:
     /movimientosVarios/updateDatosGenMovimientosVarios: [608]
     /movimientosVarios/saveCriteriosMovimientosVarios: [608]
     /movimientosVarios/updateCriteriosMovimientosVarios: [608]
+# Permisos para el módulo de ProductosYServicios
+    /pys/solicitarCompra: [39A]
+    /pys/aprobarCompra: [39B]
+    /pys/denegarPeticion: [39]
+    /pys/savePagoCompraSuscripcion: [39]
+    /pys/solicitarSuscripcion: [39]
+
+# Permisos para el módulo de PNJ
+    /comunicaciones/saveNuevaComm: [30G]

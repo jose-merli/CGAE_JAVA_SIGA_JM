@@ -97,14 +97,14 @@ public class AsistenciaController {
 	}
 	
 	@PostMapping(value = "/buscarAsistenciasExpress", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<TarjetaAsistenciaResponseDTO> searchAsistenciasExpress(HttpServletRequest request, @RequestBody FiltroAsistenciaItem filtro) {
-		TarjetaAsistenciaResponseDTO response = null;
+	public ResponseEntity<TarjetaAsistenciaResponseDTO2> searchAsistenciasExpress(HttpServletRequest request, @RequestBody FiltroAsistenciaItem filtro) {
+		TarjetaAsistenciaResponseDTO2 response = null;
 		try {
 			response = asistenciaService.searchAsistenciasExpress(request, filtro);
 		}catch(Exception e) {
 			throw e;
 		}
-		return new ResponseEntity<TarjetaAsistenciaResponseDTO>(response, HttpStatus.OK);
+		return new ResponseEntity<TarjetaAsistenciaResponseDTO2>(response, HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/buscarAsistencias", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -155,7 +155,7 @@ public class AsistenciaController {
 	}
 	
 	@PostMapping(value = "/guardarAsistenciasExpres", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<DeleteResponseDTO> guardarAsistenciasExpres(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
+	public ResponseEntity<DeleteResponseDTO> guardarAsistenciasExpres(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponse2Item> asistencias) {
 		DeleteResponseDTO response = null;
 		try {
 			response = asistenciaService.guardarAsistenciasExpres(request, asistencias);
@@ -166,13 +166,13 @@ public class AsistenciaController {
 	}
 	
 	@PostMapping(value = "/guardarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<InsertResponseDTO> guardarAsistencia(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias, @RequestParam(required = false) String idAsistenciaCopy) {
+	public ResponseEntity<InsertResponseDTO> guardarAsistencia(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias, @RequestParam(required = false) String idAsistenciaCopy, @RequestParam(required = false) String isLetrado) {
 		InsertResponseDTO response = null;
-		try {
-			response = asistenciaService.guardarAsistencia(request, asistencias, idAsistenciaCopy);
-		}catch(Exception e) {
-			throw e;
-		}
+			response = asistenciaService.guardarAsistencia(request, asistencias, idAsistenciaCopy, isLetrado);
+		if (response.getStatus() == "ERRORASOCIADAS") {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.CONFLICT);
+		} 
+
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 

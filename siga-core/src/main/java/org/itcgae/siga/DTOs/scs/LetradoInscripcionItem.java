@@ -22,7 +22,7 @@ public class LetradoInscripcionItem {
 	//Entity
 	private Short idinstitucion;
 
-	private Integer idturno;
+	private Integer idTurno;
 
 	private Long idpersona;
 
@@ -34,7 +34,7 @@ public class LetradoInscripcionItem {
 
 	private Integer usumodificacion;
 
-	private Integer idguardia;
+	private Integer idGuardia;
 
 	private String motivos;
 
@@ -62,8 +62,8 @@ public class LetradoInscripcionItem {
 		this.idpersona = perBean.getIdpersona();
 
 		this.idinstitucion = Short.valueOf(idInstitucion.toString());
-		this.idturno = idTurno;
-		this.idguardia = idGuardia;
+		this.idTurno = idTurno;
+		this.idGuardia = idGuardia;
 		this.saltoocompensacion = saltoCompensacion;
 	}
 
@@ -77,7 +77,7 @@ public class LetradoInscripcionItem {
 			this.idinstitucion = Short.valueOf(inscripcionTurno.getIdinstitucion().toString());
 		}
 		
-		this.idturno = inscripcionTurno.getIdturno();
+		this.idTurno = inscripcionTurno.getIdturno();
 		this.saltoocompensacion = null;
 		this.inscripcionTurno = inscripcionTurno;
 
@@ -266,20 +266,6 @@ public class LetradoInscripcionItem {
 	}
 
 	/**
-	 * @return the idturno
-	 */
-	public Integer getIdturno() {
-		return idturno;
-	}
-
-	/**
-	 * @param idturno the idturno to set
-	 */
-	public void setIdturno(Integer idturno) {
-		this.idturno = idturno;
-	}
-
-	/**
 	 * @return the idpersona
 	 */
 	public Long getIdpersona() {
@@ -349,18 +335,21 @@ public class LetradoInscripcionItem {
 		this.usumodificacion = usumodificacion;
 	}
 
-	/**
-	 * @return the idguardia
-	 */
-	public Integer getIdguardia() {
-		return idguardia;
+
+	public Integer getIdTurno() {
+		return idTurno;
 	}
 
-	/**
-	 * @param idguardia the idguardia to set
-	 */
-	public void setIdguardia(Integer idguardia) {
-		this.idguardia = idguardia;
+	public void setIdTurno(Integer idTurno) {
+		this.idTurno = idTurno;
+	}
+
+	public Integer getIdGuardia() {
+		return idGuardia;
+	}
+
+	public void setIdGuardia(Integer idGuardia) {
+		this.idGuardia = idGuardia;
 	}
 
 	/**
