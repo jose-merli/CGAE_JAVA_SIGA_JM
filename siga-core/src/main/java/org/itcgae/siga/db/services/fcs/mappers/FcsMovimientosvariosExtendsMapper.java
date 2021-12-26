@@ -5,6 +5,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.MovimientosVariosFacturacionItem;
+import org.itcgae.siga.db.entities.FcsMvariosCertificaciones;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsMovimientosvariosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -123,4 +124,6 @@ public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosM
             @Result(column = "IDCERTIFICACION", property = "newId", jdbcType = JdbcType.VARCHAR)
     })
     NewIdDTO selectMaxIdCertificacionByIdInstitucion(String idInstitucion);
+
+    
 }

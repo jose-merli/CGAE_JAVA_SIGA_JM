@@ -28,9 +28,5 @@ public interface IMovimientosVariosFactServices {
     public UpdateResponseDTO updateMovimientosVarios(MovimientosVariosFacturacionItem movimientos,
                                                              HttpServletRequest request);
 
-    //public InsertResponseDTO saveCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimientos,HttpServletRequest request);
-
-    //public UpdateResponseDTO updateCriteriosMovimientosVarios(MovimientosVariosFacturacionItem movimientos,HttpServletRequest request);
-
     public MovimientosVariosFacturacionDTO getMovimientoVarioPorId(String idMovimiento, HttpServletRequest request);
 }

@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.fcs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.MovimientosVariosFacturacionItem;
+import org.itcgae.siga.db.entities.FcsMvariosCertificaciones;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosSqlProvider;
 
 import java.text.DateFormat;
@@ -346,4 +347,5 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
 
         return sql.toString();
     }
+    
 }
