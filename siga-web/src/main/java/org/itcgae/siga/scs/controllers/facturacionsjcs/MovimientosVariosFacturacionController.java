@@ -94,29 +94,6 @@ public class MovimientosVariosFacturacionController {
 
     }
 
-   /* @RequestMapping(value = "/movimientosVarios/saveCriteriosMovimientosVarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<InsertResponseDTO> saveCriteriosMovimientosVarios(@RequestBody MovimientosVariosFacturacionItem movimientos, HttpServletRequest request) throws Exception {
-        InsertResponseDTO response = movimientosVariosFactServices.saveCriteriosMovimientosVarios(movimientos, request);
-
-        if (response.getStatus() == SigaConstants.OK) {
-            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }
-
-    @RequestMapping(value = "/movimientosVarios/updateCriteriosMovimientosVarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<UpdateResponseDTO> updateCriteriosMovimientosVarios(@RequestBody MovimientosVariosFacturacionItem movimientos, HttpServletRequest request) throws Exception {
-        UpdateResponseDTO response = movimientosVariosFactServices.updateCriteriosMovimientosVarios(movimientos, request);
-
-        if (response.getStatus() == SigaConstants.OK) {
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }*/
 
     @GetMapping("/movimientosVarios/getMovimientoVarioPorId")
     ResponseEntity<MovimientosVariosFacturacionDTO> getMovimientoVarioPorId(@RequestParam("idMovimiento") String idMovimiento, HttpServletRequest request) {
