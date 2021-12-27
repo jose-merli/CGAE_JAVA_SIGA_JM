@@ -43,6 +43,7 @@ public interface PySTiposServiciosExtendsMapper extends PysServiciosMapper{
 		}) 
 	List<TiposServiciosItem> searchTiposServiciosHistorico(String idioma, Short idInstitucion);
 	
+	//Servicio que devuelve la informacion necesaria para la tabla en Facturacion --> Servicios.
 	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "searchListadoServiciosBuscador")
 	@Results({
 		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),

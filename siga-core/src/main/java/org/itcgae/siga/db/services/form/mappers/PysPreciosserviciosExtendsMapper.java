@@ -5,13 +5,16 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTOs.form.PreciosCursoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.PysPreciosserviciosMapper;
+import org.itcgae.siga.db.services.fac.providers.PySTipoFormaPagoSqlExtendsProvider;
 import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
 import org.itcgae.siga.db.services.form.providers.PysPreciosserviciosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -59,4 +62,8 @@ public interface PysPreciosserviciosExtendsMapper extends PysPreciosserviciosMap
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> comboPeriodicidad(String idioma);
+	
+	//Realiza un borrado fisico de los precios de un servicio
+	@UpdateProvider(type = PysPreciosserviciosSqlExtendsProvider.class, method = "borradoFisicoPreciosByServicio")
+	int borradoFisicoPreciosByServicio(ListaServiciosItem servicio,Short idInstitucion);
 }

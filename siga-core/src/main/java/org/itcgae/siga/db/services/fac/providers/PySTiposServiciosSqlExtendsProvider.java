@@ -56,6 +56,7 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 		return sql.toString();
 	}
 
+	//Servicio que devuelve la informacion necesaria para la tabla en Facturacion --> Servicios.
 	public String searchListadoServiciosBuscador(String idioma, Short idInstitucion, FiltroServicioItem filtroServicioItem) {
 		SQL sql = new SQL();
 		
@@ -87,7 +88,7 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 		sql.SELECT(" servin.idserviciosinstitucion");
 		sql.SELECT(" servin.descripcion");
 		sql.SELECT(" servin.fechabaja");
-		sql.SELECT(" servin.automatico");
+		sql.SELECT(" case when servin.automatico = 1 then 'Automática' when servin.automatico = 0 then 'Manual' end AUTOMATICO");
 		sql.SELECT(" servin.idtipoiva");
 		sql.SELECT(" f_siga_getrecurso(\r\n"
 				+ " tservicio.descripcion,\r\n"
@@ -272,19 +273,19 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 			sql.WHERE(" servin.IDSERVICIO = '" + filtroServicioItem.getTipo() + "'");
 		
 		if(filtroServicioItem.getCodigo() != null && filtroServicioItem.getCodigo() != "")
-			sql.WHERE(" servin.CODIGOEXT = " + filtroServicioItem.getCodigo() + "')");
+			sql.WHERE(" servin.CODIGOEXT = '" + filtroServicioItem.getCodigo() + "'");
 		
 		if(filtroServicioItem.getIva() != null && filtroServicioItem.getIva() != "")
 			sql.WHERE(" servin.IDTIPOIVA = '" + filtroServicioItem.getIva() + "'");
 		
 		if(filtroServicioItem.getServicio() != null && filtroServicioItem.getServicio() != "")
-			sql.WHERE(" regexp_like(servin.DESCRIPCION,'" + filtroServicioItem.getServicio() + "')");
+        	sql.WHERE("  upper(servin.DESCRIPCION ) like upper('%" + filtroServicioItem.getServicio() + "%')");
 		
 		if(filtroServicioItem.getPrecioDesde() != null && filtroServicioItem.getPrecioDesde() != "")
-			sql.WHERE(" F_siga_formatonumero(ROUND(((precioserv.VALOR / perio.PERIODOSMES)*PYS_TIPOIVA.VALOR / 100)+ (precioserv.VALOR / perio.PERIODOSMES), 2), 2)  >= " + Float.parseFloat(filtroServicioItem.getPrecioDesde()) + "");
+			sql.WHERE(" valor_minimo >= " + Float.parseFloat(filtroServicioItem.getPrecioDesde()) + "");
 	
 		if(filtroServicioItem.getPrecioHasta() != null && filtroServicioItem.getPrecioHasta() != "")
-			sql.WHERE(" F_siga_formatonumero(ROUND(((precioserv.VALOR / perio.PERIODOSMES)*PYS_TIPOIVA.VALOR / 100)+ (precioserv.VALOR / perio.PERIODOSMES), 2), 2)  <= " + Float.parseFloat(filtroServicioItem.getPrecioHasta()) + "");
+			sql.WHERE(" valor_minimo <= " + Float.parseFloat(filtroServicioItem.getPrecioHasta()) + "");
 
 		sql.GROUP_BY(" valor_minimo");
 		sql.GROUP_BY(" perio_min.descripcion");

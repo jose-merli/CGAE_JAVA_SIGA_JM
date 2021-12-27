@@ -6,8 +6,9 @@ import java.util.Date;
 public class ListaDescuentosPeticionItem {
 
 	private String idPeticion;
+	private String idLinea;
 	private Short idAnticipo;
-	private String tipo; //1 (anticipo) , 2 (monedero)
+	private String tipo; //1 (anticipo / descuento) , 2 (monedero)
 	private String desTipo;
 	private String descripcion;
 	private BigDecimal importe;
@@ -47,5 +48,11 @@ public class ListaDescuentosPeticionItem {
 	}
 	public void setIdAnticipo(Short idAnticipo) {
 		this.idAnticipo = idAnticipo;
+	}
+	public String getIdLinea() {
+		return idLinea;
+	}
+	public void setIdLinea(String idLinea) {
+		this.idLinea = idLinea;
 	}
 }

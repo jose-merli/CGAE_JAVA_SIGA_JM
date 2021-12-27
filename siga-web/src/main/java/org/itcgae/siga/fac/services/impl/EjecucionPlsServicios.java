@@ -65,6 +65,35 @@ public class EjecucionPlsServicios {
     }
     
     /**
+     * PL para el proceso de revision automatica de servicios de unainstitucion
+     */
+    public String[] ejecutarPL_RevisionAutomaticaServicios(short idInstitucion, AdmUsuarios usuario) throws Exception {
+
+        Object[] paramIn = new Object[6];
+    
+        java.util.Date utilDate = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+        
+        paramIn[0] = idInstitucion; // IDINSTITUCION
+        paramIn[1] = sqlDate; // FECHAPROCESO
+        paramIn[2] = usuario.getIdusuario(); // IDUSUARIO
+
+        String resultado[] = new String[2];
+
+        //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
+        //El segundo parametro el numero de parametros de salida del PL
+        resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_AUTO(?,?,?,?,?,?,?,?)}", 2, paramIn);
+
+        if (!resultado[0].equalsIgnoreCase("0")) {
+            LOGGER.error("Error en PL = " + (String) resultado[1]);
+            throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisón automática de servicios de una institución. Error en PL = " + (String) resultado[1]);
+        }
+
+        return resultado;
+    }
+    
+    
+    /**
      * PL para el proceso de baja de servicios
      */
     public String[] ejecutarPL_ServiciosAutomaticosProcesoBaja(short idInstitucion, int idTipoServicios, int idServicio, int idServiciosInstitucion, AdmUsuarios usuario) throws Exception {
@@ -130,7 +159,39 @@ public class EjecucionPlsServicios {
 
         return resultado;
     }
+    
+    /**
+     * PL para el revisar todos los servicios de una persona y darse baja o alta automaticamente
+     */
+    public String[] ejecutarPL_ProcesoRevisionLetrado(short idInstitucion, Long idPersona, Date fechaProcesamiento, AdmUsuarios usuario) throws Exception {
+    	
+        Object[] paramIn = new Object[4];
+        
+        java.sql.Date fechaProcesamientoSql;
+        if(fechaProcesamiento != null) {
+        	fechaProcesamientoSql = new java.sql.Date(fechaProcesamiento.getTime());
+        }
+        else {
+        	java.util.Date utilDate = new Date();
+        	fechaProcesamientoSql = new java.sql.Date(utilDate.getTime());
+        }
+        paramIn[0] = idInstitucion; // Identificador de la institucion - NUMBER(4)
+        paramIn[1] = idPersona; // Identificador de la persona suscrita al servicio - NUMBER(10) 
+        paramIn[2] = fechaProcesamientoSql; //Fecha para la revision de las suscripciones - DATE
+        paramIn[3] = usuario.getIdusuario(); // IDUSUARIO
+        
+        String resultado[] = new String[2]; 
 
+        //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
+        //El segundo parametro el numero de parametros de salida del PL
+        resultado = callPLProcedure2("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO(?,?,?,?,?,?)}", 2, paramIn);
+
+        if (!resultado[0].equalsIgnoreCase("0")) {
+            LOGGER.error("Error en PL = " + (String) resultado[1]);
+            throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisar las condiciones de los servicios para una persona. Error en PL = " + (String) resultado[1]);
+        }
+        return resultado;
+    }
     
     /**
      * Recupera el datasource con los datos de conexión sacados del fichero de
@@ -276,6 +337,73 @@ public class EjecucionPlsServicios {
             	}   
             	
                    
+            }
+            // output Parameters
+            for (int i = 0; i < outParameters; i++) {
+                cs.registerOutParameter(i + size + 1, Types.VARCHAR);
+            }
+
+            for (int intento = 1; intento <= 2; intento++) {
+                try {
+                    cs.execute();
+                    break;
+
+                } catch (SQLTimeoutException tex) {
+                    throw tex;
+
+                } catch (SQLException ex) {
+                    if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
+                        // segunda vez deberia funcionar)
+                        throw ex;
+                    }
+                }
+
+            }
+
+            for (int i = 0; i < outParameters; i++) {
+                result[i] = cs.getString(i + size + 1);
+            }
+            cs.close();
+            return result;
+
+        } catch (Exception ex) {
+            return null;
+        } finally {
+            con.close();
+            con = null;
+        }
+    }
+    
+    
+    
+    public String[] callPLProcedure3(String functionDefinition, int outParameters, Object[] inParameters)
+            throws IOException, NamingException, SQLException {
+
+        String result[] = null;
+
+        if (outParameters > 0)
+            result = new String[outParameters];
+        DataSource ds = getOracleDataSource();
+        Connection con = ds.getConnection();
+        try {
+            CallableStatement cs = con.prepareCall(functionDefinition);
+            int size = inParameters.length;
+
+            // input Parameters
+            for (int i = 0; i < size; i++) {
+
+            	if(i == 0) {
+            		cs.setShort(i + 1,  (short) inParameters[i]);
+            	}
+            	
+            	if(i == 1 ) {
+            		cs.setLong(i + 1, (int) inParameters[i]);
+            	}
+            	
+            	if (i == 2) {
+            		cs.setDate(i + 1, (java.sql.Date) inParameters[i]);
+            	}
+            
             }
             // output Parameters
             for (int i = 0; i < outParameters; i++) {

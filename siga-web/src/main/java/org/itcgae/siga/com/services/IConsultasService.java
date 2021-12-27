@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderDTO;
 import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasRuleDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
@@ -74,11 +75,7 @@ public interface IConsultasService {
 	
 	public QueryBuilderDTO constructorConsultas(HttpServletRequest request, QueryBuilderDTO queryBuilderDTO) throws Exception;
 	
-	//SQL
 	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta);
-	
-	//JSON
-	public ConstructorConsultasDTO obtenerConsultaJSON(HttpServletRequest request, String idConsulta);
 	
 	public ConfigColumnasQueryBuilderDTO obtenerConfigColumnasQueryBuilder(HttpServletRequest request);
 	
