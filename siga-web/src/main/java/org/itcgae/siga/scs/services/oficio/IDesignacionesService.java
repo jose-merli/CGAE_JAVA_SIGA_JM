@@ -169,7 +169,7 @@ public interface IDesignacionesService {
 	
 	public DeleteResponseDTO deleteDesigna(List<DesignaItem> item, HttpServletRequest request);
 
-	public ScsDesigna busquedaDesignaActual(ScsDesigna designa, HttpServletRequest request);
+	public DesignaItem busquedaDesignaActual(ScsDesigna designa, HttpServletRequest request);
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
 			

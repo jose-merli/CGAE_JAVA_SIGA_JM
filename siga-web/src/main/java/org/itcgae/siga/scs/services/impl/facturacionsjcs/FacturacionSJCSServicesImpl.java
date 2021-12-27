@@ -90,7 +90,6 @@ import org.itcgae.siga.db.mappers.FcsHistoricoTipoactuacionMapper;
 import org.itcgae.siga.db.mappers.FcsHistoricoTipoasistcolegioMapper;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsPagosjgMapper;
-import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
@@ -100,6 +99,7 @@ import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoSJCSExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsActuacionasistenciaExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,7 +172,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	ScsGuardiascolegiadoMapper scsGuardiascolegiadoMapper;
 	
 	@Autowired
-	ScsActuacionasistenciaMapper scsActuacionasistenciaMapper;
+	ScsActuacionasistenciaExtendsMapper scsActuacionasistenciaExtendsMapper;
 	
 	@Autowired
 	FcsMovimientosvariosMapper fcsMovimientosvariosMapper;
@@ -369,10 +369,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 			
 			ScsActuacionasistenciaExample scsActuacionasistenciaExample = new ScsActuacionasistenciaExample();
 			scsActuacionasistenciaExample.createCriteria().andIdfacturacionEqualTo(idFactura).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<ScsActuacionasistencia> listaScsActuacionasistencia = scsActuacionasistenciaMapper.selectByExample(scsActuacionasistenciaExample);
+			List<ScsActuacionasistencia> listaScsActuacionasistencia = scsActuacionasistenciaExtendsMapper.selectByExample(scsActuacionasistenciaExample);
 			for(ScsActuacionasistencia item : listaScsActuacionasistencia) {
 				item.setIdfacturacion(null);
-				scsActuacionasistenciaMapper.updateByExample(item, scsActuacionasistenciaExample);
+				scsActuacionasistenciaExtendsMapper.updateByExample(item, scsActuacionasistenciaExample);
 			}
 			
 			FcsMovimientosvariosExample fcsMovimientosvariosExample = new FcsMovimientosvariosExample();
