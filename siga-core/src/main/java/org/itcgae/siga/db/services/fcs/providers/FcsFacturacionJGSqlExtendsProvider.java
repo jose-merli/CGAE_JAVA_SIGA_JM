@@ -1083,4 +1083,18 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
         return sql.toString();
     }
+
+
+    public String comboFactBaremos(String idInstitucion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("F.IDFACTURACION");
+        sql.SELECT(
+                "TO_CHAR(F.FECHADESDE, 'DD/MM/YYYY') || '-' || TO_CHAR(F.FECHAHASTA, 'DD/MM/YYYY') || ' - ' || F.NOMBRE AS DESCRIPCION");
+        sql.FROM("FCS_FACTURACIONJG F");
+        sql.WHERE("F.IDINSTITUCION = '" + idInstitucion + "'");
+
+        return sql.toString();
+
+    }
 }

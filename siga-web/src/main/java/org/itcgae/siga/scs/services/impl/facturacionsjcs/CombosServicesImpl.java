@@ -846,4 +846,46 @@ public class CombosServicesImpl implements ICombosServices {
         return comboFactNull;
     }
 
+    @Override
+    public ComboDTO comboFactBaremos(HttpServletRequest request) {
+        LOGGER.info("comboFactByPartidaPresu() -> Entrada del servicio para obtener las facturaciones");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+        ComboDTO comboFactBaremos = new ComboDTO();
+
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+            LOGGER.info("comboFactByPartidaPresu() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            LOGGER.info("comboFactByPartidaPresu() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (null != usuarios && usuarios.size() > 0) {
+                AdmUsuarios usuario = usuarios.get(0);
+                usuario.setIdinstitucion(idInstitucion);
+
+                LOGGER.info("comboFactByPartidaPresu() / fcsCertificacionesExtendsMapper.comboFactByPartidaPresu() -> Entrada a  fcsCertificacionesExtendsMapper para obtener las facturaciones");
+
+                List<ComboItem> comboItems = fcsFacturacionJGExtendsMapper.comboFactBaremos(idInstitucion.toString());
+                comboFactBaremos.setCombooItems(comboItems);
+
+                LOGGER.info("comboFactByPartidaPresu() / fcsCertificacionesExtendsMapper.comboFactByPartidaPresu() -> Salida a  fcsCertificacionesExtendsMapper para obtener las facturaciones");
+            } else {
+                LOGGER.warn("comboFactByPartidaPresu() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+            }
+        } else {
+            LOGGER.warn("comboFactByPartidaPresu() -> idInstitucion del token nula");
+        }
+
+        LOGGER.info("comboFactByPartidaPresu() -> Salida del servicio para obtener los tipos");
+
+        return comboFactBaremos;
+    }
+
 }

@@ -293,4 +293,9 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getAgrupacionDeTurnosPorTurno")
     String getAgrupacionDeTurnosPorTurno(Short idInstitucion, String idTurno);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "comboFactBaremos")
+    @Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)})
+    List<ComboItem> comboFactBaremos(String idInstitucion);
 }
