@@ -15,7 +15,7 @@ public class ScheduledFacturacionServiceImpl implements IScheduledFacturacionSer
     @Autowired
     private IFacturacionSJCSServices facturacionServices;
 
-    @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
+ //   @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
     @Override
     public void ejecutaFacturacionSJCS() {
         LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
@@ -23,7 +23,7 @@ public class ScheduledFacturacionServiceImpl implements IScheduledFacturacionSer
         LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
     }
 
-    @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacionBloqueadas}")
+//    @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacionBloqueadas}")
     @Override
     public void ejecutaFacturacionesSJCSBloqueadas() {
         LOGGER.info("ScheduledFacturacionServiceImpl --> ENTRA ejecutaFacturacionesSJCSBloqueadas");

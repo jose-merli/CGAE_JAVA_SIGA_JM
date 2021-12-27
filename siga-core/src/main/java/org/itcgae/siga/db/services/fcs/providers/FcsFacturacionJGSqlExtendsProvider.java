@@ -552,6 +552,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("pjg.idinstitucion = '" + idInstitucion + "'");
         sql.WHERE("pjg.idfacturacion =  '" + idFacturacion + "'");
         sql.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
+        sql.ORDER_BY("est.fechaestado DESC");
 
         return sql.toString();
     }
