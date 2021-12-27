@@ -293,4 +293,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getAgrupacionDeTurnosPorTurno")
     String getAgrupacionDeTurnosPorTurno(Short idInstitucion, String idTurno);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesCerradasPorInstitucion")
+    List<Integer> getFacturacionesCerradasPorInstitucion(Short idInstitucion);
 }

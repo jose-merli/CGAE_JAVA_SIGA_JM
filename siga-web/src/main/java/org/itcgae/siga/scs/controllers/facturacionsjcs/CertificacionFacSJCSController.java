@@ -7,7 +7,6 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -30,8 +29,8 @@ public class CertificacionFacSJCSController {
     private ICertificacionFacSJCSService iCertificacionFacSJCSService;
 
     @PostMapping("/tramitarCertificacion")
-    ResponseEntity<InsertResponseDTO> tramitarCertificacion(@RequestBody FcsFacturacionjg fcsFacturacionjg, HttpServletRequest request) {
-        InsertResponseDTO response = iCertificacionFacSJCSService.tramitarCertificacion(fcsFacturacionjg.getIdfacturacion().toString(), request);
+    ResponseEntity<InsertResponseDTO> tramitarCertificacion(@RequestBody List<FacturacionItem> facturacionItemList, HttpServletRequest request) {
+        InsertResponseDTO response = iCertificacionFacSJCSService.tramitarCertificacion(facturacionItemList, request);
         return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
     }
 
