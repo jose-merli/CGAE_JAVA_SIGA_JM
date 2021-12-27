@@ -736,7 +736,7 @@ public class UtilidadesPagoSJCS {
         LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.hayAbonoPosterior() -> Comprobamos si hay abonos posteriores a los relacionados con nuestro pago");
         List<FacAbono> hayAbonoPosterior = facAbonoExtendsMapper.hayAbonoPosterior(idInstitucion, pago.getIdpagosjg());
 
-        if (hayAbonoPosterior.isEmpty()) {
+        if (!hayAbonoPosterior.isEmpty()) {
             LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
                     "con nuestro pago");
             List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, hayAbonoPosterior.get(0).getFecha());
