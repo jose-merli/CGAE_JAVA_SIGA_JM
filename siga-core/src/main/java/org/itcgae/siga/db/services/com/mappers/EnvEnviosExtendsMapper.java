@@ -18,8 +18,6 @@ import java.util.List;
 @Service
 @Primary
 public interface EnvEnviosExtendsMapper {
-
-          
           
       @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectEnvios")
       @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
@@ -156,12 +154,6 @@ public interface EnvEnviosExtendsMapper {
             @Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR)
     })
     List<EnviosMasivosItem> busquedaSelectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
-
-    @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectMaxIDEnvio")
-    @Results({
-            @Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
-    })
-    NewIdDTO selectMaxIDEnvio();
 
     @DeleteProvider(type = EnvEnviosExtendsSqlProvider.class, method = "eliminarEnviosPago")
     int eliminarEnviosPago(Short idInstitucion, List<String> idPagos);

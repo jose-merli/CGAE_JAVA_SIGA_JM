@@ -150,14 +150,14 @@ public class EnvEnviosExtendsSqlProvider {
         return sql.toString();
     }
 
-    public String selectMaxIDEnvio() {
+    public String selectMaxIDEnvio(Short idInstitucion) {
 
         SQL sql = new SQL();
-        sql.SELECT("MAX(IDENVIO)+1 AS IDMAX");
-        sql.FROM("ENV_ENVIOS");
+        sql.SELECT("TO_NUMBER(TO_CHAR(SYSDATE, 'YYYY') || SEQ_ENV_ENVIOS.CURRVAL) AS IDMAX");
+        sql.FROM("DUAL");
         return sql.toString();
     }
-
+    
     public String selectEnviosComunicacion(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros) {
 
         SQL sql = new SQL();
