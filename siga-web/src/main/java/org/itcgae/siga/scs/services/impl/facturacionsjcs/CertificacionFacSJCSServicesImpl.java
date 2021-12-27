@@ -17,6 +17,7 @@ import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFactCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
@@ -102,6 +103,10 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private FcsPagosjgMapper fcsPagosjgMapper;
+
+    @Autowired
+    private FcsFactCertificacionesExtendsMapper fcsFactCertificacionesExtendsMapper;
+
 
     @Override
     public InsertResponseDTO tramitarCertificacion(List<FacturacionItem> facturacionItemList, HttpServletRequest request) {
@@ -774,6 +779,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         Error error = new Error();
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         int response = 0;
+        String idFacts = "";
 
         try {
 
@@ -802,23 +808,52 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         insertResponseDTO.setStatus(SigaConstants.KO);
                     } else {
 
-                        FcsFactCertificaciones fc = new FcsFactCertificaciones();
-                        fc.setIdinstitucion(idInstitucion);
-                        fc.setIdfacturacion(Integer.parseInt(certificacionesItem.getIdFacturacion()));
-                        fc.setIdcertificacion(Short.parseShort(certificacionesItem.getIdCertificacion()));
-                        fc.setUsumodificacion(usuarios.get(0).getIdusuario());
-                        fc.setFechamodificacion(new Date());
+                        //obtiene las facturaciones de la certificacion
+                        FcsFactCertificacionesExample facturaciones = new FcsFactCertificacionesExample();
+                        facturaciones.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                                .andIdcertificacionEqualTo(Short.parseShort(certificacionesItem.getIdCertificacion()));
+                        List<FcsFactCertificaciones> facts = fcsFactCertificacionesExtendsMapper.selectByExample(facturaciones);
+                        if (facts != null) {
+                            int cont = 0;
+                            for (FcsFactCertificaciones f : facts) {
+                                idFacts += f.getIdfacturacion();
+                                cont++;
+                                if (cont < facts.size()) {
+                                    idFacts += ",";
+                                }
 
-                        response = fcsFactCertificacionesMapper.insert(fc);
+                            }
+                        }
+                        //obtiene las fechas max y min de las facturaciones.
+                        FcsCertificaciones fechasCert = fcsFactCertificacionesExtendsMapper.getFechaMaxMinFact(idInstitucion, idFacts);
+                        //actualiza la certificacion con las nuevas fechas.
+                        FcsCertificaciones cert = new FcsCertificaciones();
+                        cert.setIdinstitucion(idInstitucion);
+                        cert.setIdcertificacion(Short.parseShort(certificacionesItem.getIdCertificacion()));
+                        cert.setFechadesde(fechasCert.getFechadesde());
+                        cert.setFechahasta(fechasCert.getFechahasta());
+                        cert.setFechamodificacion(new Date());
+                        cert.setUsumodificacion(usuarios.get(0).getIdusuario());
+                        int updateCert = fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective(cert);
+                        if (updateCert != 0) {
+                            FcsFactCertificaciones fc = new FcsFactCertificaciones();
+                            fc.setIdinstitucion(idInstitucion);
+                            fc.setIdfacturacion(Integer.parseInt(certificacionesItem.getIdFacturacion()));
+                            fc.setIdcertificacion(Short.parseShort(certificacionesItem.getIdCertificacion()));
+                            fc.setUsumodificacion(usuarios.get(0).getIdusuario());
+                            fc.setFechamodificacion(new Date());
 
-                        if (response != 0) {
-                            error.setCode(200);
-                            error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.factAsociada");
-                            insertResponseDTO.setStatus(SigaConstants.OK);
-                        } else {
-                            error.setCode(400);
-                            error.setDescription("general.mensaje.error.bbdd");
-                            insertResponseDTO.setStatus(SigaConstants.KO);
+                            response = fcsFactCertificacionesMapper.insert(fc);
+
+                            if (response != 0) {
+                                error.setCode(200);
+                                error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.factAsociada");
+                                insertResponseDTO.setStatus(SigaConstants.OK);
+                            } else {
+                                error.setCode(400);
+                                error.setDescription("general.mensaje.error.bbdd");
+                                insertResponseDTO.setStatus(SigaConstants.KO);
+                            }
                         }
 
                     }

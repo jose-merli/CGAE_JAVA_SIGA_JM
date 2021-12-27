@@ -552,6 +552,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("pjg.idinstitucion = '" + idInstitucion + "'");
         sql.WHERE("pjg.idfacturacion =  '" + idFacturacion + "'");
         sql.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
+        sql.ORDER_BY("est.fechaestado DESC");
 
         return sql.toString();
     }
@@ -1101,5 +1102,18 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("EST.IDORDENESTADO = (" + subQuery.toString() + ")");
 
         return sql.toString();
+    }
+
+    public String comboFactBaremos(String idInstitucion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("F.IDFACTURACION");
+        sql.SELECT(
+                "TO_CHAR(F.FECHADESDE, 'DD/MM/YYYY') || '-' || TO_CHAR(F.FECHAHASTA, 'DD/MM/YYYY') || ' - ' || F.NOMBRE AS DESCRIPCION");
+        sql.FROM("FCS_FACTURACIONJG F");
+        sql.WHERE("F.IDINSTITUCION = '" + idInstitucion + "'");
+
+        return sql.toString();
+
     }
 }
