@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface ICertificacionFacSJCSService {
 
-    InsertResponseDTO tramitarCertificacion(List<FacturacionItem> facturacionItemList, HttpServletRequest request);
+    InsertResponseDTO tramitarCertificacion(TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request);
 
     Resource getInformeCAM(String idFacturacion, String tipoFichero, HttpServletRequest request) throws Exception;
 

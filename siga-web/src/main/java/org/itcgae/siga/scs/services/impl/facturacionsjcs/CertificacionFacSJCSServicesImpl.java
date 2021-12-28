@@ -109,7 +109,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
 
     @Override
-    public InsertResponseDTO tramitarCertificacion(List<FacturacionItem> facturacionItemList, HttpServletRequest request) {
+    public InsertResponseDTO tramitarCertificacion(TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request) {
 
         LOGGER.info("CertificacionFacSJCSServicesImpl.tramitarCertificacion() -> Entrada al servicio para tramitar la certificacion");
 
@@ -134,10 +134,10 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                 if (null != usuarios && !usuarios.isEmpty()) {
 
-                    if (facturacionItemList != null && !facturacionItemList.isEmpty()) {
+                    if (tramitarCerttificacionRequestDTO.getFacturacionItemList() != null && !tramitarCerttificacionRequestDTO.getFacturacionItemList().isEmpty()) {
 
-                        for (FacturacionItem f : facturacionItemList) {
-                            listaParaConsejo(idInstitucion, f.getIdFacturacion(), usuarios.get(0));
+                        for (FacturacionItem f : tramitarCerttificacionRequestDTO.getFacturacionItemList()) {
+                            listaParaConsejo(tramitarCerttificacionRequestDTO.getIdCertificacion(), idInstitucion, f.getIdFacturacion(), usuarios.get(0));
                         }
 
                     }
@@ -153,6 +153,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         }
 
         insertResponseDTO.setError(error);
+        insertResponseDTO.setId(tramitarCerttificacionRequestDTO.getIdCertificacion());
 
         if (error.getDescription() == null) {
             insertResponseDTO.setStatus(SigaConstants.OK);
@@ -165,7 +166,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         return insertResponseDTO;
     }
 
-    private void listaParaConsejo(Short idInstitucion, String idFacturacion, AdmUsuarios usuario) throws Exception {
+    private void listaParaConsejo(String idCertificacion, Short idInstitucion, String idFacturacion, AdmUsuarios usuario) throws Exception {
 
         String estadoActualFacturacion = fcsFactEstadosfacturacionExtendsMapper.getIdEstadoFacturacion(idInstitucion, idFacturacion);
 
@@ -186,13 +187,15 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         if (SigaConstants.TIPO_CAJG_XML_SANTIAGO == tipoCAJG) {
             envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_XUNTA_JE.getId(), usuario);
             estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
+            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
         }
 
         //TODO CAMBIAR LA OPERACIÓN
-        if (SigaConstants.TIPO_CAJG_CATALANES == tipoCAJG) {
-            envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_CAT_VALIDA_JUSTIFICACION.getId(), usuario);
-            estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
-        }
+//        if (SigaConstants.TIPO_CAJG_CATALANES == tipoCAJG) {
+//            envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_CAT_VALIDA_JUSTIFICACION.getId(), usuario);
+//            estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
+//            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
+//        }
 
         if (esCAM(idInstitucion)) {
             /* en el caso de la CAM el fichero ya se ha generado previamente al ejecutar informe
@@ -205,6 +208,29 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             actualizarEstadoFacturacion(usuario, idInstitucion, idFacturacion, estadoFuturo);
         }
 
+    }
+
+    private void actualizaEstadoCertificacion(String idCertificacion, Short idInstitucion, Short idEstado, Integer idUsuario) {
+        FcsCertificacionesHistoricoEstado estado = new FcsCertificacionesHistoricoEstado();
+        estado.setIdcertificacion(Short.valueOf(idCertificacion));
+        estado.setIdinstitucion(idInstitucion);
+        estado.setFechaestado(new Date());
+        estado.setIdestado(idEstado);
+        estado.setFechamodificacion(new Date());
+        estado.setUsumodificacion(idUsuario);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> INICIO de la query para insertar el estado de la certificacion");
+        fcsCertificacionesHistoricoEstadoMapper.insertSelective(estado);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> FIN de la query para insertar el estado de la certificacion");
+
+        FcsCertificaciones fcsCertificaciones = new FcsCertificaciones();
+        fcsCertificaciones.setIdcertificacion(Short.valueOf(idCertificacion));
+        fcsCertificaciones.setIdinstitucion(idInstitucion);
+        fcsCertificaciones.setIdestadocertificacion(idEstado);
+        fcsCertificaciones.setFechamodificacion(new Date());
+        fcsCertificaciones.setUsumodificacion(idUsuario);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective() -> INICIO de la query para aztualizar la certificacion");
+        fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective(fcsCertificaciones);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective() -> FIN de la query para aztualizar la certificacion");
     }
 
     private void actualizarEstadoFacturacion(AdmUsuarios usuario, Short idInstitucion, String idFacturacion, int estadoFuturo) {
@@ -825,7 +851,20 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                             }
                         }
                         //obtiene las fechas max y min de las facturaciones.
-                        FcsCertificaciones fechasCert = fcsFactCertificacionesExtendsMapper.getFechaMaxMinFact(idInstitucion, idFacts);
+                        FcsCertificaciones fechasCert = null;
+                        if(facts != null && !facts.isEmpty()) {
+                            fechasCert = fcsFactCertificacionesExtendsMapper.getFechaMaxMinFact(idInstitucion, idFacts);
+                        } else {
+                            FcsFacturacionjgKey fcsFacturacionjgKey = new FcsFacturacionjgKey();
+                            fcsFacturacionjgKey.setIdinstitucion(idInstitucion);
+                            fcsFacturacionjgKey.setIdfacturacion(Integer.valueOf(certificacionesItem.getIdFacturacion()));
+                            FcsFacturacionjg facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(fcsFacturacionjgKey);
+
+                            fechasCert = new FcsCertificaciones();
+                            fechasCert.setFechadesde(facturacion.getFechadesde());
+                            fechasCert.setFechahasta(facturacion.getFechahasta());
+                        }
+
                         //actualiza la certificacion con las nuevas fechas.
                         FcsCertificaciones cert = new FcsCertificaciones();
                         cert.setIdinstitucion(idInstitucion);

@@ -29,8 +29,8 @@ public class CertificacionFacSJCSController {
     private ICertificacionFacSJCSService iCertificacionFacSJCSService;
 
     @PostMapping("/tramitarCertificacion")
-    ResponseEntity<InsertResponseDTO> tramitarCertificacion(@RequestBody List<FacturacionItem> facturacionItemList, HttpServletRequest request) {
-        InsertResponseDTO response = iCertificacionFacSJCSService.tramitarCertificacion(facturacionItemList, request);
+    ResponseEntity<InsertResponseDTO> tramitarCertificacion(@RequestBody TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request) {
+        InsertResponseDTO response = iCertificacionFacSJCSService.tramitarCertificacion(tramitarCerttificacionRequestDTO, request);
         return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
     }
 
