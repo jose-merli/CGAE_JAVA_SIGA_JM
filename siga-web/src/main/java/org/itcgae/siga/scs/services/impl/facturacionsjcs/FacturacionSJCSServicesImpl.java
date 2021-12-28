@@ -397,6 +397,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
                     facturacionesDelete.setStatus(SigaConstants.KO);
                     error.setDescription("facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
+                    error.setMessage(facturacionItem.getNombre());
                 }
                 LOGGER.info(
                         "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
