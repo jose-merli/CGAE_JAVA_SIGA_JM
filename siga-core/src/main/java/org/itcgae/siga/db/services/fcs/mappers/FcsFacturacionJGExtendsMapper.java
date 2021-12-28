@@ -34,6 +34,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDGRUPOFACTURACION", property = "descGrupo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR)})
     List<FacturacionItem> buscarFacturaciones(FacturacionItem facturacionItem, String idInstitucion, Integer tamMax);
 
