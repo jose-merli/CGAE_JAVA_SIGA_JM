@@ -16,10 +16,13 @@ import org.itcgae.siga.db.entities.FcsMovimientosvarios;
 import org.itcgae.siga.db.entities.FcsMovimientosvariosKey;
 import org.itcgae.siga.db.entities.FcsMvariosCertificaciones;
 import org.itcgae.siga.db.entities.FcsMvariosCertificacionesKey;
+import org.itcgae.siga.db.entities.ScsAsistencia;
+import org.itcgae.siga.db.entities.ScsAsistenciaKey;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsMvariosCertificacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsMovimientosvariosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IMovimientosVariosFactServices;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,8 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
     
     @Autowired 
     private FcsMvariosCertificacionesMapper fcsMvariosCertificacionesMapper;
+    @Autowired
+    private ScsAsistenciaExtendsMapper scsAsistenciaExtendsMapper;
 
 
     public MovimientosVariosFacturacionDTO buscarMovimientosVarios(MovimientosVariosFacturacionItem facturacionItem, HttpServletRequest request) {
@@ -258,30 +263,31 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
                      int cert = 0;
                      
+                     responses.add(fin);
                         if (fin == 1) {
+                        	
                             LOGGER.debug("MovimientosVariosFactServiceImpl.delete() ->Entrada para eliminar un movimiento vario");
                             FcsMovimientosvariosKey movimientoMapper = new FcsMovimientosvariosKey();
                             movimientoMapper.setIdinstitucion(idInstitucion);
-                            movimientoMapper.setIdmovimiento(Long.parseLong(mov.getIdMovimiento()));
+                            movimientoMapper.setIdmovimiento(Long.valueOf(mov.getIdMovimiento()));
                             response = fcsMovimientosVariosMapper.deleteByPrimaryKey(movimientoMapper);
                             //response=fcsMovimientosvariosExtendsMapper.delete(mov.getIdInstitucion().toString(), mov.getIdMovimiento());
                             LOGGER.debug("MovimientosVariosFactServiceImpl.delete() -> Salida del movimiento eliminado.");
                             
-                           if(response == 1) {
+                           if(response == 1 && mov.getCertificacion()!=null) {
                         	   LOGGER.debug("MovimientosVariosFactServiceImpl.delete() ->Entrada para eliminar la certficación asociada al movimiento");
                             	//borrar la certificación asociada a este movimiento
                             	FcsMvariosCertificacionesKey deleteCert = new FcsMvariosCertificacionesKey();
                             	
-                            	deleteCert.setIdcertificacion(Short.parseShort(mov.getCertificacion()));
+                            	deleteCert.setIdcertificacion(Short.valueOf(mov.getCertificacion()));
                             	deleteCert.setIdinstitucion(idInstitucion);
-                            	deleteCert.setIdmovimiento(Long.parseLong(mov.getIdMovimiento()));
+                            	deleteCert.setIdmovimiento(Long.valueOf(mov.getIdMovimiento()));
                             	
                                cert = fcsMvariosCertificacionesMapper.deleteByPrimaryKey(deleteCert);
                                LOGGER.debug("MovimientosVariosFactServiceImpl.delete() ->Salida para eliminar la certificacion asociada al movimiento vario");
+                               responses.add(cert);
                            }
                         }
-
-                        responses.add(cert);
 
                     }
 
@@ -315,7 +321,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
             LOGGER.error("MovimientosVariosFactServiceImpl.deleteMovimientosVarios() -> idInstitucion del token nula");
         }
 
-        if (responses.contains(0) && error.getDescription() == null) {
+        if (responses.contains(0) && error.getDescription() != null) {
             error.setCode(400);
             deleteResponse.setStatus(SigaConstants.KO);
         } else if (error.getCode() == null) {
@@ -332,7 +338,6 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
     }
 
 
-    @Transactional
     public InsertResponseDTO saveMovimientosVarios(MovimientosVariosFacturacionItem movimiento, HttpServletRequest request) {
 
         LOGGER.debug("<MovimientosVariosFactServiceImpl.saveMovimientosVarios() -> Entrada");
@@ -342,9 +347,9 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         InsertResponseDTO insertResponse = new InsertResponseDTO();
         Error error = new Error();
+    	Long newid = Long.valueOf("0");
         int response = 0;
-        int responseCert = 0;
-        Long newid = Long.valueOf("0");
+
 
         if (null != idInstitucion) {
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -361,73 +366,11 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                 usuario.setIdinstitucion(idInstitucion);
 
                 try {
-
-                    NewIdDTO idMovimiento = fcsMovimientosvariosExtendsMapper
+                	NewIdDTO idMovimiento = fcsMovimientosvariosExtendsMapper
                             .selectMaxIdMovimientoByIdInstitucion(idInstitucion.toString());
 
-                     newid = Long.parseLong(idMovimiento.getNewId());
-
-                    if (movimiento != null) {
-                        LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Insertar Datos Generales a un nuevo movimiento");
-
-                        FcsMovimientosvarios record = new FcsMovimientosvarios();
-                        record.setFechamodificacion(new Date());
-                        record.setUsumodificacion(usuarios.get(0).getIdusuario());
-                        record.setIdinstitucion(idInstitucion);
-
-                        record.setIdmovimiento(newid + 1);
-                        record.setIdpersona(Long.parseLong(movimiento.getIdPersona()));
-                        record.setFechaalta(new Date());
-
-                        record.setDescripcion(movimiento.getDescripcion());
-                        record.setCantidad(new BigDecimal(movimiento.getCantidad()));
-                        record.setContabilizado(" ");
-
-                        record.setMotivo(movimiento.getMotivo());
-
-                        if (movimiento.getTipo() != null) {
-                            record.setIdtipomovimiento(Short.parseShort(movimiento.getTipo()));
-                        }
-                        
-                        if (movimiento.getIdGrupoFacturacion() != null) {
-                        	record.setIdgrupofacturacion(Short.parseShort(movimiento.getIdGrupoFacturacion()));
-                        }
-
-                        if (movimiento.getIdFacturacion() != null) {
-                        	record.setIdfacturacion(Integer.parseInt(movimiento.getIdFacturacion()));
-
-                        }
-
-                        if (movimiento.getIdConcepto() != null) {
-                        	record.setIdhitogeneral(Short.parseShort(movimiento.getIdConcepto()));
-                        }
-
-                        if (movimiento.getIdPartidaPresupuestaria() != null) {
-                        	record.setIdpartidapresupuestaria(Integer.parseInt(movimiento.getIdPartidaPresupuestaria()));
-                        }
-
-                 
-                        
-                        response = fcsMovimientosVariosMapper.insertSelective(record);
-
-
-                        if (response == 1 && movimiento.getCertificacion() != null && movimiento.getCertificacion() != "") {                     
-                            
-                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Salida con los datos ya insertados");
-                            
-                            FcsMvariosCertificaciones insertCert = new FcsMvariosCertificaciones();
-                            insertCert.setIdmovimiento(newid + 1);
-                            insertCert.setFechamodificacion(new Date());
-                            insertCert.setIdinstitucion(idInstitucion);
-                            insertCert.setUsumodificacion(usuarios.get(0).getIdusuario());
-                            insertCert.setIdcertificacion(Short.parseShort(movimiento.getCertificacion()));
-                            
-                            responseCert = fcsMvariosCertificacionesMapper.insert(insertCert);
-                            
-                        } else if(response == 0 || responseCert == 0){
-                            LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Salida sin haber insertado los datos");
-                        }
-                    }
+                    newid = Long.valueOf(idMovimiento.getNewId());
+                    response = guardarMV(idInstitucion,movimiento,newid,usuarios.get(0));
 
                 } catch (Exception e) {
                     LOGGER.error(
@@ -446,7 +389,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
             LOGGER.error("MovimientosVariosFactServiceImpl.saveDatosGenMovimientosVarios() -> idInstitucion del token nula");
         }
 
-        if (response == 0 && responseCert == 0 && error.getDescription() == null) {
+        if (response == 0 && error.getDescription() != null) {
             error.setCode(400);
             insertResponse.setStatus(SigaConstants.KO);
         } else if (error.getCode() == null) {
@@ -463,6 +406,136 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
     }
 
     @Transactional
+    private int guardarMV(Short idInstitucion, MovimientosVariosFacturacionItem movimiento, Long newid, AdmUsuarios usuario) throws Exception {
+    	int response = 0;
+        int responseAsunto = 0;
+        int responseCert = 0;
+        
+    	if (movimiento != null) {
+        	
+            LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Insertar Datos Generales a un nuevo movimiento");
+
+            FcsMovimientosvarios record = new FcsMovimientosvarios();
+            record.setFechamodificacion(new Date());
+            record.setUsumodificacion(usuario.getIdusuario());
+            record.setIdinstitucion(idInstitucion);
+
+            record.setIdmovimiento(newid + 1);
+            record.setIdpersona(Long.valueOf(movimiento.getIdPersona()));
+            record.setFechaalta(new Date());
+
+            record.setDescripcion(movimiento.getDescripcion());
+            record.setCantidad(new BigDecimal(movimiento.getCantidad()));
+            record.setContabilizado(" ");
+
+            record.setMotivo(movimiento.getMotivo());
+
+            if (movimiento.getTipo() != null && !movimiento.getTipo().isEmpty()) {
+                record.setIdtipomovimiento(Short.valueOf(movimiento.getTipo()));
+            }
+            
+            if (movimiento.getIdGrupoFacturacion() != null && !movimiento.getIdGrupoFacturacion().isEmpty()) {
+            	record.setIdgrupofacturacion(Short.valueOf(movimiento.getIdGrupoFacturacion()));
+            }
+
+            if (movimiento.getIdFacturacion() != null && !movimiento.getIdFacturacion().isEmpty()) {
+            	record.setIdfacturacion(Integer.valueOf(movimiento.getIdFacturacion()));
+
+            }
+
+            if (movimiento.getIdConcepto() != null && !movimiento.getIdConcepto().isEmpty()) {
+            	record.setIdhitogeneral(Short.valueOf(movimiento.getIdConcepto()));
+            }
+
+            if (movimiento.getIdPartidaPresupuestaria() != null && !movimiento.getIdPartidaPresupuestaria().isEmpty()) {
+            	record.setIdpartidapresupuestaria(Integer.valueOf(movimiento.getIdPartidaPresupuestaria()));
+            }
+
+     
+            
+            response = fcsMovimientosVariosMapper.insertSelective(record);
+            
+            if(response == 1) {
+            	responseAsunto = actualizarAsuntoMV(movimiento, newid + 1 , idInstitucion);
+            }
+
+
+            if (response == 1 && movimiento.getCertificacion() != null && movimiento.getCertificacion() != "") {                     
+                
+                LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Salida con los datos ya insertados");
+                
+                FcsMvariosCertificaciones insertCert = new FcsMvariosCertificaciones();
+                insertCert.setIdmovimiento(newid + 1);
+                insertCert.setFechamodificacion(new Date());
+                insertCert.setIdinstitucion(idInstitucion);
+                insertCert.setUsumodificacion(usuario.getIdusuario());
+                insertCert.setIdcertificacion(Short.valueOf(movimiento.getCertificacion()));
+                
+                responseCert = fcsMvariosCertificacionesMapper.insert(insertCert);
+                
+            }
+            
+            if(response == 0 || (responseCert == 0 && movimiento.getCertificacion() != null && movimiento.getCertificacion() != "")
+            		|| responseAsunto == 0){
+                LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveMovimientosVarios() -> Salida sin haber insertado los datos");
+                response = 0;
+            }
+        }
+        return response;
+	}
+
+	private int actualizarAsuntoMV(MovimientosVariosFacturacionItem movimiento, Long newid, Short idInstitucion) throws Exception {
+		String asuntoSplit [] = null;
+		String asunto = "";
+		int response = 0;
+		
+		if(movimiento.getDescripcion()!=null && !movimiento.getDescripcion().isEmpty()) {
+			asuntoSplit = movimiento.getDescripcion().split(" ");
+			if(asuntoSplit != null && asuntoSplit.length > 0){
+				asunto = asuntoSplit[0];
+				String identificador [] = null;
+				String anio = "";
+				String numero = "";
+				switch(asunto)
+				{
+				   case "Asistencia" :
+					   identificador = asuntoSplit[1].split("/");
+					   if(identificador!= null && identificador.length>0) {
+							anio = identificador[0];
+							numero = identificador[1];
+							ScsAsistenciaKey key = new ScsAsistenciaKey();
+							key.setAnio(Short.valueOf(anio));
+							key.setNumero(Long.valueOf(numero));
+							key.setIdinstitucion(idInstitucion);
+							ScsAsistencia asistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(key);
+							if(asistencia!= null) {
+								asistencia.setIdmovimiento(newid);
+								response = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(asistencia);
+							}else {
+								throw new Exception("No se ha encontrado la asistencia relacionada");
+							}
+					   }
+				      break; 
+				      
+				   case "Designación" :
+				      break;
+				      
+				   case "Actuación" :
+					  break;
+					  
+				   case "Guardia":
+					  break;
+
+				   default : 
+				      // EJG
+				}
+
+			}
+		}
+		return response;
+	}
+
+	@Transactional
     public UpdateResponseDTO updateMovimientosVarios(MovimientosVariosFacturacionItem movimiento,
                                                              HttpServletRequest request) {
         LOGGER.debug("<MovimientosVariosFactServiceImpl.updateMovimientosVarios() -> Entrada");
@@ -507,9 +580,9 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
                         movimientoItem.setIdinstitucion(idInstitucion);
 
-                        movimientoItem.setIdpersona(Long.parseLong(movimiento.getIdPersona()));
+                        movimientoItem.setIdpersona(Long.valueOf(movimiento.getIdPersona()));
 
-                        movimientoItem.setIdmovimiento(Long.parseLong(movimiento.getIdMovimiento()));
+                        movimientoItem.setIdmovimiento(Long.valueOf(movimiento.getIdMovimiento()));
 
 
                         movimientoItem.setDescripcion(movimiento.getDescripcion());
@@ -517,23 +590,23 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                         movimientoItem.setMotivo(movimiento.getMotivo());
 
                         if(movimiento.getIdFacturacion() != null) {
-                        	 movimientoItem.setIdfacturacion(Integer.parseInt(movimiento.getIdFacturacion()));
+                        	 movimientoItem.setIdfacturacion(Integer.valueOf(movimiento.getIdFacturacion()));
                         }
                         
                         if(movimiento.getTipo() != null) {
-                        	movimientoItem.setIdtipomovimiento(Short.parseShort(movimiento.getTipo()));
+                        	movimientoItem.setIdtipomovimiento(Short.valueOf(movimiento.getTipo()));
                         }
                         
                         if(movimiento.getIdConcepto() != null) {
-                        	 movimientoItem.setIdhitogeneral(Short.parseShort(movimiento.getIdConcepto()));
+                        	 movimientoItem.setIdhitogeneral(Short.valueOf(movimiento.getIdConcepto()));
                         }
                        
                         if(movimiento.getIdGrupoFacturacion() != null) {
-                        	 movimientoItem.setIdgrupofacturacion(Short.parseShort(movimiento.getIdGrupoFacturacion()));
+                        	 movimientoItem.setIdgrupofacturacion(Short.valueOf(movimiento.getIdGrupoFacturacion()));
                         }
                        
                         if(movimiento.getIdPartidaPresupuestaria() != null) {
-                        	  movimientoItem.setIdpartidapresupuestaria(Integer.parseInt(movimiento.getIdPartidaPresupuestaria()));
+                        	  movimientoItem.setIdpartidapresupuestaria(Integer.valueOf(movimiento.getIdPartidaPresupuestaria()));
                         }
                        
                       
@@ -547,11 +620,11 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                   
                             LOGGER.debug("fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective() -> Entrada para actualizar el dato de certificacion");
                             FcsMvariosCertificaciones updCert = new FcsMvariosCertificaciones();
-                            updCert.setIdmovimiento(Long.parseLong(movimiento.getIdMovimiento()));
+                            updCert.setIdmovimiento(Long.valueOf(movimiento.getIdMovimiento()));
                             updCert.setFechamodificacion(new Date());
                             updCert.setIdinstitucion(idInstitucion);
                             updCert.setUsumodificacion(usuarios.get(0).getIdusuario());
-                            updCert.setIdcertificacion(Short.parseShort(movimiento.getCertificacion()));
+                            updCert.setIdcertificacion(Short.valueOf(movimiento.getCertificacion()));
                             
                             responseCert = fcsMvariosCertificacionesMapper.updateByPrimaryKeySelective(updCert);
                            
@@ -563,11 +636,11 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                                LOGGER.debug("fcsMvariosCertificacionesMapper.insert() -> Entrada para insertar el dato de certificacion");                      
                                
                                FcsMvariosCertificaciones insertCert = new FcsMvariosCertificaciones();
-                               insertCert.setIdmovimiento(Long.parseLong(movimiento.getIdMovimiento()));
+                               insertCert.setIdmovimiento(Long.valueOf(movimiento.getIdMovimiento()));
                                insertCert.setFechamodificacion(new Date());
                                insertCert.setIdinstitucion(idInstitucion);
                                insertCert.setUsumodificacion(usuarios.get(0).getIdusuario());
-                               insertCert.setIdcertificacion(Short.parseShort(movimiento.getCertificacion()));
+                               insertCert.setIdcertificacion(Short.valueOf(movimiento.getCertificacion()));
                                
                                responseCert2 = fcsMvariosCertificacionesMapper.insertSelective(insertCert);
                                LOGGER.debug("fcsMvariosCertificacionesMapper.insert() -> Salida con el dato de certificacion insertado");
@@ -702,7 +775,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                     NewIdDTO idMovimiento = fcsMovimientosvariosExtendsMapper
                             .selectMaxIdMovimientoByIdInstitucion(idInstitucion.toString());
 
-                    Long newid = Long.parseLong(idMovimiento.getNewId());
+                    Long newid = Long.valueOf(idMovimiento.getNewId());
 
                     if (movimiento != null) {
                         LOGGER.debug("fcsMovimientosvariosExtendsMapper.saveClienteMovimientosVarios() -> Insertar nuevo cliente en el movimiento");
@@ -715,7 +788,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                         record.setIdinstitucion(idInstitucion);
 
                         record.setIdmovimiento(newid + 1);
-                        record.setIdpersona(Long.parseLong(idPersona));
+                        record.setIdpersona(Long.valueOf(idPersona));
                         record.setFechaalta(new Date());
 
                         record.setDescripcion(" ");
@@ -808,9 +881,9 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
                         movimientoItem.setIdinstitucion(idInstitucion);
 
-                        movimientoItem.setIdpersona(Long.parseLong(movimiento.getIdPersona()));
+                        movimientoItem.setIdpersona(Long.valueOf(movimiento.getIdPersona()));
 
-                        movimientoItem.setIdmovimiento(Long.parseLong(movimiento.getIdMovimiento()));
+                        movimientoItem.setIdmovimiento(Long.valueOf(movimiento.getIdMovimiento()));
 
                         response = fcsMovimientosVariosMapper.updateByPrimaryKeySelective(movimientoItem);
 
