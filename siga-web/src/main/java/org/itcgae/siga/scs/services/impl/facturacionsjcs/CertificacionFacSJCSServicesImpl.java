@@ -852,7 +852,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         }
                         //obtiene las fechas max y min de las facturaciones.
                         FcsCertificaciones fechasCert = null;
-                        if(facts != null && !facts.isEmpty()) {
+                        if (facts != null && !facts.isEmpty()) {
                             fechasCert = fcsFactCertificacionesExtendsMapper.getFechaMaxMinFact(idInstitucion, idFacts);
                         } else {
                             FcsFacturacionjgKey fcsFacturacionjgKey = new FcsFacturacionjgKey();
@@ -1047,22 +1047,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
 
     @Override
-    public Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem,
-                                                  HttpServletRequest request) throws Exception {
+    public Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) {
         Resource resource = null;
 
         LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Entrada al servicio para la descarga de certificaciones de la Xunta");
 
-        File file = xuntaHelper.generaFicheroCertificacionesXunta(descargaItem.getIdInstitucion(), descargaItem.getLIdFacturaciones());
-
-        if (file != null) {
-            resource = new ByteArrayResource(Files.readAllBytes(file.toPath())) {
-                public String getFilename() {
-                    return file.getName();
-                }
-            };
-
-        }
+        resource = xuntaHelper.generaFicheroCertificacionesXunta(descargaItem.getIdInstitucion(), descargaItem.getListaIdFacturaciones(), descargaItem.getIdEstadoCertificacion());
 
         LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Salida del servicio para la descarga de certificaciones de la Xunta");
 

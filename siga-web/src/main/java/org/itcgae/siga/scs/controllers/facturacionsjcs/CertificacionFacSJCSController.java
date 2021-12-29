@@ -137,9 +137,10 @@ public class CertificacionFacSJCSController {
         try {
             resource = iCertificacionFacSJCSService.descargarCertificacionesXunta(descargaItem, request);
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=documentos.zip");
+            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
             response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+                    .contentType(MediaType.parseMediaType("application/zip")).body(resource);
         } catch (Exception e) {
             error = true;
         }
