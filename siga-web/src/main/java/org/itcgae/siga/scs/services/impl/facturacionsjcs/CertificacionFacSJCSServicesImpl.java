@@ -1630,10 +1630,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                     String path = getDirectorioFichero("FCS", SigaConstants.PATH_PREVISIONES_BD, idInstitucion);
                     path += File.separator + "LOG_ERROR_" + idInstitucion + "_" + idFactsList.get(i) + ".log";
                     File file = new File(path);
-                    zipOutputStream.putNextEntry(new ZipEntry(file.getName() + ".txt"));
-                    FileInputStream fileInputStream = new FileInputStream(file);
-                    IOUtils.copy(fileInputStream, zipOutputStream);
-                    fileInputStream.close();
+                    if(file.exists()) {
+                        zipOutputStream.putNextEntry(new ZipEntry(file.getName() + ".txt"));
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        IOUtils.copy(fileInputStream, zipOutputStream);
+                        fileInputStream.close();
+                    }
                 }
 
                 fileStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
@@ -1683,10 +1685,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                 for (int i = 0; i < idFactsList.size();i ++) {
 
                     File file = getFileInformeIncidencias(idInstitucion,idFactsList.get(i));
-                    zipOutputStream.putNextEntry(new ZipEntry(file.getName() + ".txt"));
-                    FileInputStream fileInputStream = new FileInputStream(file);
-                    IOUtils.copy(fileInputStream, zipOutputStream);
-                    fileInputStream.close();
+                    if(file.exists()) {
+                        zipOutputStream.putNextEntry(new ZipEntry(file.getName() + ".txt"));
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        IOUtils.copy(fileInputStream, zipOutputStream);
+                        fileInputStream.close();
+                    }
                 }
 
                 fileStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
