@@ -34,6 +34,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDGRUPOFACTURACION", property = "descGrupo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR)})
     List<FacturacionItem> buscarFacturaciones(FacturacionItem facturacionItem, String idInstitucion, Integer tamMax);
 
@@ -293,4 +294,12 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getAgrupacionDeTurnosPorTurno")
     String getAgrupacionDeTurnosPorTurno(Short idInstitucion, String idTurno);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesCerradasPorInstitucion")
+    List<Integer> getFacturacionesCerradasPorInstitucion(Short idInstitucion);
+
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "comboFactBaremos")
+    @Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)})
+    List<ComboItem> comboFactBaremos(String idInstitucion);
 }

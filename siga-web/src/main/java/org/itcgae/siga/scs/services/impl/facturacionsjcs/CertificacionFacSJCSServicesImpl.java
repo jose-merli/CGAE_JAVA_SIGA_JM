@@ -17,6 +17,7 @@ import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFactCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
@@ -101,13 +102,16 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
 
     @Autowired
-    FcsPagosjgMapper fcsPagosjgMapper;
+    private FcsPagosjgMapper fcsPagosjgMapper;
+
+    @Autowired
+    private FcsFactCertificacionesExtendsMapper fcsFactCertificacionesExtendsMapper;
 
 
     @Override
-    public InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request) {
+    public InsertResponseDTO tramitarCertificacion(TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request) {
 
-        LOGGER.info("CertificacionFacSJCSServicesImpl.generaInformeCertificacion() -> Entrada al servicio para generar el informe de la certificacion");
+        LOGGER.info("CertificacionFacSJCSServicesImpl.tramitarCertificacion() -> Entrada al servicio para tramitar la certificacion");
 
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -122,25 +126,34 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                 AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
                 exampleUsuarios.createCriteria().andNifEqualTo(dni)
                         .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-                LOGGER.info("CertificacionFacSJCSServicesImpl.generaInformeCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
+                LOGGER.info("CertificacionFacSJCSServicesImpl.tramitarCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
                         "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
                 List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-                LOGGER.info("CertificacionFacSJCSServicesImpl.generaInformeCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
+                LOGGER.info("CertificacionFacSJCSServicesImpl.tramitarCertificacion() / admUsuariosExtendsMapper.selectByExample() -> " +
                         "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
                 if (null != usuarios && !usuarios.isEmpty()) {
-                    listaParaConsejo(idInstitucion, idFacturacion, usuarios.get(0));
+
+                    if (tramitarCerttificacionRequestDTO.getFacturacionItemList() != null && !tramitarCerttificacionRequestDTO.getFacturacionItemList().isEmpty()) {
+
+                        for (FacturacionItem f : tramitarCerttificacionRequestDTO.getFacturacionItemList()) {
+                            listaParaConsejo(tramitarCerttificacionRequestDTO.getIdCertificacion(), idInstitucion, f.getIdFacturacion(), usuarios.get(0));
+                        }
+
+                    }
+
                 }
 
             }
 
         } catch (Exception e) {
-            LOGGER.error("CertificacionFacSJCSServicesImpl.generaInformeCertificacion() -> Se ha producido un error al intentar generar el informe de la certificacion", e);
+            LOGGER.error("CertificacionFacSJCSServicesImpl.tramitarCertificacion() -> Se ha producido un error al intentar tramitar la certificacion", e);
             error.setCode(500);
             error.setDescription("general.mensaje.error.bbdd");
         }
 
         insertResponseDTO.setError(error);
+        insertResponseDTO.setId(tramitarCerttificacionRequestDTO.getIdCertificacion());
 
         if (error.getDescription() == null) {
             insertResponseDTO.setStatus(SigaConstants.OK);
@@ -148,12 +161,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             insertResponseDTO.setStatus(SigaConstants.KO);
         }
 
-        LOGGER.info("CertificacionFacSJCSServicesImpl.generaInformeCertificacion() -> Salida del servicio para generar el informe de la certificacion");
+        LOGGER.info("CertificacionFacSJCSServicesImpl.tramitarCertificacion() -> Salida del servicio para tramitar la certificacion");
 
         return insertResponseDTO;
     }
 
-    private void listaParaConsejo(Short idInstitucion, String idFacturacion, AdmUsuarios usuario) throws Exception {
+    private void listaParaConsejo(String idCertificacion, Short idInstitucion, String idFacturacion, AdmUsuarios usuario) throws Exception {
 
         String estadoActualFacturacion = fcsFactEstadosfacturacionExtendsMapper.getIdEstadoFacturacion(idInstitucion, idFacturacion);
 
@@ -174,13 +187,15 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         if (SigaConstants.TIPO_CAJG_XML_SANTIAGO == tipoCAJG) {
             envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_XUNTA_JE.getId(), usuario);
             estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
+            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
         }
 
         //TODO CAMBIAR LA OPERACIÓN
-        if (SigaConstants.TIPO_CAJG_CATALANES == tipoCAJG) {
-            envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_CAT_VALIDA_JUSTIFICACION.getId(), usuario);
-            estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
-        }
+//        if (SigaConstants.TIPO_CAJG_CATALANES == tipoCAJG) {
+//            envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_CAT_VALIDA_JUSTIFICACION.getId(), usuario);
+//            estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
+//            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
+//        }
 
         if (esCAM(idInstitucion)) {
             /* en el caso de la CAM el fichero ya se ha generado previamente al ejecutar informe
@@ -193,6 +208,29 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             actualizarEstadoFacturacion(usuario, idInstitucion, idFacturacion, estadoFuturo);
         }
 
+    }
+
+    private void actualizaEstadoCertificacion(String idCertificacion, Short idInstitucion, Short idEstado, Integer idUsuario) {
+        FcsCertificacionesHistoricoEstado estado = new FcsCertificacionesHistoricoEstado();
+        estado.setIdcertificacion(Short.valueOf(idCertificacion));
+        estado.setIdinstitucion(idInstitucion);
+        estado.setFechaestado(new Date());
+        estado.setIdestado(idEstado);
+        estado.setFechamodificacion(new Date());
+        estado.setUsumodificacion(idUsuario);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> INICIO de la query para insertar el estado de la certificacion");
+        fcsCertificacionesHistoricoEstadoMapper.insertSelective(estado);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.insertSelective() -> FIN de la query para insertar el estado de la certificacion");
+
+        FcsCertificaciones fcsCertificaciones = new FcsCertificaciones();
+        fcsCertificaciones.setIdcertificacion(Short.valueOf(idCertificacion));
+        fcsCertificaciones.setIdinstitucion(idInstitucion);
+        fcsCertificaciones.setIdestadocertificacion(idEstado);
+        fcsCertificaciones.setFechamodificacion(new Date());
+        fcsCertificaciones.setUsumodificacion(idUsuario);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective() -> INICIO de la query para aztualizar la certificacion");
+        fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective(fcsCertificaciones);
+        LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective() -> FIN de la query para aztualizar la certificacion");
     }
 
     private void actualizarEstadoFacturacion(AdmUsuarios usuario, Short idInstitucion, String idFacturacion, int estadoFuturo) {
@@ -767,6 +805,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         Error error = new Error();
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         int response = 0;
+        String idFacts = "";
 
         try {
 
@@ -795,23 +834,65 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         insertResponseDTO.setStatus(SigaConstants.KO);
                     } else {
 
-                        FcsFactCertificaciones fc = new FcsFactCertificaciones();
-                        fc.setIdinstitucion(idInstitucion);
-                        fc.setIdfacturacion(Integer.parseInt(certificacionesItem.getIdFacturacion()));
-                        fc.setIdcertificacion(Short.parseShort(certificacionesItem.getIdCertificacion()));
-                        fc.setUsumodificacion(usuarios.get(0).getIdusuario());
-                        fc.setFechamodificacion(new Date());
+                        //obtiene las facturaciones de la certificacion
+                        FcsFactCertificacionesExample facturaciones = new FcsFactCertificacionesExample();
+                        facturaciones.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                                .andIdcertificacionEqualTo(Short.parseShort(certificacionesItem.getIdCertificacion()));
+                        List<FcsFactCertificaciones> facts = fcsFactCertificacionesExtendsMapper.selectByExample(facturaciones);
+                        if (facts != null) {
+                            int cont = 0;
+                            for (FcsFactCertificaciones f : facts) {
+                                idFacts += f.getIdfacturacion();
+                                cont++;
+                                if (cont < facts.size()) {
+                                    idFacts += ",";
+                                }
 
-                        response = fcsFactCertificacionesMapper.insert(fc);
-
-                        if (response != 0) {
-                            error.setCode(200);
-                            error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.factAsociada");
-                            insertResponseDTO.setStatus(SigaConstants.OK);
+                            }
+                        }
+                        //obtiene las fechas max y min de las facturaciones.
+                        FcsCertificaciones fechasCert = null;
+                        if(facts != null && !facts.isEmpty()) {
+                            fechasCert = fcsFactCertificacionesExtendsMapper.getFechaMaxMinFact(idInstitucion, idFacts);
                         } else {
-                            error.setCode(400);
-                            error.setDescription("general.mensaje.error.bbdd");
-                            insertResponseDTO.setStatus(SigaConstants.KO);
+                            FcsFacturacionjgKey fcsFacturacionjgKey = new FcsFacturacionjgKey();
+                            fcsFacturacionjgKey.setIdinstitucion(idInstitucion);
+                            fcsFacturacionjgKey.setIdfacturacion(Integer.valueOf(certificacionesItem.getIdFacturacion()));
+                            FcsFacturacionjg facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(fcsFacturacionjgKey);
+
+                            fechasCert = new FcsCertificaciones();
+                            fechasCert.setFechadesde(facturacion.getFechadesde());
+                            fechasCert.setFechahasta(facturacion.getFechahasta());
+                        }
+
+                        //actualiza la certificacion con las nuevas fechas.
+                        FcsCertificaciones cert = new FcsCertificaciones();
+                        cert.setIdinstitucion(idInstitucion);
+                        cert.setIdcertificacion(Short.parseShort(certificacionesItem.getIdCertificacion()));
+                        cert.setFechadesde(fechasCert.getFechadesde());
+                        cert.setFechahasta(fechasCert.getFechahasta());
+                        cert.setFechamodificacion(new Date());
+                        cert.setUsumodificacion(usuarios.get(0).getIdusuario());
+                        int updateCert = fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective(cert);
+                        if (updateCert != 0) {
+                            FcsFactCertificaciones fc = new FcsFactCertificaciones();
+                            fc.setIdinstitucion(idInstitucion);
+                            fc.setIdfacturacion(Integer.parseInt(certificacionesItem.getIdFacturacion()));
+                            fc.setIdcertificacion(Short.parseShort(certificacionesItem.getIdCertificacion()));
+                            fc.setUsumodificacion(usuarios.get(0).getIdusuario());
+                            fc.setFechamodificacion(new Date());
+
+                            response = fcsFactCertificacionesMapper.insert(fc);
+
+                            if (response != 0) {
+                                error.setCode(200);
+                                error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.factAsociada");
+                                insertResponseDTO.setStatus(SigaConstants.OK);
+                            } else {
+                                error.setCode(400);
+                                error.setDescription("general.mensaje.error.bbdd");
+                                insertResponseDTO.setStatus(SigaConstants.KO);
+                            }
                         }
 
                     }
@@ -1020,29 +1101,29 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                     // HACEMOS INSERT DEL ESTADO ABIERTA
                     LOGGER.info("reabrirFacturacion() -> Guardar datos para reabrir en fcsFactEstadosfacturacion");
 
-                    for(CertificacionesItem cert: certificacionesItemList){
+                    for (CertificacionesItem cert : certificacionesItemList) {
                         //comprobacion de si la facturacion tiene pagos asociados
                         FcsPagosjgExample pagosAso = new FcsPagosjgExample();
                         pagosAso.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturacionEqualTo(Integer.parseInt(cert.getIdFacturacion()));
                         List<FcsPagosjg> pagos = fcsPagosjgMapper.selectByExample(pagosAso);
 
-                        if(pagos.isEmpty()){
+                        if (pagos.isEmpty()) {
                             response += insertarEstado(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), idInstitucion,
-                            Integer.valueOf(cert.getIdFacturacion()), usuario.getIdusuario());
-                        }else{
+                                    Integer.valueOf(cert.getIdFacturacion()), usuario.getIdusuario());
+                        } else {
                             factNoReabierta += cert.getNombre() + "/";
                         }
                     }
 
-                    if(response == certificacionesItemList.size() && response != 0){
+                    if (response == certificacionesItemList.size() && response != 0) {
                         error.setCode(200);
                         error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.reabrirFact");
                         insertResponse.setStatus(SigaConstants.OK);
-                    }else if(response != certificacionesItemList.size() && response != 0){
+                    } else if (response != certificacionesItemList.size() && response != 0) {
                         error.setCode(200);
-                        error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.reabrirAlgunas" +" "+ factNoReabierta);
+                        error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.reabrirAlgunas" + " " + factNoReabierta);
                         insertResponse.setStatus(SigaConstants.OK);
-                    }else if(response == 0){
+                    } else if (response == 0) {
                         error.setCode(400);
                         error.setDescription("fichaCertificacionSJCS.tarjetaFacturacion.reabrirConPagos");
                         insertResponse.setStatus(SigaConstants.KO);
@@ -1489,5 +1570,32 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         LOGGER.info("CertificacionFacSJCSServicesImpl.getMvariosAplicadosEnPagosEjecutadosPorPeriodo() -> Salida del servicio para obtener los movimientos varios aplicados en pagos ejecutados durante un periodo");
 
         return movimientosVariosApliCerDTO;
+    }
+
+    @Override
+    public void marcaVisiblesFacturacionesCerradas() {
+
+        CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+        exampleInstitucion.setDistinct(true);
+        exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull().andCenInstIdinstitucionEqualTo(Short.valueOf("3005"));
+
+        List<CenInstitucion> listaInstituciones = institucionesMapper.selectByExample(exampleInstitucion);
+
+        for (CenInstitucion institucion : listaInstituciones) {
+
+            List<Integer> facturaciones = fcsFacturacionJGExtendsMapper.getFacturacionesCerradasPorInstitucion(institucion.getIdinstitucion());
+
+            FcsFacturacionjgExample fcsFacturacionjgExample = new FcsFacturacionjgExample();
+            fcsFacturacionjgExample.createCriteria().andIdinstitucionEqualTo(institucion.getIdinstitucion()).andIdfacturacionIn(facturaciones);
+
+            FcsFacturacionjg fcsFacturacionjg = new FcsFacturacionjg();
+            fcsFacturacionjg.setFechamodificacion(new Date());
+            fcsFacturacionjg.setUsumodificacion(0);
+            fcsFacturacionjg.setVisible("1");
+
+            fcsFacturacionJGExtendsMapper.updateByExampleSelective(fcsFacturacionjg, fcsFacturacionjgExample);
+
+        }
+
     }
 }

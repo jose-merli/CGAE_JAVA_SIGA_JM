@@ -92,6 +92,7 @@ public class FacturacionSJCSHelper  {
 	            ecomCola.setIdestadocola(SigaConstants.ECOM_ESTADOSCOLA.INICIAL.getId());
 	            ecomCola.setReintento(0);
 	            ecomCola.setFechacreacion(new Date());
+				ecomCola.setFechamodificacion(new Date());
 	            ecomCola.setUsumodificacion(usuario.getIdusuario());
 
 	            return ecomColaMapper.insert(ecomCola);

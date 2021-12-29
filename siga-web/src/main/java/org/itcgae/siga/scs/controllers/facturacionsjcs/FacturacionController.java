@@ -51,11 +51,11 @@ public class FacturacionController {
     ResponseEntity<FacturacionDeleteDTO> eliminarFacturaciones(@RequestBody FacturacionItem facturacionItem,
                                                                HttpServletRequest request) {
         FacturacionDeleteDTO response = facturacionServices.eliminarFacturaciones(facturacionItem, request);
-        if (response.getStatus() == SigaConstants.OK) {
+        //if (response.getStatus() == SigaConstants.OK) {
             return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        //} else {
+        //    return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        //}
     }
 
     @RequestMapping(value = "/facturacionsjcs/datosfacturacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

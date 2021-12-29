@@ -22,6 +22,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("FECHADESDE");
         sql.SELECT("FECHAHASTA");
         sql.SELECT("NOMBRE");
+        sql.SELECT("IDGRUPOFACTURACION");
         sql.SELECT("REGULARIZACION");
         sql.SELECT("DESESTADO");
         sql.SELECT("IDESTADO");
@@ -36,6 +37,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql2.SELECT("FAC.FECHADESDE");
         sql2.SELECT("FAC.FECHAHASTA");
         sql2.SELECT("FAC.NOMBRE");
+        sql2.SELECT("F_SIGA_GETRECURSO(sg.NOMBRE,1) IDGRUPOFACTURACION");
         sql2.SELECT("DECODE(FAC.REGULARIZACION, '1', 'Si', 'No') AS REGULARIZACION");
         sql2.SELECT("(SELECT F_SIGA_GETRECURSO(ESTADOS.DESCRIPCION, 1) DESCRIPCION "
                 + "FROM FCS_ESTADOSFACTURACION ESTADOS "
@@ -50,6 +52,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
         sql2.INNER_JOIN(
                 "FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION)");
+        sql2.INNER_JOIN("FCS_FACT_GRUPOFACT_HITO ffgh ON (ffgh.IDFACTURACION = FAC.IDFACTURACION AND ffgh.IDINSTITUCION = FAC.IDINSTITUCION)");
+        sql2.INNER_JOIN("SCS_GRUPOFACTURACION sg ON (sg.IDGRUPOFACTURACION = ffgh.IDGRUPOFACTURACION AND sg.IDINSTITUCION = ffgh.IDINSTITUCION)");
         sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");
         sql2.WHERE("EST.IDORDENESTADO =(SELECT MAX(EST2.IDORDENESTADO) FROM FCS_FACT_ESTADOSFACTURACION EST2 "
                 + "WHERE EST2.IDINSTITUCION = EST.IDINSTITUCION AND EST2.IDFACTURACION = EST.IDFACTURACION)");
@@ -107,9 +111,9 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         }
 
         sql.FROM("(" + sql2.toString() + ") busqueda");
-        sql.ORDER_BY("busqueda.FECHADESDE ASC");
-        sql.ORDER_BY("busqueda.FECHAHASTA");
-        sql.ORDER_BY("busqueda.FECHAESTADO DESC");
+        sql.ORDER_BY("busqueda.FECHADESDE DESC");
+        sql.ORDER_BY("busqueda.FECHAHASTA DESC");
+        //sql.ORDER_BY("busqueda.FECHAESTADO DESC");
 
         SQL query = new SQL();
         query.SELECT("*");
@@ -552,6 +556,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("pjg.idinstitucion = '" + idInstitucion + "'");
         sql.WHERE("pjg.idfacturacion =  '" + idFacturacion + "'");
         sql.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
+        sql.ORDER_BY("est.fechaestado DESC");
 
         return sql.toString();
     }
@@ -1082,5 +1087,37 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("IDTURNO = " + idTurno);
 
         return sql.toString();
+    }
+
+    public String getFacturacionesCerradasPorInstitucion(Short idInstitucion) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("MAX(EST2.IDORDENESTADO)");
+        subQuery.FROM("FCS_FACT_ESTADOSFACTURACION EST2");
+        subQuery.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+        subQuery.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+
+        SQL sql = new SQL();
+        sql.SELECT("FAC.IDFACTURACION");
+        sql.FROM("FCS_FACTURACIONJG FAC");
+        sql.JOIN("FCS_FACT_ESTADOSFACTURACION EST ON FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION");
+        sql.WHERE("FAC.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("EST.IDESTADOFACTURACION = 30");
+        sql.WHERE("EST.IDORDENESTADO = (" + subQuery.toString() + ")");
+
+        return sql.toString();
+    }
+
+    public String comboFactBaremos(String idInstitucion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("F.IDFACTURACION");
+        sql.SELECT(
+                "TO_CHAR(F.FECHADESDE, 'DD/MM/YYYY') || '-' || TO_CHAR(F.FECHAHASTA, 'DD/MM/YYYY') || ' - ' || F.NOMBRE AS DESCRIPCION");
+        sql.FROM("FCS_FACTURACIONJG F");
+        sql.WHERE("F.IDINSTITUCION = '" + idInstitucion + "'");
+
+        return sql.toString();
+
     }
 }

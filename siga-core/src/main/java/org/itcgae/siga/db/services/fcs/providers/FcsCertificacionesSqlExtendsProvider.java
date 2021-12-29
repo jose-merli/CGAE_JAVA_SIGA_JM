@@ -242,27 +242,45 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
     }
 
     public String comboFactByPartidaPresu(String idpartidapresupuestaria, String idinstitucion) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("MAX(EST2.IDORDENESTADO)");
+        subQuery.FROM("FCS_FACT_ESTADOSFACTURACION EST2");
+        subQuery.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+        subQuery.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+
         SQL sql = new SQL();
         sql.SELECT("FAC.IDFACTURACION");
         sql.SELECT("FAC.NOMBRE");
         sql.FROM("FCS_FACTURACIONJG FAC");
-        sql.JOIN("fcs_fact_estadosfacturacion est ON (  fac.idinstitucion = est.idinstitucion AND fac.idfacturacion = est.idfacturacion AND est.IDESTADOFACTURACION = '20')");
+        sql.JOIN("FCS_FACT_ESTADOSFACTURACION EST ON FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION");
         sql.WHERE("FAC.IDINSTITUCION = " + idinstitucion);
+        sql.WHERE("EST.IDESTADOFACTURACION = 20");
+        sql.WHERE("EST.IDORDENESTADO = (" + subQuery.toString() + ")");
 
         if (!idpartidapresupuestaria.equals("sinPartida")) {
             sql.WHERE("FAC.IDPARTIDAPRESUPUESTARIA = " + idpartidapresupuestaria);
         }
+
         return sql.toString();
     }
 
     public String comboFactNull(String idinstitucion) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("MAX(EST2.IDORDENESTADO)");
+        subQuery.FROM("FCS_FACT_ESTADOSFACTURACION EST2");
+        subQuery.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+        subQuery.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+
         SQL sql = new SQL();
         sql.SELECT("FAC.IDFACTURACION");
         sql.SELECT("FAC.NOMBRE");
         sql.FROM("FCS_FACTURACIONJG FAC");
-        sql.JOIN("fcs_fact_estadosfacturacion est ON (  fac.idinstitucion = est.idinstitucion AND fac.idfacturacion = est.idfacturacion AND est.IDESTADOFACTURACION = '20')");
+        sql.JOIN("FCS_FACT_ESTADOSFACTURACION EST ON FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION");
         sql.WHERE("FAC.IDINSTITUCION = " + idinstitucion);
-        sql.WHERE("FAC.IDPARTIDAPRESUPUESTARIA IS NULL");
+        sql.WHERE("EST.IDESTADOFACTURACION = 20");
+        sql.WHERE("EST.IDORDENESTADO = (" + subQuery.toString() + ")");
         return sql.toString();
     }
 

@@ -397,6 +397,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
                     facturacionesDelete.setStatus(SigaConstants.KO);
                     error.setDescription("facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
+                    error.setMessage(facturacionItem.getNombre());
                 }
                 LOGGER.info(
                         "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
@@ -1555,9 +1556,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         "datosPagos() / fcsFacturacionJGExtendsMapper.datosPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los datos de los pagos");
                 List<PagosjgItem> pagosItem = fcsFacturacionJGExtendsMapper.datosPagos(idFacturacion,
                         idInstitucion.toString(), idLenguaje);
+                /* Quitamos esto porque en principio no se pide que se agrupe y se tienen que mostrar todos
                 pagosItem = pagosItem.stream()
                         .collect(collectingAndThen(toCollection(() -> new TreeSet<>(Comparator.comparing(PagosjgItem::getIdHitoGeneral))),
-                                ArrayList::new));
+                                ArrayList::new));*/
                 pagos.setPagosjgItem(pagosItem);
                 LOGGER.info(
                         "datosPagos() / fcsFacturacionJGExtendsMapper.datosPagos() -> Salida fcsFacturacionJGExtendsMapper para obtener los datos de los pagos");

@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface ICertificacionFacSJCSService {
 
-    InsertResponseDTO tramitarCertificacion(String idFacturacion, HttpServletRequest request);
+    InsertResponseDTO tramitarCertificacion(TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request);
 
     Resource getInformeCAM(String idFacturacion, String tipoFichero, HttpServletRequest request) throws Exception;
 
@@ -53,4 +53,6 @@ public interface ICertificacionFacSJCSService {
     MovimientosVariosApliCerDTO getMvariosAplicadosEnPagosEjecutadosPorPeriodo(MovimientosVariosApliCerRequestDTO movimientosVariosApliCerRequestDTO, HttpServletRequest request);
 
     UpdateResponseDTO accionXuntaEnvios(EnvioXuntaItem envioItem, HttpServletRequest request);
+
+    void marcaVisiblesFacturacionesCerradas();
 }
