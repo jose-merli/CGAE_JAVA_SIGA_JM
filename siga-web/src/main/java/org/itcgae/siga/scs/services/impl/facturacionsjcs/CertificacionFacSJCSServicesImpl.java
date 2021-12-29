@@ -1722,14 +1722,27 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
 
     private String getDirectorioFichero(String modulo, String parametro, Short idinstitucion) {
-        GenParametrosKey path = new GenParametrosKey();
+        GenParametrosExample path = new GenParametrosExample();
 
         String valor = "";
-        path.setIdinstitucion(idinstitucion);
-        path.setModulo(modulo);
-        path.setParametro(parametro);
+        path.createCriteria().andModuloEqualTo(modulo).andParametroEqualTo(parametro);
 
-        valor = genParametrosMapper.selectByPrimaryKey(path).getValor();
+        List<GenParametros> parametros = genParametrosMapper.selectByExample(path);
+
+        for (GenParametros param : parametros) {
+            if (idinstitucion.equals(param.getIdinstitucion().toString())) {
+                valor = param.getValor().toString();
+            } else {
+
+                GenParametrosKey pathDefecto = new GenParametrosKey();
+                pathDefecto.setIdinstitucion(Short.parseShort("0"));
+                pathDefecto.setModulo(modulo);
+                pathDefecto.setParametro(parametro);
+
+                valor = genParametrosMapper.selectByPrimaryKey(pathDefecto).getValor();
+            }
+        }
+
         return valor;
     }
 
