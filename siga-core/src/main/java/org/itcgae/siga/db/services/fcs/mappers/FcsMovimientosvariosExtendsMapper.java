@@ -17,33 +17,6 @@ import java.util.List;
 @Primary
 public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosMapper {
 
-    @SelectProvider(type = FcsMovimientosvariosSqlExtendsProvider.class, method = "buscarMovimientosVarios")
-    @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "NOMBRE", property = "letrado", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "MOVIMIENTO", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "CANTIDAD", property = "cantidad", jdbcType = JdbcType.DECIMAL),
-            @Result(column = "CANTIDADAPLICADA", property = "cantidadAplicada", jdbcType = JdbcType.DECIMAL),
-            @Result(column = "CANTIDADRESTANTE", property = "cantidadRestante", jdbcType = JdbcType.DECIMAL),
-            @Result(column = "IDPAGOSJG", property = "idAplicadoEnPago", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDGRUPOFACTURACION", property = "idGrupoFacturacion", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "NOMBRELETRADO", property = "nombre", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "NOMBREFACTURACION", property = "nombrefacturacion", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "PAGOASOCIADO", property = "nombrePago", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDCERTIFICACION", property = "certificacion", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDCONCEPTO", property = "idConcepto", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDTIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "NOMBRETIPO", property = "nombretipo", jdbcType = JdbcType.VARCHAR)})
-    List<MovimientosVariosFacturacionItem> buscarMovimientosVarios(MovimientosVariosFacturacionItem movimientoItem, String idInstitucion);
-
 
     @SelectProvider(type = FcsMovimientosvariosSqlExtendsProvider.class, method = "ejecutarFuncionMovVario")
     String ejecutarFuncionMovVario(String idInstitucion, String idMovimiento, String funcion);
@@ -124,6 +97,35 @@ public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosM
             @Result(column = "IDCERTIFICACION", property = "newId", jdbcType = JdbcType.VARCHAR)
     })
     NewIdDTO selectMaxIdCertificacionByIdInstitucion(String idInstitucion);
+
+    
+    @SelectProvider(type = FcsMovimientosvariosSqlExtendsProvider.class, method = "buscarMVColegiado")
+    @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "letrado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "MOVIMIENTO", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CANTIDAD", property = "cantidad", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "CANTIDADAPLICADA", property = "cantidadAplicada", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "CANTIDADRESTANTE", property = "cantidadRestante", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPAGOSJG", property = "idAplicadoEnPago", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDGRUPOFACTURACION", property = "idGrupoFacturacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRELETRADO", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBREFACTURACION", property = "nombrefacturacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "PAGOASOCIADO", property = "nombrePago", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDCERTIFICACION", property = "certificacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDCONCEPTO", property = "idConcepto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDTIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRETIPO", property = "nombretipo", jdbcType = JdbcType.VARCHAR)})
+    List<MovimientosVariosFacturacionItem> buscarMVColegiado(MovimientosVariosFacturacionItem movimientoItem, String idInstitucion);
+
 
     
 }

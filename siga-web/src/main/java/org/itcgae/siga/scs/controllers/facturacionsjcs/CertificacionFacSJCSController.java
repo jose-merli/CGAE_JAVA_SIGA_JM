@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -212,6 +213,18 @@ public class CertificacionFacSJCSController {
     ResponseEntity<MovimientosVariosApliCerDTO> getMvariosAplicadosEnPagosEjecutadosPorPeriodo(@RequestBody MovimientosVariosApliCerRequestDTO movimientosVariosApliCerRequestDTO, HttpServletRequest request) {
         MovimientosVariosApliCerDTO response = iCertificacionFacSJCSService.getMvariosAplicadosEnPagosEjecutadosPorPeriodo(movimientosVariosApliCerRequestDTO, request);
         return new ResponseEntity<MovimientosVariosApliCerDTO>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/descargarLogReintegrosXunta",method = RequestMethod.POST)
+    ResponseEntity<InputStreamResource> descargarLogReintegrosXunta(@RequestBody List<String> idFactsList, HttpServletRequest request) {
+        ResponseEntity<InputStreamResource> response = iCertificacionFacSJCSService.descargarLogReintegrosXunta(idFactsList, request);
+        return response;
+    }
+
+    @RequestMapping(value = "/descargarInformeIncidencias",method = RequestMethod.POST)
+    ResponseEntity<InputStreamResource> descargarInformeReintegrosXunta(@RequestBody List<String> idFactsList, HttpServletRequest request) {
+        ResponseEntity<InputStreamResource> response = iCertificacionFacSJCSService.descargarInformeIncidencias(idFactsList, request);
+        return response;
     }
 
 }
