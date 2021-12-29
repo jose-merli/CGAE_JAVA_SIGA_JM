@@ -32,7 +32,6 @@ import org.itcgae.siga.db.entities.PysProductosExample;
 import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
-import org.itcgae.siga.db.mappers.CenGruposcriteriosMapper;
 import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
@@ -123,9 +122,6 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
-
-	@Autowired
-	private CenGruposcriteriosMapper cenGruposcriteriosMapper;
 
 	@Autowired
 	private ConConsultasExtendsMapper conConsultasExtendsMapper;
@@ -915,8 +911,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			}
 
 			comboItems.add(item);
-			
-			//primeros recibos
+
+			// primeros recibos
 			item = new ComboItem();
 			example = new GenParametrosExample();
 

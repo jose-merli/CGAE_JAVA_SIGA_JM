@@ -97,9 +97,10 @@ public interface IFacturacionPySService {
 
 	public ConsultasDTO getConsultasSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 
-    public FinalidadConsultaDTO getFinalidadConsultasSerie(ConsultaDestinatarioItem consulta, HttpServletRequest request) throws Exception;
+	public FinalidadConsultaDTO getFinalidadConsultasSerie(ConsultaDestinatarioItem consulta,
+			HttpServletRequest request) throws Exception;
 
-    public CreateResponseDTO nuevaConsultaSerie(ConsultaDestinatarioItem consulta, HttpServletRequest request)
+	public CreateResponseDTO nuevaConsultaSerie(ConsultaDestinatarioItem consulta, HttpServletRequest request)
 			throws Exception;
 
 	public DeleteResponseDTO eliminaConsultasSerie(List<ConsultaDestinatarioItem> consultas, HttpServletRequest request)
@@ -178,13 +179,15 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request)
 			throws Exception;
 
-	public FacturasIncluidasDTO getFacturasIncluidas(String idFichero, String tipoFichero, HttpServletRequest request) throws Exception;
-	
-	public FacRegistroFichContaDTO search(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request) throws Exception;
-	
-	public FacRegistroFichContaDTO maxIdContabilidad(HttpServletRequest request)throws Exception;
+	public FacturasIncluidasDTO getFacturasIncluidas(String idFichero, String tipoFichero, HttpServletRequest request)
+			throws Exception;
 
-	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request);
-	
+	public FacRegistroFichContaDTO search(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request)
+			throws Exception;
+
+	public FacRegistroFichContaDTO maxIdContabilidad(HttpServletRequest request) throws Exception;
+
+	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
+			HttpServletRequest request);
 
 }

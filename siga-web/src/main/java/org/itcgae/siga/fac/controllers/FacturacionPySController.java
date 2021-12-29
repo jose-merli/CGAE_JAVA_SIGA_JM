@@ -280,7 +280,7 @@ public class FacturacionPySController {
 
 	@PostMapping(value = "/getFinalidadConsultasSerie")
 	ResponseEntity<FinalidadConsultaDTO> getFinalidadConsultasSerie(@RequestBody ConsultaDestinatarioItem consulta,
-																	HttpServletRequest request) {
+			HttpServletRequest request) {
 		FinalidadConsultaDTO response = new FinalidadConsultaDTO();
 
 		try {
@@ -799,9 +799,10 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacturasIncluidasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping(value = "/searchExportacionContabilidad")
-	ResponseEntity<FacRegistroFichContaDTO> search( @RequestBody FacRegistroFichConta facRegistroFichConta, HttpServletRequest request) {
+	ResponseEntity<FacRegistroFichContaDTO> search(@RequestBody FacRegistroFichConta facRegistroFichConta,
+			HttpServletRequest request) {
 		FacRegistroFichContaDTO response = new FacRegistroFichContaDTO();
 		try {
 			response = facturacionService.search(facRegistroFichConta, request);
@@ -811,7 +812,7 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping(value = "/maxIdContabilidad")
 	ResponseEntity<FacRegistroFichContaDTO> maxIdContabilidad(HttpServletRequest request) {
 		FacRegistroFichContaDTO response = new FacRegistroFichContaDTO();
@@ -823,7 +824,7 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping(value = "/guardarRegistroFichConta")
 	ResponseEntity<UpdateResponseDTO> guardarRegistroFichConta(@RequestBody FacRegistroFichConta facRegistroFichConta,
 			HttpServletRequest request) {
@@ -838,6 +839,5 @@ public class FacturacionPySController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
+
 }
