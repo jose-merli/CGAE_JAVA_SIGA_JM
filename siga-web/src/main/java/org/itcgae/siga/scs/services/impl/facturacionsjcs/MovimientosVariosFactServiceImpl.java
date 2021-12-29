@@ -80,17 +80,17 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
                 if (null != usuarios && usuarios.size() > 0) {
                     AdmUsuarios usuario = usuarios.get(0);
-                    usuario.setIdinstitucion(idInstitucion);
-
+                    usuario.setIdinstitucion(idInstitucion);          
+                    						
                     LOGGER.debug(
                             "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / fcsMovimientosvariosExtendsMapper.buscarMovimientosVarios() -> Entrada a fcsMovimientosvariosExtendsMapper para obtener los movimientos varios");
                     List<MovimientosVariosFacturacionItem> movimientosItems = fcsMovimientosvariosExtendsMapper
-                            .buscarMovimientosVarios(facturacionItem, idInstitucion.toString());
-
+                            .buscarMVColegiado(facturacionItem, idInstitucion.toString());               
 
                     movimientos.setFacturacionItem(movimientosItems);
                     LOGGER.debug(
                             "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / fcsMovimientosvariosExtendsMapper.buscarMovimientosVarios() -> Salida a fcsMovimientosvariosExtendsMapper para obtener los movimientos varios");
+                
                 } else {
                     LOGGER.warn(
                             "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -258,7 +258,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 
                      int cert = 0;
                      
-                        if (fin == 1) {
+                        if (fin == 1 || origen == null) {
                             LOGGER.debug("MovimientosVariosFactServiceImpl.delete() ->Entrada para eliminar un movimiento vario");
                             FcsMovimientosvariosKey movimientoMapper = new FcsMovimientosvariosKey();
                             movimientoMapper.setIdinstitucion(idInstitucion);
@@ -267,7 +267,8 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                             //response=fcsMovimientosvariosExtendsMapper.delete(mov.getIdInstitucion().toString(), mov.getIdMovimiento());
                             LOGGER.debug("MovimientosVariosFactServiceImpl.delete() -> Salida del movimiento eliminado.");
                             
-                           if(response == 1) {
+                           if(response == 1 && mov.getCertificacion() != null && mov.getCertificacion() != "") {
+                        	                         
                         	   LOGGER.debug("MovimientosVariosFactServiceImpl.delete() ->Entrada para eliminar la certficación asociada al movimiento");
                             	//borrar la certificación asociada a este movimiento
                             	FcsMvariosCertificacionesKey deleteCert = new FcsMvariosCertificacionesKey();
@@ -278,10 +279,17 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                             	
                                cert = fcsMvariosCertificacionesMapper.deleteByPrimaryKey(deleteCert);
                                LOGGER.debug("MovimientosVariosFactServiceImpl.delete() ->Salida para eliminar la certificacion asociada al movimiento vario");
+                               
+                               responses.add(cert);
+                               
+                           }else if(response == 1 && (mov.getCertificacion() == null || mov.getCertificacion() == "")) {
+                        	   responses.add(response);
+                           }else{ //si response es igual a 0
+                        	   responses.add(response);
                            }
                         }
 
-                        responses.add(cert);
+                        
 
                     }
 
