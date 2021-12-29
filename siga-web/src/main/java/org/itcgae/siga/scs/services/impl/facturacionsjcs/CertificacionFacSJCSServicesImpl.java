@@ -1733,7 +1733,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         return valor;
     }
 
-    public static File getFileInformeIncidencias(Short idInstitucion, String idFacturacion) {
+    public File getFileInformeIncidencias(Short idInstitucion, String idFacturacion) {
         ReadProperties rp = new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
         File file = new File(rp.returnProperty("informes.directorioFisicoSalidaInformesJava")
                 + SigaConstants.FILE_SEP + "informeIncidenciasWS"
