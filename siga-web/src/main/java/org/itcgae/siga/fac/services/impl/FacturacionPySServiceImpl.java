@@ -189,7 +189,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	WSCommons commons;
-	
+
 	@Autowired
 	private FacBancoinstitucionExtendsMapper facBancoinstitucionExtendsMapper;
 
@@ -2873,32 +2873,31 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
 		facUpdate.setFechamodificacion(new Date());
 		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
-		
+
 		String resultado[] = null;
-		
-		Object[] param_in = new Object[2]; 	//Parametros de entrada del PL
-	
+
+		Object[] param_in = new Object[2]; // Parametros de entrada del PL
+
 		param_in = new Object[5];
-		
+
 		param_in[0] = devolucion.getIdInstitucion();
 		param_in[1] = devolucion.getListaFacturas();
 		param_in[2] = devolucion.getFechaDevolucion();
 		param_in[3] = devolucion.getIdIdioma();
-		param_in[4] = devolucion.getUsuModificacion();			
-			
-		//resultado=facHistoricofacturaExtendsMapper.devolucionesManuales(devolucion);
-		
-		 resultado = commons.callPLProcedureFacturacionPyS("{call PKG_SIGA_CARGOS.DevolucionesManuales(?,?,?,?,?,?,?,?)}", 3, param_in);
-		 
-		 if (resultado[0].equals("0")) {
+		param_in[4] = devolucion.getUsuModificacion();
+
+		resultado = commons.callPLProcedureFacturacionPyS(
+				"{call PKG_SIGA_CARGOS.DevolucionesManuales(?,?,?,?,?,?,?,?)}", 3, param_in);
+
+		if (resultado[0].equals("0")) {
 
 			facHistoricoInsert.setIddisquetedevoluciones(Long.valueOf(devolucion.getListaIdDisquetesDevolucion()));
 
 			facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 
 			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
-				
-				// Aplicacion de comisiones
+
+			// Aplicacion de comisiones
 //				if (aplicaComisiones!=null && aplicaComisiones.equalsIgnoreCase(ClsConstants.DB_TRUE)){
 //					
 //					String [] aListaIdDisquetesDevolucion = retornoDevolucionManual[2].split(";");
@@ -2917,13 +2916,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 //						}
 //					}				
 //			    }
-				
+
 		} else if (resultado[0].equals("5404")) {
 			throw new Exception("facturacion.devolucionManual.error.fechaDevolucion");
-							
+
 		} else {
-			throw new Exception("Fichero de devoluciones manuales: Error en el proceso de actualicacion de tablas de devolucion.");
-		}   
+			throw new Exception(
+					"Fichero de devoluciones manuales: Error en el proceso de actualicacion de tablas de devolucion.");
+		}
 	}
 
 	private void anularFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
