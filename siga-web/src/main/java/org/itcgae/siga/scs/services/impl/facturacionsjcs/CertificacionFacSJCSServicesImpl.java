@@ -1,9 +1,11 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ReadProperties;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -11,6 +13,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.OPERACION;
+import org.itcgae.siga.commons.utils.SIGAReferences;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
@@ -24,19 +27,25 @@ import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSService {
@@ -1597,5 +1606,139 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
         }
 
+    }
+
+    @Override
+    public ResponseEntity<InputStreamResource> descargarLogReintegrosXunta(List<String> idFactsList, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        InputStream fileStream = null;
+        ResponseEntity<InputStreamResource> res = null;
+        HttpHeaders headers = new HttpHeaders();
+        try {
+
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+            ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+            if(!idFactsList.isEmpty() || idFactsList.size() !=0 || idFactsList != null){
+                for (int i = 0; i < idFactsList.size();i ++) {
+
+
+                    String path = getDirectorioFichero("FCS", SigaConstants.PATH_PREVISIONES_BD, idInstitucion);
+                    path += File.separator + "LOG_ERROR_" + idInstitucion + "_" + idFactsList.get(i) + ".log";
+                    File file = new File(path);
+                    zipOutputStream.putNextEntry(new ZipEntry(file.getName() + ".txt"));
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    IOUtils.copy(fileInputStream, zipOutputStream);
+                    fileInputStream.close();
+                }
+
+                fileStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                headers.setContentType(MediaType.parseMediaType("application/zip"));
+                headers.set("Content-Disposition", "attachment; filename=\"Reintegros_Xunta_Error_Log\"");
+                res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+                        HttpStatus.OK);
+
+                zipOutputStream.closeEntry();
+            }else{
+                res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+                        HttpStatus.FORBIDDEN);
+            }
+
+            if (zipOutputStream != null) {
+                zipOutputStream.finish();
+                zipOutputStream.flush();
+                IOUtils.closeQuietly(zipOutputStream);
+            }
+
+            IOUtils.closeQuietly(bufferedOutputStream);
+            IOUtils.closeQuietly(byteArrayOutputStream);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return res;
+    }
+
+    @Override
+    public ResponseEntity<InputStreamResource> descargarInformeIncidencias(List<String> idFactsList, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        InputStream fileStream = null;
+        ResponseEntity<InputStreamResource> res = null;
+        HttpHeaders headers = new HttpHeaders();
+        try {
+
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+            ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+            if(!idFactsList.isEmpty() || idFactsList.size() !=0 || idFactsList != null){
+                for (int i = 0; i < idFactsList.size();i ++) {
+
+                    File file = getFileInformeIncidencias(idInstitucion,idFactsList.get(i));
+                    zipOutputStream.putNextEntry(new ZipEntry(file.getName() + ".txt"));
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    IOUtils.copy(fileInputStream, zipOutputStream);
+                    fileInputStream.close();
+                }
+
+                fileStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                headers.setContentType(MediaType.parseMediaType("application/zip"));
+                headers.set("Content-Disposition", "attachment; filename=\"Informe_Incidencias\"");
+                res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+                        HttpStatus.OK);
+
+                zipOutputStream.closeEntry();
+            }else{
+                res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+                        HttpStatus.FORBIDDEN);
+            }
+
+            if (zipOutputStream != null) {
+                zipOutputStream.finish();
+                zipOutputStream.flush();
+                IOUtils.closeQuietly(zipOutputStream);
+            }
+
+            IOUtils.closeQuietly(bufferedOutputStream);
+            IOUtils.closeQuietly(byteArrayOutputStream);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return res;
+    }
+
+    private String getDirectorioFichero(String modulo, String parametro, Short idinstitucion) {
+        GenParametrosKey path = new GenParametrosKey();
+
+        String valor = "";
+        path.setIdinstitucion(idinstitucion);
+        path.setModulo(modulo);
+        path.setParametro(parametro);
+
+        valor = genParametrosMapper.selectByPrimaryKey(path).getValor();
+        return valor;
+    }
+
+    public static File getFileInformeIncidencias(Short idInstitucion, String idFacturacion) {
+        ReadProperties rp = new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
+        File file = new File(rp.returnProperty("informes.directorioFisicoSalidaInformesJava")
+                + SigaConstants.FILE_SEP + "informeIncidenciasWS"
+                + SigaConstants.FILE_SEP + idInstitucion
+                + SigaConstants.FILE_SEP + idFacturacion);
+
+        new File(file.getAbsolutePath()).mkdirs();
+        file = new File (file, "InformeIncididencias.csv");
+
+        return file;
     }
 }
