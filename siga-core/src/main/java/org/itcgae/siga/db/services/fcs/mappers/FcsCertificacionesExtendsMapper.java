@@ -63,7 +63,7 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.TIMESTAMP),
-            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.NUMERIC)})
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.DECIMAL)})
     List<MovimientosVariosAsoCerItem> getMvariosAsociadosCertificacion(String idCertificacion, Short idInstitucion);
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getFactCertificaciones")
@@ -110,7 +110,7 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.TIMESTAMP),
-            @Result(column = "IMPORTEAPLICADO", property = "importeAplicado", jdbcType = JdbcType.NUMERIC)
+            @Result(column = "IMPORTEAPLICADO", property = "importeAplicado", jdbcType = JdbcType.DECIMAL)
     })
     List<MovimientosVariosApliCerItem> getMvariosAplicadosEnPagosEjecutadosPorPeriodo(Short idInstitucion, Date fechaDesde, Date fechaHasta);
 

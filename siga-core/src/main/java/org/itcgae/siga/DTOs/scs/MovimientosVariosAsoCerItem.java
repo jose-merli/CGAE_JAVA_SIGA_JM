@@ -2,6 +2,7 @@ package org.itcgae.siga.DTOs.scs;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -18,6 +19,6 @@ public class MovimientosVariosAsoCerItem {
     private String nombre;
     private String descripcion;
     private Date fechaAlta;
-    private Short importe;
+    private BigDecimal importe;
     private String asunto;
 }
