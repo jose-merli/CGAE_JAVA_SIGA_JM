@@ -11,107 +11,104 @@ import java.util.Date;
 
 public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvariosSqlProvider {
 
-    public String buscarMovimientosVarios(MovimientosVariosFacturacionItem movimientoItem, String idInstitucion) {
 
-        SQL sql = new SQL();
+    public String buscarMVColegiado (MovimientosVariosFacturacionItem movimientoItem, String idInstitucion) {
+    	
+    	SQL sql = new SQL();
+    	
+    	
+    	SQL subquery5 = new SQL();
+        subquery5.SELECT("MAX(estado.fechaestado)");
+        subquery5.FROM("fcs_pagos_estadospagos estado");
+        subquery5.WHERE("estado.idinstitucion = fcs_aplica_movimientosvarios.idinstitucion");
+        subquery5.WHERE("estado.idpagosjg = fcs_aplica_movimientosvarios.idpagosjg");
 
-        SQL subquery = new SQL();
-        subquery.SELECT("SUM(aplica.importeaplicado)");
-        subquery.FROM("fcs_aplica_movimientosvarios aplica");
-        subquery.WHERE("fcs_aplica_movimientosvarios.idinstitucion = aplica.idinstitucion");
-        subquery.WHERE("fcs_aplica_movimientosvarios.idmovimiento = aplica.idmovimiento");
-        subquery.WHERE("aplica.idaplicacion <= fcs_aplica_movimientosvarios.idaplicacion"); // ??
-
-        SQL subquery3 = new SQL();
-        subquery3.SELECT("MAX(estado.fechaestado)");
-        subquery3.FROM("fcs_pagos_estadospagos estado");
-        subquery3.WHERE("estado.idinstitucion = fcs_aplica_movimientosvarios.idinstitucion");
-        subquery3.WHERE("estado.idpagosjg = fcs_aplica_movimientosvarios.idpagosjg");
-
-        SQL subquery2 = new SQL();
-        subquery2.SELECT("fcs_pagos_estadospagos.idestadopagosjg");
-        subquery2.FROM("fcs_pagos_estadospagos");
-        subquery2.WHERE("fcs_pagos_estadospagos.fechaestado = (" + subquery3 + ")");
-        subquery2.WHERE("fcs_pagos_estadospagos.idinstitucion = fcs_aplica_movimientosvarios.idinstitucion");
-        subquery2.WHERE("fcs_pagos_estadospagos.idpagosjg = fcs_aplica_movimientosvarios.idpagosjg");
-
-
-        sql.SELECT("fcs_pagosjg.nombre pagoasociado");
-        sql.SELECT("fcs_aplica_movimientosvarios.idpagosjg idpagosjg");
-        sql.SELECT("fcs_movimientosvarios.fechaalta fecha_orden");
-        sql.SELECT("CASE WHEN (fcs_movimientosvarios.cantidad > 0 ) THEN '1' ELSE '2' END orden");
-        sql.SELECT("(CASE cen_colegiado.comunitario WHEN '0'   THEN cen_colegiado.ncolegiado ELSE cen_colegiado.ncomunitario END) AS numero");
-        sql.SELECT("( cen_persona.apellidos1"
-                + "     || ' '"
-                + "     || cen_persona.apellidos2"
-                + "     || ' '"
-                + "     || cen_persona.nombre ) nombre");
-        sql.SELECT("cen_persona.apellidos1 apellido1");
-        sql.SELECT("cen_persona.apellidos2 apellido2");
-        sql.SELECT("cen_persona.nombre nombreLetrado");
-        sql.SELECT("cen_persona.nifcif nif");
-        sql.SELECT("cen_colegiado.ncolegiado ncolegiado");
-        sql.SELECT("cen_colegiado.ncomunitario ncomunitario");
-        sql.SELECT("fcs_movimientosvarios.idinstitucion idinstitucion");
-        sql.SELECT("fcs_movimientosvarios.idpersona idpersona");
-        sql.SELECT("fcs_movimientosvarios.cantidad cantidad");
-        sql.SELECT("fcs_aplica_movimientosvarios.importeaplicado cantidadaplicada");
-        sql.SELECT("(fcs_movimientosvarios.cantidad - (" + subquery + ") ) cantidadrestante");
-        sql.SELECT("fcs_movimientosvarios.fechaalta fechaalta");
-        sql.SELECT("fcs_movimientosvarios.descripcion movimiento");
-        sql.SELECT("fcs_movimientosvarios.idmovimiento idmovimiento");
-        sql.SELECT("(" + subquery2 + ") idestadopagosjg");
-        sql.SELECT("fcs_movimientosvarios.idfacturacion idfacturacion");
-        sql.SELECT("fcs_movimientosvarios.idgrupofacturacion idgrupofacturacion");
-        sql.SELECT("fcs_facturacionjg.nombre nombrefacturacion");
-        sql.SELECT("f_siga_getrecurso(scs_grupofacturacion.nombre,1) nombregrupofacturacion");
-        sql.SELECT("fcs_aplica_movimientosvarios.idaplicacion");
-        sql.SELECT("fcs_movimientosvarios.motivo motivo");
-        sql.SELECT("fcs_movimientosvarios.idhitogeneral idconcepto");
-        sql.SELECT("fcs_movimientosvarios.idpartidapresupuestaria idpartidapresupuestaria");
-        sql.SELECT("fcs_movimientosvarios.idtipomovimiento idtipo");
-        sql.SELECT("fmc.idcertificacion idcertificacion");
-
-        sql.FROM("fcs_movimientosvarios");
-        sql.INNER_JOIN("cen_colegiado ON fcs_movimientosvarios.idinstitucion = cen_colegiado.idinstitucion AND fcs_movimientosvarios.idpersona = cen_colegiado.idpersona");
-        sql.INNER_JOIN("cen_persona ON cen_colegiado.idpersona = cen_persona.idpersona");
-        sql.LEFT_OUTER_JOIN("fcs_aplica_movimientosvarios ON fcs_movimientosvarios.idinstitucion = fcs_aplica_movimientosvarios.idinstitucion AND fcs_movimientosvarios.idmovimiento = fcs_aplica_movimientosvarios.idmovimiento");
-        sql.LEFT_OUTER_JOIN("fcs_pagosjg ON fcs_aplica_movimientosvarios.idinstitucion = fcs_pagosjg.idinstitucion AND fcs_aplica_movimientosvarios.idpagosjg = fcs_pagosjg.idpagosjg");
-        sql.LEFT_OUTER_JOIN("fcs_facturacionjg ON fcs_movimientosvarios.idinstitucion = fcs_facturacionjg.idinstitucion AND fcs_movimientosvarios.idfacturacion = fcs_facturacionjg.idfacturacion");
-        sql.LEFT_OUTER_JOIN("scs_grupofacturacion ON fcs_movimientosvarios.idinstitucion = scs_grupofacturacion.idinstitucion AND fcs_movimientosvarios.idgrupofacturacion = scs_grupofacturacion.idgrupofacturacion");
-        sql.LEFT_OUTER_JOIN("FCS_MVARIOS_CERTIFICACIONES fmc ON fmc.IDINSTITUCION = fcs_movimientosvarios.IDINSTITUCION AND fmc.IDMOVIMIENTO = fcs_movimientosvarios.IDMOVIMIENTO");
-
-                
-        if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
-        	sql.INNER_JOIN("fcs_movimientosvarios_tipo ON fcs_movimientosvarios.idinstitucion = fcs_movimientosvarios_tipo.idinstitucion AND fcs_movimientosvarios.idtipomovimiento = fcs_movimientosvarios_tipo.idtipomovimiento");
-        }
-        sql.WHERE("fcs_movimientosvarios.idinstitucion = "+idInstitucion);
+        SQL subquery4 = new SQL();
+        subquery4.SELECT("fcs_pagos_estadospagos.idestadopagosjg");
+        subquery4.FROM("fcs_pagos_estadospagos");
+        subquery4.WHERE("fcs_pagos_estadospagos.fechaestado = (" + subquery5 + ")");
+        subquery4.WHERE("fcs_pagos_estadospagos.idinstitucion = fcs_aplica_movimientosvarios.idinstitucion");
+        subquery4.WHERE("fcs_pagos_estadospagos.idpagosjg = fcs_aplica_movimientosvarios.idpagosjg");
+    	
+    	SQL subquery3 = new SQL();
+        subquery3.SELECT("SUM(aplica.importeaplicado)");
+        subquery3.FROM("fcs_aplica_movimientosvarios aplica");
+        subquery3.WHERE("fcs_aplica_movimientosvarios.idinstitucion = aplica.idinstitucion");
+        subquery3.WHERE("fcs_aplica_movimientosvarios.idmovimiento = aplica.idmovimiento");
+        subquery3.WHERE("aplica.idaplicacion <= fcs_aplica_movimientosvarios.idaplicacion"); 
         
-        if(movimientoItem.isHistorico()) {
-        	sql.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery+") )  >= 0"); 
-        }else {
-        	sql.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery+") )  > 0"); 
-        }
+        SQL subquery6 = new SQL();
+        
+        subquery6.SELECT("fcs_pagosjg.nombre pagoasociado");
+        subquery6.SELECT("FCS_APLICA_MOVIMIENTOSVARIOS.IDPAGOSJG IDPAGOSJG");
+        subquery6.SELECT("FCS_MOVIMIENTOSVARIOS.FECHAALTA fecha_orden");
+        
+        subquery6.SELECT("CASE WHEN (FCS_MOVIMIENTOSVARIOS.CANTIDAD > 0) THEN '1' ELSE '2' END orden");
+        subquery6.SELECT("(CASE CEN_COLEGIADO.COMUNITARIO WHEN '0' THEN CEN_COLEGIADO.NCOLEGIADO ELSE CEN_COLEGIADO.NCOMUNITARIO END ) AS NUMERO");
+        subquery6.SELECT("(CEN_PERSONA.APELLIDOS1 || ' ' || CEN_PERSONA.APELLIDOS2 || ' ' || CEN_PERSONA.NOMBRE) NOMBRE");
+        subquery6.SELECT("cen_persona.apellidos1 apellido1");
+        subquery6.SELECT("cen_persona.apellidos2 apellido2");
+        subquery6.SELECT("cen_persona.nombre nombreLetrado");
+        subquery6.SELECT("cen_persona.nifcif nif");
+        subquery6.SELECT("cen_colegiado.ncolegiado ncolegiado");
+        subquery6.SELECT("cen_colegiado.ncomunitario ncomunitario");
+        subquery6.SELECT("fcs_movimientosvarios.idinstitucion idinstitucion");
+        subquery6.SELECT("fcs_movimientosvarios.idpersona idpersona");
+        subquery6.SELECT("fcs_movimientosvarios.cantidad cantidad");
+        subquery6.SELECT("fcs_aplica_movimientosvarios.importeaplicado cantidadaplicada");
+        subquery6.SELECT("(fcs_movimientosvarios.cantidad - (" + subquery3 + ") ) cantidadrestante");
+        subquery6.SELECT("fcs_movimientosvarios.fechaalta fechaalta");
+        subquery6.SELECT("fcs_movimientosvarios.descripcion movimiento");
+        subquery6.SELECT("fcs_movimientosvarios.idmovimiento idmovimiento");
+        subquery6.SELECT("(" + subquery4 + ") idestadopagosjg");
+        subquery6.SELECT("fcs_movimientosvarios.idfacturacion idfacturacion");
+        subquery6.SELECT("fcs_movimientosvarios.idgrupofacturacion idgrupofacturacion");
+        subquery6.SELECT("fcs_facturacionjg.nombre nombrefacturacion");
+        subquery6.SELECT("f_siga_getrecurso(scs_grupofacturacion.nombre,1) nombregrupofacturacion");
+        subquery6.SELECT("fcs_aplica_movimientosvarios.idaplicacion");
+        subquery6.SELECT("fcs_movimientosvarios.motivo motivo");
+        subquery6.SELECT("fcs_movimientosvarios.idhitogeneral idconcepto");
+        subquery6.SELECT("fcs_movimientosvarios.idpartidapresupuestaria idpartidapresupuestaria");
+        subquery6.SELECT("fcs_movimientosvarios.idtipomovimiento idtipo");
+        subquery6.SELECT("fmc.idcertificacion idcertificacion");  
+                   
+        subquery6.FROM("FCS_MOVIMIENTOSVARIOS");
+        subquery6.INNER_JOIN("CEN_COLEGIADO ON FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = CEN_COLEGIADO.IDINSTITUCION AND FCS_MOVIMIENTOSVARIOS.IDPERSONA = CEN_COLEGIADO.IDPERSONA");
+        subquery6.INNER_JOIN("CEN_PERSONA ON CEN_COLEGIADO.IDPERSONA = CEN_PERSONA.IDPERSONA");
+        subquery6.LEFT_OUTER_JOIN("FCS_APLICA_MOVIMIENTOSVARIOS ON FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = FCS_APLICA_MOVIMIENTOSVARIOS.IDINSTITUCION AND FCS_MOVIMIENTOSVARIOS.IDMOVIMIENTO = FCS_APLICA_MOVIMIENTOSVARIOS.IDMOVIMIENTO");
+        subquery6.LEFT_OUTER_JOIN("FCS_PAGOSJG ON FCS_APLICA_MOVIMIENTOSVARIOS.IDINSTITUCION = FCS_PAGOSJG.IDINSTITUCION AND FCS_APLICA_MOVIMIENTOSVARIOS.IDPAGOSJG = FCS_PAGOSJG.IDPAGOSJG");
+        subquery6.LEFT_OUTER_JOIN("FCS_FACTURACIONJG ON FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = FCS_FACTURACIONJG.IDINSTITUCION AND FCS_MOVIMIENTOSVARIOS.IDFACTURACION = FCS_FACTURACIONJG.IDFACTURACION");
+        subquery6.LEFT_OUTER_JOIN("SCS_GRUPOFACTURACION ON FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = SCS_GRUPOFACTURACION.IDINSTITUCION AND FCS_MOVIMIENTOSVARIOS.IDGRUPOFACTURACION = SCS_GRUPOFACTURACION.IDGRUPOFACTURACION");
+        subquery6.LEFT_OUTER_JOIN("FCS_MVARIOS_CERTIFICACIONES fmc ON fmc.IDINSTITUCION = fcs_movimientosvarios.IDINSTITUCION AND fmc.IDMOVIMIENTO = fcs_movimientosvarios.IDMOVIMIENTO");
 
+        if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
+        	subquery6.INNER_JOIN("fcs_movimientosvarios_tipo ON fcs_movimientosvarios.idinstitucion = fcs_movimientosvarios_tipo.idinstitucion AND fcs_movimientosvarios.idtipomovimiento = fcs_movimientosvarios_tipo.idtipomovimiento");
+        }
+        
+        subquery6.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  < 0"); 
+    	subquery6.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
+        
+        subquery6.WHERE("FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = "+idInstitucion);
 
         if (movimientoItem.getNcolegiado() != null && movimientoItem.getNcolegiado() != "") {
-            sql.WHERE("REGEXP_LIKE ( cen_colegiado.ncolegiado,'^[0]{0,}" + movimientoItem.getNcolegiado() + "$')");
+        	subquery6.WHERE("REGEXP_LIKE ( cen_colegiado.ncolegiado,'^[0]{0,}" + movimientoItem.getNcolegiado() + "$')");
         }
 
         if (movimientoItem.getDescripcion() != null && movimientoItem.getDescripcion() != "") {
-            sql.WHERE("REGEXP_LIKE ( fcs_movimientosvarios.descripcion,'" + movimientoItem.getDescripcion() + "')");
+        	//subquery6.WHERE("REGEXP_LIKE ( fcs_movimientosvarios.descripcion,'" + movimientoItem.getDescripcion() + "')");
+        	subquery6.WHERE("UPPER(FCS_MOVIMIENTOSVARIOS.DESCRIPCION) LIKE UPPER('%"+ movimientoItem.getDescripcion()+"%')");
         }
         
         if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
-            sql.WHERE("fcs_movimientosvarios.idtipomovimiento IN("+movimientoItem.getTipo()+")");
+        	subquery6.WHERE("fcs_movimientosvarios.idtipomovimiento IN("+movimientoItem.getTipo()+")");
         }
 
         if (movimientoItem.getCertificacion() != null && movimientoItem.getCertificacion() != "") {
-            sql.WHERE("fmc.IDCERTIFICACION IN("+movimientoItem.getCertificacion()+")");
+        	subquery6.WHERE("fmc.IDCERTIFICACION IN("+movimientoItem.getCertificacion()+")");
         }
         
         if(movimientoItem.getIdAplicadoEnPago() != null && movimientoItem.getIdAplicadoEnPago() != "") {
-            sql.WHERE("fcs_aplica_movimientosvarios.idpagosjg IN("+movimientoItem.getIdAplicadoEnPago()+")");
+        	subquery6.WHERE("fcs_aplica_movimientosvarios.idpagosjg IN("+movimientoItem.getIdAplicadoEnPago()+")");
         }
 
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -121,39 +118,150 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         	String fechaDesde = "";
             
             fechaDesde = dateFormat.format(movimientoItem.getFechaApDesde());
-            sql.WHERE("TRUNC(fcs_pagosjg.fechadesde) >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
+            subquery6.WHERE("TRUNC(fcs_pagosjg.fechadesde) >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
         }
         
         if (movimientoItem.getFechaApHasta() != null) {
         	 String fechaHasta = "";
         	 
         	fechaHasta = dateFormat.format(movimientoItem.getFechaApHasta());
-            sql.WHERE("TRUNC(fcs_pagosjg.fechahasta) <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
+        	subquery6.WHERE("TRUNC(fcs_pagosjg.fechahasta) <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
         }
         
         if(movimientoItem.getIdFacturacion() != null && movimientoItem.getIdFacturacion() != "") {
-            sql.WHERE("fcs_movimientosvarios.idfacturacion IN("+movimientoItem.getIdFacturacion()+")");
+        	subquery6.WHERE("fcs_movimientosvarios.idfacturacion IN("+movimientoItem.getIdFacturacion()+")");
         }
         
         if(movimientoItem.getIdGrupoFacturacion() != null && movimientoItem.getIdGrupoFacturacion() != "") {
-            sql.WHERE("fcs_movimientosvarios.idgrupofacturacion IN("+movimientoItem.getIdGrupoFacturacion()+")");
+        	subquery6.WHERE("fcs_movimientosvarios.idgrupofacturacion IN("+movimientoItem.getIdGrupoFacturacion()+")");
         }
         
         if(movimientoItem.getIdConcepto() != null && movimientoItem.getIdConcepto() != "") {
-           sql.WHERE("fcs_movimientosvarios.idhitogeneral IN("+movimientoItem.getIdConcepto()+")");
+        	subquery6.WHERE("fcs_movimientosvarios.idhitogeneral IN("+movimientoItem.getIdConcepto()+")");
         }
         
         if(movimientoItem.getIdPartidaPresupuestaria() != null && movimientoItem.getIdPartidaPresupuestaria() != "") {
-           sql.WHERE("fcs_movimientosvarios.idpartidapresupuestaria IN("+movimientoItem.getIdPartidaPresupuestaria()+")");
+        	subquery6.WHERE("fcs_movimientosvarios.idpartidapresupuestaria IN("+movimientoItem.getIdPartidaPresupuestaria()+")");
+        }
+        
+        SQL subquery2 = new SQL();
+       
+        subquery2.SELECT("FCS_PAGOSJG.NOMBRE PAGOASOCIADO");
+        subquery2.SELECT("FCS_APLICA_MOVIMIENTOSVARIOS.IDPAGOSJG IDPAGOSJG");
+        subquery2.SELECT("FCS_MOVIMIENTOSVARIOS.FECHAALTA fecha_orden");
+        subquery2.SELECT("CASE WHEN (FCS_MOVIMIENTOSVARIOS.CANTIDAD > 0) THEN '1' ELSE '2' END orden");
+        subquery2.SELECT("(CASE CEN_COLEGIADO.COMUNITARIO WHEN '0' THEN CEN_COLEGIADO.NCOLEGIADO ELSE CEN_COLEGIADO.NCOMUNITARIO END ) AS NUMERO");
+        subquery2.SELECT("(CEN_PERSONA.APELLIDOS1 || ' ' || CEN_PERSONA.APELLIDOS2 || ' ' || CEN_PERSONA.NOMBRE) NOMBRE");
+        subquery2.SELECT("cen_persona.apellidos1 apellido1");
+        subquery2.SELECT("cen_persona.apellidos2 apellido2");
+        subquery2.SELECT("cen_persona.nombre nombreLetrado");
+        subquery2.SELECT("cen_persona.nifcif nif");
+        subquery2.SELECT("cen_colegiado.ncolegiado ncolegiado");
+        subquery2.SELECT("cen_colegiado.ncomunitario ncomunitario");
+        subquery2.SELECT("fcs_movimientosvarios.idinstitucion idinstitucion");
+        subquery2.SELECT("fcs_movimientosvarios.idpersona idpersona");
+        subquery2.SELECT("fcs_movimientosvarios.cantidad cantidad");
+        subquery2.SELECT("fcs_aplica_movimientosvarios.importeaplicado cantidadaplicada");
+        subquery2.SELECT("(fcs_movimientosvarios.cantidad - (" + subquery3 + ") ) cantidadrestante");
+        subquery2.SELECT("fcs_movimientosvarios.fechaalta fechaalta");
+        subquery2.SELECT("fcs_movimientosvarios.descripcion movimiento");
+        subquery2.SELECT("fcs_movimientosvarios.idmovimiento idmovimiento");
+        subquery2.SELECT("(" + subquery4 + ") idestadopagosjg");
+        subquery2.SELECT("fcs_movimientosvarios.idfacturacion idfacturacion");
+        subquery2.SELECT("fcs_movimientosvarios.idgrupofacturacion idgrupofacturacion");
+        subquery2.SELECT("fcs_facturacionjg.nombre nombrefacturacion");
+        subquery2.SELECT("f_siga_getrecurso(scs_grupofacturacion.nombre,1) nombregrupofacturacion");
+        subquery2.SELECT("fcs_aplica_movimientosvarios.idaplicacion");
+        subquery2.SELECT("fcs_movimientosvarios.motivo motivo");
+        subquery2.SELECT("fcs_movimientosvarios.idhitogeneral idconcepto");
+        subquery2.SELECT("fcs_movimientosvarios.idpartidapresupuestaria idpartidapresupuestaria");
+        subquery2.SELECT("fcs_movimientosvarios.idtipomovimiento idtipo");
+        subquery2.SELECT("fmc.idcertificacion idcertificacion");  
+     
+        subquery2.FROM("FCS_MOVIMIENTOSVARIOS");
+        subquery2.INNER_JOIN("CEN_COLEGIADO ON FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = CEN_COLEGIADO.IDINSTITUCION AND FCS_MOVIMIENTOSVARIOS.IDPERSONA = CEN_COLEGIADO.IDPERSONA");
+        subquery2.INNER_JOIN("CEN_PERSONA ON CEN_COLEGIADO.IDPERSONA = CEN_PERSONA.IDPERSONA");
+        subquery2.LEFT_OUTER_JOIN("FCS_APLICA_MOVIMIENTOSVARIOS ON FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = FCS_APLICA_MOVIMIENTOSVARIOS.IDINSTITUCION AND FCS_MOVIMIENTOSVARIOS.IDMOVIMIENTO = FCS_APLICA_MOVIMIENTOSVARIOS.IDMOVIMIENTO");
+        subquery2.LEFT_OUTER_JOIN("FCS_PAGOSJG ON FCS_APLICA_MOVIMIENTOSVARIOS.IDINSTITUCION = FCS_PAGOSJG.IDINSTITUCION AND FCS_APLICA_MOVIMIENTOSVARIOS.IDPAGOSJG = FCS_PAGOSJG.IDPAGOSJG");
+        subquery2.LEFT_OUTER_JOIN("FCS_FACTURACIONJG ON FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = FCS_FACTURACIONJG.IDINSTITUCION AND FCS_MOVIMIENTOSVARIOS.IDFACTURACION = FCS_FACTURACIONJG.IDFACTURACION");
+        subquery2.LEFT_OUTER_JOIN("SCS_GRUPOFACTURACION ON FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = SCS_GRUPOFACTURACION.IDINSTITUCION AND FCS_MOVIMIENTOSVARIOS.IDGRUPOFACTURACION = SCS_GRUPOFACTURACION.IDGRUPOFACTURACION");
+        subquery2.LEFT_OUTER_JOIN("FCS_MVARIOS_CERTIFICACIONES fmc ON fmc.IDINSTITUCION = fcs_movimientosvarios.IDINSTITUCION AND fmc.IDMOVIMIENTO = fcs_movimientosvarios.IDMOVIMIENTO");
+
+        if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
+        	subquery2.INNER_JOIN("fcs_movimientosvarios_tipo ON fcs_movimientosvarios.idinstitucion = fcs_movimientosvarios_tipo.idinstitucion AND fcs_movimientosvarios.idtipomovimiento = fcs_movimientosvarios_tipo.idtipomovimiento");
+        }
+        
+        if (movimientoItem.getNcolegiado() != null && movimientoItem.getNcolegiado() != "") {
+        	subquery2.WHERE("REGEXP_LIKE ( cen_colegiado.ncolegiado,'^[0]{0,}" + movimientoItem.getNcolegiado() + "$')");
         }
 
-        sql.WHERE("ROWNUM <= 200");
+        if (movimientoItem.getDescripcion() != null && movimientoItem.getDescripcion() != "") {
+        	//subquery2.WHERE("REGEXP_LIKE ( fcs_movimientosvarios.descripcion,'" + movimientoItem.getDescripcion() + "')");
+        	subquery2.WHERE("UPPER(FCS_MOVIMIENTOSVARIOS.DESCRIPCION) LIKE UPPER('%"+ movimientoItem.getDescripcion()+"%')");
+        }
+        
+        if(movimientoItem.getTipo() != null && movimientoItem.getTipo() != "") {
+        	subquery2.WHERE("fcs_movimientosvarios.idtipomovimiento IN("+movimientoItem.getTipo()+")");
+        }
 
+        if (movimientoItem.getCertificacion() != null && movimientoItem.getCertificacion() != "") {
+        	subquery2.WHERE("fmc.IDCERTIFICACION IN("+movimientoItem.getCertificacion()+")");
+        }
+        
+        if(movimientoItem.getIdAplicadoEnPago() != null && movimientoItem.getIdAplicadoEnPago() != "") {
+        	subquery2.WHERE("fcs_aplica_movimientosvarios.idpagosjg IN("+movimientoItem.getIdAplicadoEnPago()+")");
+        }
+
+        
+        if (movimientoItem.getFechaApDesde() != null) {
+        	String fechaDesde = "";
+            
+            fechaDesde = dateFormat.format(movimientoItem.getFechaApDesde());
+            subquery2.WHERE("TRUNC(fcs_pagosjg.fechadesde) >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
+        }
+        
+        if (movimientoItem.getFechaApHasta() != null) {
+        	 String fechaHasta = "";
+        	 
+        	fechaHasta = dateFormat.format(movimientoItem.getFechaApHasta());
+        	subquery2.WHERE("TRUNC(fcs_pagosjg.fechahasta) <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
+        }
+        
+        if(movimientoItem.getIdFacturacion() != null && movimientoItem.getIdFacturacion() != "") {
+        	subquery2.WHERE("fcs_movimientosvarios.idfacturacion IN("+movimientoItem.getIdFacturacion()+")");
+        }
+        
+        if(movimientoItem.getIdGrupoFacturacion() != null && movimientoItem.getIdGrupoFacturacion() != "") {
+        	subquery2.WHERE("fcs_movimientosvarios.idgrupofacturacion IN("+movimientoItem.getIdGrupoFacturacion()+")");
+        }
+        
+        if(movimientoItem.getIdConcepto() != null && movimientoItem.getIdConcepto() != "") {
+        	subquery2.WHERE("fcs_movimientosvarios.idhitogeneral IN("+movimientoItem.getIdConcepto()+")");
+        }
+        
+        if(movimientoItem.getIdPartidaPresupuestaria() != null && movimientoItem.getIdPartidaPresupuestaria() != "") {
+        	subquery2.WHERE("fcs_movimientosvarios.idpartidapresupuestaria IN("+movimientoItem.getIdPartidaPresupuestaria()+")");
+        }
+          
+       
+        if(movimientoItem.isHistorico()) {
+        	subquery2.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  = 0"); 
+         }else {
+        	 subquery2.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  > 0");  	   
+         }
+        
+        subquery2.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
+        
+        subquery2.WHERE("FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = "+idInstitucion+") MINUS "+ subquery6);
+        
+       
+        sql.SELECT("*");
+    	sql.FROM("("+subquery2);
+    	sql.WHERE("ROWNUM <= 200");
         sql.ORDER_BY("nombre,orden,fecha_orden,idaplicacion ASC");
-
-        return sql.toString();
+        
+    	return sql.toString();
     }
-
 
     public String ejecutarFuncionMovVario(String idInstitucion, String idMovimiento, String funcion) {
 

@@ -5,7 +5,9 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -14,7 +16,7 @@ import java.util.List;
 
 public interface ICertificacionFacSJCSService {
 
-    InsertResponseDTO tramitarCertificacion(List<FacturacionItem> facturacionItemList, HttpServletRequest request);
+    InsertResponseDTO tramitarCertificacion(TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request);
 
     Resource getInformeCAM(String idFacturacion, String tipoFichero, HttpServletRequest request) throws Exception;
 
@@ -55,4 +57,8 @@ public interface ICertificacionFacSJCSService {
     UpdateResponseDTO accionXuntaEnvios(EnvioXuntaItem envioItem, HttpServletRequest request);
 
     void marcaVisiblesFacturacionesCerradas();
+
+    ResponseEntity<InputStreamResource> descargarLogReintegrosXunta(List<String> idFactsList, HttpServletRequest request);
+
+    ResponseEntity<InputStreamResource> descargarInformeIncidencias(List<String> idFactsList, HttpServletRequest request);
 }

@@ -122,7 +122,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                     LOGGER.debug(
                             "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / fcsMovimientosvariosExtendsMapper.buscarMovimientosVarios() -> Entrada a fcsMovimientosvariosExtendsMapper para obtener los movimientos varios");
                     List<MovimientosVariosFacturacionItem> movimientosItems = fcsMovimientosvariosExtendsMapper
-                            .buscarMovimientosVarios(facturacionItem, idInstitucion.toString());
+                            .buscarMVColegiado(facturacionItem, idInstitucion.toString());
 
 
                     movimientos.setFacturacionItem(movimientosItems);
@@ -296,7 +296,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                      int cert = 0;
                      
                      responses.add(fin);
-                        if (fin == 1) {
+                        if (fin == 1 || origen == null) {
                         	
                             LOGGER.debug("MovimientosVariosFactServiceImpl.delete() ->Entrada para eliminar un movimiento vario");
                             FcsMovimientosvariosKey movimientoMapper = new FcsMovimientosvariosKey();
@@ -306,7 +306,7 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                             //response=fcsMovimientosvariosExtendsMapper.delete(mov.getIdInstitucion().toString(), mov.getIdMovimiento());
                             LOGGER.debug("MovimientosVariosFactServiceImpl.delete() -> Salida del movimiento eliminado.");
                             
-                           if(response == 1 && mov.getCertificacion()!=null) {
+                           if(response == 1 && mov.getCertificacion()!=null && mov.getCertificacion() != "") {
                         	   LOGGER.debug("MovimientosVariosFactServiceImpl.delete() ->Entrada para eliminar la certficación asociada al movimiento");
                             	//borrar la certificación asociada a este movimiento
                             	FcsMvariosCertificacionesKey deleteCert = new FcsMvariosCertificacionesKey();
