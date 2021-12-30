@@ -30,6 +30,8 @@ import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
+import org.itcgae.siga.db.entities.ScsTurno;
+import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsMvariosCertificacionesMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
@@ -40,6 +42,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsCabeceraguardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IMovimientosVariosFactServices;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,6 +98,9 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
     
     @Autowired
     private ScsGuardiasturnoExtendsMapper scsGuardiasturnoExtendsMapper;
+    
+    @Autowired
+    private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
     
     public MovimientosVariosFacturacionDTO buscarMovimientosVarios(MovimientosVariosFacturacionItem facturacionItem, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
@@ -602,27 +609,43 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 					  break;
 					  
 				   case "Guardia":
-					   identificador = asuntoSplit[1].split(".");
-					   if(identificador!= null && identificador.length>0) {
-						   String[] identificador2 = identificador[1].split(">");
-							anio = identificador2[0];
-							numero = identificador2[1];
-							
-							ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
-							example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdturnoEqualTo(Integer.valueOf(anio)).andNombreEqualTo(numero);
-							List<ScsGuardiasturno> guardiaList = scsGuardiasturnoExtendsMapper.selectByExample(example);
-							if(guardiaList!= null && !guardiaList.isEmpty()) {
-								ScsGuardiasturno guardia = guardiaList.get(0);
-								ScsCabeceraguardiasExample exampleCabecera = new ScsCabeceraguardiasExample();
-								exampleCabecera.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-									.andIdturnoEqualTo(guardia.getIdturno()).andIdguardiaEqualTo(guardia.getIdguardia())
-									.andIdpersonaEqualTo(Long.valueOf(movimiento.getNcolegiado()));
-								List<ScsCabeceraguardias> cabeceraList = scsCabeceraguardiasExtendsMapper.selectByExample(exampleCabecera );
-								if(cabeceraList!= null && !cabeceraList.isEmpty()) {
-									ScsCabeceraguardias cabecera = cabeceraList.get(0);
-									cabecera.setIdmovimiento(newid);
-								response = scsCabeceraguardiasExtendsMapper.updateByPrimaryKeySelective(cabecera);
+					   int separadorPunto = 0;
+					   int separadorMayor = 0;
+					   separadorPunto = movimiento.getDescripcion().indexOf(".");
+					   separadorMayor = movimiento.getDescripcion().indexOf(">");
+					   String nombreTurno = movimiento.getDescripcion().substring(separadorPunto+1, separadorMayor);
+					   String nombreGuardia = movimiento.getDescripcion().substring(separadorMayor+1);
+					   String fechaIni = movimiento.getDescripcion().substring(movimiento.getDescripcion().indexOf("/")-2,separadorPunto);
+					   SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					   Date fechaInicio = sdf.parse(fechaIni.trim());
+					   if(nombreTurno != null && !nombreTurno.isEmpty() && nombreGuardia != null && !nombreGuardia.isEmpty()) {
+						   ScsTurnoExample exampleTurno = new ScsTurnoExample();
+						   exampleTurno.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						   		.andNombreEqualTo(nombreTurno);
+						   List<ScsTurno> turno = scsTurnosExtendsMapper.selectByExample(exampleTurno);
+						   if(turno == null) {
+							   exampleTurno.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							   		.andAbreviaturaEqualTo(nombreTurno);
+							   turno = scsTurnosExtendsMapper.selectByExample(exampleTurno);
+						   }
+						   if(turno != null) {
+								ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+								example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdturnoEqualTo(turno.get(0).getIdturno()).andNombreEqualTo(nombreGuardia);
+								List<ScsGuardiasturno> guardiaList = scsGuardiasturnoExtendsMapper.selectByExample(example);
+								if(guardiaList!= null && !guardiaList.isEmpty()) {
+									ScsGuardiasturno guardia = guardiaList.get(0);
+									ScsCabeceraguardiasKey key = new ScsCabeceraguardiasKey();
+									key.setIdguardia(guardia.getIdguardia());
+									key.setIdinstitucion(idInstitucion);
+									key.setIdpersona(Long.valueOf(movimiento.getIdPersona()));
+									key.setIdturno(guardia.getIdturno());
+									key.setFechainicio(fechaInicio);
+									ScsCabeceraguardias cabecera = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(key );
+									if(cabecera!= null) {
+										cabecera.setIdmovimiento(newid);
+									response = scsCabeceraguardiasExtendsMapper.updateByPrimaryKeySelective(cabecera);
+									}
 								}
 							}else {
 								throw new Exception("No se ha encontrado la actuación de la asistencia relacionada");
