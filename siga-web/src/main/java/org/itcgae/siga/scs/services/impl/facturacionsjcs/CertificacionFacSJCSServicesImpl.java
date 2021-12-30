@@ -1057,13 +1057,38 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Override
     public Resource descargarCertificacionesXunta(DescargaCertificacionesXuntaItem descargaItem, HttpServletRequest request) {
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Entrada al servicio para descargar los archivos de certificacion de la Xunta");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         Resource resource = null;
 
-        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Entrada al servicio para la descarga de certificaciones de la Xunta");
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            LOGGER.info(
+                    "CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+            LOGGER.info(
+                    "CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-        resource = xuntaHelper.generaFicheroCertificacionesXunta(descargaItem.getIdInstitucion(), descargaItem.getListaIdFacturaciones(), descargaItem.getIdEstadoCertificacion());
+            if (null != usuarios && usuarios.size() > 0) {
 
-        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Salida del servicio para la descarga de certificaciones de la Xunta");
+                resource = xuntaHelper.generaFicheroCertificacionesXunta(descargaItem.getIdInstitucion(), descargaItem.getListaIdFacturaciones(), descargaItem.getIdEstadoCertificacion());
+
+            } else {
+                LOGGER.warn(
+                        "CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                                + dni + " e idInstitucion = " + idInstitucion);
+            }
+
+        } else {
+            LOGGER.warn("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> idInstitucion del token nula");
+        }
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarCertificacionesXunta() -> Salida del servicio para descargar los archivos de certificacion de la Xunta");
 
         return resource;
     }
@@ -1176,35 +1201,72 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Override
     public UpdateResponseDTO accionXuntaEnvios(EnvioXuntaItem envioItem, HttpServletRequest request) {
-        Short idInstitucion = envioItem.getIdInstitucion();
-        String idFacturacion = envioItem.getIdFacturacion();
-        UpdateResponseDTO response = new UpdateResponseDTO();
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.accionXuntaEnvios() -> Entrada al servicio para realizar envios a la Xunta");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         Error error = new Error();
-        response.setError(error);
+        UpdateResponseDTO response = new UpdateResponseDTO();
 
         try {
-            OPERACION op = OPERACION.getEnum(envioItem.getCodigoOperacion());
-            switch (op) {
-                case XUNTA_ENVIO_JUSTIFICACION:
-                    xuntaHelper.envioJustificacion(idInstitucion, idFacturacion);
-                    response.setStatus(SigaConstants.OK);
-                    break;
 
-                case XUNTA_ENVIO_REINTEGROS:
-                    xuntaHelper.envioReintegros(idInstitucion, idFacturacion);
-                    response.setStatus(SigaConstants.OK);
-                    break;
+            if (null != idInstitucion) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "CertificacionFacSJCSServicesImpl.accionXuntaEnvios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "CertificacionFacSJCSServicesImpl.accionXuntaEnvios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-                default:
-                    error.setDescription("operación no soportada");
-                    response.setStatus(SigaConstants.KO);
-                    break;
+                if (null != usuarios && usuarios.size() > 0) {
+
+                    List<String> idsFacturacion = envioItem.getListaIdFacturaciones();
+
+                    for (String idFacturacion : idsFacturacion) {
+
+                        OPERACION op = OPERACION.getEnum(envioItem.getCodigoOperacion());
+                        switch (op) {
+                            case XUNTA_ENVIO_JUSTIFICACION:
+                                xuntaHelper.envioJustificacion(idInstitucion, idFacturacion);
+                                response.setStatus(SigaConstants.OK);
+                                break;
+
+                            case XUNTA_ENVIO_REINTEGROS:
+                                xuntaHelper.envioReintegros(idInstitucion, idFacturacion);
+                                response.setStatus(SigaConstants.OK);
+                                break;
+
+                            default:
+                                error.setDescription("operación no soportada");
+                                response.setStatus(SigaConstants.KO);
+                                break;
+                        }
+
+                    }
+
+                } else {
+                    LOGGER.warn(
+                            "CertificacionFacSJCSServicesImpl.accionXuntaEnvios() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("CertificacionFacSJCSServicesImpl.accionXuntaEnvios() -> idInstitucion del token nula");
             }
+
         } catch (Exception e) {
             response.setStatus(SigaConstants.KO);
+            error.setCode(500);
             error.setDescription("messages.general.error");
-
         }
+
+        response.setError(error);
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.accionXuntaEnvios() -> Salida del servicio para realizar envios a la Xunta");
+
         return response;
     }
 
@@ -1613,14 +1675,14 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
             ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-            if(!idFactsList.isEmpty() || idFactsList.size() !=0 || idFactsList != null){
-                for (int i = 0; i < idFactsList.size();i ++) {
+            if (!idFactsList.isEmpty() || idFactsList.size() != 0 || idFactsList != null) {
+                for (int i = 0; i < idFactsList.size(); i++) {
 
 
                     String path = getDirectorioFichero("FCS", SigaConstants.PATH_PREVISIONES_BD, idInstitucion);
                     path += File.separator + "LOG_ERROR_" + idInstitucion + "_" + idFactsList.get(i) + ".log";
                     File file = new File(path);
-                    if(file.exists()) {
+                    if (file.exists()) {
                         zipOutputStream.putNextEntry(new ZipEntry(file.getName() + ".txt"));
                         FileInputStream fileInputStream = new FileInputStream(file);
                         IOUtils.copy(fileInputStream, zipOutputStream);
@@ -1635,7 +1697,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         HttpStatus.OK);
 
                 zipOutputStream.closeEntry();
-            }else{
+            } else {
                 res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
                         HttpStatus.FORBIDDEN);
             }
@@ -1671,11 +1733,11 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
             ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-            if(!idFactsList.isEmpty() || idFactsList.size() !=0 || idFactsList != null){
-                for (int i = 0; i < idFactsList.size();i ++) {
+            if (!idFactsList.isEmpty() || idFactsList.size() != 0 || idFactsList != null) {
+                for (int i = 0; i < idFactsList.size(); i++) {
 
-                    File file = getFileInformeIncidencias(idInstitucion,idFactsList.get(i));
-                    if(file.exists()) {
+                    File file = getFileInformeIncidencias(idInstitucion, idFactsList.get(i));
+                    if (file.exists()) {
                         zipOutputStream.putNextEntry(new ZipEntry(file.getName() + ".txt"));
                         FileInputStream fileInputStream = new FileInputStream(file);
                         IOUtils.copy(fileInputStream, zipOutputStream);
@@ -1690,7 +1752,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         HttpStatus.OK);
 
                 zipOutputStream.closeEntry();
-            }else{
+            } else {
                 res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
                         HttpStatus.FORBIDDEN);
             }
@@ -1744,7 +1806,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                 + SigaConstants.FILE_SEP + idFacturacion);
 
         new File(file.getAbsolutePath()).mkdirs();
-        file = new File (file, "InformeIncididencias.csv");
+        file = new File(file, "InformeIncididencias.csv");
 
         return file;
     }

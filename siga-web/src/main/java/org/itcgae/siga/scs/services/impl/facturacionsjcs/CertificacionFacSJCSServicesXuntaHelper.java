@@ -4,10 +4,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.OPERACION;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
 import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
-import org.itcgae.siga.db.mappers.FcsFactEstadosfacturacionMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -48,7 +49,9 @@ public class CertificacionFacSJCSServicesXuntaHelper {
 
     @Autowired
     private FacturacionSJCSHelper facHelper;
-    private FcsFactEstadosfacturacionMapper fcsFactEstadosfacturacionMapper;
+
+    @Autowired
+    private FcsFactEstadosfacturacionExtendsMapper fcsFactEstadosfacturacionExtendsMapper;
 
     public Resource generaFicheroCertificacionesXunta(Short idInstitucion, List<String> lFacturaciones, String idEstadoCertificacion) throws BusinessException {
 
@@ -133,15 +136,8 @@ public class CertificacionFacSJCSServicesXuntaHelper {
         }
 
         LOGGER.debug(String.format("Se va a insertar un nuevo estado y solicitar e ecom el envío para el colegio %s e idFacturación %s", idinstitucion, idfacturacion));
-        FcsFactEstadosfacturacion fcsFactEstadosfacturacion = new FcsFactEstadosfacturacion();
-        fcsFactEstadosfacturacion.setIdinstitucion(idinstitucion);
-        fcsFactEstadosfacturacion.setIdfacturacion(Integer.valueOf(idfacturacion));
-        fcsFactEstadosfacturacion.setIdestadofacturacion(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo().shortValue());
-        fcsFactEstadosfacturacion.setFechaestado(Calendar.getInstance().getTime());
-        fcsFactEstadosfacturacion.setFechamodificacion(Calendar.getInstance().getTime());
-        fcsFactEstadosfacturacion.setUsumodificacion(facHelper.getUsuarioAuto().getIdusuario());
 
-        if (fcsFactEstadosfacturacionMapper.insert(fcsFactEstadosfacturacion) != 1) {
+        if (actualizarEstadoFacturacion(facHelper.getUsuarioAuto(), idinstitucion, idfacturacion, SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo().shortValue()) != 1) {
             String error = String.format("No se ha insertado o se ha insertado más de un estado en FcsFactEstadosfacturacion para el colegio %s e idfacturación %s", idinstitucion, idfacturacion);
             LOGGER.error(error);
             throw new BusinessException(error);
@@ -159,6 +155,29 @@ public class CertificacionFacSJCSServicesXuntaHelper {
         facHelper.insertaColaConParametros(ecomCola, mapa);
     }
 
+    private int actualizarEstadoFacturacion(AdmUsuarios usuario, Short idInstitucion, String idFacturacion, Short estadoFuturo) {
+
+        int respuesta;
+
+        try {
+
+            String idOrdenEstado = fcsFactEstadosfacturacionExtendsMapper.getIdordenestadoMaximo(idInstitucion, idFacturacion);
+            FcsFactEstadosfacturacion fcsFactEstadosfacturacion = new FcsFactEstadosfacturacion();
+            fcsFactEstadosfacturacion.setIdinstitucion(idInstitucion);
+            fcsFactEstadosfacturacion.setIdfacturacion(Integer.valueOf(idFacturacion));
+            fcsFactEstadosfacturacion.setIdestadofacturacion(estadoFuturo);
+            fcsFactEstadosfacturacion.setIdordenestado(Short.valueOf(idOrdenEstado));
+            fcsFactEstadosfacturacion.setFechaestado(new Date());
+            fcsFactEstadosfacturacion.setFechamodificacion(new Date());
+            fcsFactEstadosfacturacion.setUsumodificacion(usuario.getIdusuario());
+            respuesta = fcsFactEstadosfacturacionExtendsMapper.insert(fcsFactEstadosfacturacion);
+
+        } catch (Exception e) {
+            respuesta = 0;
+        }
+
+        return respuesta;
+    }
 
 }
 
