@@ -1223,28 +1223,46 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                 if (null != usuarios && usuarios.size() > 0) {
 
-                    List<String> idsFacturacion = envioItem.getListaIdFacturaciones();
+                    CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+                    exampleInstitucion.setDistinct(true);
+                    exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull().andCenInstIdinstitucionEqualTo(Short.valueOf("3005"));
 
-                    for (String idFacturacion : idsFacturacion) {
+                    List<CenInstitucion> listaInstituciones = institucionesMapper.selectByExample(exampleInstitucion);
 
-                        OPERACION op = OPERACION.getEnum(envioItem.getCodigoOperacion());
-                        switch (op) {
-                            case XUNTA_ENVIO_JUSTIFICACION:
-                                xuntaHelper.envioJustificacion(idInstitucion, idFacturacion);
-                                response.setStatus(SigaConstants.OK);
-                                break;
+                    List<Short> idsInstituciones = listaInstituciones.stream().map(CenInstitucion::getIdinstitucion).collect(Collectors.toList());
 
-                            case XUNTA_ENVIO_REINTEGROS:
-                                xuntaHelper.envioReintegros(idInstitucion, idFacturacion);
-                                response.setStatus(SigaConstants.OK);
-                                break;
+                    if (idsInstituciones.contains(idInstitucion)) {
 
-                            default:
-                                error.setDescription("operación no soportada");
-                                response.setStatus(SigaConstants.KO);
-                                break;
+                        List<String> idsFacturacion = envioItem.getListaIdFacturaciones();
+
+                        for (String idFacturacion : idsFacturacion) {
+
+                            OPERACION op = OPERACION.getEnum(envioItem.getCodigoOperacion());
+                            switch (op) {
+                                case XUNTA_ENVIO_JUSTIFICACION:
+                                    xuntaHelper.envioJustificacion(idInstitucion, idFacturacion);
+                                    response.setStatus(SigaConstants.OK);
+                                    break;
+
+                                case XUNTA_ENVIO_REINTEGROS:
+                                    xuntaHelper.envioReintegros(idInstitucion, idFacturacion);
+                                    response.setStatus(SigaConstants.OK);
+                                    break;
+
+                                default:
+                                    error.setDescription("operación no soportada");
+                                    response.setStatus(SigaConstants.KO);
+                                    break;
+                            }
+
                         }
 
+                    } else {
+                        LOGGER.error(
+                                "CertificacionFacSJCSServicesImpl.accionXuntaEnvios() --> Operación no disponible para esta institucion");
+                        response.setStatus(SigaConstants.KO);
+                        error.setCode(500);
+                        error.setDescription("facturacionSJCS.certificaciones.error.envio");
                     }
 
                 } else {
@@ -1258,6 +1276,8 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             }
 
         } catch (Exception e) {
+            LOGGER.error(
+                    "CertificacionFacSJCSServicesImpl.accionXuntaEnvios() --> Se ha producido un error al intentar realizar alguna accion de envio a la Xunta");
             response.setStatus(SigaConstants.KO);
             error.setCode(500);
             error.setDescription("messages.general.error");
