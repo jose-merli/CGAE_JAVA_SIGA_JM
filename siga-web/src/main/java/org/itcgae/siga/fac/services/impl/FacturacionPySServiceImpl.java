@@ -1,10 +1,8 @@
 package org.itcgae.siga.fac.services.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -1972,7 +1969,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facElim.setIdProgramacion(fac.getIdProgramacion());
 		facElim.setIdSerieFacturacion(fac.getIdSerieFacturacion());
 		try {
-			facFacturaMapper.eliminarFacturacion(facElim);
+			// facFacturaMapper.eliminarFacturacion(facElim);
+//			@Update(value = "{CALL PKG_SIGA_FACTURACION.ELIMINARFACTURACION ("
+//					+ "#{idInstitucion,mode=IN},"
+//					+ "#{idSerieFacturacion, mode=IN},"
+//					+ "#{idProgramacion, mode=IN},"
+//					+ "#{idUsuarioModificacion, mode=IN},"
+//					+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
+//					+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
+//	@Options(statementType = StatementType.CALLABLE)
+//	@ResultType(FacFacturacionEliminar.class)
+//	void eliminarFacturacion(FacFacturacionEliminar facturaEliminar);
+
 			if (facElim != null && !facElim.getCodRetorno().equals(RET_OK)) {
 				Integer ret;
 				try {
@@ -3225,7 +3233,28 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		presentacionAdeudosDTO.setError(error);
 
 		try {
-			facFacturaMapper.presentacionAdeudos(presAdeudos);
+
+			// facFacturaMapper.presentacionAdeudos(presAdeudos);
+
+//			@Update(value = "{CALL PKG_SIGA_CARGOS.PRESENTACION ("
+//					+ "#{idInstitucion,mode=IN},"
+//					+ "#{idSerieFacturacion, mode=IN},"
+//					+ "#{idProgramacion, mode=IN},"	
+//					+ "#{fechaPresentacion, mode=IN},"
+//					+ "#{fechaCargoFRST, mode=IN},"
+//					+ "#{fechaCargoRCUR, mode=IN},"
+//					+ "#{fechaCargoCOR1, mode=IN},"
+//					+ "#{fechaCargoB2B, mode=IN},"
+//					+ "#{pathFichero, mode=IN},"
+//					+ "#{idUsuarioModificacion, mode=IN},"
+//					+ "#{idIdioma, mode=IN, jdbcType=VARCHAR},"
+//					+ "#{nFicheros, mode=OUT, jdbcType=VARCHAR},"
+//					+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
+//					+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
+//			@Options(statementType = StatementType.CALLABLE)
+//			@ResultType(FacPresentacionAdeudos.class)
+//			void presentacionAdeudos(FacPresentacionAdeudos presAdeudos);
+
 			if (!presAdeudos.getCodRetorno().equals(RET_OK)) {
 				Integer ret;
 				try {
@@ -3266,7 +3295,24 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		presentacionAdeudosDTO.setError(error);
 
 		try {
-			facFacturaMapper.regenerarPresentacionAdeudos(presAdeudos);
+			// facFacturaMapper.regenerarPresentacionAdeudos(presAdeudos);
+
+//			@Update(value = "{CALL PKG_SIGA_CARGOS.REGENERAR_PRESENTACION ("
+//					+ "#{idInstitucion,mode=IN},"
+//					+ "#{idDisqueteCargos, mode=IN},"
+//					+ "#{fechaPresentacion, mode=IN},"
+//					+ "#{fechaCargoFRST, mode=IN},"
+//					+ "#{fechaCargoRCUR, mode=IN},"
+//					+ "#{fechaCargoCOR1, mode=IN},"
+//					+ "#{fechaCargoB2B, mode=IN},"
+//					+ "#{pathFichero, mode=IN},"
+//					+ "#{idIdioma, mode=IN, jdbcType=VARCHAR},"
+//					+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
+//					+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
+//			@Options(statementType = StatementType.CALLABLE)
+//			@ResultType(FacRegenerarPresentacionAdeudos.class)
+//			void regenerarPresentacionAdeudos(FacRegenerarPresentacionAdeudos presAdeudos);
+
 			if (!presAdeudos.getCodRetorno().equals(RET_OK)) {
 				Integer ret;
 				try {
