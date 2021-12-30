@@ -460,7 +460,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
-			sql.WHERE("pet.fecha >= to_date('"+strDate+"','dd/MM/YY')");
+			sql.WHERE("pet.fecha >= to_date('"+strDate+" 00:00:00' ,'dd/MM/YY HH24:MI:SS')");
 		}
 
 		if(filtro.getFechaSolicitudHasta() != null) {
@@ -468,9 +468,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
-			sql.WHERE("pet.fecha <= to_date('"+strDate+"','dd/MM/YY')");
+			sql.WHERE("pet.fecha <= to_date('"+strDate+" 23:59:00','dd/MM/YY HH24:MI:SS')");
 		}
-			
+		
 		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
 			if (filtro.getIdTipoProducto() != null && !filtro.getIdTipoProducto().isEmpty()) {
 				String condTipoProd = "((";
