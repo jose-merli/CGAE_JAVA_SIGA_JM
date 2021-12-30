@@ -416,7 +416,11 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                             "MovimientosVariosFactServiceImpl.saveMovimientosVarios() -> ERROR al insertar los datos generales en el nuevo movimiento.",
                             e);
                     error.setCode(400);
-                    error.setDescription("general.mensaje.error.bbdd");
+                    if(e.getMessage()!=null && e.getMessage().contains("ya tiene un movimiento vario asociado")) {
+                    	error.setDescription(e.getMessage());
+                    }else {
+                    	error.setDescription("general.mensaje.error.bbdd");
+                    }
                     insertResponse.setStatus(SigaConstants.KO);
                 }
             } else {
@@ -548,7 +552,12 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 							key.setNumero(Long.valueOf(numero));
 							key.setIdinstitucion(idInstitucion);
 							ScsAsistencia asistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(key);
+							
 							if(asistencia!= null) {
+								if(asistencia.getIdmovimiento()!=null) {
+									throw new Exception("La asistencia "+asistencia.getAnio()+"/"+asistencia.getNumero()
+										+" ya tiene un movimiento vario asociado");
+								}
 								asistencia.setIdmovimiento(newid);
 								response = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(asistencia);
 							}else {
@@ -563,6 +572,8 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 							anio = identificador[0];
 							numero = identificador[1];
 							actuacion = identificador[2];
+							actuacion = actuacion.substring(0, actuacion.indexOf("-"));
+							
 							ScsDesignaExample example = new ScsDesignaExample();
 							example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(Short.valueOf(anio))
 									.andCodigoEqualTo(numero);
@@ -578,6 +589,10 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 								key.setNumeroasunto(Long.valueOf(actuacion));
 								ScsActuaciondesigna act = scsActDesignaExtendsMapper.selectByPrimaryKey(key );
 								if(act!=null) {
+									if(act.getIdmovimiento()!=null) {
+										throw new Exception("La actuación "+ act.getNumeroasunto() + " de la designa "+act.getAnio()+"/"
+												+act.getNumero()+" ya tiene un movimiento vario asociado");
+									}
 									act.setIdmovimiento(newid);
 									response = scsActDesignaExtendsMapper.updateByPrimaryKeySelective(act);
 								}
@@ -600,6 +615,10 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 							key.setIdactuacion(Long.valueOf(actuacion));
 							ScsActuacionasistencia actAsistencia = scsActAsistenciaExtendsMapper.selectByPrimaryKey(key);
 							if(actAsistencia!= null) {
+								if(actAsistencia.getIdmovimiento()!=null) {
+									throw new Exception("La actuación "+ actAsistencia.getNumeroasunto() + " de la asistencia "+actAsistencia.getAnio()+"/"
+											+actAsistencia.getNumero()+" ya tiene un movimiento vario asociado");
+								}
 								actAsistencia.setIdmovimiento(newid);
 								response = scsActAsistenciaExtendsMapper.updateByPrimaryKeySelective(actAsistencia);
 							}else {
@@ -643,6 +662,10 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
 									key.setFechainicio(fechaInicio);
 									ScsCabeceraguardias cabecera = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(key );
 									if(cabecera!= null) {
+										if(cabecera.getIdmovimiento()!=null) {
+											throw new Exception("La guardia "+guardia.getDescripcion()
+												+" ya tiene un movimiento vario asociado");
+										}
 										cabecera.setIdmovimiento(newid);
 									response = scsCabeceraguardiasExtendsMapper.updateByPrimaryKeySelective(cabecera);
 									}
