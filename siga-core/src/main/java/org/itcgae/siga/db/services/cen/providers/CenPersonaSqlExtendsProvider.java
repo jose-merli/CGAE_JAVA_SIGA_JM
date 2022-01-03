@@ -85,12 +85,12 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.FROM("CEN_PERSONA PER");
 		// Mybatis cambia el orden de inner join y left_outer_join con sus funciones
 		// predefinidas=> siempre pone inner join antes
-		sql.LEFT_OUTER_JOIN(" CEN_CLIENTE CLI  ON (PER.IDPERSONA = CLI.IDPERSONA) ");
+		sql.JOIN(" CEN_CLIENTE CLI  ON (PER.IDPERSONA = CLI.IDPERSONA) ");
 		sql.LEFT_OUTER_JOIN(
 				"CEN_NOCOLEGIADO NOCOL  ON (PER.IDPERSONA = NOCOL.IDPERSONA AND CLI.IDINSTITUCION = NOCOL.IDINSTITUCION AND NOCOL.FECHA_BAJA IS NULL)");
 		sql.LEFT_OUTER_JOIN(
 				" CEN_COLEGIADO COL  ON (PER.IDPERSONA = COL.IDPERSONA AND CLI.IDINSTITUCION = COL.IDINSTITUCION)");
-		sql.LEFT_OUTER_JOIN(" CEN_INSTITUCION I ON (CLI.IDINSTITUCION = I.IDINSTITUCION) ");
+		sql.JOIN(" CEN_INSTITUCION I ON (CLI.IDINSTITUCION = I.IDINSTITUCION) ");
 
 		sql2.SELECT("A.IDINSTITUCION");
 		sql2.SELECT("A.IDPERSONA");
@@ -108,16 +108,16 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql2.WHERE("A.IDPERSONA=B.IDPERSONA");
 		sql2.WHERE("A.FECHAESTADO=B.FE");
 
-		sql.LEFT_OUTER_JOIN("(" + sql2 + ") "
+		sql.JOIN("(" + sql2 + ") "
 				+ " DATOSCOLEGIALES ON (DATOSCOLEGIALES.IDPERSONA  = PER.IDPERSONA AND DATOSCOLEGIALES.IDINSTITUCION = I.IDINSTITUCION)");
 
-		sql.LEFT_OUTER_JOIN("CEN_ESTADOCOLEGIAL ESTADOCOLEGIAL ON ESTADOCOLEGIAL.IDESTADO = DATOSCOLEGIALES.IDESTADO");
-		sql.LEFT_OUTER_JOIN(
+		sql.JOIN("CEN_ESTADOCOLEGIAL ESTADOCOLEGIAL ON ESTADOCOLEGIAL.IDESTADO = DATOSCOLEGIALES.IDESTADO");
+		sql.JOIN(
 				"GEN_RECURSOS_CATALOGOS CA ON (ESTADOCOLEGIAL.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '"
 						+ idLenguaje + "')");
 		sql.LEFT_OUTER_JOIN(
 				"CEN_NOCOLEGIADO_ACTIVIDAD ACT ON (PER.IDPERSONA = ACT.IDPERSONA AND CLI.IDINSTITUCION = ACT.IDINSTITUCION)");
-		sql.WHERE("PER.IDTIPOIDENTIFICACION NOT IN ('20')");
+		sql.WHERE("PER.IDTIPOIDENTIFICACION IN ('10','30','40','50')");
 	
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 			sql.WHERE("PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "'");
@@ -536,6 +536,38 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.INNER_JOIN("CEN_COLEGIADO COLEGIADO ON PERSONA.IDPERSONA = COLEGIADO.IDPERSONA AND CLIENTE.IDINSTITUCION = COLEGIADO.IDINSTITUCION");
 		sql.WHERE("CLIENTE.idinstitucion = '"+idInstitucion+"'");
 		sql.WHERE("(colegiado.comunitario = 0 and COLEGIADO.ncolegiado = '"+colegiadoJGItem+"') OR (colegiado.comunitario = 1 and COLEGIADO.NCOMUNITARIO = '"+colegiadoJGItem+"')");
+		return sql.toString();
+	}
+	
+	public String getDestinatariosSeries(Short idInstitucion, String idSerieFacturacion) {
+		SQL sql = new SQL();
+		
+		// Select
+		sql.SELECT_DISTINCT("p.idpersona");
+		sql.SELECT_DISTINCT("c.idinstitucion");
+		sql.SELECT_DISTINCT("p.nombre");
+		sql.SELECT_DISTINCT("p.apellidos1");
+		sql.SELECT_DISTINCT("p.apellidos2");
+		sql.SELECT_DISTINCT("p.nifcif");
+		sql.SELECT_DISTINCT("d.movil");
+		sql.SELECT_DISTINCT("d.correoelectronico");
+		sql.SELECT_DISTINCT("d.domicilio");
+		
+		// From
+		sql.FROM("cen_persona p");
+		
+		// Joins
+		sql.INNER_JOIN("cen_cliente c ON ( c.idpersona = p.idpersona )");
+		sql.INNER_JOIN("fac_clienincluidoenseriefactur fc ON ( fc.idpersona = c.idpersona AND fc.idinstitucion = c.idinstitucion )");
+		sql.INNER_JOIN("cen_direcciones d ON ( d.idpersona = p.idpersona AND d.idinstitucion = c.idinstitucion )");
+
+		// Where
+		sql.WHERE("fc.idinstitucion = " + idInstitucion);
+		sql.WHERE("fc.idseriefacturacion = " + idSerieFacturacion);
+		
+		// Order by
+		sql.ORDER_BY("p.nombre");
+
 		return sql.toString();
 	}
 }

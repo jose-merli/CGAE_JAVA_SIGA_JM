@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -453,6 +454,81 @@ public class UtilidadesString {
 			retorno = texto.substring(inicio + marcaInicial.length(), fin);
 		}
 		return retorno;
+	} 
+
+	/**
+	 * formatea un dato a una longitud rellenando por la izquierda a ceros
+	 * o por la derecha a blancos en funcion de si es numerico
+	 */
+	public static String formatea(Object datoOrig, int longitud, boolean numerico) {
+		String salida = "";
+		if (datoOrig == null) {
+			if (numerico) {
+				salida = relleno("0", longitud);
+			} else {
+				salida = relleno(" ", longitud);
+			}
+		} else {
+			String dato = datoOrig.toString();
+			if (dato.length() == 0) {
+				if (numerico) {
+					salida = relleno("0", longitud);
+				} else {
+					salida = relleno(" ", longitud);
+				}
+			} else if (dato.length() > longitud) {
+				// mayor
+				if (numerico) {
+					salida = dato.substring(dato.length() - longitud, dato.length());
+				} else {
+					salida = dato.substring(0, longitud);
+				}
+			} else if (dato.length() < longitud) {
+				// menor
+				if (numerico) {
+					salida = relleno("0", longitud - dato.length()) + dato;
+				} else {
+					salida = dato + relleno(" ", longitud - dato.length());
+				}
+			} else {
+				// es igual
+				salida = dato;
+			}
+		}
+
+		return salida;
+	}
+	
+
+	/**
+	 * @param nombreFichero Debe ser unicamente el nombre del fichero 'fichero.txt' sin ruta
+	 * @return
+	 */
+	public static String validarNombreFichero(String nombreFichero) {
+		char caracter = '_';
+		nombreFichero = nombreFichero.replace('\\', caracter);
+		nombreFichero = nombreFichero.replace('/', caracter);
+		nombreFichero = nombreFichero.replace(':', caracter);
+		nombreFichero = nombreFichero.replace('*', caracter);
+		nombreFichero = nombreFichero.replace('?', caracter);
+		nombreFichero = nombreFichero.replace('\"', caracter);
+		nombreFichero = nombreFichero.replace('<', caracter);
+		nombreFichero = nombreFichero.replace('>', caracter);
+		nombreFichero = nombreFichero.replace('|', caracter);
+		return nombreFichero;
+	}
+
+	/**
+	 * Crea un string de longitud x relleno del caracter indicado
+	 */
+	public static String relleno(String caracter, int longitud) {
+		String salida = "";
+
+		for (int i = 0; i < longitud; i++) {
+			salida += caracter;
+		}
+
+		return salida;
 	}
 	
 	public static Error creaError(String mensaje) {
@@ -461,29 +537,52 @@ public class UtilidadesString {
 		error.setCode(500);
 		error.setDescription("general.mensaje.error.bbdd");
 		error.setMessage(mensaje);
-		
 		return error;
+
 	}
-	
+
 	public static Error creaInfoResultados() {
 		Error error = new Error();
-		
+
 		error.setMessage("general.message.consulta.resultados");
-		
+
 		return error;
 	}
-	
-	 /**
+
+	/**
 	 * Reemplaza una cadea de caracteres por otro
 	 * 
 	 * @param cadenaOld, cadena a reemplazar
 	 * @param cadenaNew, nueva cadea de caracteres
 	 */
-	public static String reemplazaString (String cadenaOld, String cadenaNew, String frase){
-		
+	public static String reemplazaString(String cadenaOld, String cadenaNew, String frase) {
+
 		final Pattern pattern = Pattern.compile(cadenaOld);
-		final Matcher matcher = pattern.matcher( frase );
+		final Matcher matcher = pattern.matcher(frase);
 		frase = matcher.replaceAll(cadenaNew);
 		return frase;
+	}
+
+	/**
+	 * funciona para validar el iban
+	 * 
+	 * @param cuenta
+	 * @return
+	 */
+	public static boolean validarIBAN(String cuenta) {
+		boolean esValido = cuenta != null && cuenta.length() == 24 && cuenta.substring(0, 2).equals("ES");
+
+		for (int i = 2; i < cuenta.length() && esValido; i++) {
+			esValido = Character.isDigit(cuenta.charAt(i));
+		}
+
+		if (esValido) {
+			BigInteger cuentaBancaria = new BigInteger(cuenta.substring(4, 24) + "1428" + cuenta.substring(2, 4));
+			Integer resto = cuentaBancaria.mod(new BigInteger("97")).intValue();
+
+			esValido = resto == 1;
+		}
+
+		return esValido;
 	}
 }

@@ -284,8 +284,16 @@ siga-core/target/
 .sonarlint/
 siga-web/.sts4-cache/
 siga-core/.sts4-cache/classpath-data.json
+<<<<<<< HEAD
+siga-web/.sts4-cache/
+=======
 .idea/
 siga-parent.iml
 siga-core/siga-core.iml
 siga-web/siga-web.iml
 .gradle/
+<<<<<<< HEAD
+/bin/
+=======
+>>>>>>> origin/EJG
+>>>>>>> Comision

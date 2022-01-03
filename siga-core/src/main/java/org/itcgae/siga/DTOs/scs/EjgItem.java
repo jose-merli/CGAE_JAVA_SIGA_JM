@@ -51,7 +51,7 @@ public class EjgItem {
     private String renuncia;
     private String numAnnioProcedimiento;
     private String procedimiento;
-    private String nig;
+    private String NIG;
     private Short idsituacion;
     private String numerodiligencia;
     private Long comisaria;
@@ -139,6 +139,9 @@ public class EjgItem {
 
     // Check que indica si se busca EJGs por estados concretos o que hayan pasado por ese estado en algún momento
     private boolean ultimoEstado;
+    
+    private boolean informacionEconomica;
+    private int editableComision;
 
     /**
      *
@@ -738,18 +741,18 @@ public class EjgItem {
     /**
      *
      **/
-    public EjgItem nig(String nig) {
-        this.nig = nig;
+    public EjgItem NIG(String NIG) {
+        this.NIG = NIG;
         return this;
     }
 
     @JsonProperty("nig")
     public String getNig() {
-        return nig;
+        return NIG;
     }
 
-    public void setNig(String nig) {
-        this.nig = nig;
+    public void setNig(String NIG) {
+        this.NIG = NIG;
     }
 
     /**
@@ -1039,14 +1042,6 @@ public class EjgItem {
 
     public void setGuardia(String guardia) {
         this.guardia = guardia;
-    }
-
-    /**
-     *
-     **/
-    public EjgItem numColegiado(String numColegiado) {
-        this.numColegiado = numColegiado;
-        return this;
     }
 
     @JsonProperty("numColegiado")
@@ -1719,4 +1714,21 @@ public class EjgItem {
     public void setUltimoEstado(boolean ultimoEstado) {
         this.ultimoEstado = ultimoEstado;
     }
+
+	public boolean isInformacionEconomica() {
+		return informacionEconomica;
+	}
+
+	public void setInformacionEconomica(boolean informacionEconomica) {
+		this.informacionEconomica = informacionEconomica;
+	}
+
+	public int getEditableComision() {
+		return editableComision;
+	}
+
+	public void setEditableComision(int editableComision) {
+		this.editableComision = editableComision;
+	}
+	    
 }

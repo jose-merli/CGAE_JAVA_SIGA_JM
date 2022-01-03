@@ -65,4 +65,5 @@ public interface CenGruposclienteClienteExtendsMapper extends CenGruposclienteCl
 	@UpdateProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "updateByExample")
 	int updateByExample(@Param("record") CenGruposclienteCliente record,
 			@Param("example") CenGruposclienteClienteExample example);
+
 }

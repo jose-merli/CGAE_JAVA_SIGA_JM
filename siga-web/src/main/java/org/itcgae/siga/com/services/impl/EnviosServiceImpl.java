@@ -73,12 +73,13 @@ import org.springframework.stereotype.Component;
 
 import com.ecos.ws.solicitarenvio.SolicitudEnvioSMS;
 
+import org.springframework.stereotype.Service;
 import service.serviciosecos.EnviarSMSDocument;
 import service.serviciosecos.EnviarSMSDocument.EnviarSMS;
 import service.serviciosecos.EnviarSMSResponseDocument;
 import service.serviciosecos.EnviarSMSResponseDocument.EnviarSMSResponse;
 
-@Component
+@Service
 public class EnviosServiceImpl implements IEnviosService{
 
     Logger LOGGER = Logger.getLogger(EnviosServiceImpl.class);    

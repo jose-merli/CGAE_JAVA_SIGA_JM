@@ -22,14 +22,6 @@ public interface ScsTipoEJGColegioExtendsMapper extends ScsTipoejgcolegioMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> comboTipoEjgColegio(Short idLenguaje);
-	
-	
-    @SelectProvider(type = ScsTipoEJGColegioSqlExtendsProvider.class, method = "comboTipoColegioEjg")
-    @Results({ 
-        @Result(column = "IDTIPOEJGCOLEGIO", property = "value", jdbcType = JdbcType.VARCHAR),
-        @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
-    })
-    List<ComboItem> comboTipoColegioEjg(String idlenguaje, String idInstitucion);
 
 	
 }

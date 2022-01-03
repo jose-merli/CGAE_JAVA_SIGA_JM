@@ -8,10 +8,13 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.PagosjgDTO;
+import org.itcgae.siga.db.entities.FacAbono;
 
 public interface IFacturacionSJCSServices {
 
@@ -46,4 +49,6 @@ public interface IFacturacionSJCSServices {
 	public PagosjgDTO datosPagos(String idFacturacion, HttpServletRequest request);
 
 	public void ejecutaFacturacionSJCS();
+
+	public FacAbonoDTO buscarAbonosSJCS(FacAbonoItem facAbono, HttpServletRequest request);
 }

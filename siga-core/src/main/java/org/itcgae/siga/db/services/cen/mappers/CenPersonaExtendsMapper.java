@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
@@ -165,8 +166,8 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	@Results({
 		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COLEGIADO", property = "colegiado", jdbcType = JdbcType.VARCHAR),
 
 	})
@@ -179,4 +180,19 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ColegiadoJGItem> busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDestinatariosSeries")
+	@Results({
+		@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idinstitucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellidos1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellidos2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nifcif", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "movil", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "correoelectronico", property = "correoElectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "domicilio", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+	})
+	List<DestinatariosSeriesItem> getDestinatariosSeries(Short idInstitucion, String idSerieFacturacion);
+	
 }

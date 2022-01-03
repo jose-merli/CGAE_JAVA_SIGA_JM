@@ -1,6 +1,6 @@
 application:
   permisos:
-     # Permisos para el módulo de FacturacionSJCS
+    # Permisos para el módulo de FacturacionSJCS
     /facturacionsjcs/eliminarFacturacion: [600]
     /facturacionsjcs/simularfacturacion: [601, 602, 603]
     /facturacionsjcs/ejecutarfacturacion: [601]
@@ -8,7 +8,7 @@ application:
     /facturacionsjcs/saveFacturacion: [601]
     /facturacionsjcs/updateFacturacion: [601]
 
-     # Inicio permisos para el módulo de ProductosYServicios
+    # Inicio permisos para el módulo de ProductosYServicios
     /pys/solicitarCompra: [39A]
     /pys/aprobarCompra: [39B]
     /pys/denegarPeticion: [39]
@@ -20,6 +20,10 @@ application:
     /pys/aprobarSuscripcion: [39H]
 
     /cargaMasivaCompras/cargarFichero: [39A]
+    /pys/savePagoCompraSuscripcion: [39]
+
+    # Permisos para el módulo de PNJ
+    /comunicaciones/saveNuevaComm: [30G]
 
     /pys/liquidacionMonederos: [52A]
     /pys/updateMovimientosMonedero: [52B]

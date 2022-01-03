@@ -58,7 +58,7 @@ public interface EnvEnviosExtendsMapper {
       @Results({
                 @Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
       })
-      NewIdDTO selectMaxIDEnvio();
+      NewIdDTO selectMaxIDEnvio(Short idInstitucion);
       
       @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectEnviosComunicacion")
       @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
