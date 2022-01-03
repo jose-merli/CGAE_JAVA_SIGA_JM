@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesDTO;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesItem;
 import org.itcgae.siga.DTO.fac.RevisionAutLetradoItem;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -140,24 +142,44 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	}
 	
 		
-//	@Scheduled(cron = "${cron.pattern.scheduled.procesoServicios}")
+	@Scheduled(cron = "0 0/2 * * * *")//    @Scheduled(cron = "${cron.pattern.scheduled.procesoServicios}")
 	@Override
 	public void ejecutaSuscripcionesAutomaticas() {
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaSuscripcionesAutomaticas --> ENTRA ejecutaSuscripcionesAutomaticas");
 		//this.ejecutaFacturacionSJCS();
-		if (isAlguienEjecutando()){
-			LOGGER.debug("YA SE ESTAN EJECUTANDO LOS SERVICIOS AUTOMATICOS EN BACKGROUND. CUANDO SE TERMINE SE INICIARA OTRA VEZ EL PROCESO.");
-		}
+//		if (isAlguienEjecutando()){
+//			LOGGER.debug("YA SE ESTAN EJECUTANDO LOS SERVICIOS AUTOMATICOS EN BACKGROUND. CUANDO SE TERMINE SE INICIARA OTRA VEZ EL PROCESO.");
+//		}
 		try {
 			procesarSuscripcionesAut();
 
 		} catch(Exception e){
 			throw e;
 		}
-		finally {
-			setNadieEjecutando();
-		}
+//		finally {
+//			setNadieEjecutando();
+//		}
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaSuscripcionesAutomaticas --> SALE ejecutaSuscripcionesAutomaticas");
+	}
+	
+	@Scheduled(cron = "0 0/2 * * * *")
+	@Override
+	public void ejecutaRevisionAutomatica() {
+		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaRevisionAutomatica --> ENTRA ejecutaRevisionAutomatica");
+		//this.ejecutaFacturacionSJCS();
+//		if (isAlguienEjecutando()){
+//			LOGGER.debug("YA SE ESTAN EJECUTANDO LOS SERVICIOS AUTOMATICOS EN BACKGROUND. CUANDO SE TERMINE SE INICIARA OTRA VEZ EL PROCESO.");
+//		}
+		try {
+			procesarRevisionAut();
+
+		} catch(Exception e){
+			throw e;
+		}
+//		finally {
+//			setNadieEjecutando();
+//		}
+		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaRevisionAutomatica --> SALE ejecutaRevisionAutomatica");
 	}
 	
 	private void setNadieEjecutando(){
@@ -202,6 +224,15 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	
+	private void procesarRevisionAut() {
+		
+		AdmUsuarios usu = new AdmUsuarios();
+
+		//REVISAR: Al ser un servicioque se ejecuta de forma automatica, se considera que el usuario sera el 0.
+		usu.setIdusuario(0);
 		
 		CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
 		exampleInstitucion.setDistinct(true);
@@ -233,27 +264,148 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 		LOGGER.info(
-				"getListaSuscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				"actualizacionSuscripcionesPersona() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		
+		LOGGER.info(
+				"actualizacionSuscripcionesPersona() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
 
 		LOGGER.info(
 				"SuscripcionServiciosServiceImpl --> actualizacionSuscripcionesPersona --> ENTRA actualizacionSuscripcionesPersona");
 		// this.ejecutaFacturacionSJCS();
-		if (isAlguienEjecutando()) {
-			LOGGER.debug(
-					"YA SE ESTAN EJECUTANDO LOS SERVICIOS AUTOMATICOS EN BACKGROUND. CUANDO SE TERMINE SE INICIARA OTRA VEZ EL PROCESO.");
-		}
+//		if (isAlguienEjecutando()) {
+//			LOGGER.debug(
+//					"YA SE ESTAN EJECUTANDO LOS SERVICIOS AUTOMATICOS EN BACKGROUND. CUANDO SE TERMINE SE INICIARA OTRA VEZ EL PROCESO.");
+//		}
+		
+		//Se seleccionan las entradas a procesar
+//		PysColasuscripcionesAutoExample personasActualizarExample = new PysColasuscripcionesAutoExample();
+		
+		//Se eligen las entradas que tengan una fecha de modificacion de hace más de diez minutos y que esten sin procesar
+//		personasActualizarExample.createCriteria().set;
+//		
+//		List<PysColasuscripcionesAuto> personasActualizar = pysColasuscripcionesAutoMapper.selectByExample(personasActualizarExample);
 		try {
 			
-			ejecucionPlsServicios.ejecutarPL_ProcesoRevisionLetrado(idInstitucion, peticion.getIdPersona(), peticion.getFechaProcesamiento(), usuarios.get(0));
-
+//			for(PysColasuscripcionesAuto peticion: personasActualizar) {
+//			
+//				ejecucionPlsServicios.ejecutarPL_ProcesoRevisionLetrado(idInstitucion, peticion.getIdPersona(), peticion.getFechaProcesamiento(), usuarios.get(0));
+//
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			setNadieEjecutando();
-		}
+		} 
+//		finally {
+//			setNadieEjecutando();
+//		}
+		//Se seleccionan las filas a eliminar
+//		PysColasuscripcionesAutoExample personasActualizarExample = new PysColasuscripcionesAutoExample();
+		
+		//Se eligen las entradas que tengan una fecha de modificacion de hace más de un día
+//		personasActualizarExample.createCriteria().set;
+//		
+//		List<PysColasuscripcionesAuto> personasBorrar = pysColasuscripcionesAutoMapper.selectByExample(personasActualizarExample);
+		
+		
 		LOGGER.info(
 				"SuscripcionServiciosServiceImpl --> actualizacionSuscripcionesPersona --> SALE actualizacionSuscripcionesPersona");
+	}
+	
+	@Override
+	public InsertResponseDTO actualizacionColaSuscripcionesPersona(HttpServletRequest request, RevisionAutLetradoItem peticion) {
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+		LOGGER.info(
+				"actualizacionColaSuscripcionesPersona() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		
+		LOGGER.info(
+				"actualizacionColaSuscripcionesPersona() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+
+					
+//					pysColasuscripcionesAutoExample personaColaExample = new pysColasuscripcionesAutoExample();
+//					
+//					personaColaExample.createCriteria().set;
+					
+					
+					LOGGER.info(
+							"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.selectByExample() -> Entrada a pysColasuscripcionesAutoMapper para comprobar si ya hay una entrada en la cola proprocesar para esta persona");
+	
+//					List<pysColasuscripcionesAuto> personaColaVieja = pysColasuscripcionesAutoMapper.selectByExample(personaColaExample);
+					
+					LOGGER.info(
+							"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.selectByExample() -> Salida de pysColasuscripcionesAutoMapper para comprobar si ya hay una entrada en la cola proprocesar para esta persona");
+	
+//					if(personaColaVieja.isEmpty()) {
+						LOGGER.info(
+								"actualizacionColaSuscripcionesPersona() -> Persona no presente en la cola");
+		
+//						PysColasuscripcionesAuto personaCola = new pysColasuscripcionesAuto();
+//						
+//						personaCola.setFechaClave(peticion.getFechaProcesamiento());
+//						personaCola.setIdpersona(peticion.getIdPersona());
+//						personaCola.setIdinstitucion(idInstitucion);
+//						personaCola.setIdestado("0");
+//						
+//						personaCola.setFechaModificacion(new Date());
+//						personaCola.setUsuModificacion(usuarios.get(0));
+						
+						LOGGER.info(
+								"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.insert() -> Entrada a pysColasuscripcionesAutoMapper para insertar una entrada en la cola por procesar para esta persona");
+						
+//						pysColasuscripcionesAutoMapper.insert(personaCola);
+
+						LOGGER.info(
+								"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.insert() -> Salida de pysColasuscripcionesAutoMapper para insertar una entrada en la cola por procesar para esta persona");
+		
+//					}
+//					else {
+						LOGGER.info(
+								"actualizacionColaSuscripcionesPersona()  -> Persona presente en la cola");
+						
+//						PysColasuscripcionesAuto personaCola = personaColaVieja.get(0);
+//		
+//						personaCola.setFechaModificacion(new Date());
+//						personaCola.setUsuModificacion(usuarios.get(0));
+//						
+//						if(personaCola.getFechaClave()<peticion.getFechaProcesamiento()) {
+//							personaCola.setFechaClave(peticion.getFechaProcesamiento());
+//						}
+
+						LOGGER.info(
+								"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.updateByPrimaryKey() -> Entrada a pysColasuscripcionesAutoMapper para actualizar una entrada en la cola por procesar para esta persona");
+		
+//						pysColasuscripcionesAutoMapper.updateByPrimaryKey(personaCola);
+						
+
+						LOGGER.info(
+								"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.updateByPrimaryKey() -> Entrada a pysColasuscripcionesAutoMapper para actualizar una entrada en la cola por procesar para esta persona");
+		
+						
+//					}
+			}
+			
+		LOGGER.debug(
+				"actualizacionColaSuscripcionesPersona() -> Salida del servicio para obtener las peticiones de suscripcion que cumplan las condiciones");
+		
+		response.setStatus("200");
+
+		return response;
+	
 	}
 }
