@@ -26,6 +26,7 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 		@Result(column = "cod_sucursal", property = "codSucursal", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechabaja", property = "fechaBaja", jdbcType = JdbcType.DATE),
 		@Result(column = "iban", property = "IBAN", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "asientocontable", property = "asientoContable", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "cuentacontabletarjeta", property = "cuentaContableTarjeta", jdbcType = JdbcType.VARCHAR),
@@ -35,11 +36,14 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 		@Result(column = "comisionimporte", property = "comisionImporte", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "comisiondescripcion", property = "comisionDescripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoiva", property = "idTipoIVA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "tipoiva", property = "tipoIVA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "comisioncuentacontable", property = "comisionCuentaContable", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "configficherossecuencia", property = "configFicherosSecuencia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "configficherosesquema", property = "configFicherosEsquema", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "configlugaresquemasecuencia", property = "configLugaresQueMasSecuencia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "configconceptoampliado", property = "configConceptoAmpliado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idsufijosjcs", property = "idSufijoSjcs", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "sufijosjcs", property = "sufijoSjcs", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "concepto", property = "concepto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "sjcs", property = "sjcs", jdbcType = JdbcType.VARCHAR)})
 	List<CuentasBancariasItem> getCuentasBancarias(String idCuenta, Short idInstitucion);
@@ -47,11 +51,5 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "getNextIdCuentaBancaria")
 	@Results({ @Result(column = "bancos_codigo", property = "newId", jdbcType = JdbcType.VARCHAR) })
 	NewIdDTO getNextIdCuentaBancaria(Short idInstitucion);
-	
-	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "comboCuentasBancarias")
-	@Results({ 
-		@Result(column = "BANCOS_CODIGO", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "CUENTA", property = "label", jdbcType = JdbcType.VARCHAR)}) 
-	List<ComboItem> comboCuentasBancarias(Short idInstitucion);
 	
 }

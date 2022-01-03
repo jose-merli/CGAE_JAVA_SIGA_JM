@@ -1,8 +1,10 @@
 package org.itcgae.siga.fac.services;
 
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-
 import javax.servlet.http.HttpServletRequest;
+
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO2;
 
 public interface IFacturacionPySGeneralService {
 
@@ -26,6 +28,8 @@ public interface IFacturacionPySGeneralService {
 
 	public ComboDTO comboPlanificacion(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 
+	public ComboConsultaInstitucionDTO comboConsultas(HttpServletRequest request) throws Exception;
+
 	public ComboDTO comboPlantillasEnvio(HttpServletRequest request) throws Exception;
 
 	public ComboDTO comboFormasPagoFactura(HttpServletRequest request) throws Exception;
@@ -34,18 +38,21 @@ public interface IFacturacionPySGeneralService {
 
 	public ComboDTO comboModelosComunicacion(HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboTiposIVA(HttpServletRequest request) throws Exception;
+	public ComboDTO2 comboTiposIVA(HttpServletRequest request) throws Exception;
 
 	public ComboDTO comboEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 
-    public ComboDTO comboEstadosFact(String tipo, HttpServletRequest request) throws Exception;
+	public ComboDTO comboEstadosFact(String tipo, HttpServletRequest request) throws Exception;
 
-    public ComboDTO comboEstadosFacturas(HttpServletRequest request) throws Exception;
+	public ComboDTO2 comboEstadosFacturas(HttpServletRequest request) throws Exception;
 
-    public ComboDTO comboFacturaciones(HttpServletRequest request) throws Exception;
+	public ComboDTO comboFacturaciones(HttpServletRequest request) throws Exception;
 
 	public ComboDTO parametrosSEPA(String idInstitucion, HttpServletRequest request) throws Exception;
 
-    public ComboDTO parametrosCONTROL(String idInstitucion, HttpServletRequest request) throws Exception;
+	public ComboDTO parametrosCONTROL(String idInstitucion, HttpServletRequest request) throws Exception;
 
+	public ComboDTO parametrosLINEAS(String idInstitucion, HttpServletRequest request) throws Exception;
+
+	public ComboDTO comboMotivosDevolucion(HttpServletRequest request) throws Exception;
 }

@@ -9,7 +9,7 @@ public class FactEstadosfacturaExtendsSqlProvider extends FacEstadofacturaSqlPro
         SQL sql = new SQL();
 
         // Select
-        sql.SELECT("ef.idestado, '(FACTURA) ' ||  r.descripcion descripcion");
+        sql.SELECT("ef.idestado, r.descripcion descripcion, 'FACTURA' AS tipo");
 
         // From
         sql.FROM("fac_estadofactura ef");

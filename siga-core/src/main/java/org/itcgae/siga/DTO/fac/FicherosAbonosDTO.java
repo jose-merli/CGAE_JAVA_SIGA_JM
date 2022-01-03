@@ -10,11 +10,11 @@ public class FicherosAbonosDTO {
 	private List<FicherosAbonosItem> ficherosAbonosItems = new ArrayList<>();
 	private Error error = null;
 	
-	public List<FicherosAbonosItem> getFicherosTransferenciasItems() {
+	public List<FicherosAbonosItem> getFicherosAbonosItems() {
 		return ficherosAbonosItems;
 	}
 	
-	public void setFicherosTransferenciasItems(List<FicherosAbonosItem> ficherosAbonosItems) {
+	public void setFicherosAbonosItems(List<FicherosAbonosItem> ficherosAbonosItems) {
 		this.ficherosAbonosItems = ficherosAbonosItems;
 	}
 	

@@ -13,6 +13,7 @@ public class CuentasBancariasItem {
 	private String IBAN;
 	private String nombre;
 	private String descripcion;
+	private Boolean descripcionRepetida;
 	private String asientoContable;
 	private String cuentaContableTarjeta;
 	private String BIC;
@@ -22,6 +23,8 @@ public class CuentasBancariasItem {
 	private String comisionImporte;
 	private String comisionDescripcion;
 	private String idTipoIVA;
+	private String tipoIVA;
+	private String comisionCuentaContable;
 
 	private String configFicherosSecuencia;
 	private String configFicherosEsquema;
@@ -30,6 +33,7 @@ public class CuentasBancariasItem {
 
 	private Boolean sjcs;
 	private String idSufijoSjcs;
+	private String sufijoSjcs;
 	private String concepto;
 
 	public String getBancosCodigo() {
@@ -102,6 +106,14 @@ public class CuentasBancariasItem {
 
 	public void setCuentaContableTarjeta(String cuentaContableTarjeta) {
 		this.cuentaContableTarjeta = cuentaContableTarjeta;
+	}
+
+	public Boolean getDescripcionRepetida() {
+		return descripcionRepetida;
+	}
+
+	public void setDescripcionRepetida(Boolean descripcionRepetida) {
+		this.descripcionRepetida = descripcionRepetida;
 	}
 
 	public String getBIC() {
@@ -208,6 +220,30 @@ public class CuentasBancariasItem {
 		this.concepto = concepto;
 	}
 
+	public String getComisionCuentaContable() {
+		return comisionCuentaContable;
+	}
+
+	public void setComisionCuentaContable(String comisionCuentaContable) {
+		this.comisionCuentaContable = comisionCuentaContable;
+	}
+
+	public String getTipoIVA() {
+		return tipoIVA;
+	}
+
+	public void setTipoIVA(String tipoIVA) {
+		this.tipoIVA = tipoIVA;
+	}
+
+	public String getSufijoSjcs() {
+		return sufijoSjcs;
+	}
+
+	public void setSufijoSjcs(String sufijoSjcs) {
+		this.sufijoSjcs = sufijoSjcs;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -220,6 +256,7 @@ public class CuentasBancariasItem {
 				Objects.equals(IBAN, that.IBAN) &&
 				Objects.equals(nombre, that.nombre) &&
 				Objects.equals(descripcion, that.descripcion) &&
+				Objects.equals(descripcionRepetida, that.descripcionRepetida) &&
 				Objects.equals(asientoContable, that.asientoContable) &&
 				Objects.equals(cuentaContableTarjeta, that.cuentaContableTarjeta) &&
 				Objects.equals(BIC, that.BIC) &&
@@ -228,18 +265,21 @@ public class CuentasBancariasItem {
 				Objects.equals(comisionImporte, that.comisionImporte) &&
 				Objects.equals(comisionDescripcion, that.comisionDescripcion) &&
 				Objects.equals(idTipoIVA, that.idTipoIVA) &&
+				Objects.equals(tipoIVA, that.tipoIVA) &&
+				Objects.equals(comisionCuentaContable, that.comisionCuentaContable) &&
 				Objects.equals(configFicherosSecuencia, that.configFicherosSecuencia) &&
 				Objects.equals(configFicherosEsquema, that.configFicherosEsquema) &&
 				Objects.equals(configLugaresQueMasSecuencia, that.configLugaresQueMasSecuencia) &&
 				Objects.equals(configConceptoAmpliado, that.configConceptoAmpliado) &&
 				Objects.equals(sjcs, that.sjcs) &&
 				Objects.equals(idSufijoSjcs, that.idSufijoSjcs) &&
+				Objects.equals(sufijoSjcs, that.sufijoSjcs) &&
 				Objects.equals(concepto, that.concepto);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, concepto);
+		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, descripcionRepetida, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, tipoIVA, comisionCuentaContable, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, sufijoSjcs, concepto);
 	}
 
 	@Override
@@ -252,6 +292,7 @@ public class CuentasBancariasItem {
 				", IBAN='" + IBAN + '\'' +
 				", nombre='" + nombre + '\'' +
 				", descripcion='" + descripcion + '\'' +
+				", descripcionRepetida=" + descripcionRepetida +
 				", asientoContable='" + asientoContable + '\'' +
 				", cuentaContableTarjeta='" + cuentaContableTarjeta + '\'' +
 				", BIC='" + BIC + '\'' +
@@ -260,12 +301,15 @@ public class CuentasBancariasItem {
 				", comisionImporte='" + comisionImporte + '\'' +
 				", comisionDescripcion='" + comisionDescripcion + '\'' +
 				", idTipoIVA='" + idTipoIVA + '\'' +
+				", tipoIVA='" + tipoIVA + '\'' +
+				", comisionCuentaContable='" + comisionCuentaContable + '\'' +
 				", configFicherosSecuencia='" + configFicherosSecuencia + '\'' +
 				", configFicherosEsquema='" + configFicherosEsquema + '\'' +
 				", configLugaresQueMasSecuencia='" + configLugaresQueMasSecuencia + '\'' +
 				", configConceptoAmpliado='" + configConceptoAmpliado + '\'' +
-				", sjcs='" + sjcs + '\'' +
+				", sjcs=" + sjcs +
 				", idSufijoSjcs='" + idSufijoSjcs + '\'' +
+				", sufijoSjcs='" + sufijoSjcs + '\'' +
 				", concepto='" + concepto + '\'' +
 				'}';
 	}

@@ -23,7 +23,7 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		numRecibos.WHERE("fi.idinstitucion = c.idinstitucion AND fi.iddisqueteabono = c.iddisquetedevoluciones");
 
 		//query principal
-		principal.SELECT("c.idinstitucion,c.iddisquetedevoluciones, c.FECHAGENERACION, b.cod_banco, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
+		principal.SELECT("c.idinstitucion,c.iddisquetedevoluciones, c.FECHAGENERACION, b.bancos_codigo, b.comisiondescripcion || ' (...' || SUBSTR(b.iban, -4) || ')' CUENTA_ENTIDAD, c.nombrefichero,"
 				+ "c.fechamodificacion, id.importe, ("+numRecibos.toString()+") AS numfacturas");
 
 		principal.FROM("fac_disquetedevoluciones c");
@@ -31,7 +31,7 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		principal.INNER_JOIN("fac_facturaincluidaendisquete id ON (lin.idinstitucion = id.idinstitucion AND lin.iddisquetecargos = id.iddisquetecargos AND lin.idfacturaincluidaendisquete = id.idfacturaincluidaendisquete)");
 		principal.INNER_JOIN("fac_bancoinstitucion b ON (c.idinstitucion=b.idinstitucion AND c.bancos_codigo=b.bancos_codigo)");
 
-		//principal.WHERE("c.idinstitucion="+idInstitucion);
+		principal.WHERE("c.idinstitucion="+idInstitucion);
 
 		//CUENTA BANCARIA
 		if(item.getBancosCodigo()!=null) {
@@ -78,6 +78,27 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		if(item.getNumRecibosHasta()!=null && !item.getNumRecibosHasta().isEmpty()) {
 			sql.WHERE("numfacturas <= "+item.getNumRecibosHasta());
 		}
+
+		return sql.toString();
+	}
+
+	public String getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("gr.DESCRIPCION ESTADO, F_SIGA_GETRECURSO(pf.DESCRIPCION,1) FORMAPAGO, COUNT(*) NUMEROFACTURAS, "
+				+"SUM(ff.IMPTOTAL) IMPORTETOTAL, SUM(ff.IMPTOTALPORPAGAR) PENDIENTETOTAL");
+		sql.FROM("FAC_FACTURA ff");
+		sql.INNER_JOIN("FAC_LINEADEVOLUDISQBANCO ff3 ON (ff.IDINSTITUCION = ff3.IDINSTITUCION)");
+		sql.INNER_JOIN("FAC_FACTURAINCLUIDAENDISQUETE ff2 ON (ff.IDINSTITUCION = ff2.IDINSTITUCION AND "
+				+"ff.IDFACTURA = ff2.IDFACTURA AND ff3.IDFACTURAINCLUIDAENDISQUETE = ff2.IDFACTURAINCLUIDAENDISQUETE "
+				+"AND ff3.IDDISQUETECARGOS = ff2.IDDISQUETECARGOS)");
+		sql.LEFT_OUTER_JOIN("FAC_ESTADOFACTURA fe ON (ff.ESTADO = fe.IDESTADO)");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS gr ON (gr.IDLENGUAJE = "+idIdioma+" AND fe.DESCRIPCION = gr.IDRECURSO)");
+		sql.LEFT_OUTER_JOIN("PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
+		sql.WHERE("ff.IDINSTITUCION = "+idInstitucion);
+		sql.WHERE("ff3.IDDISQUETEDEVOLUCIONES ="+idFichero);
+		sql.GROUP_BY("gr.DESCRIPCION, pf.DESCRIPCION");
 
 		return sql.toString();
 	}

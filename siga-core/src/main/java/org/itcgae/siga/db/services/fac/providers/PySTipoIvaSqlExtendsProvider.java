@@ -38,10 +38,12 @@ public class PySTipoIvaSqlExtendsProvider extends PysTipoivaSqlProvider{
 
 		sql.SELECT("p.idtipoiva");
 		sql.SELECT("f_siga_getrecurso (p.descripcion,'" + idioma + "') AS DESCRIPCION");
+		sql.SELECT("p.valor");
 
 		sql.FROM("pys_tipoiva p");
 
-		sql.WHERE("p.idtipoiva NOT IN ( SELECT p2.idtipoiva FROM pys_tipoiva p2 WHERE upper(p2.descripcion) LIKE '%DEROGADO%' AND p2.fechabaja IS NOT NULL )");
+		sql.WHERE("p.idtipoiva NOT IN ( SELECT p2.idtipoiva FROM pys_tipoiva p2 WHERE upper(p2.descripcion) LIKE '%DEROGADO%' AND p2.fechabaja IS NULL)");
+		
 
 		return sql.toString();
 	}

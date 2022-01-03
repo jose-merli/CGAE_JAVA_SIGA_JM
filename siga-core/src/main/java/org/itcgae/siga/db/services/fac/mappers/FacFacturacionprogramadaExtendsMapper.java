@@ -11,6 +11,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.FacFacturacionprogramadaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacFacturacionprogramadaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -52,6 +53,7 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
         @Result(column = "generapdf", property = "generaPDF", jdbcType = JdbcType.BOOLEAN),
         @Result(column = "envio", property = "envio", jdbcType = JdbcType.BOOLEAN),
         @Result(column = "idtipoplantillamail", property = "idTipoPlantillaMail", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "tipoplantillamail", property = "tipoPlantillaMail", jdbcType = JdbcType.VARCHAR),
         @Result(column = "traspaso_platilla", property = "traspasoPlatilla", jdbcType = JdbcType.VARCHAR),
         @Result(column = "traspaso_codauditoria_def", property = "traspasoCodAuditoriaDef", jdbcType = JdbcType.VARCHAR),
         @Result(column = "importe", property = "importe", jdbcType = JdbcType.VARCHAR),
@@ -67,6 +69,10 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
         @Result(column = "modelorectificativa", property = "modeloRectificativa", jdbcType = JdbcType.VARCHAR)
     })
     List<FacFacturacionprogramadaItem> getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramada, Short idInstitucion, String idioma, Integer rownum);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNextIdFacturacionProgramada")
+    @Results({ @Result(column = "idprogramacion", property = "newId", jdbcType = JdbcType.VARCHAR) })
+    NewIdDTO getNextIdFacturacionProgramada(Short idInstitucion, Long idSerieFacturacion);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "comboFacturaciones")
     @Results({
