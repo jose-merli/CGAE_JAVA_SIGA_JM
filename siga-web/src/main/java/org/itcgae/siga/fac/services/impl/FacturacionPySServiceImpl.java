@@ -2163,11 +2163,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return facturaLineaDTO;
 	}
 	
-	private String boolToString10(Boolean b) {
-		return b?"1":"0";
-	}
-	
-
 	@Override
 	public FacturaLineaDTO getLineasAbono(String idAbono, HttpServletRequest request) throws Exception {
 		FacturaLineaDTO facturaLineaDTO = new FacturaLineaDTO();
