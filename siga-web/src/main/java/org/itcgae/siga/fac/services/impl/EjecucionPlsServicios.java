@@ -55,6 +55,8 @@ public class EjecucionPlsServicios {
         //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
         //El segundo parametro el numero de parametros de salida del PL
         resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_SUSCRIPCION_AUTO(?,?,?,?,?,?,?,?)}", 2, paramIn);
+        
+//        LOGGER.info("SUSCRIPCION_AUTO: resultado[0] = " + resultado[0] + " y resultado[1] = " + resultado[1]);
 
         if (!resultado[0].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[1]);
@@ -69,7 +71,7 @@ public class EjecucionPlsServicios {
      */
     public String[] ejecutarPL_RevisionAutomaticaServicios(short idInstitucion, AdmUsuarios usuario) throws Exception {
 
-        Object[] paramIn = new Object[6];
+        Object[] paramIn = new Object[3];
     
         java.util.Date utilDate = new Date();
         java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
@@ -82,7 +84,9 @@ public class EjecucionPlsServicios {
 
         //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
         //El segundo parametro el numero de parametros de salida del PL
-        resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_AUTO(?,?,?,?,?,?,?,?)}", 2, paramIn);
+        resultado = callPLProcedure3("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_AUTO(?,?,?,?,?)}", 2, paramIn);
+        
+//        LOGGER.info("REVISION_AUTO: resultado[0] = " + resultado[0] + " y resultado[1] = " + resultado[1]);
 
         if (!resultado[0].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[1]);
@@ -116,6 +120,8 @@ public class EjecucionPlsServicios {
         //El segundo parametro el numero de parametros de salida del PL
         resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_BAJA_SERVICIO(?,?,?,?,?,?,?,?)}", 2, paramIn);
 
+//        LOGGER.info("BAJA_SERVICIO: resultado[0] = " + resultado[0] + " y resultado[1] = " + resultado[1]);
+        
         if (!resultado[0].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[1]);
             throw new Exception("Ha ocurrido un error al ejecutar el proceso de baja del servicio. Error en PL = " + (String) resultado[1]);
@@ -150,6 +156,10 @@ public class EjecucionPlsServicios {
         //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
         //El segundo parametro el numero de parametros de salida del PL
         resultado = callPLProcedure2("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_ELIMINAR_SUSCRIPCION(?,?,?,?,?,?,?,?,?,?,?)}", 3, paramIn);
+        
+
+//        LOGGER.info("ELIMINAR_SUSCRIPCION: resultado[0] = " + resultado[0] + ", resultado[1] = " + resultado[1] + " y resultado[2] = "+ resultado[2]);
+        
 
         if (!resultado[0].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[1]);
@@ -184,7 +194,9 @@ public class EjecucionPlsServicios {
 
         //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
         //El segundo parametro el numero de parametros de salida del PL
-        resultado = callPLProcedure2("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO(?,?,?,?,?,?)}", 2, paramIn);
+        resultado = callPLProcedureRevLetr("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO(?,?,?,?,?,?)}", 2, paramIn);
+        
+//        LOGGER.info("BAJA_SERVICIO: resultado[0] = " + resultado[0] + " y resultado[1] = " + resultado[1]);
 
         if (!resultado[0].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[1]);
@@ -397,11 +409,79 @@ public class EjecucionPlsServicios {
             	}
             	
             	if(i == 1 ) {
+            		cs.setDate(i + 1, (java.sql.Date) inParameters[i]);
+            	}
+            	
+            	if (i == 2) {
             		cs.setLong(i + 1, (int) inParameters[i]);
+            	}
+            
+            }
+            // output Parameters
+            for (int i = 0; i < outParameters; i++) {
+                cs.registerOutParameter(i + size + 1, Types.VARCHAR);
+            }
+
+            for (int intento = 1; intento <= 2; intento++) {
+                try {
+                    cs.execute();
+                    break;
+
+                } catch (SQLTimeoutException tex) {
+                    throw tex;
+
+                } catch (SQLException ex) {
+                    if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
+                        // segunda vez deberia funcionar)
+                        throw ex;
+                    }
+                }
+
+            }
+
+            for (int i = 0; i < outParameters; i++) {
+                result[i] = cs.getString(i + size + 1);
+            }
+            cs.close();
+            return result;
+
+        } catch (Exception ex) {
+            return null;
+        } finally {
+            con.close();
+            con = null;
+        }
+    }
+    
+    public String[] callPLProcedureRevLetr(String functionDefinition, int outParameters, Object[] inParameters)
+            throws IOException, NamingException, SQLException {
+
+        String result[] = null;
+
+        if (outParameters > 0)
+            result = new String[outParameters];
+        DataSource ds = getOracleDataSource();
+        Connection con = ds.getConnection();
+        try {
+            CallableStatement cs = con.prepareCall(functionDefinition);
+            int size = inParameters.length;
+
+            // input Parameters
+            for (int i = 0; i < size; i++) {
+
+            	if(i == 0) {
+            		cs.setShort(i + 1,  (short) inParameters[i]);
+            	}
+            	
+            	if(i == 1 ) {
+            		cs.setLong(i + 1, (long) inParameters[i]);
             	}
             	
             	if (i == 2) {
             		cs.setDate(i + 1, (java.sql.Date) inParameters[i]);
+            	}
+            	if(i == 3 ) {
+            		cs.setInt(i + 1, (int) inParameters[i]);
             	}
             
             }

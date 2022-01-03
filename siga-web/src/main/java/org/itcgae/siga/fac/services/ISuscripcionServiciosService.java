@@ -13,10 +13,10 @@ public interface ISuscripcionServiciosService {
 	
 	public void ejecutaSuscripcionesAutomaticas();
 
-	public void actualizacionSuscripcionesPersona(HttpServletRequest request, RevisionAutLetradoItem peticion);
-
 	void ejecutaRevisionAutomatica();
 
 	InsertResponseDTO actualizacionColaSuscripcionesPersona(HttpServletRequest request, RevisionAutLetradoItem peticion);
+
+	void actualizacionSuscripcionesPersona();
 
 }
