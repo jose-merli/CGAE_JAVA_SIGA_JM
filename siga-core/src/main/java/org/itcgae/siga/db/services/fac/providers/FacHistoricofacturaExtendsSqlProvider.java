@@ -34,7 +34,7 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
         sql.WHERE("FH.IDINSTITUCION ="+idInstitucion);
         sql.WHERE("FH.IDFACTURA ="+idFactura);
 
-        sql.ORDER_BY("FH.FECHAMODIFICACION DESC");
+        sql.ORDER_BY("FH.IDHISTORICO ASC");
 
         return sql.toString();
     }

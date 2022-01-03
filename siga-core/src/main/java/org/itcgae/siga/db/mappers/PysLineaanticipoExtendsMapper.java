@@ -6,9 +6,13 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FiltroMonederoItem;
+import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionItem;
 import org.itcgae.siga.DTO.fac.ListaMonederosItem;
+import org.itcgae.siga.DTO.fac.ListaMovimientosMonederoItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosMonederoItem;
 import org.itcgae.siga.DTO.fac.MonederoDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.db.entities.PysServicioanticipo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +37,8 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
             @Result(column="IMPORTE_INICIAL", property="importeInicial", jdbcType=JdbcType.DECIMAL),
             @Result(column="IMPORTE_RESTANTE", property="importeRestante", jdbcType=JdbcType.DECIMAL),
             @Result(column="IMPORTE_USADO", property="importeUsado", jdbcType=JdbcType.DECIMAL),
-            @Result(column="ID_PERSONA", property="idPersona", jdbcType=JdbcType.DECIMAL),
-            @Result(column="ID_ANTICIPO", property="idAnticipo", jdbcType=JdbcType.DECIMAL)
+            @Result(column="IDPERSONA", property="idPersona", jdbcType=JdbcType.DECIMAL),
+            @Result(column="IDANTICIPO", property="idAnticipo", jdbcType=JdbcType.DECIMAL)
     })
     List<ListaMonederosItem> selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter);
     
@@ -43,4 +47,34 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
             @Result(column="ID", property="newId", jdbcType=JdbcType.VARCHAR)
     })
     NewIdDTO selectMaxIdLinea(Short idInstitution, Long idPersona);
+    
+    @SelectProvider(type=PysLineaanticipoExtendsSqlProvider.class, method="getListaMovimientosMonedero")
+    @Results({
+            @Result(column="FECHA", property="fecha", jdbcType= JdbcType.TIMESTAMP),
+            @Result(column="CONCEPTO", property="concepto", jdbcType=JdbcType.VARCHAR),
+            @Result(column="CUENTACONTABLE", property="cuentaContable", jdbcType=JdbcType.VARCHAR),
+            @Result(column="Importe", property="impOp", jdbcType=JdbcType.DECIMAL),
+            @Result(column="IMPTOTAL", property="impTotal", jdbcType=JdbcType.DECIMAL),
+            @Result(column="NUEVO", property="nuevo", jdbcType=JdbcType.BOOLEAN)
+    })
+    List<ListaMovimientosMonederoItem> getListaMovimientosMonedero(Short idInstitucion, String idAnticipo, String idPersona);
+    
+    @SelectProvider(type=PysLineaanticipoExtendsSqlProvider.class, method="getListaServiciosMonedero")
+    @Results({
+            @Result(column="FECHAMODIFICACION", property="fecha", jdbcType= JdbcType.TIMESTAMP),
+            @Result(column="DESCRIPCION", property="nombre", jdbcType=JdbcType.VARCHAR),
+            @Result(column="PRECIO", property="precioPerio", jdbcType=JdbcType.VARCHAR),
+            @Result(column="IDSERVICIO", property="idServicio", jdbcType=JdbcType.VARCHAR),
+            @Result(column="IDSERVICIOSINSTITUCION", property="idServiciosInstitucion", jdbcType=JdbcType.VARCHAR),
+            @Result(column="IDTIPOSERVICIOS", property="idTipoServicios", jdbcType=JdbcType.VARCHAR),
+    })
+    List<ListaServiciosMonederoItem> getListaServiciosMonedero(Short idInstitucion, String idAnticipo, String idPersona);
+    
+    @SelectProvider(type=PysLineaanticipoExtendsSqlProvider.class, method="getMonederoServicio")
+    @Results({
+            @Result(column="IdAnticipo", property="idAnticipo", jdbcType= JdbcType.VARCHAR),
+            @Result(column="IMPORTE_RESTANTE", property="importe", jdbcType=JdbcType.VARCHAR),
+            @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.VARCHAR)
+    })
+    ListaDescuentosPeticionItem getMonederoServicio(PysServicioanticipo servicio);
 }

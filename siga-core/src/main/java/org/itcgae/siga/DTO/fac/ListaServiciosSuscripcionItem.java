@@ -176,5 +176,11 @@ public class ListaServiciosSuscripcionItem {
 	public void setPrecioServicioDesc(String precioServicioDesc) {
 		this.precioServicioDesc = precioServicioDesc;
 	}
+	public String getIdComboPrecio() {
+		return idComboPrecio;
+	}
+	public void setIdComboPrecio(String idComboPrecio) {
+		this.idComboPrecio = idComboPrecio;
+	}
 
 }

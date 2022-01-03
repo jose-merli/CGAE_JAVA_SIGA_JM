@@ -950,6 +950,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 				try {
 					TurnosItem turnosItem = new TurnosItem();
 					turnosItem.setAbreviatura(cargaMasivaDatosITItem.getNombreTurno());
+					turnosItem.setNombre(cargaMasivaDatosITItem.getNombreTurno());
 					List<TurnosItem> listaTur = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
 		
 					cargaMasivaDatosITItem.setIdTurno(listaTur.get(0).getIdturno().toString());
@@ -974,7 +975,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 						andIdinstitucionEqualTo(idInstitucion);
 					List<ScsGuardiasturno> listaGuar = scsGuardiasTurnoExtendsMapper.selectByExample(guardiaExample);
 		
-					if(listaGuar.get(0).getIdturno().toString().equals(cargaMasivaDatosITItem.getIdTurno())) {
+					if(!listaGuar.get(0).getIdturno().toString().equals(cargaMasivaDatosITItem.getIdTurno())) {
 						errorLinea.append("No se ha encontrado una guardia con el nombre introducido en el turno asociado");
 						cargaMasivaDatosITItem.setNombreGuardia("Error");
 					}
@@ -1233,7 +1234,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 	
 	private void CheckGrupoOrden (CargaMasivaDatosITItem cargaMasivaDatosITItem, StringBuffer errorLinea, Short idInstitucion, Hashtable<String, Object> hashtable, Vector<Hashtable<String, Object>> datos) {
 		//Comprobamos que la guardia esta en un grupo. Se cambian los valores pero no se añade un error para que no impida su posible insercion
-		List<CargaMasivaDatosITItem> group = scsInscripcionguardiaExtendsMapper.searchGrupoGuardia(idInstitucion, cargaMasivaDatosITItem.getIdGuardia());
+		List<CargaMasivaDatosITItem> group = scsInscripcionguardiaExtendsMapper.searchGrupoGuardia(idInstitucion, cargaMasivaDatosITItem.getIdGuardia(), null);
 		if(group.isEmpty()) {
 			cargaMasivaDatosITItem.setOrden("Error");
 			cargaMasivaDatosITItem.setGrupo("Error");

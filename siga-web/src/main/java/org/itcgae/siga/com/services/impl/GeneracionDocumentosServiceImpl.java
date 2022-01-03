@@ -31,6 +31,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
@@ -212,24 +213,28 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				// Creamos el libro de excel
 				// si existe la plantilla la cogemos, si no, generamos el excel desde cero
 
-				File plantilla = new File(pathPlantilla);
-
-				if (plantilla.exists()) {
-					FileInputStream inputStream;
-					try {
-						inputStream = new FileInputStream(new File(pathPlantilla));
-						XSSFWorkbook wb = new XSSFWorkbook(inputStream);
-						workbook = new SXSSFWorkbook(wb, EXCEL_ROW_FLUSH);
-					} catch (Exception e) {
-						LOGGER.error(e);
-						throw e;
+				if (pathPlantilla != null) {
+					File plantilla = new File(pathPlantilla);
+					
+	
+					if (plantilla.exists()) {
+						FileInputStream inputStream;
+						try {
+							inputStream = new FileInputStream(new File(pathPlantilla));
+							XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+							workbook = new SXSSFWorkbook(wb, EXCEL_ROW_FLUSH);
+						} catch (Exception e) {
+							LOGGER.error(e);
+							throw e;
+						}
+	
+						hayPlantilla = true;
+					} else {
+						workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
 					}
-
-					hayPlantilla = true;
 				} else {
 					workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
 				}
-				
 				LOGGER.debug("Rellenamos los valores en el excel " + nombreFicheroSalida);
 
 				for (int i = 0; i < listaDatosExcel.size(); i++) {
@@ -359,7 +364,12 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				}
 
                 
-                
+
+				File theDir = new File(pathFicheroSalida);
+				if (!theDir.exists()){
+				    theDir.mkdirs();
+				}
+
 				File file = new File(pathFicheroSalida);
 				SIGAHelper.addPerm777(file);
 				
@@ -390,6 +400,112 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		return documento;
 	}
 
+	
+	
+	@Override
+	public DatosDocumentoItem generarExcelGeneracionCalendario(String pathFicheroSalida, String nombreFicheroSalida,
+			List<List<Map<String, Object>>> listaDatosExcel) throws Exception {
+		DatosDocumentoItem documento = new DatosDocumentoItem();
+
+		if (listaDatosExcel != null && listaDatosExcel.size() >= 1) {
+			if (listaDatosExcel.get(0).size() >= 1) {
+				XSSFWorkbook workbook = null;
+
+				// Creamos el libro de excel
+				// si existe la plantilla la cogemos, si no, generamos el excel desde cero
+
+				workbook = new XSSFWorkbook();
+
+				LOGGER.debug("Rellenamos los valores en el excel " + nombreFicheroSalida);
+
+				for (int i = 0; i < listaDatosExcel.size(); i++) {
+
+					// Cada lista de listaDatosExcel se crea en una hoja
+					List<Map<String, Object>> registrosHoja = listaDatosExcel.get(i);
+					XSSFSheet sheet = null;
+
+					// Creamos la hoja
+					String nombreHoja = "Consulta " + i;
+					nombreHoja = getNombreConsulta(workbook, nombreHoja);
+					sheet = workbook.createSheet(nombreHoja);
+
+
+					int rowNum = 1;
+					int index = 0;
+					CellStyle headerCellStyle = null;
+				
+					Map<Integer, CellStyle> mapaEstilos = new HashMap<Integer, CellStyle>();
+
+					CellStyle cellStyleNum = workbook.createCellStyle();
+					cellStyleNum.setAlignment(CellStyle.ALIGN_RIGHT);
+					
+					CellStyle cellStyleString = workbook.createCellStyle();
+					cellStyleString.setAlignment(CellStyle.ALIGN_LEFT);
+					Row row = null;
+					Object campo = null;
+					XSSFRichTextString textCell = null;
+					
+					for (Map<String, Object> map : registrosHoja) {
+			
+						if (map != null) {
+			
+							row = sheet.createRow(rowNum++);
+							for(Map.Entry<String, Object> entry: map.entrySet()) {
+								Cell celda1 = row.createCell(0);
+								Cell celda2 = row.createCell(1);
+								celda1.setCellValue(entry.getKey());
+								celda2.setCellValue(entry.getValue().toString());				
+							}
+
+						}
+					}
+					
+					LOGGER.debug("Ponemos los estilos al excel " + nombreFicheroSalida);
+					
+					for (int j = 0; j < index; j++) {
+						//sheet.autoSizeColumn(j);
+						if (mapaEstilos.containsKey(j)) {
+							sheet.setDefaultColumnStyle(j, mapaEstilos.get(j));
+						}
+					}
+				}
+
+                
+
+				File theDir = new File(pathFicheroSalida);
+				if (!theDir.exists()){
+				    theDir.mkdirs();
+				}
+
+				File file = new File(pathFicheroSalida);
+				SIGAHelper.addPerm777(file);
+				
+				nombreFicheroSalida = reeemplazaCaracteres(nombreFicheroSalida);
+				
+				file = new File(file, nombreFicheroSalida);
+				
+				FileOutputStream fileOut = new FileOutputStream(file);
+				
+				LOGGER.debug("Guardamos el excel en " + file.getAbsolutePath());
+				workbook.write(fileOut);
+				fileOut.flush();
+				fileOut.close();
+				workbook.close();
+
+				documento.setDatos(Files.readAllBytes(file.toPath()));
+				documento.setFileName(nombreFicheroSalida);
+				documento.setPathDocumento(pathFicheroSalida);
+			} else {
+				documento = null;
+			}
+		} else {
+			documento = null;
+		}
+		
+		LOGGER.debug("Fin de proceso de generación del excel.");
+
+		return documento;
+	}
 	public static void main2(String[] args) {
 		String nombreHoja = "adfadf :a asd//fad? : ,;;";
 		String[] invalidCharsRegex = new String[] { "/", "\\", "*", "[", "]", ":", "?" };

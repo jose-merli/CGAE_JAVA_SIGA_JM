@@ -8,11 +8,14 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.PagosjgDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -155,4 +158,11 @@ public class FacturacionController {
 		PagosjgDTO response = facturacionServices.datosPagos(idFacturacion, request);
 		return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="/facturacionsjcs/buscarAbonosSJCS", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FacAbonoDTO> buscarAbonosSJCS(@RequestBody FacAbonoItem facAbono, HttpServletRequest request){
+		FacAbonoDTO response = facturacionServices.buscarAbonosSJCS(facAbono, request);
+		return new ResponseEntity<FacAbonoDTO>(response, HttpStatus.OK);
+	}
+	
 }

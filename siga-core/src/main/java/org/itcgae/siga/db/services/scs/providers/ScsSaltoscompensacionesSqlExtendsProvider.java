@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -91,11 +92,11 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.WHERE("IDGUARDIA IS NOT NULL");
 
 		if (!UtilidadesString.esCadenaVacia(salto.getFechaDesde())) {
-			sql.WHERE("TRUNC(FECHA) >= TRUNC(TO_DATE(" + salto.getFechaDesde() + ", 'YYYY/MM/DD HH24:MI:SS'))");
+			sql.WHERE("TRUNC(FECHA) >= TRUNC(TO_DATE('" + salto.getFechaDesde() + "', 'DD/MM/YYYY'))");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(salto.getFechaHasta())) {
-			sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE(" + salto.getFechaHasta() + ", 'YYYY/MM/DD HH24:MI:SS'))");
+			sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE('" + salto.getFechaHasta() + "', 'DD/MM/YYYY'))");
 		}
 
 		sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");
@@ -137,6 +138,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
         sql2.SELECT(" SCS_SALTOSCOMPENSACIONES.MOTIVOS AS MOTIVO");
         sql2.SELECT(" SCS_SALTOSCOMPENSACIONES.FECHACUMPLIMIENTO AS FECHAUSO");
         sql2.SELECT(" SCS_SALTOSCOMPENSACIONES.FECHA_ANULACION");
+        sql2.SELECT(" CEN_PERSONA.IDPERSONA");
         
         sql2.FROM(" SCS_SALTOSCOMPENSACIONES");
         
@@ -197,7 +199,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
         sql.WHERE("IDINSTITUCION =" + idInstitucion);
         
         if (!UtilidadesString.esCadenaVacia(salto.getIdTurno())) {
-        	sql.WHERE(" IDTURNO =" + salto.getIdTurno());
+        	sql.WHERE(" IDTURNO IN (" + salto.getIdTurno() + ")");
         }
         
         sql.WHERE("IDGUARDIA IS NULL");
@@ -351,7 +353,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 	}
 
 	public String guardarSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion,
-			String idSaltosTurno, AdmUsuarios usuario) {
+											  String idSaltosTurno, AdmUsuarios usuario) {
 
 		SQL sql = new SQL();
 
@@ -380,7 +382,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 	}
 
 	public String guardarSaltosCompensacionesGrupo(SaltoCompGuardiaItem saltoItem, String idInstitucion,
-			String idSalComGrupo, AdmUsuarios usuario) {
+												   String idSalComGrupo, AdmUsuarios usuario) {
 
 		SQL sql = new SQL();
 
@@ -394,8 +396,8 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.VALUES("MOTIVO", "'" + saltoItem.getMotivo() + "'");
 		sql.VALUES("MOTIVOCUMPLIMIENTO", "NULL");
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
-		sql.VALUES("IDTURNO", "'" + saltoItem.getIdGuardia() + "'");
-		sql.VALUES("IDGUARDIA", "'" + saltoItem.getIdTurno() + "'");
+		sql.VALUES("IDTURNO", "'" + saltoItem.getIdTurno() + "'");
+		sql.VALUES("IDGUARDIA", "'" + saltoItem.getIdGuardia() + "'");
 		sql.VALUES("IDCALENDARIOGUARDIAS", "NULL");
 		sql.VALUES("IDINSTITUCION_CUMPLI", "NULL");
 		sql.VALUES("IDTURNO_CUMPLI", "NULL");
@@ -411,7 +413,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 	}
 
 	public String actualizarSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion,
-			AdmUsuarios usuario) {
+												 AdmUsuarios usuario) {
 
 		SQL sql = new SQL();
 
@@ -442,7 +444,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 	}
 
 	public String actualizarSaltosCompensacionesGrupo(SaltoCompGuardiaItem saltoItem, String idInstitucion,
-			AdmUsuarios usuario) {
+													  AdmUsuarios usuario) {
 
 		SQL sql = new SQL();
 
@@ -495,7 +497,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 	}
 
 	public String anularSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion,
-			AdmUsuarios usuario) {
+											 AdmUsuarios usuario) {
 
 		SQL sql = new SQL();
 
@@ -528,14 +530,23 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 		return sql.toString();
 	}
-	
+
+	public String isGrupo(BusquedaLetradosGuardiaDTO letrado) {
+		SQL sql = new SQL();
+		sql.SELECT("SCS_GUARDIASTURNO.PORGRUPOS");
+		sql.FROM("SCS_GUARDIASTURNO");
+		sql.WHERE("IDTURNO = '" + letrado.getIdTurno() + "'");
+		sql.WHERE("IDGUARDIA = '" + letrado.getIdGuardia() + "'");
+		return sql.toString();
+	}
+
 	public String searchSaltosOCompensacionesOficio(String idInstitucion, String idTurno, String idGuardia, String saltoocompensacion) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 
 		sql2.SELECT("IDPERSONA, count(1) NUMERO ");
-		
-		// Los siguientes minimos se usan para ordenar en la lista de saltos/compensaciones (SCs). 
+
+		// Los siguientes minimos se usan para ordenar en la lista de saltos/compensaciones (SCs).
 		// el orden principal es por cantidad de saltos/compensaciones de forma descendente.
 		// Sin embargo, como ayuda, también se añade el orden por fecha y orden de creacion. Pero este orden solo será válido si cada colegiado tiene 1 unico SC. En caso contrario, el orden no se garantiza.
 		sql2.SELECT("min(FECHA) MINFECHA, min(IDSALTOSTURNO) MINSALTO");
@@ -548,13 +559,13 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		} else {
 			sql2.WHERE("idguardia IS NULL");
 		}
-		
+
 		if (saltoocompensacion != " ") {
 			sql2.WHERE("SALTOOCOMPENSACION = '" + saltoocompensacion + "'");
 		}
 		sql2.WHERE("FECHACUMPLIMIENTO IS NULL ");
 		sql2.GROUP_BY("IDPERSONA");
-		
+
 		sql.SELECT("decode(C.COMUNITARIO,'1', C.NCOMUNITARIO,NCOLEGIADO) NCOLEGIADO");
 		sql.SELECT("P.NOMBRE");
 		sql.SELECT("P.APELLIDOS1");
@@ -567,9 +578,73 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.WHERE("SC.IDPERSONA = " + "C.IDPERSONA");
 		sql.WHERE("SC.IDPERSONA = P.IDPERSONA");
 		sql.WHERE("C.IDINSTITUCION = " + idInstitucion);
-	
-		// El orden principal es por cantidad. Los siguientes campos de orden son solo orientativos (ver origen arriba) 
+
+		// El orden principal es por cantidad. Los siguientes campos de orden son solo orientativos (ver origen arriba)
 		sql.ORDER_BY("SC.NUMERO desc, SC.MINFECHA, SC.MINSALTO");
+
+		return sql.toString();
+	}
+	
+	
+	public String insertManual(ScsSaltoscompensaciones record, String fechaFormat) {
+		SQL sql = new SQL();
+		sql.INSERT_INTO("SCS_SALTOSCOMPENSACIONES");
+
+		if (record.getIdinstitucion() != null) {
+			sql.VALUES("IDINSTITUCION", record.getIdinstitucion().toString());
+		}
+
+		if (record.getIdturno() != null) {
+			sql.VALUES("IDTURNO", record.getIdturno().toString());
+		}
+
+		if (record.getIdsaltosturno() != null) {
+			sql.VALUES("IDSALTOSTURNO", record.getIdsaltosturno().toString());
+		}
+
+		if (record.getIdpersona() != null) {
+			sql.VALUES("IDPERSONA", record.getIdpersona().toString());
+		}
+
+		if (record.getSaltoocompensacion() != null) {
+			sql.VALUES("SALTOOCOMPENSACION", "'" +record.getSaltoocompensacion().toString()+ "'");
+		}
+
+		if (record.getFecha() != null) {
+			sql.VALUES("FECHA", "'" +fechaFormat+ "'");
+		}
+
+		if (record.getFechamodificacion() != null) {
+			sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		}
+
+		if (record.getUsumodificacion() != null) {
+			sql.VALUES("USUMODIFICACION", record.getUsumodificacion().toString());
+		}
+
+		if (record.getIdguardia() != null) {
+			sql.VALUES("IDGUARDIA", record.getIdguardia().toString());
+		}
+
+		if (record.getMotivos() != null) {
+			sql.VALUES("MOTIVOS", "' " + record.getMotivos().toString() + " '");
+		}
+
+		if (record.getFechacumplimiento() != null) {
+			sql.VALUES("FECHACUMPLIMIENTO", "'" +record.getFechacumplimiento().toString());
+		}
+
+		if (record.getIdcalendarioguardias() != null) {
+			sql.VALUES("IDCALENDARIOGUARDIAS", record.getIdcalendarioguardias().toString());
+		}
+
+		if (record.getIdcalendarioguardiascreacion() != null) {
+			sql.VALUES("IDCALENDARIOGUARDIASCREACION", record.getIdcalendarioguardiascreacion().toString());
+		}
+
+		if (record.getTipomanual() != null) {
+			sql.VALUES("TIPOMANUAL", record.getTipomanual().toString());
+		}
 
 		return sql.toString();
 	}

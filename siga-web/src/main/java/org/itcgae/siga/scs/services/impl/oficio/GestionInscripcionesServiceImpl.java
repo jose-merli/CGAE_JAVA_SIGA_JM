@@ -691,9 +691,8 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									}
 									
 									//Final comprobación
-									if(inscripcionesItem.getFechaActual().before(inscripcionturno.getFechavalidacion()) 
-											|| inscripcionesItem.getFechaActual().equals(inscripcionturno.getFechavalidacion()) 
-											|| response != 0) {
+									if(inscripcionesItem.getEstadonombre().equals("Alta")
+											|| inscripcionesItem.getFechaActual().before(inscripcionturno.getFechasolicitudbaja())) {
 										inscripcionturno.setFechavalidacion(inscripcionesItem.getFechaActual());
 										if(inscripcionesItem.getEstadonombre().equals("Alta") ) {
 											inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
@@ -702,16 +701,15 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 										}
 										inscripcionturno.setFechamodificacion(new Date());
 										inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
-
+										
+										response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
 									}else {
 										response = 0;
 										error.setCode(400);
-										error.setDescription("justiciaGratuita.oficio.inscripciones.errorFechaAlta");
+										error.setDescription("justiciaGratuita.oficio.inscripciones.errorFechaAltaBaja");
 										updateResponseDTO.setStatus(SigaConstants.KO);
 										break;
 									}
-									
-									response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
 									
 								}
 								
@@ -719,7 +717,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									int ccindex = 0;
 									int cc = 0;
 									while(ccindex<guardias.size() && cc==0) {
-										if(guardias.get(ccindex).getFechabaja()!= null && inscripcionesItem.getFechaActual().after(guardias.get(ccindex).getFechabaja()) ) cc++;
+										if(guardias.get(ccindex).getFechabaja()!= null && inscripcionesItem.getFechaActual().before(guardias.get(ccindex).getFechabaja()) ) cc++;
 										ccindex++;
 									}
 									if(cc>0){
@@ -732,26 +730,29 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									
 									//Final comprobación
 									
-									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechabaja()) 
-											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechabaja()) 
-											|| response != 0) {
+									//if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechabaja()) 
+									//		|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechabaja()) 
+									//		|| response != 0) {
+									//if(response !=0) {
 										inscripcionturno.setFechabaja(inscripcionesItem.getFechaActual());
 										inscripcionturno.setObservacionesbaja(inscripcionesItem.getObservaciones());
 
 										inscripcionturno.setFechamodificacion(new Date());
 										inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
+										
+										response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
 
-									}else {
-										response = 0;
-										error.setCode(400);
-										error.setDescription("justiciaGratuita.oficio.inscripciones.errorFechaBaja");
-										updateResponseDTO.setStatus(SigaConstants.KO);
-										break;
-									}
+									//}//else {
+									//	response = 0;
+									//	error.setCode(400);
+									//	error.setDescription("justiciaGratuita.oficio.inscripciones.errorFechaBaja");
+									//	updateResponseDTO.setStatus(SigaConstants.KO);
+									//	break;
+									//}
 									
 								
 								
-									response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);						
+									//response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);						
 						}
 						
 						LOGGER.info(
@@ -1102,16 +1103,16 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 				if (response == 0 && error.getDescription() == null) {
 					error.setCode(400);
-					error.setDescription("No se ha modificado la partida presupuestaria");
+					error.setDescription("No se ha modificado inscripción");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				} else if (response == 1 && existentes != 0) {
 					error.setCode(200);
 					error.setDescription(
-							"Se han modificiado la partida presupuestaria excepto algunos que tiene las mismas características");
+							"Se han modificiado las inscripciones excepto algunas que tiene las mismas características");
 
 				} else if (error.getCode() == null) {
 					error.setCode(200);
-					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+					error.setDescription("Se ha modificado la inscripción correctamente");
 				}
 
 				updateResponseDTO.setError(error);

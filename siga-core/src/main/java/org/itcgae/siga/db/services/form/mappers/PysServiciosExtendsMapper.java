@@ -21,6 +21,71 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface PysServiciosExtendsMapper extends PysServiciosMapper{
 
+    //Datos tabla pantalla Maestros --> Tipos Servicios
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServicios")
+	@Results({ 
+		@Result(column = "IDTIPOSERVICIOS", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION_TIPO", property = "descripciontipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSERVICIO", property = "idservicio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE)
+		}) 
+	List<TiposServiciosItem> searchTiposServicios(String idioma, Short idInstitucion);
+	
+    //Datos con historico (incluidos registros con fechabaja != null) tabla pantalla Maestros --> Tipos Servicios
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosHistorico")
+	@Results({ 
+		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION_TIPO", property = "descripciontipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE)
+		}) 
+	List<TiposServiciosItem> searchTiposServiciosHistorico(String idioma, Short idInstitucion);
+	
+    //Obtiene los datos del combo categoria de servicios (PYS_TIPOSSERVICIOS)
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "comboTiposServicios")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> comboTiposServicios(String idioma);
+	
+	//Obtiene el siguiente id a establecer a la hora de crear un nuevo tipo producto (idproducto - PYS_PRODUCTOS)
+    @SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "getIndiceMaxTipoServicio")
+    @Results({ 
+        @Result(column = "IDSERVICIO", property = "newId", jdbcType = JdbcType.NUMERIC)
+        }) 
+    NewIdDTO getIndiceMaxTipoServicio(int idtiposervicio, Short idInstitucion);
+	
+    //Obtiene el siguiente id a establecer a la hora de crear un nuevo tipo servicio (idservicio - PYS_SERVICIOS) //REVISAR EN QUE SITIOS SE USA
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "getIndiceMaxServicio")
+	@Results({ 
+		@Result(column = "IDSERVICIO", property = "newId", jdbcType = JdbcType.NUMERIC)
+		}) 
+	NewIdDTO getIndiceMaxServicio(List<TiposServiciosItem> listadoServicios, Short idInstitucion);
+	
+    //Realiza un borrado logico (establecer fechabaja = new Date()) o lo reactiva en caso de que esta inhabilitado.
+	@UpdateProvider(type = PysServiciosSqlExtendsProvider.class, method = "activarDesactivarServicio")
+	int activarDesactivarServicio(AdmUsuarios usuario, Short idInstitucion, TiposServiciosItem servicio);
+	
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "obtenerCodigosPorColegioServicios")
+	List<String> obtenerCodigosPorColegioServicios(Short idInstitucion);
+	
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosByIdCategoriaMultiple")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> searchTiposServiciosByIdCategoriaMultiple(String idioma, Short idInstitucion, String idCategoria);
+	
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosByIdCategoria")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> searchTiposServiciosByIdCategoria(String idioma, Short idInstitucion, String idCategoria);
+	
 	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "selectMaxIdServicio")
 	@Results({
 		@Result(column = "IDSERVICIO", property = "newId", jdbcType = JdbcType.VARCHAR),
@@ -39,59 +104,5 @@ public interface PysServiciosExtendsMapper extends PysServiciosMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> getServicesCourse(String idInstitucion, String idLenguaje);
-	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServicios")
-	@Results({ 
-		@Result(column = "IDTIPOSERVICIOS", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "DESCRIPCION_TIPO", property = "descripciontipo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDSERVICIO", property = "idservicio", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE)
-		}) 
-	List<TiposServiciosItem> searchTiposServicios(String idioma, Short idInstitucion);
-	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosHistorico")
-	@Results({ 
-		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "DESCRIPCION_TIPO", property = "descripciontipo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE)
-		}) 
-	List<TiposServiciosItem> searchTiposServiciosHistorico(String idioma, Short idInstitucion);
-	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "comboTiposServicios")
-	@Results({ 
-		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
-		}) 
-	List<ComboItem> comboTiposServicios(String idioma);
-	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosByIdCategoriaMultiple")
-	@Results({ 
-		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
-		}) 
-	List<ComboItem> searchTiposServiciosByIdCategoriaMultiple(String idioma, Short idInstitucion, String idCategoria);
-	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosByIdCategoria")
-	@Results({ 
-		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
-		}) 
-	List<ComboItem> searchTiposServiciosByIdCategoria(String idioma, Short idInstitucion, String idCategoria);
-
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "getIndiceMaxServicio")
-	@Results({ 
-		@Result(column = "IDSERVICIO", property = "newId", jdbcType = JdbcType.NUMERIC)
-		}) 
-	NewIdDTO getIndiceMaxServicio(List<TiposServiciosItem> listadoServicios, Short idInstitucion);
-	
-	@UpdateProvider(type = PysServiciosSqlExtendsProvider.class, method = "activarDesactivarServicio")
-	int activarDesactivarServicio(AdmUsuarios usuario, Short idInstitucion, TiposServiciosItem servicio);
-	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "obtenerCodigosPorColegioServicios")
-	List<String> obtenerCodigosPorColegioServicios(Short idInstitucion);
-	
 	
 }

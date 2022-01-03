@@ -5,17 +5,24 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class TiposServiciosItem {
-	private int idtiposervicios;
-	private int idservicio;
+	private int idtiposervicios; //Categoria
+	private int idservicio; //Tipo
 	private String descripcion;
-	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechamodificacion;
 	private String usumodificacion;
 	private int idinstitucion;
-	private String descripciontipo;
-	@JsonFormat(pattern = "dd/MM/yyyy")
+	private String descripciontipo; //Nombre tipo
 	private Date fechabaja;
-	
+    boolean nuevo;
+    
+	public boolean isNuevo() {
+		return nuevo;
+	}
+
+	public void setNuevo(boolean nuevo) {
+		this.nuevo = nuevo;
+	}
+
 	public int getIdtiposervicios() {
 		return idtiposervicios;
 	}
@@ -139,10 +146,10 @@ public class TiposServiciosItem {
 	
 	@Override
 	public String toString() {
-		return "TiposServiciosItem [idtiposervicios=" + idtiposervicios + ", idservicio=" + idservicio + ", descripcion="
-				+ descripcion + ", fechamodificacion=" + fechamodificacion + ", usumodificacion=" + usumodificacion
-				+ ", idinstitucion=" + idinstitucion + ", descripciontipo=" + descripciontipo + ", fechabaja="
-				+ fechabaja + "]";
+		return "TiposServiciosItem [idtiposervicios=" + idtiposervicios + ", idservicio=" + idservicio
+				+ ", descripcion=" + descripcion + ", fechamodificacion=" + fechamodificacion + ", usumodificacion="
+				+ usumodificacion + ", idinstitucion=" + idinstitucion + ", descripciontipo=" + descripciontipo
+				+ ", fechabaja=" + fechabaja + ", nuevo=" + nuevo + "]";
 	}
 	
 }

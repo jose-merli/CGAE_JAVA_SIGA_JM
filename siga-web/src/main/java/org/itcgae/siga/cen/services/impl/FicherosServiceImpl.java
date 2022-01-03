@@ -38,19 +38,36 @@ public class FicherosServiceImpl implements IFicherosService {
 		genFichero.setDirectorio(objectVo.getDirectorio());
 		genFichero.setDescripcion(objectVo.getDescripcion());
 		
-		NewIdDTO idFichero = genFicheroExtendsMapper.selectMaxIdFicheroByIdInstitucion(String.valueOf(objectVo.getIdinstitucion()));
-		
-		if(idFichero == null) {
-			genFichero.setIdfichero((long) 1);
-		}else {
-			genFichero.setIdfichero(Long.valueOf(idFichero.getNewId()) + 1);
+		NewIdDTO idFichero = new NewIdDTO();
+		try {
+			idFichero.setNewId(getNuevoIdGenFichero());
+			if(idFichero.getNewId() == null) {
+				genFichero.setIdfichero((long) 1);
+			}else {
+				genFichero.setIdfichero(Long.valueOf(idFichero.getNewId()) + 1);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
 	
 		genFichero.setIdinstitucion(objectVo.getIdinstitucion());
 		genFichero.setFechamodificacion(objectVo.getFechamodificacion());
 		genFichero.setUsumodificacion(objectVo.getUsumodificacion());
 		LOGGER.info(dateLog+":fin.FicherosServiceImpl.getVo2Db");
 		return genFichero;
+	}
+	public String getNuevoIdGenFichero() throws Exception {
+		String nuevoId = "";
+
+		try {
+			nuevoId = genFicheroExtendsMapper.nextIdGenFichero();
+		} catch (Exception e) {
+			throw new Exception(e + ": Error al obtener nuevo id gen ficheros");
+		}
+
+		return nuevoId;
 	}
 
 	public void insert(FicheroVo ficheroVo) throws BusinessException {

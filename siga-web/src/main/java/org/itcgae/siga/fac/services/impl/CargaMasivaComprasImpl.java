@@ -743,15 +743,25 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 					
 				productoInsExample.createCriteria().andCodigoextEqualTo(CargaMasivaDatosCompItem.getCodigoProducto());
 				
+				List<PysProductosinstitucion> productosCodigo = pysProductosinstitucionMapper.selectByExample(productoInsExample);
+				
 
-				if(!pysProductosinstitucionMapper.selectByExample(productoInsExample).isEmpty()) {
-					PysProductosinstitucion prodIns = pysProductosinstitucionMapper.selectByExample(productoInsExample).get(0);
-					CargaMasivaDatosCompItem.setIdProducto(prodIns.getIdproducto());
-					CargaMasivaDatosCompItem.setIdProductoInstitucion(prodIns.getIdproductoinstitucion());
-					CargaMasivaDatosCompItem.setIdTipoProducto(prodIns.getIdtipoproducto());
-					CargaMasivaDatosCompItem.setValor(prodIns.getValor());
-					CargaMasivaDatosCompItem.setIdTipoIva(prodIns.getIdtipoiva());
-					CargaMasivaDatosCompItem.setNoFacturable(prodIns.getNofacturable());
+				if(!productosCodigo.isEmpty()) {
+					
+					//Se compruba si el producto introducido es de la categoria de certificados.
+					//En tal caso, no se permite la compra.
+					if(productosCodigo.get(0).getIdtipoproducto() == 18) {
+						errorLinea.append("No se puede realizar la compra masiva de certificados (se debe hacer desde el modulo de certificados). ");
+					}
+					else {
+						PysProductosinstitucion prodIns = productosCodigo.get(0);
+						CargaMasivaDatosCompItem.setIdProducto(prodIns.getIdproducto());
+						CargaMasivaDatosCompItem.setIdProductoInstitucion(prodIns.getIdproductoinstitucion());
+						CargaMasivaDatosCompItem.setIdTipoProducto(prodIns.getIdtipoproducto());
+						CargaMasivaDatosCompItem.setValor(prodIns.getValor());
+						CargaMasivaDatosCompItem.setIdTipoIva(prodIns.getIdtipoiva());
+						CargaMasivaDatosCompItem.setNoFacturable(prodIns.getNofacturable());
+					}
 				}
 				else {
 					errorLinea.append("Producto no encontrado por codigo de producto. ");

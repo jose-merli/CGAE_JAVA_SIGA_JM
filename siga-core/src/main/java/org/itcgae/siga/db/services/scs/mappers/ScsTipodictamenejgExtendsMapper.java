@@ -9,6 +9,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.mappers.ScsTipodictamenejgMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsEjgComisionSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTipodictamenejgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -17,11 +18,10 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface ScsTipodictamenejgExtendsMapper extends ScsTipodictamenejgMapper {
 
+	
 	@SelectProvider(type = ScsTipodictamenejgSqlExtendsProvider.class, method = "comboDictamen")
-	@Results({ 
-		@Result(column = "IDTIPODICTAMENEJG", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
-	})
+	@Results({ @Result(column = "IDTIPODICTAMENEJG", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboDictamen(String idLenguaje, String idInstitucion);
 	
 	/**

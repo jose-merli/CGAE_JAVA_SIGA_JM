@@ -20,6 +20,8 @@ import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
+import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
+import org.itcgae.siga.DTO.fac.FacRegistroFichContaDTO;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
@@ -42,6 +44,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
@@ -272,6 +275,20 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/getFinalidadConsultasSerie")
+	ResponseEntity<FinalidadConsultaDTO> getFinalidadConsultasSerie(@RequestBody ConsultaDestinatarioItem consulta,
+			HttpServletRequest request) {
+		FinalidadConsultaDTO response = new FinalidadConsultaDTO();
+
+		try {
+			response = facturacionService.getFinalidadConsultasSerie(consulta, request);
+			return new ResponseEntity<FinalidadConsultaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FinalidadConsultaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -782,4 +799,45 @@ public class FacturacionPySController {
 			return new ResponseEntity<FacturasIncluidasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@PostMapping(value = "/searchExportacionContabilidad")
+	ResponseEntity<FacRegistroFichContaDTO> search(@RequestBody FacRegistroFichConta facRegistroFichConta,
+			HttpServletRequest request) {
+		FacRegistroFichContaDTO response = new FacRegistroFichContaDTO();
+		try {
+			response = facturacionService.search(facRegistroFichConta, request);
+			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/maxIdContabilidad")
+	ResponseEntity<FacRegistroFichContaDTO> maxIdContabilidad(HttpServletRequest request) {
+		FacRegistroFichContaDTO response = new FacRegistroFichContaDTO();
+		try {
+			response = facturacionService.maxIdContabilidad(request);
+			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/guardarRegistroFichConta")
+	ResponseEntity<UpdateResponseDTO> guardarRegistroFichConta(@RequestBody FacRegistroFichConta facRegistroFichConta,
+			HttpServletRequest request) {
+
+		UpdateResponseDTO response = new UpdateResponseDTO();
+
+		try {
+			response = facturacionService.guardarRegistroFichConta(facRegistroFichConta, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }

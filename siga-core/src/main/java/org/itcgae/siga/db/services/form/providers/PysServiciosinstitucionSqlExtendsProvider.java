@@ -19,19 +19,6 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		
 		return sql.toString();
 	}
-//	
-//	public String selectIdServicioinstitucionByIdServicio(Short idInstitucion, Long idServicio) {
-//
-//		SQL sql = new SQL();
-//
-//		sql.SELECT("min(IDSERVICIOSINSTITUCION) as IDSERVICIOSINSTITUCION");
-//		sql.FROM("PYS_SERVICIOSINSTITUCION");
-//		sql.WHERE("idInstitucion =" + idInstitucion);
-//		sql.WHERE("idTipoServicios = 5");
-//		sql.WHERE("idservicio =" + idServicio);
-//		
-//		return sql.toString();
-//	}
 	
 	public String selectIdServicioinstitucionByIdServicio(Short idInstitucion, Long idCurso) {
 
@@ -141,49 +128,6 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		return sql.toString();
 	}
 	
-//	public String comboCondicionSuscripcion(String idioma, short idInstitucion, int idConsulta) {
-//		SQL sql = new SQL();
-//		String sqlUnion;
-//		SQL sql2 = new SQL();
-//		
-//		sql.SELECT(" idconsulta");
-//		sql.SELECT(" f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
-//		
-//		sql.FROM(" con_consulta");
-//		sql.WHERE(" idobjetivo = 3");
-//		sql.WHERE(" idclasecomunicacion = 1");
-//		sql.WHERE(" idinstitucion = '" + idInstitucion + "'");
-//		sql.WHERE(" fechabaja is null");
-//		
-//		if(idConsulta != 0) {
-//			
-//			sql2.SELECT( " idconsulta");
-//			sql2.SELECT(" f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
-//			sql2.WHERE(" idinstitucion = '" + idInstitucion + "'");
-//			sql2.WHERE(" idconsulta = " + idConsulta);
-//			
-//			sql2.ORDER_BY(" DESCRIPCION");
-//			
-//			return sqlUnion = sql.toString() + " UNION " + sql2.toString();
-//		}
-//		
-//		sql.ORDER_BY(" DESCRIPCION");
-//		
-//	
-//		return sql.toString();
-		
-//		select idconsulta, descripcion from con_consulta
-//		where idinstitucion = 2005
-//		and idobjetivo = 3
-//		and idclasecomunicacion = 1
-//		and fechabaja is null
-//		union
-//		select idconsulta, descripcion from con_consulta
-//		where idinstitucion = 2005
-//		and idconsulta = 51;
-
-//	}
-	
 	public String comboCondicionSuscripcion(String idioma, short idInstitucion) {
 		SQL sql = new SQL();
 		
@@ -193,6 +137,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		sql.FROM(" con_consulta");
 		sql.WHERE(" idobjetivo = 3");
 		sql.WHERE(" idclasecomunicacion = 1");
+		sql.WHERE(" idmodulo = 9");
 		sql.WHERE(" idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE(" fechabaja is null");
 		

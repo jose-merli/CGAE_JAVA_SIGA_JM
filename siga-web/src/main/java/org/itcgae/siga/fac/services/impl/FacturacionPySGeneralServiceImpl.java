@@ -32,7 +32,6 @@ import org.itcgae.siga.db.entities.PysProductosExample;
 import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
-import org.itcgae.siga.db.mappers.CenGruposcriteriosMapper;
 import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
@@ -123,9 +122,6 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facFacturacionprogramadaExtendsMapper;
-
-	@Autowired
-	private CenGruposcriteriosMapper cenGruposcriteriosMapper;
 
 	@Autowired
 	private ConConsultasExtendsMapper conConsultasExtendsMapper;
@@ -915,8 +911,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			}
 
 			comboItems.add(item);
-			
-			//primeros recibos
+
+			// primeros recibos
 			item = new ComboItem();
 			example = new GenParametrosExample();
 
@@ -1076,19 +1072,19 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			genKey.setParametro("MODIFICAR_DESCRIPCION");
 			item1.setLabel("MODIFICAR_DESCRIPCION");
 			param = genParametrosMapper.selectByPrimaryKey(genKey);
-			item1.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
+			item1.setValue(param == null || param.getValor().equals("0") ? "0" : "1");
 			comboItems.add(item1);
 
 			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
 			item2.setLabel("MODIFICAR_IMPORTE_UNITARIO");
 			param = genParametrosMapper.selectByPrimaryKey(genKey);
-			item2.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
+			item2.setValue(param == null || param.getValor().equals("0") ? "0" : "1");
 			comboItems.add(item2);
 
 			genKey.setParametro("MODIFICAR_IVA");
 			item3.setLabel("MODIFICAR_IVA");
 			param = genParametrosMapper.selectByPrimaryKey(genKey);
-			item3.setValue(param == null || param.getValor().equals("N") ? "0" : "1");
+			item3.setValue(param == null || param.getValor().equals("0") ? "0" : "1");
 			comboItems.add(item3);
 
 			comboDTO.setCombooItems(comboItems);

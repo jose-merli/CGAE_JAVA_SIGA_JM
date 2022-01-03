@@ -22,7 +22,7 @@ public interface IProductosService {
 	public InsertResponseDTO nuevoProducto(ProductoDetalleDTO producto, HttpServletRequest request) throws Exception;
 	public DeleteResponseDTO editarProducto(ProductoDetalleDTO producto, HttpServletRequest request);
 	public ListaProductosDTO searchListadoProductos(HttpServletRequest request, FiltroProductoItem filtroProductoItem);
-	public DeleteResponseDTO reactivarBorradoFisicoLogicoProductos(ListaProductosDTO listadoProductos, HttpServletRequest request);
+	public DeleteResponseDTO reactivarBorradoFisicoLogicoProductos(ListaProductosDTO listadoProductos, HttpServletRequest request) throws Exception;
 	public ListaCodigosPorColegioDTO obtenerCodigosPorColegio(HttpServletRequest request);
 	public PysTipoiva getIvaDetail(HttpServletRequest request, String idTipoIva);
 }

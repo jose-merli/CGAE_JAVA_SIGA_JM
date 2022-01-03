@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.form.providers;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.db.mappers.PysPreciosserviciosSqlProvider;
 
 public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSqlProvider {
@@ -86,6 +87,20 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 		
 		sql.FROM("PYS_PERIODICIDAD");
 		
+		return sql.toString();
+	}
+	
+	//Realiza un borrado fisico de los precios de un servicio
+	public String borradoFisicoPreciosByServicio(ListaServiciosItem servicio,Short idInstitucion) {
+		SQL sql = new SQL();
+			
+		sql.DELETE_FROM(" PYS_PRECIOSSERVICIOS");
+				
+		sql.WHERE(" IDTIPOSERVICIOS = " + servicio.getIdtiposervicios());
+		sql.WHERE(" IDSERVICIO = " + servicio.getIdservicio());
+		sql.WHERE(" IDSERVICIOSINSTITUCION = " +  servicio.getIdserviciosinstitucion());
+		sql.WHERE(" IDINSTITUCION = " + idInstitucion);
+						
 		return sql.toString();
 	}
 
