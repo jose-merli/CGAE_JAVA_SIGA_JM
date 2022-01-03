@@ -120,7 +120,11 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //facturacion
         if (item.getFacturacion() != null) {
-            facturas.WHERE("f.idprogramacion=" + item.getFacturacion());
+            String[] facturacion = item.getFacturacion().split("-");
+            if (facturacion.length == 2) {
+                facturas.WHERE("f.idprogramacion=" + facturacion[0].trim());
+                facturas.WHERE("f.idseriefacturacion=" + facturacion[1].trim());
+            }
         }
 
         //importe adeudado
