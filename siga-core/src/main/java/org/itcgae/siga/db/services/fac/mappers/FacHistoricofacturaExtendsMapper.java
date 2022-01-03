@@ -1,0 +1,41 @@
+package org.itcgae.siga.db.services.fac.mappers;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.EstadosPagosItem;
+import org.itcgae.siga.db.mappers.FacHistoricofacturaMapper;
+import org.itcgae.siga.db.services.fac.providers.FacHistoricofacturaExtendsSqlProvider;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
+@Service
+@Primary
+public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMapper {
+
+	@SelectProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "getEstadosPagos")
+	@Results({
+			@Result(column = "FECHAMODIFICACION", property = "fechaModificaion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOACCION", property = "idAccion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ACCION", property = "accion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IBAN", property = "iban", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPTOTALPAGADO", property = "impTotalPagado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPTOTALPORPAGAR", property = "impTotalPorPagar", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDSJCS", property = "IDSJCS", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ENLACEFACTURA", property = "enlaceFactura", jdbcType = JdbcType.BOOLEAN),
+			@Result(column = "NUMEROFACTURA", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDCARGOS", property = "idCargos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDDEVOLUCIONES", property = "idDevoluciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ENLACEABONO", property = "enlaceAbono", jdbcType = JdbcType.BOOLEAN),
+			@Result(column = "NUMEROABONO", property = "numeroAbono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOTAACCION", property = "notaAccion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<EstadosPagosItem> getEstadosPagos(String idFactura, String idInstitucion, String idLenguaje);
+}
