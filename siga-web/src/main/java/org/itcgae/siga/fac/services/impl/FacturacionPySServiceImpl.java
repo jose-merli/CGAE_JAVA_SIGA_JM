@@ -3754,7 +3754,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, HttpServletRequest request) throws Exception {
+	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, String idProgramacion, HttpServletRequest request) throws Exception {
 		InformeFacturacionDTO informeFacturacionDTO = new InformeFacturacionDTO();
 		List<InformeFacturacionItem> items;
 		Error error = new Error();
@@ -3770,8 +3770,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					"getFacturacionesProgramadas() / facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas() -> Entrada a facFacturacionprogramadaExtendsMapper para obtener el listado de facturaciones programadas");
 
 			// Logica
-			items = facFacturaExtendsMapper.getInformeFacturacionOriginal(idSerieFacturacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
-			items.addAll(facFacturaExtendsMapper.getInformeFacturacionActual(idSerieFacturacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
+			items = facFacturaExtendsMapper.getInformeFacturacionOriginal(idSerieFacturacion, idProgramacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+			items.addAll(facFacturaExtendsMapper.getInformeFacturacionActual(idSerieFacturacion, idProgramacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
 			informeFacturacionDTO.setInformeFacturacion(items);
 
 		}

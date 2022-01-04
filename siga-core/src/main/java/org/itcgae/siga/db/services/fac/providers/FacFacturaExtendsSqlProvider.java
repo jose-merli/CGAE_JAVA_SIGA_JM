@@ -228,7 +228,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
     }
 
 
-    public String getInformeFacturacionActual(String idSerieFacturacion, String idInstitucion, String idLenguaje) {
+    public String getInformeFacturacionActual(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje) {
         SQL sql = new SQL();
 
         // Select
@@ -242,6 +242,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         // Where
         sql.WHERE("ff.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("ff.IDSERIEFACTURACION = " + idSerieFacturacion);
+        sql.WHERE("ff.IDPROGRAMACION = " + idProgramacion);
 
         // Order by
         sql.GROUP_BY("pf.DESCRIPCION");
@@ -249,7 +250,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         return sql.toString();
     }
 
-    public String getInformeFacturacionOriginal(String idSerieFacturacion, String idInstitucion, String idLenguaje) {
+    public String getInformeFacturacionOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje) {
         SQL sql = new SQL();
 
         // Select
@@ -264,6 +265,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         // Where
         sql.WHERE("ff.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("ff.IDSERIEFACTURACION = " + idSerieFacturacion);
+        sql.WHERE("ff.IDPROGRAMACION = " + idProgramacion);
 
         // Order by
         sql.GROUP_BY("pf.DESCRIPCION");

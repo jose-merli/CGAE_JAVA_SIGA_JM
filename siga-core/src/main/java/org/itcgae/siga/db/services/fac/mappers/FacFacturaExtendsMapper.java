@@ -88,7 +88,7 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "totalPendiente", property = "totalPendiente", jdbcType = JdbcType.VARCHAR)
 	})
-	List<InformeFacturacionItem> getInformeFacturacionActual(String idSerieFacturacion, String idInstitucion, String idLenguaje);
+	List<InformeFacturacionItem> getInformeFacturacionActual(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje);
 
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getInformeFacturacionOriginal")
 	@Results({
@@ -98,5 +98,5 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "totalPendiente", property = "totalPendiente", jdbcType = JdbcType.VARCHAR)
 	})
-	List<InformeFacturacionItem> getInformeFacturacionOriginal(String idSerieFacturacion, String idInstitucion, String idLenguaje);
+	List<InformeFacturacionItem> getInformeFacturacionOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje);
 }
