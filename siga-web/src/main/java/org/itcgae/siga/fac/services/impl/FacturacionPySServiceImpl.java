@@ -3444,6 +3444,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				|| record.getIdestadoconfirmacion() == string2Short("21") // Confirmación con errores
 		)) {
 
+			// Tarjeta de datos generales
+			record.setFechaprevistageneracion(facItem.getFechaPrevistaGeneracion());
+			record.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
+
 			// Tarjeta de generación de fichero de adeudos
 			record.setFechapresentacion(facItem.getFechaPresentacion());
 			record.setFecharecibosprimeros(facItem.getFechaRecibosPrimeros());
@@ -3463,7 +3467,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		)) {
 
 			// Datos de la tarjeta generación de ficheros
-			record.setGenerapdf(facItem.getGeneraPDF() ? "1" : "0");
+			record.setGenerapdf(facItem.getGeneraPDF() != null && facItem.getGeneraPDF() ? "1" : "0");
 			// seriefacturacion.getIdmodelofactura();
 			// seriefacturacion.getIdmodelorectificativa();
 
@@ -3478,7 +3482,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			// Datos de la tarjeta envío facturas
-			record.setEnvio(facItem.getEnvio() ? "1" : "0");
+			record.setEnvio(facItem.getEnvio() != null && facItem.getEnvio() ? "1" : "0");
 			if (!UtilidadesString.esCadenaVacia(facItem.getIdTipoPlantillaMail())) {
 				record.setIdtipoplantillamail(string2Integer(facItem.getIdTipoPlantillaMail()));
 				record.setIdtipoenvios(Short.parseShort("1"));
@@ -3498,7 +3502,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			// Datos de la tarjeta generación de traspasos
-			record.setTraspasofacturas(facItem.getTraspasoFacturas() ? "1" : "0");
+			record.setTraspasofacturas(facItem.getTraspasoFacturas() != null && facItem.getTraspasoFacturas() ? "1" : "0");
 			record.setTraspasoPlantilla(facItem.getTraspasoPlatilla());
 			record.setTraspasoCodauditoriaDef(facItem.getTraspasoCodAuditoriaDef());
 
@@ -3514,20 +3518,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 		}
 
-		if (record.getIdestadoconfirmacion() != null && (record.getIdestadoconfirmacion() == string2Short("20") // Generación
-																												// con
-																												// errores
-				|| record.getIdestadoconfirmacion() == string2Short("2") // Generada
-		)) {
-
-			// Datos generales
-
-			if (facItem.getFechaPrevistaConfirm() != null)
-				record.setFechaprevistaconfirm(facItem.getFechaPrevistaConfirm());
-		}
-
 		if (record.getIdestadoconfirmacion() != null && facItem.getEsDatosGenerales()
-				&& (record.getIdestadoconfirmacion() == string2Short("20") // Confirmación con errores
+				&& (record.getIdestadoconfirmacion() == string2Short("21") // Confirmación con errores
 						|| record.getIdestadoconfirmacion() == string2Short("2") // Generada
 				)) {
 
