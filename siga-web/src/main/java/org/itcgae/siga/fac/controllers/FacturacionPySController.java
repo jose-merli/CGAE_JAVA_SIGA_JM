@@ -842,11 +842,11 @@ public class FacturacionPySController {
 	}
 
 	@GetMapping(value = "/getInformeFacturacion")
-	ResponseEntity<InformeFacturacionDTO> getInformeFacturacion(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+	ResponseEntity<InformeFacturacionDTO> getInformeFacturacion(@RequestParam String idSerieFacturacion, @RequestParam String idProgramacion, HttpServletRequest request) {
 		InformeFacturacionDTO response = new InformeFacturacionDTO();
 
 		try {
-			response = facturacionService.getInformeFacturacion(idSerieFacturacion, request);
+			response = facturacionService.getInformeFacturacion(idSerieFacturacion, idProgramacion, request);
 
 			if (response.getInformeFacturacion().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());

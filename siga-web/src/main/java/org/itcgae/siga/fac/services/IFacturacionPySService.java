@@ -191,5 +191,5 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
 			HttpServletRequest request);
 
-	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, HttpServletRequest request) throws Exception;
+	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, String idProgramacion, HttpServletRequest request) throws Exception;
 }
