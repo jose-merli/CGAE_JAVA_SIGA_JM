@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -154,6 +155,7 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 				// Para que la etiqueta @Transactional funcione adecuadamente debe recibir una
 				// excepcion
 //				try {
+				List<PysLineaanticipo> movimientosViejosMonedero = null;
 
 				// 1. Se comprueba si es un monedero nuevo o no
 				if (ficha.getIdAnticipo() != null) {
@@ -167,36 +169,82 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 					monederoKey.setIdanticipo(ficha.getIdAnticipo());
 
 					response = pysAnticipoletradoMapper.deleteByPrimaryKey(monederoKey);
+					
 					if (response == 0) {
 						throw new SigaExceptions("Error al borrar el anticipo del monedero en la BBDD.");
 					}
+					
+					//Se eliminan todos los movimientos del monedero
+					
+					PysLineaanticipoExample movimientosExample = new PysLineaanticipoExample();
+					
+					movimientosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(ficha.getIdPersona())
+					.andIdanticipoEqualTo(ficha.getIdAnticipo());
+					
+					movimientosViejosMonedero = pysLineaanticipoExtendsMapper.selectByExample(movimientosExample);
+					
+					response = pysLineaanticipoExtendsMapper.deleteByExample(movimientosExample);
+					
+					if (response == 0) {
+						throw new SigaExceptions("Error al borrar los movimientos del monedero en la BBDD.");
+					}
 				}
 
-				// 2. Se inserta el anticipo asociado al monedero
-				// Comprobamos el id maximo de los anticipos asociados con esta persona
+				// 2. Se inserta el anticipo asociado al monedero y sus movimientos
+				
+				
 				int idAnticipo;
 				if (ficha.getIdAnticipo() == null) {
+					// Comprobamos el id maximo de los anticipos asociados con esta persona
 					idAnticipo = Integer.valueOf(pysAnticipoletradoExtendsMapper
 							.selectMaxIdAnticipo(idInstitucion, ficha.getIdPersona()).getNewId()) + 1;
 				} else {
 					idAnticipo = ficha.getIdAnticipo();
 				}
 
-				// Se recorren los movimientos presentes
-				ListaMovimientosMonederoItem anticipoInicial = ficha.getMovimientos().get(0);
+				// 2. Se recorren los movimientos enviados desde la ficha.
+				//Se comprueba si tienen valor de idLinea.
+				//Eso indicara que no son nuevos.
+				List<ListaMovimientosMonederoItem> movimientosFicha = ficha.getMovimientos();
+				
+				int diff = movimientosViejosMonedero.size() - movimientosFicha.size();
+				
+				BigDecimal impIniTot = new BigDecimal(0);
+				
+				for (int i = movimientosFicha.size() - 1; i >= 0; i--) {
+					
+					//Se comprueba si el importe es positivo (si es un ingreso)
+					if(movimientosFicha.get(i).getImpOp().compareTo(new BigDecimal(0)) == 1) {
+						impIniTot = impIniTot.add(movimientosFicha.get(i).getImpOp());
+					}
+					
+					if(movimientosFicha.get(i).getIdLinea() != null) {
+						pysLineaanticipoExtendsMapper.insert(movimientosViejosMonedero.get(i + diff));
+					}
+					else {
+						PysLineaanticipo movimiento = new PysLineaanticipo();
+						
+						movimiento.setIdlinea((short) i);
+						
+						movimiento.setUsumodificacion(usuarios.get(0).getIdusuario());
+						movimiento.setFechamodificacion(new Date());
+						
+						pysLineaanticipoExtendsMapper.insert(movimiento);
+					}
+		        }
 
-				// 2.a Se introduce fila en la tabla PYS_ANTICIPOLETRADO
+				// 3. Se introduce fila en la tabla PYS_ANTICIPOLETRADO
 
 				PysAnticipoletrado anticipo = new PysAnticipoletrado();
 
 //				anticipo.setContabilizado(anticipoInicial.getContabilizado());
-				anticipo.setCtacontable(anticipoInicial.getCuentaContable());
-				anticipo.setDescripcion(anticipoInicial.getConcepto());
-				anticipo.setFecha(anticipoInicial.getFecha());
+//				anticipo.setCtacontable(movimientosFicha.get(movimientosFicha.size()-1).getCuentaContable());
+				anticipo.setDescripcion(movimientosFicha.get(movimientosFicha.size()-1).getConcepto());
+				anticipo.setFecha(movimientosFicha.get(movimientosFicha.size()-1).getFecha());
 				anticipo.setIdanticipo((short) idAnticipo);
 				anticipo.setIdinstitucion(idInstitucion);
 				anticipo.setIdpersona(ficha.getIdPersona());
-				anticipo.setImporteinicial(anticipoInicial.getImpOp());
+				anticipo.setImporteinicial(impIniTot);
 
 				anticipo.setFechamodificacion(new Date());
 				anticipo.setUsumodificacion(usuarios.get(0).getIdusuario());

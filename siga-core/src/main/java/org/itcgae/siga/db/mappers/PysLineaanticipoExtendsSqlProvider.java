@@ -15,10 +15,11 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SQL query = new SQL();
         query.SELECT("anti.fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", "anti.idanticipo", "anti.descripcion", "anti.importeinicial as importe_inicial"
-        		, "sum(nvl(linea.importeanticipado, 0)) as importe_usado", "anti.importeinicial- sum(nvl(linea.importeanticipado, 0)) as importe_restante");
+        		, "sum(gastos.importeanticipado) as importe_usado", "sum(linea.importeanticipado) as importe_restante");
         query.FROM("pys_anticipoletrado anti");
         query.INNER_JOIN("cen_persona pers on pers.idpersona = anti.idpersona");
         query.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona and linea.idanticipo = anti.idanticipo");
+        query.LEFT_OUTER_JOIN("pys_lineaanticipo gastos on gastos.idpersona = pers.idpersona and gastos.idanticipo = anti.idanticipo and gastos.importeanticipado");
 
         query.WHERE("anti.idinstitucion = " + institutionId);
         
@@ -67,28 +68,30 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
     
     public String getListaMovimientosMonedero(Short idInstitucion, String idAnticipo, String idPersona) {
     	
-    	SQL queryAnti = new SQL();
-    	
-    	queryAnti.SELECT("anti.fecha"); 
-    	queryAnti.SELECT("anti.descripcion as concepto"); 
-    	queryAnti.SELECT("anti.CTACONTABLE as cuentacontable "); 
-    	queryAnti.SELECT("anti.importeinicial as importe"); 
-    	queryAnti.SELECT("0 as nuevo");
-
-    	queryAnti.FROM("pys_anticipoletrado anti"); 
-        
-        queryAnti.WHERE("anti.idinstitucion = " + idInstitucion);
-        queryAnti.WHERE("anti.idPersona = " + idPersona);
-        queryAnti.WHERE("anti.idanticipo = " + idAnticipo);
+//    	SQL queryAnti = new SQL();
+//    	
+//    	queryAnti.SELECT("anti.fecha"); 
+//    	queryAnti.SELECT("anti.descripcion as concepto"); 
+//    	queryAnti.SELECT("anti.CTACONTABLE as cuentacontable "); 
+//    	queryAnti.SELECT("anti.importeinicial as importe"); 
+//    	queryAnti.SELECT("0 as nuevo");
+//
+//    	queryAnti.FROM("pys_anticipoletrado anti"); 
+//        
+//        queryAnti.WHERE("anti.idinstitucion = " + idInstitucion);
+//        queryAnti.WHERE("anti.idPersona = " + idPersona);
+//        queryAnti.WHERE("anti.idanticipo = " + idAnticipo);
         
         
         SQL queryLineas = new SQL();
         
         queryLineas.SELECT("linea.fechaefectiva as fecha"); 
-    	queryLineas.SELECT("CASE WHEN servIns.DESCRIPCION is null then 'Liquidacion' \r\n"
+    	queryLineas.SELECT("CASE WHEN linea.liquidacion = 1 then 'Liquidacion' \r\n"
     			+ "else servIns.DESCRIPCION end as concepto"); 
-    	queryLineas.SELECT("'' as cuentacontable "); 
-    	queryLineas.SELECT("-linea.importeanticipado as importe"); 
+    	queryLineas.SELECT("anti.CTACONTABLE as cuentacontable "); 
+    	queryLineas.SELECT("case when linea.idfactura is null linea.importeanticipado then linea.IMPORTEANTICIPADO \r\n"
+    			+ "else IMPORTEANTICIPADO * -1 end as importe"); 
+    	queryLineas.SELECT("linea.idlinea");
     	queryLineas.SELECT("0 as nuevo");
 
     	queryLineas.FROM("pys_anticipoletrado anti"); 
@@ -105,11 +108,11 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         queryLineas.WHERE("anti.idanticipo = " + idAnticipo);        
         
     	
-        String query =  queryLineas.toString() +" \r\n UNION \r\n"+ queryAnti.toString()+ " order by fecha desc";
+//        String query =  queryLineas.toString() +" \r\n UNION \r\n"+ queryAnti.toString()+ " order by fecha desc";
 
-        LOGGER.info("CONSULTA DE LISTA DE BUSQUEDA DE MOVIMIENTOS DE UN MONEDERO: \r\n" + query.toString());
+        LOGGER.info("CONSULTA DE LISTA DE MOVIMIENTOS DE UN MONEDERO: \r\n" + queryLineas.toString());
         
-    	return query;
+    	return queryLineas.toString();
     }
     
 public String getListaServiciosMonedero(Short idInstitucion, String idAnticipo, String idPersona) {
@@ -266,7 +269,7 @@ public String getListaServiciosMonedero(Short idInstitucion, String idAnticipo, 
 		
 		SQL query = new SQL();
 		query.SELECT("anti.fecha", "anti.idanticipo", "anti.descripcion",
-        		"anti.importeinicial- sum(nvl(linea.importeanticipado, 0)) as importe_restante");
+        		"sum(linea.importeanticipado) as importe_restante");
         query.FROM("pys_anticipoletrado anti");
         query.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = anti.idpersona and linea.idanticipo = anti.idanticipo");
         query.INNER_JOIN("pys_servicioanticipo servAnti on servAnti.IDINSTITUCION = anti.idInstitucion and servAnti.IDPERSONA = anti.idPersona and servAnti.IDANTICIPO = anti.idanticipo");
@@ -278,13 +281,12 @@ public String getListaServiciosMonedero(Short idInstitucion, String idAnticipo, 
         query.WHERE("servAnti.idServicio = "+ servicio.getIdservicio());
         query.WHERE("servAnti.idTipoServicios = "+ servicio.getIdtiposervicios());
         query.WHERE("servAnti.idServiciosInstitucion = "+ servicio.getIdserviciosinstitucion());
-        query.WHERE("rownum <= 1");
         
         query.ORDER_BY("anti.fecha desc");
         
-        LOGGER.info("CONSULTA DE LISTA DE BUSQUEDA DE SERVICIOS DE UN MONEDERO: \r\n" + "SELECT * from ("+query.toString()+") where importe_restante > 0");
+        LOGGER.info("CONSULTA PARA EL MONEDERO DE UNA SUSCRIPCION: \r\n" + "SELECT * from ("+query.toString()+") where importe_restante > 0");
         
-        return "SELECT * from ("+query.toString()+") where importe_restante > 0";
+        return "SELECT * from ("+query.toString()+") where importe_restante > 0 and rownum <= 1";
 		
 	}
 

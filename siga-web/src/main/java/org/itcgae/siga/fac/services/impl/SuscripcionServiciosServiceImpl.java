@@ -287,7 +287,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	}
 
 
-	@Scheduled(cron = "0 0/2 * * * *")//    @Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionLetrado}")
+	@Scheduled(cron = "0 0/1 * * * *")//    @Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionLetrado}")
 	@Override
 	public void actualizacionSuscripcionesPersona() {
 
@@ -316,6 +316,9 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 			//REVISAR: Al ser un servicioque se ejecuta de forma automatica, se considera que el usuario sera el 0.
 			usu.setIdusuario(0);
 			
+			LOGGER.info("SuscripcionServiciosServiceImpl --> actualizacionSuscripcionesPersona --> Entrada al bucle con "+personasActualizar.size()+" personas a las que revisar sus suscripciones");
+
+			
 			for(PysColaSuscripcionesAuto persona: personasActualizar) {
 			
 				ejecucionPlsServicios.ejecutarPL_ProcesoRevisionLetrado(persona.getIdinstitucion(), persona.getIdpersona(), persona.getFechaclave(), usu);
@@ -324,6 +327,9 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 				
 				pysColaSuscripcionesAutoMapper.updateByPrimaryKey(persona);
 			}
+			
+			LOGGER.info("SuscripcionServiciosServiceImpl --> actualizacionSuscripcionesPersona --> Salida del bucle con personas a las que revisar sus suscripciones");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -337,6 +343,8 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 		personasBorrarExample.createCriteria().andFechamodificacionLessThan(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
 		
 		List<PysColaSuscripcionesAuto> personasBorrar = pysColaSuscripcionesAutoMapper.selectByExample(personasBorrarExample);
+		
+		LOGGER.info("SuscripcionServiciosServiceImpl --> actualizacionSuscripcionesPersona --> Se seleccionan para eliminar "+personasBorrar.size()+" entradas del historico");
 		
 		int response = pysColaSuscripcionesAutoMapper.deleteByExample(personasBorrarExample);
 		

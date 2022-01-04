@@ -192,6 +192,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		//REVISAR
 		sql.WHERE("rownum = 1");
+		
+		LOGGER.info("CONSULTA FICHA COMPRA/SUSCRIPCION: \r\n"+ sql.toString());
 
 		return sql.toString();
 	}
