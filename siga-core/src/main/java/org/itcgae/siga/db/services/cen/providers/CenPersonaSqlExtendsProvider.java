@@ -559,7 +559,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		// Joins
 		sql.INNER_JOIN("cen_cliente c ON ( c.idpersona = p.idpersona )");
 		sql.INNER_JOIN("fac_clienincluidoenseriefactur fc ON ( fc.idpersona = c.idpersona AND fc.idinstitucion = c.idinstitucion )");
-		sql.INNER_JOIN("cen_direcciones d ON ( d.idpersona = p.idpersona AND d.idinstitucion = c.idinstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_direcciones d ON ( d.idpersona = p.idpersona AND d.idinstitucion = c.idinstitucion )");
 
 		// Where
 		sql.WHERE("fc.idinstitucion = " + idInstitucion);

@@ -1346,7 +1346,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			FacClienincluidoenseriefacturKey key = new FacClienincluidoenseriefacturKey();
-			key.setIdinstitucion(Short.parseShort(destinatariosSeriesItem.getIdInstitucion()));
+			key.setIdinstitucion(Short.parseShort(destinatariosSeriesItem.getNumeroInstitucion()));
 			key.setIdseriefacturacion(Long.parseLong(destinatariosSeriesItem.getIdSerieFacturacion()));
 			key.setIdpersona(Long.parseLong(destinatariosSeriesItem.getIdPersona()));
 
