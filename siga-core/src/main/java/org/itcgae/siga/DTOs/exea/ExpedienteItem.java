@@ -15,9 +15,45 @@ public class ExpedienteItem {
     private String relacion;
     private String fechaApertura;
     private String idInstitucionTipoExpediente;
+    private String numRegistro;
+    private String fechaRegistro;
+    private String titular;
     private boolean exea;
     private List<DocumentacionAsistenciaItem> documentos;
     private String descInstitucion;
+    private String idFase;
+
+    public String getIdFase() {
+        return idFase;
+    }
+
+    public void setIdFase(String idFase) {
+        this.idFase = idFase;
+    }
+
+    public String getNumRegistro() {
+        return numRegistro;
+    }
+
+    public void setNumRegistro(String numRegistro) {
+        this.numRegistro = numRegistro;
+    }
+
+    public String getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(String fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    public String getTitular() {
+        return titular;
+    }
+
+    public void setTitular(String titular) {
+        this.titular = titular;
+    }
 
     public List<DocumentacionAsistenciaItem> getDocumentos() {
         return documentos;

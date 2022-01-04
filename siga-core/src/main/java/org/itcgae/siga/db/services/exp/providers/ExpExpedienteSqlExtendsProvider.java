@@ -15,7 +15,7 @@ public class ExpExpedienteSqlExtendsProvider extends ExpExpedienteSqlProvider {
                 "t.idinstitucion    AS IDINSTITUCIONTIPOEXPEDIENTE",
                 "es.nombre as estadoexpediente",
                 "TO_CHAR(e.fecha,'DD/MM/YYYY HH24:MI') as fechaapertura",
-                "'Denunciado' as relacion"); //Esta query es para traer expresamente los expedientes en los que el colegial es el denunciado, por lo que la relación sera siempre denunciado
+                "'Interesado' as relacion"); //Esta query es para traer expresamente los expedientes en los que el colegial es el denunciado, por lo que la relación sera siempre denunciado
         SQL.FROM("exp_denunciado      d",
                 "exp_expediente      e",
                 "exp_tipoexpediente  t",

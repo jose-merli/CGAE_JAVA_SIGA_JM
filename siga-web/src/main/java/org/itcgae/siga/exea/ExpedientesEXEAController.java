@@ -1,6 +1,8 @@
 package org.itcgae.siga.exea;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.exea.DocumentacionIncorporacionItem;
 import org.itcgae.siga.DTOs.exea.ExpedienteDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.exea.services.ExpedientesEXEAService;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/expedientesEXEA")
@@ -72,5 +75,31 @@ public class ExpedientesEXEAController {
         }
         return new ResponseEntity<ExpedienteDTO>(response, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/paramsDocEXEA")
+    public ResponseEntity<StringDTO> getParamsDocumentacionEXEA(HttpServletRequest request) {
+        StringDTO response = null;
+        try {
+            response = expedientesEXEAService.getParamsDocumentacionEXEA(request);
+        }catch(Exception e) {
+            throw e;
+        }
+        return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/sincronizarDocumentacionEXEA")
+    public ResponseEntity<InsertResponseDTO> sincronizarDocumentacionEXEA(HttpServletRequest request, @RequestBody List<DocumentacionIncorporacionItem> documentosEXEA) {
+        InsertResponseDTO response = null;
+        try {
+            response = expedientesEXEAService.sincronizarDocumentacionEXEA(request,documentosEXEA);
+        }catch(Exception e) {
+            throw e;
+        }
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+    }
+
+
+
+
 
 }

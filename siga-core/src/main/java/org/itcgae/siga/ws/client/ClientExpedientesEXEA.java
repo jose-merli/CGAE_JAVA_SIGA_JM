@@ -2,6 +2,8 @@ package org.itcgae.siga.ws.client;
 
 import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeRequestDocument;
 import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeResponseDocument;
+import ieci.tdw.ispac.services.ws.server.BusquedaAvanzadaDocument;
+import ieci.tdw.ispac.services.ws.server.BusquedaAvanzadaResponseDocument;
 import ieci.tdw.ispac.services.ws.server.GetExpedienteDocument;
 import ieci.tdw.ispac.services.ws.server.GetExpedienteResponseDocument;
 import org.apache.log4j.Logger;
@@ -54,6 +56,23 @@ public class ClientExpedientesEXEA extends WebServiceGatewaySupport {
         {
             AddInEXEAClient client = context.getBean(AddInEXEAClient.class);
             response = client.getDetalleExpediente(request, uriService);
+
+        }catch(Exception e) {
+            LOGGER.error("ClientExpedientesEXEA -> Error al obtener el detalle del expediente: " + e.getMessage(), e);
+            throw e;
+        }
+
+        return response;
+    }
+
+    public BusquedaAvanzadaResponseDocument getExpedientesEXEAPersonalColegio (BusquedaAvanzadaDocument request, String uriService){
+
+        BusquedaAvanzadaResponseDocument response;
+
+        try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfigAddInEXEA.class))
+        {
+            AddInEXEAClient client = context.getBean(AddInEXEAClient.class);
+            response = client.getExpedientesEXEAPersonalColegio(request, uriService);
 
         }catch(Exception e) {
             LOGGER.error("ClientExpedientesEXEA -> Error al obtener el detalle del expediente: " + e.getMessage(), e);

@@ -6,7 +6,34 @@ public class DocumentacionIncorporacionItem {
     private String nombreDoc;
     private String obligatorio;
     private String observaciones;
+    private String codDocEXEA;
     private String documento;
+    private String tipoColegiacion;
+    private String tipoSolicitud;
+
+    public String getTipoColegiacion() {
+        return tipoColegiacion;
+    }
+
+    public void setTipoColegiacion(String tipoColegiacion) {
+        this.tipoColegiacion = tipoColegiacion;
+    }
+
+    public String getTipoSolicitud() {
+        return tipoSolicitud;
+    }
+
+    public void setTipoSolicitud(String tipoSolicitud) {
+        this.tipoSolicitud = tipoSolicitud;
+    }
+
+    public String getCodDocEXEA() {
+        return codDocEXEA;
+    }
+
+    public void setCodDocEXEA(String codDocEXEA) {
+        this.codDocEXEA = codDocEXEA;
+    }
 
     public String getIdDocumentacion() {
         return idDocumentacion;
