@@ -33,6 +33,7 @@ import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesDTO;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesItem;
+import org.itcgae.siga.DTO.fac.InformeFacturacionDTO;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
@@ -190,4 +191,5 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
 			HttpServletRequest request);
 
+	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 }

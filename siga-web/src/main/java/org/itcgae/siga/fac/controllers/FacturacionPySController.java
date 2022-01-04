@@ -33,6 +33,7 @@ import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesDTO;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesItem;
+import org.itcgae.siga.DTO.fac.InformeFacturacionDTO;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
@@ -840,4 +841,21 @@ public class FacturacionPySController {
 		}
 	}
 
+	@GetMapping(value = "/getInformeFacturacion")
+	ResponseEntity<InformeFacturacionDTO> getInformeFacturacion(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+		InformeFacturacionDTO response = new InformeFacturacionDTO();
+
+		try {
+			response = facturacionService.getInformeFacturacion(idSerieFacturacion, request);
+
+			if (response.getInformeFacturacion().size() == 200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<InformeFacturacionDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InformeFacturacionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

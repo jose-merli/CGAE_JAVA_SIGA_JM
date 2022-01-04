@@ -222,4 +222,48 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         return query.toString();
     }
+
+
+    public String getInformeFacturacionActual(String idSerieFacturacion, String idInstitucion, String idLenguaje) {
+        SQL sql = new SQL();
+
+        // Select
+        sql.SELECT("'ACTUAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION, "+ idLenguaje+") AS formaPago,"
+                +"COUNT(*) AS numeroFacturas, SUM(ff.IMPTOTAL) AS total, SUM(ff.IMPTOTALPORPAGAR) AS totalPendiente");
+
+        // From
+        sql.FROM("FAC_FACTURA ff");
+        sql.INNER_JOIN("PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
+
+        // Where
+        sql.WHERE("ff.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("ff.IDSERIEFACTURACION = " + idSerieFacturacion);
+
+        // Order by
+        sql.GROUP_BY("pf.DESCRIPCION");
+
+        return sql.toString();
+    }
+
+    public String getInformeFacturacionOriginal(String idSerieFacturacion, String idInstitucion, String idLenguaje) {
+        SQL sql = new SQL();
+
+        // Select
+        sql.SELECT("'ORIGINAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION, "+ idLenguaje+") AS formaPago,"
+                +"COUNT(*) AS numeroFacturas, SUM(fh.IMPTOTALPAGADO) AS total, SUM(fh.IMPTOTALPORPAGAR) AS totalPendiente");
+
+        // From
+        sql.FROM("FAC_FACTURA ff");
+        sql.INNER_JOIN("FAC_HISTORICOFACTURA fh ON (ff.IDINSTITUCION = fh.IDINSTITUCION AND ff.IDFACTURA = fh.IDFACTURA AND fh.IDHISTORICO = 1)");
+        sql.INNER_JOIN("PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
+
+        // Where
+        sql.WHERE("ff.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("ff.IDSERIEFACTURACION = " + idSerieFacturacion);
+
+        // Order by
+        sql.GROUP_BY("pf.DESCRIPCION");
+
+        return sql.toString();
+    }
 }

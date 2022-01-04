@@ -46,6 +46,8 @@ import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesDTO;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesItem;
+import org.itcgae.siga.DTO.fac.InformeFacturacionDTO;
+import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
@@ -3750,5 +3752,37 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		return updateResponseDTO;
 	}
+
+	@Override
+	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, HttpServletRequest request) throws Exception {
+		InformeFacturacionDTO informeFacturacionDTO = new InformeFacturacionDTO();
+		List<InformeFacturacionItem> items;
+		Error error = new Error();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("getInformeFacturacion() -> Entrada al servicio para recuperar el listado facturas con facturacion");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info(
+					"getFacturacionesProgramadas() / facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas() -> Entrada a facFacturacionprogramadaExtendsMapper para obtener el listado de facturaciones programadas");
+
+			// Logica
+			items = facFacturaExtendsMapper.getInformeFacturacionOriginal(idSerieFacturacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+			items.addAll(facFacturaExtendsMapper.getInformeFacturacionActual(idSerieFacturacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
+			informeFacturacionDTO.setInformeFacturacion(items);
+
+		}
+
+		informeFacturacionDTO.setError(error);
+
+		LOGGER.info(
+				"getFacturacionesProgramadas() -> Salida del servicio para obtener el listado de facturaciones programadas");
+
+		return informeFacturacionDTO;
+	}
+
 
 }
