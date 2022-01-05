@@ -1958,19 +1958,20 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
-		FacFacturacionEliminar facElim = new FacFacturacionEliminar();
 		Error error = new Error();
 		error.setCode(0);
 		deleteResponseDTO.setError(error);
 
-		if (usuario != null) {
-			facElim.setIdInstitucion(usuario.getIdinstitucion());
-			facElim.setIdUsuarioModificacion(usuario.getIdusuario());
-		}
+        Object[] param_in = new Object[4]; // Parametros de entrada del PL
 
-		facElim.setIdProgramacion(fac.getIdProgramacion());
-		facElim.setIdSerieFacturacion(fac.getIdSerieFacturacion());
-		try {
+        param_in[0] = usuario.getIdinstitucion();
+        param_in[1] = fac.getIdSerieFacturacion();
+        param_in[2] = fac.getIdProgramacion();
+        param_in[3] = usuario.getIdusuario();
+
+        String resultado[] = commons.callPLProcedureFacturacionPyS(
+                "{call PKG_SIGA_FACTURACION.ELIMINARFACTURACION(?,?,?,?,?,?)}", 2, param_in);
+
 			// facFacturaMapper.eliminarFacturacion(facElim);
 //			@Update(value = "{CALL PKG_SIGA_FACTURACION.ELIMINARFACTURACION ("
 //					+ "#{idInstitucion,mode=IN},"
@@ -1983,25 +1984,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 //	@ResultType(FacFacturacionEliminar.class)
 //	void eliminarFacturacion(FacFacturacionEliminar facturaEliminar);
 
-			if (facElim != null && !facElim.getCodRetorno().equals(RET_OK)) {
-				Integer ret;
-				try {
-					ret = Integer.valueOf(facElim.getCodRetorno());
-				} catch (Exception e) {
-					ret = -3;
-				}
-				error.setCode(ret);
-				error.setDescription(facElim.getDatosError());
-			} else {
-				// TODO: borrado de ficheros
-			}
-		} catch (Exception e) {
-			error.setCode(-3);
-			error.setDescription("error:" + e);
-			;
-		}
+        if (resultado[0] != null && !resultado[0].equals(RET_OK)) {
+            throw new Exception(resultado[1]);
+        } else {
+            // TODO: borrado de ficheros
+        }
 
-		deleteResponseDTO.setStatus(HttpStatus.OK.toString());
 
 		LOGGER.info("eliminarFacturacion() -> Salida del servicio para eliminar facturación");
 
