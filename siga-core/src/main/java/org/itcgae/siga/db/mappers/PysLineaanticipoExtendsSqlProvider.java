@@ -15,11 +15,10 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SQL query = new SQL();
         query.SELECT("anti.fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", "anti.idanticipo", "anti.descripcion", "anti.importeinicial as importe_inicial"
-        		, "sum(gastos.importeanticipado) as importe_usado", "sum(linea.importeanticipado) as importe_restante");
+        		, "nvl(sum(gastos.importeanticipado), 0) as importe_usado", "anti.importeinicial - nvl(SUM(gastos.importeanticipado), 0) as importe_restante");
         query.FROM("pys_anticipoletrado anti");
         query.INNER_JOIN("cen_persona pers on pers.idpersona = anti.idpersona");
-        query.LEFT_OUTER_JOIN("pys_lineaanticipo linea on linea.idpersona = pers.idpersona and linea.idanticipo = anti.idanticipo");
-        query.LEFT_OUTER_JOIN("pys_lineaanticipo gastos on gastos.idpersona = pers.idpersona and gastos.idanticipo = anti.idanticipo and gastos.importeanticipado");
+        query.LEFT_OUTER_JOIN("pys_lineaanticipo gastos on gastos.idpersona = pers.idpersona and gastos.idanticipo = anti.idanticipo and (gastos.idfactura is not null or gastos.liquidacion = 1)");
 
         query.WHERE("anti.idinstitucion = " + institutionId);
         
@@ -87,10 +86,12 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         
         queryLineas.SELECT("linea.fechaefectiva as fecha"); 
     	queryLineas.SELECT("CASE WHEN linea.liquidacion = 1 then 'Liquidacion' \r\n"
+    			+ "when linea.idLinea = 0 then anti.descripcion \r\n"
     			+ "else servIns.DESCRIPCION end as concepto"); 
     	queryLineas.SELECT("anti.CTACONTABLE as cuentacontable "); 
-    	queryLineas.SELECT("case when linea.idfactura is null linea.importeanticipado then linea.IMPORTEANTICIPADO \r\n"
-    			+ "else IMPORTEANTICIPADO * -1 end as importe"); 
+    	queryLineas.SELECT("case when linea.liquidacion = 1 then linea.IMPORTEANTICIPADO * -1 \r\n"
+    			+ "when linea.idfactura is null then linea.IMPORTEANTICIPADO \r\n"
+    			+ "else linea.IMPORTEANTICIPADO * -1 end as importe"); 
     	queryLineas.SELECT("linea.idlinea");
     	queryLineas.SELECT("0 as nuevo");
 
@@ -105,7 +106,9 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
     	
         queryLineas.WHERE("anti.idinstitucion = " + idInstitucion);
         queryLineas.WHERE("anti.idPersona = " + idPersona);
-        queryLineas.WHERE("anti.idanticipo = " + idAnticipo);        
+        queryLineas.WHERE("anti.idanticipo = " + idAnticipo);     
+        
+        queryLineas.ORDER_BY("linea.fechaefectiva desc");
         
     	
 //        String query =  queryLineas.toString() +" \r\n UNION \r\n"+ queryAnti.toString()+ " order by fecha desc";
