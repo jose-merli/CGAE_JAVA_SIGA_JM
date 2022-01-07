@@ -40,7 +40,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT("pet.idpeticion");
 		sql.SELECT("pet.idestadopeticion");// Para determinar si es una fecha de solicitud, anulacion o denegacion.
 											// Determinar el equivalente de sus valores numericos.
-		sql.SELECT("usuario.descripcion as usuModificacion");
+		sql.SELECT("nvl(usuario.descripcion, 'Proceso Automático') as usuModificacion");
 		
 		sql.SELECT("pet.fecha as fechaPendiente"); // Esta fecha se utiliza de fecha de solicitud
 		
@@ -70,7 +70,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.FROM("pys_peticioncomprasuscripcion pet");
 
 		sql.INNER_JOIN("cen_persona per on per.idpersona = pet.idpersona");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"adm_usuarios usuario ON (pet.usumodificacion = usuario.idusuario and pet.idinstitucion = usuario.idinstitucion)");
 
 		sql.WHERE("pet.idinstitucion = " + idInstitucion);
@@ -263,7 +263,6 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				
 				innerJoinProductos += "(prin.idproducto = "+producto.getIdproducto()+" and prin.idtipoproducto="+producto.getIdtipoproducto()+
 						" and prin.idproductoinstitucion="+producto.getIdproductoinstitucion()+") OR";
-				
 			}
 			//Se elimina el ultimo OR
 			sql.INNER_JOIN(innerJoinProductos.substring(0, innerJoinProductos.length() - 2) + ")");
