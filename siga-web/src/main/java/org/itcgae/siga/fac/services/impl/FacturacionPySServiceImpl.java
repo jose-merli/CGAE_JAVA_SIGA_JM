@@ -114,6 +114,8 @@ import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
 import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
+import org.itcgae.siga.db.entities.FacPlantillafacturacion;
+import org.itcgae.siga.db.entities.FacPlantillafacturacionExample;
 import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
 import org.itcgae.siga.db.entities.FacRegenerarPresentacionAdeudos;
 import org.itcgae.siga.db.entities.FacRegistrofichconta;
@@ -143,6 +145,7 @@ import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
+import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -287,6 +290,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private ConConsultasExtendsMapper conConsultasExtendsMapper;
+
+	@Autowired
+	private FacPlantillafacturacionMapper facPlantillafacturacionMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -972,6 +978,21 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				idSerieFacturacion = Long.parseLong(facSeriefacturacionExtendsMapper
 						.getNextIdSerieFacturacion(usuario.getIdinstitucion()).getNewId());
 				serieToUpdate.setIdseriefacturacion(idSerieFacturacion);
+
+                // 3. Generación de ficheros por defecto
+                FacPlantillafacturacionExample modeloExample = new FacPlantillafacturacionExample();
+                modeloExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+                modeloExample.setOrderByClause("fechamodificacion");
+
+                List<FacPlantillafacturacion> modelosComunicacion = facPlantillafacturacionMapper.selectByExample(modeloExample);
+
+                if (!modelosComunicacion.isEmpty()) {
+                    serieToUpdate.setIdmodelofactura(Long.valueOf(modelosComunicacion.get(0).getIdplantilla()));
+                    serieToUpdate.setIdmodelorectificativa(Long.valueOf(modelosComunicacion.get(0).getIdplantilla()));
+                } else {
+                    serieToUpdate.setIdmodelofactura(null);
+                    serieToUpdate.setIdmodelorectificativa(null);
+                }
 			} else {
 				idSerieFacturacion = Long.parseLong(serieFacturacion.getIdSerieFacturacion());
 				FacSeriefacturacionKey serieKey = new FacSeriefacturacionKey();
