@@ -108,7 +108,7 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         queryLineas.WHERE("anti.idPersona = " + idPersona);
         queryLineas.WHERE("anti.idanticipo = " + idAnticipo);     
         
-        queryLineas.ORDER_BY("linea.fechaefectiva desc");
+        queryLineas.ORDER_BY("linea.idlinea desc");
         
     	
 //        String query =  queryLineas.toString() +" \r\n UNION \r\n"+ queryAnti.toString()+ " order by fecha desc";
