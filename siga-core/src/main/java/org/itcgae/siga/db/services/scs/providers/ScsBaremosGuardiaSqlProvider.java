@@ -287,7 +287,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "        END"
 				+ "    por_dia");
 				
-				if(facturaciones != "") {
+				if(!facturaciones.equals("0")) {
 					sql.FROM("FCS_HISTORICO_HITOFACT  hit,"
 							+ "    scs_hitofacturable tip,"
 							+ "    scs_guardiasturno gua,"
@@ -321,7 +321,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				if(turnos != "") {
 					sql.WHERE("hit.idturno IN( " + turnos +")");
 				}
-				if(facturaciones != "") {
+				if(!facturaciones.equals("0")) {
 					sql.WHERE("hit.idfacturacion IN( " + facturaciones +")");
 				}
 				if(baremosGuardiaItem.isHistorico() == false) {
