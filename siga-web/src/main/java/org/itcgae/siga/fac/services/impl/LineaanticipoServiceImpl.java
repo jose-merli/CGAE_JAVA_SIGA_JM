@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -154,66 +155,147 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 				// Para que la etiqueta @Transactional funcione adecuadamente debe recibir una
 				// excepcion
 //				try {
+				List<PysLineaanticipo> movimientosViejosMonedero = null;
 
 				// 1. Se comprueba si es un monedero nuevo o no
 				if (ficha.getIdAnticipo() != null) {
+					
+					//1.a Se eliminan todos los movimientos del monedero
+					
+					PysLineaanticipoExample movimientosExample = new PysLineaanticipoExample();
+					
+					movimientosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(ficha.getIdPersona())
+					.andIdanticipoEqualTo(ficha.getIdAnticipo());
+					
+					movimientosExample.setOrderByClause("idlinea desc");
+					
+					movimientosViejosMonedero = pysLineaanticipoExtendsMapper.selectByExample(movimientosExample);
+					
+					response = pysLineaanticipoExtendsMapper.deleteByExample(movimientosExample);
+					
+					if (response == 0) {
+						throw new SigaExceptions("Error al borrar los movimientos del monedero en la BBDD.");
+					}
 
-					// 1.a Se elimina el anticipo del monedero (PYS_ANTICIPOLETRADO)
+					// 1.b Se elimina el anticipo del monedero (PYS_ANTICIPOLETRADO)
 
-					PysAnticipoletradoKey monederoKey = new PysAnticipoletradoKey();
-
-					monederoKey.setIdinstitucion(idInstitucion);
-					monederoKey.setIdpersona(ficha.getIdPersona());
-					monederoKey.setIdanticipo(ficha.getIdAnticipo());
-
-					response = pysAnticipoletradoMapper.deleteByPrimaryKey(monederoKey);
+//					PysAnticipoletradoKey monederoKey = new PysAnticipoletradoKey();
+//
+//					monederoKey.setIdinstitucion(idInstitucion);
+//					monederoKey.setIdpersona(ficha.getIdPersona());
+//					monederoKey.setIdanticipo(ficha.getIdAnticipo());
+//
+//					response = pysAnticipoletradoMapper.deleteByPrimaryKey(monederoKey);
+					
 					if (response == 0) {
 						throw new SigaExceptions("Error al borrar el anticipo del monedero en la BBDD.");
 					}
+					
+					
 				}
 
-				// 2. Se inserta el anticipo asociado al monedero
-				// Comprobamos el id maximo de los anticipos asociados con esta persona
-				int idAnticipo;
-				if (ficha.getIdAnticipo() == null) {
-					idAnticipo = Integer.valueOf(pysAnticipoletradoExtendsMapper
-							.selectMaxIdAnticipo(idInstitucion, ficha.getIdPersona()).getNewId()) + 1;
-				} else {
-					idAnticipo = ficha.getIdAnticipo();
-				}
+				// 2. Se inserta el anticipo asociado al monedero y sus movimientos
 
-				// Se recorren los movimientos presentes
-				ListaMovimientosMonederoItem anticipoInicial = ficha.getMovimientos().get(0);
-
-				// 2.a Se introduce fila en la tabla PYS_ANTICIPOLETRADO
+				List<ListaMovimientosMonederoItem> movimientosFicha = ficha.getMovimientos();
+				
+				// 2.a Se introduce o actualiza una fila en la tabla PYS_ANTICIPOLETRADO
 
 				PysAnticipoletrado anticipo = new PysAnticipoletrado();
 
 //				anticipo.setContabilizado(anticipoInicial.getContabilizado());
-				anticipo.setCtacontable(anticipoInicial.getCuentaContable());
-				anticipo.setDescripcion(anticipoInicial.getConcepto());
-				anticipo.setFecha(anticipoInicial.getFecha());
-				anticipo.setIdanticipo((short) idAnticipo);
+				anticipo.setCtacontable(movimientosFicha.get(movimientosFicha.size()-1).getCuentaContable());
+				anticipo.setDescripcion(movimientosFicha.get(movimientosFicha.size()-1).getConcepto());
+				anticipo.setFecha(movimientosFicha.get(movimientosFicha.size()-1).getFecha());
 				anticipo.setIdinstitucion(idInstitucion);
 				anticipo.setIdpersona(ficha.getIdPersona());
-				anticipo.setImporteinicial(anticipoInicial.getImpOp());
+				anticipo.setImporteinicial(new BigDecimal(0));
 
 				anticipo.setFechamodificacion(new Date());
 				anticipo.setUsumodificacion(usuarios.get(0).getIdusuario());
 				
+				int idAnticipo;
+				if (ficha.getIdAnticipo() == null) {
+					// Comprobamos el id maximo de los anticipos asociados con esta persona
+					idAnticipo = Integer.valueOf(pysAnticipoletradoExtendsMapper
+							.selectMaxIdAnticipo(idInstitucion, ficha.getIdPersona()).getNewId()) + 1;
+					anticipo.setIdanticipo((short) idAnticipo);
+					
+					LOGGER.debug(
+							"LineaanticipoServiceImpl.updateMovimientosMonedero() / pysAnticipoletradoMapper.insert() -> Se entra en el mapper para introducir el anticipo asociado al monedero");
 
-				LOGGER.debug(
-						"LineaanticipoServiceImpl.updateMovimientosMonedero() / pysAnticipoletradoMapper.insert() -> Se entra en el mapper para introducir el anticipo asociado al monedero");
+					response = pysAnticipoletradoMapper.insert(anticipo);
+					if (response == 0) {
+						throw new SigaExceptions("Error al insertar un anticipo en la BBDD.");
+					}
 
-				response = pysAnticipoletradoMapper.insert(anticipo);
-				if (response == 0) {
-					throw new SigaExceptions("Error al insertar un anticipo en la BBDD.");
+					LOGGER.debug(
+							"LineaanticipoServiceImpl.updateMovimientosMonedero() / pysAnticipoletradoMapper.insert() -> Se sale del mapper para introducir el anticipo asociado al monedero");
+					
+				} else {
+					idAnticipo = ficha.getIdAnticipo();
+					anticipo.setIdanticipo((short) idAnticipo);
+					
+					LOGGER.debug(
+							"LineaanticipoServiceImpl.updateMovimientosMonedero() / pysAnticipoletradoMapper.updateByPrimaryKey() -> Se entra en el mapper para actualizar el anticipo asociado al monedero");
+
+					response = pysAnticipoletradoMapper.updateByPrimaryKey(anticipo);
+					if (response == 0) {
+						throw new SigaExceptions("Error al insertar un anticipo en la BBDD.");
+					}
+
+					LOGGER.debug(
+							"LineaanticipoServiceImpl.updateMovimientosMonedero() / pysAnticipoletradoMapper.updateByPrimaryKey() -> Se sale del mapper para actualizar el anticipo asociado al monedero");
+					
 				}
-				
+
 				error.setMessage(Integer.toString(idAnticipo));
 
-				LOGGER.debug(
-						"LineaanticipoServiceImpl.updateMovimientosMonedero() / pysAnticipoletradoMapper.insert() -> Se sale del mapper para introducir el anticipo asociado al monedero");
+				// 2.b Se recorren los movimientos enviados desde la ficha.
+				// Se comprueba si tienen valor de idLinea.
+				// Eso indicara que no son nuevos.
+				
+				int diff = 0;
+				
+				if(movimientosViejosMonedero != null) {
+					diff = movimientosViejosMonedero.size() - movimientosFicha.size();
+				}
+				
+				BigDecimal impIniTot = new BigDecimal(0);
+				
+				for (int i = movimientosFicha.size() - 1; i >= 0; i--) {
+					
+					//Se comprueba si el importe es positivo (si es un ingreso)
+					if(movimientosFicha.get(i).getImpOp().compareTo(new BigDecimal(0)) == 1) {
+						impIniTot = impIniTot.add(movimientosFicha.get(i).getImpOp());
+					}
+					
+					if(movimientosFicha.get(i).getIdLinea() != null) {
+						pysLineaanticipoExtendsMapper.insert(movimientosViejosMonedero.get(i + diff));
+					}
+					else {
+						PysLineaanticipo movimiento = new PysLineaanticipo();
+
+						movimiento.setIdlinea((short) (movimientosFicha.size() - i - 1));
+						movimiento.setFechaefectiva(new Date());
+						movimiento.setIdanticipo((short) idAnticipo);
+						movimiento.setIdinstitucion(idInstitucion);
+						movimiento.setIdpersona(ficha.getIdPersona());
+						movimiento.setImporteanticipado(movimientosFicha.get(i).getImpOp());
+						movimiento.setLiquidacion("0");
+						
+						movimiento.setUsumodificacion(usuarios.get(0).getIdusuario());
+						movimiento.setFechamodificacion(new Date());
+						
+						pysLineaanticipoExtendsMapper.insert(movimiento);
+					}
+		        }
+				
+				anticipo.setImporteinicial(impIniTot);
+				response = pysAnticipoletradoMapper.updateByPrimaryKey(anticipo);
+				
+				if (response == 0) {
+					throw new SigaExceptions("Error al actualizar el importe incial de un anticipo en la BBDD.");
+				}
 				
 
 				LOGGER.debug(
@@ -255,6 +337,7 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 	            if (usuarios != null && usuarios.size() > 0) {
 	            	try {
 	            		List<ListaMovimientosMonederoItem> movimientosMonedero = pysLineaanticipoExtendsMapper.getListaMovimientosMonedero(idInstitucion, idAnticipo, idPersona);
+	            		
 	            		responsedto.setListaMovimientosMonederoItem(movimientosMonedero);
 	            	}catch(Exception e) {
 	            		 LOGGER.error(
@@ -461,14 +544,13 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 					lineaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdanticipoEqualTo(Short.valueOf(monedero.getIdAnticipo()))
 					.andIdpersonaEqualTo(Long.valueOf(monedero.getIdPersona()));
 					
-					
-					liquidacion.setIdlinea(Short.valueOf(String.valueOf(pysLineaanticipoExtendsMapper.countByExample(lineaExample)+1)));
+					//Actualmente (05/01/2022) se el idLinea se inicia a partir de 0
+					liquidacion.setIdlinea(Short.valueOf(String.valueOf(pysLineaanticipoExtendsMapper.countByExample(lineaExample))));
 					
 					liquidacion.setIdpersona(Long.valueOf(monedero.getIdPersona()));
 					liquidacion.setImporteanticipado(monedero.getImporteRestante());
 					liquidacion.setLiquidacion("1");
-//					liquidacion.setConcepto("Liquidacion");
-					
+
 					liquidacion.setUsumodificacion(usuarios.get(0).getIdusuario());
 					liquidacion.setFechamodificacion(new Date());
 						
