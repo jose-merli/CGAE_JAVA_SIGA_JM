@@ -2,16 +2,15 @@ package org.itcgae.siga.db.services.fac.mappers;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.mappers.FacFacturacionprogramadaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacFacturacionprogramadaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -71,7 +70,7 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
     List<FacFacturacionprogramadaItem> getFacturacionesProgramadas(FacFacturacionprogramadaItem facturacionProgramada, Short idInstitucion, String idioma, Integer rownum);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNextIdFacturacionProgramada")
-    @Results({ @Result(column = "idprogramacion", property = "newId", jdbcType = JdbcType.VARCHAR) })
+    @Results( { @Result(column = "idprogramacion", property = "newId", jdbcType = JdbcType.VARCHAR) })
     NewIdDTO getNextIdFacturacionProgramada(Short idInstitucion, Long idSerieFacturacion);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "comboFacturaciones")
@@ -81,21 +80,9 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
     })
     List<ComboItem> comboFacturaciones(Short idInstitucion);
     
-    @Select({
-        "select",
-        "IDINSTITUCION, IDSERIEFACTURACION, IDPROGRAMACION, FECHAINICIOPRODUCTOS, FECHAFINPRODUCTOS, ",
-        "FECHAINICIOSERVICIOS, FECHAFINSERVICIOS, FECHAPROGRAMACION, FECHAPREVISTAGENERACION, ",
-        "FECHAMODIFICACION, USUMODIFICACION, IDPREVISION, FECHAREALGENERACION, FECHACONFIRMACION, ",
-        "IDESTADOCONFIRMACION, IDESTADOPDF, IDESTADOENVIO, FECHAPREVISTACONFIRM, GENERAPDF, ",
-        "ENVIO, ARCHIVARFACT, FECHACARGO, CONFDEUDOR, CONFINGRESOS, CTAINGRESOS, CTACLIENTES, ",
-        "VISIBLE, DESCRIPCION, IDTIPOPLANTILLAMAIL, IDTIPOENVIOS, FECHAPRESENTACION, ",
-        "FECHARECIBOSPRIMEROS, FECHARECIBOSRECURRENTES, FECHARECIBOSCOR1, FECHARECIBOSB2B, ",
-        "NOMBREFICHERO, LOGERROR, TRASPASO_PLANTILLA, TRASPASO_CODAUDITORIA_DEF, TRASPASOFACTURAS, ",
-        "IDESTADOTRASPASO, LOGTRASPASO",
-        "from FAC_FACTURACIONPROGRAMADA",
-        "where rownum <= #{rownum,jdbcType=DECIMAL}"
-    })
-    @Results({
+    
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getListaNFacturacionesProgramadasProcesar")
+    @Results(id="facProgramadaResult", value={
         @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
         @Result(column="IDSERIEFACTURACION", property="idseriefacturacion", jdbcType=JdbcType.DECIMAL, id=true),
         @Result(column="IDPROGRAMACION", property="idprogramacion", jdbcType=JdbcType.DECIMAL, id=true),
@@ -139,7 +126,16 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
         @Result(column="IDESTADOTRASPASO", property="idestadotraspaso", jdbcType=JdbcType.DECIMAL),
         @Result(column="LOGTRASPASO", property="logtraspaso", jdbcType=JdbcType.VARCHAR)
     })
-    List<FacFacturacionprogramada> getListaNFacturacionesProgramadasPorOrdenEjecucion(@Param("rownum")  Integer rownum);
+    List<FacFacturacionprogramada> getListaNFacturacionesProgramadasProcesar(Integer rownum, Double tiempoMaximoEjecucion);
+   
     
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getListaNConfirmarFacturacionesProgramadas")
+    @ResultMap("facProgramadaResult")
+    List<FacFacturacionprogramada>  getListaNConfirmarFacturacionesProgramadas (Integer rownum);
+
+    
+    
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "isSerieFacturacionActiva")
+	boolean isSerieFacturacionActiva(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion);
     
 }
