@@ -10,6 +10,7 @@ public class ListaMovimientosMonederoItem {
 	private String cuentaContable;
 	private BigDecimal impOp;
 	private String impTotal;
+	private Short idLinea;
 
 	private boolean nuevo; //Se utiliza para determinar si es editable o no en la tabla de movimientos de la ficha Monedero
 
@@ -59,6 +60,14 @@ public class ListaMovimientosMonederoItem {
 
 	public void setNuevo(boolean nuevo) {
 		this.nuevo = nuevo;
+	}
+
+	public Short getIdLinea() {
+		return idLinea;
+	}
+
+	public void setIdLinea(Short idLinea) {
+		this.idLinea = idLinea;
 	}
 
 }
