@@ -531,6 +531,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ "group by gen.fechasolicitud, gen.nsolicitud, gen.idpersona, gen.nidentificacion, gen.ncolegiado, gen.apellidosnombre, gen.nprod, gen.idformapago, gen.desformapago, \r\n"
 						+ "gen.imptotal, gen.fechadenegada, gen.fechasolicitadaanulacion, gen.fechaefectiva, gen.fechaanulada, gen.estadofactura, gen.solicitarbaja, gen.facturas";
 				
+				LOGGER.info(query.toString());
 				
 				return query;
 		
@@ -600,9 +601,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 //		sql.SELECT_DISTINCT(
 //				"CASE WHEN COUNT(1) OVER (ORDER BY servIns.descripcion) >1 THEN FIRST_VALUE(servIns.descripcion) OVER (ORDER BY suscripcion.fechasuscripcion) || '...'\r\n"
 //						+ "ELSE FIRST_VALUE(servIns.descripcion) OVER (ORDER BY suscripcion.fechasuscripcion) || '[ ' || precioServ.descripcion || ' ]'  END as concepto \r\n");
-//		sql.SELECT_DISTINCT("servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' as concepto");
-		sql.SELECT_DISTINCT("CASE WHEN suscripcion.fechabaja is not null or petBaja.fecha is null THEN servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' "
-				+ "ELSE servIns.descripcion END as concepto");
+		sql.SELECT_DISTINCT("CASE WHEN suscripcion.fechabaja is not null THEN servIns.descripcion else servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' "
+				+ "END as concepto");
 		sql.SELECT_DISTINCT("servSol.idformapago as idformapago \r\n");
 		sql.SELECT_DISTINCT("CASE WHEN servIns.noFacturable = '1' THEN 'No facturable'\r\n"
 				+ "ELSE f_siga_getrecurso(formPago.descripcion, " + idioma + ") END as desFormaPago");
@@ -772,7 +772,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		sql.GROUP_BY("servIns.solicitarBaja, pet.fecha, pet.idPeticion, pet.idPersona, per.nifcif, col.NCOLEGIADO \r\n"
 				+ ", per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre \r\n"
-				+ ", CASE WHEN suscripcion.fechabaja is not null or petBaja.fecha is null THEN servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' ELSE servIns.descripcion END , servSol.idformapago\r\n"
+				+ ", CASE WHEN suscripcion.fechabaja is not null THEN servIns.descripcion else servIns.descripcion || '[ ' || precioServ.descripcion || ' ]'  END , servSol.idformapago\r\n"
 				+ ", CASE WHEN servIns.noFacturable = '1' THEN 'No facturable'\r\n"
 				+ "ELSE f_siga_getrecurso(formPago.descripcion, 1) END , CASE WHEN suscripcion.fechasuscripcion is null THEN petBaja.fecha \r\n"
 				+ "ELSE null END\r\n"
@@ -783,6 +783,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "ELSE precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, 1) || ')' END, suscripcion.fechasuscripcion , suscripcion.fechabaja\r\n"
 				+ ", case when factSus.idfactura is null then '0' else '1' end");
 
+		LOGGER.info(sql.toString());
+		
 		return sql.toString();
 	}
 
@@ -898,7 +900,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		sql.WHERE("rownum <= 200");
 		
-		LOGGER.debug(sql.toString());
+		LOGGER.info(sql.toString());
 
 		return sql.toString();
 	}
