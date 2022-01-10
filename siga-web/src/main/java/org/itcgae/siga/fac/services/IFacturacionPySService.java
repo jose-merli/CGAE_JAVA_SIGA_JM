@@ -49,6 +49,8 @@ import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 
 public interface IFacturacionPySService {
 
@@ -192,4 +194,6 @@ public interface IFacturacionPySService {
 			HttpServletRequest request);
 
 	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, String idProgramacion, HttpServletRequest request) throws Exception;
+
+	public ResponseEntity<InputStreamResource> descargarFichaFacturacion(String idFactura, HttpServletRequest request) throws Exception;
 }

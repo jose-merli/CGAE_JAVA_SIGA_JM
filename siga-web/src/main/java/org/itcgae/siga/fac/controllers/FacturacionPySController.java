@@ -3,6 +3,7 @@ package org.itcgae.siga.fac.controllers;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
@@ -46,18 +47,24 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
+import org.itcgae.siga.DTOs.form.CursoItem;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
+import org.osgi.dto.DTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -857,5 +864,11 @@ public class FacturacionPySController {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<InformeFacturacionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	@RequestMapping(value = "/descargarFichaFacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> descargarFichaFacturacion(@RequestParam String idFactura, HttpServletRequest request) throws Exception {
+		ResponseEntity<InputStreamResource> res = facturacionService.descargarFichaFacturacion(idFactura, request);
+		return res;
 	}
 }

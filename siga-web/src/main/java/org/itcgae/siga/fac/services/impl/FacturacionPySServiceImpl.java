@@ -1,13 +1,19 @@
 package org.itcgae.siga.fac.services.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,6 +70,7 @@ import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
@@ -109,6 +116,7 @@ import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineaabonoKey;
 import org.itcgae.siga.db.entities.FacLineafactura;
+import org.itcgae.siga.db.entities.FacLineafacturaExample;
 import org.itcgae.siga.db.entities.FacLineafacturaKey;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
@@ -168,12 +176,17 @@ import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposproduincluenfactuExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
@@ -2884,6 +2897,39 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facUpdate.setFechamodificacion(new Date());
 		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
 
+		//comision factura
+		if(item.getComision() != null && item.getComision()){
+			FacFacturaKey facFacturaKey = new FacFacturaKey();
+			facFacturaKey.setIdfactura(facUpdate.getComisionidfactura());
+			facFacturaKey.setIdinstitucion(facUpdate.getIdinstitucion());
+
+			FacFactura comision = facFacturaExtendsMapper.selectByPrimaryKey(facFacturaKey);
+
+			FacLineafactura lineaComision = new FacLineafactura();
+
+			lineaComision.setIdinstitucion(comision.getIdinstitucion());
+			lineaComision.setIdfactura(facUpdate.getIdfactura());
+			lineaComision.setNumeroorden((long) 1);
+			lineaComision.setCantidad(1);
+			lineaComision.setFechamodificacion(new Date());
+			lineaComision.setUsumodificacion(usuario.getUsumodificacion());
+			lineaComision.setFechamodificacion(new Date());
+			lineaComision.setPreciounitario(comision.getImptotal());
+
+			FacLineafacturaExample exampleLinea = new FacLineafacturaExample();
+			exampleLinea.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
+					.andIdinstitucionEqualTo(usuario.getIdinstitucion());
+			exampleLinea.setOrderByClause("NUMEROLINEA");
+
+			List<FacLineafactura> listLinea = facLineafacturaExtendsMapper.selectByExample(exampleLinea);
+			if (!listLinea.isEmpty())
+				lineaComision.setNumerolinea((listLinea.get(listLinea.size() - 1).getNumerolinea() + 1));
+			else
+				lineaComision.setNumerolinea((long) 1);
+
+			facLineafacturaExtendsMapper.insert(lineaComision);
+		}
+
 		String resultado[] = null;
 
 		Object[] param_in = new Object[2]; // Parametros de entrada del PL
@@ -2982,7 +3028,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				facAbonoExtendsMapper.getNewAbonoID(String.valueOf(usuario.getIdinstitucion())).get(0).getValue()));
 
 		abonoInsert.setEstado((short) 6);
-		abonoInsert.setNumeroabono("EJEMPLO");
+		abonoInsert.setNumeroabono(String.valueOf(abonoInsert.getIdabono()));
 
 		facHistoricoInsert.setIdabono(abonoInsert.getIdabono());
 
@@ -3644,11 +3690,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private Short string2Short(String val) {
 		return val != null ? Short.valueOf(val) : null;
-	};
+	}
 
 	private Long string2Long(String val) {
 		return val != null ? Long.valueOf(val) : null;
-	};
+	}
 
 	private Integer string2Integer(String val) {
 		return val != null ? Integer.valueOf(val) : null;
@@ -3656,7 +3702,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private String boolToString10(Boolean b) {
 		return b ? "1" : "0";
-	};
+	}
 
 	@Override
 	public FacRegistroFichContaDTO search(FacRegistroFichConta facRegistroFichConta, HttpServletRequest request)
@@ -3760,14 +3806,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		Error error = new Error();
 		AdmUsuarios usuario = new AdmUsuarios();
 
-		LOGGER.info("getInformeFacturacion() -> Entrada al servicio para recuperar el listado facturas con facturacion");
+		LOGGER.info("getInformeFacturacion() -> Entrada al servicio para recuperar el informe de facturacion");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
 
 		if (usuario != null) {
 			LOGGER.info(
-					"getFacturacionesProgramadas() / facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas() -> Entrada a facFacturacionprogramadaExtendsMapper para obtener el listado de facturaciones programadas");
+					"getInformeFacturacion() / facFacturaExtendsMapper.getInformeFacturacion() -> Entrada a facFacturacionprogramadaExtendsMapper para recuperar el informe de facturacion");
 
 			// Logica
 			items = facFacturaExtendsMapper.getInformeFacturacionOriginal(idSerieFacturacion, idProgramacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
@@ -3779,10 +3825,78 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		informeFacturacionDTO.setError(error);
 
 		LOGGER.info(
-				"getFacturacionesProgramadas() -> Salida del servicio para obtener el listado de facturaciones programadas");
+				"getFacturacionesProgramadas() -> Salida del servicio para recuperar el informe de facturacion");
 
 		return informeFacturacionDTO;
 	}
 
+	@Override
+	public ResponseEntity<InputStreamResource> descargarFichaFacturacion(String idFactura, HttpServletRequest request) throws Exception {
 
+		ResponseEntity<InputStreamResource> res = null;
+		InformeFacturacionDTO informeFacturacionDTO = new InformeFacturacionDTO();
+		Vector<Hashtable<String, Object>> datosVector = new Vector<Hashtable<String, Object>>();
+		Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+		List<EstadosPagosItem> items;
+		Error error = new Error();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("getInformeFacturacion() -> Entrada al servicio para recuperar el listado facturas con facturacion");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("getFacturacionesProgramadas() / facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas() -> Entrada a facFacturacionprogramadaExtendsMapper para obtener el listado de facturaciones programadas");
+			items = facHistoricofacturaExtendsMapper.getFacturacionLog(idFactura, String.valueOf(usuario.getIdinstitucion()), usuario.getIdlenguaje());
+
+			for (EstadosPagosItem i : items) {
+
+				datosHashtable = new Hashtable<String, Object>();
+
+				datosHashtable.put("FECHA", i.getFechaModificaion().toString());
+				datosHashtable.put("ACCION", i.getAccion());
+				datosHashtable.put("ESTADO", i.getEstado());
+				datosVector.add(datosHashtable);
+			}
+
+			File file = createExcelFile(Arrays.asList("FECHA", "ACCION", "ESTADO"), datosVector);
+
+			InputStream fileStream = null;
+
+			try {
+				fileStream = new FileInputStream(file);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+				headers.setContentLength(file.length());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,	HttpStatus.OK);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		informeFacturacionDTO.setError(error);
+
+		LOGGER.info("getFacturacionesProgramadas() -> Salida del servicio para obtener el listado de facturaciones programadas");
+
+		return res;
+	}
+
+	private File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector)
+			throws BusinessException {
+
+		LOGGER.info("createExcelFile() -> Entrada al servicio que crea la plantilla Excel");
+
+		if (orderList == null && datosVector == null)
+			throw new BusinessException("No hay datos para crear el fichero");
+		if (orderList == null)
+			orderList = new ArrayList<String>(datosVector.get(0).keySet());
+		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
+
+		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
+
+		return XLSFile;
+	}
 }
