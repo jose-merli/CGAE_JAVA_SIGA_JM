@@ -25,7 +25,7 @@ public interface FcsFicheroImpreso190ExtendsMapper extends FcsFicheroImpreso190M
             @Result(column = "APELLIDO2CONTACTO", property = "apellido2Contacto", jdbcType = JdbcType.VARCHAR),
             @Result(column = "FECHAGENERARION", property = "fechageneracion", jdbcType = JdbcType.VARCHAR),
        })
-    List<Impreso190Item> getImpreso190(String anio, Short idInstitucion);
+    List<Impreso190Item> getImpreso190(String[] anio, Short idInstitucion);
 	
 	@SelectProvider(type = FcsFicheroImpreso190SqlExtendsProviders.class, method = "getConfImpreso190")
     @Results({

@@ -20,7 +20,7 @@ public interface IImpreso190Service {
 	
 	public ResponseEntity<InputStreamResource> impreso190descargar(List<Impreso190Item> impreso190Item, HttpServletRequest request);
 	
-	Impreso190DTO searchImpreso190(String anio, HttpServletRequest request) throws Exception;
+	Impreso190DTO searchImpreso190(String[] anio, HttpServletRequest request) throws Exception;
 
 	Impreso190DTO deleteImpreso190(List<Impreso190Item> impreso190Item, HttpServletRequest request) throws Exception;
 	

@@ -971,7 +971,7 @@ public class Impreso190SJCSServiceImpl implements IImpreso190Service {
 
 	@Override
 	@Transactional
-	public Impreso190DTO searchImpreso190(String anio, HttpServletRequest request) throws Exception {
+	public Impreso190DTO searchImpreso190(String[] anio, HttpServletRequest request) throws Exception {
 		Error error = new Error();
 		LOGGER.info(
 				"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio para buscar los contrarios asociados a una designacion.");

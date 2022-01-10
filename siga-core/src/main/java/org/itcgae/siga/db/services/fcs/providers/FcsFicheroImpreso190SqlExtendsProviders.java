@@ -6,7 +6,15 @@ import org.itcgae.siga.db.mappers.FcsFicheroImpreso190SqlProvider;
 
 public class FcsFicheroImpreso190SqlExtendsProviders extends FcsFicheroImpreso190SqlProvider {
 
-	public String getImpreso190(String anio, Short idInstitucion) {
+	public String getImpreso190(String[] anio, Short idInstitucion) {
+		String anios = "";
+		if(anio != null) {
+			for (int i = 0; i < anio.length; i++) {
+				anios += anio[i].toString();
+				if (i < anio.length - 1)
+					anios += ",";
+			}
+		}
 		SQL sql = new SQL();
 		sql.SELECT("IDFICHERO,"
 				+ "IDINSTITUCION,"
@@ -21,8 +29,8 @@ public class FcsFicheroImpreso190SqlExtendsProviders extends FcsFicheroImpreso19
 		sql.FROM("FCS_FICHERO_IMPRESO190");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		
-		if(!UtilidadesString.esCadenaVacia(anio) || anio.length() != 0) {
-			sql.WHERE("ANIO in (" + anio + ")");
+		if(!UtilidadesString.esCadenaVacia(anios)) {
+			sql.WHERE("ANIO in (" + anios + ")");
 		}
 		
 		return sql.toString();

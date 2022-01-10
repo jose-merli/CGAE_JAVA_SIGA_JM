@@ -47,7 +47,7 @@ public class Impreso190Controller {
 	}
 	
 	@RequestMapping(value = "/facturacionsjcs/searchImpreso190",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Impreso190DTO> searchImpreso190(@RequestBody String  anio, HttpServletRequest request) throws Exception {
+	ResponseEntity<Impreso190DTO> searchImpreso190(@RequestBody String[]  anio, HttpServletRequest request) throws Exception {
 		Impreso190DTO response = iImpreso190Service.searchImpreso190(anio, request);
 		if (response.getError().getCode() == 200) {
             return new ResponseEntity<Impreso190DTO>(response, HttpStatus.OK);
