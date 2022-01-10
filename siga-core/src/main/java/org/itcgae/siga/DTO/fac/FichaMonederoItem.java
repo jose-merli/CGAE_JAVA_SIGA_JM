@@ -11,6 +11,7 @@ public class FichaMonederoItem {
     private String apellidos;
     private String idtipoidentificacion;
     private String nif;
+    private String nColegiado;
 
     //TARJETA MOVIMIENTOS
     private List<ListaMovimientosMonederoItem> movimientos;
@@ -99,5 +100,13 @@ public class FichaMonederoItem {
 
 	public void setAnioAnticipo(String anioAnticipo) {
 		this.anioAnticipo = anioAnticipo;
+	}
+
+	public String getnColegiado() {
+		return nColegiado;
+	}
+
+	public void setnColegiado(String nColegiado) {
+		this.nColegiado = nColegiado;
 	}
 }

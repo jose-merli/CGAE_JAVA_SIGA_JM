@@ -573,7 +573,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 						status = pysServiciosInstitucionMapper.updateByPrimaryKeySelective(servicioInstitucion);
 						
 						if(servicio.getAutomatico() != null) {
-							if(servicio.getAutomatico().equals("1") && status == 1 && servicio.getIdconsulta() != servicio.getServiciooriginal().getIdconsulta()) {
+							if(servicio.getAutomatico().equals("1") && status == 1) {
 								LOGGER.info(
 										"editarServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Entrada a ejecucionPlsServicios para comenzar el proceso de suscripcion automatica de servicios");
 							

@@ -55,7 +55,8 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
             @Result(column="CUENTACONTABLE", property="cuentaContable", jdbcType=JdbcType.VARCHAR),
             @Result(column="Importe", property="impOp", jdbcType=JdbcType.DECIMAL),
             @Result(column="IMPTOTAL", property="impTotal", jdbcType=JdbcType.DECIMAL),
-            @Result(column="NUEVO", property="nuevo", jdbcType=JdbcType.BOOLEAN)
+            @Result(column="NUEVO", property="nuevo", jdbcType=JdbcType.BOOLEAN),
+            @Result(column="idLinea", property="idLinea", jdbcType=JdbcType.VARCHAR)
     })
     List<ListaMovimientosMonederoItem> getListaMovimientosMonedero(Short idInstitucion, String idAnticipo, String idPersona);
     

@@ -26,4 +26,5 @@ public class EstadosPagosItem {
 	String idAbono;
 	String comentario;
 	String cuentaBanco;
+	Boolean comision;
 }

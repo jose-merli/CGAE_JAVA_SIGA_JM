@@ -137,7 +137,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		sql.FROM(" con_consulta");
 		sql.WHERE(" idobjetivo = 3");
 		sql.WHERE(" idclasecomunicacion = 1");
-		sql.WHERE(" idmodulo = 9");
+		//sql.WHERE(" idmodulo = 9");
 		sql.WHERE(" idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE(" fechabaja is null");
 		
