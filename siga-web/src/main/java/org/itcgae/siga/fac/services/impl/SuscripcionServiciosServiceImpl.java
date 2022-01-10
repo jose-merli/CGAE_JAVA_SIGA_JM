@@ -151,7 +151,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	}
 	
 		
-	//    @Scheduled(cron = "${cron.pattern.scheduled.procesoSuscripAut}")
+	@Scheduled(cron = "${cron.pattern.scheduled.procesoSuscripAut}")
 	@Override
 	public void ejecutaSuscripcionesAutomaticas() {
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaSuscripcionesAutomaticas --> ENTRA ejecutaSuscripcionesAutomaticas");
@@ -171,7 +171,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaSuscripcionesAutomaticas --> SALE ejecutaSuscripcionesAutomaticas");
 	}
 	
-	//    @Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionAutomatica}")
+	@Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionAutomatica}")
 	@Override
 	public void ejecutaRevisionAutomatica() {
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaRevisionAutomatica --> ENTRA ejecutaRevisionAutomatica");
@@ -287,7 +287,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	}
 
 
-	@Scheduled(cron = "0 0/1 * * * *")//    @Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionLetrado}")
+	@Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionLetrado}")
 	@Override
 	public void actualizacionSuscripcionesPersona() {
 
