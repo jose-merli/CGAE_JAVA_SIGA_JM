@@ -6,7 +6,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
-import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,11 +57,9 @@ public class CertificacionFacSJCSController {
     }
 
     @PostMapping(value = "/subirFicheroCAM", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<UpdateResponseDTO> subirFicheroCAM(@RequestParam("idFacturacion") String idFacturacion, @RequestPart MultipartFile fichero, MultipartHttpServletRequest request) {
-        UpdateResponseDTO response = iCertificacionFacSJCSService.subirFicheroCAM(idFacturacion, fichero, request);
-        if (response.getStatus().equals(SigaConstants.OK))
-            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-        else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+    ResponseEntity<UpdateResponseDTO> subirFicheroCAM(MultipartHttpServletRequest request) {
+         UpdateResponseDTO response = iCertificacionFacSJCSService.subirFicheroCAM(request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
     @GetMapping("/getComboEstadosCertificaciones")
@@ -215,13 +211,13 @@ public class CertificacionFacSJCSController {
         return new ResponseEntity<MovimientosVariosApliCerDTO>(response, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/descargarLogReintegrosXunta",method = RequestMethod.POST)
+    @RequestMapping(value = "/descargarLogReintegrosXunta", method = RequestMethod.POST)
     ResponseEntity<InputStreamResource> descargarLogReintegrosXunta(@RequestBody List<String> idFactsList, HttpServletRequest request) {
         ResponseEntity<InputStreamResource> response = iCertificacionFacSJCSService.descargarLogReintegrosXunta(idFactsList, request);
         return response;
     }
 
-    @RequestMapping(value = "/descargarInformeIncidencias",method = RequestMethod.POST)
+    @RequestMapping(value = "/descargarInformeIncidencias", method = RequestMethod.POST)
     ResponseEntity<InputStreamResource> descargarInformeReintegrosXunta(@RequestBody List<String> idFactsList, HttpServletRequest request) {
         ResponseEntity<InputStreamResource> response = iCertificacionFacSJCSService.descargarInformeIncidencias(idFactsList, request);
         return response;

@@ -274,6 +274,10 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
 
     private void envioWS(Short idInstitucion, String idFacturacion, Integer idOperacion, AdmUsuarios usuario) throws Exception {
+        envioWS(idInstitucion, idFacturacion, idOperacion, usuario, null);
+    }
+
+    private void envioWS(Short idInstitucion, String idFacturacion, Integer idOperacion, AdmUsuarios usuario, Map<String, String> parametros) throws Exception {
 
         FcsFacturacionjgKey fcsFacturacionjgKey = new FcsFacturacionjgKey();
         fcsFacturacionjgKey.setIdinstitucion(idInstitucion);
@@ -283,12 +287,33 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         ecomCola.setIdinstitucion(idInstitucion);
         ecomCola.setIdoperacion(idOperacion);
 
-        insertaColaFcsFacturacionJG(ecomCola, fcsFacturacionjgKey, usuario);
+        if (parametros != null) {
+            insertaColaFcsFacturacionJG(ecomCola, fcsFacturacionjgKey, usuario, parametros);
+        } else {
+            insertaColaFcsFacturacionJG(ecomCola, fcsFacturacionjgKey, usuario);
+        }
+
     }
 
     private void insertaColaFcsFacturacionJG(EcomCola ecomCola, FcsFacturacionjgKey fcsFacturacionjgKey, AdmUsuarios usuario) throws Exception {
-        Map<String, String> parametros = new HashMap<String, String>();
+        insertaColaFcsFacturacionJG(ecomCola, fcsFacturacionjgKey, usuario, null);
+    }
+
+    private void insertaColaFcsFacturacionJG(EcomCola ecomCola, FcsFacturacionjgKey fcsFacturacionjgKey, AdmUsuarios usuario, Map<String, String> params) throws Exception {
+
+        Map<String, String> parametros = new HashMap<>();
         parametros.put(IDFACTURACION, fcsFacturacionjgKey.getIdfacturacion().toString());
+
+        if (params != null) {
+            Iterator<String> it = params.keySet().iterator();
+
+            while (it.hasNext()) {
+                String clave = it.next();
+                String valor = params.get(clave);
+                parametros.put(clave, valor);
+            }
+        }
+
         facturacionHelper.insertaColaConParametros(ecomCola, parametros, usuario);
     }
 
@@ -354,39 +379,91 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
 
     @Override
-    public UpdateResponseDTO subirFicheroCAM(String idFacturacion, MultipartFile fichero, MultipartHttpServletRequest request) {
+    public UpdateResponseDTO subirFicheroCAM(MultipartHttpServletRequest request) {
         LOGGER.info("CertificacionFacSJCSServicesImpl.subirFicheroCAM() -> Entrada al servicio para subir el Fichero CAM");
 
-        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
         String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         Error error = new Error();
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 
-        if (fichero.getSize() == 0l) {
-            updateResponseDTO.setStatus(SigaConstants.KO);
-            error.setDescription("message.cajg.ficheroValido");
-            updateResponseDTO.setError(error);
-        } else {
-            try {
-                Path pFile = camHelper.subirFicheroCAM(idInstitucion, idFacturacion, fichero, request);
-                if (!facturacionHelper.isEjecutandoOperacionFacturacion(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId())) {
-                    insertaEstadoFacturacion(facturacionHelper.getUsuario(idInstitucion, token), idInstitucion, idFacturacion);
-                    envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId(), facturacionHelper.getUsuario(idInstitucion, token));
-                    updateResponseDTO.setStatus(SigaConstants.OK);
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info("CertificacionFacSJCSServicesImpl.subirFicheroCAM() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("CertificacionFacSJCSServicesImpl.subirFicheroCAM() / admUsuariosExtendsMapper.selectByExample() -> " +
+                        "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    List<String> listaIdFacturaciones = Arrays.asList(request.getParameter("listaIdFacturaciones").split(","));
+
+                    if (listaIdFacturaciones == null || listaIdFacturaciones.isEmpty()) {
+                        error.setDescription("facturacionSJCS.certificaciones.error.asociar.facturaciones");
+                        throw new Exception("Debe asociar facturaciones a la certficacion");
+                    }
+
+                    Iterator<String> itr = request.getFileNames();
+                    MultipartFile file = null;
+
+                    while (itr.hasNext()) {
+                        file = request.getFile(itr.next());
+                    }
+
+                    if (file == null || file.getSize() == 0l) {
+                        error.setDescription("message.cajg.ficheroValido");
+                        throw new Exception("Debe introducir una ruta de fichero válida");
+                    }
+
+                    for (String idFacturacion : listaIdFacturaciones) {
+
+                        Path pFile = camHelper.subirFicheroCAM(idInstitucion, idFacturacion, file);
+
+                        if (!facturacionHelper.isEjecutandoOperacionFacturacion(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId())) {
+                            insertaEstadoFacturacion(usuarios.get(0), idInstitucion, idFacturacion);
+                            Map<String, String> parametros = new HashMap<>();
+                            parametros.put(SigaConstants.PCAJG_ALC_CAM_PATH, pFile.toFile().getAbsolutePath());
+                            envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.PCAJG_ALCALA_JE_FICHERO_ERROR.getId(), usuarios.get(0), parametros);
+                        } else {
+                            error.setDescription("justiciaGratuita.ejg.documentacion.errorFich");
+                            throw new Exception("Operacion en curso");
+                        }
+                    }
+
                 } else {
-                    error.setCode(200);
-                    error.setDescription("La operación ya se está ejecutando para la facturación");
-                    updateResponseDTO.setStatus(SigaConstants.OK);
-                    updateResponseDTO.setError(error);
-                    LOGGER.error("La operación ya se está ejecutando para la facturación.");
+                    LOGGER.warn(
+                            "CertificacionFacSJCSServicesImpl.subirFicheroCAM() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
                 }
-            } catch (Exception e) {
-                LOGGER.error("error en subirFicheroCAM:" + e);
-                updateResponseDTO.setStatus(SigaConstants.KO);
-                error.setDescription("messages.general.error");
-                updateResponseDTO.setError(error);
+
+            } else {
+                LOGGER.warn("CertificacionFacSJCSServicesImpl.subirFicheroCAM() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("CertificacionFacSJCSServicesImpl.subirFicheroCAM() -> Se ha producido un error al intentar subir el Fichero CAM", e);
+            error.setCode(500);
+            if (error.getDescription() == null) {
+                error.setDescription("general.mensaje.error.bbdd");
             }
         }
+
+        if (error != null && error.getDescription() != null) {
+            updateResponseDTO.setStatus(SigaConstants.KO);
+        } else {
+            updateResponseDTO.setStatus(SigaConstants.OK);
+        }
+
+        updateResponseDTO.setError(error);
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.subirFicheroCAM() -> Salida del servicio para subir el Fichero CAM");
 
         return updateResponseDTO;
     }
