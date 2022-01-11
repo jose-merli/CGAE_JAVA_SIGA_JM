@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -21,6 +22,7 @@ import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.gen.services.IMenuService;
+import org.itcgae.siga.services.IFusionadorPersonasServerService;
 import org.itcgae.siga.gen.services.IProcesoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -153,6 +155,12 @@ public class MenuController {
        	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
    	}
     
+    @RequestMapping(value = "/isColegiado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ColegiadoItem> isColegiado(HttpServletRequest request) {
+    	ColegiadoItem response = menuService.isColegiado(request);
+       	return new ResponseEntity<ColegiadoItem>(response, HttpStatus.OK);
+   	}
+
     @RequestMapping(value = "/getTokenOldSiga", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    	ResponseEntity<StringDTO> getTokenOldSiga(HttpServletRequest request) {
     	StringDTO response = menuService.getTokenOldSiga(request);

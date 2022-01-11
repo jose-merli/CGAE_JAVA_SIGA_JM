@@ -1,13 +1,10 @@
 package org.itcgae.siga.scs.services.impl.componentesGenerales;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -247,4 +244,6 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 		LOGGER.info("busquedaColegiadosExpress.comboTurnos() -> Salida del servicio para obtener los turnos");
 		return comboDTO;
 	}
+
 }
+

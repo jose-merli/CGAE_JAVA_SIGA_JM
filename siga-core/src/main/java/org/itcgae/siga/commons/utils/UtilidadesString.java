@@ -50,6 +50,7 @@ public class UtilidadesString {
 		 * if (prop == null) { }
 		 */
 		String aux = prop.getProperty(key, key);
+
 		if (aux.equals(key)) {
 			return aux;
 		} else {
@@ -64,6 +65,7 @@ public class UtilidadesString {
 	 * @param sCadena a traducir
 	 * @return
 	 */
+
 
 	private static String caracteresJavascript(String sCadena) {
 		if (sCadena == null)
@@ -104,13 +106,14 @@ public class UtilidadesString {
 	public static String getPrimeraMayuscula(String cadena) {
 		if (cadena != null)
 			return cadena.substring(0, 1).toUpperCase() + cadena.substring(1).toLowerCase();
+
 		else
 			return "";
 
 	}
 
 	/**
-	 * Funci�n que elimina acentos y caracteres especiales de una cadena de texto.
+	 * Funcion que elimina acentos y caracteres especiales de una cadena de texto.
 	 * 
 	 * @param input
 	 * @return cadena de texto limpia de acentos y caracteres especiales.
@@ -129,7 +132,9 @@ public class UtilidadesString {
 		return output;
 	}
 
+
 	public static Calendar toCalendar(Date date) {
+
 		if (null != date) {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(date);
@@ -157,6 +162,7 @@ public class UtilidadesString {
 
 		return obj == null || "".equals(obj.toString().trim());
 	}
+
 
 	public static Date toDate(String string) throws ParseException {
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
@@ -188,6 +194,7 @@ public class UtilidadesString {
 	}
 
 	public static List<String> formateaListaPerfiles(List<String> perfiles) {
+
 		List<String> listaPerfilesFormat = new ArrayList<String>();
 
 		for (String cadena : perfiles) {
@@ -229,9 +236,10 @@ public class UtilidadesString {
 	}
 
 	// Los siguientes son los tipos que no pueden repetirse dentro de un cliente
-	public static final Integer[] tiposDireccionUnicos = { SigaConstants.TIPO_DIRECCION_CENSOWEB,
-			SigaConstants.TIPO_DIRECCION_GUARDIA, SigaConstants.TIPO_DIRECCION_FACTURACION,
-			SigaConstants.TIPO_DIRECCION_TRASPASO_OJ };
+	public static final Integer[] tiposDireccionUnicos = {
+			SigaConstants.TIPO_DIRECCION_CENSOWEB, SigaConstants.TIPO_DIRECCION_GUARDIA,
+			SigaConstants.TIPO_DIRECCION_FACTURACION, SigaConstants.TIPO_DIRECCION_TRASPASO_OJ
+	};
 
 	public static String traduceNota(Double nota) {
 		String notaString = "";
@@ -261,6 +269,7 @@ public class UtilidadesString {
 
 	public static String replaceFirstIgnoreCase(String texto, String clave, String valor) {
 		if (texto != null && clave != null && valor != null) {
+
 			String t = texto.toUpperCase();
 			int ini = t.indexOf(clave.toUpperCase());
 			if (ini < 0)
@@ -268,11 +277,13 @@ public class UtilidadesString {
 
 			t = texto.substring(0, ini) + valor + texto.substring(ini + clave.length());
 			return t;
+
 		} else {
 			LOGGER.info("replaceFirstIgnoreCase Devolvemos espacio");
 			return "";
 		}
 	}
+
 
 	private static int replaceFirstIgnoreCase(String texto[], String clave, String valor, int posIni) {
 		if (texto == null || texto.length < 0 || clave == null || valor == null) {
@@ -289,6 +300,7 @@ public class UtilidadesString {
 		texto[0] = t;
 		return ini + valor.length();
 	}
+
 
 	public static String replaceAllIgnoreCase(String texto, String clave, String valor) {
 		String t[] = { texto };
@@ -335,6 +347,7 @@ public class UtilidadesString {
 	}
 
 	public static String getFileContent(File plantillaFO) throws IOException, Exception {
+
 		String content = null;
 
 		if (!plantillaFO.exists()) {
@@ -352,8 +365,9 @@ public class UtilidadesString {
 		} catch (IOException e) {
 			try {
 				is.close();
-			} catch (Exception eee) {
-			}
+
+			} catch (Exception eee) {}
+
 			throw new Exception("Error en la lectura del fichero", e);
 		}
 	}
@@ -454,7 +468,7 @@ public class UtilidadesString {
 			retorno = texto.substring(inicio + marcaInicial.length(), fin);
 		}
 		return retorno;
-	} 
+	}
 
 	/**
 	 * formatea un dato a una longitud rellenando por la izquierda a ceros
