@@ -7,19 +7,21 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmInforme;
 import org.itcgae.siga.db.entities.AdmInformeExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.EcomColaParametros;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
@@ -28,6 +30,7 @@ import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmInformeMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
+import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
@@ -43,6 +46,8 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 @Service
 public class FacturacionProgramadaPySServiceImpl implements IFacturacionProgramadaPySService {
 
+	private static final String MESSAGES_FACTURACION_CONFIRMACION_ERROR_ENVIO = "messages.facturacion.confirmacion.errorEnvio";
+	private static final String MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF = "messages.facturacion.confirmacion.errorPdf";
 	private static final String TRASPASO_FACTURAS_WS_ACTIVO = "TRASPASO_FACTURAS_WS_ACTIVO";
 	private static final String MESSAGES_FACTURACION_CONFIRMACION_ERROR = "messages.facturacion.confirmacion.error";
 	private static final String PROC_PAGOS_BANCO = "{call PKG_SIGA_CARGOS.PRESENTACION(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
@@ -52,7 +57,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	private static final String COD_FACTURACION_CONFIRMACION_ERROR_PDF = "-208";
 	private static final String COD_FACTURACION_CONFIRMAR_CONTADOR_REPETIDO = "-205";
 	private static final String MSG_FACTURACION_CONFIRMAR_CONTADOR_REPETIDO = "messages.facturacion.confirmar.contadorRepetido";
-	private static final String MSG_FACTURACION_CONFIRMACION_ERROR_PDF = "messages.facturacion.confirmacion.errorPdf";
+	private static final String MSG_FACTURACION_CONFIRMACION_ERROR_PDF = MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF;
 	private static final String MSG_FACTURACION_CONFIRMAR_FACTURACION_MENSAJE_GENERACION_DISQUETES_ERROR = "facturacion.confirmarFacturacion.mensaje.generacionDisquetesERROR";
 	private static final String FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION = "facturacion.directorioFisicoLogProgramacion";
 	private static final String LOG_XLS = ".log.xls";
@@ -69,8 +74,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	private static final Integer DEFAULT_SIGA_JTA_TIMEOUT_PESADA = 2400;
 	private static final int CHUNK_SIZE = 10;
 	private static final String PROP_FACTURACION_PROGRAMACION_AUTOMATICA_MAX_MINUTOS_EN_EJECUCION = "facturacion.programacionAutomatica.maxMinutosEnEjecucion";
-	private static final Double DEFAULT_FACTURACION_PROGRAMACION_AUTOMATICA_MAX_MINUTOS_EN_EJECUCION = 120.0
-			/ (24.0 * 60.0);
+	private static final Double DEFAULT_FACTURACION_PROGRAMACION_AUTOMATICA_MAX_MINUTOS_EN_EJECUCION = 120.0 / (24.0 * 60.0);
 	private static final Integer USUARIO_AUTO = 0;
 	private static final String DEFAULT_LENGUAJE = "1";
 	private static final String[] CODIGOS_ERROR_FORMATO = {"-201", "-202", "-203", "-204"};
@@ -99,6 +103,9 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	@Autowired
 	private EcomColaMapper ecomColaMapper;
 	
+	@Autowired
+	private EcomColaParametrosMapper ecomColaParametrosMapper;
+	
 
 	private Map<Short, CenInstitucion> mInstituciones;
 	
@@ -110,26 +117,28 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
 	@Override
 	public void ejecutaProcesoFacturacionPyS() {
+		/* la clase de referencia en SIGA Clásico es  com.siga.servlets.SIGASvlProcesoFacturacion */
 		Double tiempoMaximoEjecucion = getMaxMinutosEnEjecucion();
 		List<FacFacturacionprogramada> lFac = facProgMapper.getListaNFacturacionesProgramadasProcesar(CHUNK_SIZE,
 				tiempoMaximoEjecucion);
 		
 		List<FacFacturacionprogramada> lFacConfirmar = facProgMapper.getListaNConfirmarFacturacionesProgramadas(CHUNK_SIZE);
 
-		// esto es temporal, hay que "mezclar" la ejecución de distintos estados de la facturación
+		// estos "for" son temporales, hay que "mezclar" la ejecución de distintos estados de la facturación
+		// para que el funcionamiento sea similar al descrito en el DF.
 		for (FacFacturacionprogramada fac : lFac) {
 			tratarFacturacion(fac);
 		}
 		for(FacFacturacionprogramada fac:lFacConfirmar) {
 			tratarConfirmacion(fac);
 		}
-
+		
 	}
 
 	private void tratarConfirmacion(FacFacturacionprogramada fac) {
 		LOGGER.info("Confirmar facturación programada: " + fac.getIdinstitucion() + " " + fac.getIdseriefacturacion()  + " " + fac.getIdprogramacion());
 		
-		Path pLog = getLogConfirmacion(fac); 
+		Path pLog = getPathLogConfirmacion(fac); 
 		
 		boolean archivar=false;
 		boolean generarPagosBanco=true;
@@ -157,10 +166,14 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		}
 	}
 
-	private Path getLogConfirmacion(FacFacturacionprogramada fac) {
-		String nombreFichero = LOG_FAC_CONFIRMACION_PREFIX + fac.getIdseriefacturacion() +"_"+ fac.getIdprogramacion() +LOG_XLS;
+	private Path getPathLogConfirmacion(FacFacturacionprogramada fac) {
+		String nombreFichero = getNombreFicheroLogConfirmacion(fac);
 		String pathFichero = getProperty(FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION);
 		return 	Paths.get(pathFichero).resolve(fac.getIdinstitucion().toString()).resolve(nombreFichero);
+	}
+	
+	private String getNombreFicheroLogConfirmacion(FacFacturacionprogramada fac) {
+		return LOG_FAC_CONFIRMACION_PREFIX + fac.getIdseriefacturacion() +"_"+ fac.getIdprogramacion() +LOG_XLS;
 	}
 
 	
@@ -173,7 +186,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		}
 		
 		if(pLog==null) {
-			pLog = getLogConfirmacion(fac);
+			pLog = getPathLogConfirmacion(fac);
 		}
 		
 		fac.setArchivarfact(boolTo10.apply(archivar));
@@ -191,14 +204,9 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 					String nameFile = generarInformesConfirmacion(fac);
 				}
 			} catch(Exception e) {
-				tratarExcepcionesConfirmarFacturacion(fac, transactionStatus, e, pLog);
+				tratarExcepcionesConfirmarFacturacion(fac, transactionStatus, e);
 			}
-				
-			
-			//INSERTAMOS EN LA COLA LA OPERACI�N CREARCLIENTE(): (NO HAY PROBLEMA PORQUE SI EL CLIENTE YA EXISTE LO ACTUALIZA, Y HACE UN INTENTO DE TRASPASAR �NICAMENTE LAS FACTURAS QUE TENGA SIN TRASPASAR, QUE ES LO QUE NOS INTERESA).
-//    		UtilidadesHash.set(hashNew, FacFacturacionProgramadaBean.C_IDESTADOTRASPASO, FacEstadoConfirmFactBean.TRASPASO_PROGRAMADA);
-//    		Short idInstitucion = Short.valueOf(String.valueOf(beanP.getIdInstitucion()));
-//    		encolarTraspasoFacturas(idInstitucion, idSerieFacturacion, idProgramacion);
+    		encolarTraspasoFacturas(fac);
 		}
 		
 		facProgMapper.updateByPrimaryKey(fac);
@@ -207,68 +215,127 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		//////////// FIN TRANSACCION ////////////////
 		
 		LOGGER.info("CONFIRMAR Y PRESENTAR OK ");
-		
-		Predicate<String> checkBool10 = s->s!=null&&s.trim().equals("1");
-		
+			
 		LOGGER.info("Entra a generar y enviar");
-		boolean isGenerarPdf = checkBool10.test(fac.getGenerapdf())  && !esFacturacionRapida;
-		boolean isGenerarEnvio = checkBool10.test(fac.getEnvio()) && realizarEnvio;
+		boolean isGenerarPdf = s10ToBool.apply(fac.getGenerapdf())  && !esFacturacionRapida;
+		boolean isGenerarEnvio = s10ToBool.apply(fac.getEnvio()) && realizarEnvio;
 		
 		if(isGenerarPdf){
-//			msjAviso = this.generarPdfEnvioProgramacionFactura(fac,req,log,idSerieFacturacion, idProgramacion, claves, hashNew, isGenerarEnvio, tx);
+			generarPdfEnvioProgramacionFactura(fac, isGenerarEnvio, tx);
 		}
 			
 		
 	}
 	
-	public void encolarTraspasoFacturas(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion) throws BusinessException
+	private void generarPdfEnvioProgramacionFactura(FacFacturacionprogramada fac, boolean isGenerarEnvio,
+			TransactionStatus tx) {
+		fac.setIdestadopdf(FacEstadosFacturacion.PDF_PROCESANDO.getId());
+		facProgMapper.updateByPrimaryKey(fac);
+		int errorAlmacenar = generaryEnviarProgramacionFactura(fac);
+		if(errorAlmacenar==0) {
+			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADA.getId());
+			if(isGenerarEnvio) {
+				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADA.getId());
+			}
+			facProgMapper.updateByPrimaryKey(fac);
+			LOGGER.info("OK TODO, CAMBIO DE ESTADO PDF");
+		} else {
+			tratarErrorAlmacenarFactura(errorAlmacenar, fac,isGenerarEnvio );
+		}
+		
+	}
+
+	private String tratarErrorAlmacenarFactura(int errorAlmacenar, FacFacturacionprogramada fac, boolean isGenerarEnvio) {
+		String logError = getNombreFicheroLogConfirmacion(fac);
+		String msjAviso;
+		LOGGER.error("ERROR AL ALMACENAR FACTURA, RETORNO="+errorAlmacenar);
+		switch (errorAlmacenar) {
+		case 1:// ERROR EN GENERAR PDF
+			msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF;
+			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADAERRORES.getId());
+			fac.setLogerror(logError);
+			if(isGenerarEnvio) {
+				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
+			}
+			break;
+		case 2:
+			msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_ENVIO;
+			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADA.getId());
+			if(isGenerarEnvio) {
+				fac.setLogerror(logError);
+				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
+			}
+			break;
+		default:
+			msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF;
+			fac.setLogerror(logError);
+			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADAERRORES.getId());
+			if(isGenerarEnvio) {
+				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
+			}
+			break;
+		}
+		facProgMapper.updateByPrimaryKey(fac);
+		return msjAviso;
+	}
+
+	private int generaryEnviarProgramacionFactura(FacFacturacionprogramada fac) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void encolarTraspasoFacturas(FacFacturacionprogramada fac) throws BusinessException
     {
-//		FacFacturacionProgramadaAdm facadm = new FacFacturacionProgramadaAdm(this.usrbean);
-//		
-//    	int estado = 0;
-//    	//CONSULTA DE LA SERIE DE FACTURACI�N (idinstitucion e idseriefacturacion) PARA VER SI HAY QUE TRASPASARLA O NO: FAC_FACTURACION.TRASPASOFACTURAS (1, 0):
-//    	//SI LA TRANSFERENCIA DE FACTURAS ACTIVA ES NAVISION Y EST� ACTIVA LA SERIE DE FACTURACI�N: 
-//    	if (this.getServicioTraspasoFacturasActivo(idInstitucion).equals("1") && isSerieFacturacionActiva(idInstitucion, idSerieFacturacion, idProgramacion))
-//    	{
-//	    	//INSERTAMOS EN LA COLA LA OPERACI�N CREARCLIENTE(): (NO HAY PROBLEMA PORQUE SI EL CLIENTE YA EXISTE LO ACTUALIZA, Y HACE UN INTENTO DE TRASPASAR �NICAMENTE LAS FACTURAS QUE TENGA SIN TRASPASAR, QUE ES LO QUE NOS INTERESA).
-//			HashMap map = new HashMap<String, String>();
-//			map.put(FacFactura.C_IDINSTITUCION, String.valueOf(idInstitucion));
-//			map.put(FacFactura.C_IDSERIEFACTURACION, String.valueOf(idSerieFacturacion));
-//			map.put(FacFactura.C_IDPROGRAMACION, String.valueOf(idProgramacion));
-//			
-//			EcomCola ecomColaCrearCliente = new EcomCola();
-//			ecomColaCrearCliente.setIdinstitucion(idInstitucion);
-//			ecomColaCrearCliente.setIdoperacion(AppConstants.OPERACION.TRASPASAR_FACTURAS_CREARCLIENTE_NAVISION.getId());
-//			 
-//			estado = FacEstadoConfirmFactBean.TRASPASO_PROGRAMADA;
-//			
-//			EcomColaService ecomColaService = (EcomColaService) BusinessManager.getInstance().getService(EcomColaService.class);
-//			ecomColaService.insertaColaConParametros(ecomColaCrearCliente, map);
-//    	}
-//    	else //EN CASO DE A�ADIR NUEVOS M�TODOS DE TRASPASO, IR A�ADIENDO LLAMADAS AQU�.
-//    	{
-//    		estado = FacEstadoConfirmFactBean.TRASPASO_NOAPLICA;
-//    	}
-//    	
-//		//CAMBIO DE ESTADO DE TRASPASO DE LA FACTURACI�N: 
-//		Hashtable<String,Object> hashNew = new Hashtable<String,Object>();
-//		UtilidadesHash.set(hashNew, FacFacturacionProgramadaBean.C_IDINSTITUCION, idInstitucion);
-//		UtilidadesHash.set(hashNew, FacFacturacionProgramadaBean.C_IDPROGRAMACION, idProgramacion);
-//		UtilidadesHash.set(hashNew, FacFacturacionProgramadaBean.C_IDSERIEFACTURACION, idSerieFacturacion);
-//		
-//		UtilidadesHash.set(hashNew, FacFacturacionProgramadaBean.C_FECHAMODIFICACION, "sysdate");
-//		UtilidadesHash.set(hashNew, FacFacturacionProgramadaBean.C_IDESTADOTRASPASO, estado);
-//		String [] camposParaActualizar = {FacFacturacionProgramadaBean.C_IDESTADOTRASPASO, FacFacturacionProgramadaBean.C_FECHAMODIFICACION};
-//		facadm.updateDirect(hashNew, null, camposParaActualizar);
+		FacEstadosFacturacion estado;
+		if(isServicioTraspasoFacturasActivo(fac.getIdinstitucion())&&
+				isSerieFacturacionActiva(fac.getIdinstitucion(), fac.getIdseriefacturacion(), fac.getIdprogramacion())) {
+			informarTraspasoEcomCola( fac);
+			estado = FacEstadosFacturacion.TRASPASO_PROGRAMADA;
+		} else {
+			estado = FacEstadosFacturacion.TRASPASO_NOAPLICA;
+		}
+		
+		fac.setIdestadotraspaso(estado.getId());
+		fac.setFechamodificacion(new Date());
+		facProgMapper.updateByPrimaryKey(fac);
     }
 	
 	
-	private void informarTraspasoEcomCola(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion) {
-		EcomCola obj = new EcomCola();
+	private void informarTraspasoEcomCola(FacFacturacionprogramada fac) {
+		EcomCola ecomCola = new EcomCola();
+		ecomCola.setIdinstitucion(fac.getIdinstitucion());
+		ecomCola.setIdoperacion(SigaConstants.ECOM_OPERACION.TRASPASAR_FACTURAS_CREARCLIENTE_NAVISION.getId());
 		
-		ecomColaMapper.insert(null);
+		ecomColaMapper.insert(ecomCola);
+				
+		HashMap<String,String> map = new HashMap<>();
+		
+		map.put("IDINSTITUCION", fac.getIdinstitucion().toString());
+		map.put("IDSERIEFACTURACION", fac.getIdseriefacturacion().toString());
+		map.put("IDPROGRAMACION", fac.getIdprogramacion().toString());
+		
+		insertarColaParametros(ecomCola, map);		
 	}
 	
+	
+	private void insertarColaParametros(EcomCola ecomCola, HashMap<String,String> map) {
+		try {
+			map.forEach((k,v)->{
+				EcomColaParametros param = new EcomColaParametros();
+				param.setIdecomcola(ecomCola.getIdecomcola());
+				param.setClave(k);
+				param.setValor(v);
+				int insertado = ecomColaParametrosMapper.insert(param);
+				if(insertado!=1) { 
+					throw new RuntimeException();
+				}
+			});
+		} catch (Exception e) {
+			throw new BusinessException("Error al insertar los parámetros de la cola.");
+		}
+		
+	}
+
 	private boolean  isServicioTraspasoFacturasActivo(Short idInstitucion) {
 		Boolean activo = getParametro(TRASPASO_FACTURAS_WS_ACTIVO,s10ToBool,false);
 		return activo;
@@ -290,12 +357,11 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
     	return bResultado;
     }
 
-	private void tratarExcepcionesConfirmarFacturacion(FacFacturacionprogramada fac,
-			TransactionStatus transactionStatus, Exception e, Path pLog) {
+	private void tratarExcepcionesConfirmarFacturacion(FacFacturacionprogramada fac, TransactionStatus transactionStatus, Exception e) {
 		rollBack(transactionStatus);// TODO Auto-generated method stub
 		LOGGER.error("ERROR AL CONFIRMAR Y PRESENTAR: " + e);
 //		(SIGALogging) log.error("CONFIRMACION","N/A","N/A","Error en proceso de confirmaci�n: " + e.getMessage());
-		String nombreFichero = pLog.getFileName().toString();
+		String nombreFichero = getNombreFicheroLogConfirmacion(fac);
 		fac.setIdestadoconfirmacion(FacEstadosFacturacion.ERROR_CONFIRMACION.getId());
 		fac.setFechaconfirmacion(null);
 		fac.setLogerror(nombreFichero);
@@ -306,7 +372,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	}
 
 	private String generarInformesConfirmacion(FacFacturacionprogramada fac) {
-		// TODO Auto-generated method stub
+		// TODO hay que ver si procede generar estos informes y en su caso migrarlos 
 		return null;
 	}
 
@@ -335,7 +401,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		try {
 			resultado = wsCommons.callPLProcedureFacturacionPyS(
 					PROC_CONFIRMACION_FACTURACION, 2, param_in);
-
 		} catch (Exception e) {
 			tratarExcepcionEnLlamadaConfirmacion(fac,e);
 		}
@@ -397,7 +462,8 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
 	private void tratarExcepcionEnLlamadaConfirmacion(FacFacturacionprogramada fac, Exception e) {
 		// TODO Auto-generated method stub
-		
+		String msgErr = getMensaje(MESSAGES_FACTURACION_CONFIRMACION_ERROR,fac.getIdinstitucion());
+		throw new BusinessException(msgErr);
 	}
 
 	private void initInstituciones() {
@@ -405,6 +471,10 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		example.createCriteria().andFechaenproduccionIsNotNull();
 		List<CenInstitucion> lInst = instMapper.selectByExample(example);
 		mInstituciones = lInst.stream().collect(Collectors.toMap(i -> i.getIdinstitucion(), i -> i));
+	}
+	
+	public void tratarFacturacionRapida(FacFacturacionprogramada fac /* habría que parametrizar el usuario que realiza la fact. rápida*/) {
+		
 	}
 
 	private void tratarFacturacion(FacFacturacionprogramada fac) {
@@ -423,7 +493,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		}
 		
 		finalizaTransaccion(transactionStatus);
-
 	}
 
 	private void finalizaTransaccion(TransactionStatus transactionStatus) {

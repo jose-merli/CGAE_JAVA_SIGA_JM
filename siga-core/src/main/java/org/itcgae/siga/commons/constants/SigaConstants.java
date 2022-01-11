@@ -502,6 +502,38 @@ public class SigaConstants {
 			return null;
 		}
 	}
+	
+	
+	 public static enum ECOM_OPERACION {
+	        ECOM2_INIT_PARAMETROS_GENERALES(206),
+	        ECOM2_XUNTA_JE(18),
+	        ECOM2_CAT_VALIDA_JUSTIFICACION(69),
+	        CAT_ENVIA_RESP_JUSTIFICACION(74),
+	        PCAJG_ALCALA_JE_FICHERO_ERROR(56),
+	    	XUNTA_ENVIO_JUSTIFICACION (27),
+			XUNTA_ENVIO_REINTEGROS (28),
+			TRASPASAR_FACTURAS_CREARCLIENTE_NAVISION(61)
+			;
+
+	        public static ECOM_OPERACION getEnum(Integer codigo) {
+	            for (ECOM_OPERACION sc : values()) {
+	                if (sc.getId() == codigo) {
+	                    return sc;
+	                }
+	            }
+	            return null;
+	        }
+
+	        private int id = -1;
+
+	        private ECOM_OPERACION(int id) {
+	            this.id = id;
+	        }
+
+	        public int getId() {
+	            return this.id;
+	        }
+	    }
 
 	public static enum CEN_TIPOCAMBIO {
 
