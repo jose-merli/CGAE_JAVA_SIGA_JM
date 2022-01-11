@@ -118,14 +118,16 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         	String fechaDesde = "";
             
             fechaDesde = dateFormat.format(movimientoItem.getFechaApDesde());
-            subquery6.WHERE("TRUNC(fcs_pagosjg.fechadesde) >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
+            //subquery6.WHERE("TRUNC(fcs_pagosjg.fechadesde) >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
+            subquery6.WHERE("fcs_pagosjg.fechadesde >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
         }
         
         if (movimientoItem.getFechaApHasta() != null) {
         	 String fechaHasta = "";
         	 
         	fechaHasta = dateFormat.format(movimientoItem.getFechaApHasta());
-        	subquery6.WHERE("TRUNC(fcs_pagosjg.fechahasta) <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
+        	//subquery6.WHERE("TRUNC(fcs_pagosjg.fechahasta) <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
+            subquery6.WHERE("fcs_pagosjg.fechahasta <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
         }
         
         if(movimientoItem.getIdFacturacion() != null && movimientoItem.getIdFacturacion() != "") {
@@ -217,14 +219,16 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         	String fechaDesde = "";
             
             fechaDesde = dateFormat.format(movimientoItem.getFechaApDesde());
-            subquery2.WHERE("TRUNC(fcs_pagosjg.fechadesde) >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
+            //subquery2.WHERE("TRUNC(fcs_pagosjg.fechadesde) >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
+            subquery2.WHERE("fcs_pagosjg.fechadesde >= TO_DATE('" + fechaDesde + "', 'DD/MM/RRRR')");
         }
         
         if (movimientoItem.getFechaApHasta() != null) {
         	 String fechaHasta = "";
         	 
         	fechaHasta = dateFormat.format(movimientoItem.getFechaApHasta());
-        	subquery2.WHERE("TRUNC(fcs_pagosjg.fechahasta) <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
+        	//subquery2.WHERE("TRUNC(fcs_pagosjg.fechahasta) <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
+            subquery2.WHERE("fcs_pagosjg.fechahasta <= TO_DATE('" + fechaHasta + "', 'DD/MM/RRRR')");
         }
         
         if(movimientoItem.getIdFacturacion() != null && movimientoItem.getIdFacturacion() != "") {
