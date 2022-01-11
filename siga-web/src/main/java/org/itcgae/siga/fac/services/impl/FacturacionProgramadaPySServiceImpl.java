@@ -133,6 +133,12 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 			tratarConfirmacion(fac);
 		}
 		
+		/* lo mismo con 
+		 * 	generarPDFsYenviarFacturasProgramacion (reutiliza generarPdfEnvioProgramacionFactura)
+		 *  generarEnviosFacturasPendientes
+		 *  comprobacionTraspasoFacturas
+		 * */
+		
 	}
 
 	private void tratarConfirmacion(FacFacturacionprogramada fac) {
@@ -790,15 +796,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	}
 
 	private int getTimeoutLargo() {
-		Integer time = DEFAULT_SIGA_JTA_TIMEOUT_PESADA;
-		GenPropertiesExample pEx = new GenPropertiesExample();
-		pEx.createCriteria().andParametroEqualTo(PROP_SIGA_JTA_TIMEOUT_PESADA);
-
-		List<GenProperties> lParam = genPropertiesMapper.selectByExample(pEx);
-		if (lParam.size() > 0) {
-			time = Integer.valueOf(lParam.get(0).getValor());
-		}
-
+		Integer time = getProperty(PROP_SIGA_JTA_TIMEOUT_PESADA, Integer::valueOf, DEFAULT_SIGA_JTA_TIMEOUT_PESADA);
 		return time;
 	}
 
@@ -867,6 +865,9 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		
 		return value;
 	}
+	
+	
+	
 
 
 
