@@ -3145,15 +3145,28 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                         " Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
                 if (null != usuarios && !usuarios.isEmpty()) {
+                    if (FacturacionSJCSServicesImpl.isAlguienEjecutando()) {
+                        LOGGER.debug(
+                                "YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+                        updateResponseDTO.setStatus(SigaConstants.KO);
+                        error.setCode(400);
+                        error.setDescription("facturacionSJCS.facturacionPagos.pagos.errorDeshacerCierreProceso");
+                    }else {
+                        FacturacionSJCSServicesImpl.setAlguienEjecutando();
+                        try{
+                            FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                            fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
+                            fcsPagosjgKey.setIdinstitucion(idInstitucion);
 
-                    FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
-                    fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
-                    fcsPagosjgKey.setIdinstitucion(idInstitucion);
+                            FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
 
-                    FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
-
-                    utilidadesPagoSJCS.deshacerCierre(pago, idInstitucion, usuarios.get(0));
-
+                            utilidadesPagoSJCS.deshacerCierre(pago, idInstitucion, usuarios.get(0));
+                        }catch (Exception e){
+                            throw e;
+                        }finally {
+                            FacturacionSJCSServicesImpl.setNadieEjecutando();
+                        }
+                    }
                 }
             }
 
