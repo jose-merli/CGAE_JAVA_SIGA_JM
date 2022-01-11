@@ -126,7 +126,7 @@ public class FacturacionSJCSHelper {
 
         EcomColaParametrosExample ecomColaParametrosExample = new EcomColaParametrosExample();
 
-        ecomColaParametrosExample.createCriteria().andClaveEqualTo(FcsFacturacionjgKey.C_IDFACTURACION).andValorEqualTo(idFacturacion.toString());
+        ecomColaParametrosExample.createCriteria().andClaveEqualTo(SigaConstants.C_IDFACTURACION).andValorEqualTo(idFacturacion.toString());
         List<EcomColaParametros> listaEcomColaParametros = ecomColaParametrosMapper.selectByExample(ecomColaParametrosExample);
 
         if (listaEcomColaParametros != null && listaEcomColaParametros.size() > 0) {

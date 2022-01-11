@@ -149,8 +149,8 @@ public class CertificacionFacSJCSServicesXuntaHelper {
         ecomCola.setIdoperacion(operacion.getId());
 
         Map<String, String> mapa = new HashMap<String, String>();
-        mapa.put(FcsFacturacionjgKey.C_IDINSTITUCION, idinstitucion.toString());
-        mapa.put(FcsFacturacionjgKey.C_IDFACTURACION, idfacturacion.toString());
+        mapa.put(SigaConstants.C_IDINSTITUCION, idinstitucion.toString());
+        mapa.put(SigaConstants.C_IDFACTURACION, idfacturacion.toString());
 
         facHelper.insertaColaConParametros(ecomCola, mapa);
     }

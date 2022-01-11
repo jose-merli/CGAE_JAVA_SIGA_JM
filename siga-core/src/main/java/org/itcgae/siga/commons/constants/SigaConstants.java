@@ -1462,5 +1462,7 @@ public class SigaConstants {
 	public static final String C_PPN_IDTIPOPRODUCTO = "PPN_IDTIPOPRODUCTO";
     public static final String C_PPN_IDPRODUCTO = "PPN_IDPRODUCTO";
     public static final String C_PPN_IDPRODUCTOINSTITUCION = "PPN_IDPRODUCTOINSTITUCION";
+    
+	public static final String C_IDFACTURACION = "IDFACTURACION";
 
 }
