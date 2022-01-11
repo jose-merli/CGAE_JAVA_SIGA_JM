@@ -741,7 +741,7 @@ public class UtilidadesPagoSJCS {
             LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
                     "con nuestro pago");
 
-            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             String fecha = formato.format(hayAbonoPosterior.get(0).getFecha());
 
             List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, fecha);
