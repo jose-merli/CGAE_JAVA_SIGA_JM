@@ -82,6 +82,7 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenGruposcriterios;
 import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
+import org.itcgae.siga.db.entities.CenGruposcriteriosKey;
 import org.itcgae.siga.db.entities.CenSucursalesExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
@@ -891,6 +892,34 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 							facFormapagoserieExtendsMapper.deleteByExample(formapagoExample);
 							facGrupcritincluidosenserieExtendsMapper.deleteByExample(grupoCriterioExample);
 
+							// Si la consulta no se utiliza en ninguna otra serie de facturación, se elimina la entrada en CEN_GRUPOSCRITERIOS
+
+							FacGrupcritincluidosenserieExample criteriosExample = new FacGrupcritincluidosenserieExample();
+							criteriosExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+									.andIdseriefacturacionEqualTo(idSerieFacturacion);
+
+							List<FacGrupcritincluidosenserie> gruposCriterios = facGrupcritincluidosenserieExtendsMapper.selectByExample(criteriosExample);
+							for (FacGrupcritincluidosenserie grupoCriterio: gruposCriterios) {
+								facGrupcritincluidosenserieExtendsMapper.deleteByPrimaryKey(grupoCriterio);
+
+								FacGrupcritincluidosenserieExample criterioExample = new FacGrupcritincluidosenserieExample();
+								criterioExample.createCriteria()
+										.andIdgruposcriteriosEqualTo(grupoCriterio.getIdgruposcriterios())
+										.andIdinstitucionGrupEqualTo(grupoCriterio.getIdinstitucion());
+
+								long foundGrupocriterios = facGrupcritincluidosenserieExtendsMapper.countByExample(criterioExample);
+
+								if (foundGrupocriterios == 0) {
+									CenGruposcriteriosKey criterioKey = new	CenGruposcriteriosKey();
+									criterioKey.setIdinstitucion(grupoCriterio.getIdinstitucion());
+									criterioKey.setIdgruposcriterios(grupoCriterio.getIdgruposcriterios());
+
+									cenGruposcriteriosExtendsMapper.deleteByPrimaryKey(criterioKey);
+								}
+							}
+
+
+
 							facSeriefacturacionExtendsMapper.deleteByPrimaryKey(seriefacturacionKey);
 						} else {
 							LOGGER.info(
@@ -1563,6 +1592,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				ConConsulta conConsulta = conConsultasExtendsMapper.selectByPrimaryKey(consultaKey);
 
+				// Si no existe la consulta en CEN_GRUPOSCRITERIOS se crea la entrada
 				if (consulta != null) {
 					CenGruposcriterios recordGruposCriterios = new CenGruposcriterios();
 					recordGruposCriterios.setIdinstitucion(Short.parseShort(consulta.getIdInstitucion()));
@@ -1636,25 +1666,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				facGrupcritincluidosenserieExtendsMapper.deleteByExample(grupoCriterioIncuidoExample);
 
-				/*
-				 * FacGrupcritincluidosenserieExample criterioExample = new
-				 * FacGrupcritincluidosenserieExample(); criterioExample.createCriteria()
-				 * .andIdgruposcriteriosEqualTo(Integer.parseInt(consulta.getIdConsulta()))
-				 * .andIdinstitucionGrupEqualTo(Short.parseShort(consulta.getIdInstitucion()));
-				 * 
-				 * // Se borran las entradas de la tabla CenGruposcriterios en caso de que no se
-				 * // utilicen long foundGrupocriterios =
-				 * facGrupcritincluidosenserieExtendsMapper.countByExample(criterioExample);
-				 * 
-				 * if (foundGrupocriterios == 0) { CenGruposcriteriosKey criterioKey = new
-				 * CenGruposcriteriosKey();
-				 * criterioKey.setIdinstitucion(Short.parseShort(consulta.getIdInstitucion()));
-				 * criterioKey.setIdgruposcriterios(Integer.parseInt(consulta.getIdConsulta()));
-				 * 
-				 * cenGruposcriteriosExtendsMapper.deleteByPrimaryKey(criterioKey); }
-				 * 
-				 * 
-				 */
+				// Si la consulta no se utiliza en ninguna otra serie de facturación, se elimina la entrada en CEN_GRUPOSCRITERIOS
+
+				FacGrupcritincluidosenserieExample criterioExample = new
+				FacGrupcritincluidosenserieExample(); criterioExample.createCriteria()
+					.andIdgruposcriteriosEqualTo(Integer.parseInt(consulta.getIdConsulta()))
+					.andIdinstitucionGrupEqualTo(Short.parseShort(consulta.getIdInstitucion()));
+
+				long foundGrupocriterios = facGrupcritincluidosenserieExtendsMapper.countByExample(criterioExample);
+
+				if (foundGrupocriterios == 0) {
+					CenGruposcriteriosKey criterioKey = new	CenGruposcriteriosKey();
+					criterioKey.setIdinstitucion(Short.parseShort(consulta.getIdInstitucion()));
+					criterioKey.setIdgruposcriterios(Integer.parseInt(consulta.getIdConsulta()));
+
+					cenGruposcriteriosExtendsMapper.deleteByPrimaryKey(criterioKey);
+				}
 			}
 
 		}

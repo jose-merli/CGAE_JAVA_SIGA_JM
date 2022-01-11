@@ -1,8 +1,11 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,6 +21,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
@@ -66,6 +72,8 @@ import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenGruposcriterios;
+import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.ConCriterioconsulta;
@@ -107,6 +115,8 @@ import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.CenGruposcriteriosExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacGrupcritincluidosenserieExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -116,6 +126,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 @Service
 public class ConsultasServiceImpl implements IConsultasService {
@@ -195,6 +208,12 @@ public class ConsultasServiceImpl implements IConsultasService {
 	
 	@Autowired
 	private PysPreciosserviciosMapper _pysPreciosServiciosMapper;
+
+	@Autowired
+	private FacGrupcritincluidosenserieExtendsMapper _facGrupcritincluidosenserieExtendsMapper;
+
+	@Autowired
+	private CenGruposcriteriosExtendsMapper _cenGruposcriteriosExtendsMapper;
 
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -969,6 +988,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					boolean camposIncorrectos = false;
 					boolean objetivoIncorrecto = false;
 					boolean noContieneInstitucion = false;
+					boolean errorActualizarGruposCriterios = false;
 
 
 					ConConsultaKey key = new ConConsultaKey();
@@ -1001,6 +1021,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 						respuesta.setCode(400);
 						respuesta.setMessage("No cumple con las restricciones del objetivo");
 					} else {
+						// Actualizar entrada en CEN_GRUPOSCRITERIOS en caso de que la consulta se encuentre asociada a una serie de facturación
+						actualizarConsultaEnCenGruposCriterios(Short.parseShort(consultaDTO.getIdInstitucion()), key.getIdconsulta(), consultaDTO.getSentencia());
+
 						consulta.setSentencia(consultaDTO.getSentencia());
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
@@ -1019,6 +1042,41 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		LOGGER.info("guardarConsulta() -> Salida del servicio para guardar la sentencia de la consulta");
 		return respuesta;
+	}
+
+	// FUNCIÓN UTILIZADA PARA ACTUALIZAR LAS SENTECIAS DE LA TABLE CEN_GRUPOSCRITERIOS UTILIZADA EN LA FICHA DE SERIRES DE FACTURACIÓN (SENTENCIAS SIN ETIQUETAS)
+	private boolean actualizarConsultaEnCenGruposCriterios(Short idInstitucion, Long idConsulta, String consulta) {
+		try {
+			CenGruposcriteriosExample exampleGruposCriterios = new CenGruposcriteriosExample();
+			exampleGruposCriterios.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdconsultaEqualTo(idConsulta);
+
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document doc = builder.parse(new ByteArrayInputStream(
+					("<root>" + consulta + "</root>").getBytes(StandardCharsets.UTF_8)));
+
+
+			List<String> partesSentencia = new ArrayList<>();
+			NodeList nodes = doc.getDocumentElement().getChildNodes();
+			for (int i = 0; i < nodes.getLength(); i++) {
+				String nodeContent = nodes.item(i).getTextContent();
+				if (nodeContent != null)
+					partesSentencia.add(nodeContent.trim());
+			}
+
+			CenGruposcriterios recordGruposCriterios = new CenGruposcriterios();
+			if (partesSentencia.isEmpty()) {
+				recordGruposCriterios.setSentencia(consulta);
+			} else {
+				recordGruposCriterios.setSentencia(String.join(" \n", partesSentencia));
+			}
+
+			_cenGruposcriteriosExtendsMapper.updateByExampleSelective(recordGruposCriterios, exampleGruposCriterios);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+
 	}
 
 	private boolean comprobarInstitucion(String sentencia) {
