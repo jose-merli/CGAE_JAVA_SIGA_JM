@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -739,7 +740,11 @@ public class UtilidadesPagoSJCS {
         if (!hayAbonoPosterior.isEmpty()) {
             LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
                     "con nuestro pago");
-            List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, hayAbonoPosterior.get(0).getFecha());
+
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String fecha = formato.format(hayAbonoPosterior.get(0).getFecha());
+
+            List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, fecha);
 
             AdmContador admContador = new AdmContador();
             admContador.setIdcontador(SigaConstants.CONTADOR_ABONOS_PAGOSJG);
