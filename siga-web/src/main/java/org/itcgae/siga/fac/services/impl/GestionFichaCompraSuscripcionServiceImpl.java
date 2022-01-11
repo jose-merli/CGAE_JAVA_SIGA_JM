@@ -381,12 +381,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				}
 				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
+				//Con el format logramos que siempre una longitud de 10 precedida por 0s
 				solicitud.setNumOperacion(
-						"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR: Necesita
-																											// confirmacion
-																											// de que es
-																											// el valor
-																											// correcto
+						"1" + idInstitucion.toString() + String.format("%010d", idPersona) + fechaActual.toString()); 
 				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
 				solicitud.setFechamodificacion(new Date());
 
@@ -507,13 +504,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				}
 				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
+				//Con el format logramos que siempre una longitud de 10 precedida por 0s
 				solicitud.setNumOperacion(
-						"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR:
-																											// Necesita
-																											// confirmacion
-																											// de que es
-																											// el valor
-																											// correcto
+						"1" + idInstitucion.toString() + String.format("%010d", idPersona) + fechaActual.toString());
+				
 				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
 				solicitud.setFechamodificacion(new Date());
 
@@ -867,8 +861,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				solicitudBaja.setTipopeticion("B");
 				solicitudBaja.setIdestadopeticion((short) 20);
 				Long fechaActual = new Date().getTime();
+				//Con el format logramos que siempre una longitud de 10 precedida por 0s
 				solicitudBaja.setNumOperacion(
-						"1" + idInstitucion.toString() + solicitudAlta.getIdpersona() + fechaActual.toString());
+						"1" + idInstitucion.toString() + String.format("%010d", solicitudAlta.getIdpersona()) + fechaActual.toString());
 
 				response = pysPeticioncomprasuscripcionMapper.insert(solicitudBaja);
 				if (response == 0)
@@ -2038,8 +2033,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							solicitudBaja.setTipopeticion("B");
 							solicitudBaja.setIdestadopeticion((short) 20);
 							Long fechaActual = new Date().getTime();
+							//Con el format logramos que siempre una longitud de 10 precedida por 0s
 							solicitudBaja.setNumOperacion(
-									"1" + idInstitucion.toString() + solicitudAlta.getIdpersona() + fechaActual.toString());
+									"1" + idInstitucion.toString() + String.format("%010d", solicitudAlta.getIdpersona()) + fechaActual.toString());
+
 							
 							LOGGER.info(
 									"anularPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para solicitar la anulacion una petición");
