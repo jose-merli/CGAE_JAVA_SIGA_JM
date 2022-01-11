@@ -38,4 +38,24 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
         return sql.toString();
     }
+
+    public String getFacturacionLog(String idFactura, String idInstitucion, String idLenguaje) {
+
+        SQL sql = new SQL();
+
+        sql.SELECT("fh.FECHAMODIFICACION AS FECHA, F_SIGA_GETRECURSO(ft.NOMBRE ,"+idLenguaje+") AS ACCION, gr.DESCRIPCION AS ESTADO");
+
+        sql.FROM("FAC_HISTORICOFACTURA fh");
+        sql.LEFT_OUTER_JOIN("FAC_TIPOSACCIONFACTURA ft ON(fh.IDTIPOACCION = ft.IDTIPOACCION)");
+        sql.LEFT_OUTER_JOIN("FAC_ESTADOFACTURA fe ON(fh.ESTADO = fe.IDESTADO)");
+        sql.LEFT_OUTER_JOIN("GEN_RECURSOS gr ON(fe.DESCRIPCION = gr.IDRECURSO AND gr.IDLENGUAJE = "+idLenguaje+")");
+        sql.LEFT_OUTER_JOIN("FAC_TIPOSACCIONFACTURA ft ON(fh.IDTIPOACCION = ft.IDTIPOACCION)");
+
+        sql.WHERE("fh.IDINSTITUCION ="+idInstitucion);
+        sql.WHERE("fh.IDFACTURA ="+idFactura);
+
+        sql.ORDER_BY("fh.FECHAMODIFICACION ASC");
+
+        return sql.toString();
+    }
 }

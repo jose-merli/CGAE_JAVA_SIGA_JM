@@ -30,7 +30,7 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		numRecibos.WHERE("fi.idinstitucion = c.idinstitucion AND fi.iddisquetecargos = c.iddisquetecargos");
 		
 		//query principal
-		principal.SELECT("c.idinstitucion, c.iddisquetecargos, c.nombrefichero, c.bancos_codigo, b.comisiondescripcion || ' (...' || SUBSTR(IBAN, -4) || ')' CUENTA_ENTIDAD, b.iban, "
+		principal.SELECT("c.idinstitucion, c.iddisquetecargos, c.nombrefichero, c.bancos_codigo, b.DESCRIPCION CUENTA_ENTIDAD, b.iban, "
 				+ "c.fechacreacion, c.idseriefacturacion, nvl(sf.nombreabreviado,'<FACTURAS SUELTAS>') nombreabreviado,c .idprogramacion, nvl(p.descripcion,'<FACTURAS SUELTAS>') descripcion, "
 				+ "c.fechacargo, c.numerolineas, c.idsufijo,( sufijo || ' - ' || concepto ) sufijo, ("+totalRemesa.toString()+") total_remesa, ("+numRecibos.toString()+") AS NUMRECIBOS, "
 				+ "c.fechapresentacion, c. fecharecibosprimeros, c.fecharecibosrecurrentes, c.fechareciboscor1, c.fecharecibosb2b, c.fechamodificacion");
@@ -69,6 +69,11 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		//serie
 		if(item.getIdseriefacturacion()!=null) {
 			principal.WHERE("c.idseriefacturacion = "+item.getIdseriefacturacion());
+		}
+
+		//programacion
+		if(item.getIdseriefacturacion()!=null) {
+			principal.WHERE("c.idprogramacion = "+item.getIdprogramacion());
 		}
 		
 		//facturacion

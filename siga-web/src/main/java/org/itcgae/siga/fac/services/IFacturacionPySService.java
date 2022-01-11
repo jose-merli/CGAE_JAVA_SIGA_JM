@@ -33,6 +33,7 @@ import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesDTO;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesItem;
+import org.itcgae.siga.DTO.fac.InformeFacturacionDTO;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
@@ -48,6 +49,8 @@ import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 
 public interface IFacturacionPySService {
 
@@ -190,4 +193,7 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
 			HttpServletRequest request);
 
+	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, String idProgramacion, HttpServletRequest request) throws Exception;
+
+	public ResponseEntity<InputStreamResource> descargarFichaFacturacion(String idFactura, HttpServletRequest request) throws Exception;
 }

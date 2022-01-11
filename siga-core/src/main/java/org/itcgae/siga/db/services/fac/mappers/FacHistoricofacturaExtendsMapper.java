@@ -38,4 +38,12 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 			@Result(column = "NOTAACCION", property = "notaAccion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<EstadosPagosItem> getEstadosPagos(String idFactura, String idInstitucion, String idLenguaje);
+
+	@SelectProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "getFacturacionLog")
+	@Results({
+			@Result(column = "FECHA", property = "fechaModificaion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ACCION", property = "accion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
+	})
+	List<EstadosPagosItem> getFacturacionLog(String idFactura, String idInstitucion, String idLenguaje);
 }
