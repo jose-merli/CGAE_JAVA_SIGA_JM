@@ -78,6 +78,8 @@ import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenGruposcriterios;
 import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.CenSucursalesExample;
@@ -107,6 +109,8 @@ import org.itcgae.siga.db.entities.FacFacturacionEliminar;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
+import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
+import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
 import org.itcgae.siga.db.entities.FacGrupcritincluidosenserie;
@@ -146,17 +150,22 @@ import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
+import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
 import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
 import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -306,6 +315,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacPlantillafacturacionMapper facPlantillafacturacionMapper;
+
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
+
+	@Autowired
+	private FacFacturaincluidaendisqueteMapper facFacturaincluidaendisqueteMapper;
+
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -2742,9 +2760,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 	}
 
-	/**
-	 * ¿Que se inseta en la table de fac_historico?
-	 */
 	private void nuevoAbono(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacAbono abonoUpdate,
 			AdmUsuarios usuario) {
 
@@ -2874,24 +2889,51 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private void devolverFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
 			AdmUsuarios usuario) throws Exception {
-		// historico fac
+
+		//Porcentaje de Comision
+		CenClienteKey cenClienteKey = new CenClienteKey();
+		cenClienteKey.setIdinstitucion(facUpdate.getIdinstitucion());
+		cenClienteKey.setIdpersona(facUpdate.getIdpersona());
+		CenCliente cliente = cenClienteMapper.selectByPrimaryKey(cenClienteKey);
+
+		long importeComision = Long.parseLong(facBancoinstitucionExtendsMapper.getComisionFactura(String.valueOf(facUpdate.getIdinstitucion()), facUpdate.getIdfactura()).get(0).getValue());
+		importeComision = importeComision / 100 * Long.parseLong(String.valueOf(facHistoricoInsert.getImptotalporpagar()));
+
+
+		//Pago a devolver
+		FacFacturaincluidaendisqueteKey facFacturaincluidaendisqueteKey = new FacFacturaincluidaendisqueteKey();
+		facFacturaincluidaendisqueteKey.setIddisquetecargos(facHistoricoInsert.getIddisquetecargos());
+		facFacturaincluidaendisqueteKey.setIdfacturaincluidaendisquete(facHistoricoInsert.getIdfacturaincluidaendisquete());
+		facFacturaincluidaendisqueteKey.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
+
+		FacFacturaincluidaendisquete facFacturaincluidaendisquete = facFacturaincluidaendisqueteMapper.selectByPrimaryKey(facFacturaincluidaendisqueteKey);
+
+		BigDecimal importeDevolver = facFacturaincluidaendisquete.getImporte();
+
+
+		//Historico fac
 		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
 
-		facHistoricoInsert.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
-		facHistoricoInsert.setImptotalpagado(BigDecimal.valueOf(0));
-		facHistoricoInsert.setImptotalporpagar(facUpdate.getImptotal());
+		facHistoricoInsert.setImptotalporpagar(facHistoricoInsert.getImptotalporpagar().add(importeDevolver));
+		facHistoricoInsert.setImptotalpagado(facHistoricoInsert.getImptotalpagado().subtract(importeDevolver));
+		facHistoricoInsert.setImptotalpagadoporbanco(facHistoricoInsert.getImptotalpagadoporbanco().subtract(importeDevolver));
 
 		facHistoricoInsert.setEstado((short) 4);
 
-		FacFacturaDevolucion devolucion = new FacFacturaDevolucion();
+		facHistoricoInsert.setIdrecibo("00" + facHistoricoInsert.getIdrecibo());
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fecha = dateFormat.format(item.getFechaModificaion());
-		devolucion.setFechaDevolucion(fecha);
+
+		//Objeto del PKG para la devolucion
+		FacFacturaDevolucion devolucion = new FacFacturaDevolucion();
 
 		devolucion.setIdIdioma(usuario.getIdlenguaje());
 		devolucion.setIdInstitucion(usuario.getIdinstitucion());
 		devolucion.setUsuModificacion(usuario.getUsumodificacion());
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fecha = dateFormat.format(item.getFechaModificaion());
+
+		devolucion.setFechaDevolucion(fecha);
 
 		String listaFacturas = facHistoricoInsert.getIddisquetecargos() + "||"
 				+ facHistoricoInsert.getIdfacturaincluidaendisquete() + "||" + facHistoricoInsert.getIdfactura() + "||"
@@ -2899,46 +2941,17 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		devolucion.setListaFacturas(listaFacturas);
 
-		// factura
+
+		//Factura Original
 		facUpdate.setEstado((short) 4);
-		facUpdate.setImptotalpagado(facUpdate.getImptotal());
-		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagado(facHistoricoInsert.getImptotalpagado());
+		facUpdate.setImptotalporpagar(facHistoricoInsert.getImptotalporpagar());
+		facUpdate.setImptotalpagadoporbanco(facHistoricoInsert.getImptotalpagadoporbanco());
 		facUpdate.setFechamodificacion(new Date());
 		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
 
-		//comision factura
-		if(item.getComision() != null && item.getComision()){
-			FacFacturaKey facFacturaKey = new FacFacturaKey();
-			facFacturaKey.setIdfactura(facUpdate.getComisionidfactura());
-			facFacturaKey.setIdinstitucion(facUpdate.getIdinstitucion());
 
-			FacFactura comision = facFacturaExtendsMapper.selectByPrimaryKey(facFacturaKey);
-
-			FacLineafactura lineaComision = new FacLineafactura();
-
-			lineaComision.setIdinstitucion(comision.getIdinstitucion());
-			lineaComision.setIdfactura(facUpdate.getIdfactura());
-			lineaComision.setNumeroorden((long) 1);
-			lineaComision.setCantidad(1);
-			lineaComision.setFechamodificacion(new Date());
-			lineaComision.setUsumodificacion(usuario.getUsumodificacion());
-			lineaComision.setFechamodificacion(new Date());
-			lineaComision.setPreciounitario(comision.getImptotal());
-
-			FacLineafacturaExample exampleLinea = new FacLineafacturaExample();
-			exampleLinea.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
-					.andIdinstitucionEqualTo(usuario.getIdinstitucion());
-			exampleLinea.setOrderByClause("NUMEROLINEA");
-
-			List<FacLineafactura> listLinea = facLineafacturaExtendsMapper.selectByExample(exampleLinea);
-			if (!listLinea.isEmpty())
-				lineaComision.setNumerolinea((listLinea.get(listLinea.size() - 1).getNumerolinea() + 1));
-			else
-				lineaComision.setNumerolinea((long) 1);
-
-			facLineafacturaExtendsMapper.insert(lineaComision);
-		}
-
+		//Obtener ID Disquete Devoluciones
 		String resultado[] = null;
 
 		Object[] param_in = new Object[2]; // Parametros de entrada del PL
@@ -2959,8 +2972,123 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			facHistoricoInsert.setIddisquetedevoluciones(Long.valueOf(devolucion.getListaIdDisquetesDevolucion()));
 
 			facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
-
 			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+
+			//Con Comision
+			if(item.getComision() != null && item.getComision() && cliente.getComisiones().equals("1") && importeComision != 0){
+
+				//Copia Factura
+				FacFactura facturaComision = facUpdate;
+				facturaComision.setIdfactura(facFacturaExtendsMapper.getNewFacturaID(String.valueOf(facturaComision.getIdinstitucion())).get(0).getValue());
+
+
+				//Historico Factura Anulada
+				FacHistoricofactura fachistoricoAnulada = facHistoricoInsert;
+
+				fachistoricoAnulada.setIddisquetedevoluciones(null);
+				fachistoricoAnulada.setIdrecibo(null);
+				fachistoricoAnulada.setIddisquetecargos(null);
+				fachistoricoAnulada.setIdfacturaincluidaendisquete(null);
+
+				fachistoricoAnulada.setIdtipoaccion((short) 9);
+				fachistoricoAnulada.setEstado((short) 8);
+				fachistoricoAnulada.setIdhistorico((short) (fachistoricoAnulada.getIdhistorico()+1));
+
+				fachistoricoAnulada.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalpagado(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalporpagar(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalcompensado(facUpdate.getImptotal());
+
+				facHistoricofacturaExtendsMapper.insert(fachistoricoAnulada);
+
+
+				//Anular Factura Original
+				facUpdate.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+				facUpdate.setImptotalpagado(BigDecimal.valueOf(0));
+				facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
+				facUpdate.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+				facUpdate.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+				facUpdate.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+				facUpdate.setImptotalcompensado(facUpdate.getImptotal());
+
+				facUpdate.setEstado((short) 8);
+
+				facUpdate.setComisionidfactura(facturaComision.getIdfactura());
+
+				facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+
+
+				//Factura Comision
+				facturaComision.setImptotalporpagar(facturaComision.getImptotalporpagar().add(BigDecimal.valueOf(importeComision)));
+
+				facFacturaExtendsMapper.insert(facturaComision);
+
+
+				//Historico Factura Comision
+				FacHistoricofactura fachistoricoRevision = fachistoricoAnulada;
+
+				fachistoricoRevision.setIdfactura(facturaComision.getIdfactura());
+				fachistoricoRevision.setIdhistorico((short) 1);
+				fachistoricoRevision.setIdtipoaccion((short) 1);
+				fachistoricoRevision.setEstado((short) 7);
+
+				fachistoricoRevision.setImptotalanticipado(BigDecimal.valueOf(0));
+				fachistoricoRevision.setImptotalcompensado(facturaComision.getImptotal());
+
+				facHistoricofacturaExtendsMapper.insert(fachistoricoRevision);
+
+				FacHistoricofactura fachistoricoPendiente = fachistoricoRevision;
+
+				fachistoricoRevision.setIdhistorico((short) 2);
+				fachistoricoRevision.setIdtipoaccion((short) 2);
+				fachistoricoRevision.setEstado((short) 9);
+
+				facHistoricofacturaExtendsMapper.insert(fachistoricoPendiente);
+
+
+				//Copia Lineas Factura
+				FacLineafacturaExample exampleLinea = new FacLineafacturaExample();
+				exampleLinea.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
+						.andIdinstitucionEqualTo(usuario.getIdinstitucion());
+				exampleLinea.setOrderByClause("NUMEROLINEA");
+
+				List<FacLineafactura> listLinea = facLineafacturaExtendsMapper.selectByExample(exampleLinea);
+
+				for (FacLineafactura lf : listLinea) {
+					lf.setIdfactura(facturaComision.getIdfactura());
+					facLineafacturaExtendsMapper.insert(lf);
+				}
+
+
+				//Linea Factura Comision
+				FacLineafactura lineaComision = new FacLineafactura();
+
+				lineaComision.setIdinstitucion(facturaComision.getIdinstitucion());
+				lineaComision.setIdfactura(facturaComision.getIdfactura());
+				lineaComision.setNumeroorden((long) 1);
+				lineaComision.setCantidad(1);
+				lineaComision.setFechamodificacion(new Date());
+				lineaComision.setUsumodificacion(usuario.getUsumodificacion());
+				lineaComision.setFechamodificacion(new Date());
+
+				lineaComision.setPreciounitario(BigDecimal.valueOf(importeComision));
+
+				GenRecursosKey genRecursosKey = new GenRecursosKey();
+				genRecursosKey.setIdlenguaje(usuario.getIdlenguaje());
+				genRecursosKey.setIdrecurso("certificados.tipocertificado.literal.comisionBancaria");
+
+				lineaComision.setDescripcion(genRecursosMapper.selectByPrimaryKey(genRecursosKey).getDescripcion());
+
+				if (!listLinea.isEmpty())
+					lineaComision.setNumerolinea((listLinea.get(listLinea.size() - 1).getNumerolinea() + 1));
+				else
+					lineaComision.setNumerolinea((long) 1);
+
+				facLineafacturaExtendsMapper.insert(lineaComision);
+			}
 
 			// Aplicacion de comisiones
 //				if (aplicaComisiones!=null && aplicaComisiones.equalsIgnoreCase(ClsConstants.DB_TRUE)){
@@ -2979,7 +3107,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 //							FacLineaDevoluDisqBancoBean lineaDevolucion = (FacLineaDevoluDisqBancoBean) vDevoluciones.get(d);
 //							facturacion.aplicarComisionAFactura (idInstitucion, lineaDevolucion, aplicaComisiones, user, fechaDevolucionHora);
 //						}
-//					}				
+//					}
 //			    }
 
 		} else if (resultado[0].equals("5404")) {

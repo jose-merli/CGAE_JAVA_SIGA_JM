@@ -272,4 +272,15 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         return sql.toString();
     }
+
+    public String getNewFacturaID(String idInstitucion) {
+
+        SQL query = new SQL();
+
+        query.SELECT("MAX(IDFACTURA)+1 AS ID");
+        query.FROM("FAC_FACTURA ff");
+        query.WHERE("IDINSTITUCION ="+idInstitucion);
+
+        return query.toString();
+    }
 }
