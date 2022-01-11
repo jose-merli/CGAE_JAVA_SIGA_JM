@@ -1379,6 +1379,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							
 							facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturaIn(idFacturasPeticion);
 							
+							facturaExample.setOrderByClause("fechaEmision desc");
 
 							LOGGER.info(
 									"getFacturasPeticion() / facFacturaMapper.selectByExample() -> Entrada a facFacturaMapper para recuperar las posibles facturas asociadas a la peticion de compra");
@@ -1427,6 +1428,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtiposerviciosEqualTo(suscripcion.getIdtiposervicios())
 								.andIdservicioEqualTo(suscripcion.getIdservicio()).andIdserviciosinstitucionEqualTo(suscripcion.getIdserviciosinstitucion())
 								.andIdsuscripcionEqualTo(suscripcion.getIdsuscripcion());
+								
+								facturaExample.setOrderByClause("fechaInicio desc");
 							
 								LOGGER.info(
 										"getFacturasPeticion() / facFacturacionsuscripcionMapper.selectByExample() -> Entrada a facFacturacionsuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");

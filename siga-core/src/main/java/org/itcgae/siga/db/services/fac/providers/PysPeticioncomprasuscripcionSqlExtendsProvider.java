@@ -649,7 +649,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.LEFT_OUTER_JOIN("fac_facturacionSuscripcion factSusBis ON (factSusBis.idservicio = suscripcion.idservicio \r\n"
 				+ "and factSusBis.idTipoServicios = suscripcion.idTipoServicios and factSusBis.idServiciosInstitucion = suscripcion.idServiciosInstitucion \r\n"
 				+ "and factSusBis.idinstitucion = suscripcion.idinstitucion and factSusBis.idsuscripcion = suscripcion.idsuscripcion AND \r\n"
-			   + "(factSus.idfactura < factSusBis.idfactura))");
+			   + "(factSus.fechainicio < factSusBis.fechainicio))");
 		sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = factSus.idfactura \r\n"
 				+ "and fact.idinstitucion = suscripcion.idinstitucion");
 		
