@@ -8,7 +8,6 @@ import org.itcgae.siga.DTOs.scs.*;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +19,7 @@ public interface ICertificacionFacSJCSService {
 
     Resource getInformeCAM(String idFacturacion, String tipoFichero, HttpServletRequest request) throws Exception;
 
-    UpdateResponseDTO subirFicheroCAM(String idFacturacion, MultipartFile fichero, MultipartHttpServletRequest request);
+    UpdateResponseDTO subirFicheroCAM(MultipartHttpServletRequest request);
 
     CertificacionesDTO buscarCertificaciones(BusquedaRetencionesRequestDTO busquedaRetencionesRequestDTO, HttpServletRequest request);
 
