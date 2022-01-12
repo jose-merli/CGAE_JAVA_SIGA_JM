@@ -1,13 +1,12 @@
 package org.itcgae.siga.db.services.fcs.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.db.entities.FacAbono;
-import org.itcgae.siga.db.mappers.FacAbonoSqlProvider;
 import org.apache.log4j.Logger;
-import java.util.Date;
-import java.util.List;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
+import org.itcgae.siga.db.mappers.FacAbonoSqlProvider;
 
 
 public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{

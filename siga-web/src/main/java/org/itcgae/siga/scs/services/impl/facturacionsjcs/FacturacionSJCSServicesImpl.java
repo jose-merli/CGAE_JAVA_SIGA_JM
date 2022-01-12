@@ -1,8 +1,5 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,11 +10,9 @@ import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.TreeSet;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -32,11 +27,11 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.FacAbonoDTO;
-import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.DTOs.scs.DatosFacturacionAsuntoDTO;
 import org.itcgae.siga.DTOs.scs.DatosMovimientoVarioDTO;
 import org.itcgae.siga.DTOs.scs.DatosPagoAsuntoDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
@@ -120,7 +115,6 @@ import org.itcgae.siga.db.mappers.FcsHistoricoTipoactuacionMapper;
 import org.itcgae.siga.db.mappers.FcsHistoricoTipoasistcolegioMapper;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsPagosjgMapper;
-import org.itcgae.siga.db.mappers.FcsTrazaErrorEjecucionExtendsMapper;
 import org.itcgae.siga.db.mappers.FcsTrazaErrorEjecucionMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -253,7 +247,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     private FcsTrazaErrorEjecucionMapper fcsTrazaErrorEjecucionMapper;
 
     @Autowired
-    private FcsTrazaErrorEjecucionExtendsMapper fcsTrazaErrorEjecucionExtendsMapper;
+    private FacAbonoSJCSExtendsMapper facAbonoSJCSExtendsMapper;
 
     @Autowired
     private IFacturacionSJCSZombiService iFacturacionSJCSZombiService;

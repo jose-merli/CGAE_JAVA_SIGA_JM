@@ -46,4 +46,6 @@ public interface ICombosServices {
     ComboDTO comboFactNull(HttpServletRequest request);
 
     ComboDTO comboFactBaremos(HttpServletRequest request);
+    
+    ComboDTO comboGrupoFacturacion(HttpServletRequest request);
 }

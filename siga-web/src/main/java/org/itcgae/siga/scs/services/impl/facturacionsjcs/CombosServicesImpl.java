@@ -6,12 +6,14 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoSJCSExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsDestinatariosRetencionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsEstadosFacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsHitoGeneralExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsMovimientosvariosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsPagosjgExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupofacturacionExtendsMapper;
@@ -60,92 +62,6 @@ public class CombosServicesImpl implements ICombosServices {
 	
 	@Autowired
 	private FacAbonoSJCSExtendsMapper facAbonosjgExtendsMapper;
-
-	public ComboDTO comboFactEstados(HttpServletRequest request) {
-
-		LOGGER.info("comboFactEstados() -> Entrada del servicio para obtener los estados de las facturas");
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String idLenguaje;
-		ComboDTO comboEstadosFact = new ComboDTO();
-
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			LOGGER.info(
-					"comboFactEstados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info(
-					"comboFactEstados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
-				idLenguaje = usuario.getIdlenguaje();
-
-				LOGGER.info(
-						"comboFactEstados() / FcsEstadosFacturacionExtendsMapper.estadosFacturacion() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener los estados");
-				List<ComboItem> comboItems = fcsEstadosFacturacionExtendsMapper.estadosFacturacion(idLenguaje);
-				comboEstadosFact.setCombooItems(comboItems);
-				LOGGER.info(
-						"comboFactEstados() / FcsEstadosFacturacionExtendsMapper.estadosFacturacion() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener los estados");
-			} else {
-				LOGGER.warn(
-						"comboFactEstados() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-								+ dni + " e idInstitucion = " + idInstitucion);
-			}
-		} else {
-			LOGGER.warn("comboFactEstados() -> idInstitucion del token nula");
-		}
-
-		LOGGER.info("comboFactEstados() -> Salida del servicio para obtener los estados de las facturas");
-		return comboEstadosFact;
-	}
-
-	public ComboDTO comboFactConceptos(HttpServletRequest request) {
-		
-		LOGGER.info("comboFactConceptos() -> Entrada del servicio para obtener los conceptos de las facturas");
-		
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String idLenguaje;
-		ComboDTO comboEstadosFact = new ComboDTO();
-
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			LOGGER.info(
-					"comboFactConceptos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info(
-					"comboFactConceptos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
-				idLenguaje = usuario.getIdlenguaje();
-
-				LOGGER.info(
-						"comboFactConceptos() / FcsEstadosFacturacionExtendsMapper.estadosFacturacion() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener los estados");
-				List<ComboItem> comboItems = fcsHitoGeneralExtendsMapper.factConceptos(idLenguaje);
-				comboEstadosFact.setCombooItems(comboItems);
-				LOGGER.info(
-						"comboFactConceptos() / FcsEstadosFacturacionExtendsMapper.estadosFacturacion() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener los estados");
-			} else {
-				LOGGER.warn(
-						"comboFactConceptos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-								+ dni + " e idInstitucion = " + idInstitucion);
-			}
-		} else {
-			LOGGER.warn("comboFactConceptos() -> idInstitucion del token nula");
-		}
-
-		LOGGER.info("comboFactConceptos() -> Salida del servicio para obtener los conceptos de las facturas");
-		return comboEstadosFact;
-	}
 
 	@Override
 	public ComboDTO comboPagosColegio(HttpServletRequest request) {
