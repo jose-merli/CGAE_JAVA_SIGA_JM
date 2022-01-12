@@ -2320,7 +2320,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		return facturaLineaDTO;
 	}
-
+	
 	@Override
 	public FacturaLineaDTO getLineasAbono(String idAbono, HttpServletRequest request) throws Exception {
 		FacturaLineaDTO facturaLineaDTO = new FacturaLineaDTO();
