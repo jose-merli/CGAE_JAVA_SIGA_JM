@@ -1959,13 +1959,22 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		FacAbonoDTO facAbonoDTO = new FacAbonoDTO();
-		
+		String idLenguaje="";
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+        	AdmUsuarios usuario = usuarios.get(0);
+            usuario.setIdinstitucion(idInstitucion);
+            idLenguaje=usuario.getIdlenguaje();    
+            
 		if(null != idInstitucion) {
-	     /*            
-         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonos(facAbonoItem, idInstitucion.toString());
+	              
+         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem, idInstitucion.toString(), idLenguaje);
          facAbonoDTO.setListaFacAbonoItem(listaFacAbonosItem);    
-	    */
+	    
 		}
+	
 
 	    return facAbonoDTO;
 	}
