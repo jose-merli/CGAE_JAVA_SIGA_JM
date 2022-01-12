@@ -76,7 +76,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FacAbonoExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFicheroImpreso190ExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsPagoColegiadoExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IImpreso190Service;
