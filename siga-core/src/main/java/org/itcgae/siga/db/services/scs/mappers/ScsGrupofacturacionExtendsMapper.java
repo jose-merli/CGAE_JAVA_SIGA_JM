@@ -20,4 +20,11 @@ public interface ScsGrupofacturacionExtendsMapper extends ScsGrupofacturacionMap
 	})
 	List<ComboItem> getComboGrupoFacturacion(String idInstitucion, String idLenguaje);
 
+	@SelectProvider(type= ScsGrupofacturacionSqlExtendsProvider.class, method = "grupoFacturacionByColegios")
+	@Results({
+			@Result(column = "IDGRUPOFACTURACION", property="value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property="label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> grupoFacturacionByColegios(List<String> idColegios, String idLenguaje);
+
 }
