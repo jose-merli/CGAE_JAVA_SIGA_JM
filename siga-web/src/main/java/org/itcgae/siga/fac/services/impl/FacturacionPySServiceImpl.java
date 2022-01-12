@@ -1,26 +1,35 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
@@ -35,10 +44,6 @@ import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
-import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosDTO;
-import org.itcgae.siga.DTO.fac.FacPresentacionAdeudosItem;
-import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosDTO;
-import org.itcgae.siga.DTO.fac.FacRegenerarPresentacionAdeudosItem;
 import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
 import org.itcgae.siga.DTO.fac.FacRegistroFichContaDTO;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
@@ -71,6 +76,8 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
+import org.itcgae.siga.commons.utils.SIGAReferences;
+import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
@@ -125,8 +132,6 @@ import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
 import org.itcgae.siga.db.entities.FacPlantillafacturacion;
 import org.itcgae.siga.db.entities.FacPlantillafacturacionExample;
-import org.itcgae.siga.db.entities.FacPresentacionAdeudos;
-import org.itcgae.siga.db.entities.FacRegenerarPresentacionAdeudos;
 import org.itcgae.siga.db.entities.FacRegistrofichconta;
 import org.itcgae.siga.db.entities.FacRenegociacion;
 import org.itcgae.siga.db.entities.FacRenegociacionExample;
@@ -147,6 +152,8 @@ import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
@@ -158,6 +165,7 @@ import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -307,6 +315,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacPlantillafacturacionMapper facPlantillafacturacionMapper;
+
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -3148,68 +3159,169 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public UpdateResponseDTO actualizarFicheroAdeudos(FacDisquetecargos updateItem, HttpServletRequest request)
+	public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
+			throws Exception {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		insertResponseDTO.setError(error);
+
+		SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("nuevoFicheroAdeudos() -> Entrada al servicio para crear un fichero de adeudos");
+
+		if (usuario != null) {
+			// Comprobar los campos obligatorios
+			if ( Objects.nonNull(ficheroAdeudosItem.getFechaPresentacion())
+					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
+					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
+					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosCOR())
+					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
+				throw new Exception("general.message.camposObligatorios");
+			}
+
+			Object[] param_in = new Object[11]; // Parametros de entrada del PL
+
+			// Ruta del fichero
+			String pathFichero = getProperty("facturacion.directorioBancosOracle");
+
+			String sBarra = "";
+			if (pathFichero.indexOf("/") > -1) sBarra = "/";
+			if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
+			pathFichero += sBarra + usuario.getIdinstitucion().toString();
+
+			// Parámetros de entrada
+			param_in[0] = usuario.getIdinstitucion();
+			param_in[1] = ficheroAdeudosItem.getIdseriefacturacion();
+			param_in[2] = ficheroAdeudosItem.getIdprogramacion();
+			param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
+			param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
+			param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
+			param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
+			param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
+			param_in[8] = pathFichero;
+			param_in[9] = usuario.getIdusuario();
+			param_in[10] = usuario.getIdlenguaje();
+
+			String resultado[] = commons.callPLProcedureFacturacionPyS(
+					"{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
+
+			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
+			if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
+				throw new Exception(resultado[2]);
+			} else {
+				if (!resultado[1].equals("0")) {
+					throw new Exception("censo.fichaCliente.bancos.mandatos.error.generacionFicheros");
+				}
+			}
+			insertResponseDTO.setId(resultado[0]);
+		}
+
+		LOGGER.info("nuevoFicheroAdeudos() -> Salida del servicio para crear un fichero de adeudos");
+
+		return insertResponseDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO actualizarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
 			throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		updateResponseDTO.setError(error);
 
+		SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
+
 		// Conseguimos información del usuario logeado
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 
-		LOGGER.info("actualizarFicheroDevoluciones() -> Entrada al servicio para actualizar un fichero devoluciones");
+		LOGGER.info("actualizarFicheroAdeudos() -> Entrada al servicio para actualizar un fichero de adeudos");
 
 		if (usuario != null) {
-			// Clave primaria
-			FacDisquetecargosKey key = new FacDisquetecargosKey();
-			key.setIddisquetecargos(updateItem.getIddisquetecargos());
-			key.setIdinstitucion(usuario.getIdinstitucion());
+			// Comprobar los campos obligatorios
+			if ( Objects.nonNull(ficheroAdeudosItem.getFechaPresentacion())
+					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
+					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
+					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosCOR())
+					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
+				throw new Exception("general.message.camposObligatorios");
+			}
 
-			FacDisquetecargos record = facDisquetecargosExtendsMapper.selectByPrimaryKey(key);
+			Object[] param_in = new Object[9]; // Parametros de entrada del PL
 
-			if (updateItem.getBancosCodigo() != null)
-				record.setBancosCodigo(updateItem.getBancosCodigo());
-			if (updateItem.getFecharecibosb2b() != null)
-				record.setFecharecibosb2b(updateItem.getFecharecibosb2b());
-			if (updateItem.getFechareciboscor1() != null)
-				record.setFechareciboscor1(updateItem.getFechareciboscor1());
-			if (updateItem.getFecharecibosprimeros() != null)
-				record.setFecharecibosprimeros(updateItem.getFecharecibosprimeros());
-			if (updateItem.getFecharecibosrecurrentes() != null)
-				record.setFecharecibosrecurrentes(updateItem.getFecharecibosrecurrentes());
-			if (updateItem.getFechapresentacion() != null)
-				record.setFechapresentacion(updateItem.getFechapresentacion());
-			if (updateItem.getEssepa() != null)
-				record.setEssepa(updateItem.getEssepa());
-			if (updateItem.getFechacargo() != null)
-				record.setFechacargo(updateItem.getFechacargo());
-			if (updateItem.getFechacreacion() != null)
-				record.setFechacreacion(updateItem.getFechacreacion());
-			if (updateItem.getFechamodificacion() != null)
-				record.setFechamodificacion(updateItem.getFechamodificacion());
-			if (updateItem.getIdsufijo() != null)
-				record.setIdsufijo(updateItem.getIdsufijo());
-			if (updateItem.getNombrefichero() != null)
-				record.setNombrefichero(updateItem.getNombrefichero());
-			if (updateItem.getNumerolineas() != null)
-				record.setNumerolineas(updateItem.getNumerolineas());
-			if (updateItem.getUsumodificacion() != null)
-				record.setUsumodificacion(updateItem.getUsumodificacion());
-			if (updateItem.getIdprogramacion() != null)
-				record.setIdprogramacion(updateItem.getIdprogramacion());
-			if (updateItem.getIdseriefacturacion() != null)
-				record.setIdseriefacturacion(updateItem.getIdseriefacturacion());
-			if (updateItem.getIdsufijo() != null)
-				record.setIdsufijo(updateItem.getIdsufijo());
+			// Ruta del fichero
+			String pathFichero = getProperty("facturacion.directorioBancosOracle");
 
-			facDisquetecargosExtendsMapper.updateByPrimaryKey(record);
+			String sBarra = "";
+			if (pathFichero.indexOf("/") > -1) sBarra = "/";
+			if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
+			pathFichero += sBarra + usuario.getIdinstitucion().toString();
 
-			updateResponseDTO.setId(record.getIddisquetecargos().toString());
+			// Se borran todos os ficheros que contenga el identificador del fichero de abonos
+			File directorioFicheros = new File(pathFichero);
+			if (directorioFicheros.exists() && directorioFicheros.isDirectory()){
+				File[] ficheros = directorioFicheros.listFiles();
+				for (int x=0; x<ficheros.length; x++){
+					String nombreFichero = ficheros[x].getName();
+					if (nombreFichero.startsWith(ficheroAdeudosItem.getIdDisqueteCargos() + ".")) {
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+						nombreFichero = sdf.format(new Date()) + "_" + nombreFichero;
+
+						File newFile = new File(directorioFicheros, nombreFichero);
+						ficheros[x].renameTo(newFile);
+						// Se cambia el nombre del archivo para que no se interponga en la nueva generación
+					}
+				}
+			}
+
+			// Parámetros de entrada
+			param_in[0] = usuario.getIdinstitucion();
+			param_in[1] = ficheroAdeudosItem.getIdDisqueteCargos();
+			param_in[2] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
+			param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
+			param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
+			param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
+			param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
+			param_in[7] = pathFichero;
+			param_in[8] = usuario.getIdlenguaje();
+
+			String resultado[] = commons.callPLProcedureFacturacionPyS(
+					"{call PKG_SIGA_CARGOS.Regenerar_Presentacion(?,?,?,?,?,?,?,?,?,?,?)}", 2, param_in);
+
+			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
+			if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
+				throw new Exception(resultado[2]);
+			} else {
+				if (!resultado[1].equals("0")) {
+					throw new Exception("censo.fichaCliente.bancos.mandatos.error.generacionFicheros");
+				}
+			}
 		}
 
-		LOGGER.info("actualizarProgramacionFactura() -> Salida del servicio para actualizar un fichero devoluciones");
+		LOGGER.info("actualizarFicheroAdeudos() -> Salida del servicio para actualizar un fichero de adeudos");
 
 		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public DeleteResponseDTO eliminarFicheroAdeudos(FacDisquetecargos ficheroAdeudosItem, HttpServletRequest request)
+			throws Exception {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		deleteResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("deleteResponseDTO() -> Entrada al servicio para eliminar un fichero de adeudos");
+
+
+		LOGGER.info("deleteResponseDTO() -> Salida del servicio para eliminar un fichero de adeudos");
+
+		return deleteResponseDTO;
 	}
 
 	@Override
@@ -3302,125 +3414,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("actualizarProgramacionFactura() -> Salida del servicio para actualizar un fichero devoluciones");
 
 		return updateResponseDTO;
-	}
-
-	@Override
-	public FacPresentacionAdeudosDTO presentacionAdeudos(FacPresentacionAdeudosItem presAdeuItem,
-			HttpServletRequest request) throws Exception {
-		LOGGER.info("presentacionAdeudos() -> Entrada al servicio para presentar adeudos");
-
-		FacPresentacionAdeudosDTO presentacionAdeudosDTO = new FacPresentacionAdeudosDTO();
-		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
-		FacPresentacionAdeudos presAdeudos = new FacPresentacionAdeudos(presAdeuItem, usuario);
-		Error error = new Error();
-		error.setCode(0);
-		presentacionAdeudosDTO.setError(error);
-
-		try {
-
-			// facFacturaMapper.presentacionAdeudos(presAdeudos);
-
-//			@Update(value = "{CALL PKG_SIGA_CARGOS.PRESENTACION ("
-//					+ "#{idInstitucion,mode=IN},"
-//					+ "#{idSerieFacturacion, mode=IN},"
-//					+ "#{idProgramacion, mode=IN},"	
-//					+ "#{fechaPresentacion, mode=IN},"
-//					+ "#{fechaCargoFRST, mode=IN},"
-//					+ "#{fechaCargoRCUR, mode=IN},"
-//					+ "#{fechaCargoCOR1, mode=IN},"
-//					+ "#{fechaCargoB2B, mode=IN},"
-//					+ "#{pathFichero, mode=IN},"
-//					+ "#{idUsuarioModificacion, mode=IN},"
-//					+ "#{idIdioma, mode=IN, jdbcType=VARCHAR},"
-//					+ "#{nFicheros, mode=OUT, jdbcType=VARCHAR},"
-//					+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
-//					+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
-//			@Options(statementType = StatementType.CALLABLE)
-//			@ResultType(FacPresentacionAdeudos.class)
-//			void presentacionAdeudos(FacPresentacionAdeudos presAdeudos);
-
-			if (!presAdeudos.getCodRetorno().equals(RET_OK)) {
-				Integer ret;
-				try {
-					ret = Integer.valueOf(presAdeudos.getCodRetorno());
-				} catch (Exception e) {
-					ret = -3;
-				}
-				error.setCode(ret);
-				error.setDescription(presAdeudos.getDatosError());
-			} else {
-				// TODO: borrado de ficheros
-			}
-			List<FacPresentacionAdeudosItem> lPresAdeudo = new ArrayList<>();
-			presAdeuItem.setnFicheros(presAdeudos.getnFicheros());
-			lPresAdeudo.add(presAdeuItem);
-			presentacionAdeudosDTO.setFacPresentacionAdeudosItems(lPresAdeudo);
-		} catch (Exception e) {
-			error.setCode(-3);
-			error.setDescription("error:" + e);
-			;
-		}
-
-		LOGGER.info("presentacionAdeudos() -> Salida del servicio para presentar adeudos");
-
-		return presentacionAdeudosDTO;
-	}
-
-	@Override
-	public FacRegenerarPresentacionAdeudosDTO regenerarPresentacionAdeudos(
-			FacRegenerarPresentacionAdeudosItem regPresAdeuItem, HttpServletRequest request) throws Exception {
-		LOGGER.info("regenerarPresentacionAdeudos() -> Entrada al servicio para presentar adeudos");
-
-		FacRegenerarPresentacionAdeudosDTO presentacionAdeudosDTO = new FacRegenerarPresentacionAdeudosDTO();
-		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
-		FacRegenerarPresentacionAdeudos presAdeudos = new FacRegenerarPresentacionAdeudos(regPresAdeuItem, usuario);
-		Error error = new Error();
-		error.setCode(0);
-		presentacionAdeudosDTO.setError(error);
-
-		try {
-			// facFacturaMapper.regenerarPresentacionAdeudos(presAdeudos);
-
-//			@Update(value = "{CALL PKG_SIGA_CARGOS.REGENERAR_PRESENTACION ("
-//					+ "#{idInstitucion,mode=IN},"
-//					+ "#{idDisqueteCargos, mode=IN},"
-//					+ "#{fechaPresentacion, mode=IN},"
-//					+ "#{fechaCargoFRST, mode=IN},"
-//					+ "#{fechaCargoRCUR, mode=IN},"
-//					+ "#{fechaCargoCOR1, mode=IN},"
-//					+ "#{fechaCargoB2B, mode=IN},"
-//					+ "#{pathFichero, mode=IN},"
-//					+ "#{idIdioma, mode=IN, jdbcType=VARCHAR},"
-//					+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
-//					+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
-//			@Options(statementType = StatementType.CALLABLE)
-//			@ResultType(FacRegenerarPresentacionAdeudos.class)
-//			void regenerarPresentacionAdeudos(FacRegenerarPresentacionAdeudos presAdeudos);
-
-			if (!presAdeudos.getCodRetorno().equals(RET_OK)) {
-				Integer ret;
-				try {
-					ret = Integer.valueOf(presAdeudos.getCodRetorno());
-				} catch (Exception e) {
-					ret = -3;
-				}
-				error.setCode(ret);
-				error.setDescription(presAdeudos.getDatosError());
-			} else {
-				// TODO: borrado de ficheros
-			}
-			List<FacRegenerarPresentacionAdeudosItem> lPresAdeudo = new ArrayList<>();
-			lPresAdeudo.add(regPresAdeuItem);
-			presentacionAdeudosDTO.setFacRegenerarPresentacionAdeudosItems(lPresAdeudo);
-		} catch (Exception e) {
-			error.setCode(-3);
-			error.setDescription("error:" + e);
-			;
-		}
-
-		LOGGER.info("regenerarPresentacionAdeudos() -> Salida del servicio para regenerar presentación adeudos");
-
-		return presentacionAdeudosDTO;
 	}
 
 	@Override
@@ -3716,6 +3709,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return fac;
 	}
 
+	private String getProperty(String parametro) {
+		GenPropertiesKey keyProperties = new GenPropertiesKey();
+		keyProperties.setFichero("SIGA");
+		keyProperties.setParametro(parametro);
+		GenProperties property = genPropertiesMapper.selectByPrimaryKey(keyProperties);
+		return property != null ? property.getValor() : "";
+	}
+
 	private Short string2Short(String val) {
 		return val != null ? Short.valueOf(val) : null;
 	}
@@ -3859,55 +3860,86 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	public ResponseEntity<InputStreamResource> descargarFichaFacturacion(String idFactura, HttpServletRequest request) throws Exception {
-
+	public ResponseEntity<InputStreamResource> descargarFicheroAdeudos(List<FicherosAdeudosItem> ficheroAdeudosItems, HttpServletRequest request) throws Exception {
 		ResponseEntity<InputStreamResource> res = null;
-		InformeFacturacionDTO informeFacturacionDTO = new InformeFacturacionDTO();
-		Vector<Hashtable<String, Object>> datosVector = new Vector<Hashtable<String, Object>>();
-		Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
-		List<EstadosPagosItem> items;
-		Error error = new Error();
-		AdmUsuarios usuario = new AdmUsuarios();
 
-		LOGGER.info("getInformeFacturacion() -> Entrada al servicio para recuperar el listado facturas con facturacion");
+		String directorioFisico = "facturacion.directorioFisicoPagosBancosJava";
+		String directorio = "facturacion.directorioPagosBancosJava";
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("descargarFicheroAdeudos() -> Entrada al servicio para descargar ficheros de adeudos");
+
+		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+				+ File.separator + usuario.getIdinstitucion();
+
+		List<File> listaFicheros = ficheroAdeudosItems.stream().map(item -> {
+			FacDisquetecargosKey key = new FacDisquetecargosKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIddisquetecargos(Long.parseLong(item.getIdDisqueteCargos()));
+			FacDisquetecargos disquetecargos = facDisquetecargosExtendsMapper.selectByPrimaryKey(key);
+
+			File file = null;
+			if (Objects.nonNull(disquetecargos)) {
+				String nombreFichero = pathFichero + File.separator + disquetecargos.getNombrefichero();
+				file = new File(nombreFichero);
+			}
+
+			return file;
+		}).filter(Objects::nonNull).collect(Collectors.toList());
+
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
+				MediaType.parseMediaType("application/vnd.ms-excel"),
+				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_ADEUDOS");
+
+		LOGGER.info("descargarFicheroAdeudos() -> Salida del servicio para descargar ficheros de adeudos");
+
+		return res;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> descargarFichaFacturacion(List<FacFacturacionprogramadaItem> facturacionItems, HttpServletRequest request)throws Exception {
+		ResponseEntity<InputStreamResource> res = null;
+		AdmUsuarios usuario = null;
+
+		LOGGER.info("descargarFichaFacturacion() -> Entrada al servicio para recuperar el archivo de LOG de la facturación");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
+		Short idInstitucion = usuario.getIdinstitucion();
 
-		if (usuario != null) {
-			LOGGER.info("getFacturacionesProgramadas() / facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas() -> Entrada a facFacturacionprogramadaExtendsMapper para obtener el listado de facturaciones programadas");
-			items = facHistoricofacturaExtendsMapper.getFacturacionLog(idFactura, String.valueOf(usuario.getIdinstitucion()), usuario.getIdlenguaje());
+		String directorioFisico = "facturacion.directorioFisicoPrevisionesJava";
+		String directorio = "facturacion.directorioPrevisionesJava";
 
-			for (EstadosPagosItem i : items) {
+		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+				+ File.separator + usuario.getIdinstitucion();
 
-				datosHashtable = new Hashtable<String, Object>();
+		// Lista de ficheros de facturaciones programadas
+		List<File> listaFicheros = facturacionItems.stream().map(item -> {
+			FacFacturacionprogramadaKey key = new FacFacturacionprogramadaKey();
+			key.setIdinstitucion(idInstitucion);
+			key.setIdseriefacturacion(string2Long(item.getIdSerieFacturacion()));
+			key.setIdprogramacion(string2Long(item.getIdProgramacion()));
+			FacFacturacionprogramada facturacion = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
 
-				datosHashtable.put("FECHA", i.getFechaModificaion().toString());
-				datosHashtable.put("ACCION", i.getAccion());
-				datosHashtable.put("ESTADO", i.getEstado());
-				datosVector.add(datosHashtable);
+			File file = null;
+			if (Objects.nonNull(facturacion)) {
+				String nombreFichero = pathFichero + File.separator + facturacion.getNombrefichero();
+				file = new File(nombreFichero);
 			}
 
-			File file = createExcelFile(Arrays.asList("FECHA", "ACCION", "ESTADO"), datosVector);
+			return file;
+		}).filter(Objects::nonNull).collect(Collectors.toList());
 
-			InputStream fileStream = null;
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
+				MediaType.parseMediaType("application/vnd.ms-excel"),
+				MediaType.parseMediaType("application/zip"), "LOG_FACTURACION");
 
-			try {
-				fileStream = new FileInputStream(file);
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
 
-				headers.setContentLength(file.length());
-				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,	HttpStatus.OK);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		informeFacturacionDTO.setError(error);
-
-		LOGGER.info("getFacturacionesProgramadas() -> Salida del servicio para obtener el listado de facturaciones programadas");
+		LOGGER.info("descargarFichaFacturacion() -> Salida del servicio para obtener el archivo de LOG de la facturación");
 
 		return res;
 	}

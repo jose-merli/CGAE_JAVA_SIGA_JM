@@ -1,15 +1,35 @@
 package org.itcgae.siga.commons.utils;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.exception.BusinessException;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import javax.mail.internet.ContentDisposition;
+import javax.mail.internet.ParameterList;
 
 public class SIGAServicesHelper {
 
-public static void uploadFichero(String pathDirectorio,String nombreFichero,byte [] bytesFichero) throws BusinessException{	
+	private static Logger LOGGER = Logger.getLogger(SIGAServicesHelper.class);
+
+	public static void uploadFichero(String pathDirectorio,String nombreFichero,byte [] bytesFichero) throws BusinessException{
 	File directorio = new File(pathDirectorio);
 	if(!directorio.exists()) 
 		directorio.mkdirs();
@@ -40,4 +60,95 @@ public static void uploadFichero(String pathDirectorio,String nombreFichero,byte
 		    theBAOS = null;
 		}
 	}
+
+	public static InputStreamResource doZipToDownload(List<File> list) throws BusinessException {
+		InputStreamResource result = null;
+
+		ByteArrayOutputStream byteArrayOutputStream;
+		BufferedOutputStream bufferedOutputStream;
+		ZipOutputStream zipOutputStream = null;
+
+		try {
+			if (list != null && list.size() > 0) {
+
+				byteArrayOutputStream = new ByteArrayOutputStream();
+				bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+				zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+				for (File baos : list) {
+					if (baos.exists()) {
+						ZipEntry ze = new ZipEntry(baos.getName());
+						zipOutputStream.putNextEntry(ze);
+						FileInputStream fis = new FileInputStream(baos);
+
+						// Copia del fichero al zip
+						IOUtils.copy(fis, zipOutputStream);
+
+						zipOutputStream.flush();
+						fis.close();
+						zipOutputStream.closeEntry();
+					}
+				}
+
+				zipOutputStream.close();
+
+				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+				result = new InputStreamResource(byteArrayInputStream);
+			}
+
+		} catch (Exception e) {
+			throw new BusinessException("Error al crear fichero zip", e);
+		} finally {
+			try {
+				if (zipOutputStream != null) {
+					zipOutputStream.close();
+				}
+			} catch (Exception eee) {
+			}
+		}
+
+		return result;
+	}
+
+	public static ResponseEntity<InputStreamResource> descargarFicheros(List<File> listaFicheros, MediaType fileContentType, MediaType zipContentType, String zipName) {
+		ResponseEntity<InputStreamResource> res = null;
+
+		if (listaFicheros != null && !listaFicheros.isEmpty()) {
+			if (listaFicheros.size() == 1) {
+				LOGGER.info("descargarFicheros() -> Entrada al servicio para recuperar un único archivo");
+
+				try {
+					FileInputStream fileInputStream = new FileInputStream(listaFicheros.get(0));
+
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(fileContentType);
+					headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + listaFicheros.get(0).getName());
+					headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileInputStream), headers, HttpStatus.OK);
+				} catch (FileNotFoundException e) {
+					throw new BusinessException("messages.general.error.ficheroNoExiste");
+				}
+
+				LOGGER.info("descargarFicheros() -> Saliendo servicio para recuperar un único archivo");
+			} else {
+				LOGGER.info("descargarFicheros() -> Entrada al servicio para recuperar varios archivos");
+
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(zipContentType);
+				headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
+				headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+				res = new ResponseEntity<InputStreamResource>(SIGAServicesHelper.doZipToDownload(listaFicheros), headers, HttpStatus.OK);
+
+				LOGGER.info("descargarFicheros() -> Saliendo servicio para recuperar varios archivos");
+			}
+
+		} else {
+			throw new BusinessException("messages.general.error.ficheroNoExiste");
+		}
+
+		return res;
+	}
+
 }
