@@ -21,6 +21,7 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenHistorico;
@@ -307,6 +308,28 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 			insertaCenHistorico(cenComponentesPosterior.getIdpersona(),
 					SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_COMPONENTES, getDescripcionCenComponentes(
 							cenComponentesAnterior, cenComponentesPosterior, accion),
+					request, motivo);
+		case "DELETE":
+			// (NO SE HACE PORQUE EXISTE HISTÓRICO)
+			break;
+		default:
+			break;
+		}
+	}
+	
+	@Override
+	public void manageAuditoriaEstados(CenDatoscolegialesestado estadoAnterior, CenDatoscolegialesestado estadoPosterior,
+			String accion, HttpServletRequest request,
+			String motivo, CEN_TIPOCAMBIO tipoCambio, Long idPersona) {
+		switch (accion) {
+		case "UPDATE":
+			insertaCenHistorico(idPersona,
+					tipoCambio, getDescripcionEstados(estadoAnterior, estadoPosterior, accion),
+					request, motivo);
+			break;
+		case "INSERT":
+			insertaCenHistorico(idPersona,
+					tipoCambio, getDescripcionEstados(estadoAnterior, estadoPosterior, accion),
 					request, motivo);
 		case "DELETE":
 			// (NO SE HACE PORQUE EXISTE HISTÓRICO)
@@ -975,6 +998,38 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 			addDato(sb, "Provincia", cenComponentes.getIdprovincia());
 			addDato(sb, "Sociedad", cenComponentes.getSociedad());
 			addDato(sb, "Tipo colegio", cenComponentes.getIdtipocolegio());
+		}
+
+	}
+
+	private String getDescripcionEstados(CenDatoscolegialesestado estadoAnterior, CenDatoscolegialesestado estadoPosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionEstados(sb, estadoAnterior, "REGISTRO ANTERIOR");
+			getDescripcionEstados(sb, estadoPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionEstados(sb, estadoPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionEstados(sb, estadoPosterior, "REGISTRO ELIMINADO"); // no necesario
+			break;
+		default:
+			break;
+		}
+
+		return sb.toString();
+	}
+	
+	private void getDescripcionEstados(StringBuffer sb, CenDatoscolegialesestado estado,
+			String cabecera) {
+		if (estado != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Fechaestado", estado.getFechaestado());
+			addDato(sb, "Idestado", estado.getIdestado());
+			addDato(sb, "Observaciones", estado.getObservaciones());
 		}
 
 	}

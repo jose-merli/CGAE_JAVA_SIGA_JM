@@ -5,10 +5,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.CEN_TIPOCAMBIO;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenNocolegiado;
@@ -37,5 +39,8 @@ public interface IAuditoriaCenHistoricoService {
 
 	public void manageAuditoriaComponentes(CenComponentes cenComponentesAnterior, CenComponentes cenComponentesPosterior,
 			String accion, HttpServletRequest request, String motivo);
+
+	public void manageAuditoriaEstados(CenDatoscolegialesestado estadoAnterior, CenDatoscolegialesestado estadoPosterior,
+			String accion, HttpServletRequest request, String motivo, CEN_TIPOCAMBIO tipoCambio, Long idPersona);
 }
 

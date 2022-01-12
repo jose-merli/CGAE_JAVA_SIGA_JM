@@ -91,6 +91,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTipocolegiacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoidentificacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposolicitudExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
+import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -181,6 +182,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -778,6 +782,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						}else {
 							LOGGER.info(
 									"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+							
+							// AUDITORIA si se dió de alta correctamente
+							auditoriaCenHistoricoService.insertaCenHistorico(idPersona, SigaConstants.CEN_TIPOCAMBIO.ALTA_COLEGIACION,
+									"Alta de colegiacion", request, solIncorporacion.getObservaciones());
 						}
 						/*
 						Object[] paramMandatos = new Object[5];
