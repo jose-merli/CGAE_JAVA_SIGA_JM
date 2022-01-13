@@ -120,7 +120,11 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //facturacion
         if (item.getFacturacion() != null) {
-            facturas.WHERE("f.idprogramacion=" + item.getFacturacion());
+            String[] facturacion = item.getFacturacion().split("-");
+            if (facturacion.length == 2) {
+                facturas.WHERE("f.idprogramacion=" + facturacion[0].trim());
+                facturas.WHERE("f.idseriefacturacion=" + facturacion[1].trim());
+            }
         }
 
         //importe adeudado
@@ -221,5 +225,51 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         query.WHERE("F.IDINSTITUCION ="+idInstitucion);
 
         return query.toString();
+    }
+
+
+    public String getInformeFacturacionActual(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje) {
+        SQL sql = new SQL();
+
+        // Select
+        sql.SELECT("'ACTUAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION, "+ idLenguaje+") AS formaPago,"
+                +"COUNT(*) AS numeroFacturas, SUM(ff.IMPTOTAL) AS total, SUM(ff.IMPTOTALPORPAGAR) AS totalPendiente");
+
+        // From
+        sql.FROM("FAC_FACTURA ff");
+        sql.INNER_JOIN("PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
+
+        // Where
+        sql.WHERE("ff.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("ff.IDSERIEFACTURACION = " + idSerieFacturacion);
+        sql.WHERE("ff.IDPROGRAMACION = " + idProgramacion);
+
+        // Order by
+        sql.GROUP_BY("pf.DESCRIPCION");
+
+        return sql.toString();
+    }
+
+    public String getInformeFacturacionOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje) {
+        SQL sql = new SQL();
+
+        // Select
+        sql.SELECT("'ORIGINAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION, "+ idLenguaje+") AS formaPago,"
+                +"COUNT(*) AS numeroFacturas, SUM(fh.IMPTOTALPAGADO) AS total, SUM(fh.IMPTOTALPORPAGAR) AS totalPendiente");
+
+        // From
+        sql.FROM("FAC_FACTURA ff");
+        sql.INNER_JOIN("FAC_HISTORICOFACTURA fh ON (ff.IDINSTITUCION = fh.IDINSTITUCION AND ff.IDFACTURA = fh.IDFACTURA AND fh.IDHISTORICO = 1)");
+        sql.INNER_JOIN("PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
+
+        // Where
+        sql.WHERE("ff.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("ff.IDSERIEFACTURACION = " + idSerieFacturacion);
+        sql.WHERE("ff.IDPROGRAMACION = " + idProgramacion);
+
+        // Order by
+        sql.GROUP_BY("pf.DESCRIPCION");
+
+        return sql.toString();
     }
 }

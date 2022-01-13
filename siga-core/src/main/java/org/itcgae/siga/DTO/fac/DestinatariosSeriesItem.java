@@ -7,6 +7,7 @@ public class DestinatariosSeriesItem {
 	private String idPersona;
 	private String idSerieFacturacion;
 	private String idInstitucion;
+	private String numeroInstitucion;
 	private String nombre;
 	private String apellido1;
 	private String apellido2;
@@ -96,6 +97,14 @@ public class DestinatariosSeriesItem {
 		this.idInstitucion = idInstitucion;
 	}
 
+	public String getNumeroInstitucion() {
+		return numeroInstitucion;
+	}
+
+	public void setNumeroInstitucion(String numeroInstitucion) {
+		this.numeroInstitucion = numeroInstitucion;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -104,6 +113,7 @@ public class DestinatariosSeriesItem {
 		return Objects.equals(idPersona, that.idPersona) &&
 				Objects.equals(idSerieFacturacion, that.idSerieFacturacion) &&
 				Objects.equals(idInstitucion, that.idInstitucion) &&
+				Objects.equals(numeroInstitucion, that.numeroInstitucion) &&
 				Objects.equals(nombre, that.nombre) &&
 				Objects.equals(apellido1, that.apellido1) &&
 				Objects.equals(apellido2, that.apellido2) &&
@@ -115,7 +125,7 @@ public class DestinatariosSeriesItem {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idPersona, idSerieFacturacion, idInstitucion, nombre, apellido1, apellido2, nif, movil, correoElectronico, domicilio);
+		return Objects.hash(idPersona, idSerieFacturacion, idInstitucion, numeroInstitucion, nombre, apellido1, apellido2, nif, movil, correoElectronico, domicilio);
 	}
 
 	@Override
@@ -124,6 +134,7 @@ public class DestinatariosSeriesItem {
 				"idPersona='" + idPersona + '\'' +
 				", idSerieFacturacion='" + idSerieFacturacion + '\'' +
 				", idInstitucion='" + idInstitucion + '\'' +
+				", numeroInstitucion='" + numeroInstitucion + '\'' +
 				", nombre='" + nombre + '\'' +
 				", apellido1='" + apellido1 + '\'' +
 				", apellido2='" + apellido2 + '\'' +

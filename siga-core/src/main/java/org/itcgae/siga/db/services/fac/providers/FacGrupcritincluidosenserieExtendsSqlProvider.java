@@ -19,6 +19,7 @@ public class FacGrupcritincluidosenserieExtendsSqlProvider extends FacGrupcritin
 		sql.SELECT("con.descripcion");
 		sql.SELECT("con.observaciones");
 		sql.SELECT("con.tipoconsulta");
+		sql.SELECT("con.idmodulo");
 		sql.SELECT("con.idclasecomunicacion");
 		sql.SELECT("con.idobjetivo");
 		sql.SELECT("con.sentencia");

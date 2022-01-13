@@ -5,8 +5,10 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacFacturaExtendsSqlProvider;
+import org.itcgae.siga.db.services.fac.providers.FacFacturacionprogramadaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -76,4 +78,25 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturaItem> getFactura(String idFactura, String idInstitucion);
+
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getInformeFacturacionActual")
+	@Results({
+			@Result(column = "momento", property = "momento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "formaPago", property = "formaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numeroFacturas", property = "numeroFacturas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "totalPendiente", property = "totalPendiente", jdbcType = JdbcType.VARCHAR)
+	})
+	List<InformeFacturacionItem> getInformeFacturacionActual(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getInformeFacturacionOriginal")
+	@Results({
+			@Result(column = "momento", property = "momento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "formaPago", property = "formaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numeroFacturas", property = "numeroFacturas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "totalPendiente", property = "totalPendiente", jdbcType = JdbcType.VARCHAR)
+	})
+	List<InformeFacturacionItem> getInformeFacturacionOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje);
 }

@@ -21,5 +21,5 @@ public interface ScsActacomisionExtendsMapper extends ScsActacomisionMapper {
 			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 
 	})
-	List<ComboItem> getActaAnnio(String idInstitucion, String idActa, String anioActa);
+	List<ComboItem> getActaAnnio(String idInstitucion);
 }

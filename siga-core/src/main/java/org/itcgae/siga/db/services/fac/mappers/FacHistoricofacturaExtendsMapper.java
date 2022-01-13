@@ -2,6 +2,8 @@ package org.itcgae.siga.db.services.fac.mappers;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.DeleteProvider;
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -38,4 +40,20 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 			@Result(column = "NOTAACCION", property = "notaAccion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<EstadosPagosItem> getEstadosPagos(String idFactura, String idInstitucion, String idLenguaje);
+
+	@SelectProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "getFacturacionLog")
+	@Results({
+			@Result(column = "FECHA", property = "fechaModificaion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ACCION", property = "accion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
+	})
+	List<EstadosPagosItem> getFacturacionLog(String idFactura, String idInstitucion, String idLenguaje);
+	
+	@InsertProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "insertarHistoricoFacParametros")
+    int insertarHistoricoFacParametros(String idInstitucion, String idFactura, Integer idTipoAccion,
+                                       Integer idPagoPorCaja, Integer idDisqueteCargos, Integer idFacturaIncluidaEnDisquete,
+                                       Integer idDisqueteDevoluciones, String idRecibo, Integer idRenegociacion, Integer idAbono, String comisionIdFactura);
+
+    @DeleteProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "deleteDeshacerCierre")
+    int deleteDeshacerCierre(Short idInstitucion, List<Integer> idPagos);
 }

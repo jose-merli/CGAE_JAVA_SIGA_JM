@@ -82,7 +82,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 	
 	@Autowired
 	AdmRolExtendsMapper admRol;
-
+	
 	@Override
 	public UserDetails loadUserByUsername(String dni) throws UsernameNotFoundException {
 
@@ -451,4 +451,5 @@ public class SigaUserDetailsService implements UserDetailsService {
         return true;
 
     }
+		
 }
