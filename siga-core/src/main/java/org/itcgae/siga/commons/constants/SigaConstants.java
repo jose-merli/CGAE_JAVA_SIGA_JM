@@ -770,7 +770,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final Integer CURSO_ARCHIVADO = 1;
 
-	public static final long EMITIR_CERTIFICADO = 1;
+	public static final Long EMITIR_CERTIFICADO = new Long("1");
 	
 	public static final Short DESIGNAR_TUTOR = 0; 
 	public static final Short ASIGNAR_TUTOR = 1; 
