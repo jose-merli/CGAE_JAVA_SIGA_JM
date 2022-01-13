@@ -3010,12 +3010,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
 
 
-<<<<<<< HEAD
 		//Obtener ID Disquete Devoluciones
 		String resultado[] = null;
-=======
-		String[] resultado = null;
->>>>>>> bded6587e4b913628c227ce675b87e27157a440c
 
 		Object[] param_in = new Object[2]; // Parametros de entrada del PL
 
