@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class FacAbonoItem {
 	
-	private Long idAdono;
+	private Long idAbono;
 	private String motivos;
 	private Date fechaEmision;
 	private Date fechaEmisionDesde;
@@ -83,10 +83,10 @@ public class FacAbonoItem {
 		this.esSociedad = esSociedad;
 	}
 	public Long getIdAdono() {
-		return idAdono;
+		return idAbono;
 	}
 	public void setIdAdono(Long idAdono) {
-		this.idAdono = idAdono;
+		this.idAbono = idAdono;
 	}
 	public String getMotivos() {
 		return motivos;

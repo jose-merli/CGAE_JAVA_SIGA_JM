@@ -19,7 +19,7 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		  
-		sql.SELECT("A.NUMEROABONO,A.FECHA,A.IDPERSONA,A.IMPTOTALABONADO, A.IMPPENDIENTEPORABONAR,A.ESTADO");
+		sql.SELECT("A.IDABONO, A.NUMEROABONO,A.FECHA,A.IDPERSONA,A.IMPTOTALABONADO, A.IMPPENDIENTEPORABONAR,A.ESTADO");
 		sql.SELECT("nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' || p.nombre, p.nombre) nombreCompleto");
 		sql.SELECT("P.NOMBRE as NOMBREGENERAL ,P.APELLIDOS1 || ' ' || NVL(P.APELLIDOS2, '') AS APELLIDOSGENERAL");
 		sql.SELECT("A.IMPTOTAL, A.IMPTOTALABONADOEFECTIVO, A.IMPTOTALABONADOPORBANCO, A.IMPTOTALNETO");
