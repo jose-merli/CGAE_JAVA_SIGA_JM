@@ -926,7 +926,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 				item.setLabel(parametros.get(0).getValor());
 			} else {
-				item.setLabel("0");
+				item.setLabel("7");
 			}
 
 			comboItems.add(item);
@@ -944,7 +944,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
 			} else {
-				item.setLabel("0");
+				item.setLabel("4");
 			}
 
 			comboItems.add(item);
@@ -962,7 +962,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
 			} else {
-				item.setLabel("0");
+				item.setLabel("3");
 			}
 
 			comboItems.add(item);
@@ -980,7 +980,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
 			} else {
-				item.setLabel("0");
+				item.setLabel("3");
 			}
 
 			comboItems.add(item);

@@ -177,7 +177,7 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO actualizarFicheroDevoluciones(FacDisquetedevoluciones updateItem,
 			HttpServletRequest request) throws Exception;
 
-    public DeleteResponseDTO eliminarFicheroAdeudos(FacDisquetecargos ficheroAdeudosItem, HttpServletRequest request)
+    public DeleteResponseDTO eliminarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
             throws Exception;
 
     public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request)
