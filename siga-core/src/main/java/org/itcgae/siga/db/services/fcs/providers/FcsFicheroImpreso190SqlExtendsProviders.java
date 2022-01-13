@@ -32,7 +32,7 @@ public class FcsFicheroImpreso190SqlExtendsProviders extends FcsFicheroImpreso19
 		if(!UtilidadesString.esCadenaVacia(anios)) {
 			sql.WHERE("ANIO in (" + anios + ")");
 		}
-		
+		sql.ORDER_BY("FECHAGENERARION DESC");
 		return sql.toString();
 	}
 	
