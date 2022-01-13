@@ -2358,8 +2358,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					servicioSolicitado.setIdservicio((long) servicio.getIdServicio());
 					servicioSolicitado.setIdtiposervicios((short) servicio.getIdTipoServicios());
 					servicioSolicitado.setIdserviciosinstitucion((long) servicio.getIdServiciosInstitucion());
-					servicioSolicitado.setIdpreciosservicios(Short.valueOf(servicio.getIdPrecioServicio()));
-					servicioSolicitado.setIdperiodicidad(Short.valueOf(servicio.getIdPeriodicidad()));
+					if(servicio.getIdPrecioServicio() != null) {
+						servicioSolicitado.setIdpreciosservicios(Short.valueOf(servicio.getIdPrecioServicio()));
+						servicioSolicitado.setIdperiodicidad(Short.valueOf(servicio.getIdPeriodicidad()));
+					}
+					else {
+						servicioSolicitado.setIdpreciosservicios(null);
+						servicioSolicitado.setIdperiodicidad(null);
+					}
 					
 					//REVISAR: 
 					servicioSolicitado.setAceptado("A");
