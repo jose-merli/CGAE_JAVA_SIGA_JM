@@ -3010,8 +3010,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
 
 
+<<<<<<< HEAD
 		//Obtener ID Disquete Devoluciones
 		String resultado[] = null;
+=======
+		String[] resultado = null;
+>>>>>>> bded6587e4b913628c227ce675b87e27157a440c
 
 		Object[] param_in = new Object[2]; // Parametros de entrada del PL
 
@@ -3369,11 +3373,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			// Comprobar los campos obligatorios
-			if ( Objects.nonNull(ficheroAdeudosItem.getFechaPresentacion())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosCOR())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
+			if ( Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
 				throw new Exception("general.message.camposObligatorios");
 			}
 
@@ -3389,8 +3393,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			// Parámetros de entrada
 			param_in[0] = usuario.getIdinstitucion();
-			param_in[1] = ficheroAdeudosItem.getIdseriefacturacion();
-			param_in[2] = ficheroAdeudosItem.getIdprogramacion();
+			param_in[1] = Objects.nonNull(ficheroAdeudosItem.getIdseriefacturacion()) ? ficheroAdeudosItem.getIdseriefacturacion() : "";
+			param_in[2] = Objects.nonNull(ficheroAdeudosItem.getIdprogramacion()) ? ficheroAdeudosItem.getIdprogramacion() : "";
 			param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
 			param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
 			param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
@@ -3400,7 +3404,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			param_in[9] = usuario.getIdusuario();
 			param_in[10] = usuario.getIdlenguaje();
 
-			String resultado[] = commons.callPLProcedureFacturacionPyS(
+			String[] resultado = commons.callPLProcedureFacturacionPyS(
 					"{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
 
 			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
@@ -3436,11 +3440,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			// Comprobar los campos obligatorios
-			if ( Objects.nonNull(ficheroAdeudosItem.getFechaPresentacion())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosCOR())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
+			if (Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
 				throw new Exception("general.message.camposObligatorios");
 			}
 
@@ -3482,12 +3486,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			param_in[7] = pathFichero;
 			param_in[8] = usuario.getIdlenguaje();
 
-			String resultado[] = commons.callPLProcedureFacturacionPyS(
+			String[] resultado = commons.callPLProcedureFacturacionPyS(
 					"{call PKG_SIGA_CARGOS.Regenerar_Presentacion(?,?,?,?,?,?,?,?,?,?,?)}", 2, param_in);
 
 			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
-			if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
-				throw new Exception(resultado[2]);
+			if (Arrays.asList(codigosErrorFormato).contains(resultado[0])) {
+				throw new Exception(resultado[1]);
 			} else {
 				if (!resultado[1].equals("0")) {
 					throw new Exception("censo.fichaCliente.bancos.mandatos.error.generacionFicheros");
@@ -3502,7 +3506,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public DeleteResponseDTO eliminarFicheroAdeudos(FacDisquetecargos ficheroAdeudosItem, HttpServletRequest request)
+	public DeleteResponseDTO eliminarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
 			throws Exception {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
@@ -4075,24 +4079,39 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
 				+ File.separator + usuario.getIdinstitucion();
 
-		List<File> listaFicheros = ficheroAdeudosItems.stream().map(item -> {
+		List<File> listaFicheros = ficheroAdeudosItems.stream().flatMap(item -> {
 			FacDisquetecargosKey key = new FacDisquetecargosKey();
 			key.setIdinstitucion(usuario.getIdinstitucion());
 			key.setIddisquetecargos(Long.parseLong(item.getIdDisqueteCargos()));
 			FacDisquetecargos disquetecargos = facDisquetecargosExtendsMapper.selectByPrimaryKey(key);
 
-			File file = null;
+			List<File> files = new ArrayList<>();
 			if (Objects.nonNull(disquetecargos)) {
-				String nombreFichero = pathFichero + File.separator + disquetecargos.getNombrefichero();
-				file = new File(nombreFichero);
+				String nombreFichero = disquetecargos.getNombrefichero();
+				File directorioFicheros = new File(pathFichero);
+
+				// Se buscan todos los ficheros que coincidan con el nombre del fichero
+				if (directorioFicheros.exists()) {
+					File[] ficheros = directorioFicheros.listFiles();
+					String nombreFicheroListadoSinExtension, nombreFicheroGeneradoSinExtension;
+					for (File file: ficheros){
+						nombreFicheroListadoSinExtension = (file.getName().indexOf(".") > 0)
+								? file.getName().substring(0, file.getName().indexOf(".")) : file.getName();
+						nombreFicheroGeneradoSinExtension = (nombreFichero.indexOf(".") > 0)
+								? nombreFichero.substring(0, nombreFichero.indexOf(".")) : nombreFichero;
+						if(nombreFicheroGeneradoSinExtension.equalsIgnoreCase(nombreFicheroListadoSinExtension)){
+							files.add(file);
+						}
+					}
+				}
 			}
 
-			return file;
+			return files.stream();
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 
 		// Construcción de la respuesta para uno o más archivos
 		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
-				MediaType.parseMediaType("application/vnd.ms-excel"),
+				MediaType.parseMediaType("application/octet-stream"),
 				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_ADEUDOS");
 
 		LOGGER.info("descargarFicheroAdeudos() -> Salida del servicio para descargar ficheros de adeudos");
