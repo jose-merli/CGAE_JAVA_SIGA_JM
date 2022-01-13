@@ -3,14 +3,17 @@ package org.itcgae.siga.db.services.fac.mappers;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.mappers.FacAbonoMapper;
 import org.itcgae.siga.db.services.fac.providers.FacAbonoExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -76,4 +79,22 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getNewAbonoID(String idInstitucion);
+	
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNuevoID")
+    Long getNuevoID(String idInstitucion);
+
+    @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getIdAbonosPorPago")
+    List<Long> getIdAbonosPorPago(Short idInstitucion, Integer idPagosjg);
+
+    @UpdateProvider(type = FacAbonoExtendsSqlProvider.class, method = "restableceValoresAbono")
+    int restableceValoresAbono(Short idInstitucion, Long idDisqueteAbono);
+
+    @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "hayAbonoPosterior")
+    List<FacAbono> hayAbonoPosterior(Short idInstitucion, Integer idPago);
+
+    @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonoAnterior")
+    List<Long> getAbonoAnterior(Short idInstitucion, Date fecha);
+    
+    @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getPagosCerrados")
+    List<FacAbono> getPagosCerrados(Short idInstitucion, String anio);
 }
