@@ -159,7 +159,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         return sql.toString();
     }
 
-    public String getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax) {
+    public String getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax, String idLenguaje) {
         SQL sql = new SQL();
         SQL sql2 = new SQL();
 
@@ -200,12 +200,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql2.SELECT("NVL(DECODE(EST.IDESTADOFACTURACION, 20, 0, " + "(SELECT SUM(P.IMPORTEPAGADO) "
                 + "FROM FCS_PAGOSJG P "
                 + "WHERE P.IDFACTURACION = FAC.IDFACTURACION AND P.IDINSTITUCION = FAC.IDINSTITUCION)),0) AS IMPORTEPAGADO");
-        sql2.SELECT("CASE WHEN (SELECT 1 FROM" +
-                "   fcs_fact_grupofact_hito hit WHERE" +
-                "   hit.idfacturacion = fac.idfacturacion AND" +
-                "    hit.idinstitucion = fac.idinstitucion " +
-                " group by hit.IDGRUPOFACTURACION" +
-                "  having COUNT(*)>0) is null then ' ' END AS GRUPOFACTURACION");
+        sql2.SELECT("F_SIGA_GETRECURSO(GRUP.NOMBRE, " + idLenguaje + ") AS GRUPOFACTURACION");
         sql2.SELECT("fac.idpartidapresupuestaria as PARTIDAPRESUPUESTARIA");
         sql2.SELECT("CASE WHEN fac.IMPORTEGUARDIA is null then '0' END AS GUARDIA");
         sql2.SELECT("CASE WHEN fac.IMPORTEOFICIO is null then '0' END as TURNO");
@@ -218,7 +213,9 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql2.INNER_JOIN(
                 "FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION AND EST.idestadofacturacion = '20')");
         sql2.INNER_JOIN(
-                "FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)");
+                "FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)" +
+                        " LEFT JOIN FCS_FACT_GRUPOFACT_HITO HIT ON HIT.IDFACTURACION = FAC.IDFACTURACION AND HIT.IDINSTITUCION = FAC.IDINSTITUCION" +
+                        " JOIN SCS_GRUPOFACTURACION GRUP ON GRUP.IDGRUPOFACTURACION = HIT.IDGRUPOFACTURACION AND GRUP.IDINSTITUCION  = HIT.IDINSTITUCION");
 
 
         sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");

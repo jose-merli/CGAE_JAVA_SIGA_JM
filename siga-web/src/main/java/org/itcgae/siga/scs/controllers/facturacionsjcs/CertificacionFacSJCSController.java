@@ -4,6 +4,7 @@ package org.itcgae.siga.scs.controllers.facturacionsjcs;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
@@ -34,15 +35,16 @@ public class CertificacionFacSJCSController {
     }
 
     @PostMapping(path = "/descargaInformeCAM")
-    public ResponseEntity<Resource> descargaInformeCAM(@RequestParam("idFacturacion") String idFacturacion, @RequestParam("tipoFichero") String tipoFichero, HttpServletRequest request) {
+    public ResponseEntity<Resource> descargaInformeCAM(@RequestBody DescargaInfomreCAMItem descargaInfomreCAMItem, HttpServletRequest request) {
         ResponseEntity<Resource> response = null;
         Resource resource = null;
         Boolean error = false;
 
         try {
-            resource = iCertificacionFacSJCSService.getInformeCAM(idFacturacion, tipoFichero, request);
+            resource = iCertificacionFacSJCSService.getInformeCAM(descargaInfomreCAMItem, request);
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
             response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
         } catch (Exception e) {
@@ -58,7 +60,7 @@ public class CertificacionFacSJCSController {
 
     @PostMapping(value = "/subirFicheroCAM", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<UpdateResponseDTO> subirFicheroCAM(MultipartHttpServletRequest request) {
-         UpdateResponseDTO response = iCertificacionFacSJCSService.subirFicheroCAM(request);
+        UpdateResponseDTO response = iCertificacionFacSJCSService.subirFicheroCAM(request);
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
@@ -223,4 +225,14 @@ public class CertificacionFacSJCSController {
         return response;
     }
 
+    @GetMapping("/perteneceInstitucionCAMoXunta")
+    ResponseEntity<StringDTO> perteneceInstitucionCAMoXunta(HttpServletRequest request) {
+        StringDTO response = new StringDTO();
+        try {
+            response = iCertificacionFacSJCSService.perteneceInstitucionCAMoXunta(request);
+        } catch (Exception e) {
+            return new ResponseEntity<StringDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+    }
 }

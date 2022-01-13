@@ -87,7 +87,7 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "IMPORTESOJ", property = "importeSoj", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTEEJG", property = "importeEjg", jdbcType = JdbcType.VARCHAR),
     })
-    List<FacturacionItem> getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax);
+    List<FacturacionItem> getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax, String idLenguaje);
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "comboFactByPartidaPresu")
     @Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
