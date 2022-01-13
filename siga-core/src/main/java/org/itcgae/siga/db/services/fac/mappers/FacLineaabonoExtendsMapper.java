@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.fac.mappers;
 
+import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -28,4 +29,10 @@ public interface FacLineaabonoExtendsMapper extends FacLineaabonoMapper {
 			@Result(column = "importeTotal", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
 	})
 	List<FacturaLineaItem> getLineasAbono(String idFactura, String idInstitucion);
+	
+	@SelectProvider(type = FacLineaabonoExtendsSqlProvider.class, method = "getNuevoID")
+    Long getNuevoID(String idInstitucion, String idAbono);
+
+    @DeleteProvider(type = FacLineaabonoExtendsSqlProvider.class, method = "deleteDeshacerCierre")
+    int deleteDeshacerCierre(Short idInstitucion, List<Integer> idPagos);
 }
