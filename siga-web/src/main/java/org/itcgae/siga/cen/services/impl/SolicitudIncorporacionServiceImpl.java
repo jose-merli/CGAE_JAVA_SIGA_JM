@@ -1,31 +1,10 @@
 package org.itcgae.siga.cen.services.impl;
 
-import java.io.IOException;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.SQLTimeoutException;
-import java.sql.Types;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
-import com.exea.sincronizacion.redabogacia.TipoColegiacionType;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
-import org.itcgae.siga.DTOs.cen.MaxIdDto;
-import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
-import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
-import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
-import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.cen.*;
+import org.itcgae.siga.DTOs.exea.DocumentacionIncorporacionDTO;
+import org.itcgae.siga.DTOs.exea.DocumentacionIncorporacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -37,29 +16,25 @@ import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenEstadoSolicitudExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenTipocolegiacionExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenTipoidentificacionExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenTiposolicitudExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.*;
+import org.itcgae.siga.db.services.scs.mappers.CenDocumentsolicitudinstituExtendsMapper;
 import org.itcgae.siga.exea.services.ExpedientesEXEAService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.*;
 
 
 @Service
@@ -150,6 +125,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 	@Autowired
 	private ExpedientesEXEAService expedientesEXEAService;
+
+	@Autowired
+	private CenDocumentsolicitudinstituExtendsMapper cenDocumentsolicitudinstituExtendsMapper;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -176,7 +154,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				LOGGER.info(
 						"getTipoSolicitud() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Entrada a cenTiposolicitudSqlExtendsMapper para obtener los tipos de solicitud");
 
-				List<ComboItem> comboItems = _cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud(usuario.getIdlenguaje());
+				String isActivoEXEA = expedientesEXEAService.isEXEActivoInstitucion(request).getValor();
+				List<ComboItem> comboItems = _cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud(usuario.getIdlenguaje(),isActivoEXEA);
 				
 				if(comboItems != null && comboItems.size() >0){
 //					ComboItem element = new ComboItem();
@@ -382,6 +361,44 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		return solIncorporacionResult;
 	}
 
+	@Override
+	public DocumentacionIncorporacionDTO getDocRequerida(HttpServletRequest request, String tipoColegiacion, String tipoSolicitud, String modalidad, String idSolicitud) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DocumentacionIncorporacionDTO documentacionIncorporacionDTO = new DocumentacionIncorporacionDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"getDocRequerida() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = _admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"getDocRequerida() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && usuarios.size() > 0) {
+
+					List<DocumentacionIncorporacionItem> documentosInstitucion = cenDocumentsolicitudinstituExtendsMapper.getDocRequerida(idInstitucion,tipoColegiacion,tipoSolicitud,modalidad,usuarios.get(0).getIdlenguaje(), idSolicitud);
+
+					documentacionIncorporacionDTO.setDocumentacionIncorporacionItem(documentosInstitucion);
+
+				}
+			}
+		}catch(Exception e){
+			LOGGER.error("getDocRequerida() / ERROR: " + e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al buscar la documentación requerida");
+			error.description("Error al buscar la documentación requerida");
+			documentacionIncorporacionDTO.setError(error);
+		}
+		return documentacionIncorporacionDTO;
+	}
+
 
 	@Override
 	public ComboDTO getTratamiento(HttpServletRequest request) {
@@ -533,7 +550,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				LOGGER.info(
 						"getTipoColegiacion() / _cenTipocolegiacionExtendsMapper.selectTipoColegiacion -> Entrada a cenTipocolegiacionExtendsMapper para obtener los tipos de colegiación");
 
-				List<ComboItem> comboItems = _cenTipocolegiacionExtendsMapper.selectTipoColegiacion(usuario.getIdlenguaje());
+				String isActivoEXEA = expedientesEXEAService.isEXEActivoInstitucion(request).getValor();
+				List<ComboItem> comboItems = _cenTipocolegiacionExtendsMapper.selectTipoColegiacion(usuario.getIdlenguaje(), isActivoEXEA);
 				
 				if(comboItems != null && comboItems.size() >0){
 //					ComboItem element = new ComboItem();
@@ -575,7 +593,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				LOGGER.info(
 						"getModalidadDocumentacion() / _cenDocumentacionmodalidadExtendsMapper.selectModalidadDocumentacion() -> Entrada a cenDocumentacionmodalidadExtendsMapper para obtener los tipos de colegiación");
 
-				List<ComboItem> comboItems = _cenDocumentacionmodalidadExtendsMapper.selectModalidadDocumentacion(usuario);
+				String isActivoEXEA = expedientesEXEAService.isEXEActivoInstitucion(request).getValor();
+				List<ComboItem> comboItems = _cenDocumentacionmodalidadExtendsMapper.selectModalidadDocumentacion(usuario, isActivoEXEA);
 				
 				if(comboItems != null && comboItems.size() >0){
 //					ComboItem element = new ComboItem();
@@ -660,7 +679,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 //						}
 						
 						solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
-						solIncorporacion.setIdestado((short)20);
+						boolean isActivoEXEA = SigaConstants.DB_TRUE.equals(expedientesEXEAService.isEXEActivoInstitucion(request).getValor());
+						//Si las solicitudes de colegiacion se tramitan por EXEA en dicha institucion se creara como Pendiente Documentacion
+						if(isActivoEXEA){
+							solIncorporacion.setIdestado(SigaConstants.INCORPORACION_PENDIENTE_DOCUMENTACION);
+						}else {
+							solIncorporacion.setIdestado(SigaConstants.INCORPORACION_PENDIENTE_APROBACION);
+						}
 						insert = _cenSolicitudincorporacionMapper.insert(solIncorporacion);
 					}
 					if(insert == 1 | update ==1 ){

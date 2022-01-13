@@ -10,6 +10,24 @@ public class DocumentacionIncorporacionItem {
     private String documento;
     private String tipoColegiacion;
     private String tipoSolicitud;
+    private String idModalidad;
+    private String idFichero;
+
+    public String getIdFichero() {
+        return idFichero;
+    }
+
+    public void setIdFichero(String idFichero) {
+        this.idFichero = idFichero;
+    }
+
+    public String getIdModalidad() {
+        return idModalidad;
+    }
+
+    public void setIdModalidad(String idModalidad) {
+        this.idModalidad = idModalidad;
+    }
 
     public String getTipoColegiacion() {
         return tipoColegiacion;

@@ -1,15 +1,21 @@
 package org.itcgae.siga.exea;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.exea.DocumentacionIncorporacionItem;
 import org.itcgae.siga.DTOs.exea.ExpedienteDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.DocumentacionAsistenciaItem;
 import org.itcgae.siga.exea.services.ExpedientesEXEAService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -98,8 +104,45 @@ public class ExpedientesEXEAController {
         return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/subirDocumentoSolIncorp", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<InsertResponseDTO> subirDocumentoSolIncorp(MultipartHttpServletRequest request) {
+        InsertResponseDTO response = null;
+        try {
+            response = expedientesEXEAService.subirDocumentoSolIncorp(request);
+        }catch(Exception e) {
+            throw e;
+        }
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+    }
+    @PostMapping(value = "/eliminarDocumentoSolIncorp", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DeleteResponseDTO> eliminarDocumentoSolIncorp(HttpServletRequest request, @RequestParam String idSolicitud, @RequestBody List<DocumentacionIncorporacionItem> documentos) {
+        DeleteResponseDTO response = null;
+        try {
+            response = expedientesEXEAService.eliminarDocumentoSolIncorp(request,idSolicitud,documentos);
+        }catch(Exception e) {
+            throw e;
+        }
+        return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/descargarDocumentoSolIncorp", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<InputStreamResource> descargarDocumentosSolIncorp(
+            @RequestBody List<DocumentacionIncorporacionItem> documentos, HttpServletRequest request) {
+        ResponseEntity<InputStreamResource> response = expedientesEXEAService.descargarDocumentosSolIncorp(documentos,request);
+        return response;
+    }
 
 
+    @PostMapping(value = "/iniciarTramiteColegiacionEXEA", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdateResponseDTO> iniciarTramiteColegiacionEXEA(HttpServletRequest request, @RequestBody String idSolicitud) {
+        UpdateResponseDTO response = null;
+        try {
+            response = expedientesEXEAService.iniciarTramiteColegiacionEXEA(request, idSolicitud);
+        }catch(Exception e) {
+            throw e;
+        }
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+    }
 
 
 }

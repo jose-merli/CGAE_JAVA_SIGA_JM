@@ -1159,10 +1159,15 @@ public class SigaConstants {
 	public static final String EXEA_AUTENTICACION_URL_PARAM = "URL_EXEA_AUTENTICACION";
 	public static final String EXEA_SYNC_IP_PARAM = "EXEA_SYNC_IPS";
 	public static final String EXEA_WEBSERVICES_ADDIN_PARAM = "URL_WEBSERVICES_ADDIN";
+	public static final String EXEA_NOMBRE_FORM_BUSQ = "NOMBRE_FORM_BUSQUEDA";
+	public static final String EXEA_NOMBRE_GRUPO = "NOMBRE_GRUPO";
+	public static final String EXEA_URL_WEBSERVICES_REGTEL = "URL_WEBSERVICES_REGTEL";
 	public static final String ID_SEDE_PARAM = "ID_SEDE";
 	public static final String EXPEDIENTE_ACEPTADO_EXEA = "Aceptado";
 	public static final String EXPEDIENTE_DENEGADO_EXEA = "Rechazado";
 	public static final short SANCION_EN_SUSPENSO = 8;
+	public static final short INCORPORACION_PENDIENTE_APROBACION = 20;
+	public static final short INCORPORACION_PENDIENTE_DOCUMENTACION = 10;
 
 	public enum ERROR_SINCRONIZACION_EXEA {
 		FORMATO_NOVALIDO("Formato XML de petición no correcto."),

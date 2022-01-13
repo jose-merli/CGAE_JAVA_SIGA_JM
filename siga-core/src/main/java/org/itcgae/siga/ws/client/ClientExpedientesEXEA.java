@@ -7,10 +7,9 @@ import ieci.tdw.ispac.services.ws.server.BusquedaAvanzadaResponseDocument;
 import ieci.tdw.ispac.services.ws.server.GetExpedienteDocument;
 import ieci.tdw.ispac.services.ws.server.GetExpedienteResponseDocument;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.ws.config.AddInEXEAClient;
-import org.itcgae.siga.ws.config.TokenEXEAClient;
-import org.itcgae.siga.ws.config.WebServiceClientConfigAddInEXEA;
-import org.itcgae.siga.ws.config.WebServiceClientConfigTokenEXEA;
+import org.itcgae.siga.ws.config.*;
+import org.redabogacia.regtel.ws.eregtel.RegistroEntradaDocument;
+import org.redabogacia.regtel.ws.eregtel.RegistroEntradaResponseDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
@@ -76,6 +75,23 @@ public class ClientExpedientesEXEA extends WebServiceGatewaySupport {
 
         }catch(Exception e) {
             LOGGER.error("ClientExpedientesEXEA -> Error al obtener el detalle del expediente: " + e.getMessage(), e);
+            throw e;
+        }
+
+        return response;
+    }
+
+    public RegistroEntradaResponseDocument iniciarExpedienteColegiacion (RegistroEntradaDocument request, String uriService){
+
+        RegistroEntradaResponseDocument response;
+
+        try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfigRegTel.class))
+        {
+            RegTelClient client = context.getBean(RegTelClient.class);
+            response = client.iniciarExpedienteColegiacion(request, uriService);
+
+        }catch(Exception e) {
+            LOGGER.error("ClientExpedientesEXEA -> Error al iniciar el expediente: " + e.getMessage(), e);
             throw e;
         }
 

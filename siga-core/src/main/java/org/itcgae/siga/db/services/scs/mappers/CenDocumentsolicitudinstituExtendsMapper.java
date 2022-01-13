@@ -15,7 +15,15 @@ public interface CenDocumentsolicitudinstituExtendsMapper extends CenDocumentsol
     @SelectProvider(type = CenDocumentsolicitudinstituSqlExtendsProvider.class, method = "getDocRequerida")
     @Results({
             @Result(column = "IDDOCUMENTACION", property = "idDocumentacion", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "DESCRIPCION", property = "documento", jdbcType = JdbcType.VARCHAR)
+            @Result(column = "DESCRIPCION", property = "documento", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "OBLIGATORIO", property = "obligatorio", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBREFICHERO", property = "nombreDoc", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDFICHERO", property = "idFichero", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMODALIDAD", property = "idModalidad", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDTIPOSOLICITUD", property = "tipoSolicitud", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDTIPOCOLEGIACION", property = "tipoColegiacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CODIGOEXT", property = "codDocEXEA", jdbcType = JdbcType.VARCHAR)
     })
-    List<DocumentacionIncorporacionItem> getDocRequerida(Short idInstitucion, String tipoColegiacion, String tipoSolicitud, String modalidad, String idLenguaje);
+    List<DocumentacionIncorporacionItem> getDocRequerida(Short idInstitucion, String tipoColegiacion, String tipoSolicitud, String modalidad, String idLenguaje, String idSolicitud);
 }
