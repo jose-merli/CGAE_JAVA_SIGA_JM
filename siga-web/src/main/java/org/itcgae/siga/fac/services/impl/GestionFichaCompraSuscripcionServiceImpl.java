@@ -657,7 +657,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							else{
 								suscripcion.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
 							}
-							if(ficha.getIdFormaPagoSeleccionada().equals("80")) {
+							if(ficha.getIdFormaPagoSeleccionada().equals("80") || ficha.getIdFormaPagoSeleccionada().equals("20")) {
 								suscripcion.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
 							}
 							else {
@@ -778,7 +778,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
 								compra.setNofacturable("0");
 							}
-							if(ficha.getIdFormaPagoSeleccionada().equals("80")) {
+							if(ficha.getIdFormaPagoSeleccionada().equals("80") || ficha.getIdFormaPagoSeleccionada().equals("20")) {
 								compra.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
 							}
 							else {
@@ -1182,7 +1182,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					productoSolicitado.setNofacturable("0");
 				}
 				//En el caso que la forma de pago sea domiciliación bancaria
-				if(peticion.getIdFormaPagoSeleccionada().equals("80")) {
+				if(peticion.getIdFormaPagoSeleccionada().equals("80") || peticion.getIdFormaPagoSeleccionada().equals("20")) {
 					productoSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
 				}
 				else {
@@ -2343,7 +2343,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 //					servicioSolicitado.setNofacturable("0");
 //				}
 				//En el caso que la forma de pago sea domiciliación bancaria
-				if(peticion.getIdFormaPagoSeleccionada().equals("80")) {
+				if(peticion.getIdFormaPagoSeleccionada().equals("80") || peticion.getIdFormaPagoSeleccionada().equals("20")) {
 					servicioSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
 				}
 				else {

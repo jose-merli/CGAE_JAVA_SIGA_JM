@@ -23,6 +23,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import javax.transaction.Transaction;
 
 import org.apache.xmlbeans.XmlObject;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
@@ -1923,5 +1924,6 @@ public class WSCommons {
 		}
 
 		return result;
-	}
+	}	
+	
 }

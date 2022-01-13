@@ -1,7 +1,6 @@
 package org.itcgae.siga.db.services.com.mappers;
 
-import java.util.List;
-
+import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -14,10 +13,11 @@ import org.itcgae.siga.db.services.com.providers.EnvEnviosExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Primary
 public interface EnvEnviosExtendsMapper {
-          
           
       @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectEnvios")
       @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
@@ -38,21 +38,6 @@ public interface EnvEnviosExtendsMapper {
                 @Result(column = "NUMDEST", property = "numDestinatarios", jdbcType = JdbcType.NUMERIC)
       })
       List<EnviosMasivosItem> selectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
-      
-      @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "busquedaSelectEnvios")
-      @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
-                @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
-                @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-                @Result(column = "FECHACREACION", property = "fechaCreacion", jdbcType = JdbcType.DATE),
-                @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
-                @Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
-                @Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
-                @Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
-                @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
-                @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
-                @Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR)                
-      })
-      List<EnviosMasivosItem> busquedaSelectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
       
       @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectMaxIDEnvio")
       @Results({
@@ -155,5 +140,21 @@ public interface EnvEnviosExtendsMapper {
       })
       List<EnvEnvios> obtenerEnviosMalCreados();
 	
+    @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "busquedaSelectEnvios")
+    @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+            @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHACREACION", property = "fechaCreacion", jdbcType = JdbcType.DATE),
+            @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
+            @Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
+            @Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
+            @Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+            @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR)
+    })
+    List<EnviosMasivosItem> busquedaSelectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
 
+    @DeleteProvider(type = EnvEnviosExtendsSqlProvider.class, method = "eliminarEnviosPago")
+    int eliminarEnviosPago(Short idInstitucion, List<String> idPagos);
 }

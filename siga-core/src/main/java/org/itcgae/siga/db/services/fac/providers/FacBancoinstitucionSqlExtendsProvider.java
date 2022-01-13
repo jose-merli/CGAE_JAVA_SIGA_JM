@@ -116,4 +116,19 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 
 		return sql.toString();
 	}
+	
+	 public String comboPropTranferencia(Short idInstitucion) {
+
+	        SQL sql = new SQL();
+
+	        sql.SELECT("BANCOS_CODIGO");
+	        sql.SELECT("IBAN");
+
+	        sql.FROM("FAC_BANCOINSTITUCION");
+
+	        sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+	        return sql.toString();
+	    }
+	
 }

@@ -58,4 +58,10 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getComisionFactura(String idInstitucion, String idFactura);
+	
+	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "comboPropTranferencia")
+    @Results({@Result(column = "IBAN", property = "label", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "BANCOS_CODIGO", property = "value", jdbcType = JdbcType.VARCHAR)})
+    List<ComboItem> comboCuentasBanc(Short idInstitucion);
+	
 }
