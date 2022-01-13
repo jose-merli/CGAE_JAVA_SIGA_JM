@@ -20,9 +20,17 @@ public class FacRegistroFichConta {
 	private Date fechaModificacion;
 	private String nombreFichero;
 	private int estado;
+	private String nombreEstado;
 	private boolean nuevo;
 	
 	
+	
+	public String getNombreEstado() {
+		return nombreEstado;
+	}
+	public void setNombreEstado(String nombreEstado) {
+		this.nombreEstado = nombreEstado;
+	}
 	public int getIdContabilidad() {
 		return idContabilidad;
 	}

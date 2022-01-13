@@ -3893,6 +3893,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		List<FacRegistroFichConta> listaFacRegistroFichConta = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("getInformeFacturacion() -> Entrada al servicio para recuperar el informe de facturacion");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
 
 		GenParametrosExample genParametrosExample = new GenParametrosExample();
 		genParametrosExample.createCriteria().andModuloEqualTo("FAC").andParametroEqualTo("TAM_MAX_CONSULTA_FAC")
@@ -3908,7 +3915,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 			LOGGER.info("Filtro: search()- Item:" + facRegistroFichConta.toString());
 			listaFacRegistroFichConta = facRegistroFichContaExtendsMapper.search(facRegistroFichConta, idInstitucion,
-					tamMaximo);
+					tamMaximo,usuario.getIdlenguaje());
 			if (listaFacRegistroFichConta != null) {
 				facRegistroFichContaDTO.setFacRegistroFichConta(listaFacRegistroFichConta);
 			}
@@ -3959,7 +3966,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			beanRegistro.setFechahasta(facRegistroFichConta.getFechaExportacionHasta());
 			beanRegistro.setFechamodificacion(new Date());
 			beanRegistro.setEstado(new Short("1"));
-			;
 
 			int resultado = facRegistroFichContaExtendsMapper.insert(beanRegistro);
 
