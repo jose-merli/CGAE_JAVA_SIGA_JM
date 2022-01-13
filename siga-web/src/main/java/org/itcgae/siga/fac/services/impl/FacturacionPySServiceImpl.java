@@ -2917,14 +2917,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private void devolverFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
 			AdmUsuarios usuario) throws Exception {
 
-		//Porcentaje de Comision
+		//Cliente
 		CenClienteKey cenClienteKey = new CenClienteKey();
 		cenClienteKey.setIdinstitucion(facUpdate.getIdinstitucion());
 		cenClienteKey.setIdpersona(facUpdate.getIdpersona());
 		CenCliente cliente = cenClienteMapper.selectByPrimaryKey(cenClienteKey);
 
+
+		//Importe de Comision
 		long importeComision = Long.parseLong(facBancoinstitucionExtendsMapper.getComisionFactura(String.valueOf(facUpdate.getIdinstitucion()), facUpdate.getIdfactura()).get(0).getValue());
-		importeComision = importeComision / 100 * Long.parseLong(String.valueOf(facHistoricoInsert.getImptotalporpagar()));
 
 
 		//Pago a devolver
@@ -2934,6 +2935,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facFacturaincluidaendisqueteKey.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
 
 		FacFacturaincluidaendisquete facFacturaincluidaendisquete = facFacturaincluidaendisqueteMapper.selectByPrimaryKey(facFacturaincluidaendisqueteKey);
+
+		facFacturaincluidaendisquete.setDevuelta("S");
+		facFacturaincluidaendisqueteMapper.updateByPrimaryKey(facFacturaincluidaendisquete);
 
 		BigDecimal importeDevolver = facFacturaincluidaendisquete.getImporte();
 
@@ -3010,12 +3014,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 
 				//Historico Factura Anulada
-				FacHistoricofactura fachistoricoAnulada = facHistoricoInsert;
+				FacHistoricofactura fachistoricoAnulada = new FacHistoricofactura();
 
-				fachistoricoAnulada.setIddisquetedevoluciones(null);
-				fachistoricoAnulada.setIdrecibo(null);
-				fachistoricoAnulada.setIddisquetecargos(null);
-				fachistoricoAnulada.setIdfacturaincluidaendisquete(null);
+				fachistoricoAnulada.setIdfactura(facUpdate.getIdfactura());
+				fachistoricoAnulada.setIdinstitucion(facUpdate.getIdinstitucion());
 
 				fachistoricoAnulada.setIdtipoaccion((short) 9);
 				fachistoricoAnulada.setEstado((short) 8);
@@ -3043,13 +3045,17 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				facUpdate.setEstado((short) 8);
 
-				facUpdate.setComisionidfactura(facturaComision.getIdfactura());
-
 				facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
 
 
 				//Factura Comision
+				facturaComision.setFechaemision(item.getFechaModificaion());
+				facturaComision.setEstado((short) 4);
 				facturaComision.setImptotalporpagar(facturaComision.getImptotalporpagar().add(BigDecimal.valueOf(importeComision)));
+
+				facUpdate.setComisionidfactura(facUpdate.getIdfactura());
+
+				long importeIvaComision =
 
 				facFacturaExtendsMapper.insert(facturaComision);
 
@@ -3084,9 +3090,19 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				List<FacLineafactura> listLinea = facLineafacturaExtendsMapper.selectByExample(exampleLinea);
 
+				long maximoNumeroOrden = 1;
+				long maximoNumeroLinea = 1;
+
 				for (FacLineafactura lf : listLinea) {
 					lf.setIdfactura(facturaComision.getIdfactura());
 					facLineafacturaExtendsMapper.insert(lf);
+
+					if(lf.getNumeroorden() > maximoNumeroOrden){
+						maximoNumeroOrden = lf.getNumeroorden();
+					}
+					if(lf.getNumerolinea() > maximoNumeroLinea){
+						maximoNumeroLinea = lf.getNumerolinea();
+					}
 				}
 
 
@@ -3095,13 +3111,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				lineaComision.setIdinstitucion(facturaComision.getIdinstitucion());
 				lineaComision.setIdfactura(facturaComision.getIdfactura());
-				lineaComision.setNumeroorden((long) 1);
 				lineaComision.setCantidad(1);
 				lineaComision.setFechamodificacion(new Date());
 				lineaComision.setUsumodificacion(usuario.getUsumodificacion());
 				lineaComision.setFechamodificacion(new Date());
 
+				lineaComision.setIdformapago(facUpdate.getIdformapago());
+
 				lineaComision.setPreciounitario(BigDecimal.valueOf(importeComision));
+				lineaComision.setImporteanticipado(BigDecimal.valueOf(0));
+
+				lineaComision.setNumeroorden(maximoNumeroOrden + 1);
+				lineaComision.setNumerolinea(maximoNumeroLinea + 1);
 
 				GenRecursosKey genRecursosKey = new GenRecursosKey();
 				genRecursosKey.setIdlenguaje(usuario.getIdlenguaje());
@@ -3109,12 +3130,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				lineaComision.setDescripcion(genRecursosMapper.selectByPrimaryKey(genRecursosKey).getDescripcion());
 
-				if (!listLinea.isEmpty())
-					lineaComision.setNumerolinea((listLinea.get(listLinea.size() - 1).getNumerolinea() + 1));
-				else
-					lineaComision.setNumerolinea((long) 1);
-
 				facLineafacturaExtendsMapper.insert(lineaComision);
+			}
+
+
+			//Sin Comision
+			else {
+
 			}
 
 			// Aplicacion de comisiones
