@@ -105,14 +105,26 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		return sql.toString();
 	}
 
-	public String getComisionFactura(String idInstitucion, String idFactura) {
+	public String getBancosCodigo(String idInstitucion, String idFactura) {
 		SQL sql = new SQL();
 
-		sql.SELECT("fb.COMISIONIMPORTE");
+		sql.SELECT("fb.BANCOS_CODIGO");
 		sql.FROM("FAC_BANCOINSTITUCION fb");
 		sql.INNER_JOIN("FAC_SERIEFACTURACION_BANCO fsb ON(fsb.IDINSTITUCION = fb.IDINSTITUCION AND fb.BANCOS_CODIGO = fsb.BANCOS_CODIGO)");
 		sql.INNER_JOIN("FAC_FACTURA ff ON(ff.IDFACTURA = "+idFactura+" AND ff.IDINSTITUCION = fb.IDINSTITUCION AND fsb.IDSERIEFACTURACION = ff.IDSERIEFACTURACION)");
 		sql.WHERE("bi.idinstitucion = " + idInstitucion);
+
+		return sql.toString();
+	}
+
+	public String getPorcentajeIva(String idInstitucion, String bancoCodigo) {
+		SQL sql = new SQL();
+
+		sql.SELECT("pt.VALOR");
+		sql.FROM("PYS_TIPOIVA pt");
+		sql.INNER_JOIN("FAC_BANCOINSTITUCION fb ON(fb.IDTIPOIVA = pt.IDTIPOIVA)");
+		sql.WHERE("fb.idinstitucion = " + idInstitucion);
+		sql.WHERE("fb.fb.BANCOS_CODIGO = " + bancoCodigo);
 
 		return sql.toString();
 	}

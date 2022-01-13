@@ -283,4 +283,22 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         return query.toString();
     }
+
+    public String getNuevoNumeroFactura(String idInstitucion, String idSerieFacturacion){
+
+        SQL sql = new SQL();
+
+        // Select
+        sql.SELECT("ac.PREFIJO || LPAD(ac.CONTADOR + 1, ac.LONGITUDCONTADOR, '0') || ac.SUFIJO AS NUEVOCONTADOR");
+
+        // From
+        sql.FROM("ADM_CONTADOR ac");
+        sql.INNER_JOIN("FAC_SERIEFACTURACION fs ON(ac.IDINSTITUCION = fs.IDINSTITUCION AND ac.IDCONTADOR = fs.IDCONTADOR)");
+
+        // Where
+        sql.WHERE("fs.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("fs.IDSERIEFACTURACION = " + idSerieFacturacion);
+
+        return sql.toString();
+    }
 }

@@ -127,6 +127,8 @@ import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineaabonoKey;
+import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
+import org.itcgae.siga.db.entities.FacLineadevoludisqbancoKey;
 import org.itcgae.siga.db.entities.FacLineafactura;
 import org.itcgae.siga.db.entities.FacLineafacturaExample;
 import org.itcgae.siga.db.entities.FacLineafacturaKey;
@@ -160,6 +162,7 @@ import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.PysTipoiva;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
@@ -167,6 +170,7 @@ import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
+import org.itcgae.siga.db.mappers.FacLineadevoludisqbancoMapper;
 import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
 import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
@@ -197,6 +201,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposproduincluenfactuExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
@@ -333,7 +338,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private GenRecursosMapper genRecursosMapper;
+
+	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
+
+	@Autowired
+	private FacLineadevoludisqbancoMapper facLineadevoludisqbancoMapper;
+
+	@Autowired
+	private PySTipoIvaExtendsMapper pySTipoIvaExtendsMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -2933,8 +2946,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		CenCliente cliente = cenClienteMapper.selectByPrimaryKey(cenClienteKey);
 
 
-		//Importe de Comision
-		long importeComision = Long.parseLong(facBancoinstitucionExtendsMapper.getComisionFactura(String.valueOf(facUpdate.getIdinstitucion()), facUpdate.getIdfactura()).get(0).getValue());
+		//Entidad Bancaria
+		String codigoBanco = facBancoinstitucionExtendsMapper.getBancosCodigo(String.valueOf(facUpdate.getIdinstitucion()), facUpdate.getIdfactura()).get(0).getValue();
+
+		FacBancoinstitucionKey bancoinstitucionKey = new FacBancoinstitucionKey();
+		bancoinstitucionKey.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
+		bancoinstitucionKey.setBancosCodigo(codigoBanco);
+
+		FacBancoinstitucion banco = facBancoinstitucionExtendsMapper.selectByPrimaryKey(bancoinstitucionKey);
 
 
 		//Pago a devolver
@@ -3014,8 +3033,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
 
+			FacLineadevoludisqbancoKey facLineadevoludisqbancoKey = new FacLineadevoludisqbancoKey();
+			facLineadevoludisqbancoKey.setIddisquetedevoluciones(facHistoricoInsert.getIddisquetedevoluciones());
+			facLineadevoludisqbancoKey.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
+			facLineadevoludisqbancoKey.setIdrecibo(facHistoricoInsert.getIdrecibo());
+			FacLineadevoludisqbanco lienaDevolucion = facLineadevoludisqbancoMapper.selectByPrimaryKey(facLineadevoludisqbancoKey);
+
 			//Con Comision
-			if(item.getComision() != null && item.getComision() && cliente.getComisiones().equals("1") && importeComision != 0){
+			if(item.getComision() != null && item.getComision() && cliente.getComisiones().equals("1") && banco.getComisionimporte() != BigDecimal.valueOf(0)){
 
 				//Copia Factura
 				FacFactura facturaComision = facUpdate;
@@ -3060,17 +3085,25 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				//Factura Comision
 				facturaComision.setFechaemision(item.getFechaModificaion());
 				facturaComision.setEstado((short) 4);
-				facturaComision.setImptotalporpagar(facturaComision.getImptotalporpagar().add(BigDecimal.valueOf(importeComision)));
 
-				facUpdate.setComisionidfactura(facUpdate.getIdfactura());
+				facturaComision.setComisionidfactura(facUpdate.getIdfactura());
+				facturaComision.setNumerofactura(facFacturaExtendsMapper.getNuevoNumeroFactura(facturaComision.getIdinstitucion().toString(), facturaComision.getIdseriefacturacion().toString()).get(0).getValue());
 
-				long importeIvaComision =
+				long IVAComision = Long.parseLong(facBancoinstitucionExtendsMapper.getPorcentajeIva(String.valueOf(facUpdate.getIdinstitucion()), banco.getBancosCodigo()).get(0).getValue());
+				BigDecimal importeIVAComision = banco.getComisionimporte().multiply(BigDecimal.valueOf(IVAComision/100));
+
+				facturaComision.setImptotalporpagar(facturaComision.getImptotalporpagar().add(importeIVAComision.add(banco.getComisionimporte())));
+				facturaComision.setImptotal(facturaComision.getImptotal().add(importeIVAComision.add(banco.getComisionimporte())));
+				facturaComision.setImptotaliva(facturaComision.getImptotaliva().add(importeIVAComision));
+				facturaComision.setImptotalneto(facturaComision.getImptotalneto().add(banco.getComisionimporte()));
 
 				facFacturaExtendsMapper.insert(facturaComision);
 
 
 				//Historico Factura Comision
 				FacHistoricofactura fachistoricoRevision = fachistoricoAnulada;
+
+				fachistoricoRevision.setComisionidfactura(facUpdate.getIdfactura());
 
 				fachistoricoRevision.setIdfactura(facturaComision.getIdfactura());
 				fachistoricoRevision.setIdhistorico((short) 1);
@@ -3127,8 +3160,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				lineaComision.setIdformapago(facUpdate.getIdformapago());
 
-				lineaComision.setPreciounitario(BigDecimal.valueOf(importeComision));
+				lineaComision.setPreciounitario(banco.getComisionimporte());
 				lineaComision.setImporteanticipado(BigDecimal.valueOf(0));
+				lineaComision.setIdtipoiva(banco.getIdtipoiva());
+				lineaComision.setIva(BigDecimal.valueOf(IVAComision));
+
+				lineaComision.setCtaiva(pySTipoIvaExtendsMapper.getC_CTAIVA(lineaComision.getIdinstitucion().toString(), lineaComision.getIdtipoiva().toString()).get(0).getValue());
+
+				lineaComision.setCtaproductoservicio(banco.getComisioncuentacontable());
 
 				lineaComision.setNumeroorden(maximoNumeroOrden + 1);
 				lineaComision.setNumerolinea(maximoNumeroLinea + 1);
@@ -3140,13 +3179,21 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				lineaComision.setDescripcion(genRecursosMapper.selectByPrimaryKey(genRecursosKey).getDescripcion());
 
 				facLineafacturaExtendsMapper.insert(lineaComision);
+
+
+				//Carga Cliente
+				lienaDevolucion.setCargarcliente("S");
 			}
 
 
-			//Sin Comision
+			//Carga Cliente Sin Comision
 			else {
-
+				lienaDevolucion.setCargarcliente("N");
 			}
+
+
+			//Guardar Carga Cliente
+			facLineadevoludisqbancoMapper.updateByPrimaryKey(lienaDevolucion);
 
 			// Aplicacion de comisiones
 //				if (aplicaComisiones!=null && aplicaComisiones.equalsIgnoreCase(ClsConstants.DB_TRUE)){

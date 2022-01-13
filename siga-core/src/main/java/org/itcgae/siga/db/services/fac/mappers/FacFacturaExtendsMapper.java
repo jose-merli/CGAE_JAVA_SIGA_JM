@@ -107,4 +107,10 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getNewFacturaID(String idInstitucion);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getNuevoNumeroFactura")
+	@Results({
+			@Result(column = "NUEVOCONTADOR", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getNuevoNumeroFactura(String idInstitucion, String idSerieFacturacion);
 }
