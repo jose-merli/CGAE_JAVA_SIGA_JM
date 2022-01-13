@@ -36,6 +36,7 @@ public interface FacAbonoSJCSExtendsMapper extends FacAbonoMapper{
 		@Result(column = "nombreCompleto", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREGENERAL", property = "nombreGeneral", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "APELLIDOSGENERAL", property = "apellidosGeneral", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
 		
 		
 	})
