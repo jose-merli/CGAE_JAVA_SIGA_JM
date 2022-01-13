@@ -461,7 +461,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
-			sql.WHERE("pet.fecha >= to_date('"+strDate+" 00:00:00' ,'dd/MM/YY HH24:MI:SS')");
+			sql.WHERE("to_char(pet.fecha) >= to_date('"+strDate+" 00:00:00' ,'dd/MM/YY HH24:MI:SS')");
 		}
 
 		if(filtro.getFechaSolicitudHasta() != null) {
@@ -469,7 +469,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
-			sql.WHERE("pet.fecha <= to_date('"+strDate+" 23:59:00','dd/MM/YY HH24:MI:SS')");
+			sql.WHERE("to_char(pet.fecha) <= to_date('"+strDate+" 23:59:00','dd/MM/YY HH24:MI:SS')");
 		}
 		
 		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
@@ -798,8 +798,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			//Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
 			sql.WHERE(
 					"(suscripcion.fechaSuscripcion is not null and "
-					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
-					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
+					+ "to_char(suscripcion.fechaSuscripcion) <= to_date('" + strDate + "','dd/MM/YY') and"
+					+ "(suscripcion.fechaBaja is null or to_char(suscripcion.fechaBaja) > to_date('" + strDate + "','dd/MM/YY')))");
 		}
 		//REVISAR: No se busca correctamente con alos anteriores al 2000
 		if (filtro.getFechaSolicitudDesde() != null) {
@@ -807,7 +807,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql
 					.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
-			sql.WHERE("pet.fecha >= to_date('" + strDate + "','dd/MM/YY')");
+			sql.WHERE("to_char(pet.fecha) >= to_date('" + strDate + "','dd/MM/YY')");
 		}
 	
 		if (filtro.getFechaSolicitudHasta() != null) {
@@ -815,7 +815,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql
 					.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
-			sql.WHERE("pet.fecha <= to_date('" + strDate + "','dd/MM/YY')");
+			sql.WHERE("to_char(pet.fecha) <= to_date('" + strDate + "','dd/MM/YY')");
 		}
 		
 		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
