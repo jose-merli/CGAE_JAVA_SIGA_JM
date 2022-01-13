@@ -265,7 +265,7 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         sql.ORDER_BY("nombre,orden,fecha_orden,idaplicacion ASC");
         
     	return sql.toString();
-    }impreso1
+    }
 
     public String ejecutarFuncionMovVario(String idInstitucion, String idMovimiento, String funcion) {
 
