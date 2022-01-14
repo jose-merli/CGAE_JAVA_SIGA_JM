@@ -112,7 +112,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		sql.FROM("FAC_BANCOINSTITUCION fb");
 		sql.INNER_JOIN("FAC_SERIEFACTURACION_BANCO fsb ON(fsb.IDINSTITUCION = fb.IDINSTITUCION AND fb.BANCOS_CODIGO = fsb.BANCOS_CODIGO)");
 		sql.INNER_JOIN("FAC_FACTURA ff ON(ff.IDFACTURA = "+idFactura+" AND ff.IDINSTITUCION = fb.IDINSTITUCION AND fsb.IDSERIEFACTURACION = ff.IDSERIEFACTURACION)");
-		sql.WHERE("bi.idinstitucion = " + idInstitucion);
+		sql.WHERE("fb.idinstitucion = " + idInstitucion);
 
 		return sql.toString();
 	}
@@ -124,7 +124,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		sql.FROM("PYS_TIPOIVA pt");
 		sql.INNER_JOIN("FAC_BANCOINSTITUCION fb ON(fb.IDTIPOIVA = pt.IDTIPOIVA)");
 		sql.WHERE("fb.idinstitucion = " + idInstitucion);
-		sql.WHERE("fb.fb.BANCOS_CODIGO = " + bancoCodigo);
+		sql.WHERE("fb.BANCOS_CODIGO = " + bancoCodigo);
 
 		return sql.toString();
 	}
