@@ -82,6 +82,7 @@ import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
+import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
@@ -3098,6 +3099,21 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				facturaComision.setImptotalneto(facturaComision.getImptotalneto().add(banco.getComisionimporte()));
 
 				facFacturaExtendsMapper.insert(facturaComision);
+
+
+				//Actualizar Contador Factura
+				FacSeriefacturacionKey facSeriefacturacionKey = new FacSeriefacturacionKey();
+				facSeriefacturacionKey.setIdinstitucion(facturaComision.getIdinstitucion());
+				facSeriefacturacionKey.setIdseriefacturacion(facturaComision.getIdseriefacturacion());
+
+				AdmContadorKey admContadorKey = new AdmContadorKey();
+				admContadorKey.setIdinstitucion(facturaComision.getIdinstitucion());
+				admContadorKey.setIdcontador(facSeriefacturacionExtendsMapper.selectByPrimaryKey(facSeriefacturacionKey).getIdcontador());
+
+				AdmContador admContador = admContadorMapper.selectByPrimaryKey(admContadorKey);
+				admContador.setContador(admContador.getContador()+1);
+
+				admContadorMapper.updateByPrimaryKey(admContador);
 
 
 				//Historico Factura Comision
