@@ -627,17 +627,13 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							suscripcion.setIdserviciosinstitucion((long) servicio.getIdServiciosInstitucion());
 							
 							//Obtenemos el id para la nueva suscripcion
-							PysSuscripcionExample susExample = new PysSuscripcionExample();
-							
-							susExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-							
 							LOGGER.info(
-									"aprobarSuscripcion() / pysSuscripcionMapper.countByExample() -> Entrada a pysSuscripcionMapper para obtener el id para la nueva suscripcion");
+									"aprobarSuscripcion() / pysSuscripcionMapper.getNewIdCola() -> Entrada a pysSuscripcionMapper para obtener el id para la nueva suscripcion");
 							
-							long newIdSus = pysSuscripcionMapper.countByExample(susExample) + 1;
+							long newIdSus = pysSuscripcionMapper.getNewIdSus(idInstitucion);
 
 							LOGGER.info(
-									"aprobarSuscripcion() / pysSuscripcionMapper.countByExample() -> Salida de pysSuscripcionMapper para obtener el id para la nueva suscripcion");
+									"aprobarSuscripcion() / pysSuscripcionMapper.getNewIdCola() -> Salida de pysSuscripcionMapper para obtener el id para la nueva suscripcion");
 							
 							suscripcion.setIdsuscripcion(newIdSus);
 							suscripcion.setDescripcion(servicio.getDescripcion());
