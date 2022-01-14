@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.services.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -342,9 +343,13 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 //		}
 		//Se seleccionan las filas a eliminar
 		PysColaSuscripcionesAutoExample personasBorrarExample = new PysColaSuscripcionesAutoExample();
+
+	      Calendar calendar = Calendar.getInstance();
 		
 		//Se eligen las entradas que tengan una fecha de modificacion de hace más de un día
-		personasBorrarExample.createCriteria().andFechamodificacionLessThan(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
+	    calendar.add(Calendar.DATE, -1);
+		
+	    personasBorrarExample.createCriteria().andIdestadoEqualTo((short) 1).andFechamodificacionLessThan(calendar.getTime());
 		
 		List<PysColaSuscripcionesAuto> personasBorrar = pysColaSuscripcionesAutoMapper.selectByExample(personasBorrarExample);
 		
