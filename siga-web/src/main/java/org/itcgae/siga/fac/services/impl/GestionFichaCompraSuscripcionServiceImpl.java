@@ -404,7 +404,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				// Al no necesitar aprobación, se crea el registro de compra
 				// inmediatamente
-				if (aprobNecesaria.getValor() == "N") {
+				if (aprobNecesaria.getValor().equals("N")) {
 					
 					this.aprobarCompra(request, ficha);
 
@@ -529,7 +529,11 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				// Al no necesitar aprobación, se crea el registro de suscripcion
 				// inmediatamente. Aunque el nombre del parametro puede inducir error,
 				// tambien hace referencia a servicios como se indica en el documento funcional.
-				if (aprobNecesaria.getValor() == "N") {
+				LOGGER.info("solicitarSuscripcion() EL VALOR QUE TENEMOS PARA LA NECESIDAD DE APROBACION ES "+aprobNecesaria.getValor());
+				if (aprobNecesaria.getValor().equals("N")) {
+					LOGGER.info(
+							"solicitarSuscripcion() / aprobarSuscripcion() -> Entrada a  aprobarSuscripcion ya que la institucion aprueba las solicitudes automaticamente");
+
 
 					this.aprobarSuscripcion(request, ficha);
 
@@ -603,9 +607,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 					
-					// Al necesitar aprobación, se crea el registro de suscripcion
-					// inmediatamente. Esto es a diferencia del servicio de solicitud.
-					if (aprobNecesaria.getValor().equals("S")) {
 
 					
 						LOGGER.info(
@@ -670,7 +671,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								"aprobarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de suscripcion");
 
 					}
-				}
+				
 
 				
 				updateResponseDTO.setStatus("200");
@@ -733,9 +734,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 					
-					// Al necesitar aprobación, se crea el registro de compra
-					// inmediatamente. Esto es a diferencia del servicio de solicitud.
-					if (aprobNecesaria.getValor().equals("S")) {
 
 					
 						LOGGER.info(
@@ -792,7 +790,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de compra");
 
 					}
-				}
+				
 
 				
 				updateResponseDTO.setStatus("200");
