@@ -19,7 +19,10 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
+import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenHistorico;
 import org.itcgae.siga.db.entities.CenNocolegiado;
@@ -257,6 +260,76 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 			insertaCenHistorico(cenCuentasbancariasPosterior.getIdpersona(),
 					SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_CUENTAS_BANCARIAS, getDescripcionCenCuentasBancarias(
 							cenCuentasbancariasAnterior, cenCuentasbancariasPosterior, accion),
+					request, motivo);
+		case "DELETE":
+			// (NO SE HACE PORQUE EXISTE HISTÓRICO)
+			break;
+		default:
+			break;
+		}
+	}
+	
+	@Override
+	public void manageAuditoriaDatosCv(CenDatoscv cenDatoscvAnterior,
+			CenDatoscv cenDatoscvPosterior, String accion, HttpServletRequest request,
+			String motivo) {
+		switch (accion) {
+		case "UPDATE":
+			insertaCenHistorico(cenDatoscvPosterior.getIdpersona(),
+					SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_CV, getDescripcionCenDatoscv(
+							cenDatoscvAnterior, cenDatoscvPosterior, accion),
+					request, motivo);
+			break;
+		case "INSERT":
+			insertaCenHistorico(cenDatoscvPosterior.getIdpersona(),
+					SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_CV, getDescripcionCenDatoscv(
+							cenDatoscvAnterior, cenDatoscvPosterior, accion),
+					request, motivo);
+		case "DELETE":
+			// (NO SE HACE PORQUE EXISTE HISTÓRICO)
+			break;
+		default:
+			break;
+		}
+	}
+	
+	@Override
+	public void manageAuditoriaComponentes(CenComponentes cenComponentesAnterior,
+			CenComponentes cenComponentesPosterior, String accion, HttpServletRequest request,
+			String motivo) {
+		switch (accion) {
+		case "UPDATE":
+			insertaCenHistorico(cenComponentesPosterior.getIdpersona(),
+					SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_COMPONENTES, getDescripcionCenComponentes(
+							cenComponentesAnterior, cenComponentesPosterior, accion),
+					request, motivo);
+			break;
+		case "INSERT":
+			insertaCenHistorico(cenComponentesPosterior.getIdpersona(),
+					SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_COMPONENTES, getDescripcionCenComponentes(
+							cenComponentesAnterior, cenComponentesPosterior, accion),
+					request, motivo);
+		case "DELETE":
+			// (NO SE HACE PORQUE EXISTE HISTÓRICO)
+			break;
+		default:
+			break;
+		}
+	}
+	
+	@Override
+	public void manageAuditoriaEstados(CenDatoscolegialesestado estadoAnterior, CenDatoscolegialesestado estadoPosterior,
+			String accion, HttpServletRequest request,
+			String motivo, CEN_TIPOCAMBIO tipoCambio, Long idPersona) {
+		switch (accion) {
+		case "UPDATE":
+			insertaCenHistorico(idPersona,
+					tipoCambio, getDescripcionEstados(estadoAnterior, estadoPosterior, accion),
+					request, motivo);
+			break;
+		case "INSERT":
+			insertaCenHistorico(idPersona,
+					tipoCambio, getDescripcionEstados(estadoAnterior, estadoPosterior, accion),
 					request, motivo);
 		case "DELETE":
 			// (NO SE HACE PORQUE EXISTE HISTÓRICO)
@@ -835,6 +908,128 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 			addDato(sb, "Fechabaja", cenCuentasbancarias.getFechabaja());
 			addDato(sb, "Cuentacontable", cenCuentasbancarias.getCuentacontable());
 			addDato(sb, "Iban", cenCuentasbancarias.getIban());
+		}
+
+	}
+	
+	// DATOS CEN_DATOS_CV
+
+	private String getDescripcionCenDatoscv(CenDatoscv cenDatoscvAnterior,
+			CenDatoscv cenDatoscvPosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionCenDatoscv(sb, cenDatoscvAnterior, "REGISTRO ANTERIOR");
+			getDescripcionCenDatoscv(sb, cenDatoscvPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionCenDatoscv(sb, cenDatoscvPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionCenDatoscv(sb, cenDatoscvPosterior, "REGISTRO ELIMINADO"); // no necesario
+			break;
+		default:
+			break;
+		}
+
+		return sb.toString();
+	}
+	
+	private void getDescripcionCenDatoscv(StringBuffer sb, CenDatoscv cenDatoscv,
+			String cabecera) {
+		if (cenDatoscv != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Certificado", cenDatoscv.getCertificado());
+			addDato(sb, "Creditos", cenDatoscv.getCreditos());
+			addDato(sb, "Descripcion", cenDatoscv.getDescripcion());
+			addDato(sb, "Fechainicio", cenDatoscv.getFechainicio());
+			addDato(sb, "Fechafin", cenDatoscv.getFechafin());
+			addDato(sb, "Idtipocv", cenDatoscv.getIdtipocv());
+			addDato(sb, "Idtipocvsubtipo1", cenDatoscv.getIdtipocvsubtipo1());
+			addDato(sb, "IdinstitucionSubt1", cenDatoscv.getIdinstitucionSubt1());
+			addDato(sb, "Idtipocvsubtipo2", cenDatoscv.getIdtipocvsubtipo2());
+			addDato(sb, "IdinstitucionSubt2", cenDatoscv.getIdinstitucionSubt2());
+		}
+
+	}
+	
+	// DATOS CEN_COMPONENTES
+
+	private String getDescripcionCenComponentes(CenComponentes cenComponentesAnterior,
+			CenComponentes cenComponentesPosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionCenComponentes(sb, cenComponentesAnterior, "REGISTRO ANTERIOR");
+			getDescripcionCenComponentes(sb, cenComponentesPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionCenComponentes(sb, cenComponentesPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionCenComponentes(sb, cenComponentesPosterior, "REGISTRO ELIMINADO"); // no necesario
+			break;
+		default:
+			break;
+		}
+
+		return sb.toString();
+	}
+	
+	private void getDescripcionCenComponentes(StringBuffer sb, CenComponentes cenComponentes,
+			String cabecera) {
+		if (cenComponentes != null) {
+			sb.append(cabecera).append(salto);
+			
+			if (cenComponentes.getCapitalsocial() != null) {
+				addDato(sb, "Capitalsocial", cenComponentes.getCapitalsocial().toString());
+			} else { 
+				addDato(sb, "Capitalsocial", "");
+			}
+			
+			addDato(sb, "Idcargo", cenComponentes.getIdcargo());
+			addDato(sb, "Descripcion cargo", cenComponentes.getCargo());
+			addDato(sb, "Fechacargo", cenComponentes.getFechacargo());
+			addDato(sb, "Idcomponente", cenComponentes.getIdcomponente());
+			addDato(sb, "Numcolegiado", cenComponentes.getNumcolegiado());
+			addDato(sb, "Persona", cenComponentes.getCenClienteIdpersona());
+			addDato(sb, "Provincia", cenComponentes.getIdprovincia());
+			addDato(sb, "Sociedad", cenComponentes.getSociedad());
+			addDato(sb, "Tipo colegio", cenComponentes.getIdtipocolegio());
+		}
+
+	}
+
+	private String getDescripcionEstados(CenDatoscolegialesestado estadoAnterior, CenDatoscolegialesestado estadoPosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionEstados(sb, estadoAnterior, "REGISTRO ANTERIOR");
+			getDescripcionEstados(sb, estadoPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionEstados(sb, estadoPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionEstados(sb, estadoPosterior, "REGISTRO ELIMINADO"); // no necesario
+			break;
+		default:
+			break;
+		}
+
+		return sb.toString();
+	}
+	
+	private void getDescripcionEstados(StringBuffer sb, CenDatoscolegialesestado estado,
+			String cabecera) {
+		if (estado != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Fechaestado", estado.getFechaestado());
+			addDato(sb, "Idestado", estado.getIdestado());
+			addDato(sb, "Observaciones", estado.getObservaciones());
 		}
 
 	}

@@ -770,7 +770,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final Integer CURSO_ARCHIVADO = 1;
 
-	public static final long EMITIR_CERTIFICADO = 1;
+	public static final Long EMITIR_CERTIFICADO = new Long("1");
 	
 	public static final Short DESIGNAR_TUTOR = 0; 
 	public static final Short ASIGNAR_TUTOR = 1; 
@@ -1033,7 +1033,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static Integer USUMODIFICACION_0 = 0;
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
 	
-	public static String SIGAFRONT_VERSION = "1.0.71_13";
-	public static String SIGAWEB_VERSION = "1.0.71_13";
+	public static String SIGAFRONT_VERSION = "1.0.71_14";
+	public static String SIGAWEB_VERSION = "1.0.71_14";
 	
 }

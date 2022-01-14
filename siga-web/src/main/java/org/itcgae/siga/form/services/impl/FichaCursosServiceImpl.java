@@ -3183,19 +3183,21 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 									for (InscripcionItem inscripcion : inscriptionItemList) {
 
-										if (inscripcion.getEmitirCertificado() == SigaConstants.EMITIR_CERTIFICADO) {
-											// Añadimos los certificados si existen para el curso y calificacion
-											ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
-											certificadosCursoExample.createCriteria()
-													.andIdcursoEqualTo(Long.valueOf(inscripcion.getIdCurso()))
-													.andIdcalificacionEqualTo(inscripcion.getIdCalificacion());
+										if (inscripcion.getEmitirCertificado() == null) {
+											if (inscripcion.getEmitirCertificado().intValue() == SigaConstants.EMITIR_CERTIFICADO.intValue()) {
+												// Añadimos los certificados si existen para el curso y calificacion
+												ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
+												certificadosCursoExample.createCriteria()
+														.andIdcursoEqualTo(Long.valueOf(inscripcion.getIdCurso()))
+														.andIdcalificacionEqualTo(inscripcion.getIdCalificacion());
 
-											listCertificadosCurso = forCertificadosCursoExtendsMapper
-													.selectByExample(certificadosCursoExample);
+												listCertificadosCurso = forCertificadosCursoExtendsMapper
+														.selectByExample(certificadosCursoExample);
 
-											if (null != listCertificadosCurso && listCertificadosCurso.size() > 0) {
-												responseInsert = fichaInscripcionService
-														.generarSolicitudCertificados(inscripcion, request);
+												if (null != listCertificadosCurso && listCertificadosCurso.size() > 0) {
+													responseInsert = fichaInscripcionService
+															.generarSolicitudCertificados(inscripcion, request);
+												}
 											}
 										}
 
