@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 public interface ICertificacionFacSJCSService {
@@ -58,9 +59,9 @@ public interface ICertificacionFacSJCSService {
 
     void marcaVisiblesFacturacionesCerradas();
 
-    ResponseEntity<InputStreamResource> descargarLogReintegrosXunta(List<String> idFactsList, HttpServletRequest request);
+    Resource descargarLogReintegrosXunta(List<String> idFactsList, HttpServletRequest request) throws Exception;
 
-    ResponseEntity<InputStreamResource> descargarInformeIncidencias(List<String> idFactsList, HttpServletRequest request);
+    Resource descargarInformeIncidencias(List<String> idFactsList, HttpServletRequest request) throws Exception;
 
     StringDTO perteneceInstitucionCAMoXunta(HttpServletRequest request);
 }

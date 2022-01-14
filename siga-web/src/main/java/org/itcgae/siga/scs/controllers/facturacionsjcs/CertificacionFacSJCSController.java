@@ -9,7 +9,6 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,7 +36,7 @@ public class CertificacionFacSJCSController {
     @PostMapping(path = "/descargaInformeCAM")
     public ResponseEntity<Resource> descargaInformeCAM(@RequestBody DescargaInfomreCAMItem descargaInfomreCAMItem, HttpServletRequest request) {
         ResponseEntity<Resource> response = null;
-        Resource resource = null;
+        Resource resource;
         Boolean error = false;
 
         try {
@@ -213,15 +212,53 @@ public class CertificacionFacSJCSController {
         return new ResponseEntity<MovimientosVariosApliCerDTO>(response, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/descargarLogReintegrosXunta", method = RequestMethod.POST)
-    ResponseEntity<InputStreamResource> descargarLogReintegrosXunta(@RequestBody List<String> idFactsList, HttpServletRequest request) {
-        ResponseEntity<InputStreamResource> response = iCertificacionFacSJCSService.descargarLogReintegrosXunta(idFactsList, request);
+    @PostMapping(value = "/descargarLogReintegrosXunta")
+    ResponseEntity<Resource> descargarLogReintegrosXunta(@RequestBody DescargaReintegrosXuntaDTO descargaReintegrosXuntaDTO, HttpServletRequest request) {
+
+        ResponseEntity<Resource> response = null;
+        Resource resource;
+        Boolean error = false;
+
+        try {
+            resource = iCertificacionFacSJCSService.descargarLogReintegrosXunta(descargaReintegrosXuntaDTO.getIdFactsList(), request);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+            response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        } catch (Exception e) {
+            error = true;
+        }
+
+        if (error) {
+            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
         return response;
     }
 
-    @RequestMapping(value = "/descargarInformeIncidencias", method = RequestMethod.POST)
-    ResponseEntity<InputStreamResource> descargarInformeReintegrosXunta(@RequestBody List<String> idFactsList, HttpServletRequest request) {
-        ResponseEntity<InputStreamResource> response = iCertificacionFacSJCSService.descargarInformeIncidencias(idFactsList, request);
+    @PostMapping(value = "/descargarInformeIncidencias")
+    ResponseEntity<Resource> descargarInformeReintegrosXunta(@RequestBody DescargaReintegrosXuntaDTO descargaReintegrosXuntaDTO, HttpServletRequest request) {
+
+        ResponseEntity<Resource> response = null;
+        Resource resource;
+        Boolean error = false;
+
+        try {
+            resource = iCertificacionFacSJCSService.descargarLogReintegrosXunta(descargaReintegrosXuntaDTO.getIdFactsList(), request);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+            response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        } catch (Exception e) {
+            error = true;
+        }
+
+        if (error) {
+            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
         return response;
     }
 
