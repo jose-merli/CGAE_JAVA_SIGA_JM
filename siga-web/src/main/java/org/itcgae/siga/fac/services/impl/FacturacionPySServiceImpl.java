@@ -3866,8 +3866,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		// Datos de la tarjeta generación de ficheros
 		fac.setGenerapdf(seriefacturacion.getGenerarpdf());
-		// seriefacturacion.getIdmodelofactura();
-		// seriefacturacion.getIdmodelorectificativa();
+		fac.setIdmodelofactura(seriefacturacion.getIdmodelofactura());
+		fac.setIdmodelorectificativa(seriefacturacion.getIdmodelorectificativa());
+
 		if (!UtilidadesString.esCadenaVacia(seriefacturacion.getGenerarpdf())
 				&& seriefacturacion.getGenerarpdf().equals("1")) {
 			fac.setIdestadopdf(Short.parseShort("7")); // Pendiente
