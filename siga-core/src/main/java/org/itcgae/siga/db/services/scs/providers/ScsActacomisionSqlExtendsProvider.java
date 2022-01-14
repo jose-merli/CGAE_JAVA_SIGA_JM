@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsActacomisionSqlProvider;
 
 public class ScsActacomisionSqlExtendsProvider extends ScsActacomisionSqlProvider{
@@ -19,7 +20,12 @@ public class ScsActacomisionSqlExtendsProvider extends ScsActacomisionSqlProvide
 		
 		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 
-		sql.WHERE("((fechaResolucion is null) OR (idacta = '" +idacta + "' AND anioacta = '" + anioacta + "'))");
+		if(!UtilidadesString.esCadenaVacia(idacta) && !UtilidadesString.esCadenaVacia(anioacta)) {
+			sql.WHERE("((fechaResolucion is null) OR (idacta = '" +idacta + "' AND anioacta = '" + anioacta + "'))");
+		}else {
+			sql.WHERE("fechaResolucion is null");
+		}
+		
 		
 		return sql.toString();
 	}
