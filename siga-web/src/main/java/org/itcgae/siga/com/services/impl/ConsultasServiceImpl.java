@@ -2988,6 +2988,14 @@ public class ConsultasServiceImpl implements IConsultasService {
 			
 			LOGGER.info("constructorConsultas() -> Salida del servicio para crear una nueva consulta desde el constructor de consultas");
 
+			ConConsultaKey conConsultaKey = new ConConsultaKey();
+			
+			conConsultaKey.setIdinstitucion(idInstitucion);
+			conConsultaKey.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
+			
+			ConConsulta conConsulta = _conConsultaMapper.selectByPrimaryKey(conConsultaKey);
+			
+			queryBuilderDTO.setSentencia(conConsulta.getSentencia());
 			
 			return queryBuilderDTO;
 				
