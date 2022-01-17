@@ -220,7 +220,7 @@ public interface PysSuscripcionMapper {
         "select",
         "NVL(max(IDSUSCRIPCION) +1, 1)",
         "from PYS_SUSCRIPCION",
-        "where idinstitucion= #{idinstitucion,jdbcType=DECIMAL} and rownum <= 1"
+        "where idinstitucion= #{idinstitucion,jdbcType=DECIMAL}"
     })
-    int getNewIdSus(Short idInstitucion);
+    int getNewIdSus(PysSuscripcion idInstitucion);
 }
