@@ -1,18 +1,10 @@
 package org.itcgae.siga.fac.services.impl;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,14 +14,11 @@ import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
@@ -76,7 +65,6 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
-import org.itcgae.siga.commons.utils.SIGAReferences;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -114,7 +102,6 @@ import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaDevolucion;
 import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
-import org.itcgae.siga.db.entities.FacFacturacionEliminar;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
@@ -159,11 +146,9 @@ import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
-import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
-import org.itcgae.siga.db.entities.PysTipoiva;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
@@ -210,7 +195,6 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -3242,14 +3226,21 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private void anularFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
 			AdmUsuarios usuario) {
-		// historico fac
-		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
 
-		facHistoricoInsert.setImptotalpagado(facUpdate.getImptotal());
-		facHistoricoInsert.setImptotalcompensado(facUpdate.getImptotal());
-		facHistoricoInsert.setImptotalporpagar(BigDecimal.valueOf(0));
+		//Historico Factura Anulada
+		facHistoricoInsert.setIdfactura(facUpdate.getIdfactura());
+		facHistoricoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
 
+		facHistoricoInsert.setIdtipoaccion((short) 8);
 		facHistoricoInsert.setEstado((short) 8);
+
+		facHistoricoInsert.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagado(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalporpagar(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalcompensado(facUpdate.getImptotal());
 
 		facHistoricoInsert.setIddisquetecargos(null);
 		facHistoricoInsert.setIdfacturaincluidaendisquete(null);
@@ -3260,7 +3251,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricoInsert.setIdabono(null);
 		facHistoricoInsert.setComisionidfactura(null);
 
-		// abono
+
+		//Anular Factura Original
+		facUpdate.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagado(BigDecimal.valueOf(0));
+		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+		facUpdate.setImptotalcompensado(facUpdate.getImptotal());
+
+		facUpdate.setEstado((short) 8);
+
+		facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+
+
+		//Abono
 		FacAbono abonoInsert = new FacAbono();
 
 		abonoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
@@ -3285,17 +3291,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		abonoInsert.setIdabono(Long.valueOf(
 				facAbonoExtendsMapper.getNewAbonoID(String.valueOf(usuario.getIdinstitucion())).get(0).getValue()));
 
+		abonoInsert.setNumeroabono(facAbonoExtendsMapper.getNuevoNumeroAbono(facUpdate.getIdinstitucion().toString(), "FAC_ABONOS_GENERAL").get(0).getValue());
+
 		abonoInsert.setEstado((short) 6);
-		abonoInsert.setNumeroabono(String.valueOf(abonoInsert.getIdabono()));
 
 		facHistoricoInsert.setIdabono(abonoInsert.getIdabono());
 
-		// factura
-		facUpdate.setEstado((short) 8);
-		facUpdate.setImptotalpagado(facUpdate.getImptotal());
-		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
-		facUpdate.setFechamodificacion(new Date());
-		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
+
+		//Actualizar Contador Factura
+		AdmContadorKey admContadorKey = new AdmContadorKey();
+		admContadorKey.setIdinstitucion(facUpdate.getIdinstitucion());
+		admContadorKey.setIdcontador("FAC_ABONOS_GENERAL");
+
+		AdmContador admContador = admContadorMapper.selectByPrimaryKey(admContadorKey);
+		admContador.setContador(admContador.getContador()+1);
+
+		admContadorMapper.updateByPrimaryKey(admContador);
 
 		// saves
 		facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);

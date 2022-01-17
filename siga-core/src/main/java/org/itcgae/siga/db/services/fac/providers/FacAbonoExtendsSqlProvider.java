@@ -273,4 +273,21 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
     	
     	return sql.toString();
     }
+
+    public String getNuevoNumeroAbono(String idInstitucion, String idContador){
+
+        SQL sql = new SQL();
+
+        // Select
+        sql.SELECT("ac.PREFIJO || LPAD(ac.CONTADOR + 1, ac.LONGITUDCONTADOR, '0') || ac.SUFIJO AS NUEVOCONTADOR");
+
+        // From
+        sql.FROM("ADM_CONTADOR ac");
+
+        // Where
+        sql.WHERE("ac.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("ac.IDCONTADOR = '" + idContador + "'");
+
+        return sql.toString();
+    }
 }
