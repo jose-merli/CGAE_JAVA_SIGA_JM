@@ -453,6 +453,10 @@ public class UtilidadesFacturacionSJCS {
             // TODO Esta funcionalidad llamará al módulo de comunicaciones cuando esté
             // desarrollado
 
+            String error = "Fin de la simulacion de la facturacion.";
+            LOGGER.error(error);
+            logErroresFac.logError(error);
+            logErroresFac.writeAllErrors();
             throw new Exception("Hacemos rollback por tratarse de una simulacion");
         }
 
