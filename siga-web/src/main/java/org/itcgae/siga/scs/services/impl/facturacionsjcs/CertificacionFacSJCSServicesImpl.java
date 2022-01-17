@@ -33,10 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -201,18 +198,18 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 //        }
 
         // Acciones a realizar si se trata de la CAM
-        if (isCAM(idInstitucion)) {
-            /* en el caso de la CAM el fichero ya se ha generado previamente al ejecutar informe
-             *  averiguar qué implicaciones tiene en el estado en el caso de la CAM
-             */
+//        if (isCAM(idInstitucion)) {
+        /* en el caso de la CAM el fichero ya se ha generado previamente al ejecutar informe
+         *  averiguar qué implicaciones tiene en el estado en el caso de la CAM
+         */
 
-        }
-
-        if (!isCAM(idInstitucion)) {
-            actualizarEstadoFacturacion(usuario, idInstitucion, idFacturacion, estadoFuturo);
-        }
+//        }
 
         // Acciones a realizar si se trata de territorio común
+        if (SigaConstants.TIPO_CAJG_XML_SANTIAGO != tipoCAJG && SigaConstants.TIPO_CAJG_CATALANES != tipoCAJG) {
+            actualizarEstadoFacturacion(usuario, idInstitucion, idFacturacion, estadoFuturo);
+            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
+        }
 
     }
 
@@ -1840,6 +1837,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         Resource res = null;
+        Error error = new Error();
 
         if (null != idInstitucion) {
 
@@ -1851,59 +1849,59 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
             if (null != usuarios && !usuarios.isEmpty()) {
 
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-                ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-
                 if (null != idFactsList && !idFactsList.isEmpty()) {
 
-                    for (String idFacturacion : idFactsList) {
+                    if (idFactsList.size() == 1) {
 
-                        File file = getFileInformeIncidencias(idInstitucion, idFacturacion);
+                        File file = getFileInformeIncidencias(idInstitucion, idFactsList.get(0));
+                        FileInputStream fileInputStream = new FileInputStream(file);
 
-                        if (file.exists()) {
-                            String addFName = file.getPath().replace(file.getPath(), File.separator + file.getName());
-                            zipOutputStream.putNextEntry(new ZipEntry(addFName));
-                            Files.copy(file.toPath(), zipOutputStream);
+                        res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
+                            public String getFilename() {
+                                return file.getName();
+                            }
+                        };
+
+                    } else {
+
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+                        ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+                        for (String idFacturacion : idFactsList) {
+
+                            File file = getFileInformeIncidencias(idInstitucion, idFacturacion);
+
+                            if (file.exists()) {
+                                String addFName = file.getPath().replace(file.getPath(), File.separator + idFacturacion + File.separator + file.getName());
+                                zipOutputStream.putNextEntry(new ZipEntry(addFName));
+                                Files.copy(file.toPath(), zipOutputStream);
+                            }
+
                         }
 
-                    }
+                        zipOutputStream.closeEntry();
 
-                    zipOutputStream.closeEntry();
-
-                    if (zipOutputStream != null) {
-                        zipOutputStream.finish();
-                        zipOutputStream.flush();
-                        IOUtils.closeQuietly(zipOutputStream);
-                    }
-
-                    IOUtils.closeQuietly(bufferedOutputStream);
-                    IOUtils.closeQuietly(byteArrayOutputStream);
-
-                    res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
-                        public String getFilename() {
-                            return "Informe_Incidencias.zip";
+                        if (zipOutputStream != null) {
+                            zipOutputStream.finish();
+                            zipOutputStream.flush();
+                            IOUtils.closeQuietly(zipOutputStream);
                         }
-                    };
+
+                        IOUtils.closeQuietly(bufferedOutputStream);
+                        IOUtils.closeQuietly(byteArrayOutputStream);
+
+                        res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
+                            public String getFilename() {
+                                return "Informe_Incidencias.zip";
+                            }
+                        };
+
+                    }
 
                 } else {
-
-                    zipOutputStream.closeEntry();
-
-                    if (zipOutputStream != null) {
-                        zipOutputStream.finish();
-                        zipOutputStream.flush();
-                        IOUtils.closeQuietly(zipOutputStream);
-                    }
-
-                    IOUtils.closeQuietly(bufferedOutputStream);
-                    IOUtils.closeQuietly(byteArrayOutputStream);
-
-                    res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
-                        public String getFilename() {
-                            return "Informe_Incidencias.zip";
-                        }
-                    };
+                    error.setCode(400);
+                    error.setDescription("general.mensaje.error.bbdd");
                 }
 
             } else {
