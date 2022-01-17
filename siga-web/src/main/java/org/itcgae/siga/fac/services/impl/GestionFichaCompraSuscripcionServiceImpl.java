@@ -631,7 +631,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							LOGGER.info(
 									"aprobarSuscripcion() / pysSuscripcionMapper.getNewIdCola() -> Entrada a pysSuscripcionMapper para obtener el id para la nueva suscripcion");
 							
-							long newIdSus = pysSuscripcionMapper.getNewIdSus(idInstitucion);
+							PysSuscripcion sus = new PysSuscripcion();
+							
+							sus.setIdinstitucion(idInstitucion);
+							long newIdSus = pysSuscripcionMapper.getNewIdSus(sus);
 
 							LOGGER.info(
 									"aprobarSuscripcion() / pysSuscripcionMapper.getNewIdCola() -> Salida de pysSuscripcionMapper para obtener el id para la nueva suscripcion");
@@ -2326,16 +2329,16 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				servicioSolicitado.setIdpersona(idPersona);
 				servicioSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
 				//Si se ha seleccionado como forma de pago "No facturable"
-//				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
-//					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
-//					//que no tendra cuenta bancaria seleccionada.
-//					servicioSolicitado.setIdformapago((short) 80);
+				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
+					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
+					//que no tendra cuenta bancaria seleccionada.
+					servicioSolicitado.setIdformapago((short) 80);
 //					servicioSolicitado.setNofacturable("1");
-//				}
-//				else{
+				}
+				else{
 					servicioSolicitado.setIdformapago(Short.valueOf(peticion.getIdFormaPagoSeleccionada()));
 //					servicioSolicitado.setNofacturable("0");
-//				}
+				}
 				//En el caso que la forma de pago sea domiciliación bancaria
 				if(peticion.getIdFormaPagoSeleccionada().equals("80") || peticion.getIdFormaPagoSeleccionada().equals("20")) {
 					servicioSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
