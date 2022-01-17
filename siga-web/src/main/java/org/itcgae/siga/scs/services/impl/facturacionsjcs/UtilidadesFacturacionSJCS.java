@@ -361,11 +361,12 @@ public class UtilidadesFacturacionSJCS {
         	String sError = "Error en PL = " + (String) resultado[2]; 
             LOGGER.error(sError);
             logErroresFac.logError(sError);
-            throw new Exception("Ha ocurrido un error al ejecutar la facturación de Turnos de Oficio: "
-                    + (String) resultado[2]);
+
+        }else{
+            importeOficio = new Double(resultado[0].replaceAll(",", "."));
+            importeTotal += importeOficio.doubleValue();
         }
-        importeOficio = new Double(resultado[0].replaceAll(",", "."));
-        importeTotal += importeOficio.doubleValue();
+
 
         //////////////////////////////////
         // GUARDIAS rgg 22-03-2005
@@ -388,11 +389,12 @@ public class UtilidadesFacturacionSJCS {
         	String sError ="Error en PL = " + (String) resultado[2];
             LOGGER.error(sError);
             logErroresFac.logError(sError);
-            throw new Exception(
-                    "Ha ocurrido un error al ejecutar la facturación de Guardias: " + (String) resultado[2]);
+
+        }else{
+            importeGuardia = new Double(resultado[0].replaceAll(",", "."));
+            importeTotal += importeGuardia.doubleValue();
         }
-        importeGuardia = new Double(resultado[0].replaceAll(",", "."));
-        importeTotal += importeGuardia.doubleValue();
+
 
         //////////////////////////////////
         // EXPEDIENTES SOJ rgg 22-03-2005
@@ -409,12 +411,12 @@ public class UtilidadesFacturacionSJCS {
         	String error = "Error en PL = " + (String) resultado[2];
             LOGGER.error(error);
             logErroresFac.logError(error);
-            throw new Exception(
-                    "Ha ocurrido un error al ejecutar la facturación de Expedientes de Orientación Jurídica: "
-                            + (String) resultado[2]);
+
+        }else{
+            importeSOJ = new Double(resultado[0].replaceAll(",", "."));
+            importeTotal += importeSOJ.doubleValue();
         }
-        importeSOJ = new Double(resultado[0].replaceAll(",", "."));
-        importeTotal += importeSOJ.doubleValue();
+
 
         //////////////////////////////////
         // EXPEDIENTES EJG rgg 22-03-2005
@@ -431,13 +433,13 @@ public class UtilidadesFacturacionSJCS {
         	String error = "Error en PL = " + (String) resultado[2];
             LOGGER.error(error);
             logErroresFac.logError(error);
-            throw new Exception(
-                    "Ha ocurrido un error al ejecutar la facturación de Expedientes de Justicia Gratuita: "
-                            + (String) resultado[2]);
+
+        }else{
+            importeEJG = new Double(resultado[0].replaceAll(",", "."));
+            importeTotal += importeEJG.doubleValue();
         }
 
-        importeEJG = new Double(resultado[0].replaceAll(",", "."));
-        importeTotal += importeEJG.doubleValue();
+
 
         if (prevision) {
             //////////////////////////////////////
@@ -451,17 +453,14 @@ public class UtilidadesFacturacionSJCS {
             // TODO Esta funcionalidad llamará al módulo de comunicaciones cuando esté
             // desarrollado
 
+            String error = "Fin de la simulacion de la facturacion.";
+            LOGGER.error(error);
+            logErroresFac.logError(error);
+            logErroresFac.writeAllErrors();
             throw new Exception("Hacemos rollback por tratarse de una simulacion");
         }
 
-        // ACTUALIZO LOS TOTALES
-        itemFac.setImporteejg(new BigDecimal(importeEJG));
-        itemFac.setImporteguardia(new BigDecimal(importeGuardia));
-        itemFac.setImporteoficio(new BigDecimal(importeOficio));
-        itemFac.setImportesoj(new BigDecimal(importeSOJ));
-        itemFac.setImportetotal(new BigDecimal(importeTotal));
 
-        fcsFacturacionjgMapper.updateByPrimaryKey(itemFac);
 
         // Exportacion de datos a EXCEL: Se ha comentado este metodo por que no se
         // quiere utilizar
@@ -471,6 +470,14 @@ public class UtilidadesFacturacionSJCS {
         	logErroresFac.writeAllErrors();
         } else {
         	logErroresFac.writeExito();
+            // ACTUALIZO LOS TOTALES
+            itemFac.setImporteejg(new BigDecimal(importeEJG));
+            itemFac.setImporteguardia(new BigDecimal(importeGuardia));
+            itemFac.setImporteoficio(new BigDecimal(importeOficio));
+            itemFac.setImportesoj(new BigDecimal(importeSOJ));
+            itemFac.setImportetotal(new BigDecimal(importeTotal));
+
+            fcsFacturacionjgMapper.updateByPrimaryKey(itemFac);
         }
 
     }

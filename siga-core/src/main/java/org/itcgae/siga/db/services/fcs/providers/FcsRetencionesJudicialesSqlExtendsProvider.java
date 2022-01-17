@@ -128,7 +128,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
             query.WHERE("TRUNC(FECHAINICIO) <= TRUNC(TO_DATE('" + fecha + "', 'YYYY/MM/DD HH24:MI:SS'))");
         }
         if (!retencionesRequestDTO.isHistorico()) {
-            query.WHERE("(FECHAFIN IS NULL)");
+            query.WHERE("(FECHAFIN IS NULL OR TRUNC(FECHAFIN) >= TRUNC(SYSDATE))");
         }
         query.WHERE("(( IMPORTE + NVL ((" + subQuery6.toString() + "), 0) ) > 0 OR TIPORETENCION = 'P' OR (TIPORETENCION = 'L' AND IMPORTE IS NULL))");
         if (!UtilidadesString.esCadenaVacia(retencionesRequestDTO.getIdPagos())) {

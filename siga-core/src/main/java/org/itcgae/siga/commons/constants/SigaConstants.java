@@ -1465,4 +1465,6 @@ public class SigaConstants {
     
 	public static final String C_IDFACTURACION = "IDFACTURACION";
 
+    public static final String PCAJG_ALC_CAM_PATH = "PCAJG_ALC_CAM_PATH";
+    public static final String IDFACTURACION = "IDFACTURACION";;
 }

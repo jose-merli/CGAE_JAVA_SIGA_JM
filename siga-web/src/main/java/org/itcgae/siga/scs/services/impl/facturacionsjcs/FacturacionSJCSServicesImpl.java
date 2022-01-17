@@ -1730,13 +1730,19 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         }
     }
 
-    private void setNadieEjecutando() {
+    public static void setNadieEjecutando() {
         synchronized (FacturacionSJCSServicesImpl.alguienEjecutando) {
             FacturacionSJCSServicesImpl.alguienEjecutando = Boolean.FALSE;
         }
     }
 
-    public boolean isAlguienEjecutando() {
+    public static void setAlguienEjecutando() {
+        synchronized (FacturacionSJCSServicesImpl.alguienEjecutando) {
+            FacturacionSJCSServicesImpl.alguienEjecutando = Boolean.TRUE;
+        }
+    }
+
+    public static boolean isAlguienEjecutando() {
         synchronized (FacturacionSJCSServicesImpl.alguienEjecutando) {
             if (!FacturacionSJCSServicesImpl.alguienEjecutando) {
                 FacturacionSJCSServicesImpl.alguienEjecutando = Boolean.TRUE;
