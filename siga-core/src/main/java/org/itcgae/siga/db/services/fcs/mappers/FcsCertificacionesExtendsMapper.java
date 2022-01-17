@@ -81,7 +81,6 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR),
             @Result(column = "PARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "GRUPOFACTURACION", property = "idGrupo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "TURNO", property = "importeOficio", jdbcType = JdbcType.VARCHAR),
             @Result(column = "GUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTESOJ", property = "importeSoj", jdbcType = JdbcType.VARCHAR),
@@ -137,5 +136,8 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.VARCHAR)
     })
     List<AsuntoPorMovimientoItem> getAsuntoGuardiaPorMovimientos(Short idInstitucion, List<Long> idMovimientos);
+
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getGrupoFacturacionPorFacturacion")
+    List<String> getGrupoFacturacionPorFacturacion(Short idInstitucion, String idFacturacion, String idLenguaje);
 
 }

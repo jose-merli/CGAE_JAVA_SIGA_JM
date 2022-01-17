@@ -184,11 +184,14 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         //SI TIENE CONFIGURADO EL WEBSERVICE HACEMOS LA LLAMADA
         int tipoCAJG = getTipoCAJG(idInstitucion);
 
+        // Acciones a realizar si se trata de la Xunta
         if (SigaConstants.TIPO_CAJG_XML_SANTIAGO == tipoCAJG) {
             envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_XUNTA_JE.getId(), usuario);
             estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
             actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
         }
+
+        // Acciones a realizar si se trata de los Catalanes: NO SE HACE
 
         //TODO CAMBIAR LA OPERACIÓN
 //        if (SigaConstants.TIPO_CAJG_CATALANES == tipoCAJG) {
@@ -197,6 +200,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 //            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
 //        }
 
+        // Acciones a realizar si se trata de la CAM
         if (isCAM(idInstitucion)) {
             /* en el caso de la CAM el fichero ya se ha generado previamente al ejecutar informe
              *  averiguar qué implicaciones tiene en el estado en el caso de la CAM
@@ -207,6 +211,8 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         if (!isCAM(idInstitucion)) {
             actualizarEstadoFacturacion(usuario, idInstitucion, idFacturacion, estadoFuturo);
         }
+
+        // Acciones a realizar si se trata de territorio común
 
     }
 
@@ -884,6 +890,14 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                     LOGGER.info("CertificacionFacSJCSServicesImpl.getFactCertificaciones() / fcsCertificacionesExtendsMapper.getFactCertificaciones() -> Entrada a fcsCertificacionesExtendsMapper para obtener las facturaciones");
                     List<FacturacionItem> facturacionItems = fcsCertificacionesExtendsMapper.getFactCertificaciones(idCertificacion, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje());
+
+                    for (FacturacionItem fac : facturacionItems) {
+                        List<String> grupoFacturacionList = fcsCertificacionesExtendsMapper.getGrupoFacturacionPorFacturacion(idInstitucion, fac.getIdFacturacion(), usuarios.get(0).getIdlenguaje());
+
+                        if (null != grupoFacturacionList && !grupoFacturacionList.isEmpty()) {
+                            fac.setIdGrupo(String.join(", ", grupoFacturacionList));
+                        }
+                    }
 
                     if (null != facturacionItems && facturacionItems.size() > tamMaximo) {
                         facturacionItems.remove(facturacionItems.size() - 1);

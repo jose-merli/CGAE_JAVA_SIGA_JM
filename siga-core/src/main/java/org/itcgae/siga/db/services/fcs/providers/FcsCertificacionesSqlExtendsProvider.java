@@ -176,7 +176,6 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql.SELECT("IMPORTETOTAL");
         sql.SELECT("IMPORTEPAGADO");
         sql.SELECT("IMPORTETOTAL-IMPORTEPAGADO AS IMPORTEPENDIENTE");
-        sql.SELECT("GRUPOFACTURACION");
         sql.SELECT("PARTIDAPRESUPUESTARIA");
         sql.SELECT("GUARDIA");
         sql.SELECT("TURNO");
@@ -200,7 +199,6 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql2.SELECT("NVL(DECODE(EST.IDESTADOFACTURACION, 20, 0, " + "(SELECT SUM(P.IMPORTEPAGADO) "
                 + "FROM FCS_PAGOSJG P "
                 + "WHERE P.IDFACTURACION = FAC.IDFACTURACION AND P.IDINSTITUCION = FAC.IDINSTITUCION)),0) AS IMPORTEPAGADO");
-        sql2.SELECT("F_SIGA_GETRECURSO(GRUP.NOMBRE, " + idLenguaje + ") AS GRUPOFACTURACION");
         sql2.SELECT("fac.idpartidapresupuestaria as PARTIDAPRESUPUESTARIA");
         sql2.SELECT("CASE WHEN fac.IMPORTEGUARDIA is null then '0' END AS GUARDIA");
         sql2.SELECT("CASE WHEN fac.IMPORTEOFICIO is null then '0' END as TURNO");
@@ -210,12 +208,8 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
 
         sql2.FROM("FCS_FACTURACIONJG FAC");
         sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
-        sql2.INNER_JOIN(
-                "FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION AND EST.idestadofacturacion = '20')");
-        sql2.INNER_JOIN(
-                "FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)" +
-                        " LEFT JOIN FCS_FACT_GRUPOFACT_HITO HIT ON HIT.IDFACTURACION = FAC.IDFACTURACION AND HIT.IDINSTITUCION = FAC.IDINSTITUCION" +
-                        " JOIN SCS_GRUPOFACTURACION GRUP ON GRUP.IDGRUPOFACTURACION = HIT.IDGRUPOFACTURACION AND GRUP.IDINSTITUCION  = HIT.IDINSTITUCION");
+        sql2.INNER_JOIN("FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION AND EST.idestadofacturacion = '20')");
+        sql2.INNER_JOIN("FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)");
 
 
         sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");
@@ -223,6 +217,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
 
 
         sql.FROM("(" + sql2.toString() + ") busqueda");
+
         sql.ORDER_BY("busqueda.FECHADESDE ASC");
         sql.ORDER_BY("busqueda.FECHAHASTA");
         sql.ORDER_BY("busqueda.FECHAESTADO DESC");
@@ -373,6 +368,21 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql.JOIN("SCS_GUARDIASTURNO G ON G.IDINSTITUCION = C.IDINSTITUCION AND G.IDTURNO = C.IDTURNO AND G.IDGUARDIA = C.IDGUARDIA");
         sql.WHERE("C.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("C.IDMOVIMIENTO IN " + idMovimientos.toString().replace("[", "(").replace("]", ")"));
+
+        return sql.toString();
+    }
+
+    public String getGrupoFacturacionPorFacturacion(Short idInstitucion, String idFacturacion, String idLenguaje) {
+
+        SQL sql = new SQL();
+        sql.SELECT("F_SIGA_GETRECURSO(G.NOMBRE, " + idLenguaje + ") AS GRUPOFACTURACION");
+        sql.FROM("FCS_FACT_GRUPOFACT_HITO H");
+        sql.JOIN("SCS_GRUPOFACTURACION G ON G.IDINSTITUCION = H.IDINSTITUCION AND G.IDGRUPOFACTURACION = H.IDGRUPOFACTURACION");
+        sql.WHERE("H.IDFACTURACION = " + idFacturacion);
+        sql.WHERE("H.IDINSTITUCION = " + idInstitucion);
+        sql.GROUP_BY("H.IDINSTITUCION");
+        sql.GROUP_BY("H.IDGRUPOFACTURACION");
+        sql.GROUP_BY("F_SIGA_GETRECURSO(G.NOMBRE, " + idLenguaje + ")");
 
         return sql.toString();
     }

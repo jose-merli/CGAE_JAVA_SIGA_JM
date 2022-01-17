@@ -245,7 +245,7 @@ public class CertificacionFacSJCSController {
         Boolean error = false;
 
         try {
-            resource = iCertificacionFacSJCSService.descargarLogReintegrosXunta(descargaReintegrosXuntaDTO.getIdFactsList(), request);
+            resource = iCertificacionFacSJCSService.descargarInformeIncidencias(descargaReintegrosXuntaDTO.getIdFactsList(), request);
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
             headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
