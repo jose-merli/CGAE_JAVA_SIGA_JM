@@ -1,11 +1,32 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.FacturacionGrupoPagoDTO;
 import org.itcgae.siga.DTOs.scs.MovimientoVarioDTO;
 import org.itcgae.siga.DTOs.scs.PerteneceAunaSociedadDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.EnvProgrampagosExample;
+import org.itcgae.siga.db.entities.FacAbono;
+import org.itcgae.siga.db.entities.FacAbonoExample;
+import org.itcgae.siga.db.entities.FacAbonoincluidoendisqueteExample;
+import org.itcgae.siga.db.entities.FacDisqueteabonosExample;
+import org.itcgae.siga.db.entities.FcsAplicaMovimientosvarios;
+import org.itcgae.siga.db.entities.FcsFacturacionjg;
+import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
+import org.itcgae.siga.db.entities.FcsMovimientosvarios;
+import org.itcgae.siga.db.entities.FcsPagoColegiado;
+import org.itcgae.siga.db.entities.FcsPagosEstadospagos;
+import org.itcgae.siga.db.entities.FcsPagosjg;
 import org.itcgae.siga.db.mappers.FacDisqueteabonosMapper;
 import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
@@ -13,22 +34,19 @@ import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.env.mappers.EnvEnvioprogramadoExtendsMapper;
 import org.itcgae.siga.db.services.env.mappers.EnvProgrampagosExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacHistoricofacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineaabonoExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.*;
+import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacPagoabonoefectivoExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacPagosporcajaExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsPagoColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsPagosjgExtendsMapper;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UtilidadesPagoSJCS {
