@@ -248,11 +248,11 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/comboModelosComunicacion")
-	ResponseEntity<ComboDTO> comboModelosComunicacion(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> comboModelosComunicacion(@RequestParam(defaultValue = "false") Boolean esRectificativa, HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
 
 		try {
-			response = facturacionGeneralService.comboModelosComunicacion(request);
+			response = facturacionGeneralService.comboModelosComunicacion(esRectificativa, request);
 
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
