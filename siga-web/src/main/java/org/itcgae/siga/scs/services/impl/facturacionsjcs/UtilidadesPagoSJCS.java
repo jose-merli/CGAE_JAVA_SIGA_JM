@@ -13,6 +13,8 @@ import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.env.mappers.EnvEnvioprogramadoExtendsMapper;
 import org.itcgae.siga.db.services.env.mappers.EnvProgrampagosExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacHistoricofacturaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacLineaabonoExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.*;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.springframework.beans.factory.annotation.Autowired;
