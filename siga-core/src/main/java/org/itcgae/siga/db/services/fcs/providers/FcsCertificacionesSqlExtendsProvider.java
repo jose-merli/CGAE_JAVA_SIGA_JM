@@ -200,21 +200,28 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
                 + "FROM FCS_PAGOSJG P "
                 + "WHERE P.IDFACTURACION = FAC.IDFACTURACION AND P.IDINSTITUCION = FAC.IDINSTITUCION)),0) AS IMPORTEPAGADO");
         sql2.SELECT("fac.idpartidapresupuestaria as PARTIDAPRESUPUESTARIA");
-        sql2.SELECT("CASE WHEN fac.IMPORTEGUARDIA is null then '0' END AS GUARDIA");
-        sql2.SELECT("CASE WHEN fac.IMPORTEOFICIO is null then '0' END as TURNO");
-        sql2.SELECT("CASE WHEN fac.IMPORTESOJ is null then '0' END as IMPORTESOJ");
-        sql2.SELECT("CASE WHEN fac.IMPORTEEJG is null then '0' END as IMPORTEEJG");
+        sql2.SELECT("NVL(fac.IMPORTEGUARDIA, 0) AS GUARDIA");
+        sql2.SELECT("NVL(fac.IMPORTEOFICIO, 0) AS TURNO");
+        sql2.SELECT("NVL(fac.IMPORTESOJ, 0) AS IMPORTESOJ");
+        sql2.SELECT("NVL(fac.IMPORTEEJG, 0) AS IMPORTEEJG");
 
 
         sql2.FROM("FCS_FACTURACIONJG FAC");
         sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
-        sql2.INNER_JOIN("FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION AND EST.idestadofacturacion = '20')");
+        sql2.INNER_JOIN("FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION)");
         sql2.INNER_JOIN("FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)");
 
 
         sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");
         sql2.WHERE("cert.IDCERTIFICACION = " + idCertificacion);
 
+        SQL subQueryMaxEstado = new SQL();
+        subQueryMaxEstado.SELECT("MAX(EST2.IDORDENESTADO)");
+        subQueryMaxEstado.FROM("FCS_FACT_ESTADOSFACTURACION EST2");
+        subQueryMaxEstado.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+        subQueryMaxEstado.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+
+        sql2.WHERE("EST.IDORDENESTADO = (" + subQueryMaxEstado.toString() + ")");
 
         sql.FROM("(" + sql2.toString() + ") busqueda");
 

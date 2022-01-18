@@ -439,6 +439,10 @@ public class InscripcionServiceImpl implements InscripcionService {
 							}
 						}
 						
+						if (a.getFechasolicitudbajaNUEVA() != null) {
+							record.setFechasolicitudbaja(a.getFechasolicitudbajaNUEVA());
+						}
+						
 						inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record);
 					}
 					if (inscripciones != 0)

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
@@ -23,6 +24,8 @@ import org.itcgae.siga.DTO.fac.ListaSuscripcionesItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
+import org.itcgae.siga.db.entities.PysSuscripcion;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionMapper;
 import org.itcgae.siga.db.services.fac.providers.PySTipoIvaSqlExtendsProvider;
 import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
@@ -216,4 +219,11 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 	})
 	List<CargaMasivaComprasItem> listadoCargaMasivaCompras(FiltroCargaMasivaCompras cargaMasivaItem, Short idInstitucion);
 	
+	 @Select({
+	        "select",
+	        "NVL(max(IDPETICION) +1, 1)",
+	        "from PYS_PETICIONCOMPRASUSCRIPCION",
+	        "where idinstitucion= #{idinstitucion,jdbcType=DECIMAL}"
+	    })
+	    int getNewIdPet(PysPeticioncomprasuscripcion idInstitucion);
 }

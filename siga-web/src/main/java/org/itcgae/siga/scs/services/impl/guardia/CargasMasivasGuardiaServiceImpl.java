@@ -420,9 +420,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				// Busqueda para obtener turno asociado a la guardia y su nombre
 				List<CargaMasivaDatosITItem> listGu = scsGuardiasTurnoExtendsMapper
 						.searchNombreTurnoGuardiaNoAbrev(idInstitucion.toString(), gparts[i]);
-				List<String> idGuardiaList = scsGuardiasturnoExtendsMapper.getIdGuardiaByName(gparts[i]);
+				List<String> idGuardiaList = scsGuardiasturnoExtendsMapper.getIdGuardiaByName(gparts[i], idInstitucion.toString());
 				String idGuardia = idGuardiaList.get(0);
-				List<String> idTurnoList = scsGuardiasturnoExtendsMapper.getIdTurnoByName(tparts[i]);
+				List<String> idTurnoList = scsGuardiasturnoExtendsMapper.getIdTurnoByName(tparts[i], idInstitucion.toString());
 				String idTurno = idTurnoList.get(0);
 				ScsInscripcionguardiaKey key1 = new ScsInscripcionguardiaKey();
 
@@ -989,7 +989,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					&& !hashtable.get(SigaConstants.GUARDIA).toString().equals("")) {
 				cargaMasivaDatosITItem.setNombreGuardia((String) hashtable.get(SigaConstants.GUARDIA));
 				List<String> idGuardiaList = scsGuardiasturnoExtendsMapper
-						.getIdGuardiaByName(cargaMasivaDatosITItem.getNombreGuardia());
+						.getIdGuardiaByName(cargaMasivaDatosITItem.getNombreGuardia(), idInstitucion.toString());
 				String idGuardia = idGuardiaList.get(0);
 				cargaMasivaDatosITItem.setIdGuardia(idGuardia);
 				try {
@@ -1964,10 +1964,10 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 												cargaMasivaDatosBTItem.getFechaFinal()),
 										idInstitucion.toString());
 								List<String> idGuardiaList = scsGuardiasturnoExtendsMapper
-										.getIdGuardiaByName(cargaMasivaDatosBTItem.getIdGuardia());
+										.getIdGuardiaByName(cargaMasivaDatosBTItem.getIdGuardia(), idInstitucion.toString());
 								String idGuardia = idGuardiaList.get(0);
 								List<String> idTurnoList = scsGuardiasturnoExtendsMapper
-										.getIdTurnoByName(cargaMasivaDatosBTItem.getIdTurno());
+										.getIdTurnoByName(cargaMasivaDatosBTItem.getIdTurno(), idInstitucion.toString());
 								String idTurno = idTurnoList.get(0);
 								if (numGuards <= 0) {
 									error.setCode(204);
@@ -2271,10 +2271,10 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			if (errorLinea.toString().isEmpty()) {
 			// 1. Si la guardia de colegiado ya existe en el sistema, dará error.
 			List<String> idGuardiaList = scsGuardiasturnoExtendsMapper
-					.getIdGuardiaByName(cargaMasivaDatosBTItem.getIdGuardia());
+					.getIdGuardiaByName(cargaMasivaDatosBTItem.getIdGuardia(), idInstitucion.toString());
 			String idGuardia = idGuardiaList.get(0);
 			List<String> idTurnoList = scsGuardiasturnoExtendsMapper
-					.getIdTurnoByName(cargaMasivaDatosBTItem.getIdTurno());
+					.getIdTurnoByName(cargaMasivaDatosBTItem.getIdTurno(), idInstitucion.toString());
 			String idTurno = idTurnoList.get(0);
 			ScsGuardiascolegiadoKey keyGC = new ScsGuardiascolegiadoKey();
 			keyGC.setFechafin(cargaMasivaDatosBTItem.getFechaFinal());
@@ -2294,7 +2294,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				key.setIdinstitucion(idInstitucion);
 				key.setIdturno(Integer.parseInt(idTurno));
 				ScsGuardiasturno configGuardia = scsGuardiasturnoMapper.selectByPrimaryKey(key);
-
+				if (configGuardia != null) {
 				Short diasSeparacion = configGuardia.getDiasseparacionguardias();
 				int periodo = 0;
 				int unidadesPeriodo = 0;
@@ -2457,7 +2457,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					}
 				}
 			
-			
+			}else {
+				errorLinea.append("No existen guardiasTurno para el idGuardia, idTurno e idInstitucion indicados");
+			}
 
 			} else {
 				errorLinea.append("La guardia de colegiado ya existe en el sistema");
@@ -2793,7 +2795,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					&& !hashtable.get(SigaConstants.GUARDIA).toString().equals("")) {
 				try {
 					List<String> idGuardiaList = scsGuardiasturnoExtendsMapper
-							.getIdGuardiaByName(hashtable.get(SigaConstants.GUARDIA).toString());
+							.getIdGuardiaByName(hashtable.get(SigaConstants.GUARDIA).toString(), idInstitucion.toString());
 					String idGuardia = idGuardiaList.get(0);
 					cargaMasivaDatosGCItem.setIdGuardia(idGuardia);
 				} catch (Exception e) {
@@ -2811,7 +2813,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					&& !hashtable.get(SigaConstants.TURNO).toString().equals("")) {
 				try {
 					List<String> idTurnoList = scsGuardiasturnoExtendsMapper
-							.getIdTurnoByName(hashtable.get(SigaConstants.TURNO).toString());
+							.getIdTurnoByName(hashtable.get(SigaConstants.TURNO).toString(), idInstitucion.toString());
 					String idTurno = idTurnoList.get(0);
 					cargaMasivaDatosGCItem.setIdTurno(idTurno);
 				} catch (Exception e) {
