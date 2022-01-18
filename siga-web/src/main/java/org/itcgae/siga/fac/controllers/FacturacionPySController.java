@@ -864,6 +864,16 @@ public class FacturacionPySController {
 		return facturacionService.descargarFicheroAdeudos(disqueteItems, request);
 	}
 
+	@RequestMapping(value = "/descargarFicheroTransferencias", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> descargarFicheroTransferencias(@RequestBody List<FicherosAbonosItem> disqueteItems, HttpServletRequest request) throws Exception {
+		return facturacionService.descargarFicheroTransferencias(disqueteItems, request);
+	}
+
+	@RequestMapping(value = "/descargarFicheroDevoluciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> descargarFicheroDevoluciones(@RequestBody List<FicherosDevolucionesItem> disqueteItems, HttpServletRequest request) throws Exception {
+		return facturacionService.descargarFicheroDevoluciones(disqueteItems, request);
+	}
+
 	@RequestMapping(value = "/descargarFichaFacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	ResponseEntity<InputStreamResource> descargarFichaFacturacion(@RequestBody List<FacFacturacionprogramadaItem> facturacionItems, HttpServletRequest request) throws Exception {
 		return facturacionService.descargarFichaFacturacion(facturacionItems, request);

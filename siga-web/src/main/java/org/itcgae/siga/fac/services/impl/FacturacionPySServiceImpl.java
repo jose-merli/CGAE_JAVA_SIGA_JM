@@ -8,13 +8,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -74,6 +77,7 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAReferences;
@@ -97,7 +101,9 @@ import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.EnvComunicacionmorosos;
 import org.itcgae.siga.db.entities.EnvComunicacionmorososExample;
 import org.itcgae.siga.db.entities.FacAbono;
+import org.itcgae.siga.db.entities.FacAbonoExample;
 import org.itcgae.siga.db.entities.FacAbonoKey;
+import org.itcgae.siga.db.entities.FacAbonoincluidoendisquete;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionExample;
 import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
@@ -137,8 +143,6 @@ import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
 import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
-import org.itcgae.siga.db.entities.FacPlantillafacturacion;
-import org.itcgae.siga.db.entities.FacPlantillafacturacionExample;
 import org.itcgae.siga.db.entities.FacRegistrofichconta;
 import org.itcgae.siga.db.entities.FacRenegociacion;
 import org.itcgae.siga.db.entities.FacRenegociacionExample;
@@ -163,6 +167,10 @@ import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ModClasecomunicaciones;
+import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.PysTipoiva;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
@@ -174,16 +182,17 @@ import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
 import org.itcgae.siga.db.mappers.FacLineadevoludisqbancoMapper;
 import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
-import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.CenGruposcriteriosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
@@ -203,6 +212,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExten
 import org.itcgae.siga.db.services.fac.mappers.FacTiposproduincluenfactuExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
@@ -278,6 +288,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private FacDisqueteabonosExtendsMapper facDisqueteabonosExtendsMapper;
 
 	@Autowired
+	private FacAbonoincluidoendisqueteExtendsMapper facAbonoincluidoendisqueteExtendsMapper;
+
+	@Autowired
 	private FacDisquetedevolucionesExtendsMapper facDisquetedevolucionesExtendsMapper;
 
 	@Autowired
@@ -329,9 +342,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private ConConsultasExtendsMapper conConsultasExtendsMapper;
 
 	@Autowired
-	private FacPlantillafacturacionMapper facPlantillafacturacionMapper;
-
-	@Autowired
 	private CenClienteMapper cenClienteMapper;
 
 	@Autowired
@@ -348,6 +358,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private PySTipoIvaExtendsMapper pySTipoIvaExtendsMapper;
+
+	@Autowired
+	private ModClasecomunicacionesMapper modClasecomunicacionesMapper;
+
+	@Autowired
+	private ModModeloComunicacionExtendsMapper modModeloComunicacionExtendsMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1063,19 +1079,44 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				serieToUpdate.setIdseriefacturacion(idSerieFacturacion);
 
                 // 3. Generación de ficheros por defecto
-                FacPlantillafacturacionExample modeloExample = new FacPlantillafacturacionExample();
-                modeloExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
-                modeloExample.setOrderByClause("fechamodificacion");
+				ModClasecomunicacionesExample claseFactExample = new ModClasecomunicacionesExample();
+				claseFactExample.createCriteria().andNombreEqualTo("Facturas");
+				List<ModClasecomunicaciones> clasesFactura = modClasecomunicacionesMapper.selectByExample(claseFactExample);
 
-                List<FacPlantillafacturacion> modelosComunicacion = facPlantillafacturacionMapper.selectByExample(modeloExample);
+				ModClasecomunicacionesExample claseFactRectExample = new ModClasecomunicacionesExample();
+				claseFactRectExample.createCriteria().andNombreEqualTo("Facturas rectificativas");
+				List<ModClasecomunicaciones> clasesFacturaRect = modClasecomunicacionesMapper.selectByExample(claseFactRectExample);
 
-                if (!modelosComunicacion.isEmpty()) {
-                    serieToUpdate.setIdmodelofactura(Long.valueOf(modelosComunicacion.get(0).getIdplantilla()));
-                    serieToUpdate.setIdmodelorectificativa(Long.valueOf(modelosComunicacion.get(0).getIdplantilla()));
-                } else {
-                    serieToUpdate.setIdmodelofactura(null);
-                    serieToUpdate.setIdmodelorectificativa(null);
-                }
+				// 3.1. Obtenemos el modelo de comunicación por defecto de las facturas
+				if (clasesFactura != null && !clasesFactura.isEmpty()) {
+					ModModelocomunicacionExample comunicacionExample = new ModModelocomunicacionExample();
+					comunicacionExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+							.andIdclasecomunicacionEqualTo(clasesFactura.get(0).getIdclasecomunicacion())
+							.andFechabajaIsNull();
+					comunicacionExample.setOrderByClause("(CASE pordefecto WHEN 'SI' THEN 1 ELSE 0 END), fechamodificacion");
+
+					List<ModModelocomunicacion> modelos = modModeloComunicacionExtendsMapper.selectByExample(comunicacionExample);
+					if (modelos != null && !modelos.isEmpty())
+						serieToUpdate.setIdmodelofactura(modelos.get(0).getIdmodelocomunicacion());
+				} else {
+					serieToUpdate.setIdmodelofactura(null);
+				}
+
+				// 3.2. Obtenemos el modelo de comunicación por defecto de las facturas rectificativas
+				if (clasesFacturaRect != null && !clasesFacturaRect.isEmpty()) {
+					ModModelocomunicacionExample comunicacionExample = new ModModelocomunicacionExample();
+					comunicacionExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+							.andIdclasecomunicacionEqualTo(clasesFacturaRect.get(0).getIdclasecomunicacion())
+							.andFechabajaIsNull();
+					comunicacionExample.setOrderByClause("(CASE pordefecto WHEN 'SI' THEN 1 ELSE 0 END), fechamodificacion");
+
+					List<ModModelocomunicacion> modelos = modModeloComunicacionExtendsMapper.selectByExample(comunicacionExample);
+					if (modelos != null && !modelos.isEmpty())
+						serieToUpdate.setIdmodelorectificativa(modelos.get(0).getIdmodelocomunicacion());
+				} else {
+					serieToUpdate.setIdmodelorectificativa(null);
+				}
+
 			} else {
 				idSerieFacturacion = Long.parseLong(serieFacturacion.getIdSerieFacturacion());
 				FacSeriefacturacionKey serieKey = new FacSeriefacturacionKey();
@@ -2064,6 +2105,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		error.setCode(0);
 		deleteResponseDTO.setError(error);
 
+		// Obtener la facturación cuyo fichero se va a eliminar
+		FacFacturacionprogramadaKey key = new FacFacturacionprogramadaKey();
+		key.setIdinstitucion(usuario.getIdinstitucion());
+		key.setIdseriefacturacion(fac.getIdSerieFacturacion());
+		key.setIdprogramacion(fac.getIdProgramacion());
+		FacFacturacionprogramada facturacionToDelete = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
+
         Object[] param_in = new Object[4]; // Parametros de entrada del PL
 
         param_in[0] = usuario.getIdinstitucion();
@@ -2074,22 +2122,26 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
         String resultado[] = commons.callPLProcedureFacturacionPyS(
                 "{call PKG_SIGA_FACTURACION.ELIMINARFACTURACION(?,?,?,?,?,?)}", 2, param_in);
 
-			// facFacturaMapper.eliminarFacturacion(facElim);
-//			@Update(value = "{CALL PKG_SIGA_FACTURACION.ELIMINARFACTURACION ("
-//					+ "#{idInstitucion,mode=IN},"
-//					+ "#{idSerieFacturacion, mode=IN},"
-//					+ "#{idProgramacion, mode=IN},"
-//					+ "#{idUsuarioModificacion, mode=IN},"
-//					+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
-//					+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
-//	@Options(statementType = StatementType.CALLABLE)
-//	@ResultType(FacFacturacionEliminar.class)
-//	void eliminarFacturacion(FacFacturacionEliminar facturaEliminar);
-
         if (resultado[0] != null && !resultado[0].equals(RET_OK)) {
             throw new Exception(resultado[1]);
         } else {
-            // TODO: borrado de ficheros
+        	// Obtener la ruta del fichero
+			String directorioFisico = "facturacion.directorioFisicoPrevisionesJava";
+			String directorio = "facturacion.directorioPrevisionesJava";
+
+			String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+					+ File.separator + usuario.getIdinstitucion();
+
+			// Borrado del fichero
+			File file = null;
+			if (Objects.nonNull(facturacionToDelete)) {
+				String nombreFichero = pathFichero + File.separator + facturacionToDelete.getNombrefichero();
+				file = new File(nombreFichero);
+
+				if (file.exists()) {
+					file.delete();
+				}
+			}
         }
 
 
@@ -2115,7 +2167,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					"FacturacionPySServiceImpl.getFicherosTransferencias() -> obteniendo datos de ficheros de transferencias");
 
 			List<FicherosAbonosItem> items = facDisqueteabonosExtendsMapper.getFicherosTransferencias(item,
-					usuario.getIdinstitucion().toString());
+					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 
 			ficherosAbonosDTO.setFicherosAbonosItems(items);
 		}
@@ -4104,7 +4156,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				File directorioFicheros = new File(pathFichero);
 
 				// Se buscan todos los ficheros que coincidan con el nombre del fichero
-				if (directorioFicheros.exists()) {
+				if (directorioFicheros.exists() && Objects.nonNull(disquetecargos.getNombrefichero())) {
 					File[] ficheros = directorioFicheros.listFiles();
 					String nombreFicheroListadoSinExtension, nombreFicheroGeneradoSinExtension;
 					for (File file: ficheros){
@@ -4128,6 +4180,102 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_ADEUDOS");
 
 		LOGGER.info("descargarFicheroAdeudos() -> Salida del servicio para descargar ficheros de adeudos");
+
+		return res;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> descargarFicheroTransferencias(List<FicherosAbonosItem> ficheroAbonosItems, HttpServletRequest request) throws Exception {
+		ResponseEntity<InputStreamResource> res = null;
+
+		String directorioFisico = "facturacion.directorioFisicoAbonosBancosJava";
+		String directorio = "facturacion.directorioAbonosBancosJava";
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("descargarFicheroTransferencias() -> Entrada al servicio para descargar ficheros de transferencias");
+
+		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+				+ File.separator + usuario.getIdinstitucion();
+
+		List<File> listaFicheros = ficheroAbonosItems.stream().flatMap(item -> {
+			FacDisqueteabonosKey key = new FacDisqueteabonosKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIddisqueteabono(string2Long(item.getIdDisqueteAbono()));
+			FacDisqueteabonos disqueteabonos = facDisqueteabonosExtendsMapper.selectByPrimaryKey(key);
+
+			List<File> files = new ArrayList<>();
+			if (Objects.nonNull(disqueteabonos)) {
+				String nombreFichero = disqueteabonos.getNombrefichero();
+				File directorioFicheros = new File(pathFichero);
+
+				// Se buscan todos los ficheros que coincidan con el nombre del fichero
+				if (directorioFicheros.exists() && Objects.nonNull(disqueteabonos.getNombrefichero())) {
+					File[] ficheros = directorioFicheros.listFiles();
+					String nombreFicheroListadoSinExtension, nombreFicheroGeneradoSinExtension;
+					for (File file: ficheros){
+						nombreFicheroListadoSinExtension = (file.getName().indexOf(".") > 0)
+								? file.getName().substring(0, file.getName().indexOf(".")) : file.getName();
+						nombreFicheroGeneradoSinExtension = (nombreFichero.indexOf(".") > 0)
+								? nombreFichero.substring(0, nombreFichero.indexOf(".")) : nombreFichero;
+						if(nombreFicheroGeneradoSinExtension.equalsIgnoreCase(nombreFicheroListadoSinExtension)){
+							files.add(file);
+						}
+					}
+				}
+			}
+
+			return files.stream();
+		}).filter(Objects::nonNull).collect(Collectors.toList());
+
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
+				MediaType.parseMediaType("application/octet-stream"),
+				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_TRANSFERENCIAS");
+
+		LOGGER.info("descargarFicheroTransferencias() -> Salida del servicio para descargar ficheros de transferencias");
+
+		return res;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> descargarFicheroDevoluciones(List<FicherosDevolucionesItem> ficheroDevolucionesItems, HttpServletRequest request) throws Exception {
+		ResponseEntity<InputStreamResource> res = null;
+
+		String directorioFisico = "facturacion.directorioFisicoDevolucionesJava";
+		String directorio = "facturacion.directorioDevolucionesJava";
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("descargarFicheroDevoluciones() -> Entrada al servicio para descargar ficheros de devoluciones");
+
+		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+				+ File.separator + usuario.getIdinstitucion();
+
+		List<File> listaFicheros = ficheroDevolucionesItems.stream().map(item -> {
+			FacDisquetedevolucionesKey key = new FacDisquetedevolucionesKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIddisquetedevoluciones(string2Long(item.getIdDisqueteDevoluciones()));
+			FacDisquetedevoluciones disquetedevoluciones = facDisquetedevolucionesExtendsMapper.selectByPrimaryKey(key);
+
+			List<File> files = new ArrayList<>();
+			File file = null;
+			if (Objects.nonNull(disquetedevoluciones) && Objects.nonNull(disquetedevoluciones.getNombrefichero())) {
+				String nombreFichero = pathFichero + File.separator + disquetedevoluciones.getNombrefichero();
+				file = new File(nombreFichero);
+			}
+
+			return file;
+		}).filter(Objects::nonNull).collect(Collectors.toList());
+
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
+				MediaType.parseMediaType("application/octet-stream"),
+				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_DEVOLUCIONES");
+
+		LOGGER.info("descargarFicheroDevoluciones() -> Salida del servicio para descargar ficheros de devoluciones");
 
 		return res;
 	}
@@ -4158,7 +4306,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			FacFacturacionprogramada facturacion = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
 
 			File file = null;
-			if (Objects.nonNull(facturacion)) {
+			if (Objects.nonNull(facturacion) && Objects.nonNull(facturacion.getNombrefichero())) {
 				String nombreFichero = pathFichero + File.separator + facturacion.getNombrefichero();
 				file = new File(nombreFichero);
 			}
