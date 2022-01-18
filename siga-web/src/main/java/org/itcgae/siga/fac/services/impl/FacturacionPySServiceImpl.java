@@ -3441,14 +3441,21 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private void anularFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
 			AdmUsuarios usuario) {
-		// historico fac
-		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
 
-		facHistoricoInsert.setImptotalpagado(facUpdate.getImptotal());
-		facHistoricoInsert.setImptotalcompensado(facUpdate.getImptotal());
-		facHistoricoInsert.setImptotalporpagar(BigDecimal.valueOf(0));
+		//Historico Factura Anulada
+		facHistoricoInsert.setIdfactura(facUpdate.getIdfactura());
+		facHistoricoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
 
+		facHistoricoInsert.setIdtipoaccion((short) 8);
 		facHistoricoInsert.setEstado((short) 8);
+
+		facHistoricoInsert.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagado(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalporpagar(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalcompensado(facUpdate.getImptotal());
 
 		facHistoricoInsert.setIddisquetecargos(null);
 		facHistoricoInsert.setIdfacturaincluidaendisquete(null);
@@ -3459,7 +3466,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricoInsert.setIdabono(null);
 		facHistoricoInsert.setComisionidfactura(null);
 
-		// abono
+
+		//Anular Factura Original
+		facUpdate.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagado(BigDecimal.valueOf(0));
+		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+		facUpdate.setImptotalcompensado(facUpdate.getImptotal());
+
+		facUpdate.setEstado((short) 8);
+
+		facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+
+
+		//Abono
 		FacAbono abonoInsert = new FacAbono();
 
 		abonoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
@@ -3484,17 +3506,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		abonoInsert.setIdabono(Long.valueOf(
 				facAbonoExtendsMapper.getNewAbonoID(String.valueOf(usuario.getIdinstitucion())).get(0).getValue()));
 
+		abonoInsert.setNumeroabono(facAbonoExtendsMapper.getNuevoNumeroAbono(facUpdate.getIdinstitucion().toString(), "FAC_ABONOS_GENERAL").get(0).getValue());
+
 		abonoInsert.setEstado((short) 6);
-		abonoInsert.setNumeroabono(String.valueOf(abonoInsert.getIdabono()));
 
 		facHistoricoInsert.setIdabono(abonoInsert.getIdabono());
 
-		// factura
-		facUpdate.setEstado((short) 8);
-		facUpdate.setImptotalpagado(facUpdate.getImptotal());
-		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
-		facUpdate.setFechamodificacion(new Date());
-		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
+
+		//Actualizar Contador Factura
+		AdmContadorKey admContadorKey = new AdmContadorKey();
+		admContadorKey.setIdinstitucion(facUpdate.getIdinstitucion());
+		admContadorKey.setIdcontador("FAC_ABONOS_GENERAL");
+
+		AdmContador admContador = admContadorMapper.selectByPrimaryKey(admContadorKey);
+		admContador.setContador(admContador.getContador()+1);
+
+		admContadorMapper.updateByPrimaryKey(admContador);
 
 		// saves
 		facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);

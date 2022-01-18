@@ -100,4 +100,10 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonosBanco")
 	List<FacAbono> getAbonosBanco(Short idInstitucion, String bancosCodigo, Short idSufijo);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNuevoNumeroAbono")
+	@Results({
+			@Result(column = "NUEVOCONTADOR", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getNuevoNumeroAbono(String idInstitucion, String idContador);
 }
