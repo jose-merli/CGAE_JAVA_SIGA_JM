@@ -129,6 +129,7 @@ import org.itcgae.siga.db.entities.ScsHcoConfProgCalendarios;
 import org.itcgae.siga.db.entities.ScsIncompatibilidadguardias;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
 import org.itcgae.siga.db.entities.ScsPermutaCabecera;
@@ -181,6 +182,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -197,7 +199,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private static final String EN_PROCESO = "1";
 	private static final String PROCESADO_CON_ERRORES = "2";
 	private static final String GENERADO = "3"; // FINALIZADO
-	private static final String REPROGRAMADO = "4"; // REPROGRAMADO = PENDIENTE
+	private static final String PENDIENTE = "4"; 
+	private static final String REPROGRAMADO = "5"; 
 	public static final int INSTITUCION_CGAE = 2000;
 	public static final String DATE_FORMAT_JAVA = "yyyy/MM/dd HH:mm:ss";
 	public static final String DATE_FORMAT_SHORT_SPANISH = "dd/MM/yyyy";
@@ -1350,8 +1353,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo);
 					String porGrupos = guardiasItem.getPorGrupos();
 					//cuando marcamos orden = manual por primera vez
-					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,")) {
+					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos == "1") {
 
+						int j = 1;
+						for (int x = 0; x < colaGuardia.size(); x++) {
+						//rellenar todos los numero grupo y orden
+							if (colaGuardia.get(x).getNumeroGrupo() == null || colaGuardia.get(x).getNumeroGrupo().equals("null")) {
+								
+								colaGuardia.get(x).setNumeroGrupo(String.valueOf(x + 1));
+								j++;
+								colaGuardia.get(x).setOrden("1");
+							}
+						}
+
+						
+					}else if(ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos != "1") {
 						int j = 1;
 						for (int x = 0; x < colaGuardia.size(); x++) {
 						//rellenar todos los numero grupo y orden
@@ -1362,8 +1378,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 								colaGuardia.get(x).setOrden("1");
 							}
 						}
-
-						
 					}
 					List<InscripcionGuardiaItem> colaGuardiaNulos = new ArrayList<InscripcionGuardiaItem>();
 					List<InscripcionGuardiaItem> needToRemove = new ArrayList<InscripcionGuardiaItem>();
@@ -1724,7 +1738,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return turnoDTO;
 	}
 
-	@Transactional
+
 	@Override
 	public UpdateResponseDTO guardarColaGuardias(List<InscripcionGuardiaItem> inscripciones,
 			HttpServletRequest request) {
@@ -1786,22 +1800,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						
 						
 						InscripcionGuardiaItem element = inscripciones.get(i);
-						String fS = null;
-						String fSoK = null;
-						if (element.getUltimoCola() != null && element.getUltimoCola() != 0) {
-							if (element.getFechaSuscripcion() != null) {
-								fS = element.getFechaSuscripcion().toString();
-								LocalDate date4 = ZonedDateTime
-								.parse(fS, DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH))
-								.toLocalDate();
-								fSoK = date4.toString();
-							}
 		
-								
-							
-							int resultimo = scsGuardiasturnoExtendsMapper.cambiarUltimoCola4(idInstitucion.toString(), element.getIdTurno(), element.getIdGuardia(), element.getIdPersona(),
-									element.getIdGrupoGuardiaColegiado(),fSoK, usuarios.get(0).getIdusuario().toString());
-						}
 						//int updateOrdenSinGrupo = scsInscripcionguardiaExtendsMapper.updateOrdenInscripciones(element.getIdturno(), element.getIdGuardia(), element.getIdPersona(), idInstitucion.toString(), element.getOrdenBD());
 						// Vemos si la inscripcion tiene grupo y si existe
 						if (element.getNumeroGrupo() != null && !"".equals(element.getNumeroGrupo()))
@@ -1863,6 +1862,26 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 								response = scsGrupoguardiacolegiadoExtendsMapper
 										.updateByExampleSelective(grupoColegiado, scsGrupoguardiacolegiadoExample);
+							}
+						}
+						
+						
+						String fS = null;
+						String fSoK = null;
+						if (element.getUltimoCola() != null && element.getUltimoCola() != 0) {
+							if (element.getFechaSuscripcion() != null) {
+								fS = element.getFechaSuscripcion().toString();
+								LocalDate date4 = ZonedDateTime
+								.parse(fS, DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH))
+								.toLocalDate();
+								fSoK = date4.toString();
+							}
+
+							try {
+							int resultimo = scsGuardiasturnoExtendsMapper.cambiarUltimoCola4(idInstitucion.toString(), element.getIdTurno(), element.getIdGuardia(), element.getIdPersona(),
+									element.getIdGrupoGuardiaColegiado(),fSoK, usuarios.get(0).getIdusuario().toString());
+							}catch(Exception e) {
+								
 							}
 						}
 					}
@@ -3639,7 +3658,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		insertResponseDTO.setError(error);
 		return insertResponseDTO;
 	}
-
+	@Transactional
 	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 0 * ? * * *}")
 	@Override
 	public void generarCalendarioAsync() {
@@ -3786,6 +3805,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 													d.setEstado(PROCESADO_CON_ERRORES);
 													scsGuardiasturnoExtendsMapper.updateEstado(d, null);
 												}
+												TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 												// TODO Auto-generated catch block
 												e.printStackTrace();
 											}
@@ -3848,6 +3868,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 										// false);
 										insertResponseDTO.setStatus(SigaConstants.KO);
 										error.setDescription(e.toString());
+										TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 									}
 
 								});
@@ -3868,6 +3889,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								error.setCode(500);
 								insertResponseDTO.setStatus(SigaConstants.KO);
 								error.setDescription(e.toString());
+								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 							}
 						}
 					});
@@ -3888,6 +3910,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				error.setDescription("general.mensaje.error.bbdd");
 				error.setMessage(e.getMessage());
 				insertResponseDTO.setError(error);
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			}
 
 			insertResponseDTO.setError(error);
@@ -3906,10 +3929,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 			error.setMessage("No puede generarse un calendario hasta que no finalice la generación del anterior");
 			insertResponseDTO.setError(error);
 //			return insertResponseDTO;
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		}
 	}
 
 	@Override
+	@Transactional
 	public InsertResponseDTO generarCalendario(HttpServletRequest request,
 			DatosCalendarioProgramadoItem programacionItem) throws Exception {
 		LOGGER.info("generarCalendario() -> Entrada al servicio para búsqueda de las guardias");
@@ -4016,6 +4041,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								scsGuardiasturnoExtendsMapper.updateEstado(programacionItem, idInstitucion.toString());
 								// TODO Auto-generated catch block
 								e.printStackTrace();
+								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 							}
 							programacionItem.setEstado(GENERADO);// FINALIZADO
 							scsGuardiasturnoExtendsMapper.updateEstado(programacionItem, idInstitucion.toString());
@@ -4046,6 +4072,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							errorGeneracionCalendario = "No existen proximas guardias generadas no programadas";
 							error.setDescription("No existen proximas guardias generadas no programadas");
+							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 						}
 						// tx.commit();
 						if (hcoConfProgCalendariosItem == null && error.getDescription() == null) { // generacionCalEnProceso
@@ -4087,6 +4114,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						error.setCode(500);
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setDescription(e.toString());
+						TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					}
 					LOGGER.info("generarCalendario() -> Entrada para obtener los datos del calendario");
 				}
@@ -4106,6 +4134,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			error.setDescription(errorGeneracionCalendario);
 			error.setMessage(errorGeneracionCalendario);
 			insertResponseDTO.setError(error);
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		}
 		error.setDescription(errorGeneracionCalendario);
 		error.setMessage(errorGeneracionCalendario);
@@ -4706,7 +4735,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Long idPersona = null;
 		String fechaSubs = "";
 
-		try {
+		//try {
 
 			// Crea una copia de la cola de guardias de grupos de un calendario
 			try {
@@ -4977,10 +5006,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (calendariosVinculados1 != null)
 				primerPeriodo = segundoPeriodo;
 
-		} catch (Exception e) {
-			arrayPeriodosLetradosSJCS1 = null;
-			throw new Exception(e + "");
-		}
+//		} catch (Exception e) {
+//			arrayPeriodosLetradosSJCS1 = null;
+//			throw new Exception(e + "");
+//		}
 	} // calcularMatrizLetradosGuardiaPorGrupos()
 
 	public HashMap<Long, TreeMap<String, BajasTemporalesItem>> getLetradosDiasBajaTemporal(Integer idInstitucion,
@@ -7203,8 +7232,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 		ScsGuardiascolegiado beanGuardiasColegiado;
 		LetradoInscripcionItem letrado = null;
 
-		try {
-
 			List alPeriodosSinAgrupar = getPeriodos(periodoDiasGuardia, lDiasASeparar);
 			for (int j = 0; j < alPeriodosSinAgrupar.size(); j++) {
 				ArrayList alDiasPeriodo = (ArrayList) alPeriodosSinAgrupar.get(j);
@@ -7367,7 +7394,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						beanGuardiasColegiado.setPagado("N");
 						beanGuardiasColegiado.setIdfacturacion(null);
 						scsGuardiascolegiadoMapper.insertSelective2(beanGuardiasColegiado, fechaInicioPSt, fechaFinPSt,
-								today);
+								today); //generado
 					}
 				}
 			}
@@ -7383,11 +7410,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 			listaDatosExcelGeneracionCalendarios.add(mapLog10);
 			LOGGER.info("*Almacenando guardia " + g + " y " + t);
 
-		} catch (Exception e) {
-			errorGeneracionCalendario = "Error almacenando las guardias de colegiado";
-			e.printStackTrace();
-			throw new Exception(e + ": Excepcion en almacenarAsignacionGuardia.");
-		}
 	}
 
 	private int convertirUnidadesDuracion(String tipoDiasGuardia) {
