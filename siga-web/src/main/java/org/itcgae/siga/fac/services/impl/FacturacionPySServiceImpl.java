@@ -2852,12 +2852,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricoInsert.setIdcuenta(null);
 		facHistoricoInsert.setIdcuentadeudor(null);
 
-		facHistoricoInsert.setImptotalpagadoporcaja(BigDecimal
-				.valueOf(Double.parseDouble(item.getImpTotalPagado() + facHistoricoInsert.getImptotalpagadoporcaja())));
-		facHistoricoInsert.setImptotalpagadosolocaja(BigDecimal.valueOf(
-				Double.parseDouble(item.getImpTotalPagado() + facHistoricoInsert.getImptotalpagadosolocaja())));
-		facHistoricoInsert.setImptotalpagado(BigDecimal
-				.valueOf(Double.parseDouble(item.getImpTotalPagado() + facHistoricoInsert.getImptotalpagado())));
+		facHistoricoInsert.setImptotalpagadoporcaja(facHistoricoInsert.getImptotalpagado().add(
+				BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
+		facHistoricoInsert.setImptotalpagadosolocaja(facHistoricoInsert.getImptotalpagadosolocaja().add(
+				BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
+		facHistoricoInsert.setImptotalpagado(facHistoricoInsert.getImptotalpagado().add(
+				BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
 		facHistoricoInsert.setImptotalporpagar(
 				facHistoricoInsert.getImptotalporpagar().subtract(facHistoricoInsert.getImptotalpagado()));
 
@@ -2964,9 +2964,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		facHistoricoInsert.setEstado((short) 4);
 
-		facHistoricoInsert.setIdrecibo("00" + facHistoricoInsert.getIdrecibo());
-
-
 		//Objeto del PKG para la devolucion
 		FacFacturaDevolucion devolucion = new FacFacturaDevolucion();
 
@@ -2974,7 +2971,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		devolucion.setIdInstitucion(usuario.getIdinstitucion());
 		devolucion.setUsuModificacion(usuario.getUsumodificacion());
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMDD");
 		String fecha = dateFormat.format(item.getFechaModificaion());
 
 		devolucion.setFechaDevolucion(fecha);
@@ -2984,6 +2981,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				+ facHistoricoInsert.getIdrecibo() + "||" + item.getComentario();
 
 		devolucion.setListaFacturas(listaFacturas);
+
+		facHistoricoInsert.setIdrecibo("00" + facHistoricoInsert.getIdrecibo());
 
 
 		//Factura Original
@@ -3368,8 +3367,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			// saves
 			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
-			facPagosporcajaMapper.deleteByPrimaryKey(pagosCajaDelete);
 			facHistoricofacturaExtendsMapper.deleteByPrimaryKey(facHistoricoList.get(facHistoricoList.size() - 1));
+			facPagosporcajaMapper.deleteByPrimaryKey(pagosCajaDelete);
 
 			deleteResponseDTO.setStatus(HttpStatus.OK.toString());
 		}
