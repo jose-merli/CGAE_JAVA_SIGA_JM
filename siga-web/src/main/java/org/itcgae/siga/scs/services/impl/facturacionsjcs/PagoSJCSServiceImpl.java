@@ -1820,47 +1820,60 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                         "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
                 if (null != usuarios && !usuarios.isEmpty()) {
+                    if (FacturacionSJCSServicesImpl.isAlguienEjecutando()) {
+                        LOGGER.debug(
+                                "YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+                        insertResponseDTO.setStatus(SigaConstants.KO);
+                        error.setCode(400);
+                        error.setDescription("facturacionSJCS.facturacionPagos.pagos.errorDeshacerCierreProceso");
+                    }else{
+                        FacturacionSJCSServicesImpl.setAlguienEjecutando();
+                        try{
+                        AdmUsuarios usuario = usuarios.get(0);
 
-                    AdmUsuarios usuario = usuarios.get(0);
+                        // Antes de ejecutar el pago comprobamos si tiene banco asociado
+                        FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                        fcsPagosjgKey.setIdinstitucion(idInstitucion);
+                        fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
 
-                    // Antes de ejecutar el pago comprobamos si tiene banco asociado
-                    FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
-                    fcsPagosjgKey.setIdinstitucion(idInstitucion);
-                    fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
+                        LOGGER.info(
+                                "UtilidadesPagoSJCS.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
+                                        + idPago);
+                        pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+                        LOGGER.info(
+                                "UtilidadesPagoSJCS.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
+                                        + idPago);
 
-                    LOGGER.info(
-                            "UtilidadesPagoSJCS.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
-                                    + idPago);
-                    pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
-                    LOGGER.info(
-                            "UtilidadesPagoSJCS.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
-                                    + idPago);
+                        if (UtilidadesString.esCadenaVacia(pago.getBancosCodigo())) {
+                            throw new FacturacionSJCSException("Debe de seleccionar una cuenta bancaria", "factSJCS.abonos.configuracion.literal.cuentaObligatoria");
+                        }
 
-                    if (UtilidadesString.esCadenaVacia(pago.getBancosCodigo())) {
-                        throw new FacturacionSJCSException("Debe de seleccionar una cuenta bancaria", "factSJCS.abonos.configuracion.literal.cuentaObligatoria");
+                        String estadoPago = fcsPagosjgExtendsMapper.getEstadoPago(idPago, idInstitucion);
+                        String criterioTurno = pago.getCriteriopagoturno();
+
+                        // Validacion de los datos antes de ejecutar el pago:
+                        // 1. El estado del pago debe ser abierto:
+                        if (!estadoPago.equals(SigaConstants.ESTADO_PAGO_ABIERTO)) {
+                            ponerEnEstadoAbierto = false;
+                            throw new FacturacionSJCSException("El pago no se encuentra en un estado correcto para realizar esta operación", "messages.factSJCS.error.estadoPagoNoCorrecto");
+                        }
+                        // 2. Criterios correctos del Turno:
+                        if (!criterioTurno.equals(SigaConstants.CRITERIOS_PAGO_FACTURACION)) {
+                            throw new FacturacionSJCSException("No ha sido configurado el criterio de pago.", "messages.factSJCS.error.criterioPago");
+                        }
+
+                        //3. Si no se ha introducido importe a pagar el importe a facturar será cero
+                        if (pago.getImporterepartir().doubleValue() == 0.00) {
+                            throw new FacturacionSJCSException("El importe a facturar será cero, introduzca importe a pagar distinto de cero.", "messages.facturacionSJCS.abono.sin.importe.pago");
+                        }
+
+                        utilidadesPagoSJCS.ejecutarPagoSJCS(pago, simular, idInstitucion, usuario);
+                        }catch (Exception e){
+                            throw e;
+                        }finally {
+                            FacturacionSJCSServicesImpl.setNadieEjecutando();
+                        }
                     }
-
-                    String estadoPago = fcsPagosjgExtendsMapper.getEstadoPago(idPago, idInstitucion);
-                    String criterioTurno = pago.getCriteriopagoturno();
-
-                    // Validacion de los datos antes de ejecutar el pago:
-                    // 1. El estado del pago debe ser abierto:
-                    if (!estadoPago.equals(SigaConstants.ESTADO_PAGO_ABIERTO)) {
-                        ponerEnEstadoAbierto = false;
-                        throw new FacturacionSJCSException("El pago no se encuentra en un estado correcto para realizar esta operación", "messages.factSJCS.error.estadoPagoNoCorrecto");
-                    }
-                    // 2. Criterios correctos del Turno:
-                    if (!criterioTurno.equals(SigaConstants.CRITERIOS_PAGO_FACTURACION)) {
-                        throw new FacturacionSJCSException("No ha sido configurado el criterio de pago.", "messages.factSJCS.error.criterioPago");
-                    }
-
-                    //3. Si no se ha introducido importe a pagar el importe a facturar será cero
-                    if (pago.getImporterepartir().doubleValue() == 0.00) {
-                        throw new FacturacionSJCSException("El importe a facturar será cero, introduzca importe a pagar distinto de cero.", "messages.facturacionSJCS.abono.sin.importe.pago");
-                    }
-
-                    utilidadesPagoSJCS.ejecutarPagoSJCS(pago, simular, idInstitucion, usuario);
-
                 }
 
             }
