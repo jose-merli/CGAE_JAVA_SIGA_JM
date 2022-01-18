@@ -760,7 +760,11 @@ public class UtilidadesPagoSJCS {
         if (!hayAbonoPosterior.isEmpty()) {
             LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
                     "con nuestro pago");
-            List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, hayAbonoPosterior.get(0).getFecha());
+
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String fecha = formato.format(hayAbonoPosterior.get(0).getFecha());
+
+            List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, fecha);
 
             AdmContador admContador = new AdmContador();
             admContador.setIdcontador(SigaConstants.CONTADOR_ABONOS_PAGOSJG);
@@ -783,21 +787,31 @@ public class UtilidadesPagoSJCS {
 
         for (Integer idpagoJG : idPagos) {
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> fcsPagosjgExtendsMapper.getFechaEstadoPago() -> Obtenemos la fecha del estado de pago");
-            Date fechaPago = fcsPagosjgExtendsMapper.getFechaEstadoPago(idInstitucion, idpagoJG);
+            try{
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> fcsPagosjgExtendsMapper.getFechaEstadoPago() -> Obtenemos la fecha del estado de pago");
+                Date fechaPago = fcsPagosjgExtendsMapper.getFechaEstadoPago(idInstitucion, idpagoJG);
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> ejecucionPlsPago.ejecutarPLDeshacerCierre() -> Ejecutamos el procedimiento de base de datos");
-            ejecucionPlsPago.ejecutarPLDeshacerCierre(idInstitucion, fechaPago);
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> ejecucionPlsPago.ejecutarPLDeshacerCierre() -> Ejecutamos el procedimiento de base de datos");
+                ejecucionPlsPago.ejecutarPLDeshacerCierre(idInstitucion, fechaPago);
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() ->fcsPagosEstadospagosMapper.updateByPrimaryKeySelective() -> Actualizamos el estado de pago a ejecutado");
-            FcsPagosEstadospagos record = new FcsPagosEstadospagos();
-            record.setIdinstitucion(idInstitucion);
-            record.setIdpagosjg(idpagoJG);
-            record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
-            record.setFechaestado(new Date());
-            record.setFechamodificacion(new Date());
-            record.setUsumodificacion(usuario.getIdusuario());
-            fcsPagosEstadospagosMapper.updateByPrimaryKeySelective(record);
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() ->fcsPagosEstadospagosMapper.updateByPrimaryKeySelective() -> Actualizamos el estado de pago a ejecutado");
+                FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+                record.setIdinstitucion(idInstitucion);
+                record.setIdpagosjg(idpagoJG);
+                record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
+                record.setFechaestado(new Date());
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(usuario.getIdusuario());
+                FcsPagosEstadospagos pagoEdit = fcsPagosEstadospagosMapper.selectByPrimaryKey(record);
+                if(pagoEdit != null ){
+                    fcsPagosEstadospagosMapper.updateByPrimaryKeySelective(record);
+                }else{
+                    fcsPagosEstadospagosMapper.insertSelective(record);
+                }
+
+            }catch (Exception e){
+                throw new Exception("Error al insertar el nuevo estado de la facturacion", e);
+            }
 
         }
 

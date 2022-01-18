@@ -1345,10 +1345,10 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			}
 
 		if (calendarioItem.getIdTurno() != null && calendarioItem.getIdTurno() != "") {
-		sql.WHERE("hpc.IDTURNO IN ( " + calendarioItem.getIdTurno() + " ) OR hpc.idturno is null");
+		sql.WHERE("(hpc.IDTURNO IN ( " + calendarioItem.getIdTurno() + " ) OR hpc.idturno is null)");
 		}
 		if (calendarioItem.getIdGuardia() != null && calendarioItem.getIdGuardia() != "") {
-		sql.WHERE("hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+") OR hpc.IDGUARDIA is null");
+		sql.WHERE("(hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+") OR hpc.IDGUARDIA is null)");
 		}
 		
 		//sql.WHERE("NOT EXISTS (" + sql2 + ")");
