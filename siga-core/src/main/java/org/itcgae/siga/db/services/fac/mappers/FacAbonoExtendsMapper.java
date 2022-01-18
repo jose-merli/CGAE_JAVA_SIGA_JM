@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.mappers.FacAbonoMapper;
 import org.itcgae.siga.db.services.fac.providers.FacAbonoExtendsSqlProvider;
-import org.itcgae.siga.db.services.fac.providers.FacFacturaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -98,6 +97,9 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
     
     @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getPagosCerrados")
     List<FacAbono> getPagosCerrados(Short idInstitucion, String anio);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonosBanco")
+	List<FacAbono> getAbonosBanco(Short idInstitucion, String bancosCodigo, Short idSufijo);
 
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNuevoNumeroAbono")
 	@Results({
