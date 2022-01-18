@@ -85,8 +85,15 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		if (!UtilidadesString.esCadenaVacia(item.getIdDisqueteCargos())) {
 			principal.WHERE("c.iddisquetecargos = " + item.getIdDisqueteCargos());
 		}
-		
-		//origen  -PENDIENTE POR PREGUNTAR A CLIENTE
+
+		// Origen --> 0: Facturación de serie; 1: Facturas sueltas
+		if (!UtilidadesString.esCadenaVacia(item.getOrigen())) {
+			if (item.getOrigen().equals("0")) {
+				principal.WHERE("c.idseriefacturacion IS NOT NULL");
+			} else if (item.getOrigen().equals("1")) {
+				principal.WHERE("c.idseriefacturacion IS NULL");
+			}
+		}
 	
 		principal.ORDER_BY("c.iddisquetecargos DESC");
 		

@@ -273,4 +273,21 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
     	
     	return sql.toString();
     }
+
+    public String getAbonosBanco(Short idInstitucion, String bancosCodigo, Short idSufijo) {
+
+        SQL sql = new SQL();
+
+        sql.SELECT("*");
+
+        sql.FROM("FAC_ABONO abono");
+        sql.LEFT_OUTER_JOIN("FAC_FACTURA factura ON (factura.IDINSTITUCION = abono.IDINSTITUCION AND factura.IDFACTURA = abono.IDFACTURA)");
+        sql.LEFT_OUTER_JOIN("FAC_SERIEFACTURACION_BANCO banco ON (factura.IDINSTITUCION = banco.IDINSTITUCION AND factura.IDSERIEFACTURACION = banco.IDSERIEFACTURACION)");
+
+        sql.WHERE("abono.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("banco.BANCOS_CODIGO = " + bancosCodigo);
+        sql.WHERE("banco.IDSUFIJO = " + idSufijo);
+
+        return sql.toString();
+    }
 }

@@ -2179,6 +2179,153 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	public InsertResponseDTO nuevoFicheroTransferencias(List<FacAbonoItem> abonoItems, HttpServletRequest request) throws Exception {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.nuevoFicheroTransferencias() -> Entrada al servicio para generar un nuevo fichero de transferencias");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			String fcs = "0";
+
+			FacSeriefacturacionBancoExample bancosExample = new FacSeriefacturacionBancoExample();
+			bancosExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+
+			List<FacSeriefacturacionBanco> bancos = facSeriefacturacionBancoMapper.selectByExample(bancosExample);
+
+			for (FacSeriefacturacionBanco banco: bancos) {
+
+				String bancosCodigo = banco.getBancosCodigo();
+				Short idSufijo = banco.getIdsufijo();
+
+				if (idSufijo == null) {
+					throw new Exception("facturacion.ficheroBancarioTransferencias.errorSufijosSerie.mensajeCondicionesIncumplidas");
+				}
+
+				List<FacAbono> abonosBanco = facAbonoExtendsMapper.getAbonosBanco(usuario.getIdinstitucion(), bancosCodigo, idSufijo);
+				int resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, null, null, usuario);
+
+				if (resultado == -1) {
+					throw new Exception("general.mensaje.error.bbdd");
+				}
+			}
+
+		}
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.nuevoFicheroTransferencias() -> Salida del servicio  para generar un nuevo fichero de transferencias");
+
+		return insertResponseDTO;
+	}
+
+	private int prepararFicheroTransferencias(String fcs, Short idInstitucion,
+											  String bancosCodigo,
+											  Short idSufijo,
+											  List<FacAbono> abonosBanco,
+											  Integer idPropositoSEPA,
+											  Integer idPropositoOtros,
+											  AdmUsuarios usuario) throws Exception {
+		Long idDisqueteAbono = facDisqueteabonosExtendsMapper.getNextIdDisqueteAbono(idInstitucion);
+		String nombreFichero = getProperty("facturacion.prefijo.ficherosAbonos") + idDisqueteAbono;
+
+		// Creación del nuevo fichero de transferencias
+		FacDisqueteabonos record = new FacDisqueteabonos();
+		record.setIdinstitucion(idInstitucion);
+		record.setIddisqueteabono(idDisqueteAbono);
+		record.setFecha(new Date());
+		record.setFechaejecucion(new Date());
+		record.setBancosCodigo(bancosCodigo);
+		record.setFcs(fcs);
+		record.setNombrefichero(nombreFichero);
+		record.setNumerolineas(Long.valueOf(abonosBanco.size()));
+		record.setIdsufijo(idSufijo);
+
+		if (facDisqueteabonosExtendsMapper.insert(record) == 0) {
+			return -1;
+		}
+
+		int numeroAbonosIncluidosEnDisquete = 0;
+		for (FacAbono abono: abonosBanco) {
+			FacAbonoKey abonoKey = new FacAbonoKey();
+			abonoKey.setIdinstitucion(idInstitucion);
+			abonoKey.setIdabono(abono.getIdabono());
+
+			FacAbono abonoToUpdate = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
+
+			Double importeAbonado = abonoToUpdate.getImppendienteporabonar().doubleValue();
+			if (importeAbonado == 0)
+				continue;
+
+			numeroAbonosIncluidosEnDisquete++;
+
+			// Introducimos el abono en el fichero de transferencias
+			FacAbonoincluidoendisquete recordAbono = new FacAbonoincluidoendisquete();
+			recordAbono.setIdinstitucion(idInstitucion);
+			recordAbono.setIdabono(abono.getIdabono());
+			recordAbono.setIddisqueteabono(idDisqueteAbono);
+			recordAbono.setImporteabonado(new BigDecimal(importeAbonado).setScale(2, RoundingMode.DOWN));
+			recordAbono.setContabilizado("N");
+			facAbonoincluidoendisqueteExtendsMapper.insert(recordAbono);
+
+			// Actualización de los importes
+			Double impPendientePorAbonar = abonoToUpdate.getImppendienteporabonar().doubleValue() - importeAbonado;
+			Double impTotalAbonado = abonoToUpdate.getImptotalabonado().doubleValue() + importeAbonado;
+			Double impTotalAbonadoPorBanco = abonoToUpdate.getImptotalabonadoporbanco().doubleValue() + importeAbonado;
+
+			abonoToUpdate.setImppendienteporabonar(new BigDecimal(impPendientePorAbonar).setScale(2, RoundingMode.DOWN));
+			abonoToUpdate.setImptotalabonado(new BigDecimal(impTotalAbonado).setScale(2, RoundingMode.DOWN));
+			abonoToUpdate.setImptotalabonadoporbanco(new BigDecimal(impTotalAbonadoPorBanco).setScale(2, RoundingMode.DOWN));
+
+			//  Actualización del estado
+			if (impPendientePorAbonar <= 0) {
+				abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PAGADO);
+			} else if (abonoToUpdate.getIdcuenta() != null) {
+				abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
+			} else {
+				abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA);
+			}
+
+			facAbonoExtendsMapper.updateByPrimaryKey(abonoToUpdate);
+		}
+
+		if (numeroAbonosIncluidosEnDisquete == 0) {
+			return 0;
+		}
+
+		// Obtener la ruta del fichero
+		String directorioFisico = "facturacion.directorioFisicoAbonosBancosJava";
+		String directorio = "facturacion.directorioAbonosBancosJava";
+
+		String rutaServidor = getProperty(directorioFisico) + getProperty(directorio)
+				+ File.separator + usuario.getIdinstitucion();
+
+		Object[] param_in = new Object[7]; // Parametros de entrada del PL
+
+		param_in[0] = idInstitucion;
+		param_in[1] = idDisqueteAbono;
+		param_in[2] = idPropositoSEPA;
+		param_in[3] = idPropositoOtros;
+		param_in[4] = rutaServidor;
+		param_in[5] = nombreFichero;
+		param_in[6] = usuario.getIdlenguaje();
+
+		String[] resultado = commons.callPLProcedureFacturacionPyS(
+				"{call PKG_SIGA_ABONOS.Generarficherotransferencias("
+						+ String.join(",", Collections.nCopies(9, "?"))
+						+ ")}", 2, param_in);
+
+		if (resultado[0] != null && resultado.length > 1 && string2Integer(resultado[0]) > 0) {
+			throw new Exception(resultado[1]);
+		}
+
+		return 1;
+	}
+
+	@Override
 	public FicherosDevolucionesDTO getFicherosDevoluciones(FicherosDevolucionesItem item, HttpServletRequest request)
 			throws Exception {
 		FicherosDevolucionesDTO ficherosDevolucionesDTO = new FicherosDevolucionesDTO();
