@@ -22,7 +22,7 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonos")
 	@Results({
-			@Result(column = "idabono", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idabono", property = "idAbono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numeroabono", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fecha", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "facturacion", property = "facturacion", jdbcType = JdbcType.VARCHAR),
@@ -43,7 +43,7 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbono")
 	@Results({
 			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDABONO", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROABONO", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),

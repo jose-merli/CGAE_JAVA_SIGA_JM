@@ -2436,7 +2436,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	public FacturaDTO getFactura(String idFactura, String tipo, HttpServletRequest request) throws Exception {
+	public FacturaDTO getFactura(String idFactura, String idAbono, String tipo, HttpServletRequest request) throws Exception {
 		FacturaDTO facturaDTO = new FacturaDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
 
@@ -2461,7 +2461,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			if (tipo.equalsIgnoreCase("ABONO")) {
-				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idFactura,
+				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idAbono,
 						usuario.getIdinstitucion().toString());
 
 				facturaDTO.setFacturasItems(items);
@@ -2513,7 +2513,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (item.getTipo().equalsIgnoreCase("ABONO")) {
 
 				FacAbonoKey key = new FacAbonoKey();
-				key.setIdabono(Long.valueOf(item.getIdFactura()));
+				key.setIdabono(Long.valueOf(item.getIdAbono()));
 				key.setIdinstitucion(usuario.getIdinstitucion());
 				FacAbono updateItem = facAbonoExtendsMapper.selectByPrimaryKey(key);
 

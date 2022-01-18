@@ -12,6 +12,7 @@ public class FacturaItem {
 	String tipo;//"FACTURA" o "ABONO"
 
 	String idFactura;
+	String idAbono;
 	String idInstitucion;
 
 	//datos generales

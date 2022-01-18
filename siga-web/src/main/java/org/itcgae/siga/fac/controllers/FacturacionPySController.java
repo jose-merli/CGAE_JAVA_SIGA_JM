@@ -554,12 +554,12 @@ public class FacturacionPySController {
 	}
 
 	@GetMapping(value = "/getFactura")
-	ResponseEntity<FacturaDTO> getFactura(@RequestParam String idFactura, @RequestParam String tipo,
+	ResponseEntity<FacturaDTO> getFactura(@RequestParam String idFactura, @RequestParam String idAbono, @RequestParam String tipo,
 			HttpServletRequest request) {
 		FacturaDTO response = new FacturaDTO();
 
 		try {
-			response = facturacionService.getFactura(idFactura, tipo, request);
+			response = facturacionService.getFactura(idFactura, idAbono, tipo, request);
 
 			if (response.getFacturasItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());

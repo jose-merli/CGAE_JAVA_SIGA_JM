@@ -145,7 +145,7 @@ public interface IFacturacionPySService {
 
 	public FacturaDTO getFacturas(FacturaItem item, HttpServletRequest request) throws Exception;
 
-	public FacturaDTO getFactura(String idFactura, String tipo, HttpServletRequest request) throws Exception;
+	public FacturaDTO getFactura(String idFactura, String idAbono, String tipo, HttpServletRequest request) throws Exception;
 
 	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg,
 			HttpServletRequest request) throws Exception;
