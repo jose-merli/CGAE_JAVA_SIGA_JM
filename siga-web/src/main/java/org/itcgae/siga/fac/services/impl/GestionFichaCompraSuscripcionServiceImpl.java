@@ -1663,7 +1663,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								if(monedero != null) {
 									monedero.setIdPeticion(nSolicitud);
 									monedero.setTipo("2"); //En el front se procesará y representará como "Monedero"
-									monedero.setIdAnticipo(null);
+									monedero.setIdAnticipo(monedero.getIdAnticipo());
 	
 									descuentosListaPeticion.add(monedero);
 	
