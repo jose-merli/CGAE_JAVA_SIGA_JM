@@ -1747,7 +1747,6 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         Resource res = null;
 
-
         if (null != idInstitucion) {
 
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1758,61 +1757,63 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
             if (null != usuarios && !usuarios.isEmpty()) {
 
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-                ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-
                 if (null != idFactsList && !idFactsList.isEmpty()) {
 
-                    for (String idFacturacion : idFactsList) {
+                    if (idFactsList.size() == 1) {
 
                         String path = getDirectorioFichero("FCS", SigaConstants.PATH_PREVISIONES_BD, idInstitucion);
-                        path += File.separator + "LOG_ERROR_" + idInstitucion + "_" + idFacturacion + ".log";
+                        path += File.separator + "LOG_ERROR_" + idInstitucion + "_" + idFactsList.get(0) + ".log";
                         File file = new File(path);
 
                         if (file.exists()) {
-                            String addFName = file.getPath().replace(file.getPath(), File.separator + file.getName());
-                            zipOutputStream.putNextEntry(new ZipEntry(addFName));
-                            Files.copy(file.toPath(), zipOutputStream);
+                            FileInputStream fileInputStream = new FileInputStream(file);
+
+                            res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
+                                public String getFilename() {
+                                    return file.getName();
+                                }
+                            };
                         }
 
-                        zipOutputStream.closeEntry();
+                    } else {
 
-                        if (zipOutputStream != null) {
-                            zipOutputStream.finish();
-                            zipOutputStream.flush();
-                            IOUtils.closeQuietly(zipOutputStream);
-                        }
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+                        ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-                        IOUtils.closeQuietly(bufferedOutputStream);
-                        IOUtils.closeQuietly(byteArrayOutputStream);
+                        for (String idFacturacion : idFactsList) {
 
-                        res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
-                            public String getFilename() {
-                                return "Reintegros_Xunta_Error_Log.zip";
+                            String path = getDirectorioFichero("FCS", SigaConstants.PATH_PREVISIONES_BD, idInstitucion);
+                            path += File.separator + "LOG_ERROR_" + idInstitucion + "_" + idFacturacion + ".log";
+                            File file = new File(path);
+
+                            if (file.exists()) {
+                                String addFName = file.getPath().replace(file.getPath(), File.separator + file.getName());
+                                zipOutputStream.putNextEntry(new ZipEntry(addFName));
+                                Files.copy(file.toPath(), zipOutputStream);
                             }
-                        };
 
-                    }
+                            zipOutputStream.closeEntry();
 
-                } else {
+                            if (zipOutputStream != null) {
+                                zipOutputStream.finish();
+                                zipOutputStream.flush();
+                                IOUtils.closeQuietly(zipOutputStream);
+                            }
 
-                    zipOutputStream.closeEntry();
+                            IOUtils.closeQuietly(bufferedOutputStream);
+                            IOUtils.closeQuietly(byteArrayOutputStream);
 
-                    if (zipOutputStream != null) {
-                        zipOutputStream.finish();
-                        zipOutputStream.flush();
-                        IOUtils.closeQuietly(zipOutputStream);
-                    }
+                            res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
+                                public String getFilename() {
+                                    return "Reintegros_Xunta_Error_Log.zip";
+                                }
+                            };
 
-                    IOUtils.closeQuietly(bufferedOutputStream);
-                    IOUtils.closeQuietly(byteArrayOutputStream);
-
-                    res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
-                        public String getFilename() {
-                            return "Reintegros_Xunta_Error_Log.zip";
                         }
-                    };
+
+                    }
+
                 }
 
             } else {
@@ -1837,7 +1838,6 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         Resource res = null;
-        Error error = new Error();
 
         if (null != idInstitucion) {
 
@@ -1854,13 +1854,16 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                     if (idFactsList.size() == 1) {
 
                         File file = getFileInformeIncidencias(idInstitucion, idFactsList.get(0));
-                        FileInputStream fileInputStream = new FileInputStream(file);
 
-                        res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
-                            public String getFilename() {
-                                return file.getName();
-                            }
-                        };
+                        if (file.exists()) {
+                            FileInputStream fileInputStream = new FileInputStream(file);
+
+                            res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
+                                public String getFilename() {
+                                    return file.getName();
+                                }
+                            };
+                        }
 
                     } else {
 
@@ -1899,9 +1902,6 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
                     }
 
-                } else {
-                    error.setCode(400);
-                    error.setDescription("general.mensaje.error.bbdd");
                 }
 
             } else {

@@ -208,13 +208,21 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
 
         sql2.FROM("FCS_FACTURACIONJG FAC");
         sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
-        sql2.INNER_JOIN("FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION AND EST.idestadofacturacion = '20')");
+        sql2.INNER_JOIN("FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION)");
         sql2.INNER_JOIN("FCS_FACT_CERTIFICACIONES cert ON (fac.idinstitucion = cert.idinstitucion AND fac.idfacturacion = cert.idfacturacion)");
 
 
         sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");
         sql2.WHERE("cert.IDCERTIFICACION = " + idCertificacion);
 
+        SQL subQueryMaxEstado = new SQL();
+        subQueryMaxEstado.SELECT("MAX(EST2.IDORDENESTADO)");
+        subQueryMaxEstado.FROM("FCS_FACT_ESTADOSFACTURACION EST2");
+        subQueryMaxEstado.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+        subQueryMaxEstado.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+
+        sql2.WHERE("EST.IDORDENESTADO = (" + subQueryMaxEstado.toString() + ")");
+        sql2.WHERE("EST.idestadofacturacion = '20'");
 
         sql.FROM("(" + sql2.toString() + ") busqueda");
 
