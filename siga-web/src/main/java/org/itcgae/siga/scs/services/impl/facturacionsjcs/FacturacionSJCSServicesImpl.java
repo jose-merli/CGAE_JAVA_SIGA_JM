@@ -153,7 +153,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     private static final String TEXTO_REINTENTO = "Se ha perdido la ejecución de la facturación. Reintentamos la ejecución.";
 
 	private Logger LOGGER = Logger.getLogger(FacturacionSJCSServicesImpl.class);
-	
+
 	@Autowired
 	ScsActuacionasistenciaExtendsMapper scsActuacionasistenciaExtendsMapper;
 
@@ -269,7 +269,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     @Autowired
     private FcsAplicaMovimientosvariosMapper fcsAplicaMovimientosvariosMapper;
-    
+
     @Autowired
     private LogErroresFacturacionSJCSHelper logErroresFacHelper;
 
@@ -2631,10 +2631,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     "YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
             return;
         }
-        procesarFacturacionesSJCSBloqueadas();
-
 
         try {
+            procesarFacturacionesSJCSBloqueadas();
         } catch (Exception e) {
             throw e;
         } finally {
@@ -2676,9 +2675,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 // Insertamos el estado ABIERTA para las facturaciones en ejecucion
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
-                
+
                 logErroresFac.logError(TEXTO_REINTENTO);
-                
+
                 // Localizamos donde se quedó el proceso de cierre y dehacemos lo hasta ahora modificado(conceptoErroneo puede ser Turno/Guardia/EJG/SOJ)
                 FcsTrazaErrorEjecucion conceptoErroneo = localizadaEstadoFacturacionBloqueadaEnEjecucion(item);
                 if (conceptoErroneo != null) {
@@ -2709,7 +2708,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             }
-            
+
             try {
 				logErroresFac.writeAllErrors();
 			} catch (FacturacionSJCSException e) {
@@ -2791,7 +2790,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		Resource resource = null;
 	    String token = request.getHeader("Authorization");
 	    Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	    
+
 		File file = logErroresFacHelper.getFileLogErroresFacturacion(idInstitucion, idFacturacion).toFile();
 
 		if (file != null) {
@@ -2800,7 +2799,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     return file.getName();
                 }
 			};
-			
+
 		}
 
 		return resource;
@@ -2812,7 +2811,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		FacAbonoDTO facAbonoDTO = new FacAbonoDTO();
-		
+
 		if(null != idInstitucion) {
 	     /*            
          List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonos(facAbonoItem, idInstitucion.toString());
@@ -2822,5 +2821,5 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 	    return facAbonoDTO;
 	}
-	
+
 }

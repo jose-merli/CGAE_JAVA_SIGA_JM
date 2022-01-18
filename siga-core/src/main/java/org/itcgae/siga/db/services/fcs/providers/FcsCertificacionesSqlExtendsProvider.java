@@ -200,10 +200,10 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
                 + "FROM FCS_PAGOSJG P "
                 + "WHERE P.IDFACTURACION = FAC.IDFACTURACION AND P.IDINSTITUCION = FAC.IDINSTITUCION)),0) AS IMPORTEPAGADO");
         sql2.SELECT("fac.idpartidapresupuestaria as PARTIDAPRESUPUESTARIA");
-        sql2.SELECT("CASE WHEN fac.IMPORTEGUARDIA is null then '0' END AS GUARDIA");
-        sql2.SELECT("CASE WHEN fac.IMPORTEOFICIO is null then '0' END as TURNO");
-        sql2.SELECT("CASE WHEN fac.IMPORTESOJ is null then '0' END as IMPORTESOJ");
-        sql2.SELECT("CASE WHEN fac.IMPORTEEJG is null then '0' END as IMPORTEEJG");
+        sql2.SELECT("NVL(fac.IMPORTEGUARDIA, 0) AS GUARDIA");
+        sql2.SELECT("NVL(fac.IMPORTEOFICIO, 0) AS TURNO");
+        sql2.SELECT("NVL(fac.IMPORTESOJ, 0) AS IMPORTESOJ");
+        sql2.SELECT("NVL(fac.IMPORTEEJG, 0) AS IMPORTEEJG");
 
 
         sql2.FROM("FCS_FACTURACIONJG FAC");
@@ -222,7 +222,6 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         subQueryMaxEstado.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
 
         sql2.WHERE("EST.IDORDENESTADO = (" + subQueryMaxEstado.toString() + ")");
-        sql2.WHERE("EST.idestadofacturacion = '20'");
 
         sql.FROM("(" + sql2.toString() + ") busqueda");
 
