@@ -44,6 +44,7 @@ import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
@@ -471,6 +472,34 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<FicherosAbonosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/nuevoFicheroTransferencias")
+	ResponseEntity<InsertResponseDTO> nuevoFicheroTransferencias(@RequestBody List<FacAbonoItem> abonoItems,
+														   HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionService.nuevoFicheroTransferencias(abonoItems, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/eliminarFicheroTransferencias")
+	ResponseEntity<DeleteResponseDTO> eliminarFicheroTransferencias(@RequestBody FicherosAbonosItem ficherosAbonosItem,
+														  HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = this.facturacionService.eliminarFicheroTransferencias(ficherosAbonosItem, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

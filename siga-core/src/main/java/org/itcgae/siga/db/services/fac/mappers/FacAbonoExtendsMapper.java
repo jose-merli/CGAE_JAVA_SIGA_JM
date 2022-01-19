@@ -44,6 +44,7 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 	@Results({
 			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROABONO", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),
