@@ -1207,11 +1207,11 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getIdGuardiaByName")
 			@Results({})
 
-			List<String> getIdGuardiaByName( String name);
+			List<String> getIdGuardiaByName( String name, String idInstitucion);
 			
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getIdTurnoByName")
 			@Results({})
-			List<String> getIdTurnoByName( String name);
+			List<String> getIdTurnoByName( String name, String idInstitucion);
 
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "insertHistoricoCalendario")
 			@Results({})

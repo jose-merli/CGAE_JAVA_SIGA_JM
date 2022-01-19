@@ -492,8 +492,14 @@ public class CombosServicesImpl implements ICombosServices {
                 if (null != usuarios && !usuarios.isEmpty()) {
 
                     LOGGER.info("CombosServicesImpl.getColegios() / fcsDestinatariosRetencionesExtendsMapper.getComboDestinatarios() -> Entrada para obtener el combo de destinatarios");
-
-                    List<ComboItem> comboItems = cenInstitucionExtendsMapper.getComboInstitucionesNombre();
+                    //Comprobamos si es Consejo
+                    List<ComboItem> consejo = cenInstitucionExtendsMapper.isConsejo(String.valueOf(idInstitucion));
+                    List<ComboItem> comboItems = null;
+                    if(consejo.size() >0){
+                      comboItems = cenInstitucionExtendsMapper.getInstitucionesConsejo(String.valueOf(idInstitucion));
+                    }else {
+                      comboItems = cenInstitucionExtendsMapper.getComboInstitucionesNombre();
+                    }
                     comboDTO.setCombooItems(comboItems);
 
                     LOGGER.info("CombosServicesImpl.getColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Salida de obtener el combo de colegios");

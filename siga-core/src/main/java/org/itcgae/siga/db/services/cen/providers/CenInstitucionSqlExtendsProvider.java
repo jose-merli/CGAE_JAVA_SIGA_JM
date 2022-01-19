@@ -447,6 +447,22 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
 	}
-	
-    
+
+	public String isConsejo(String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("NOMBRE");
+		sql.FROM("CEN_INSTITUCION");
+		sql.WHERE("CEN_INST_IDINSTITUCION = '2000' AND IDINSTITUCION = '" + idInstitucion+"'");
+		return sql.toString();
+	}
+
+	public String getInstitucionesConsejo(String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("NOMBRE");
+		sql.FROM("CEN_INSTITUCION");
+		sql.WHERE("CEN_INST_IDINSTITUCION = '" + idInstitucion+"'");
+		return sql.toString();
+	}
 }

@@ -244,13 +244,13 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         return query.toString();
     }
 
-    public String getAbonoAnterior(Short idInstitucion, Date fecha) {
+    public String getAbonoAnterior(Short idInstitucion, String fecha) {
 
         SQL subQuery = new SQL();
         subQuery.SELECT("IDABONO");
         subQuery.FROM("FAC_ABONO");
         subQuery.WHERE("IDINSTITUCION = " + idInstitucion);
-        subQuery.WHERE("FECHA < TO_DATE(" + fecha + ", 'YYYY-MM-DD HH:MI:SS')");
+        subQuery.WHERE("FECHA < TO_DATE('" + fecha + "', 'YYYY-MM-DD HH:MI:SS')");
         subQuery.ORDER_BY("IDABONO DESC");
 
         SQL query = new SQL();

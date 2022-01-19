@@ -2,12 +2,11 @@ package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
 
-public class InscripcionGuardiaItem {
+public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem>{
 	
 	private String numeroGrupo;
 	private String idGrupoGuardiaColegiado;
 	private String orden;
-	private String ordenBD;
 	private String nColegiado;
 	private String fechaValidacion;
 	private String fechabaja;
@@ -36,6 +35,7 @@ public class InscripcionGuardiaItem {
 	// Atributos calculados
 	private String	estado;
 	private String idInstitucion;
+	private Integer ultimoCola;
 	
 	public InscripcionGuardiaItem(String numeroGrupo, String idGrupoGuardiaColegiado, String orden, String nColegiado,
 			String fechaValidacion, String fechabaja, String compensaciones, String saltos, String apellido1,
@@ -356,12 +356,231 @@ public class InscripcionGuardiaItem {
 		this.idInstitucion = idInstitucion;
 	}
 
-	public String getOrdenBD() {
-		return ordenBD;
+	public String getIdTurno() {
+		return idTurno;
 	}
 
-	public void setOrdenBD(String ordenBD) {
-		this.ordenBD = ordenBD;
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
 	}
+
+	public Integer getUltimoCola() {
+		return ultimoCola;
+	}
+
+	public void setUltimoCola(Integer ultimoCola) {
+		this.ultimoCola = ultimoCola;
+	}
+
+	public int compareTo(InscripcionGuardiaItem o) {
+		return Integer.parseInt(numeroGrupo) - Integer.parseInt(o.numeroGrupo);
+
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((apellido1 == null) ? 0 : apellido1.hashCode());
+		result = prime * result + ((apellido2 == null) ? 0 : apellido2.hashCode());
+		result = prime * result + ((compensaciones == null) ? 0 : compensaciones.hashCode());
+		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result + ((fechaBaja == null) ? 0 : fechaBaja.hashCode());
+		result = prime * result + ((fechaSuscripcion == null) ? 0 : fechaSuscripcion.hashCode());
+		result = prime * result + ((fechaValidacion == null) ? 0 : fechaValidacion.hashCode());
+		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
+		result = prime * result + ((fechadenegacion == null) ? 0 : fechadenegacion.hashCode());
+		result = prime * result + ((fechamodificacion == null) ? 0 : fechamodificacion.hashCode());
+		result = prime * result + ((fechasolicitudbaja == null) ? 0 : fechasolicitudbaja.hashCode());
+		result = prime * result + ((fechavalidacion == null) ? 0 : fechavalidacion.hashCode());
+		result = prime * result + ((idGrupoGuardia == null) ? 0 : idGrupoGuardia.hashCode());
+		result = prime * result + ((idGrupoGuardiaColegiado == null) ? 0 : idGrupoGuardiaColegiado.hashCode());
+		result = prime * result + ((idGuardia == null) ? 0 : idGuardia.hashCode());
+		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
+		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
+		result = prime * result + ((idTurno == null) ? 0 : idTurno.hashCode());
+		result = prime * result + ((nColegiado == null) ? 0 : nColegiado.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((numeroGrupo == null) ? 0 : numeroGrupo.hashCode());
+		result = prime * result + ((observacionesbaja == null) ? 0 : observacionesbaja.hashCode());
+		result = prime * result + ((observacionesdenegacion == null) ? 0 : observacionesdenegacion.hashCode());
+		result = prime * result + ((observacionessuscripcion == null) ? 0 : observacionessuscripcion.hashCode());
+		result = prime * result + ((observacionesvalbaja == null) ? 0 : observacionesvalbaja.hashCode());
+		result = prime * result + ((observacionesvalidacion == null) ? 0 : observacionesvalidacion.hashCode());
+		result = prime * result + ((orden == null) ? 0 : orden.hashCode());
+		result = prime * result + ((ordenCola == null) ? 0 : ordenCola.hashCode());
+		result = prime * result + ((saltos == null) ? 0 : saltos.hashCode());
+		result = prime * result + ((ultimoCola == null) ? 0 : ultimoCola.hashCode());
+		result = prime * result + ((usumodificacion == null) ? 0 : usumodificacion.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		InscripcionGuardiaItem other = (InscripcionGuardiaItem) obj;
+		if (apellido1 == null) {
+			if (other.apellido1 != null)
+				return false;
+		} else if (!apellido1.equals(other.apellido1))
+			return false;
+		if (apellido2 == null) {
+			if (other.apellido2 != null)
+				return false;
+		} else if (!apellido2.equals(other.apellido2))
+			return false;
+		if (compensaciones == null) {
+			if (other.compensaciones != null)
+				return false;
+		} else if (!compensaciones.equals(other.compensaciones))
+			return false;
+		if (estado == null) {
+			if (other.estado != null)
+				return false;
+		} else if (!estado.equals(other.estado))
+			return false;
+		if (fechaBaja == null) {
+			if (other.fechaBaja != null)
+				return false;
+		} else if (!fechaBaja.equals(other.fechaBaja))
+			return false;
+		if (fechaSuscripcion == null) {
+			if (other.fechaSuscripcion != null)
+				return false;
+		} else if (!fechaSuscripcion.equals(other.fechaSuscripcion))
+			return false;
+		if (fechaValidacion == null) {
+			if (other.fechaValidacion != null)
+				return false;
+		} else if (!fechaValidacion.equals(other.fechaValidacion))
+			return false;
+		if (fechabaja == null) {
+			if (other.fechabaja != null)
+				return false;
+		} else if (!fechabaja.equals(other.fechabaja))
+			return false;
+		if (fechadenegacion == null) {
+			if (other.fechadenegacion != null)
+				return false;
+		} else if (!fechadenegacion.equals(other.fechadenegacion))
+			return false;
+		if (fechamodificacion == null) {
+			if (other.fechamodificacion != null)
+				return false;
+		} else if (!fechamodificacion.equals(other.fechamodificacion))
+			return false;
+		if (fechasolicitudbaja == null) {
+			if (other.fechasolicitudbaja != null)
+				return false;
+		} else if (!fechasolicitudbaja.equals(other.fechasolicitudbaja))
+			return false;
+		if (fechavalidacion == null) {
+			if (other.fechavalidacion != null)
+				return false;
+		} else if (!fechavalidacion.equals(other.fechavalidacion))
+			return false;
+		if (idGrupoGuardia == null) {
+			if (other.idGrupoGuardia != null)
+				return false;
+		} else if (!idGrupoGuardia.equals(other.idGrupoGuardia))
+			return false;
+		if (idGrupoGuardiaColegiado == null) {
+			if (other.idGrupoGuardiaColegiado != null)
+				return false;
+		} else if (!idGrupoGuardiaColegiado.equals(other.idGrupoGuardiaColegiado))
+			return false;
+		if (idGuardia == null) {
+			if (other.idGuardia != null)
+				return false;
+		} else if (!idGuardia.equals(other.idGuardia))
+			return false;
+		if (idInstitucion == null) {
+			if (other.idInstitucion != null)
+				return false;
+		} else if (!idInstitucion.equals(other.idInstitucion))
+			return false;
+		if (idPersona == null) {
+			if (other.idPersona != null)
+				return false;
+		} else if (!idPersona.equals(other.idPersona))
+			return false;
+		if (idTurno == null) {
+			if (other.idTurno != null)
+				return false;
+		} else if (!idTurno.equals(other.idTurno))
+			return false;
+		if (nColegiado == null) {
+			if (other.nColegiado != null)
+				return false;
+		} else if (!nColegiado.equals(other.nColegiado))
+			return false;
+		if (nombre == null) {
+			if (other.nombre != null)
+				return false;
+		} else if (!nombre.equals(other.nombre))
+			return false;
+		if (numeroGrupo == null) {
+			if (other.numeroGrupo != null)
+				return false;
+		} else if (!numeroGrupo.equals(other.numeroGrupo))
+			return false;
+		if (observacionesbaja == null) {
+			if (other.observacionesbaja != null)
+				return false;
+		} else if (!observacionesbaja.equals(other.observacionesbaja))
+			return false;
+		if (observacionesdenegacion == null) {
+			if (other.observacionesdenegacion != null)
+				return false;
+		} else if (!observacionesdenegacion.equals(other.observacionesdenegacion))
+			return false;
+		if (observacionessuscripcion == null) {
+			if (other.observacionessuscripcion != null)
+				return false;
+		} else if (!observacionessuscripcion.equals(other.observacionessuscripcion))
+			return false;
+		if (observacionesvalbaja == null) {
+			if (other.observacionesvalbaja != null)
+				return false;
+		} else if (!observacionesvalbaja.equals(other.observacionesvalbaja))
+			return false;
+		if (observacionesvalidacion == null) {
+			if (other.observacionesvalidacion != null)
+				return false;
+		} else if (!observacionesvalidacion.equals(other.observacionesvalidacion))
+			return false;
+		if (orden == null) {
+			if (other.orden != null)
+				return false;
+		} else if (!orden.equals(other.orden))
+			return false;
+		if (ordenCola == null) {
+			if (other.ordenCola != null)
+				return false;
+		} else if (!ordenCola.equals(other.ordenCola))
+			return false;
+		if (saltos == null) {
+			if (other.saltos != null)
+				return false;
+		} else if (!saltos.equals(other.saltos))
+			return false;
+		if (ultimoCola == null) {
+			if (other.ultimoCola != null)
+				return false;
+		} else if (!ultimoCola.equals(other.ultimoCola))
+			return false;
+		if (usumodificacion == null) {
+			if (other.usumodificacion != null)
+				return false;
+		} else if (!usumodificacion.equals(other.usumodificacion))
+			return false;
+		return true;
+	}
+
 
 }

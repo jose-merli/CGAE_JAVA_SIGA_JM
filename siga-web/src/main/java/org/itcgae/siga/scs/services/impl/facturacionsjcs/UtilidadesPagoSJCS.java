@@ -110,7 +110,7 @@ public class UtilidadesPagoSJCS {
     private static List<Integer> listaPagosDeshacerCierre = new ArrayList<>();
 
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class,timeout = 900)
     public void ejecutarPagoSJCS(FcsPagosjg pago, boolean simular, Short idInstitucion, AdmUsuarios usuario) throws Exception {
 
         // Insertamos el estado del pago:
@@ -153,92 +153,98 @@ public class UtilidadesPagoSJCS {
         Double porcentajeIRPF;
         double importeIrpfTotal = 0.0d;
         String idCuenta;
+        List<FcsPagoColegiado> colegiados = new ArrayList<FcsPagoColegiado>();
 
         try {
 
             // Recuperamos los colegiados a los que tenemos que pagar
             // aquellos incluidos en el pago o con movimientos varios pendientes
-            List<FcsPagoColegiado> colegiados = getColegiadosApagar(idInstitucion, idPago, SigaConstants.LISTA_PAGO_TODOS, usuario);
+             colegiados = getColegiadosApagar(idInstitucion, idPago, SigaConstants.LISTA_PAGO_TODOS, usuario);
 
             // Si no existe un pago para el colegiado debe existir al menos un
             // MV
             // por lo que pasa a tratar los movimientos varios
-            for (FcsPagoColegiado colegiado : colegiados) {
+            if(!colegiados.isEmpty() || colegiados.size() != 0){
+                for (FcsPagoColegiado colegiado : colegiados) {
 
-                // Obtenemos el idcuenta con el fin de actualizar el registro de
-                // la persona de la tabla fcs_pago_colegiado
+                    // Obtenemos el idcuenta con el fin de actualizar el registro de
+                    // la persona de la tabla fcs_pago_colegiado
 
-                idPersonaDestino = colegiado.getIdperdestino().toString();
+                    idPersonaDestino = colegiado.getIdperdestino().toString();
 
-                ArrayList<String> cuenta = getCuentaAbonoSJCS(idInstitucion, idPersonaDestino, usuario);
+                    ArrayList<String> cuenta = getCuentaAbonoSJCS(idInstitucion, idPersonaDestino, usuario);
 
-                idCuenta = cuenta.get(2).equals("-1") ? null : cuenta.get(2);
+                    idCuenta = cuenta.get(2).equals("-1") ? null : cuenta.get(2);
 
-                if (idCuenta != null) {
-                    colegiado.setIdcuenta(Short.valueOf(idCuenta));
-                    colegiado.setFechamodificacion(new Date());
-                    colegiado.setUsumodificacion(usuario.getIdusuario());
-                }
+                    if (idCuenta != null) {
+                        colegiado.setIdcuenta(Short.valueOf(idCuenta));
+                        colegiado.setFechamodificacion(new Date());
+                        colegiado.setUsumodificacion(usuario.getIdusuario());
+                    }
 
-                fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective(colegiado);
+                    fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective(colegiado);
 
-                importeTurnos = colegiado.getImpoficio().doubleValue();
-                importeGuardias = colegiado.getImpasistencia().doubleValue();
-                importeSoj = colegiado.getImpsoj().doubleValue();
-                importeEjg = colegiado.getImpejg().doubleValue();
+                    importeTurnos = colegiado.getImpoficio().doubleValue();
+                    importeGuardias = colegiado.getImpasistencia().doubleValue();
+                    importeSoj = colegiado.getImpsoj().doubleValue();
+                    importeEjg = colegiado.getImpejg().doubleValue();
 
-                // 1. Calcula el IMPORTE SJCS BRUTO
-                importeSJCS = importeTurnos + importeGuardias + importeSoj + importeEjg;
+                    // 1. Calcula el IMPORTE SJCS BRUTO
+                    importeSJCS = importeTurnos + importeGuardias + importeSoj + importeEjg;
 
-                // obtiene el porcentajeIRPF del colegiado para utilizarlo al
-                // aplicar
-                // los movimientos varios y calcular el IRPF del importe bruto.
-                porcentajeIRPF = obtenerIrpf(idInstitucion.toString(), idPersonaDestino,
-                        !idPersonaDestino.equals(colegiado.getIdperorigen().toString()), usuario);
+                    // obtiene el porcentajeIRPF del colegiado para utilizarlo al
+                    // aplicar
+                    // los movimientos varios y calcular el IRPF del importe bruto.
+                    porcentajeIRPF = obtenerIrpf(idInstitucion.toString(), idPersonaDestino,
+                            !idPersonaDestino.equals(colegiado.getIdperorigen().toString()), usuario);
 
-                // 2. Aplicar los movimientos varios
-                // Asocia todos los movimientos sin idpago al pago actual.
-                // Actualiza el porcentaje e importe IRPF para cada movimiento.
-                FcsMovimientosvarios fcsMovimientosvarios = new FcsMovimientosvarios();
-                fcsMovimientosvarios.setIdinstitucion(idInstitucion);
-                fcsMovimientosvarios.setIdpersona(colegiado.getIdperorigen());
+                    // 2. Aplicar los movimientos varios
+                    // Asocia todos los movimientos sin idpago al pago actual.
+                    // Actualiza el porcentaje e importe IRPF para cada movimiento.
+                    FcsMovimientosvarios fcsMovimientosvarios = new FcsMovimientosvarios();
+                    fcsMovimientosvarios.setIdinstitucion(idInstitucion);
+                    fcsMovimientosvarios.setIdpersona(colegiado.getIdperorigen());
 
-                importeMovimientos = aplicarMovimientosVarios(fcsMovimientosvarios, idPago, importeSJCS, usuario);
+                    importeMovimientos = aplicarMovimientosVarios(fcsMovimientosvarios, idPago, importeSJCS, usuario);
 
-                // 3. Obtener importe bruto como la suma de los movimientos varios y
-                // el total SJCS
-                double importeBruto = importeSJCS + importeMovimientos;
+                    // 3. Obtener importe bruto como la suma de los movimientos varios y
+                    // el total SJCS
+                    double importeBruto = importeSJCS + importeMovimientos;
 
-                // 4. Obtener el importe neto aplicando el IRPF
-                // (hay que redondear el importeIrpf porque es un importe que se ha
-                // de presentar)
-                importeIrpfTotal = (-1) * redondea(importeBruto * porcentajeIRPF / 100, 2);
+                    // 4. Obtener el importe neto aplicando el IRPF
+                    // (hay que redondear el importeIrpf porque es un importe que se ha
+                    // de presentar)
+                    importeIrpfTotal = (-1) * redondea(importeBruto * porcentajeIRPF / 100, 2);
 
-                double importeNeto = importeBruto + importeIrpfTotal;
+                    double importeNeto = importeBruto + importeIrpfTotal;
 
-                // 5. Aplicar retenciones judiciales y no judiciales
-                //aalg Incidencia del 28-sep-2011. Se modifica el usuario de modificacion que se estaba
-                // cogiendo el idPersona en vez del userName
-                aplicarRetencionesJudiciales(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(),
-                        Double.toString(importeNeto), usuario.getIdusuario().toString(), usuario.getIdlenguaje(), usuario);
+                    // 5. Aplicar retenciones judiciales y no judiciales
+                    //aalg Incidencia del 28-sep-2011. Se modifica el usuario de modificacion que se estaba
+                    // cogiendo el idPersona en vez del userName
+                    aplicarRetencionesJudiciales(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(),
+                            Double.toString(importeNeto), usuario.getIdusuario().toString(), usuario.getIdlenguaje(), usuario);
 
-                // obtener el importe de las retenciones judiciales
-                importeRetenciones = getSumaRetenciones(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(), usuario);
+                    // obtener el importe de las retenciones judiciales
+                    importeRetenciones = getSumaRetenciones(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(), usuario);
 
-                // Actualizar el irpf, movimientos varios y retenciones en
-                // fcs_pago_colegiado
-                FcsPagoColegiado fcsPagoColegiado = new FcsPagoColegiado();
-                fcsPagoColegiado.setIdinstitucion(idInstitucion);
-                fcsPagoColegiado.setIdpagosjg(Integer.valueOf(idPago));
-                fcsPagoColegiado.setIdperorigen(colegiado.getIdperorigen());
-                fcsPagoColegiado.setImpirpf(BigDecimal.valueOf(importeIrpfTotal));
-                fcsPagoColegiado.setPorcentajeirpf(BigDecimal.valueOf(porcentajeIRPF));
-                fcsPagoColegiado.setImpmovvar(BigDecimal.valueOf(importeMovimientos));
-                fcsPagoColegiado.setImpret(BigDecimal.valueOf(importeRetenciones));
+                    // Actualizar el irpf, movimientos varios y retenciones en
+                    // fcs_pago_colegiado
+                    FcsPagoColegiado fcsPagoColegiado = new FcsPagoColegiado();
+                    fcsPagoColegiado.setIdinstitucion(idInstitucion);
+                    fcsPagoColegiado.setIdpagosjg(Integer.valueOf(idPago));
+                    fcsPagoColegiado.setIdperorigen(colegiado.getIdperorigen());
+                    fcsPagoColegiado.setImpirpf(BigDecimal.valueOf(importeIrpfTotal));
+                    fcsPagoColegiado.setPorcentajeirpf(BigDecimal.valueOf(porcentajeIRPF));
+                    fcsPagoColegiado.setImpmovvar(BigDecimal.valueOf(importeMovimientos));
+                    fcsPagoColegiado.setImpret(BigDecimal.valueOf(importeRetenciones));
 
-                fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective(fcsPagoColegiado);
+                    fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective(fcsPagoColegiado);
 
-            } // fin del for de colegiados
+                } // fin del for de colegiados
+            }else{
+                throw new FacturacionSJCSException("Para ejecutar un pago este debe estar asociado a un colegiado.");
+            }
+
 
         } catch (Exception e) {
             throw new FacturacionSJCSException("Error en la obtención de los importes", e, "messages.factSJCS.error.importes");
@@ -259,7 +265,7 @@ public class UtilidadesPagoSJCS {
      */
     private List<FcsPagoColegiado> getColegiadosApagar(Short idInstitucion, String idPago, int caseMorosos, AdmUsuarios usuario) throws Exception {
 
-        List<FcsPagoColegiado> colegiados;
+        List<FcsPagoColegiado> colegiados = new ArrayList<FcsPagoColegiado>();
 
         try {
 
@@ -378,12 +384,12 @@ public class UtilidadesPagoSJCS {
         // en esta variable se guarda el importe final de los movimientos varios
         double importeMovimientos = 0.0d;
         double importeAplicado = 0.0d;
-        double importeTotalMovimiento;
-        double importeAnteriorAplicado;
-        Long auxIdMovimiento = null;
+        double importeTotalMovimiento = 0.0d;
+        double importeAnteriorAplicado = 0.0d;
+        Long auxIdMovimiento = 0L;
         Long auxIdMovimientoAnt = 0L;
         Date ausFechaModificacion;
-        Integer auxUsuarioModificacion;
+        Integer auxUsuarioModificacion = 0;
         boolean noAplica = false;
 
         try {
@@ -760,7 +766,11 @@ public class UtilidadesPagoSJCS {
         if (!hayAbonoPosterior.isEmpty()) {
             LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
                     "con nuestro pago");
-            List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, hayAbonoPosterior.get(0).getFecha());
+
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String fecha = formato.format(hayAbonoPosterior.get(0).getFecha());
+
+            List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, fecha);
 
             AdmContador admContador = new AdmContador();
             admContador.setIdcontador(SigaConstants.CONTADOR_ABONOS_PAGOSJG);
@@ -783,21 +793,31 @@ public class UtilidadesPagoSJCS {
 
         for (Integer idpagoJG : idPagos) {
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> fcsPagosjgExtendsMapper.getFechaEstadoPago() -> Obtenemos la fecha del estado de pago");
-            Date fechaPago = fcsPagosjgExtendsMapper.getFechaEstadoPago(idInstitucion, idpagoJG);
+            try{
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> fcsPagosjgExtendsMapper.getFechaEstadoPago() -> Obtenemos la fecha del estado de pago");
+                Date fechaPago = fcsPagosjgExtendsMapper.getFechaEstadoPago(idInstitucion, idpagoJG);
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> ejecucionPlsPago.ejecutarPLDeshacerCierre() -> Ejecutamos el procedimiento de base de datos");
-            ejecucionPlsPago.ejecutarPLDeshacerCierre(idInstitucion, fechaPago);
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> ejecucionPlsPago.ejecutarPLDeshacerCierre() -> Ejecutamos el procedimiento de base de datos");
+                ejecucionPlsPago.ejecutarPLDeshacerCierre(idInstitucion, fechaPago);
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() ->fcsPagosEstadospagosMapper.updateByPrimaryKeySelective() -> Actualizamos el estado de pago a ejecutado");
-            FcsPagosEstadospagos record = new FcsPagosEstadospagos();
-            record.setIdinstitucion(idInstitucion);
-            record.setIdpagosjg(idpagoJG);
-            record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
-            record.setFechaestado(new Date());
-            record.setFechamodificacion(new Date());
-            record.setUsumodificacion(usuario.getIdusuario());
-            fcsPagosEstadospagosMapper.updateByPrimaryKeySelective(record);
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() ->fcsPagosEstadospagosMapper.updateByPrimaryKeySelective() -> Actualizamos el estado de pago a ejecutado");
+                FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+                record.setIdinstitucion(idInstitucion);
+                record.setIdpagosjg(idpagoJG);
+                record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
+                record.setFechaestado(new Date());
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(usuario.getIdusuario());
+                FcsPagosEstadospagos pagoEdit = fcsPagosEstadospagosMapper.selectByPrimaryKey(record);
+                if(pagoEdit != null ){
+                    fcsPagosEstadospagosMapper.updateByPrimaryKeySelective(record);
+                }else{
+                    fcsPagosEstadospagosMapper.insertSelective(record);
+                }
+
+            }catch (Exception e){
+                throw new Exception("Error al insertar el nuevo estado de la facturacion", e);
+            }
 
         }
 
