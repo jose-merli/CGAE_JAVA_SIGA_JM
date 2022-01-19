@@ -27,9 +27,13 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		sql.SELECT("CASE WHEN A.IDPERSONA = A.IDPERORIGEN THEN 'NO' ELSE 'SI' END AS SOCIEDAD");
 		sql.SELECT("PA.nombre AS NOMBREPAGO");
 		sql.SELECT("GEN.DESCRIPCION AS ESTADONOMBRE");
+		sql.SELECT("PA.IDPAGOSJG, PA.IDFACTURACION, A.IDFACTURA");
+		sql.SELECT("F.NOMBRE as NOMBREFACTURACION");
 		
 		sql.FROM("FAC_ABONO A");
 		sql.INNER_JOIN("FCS_PAGOSJG PA on A.IDPAGOSJG = PA.IDPAGOSJG AND A.idinstitucion = PA.idinstitucion");
+		sql.INNER_JOIN("FCS_FACTURACIONJG  F ON (PA.IDFACTURACION = F.IDFACTURACION AND PA.IDINSTITUCION = F.IDINSTITUCION) ");
+		sql.INNER_JOIN("FCS_FACT_GRUPOFACT_HITO G ON (G.IDINSTITUCION = F.IDINSTITUCION AND G.IDFACTURACION = F.IDFACTURACION)");
 		sql.INNER_JOIN("CEN_CLIENTE C ON (C.IDPERSONA = A.IDPERSONA AND C.IDINSTITUCION = A.IDINSTITUCION)");
 		sql.INNER_JOIN("CEN_PERSONA P ON (P.IDPERSONA = A.IDPERSONA)");
 		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = P.IDPERSONA AND COL.IDINSTITUCION = A.IDINSTITUCION)");
@@ -49,6 +53,9 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 	        	sql.WHERE("A.IMPTOTALABONADOPORBANCO > 0");
 	    }
 	        
+	    if(facAbonoItem.getNumColegiado() != null ) sql.WHERE("COL.NCOLEGIADO = " + facAbonoItem.getNumColegiado());
+	    
+	    if(facAbonoItem.getGrupoPago() != null) sql.WHERE("PA.IDFACTURACION = " + facAbonoItem.getGrupoPago());
 
         if(facAbonoItem.getImporteTotalDesde() != 0 ) {
         	sql.WHERE("A.IMPTOTAL>=to_number("+facAbonoItem.getImporteTotalDesde()+",'99999999999999999.99')");
@@ -71,6 +78,10 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
         }
         if(facAbonoItem.getContabilizada()!=null && facAbonoItem.getContabilizada().equalsIgnoreCase("N")) {
         	sql.WHERE("A.contabilizada = 'N'");
+        }
+        
+        if(facAbonoItem.getGrupoFacturacionNombre() != null) {
+        	sql.WHERE("G.IDGRUPOFACTURACION =" + facAbonoItem.getGrupoFacturacionNombre());
         }
 
         if(facAbonoItem.getNumIdentificadorSociedad() != null ) {
@@ -223,6 +234,17 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		sql.FROM("SCS_GRUPOFACTURACION");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);		
 		sql.ORDER_BY("NOMBRE");
+		
+		LOGGER.info(sql.toString());
+		return sql.toString();
+	}
+	
+	public String comboPago(String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDFACTURACION, ABREVIATURA ");
+		sql.FROM("fcs_pagosjg");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);		
+		sql.ORDER_BY("ABREVIATURA");
 		
 		LOGGER.info(sql.toString());
 		return sql.toString();

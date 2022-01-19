@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -79,9 +80,11 @@ public class LogErroresFacturacionSJCSHelper {
 
                 if (!directorio.exists()) {
                     directorio.mkdirs();
+                    SIGAHelper.addPerm777(directorio);
                 }
 
                 fLogErrores.createNewFile();
+                SIGAHelper.addPerm777(fLogErrores);
                 fw = new FileWriter(fLogErrores, true);
                 bw = new BufferedWriter(fw);
                 pw = new PrintWriter(bw, false);
@@ -117,9 +120,11 @@ public class LogErroresFacturacionSJCSHelper {
 
                     if (!directorio.exists()) {
                         directorio.mkdirs();
+                        SIGAHelper.addPerm777(directorio);
                     }
 
                     fLogErrores.createNewFile();
+                    SIGAHelper.addPerm777(fLogErrores);
                     fw = new FileWriter(fLogErrores, true);
                     bw = new BufferedWriter(fw);
                     pw = new PrintWriter(bw, false);

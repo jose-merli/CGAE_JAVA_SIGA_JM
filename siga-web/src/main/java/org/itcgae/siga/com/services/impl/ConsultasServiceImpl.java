@@ -2737,23 +2737,23 @@ public class ConsultasServiceImpl implements IConsultasService {
 		//Primero obtenemos todos los registros de con_criterioconsulta existentes
 		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
 		
-		constructorConsultasDTO = this.obtenerDatosConsulta(request, queryBuilderDTO.getIdconsulta());
+		constructorConsultasDTO = this.obtenerDatosConsulta(request, queryBuilderDTO.getIdconsulta(), queryBuilderDTO.getIdinstitucion());
 		//Eliminamos todos los existentes en caso de que tuviera alguno antes de insertar los nuevos.
 		if(constructorConsultasDTO.getConstructorConsultasItem().size() > 0 && constructorConsultasDTO.getConstructorConsultasItem() != null) {
 			for (ConstructorConsultasItem rule : constructorConsultasDTO.getConstructorConsultasItem()) {
 				ConCriterioconsulta conCriterioConsultaEliminar = new ConCriterioconsulta();
 				
 				conCriterioConsultaEliminar.setOrden((short) rule.getOrden());
-				conCriterioConsultaEliminar.setIdinstitucion(idInstitucion);
+				conCriterioConsultaEliminar.setIdinstitucion(Short.valueOf(queryBuilderDTO.getIdinstitucion()));
 				conCriterioConsultaEliminar.setIdconsulta((long) rule.getIdconsulta());
 				
 				statusDeleteConCriterioConsulta = conCriterioConsultaMapper.deleteByPrimaryKey(conCriterioConsultaEliminar);
 				
 				if(statusDeleteConCriterioConsulta == 0) {
-					throw new Exception("Ha fallado la eliminacion del registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + idInstitucion);
+					throw new Exception("Ha fallado la eliminacion del registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + queryBuilderDTO.getIdinstitucion());
 				}else if(statusDeleteConCriterioConsulta == 1){
 					LOGGER.info(
-							"constructorConsultas() / ConCriterioConsultaMapper.deleteByPrimaryKey() -> Eliminado con exito el registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + idInstitucion);
+							"constructorConsultas() / ConCriterioConsultaMapper.deleteByPrimaryKey() -> Eliminado con exito el registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + queryBuilderDTO.getIdinstitucion());
 				}
 						
 			}
@@ -2785,7 +2785,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					//Inserto en con_criterioconsulta los campos recibidos del constructor de consultas
 					ConCriterioconsulta conCriterioConsultaInsertar = new ConCriterioconsulta();
 					
-					conCriterioConsultaInsertar.setIdinstitucion(idInstitucion);
+					conCriterioConsultaInsertar.setIdinstitucion(Short.valueOf(queryBuilderDTO.getIdinstitucion()));
 					conCriterioConsultaInsertar.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
 					
 		            String delimitador = null;
@@ -2882,26 +2882,26 @@ public class ConsultasServiceImpl implements IConsultasService {
 		            
 		            //Si hay criterios, es decir la consulta no ha llegado vacia del constructor de consultas por lo que hemos insertado en con_criterioconsulta formamos la query basandonos en ellos
 		            if(!queryBuilderDTO.getConsulta().equals("")) {
-		            	consulta = obtenerConsultaByConCriterios(_conConsultasExtendsMapper.obtenerDatosConsulta(idioma, idInstitucion,queryBuilderDTO.getIdconsulta()));
+		            	consulta = obtenerConsultaByConCriterios(_conConsultasExtendsMapper.obtenerDatosConsulta(idioma, Short.valueOf(queryBuilderDTO.getIdinstitucion()), queryBuilderDTO.getIdconsulta()));
 		            	//Cambiamos @IDGRUPO@ por el idGrupo correcto
 						if (consulta.indexOf("@IDGRUPO@")!=-1){
 							consulta=UtilidadesString.replaceAllIgnoreCase(consulta,"@IDGRUPO@",""+null+",2000");
 						}
 						//Cambiamos @IDINSTITUCION@	 por el IdInstitucion correcto
-						consulta = UtilidadesString.reemplazaString("@IDINSTITUCION@", idInstitucion.toString(), consulta);		
+						consulta = UtilidadesString.reemplazaString("@IDINSTITUCION@", queryBuilderDTO.getIdinstitucion(), consulta);		
 						
 		            // Si no hay criterios, cogemos la select por defecto
 		            }else if(queryBuilderDTO.getConsulta().equals("")){
 		            	consulta = getQueryPorDefecto();
 						//Cambiamos @IDINSTITUCION@	 por el IdInstitucion correcto
-						consulta = UtilidadesString.reemplazaString("@IDINSTITUCION@", idInstitucion.toString(), consulta);
+						consulta = UtilidadesString.reemplazaString("@IDINSTITUCION@", queryBuilderDTO.getIdinstitucion(), consulta);
 						queryPorDefecto = true;
 		            }
 		            
 		          //Creo el objeto con los valores a actualizar en CON_CONSULTA         
 		            ConConsulta conConsulta = new ConConsulta();
 		            
-					conConsulta.setIdinstitucion(idInstitucion);
+					conConsulta.setIdinstitucion(Short.valueOf(queryBuilderDTO.getIdinstitucion()));
 					conConsulta.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
 		            
 		            conConsulta.setSentencia(consulta);            
@@ -2988,6 +2988,14 @@ public class ConsultasServiceImpl implements IConsultasService {
 			
 			LOGGER.info("constructorConsultas() -> Salida del servicio para crear una nueva consulta desde el constructor de consultas");
 
+			ConConsultaKey conConsultaKey = new ConConsultaKey();
+			
+			conConsultaKey.setIdinstitucion(Short.valueOf(queryBuilderDTO.getIdinstitucion()));
+			conConsultaKey.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
+			
+			ConConsulta conConsulta = _conConsultaMapper.selectByPrimaryKey(conConsultaKey);
+			
+			queryBuilderDTO.setSentencia(conConsulta.getSentencia());
 			
 			return queryBuilderDTO;
 				
@@ -3385,7 +3393,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	
 	
 	@Override
-	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta) {
+	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta, String idInstitucion) {
 		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
 		Error error = new Error();
 		
@@ -3394,12 +3402,12 @@ public class ConsultasServiceImpl implements IConsultasService {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idInstitucionLog = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucionLog);
 			
 
 				LOGGER.info(
@@ -3417,8 +3425,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					
-					List<ConstructorConsultasItem> constructorDeConsultasList = _conConsultasExtendsMapper.obtenerDatosConsulta(idioma, idInstitucion, idConsulta);
-				
+					List<ConstructorConsultasItem> constructorDeConsultasList = _conConsultasExtendsMapper.obtenerDatosConsulta(idioma, Short.valueOf(idInstitucion), idConsulta);
+					
 					String consulta = "";
 					if (constructorDeConsultasList != null && constructorDeConsultasList.size() > 0) {
 						for (ConstructorConsultasItem constructorConsultasItem : constructorDeConsultasList) {

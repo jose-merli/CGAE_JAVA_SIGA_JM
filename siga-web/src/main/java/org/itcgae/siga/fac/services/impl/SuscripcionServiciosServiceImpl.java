@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.services.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -140,6 +141,10 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 					e);
 			error.setCode(500);
 		}
+		
+		LOGGER.info(
+				"getListaSuscripciones() -> Salida del servicio para obtener las peticiones de suscripcion que cumplan las condiciones");
+
 
 		LOGGER.debug(
 				"getListaSuscripciones() -> Salida del servicio para obtener las peticiones de suscripcion que cumplan las condiciones");
@@ -151,7 +156,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	}
 	
 		
-	//    @Scheduled(cron = "${cron.pattern.scheduled.procesoSuscripAut}")
+	@Scheduled(cron = "${cron.pattern.scheduled.procesoSuscripAut}")
 	@Override
 	public void ejecutaSuscripcionesAutomaticas() {
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaSuscripcionesAutomaticas --> ENTRA ejecutaSuscripcionesAutomaticas");
@@ -171,7 +176,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaSuscripcionesAutomaticas --> SALE ejecutaSuscripcionesAutomaticas");
 	}
 	
-	//    @Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionAutomatica}")
+	@Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionAutomatica}")
 	@Override
 	public void ejecutaRevisionAutomatica() {
 		LOGGER.info("SuscripcionServiciosServiceImpl --> ejecutaRevisionAutomatica --> ENTRA ejecutaRevisionAutomatica");
@@ -287,7 +292,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	}
 
 
-	@Scheduled(cron = "0 0/1 * * * *")//    @Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionLetrado}")
+	@Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionLetrado}")
 	@Override
 	public void actualizacionSuscripcionesPersona() {
 
@@ -338,9 +343,13 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 //		}
 		//Se seleccionan las filas a eliminar
 		PysColaSuscripcionesAutoExample personasBorrarExample = new PysColaSuscripcionesAutoExample();
+
+	      Calendar calendar = Calendar.getInstance();
 		
 		//Se eligen las entradas que tengan una fecha de modificacion de hace más de un día
-		personasBorrarExample.createCriteria().andFechamodificacionLessThan(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
+	    calendar.add(Calendar.DATE, -1);
+		
+	    personasBorrarExample.createCriteria().andIdestadoEqualTo((short) 1).andFechamodificacionLessThan(calendar.getTime());
 		
 		List<PysColaSuscripcionesAuto> personasBorrar = pysColaSuscripcionesAutoMapper.selectByExample(personasBorrarExample);
 		
@@ -381,7 +390,11 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	
 			if (usuarios != null && !usuarios.isEmpty()) {
 
+				
+				LOGGER.info(
+						"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.selectByExample() -> Salida de pysColasuscripcionesAutoMapper para obtener el id maximo");
 
+				
 					
 					PysColaSuscripcionesAutoExample personaColaExample = new PysColaSuscripcionesAutoExample();
 					
@@ -408,31 +421,15 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 						personaCola.setIdpersona(peticion.getIdPersona());
 						personaCola.setIdinstitucion(idInstitucion);
 						personaCola.setIdestado((short) 0);
-						
-						//Se obtiene el valor maximo del idcola
-						PysColaSuscripcionesAutoExample colaSuscripcionExample = new PysColaSuscripcionesAutoExample();
-						
-						LOGGER.info(
-								"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.selectByExample() -> Entrada a pysColasuscripcionesAutoMapper para obtener el valor maximo de idColaSuscripcion");
-		
-						
-						//Se comprueba si esta persona tiene alguna entrada en la cola sin procesar
-						colaSuscripcionExample.setOrderByClause("IDCOLASUSCRIPCION DESC");
-						
-						
-						LOGGER.info(
-								"actualizacionColaSuscripcionesPersona() / pysColasuscripcionesAutoMapper.selectByExample() -> Entrada a pysColasuscripcionesAutoMapper para obtener el valor maximo de idColaSuscripcion");
-						
+
 						//REVISAR: PENDIENTE DE REALIZAR UNA CONSULTA MÁS EFICIENTE
 						List<PysColaSuscripcionesAuto> colaSuscripcion = pysColaSuscripcionesAutoMapper.selectByExample(personaColaExample);
 						
-						if(colaSuscripcion.isEmpty()) {
-							personaCola.setIdcolasuscripcion((long) 1);
-						}
-						else {
-							personaCola.setIdcolasuscripcion(colaSuscripcion.get(0).getIdcolasuscripcion() + 1);
-						}
+						//Obtiene nuevo id
 						
+						int maxIdCola = pysColaSuscripcionesAutoMapper.getNewIdCola();
+						
+						personaCola.setIdcolasuscripcion((long) maxIdCola);
 						
 						personaCola.setFechamodificacion(new Date());
 						personaCola.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -471,6 +468,10 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 						
 					}
 			}
+			
+		LOGGER.info(
+				"actualizacionColaSuscripcionesPersona() -> Salida del servicio para obtener las peticiones de suscripcion que cumplan las condiciones");
+			
 			
 		LOGGER.debug(
 				"actualizacionColaSuscripcionesPersona() -> Salida del servicio para obtener las peticiones de suscripcion que cumplan las condiciones");

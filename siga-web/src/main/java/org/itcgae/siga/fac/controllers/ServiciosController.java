@@ -3,6 +3,8 @@ package org.itcgae.siga.fac.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
+import org.itcgae.siga.DTO.fac.ComboPreciosSuscripcionDTO;
+import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
@@ -18,6 +20,7 @@ import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.fac.services.IProductosService;
 import org.itcgae.siga.fac.services.IServiciosService;
@@ -132,6 +135,15 @@ public class ServiciosController {
 	ResponseEntity<ComboDTO> comboPeriodicidad(HttpServletRequest request) { 
 		ComboDTO response = serviciosService.comboPeriodicidad(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+//	@GetMapping(value = "/combo/comboPreciosServPers")
+//	ResponseEntity<ComboPreciosSuscripcionDTO> comboPreciosServPers(HttpServletRequest request, @RequestParam String idPersona, @RequestParam int idServicio, @RequestParam int idTipoServicios, @RequestParam int idServiciosInstitucion) { 
+	@PostMapping(value="/combo/comboPreciosServPers")
+	ResponseEntity<ComboPreciosSuscripcionDTO> comboPreciosServPers(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem peticion) {
+	ComboPreciosSuscripcionDTO response = serviciosService.comboPreciosServPers(request, peticion.getIdPersona(), peticion.getServicios().get(0).getIdServicio(), 
+			peticion.getServicios().get(0).getIdTipoServicios(), peticion.getServicios().get(0).getIdServiciosInstitucion());
+		return new ResponseEntity<ComboPreciosSuscripcionDTO>(response, HttpStatus.OK);
 	}
 	
 	//Crea y edita en la tabla pys_preciosservicios usando la informacion de la tarjeta precios en la ficha servicio pantalla servicios en facturacion

@@ -492,8 +492,14 @@ public class CombosServicesImpl implements ICombosServices {
                 if (null != usuarios && !usuarios.isEmpty()) {
 
                     LOGGER.info("CombosServicesImpl.getColegios() / fcsDestinatariosRetencionesExtendsMapper.getComboDestinatarios() -> Entrada para obtener el combo de destinatarios");
-
-                    List<ComboItem> comboItems = cenInstitucionExtendsMapper.getComboInstitucionesNombre();
+                    //Comprobamos si es Consejo
+                    List<ComboItem> consejo = cenInstitucionExtendsMapper.isConsejo(String.valueOf(idInstitucion));
+                    List<ComboItem> comboItems = null;
+                    if(consejo.size() >0){
+                      comboItems = cenInstitucionExtendsMapper.getInstitucionesConsejo(String.valueOf(idInstitucion));
+                    }else {
+                      comboItems = cenInstitucionExtendsMapper.getComboInstitucionesNombre();
+                    }
                     comboDTO.setCombooItems(comboItems);
 
                     LOGGER.info("CombosServicesImpl.getColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Salida de obtener el combo de colegios");
@@ -928,7 +934,7 @@ public class CombosServicesImpl implements ICombosServices {
 				comboEstadosAbono.setCombooItems(comboItems);
 
 				LOGGER.info(
-						"comboPagosColegio() / facAbonosjgExtendsMapper.comboEstadoAbonos() -> Salida a facAbonosjgExtendsMapper para obtener el listado de estados de un abono");
+						"comboEstadoAbonos() / facAbonosjgExtendsMapper.comboEstadoAbonos() -> Salida a facAbonosjgExtendsMapper para obtener el listado de estados de un abono");
 			} else {
 				LOGGER.warn(
 						"comboEstadoAbonos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -984,6 +990,34 @@ public class CombosServicesImpl implements ICombosServices {
 
 		LOGGER.info("comboGrupoFacturacion() -> Salida del servicio para obtener el listado de grupos de facturacion");
 		return comboGrupoFacturacion;
+	}
+	
+	@Override
+	public ComboDTO comboPagos(HttpServletRequest request) {
+		
+		LOGGER.info("comboPagos() -> Entrada del servicio para obtener el listado de grupos de pago");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboEstadosAbono = new ComboDTO();
+
+		if (null != idInstitucion) {
+
+
+				LOGGER.info(
+						"comboPagos() / facAbonosjgExtendsMapper.comboPagos() -> Entrada a facAbonosjgExtendsMapper para obtener el listado de grupos de pago");
+				
+				List<ComboItem> comboItems = facAbonosjgExtendsMapper.comboPago(idInstitucion.toString());
+				comboEstadosAbono.setCombooItems(comboItems);
+
+
+		} else {
+			LOGGER.warn("comboPagos() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("comboPagos() -> Salida del servicio para obtener el listado de grupos de pago");
+		return comboEstadosAbono;
 	}
 
 }

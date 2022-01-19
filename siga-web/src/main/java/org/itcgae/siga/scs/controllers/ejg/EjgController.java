@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
@@ -273,8 +274,8 @@ public class EjgController {
 
 	// comboActaAnnio
 	@RequestMapping(value = "/gestion-ejg/comboActaAnnio", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboActaAnnio(String idActa, String anioActa, HttpServletRequest request) {
-		ComboDTO response = gestionEJG.comboActaAnnio(idActa, anioActa, request);
+	ResponseEntity<ComboDTO> comboActaAnnio(@RequestParam("anioacta") String anioacta, @RequestParam("idacta") String idacta, HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboActaAnnio(anioacta, idacta, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 

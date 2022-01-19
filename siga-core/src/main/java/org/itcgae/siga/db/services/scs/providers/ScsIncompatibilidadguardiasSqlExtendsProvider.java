@@ -141,7 +141,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 	
 	
 	
-	public String listadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion, String idGuardia, Integer tamMax) {
+	public String listadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion, Integer tamMax) {
 	
 		SQL listado_guardias = new SQL();
 		SQL listado_guardias_idGuardia = new SQL();
@@ -176,8 +176,14 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		listado_guardias.SELECT("SCS_GUARDIASTURNO.IDTIPOGUARDIA");
 		listado_guardias.FROM(" SCS_GUARDIASTURNO");
 		listado_guardias.JOIN("SCS_TURNO ON SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO AND SCS_GUARDIASTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION"); 
-		listado_guardias.JOIN("SCS_TIPOSGUARDIAS ON SCS_TIPOSGUARDIAS.IDTIPOGUARDIA = SCS_GUARDIASTURNO.IDTIPOGUARDIA " );  
-		listado_guardias.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS ON GEN_RECURSOS_CATALOGOS.IDRECURSO = SCS_TIPOSGUARDIAS.DESCRIPCION AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = 1 ");
+		if(incompatibilidades.getIdTipoGuardia() != null && ! incompatibilidades.getIdTipoGuardia().isEmpty()) {
+			listado_guardias.JOIN("SCS_TIPOSGUARDIAS ON SCS_TIPOSGUARDIAS.IDTIPOGUARDIA = SCS_GUARDIASTURNO.IDTIPOGUARDIA " ); 
+		} 
+		
+		if(incompatibilidades.getIdTipoGuardia() != null && ! incompatibilidades.getIdTipoGuardia().isEmpty()) {
+			listado_guardias.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS ON GEN_RECURSOS_CATALOGOS.IDRECURSO = SCS_TIPOSGUARDIAS.DESCRIPCION AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = 1 ");	
+		}
+			
 		listado_guardias.JOIN("SCS_AREA ON SCS_AREA.IDAREA = SCS_TURNO.IDAREA AND SCS_AREA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION " );
 		listado_guardias.JOIN("SCS_MATERIA ON SCS_MATERIA.IDAREA = SCS_AREA.IDAREA AND SCS_MATERIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION " );
 		listado_guardias.JOIN("SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA " );
@@ -254,7 +260,9 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		sqlMotivos.SELECT("MOTIVOS");
 		sqlMotivos.FROM("SCS_INCOMPATIBILIDADGUARDIAS");
 		sqlMotivos.WHERE("IDINSTITUCION = g1.IDINSTITUCION");
-		sqlMotivos.WHERE("((IDTURNO = g1.IDTURNO AND IDGUARDIA = g1.IDGUARDIA AND IDTURNO_INCOMPATIBLE = g2.IDTURNO AND IDGUARDIA_INCOMPATIBLE = g2.IDGUARDIA) OR (IDTURNO = g2.IDTURNO AND IDGUARDIA = g2.IDGUARDIA AND IDTURNO_INCOMPATIBLE = g1.IDTURNO AND IDGUARDIA_INCOMPATIBLE = g1.IDGUARDIA))");
+		//sqlMotivos.WHERE("((IDTURNO = g1.IDTURNO AND IDGUARDIA = g1.IDGUARDIA AND IDTURNO_INCOMPATIBLE = g2.IDTURNO AND IDGUARDIA_INCOMPATIBLE = g2.IDGUARDIA) OR (IDTURNO = g2.IDTURNO AND IDGUARDIA = g2.IDGUARDIA AND IDTURNO_INCOMPATIBLE = g1.IDTURNO AND IDGUARDIA_INCOMPATIBLE = g1.IDGUARDIA))");
+		sqlMotivos.WHERE("(IDTURNO = g1.IDTURNO AND IDGUARDIA = g1.IDGUARDIA AND IDTURNO_INCOMPATIBLE = g2.IDTURNO AND IDGUARDIA_INCOMPATIBLE = g2.IDGUARDIA)");
+		
 		sqlMotivos.WHERE("rownum = 1");
 		
 		sql.SELECT_DISTINCT(
