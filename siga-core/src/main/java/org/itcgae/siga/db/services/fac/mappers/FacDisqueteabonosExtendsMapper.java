@@ -28,9 +28,11 @@ public interface FacDisqueteabonosExtendsMapper extends FacDisqueteabonosMapper 
 		@Result(column = "numfacturas", property = "numRecibos", jdbcType = JdbcType.INTEGER),
 		@Result(column = "IDSUFIJO", property = "idSufijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "totalimporte", property = "importeTotal", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "totalimporte", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "propSEPA", property = "propSEPA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "propOtros", property = "propOtros", jdbcType = JdbcType.VARCHAR)
 	})
-	List<FicherosAbonosItem> getFicherosTransferencias(FicherosAbonosItem item, String idInstitucion);
+	List<FicherosAbonosItem> getFicherosTransferencias(FicherosAbonosItem item, String idInstitucion, String idioma);
 
 	@SelectProvider(type = FacDisqueteabonosExtendsSqlProvider.class, method = "getFacturasIncluidas")
 	@Results({
@@ -41,4 +43,7 @@ public interface FacDisqueteabonosExtendsMapper extends FacDisqueteabonosMapper 
 			@Result(column = "PENDIENTETOTAL", property = "pendienteTotal", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturasIncluidasItem> getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma);
+
+	@SelectProvider(type = FacDisqueteabonosExtendsSqlProvider.class, method = "getNextIdDisqueteAbono")
+	Long getNextIdDisqueteAbono(Short idInstitucion);
 }

@@ -1467,4 +1467,12 @@ public class SigaConstants {
     
 	public static final String C_IDFACTURACION = "IDFACTURACION";
 
+	// Estados de FAC_ABONO
+    public static final Short FAC_ABONO_ESTADO_PAGADO = 1;
+    public static final Short FAC_ABONO_ESTADO_PENDIENTE_BANCO = 5;
+    public static final Short FAC_ABONO_ESTADO_PENDIENTE_CAJA = 6;
+    public static final Short FAC_ABONO_DESTINATARIOABONO_SOCIEDAD = 0;
+    public static final Short FAC_ABONO_DESTINATARIOABONO_SJCS = 1;
+    public static final Short FAC_ABONO_DESTINATARIOABONO_NORMAL = 2;
+
 }

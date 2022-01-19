@@ -8,13 +8,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -74,6 +77,7 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAReferences;
@@ -82,9 +86,12 @@ import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
+import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenGruposcriterios;
 import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.CenGruposcriteriosKey;
@@ -94,7 +101,9 @@ import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.EnvComunicacionmorosos;
 import org.itcgae.siga.db.entities.EnvComunicacionmorososExample;
 import org.itcgae.siga.db.entities.FacAbono;
+import org.itcgae.siga.db.entities.FacAbonoExample;
 import org.itcgae.siga.db.entities.FacAbonoKey;
+import org.itcgae.siga.db.entities.FacAbonoincluidoendisquete;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionExample;
 import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
@@ -115,6 +124,8 @@ import org.itcgae.siga.db.entities.FacFacturacionEliminar;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
+import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
+import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
 import org.itcgae.siga.db.entities.FacGrupcritincluidosenserie;
@@ -123,6 +134,8 @@ import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineaabonoKey;
+import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
+import org.itcgae.siga.db.entities.FacLineadevoludisqbancoKey;
 import org.itcgae.siga.db.entities.FacLineafactura;
 import org.itcgae.siga.db.entities.FacLineafacturaExample;
 import org.itcgae.siga.db.entities.FacLineafacturaKey;
@@ -130,8 +143,6 @@ import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
 import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
-import org.itcgae.siga.db.entities.FacPlantillafacturacion;
-import org.itcgae.siga.db.entities.FacPlantillafacturacionExample;
 import org.itcgae.siga.db.entities.FacRegistrofichconta;
 import org.itcgae.siga.db.entities.FacRenegociacion;
 import org.itcgae.siga.db.entities.FacRenegociacionExample;
@@ -152,24 +163,36 @@ import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ModClasecomunicaciones;
+import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
+import org.itcgae.siga.db.entities.PysTipoiva;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
+import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
+import org.itcgae.siga.db.mappers.FacLineadevoludisqbancoMapper;
 import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
-import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.CenGruposcriteriosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
@@ -188,6 +211,8 @@ import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposproduincluenfactuExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
@@ -263,6 +288,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private FacDisqueteabonosExtendsMapper facDisqueteabonosExtendsMapper;
 
 	@Autowired
+	private FacAbonoincluidoendisqueteExtendsMapper facAbonoincluidoendisqueteExtendsMapper;
+
+	@Autowired
 	private FacDisquetedevolucionesExtendsMapper facDisquetedevolucionesExtendsMapper;
 
 	@Autowired
@@ -314,10 +342,28 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private ConConsultasExtendsMapper conConsultasExtendsMapper;
 
 	@Autowired
-	private FacPlantillafacturacionMapper facPlantillafacturacionMapper;
+	private CenClienteMapper cenClienteMapper;
+
+	@Autowired
+	private FacFacturaincluidaendisqueteMapper facFacturaincluidaendisqueteMapper;
+
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
 
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
+
+	@Autowired
+	private FacLineadevoludisqbancoMapper facLineadevoludisqbancoMapper;
+
+	@Autowired
+	private PySTipoIvaExtendsMapper pySTipoIvaExtendsMapper;
+
+	@Autowired
+	private ModClasecomunicacionesMapper modClasecomunicacionesMapper;
+
+	@Autowired
+	private ModModeloComunicacionExtendsMapper modModeloComunicacionExtendsMapper;
 
 	@Override
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -1033,19 +1079,44 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				serieToUpdate.setIdseriefacturacion(idSerieFacturacion);
 
                 // 3. Generación de ficheros por defecto
-                FacPlantillafacturacionExample modeloExample = new FacPlantillafacturacionExample();
-                modeloExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
-                modeloExample.setOrderByClause("fechamodificacion");
+				ModClasecomunicacionesExample claseFactExample = new ModClasecomunicacionesExample();
+				claseFactExample.createCriteria().andNombreEqualTo("Facturas");
+				List<ModClasecomunicaciones> clasesFactura = modClasecomunicacionesMapper.selectByExample(claseFactExample);
 
-                List<FacPlantillafacturacion> modelosComunicacion = facPlantillafacturacionMapper.selectByExample(modeloExample);
+				ModClasecomunicacionesExample claseFactRectExample = new ModClasecomunicacionesExample();
+				claseFactRectExample.createCriteria().andNombreEqualTo("Facturas rectificativas");
+				List<ModClasecomunicaciones> clasesFacturaRect = modClasecomunicacionesMapper.selectByExample(claseFactRectExample);
 
-                if (!modelosComunicacion.isEmpty()) {
-                    serieToUpdate.setIdmodelofactura(Long.valueOf(modelosComunicacion.get(0).getIdplantilla()));
-                    serieToUpdate.setIdmodelorectificativa(Long.valueOf(modelosComunicacion.get(0).getIdplantilla()));
-                } else {
-                    serieToUpdate.setIdmodelofactura(null);
-                    serieToUpdate.setIdmodelorectificativa(null);
-                }
+				// 3.1. Obtenemos el modelo de comunicación por defecto de las facturas
+				if (clasesFactura != null && !clasesFactura.isEmpty()) {
+					ModModelocomunicacionExample comunicacionExample = new ModModelocomunicacionExample();
+					comunicacionExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+							.andIdclasecomunicacionEqualTo(clasesFactura.get(0).getIdclasecomunicacion())
+							.andFechabajaIsNull();
+					comunicacionExample.setOrderByClause("(CASE pordefecto WHEN 'SI' THEN 1 ELSE 0 END), fechamodificacion");
+
+					List<ModModelocomunicacion> modelos = modModeloComunicacionExtendsMapper.selectByExample(comunicacionExample);
+					if (modelos != null && !modelos.isEmpty())
+						serieToUpdate.setIdmodelofactura(modelos.get(0).getIdmodelocomunicacion());
+				} else {
+					serieToUpdate.setIdmodelofactura(null);
+				}
+
+				// 3.2. Obtenemos el modelo de comunicación por defecto de las facturas rectificativas
+				if (clasesFacturaRect != null && !clasesFacturaRect.isEmpty()) {
+					ModModelocomunicacionExample comunicacionExample = new ModModelocomunicacionExample();
+					comunicacionExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+							.andIdclasecomunicacionEqualTo(clasesFacturaRect.get(0).getIdclasecomunicacion())
+							.andFechabajaIsNull();
+					comunicacionExample.setOrderByClause("(CASE pordefecto WHEN 'SI' THEN 1 ELSE 0 END), fechamodificacion");
+
+					List<ModModelocomunicacion> modelos = modModeloComunicacionExtendsMapper.selectByExample(comunicacionExample);
+					if (modelos != null && !modelos.isEmpty())
+						serieToUpdate.setIdmodelorectificativa(modelos.get(0).getIdmodelocomunicacion());
+				} else {
+					serieToUpdate.setIdmodelorectificativa(null);
+				}
+
 			} else {
 				idSerieFacturacion = Long.parseLong(serieFacturacion.getIdSerieFacturacion());
 				FacSeriefacturacionKey serieKey = new FacSeriefacturacionKey();
@@ -2034,6 +2105,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		error.setCode(0);
 		deleteResponseDTO.setError(error);
 
+		// Obtener la facturación cuyo fichero se va a eliminar
+		FacFacturacionprogramadaKey key = new FacFacturacionprogramadaKey();
+		key.setIdinstitucion(usuario.getIdinstitucion());
+		key.setIdseriefacturacion(fac.getIdSerieFacturacion());
+		key.setIdprogramacion(fac.getIdProgramacion());
+		FacFacturacionprogramada facturacionToDelete = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
+
         Object[] param_in = new Object[4]; // Parametros de entrada del PL
 
         param_in[0] = usuario.getIdinstitucion();
@@ -2044,22 +2122,26 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
         String resultado[] = commons.callPLProcedureFacturacionPyS(
                 "{call PKG_SIGA_FACTURACION.ELIMINARFACTURACION(?,?,?,?,?,?)}", 2, param_in);
 
-			// facFacturaMapper.eliminarFacturacion(facElim);
-//			@Update(value = "{CALL PKG_SIGA_FACTURACION.ELIMINARFACTURACION ("
-//					+ "#{idInstitucion,mode=IN},"
-//					+ "#{idSerieFacturacion, mode=IN},"
-//					+ "#{idProgramacion, mode=IN},"
-//					+ "#{idUsuarioModificacion, mode=IN},"
-//					+ "#{codRetorno, mode=OUT, jdbcType=VARCHAR},"
-//					+ "#{datosError, mode=OUT, jdbcType=VARCHAR})}")
-//	@Options(statementType = StatementType.CALLABLE)
-//	@ResultType(FacFacturacionEliminar.class)
-//	void eliminarFacturacion(FacFacturacionEliminar facturaEliminar);
-
         if (resultado[0] != null && !resultado[0].equals(RET_OK)) {
             throw new Exception(resultado[1]);
         } else {
-            // TODO: borrado de ficheros
+        	// Obtener la ruta del fichero
+			String directorioFisico = "facturacion.directorioFisicoPrevisionesJava";
+			String directorio = "facturacion.directorioPrevisionesJava";
+
+			String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+					+ File.separator + usuario.getIdinstitucion();
+
+			// Borrado del fichero
+			File file = null;
+			if (Objects.nonNull(facturacionToDelete)) {
+				String nombreFichero = pathFichero + File.separator + facturacionToDelete.getNombrefichero();
+				file = new File(nombreFichero);
+
+				if (file.exists()) {
+					file.delete();
+				}
+			}
         }
 
 
@@ -2085,7 +2167,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					"FacturacionPySServiceImpl.getFicherosTransferencias() -> obteniendo datos de ficheros de transferencias");
 
 			List<FicherosAbonosItem> items = facDisqueteabonosExtendsMapper.getFicherosTransferencias(item,
-					usuario.getIdinstitucion().toString());
+					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 
 			ficherosAbonosDTO.setFicherosAbonosItems(items);
 		}
@@ -2094,6 +2176,153 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				"FacturacionPySServiceImpl.getFicherosTransferencias() -> Salida del servicio  para obtener los ficheros de transferencias");
 
 		return ficherosAbonosDTO;
+	}
+
+	@Override
+	public InsertResponseDTO nuevoFicheroTransferencias(List<FacAbonoItem> abonoItems, HttpServletRequest request) throws Exception {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.nuevoFicheroTransferencias() -> Entrada al servicio para generar un nuevo fichero de transferencias");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			String fcs = "0";
+
+			FacSeriefacturacionBancoExample bancosExample = new FacSeriefacturacionBancoExample();
+			bancosExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+
+			List<FacSeriefacturacionBanco> bancos = facSeriefacturacionBancoMapper.selectByExample(bancosExample);
+
+			for (FacSeriefacturacionBanco banco: bancos) {
+
+				String bancosCodigo = banco.getBancosCodigo();
+				Short idSufijo = banco.getIdsufijo();
+
+				if (idSufijo == null) {
+					throw new Exception("facturacion.ficheroBancarioTransferencias.errorSufijosSerie.mensajeCondicionesIncumplidas");
+				}
+
+				List<FacAbono> abonosBanco = facAbonoExtendsMapper.getAbonosBanco(usuario.getIdinstitucion(), bancosCodigo, idSufijo);
+				int resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, null, null, usuario);
+
+				if (resultado == -1) {
+					throw new Exception("general.mensaje.error.bbdd");
+				}
+			}
+
+		}
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.nuevoFicheroTransferencias() -> Salida del servicio  para generar un nuevo fichero de transferencias");
+
+		return insertResponseDTO;
+	}
+
+	private int prepararFicheroTransferencias(String fcs, Short idInstitucion,
+											  String bancosCodigo,
+											  Short idSufijo,
+											  List<FacAbono> abonosBanco,
+											  Integer idPropositoSEPA,
+											  Integer idPropositoOtros,
+											  AdmUsuarios usuario) throws Exception {
+		Long idDisqueteAbono = facDisqueteabonosExtendsMapper.getNextIdDisqueteAbono(idInstitucion);
+		String nombreFichero = getProperty("facturacion.prefijo.ficherosAbonos") + idDisqueteAbono;
+
+		// Creación del nuevo fichero de transferencias
+		FacDisqueteabonos record = new FacDisqueteabonos();
+		record.setIdinstitucion(idInstitucion);
+		record.setIddisqueteabono(idDisqueteAbono);
+		record.setFecha(new Date());
+		record.setFechaejecucion(new Date());
+		record.setBancosCodigo(bancosCodigo);
+		record.setFcs(fcs);
+		record.setNombrefichero(nombreFichero);
+		record.setNumerolineas(Long.valueOf(abonosBanco.size()));
+		record.setIdsufijo(idSufijo);
+
+		if (facDisqueteabonosExtendsMapper.insert(record) == 0) {
+			return -1;
+		}
+
+		int numeroAbonosIncluidosEnDisquete = 0;
+		for (FacAbono abono: abonosBanco) {
+			FacAbonoKey abonoKey = new FacAbonoKey();
+			abonoKey.setIdinstitucion(idInstitucion);
+			abonoKey.setIdabono(abono.getIdabono());
+
+			FacAbono abonoToUpdate = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
+
+			Double importeAbonado = abonoToUpdate.getImppendienteporabonar().doubleValue();
+			if (importeAbonado == 0)
+				continue;
+
+			numeroAbonosIncluidosEnDisquete++;
+
+			// Introducimos el abono en el fichero de transferencias
+			FacAbonoincluidoendisquete recordAbono = new FacAbonoincluidoendisquete();
+			recordAbono.setIdinstitucion(idInstitucion);
+			recordAbono.setIdabono(abono.getIdabono());
+			recordAbono.setIddisqueteabono(idDisqueteAbono);
+			recordAbono.setImporteabonado(new BigDecimal(importeAbonado).setScale(2, RoundingMode.DOWN));
+			recordAbono.setContabilizado("N");
+			facAbonoincluidoendisqueteExtendsMapper.insert(recordAbono);
+
+			// Actualización de los importes
+			Double impPendientePorAbonar = abonoToUpdate.getImppendienteporabonar().doubleValue() - importeAbonado;
+			Double impTotalAbonado = abonoToUpdate.getImptotalabonado().doubleValue() + importeAbonado;
+			Double impTotalAbonadoPorBanco = abonoToUpdate.getImptotalabonadoporbanco().doubleValue() + importeAbonado;
+
+			abonoToUpdate.setImppendienteporabonar(new BigDecimal(impPendientePorAbonar).setScale(2, RoundingMode.DOWN));
+			abonoToUpdate.setImptotalabonado(new BigDecimal(impTotalAbonado).setScale(2, RoundingMode.DOWN));
+			abonoToUpdate.setImptotalabonadoporbanco(new BigDecimal(impTotalAbonadoPorBanco).setScale(2, RoundingMode.DOWN));
+
+			//  Actualización del estado
+			if (impPendientePorAbonar <= 0) {
+				abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PAGADO);
+			} else if (abonoToUpdate.getIdcuenta() != null) {
+				abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
+			} else {
+				abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA);
+			}
+
+			facAbonoExtendsMapper.updateByPrimaryKey(abonoToUpdate);
+		}
+
+		if (numeroAbonosIncluidosEnDisquete == 0) {
+			return 0;
+		}
+
+		// Obtener la ruta del fichero
+		String directorioFisico = "facturacion.directorioFisicoAbonosBancosJava";
+		String directorio = "facturacion.directorioAbonosBancosJava";
+
+		String rutaServidor = getProperty(directorioFisico) + getProperty(directorio)
+				+ File.separator + usuario.getIdinstitucion();
+
+		Object[] param_in = new Object[7]; // Parametros de entrada del PL
+
+		param_in[0] = idInstitucion;
+		param_in[1] = idDisqueteAbono;
+		param_in[2] = idPropositoSEPA;
+		param_in[3] = idPropositoOtros;
+		param_in[4] = rutaServidor;
+		param_in[5] = nombreFichero;
+		param_in[6] = usuario.getIdlenguaje();
+
+		String[] resultado = commons.callPLProcedureFacturacionPyS(
+				"{call PKG_SIGA_ABONOS.Generarficherotransferencias("
+						+ String.join(",", Collections.nCopies(9, "?"))
+						+ ")}", 2, param_in);
+
+		if (resultado[0] != null && resultado.length > 1 && string2Integer(resultado[0]) > 0) {
+			throw new Exception(resultado[1]);
+		}
+
+		return 1;
 	}
 
 	@Override
@@ -2207,7 +2436,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	public FacturaDTO getFactura(String idFactura, String tipo, HttpServletRequest request) throws Exception {
+	public FacturaDTO getFactura(String idFactura, String idAbono, String tipo, HttpServletRequest request) throws Exception {
 		FacturaDTO facturaDTO = new FacturaDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
 
@@ -2232,7 +2461,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			if (tipo.equalsIgnoreCase("ABONO")) {
-				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idFactura,
+				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idAbono,
 						usuario.getIdinstitucion().toString());
 
 				facturaDTO.setFacturasItems(items);
@@ -2284,7 +2513,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (item.getTipo().equalsIgnoreCase("ABONO")) {
 
 				FacAbonoKey key = new FacAbonoKey();
-				key.setIdabono(Long.valueOf(item.getIdFactura()));
+				key.setIdabono(Long.valueOf(item.getIdAbono()));
 				key.setIdinstitucion(usuario.getIdinstitucion());
 				FacAbono updateItem = facAbonoExtendsMapper.selectByPrimaryKey(key);
 
@@ -2780,9 +3009,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 	}
 
-	/**
-	 * ¿Que se inseta en la table de fac_historico?
-	 */
 	private void nuevoAbono(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacAbono abonoUpdate,
 			AdmUsuarios usuario) {
 
@@ -2841,12 +3067,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricoInsert.setIdcuenta(null);
 		facHistoricoInsert.setIdcuentadeudor(null);
 
-		facHistoricoInsert.setImptotalpagadoporcaja(BigDecimal
-				.valueOf(Double.parseDouble(item.getImpTotalPagado() + facHistoricoInsert.getImptotalpagadoporcaja())));
-		facHistoricoInsert.setImptotalpagadosolocaja(BigDecimal.valueOf(
-				Double.parseDouble(item.getImpTotalPagado() + facHistoricoInsert.getImptotalpagadosolocaja())));
-		facHistoricoInsert.setImptotalpagado(BigDecimal
-				.valueOf(Double.parseDouble(item.getImpTotalPagado() + facHistoricoInsert.getImptotalpagado())));
+		facHistoricoInsert.setImptotalpagadoporcaja(facHistoricoInsert.getImptotalpagado().add(
+				BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
+		facHistoricoInsert.setImptotalpagadosolocaja(facHistoricoInsert.getImptotalpagadosolocaja().add(
+				BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
+		facHistoricoInsert.setImptotalpagado(facHistoricoInsert.getImptotalpagado().add(
+				BigDecimal.valueOf(Double.parseDouble(item.getImpTotalPagado()))));
 		facHistoricoInsert.setImptotalporpagar(
 				facHistoricoInsert.getImptotalporpagar().subtract(facHistoricoInsert.getImptotalpagado()));
 
@@ -2912,24 +3138,58 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private void devolverFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
 			AdmUsuarios usuario) throws Exception {
-		// historico fac
+
+		//Cliente
+		CenClienteKey cenClienteKey = new CenClienteKey();
+		cenClienteKey.setIdinstitucion(facUpdate.getIdinstitucion());
+		cenClienteKey.setIdpersona(facUpdate.getIdpersona());
+		CenCliente cliente = cenClienteMapper.selectByPrimaryKey(cenClienteKey);
+
+
+		//Entidad Bancaria
+		String codigoBanco = facBancoinstitucionExtendsMapper.getBancosCodigo(String.valueOf(facUpdate.getIdinstitucion()), facUpdate.getIdfactura()).get(0).getValue();
+
+		FacBancoinstitucionKey bancoinstitucionKey = new FacBancoinstitucionKey();
+		bancoinstitucionKey.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
+		bancoinstitucionKey.setBancosCodigo(codigoBanco);
+
+		FacBancoinstitucion banco = facBancoinstitucionExtendsMapper.selectByPrimaryKey(bancoinstitucionKey);
+
+
+		//Pago a devolver
+		FacFacturaincluidaendisqueteKey facFacturaincluidaendisqueteKey = new FacFacturaincluidaendisqueteKey();
+		facFacturaincluidaendisqueteKey.setIddisquetecargos(facHistoricoInsert.getIddisquetecargos());
+		facFacturaincluidaendisqueteKey.setIdfacturaincluidaendisquete(facHistoricoInsert.getIdfacturaincluidaendisquete());
+		facFacturaincluidaendisqueteKey.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
+
+		FacFacturaincluidaendisquete facFacturaincluidaendisquete = facFacturaincluidaendisqueteMapper.selectByPrimaryKey(facFacturaincluidaendisqueteKey);
+
+		facFacturaincluidaendisquete.setDevuelta("S");
+		facFacturaincluidaendisqueteMapper.updateByPrimaryKey(facFacturaincluidaendisquete);
+
+		BigDecimal importeDevolver = facFacturaincluidaendisquete.getImporte();
+
+
+		//Historico fac
 		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
 
-		facHistoricoInsert.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
-		facHistoricoInsert.setImptotalpagado(BigDecimal.valueOf(0));
-		facHistoricoInsert.setImptotalporpagar(facUpdate.getImptotal());
+		facHistoricoInsert.setImptotalporpagar(facHistoricoInsert.getImptotalporpagar().add(importeDevolver));
+		facHistoricoInsert.setImptotalpagado(facHistoricoInsert.getImptotalpagado().subtract(importeDevolver));
+		facHistoricoInsert.setImptotalpagadoporbanco(facHistoricoInsert.getImptotalpagadoporbanco().subtract(importeDevolver));
 
 		facHistoricoInsert.setEstado((short) 4);
 
+		//Objeto del PKG para la devolucion
 		FacFacturaDevolucion devolucion = new FacFacturaDevolucion();
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fecha = dateFormat.format(item.getFechaModificaion());
-		devolucion.setFechaDevolucion(fecha);
 
 		devolucion.setIdIdioma(usuario.getIdlenguaje());
 		devolucion.setIdInstitucion(usuario.getIdinstitucion());
 		devolucion.setUsuModificacion(usuario.getUsumodificacion());
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMDD");
+		String fecha = dateFormat.format(item.getFechaModificaion());
+
+		devolucion.setFechaDevolucion(fecha);
 
 		String listaFacturas = facHistoricoInsert.getIddisquetecargos() + "||"
 				+ facHistoricoInsert.getIdfacturaincluidaendisquete() + "||" + facHistoricoInsert.getIdfactura() + "||"
@@ -2937,46 +3197,19 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		devolucion.setListaFacturas(listaFacturas);
 
-		// factura
+		facHistoricoInsert.setIdrecibo("00" + facHistoricoInsert.getIdrecibo());
+
+
+		//Factura Original
 		facUpdate.setEstado((short) 4);
-		facUpdate.setImptotalpagado(facUpdate.getImptotal());
-		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagado(facHistoricoInsert.getImptotalpagado());
+		facUpdate.setImptotalporpagar(facHistoricoInsert.getImptotalporpagar());
+		facUpdate.setImptotalpagadoporbanco(facHistoricoInsert.getImptotalpagadoporbanco());
 		facUpdate.setFechamodificacion(new Date());
 		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
 
-		//comision factura
-		if(item.getComision() != null && item.getComision()){
-			FacFacturaKey facFacturaKey = new FacFacturaKey();
-			facFacturaKey.setIdfactura(facUpdate.getComisionidfactura());
-			facFacturaKey.setIdinstitucion(facUpdate.getIdinstitucion());
 
-			FacFactura comision = facFacturaExtendsMapper.selectByPrimaryKey(facFacturaKey);
-
-			FacLineafactura lineaComision = new FacLineafactura();
-
-			lineaComision.setIdinstitucion(comision.getIdinstitucion());
-			lineaComision.setIdfactura(facUpdate.getIdfactura());
-			lineaComision.setNumeroorden((long) 1);
-			lineaComision.setCantidad(1);
-			lineaComision.setFechamodificacion(new Date());
-			lineaComision.setUsumodificacion(usuario.getUsumodificacion());
-			lineaComision.setFechamodificacion(new Date());
-			lineaComision.setPreciounitario(comision.getImptotal());
-
-			FacLineafacturaExample exampleLinea = new FacLineafacturaExample();
-			exampleLinea.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
-					.andIdinstitucionEqualTo(usuario.getIdinstitucion());
-			exampleLinea.setOrderByClause("NUMEROLINEA");
-
-			List<FacLineafactura> listLinea = facLineafacturaExtendsMapper.selectByExample(exampleLinea);
-			if (!listLinea.isEmpty())
-				lineaComision.setNumerolinea((listLinea.get(listLinea.size() - 1).getNumerolinea() + 1));
-			else
-				lineaComision.setNumerolinea((long) 1);
-
-			facLineafacturaExtendsMapper.insert(lineaComision);
-		}
-
+		//Obtener ID Disquete Devoluciones
 		String resultado[] = null;
 
 		Object[] param_in = new Object[2]; // Parametros de entrada del PL
@@ -2997,8 +3230,184 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			facHistoricoInsert.setIddisquetedevoluciones(Long.valueOf(devolucion.getListaIdDisquetesDevolucion()));
 
 			facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
-
 			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+
+			FacLineadevoludisqbancoKey facLineadevoludisqbancoKey = new FacLineadevoludisqbancoKey();
+			facLineadevoludisqbancoKey.setIddisquetedevoluciones(facHistoricoInsert.getIddisquetedevoluciones());
+			facLineadevoludisqbancoKey.setIdinstitucion(facHistoricoInsert.getIdinstitucion());
+			facLineadevoludisqbancoKey.setIdrecibo(facHistoricoInsert.getIdrecibo());
+			FacLineadevoludisqbanco lienaDevolucion = facLineadevoludisqbancoMapper.selectByPrimaryKey(facLineadevoludisqbancoKey);
+
+			//Con Comision
+			if(item.getComision() != null && item.getComision() && cliente.getComisiones().equals("1") && banco.getComisionimporte() != BigDecimal.valueOf(0)){
+
+				//Copia Factura
+				FacFactura facturaComision = facUpdate;
+				facturaComision.setIdfactura(facFacturaExtendsMapper.getNewFacturaID(String.valueOf(facturaComision.getIdinstitucion())).get(0).getValue());
+
+
+				//Historico Factura Anulada
+				FacHistoricofactura fachistoricoAnulada = new FacHistoricofactura();
+
+				fachistoricoAnulada.setIdfactura(facUpdate.getIdfactura());
+				fachistoricoAnulada.setIdinstitucion(facUpdate.getIdinstitucion());
+
+				fachistoricoAnulada.setIdtipoaccion((short) 9);
+				fachistoricoAnulada.setEstado((short) 8);
+				fachistoricoAnulada.setIdhistorico((short) (fachistoricoAnulada.getIdhistorico()+1));
+
+				fachistoricoAnulada.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalpagado(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalporpagar(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+				fachistoricoAnulada.setImptotalcompensado(facUpdate.getImptotal());
+
+				facHistoricofacturaExtendsMapper.insert(fachistoricoAnulada);
+
+
+				//Anular Factura Original
+				facUpdate.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+				facUpdate.setImptotalpagado(BigDecimal.valueOf(0));
+				facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
+				facUpdate.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+				facUpdate.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+				facUpdate.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+				facUpdate.setImptotalcompensado(facUpdate.getImptotal());
+
+				facUpdate.setEstado((short) 8);
+
+				facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+
+
+				//Factura Comision
+				facturaComision.setFechaemision(item.getFechaModificaion());
+				facturaComision.setEstado((short) 4);
+
+				facturaComision.setComisionidfactura(facUpdate.getIdfactura());
+				facturaComision.setNumerofactura(facFacturaExtendsMapper.getNuevoNumeroFactura(facturaComision.getIdinstitucion().toString(), facturaComision.getIdseriefacturacion().toString()).get(0).getValue());
+
+				long IVAComision = Long.parseLong(facBancoinstitucionExtendsMapper.getPorcentajeIva(String.valueOf(facUpdate.getIdinstitucion()), banco.getBancosCodigo()).get(0).getValue());
+				BigDecimal importeIVAComision = banco.getComisionimporte().multiply(BigDecimal.valueOf(IVAComision/100));
+
+				facturaComision.setImptotalporpagar(facturaComision.getImptotalporpagar().add(importeIVAComision.add(banco.getComisionimporte())));
+				facturaComision.setImptotal(facturaComision.getImptotal().add(importeIVAComision.add(banco.getComisionimporte())));
+				facturaComision.setImptotaliva(facturaComision.getImptotaliva().add(importeIVAComision));
+				facturaComision.setImptotalneto(facturaComision.getImptotalneto().add(banco.getComisionimporte()));
+
+				facFacturaExtendsMapper.insert(facturaComision);
+
+
+				//Actualizar Contador Factura
+				FacSeriefacturacionKey facSeriefacturacionKey = new FacSeriefacturacionKey();
+				facSeriefacturacionKey.setIdinstitucion(facturaComision.getIdinstitucion());
+				facSeriefacturacionKey.setIdseriefacturacion(facturaComision.getIdseriefacturacion());
+
+				AdmContadorKey admContadorKey = new AdmContadorKey();
+				admContadorKey.setIdinstitucion(facturaComision.getIdinstitucion());
+				admContadorKey.setIdcontador(facSeriefacturacionExtendsMapper.selectByPrimaryKey(facSeriefacturacionKey).getIdcontador());
+
+				AdmContador admContador = admContadorMapper.selectByPrimaryKey(admContadorKey);
+				admContador.setContador(admContador.getContador()+1);
+
+				admContadorMapper.updateByPrimaryKey(admContador);
+
+
+				//Historico Factura Comision
+				FacHistoricofactura fachistoricoRevision = fachistoricoAnulada;
+
+				fachistoricoRevision.setComisionidfactura(facUpdate.getIdfactura());
+
+				fachistoricoRevision.setIdfactura(facturaComision.getIdfactura());
+				fachistoricoRevision.setIdhistorico((short) 1);
+				fachistoricoRevision.setIdtipoaccion((short) 1);
+				fachistoricoRevision.setEstado((short) 7);
+
+				fachistoricoRevision.setImptotalanticipado(BigDecimal.valueOf(0));
+				fachistoricoRevision.setImptotalcompensado(facturaComision.getImptotal());
+
+				facHistoricofacturaExtendsMapper.insert(fachistoricoRevision);
+
+				FacHistoricofactura fachistoricoPendiente = fachistoricoRevision;
+
+				fachistoricoRevision.setIdhistorico((short) 2);
+				fachistoricoRevision.setIdtipoaccion((short) 2);
+				fachistoricoRevision.setEstado((short) 9);
+
+				facHistoricofacturaExtendsMapper.insert(fachistoricoPendiente);
+
+
+				//Copia Lineas Factura
+				FacLineafacturaExample exampleLinea = new FacLineafacturaExample();
+				exampleLinea.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
+						.andIdinstitucionEqualTo(usuario.getIdinstitucion());
+				exampleLinea.setOrderByClause("NUMEROLINEA");
+
+				List<FacLineafactura> listLinea = facLineafacturaExtendsMapper.selectByExample(exampleLinea);
+
+				long maximoNumeroOrden = 1;
+				long maximoNumeroLinea = 1;
+
+				for (FacLineafactura lf : listLinea) {
+					lf.setIdfactura(facturaComision.getIdfactura());
+					facLineafacturaExtendsMapper.insert(lf);
+
+					if(lf.getNumeroorden() > maximoNumeroOrden){
+						maximoNumeroOrden = lf.getNumeroorden();
+					}
+					if(lf.getNumerolinea() > maximoNumeroLinea){
+						maximoNumeroLinea = lf.getNumerolinea();
+					}
+				}
+
+
+				//Linea Factura Comision
+				FacLineafactura lineaComision = new FacLineafactura();
+
+				lineaComision.setIdinstitucion(facturaComision.getIdinstitucion());
+				lineaComision.setIdfactura(facturaComision.getIdfactura());
+				lineaComision.setCantidad(1);
+				lineaComision.setFechamodificacion(new Date());
+				lineaComision.setUsumodificacion(usuario.getUsumodificacion());
+				lineaComision.setFechamodificacion(new Date());
+
+				lineaComision.setIdformapago(facUpdate.getIdformapago());
+
+				lineaComision.setPreciounitario(banco.getComisionimporte());
+				lineaComision.setImporteanticipado(BigDecimal.valueOf(0));
+				lineaComision.setIdtipoiva(banco.getIdtipoiva());
+				lineaComision.setIva(BigDecimal.valueOf(IVAComision));
+
+				lineaComision.setCtaiva(pySTipoIvaExtendsMapper.getC_CTAIVA(lineaComision.getIdinstitucion().toString(), lineaComision.getIdtipoiva().toString()).get(0).getValue());
+
+				lineaComision.setCtaproductoservicio(banco.getComisioncuentacontable());
+
+				lineaComision.setNumeroorden(maximoNumeroOrden + 1);
+				lineaComision.setNumerolinea(maximoNumeroLinea + 1);
+
+				GenRecursosKey genRecursosKey = new GenRecursosKey();
+				genRecursosKey.setIdlenguaje(usuario.getIdlenguaje());
+				genRecursosKey.setIdrecurso("certificados.tipocertificado.literal.comisionBancaria");
+
+				lineaComision.setDescripcion(genRecursosMapper.selectByPrimaryKey(genRecursosKey).getDescripcion());
+
+				facLineafacturaExtendsMapper.insert(lineaComision);
+
+
+				//Carga Cliente
+				lienaDevolucion.setCargarcliente("S");
+			}
+
+
+			//Carga Cliente Sin Comision
+			else {
+				lienaDevolucion.setCargarcliente("N");
+			}
+
+
+			//Guardar Carga Cliente
+			facLineadevoludisqbancoMapper.updateByPrimaryKey(lienaDevolucion);
 
 			// Aplicacion de comisiones
 //				if (aplicaComisiones!=null && aplicaComisiones.equalsIgnoreCase(ClsConstants.DB_TRUE)){
@@ -3017,7 +3426,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 //							FacLineaDevoluDisqBancoBean lineaDevolucion = (FacLineaDevoluDisqBancoBean) vDevoluciones.get(d);
 //							facturacion.aplicarComisionAFactura (idInstitucion, lineaDevolucion, aplicaComisiones, user, fechaDevolucionHora);
 //						}
-//					}				
+//					}
 //			    }
 
 		} else if (resultado[0].equals("5404")) {
@@ -3031,14 +3440,21 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private void anularFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
 			AdmUsuarios usuario) {
-		// historico fac
-		facHistoricoInsert.setIdtipoaccion(Short.valueOf(item.getIdAccion()));
 
-		facHistoricoInsert.setImptotalpagado(facUpdate.getImptotal());
-		facHistoricoInsert.setImptotalcompensado(facUpdate.getImptotal());
-		facHistoricoInsert.setImptotalporpagar(BigDecimal.valueOf(0));
+		//Historico Factura Anulada
+		facHistoricoInsert.setIdfactura(facUpdate.getIdfactura());
+		facHistoricoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
 
+		facHistoricoInsert.setIdtipoaccion((short) 8);
 		facHistoricoInsert.setEstado((short) 8);
+
+		facHistoricoInsert.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagado(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalporpagar(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+		facHistoricoInsert.setImptotalcompensado(facUpdate.getImptotal());
 
 		facHistoricoInsert.setIddisquetecargos(null);
 		facHistoricoInsert.setIdfacturaincluidaendisquete(null);
@@ -3049,7 +3465,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricoInsert.setIdabono(null);
 		facHistoricoInsert.setComisionidfactura(null);
 
-		// abono
+
+		//Anular Factura Original
+		facUpdate.setImptotalpagadoporbanco(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagado(BigDecimal.valueOf(0));
+		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadosolocaja(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadoporcaja(BigDecimal.valueOf(0));
+		facUpdate.setImptotalpagadosolotarjeta(BigDecimal.valueOf(0));
+		facUpdate.setImptotalcompensado(facUpdate.getImptotal());
+
+		facUpdate.setEstado((short) 8);
+
+		facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
+
+
+		//Abono
 		FacAbono abonoInsert = new FacAbono();
 
 		abonoInsert.setIdinstitucion(facUpdate.getIdinstitucion());
@@ -3074,17 +3505,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		abonoInsert.setIdabono(Long.valueOf(
 				facAbonoExtendsMapper.getNewAbonoID(String.valueOf(usuario.getIdinstitucion())).get(0).getValue()));
 
+		abonoInsert.setNumeroabono(facAbonoExtendsMapper.getNuevoNumeroAbono(facUpdate.getIdinstitucion().toString(), "FAC_ABONOS_GENERAL").get(0).getValue());
+
 		abonoInsert.setEstado((short) 6);
-		abonoInsert.setNumeroabono(String.valueOf(abonoInsert.getIdabono()));
 
 		facHistoricoInsert.setIdabono(abonoInsert.getIdabono());
 
-		// factura
-		facUpdate.setEstado((short) 8);
-		facUpdate.setImptotalpagado(facUpdate.getImptotal());
-		facUpdate.setImptotalporpagar(BigDecimal.valueOf(0));
-		facUpdate.setFechamodificacion(new Date());
-		facUpdate.setUsumodificacion(usuario.getUsumodificacion());
+
+		//Actualizar Contador Factura
+		AdmContadorKey admContadorKey = new AdmContadorKey();
+		admContadorKey.setIdinstitucion(facUpdate.getIdinstitucion());
+		admContadorKey.setIdcontador("FAC_ABONOS_GENERAL");
+
+		AdmContador admContador = admContadorMapper.selectByPrimaryKey(admContadorKey);
+		admContador.setContador(admContador.getContador()+1);
+
+		admContadorMapper.updateByPrimaryKey(admContador);
 
 		// saves
 		facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
@@ -3146,8 +3582,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			// saves
 			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
-			facPagosporcajaMapper.deleteByPrimaryKey(pagosCajaDelete);
 			facHistoricofacturaExtendsMapper.deleteByPrimaryKey(facHistoricoList.get(facHistoricoList.size() - 1));
+			facPagosporcajaMapper.deleteByPrimaryKey(pagosCajaDelete);
 
 			deleteResponseDTO.setStatus(HttpStatus.OK.toString());
 		}
@@ -3174,11 +3610,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			// Comprobar los campos obligatorios
-			if ( Objects.nonNull(ficheroAdeudosItem.getFechaPresentacion())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosCOR())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
+			if ( Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
 				throw new Exception("general.message.camposObligatorios");
 			}
 
@@ -3194,8 +3630,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			// Parámetros de entrada
 			param_in[0] = usuario.getIdinstitucion();
-			param_in[1] = ficheroAdeudosItem.getIdseriefacturacion();
-			param_in[2] = ficheroAdeudosItem.getIdprogramacion();
+			param_in[1] = Objects.nonNull(ficheroAdeudosItem.getIdseriefacturacion()) ? ficheroAdeudosItem.getIdseriefacturacion() : "";
+			param_in[2] = Objects.nonNull(ficheroAdeudosItem.getIdprogramacion()) ? ficheroAdeudosItem.getIdprogramacion() : "";
 			param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
 			param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
 			param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
@@ -3205,7 +3641,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			param_in[9] = usuario.getIdusuario();
 			param_in[10] = usuario.getIdlenguaje();
 
-			String resultado[] = commons.callPLProcedureFacturacionPyS(
+			String[] resultado = commons.callPLProcedureFacturacionPyS(
 					"{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
 
 			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
@@ -3241,11 +3677,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			// Comprobar los campos obligatorios
-			if ( Objects.nonNull(ficheroAdeudosItem.getFechaPresentacion())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosCOR())
-					|| Objects.nonNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
+			if (Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
 				throw new Exception("general.message.camposObligatorios");
 			}
 
@@ -3287,12 +3723,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			param_in[7] = pathFichero;
 			param_in[8] = usuario.getIdlenguaje();
 
-			String resultado[] = commons.callPLProcedureFacturacionPyS(
+			String[] resultado = commons.callPLProcedureFacturacionPyS(
 					"{call PKG_SIGA_CARGOS.Regenerar_Presentacion(?,?,?,?,?,?,?,?,?,?,?)}", 2, param_in);
 
 			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
-			if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
-				throw new Exception(resultado[2]);
+			if (Arrays.asList(codigosErrorFormato).contains(resultado[0])) {
+				throw new Exception(resultado[1]);
 			} else {
 				if (!resultado[1].equals("0")) {
 					throw new Exception("censo.fichaCliente.bancos.mandatos.error.generacionFicheros");
@@ -3307,7 +3743,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public DeleteResponseDTO eliminarFicheroAdeudos(FacDisquetecargos ficheroAdeudosItem, HttpServletRequest request)
+	public DeleteResponseDTO eliminarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
 			throws Exception {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
@@ -3671,8 +4107,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		// Datos de la tarjeta generación de ficheros
 		fac.setGenerapdf(seriefacturacion.getGenerarpdf());
-		// seriefacturacion.getIdmodelofactura();
-		// seriefacturacion.getIdmodelorectificativa();
+		fac.setIdmodelofactura(seriefacturacion.getIdmodelofactura());
+		fac.setIdmodelorectificativa(seriefacturacion.getIdmodelorectificativa());
+
 		if (!UtilidadesString.esCadenaVacia(seriefacturacion.getGenerarpdf())
 				&& seriefacturacion.getGenerarpdf().equals("1")) {
 			fac.setIdestadopdf(Short.parseShort("7")); // Pendiente
@@ -3880,15 +4317,126 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
 				+ File.separator + usuario.getIdinstitucion();
 
-		List<File> listaFicheros = ficheroAdeudosItems.stream().map(item -> {
+		List<File> listaFicheros = ficheroAdeudosItems.stream().flatMap(item -> {
 			FacDisquetecargosKey key = new FacDisquetecargosKey();
 			key.setIdinstitucion(usuario.getIdinstitucion());
 			key.setIddisquetecargos(Long.parseLong(item.getIdDisqueteCargos()));
 			FacDisquetecargos disquetecargos = facDisquetecargosExtendsMapper.selectByPrimaryKey(key);
 
-			File file = null;
+			List<File> files = new ArrayList<>();
 			if (Objects.nonNull(disquetecargos)) {
-				String nombreFichero = pathFichero + File.separator + disquetecargos.getNombrefichero();
+				String nombreFichero = disquetecargos.getNombrefichero();
+				File directorioFicheros = new File(pathFichero);
+
+				// Se buscan todos los ficheros que coincidan con el nombre del fichero
+				if (directorioFicheros.exists() && Objects.nonNull(disquetecargos.getNombrefichero())) {
+					File[] ficheros = directorioFicheros.listFiles();
+					String nombreFicheroListadoSinExtension, nombreFicheroGeneradoSinExtension;
+					for (File file: ficheros){
+						nombreFicheroListadoSinExtension = (file.getName().indexOf(".") > 0)
+								? file.getName().substring(0, file.getName().indexOf(".")) : file.getName();
+						nombreFicheroGeneradoSinExtension = (nombreFichero.indexOf(".") > 0)
+								? nombreFichero.substring(0, nombreFichero.indexOf(".")) : nombreFichero;
+						if(nombreFicheroGeneradoSinExtension.equalsIgnoreCase(nombreFicheroListadoSinExtension)){
+							files.add(file);
+						}
+					}
+				}
+			}
+
+			return files.stream();
+		}).filter(Objects::nonNull).collect(Collectors.toList());
+
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
+				MediaType.parseMediaType("application/octet-stream"),
+				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_ADEUDOS");
+
+		LOGGER.info("descargarFicheroAdeudos() -> Salida del servicio para descargar ficheros de adeudos");
+
+		return res;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> descargarFicheroTransferencias(List<FicherosAbonosItem> ficheroAbonosItems, HttpServletRequest request) throws Exception {
+		ResponseEntity<InputStreamResource> res = null;
+
+		String directorioFisico = "facturacion.directorioFisicoAbonosBancosJava";
+		String directorio = "facturacion.directorioAbonosBancosJava";
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("descargarFicheroTransferencias() -> Entrada al servicio para descargar ficheros de transferencias");
+
+		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+				+ File.separator + usuario.getIdinstitucion();
+
+		List<File> listaFicheros = ficheroAbonosItems.stream().flatMap(item -> {
+			FacDisqueteabonosKey key = new FacDisqueteabonosKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIddisqueteabono(string2Long(item.getIdDisqueteAbono()));
+			FacDisqueteabonos disqueteabonos = facDisqueteabonosExtendsMapper.selectByPrimaryKey(key);
+
+			List<File> files = new ArrayList<>();
+			if (Objects.nonNull(disqueteabonos)) {
+				String nombreFichero = disqueteabonos.getNombrefichero();
+				File directorioFicheros = new File(pathFichero);
+
+				// Se buscan todos los ficheros que coincidan con el nombre del fichero
+				if (directorioFicheros.exists() && Objects.nonNull(disqueteabonos.getNombrefichero())) {
+					File[] ficheros = directorioFicheros.listFiles();
+					String nombreFicheroListadoSinExtension, nombreFicheroGeneradoSinExtension;
+					for (File file: ficheros){
+						nombreFicheroListadoSinExtension = (file.getName().indexOf(".") > 0)
+								? file.getName().substring(0, file.getName().indexOf(".")) : file.getName();
+						nombreFicheroGeneradoSinExtension = (nombreFichero.indexOf(".") > 0)
+								? nombreFichero.substring(0, nombreFichero.indexOf(".")) : nombreFichero;
+						if(nombreFicheroGeneradoSinExtension.equalsIgnoreCase(nombreFicheroListadoSinExtension)){
+							files.add(file);
+						}
+					}
+				}
+			}
+
+			return files.stream();
+		}).filter(Objects::nonNull).collect(Collectors.toList());
+
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
+				MediaType.parseMediaType("application/octet-stream"),
+				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_TRANSFERENCIAS");
+
+		LOGGER.info("descargarFicheroTransferencias() -> Salida del servicio para descargar ficheros de transferencias");
+
+		return res;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> descargarFicheroDevoluciones(List<FicherosDevolucionesItem> ficheroDevolucionesItems, HttpServletRequest request) throws Exception {
+		ResponseEntity<InputStreamResource> res = null;
+
+		String directorioFisico = "facturacion.directorioFisicoDevolucionesJava";
+		String directorio = "facturacion.directorioDevolucionesJava";
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("descargarFicheroDevoluciones() -> Entrada al servicio para descargar ficheros de devoluciones");
+
+		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+				+ File.separator + usuario.getIdinstitucion();
+
+		List<File> listaFicheros = ficheroDevolucionesItems.stream().map(item -> {
+			FacDisquetedevolucionesKey key = new FacDisquetedevolucionesKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIddisquetedevoluciones(string2Long(item.getIdDisqueteDevoluciones()));
+			FacDisquetedevoluciones disquetedevoluciones = facDisquetedevolucionesExtendsMapper.selectByPrimaryKey(key);
+
+			List<File> files = new ArrayList<>();
+			File file = null;
+			if (Objects.nonNull(disquetedevoluciones) && Objects.nonNull(disquetedevoluciones.getNombrefichero())) {
+				String nombreFichero = pathFichero + File.separator + disquetedevoluciones.getNombrefichero();
 				file = new File(nombreFichero);
 			}
 
@@ -3897,10 +4445,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		// Construcción de la respuesta para uno o más archivos
 		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
-				MediaType.parseMediaType("application/vnd.ms-excel"),
-				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_ADEUDOS");
+				MediaType.parseMediaType("application/octet-stream"),
+				MediaType.parseMediaType("application/zip"), "LOG_FICHERO_DEVOLUCIONES");
 
-		LOGGER.info("descargarFicheroAdeudos() -> Salida del servicio para descargar ficheros de adeudos");
+		LOGGER.info("descargarFicheroDevoluciones() -> Salida del servicio para descargar ficheros de devoluciones");
 
 		return res;
 	}
@@ -3931,7 +4479,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			FacFacturacionprogramada facturacion = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
 
 			File file = null;
-			if (Objects.nonNull(facturacion)) {
+			if (Objects.nonNull(facturacion) && Objects.nonNull(facturacion.getNombrefichero())) {
 				String nombreFichero = pathFichero + File.separator + facturacion.getNombrefichero();
 				file = new File(nombreFichero);
 			}

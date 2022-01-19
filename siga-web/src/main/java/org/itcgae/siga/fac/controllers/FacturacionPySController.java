@@ -554,12 +554,12 @@ public class FacturacionPySController {
 	}
 
 	@GetMapping(value = "/getFactura")
-	ResponseEntity<FacturaDTO> getFactura(@RequestParam String idFactura, @RequestParam String tipo,
+	ResponseEntity<FacturaDTO> getFactura(@RequestParam String idFactura, @RequestParam String idAbono, @RequestParam String tipo,
 			HttpServletRequest request) {
 		FacturaDTO response = new FacturaDTO();
 
 		try {
-			response = facturacionService.getFactura(idFactura, tipo, request);
+			response = facturacionService.getFactura(idFactura, idAbono, tipo, request);
 
 			if (response.getFacturasItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
@@ -759,6 +759,20 @@ public class FacturacionPySController {
 		}
 	}
 
+	@PostMapping(value = "/eliminarFicheroAdeudos")
+	ResponseEntity<DeleteResponseDTO> eliminarFicheroAdeudos(@RequestBody FicherosAdeudosItem item,
+																	HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = this.facturacionService.eliminarFicheroAdeudos(item, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@PostMapping(value = "/actualizarFicheroTranferencias")
 	ResponseEntity<UpdateResponseDTO> actualizarFicheroTranferencias(@RequestBody FacDisqueteabonos item,
 			HttpServletRequest request) {
@@ -848,6 +862,16 @@ public class FacturacionPySController {
 	@RequestMapping(value = "/descargarFicheroAdeudos", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	ResponseEntity<InputStreamResource> descargarFicheroAdeudos(@RequestBody List<FicherosAdeudosItem> disqueteItems, HttpServletRequest request) throws Exception {
 		return facturacionService.descargarFicheroAdeudos(disqueteItems, request);
+	}
+
+	@RequestMapping(value = "/descargarFicheroTransferencias", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> descargarFicheroTransferencias(@RequestBody List<FicherosAbonosItem> disqueteItems, HttpServletRequest request) throws Exception {
+		return facturacionService.descargarFicheroTransferencias(disqueteItems, request);
+	}
+
+	@RequestMapping(value = "/descargarFicheroDevoluciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> descargarFicheroDevoluciones(@RequestBody List<FicherosDevolucionesItem> disqueteItems, HttpServletRequest request) throws Exception {
+		return facturacionService.descargarFicheroDevoluciones(disqueteItems, request);
 	}
 
 	@RequestMapping(value = "/descargarFichaFacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

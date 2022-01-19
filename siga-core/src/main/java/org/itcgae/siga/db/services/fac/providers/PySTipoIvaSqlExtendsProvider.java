@@ -47,5 +47,17 @@ public class PySTipoIvaSqlExtendsProvider extends PysTipoivaSqlProvider{
 
 		return sql.toString();
 	}
-	
+
+	public String getC_CTAIVA(String idInstitucion, String idTipoIVA) {
+		SQL sql = new SQL();
+
+		sql.SELECT("F_SIGA_GETPARAMETRO('FAC', 'CONTABILIDAD_IVA', "+idInstitucion+") || pt.SUBCTATIPO AS C_CTAIVA");
+
+		sql.FROM("PYS_TIPOIVA pt");
+
+		sql.WHERE("pt.IDTIPOIVA = "+idTipoIVA);
+
+
+		return sql.toString();
+	}
 }

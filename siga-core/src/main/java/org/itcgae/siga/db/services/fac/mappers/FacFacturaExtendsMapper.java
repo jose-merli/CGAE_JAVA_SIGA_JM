@@ -6,7 +6,9 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
+import org.itcgae.siga.db.services.fac.providers.FacAbonoExtendsSqlProvider;
 import org.itcgae.siga.db.services.fac.providers.FacFacturaExtendsSqlProvider;
 import org.itcgae.siga.db.services.fac.providers.FacFacturacionprogramadaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -99,4 +101,16 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "totalPendiente", property = "totalPendiente", jdbcType = JdbcType.VARCHAR)
 	})
 	List<InformeFacturacionItem> getInformeFacturacionOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getNewFacturaID")
+	@Results({
+			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getNewFacturaID(String idInstitucion);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getNuevoNumeroFactura")
+	@Results({
+			@Result(column = "NUEVOCONTADOR", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getNuevoNumeroFactura(String idInstitucion, String idSerieFacturacion);
 }

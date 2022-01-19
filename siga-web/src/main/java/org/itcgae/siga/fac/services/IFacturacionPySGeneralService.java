@@ -36,7 +36,7 @@ public interface IFacturacionPySGeneralService {
 
 	public ComboDTO comboFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request) throws Exception;
 
-	public ComboDTO comboModelosComunicacion(HttpServletRequest request) throws Exception;
+	public ComboDTO comboModelosComunicacion(Boolean esRectificativa, HttpServletRequest request) throws Exception;
 
 	public ComboDTO2 comboTiposIVA(HttpServletRequest request) throws Exception;
 
