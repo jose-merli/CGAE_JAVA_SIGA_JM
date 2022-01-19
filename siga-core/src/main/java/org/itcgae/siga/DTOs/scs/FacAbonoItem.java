@@ -13,7 +13,8 @@ public class FacAbonoItem {
 	private Long idPersona;
 	private int idCuenta;
 	private String  idFactura;
-	private Long idPagoJG;
+	private String idFacturacion;
+	private Long idPagosjg;
 	private String numeroAbono;
 	private String observaciones;
 	private String forma;
@@ -35,6 +36,7 @@ public class FacAbonoItem {
 	private int idPersonaOrigen;
 	
 	private String nombrePago;
+	private String nombreFacturacion;
 	
 	//Filtros - Agrupacion
     private String grupoFacturacionNombre;
@@ -43,8 +45,8 @@ public class FacAbonoItem {
     private String identificadorFicheroT;
 
     //Filtros - Colegiado
-    private String colegioNombre;
-    private int numColegio;
+    private String colegiadoNombre;
+    private String  numColegiado;
     private String numIdentificadorColegiado;
     private String apellidosColegiado;
     private String nombreColegiado;
@@ -61,6 +63,7 @@ public class FacAbonoItem {
     private String esSociedad;
     private String nombreGeneral;
     private String apellidosGeneral;
+    private String grupoPago;
     
     
     
@@ -82,11 +85,11 @@ public class FacAbonoItem {
 	public void setEsSociedad(String esSociedad) {
 		this.esSociedad = esSociedad;
 	}
-	public Long getIdAdono() {
+	public Long getIdAbono() {
 		return idAbono;
 	}
-	public void setIdAdono(Long idAdono) {
-		this.idAbono = idAdono;
+	public void setIdAbono(Long idAbono) {
+		this.idAbono = idAbono;
 	}
 	public String getMotivos() {
 		return motivos;
@@ -137,12 +140,7 @@ public class FacAbonoItem {
 	public void setIdFactura(String idFactura) {
 		this.idFactura = idFactura;
 	}
-	public Long getIdPagoJG() {
-		return idPagoJG;
-	}
-	public void setIdPagoJG(Long idPagoJG) {
-		this.idPagoJG = idPagoJG;
-	}
+
 	public String getNumeroAbono() {
 		return numeroAbono;
 	}
@@ -263,18 +261,7 @@ public class FacAbonoItem {
 	public void setIdentificadorFicheroT(String identificadorFicheroT) {
 		this.identificadorFicheroT = identificadorFicheroT;
 	}
-	public String getColegioNombre() {
-		return colegioNombre;
-	}
-	public void setColegioNombre(String colegioNombre) {
-		this.colegioNombre = colegioNombre;
-	}
-	public int getNumColegio() {
-		return numColegio;
-	}
-	public void setNumColegio(int numColegio) {
-		this.numColegio = numColegio;
-	}
+
 	public String getNumIdentificadorColegiado() {
 		return numIdentificadorColegiado;
 	}
@@ -340,6 +327,42 @@ public class FacAbonoItem {
 	}
 	public void setNombrePago(String nombrePago) {
 		this.nombrePago = nombrePago;
+	}
+	public String getIdFacturacion() {
+		return idFacturacion;
+	}
+	public void setIdFacturacion(String idFacturacion) {
+		this.idFacturacion = idFacturacion;
+	}
+	public String getNombreFacturacion() {
+		return nombreFacturacion;
+	}
+	public void setNombreFacturacion(String nombreFacturacion) {
+		this.nombreFacturacion = nombreFacturacion;
+	}
+	public Long getIdPagosjg() {
+		return idPagosjg;
+	}
+	public void setIdPagosjg(Long idPagosjg) {
+		this.idPagosjg = idPagosjg;
+	}
+	public String getGrupoPago() {
+		return grupoPago;
+	}
+	public void setGrupoPago(String grupoPago) {
+		this.grupoPago = grupoPago;
+	}
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+	public String getColegiadoNombre() {
+		return colegiadoNombre;
+	}
+	public void setColegiadoNombre(String colegiadoNombre) {
+		this.colegiadoNombre = colegiadoNombre;
 	}
 	
 	
