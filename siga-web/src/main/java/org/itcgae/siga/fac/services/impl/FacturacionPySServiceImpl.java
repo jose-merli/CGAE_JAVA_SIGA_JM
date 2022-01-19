@@ -2396,6 +2396,34 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			facDisqueteabonosExtendsMapper.deleteByPrimaryKey(keyDisquete);
+
+			// A continuación, se eliminan los ficheros de adeudos
+
+			String directorioFisico = "facturacion.directorioFisicoAbonosBancosJava";
+			String directorio = "facturacion.directorioAbonosBancosJava";
+
+			String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+					+ File.separator + usuario.getIdinstitucion();
+
+			String nombreFichero = disquete.getNombrefichero();
+			File directorioFicheros = new File(pathFichero);
+
+			// Se buscan todos los ficheros que coincidan con el nombre del fichero
+			if (directorioFicheros.exists() && Objects.nonNull(disquete.getNombrefichero())) {
+				File[] ficheros = directorioFicheros.listFiles();
+				String nombreFicheroListadoSinExtension, nombreFicheroGeneradoSinExtension;
+				for (File file: ficheros) {
+					nombreFicheroListadoSinExtension = (file.getName().indexOf(".") > 0)
+							? file.getName().substring(0, file.getName().indexOf(".")) : file.getName();
+					nombreFicheroGeneradoSinExtension = (nombreFichero.indexOf(".") > 0)
+							? nombreFichero.substring(0, nombreFichero.indexOf(".")) : nombreFichero;
+					if(nombreFicheroGeneradoSinExtension.equalsIgnoreCase(nombreFicheroListadoSinExtension) && file.exists()){
+						file.delete();
+					}
+				}
+			}
+
+
 		}
 
 
@@ -3700,15 +3728,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			Object[] param_in = new Object[11]; // Parametros de entrada del PL
 
 			// Ruta del fichero
-			/*
+
 			String pathFichero = getProperty("facturacion.directorioBancosOracle");
 
 			String sBarra = "";
 			if (pathFichero.indexOf("/") > -1) sBarra = "/";
 			if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
 			pathFichero += sBarra + usuario.getIdinstitucion().toString();
-			*/
-			String pathFichero = "C:\\Users\\asuarezbono\\Downloads\\2005";
 
 			// Parámetros de entrada
 			param_in[0] = usuario.getIdinstitucion();
@@ -3768,7 +3794,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 
 			Object[] param_in = new Object[9]; // Parametros de entrada del PL
-/*
+
 			// Ruta del fichero
 			String pathFichero = getProperty("facturacion.directorioBancosOracle");
 
@@ -3776,8 +3802,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (pathFichero.indexOf("/") > -1) sBarra = "/";
 			if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
 			pathFichero += sBarra + usuario.getIdinstitucion().toString();
-*/
-			String pathFichero = "C:\\Users\\asuarezbono\\Downloads\\2005";
 
 			// Se borran todos os ficheros que contenga el identificador del fichero de abonos
 			File directorioFicheros = new File(pathFichero);
@@ -4063,8 +4087,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			// Datos de la tarjeta generación de ficheros
 			record.setGenerapdf(facItem.getGeneraPDF() != null && facItem.getGeneraPDF() ? "1" : "0");
-			// seriefacturacion.getIdmodelofactura();
-			// seriefacturacion.getIdmodelorectificativa();
+			if (record.getGenerapdf().equals("1")) {
+				record.setIdmodelofactura(string2Long(facItem.getIdModeloFactura()));
+				record.setIdmodelorectificativa(string2Long(facItem.getIdModeloRectificativa()));
+			} else {
+				record.setIdmodelofactura(null);
+				record.setIdmodelorectificativa(null);
+			}
 
 			if (record.getIdestadoconfirmacion() == string2Short("3") && record.getIdestadopdf() != null
 					|| record.getIdestadopdf() == string2Short("5") // Confirmada y no aplica
