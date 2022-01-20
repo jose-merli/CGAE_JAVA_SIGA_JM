@@ -144,6 +144,8 @@ import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
 import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
+import org.itcgae.siga.db.entities.FacPropositos;
+import org.itcgae.siga.db.entities.FacPropositosExample;
 import org.itcgae.siga.db.entities.FacRegistrofichconta;
 import org.itcgae.siga.db.entities.FacRenegociacion;
 import org.itcgae.siga.db.entities.FacRenegociacionExample;
@@ -214,6 +216,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacTiposproduincluenfactuExtendsM
 import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacPropositosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
@@ -366,7 +369,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	@Autowired
 	private ModModeloComunicacionExtendsMapper modModeloComunicacionExtendsMapper;
 
+	@Autowired
+	private FacPropositosExtendsMapper facPropositosExtendsMapper;
+
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
 			HttpServletRequest request) throws Exception {
 
@@ -384,21 +391,30 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			// Logica
 			for (CuentasBancariasItem cuenta : cuentasBancarias) {
+				List<CuentasBancariasItem> cuentaResults = facBancoinstitucionExtendsMapper.getCuentasBancarias(cuenta.getBancosCodigo(),
+						usuario.getIdinstitucion());
 
-				FacBancoinstitucionKey cuentasbancariasKey = new FacBancoinstitucionKey();
-				cuentasbancariasKey.setIdinstitucion(usuario.getIdinstitucion());
-				cuentasbancariasKey.setBancosCodigo(cuenta.getBancosCodigo());
+				if (cuentaResults != null && !cuentaResults.isEmpty()) {
+					// No se puede borrar una cuenta bancaria que esta siendo utilizada
+					boolean enUso = Integer.parseInt(cuentaResults.get(0).getNumUsos()) > 0;
+					if (enUso) {
+						throw new Exception("facturacionPyS.cuentasBancarias.eliminar.errorUsos");
+					}
 
-				LOGGER.info("\n\nTratamiento de la cuenta con IBAN: " + cuenta.getIBAN() + "\n\n");
+					FacBancoinstitucionKey cuentasbancariasKey = new FacBancoinstitucionKey();
+					cuentasbancariasKey.setIdinstitucion(usuario.getIdinstitucion());
+					cuentasbancariasKey.setBancosCodigo(cuenta.getBancosCodigo());
 
-				if (Integer.parseInt(cuenta.getNumUsos()) < 1) {
-					this.facBancoinstitucionExtendsMapper.deleteByPrimaryKey(cuentasbancariasKey);
-				} else {
-					FacBancoinstitucion cuentaCambio = this.facBancoinstitucionExtendsMapper
-							.selectByPrimaryKey(cuentasbancariasKey);
-					if (cuentaCambio != null) {
-						cuentaCambio.setFechabaja(new Date());
-						this.facBancoinstitucionExtendsMapper.updateByPrimaryKey(cuentaCambio);
+					// Borrado físico si numFicheros es 0
+					if (Integer.parseInt(cuenta.getNumFicheros()) < 1) {
+						this.facBancoinstitucionExtendsMapper.deleteByPrimaryKey(cuentasbancariasKey);
+					} else {
+						FacBancoinstitucion cuentaCambio = this.facBancoinstitucionExtendsMapper
+								.selectByPrimaryKey(cuentasbancariasKey);
+						if (cuentaCambio != null) {
+							cuentaCambio.setFechabaja(new Date());
+							this.facBancoinstitucionExtendsMapper.updateByPrimaryKey(cuentaCambio);
+						}
 					}
 				}
 			}
@@ -870,7 +886,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			for (SerieFacturacionItem serieFacturacion : serieFacturacionItems) {
 				Long idSerieFacturacion = Long.valueOf(serieFacturacion.getIdSerieFacturacion());
 
-				FacFacturaExample facturaExample = new FacFacturaExample();
+				FacFacturacionprogramadaExample facturaExample = new FacFacturacionprogramadaExample();
 				facturaExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
 						.andIdseriefacturacionEqualTo(Long.valueOf(serieFacturacion.getIdSerieFacturacion()));
 
@@ -882,7 +898,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 						.selectByPrimaryKey(seriefacturacionKey);
 				if (null != sfToUpdate) {
 					if (sfToUpdate.getFechabaja() == null) {
-						long numFacturas = facFacturaMapper.countByExample(facturaExample);
+						long numFacturas = facFacturacionprogramadaExtendsMapper.countByExample(facturaExample);
 						if (numFacturas == 0) {
 							LOGGER.info(
 									"eliminaSerieFacturacion() -> Baja física de la serie de facturación con idseriefacturacion="
@@ -2180,7 +2196,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
-	public InsertResponseDTO nuevoFicheroTransferencias(List<FacAbonoItem> abonoItems, HttpServletRequest request) throws Exception {
+	@Transactional(rollbackFor = Exception.class)
+	public InsertResponseDTO nuevoFicheroTransferencias(List<FacturaItem> abonoItems, HttpServletRequest request) throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
 
@@ -2203,13 +2220,23 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				String bancosCodigo = banco.getBancosCodigo();
 				Short idSufijo = banco.getIdsufijo();
 				String idPropositoSEPA = getParametro("FAC", "PROPOSITO_TRANSFERENCIA_SEPA", usuario.getIdinstitucion());
-				String idPropositoOtros = getParametro("FAC", "PROPOSITO_OTRA_TRANSFERENCIA", usuario.getIdinstitucion());;
+				String idPropositoOtros = getParametro("FAC", "PROPOSITO_OTRA_TRANSFERENCIA", usuario.getIdinstitucion());
+
+				if (idPropositoSEPA.equals(""))
+					idPropositoSEPA = getParametro("FAC", "PROPOSITO_TRANSFERENCIA_SEPA", Short.parseShort("0"));
+				if (idPropositoOtros.equals(""))
+					idPropositoOtros = getParametro("FAC", "PROPOSITO_OTRA_TRANSFERENCIA",  Short.parseShort("0"));
 
 				if (idSufijo == null) {
 					throw new Exception("facturacion.ficheroBancarioTransferencias.errorSufijosSerie.mensajeCondicionesIncumplidas");
 				}
 
+				// Se agrupan los abonos de la petición por su banco y sufijo
 				List<FacAbono> abonosBanco = facAbonoExtendsMapper.getAbonosBanco(usuario.getIdinstitucion(), bancosCodigo, idSufijo);
+				abonosBanco = abonosBanco.stream().filter(a -> abonoItems.stream()
+						.anyMatch(item -> a.getIdabono().toString().equals(item.getIdAbono())))
+						.collect(Collectors.toList());
+
 				int resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, idPropositoSEPA, idPropositoOtros, usuario);
 
 				if (resultado == -1) {
@@ -2247,10 +2274,26 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		record.setNumerolineas(Long.valueOf(abonosBanco.size()));
 		record.setIdsufijo(idSufijo);
 
-		if (!UtilidadesString.esCadenaVacia(idPropositoSEPA))
-			record.setIdpropsepa(Short.parseShort(idPropositoSEPA));
-		if (!UtilidadesString.esCadenaVacia(idPropositoOtros))
-			record.setIdpropotros(Short.parseShort(idPropositoOtros));
+		record.setFechamodificacion(new Date());
+		record.setUsumodificacion(usuario.getIdusuario());
+
+		// Propósito SEPA
+		if (!UtilidadesString.esCadenaVacia(idPropositoSEPA)) {
+			FacPropositosExample propositosExample = new FacPropositosExample();
+			propositosExample.createCriteria().andCodigoEqualTo(idPropositoSEPA);
+			List<FacPropositos> propositos = facPropositosExtendsMapper.selectByExample(propositosExample);
+			if (propositos != null && !propositos.isEmpty())
+				record.setIdpropsepa(propositos.get(0).getIdproposito());
+		}
+
+		// Propósito Otros
+		if (!UtilidadesString.esCadenaVacia(idPropositoOtros)) {
+			FacPropositosExample propositosExample = new FacPropositosExample();
+			propositosExample.createCriteria().andCodigoEqualTo(idPropositoOtros);
+			List<FacPropositos> propositos = facPropositosExtendsMapper.selectByExample(propositosExample);
+			if (propositos != null && !propositos.isEmpty())
+				record.setIdpropotros(propositos.get(0).getIdproposito());
+		}
 
 		if (facDisqueteabonosExtendsMapper.insert(record) == 0) {
 			return -1;
@@ -2277,6 +2320,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			recordAbono.setIddisqueteabono(idDisqueteAbono);
 			recordAbono.setImporteabonado(new BigDecimal(importeAbonado).setScale(2, RoundingMode.DOWN));
 			recordAbono.setContabilizado("N");
+
+			recordAbono.setFechamodificacion(new Date());
+			recordAbono.setUsumodificacion(usuario.getIdusuario());
 			facAbonoincluidoendisqueteExtendsMapper.insert(recordAbono);
 
 			// Actualización de los importes
@@ -2315,16 +2361,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		param_in[0] = idInstitucion;
 		param_in[1] = idDisqueteAbono;
-		param_in[2] = idPropositoSEPA;
-		param_in[3] = idPropositoOtros;
+		param_in[2] = record.getIdpropsepa();
+		param_in[3] = record.getIdpropotros();
 		param_in[4] = rutaServidor;
 		param_in[5] = nombreFichero;
 		param_in[6] = usuario.getIdlenguaje();
 
 		String[] resultado = commons.callPLProcedureFacturacionPyS(
-				"{call PKG_SIGA_ABONOS.Generarficherotransferencias("
-						+ String.join(",", Collections.nCopies(9, "?"))
-						+ ")}", 2, param_in);
+				"{call PKG_SIGA_ABONOS.Generarficherotransferencias(?,?,?,?,?,?,?,?,?)}", 2, param_in);
 
 		if (resultado[0] != null && resultado.length > 1 && string2Integer(resultado[0]) > 0) {
 			throw new Exception(resultado[1]);
@@ -3757,7 +3801,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				throw new Exception(resultado[2]);
 			} else {
 				if (!resultado[1].equals("0")) {
-					throw new Exception("censo.fichaCliente.bancos.mandatos.error.generacionFicheros");
+					throw new Exception("general.mensaje.error.bbdd");
 				}
 			}
 			insertResponseDTO.setId(resultado[0]);
@@ -3839,7 +3883,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				throw new Exception(resultado[1]);
 			} else {
 				if (!resultado[1].equals("0")) {
-					throw new Exception("censo.fichaCliente.bancos.mandatos.error.generacionFicheros");
+					throw new Exception("general.mensaje.error.bbdd");
 				}
 			}
 		}
