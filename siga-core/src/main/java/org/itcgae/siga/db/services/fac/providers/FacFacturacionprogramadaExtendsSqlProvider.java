@@ -290,10 +290,66 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
 				);
 		return sql.toString();
 	}
-    
-    public static void main(String[] args) {
-		System.out.println(new FacFacturacionprogramadaExtendsSqlProvider().isSerieFacturacionActiva((short)1,2L,3L));
-	}
-    
-    
+
+    public String getFacturacionesProgramadasYPendientes(Short idInstitucion, Double tiempoMaximoEjecucion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("FP.IDINSTITUCION");
+        sql.SELECT("FP.IDSERIEFACTURACION");
+        sql.SELECT("FP.IDPROGRAMACION");
+        sql.SELECT("FP.FECHAINICIOPRODUCTOS");
+        sql.SELECT("FP.FECHAFINPRODUCTOS");
+        sql.SELECT("FP.FECHAINICIOSERVICIOS");
+        sql.SELECT("FP.FECHAFINSERVICIOS");
+        sql.SELECT("FP.FECHAPROGRAMACION");
+        sql.SELECT("FP.FECHAPREVISTAGENERACION");
+        sql.SELECT("FP.FECHAMODIFICACION");
+        sql.SELECT("FP.USUMODIFICACION");
+        sql.SELECT("FP.IDPREVISION");
+        sql.SELECT("FP.FECHAREALGENERACION");
+        sql.SELECT("FP.FECHACONFIRMACION");
+        sql.SELECT("FP.IDESTADOCONFIRMACION");
+        sql.SELECT("FP.IDESTADOPDF");
+        sql.SELECT("FP.IDESTADOENVIO");
+        sql.SELECT("FP.FECHAPREVISTACONFIRM");
+        sql.SELECT("FP.GENERAPDF");
+        sql.SELECT("FP.ENVIO");
+        sql.SELECT("FP.ARCHIVARFACT");
+        sql.SELECT("FP.FECHACARGO");
+        sql.SELECT("FP.CONFDEUDOR");
+        sql.SELECT("FP.CONFINGRESOS");
+        sql.SELECT("FP.CTAINGRESOS");
+        sql.SELECT("FP.CTACLIENTES");
+        sql.SELECT("FP.VISIBLE");
+        sql.SELECT("FP.DESCRIPCION");
+        sql.SELECT("FP.IDTIPOPLANTILLAMAIL");
+        sql.SELECT("FP.IDTIPOENVIOS");
+        sql.SELECT("FP.FECHAPRESENTACION");
+        sql.SELECT("FP.FECHARECIBOSPRIMEROS");
+        sql.SELECT("FP.FECHARECIBOSRECURRENTES");
+        sql.SELECT("FP.FECHARECIBOSCOR1");
+        sql.SELECT("FP.FECHARECIBOSB2B");
+        sql.SELECT("FP.NOMBREFICHERO");
+        sql.SELECT("FP.LOGERROR");
+        sql.SELECT("FP.TRASPASO_PLANTILLA");
+        sql.SELECT("FP.TRASPASO_CODAUDITORIA_DEF");
+        sql.SELECT("FP.TRASPASOFACTURAS");
+        sql.SELECT("FP.IDESTADOTRASPASO");
+        sql.SELECT("FP.LOGTRASPASO");
+        sql.SELECT("FP.IDMODELOFACTURA");
+        sql.SELECT("FP.IDMODELORECTIFICATIVA");
+        sql.SELECT("SF.NOMBREABREVIADO");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP");
+        sql.JOIN("FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAPREVISTACONFIRM IS NULL");
+        sql.WHERE("FP.FECHAPREVISTACONFIRM <= SYSDATE");
+        sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
+        sql.WHERE("FP.IDESTADOCONFIRMACION = " + FacEstadosFacturacion.CONFIRM_FINALIZADA);
+        sql.WHERE("(FP.IDESTADOPDF = " + FacEstadosFacturacion.PDF_PROGRAMADA + " OR (FP.IDESTADOPDF = " + FacEstadosFacturacion.PDF_PROCESANDO + " AND SYSDATE - " + tiempoMaximoEjecucion + " > FP.FECHAMODIFICACION) )");
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+
+        return sql.toString();
+    }
+
 }

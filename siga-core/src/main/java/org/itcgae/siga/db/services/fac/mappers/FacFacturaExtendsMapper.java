@@ -4,13 +4,12 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
-import org.itcgae.siga.db.services.fac.providers.FacAbonoExtendsSqlProvider;
 import org.itcgae.siga.db.services.fac.providers.FacFacturaExtendsSqlProvider;
-import org.itcgae.siga.db.services.fac.providers.FacFacturacionprogramadaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -113,4 +112,14 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "NUEVOCONTADOR", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getNuevoNumeroFactura(String idInstitucion, String idSerieFacturacion);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getFacturasDeFacturacionProgramada")
+	@Results({
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROFACTURA", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDESTADOPDF", property = "idEstadoPdf", jdbcType = JdbcType.DECIMAL)
+	})
+	List<FacturaFacturacionProgramadaDTO> getFacturasDeFacturacionProgramada(String institucion, String seriefacturacion, String idProgramacion);
 }
