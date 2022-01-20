@@ -67,8 +67,14 @@ public class SolIncorporacionItem {
 	private String bic;
 	private String nombreBanco;
 	private Date fechaEstadoSolicitud;
-	
-	
+	private String numRegistro;
+
+	public String getNumRegistro() {
+		return numRegistro;
+	}
+	public void setNumRegistro(String numRegistro) {
+		this.numRegistro = numRegistro;
+	}
 	public String getIdTratamiento() {
 		return idTratamiento;
 	}

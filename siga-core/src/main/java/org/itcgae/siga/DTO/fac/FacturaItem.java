@@ -17,6 +17,7 @@ public class FacturaItem {
 
 	//datos generales
 	String numeroFactura;
+	String idEstado;
 	String estado;
 
 	String formaCobroFactura;

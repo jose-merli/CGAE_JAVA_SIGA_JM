@@ -16,6 +16,6 @@ public interface CenTipocolegiacionExtendsMapper {
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectTipoColegiacion(String idLenguage);
+	List<ComboItem> selectTipoColegiacion(String idLenguage, String isEXEA);
 	
 }

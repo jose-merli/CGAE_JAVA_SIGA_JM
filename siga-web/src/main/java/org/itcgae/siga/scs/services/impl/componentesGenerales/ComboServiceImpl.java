@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.exp.mappers.ExpProcedimientosExeaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -113,6 +114,9 @@ public class ComboServiceImpl implements ComboService {
 
 	@Autowired
 	private ScsActuacionasistenciaExtendsMapper scsActuacionasistenciaExtendsMapper;
+
+	@Autowired
+	private ExpProcedimientosExeaExtendsMapper expProcedimientosExeaExtendsMapper;
 	
 
 	@Override
@@ -904,6 +908,35 @@ public class ComboServiceImpl implements ComboService {
 		}
 		return comboDTO;
 
+	}
+
+	@Override
+	public ComboDTO comboProcedimientosEXEA(HttpServletRequest request) {
+		LOGGER.info("comboProcedimientosEXEA() -> Entrada al servicio para obtener el combo de procedimientos de EXEA");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboProcedimientosEXEA() / expProcedimientosExeaExtendsMapper.comboProcedimientosEXEA() -> Entrada a expProcedimientosExeaExtendsMapper para obtener los procedimientos");
+
+				List<ComboItem> comboItems = expProcedimientosExeaExtendsMapper.comboProcedimientosEXEA(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
+				LOGGER.info(
+						"comboProcedimientosEXEA() / expProcedimientosExeaExtendsMapper.comboProcedimientosEXEA() -> Salida a expProcedimientosExeaExtendsMapper para obtener los procedimientos");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboProcedimientosEXEA() -> Salida del servicio para obtener los procedimientos");
+		}
+		return comboDTO;
 	}
 
 	@Override

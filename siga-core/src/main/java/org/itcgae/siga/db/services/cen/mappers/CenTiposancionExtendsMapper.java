@@ -50,7 +50,8 @@ public interface CenTiposancionExtendsMapper extends CenTiposancionMapper{
 		@Result(column = "FIRMEZA", property = "firmeza", jdbcType = JdbcType.BOOLEAN),
 		@Result(column = "ARCHIVADA", property = "archivada", jdbcType = JdbcType.BOOLEAN),
 		@Result(column = "TEXTO", property = "texto", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUM_EXPEDIENTE", property = "numExpediente", jdbcType = JdbcType.VARCHAR)
 	})
 	List<BusquedaSancionesItem> searchBusquedaSanciones(BusquedaSancionesSearchDTO busquedaSancionesSearchDTO, String idLenguaje, String idInstitucion);
 }

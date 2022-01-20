@@ -26,7 +26,8 @@ public interface FacDisquetedevolucionesExtendsMapper extends FacDisquetedevoluc
 		@Result(column = "IMPORTETOTAL", property = "facturacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROFACTURAS", property = "numRecibos", jdbcType = JdbcType.INTEGER),
 		@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FicherosDevolucionesItem> getFicherosDevoluciones(FicherosDevolucionesItem item, String idInstitucion);
 
