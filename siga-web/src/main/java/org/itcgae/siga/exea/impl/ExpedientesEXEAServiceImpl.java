@@ -1702,9 +1702,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         if(Short.valueOf((short)10) == solicitudincorporacion.getIdtipoidentificacion()){ //NIF-DNI
             tipoDocIdent.appendChild(doc.createTextNode("D"));
         }else if(Short.valueOf((short)40) == solicitudincorporacion.getIdtipoidentificacion()){ //NIE
-            tipoDocIdent.appendChild(doc.createTextNode("N"));
+            tipoDocIdent.appendChild(doc.createTextNode("X"));
         }else{ //Pasaporte
-            tipoDocIdent.appendChild(doc.createTextNode("P"));
+            tipoDocIdent.appendChild(doc.createTextNode("T"));
         }
         solicitanteElement.appendChild(tipoDocIdent);
 
@@ -1879,7 +1879,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         postalElement.appendChild(tipoViaElement);
 
         Element nombreViaElement = doc.createElement("nombreVia");
-        nombreViaElement.appendChild(doc.createTextNode("Prueba")); //FIXME
+        nombreViaElement.appendChild(doc.createTextNode(solicitudincorporacion.getDomicilio())); //FIXME
         postalElement.appendChild(nombreViaElement);
 
         Element numeroViaElement = doc.createElement("numeroVia");
