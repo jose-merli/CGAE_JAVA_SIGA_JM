@@ -616,7 +616,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		int update = 0;
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
-		CenSolicitudincorporacion solIncorporacion;
+		CenSolicitudincorporacion solIncorporacion = new CenSolicitudincorporacion();
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
