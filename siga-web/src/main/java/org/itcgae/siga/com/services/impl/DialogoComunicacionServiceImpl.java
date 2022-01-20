@@ -402,7 +402,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(listaFicheros.size() == 1) {
 				
 				String path = listaFicheros.get(0).getPathDocumento() + listaFicheros.get(0).getFileName();
-				file = new File(path);
+				file = WSCommons.fileBytes(listaFicheros, path);
 			
 			}else {
 				file = new File(getRutaFicheroSalida(idInstitucion));

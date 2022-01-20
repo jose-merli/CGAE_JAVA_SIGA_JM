@@ -523,9 +523,26 @@ public class WSCommons {
 		return fileZip;
 
 	}
-
 	
-	
+	public static File fileBytes(List<DatosDocumentoItem> ficheros, String path) throws IOException {
+		File file = new File(path);
+		FileOutputStream fos = new FileOutputStream(file);
+		boolean closed = false;
+		
+		try {
+			fos.write(ficheros.get(0).getDatos());
+			fos.flush();
+			
+			fos.close();
+			closed = true;
+		} finally {
+			if (!closed) {
+				fos.close();
+			}
+		}
+		
+		return file;
+	}
 	
 	/**
 	 * Crea un boolean sacando el valor de un numero (si es 1 true, sino false)
