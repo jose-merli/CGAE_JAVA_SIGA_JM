@@ -30,9 +30,7 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionsolicitudExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.*;
 import org.itcgae.siga.db.services.exp.mappers.ExpExpedientesExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpProcedimientosExeaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.CenDocumentsolicitudinstituExtendsMapper;
@@ -58,6 +56,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -70,6 +69,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -121,6 +122,21 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     @Autowired
     private GenFicheroMapper genFicheroMapper;
+
+    @Autowired
+    private CenPaisExtendsMapper cenPaisExtendsMapper;
+
+    @Autowired
+    private CenEstadocivilExtendsMapper cenEstadocivilExtendsMapper;
+
+    @Autowired
+    private CenProvinciasExtendsMapper cenProvinciasExtendsMapper;
+
+    @Autowired
+    private CenPoblacionesExtendsMapper cenPoblacionesExtendsMapper;
+
+    @Autowired
+    private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
 
     @Override
     public StringDTO isEXEActivoInstitucion(HttpServletRequest request) {
@@ -330,7 +346,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
     }
 
     @Override
-    public ExpedienteDTO getDetalleExpedienteEXEA(HttpServletRequest request, String numExpedienteEXEA) {
+    public ExpedienteDTO getDetalleExpedienteEXEA(HttpServletRequest request, String numExpedienteEXEA, String identificacionColegiado) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -363,6 +379,26 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                         if(responseDocument != null && responseDocument.getGetExpedienteResponse() != null){
                             ExpedienteItem expedienteItem = fillExpedienteItem(responseDocument.getGetExpedienteResponse().getGetExpedienteReturn());
                             expedienteDTO.setExpedienteItem(Arrays.asList(expedienteItem));
+
+                            if(!UtilidadesString.esCadenaVacia(identificacionColegiado)){
+                                ExpedienteDTO expedientes = this.getExpedientesEXEAPersonalColegio(request, identificacionColegiado);
+
+                                if(expedientes.getError() == null
+                                    && expedientes.getExpedienteItem() != null
+                                    && !expedientes.getExpedienteItem().isEmpty()){
+                                    List<ExpedienteItem> expedienteItems = expedientes.getExpedienteItem()
+                                            .stream().filter(expediente -> expedienteItem.getNumExpediente().equals(expediente.getNumExpediente()))
+                                                    .collect(Collectors.toList());
+
+                                    if(!expedienteItems.isEmpty()){
+                                        expedienteItem.setIdFase(expedienteItems.get(0).getIdFase());
+                                        expedienteItem.setFechaRegistro(expedienteItems.get(0).getFechaRegistro());
+                                        expedienteItem.setDescInstitucion(expedienteItems.get(0).getDescInstitucion());
+                                        expedienteItem.setNumRegistro(expedienteItems.get(0).getNumRegistro());
+                                        expedienteItem.setEstadoExpediente(expedienteItems.get(0).getEstadoExpediente());
+                                    }
+                                }
+                            }
                         }else{
                             error.setCode(500);
                             error.setDescription("Error al buscar el detalle del expediente");
@@ -885,7 +921,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     @Override
     @Transactional
-    public UpdateResponseDTO iniciarTramiteColegiacionEXEA(HttpServletRequest request, String idSolicitud) {
+    public UpdateResponseDTO iniciarTramiteColegiacionEXEA(HttpServletRequest request, String data) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -906,14 +942,81 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
                 if (usuarios != null && usuarios.size() > 0) {
 
+                    String idSolicitud = data.split("/")[0];
+                    String asunto = data.split("/")[1];
+
                     CenSolicitudincorporacion solicitudincorporacion = cenSolicitudincorporacionExtendsMapper.selectByPrimaryKey(Long.valueOf(idSolicitud));
 
                     if(solicitudincorporacion != null){
                         String urlWS = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.EXEA_URL_WEBSERVICES_REGTEL, idInstitucion.toString()).getValor();
-                        RegistroEntradaDocument registroEntradaDocument = fillRegistroEntradaDocument(solicitudincorporacion, idInstitucion);
+                        RegistroEntradaDocument registroEntradaDocument = fillRegistroEntradaDocument(solicitudincorporacion, idInstitucion, asunto);
 
-
+                        LOGGER.info("iniciarTramiteColegiacionEXEA() / Tramite iniciado");
                         RegistroEntradaResponseDocument registroEntradaResponseDocument = _clientExpedientesEXEA.iniciarExpedienteColegiacion(registroEntradaDocument, urlWS);
+                        LOGGER.info("iniciarTramiteColegiacionEXEA() / Respuesta tramite: " + registroEntradaResponseDocument);
+                        LOGGER.info("iniciarTramiteColegiacionEXEA() / Una vez tramitado, comprobamos su estado");
+                        if(registroEntradaResponseDocument != null
+                            && registroEntradaResponseDocument.getRegistroEntradaResponse() != null
+                            && registroEntradaResponseDocument.getRegistroEntradaResponse().getRespuesta() != null
+                            && SigaConstants.OK.equals(registroEntradaResponseDocument.getRegistroEntradaResponse().getRespuesta().getCodigo())){
+
+                            String claveConsulta = registroEntradaResponseDocument.getRegistroEntradaResponse().getDatosRespuesta().getClaveConsulta();
+                            LOGGER.info("iniciarTramiteColegiacionEXEA() / Clave consulta: " + claveConsulta);
+                            ConsultaAsientoDocument consultaAsientoDocument = ConsultaAsientoDocument.Factory.newInstance();
+                            ConsultaAsientoDocument.ConsultaAsiento consultaAsiento = consultaAsientoDocument.addNewConsultaAsiento();
+                            consultaAsiento.setClaveConsulta(claveConsulta);
+
+                            ConsultaAsientoResponseDocument consultaAsientoResponseDocument = _clientExpedientesEXEA.consultaExpediente(consultaAsientoDocument,urlWS);
+                            //Si viene informado el num expediente es que ha ido todo bien, actualizamos la solicitud de incorporacion
+                            if(consultaAsientoResponseDocument != null
+                                && consultaAsientoResponseDocument.getConsultaAsientoResponse() != null
+                                && consultaAsientoResponseDocument.getConsultaAsientoResponse().getAsiento() != null
+                                && consultaAsientoResponseDocument.getConsultaAsientoResponse().getAsiento().getDatosExpedienteAsiento() != null
+                                && !UtilidadesString.esCadenaVacia(consultaAsientoResponseDocument.getConsultaAsientoResponse().getAsiento().getDatosExpedienteAsiento().getNumeroExpediente())
+                                && SigaConstants.OK.equals(consultaAsientoResponseDocument.getConsultaAsientoResponse().getRespuesta().getCodigo())){
+
+                                String numRegistro = registroEntradaResponseDocument.getRegistroEntradaResponse().getDatosRespuesta().getCodigoRegistro();
+                                LOGGER.info("iniciarTramiteColegiacionEXEA() / Numero registro REGTEL: " + numRegistro);
+                                //Seteamos numero registro
+                                solicitudincorporacion.setNumRegistro(numRegistro);
+                                //Pasamos de pendiente documentacion a pendiente aprobacion
+                                solicitudincorporacion.setIdestado(SigaConstants.INCORPORACION_PENDIENTE_APROBACION);
+                                solicitudincorporacion.setFechaestado(new Date());
+                                solicitudincorporacion.setFechamodificacion(new Date());
+                                solicitudincorporacion.setUsumodificacion(usuarios.get(0).getIdusuario());
+                                int affectedRows = cenSolicitudincorporacionExtendsMapper.updateByPrimaryKey(solicitudincorporacion);
+
+                                if(affectedRows == 1){
+                                    LOGGER.info("iniciarTramiteColegiacionEXEA() / Actualizado en BBDD");
+                                    updateResponseDTO.setStatus(SigaConstants.OK);
+                                    updateResponseDTO.setId(solicitudincorporacion.getIdsolicitud().toString() + ";" + solicitudincorporacion.getNumRegistro());
+                                }else{
+                                    error.setCode(500);
+                                    error.setDescription("Error al actualizar la solicitud");
+                                    error.setMessage("Error al actualizar la solicitud");
+                                    updateResponseDTO.setStatus(SigaConstants.KO);
+                                    updateResponseDTO.setError(error);
+                                    LOGGER.error("iniciarTramiteColegiacionEXEA() / Error al actualizar en BBDD");
+                                }
+
+                            }else{
+                                //No viene informado el num expediente o no ha devuelto OK la respuesta, informamos error
+                                error.setCode(500);
+                                error.setDescription("Error al consultar el tramite : " + consultaAsientoResponseDocument.getConsultaAsientoResponse().getRespuesta().getCodigo() + " - " + consultaAsientoResponseDocument.getConsultaAsientoResponse().getRespuesta().getDescripcion());
+                                error.setMessage("Error al consultar el tramite : " + consultaAsientoResponseDocument.getConsultaAsientoResponse().getRespuesta().getCodigo() + " - " + consultaAsientoResponseDocument.getConsultaAsientoResponse().getRespuesta().getDescripcion());
+                                updateResponseDTO.setStatus(SigaConstants.KO);
+                                updateResponseDTO.setError(error);
+                                LOGGER.error("iniciarTramiteColegiacionEXEA() / Error al consultar el tramite");
+                            }
+                        }else{
+                            //Ha ocurrido un error al iniciar el tramite, informamos error
+                            error.setCode(500);
+                            error.setDescription("Error al iniciar el tramite : " + registroEntradaResponseDocument.getRegistroEntradaResponse().getRespuesta().getCodigo() + " - " + registroEntradaResponseDocument.getRegistroEntradaResponse().getRespuesta().getDescripcion());
+                            error.setMessage("Error al iniciar el tramite : " + registroEntradaResponseDocument.getRegistroEntradaResponse().getRespuesta().getCodigo() + " - " + registroEntradaResponseDocument.getRegistroEntradaResponse().getRespuesta().getDescripcion());
+                            updateResponseDTO.setStatus(SigaConstants.KO);
+                            updateResponseDTO.setError(error);
+                            LOGGER.error("iniciarTramiteColegiacionEXEA() / Error al iniciar el tramite");
+                        }
                     }else{
                         LOGGER.error("iniciarTramiteColegiacionEXEA() / No se encontro la solicitud a aprobar");
                         error.setCode(500);
@@ -1444,7 +1547,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         return affectedRows;
     }
 
-    private RegistroEntradaDocument fillRegistroEntradaDocument (CenSolicitudincorporacion cenSolicitudincorporacion, Short idInstitucion) throws IOException {
+    private RegistroEntradaDocument fillRegistroEntradaDocument (CenSolicitudincorporacion cenSolicitudincorporacion, Short idInstitucion, String asunto) throws IOException, NoSuchAlgorithmException, TransformerException, ParserConfigurationException {
         RegistroEntradaDocument registroEntradaDocument = null;
 
         //Obtenemos el codigo del procedimiento de colegiacion de exea para la institucion
@@ -1498,7 +1601,8 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             }
 
             registroEntrada.setEntidadDestinataria(cdgoExtInst);
-            registroEntrada.setAsunto("Trámite de colegiación");
+            registroEntrada.setAsunto(asunto);
+            registroEntrada.setDatosEspecificos(createXMLDatosEspecificosFromSolicitud(cenSolicitudincorporacion));
             RegistroEntradaDocument.RegistroEntrada.Adjuntos adjuntos = registroEntrada.addNewAdjuntos();
             CenDocumentacionpresentadaExample cenDocumentacionpresentadaExample = new CenDocumentacionpresentadaExample();
             cenDocumentacionpresentadaExample.createCriteria().andIdsolicitudEqualTo(cenSolicitudincorporacion.getIdsolicitud());
@@ -1507,10 +1611,16 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
             if(documentosSolicitud != null && !documentosSolicitud.isEmpty()){
 
+                int i = 1;
                 for(CenDocumentacionpresentada documento : documentosSolicitud){
+
                     Adjunto adjunto = adjuntos.addNewAdjunto();
 
                     CenDocumentacionsolicitud cenDocumentacionsolicitud = cenDocumentacionsolicitudExtendsMapper.selectByPrimaryKey(documento.getIddocumentacion());
+                    GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
+                    genRecursosCatalogosKey.setIdlenguaje("1");
+                    genRecursosCatalogosKey.setIdrecurso(cenDocumentacionsolicitud.getDescripcion());
+                    String descripcionAdjunto = genRecursosCatalogosExtendsMapper.selectByPrimaryKey(genRecursosCatalogosKey).getDescripcion();
                     GenFicheroKey genFicheroKey = new GenFicheroKey();
                     genFicheroKey.setIdfichero(Long.valueOf(documento.getIdfichero()));
                     genFicheroKey.setIdinstitucion(idInstitucion);
@@ -1524,10 +1634,14 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
                     adjunto.setFicheroAdjunto(Files.readAllBytes(pathDoc));
                     adjunto.setNombreOriginalArchivo(documento.getNombrefichero());
+                    adjunto.setDescripcion(descripcionAdjunto);
                     if(cenDocumentacionsolicitud != null){
-                        adjunto.setCodigoTipoDocumento(cenDocumentacionsolicitud.getCodigoext());
+                        adjunto.setCodigoTipoDocumento(cenDocumentacionsolicitud.getCodigoext().replaceFirst("^0+(?!$)",""));
                     }
+                    adjunto.setHash(createHashFromFile(pathDoc.toFile()));
+                    adjunto.setNumeroSecuencia(i);
 
+                    i++;
                 }
 
             }
@@ -1535,5 +1649,306 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         }
 
         return registroEntradaDocument;
+    }
+
+    /**
+     *
+     * Crea el Hash necesario para la peticion de colegiacion a partir del archivo
+     *
+     * @param file
+     * @return
+     */
+    private String createHashFromFile(File file) throws NoSuchAlgorithmException, IOException {
+        String hashSHA1 = "";
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        InputStream fis = new FileInputStream(file);
+        int n = 0;
+        byte[] buffer = new byte[8192];
+        while (n != -1) {
+            n = fis.read(buffer);
+            if (n > 0) {
+                digest.update(buffer, 0, n);
+            }
+        }
+        hashSHA1 = new HexBinaryAdapter().marshal(digest.digest());
+        return  hashSHA1;
+    }
+
+    /**
+     * Metodo que rellena el nodo datosEspecificos de la peticion a partir de la solicitud de incorporacion
+     *
+     * @param solicitudincorporacion
+     * @return
+     * @throws TransformerException
+     * @throws ParserConfigurationException
+     */
+    private String createXMLDatosEspecificosFromSolicitud(CenSolicitudincorporacion solicitudincorporacion) throws TransformerException, ParserConfigurationException {
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+        // root elements
+        Document doc = docBuilder.newDocument();
+
+        Element rootElement = doc.createElement("solicitudColegiacion");
+        doc.appendChild(rootElement);
+
+        //NODO SOLICITANTE - INICIO
+        Element solicitanteElement = doc.createElement("solicitante");
+        rootElement.appendChild(solicitanteElement);
+
+        Element tipoDocIdent = doc.createElement("tipoDocIdent");
+        if(Short.valueOf((short)10) == solicitudincorporacion.getIdtipoidentificacion()){ //NIF-DNI
+            tipoDocIdent.appendChild(doc.createTextNode("D"));
+        }else if(Short.valueOf((short)40) == solicitudincorporacion.getIdtipoidentificacion()){ //NIE
+            tipoDocIdent.appendChild(doc.createTextNode("N"));
+        }else{ //Pasaporte
+            tipoDocIdent.appendChild(doc.createTextNode("P"));
+        }
+        solicitanteElement.appendChild(tipoDocIdent);
+
+        Element numDocIdenElement = doc.createElement("numDocIdent");
+        numDocIdenElement.appendChild(doc.createTextNode(solicitudincorporacion.getNumeroidentificador()));
+        solicitanteElement.appendChild(numDocIdenElement);
+
+        Element sexoElement = doc.createElement("sexo");
+        if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getSexo())) {
+            sexoElement.appendChild(doc.createTextNode(solicitudincorporacion.getSexo()));
+        }
+        solicitanteElement.appendChild(sexoElement);
+
+        Element nombreElement = doc.createElement("nombre");
+        nombreElement.appendChild(doc.createTextNode(solicitudincorporacion.getNombre()));
+        solicitanteElement.appendChild(nombreElement);
+
+        Element apellido1Element = doc.createElement("apellido1");
+        apellido1Element.appendChild(doc.createTextNode(solicitudincorporacion.getApellido1()));
+        solicitanteElement.appendChild(apellido1Element);
+
+        if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getApellido2())) {
+            Element apellido2Element = doc.createElement("apellido2");
+            apellido2Element.appendChild(doc.createTextNode(solicitudincorporacion.getApellido2()));
+            solicitanteElement.appendChild(apellido2Element);
+        }
+        String cdgoExtPais = cenPaisExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdpais()).getCodigoext();
+        if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getIdpais())){
+            Element paisElement = doc.createElement("paisNacionalidad");
+            paisElement.appendChild(doc.createTextNode(cdgoExtPais));
+            solicitanteElement.appendChild(paisElement);
+        }
+        Element fechaNacimientoElement = doc.createElement("fechaNacimiento");
+        fechaNacimientoElement.appendChild(doc.createTextNode(SigaConstants.DATE_FORMAT.format(solicitudincorporacion.getFechanacimiento())));
+        solicitanteElement.appendChild(fechaNacimientoElement);
+        //NODO SOLICITANTE - FIN
+
+        //NODO DETALLES - INICIO
+        Element detallesElement = doc.createElement("detalles");
+        rootElement.appendChild(detallesElement);
+
+        Element modalidadElement = doc.createElement("modalidad");
+        if((short)30 == solicitudincorporacion.getIdtipocolegiacion()){
+            modalidadElement.appendChild(doc.createTextNode("E"));
+        } else if((short)40 == solicitudincorporacion.getIdtipocolegiacion()){
+            modalidadElement.appendChild(doc.createTextNode("N"));
+        } else if((short)50 == solicitudincorporacion.getIdtipocolegiacion()){
+            modalidadElement.appendChild(doc.createTextNode("I"));
+        }
+        detallesElement.appendChild(modalidadElement);
+
+        Element cuentaPropiaElement = doc.createElement("porCuentaPropia");
+        cuentaPropiaElement.appendChild(doc.createTextNode("SI"));
+        detallesElement.appendChild(cuentaPropiaElement);
+
+        Element situacionPreviaElement = doc.createElement("situacionPrevia");
+        if((short)11 == solicitudincorporacion.getIdmodalidaddocumentacion()){
+            situacionPreviaElement.appendChild(doc.createTextNode("1"));
+        } else if((short)12 == solicitudincorporacion.getIdmodalidaddocumentacion()){
+            situacionPreviaElement.appendChild(doc.createTextNode("2"));
+        } else if((short)13 == solicitudincorporacion.getIdmodalidaddocumentacion()){
+            situacionPreviaElement.appendChild(doc.createTextNode("3"));
+        }
+        detallesElement.appendChild(situacionPreviaElement);
+
+        Element idiomaElement = doc.createElement("idioma");
+        idiomaElement.appendChild(doc.createTextNode("es"));
+        detallesElement.appendChild(idiomaElement);
+
+        Element emailElement = doc.createElement("emailContacto");
+        emailElement.appendChild(doc.createTextNode(solicitudincorporacion.getCorreoelectronico()));
+        detallesElement.appendChild(emailElement);
+
+        Element coberturaElement = doc.createElement("coberturaSocial");
+        coberturaElement.appendChild(doc.createTextNode("RT"));
+        detallesElement.appendChild(coberturaElement);
+
+        if(solicitudincorporacion.getIdestadocivil() != null){
+            String cdgoEstadoCivil = cenEstadocivilExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdestadocivil()).getCodigoejis().substring(0,1);
+            Element estadoCivilElement = doc.createElement("estadoCivil");
+            estadoCivilElement.appendChild(doc.createTextNode(cdgoEstadoCivil));
+            detallesElement.appendChild(estadoCivilElement);
+        }
+
+        Element autorizaCesionElement = doc.createElement("autorizaCesion");
+        autorizaCesionElement.appendChild(doc.createTextNode("MA"));
+        detallesElement.appendChild(autorizaCesionElement);
+
+        Element cniElement = doc.createElement("solicitarCNI");
+        cniElement.appendChild(doc.createTextNode(SigaConstants.SI));
+        detallesElement.appendChild(cniElement);
+
+        Element reincorpElement = doc.createElement("reincorporacion");
+        if((short)60 == solicitudincorporacion.getIdtiposolicitud()){
+            reincorpElement.appendChild(doc.createTextNode(SigaConstants.SI));
+        } else if((short)50 == solicitudincorporacion.getIdtiposolicitud()){
+            reincorpElement.appendChild(doc.createTextNode(SigaConstants.NO));
+        }
+        detallesElement.appendChild(reincorpElement);
+        //NODO DETALLES - FIN
+        //NODO CUENTA BANCARIA - INICIO
+        if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getIban())){
+            Element cuentaElement = doc.createElement("cuentaBancaria");
+            rootElement.appendChild(cuentaElement);
+
+            Element tipoCuentaElement = doc.createElement("tipoCuenta");
+            tipoCuentaElement.appendChild(doc.createTextNode("ES"));
+            cuentaElement.appendChild(tipoCuentaElement);
+
+            Element ibanElement = doc.createElement("IBAN");
+            ibanElement.appendChild(doc.createTextNode(solicitudincorporacion.getIban()));
+            cuentaElement.appendChild(ibanElement);
+
+            Element bicElement = doc.createElement("BIC");
+            if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getBic())) {
+                bicElement.appendChild(doc.createTextNode(solicitudincorporacion.getBic()));
+            }
+            cuentaElement.appendChild(bicElement);
+
+            Element titularElement = doc.createElement("titularCuenta");
+            if(UtilidadesString.esCadenaVacia(solicitudincorporacion.getApellido2())){
+                titularElement.appendChild(doc.createTextNode(solicitudincorporacion.getNombre() + " " + solicitudincorporacion.getApellido1()));
+            }else{
+                titularElement.appendChild(doc.createTextNode(solicitudincorporacion.getNombre() + " " + solicitudincorporacion.getApellido1() + " " + solicitudincorporacion.getApellido2()));
+            }
+            cuentaElement.appendChild(titularElement);
+
+            Element abonosElement = doc.createElement("checkAbonos");
+            abonosElement.appendChild(doc.createTextNode(SigaConstants.SI));
+            cuentaElement.appendChild(abonosElement);
+
+            Element turnoElement = doc.createElement("checkTurno");
+            turnoElement.appendChild(doc.createTextNode(SigaConstants.SI));
+            cuentaElement.appendChild(turnoElement);
+        }
+        //NODO CUENTA BANCARIA - FIN
+
+        //NODO DOMICILIO - INICIO
+        Element domicilioElement = doc.createElement("domicilioProfesional");
+        rootElement.appendChild(domicilioElement);
+
+        //NODO DIRECCION POSTAL - INICIO
+        Element postalElement = doc.createElement("direccionPostal");
+        domicilioElement.appendChild(postalElement);
+
+        Element codPaisElement = doc.createElement("codPais");
+        codPaisElement.appendChild(doc.createTextNode(cdgoExtPais));
+        postalElement.appendChild(codPaisElement);
+
+        Element codComunidadElement = doc.createElement("codComunidad");
+        codComunidadElement.appendChild(doc.createTextNode("13")); //FIXME - Preguntar como debe ir informado, no usamos comunidad aut en siga
+        postalElement.appendChild(codComunidadElement);
+
+        String codExtProvincia = cenProvinciasExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdprovincia()).getCodigoext();
+        Element codProvinciaElement = doc.createElement("codProvincia");
+        codProvinciaElement.appendChild(doc.createTextNode(codExtProvincia));
+        postalElement.appendChild(codProvinciaElement);
+
+        if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getIdpoblacion())) {
+            String descPoblacion = cenPoblacionesExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdpoblacion()).getNombre();
+            Element localidadElement = doc.createElement("localidad");
+            localidadElement.appendChild(doc.createTextNode(descPoblacion));
+            postalElement.appendChild(localidadElement);
+        }
+
+        Element codPostalElement = doc.createElement("codigoPostal");
+        codPostalElement.appendChild(doc.createTextNode(solicitudincorporacion.getCodigopostal()));
+        postalElement.appendChild(codPostalElement);
+
+        Element tipoViaElement = doc.createElement("tipoVia");
+        tipoViaElement.appendChild(doc.createTextNode("CL"));
+        postalElement.appendChild(tipoViaElement);
+
+        Element nombreViaElement = doc.createElement("nombreVia");
+        nombreViaElement.appendChild(doc.createTextNode("Prueba")); //FIXME
+        postalElement.appendChild(nombreViaElement);
+
+        Element numeroViaElement = doc.createElement("numeroVia");
+        numeroViaElement.appendChild(doc.createTextNode("1")); //FIXME
+        postalElement.appendChild(numeroViaElement);
+
+        Element restoDirElement = doc.createElement("restoDir");
+        restoDirElement.appendChild(doc.createTextNode("1 A")); //FIXME
+        postalElement.appendChild(restoDirElement);
+        //NODO DIRECCION POSTAL - FIN
+
+        if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getTelefono1())
+            || !UtilidadesString.esCadenaVacia(solicitudincorporacion.getTelefono2())) {
+            //NODO TLF FIJO - INICIO
+
+            Element tlfFijoElement = doc.createElement("telefonoFijo");
+            domicilioElement.appendChild(tlfFijoElement);
+
+            Element numeroFijoElement = doc.createElement("numeroFijo");
+            if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getTelefono1())){
+                numeroFijoElement.appendChild(doc.createTextNode(solicitudincorporacion.getTelefono1()));
+            }else{
+                numeroFijoElement.appendChild(doc.createTextNode(solicitudincorporacion.getTelefono2()));
+            }
+
+            tlfFijoElement.appendChild(numeroFijoElement);
+
+            Element publFijoElement = doc.createElement("publicarFijo");
+            publFijoElement.appendChild(doc.createTextNode(SigaConstants.SI));
+            tlfFijoElement.appendChild(publFijoElement);
+            //NODO TLF FIJO - FIN
+        }
+
+        if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getMovil())){
+            //NODO MOVIL - INICIO
+            Element tlfMovilElement = doc.createElement("telefonoMovil");
+            domicilioElement.appendChild(tlfMovilElement);
+
+            Element numeroMovilElement = doc.createElement("numeroMovil");
+            numeroMovilElement.appendChild(doc.createTextNode(solicitudincorporacion.getMovil()));
+            tlfMovilElement.appendChild(numeroMovilElement);
+
+            Element publMovilElement = doc.createElement("publicarMovil");
+            publMovilElement.appendChild(doc.createTextNode(SigaConstants.SI));
+            tlfMovilElement.appendChild(publMovilElement);
+            //NODO MOVIL - FIN
+        }
+
+        if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getCorreoelectronico())){
+            //NODO EMAIL - INICIO
+            Element emailParentElement = doc.createElement("email");
+            domicilioElement.appendChild(emailParentElement);
+
+            Element direccionEmailElement = doc.createElement("direccionEmail");
+            direccionEmailElement.appendChild(doc.createTextNode(solicitudincorporacion.getCorreoelectronico()));
+            emailParentElement.appendChild(direccionEmailElement);
+
+            Element publEmailElement = doc.createElement("publicarEmail");
+            publEmailElement.appendChild(doc.createTextNode(SigaConstants.SI));
+            emailParentElement.appendChild(publEmailElement);
+            //NODO EMAL - FIN
+        }
+        //NODO DOMICILIO - FIN
+        //TODO NODO tituloHabilitante?
+        StringWriter writer = new StringWriter();
+
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+
+
+        return writer.getBuffer().toString();
     }
 }

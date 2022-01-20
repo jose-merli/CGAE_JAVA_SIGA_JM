@@ -22,6 +22,15 @@ public class ExpedienteItem {
     private List<DocumentacionAsistenciaItem> documentos;
     private String descInstitucion;
     private String idFase;
+    private String identificacionColegiado;
+
+    public String getIdentificacionColegiado() {
+        return identificacionColegiado;
+    }
+
+    public void setIdentificacionColegiado(String identificacionColegiado) {
+        this.identificacionColegiado = identificacionColegiado;
+    }
 
     public String getIdFase() {
         return idFase;

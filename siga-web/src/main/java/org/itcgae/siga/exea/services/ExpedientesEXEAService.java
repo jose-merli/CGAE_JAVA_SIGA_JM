@@ -22,7 +22,7 @@ public interface ExpedientesEXEAService {
     ExpedienteDTO getExpedientesSIGAColegiado (HttpServletRequest request, String idPersona);
     StringDTO getTokenLoginEXEA(HttpServletRequest request);
     ExpedienteDTO getExpedientesEXEAPersonalColegio(HttpServletRequest request, String identificacionColegiado);
-    ExpedienteDTO getDetalleExpedienteEXEA(HttpServletRequest request, String numExpedienteEXEA);
+    ExpedienteDTO getDetalleExpedienteEXEA(HttpServletRequest request, String numExpedienteEXEA, String identificacionColegiado);
     StringDTO getParamsDocumentacionEXEA(HttpServletRequest request);
     InsertResponseDTO sincronizarDocumentacionEXEA(HttpServletRequest request, List<DocumentacionIncorporacionItem> documentacionEXEA);
     InsertResponseDTO subirDocumentoSolIncorp(MultipartHttpServletRequest request);

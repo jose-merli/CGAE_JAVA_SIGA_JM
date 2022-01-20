@@ -72,10 +72,10 @@ public class ExpedientesEXEAController {
     }
 
     @GetMapping(value = "/detalle")
-    public ResponseEntity<ExpedienteDTO> getDetalleExpedienteEXEA(HttpServletRequest request, @RequestParam("numExp") String numExpedienteEXEA) {
+    public ResponseEntity<ExpedienteDTO> getDetalleExpedienteEXEA(HttpServletRequest request, @RequestParam("numExp") String numExpedienteEXEA, @RequestParam(required = false) String identificacionColegiado) {
         ExpedienteDTO response = null;
         try {
-            response = expedientesEXEAService.getDetalleExpedienteEXEA(request, numExpedienteEXEA);
+            response = expedientesEXEAService.getDetalleExpedienteEXEA(request, numExpedienteEXEA, identificacionColegiado);
         }catch(Exception e) {
             throw e;
         }

@@ -143,9 +143,9 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 errorType.setXmlRequest("Sin error XML");
                 LOGGER.error("SincronizacionEXEAServiceImpl.getNumColegiacion() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getColegio().getCodigoColegio());
             }
-            wsCommons.comprobarIP(responseDocument.getObtenerNumColegiacionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
 
             if(idInstitucion != null) {
+                wsCommons.comprobarIP(responseDocument.getObtenerNumColegiacionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
                 String identificacion = "";
                 Long idPersona = null;
                 FichaPersonaItem fichaPersonaItem = null;
@@ -279,13 +279,13 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 errorType.setXmlRequest("Sin error XML");
                 LOGGER.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getColegiado().getColegiacion().getColegio().getCodigoColegio());
             }
-            wsCommons.comprobarIP(responseDocument.getAltaColegiadoResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
             if(idInstitucion != null) {
+                wsCommons.comprobarIP(responseDocument.getAltaColegiadoResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
                 if (UtilidadesString.esCadenaVacia(numColegiado)) {
 
                     if(isReincorporacion){
                         ErrorType errorType = response.addNewError();
-                        errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.COLEGIO_NOVALIDO.name());
+                        errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.name());
                         errorType.setDescripcion("No puede llevarse a cabo una reincorporacion si no viene informado el numero de colegiado");
                         errorType.setXmlRequest("Sin error XML");
                         LOGGER.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / No se puede llevar a cabo una reincorporacion sin el numero de colegiado");
@@ -491,9 +491,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 errorType.setXmlRequest("Sin error XML");
                 LOGGER.error("SincronizacionEXEAServiceImpl.altaSancion() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getSancion().getDatosSancion().getColegioConsejo().getCodigoColegio());
             }
-            wsCommons.comprobarIP(responseDocument.getAltaSancionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
             if(idInstitucion != null) {
-
+                wsCommons.comprobarIP(responseDocument.getAltaSancionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
                 String identificacion;
                 Long idPersona;
 
@@ -661,10 +660,9 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 LOGGER.error("SincronizacionEXEAServiceImpl.actualizarSancion() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getSancion().getColegioConsejo().getCodigoColegio());
             }
 
-            wsCommons.comprobarIP(responseDocument.getActualizacionSancionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
 
             if(idInstitucion != null) {
-
+                wsCommons.comprobarIP(responseDocument.getActualizacionSancionResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
                 CenSancionExample cenSancionExample = new CenSancionExample();
                 cenSancionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andRefcolegioEqualTo(request.getSancion().getRefSancion());
 

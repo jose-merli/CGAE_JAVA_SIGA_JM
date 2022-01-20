@@ -37,7 +37,7 @@ public class CenDocumentsolicitudinstituSqlExtendsProvider extends CenDocumentso
                 "CODIGOEXT != '002'");
         if(!UtilidadesString.esCadenaVacia(idSolicitud)) {
             SQL.OR();
-            SQL.WHERE("(CODIGOEXT = '002' AND IDFICHERO IS NOT NULL))");
+            SQL.WHERE("(CODIGOEXT = '002' AND IDFICHERO IS NOT NULL)");
         }
         SQL.ORDER_BY("OBLIGATORIO DESC");
         return SQL.toString();

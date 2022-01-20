@@ -8,6 +8,8 @@ import ieci.tdw.ispac.services.ws.server.GetExpedienteDocument;
 import ieci.tdw.ispac.services.ws.server.GetExpedienteResponseDocument;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.ws.config.*;
+import org.redabogacia.regtel.ws.eregtel.ConsultaAsientoDocument;
+import org.redabogacia.regtel.ws.eregtel.ConsultaAsientoResponseDocument;
 import org.redabogacia.regtel.ws.eregtel.RegistroEntradaDocument;
 import org.redabogacia.regtel.ws.eregtel.RegistroEntradaResponseDocument;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +94,23 @@ public class ClientExpedientesEXEA extends WebServiceGatewaySupport {
 
         }catch(Exception e) {
             LOGGER.error("ClientExpedientesEXEA -> Error al iniciar el expediente: " + e.getMessage(), e);
+            throw e;
+        }
+
+        return response;
+    }
+
+    public ConsultaAsientoResponseDocument consultaExpediente (ConsultaAsientoDocument request, String uriService){
+
+        ConsultaAsientoResponseDocument response;
+
+        try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfigRegTel.class))
+        {
+            RegTelClient client = context.getBean(RegTelClient.class);
+            response = client.consultarExpediente(request,uriService);
+
+        }catch(Exception e) {
+            LOGGER.error("ClientExpedientesEXEA -> Error al consultar el expediente: " + e.getMessage(), e);
             throw e;
         }
 
