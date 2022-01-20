@@ -197,4 +197,29 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
 		return query.toString();
 	}
+
+	public String facturasDevueltasEnDisquete(String idDisquetecargos, String idInstitucion) {
+		SQL query = new SQL();
+		SQL subquery = new SQL();
+
+		subquery.SELECT("MAX(fh2.IDHISTORICO)");
+
+		subquery.FROM("FAC_HISTORICOFACTURA fh2");
+
+		subquery.WHERE("fh2.IDFACTURA = fh.IDFACTURA");
+		subquery.WHERE("fh2.IDDISQUETECARGOS = fh.IDDISQUETECARGOS");
+		subquery.WHERE("fh2.IDINSTITUCION = fh.IDINSTITUCION");
+
+		query.SELECT("ff.*");
+
+		query.FROM("FAC_HISTORICOFACTURA fh");
+		query.INNER_JOIN("INNER JOIN FAC_FACTURA ff ON(ff.IDFACTURA = fh.IDFACTURA AND ff.IDINSTITUCION = fh.IDINSTITUCION)");
+
+		query.WHERE("fh.IDDISQUETECARGOS = " + idDisquetecargos);
+		query.WHERE("fh.IDINSTITUCION = " + idInstitucion);
+		query.WHERE("fh.ESTADO = 1");
+		query.WHERE("fh.IDHISTORICO != (" + subquery.toString() + ")");
+
+		return query.toString();
+	}
 }

@@ -280,4 +280,10 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
+	@GetMapping(value = "/comboProcedimientosEXEA")
+	public ResponseEntity<ComboDTO> comboProcedimientosEXEA(HttpServletRequest request) {
+		ComboDTO response = comboService.comboProcedimientosEXEA(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
 }
