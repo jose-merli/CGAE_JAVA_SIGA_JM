@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.guardia;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioyProgramacionItem;
 import org.itcgae.siga.DTOs.scs.DeleteCalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
@@ -34,6 +36,7 @@ import org.itcgae.siga.DTOs.scs.LetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.RangoFechasItem;
 import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
+import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -114,14 +117,14 @@ public interface GuardiasService {
 	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
 			HttpServletRequest request);
 
-	public List<GuardiaCalendarioItem> getGuardiasFromCalendar(String idCalendar, HttpServletRequest request);
+	public List<GuardiaCalendarioItem> getGuardiasFromCalendar(String idCalendar, String fechaDesde, String fechaHasta, HttpServletRequest request);
 
 
 	public List<GuardiaCalendarioItem> guardiasFromCojunto(HttpServletRequest request, String idConjuntoGuardia);
 
 	public List<RangoFechasItem> getFechasProgramacionGuardia(String idGuardia, HttpServletRequest request);
 
-	public InsertResponseDTO insertGuardiaToConjunto(HttpServletRequest request, String idConjuntoGuardia, List<GuardiaCalendarioItem> item);
+	public InsertResponseDTO insertGuardiaToConjunto(HttpServletRequest request, String idConjuntoGuardia, String idTurno, String idGuardia, String fechaDesde, String fechaHasta, List<GuardiaCalendarioItem> item);
 
 	public InsertResponseDTO insertGuardiaToCalendar(Boolean update,HttpServletRequest request, String idCalendar,
 			List<GuardiaCalendarioItem> itemList);
@@ -135,9 +138,9 @@ public interface GuardiasService {
 	public InsertResponseDTO newCalendarioProgramado(HttpServletRequest request,
 			DatosCalendarioProgramadoItem calendarioItem);
 
-	public InsertResponseDTO generarCalendario(HttpServletRequest request, DatosCalendarioProgramadoItem programacionItem);
+	public InsertResponseDTO generarCalendario(HttpServletRequest request, DatosCalendarioProgramadoItem programacionItem) throws Exception;
 
-	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request, DatosCalendarioProgramadoItem list);
+	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request, DatosCalendarioyProgramacionItem list);
 			
 
 	public InscripcionesResponseDTO getInscripciones(InscripcionDatosEntradaDTO inscripcionesDTO,
@@ -154,14 +157,19 @@ public interface GuardiasService {
 
 	public DeleteResponseDTO eliminarGuardiaColegiado(GuardiasItem guardiasItem, HttpServletRequest request);
 
-	public InsertResponseDTO generarCalendarioAsync();
+	public void generarCalendarioAsync();
 
-	public ByteArrayInputStream descargarZIPExcelLog(HttpServletRequest request, List<DatosCalendarioProgramadoItem> programacionItem);
+	public ByteArrayInputStream descargarZIPExcelLog(HttpServletRequest request, List<DatosCalendarioyProgramacionItem> programacionItem);
 
 	UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarBody, HttpServletRequest request);
 
 	UpdateResponseDTO validarInscripciones(BusquedaInscripcionItem validarBody, HttpServletRequest request);
 
 	public StringDTO getTipoDiaGuardia(HttpServletRequest var1, String var2, String var3);
+
+	public boolean validarIncompatibilidadGuardia(String idInstitucion, String idTurno, String idGuardia,
+			ArrayList arrayDiasGuardia, String idPersona);
+
+	public void insertarSaltoCompensacion(ScsSaltoscompensaciones salto) throws Exception;
 
 }

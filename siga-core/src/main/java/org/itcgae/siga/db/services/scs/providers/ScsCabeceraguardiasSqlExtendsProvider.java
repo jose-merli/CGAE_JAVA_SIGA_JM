@@ -48,8 +48,9 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		return sql.toString();
 	}
 	
-	public String busquedaGuardiasColegiado(GuardiasItem guardiaItem, String idInstitucion) {
+	public String busquedaGuardiasColegiado(GuardiasItem guardiaItem, String idInstitucion, Integer tamMax) {
 		SQL sql = new SQL();
+		SQL SQL_PADRE = new SQL();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String fechahasta;
 		String fechadesde;
@@ -59,7 +60,6 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 				+ "    guard.idguardia,"
 				+ "    guard.idcalendarioguardias,"
 				+ "    guard.idpersona,"
-				+ "    guard.fechavalidacion,"
 				+ "    guard.facturado,"
 				+ "    guard.idfacturacion,"
 				+ "    guard.numerogrupo,"
@@ -131,20 +131,26 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 			
 			if(guardiaItem.getFechadesde() != null) {
 				fechadesde = dateFormat.format(guardiaItem.getFechadesde());
-				sql.WHERE("( TO_CHAR(guard.fechainicio ,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR')"
-						+ " OR "
-						+ "TO_CHAR(guard.fecha_fin ,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR') )");
+				sql.WHERE("( guard.fechainicio >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR')"
+						+ " AND "
+						+ "guard.fecha_fin >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR') )");
 			}
 			if(guardiaItem.getFechahasta() != null) {
 				fechahasta = dateFormat.format(guardiaItem.getFechahasta());
-				sql.WHERE("( TO_CHAR(guard.fechainicio ,'DD/MM/RRRR') <= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR')"
-						+ " OR "
-						+ "TO_CHAR(guard.fecha_fin ,'DD/MM/RRRR') >= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR') )");
+				sql.WHERE("( guard.fechainicio <= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR')"
+						+ " AND "
+						+ "guard.fecha_fin <= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR') )");
 			}
-			
-			sql.WHERE("ROWNUM <= 200");
-	
-		return sql.toString();
+
+			SQL_PADRE.SELECT(" *");
+			SQL_PADRE.FROM("( " + sql.toString() + " )");
+			if(tamMax != null && tamMax > 0) {
+				tamMax += 1;
+				SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
+			}
+
+
+			return SQL_PADRE.toString();
 	}
 	
 	public String validarSolicitudGuardia(ScsCabeceraguardias record) {

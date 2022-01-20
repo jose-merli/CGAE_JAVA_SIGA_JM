@@ -3263,7 +3263,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				unLetrado = alLetradosOrdenados.get(punteroUltimo);
 
 				scsDesignacionesExtendsMapper.cambiarUltimoCola(unLetrado.getIdinstitucion().toString(),
-						unLetrado.getIdturno().toString(), unLetrado.getIdpersona().toString(),
+						unLetrado.getIdTurno().toString(), unLetrado.getIdpersona().toString(),
 						unLetrado.getInscripcionTurno().getFechasolicitud(), usuario);
 
 			}
@@ -3588,7 +3588,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				letradoSeleccionado.setIdpersona(elem.getIdpersona());
 				letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
 				letradoSeleccionado.setIdSaltoCompensacion(elem.getIdSaltoCompensacion());
-				letradoSeleccionado.setIdturno(elem.getIdturno());
+				letradoSeleccionado.setIdTurno(elem.getIdTurno());
 				letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
 				letradoSeleccionado.setSaltoocompensacion("C");
 				alLetradosCompensados.add(letradoSeleccionado);

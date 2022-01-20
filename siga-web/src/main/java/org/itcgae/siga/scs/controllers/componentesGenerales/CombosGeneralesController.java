@@ -54,6 +54,12 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/turnosDesignacion")
+	public ResponseEntity<ComboDTO> comboTurnosDesignacion(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTurnos(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping("/turnosInscritos")
 	public ResponseEntity<ComboDTO> comboTurnosInscritoLetrado(HttpServletRequest request, @RequestParam String idPersona) {
 		ComboDTO response = comboService.comboTurnosInscritoLetrado(request, idPersona);

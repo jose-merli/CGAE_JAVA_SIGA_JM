@@ -74,7 +74,7 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 			@Result(column = "fechaActuacion", property = "fchaActuacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fechajustificacion", property = "fchaJustificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "iddelito", property = "idDelito", jdbcType = JdbcType.VARCHAR),
+			
 			@Result(column = "lugar", property = "lugar", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ejganio", property = "ejgAnio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ejgnumero", property = "ejgNumero", jdbcType = JdbcType.VARCHAR),
@@ -87,7 +87,12 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 			@Result(column = "ejgidtipoejg", property = "idTipoEjg", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<TarjetaAsistenciaItem> searchAsistenciasExpress(FiltroAsistenciaItem filtro, Short idInstitucion);
+	List<TarjetaAsistenciaItem2> searchAsistenciasExpress(FiltroAsistenciaItem filtro, Short idInstitucion);
+	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "getDelitosFromAsistencia")
+	@Results({
+		@Result(column = "iddelito", property = "idDelito", jdbcType = JdbcType.VARCHAR)
+	})
+	List<String> getDelitosFromAsistencia(String anio, String numero, String institucion);
 
 	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "searchAsistencias")
 	@Results({

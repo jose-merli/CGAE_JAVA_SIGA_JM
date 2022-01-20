@@ -584,5 +584,69 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 		return sql.toString();
 	}
+	
+	
+	public String insertManual(ScsSaltoscompensaciones record, String fechaFormat) {
+		SQL sql = new SQL();
+		sql.INSERT_INTO("SCS_SALTOSCOMPENSACIONES");
+
+		if (record.getIdinstitucion() != null) {
+			sql.VALUES("IDINSTITUCION", record.getIdinstitucion().toString());
+		}
+
+		if (record.getIdturno() != null) {
+			sql.VALUES("IDTURNO", record.getIdturno().toString());
+		}
+
+		if (record.getIdsaltosturno() != null) {
+			sql.VALUES("IDSALTOSTURNO", record.getIdsaltosturno().toString());
+		}
+
+		if (record.getIdpersona() != null) {
+			sql.VALUES("IDPERSONA", record.getIdpersona().toString());
+		}
+
+		if (record.getSaltoocompensacion() != null) {
+			sql.VALUES("SALTOOCOMPENSACION", "'" +record.getSaltoocompensacion().toString()+ "'");
+		}
+
+		if (record.getFecha() != null) {
+			sql.VALUES("FECHA", "'" +fechaFormat+ "'");
+		}
+
+		if (record.getFechamodificacion() != null) {
+			sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		}
+
+		if (record.getUsumodificacion() != null) {
+			sql.VALUES("USUMODIFICACION", record.getUsumodificacion().toString());
+		}
+
+		if (record.getIdguardia() != null) {
+			sql.VALUES("IDGUARDIA", record.getIdguardia().toString());
+		}
+
+		if (record.getMotivos() != null) {
+			sql.VALUES("MOTIVOS", "' " + record.getMotivos().toString() + " '");
+		}
+
+		if (record.getFechacumplimiento() != null) {
+			sql.VALUES("FECHACUMPLIMIENTO", "'" +record.getFechacumplimiento().toString());
+		}
+
+		if (record.getIdcalendarioguardias() != null) {
+			sql.VALUES("IDCALENDARIOGUARDIAS", record.getIdcalendarioguardias().toString());
+		}
+
+		if (record.getIdcalendarioguardiascreacion() != null) {
+			sql.VALUES("IDCALENDARIOGUARDIASCREACION", record.getIdcalendarioguardiascreacion().toString());
+		}
+
+		if (record.getTipomanual() != null) {
+			sql.VALUES("TIPOMANUAL", record.getTipomanual().toString());
+		}
+
+		return sql.toString();
+	}
 
 }

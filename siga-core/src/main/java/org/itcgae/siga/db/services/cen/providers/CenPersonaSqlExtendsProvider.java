@@ -538,4 +538,65 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.WHERE("(colegiado.comunitario = 0 and COLEGIADO.ncolegiado = '"+colegiadoJGItem+"') OR (colegiado.comunitario = 1 and COLEGIADO.NCOMUNITARIO = '"+colegiadoJGItem+"')");
 		return sql.toString();
 	}
+	
+	public String getDestinatariosSeries(Short idInstitucion, String idSerieFacturacion) {
+		SQL sql = new SQL();
+		
+		// Select
+		sql.SELECT_DISTINCT("p.idpersona");
+		sql.SELECT_DISTINCT("c.idinstitucion");
+		sql.SELECT_DISTINCT("p.nombre");
+		sql.SELECT_DISTINCT("p.apellidos1");
+		sql.SELECT_DISTINCT("p.apellidos2");
+		sql.SELECT_DISTINCT("p.nifcif");
+		sql.SELECT_DISTINCT("d.movil");
+		sql.SELECT_DISTINCT("d.correoelectronico");
+		sql.SELECT_DISTINCT("d.domicilio");
+		
+		// From
+		sql.FROM("cen_persona p");
+		
+		// Joins
+		sql.INNER_JOIN("cen_cliente c ON ( c.idpersona = p.idpersona )");
+		sql.INNER_JOIN("fac_clienincluidoenseriefactur fc ON ( fc.idpersona = c.idpersona AND fc.idinstitucion = c.idinstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_direcciones d ON ( d.idpersona = p.idpersona AND d.idinstitucion = c.idinstitucion )");
+
+		// Where
+		sql.WHERE("fc.idinstitucion = " + idInstitucion);
+		sql.WHERE("fc.idseriefacturacion = " + idSerieFacturacion);
+		
+		// Order by
+		sql.ORDER_BY("p.nombre");
+		
+		return sql.toString();
+	}
+		
+	public String getDatosPersonaForImpreso190(String idPersona) {
+		SQL sql = new SQL();
+
+		sql.SELECT("PER.NIFCIF");
+		sql.SELECT("PER.IDTIPOIDENTIFICACION AS IDTIPOIDENTIFICACION");
+		sql.SELECT("PER.NOMBRE AS NOMBRE");
+		sql.SELECT("PER.APELLIDOS1 AS APELLIDO1");
+		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
+		sql.SELECT("PER.NIFCIF AS NIDENTIFICACION");
+		sql.SELECT("PER.APELLIDOS1 || ' ' || PER.APELLIDOS2 || ', ' || PER.NOMBRE AS NOMBREPERSONA ");
+		sql.FROM("cen_persona per");
+		sql.WHERE("per.IDPERSONA = '" + idPersona + "'");
+
+		return sql.toString();
+
+	}
+	
+	public String getDatosInstitucionForImpreso190(String idinstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("PER.NIFCIF");
+		sql.SELECT("PER.IDPERSONA");
+		sql.SELECT("PER.NOMBRE");
+		sql.FROM("Cen_Persona PER ");
+		sql.JOIN("Cen_Institucion INS ON INS.IDINSTITUCION = " + idinstitucion + " and INS.IDPERSONA = PER.IDPERSONA");
+
+		return sql.toString();
+	}
 }

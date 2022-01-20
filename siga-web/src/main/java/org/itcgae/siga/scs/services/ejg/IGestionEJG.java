@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
@@ -53,7 +54,7 @@ public interface IGestionEJG {
 
 	ComboDTO comboOrigen(HttpServletRequest request);
 
-	ComboDTO comboActaAnnio(String idActa, HttpServletRequest request);
+	ComboDTO comboActaAnnio(String anioacta, String idacta, HttpServletRequest request);
 
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request);
 
@@ -175,4 +176,8 @@ public interface IGestionEJG {
 	ExpInsosDTO getDatosExpInsos(EjgItem ejgItem, HttpServletRequest request);
 
 	DocushareDTO searchListDirEjg(int numPagina, DocuShareObjectVO docu, HttpServletRequest request) throws Exception;
+
+	EstadoEjgDTO getUltEstadoEjg(EjgItem ejgItem, HttpServletRequest request);
+
+	Boolean getEditResolEjg(EjgItem ejgItem, HttpServletRequest request);
 }

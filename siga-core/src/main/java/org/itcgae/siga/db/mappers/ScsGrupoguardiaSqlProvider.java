@@ -313,4 +313,6 @@ public class ScsGrupoguardiaSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	
 }

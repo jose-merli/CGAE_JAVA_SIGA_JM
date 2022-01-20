@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.Objects;
 
 public class RelacionesItem {
-
     private String sjcs;
     private String idinstitucion;
     private String anio;
@@ -366,5 +365,6 @@ public class RelacionesItem {
         }
         return o.toString().replace("\n", "\n    ");
     }
+
 
 }

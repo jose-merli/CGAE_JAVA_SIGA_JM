@@ -188,7 +188,11 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 	List<DatosDireccionLetradoOficio> getDireccionPersonalSalidaOficio(String idPersona, String idInstitucion);
 	
 	
-	
+	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "getIdProvinciaImpreso190")
+	@Results({
+		
+	})
+	String getIdProvinciaImpreso190(String idPersona, String idinstitucion, int tipoDireccionFac );
 	
 	
 	

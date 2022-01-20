@@ -27,19 +27,19 @@ public interface AsistenciaService {
 	
 	public ComboDTO getColegiadosGuardiaDia (HttpServletRequest request, String idTurno, String idGuardia, String guardiaDia);
 	
-	public TarjetaAsistenciaResponseDTO searchAsistenciasExpress(HttpServletRequest request, FiltroAsistenciaItem filtro);
+	public TarjetaAsistenciaResponseDTO2 searchAsistenciasExpress(HttpServletRequest request, FiltroAsistenciaItem filtro);
 
 	public ComboDTO getJuzgados (HttpServletRequest request, String idTurno);
 	
 	public ComboDTO getComisarias (HttpServletRequest request, String idTurno);
 	
-	public DeleteResponseDTO guardarAsistenciasExpres(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
+	public DeleteResponseDTO guardarAsistenciasExpres(HttpServletRequest request, List<TarjetaAsistenciaResponse2Item> asistencias);
 	
 	public TarjetaAsistenciaResponseDTO searchAsistenciasByIdSolicitud(HttpServletRequest request, String idSolicitud);
 	
 	public StringDTO getDefaultTipoAsistenciaColegio (HttpServletRequest request);
 	
-	public InsertResponseDTO guardarAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy);
+	public InsertResponseDTO guardarAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy, String isLetrado);
 
 	public UpdateResponseDTO updateEstadoAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
 	

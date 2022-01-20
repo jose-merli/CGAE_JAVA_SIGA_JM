@@ -111,7 +111,7 @@ import org.itcgae.siga.db.services.form.mappers.ForTipocosteExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTiposervicioCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTiposervicioExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
-import org.itcgae.siga.db.services.form.mappers.PysPeticioncomprasuscripcionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysPreciosserviciosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysProductosinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
@@ -2546,8 +2546,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					+ idInstitucion + " AND IDPERSONA = @IDPERSONA@");
 			pysPreciosservicios.setPordefecto("1");
 			NewIdDTO idPrecioServicio = pysPreciosserviciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion,
-					cursoItem.getIdtiposervicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
+					 cursoItem.getIdtiposervicio().shortValue(), pysServiciosinstitucion.getIdservicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
 					SigaConstants.PERIOCIDAD_1MES);
+			
 			pysPreciosservicios.setIdpreciosservicios(Short.valueOf(idPrecioServicio.getNewId()));
 
 			LOGGER.info(

@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaLetradoGrupoDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsSaltoscompensacionesSqlExtendsProvider;
 
@@ -128,5 +129,7 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 
 	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "isGrupo")
 	String isGrupobyId(BusquedaLetradosGuardiaDTO idGuardia);
-
+	
+	@InsertProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "insertManual")
+	int insertManual(ScsSaltoscompensaciones record, String fechaFormat);
 }

@@ -274,11 +274,11 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "    when aa.idjuzgado is not null"
 				+ "    then 'J'"
 				+ "    else '' end comisariaJuzgado");
-		sql.SELECT("da.iddelito");
+//		sql.SELECT("da.iddelito");
 		sql.FROM("scs_asistencia");
-		sql.INNER_JOIN("scs_actuacionasistencia aa on aa.idinstitucion = scs_asistencia.idinstitucion AND aa.anio = scs_asistencia.anio AND aa.numero = scs_asistencia.numero");
+		sql.LEFT_OUTER_JOIN("scs_actuacionasistencia aa on aa.idinstitucion = scs_asistencia.idinstitucion AND aa.anio = scs_asistencia.anio AND aa.numero = scs_asistencia.numero");
 		sql.LEFT_OUTER_JOIN("scs_personajg p on p.idpersona = scs_asistencia.idpersonajg AND p.idinstitucion = scs_asistencia.idinstitucion");
-		sql.LEFT_OUTER_JOIN("scs_delitosasistencia da on scs_asistencia.anio = da.anio AND scs_asistencia.numero = da.numero AND scs_asistencia.idinstitucion = da.idinstitucion");
+//		sql.LEFT_OUTER_JOIN("scs_delitosasistencia da on scs_asistencia.anio = da.anio AND scs_asistencia.numero = da.numero AND scs_asistencia.idinstitucion = da.idinstitucion");
 		sql.WHERE("scs_asistencia.idinstitucion = " + idInstitucion);
 		sql.AND();
 		sql.WHERE("scs_asistencia.idturno = '" + filtroAsistenciaItem.getIdTurno() + "'");
@@ -288,7 +288,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.WHERE("scs_asistencia.idpersonacolegiado = '" + filtroAsistenciaItem.getIdLetradoGuardia() + "'");
 		sql.AND();
 		sql.WHERE("trunc(scs_asistencia.fechahora) = '"+filtroAsistenciaItem.getDiaGuardia() + "'");
-		sql.AND();
+		/*sql.AND();
 		sql.WHERE("EXISTS ("
 				+ "        SELECT"
 				+ "            1"
@@ -298,9 +298,12 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "                aa.idinstitucion = scs_asistencia.idinstitucion"
 				+ "            AND aa.anio = scs_asistencia.anio"
 				+ "            AND aa.numero = scs_asistencia.numero"
-				+ "    )");
-		sql.AND();
-		sql.WHERE("scs_asistencia.idtipoasistencia = '" + filtroAsistenciaItem.getIdTipoAsistencia() + "'");
+				+ "    )");*/
+		
+		if(filtroAsistenciaItem.getIdTipoAsistencia()!= null) {
+			sql.AND();
+			sql.WHERE("scs_asistencia.idtipoasistencia = '" + filtroAsistenciaItem.getIdTipoAsistencia() + "'");
+		}
 		if(!"".equals(filtroAsistenciaItem.getIdTipoAsistenciaColegiado())
 				&& filtroAsistenciaItem.getIdTipoAsistenciaColegiado() != null) {
 			sql.AND();
@@ -309,6 +312,17 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.ORDER_BY("scs_asistencia.anio","scs_asistencia.numero","aa.idactuacion");
 
 		return sql.toString();
+	}
+	
+	public String getDelitosFromAsistencia(String anio, String numero, String institucion) {
+
+		SQL sql = new SQL();
+		sql.SELECT("da.iddelito");
+		sql.FROM("scs_delitosasistencia da");
+		sql.WHERE("da.anio = " + anio);
+		sql.WHERE("da.numero = " + numero);
+        sql.WHERE("da.idinstitucion = " + institucion);     
+        return sql.toString();
 	}
 	
 	
@@ -687,38 +701,43 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 	public String searchAsistencias(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion, Integer idLenguaje, Integer tamMax) {
 		SQL SQL = new SQL();
 		SQL SQL_PADRE = new SQL();
-		SQL.SELECT_DISTINCT("a.anio",
-				"a.numero",
-				"TO_CHAR(a.fechahora,'DD/MM/YYYY HH24:MI') fechahora",
-				"a.idguardia",
-				"g.nombre nombreGuardia",
-				"a.idturno",
-				"t.nombre nombreTurno",
-				"a.idpersonajg",
-				"CASE" +
-						" WHEN a.idpersonajg is not null" +
-						" then pjg.apellido1 || ' ' || pjg.apellido2 || ', ' || pjg.nombre" +
-						" else ''" +
-						" end asistido",
-				"a.idestadoasistencia",
-				"f_siga_getrecurso (ea.descripcion,"+idLenguaje+") estadoasistencia",
-				"a.idpersonacolegiado",
-				"p.apellidos1 || ' ' || p.apellidos2 || ', ' || p.nombre letrado",
-				"CASE" +
-				" WHEN UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) is null" +
-				"    THEN 'VACÍO'" +
-				" ELSE" +
-				"    UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) " +
-				"END actuacionesvalidadas",
-				"a.IDTIPOASISTENCIACOLEGIO",
-				"a.fechacierre",
-				"a.fechasolicitud",
-				"g.REQUERIDAVALIDACION");
+		SQL.SELECT("a.anio");
+		SQL.SELECT("a.numero");
+		SQL.SELECT("TO_CHAR(a.fechahora,'DD/MM/YYYY HH24:MI') fechahora");
+		SQL.SELECT("a.idguardia");
+		SQL.SELECT("(SELECT g.nombre FROM scs_guardiasturno g WHERE a.idguardia = g.idguardia AND a.idinstitucion = g.idinstitucion AND a.idturno = g.idturno) nombreguardia");
+		SQL.SELECT("a.idturno");
+		SQL.SELECT("(SELECT t.nombre FROM scs_turno t WHERE a.idturno = t.idturno AND a.idinstitucion = t.idinstitucion ) nombreturno");
+		SQL.SELECT("a.idpersonajg");
+		SQL.SELECT("(SELECT pjg.apellido1 || ' ' || pjg.apellido2 || ', ' || pjg.nombre FROM scs_personajg pjg WHERE pjg.idinstitucion = a.idinstitucion AND pjg.idpersona = a.idpersonajg) asistido");
+		SQL.SELECT("a.idestadoasistencia");
+		SQL.SELECT("(SELECT f_siga_getrecurso(ea.descripcion, "+idLenguaje+") FROM scs_estadoasistencia ea WHERE a.idestadoasistencia = ea.idestadoasistencia) estadoasistencia");
+		SQL.SELECT("a.idpersonacolegiado");
+		SQL.SELECT("p.apellidos1 || ' ' || p.apellidos2 || ', ' || p.nombre letrado");
+		SQL.SELECT("CASE" +
+			" WHEN (" +
+            	" SELECT COUNT(*) cantidad FROM scs_actuacionasistencia act" +
+            	" WHERE act.idinstitucion = a.idinstitucion AND act.anio = a.anio AND act.numero = a.numero" +
+            " ) = 0 THEN" +
+            	" 'VACÍO'" +
+            " WHEN (" +
+            	" SELECT COUNT(*) cantidad FROM scs_actuacionasistencia act" +
+            	" WHERE act.idinstitucion = a.idinstitucion AND act.anio = a.anio AND act.numero = a.numero AND act.validada = 0" +
+            " ) > 0 THEN" +
+            	" 'NO'" +
+            " ELSE" +
+            	" 'SI'" +
+			" END actuacionesvalidadas");
+		SQL.SELECT("a.IDTIPOASISTENCIACOLEGIO");
+		SQL.SELECT("a.fechacierre");
+		SQL.SELECT("a.fechasolicitud");
+		SQL.SELECT("(SELECT g.requeridavalidacion FROM scs_guardiasturno g WHERE a.idguardia = g.idguardia AND a.idinstitucion = g.idinstitucion AND a.idturno = g.idturno) requeridavalidacion");
 		SQL.FROM("scs_asistencia a");
 
-		SQL.INNER_JOIN("scs_guardiasturno g on a.idguardia = g.idguardia and a.idinstitucion = g.idinstitucion and a.idturno = g.idturno",
-				"scs_turno t on a.idturno = t.idturno and a.idinstitucion = t.idinstitucion",
-				"scs_estadoasistencia ea on a.idestadoasistencia = ea.idestadoasistencia",
+		SQL.INNER_JOIN(
+				//"scs_guardiasturno g on a.idguardia = g.idguardia and a.idinstitucion = g.idinstitucion and a.idturno = g.idturno",
+				//"scs_turno t on a.idturno = t.idturno and a.idinstitucion = t.idinstitucion",
+				//"scs_estadoasistencia ea on a.idestadoasistencia = ea.idestadoasistencia",
 				"cen_persona p on p.idpersona = a.idpersonacolegiado");
 		SQL.WHERE("a.idinstitucion = "+idInstitucion);
 		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getAnio())){
@@ -751,12 +770,19 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdEstadoAsistencia())){
 			SQL.WHERE("a.idestadoasistencia IN ("+filtroAsistenciaItem.getIdEstadoAsistencia()+")");
 		}
-		if("N".equals(filtroAsistenciaItem.getIdActuacionValidada())){
-			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'NO'");
-		}else if("S".equals(filtroAsistenciaItem.getIdActuacionValidada())){
-			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'SI'");
-		}else if("SA".equals(filtroAsistenciaItem.getIdActuacionValidada())){
-			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) is null");
+//		if("N".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+//			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'NO'");
+//		}else if("S".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+//			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'SI'");
+//		}else if("SA".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+//			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) is null");
+//		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdActuacionValidada()) && filtroAsistenciaItem.getIdActuacionValidada() != null && !filtroAsistenciaItem.getIdActuacionValidada().isEmpty()){ //Es un campo de scs_actuacionasistencia
+			if (filtroAsistenciaItem.getIdActuacionValidada().contains("SA")) {
+				SQL.WHERE("(UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) IN ("+ filtroAsistenciaItem.getIdActuacionValidada() +") OR F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero) IS NULL)");
+			}else {
+				SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) IN ("+ filtroAsistenciaItem.getIdActuacionValidada() +")");
+			}
 		}
 		if(UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdEstadoAsistido())){
 			SQL.LEFT_OUTER_JOIN("scs_personajg pjg on pjg.idinstitucion = a.idinstitucion and pjg.idpersona = a.idpersonajg");
@@ -888,12 +914,12 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdJuzgado())){ //Es un campo de scs_actuacionasistencia
 				SQL.WHERE("aa.idjuzgado IN ("+filtroAsistenciaItem.getIdJuzgado()+")");
 			}
-			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdTipoActuacion())){ //Es un campo de scs_actuacionasistencia
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdTipoActuacion()) && filtroAsistenciaItem.getIdTipoActuacion() != null && !filtroAsistenciaItem.getIdTipoActuacion().isEmpty()){ //Es un campo de scs_actuacionasistencia
 				SQL.WHERE("aa.IDTIPOACTUACION IN ("+filtroAsistenciaItem.getIdTipoActuacion()+")");
 			}
 
 		}
-		SQL.ORDER_BY("a.anio","a.numero");
+		SQL.ORDER_BY("a.anio DESC","a.numero DESC");
 		SQL_PADRE.SELECT(" *");
 		SQL_PADRE.FROM("( " + SQL.toString() + " )");
 		if(tamMax != null && tamMax > 0) {

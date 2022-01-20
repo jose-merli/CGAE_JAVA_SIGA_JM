@@ -59,7 +59,7 @@ public interface ScsIncompatibilidadguardiasExtendsMapper extends ScsIncompatibi
 		@Result(column = "DIASSEPARACIONGUARDIAS", property = "diasSeparacionGuardias", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<IncompatibilidadesItem> getListadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion,  String idGuardia, Integer tamMaximo);
+	List<IncompatibilidadesItem> getListadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion, Integer tamMaximo);
 	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "deleteIncompatibilidades")
 	void deleteIncompatibilidades(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible);
@@ -110,7 +110,7 @@ public interface ScsIncompatibilidadguardiasExtendsMapper extends ScsIncompatibi
 	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getIdTurnoIncByIdGuardiaInc")
 
-	String getIdTurnoIncByIdGuardiaInc(String idGuardiaInc);
+	List<String> getIdTurnoIncByIdGuardiaInc(String idGuardiaInc);
 	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getListaValueGuardiasInc")
 	List<String> getListaValueGuardiasInc(String idInstitucion, String idTipoGuardia, String idTurno, Integer usu, String idPartidaPresupuestaria);

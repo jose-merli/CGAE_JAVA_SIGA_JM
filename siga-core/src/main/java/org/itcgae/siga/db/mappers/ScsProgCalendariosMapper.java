@@ -182,4 +182,5 @@ public interface ScsProgCalendariosMapper {
         "where IDPROGCALENDARIO = #{idprogcalendario,jdbcType=DECIMAL}"
     })
     int updateByPrimaryKey(ScsProgCalendarios record);
+    
 }

@@ -7,6 +7,7 @@ public class GuardiaCalendarioItem {
 	private String generado;
 	private String idGuardia;
 	private String idTurno;
+	private String idCalendarioGuardia;
 	
 	public String getOrden() {
 		return orden;
@@ -43,6 +44,12 @@ public class GuardiaCalendarioItem {
 	}
 	public void setIdTurno(String idTurno) {
 		this.idTurno = idTurno;
+	}
+	public String getIdCalendarioGuardia() {
+		return idCalendarioGuardia;
+	}
+	public void setIdCalendarioGuardia(String idCalendarioGuardia) {
+		this.idCalendarioGuardia = idCalendarioGuardia;
 	}
 
 

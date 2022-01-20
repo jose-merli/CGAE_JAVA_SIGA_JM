@@ -141,8 +141,8 @@ public class BusquedaInscripcionItem {
 	public Date getFechasolicitud() {
 		return fechasolicitud;
 	}
-	public void setFechasolicitud(Date fechasolicitud) {
-		this.fechasolicitud = fechasolicitud;
+	public void setFechasolicitud(Date fechaSolicitud2) {
+		this.fechasolicitud = fechaSolicitud2;
 	}
 	public String getObservacionessolicitud() {
 		return observacionessolicitud;

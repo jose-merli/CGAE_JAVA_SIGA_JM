@@ -17,6 +17,7 @@ import org.itcgae.siga.DTOs.scs.InscripcionesDisponiblesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesResponseDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.scs.services.guardia.InscripcionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -62,8 +63,13 @@ public class InscripcionController {
 
 	@PostMapping(value = "/cambiarFechaInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> cambiarFechaInscripcion(@RequestBody List<BusquedaInscripcionMod> cambiarfechabody, HttpServletRequest request){
-		UpdateResponseDTO response= inscripcionService.cambiarFechaInscripcion(cambiarfechabody, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		UpdateResponseDTO response= null;
+		try {
+			response= inscripcionService.cambiarFechaInscripcion(cambiarfechabody, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	

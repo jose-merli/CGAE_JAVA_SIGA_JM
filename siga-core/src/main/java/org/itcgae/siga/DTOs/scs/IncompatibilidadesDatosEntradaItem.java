@@ -91,6 +91,29 @@ public class IncompatibilidadesDatosEntradaItem {
 		this.idTipoGuardia = idTipoGuardia;
 	}
 
+	public IncompatibilidadesDatosEntradaItem(String idTurno, String nombreGuardia, String idArea, String idMateria,
+			String idZona, String idSubZona, String idJurisdiccion, String idGrupoFacturacion,
+			String idPartidaPresupuestaria, String idTipoTurno, String idTipoGuardia, String idGuardia) {
+		super();
+		this.idTurno = idTurno;
+		this.nombreGuardia = nombreGuardia;
+		this.idArea = idArea;
+		this.idMateria = idMateria;
+		this.idZona = idZona;
+		this.idSubZona = idSubZona;
+		this.idJurisdiccion = idJurisdiccion;
+		this.idGrupoFacturacion = idGrupoFacturacion;
+		this.idPartidaPresupuestaria = idPartidaPresupuestaria;
+		this.idTipoTurno = idTipoTurno;
+		this.idTipoGuardia = idTipoGuardia;
+		this.idGuardia = idGuardia;
+	}
+
+	public IncompatibilidadesDatosEntradaItem() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	
 	
 	

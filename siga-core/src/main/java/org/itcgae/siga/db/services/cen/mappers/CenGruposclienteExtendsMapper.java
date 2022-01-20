@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.mappers.CenGruposclienteMapper;
@@ -62,4 +63,12 @@ public interface CenGruposclienteExtendsMapper extends CenGruposclienteMapper{
 	
 	@SelectProvider(type = CenGruposclienteSqlExtendsProvider.class, method = "getMaxIdGrupo")
     Short getMaxIdGrupo();
+	
+	
+	@SelectProvider(type = CenGruposclienteSqlExtendsProvider.class, method = "comboEtiquetas")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> comboEtiquetas(String idioma, Short idInstitucion);
 }
