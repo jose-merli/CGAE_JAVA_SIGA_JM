@@ -6,6 +6,9 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
+import org.itcgae.siga.DTOs.exea.DocumentacionIncorporacionDTO;
+import org.itcgae.siga.DTOs.exea.DocumentacionIncorporacionItem;
+import org.itcgae.siga.DTOs.exea.ExpedienteDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.ISolicitudIncorporacionService;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
@@ -14,11 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -123,6 +122,21 @@ public class SolicitudIncorporacionController {
 	ResponseEntity<ComboDTO> getComboModalidadDocumentacion(HttpServletRequest request) {
 		ComboDTO response = _solicitudIncorporacionService.getModalidadDocumentacion(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/documentosIncorporacion")
+	public ResponseEntity<DocumentacionIncorporacionDTO> getDocRequerida(HttpServletRequest request,
+																		 @RequestParam String tipoColegiacion,
+																		 @RequestParam String tipoSolicitud,
+																		 @RequestParam String modalidadDocumentacion,
+																		 @RequestParam (required = false) String idSolicitud) {
+		DocumentacionIncorporacionDTO response = null;
+		try {
+			response = _solicitudIncorporacionService.getDocRequerida(request, tipoColegiacion, tipoSolicitud, modalidadDocumentacion, idSolicitud);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<DocumentacionIncorporacionDTO>(response, HttpStatus.OK);
 	}
 	
 }

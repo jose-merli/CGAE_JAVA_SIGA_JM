@@ -514,7 +514,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 	public String getColegiadoByIdPersona(String idPersona, Short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("COLEGIADO.NCOLEGIADO");
+		sql.SELECT("CASE WHEN COLEGIADO.NCOLEGIADO IS NOT NULL THEN COLEGIADO.NCOLEGIADO ELSE COLEGIADO.NCOMUNITARIO END AS NCOLEGIADO");
 		sql.SELECT("PERSONA.APELLIDOS1");
 		sql.SELECT("PERSONA.APELLIDOS2");
 		sql.SELECT("PERSONA.NOMBRE");

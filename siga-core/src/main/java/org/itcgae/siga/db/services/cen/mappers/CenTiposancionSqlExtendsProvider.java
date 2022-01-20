@@ -58,6 +58,7 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		sql.SELECT("decode(sancion.CHKARCHIVADA,0,'No', 'Sí') as ARCHIVADA");
 		sql.SELECT("sancion.texto as TEXTO");
 		sql.SELECT("sancion.observaciones as OBSERVACIONES");
+		sql.SELECT("sancion.NUM_EXPEDIENTE");
 
 		sql.FROM("CEN_SANCION sancion");
 

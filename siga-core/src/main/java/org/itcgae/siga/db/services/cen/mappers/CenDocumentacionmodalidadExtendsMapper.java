@@ -18,5 +18,5 @@ public interface CenDocumentacionmodalidadExtendsMapper {
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectModalidadDocumentacion(AdmUsuarios usuario);
+	List<ComboItem> selectModalidadDocumentacion(AdmUsuarios usuario, String isEXEA);
 }
