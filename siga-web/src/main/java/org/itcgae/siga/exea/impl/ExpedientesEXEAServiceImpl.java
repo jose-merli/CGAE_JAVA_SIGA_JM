@@ -24,6 +24,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.mappers.CenComunidadesautonomasMapper;
 import org.itcgae.siga.db.mappers.CenDocumentacionpresentadaMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -137,6 +138,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     @Autowired
     private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
+
+    @Autowired
+    private CenComunidadesautonomasMapper cenComunidadesautonomasMapper;
 
     @Override
     public StringDTO isEXEActivoInstitucion(HttpServletRequest request) {
@@ -1549,6 +1553,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     private RegistroEntradaDocument fillRegistroEntradaDocument (CenSolicitudincorporacion cenSolicitudincorporacion, Short idInstitucion, String asunto) throws IOException, NoSuchAlgorithmException, TransformerException, ParserConfigurationException {
         RegistroEntradaDocument registroEntradaDocument = null;
+        LOGGER.info("fillRegistroEntradaDocument() / INICIO");
 
         //Obtenemos el codigo del procedimiento de colegiacion de exea para la institucion
         ExpProcedimientosExeaExample expProcedimientosExeaExample = new ExpProcedimientosExeaExample();
@@ -1606,6 +1611,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             RegistroEntradaDocument.RegistroEntrada.Adjuntos adjuntos = registroEntrada.addNewAdjuntos();
             CenDocumentacionpresentadaExample cenDocumentacionpresentadaExample = new CenDocumentacionpresentadaExample();
             cenDocumentacionpresentadaExample.createCriteria().andIdsolicitudEqualTo(cenSolicitudincorporacion.getIdsolicitud());
+            LOGGER.info("fillRegistroEntradaDocument() / Datos especificos: " + registroEntrada.getDatosEspecificos());
 
             List<CenDocumentacionpresentada> documentosSolicitud = cenDocumentacionpresentadaMapper.selectByExample(cenDocumentacionpresentadaExample);
 
@@ -1648,6 +1654,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
         }
 
+        LOGGER.info("fillRegistroEntradaDocument() / FIN");
         return registroEntradaDocument;
     }
 
@@ -1778,9 +1785,10 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         emailElement.appendChild(doc.createTextNode(solicitudincorporacion.getCorreoelectronico()));
         detallesElement.appendChild(emailElement);
 
-        Element coberturaElement = doc.createElement("coberturaSocial");
+        //Ya no se pasa
+        /*Element coberturaElement = doc.createElement("coberturaSocial");
         coberturaElement.appendChild(doc.createTextNode("RT"));
-        detallesElement.appendChild(coberturaElement);
+        detallesElement.appendChild(coberturaElement);*/
 
         if(solicitudincorporacion.getIdestadocivil() != null){
             String cdgoEstadoCivil = cenEstadocivilExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdestadocivil()).getCodigoejis().substring(0,1);
@@ -1790,11 +1798,11 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         }
 
         Element autorizaCesionElement = doc.createElement("autorizaCesion");
-        autorizaCesionElement.appendChild(doc.createTextNode("MA"));
+        autorizaCesionElement.appendChild(doc.createTextNode(SigaConstants.NO));
         detallesElement.appendChild(autorizaCesionElement);
 
         Element cniElement = doc.createElement("solicitarCNI");
-        cniElement.appendChild(doc.createTextNode(SigaConstants.SI));
+        cniElement.appendChild(doc.createTextNode(SigaConstants.NO));
         detallesElement.appendChild(cniElement);
 
         Element reincorpElement = doc.createElement("reincorporacion");
@@ -1854,11 +1862,13 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         codPaisElement.appendChild(doc.createTextNode(cdgoExtPais));
         postalElement.appendChild(codPaisElement);
 
+        CenProvincias cenProvincias = cenProvinciasExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdprovincia());
+        String codExtComAut = cenComunidadesautonomasMapper.selectByPrimaryKey(cenProvincias.getIdcomunidadautonoma()).getCodigoext();
         Element codComunidadElement = doc.createElement("codComunidad");
-        codComunidadElement.appendChild(doc.createTextNode("13")); //FIXME - Preguntar como debe ir informado, no usamos comunidad aut en siga
+        codComunidadElement.appendChild(doc.createTextNode(codExtComAut));
         postalElement.appendChild(codComunidadElement);
 
-        String codExtProvincia = cenProvinciasExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdprovincia()).getCodigoext();
+        String codExtProvincia = cenProvincias.getCodigoext();
         Element codProvinciaElement = doc.createElement("codProvincia");
         codProvinciaElement.appendChild(doc.createTextNode(codExtProvincia));
         postalElement.appendChild(codProvinciaElement);
@@ -1874,21 +1884,21 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         codPostalElement.appendChild(doc.createTextNode(solicitudincorporacion.getCodigopostal()));
         postalElement.appendChild(codPostalElement);
 
-        Element tipoViaElement = doc.createElement("tipoVia");
+        /*Element tipoViaElement = doc.createElement("tipoVia");
         tipoViaElement.appendChild(doc.createTextNode("CL"));
-        postalElement.appendChild(tipoViaElement);
+        postalElement.appendChild(tipoViaElement);*/
 
         Element nombreViaElement = doc.createElement("nombreVia");
         nombreViaElement.appendChild(doc.createTextNode(solicitudincorporacion.getDomicilio())); //FIXME
         postalElement.appendChild(nombreViaElement);
 
-        Element numeroViaElement = doc.createElement("numeroVia");
+        /*Element numeroViaElement = doc.createElement("numeroVia");
         numeroViaElement.appendChild(doc.createTextNode("1")); //FIXME
         postalElement.appendChild(numeroViaElement);
 
         Element restoDirElement = doc.createElement("restoDir");
         restoDirElement.appendChild(doc.createTextNode("1 A")); //FIXME
-        postalElement.appendChild(restoDirElement);
+        postalElement.appendChild(restoDirElement);*/
         //NODO DIRECCION POSTAL - FIN
 
         if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getTelefono1())
