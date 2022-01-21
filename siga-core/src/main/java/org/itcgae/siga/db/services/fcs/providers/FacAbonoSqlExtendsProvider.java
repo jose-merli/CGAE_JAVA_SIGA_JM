@@ -95,6 +95,9 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
             sql.WHERE("A.IDABONO IN (" + transferencia.toString() + ")");
         }
         
+        if(facAbonoItem.getNombreSociedad() != null) sql.WHERE("UPPER(P.NOMBRE) LIKE UPPER('%"+facAbonoItem.getNombreSociedad() + "%')");
+        
+        if(facAbonoItem.getIdInstitucion() != null ) sql.WHERE("COL.IDINSTITUCION = " + facAbonoItem.getIdInstitucion());
         
 		sql.WHERE("A.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("A.IDPAGOSJG IS NOT NULL");
