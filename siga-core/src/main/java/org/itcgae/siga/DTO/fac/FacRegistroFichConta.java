@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
+import java.util.Objects;
 
 import lombok.Data;
 
@@ -22,9 +23,14 @@ public class FacRegistroFichConta {
 	private int estado;
 	private String nombreEstado;
 	private boolean nuevo;
+	private Date fechaBaja;
 	
-	
-	
+	public Date getFechabaja() {
+		return fechaBaja;
+	}
+	public void setFechabaja(Date fechabaja) {
+		this.fechaBaja = fechabaja;
+	}
 	public String getNombreEstado() {
 		return nombreEstado;
 	}
@@ -122,6 +128,55 @@ public class FacRegistroFichConta {
 		this.nuevo = nuevo;
 	}
 
-	
+	@Override
+	public int hashCode() {
+		return Objects.hash(estado, fechaCreacion, fechaCreacionDesde, fechaCreacionHasta, fechaExportacionDesde,
+				fechaExportacionHasta, fechaModificacion, fechaBaja, idContabilidad, idContabilidadDesde,
+				idContabilidadHasta, nombreEstado, nombreFichero, nuevo, numAsientos, numAsientosDesde,
+				numAsientosHasta);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FacRegistroFichConta other = (FacRegistroFichConta) obj;
+		return estado == other.estado && Objects.equals(fechaCreacion, other.fechaCreacion)
+				&& Objects.equals(fechaCreacionDesde, other.fechaCreacionDesde)
+				&& Objects.equals(fechaCreacionHasta, other.fechaCreacionHasta)
+				&& Objects.equals(fechaExportacionDesde, other.fechaExportacionDesde)
+				&& Objects.equals(fechaExportacionHasta, other.fechaExportacionHasta)
+				&& Objects.equals(fechaModificacion, other.fechaModificacion)
+				&& Objects.equals(fechaBaja, other.fechaBaja) && idContabilidad == other.idContabilidad
+				&& idContabilidadDesde == other.idContabilidadDesde && idContabilidadHasta == other.idContabilidadHasta
+				&& Objects.equals(nombreEstado, other.nombreEstado)
+				&& Objects.equals(nombreFichero, other.nombreFichero) && nuevo == other.nuevo
+				&& numAsientos == other.numAsientos && numAsientosDesde == other.numAsientosDesde
+				&& numAsientosHasta == other.numAsientosHasta;
+	}
+	@Override
+	public String toString() {
+		return "FacRegistroFichConta [idContabilidad=" + idContabilidad + ", idContabilidadDesde=" + idContabilidadDesde
+				+ ", idContabilidadHasta=" + idContabilidadHasta + ", fechaCreacion=" + fechaCreacion
+				+ ", fechaCreacionDesde=" + fechaCreacionDesde + ", fechaCreacionHasta=" + fechaCreacionHasta
+				+ ", fechaExportacionDesde=" + fechaExportacionDesde + ", fechaExportacionHasta="
+				+ fechaExportacionHasta + ", numAsientos=" + numAsientos + ", numAsientosDesde=" + numAsientosDesde
+				+ ", numAsientosHasta=" + numAsientosHasta + ", fechaModificacion=" + fechaModificacion
+				+ ", nombreFichero=" + nombreFichero + ", estado=" + estado + ", nombreEstado=" + nombreEstado
+				+ ", nuevo=" + nuevo + ", fechabaja=" + fechaBaja + ", getFechabaja()=" + getFechabaja()
+				+ ", getNombreEstado()=" + getNombreEstado() + ", getIdContabilidad()=" + getIdContabilidad()
+				+ ", getIdContabilidadDesde()=" + getIdContabilidadDesde() + ", getIdContabilidadHasta()="
+				+ getIdContabilidadHasta() + ", getFechaCreacion()=" + getFechaCreacion() + ", getFechaCreacionDesde()="
+				+ getFechaCreacionDesde() + ", getFechaCreacionHasta()=" + getFechaCreacionHasta()
+				+ ", getFechaExportacionDesde()=" + getFechaExportacionDesde() + ", getFechaExportacionHasta()="
+				+ getFechaExportacionHasta() + ", getNumAsientos()=" + getNumAsientos() + ", getNumAsientosDesde()="
+				+ getNumAsientosDesde() + ", getNumAsientosHasta()=" + getNumAsientosHasta()
+				+ ", getFechaModificacion()=" + getFechaModificacion() + ", getNombreFichero()=" + getNombreFichero()
+				+ ", getEstado()=" + getEstado() + ", isNuevo()=" + isNuevo() + ", hashCode()=" + hashCode()
+				+ ", getClass()=" + getClass() + ", toString()=" + super.toString() + "]";
+	}
 	
 }
