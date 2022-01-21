@@ -73,7 +73,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //estados
-        if (item.getEstadosFiltroFac() != null) {
+        if (!item.getEstadosFiltroFac().isEmpty()) {
             StringBuilder aux = new StringBuilder();
             for (String s : item.getEstadosFiltroFac()) {
                 aux.append(s).append(",");

@@ -64,7 +64,7 @@ public class FacAbonoItem {
     private String nombreGeneral;
     private String apellidosGeneral;
     private String grupoPago;
-    
+    private String idInstitucion;
     
     
 	public String getNombreGeneral() {
@@ -363,6 +363,12 @@ public class FacAbonoItem {
 	}
 	public void setColegiadoNombre(String colegiadoNombre) {
 		this.colegiadoNombre = colegiadoNombre;
+	}
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 	
 	

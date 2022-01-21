@@ -213,7 +213,7 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 		query.SELECT("ff.*");
 
 		query.FROM("FAC_HISTORICOFACTURA fh");
-		query.INNER_JOIN("INNER JOIN FAC_FACTURA ff ON(ff.IDFACTURA = fh.IDFACTURA AND ff.IDINSTITUCION = fh.IDINSTITUCION)");
+		query.INNER_JOIN("FAC_FACTURA ff ON(ff.IDFACTURA = fh.IDFACTURA AND ff.IDINSTITUCION = fh.IDINSTITUCION)");
 
 		query.WHERE("fh.IDDISQUETECARGOS = " + idDisquetecargos);
 		query.WHERE("fh.IDINSTITUCION = " + idInstitucion);

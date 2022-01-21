@@ -179,4 +179,20 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 
 	}
 
+	public String getBancosSufijos(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		// Consulta de los select
+		sql.SELECT_DISTINCT("sf.bancos_codigo, sfb.idsufijo");
+
+		sql.FROM("fac_seriefacturacion sf");
+		sql.INNER_JOIN("fac_seriefacturacion_banco sfb ON (sf.idinstitucion = sfb.idinstitucion " +
+				"AND sf.idseriefacturacion = sfb.idseriefacturacion)");
+		sql.WHERE("sf.idinstitucion = " + idInstitucion);
+		sql.WHERE("sf.fechabaja is null");
+
+		return sql.toString();
+
+	}
+
 }
