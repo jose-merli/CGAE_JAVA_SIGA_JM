@@ -164,6 +164,7 @@ import org.itcgae.siga.db.entities.FacTiposproduincluenfactuKey;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfact;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactExample;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
+import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
@@ -188,6 +189,8 @@ import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
+import org.itcgae.siga.db.mappers.GenDiasletraMapper;
+import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -372,6 +375,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacPropositosExtendsMapper facPropositosExtendsMapper;
+
+	@Autowired
+	private GenDiccionarioMapper genDiccionarioMapper;
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -3914,9 +3920,28 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			//Devolver las factruas no pagadas
 			if(facturasNoPagadas.size() > 0){
-				for (FacFactura facturasDevueltas : facturasNoPagadas){
+				GenDiccionarioKey diccionarioKey = new GenDiccionarioKey();
+				diccionarioKey.setIdrecurso("general.message.error.realiza.accion");
+				diccionarioKey.setIdlenguaje(usuario.getIdlenguaje());
 
+				StringBuilder errorMessage = new StringBuilder();
+				errorMessage.append(genDiccionarioMapper.selectByPrimaryKey(diccionarioKey).getDescripcion() + ": ");
+				int cont = 0;
+				for (FacFactura facturasDevueltas : facturasNoPagadas){
+					errorMessage.append(facturasDevueltas.getNumerofactura());
+					cont++;
+					if(cont == 10){
+						errorMessage.append(" ...");
+						break;
+					}
+					else {
+						errorMessage.append(", ");
+					}
 				}
+				if(cont != 10){
+					errorMessage.deleteCharAt(errorMessage.length()-2);
+				}
+				throw new Exception(errorMessage.toString());
 			}
 
 			else {
