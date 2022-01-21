@@ -6,6 +6,7 @@
  */
 package org.itcgae.siga.commons.utils;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,6 +33,12 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 
+
+
+
+
+
+
 /**
  * @author daniel.campos
  *
@@ -41,7 +48,11 @@ import org.itcgae.siga.commons.constants.SigaConstants;
  */
 public class UtilidadesString {
 
+
+
+
 	private static Logger LOGGER = Logger.getLogger(UtilidadesString.class);
+
 
 	static public String getMensajeIdioma(String idioma, String key) {
 
@@ -112,6 +123,7 @@ public class UtilidadesString {
 
 	}
 
+
 	/**
 	 * Funcion que elimina acentos y caracteres especiales de una cadena de texto.
 	 * 
@@ -144,6 +156,7 @@ public class UtilidadesString {
 		}
 	}
 
+
 	public static String filtroTextoBusquedas(String columna, String cadena) {
 		StringBuilder cadenaWhere = new StringBuilder();
 		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN') ");
@@ -168,6 +181,7 @@ public class UtilidadesString {
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
 		return format.parse(string);
+
 
 	}
 
@@ -235,11 +249,14 @@ public class UtilidadesString {
 			return null;
 	}
 
+
 	// Los siguientes son los tipos que no pueden repetirse dentro de un cliente
 	public static final Integer[] tiposDireccionUnicos = {
 			SigaConstants.TIPO_DIRECCION_CENSOWEB, SigaConstants.TIPO_DIRECCION_GUARDIA,
 			SigaConstants.TIPO_DIRECCION_FACTURACION, SigaConstants.TIPO_DIRECCION_TRASPASO_OJ
 	};
+
+
 
 	public static String traduceNota(Double nota) {
 		String notaString = "";
@@ -364,12 +381,19 @@ public class UtilidadesString {
 			return content;
 		} catch (IOException e) {
 			try {
+
+
+
+
+
 				is.close();
 
 			} catch (Exception eee) {}
 
 			throw new Exception("Error en la lectura del fichero", e);
 		}
+
+
 	}
 
 	public static void setFileContent(File ficheroFOP, String sPlantillaFO) throws Exception {
@@ -468,6 +492,58 @@ public class UtilidadesString {
 			retorno = texto.substring(inicio + marcaInicial.length(), fin);
 		}
 		return retorno;
+	}
+	
+	/**
+	 * Metodo de utilidad para rellenar una cadena size veces con el caracter filler
+	 *
+	 * @param text
+	 * @param size
+	 * @param filler
+	 * @return
+	 */
+	public static String fillCadena(String text, int size, String filler){
+		String cadena = "";
+
+		if (!esCadenaVacia(text) && !esCadenaVacia(filler)) {
+			if (text != "") {
+				int lengthCad = size - text.length();
+
+				if (lengthCad == 0 || lengthCad < 0) {
+					return text;
+				} else if (lengthCad >= 1) {
+					for (int i = 0; i < lengthCad; i++) {
+						cadena += filler;
+					}
+
+					return cadena + text;
+				}
+			} else {
+				return text;
+			}
+		}
+
+		return text;
+	}
+	
+	
+	public static String getCampoMultidioma (String campo, String idioma){
+		if (esCadenaVacia(campo)) return "";
+		if (esCadenaVacia(idioma)) idioma = "1";
+
+		String alias = campo;
+		int i = campo.indexOf(".");
+		if (i >= 0) {
+			alias = campo.substring(i+1);
+		}
+		return " F_SIGA_GETRECURSO (" + campo + "," + idioma + ") " + alias + " ";
+	}
+
+	public static String getCampoMultidiomaSimple (String campo, String idioma){
+		if (esCadenaVacia(campo)) return "";
+		if (esCadenaVacia(idioma)) idioma = "1";
+
+		return " F_SIGA_GETRECURSO (" + campo + "," + idioma + ")  ";
 	}
 
 	/**

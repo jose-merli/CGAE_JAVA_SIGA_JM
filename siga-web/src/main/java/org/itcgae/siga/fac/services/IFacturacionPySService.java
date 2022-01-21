@@ -135,7 +135,7 @@ public interface IFacturacionPySService {
 	public FicherosAbonosDTO getFicherosTransferencias(FicherosAbonosItem item, HttpServletRequest request)
 			throws Exception;
 
-    public InsertResponseDTO nuevoFicheroTransferencias(List<FacAbonoItem> abonoItems, HttpServletRequest request) throws Exception;
+    public InsertResponseDTO nuevoFicheroTransferencias(List<FacturaItem> abonoItems, HttpServletRequest request) throws Exception;
 
 	public DeleteResponseDTO eliminarFicheroTransferencias(FicherosAbonosItem ficherosAbonosItem, HttpServletRequest request)
 			throws Exception;

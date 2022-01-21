@@ -40,7 +40,17 @@ public class BusquedaSancionesItem implements Comparable<BusquedaSancionesItem>{
 	private Date fechaNacimientoDate;
 	
 	private boolean restablecer;
-	
+	private String numExpediente;
+
+	@JsonProperty("numExpediente")
+	public String getNumExpediente() {
+		return numExpediente;
+	}
+
+	public void setNumExpediente(String numExpediente) {
+		this.numExpediente = numExpediente;
+	}
+
 	@JsonProperty("colegio")
 	public String getColegio() {
 		return colegio;

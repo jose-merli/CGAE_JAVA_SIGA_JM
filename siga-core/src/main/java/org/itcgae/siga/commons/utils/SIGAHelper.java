@@ -1,6 +1,10 @@
 package org.itcgae.siga.commons.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
@@ -42,7 +46,7 @@ public class SIGAHelper {
 			
 		}
 	}
-	
+
 	public static String quitarEtiquetas(String sentencia) {	
 		if (sentencia != null) {
 			sentencia = sentencia.toUpperCase();
@@ -78,4 +82,18 @@ public class SIGAHelper {
 		
 		return sentencia;
 	}
+
+	public static void mkdirs(String filePath) {
+
+		if (filePath == null || filePath.trim().equalsIgnoreCase("")) {
+			return;
+		}
+
+		File fileDir = new File(filePath.toString());
+		if (fileDir != null && !fileDir.exists()) {
+			fileDir.mkdirs();
+			addPerm777(fileDir);
+		}
+	}
+
 }

@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- editado con XMLSpy v2013 rel. 2 sp1 (http://www.altova.com) por Luis de la Fuente (REDABOGACIA) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:redabogacia.sincronizacion.exea.com" targetNamespace="urn:redabogacia.sincronizacion.exea.com" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:element name="obtenerNumColegiacionRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="colegio" type="colegioType"/>
+        <xs:element name="tipoSolicitud" type="tipoColegiacionType"/>
+        <xs:element name="situacionPrevia" type="situacionPreviaType"/>
+        <xs:element name="numeroExpediente" type="xs:string"/>
+        <xs:element name="identificacion" type="identificacionType" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="versionEsquema" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="obtenerNumColegiacionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string"/>
+        <xs:choice>
+          <xs:sequence>
+            <xs:element name="colegio" type="colegioType"/>
+            <xs:element name="tipoColegiacion" type="tipoColegiacionType"/>
+            <xs:element name="numColegiacion" type="xs:string" minOccurs="1"/>
+          </xs:sequence>
+          <xs:element name="error" type="ErrorType" maxOccurs="1"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="versionEsquema" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Indica la versión del xsd con la que se trabaja</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="codigo" type="xs:string"/>
+  <xs:element name="descripcion" type="xs:string"/>
+  <xs:complexType name="ErrorType">
+    <xs:sequence>
+      <xs:element ref="codigo"/>
+      <xs:element ref="descripcion"/>
+      <xs:element name="xmlRequest" minOccurs="0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="updateEstadoExpedienteRequest">
+    <xs:annotation>
+      <xs:documentation>Actualización del estado de un expediente, iniciado desde SIGA en EXEA</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string"/>
+        <xs:element ref="versionEsquema" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="numeroRegistro" type="xs:string"/>
+        <xs:element name="tipoExpediente" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="etadoExpediente" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="fechaEstado" type="xs:date" minOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="updateEstadoExpedienteResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string" minOccurs="1"/>
+        <xs:element name="error" type="ErrorType" maxOccurs="1" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="altaColegiadoRequest">
+    <xs:annotation>
+      <xs:documentation>Solicitud de alta de colegiado en Censo</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string"/>
+        <xs:element ref="versionEsquema" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="numeroRegistro" type="xs:string"/>
+        <xs:element name="colegiado" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="datosPersonales" type="datosPersonalesType"/>
+              <xs:element name="localizacion" type="localizacionType" minOccurs="1"/>
+              <xs:element name="colegiacion" type="colegiacionType" minOccurs="1" maxOccurs="1"/>
+              <xs:element name="datosBancarios" type="bancoType" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="altaSancionRequest">
+    <xs:annotation>
+      <xs:documentation>Solicitud de alta de colegiado en Censo</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string"/>
+        <xs:element ref="versionEsquema" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="sancion" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="identificacionColegiado" type="identificacionType"/>
+              <xs:element name="datosSancion" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="tipoSancion">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="codigo" type="xs:string"/>
+                          <xs:element name="descripcion"  minOccurs="0" type="xs:string"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="texto" type="xs:string" minOccurs="0"/>
+                    <xs:element name="observaciones" type="xs:string" minOccurs="0"/>
+                    <xs:element name="refSancion" type="xs:string" minOccurs="1"/>
+                    <xs:element name="fechaInicio" type="xs:date" minOccurs="1">
+                      <xs:annotation>
+                        <xs:documentation>Fecha de inicio de la sanción</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="fechaFin" type="xs:date" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>Fecha fin de la sanción</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="fechaAcuerdo" type="xs:date" minOccurs="1">
+                      <xs:annotation>
+                        <xs:documentation>Fecha del acuerdo de la sanción</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="datosFirmeza" type="fechaCheckType" minOccurs="0"/>
+                    <xs:element name="colegioConsejo" type="colegioType"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="altaSancionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string" minOccurs="1"/>
+        <xs:element name="error" type="ErrorType" maxOccurs="1" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="actualizacionSancionRequest">
+    <xs:annotation>
+      <xs:documentation>Actualizacion del estado de las sancion</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string"/>
+        <xs:element ref="versionEsquema" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="sancion" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="colegioConsejo" type="colegioType" minOccurs="1"/>
+              <xs:element name="refSancion" type="xs:string" minOccurs="1"/>
+              <xs:element name="fechaInicio" type="xs:date" minOccurs="0">
+                <xs:annotation>
+                  <xs:documentation>Fecha de inicio de la sanción</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="fechaFin" type="xs:date" minOccurs="0">
+                <xs:annotation>
+                  <xs:documentation>Fecha fin de la sanción</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="estadoSancion" type="estadoType" minOccurs="1"/>
+              <xs:element name="fechaEstado" type="xs:date" minOccurs="1"/>
+              <xs:element name="observaciones" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="estadoType">
+    <xs:annotation>
+      <xs:documentation>Impuesta, Firme, Suspendida</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUS"/>
+      <xs:enumeration value="IMP"/>
+      <xs:enumeration value="FIR"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="fechaCheckType">
+    <xs:choice>
+      <xs:element name="fecha" type="xs:date">
+        <xs:annotation>
+          <xs:documentation>Fecha </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="check" type="tipoBoolean">
+        <xs:annotation>
+          <xs:documentation>Check. Valores que puede tomar:
+1 – Sí
+0 – No</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="datosFirmeza">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="fechaFirmeza" type="xs:date">
+          <xs:annotation>
+            <xs:documentation>Fecha de firmeza de la sanción</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="firmeza" type="tipoBoolean">
+          <xs:annotation>
+            <xs:documentation>Indica si la sanción es ya firme independientemente de la fecha. Valores que puede tomar:
+1 – Sí
+0 – No</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="altaColegiadoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string" minOccurs="1"/>
+        <xs:element name="error" type="ErrorType" maxOccurs="1" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="actualizacionSancionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="numeroExpediente" type="xs:string" minOccurs="1"/>
+        <xs:element name="colegioConsejo" type="colegioType" minOccurs="1"/>
+        <xs:element name="refSancion" type="xs:string" minOccurs="1"/>
+        <xs:element name="error" type="ErrorType" maxOccurs="1" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="colegiacionType">
+    <xs:sequence>
+      <xs:element name="colegio" type="colegioType"/>
+      <xs:element name="numColegiado" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Número de Colegiado</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="6"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="fechaIncorporacion" type="xs:date" minOccurs="1"/>
+      <xs:element name="tipoSolicitud" type="tipoColegiacionType"/>
+      <xs:element name="situacionPrevia" type="situacionPreviaType"/>
+      <xs:element name="reincorporacion" type="tipoBoolean"/>
+      <xs:element name="residente" type="tipoBoolean">
+        <xs:annotation>
+          <xs:documentation>Si el despacho del colegiado se encuentra en el territorio del Colegio. Valores que puede tomar:
+1 – Sí
+0 – No</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datosPersonalesType">
+    <xs:sequence>
+      <xs:element name="nombre" type="tipoNombre">
+        <xs:annotation>
+          <xs:documentation>Nombre del profesional</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="apellido1" type="tipoApellidos">
+        <xs:annotation>
+          <xs:documentation>Primer apellido del profesional</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="apellido2" type="tipoApellidos" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Segundo apellido del profesional</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="identificacion" type="identificacionType">
+        <xs:annotation>
+          <xs:documentation>Identificación del profesional</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="sexo" type="tipoSexo" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Sexo del profesional. Tiene los siguientes valores predefinidos:
+- H para hombres
+- M para mujeres
+- N no conocido
+-- O otras opciones </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="fechaNacimiento" type="xs:date" minOccurs="0"/>
+      <xs:element name="estadoCivil" type="tipoEstadoCivil" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="identificacionType">
+    <xs:choice>
+      <xs:element name="NIF">
+        <xs:annotation>
+          <xs:documentation>NIF del profesional</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="9"/>
+            <xs:pattern value="\d{1,8}[A-Za-z]"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="NIE">
+        <xs:annotation>
+          <xs:documentation>NIE del profesional</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="9"/>
+            <xs:pattern value="[X-Zx-z]\d{1,7}[A-Za-z]"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="pasaporte">
+        <xs:annotation>
+          <xs:documentation>Pasaporte del profesional</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="20"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="localizacionType">
+    <xs:sequence>
+      <xs:element name="descTipoVia" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Descripción del tipo de vía del domicilio</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="15"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="domicilio">
+        <xs:annotation>
+          <xs:documentation>Domicilio del profesional</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="100"/>
+            <xs:minLength value="3"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:choice>
+        <xs:element name="nacional">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="codigoPostal">
+                <xs:annotation>
+                  <xs:documentation>Código postal del domicilio del profesional</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="5"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="provincia">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="codigoProvincia" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation>Código de la provincia</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="descripcionProvincia" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>Descripción de la provincia</xs:documentation>
+                      </xs:annotation>
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:maxLength value="100"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="poblacion">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="codigoPoblacion" type="xs:string" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>Código población</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="descripcionPoblacion" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>Descripción de la población</xs:documentation>
+                      </xs:annotation>
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:maxLength value="100"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="extranjero">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="codigoPostal">
+                <xs:annotation>
+                  <xs:documentation>Código postal extranjero del domicilio del profesional</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="14"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="poblacion">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="85"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="pais">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="codigoPais" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation>Codigo ISO 3166-1 numérico</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="descripcionPais" type="xs:string" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>Descripción del País</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:element ref="contacto" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="email" minOccurs="1">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="100"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="string20">
+    <xs:annotation>
+      <xs:documentation>Tipo string de longitud máxima de 20</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="20"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="contacto">
+    <xs:annotation>
+      <xs:documentation>Número de contacto</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="telefono1" minOccurs="1">
+          <xs:annotation>
+            <xs:documentation>Número de teléfono</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string20"/>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="telefono2" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Número de teléfono2</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string20"/>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="fax1" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Número de fax1</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string20"/>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="fax2" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Número de fax2</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string20"/>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="movil" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Número de movil</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string20"/>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="tipoApellidos">
+    <xs:annotation>
+      <xs:documentation>Apellidos del Colegiado</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tipoBoolean">
+    <xs:annotation>
+      <xs:documentation>Boolean: 0-false, 1-true</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1"/>
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tipoNombre">
+    <xs:annotation>
+      <xs:documentation>Nombre del Colegiado</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tipoSexo">
+    <xs:annotation>
+      <xs:documentation>Sexo de los colegiados</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1"/>
+      <xs:enumeration value="H"/>
+      <xs:enumeration value="M"/>
+      <xs:enumeration value="N"/>
+      <xs:enumeration value="O"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tipoEstadoCivil">
+    <xs:annotation>
+      <xs:documentation>Estados civiles del colegiado</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CA"/>
+      <xs:enumeration value="SO"/>
+      <xs:enumeration value="VI"/>
+      <xs:enumeration value="SE"/>
+      <xs:enumeration value="DI"/>
+      <xs:enumeration value="DE"/>
+      <xs:enumeration value="UH"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!--Elemento Apellidos del Colegio -->
+  <xs:complexType name="bancoType">
+    <xs:sequence>
+      <xs:element name="IBAN">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="34"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="BIC" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="11"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Banco" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="100"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="colegioType">
+    <xs:sequence>
+      <xs:element name="codigoColegio" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Codigo del Colegio según TC del CGPJ</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="descripcionColegio" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Nombre o descripción del colegio</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="tipoColegiacionType">
+    <xs:annotation>
+      <xs:documentation>Tipo de colegiación:
+      E-- Ejerciente
+      I-- Inscrito
+      N-- No ejerciente
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="E"/>
+      <xs:enumeration value="I"/>
+      <xs:enumeration value="N"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="situacionPreviaType">
+    <xs:annotation>
+      <xs:documentation>Tipo de situación previa del colegiado:
+      	1 -- Primera colegiación
+	2 -- Si ha sido o es ejerciente
+	3 -- Si ha sido o es no ejerciente
+</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
