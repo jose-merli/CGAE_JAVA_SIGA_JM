@@ -11,9 +11,9 @@ public class HistoricoUsuarioItem {
 
 	private String idPersona;
 	private String idHistorico;
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+1")
 	private Date fechaEfectiva;
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+1")
 	private Date fechaEntrada;
 	private String motivo;
 	private String descripcion;
