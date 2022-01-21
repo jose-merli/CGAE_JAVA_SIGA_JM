@@ -1,0 +1,59 @@
+<schema elementFormDefault="qualified"  xmlns:tns="http://cgae.es/consultatramites/token/schema" targetNamespace="http://cgae.es/consultatramites/token/schema" xmlns="http://www.w3.org/2001/XMLSchema">
+    <simpleType name="UUIDType">
+        <restriction base="string">
+            <length value="36"/>
+        </restriction>
+    </simpleType>
+    <simpleType name="institucionType">
+        <restriction base="string">
+            <length value="6"/>
+        </restriction>
+    </simpleType>
+    <complexType name="pasaporteType">
+        <sequence>
+            <element name="codPais" type="int"/>
+            <element name="numeroPasaporte" type="string"/>
+        </sequence>
+    </complexType>
+    <simpleType name="dniType">
+        <restriction base="string">
+            <pattern value="\d{1,8}[A-Za-z]"/>
+        </restriction>
+    </simpleType>
+    <simpleType name="nieType">
+        <restriction base="string">
+            <pattern value="[X-Zx-z]\d{1,7}[A-Za-z]"/>
+        </restriction>
+    </simpleType>
+    <complexType name="usuarioType">
+        <choice>
+            <element name="DNI" type="tns:dniType"/>
+            <element name="NIE" type="tns:nieType"/>
+            <element name="Pasaporte" type="tns:pasaporteType"/>
+        </choice>
+    </complexType>
+    <complexType name="errorType">
+        <all>
+            <element name="codError" type="string"/>
+            <element name="desError" type="string"/>
+        </all>
+    </complexType>
+    <element name="autenticarUsuarioSedeRequest">
+        <complexType>
+            <all>
+                <element name="idAplicacion" type="tns:UUIDType"/>
+                <element name="idSede" type="tns:UUIDType"/>
+                <element minOccurs="0" name="codInstitucion" type="tns:institucionType"/>
+                <element name="idUsuario" type="tns:usuarioType"/>
+            </all>
+        </complexType>
+    </element>
+    <element name="autenticarUsuarioSedeResponse">
+        <complexType>
+            <choice>
+                <element name="token" type="string"/>
+                <element name="error" type="tns:errorType"/>
+            </choice>
+        </complexType>
+    </element>
+</schema>
