@@ -349,7 +349,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
     public String getBancosSufijosSjcs(Short idInstitucion) {
         SQL sql = new SQL();
 
-        sql.SELECT_DISTINCT("pago.IDSUFIJO, ");
+        sql.SELECT_DISTINCT("pago.BANCOS_CODIGO, pago.IDSUFIJO, pago.IDPROPSEPA, pago.IDPROPOTROS");
 
         sql.FROM("FAC_ABONO abono");
         sql.LEFT_OUTER_JOIN("FCS_PAGOSJG pago ON (abono.IDINSTITUCION = pago.IDINSTITUCION AND abono.IDPAGOSJG = pago.IDPAGOSJG)");

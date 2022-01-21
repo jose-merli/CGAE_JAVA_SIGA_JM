@@ -115,6 +115,12 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 	List<FacAbono> getAbonosBancoSjcs(Short idInstitucion, String bancosCodigo, Short idSufijo, List<String> idAbonos);
 
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getBancosSufijosSjcs")
+	@Results({
+		@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSUFIJO", property = "idSufijo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROPSEPA", property = "propSEPA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROPOTROS", property = "propOtros", jdbcType = JdbcType.VARCHAR)
+	})
 	List<FicherosAbonosItem> getBancosSufijosSjcs(Short idInstitucion);
 
 }

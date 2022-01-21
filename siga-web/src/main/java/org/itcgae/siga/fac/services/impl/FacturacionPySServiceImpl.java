@@ -2226,6 +2226,24 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				if (idPropositoOtros.equals(""))
 					idPropositoOtros = getParametro("FAC", "PROPOSITO_OTRA_TRANSFERENCIA",  Short.parseShort("0"));
 
+				// Propósito SEPA
+				if (!UtilidadesString.esCadenaVacia(idPropositoSEPA)) {
+					FacPropositosExample propositosExample = new FacPropositosExample();
+					propositosExample.createCriteria().andCodigoEqualTo(idPropositoSEPA);
+					List<FacPropositos> propositos = facPropositosExtendsMapper.selectByExample(propositosExample);
+					if (propositos != null && !propositos.isEmpty())
+						idPropositoSEPA = propositos.get(0).getIdproposito().toString();
+				}
+
+				// Propósito Otros
+				if (!UtilidadesString.esCadenaVacia(idPropositoOtros)) {
+					FacPropositosExample propositosExample = new FacPropositosExample();
+					propositosExample.createCriteria().andCodigoEqualTo(idPropositoOtros);
+					List<FacPropositos> propositos = facPropositosExtendsMapper.selectByExample(propositosExample);
+					if (propositos != null && !propositos.isEmpty())
+						idPropositoOtros = propositos.get(0).getIdproposito().toString();
+				}
+
 				if (idSufijo == null) {
 					throw new BusinessException("facturacion.ficheroBancarioTransferencias.errorSufijosSerie.mensajeCondicionesIncumplidas");
 				}
@@ -2326,23 +2344,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		record.setFechamodificacion(new Date());
 		record.setUsumodificacion(usuario.getIdusuario());
 
-		// Propósito SEPA
-		if (!UtilidadesString.esCadenaVacia(idPropositoSEPA)) {
-			FacPropositosExample propositosExample = new FacPropositosExample();
-			propositosExample.createCriteria().andCodigoEqualTo(idPropositoSEPA);
-			List<FacPropositos> propositos = facPropositosExtendsMapper.selectByExample(propositosExample);
-			if (propositos != null && !propositos.isEmpty())
-				record.setIdpropsepa(propositos.get(0).getIdproposito());
-		}
-
-		// Propósito Otros
-		if (!UtilidadesString.esCadenaVacia(idPropositoOtros)) {
-			FacPropositosExample propositosExample = new FacPropositosExample();
-			propositosExample.createCriteria().andCodigoEqualTo(idPropositoOtros);
-			List<FacPropositos> propositos = facPropositosExtendsMapper.selectByExample(propositosExample);
-			if (propositos != null && !propositos.isEmpty())
-				record.setIdpropotros(propositos.get(0).getIdproposito());
-		}
+		// Propositos
+		record.setIdpropsepa(Short.parseShort(idPropositoSEPA));
+		record.setIdpropotros(Short.parseShort(idPropositoOtros));
 
 		if (facDisqueteabonosExtendsMapper.insert(record) == 0) {
 			return -1;

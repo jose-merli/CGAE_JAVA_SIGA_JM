@@ -493,7 +493,7 @@ public class FacturacionPySController {
 		}
 	}
 
-	@PostMapping(value = "/nuevoFicheroTransferencias")
+	@PostMapping(value = "/nuevoFicheroTransferenciasSjcs")
 	ResponseEntity<InsertResponseDTO> nuevoFicheroTransferenciasSjcs(@RequestBody List<FacturaItem> abonoItems,
 																 HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
