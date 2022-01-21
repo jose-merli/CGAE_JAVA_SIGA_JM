@@ -301,4 +301,22 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         return sql.toString();
     }
+
+    public String getFacturasDeFacturacionProgramada(String institucion, String seriefacturacion, String idProgramacion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("F.IDFACTURA");
+        sql.SELECT("F.NUMEROFACTURA");
+        sql.SELECT("F.IDINSTITUCION");
+        sql.SELECT("F.IDPERSONA");
+        sql.SELECT("FP.IDESTADOPDF");
+        sql.FROM("FAC_FACTURA F");
+        sql.INNER_JOIN("FAC_FACTURACIONPROGRAMADA FP ON F.IDINSTITUCION = FP.IDINSTITUCION AND F.IDSERIEFACTURACION = FP.IDSERIEFACTURACION AND F.IDPROGRAMACION = FP.IDPROGRAMACION");
+        sql.WHERE("F.IDINSTITUCION = " + institucion);
+        sql.WHERE("F.IDSERIEFACTURACION = " + seriefacturacion);
+        sql.WHERE("F.IDPROGRAMACION = " + idProgramacion);
+        sql.ORDER_BY("F.FECHAEMISION");
+
+        return sql.toString();
+    }
 }

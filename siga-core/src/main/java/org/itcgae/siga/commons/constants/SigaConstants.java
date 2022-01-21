@@ -1478,6 +1478,8 @@ public class SigaConstants {
     public static final String PCAJG_ALC_CAM_PATH = "PCAJG_ALC_CAM_PATH";
     public static final String IDFACTURACION = "IDFACTURACION";
 
+    public static final String  PARAMETRO_FACTURACION_DIRECTORIO_FISICO_PLANTILLA_FACTURA_JAVA = "facturacion.directorioFisicoPlantillaFacturaJava";
+    public static final String  PARAMETRO_FACTURACION_DIRECTORIO_PLANTILLA_FACTURA_JAVA = "facturacion.directorioPlantillaFacturaJava";
 
 	//Expedientes - INICIO
 	public static final String RECURSO_MENU_EXP_EXEA = "menu.expedientesexea";

@@ -1,39 +1,30 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaExtendsDTO;
+import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.AdmInforme;
-import org.itcgae.siga.db.entities.AdmInformeExample;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
-import org.itcgae.siga.db.entities.EcomCola;
-import org.itcgae.siga.db.entities.EcomColaParametros;
-import org.itcgae.siga.db.entities.FacFacturacionprogramada;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.commons.utils.SIGAHelper;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmInformeMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
 import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacPlantillafacturacionExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionProgramadaPySService;
 import org.itcgae.siga.services.impl.WSCommons;
@@ -78,6 +69,10 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	private static final Integer USUARIO_AUTO = 0;
 	private static final String DEFAULT_LENGUAJE = "1";
 	private static final String[] CODIGOS_ERROR_FORMATO = {"-201", "-202", "-203", "-204"};
+	private static final String FACTURACION_DIRECTORIO_FISICO_TEMPORAL_FACTURAS_JAVA = "facturacion.directorioFisicoTemporalFacturasJava";
+	private static final String FACTURACION__DIRECTORIO_TEMPORAL_FACTURAS_JAVA = "facturacion.directorioTemporalFacturasJava";
+	private static final String FACTURACION_DIRECTORIO_FISICO_PLANTILLA_FACTURA_JAVA = "facturacion.directorioFisicoPlantillaFacturaJava";
+	private static final String FACTURACION_DIRECTORIO_PLANTILLA_FACTURA_JAVA = "facturacion.directorioPlantillaFacturaJava";
 
 	@Autowired
 	private FacFacturacionprogramadaExtendsMapper facProgMapper;
@@ -105,6 +100,12 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	
 	@Autowired
 	private EcomColaParametrosMapper ecomColaParametrosMapper;
+
+	@Autowired
+	private FacFacturaExtendsMapper facFacturaExtendsMapper;
+
+	@Autowired
+	private FacPlantillafacturacionExtendsMapper facPlantillafacturacionExtendsMapper;
 	
 
 	private Map<Short, CenInstitucion> mInstituciones;
@@ -121,7 +122,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		Double tiempoMaximoEjecucion = getMaxMinutosEnEjecucion();
 		List<FacFacturacionprogramada> lFac = facProgMapper.getListaNFacturacionesProgramadasProcesar(CHUNK_SIZE,
 				tiempoMaximoEjecucion);
-		
+
 		List<FacFacturacionprogramada> lFacConfirmar = facProgMapper.getListaNConfirmarFacturacionesProgramadas(CHUNK_SIZE);
 
 		// estos "for" son temporales, hay que "mezclar" la ejecución de distintos estados de la facturación
@@ -129,16 +130,69 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		for (FacFacturacionprogramada fac : lFac) {
 			tratarFacturacion(fac);
 		}
-		for(FacFacturacionprogramada fac:lFacConfirmar) {
+		for (FacFacturacionprogramada fac : lFacConfirmar) {
 			tratarConfirmacion(fac);
 		}
-		
-		/* lo mismo con 
+
+		/* lo mismo con
 		 * 	generarPDFsYenviarFacturasProgramacion (reutiliza generarPdfEnvioProgramacionFactura)
 		 *  generarEnviosFacturasPendientes
 		 *  comprobacionTraspasoFacturas
 		 * */
-		
+
+		//TODO HAY QUE HACER TODO LO ANTERIOR POR CADA INSTITUCION
+
+		List<CenInstitucion> listaInstituciones = obtenerInstitucionesAlta();
+
+		for (CenInstitucion institucion : listaInstituciones) {
+
+			generarPDFsYenviarFacturasProgramacion(institucion.getIdinstitucion(), tiempoMaximoEjecucion);
+
+		}
+
+	}
+
+	private void generarPDFsYenviarFacturasProgramacion(Short idInstitucion, Double tiempoMaximoEjecucion) {
+		LOGGER.info("GENERAR PDF DE FACTURAS POR INSTITUCION:: " + idInstitucion);
+
+		try {
+			// Obtencion de las facturaciones programadas y pendientes con fecha de prevista confirmacion pasada a ahora
+			List<FacFacturacionprogramadaExtendsDTO> facFacturacionprogramadaExtendsDTOList = facProgMapper.getFacturacionesProgramadasYPendientes(idInstitucion, tiempoMaximoEjecucion);
+
+			if (null != facFacturacionprogramadaExtendsDTOList && !facFacturacionprogramadaExtendsDTOList.isEmpty()) {
+
+				// PROCESO PARA CADA FACTURACION PROGRAMADA
+				for (FacFacturacionprogramadaExtendsDTO fac : facFacturacionprogramadaExtendsDTOList) {
+
+					LOGGER.info("GENERAR PDFs Y ENVIAR FACTURACION PROGRAMADA: " + idInstitucion + " " + fac.getIdseriefacturacion() + " " + fac.getIdprogramacion());
+
+					// ficheros de log
+					Path log = getPathLogConfirmacion(fac);
+
+					TransactionStatus transactionStatus = getNewLongTransaction();
+					fac.setFechamodificacion(new Date());
+					fac.setIdestadoconfirmacion(FacEstadosFacturacion.CONFIRM_FINALIZADA.getId());
+
+					generarPdfEnvioProgramacionFactura(fac, true, transactionStatus);
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			// Error general (No hacemos nada, para que continue con la siguiente institucion
+			LOGGER.error("Error general al confirmar facturas (Proceso automatico) INSTITUCION: " + idInstitucion, e);
+		}
+
+	}
+
+	private List<CenInstitucion> obtenerInstitucionesAlta() {
+
+		CenInstitucionExample cenInstitucionExample = new CenInstitucionExample();
+		cenInstitucionExample.setDistinct(true);
+		cenInstitucionExample.createCriteria().andFechaenproduccionIsNotNull();
+
+		return instMapper.selectByExample(cenInstitucionExample);
 	}
 
 	private void tratarConfirmacion(FacFacturacionprogramada fac) {
@@ -160,14 +214,14 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	}
 
 	private void rollBack(TransactionStatus transactionStatus) {
-		if(!transactionStatus.isCompleted()) {
+		if (transactionStatus != null && !transactionStatus.isCompleted()) {
 			transactionManager.rollback(transactionStatus);
 		}
 	}
-	
+
 
 	private void commit(TransactionStatus transactionStatus) {
-		if(transactionStatus!=null&&!transactionStatus.isCompleted()) {
+		if (transactionStatus != null && !transactionStatus.isCompleted()) {
 			transactionManager.commit(transactionStatus);
 		}
 	}
@@ -175,14 +229,13 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 	private Path getPathLogConfirmacion(FacFacturacionprogramada fac) {
 		String nombreFichero = getNombreFicheroLogConfirmacion(fac);
 		String pathFichero = getProperty(FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION);
-		return 	Paths.get(pathFichero).resolve(fac.getIdinstitucion().toString()).resolve(nombreFichero);
-	}
-	
-	private String getNombreFicheroLogConfirmacion(FacFacturacionprogramada fac) {
-		return LOG_FAC_CONFIRMACION_PREFIX + fac.getIdseriefacturacion() +"_"+ fac.getIdprogramacion() +LOG_XLS;
+		return Paths.get(pathFichero).resolve(fac.getIdinstitucion().toString()).resolve(nombreFichero);
 	}
 
-	
+	private String getNombreFicheroLogConfirmacion(FacFacturacionprogramada fac) {
+		return LOG_FAC_CONFIRMACION_PREFIX + fac.getIdseriefacturacion() + "_" + fac.getIdprogramacion() + LOG_XLS;
+	}
+
 	private void confirmarProgramacionFactura(TransactionStatus transactionStatus, FacFacturacionprogramada fac, Path pLog, boolean archivar,
 			boolean generarPagosBanco, boolean soloGenerarFactura, boolean esFacturacionRapida, boolean realizarEnvio) {
 		TransactionStatus tx=null;
@@ -232,62 +285,191 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 			
 		
 	}
-	
-	private void generarPdfEnvioProgramacionFactura(FacFacturacionprogramada fac, boolean isGenerarEnvio,
-			TransactionStatus tx) {
-		fac.setIdestadopdf(FacEstadosFacturacion.PDF_PROCESANDO.getId());
-		facProgMapper.updateByPrimaryKey(fac);
-		int errorAlmacenar = generaryEnviarProgramacionFactura(fac);
-		if(errorAlmacenar==0) {
-			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADA.getId());
-			if(isGenerarEnvio) {
-				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADA.getId());
-			}
+
+	private void generarPdfEnvioProgramacionFactura(FacFacturacionprogramada fac, boolean isGenerarEnvio, TransactionStatus tx) {
+
+		String nombreFichero = null;
+
+		try {
+
+			nombreFichero = getNombreFicheroLogConfirmacion(fac);
+
+			fac.setIdestadopdf(FacEstadosFacturacion.PDF_PROCESANDO.getId());
 			facProgMapper.updateByPrimaryKey(fac);
-			LOGGER.info("OK TODO, CAMBIO DE ESTADO PDF");
-		} else {
-			tratarErrorAlmacenarFactura(errorAlmacenar, fac,isGenerarEnvio );
+
+			commit(tx);
+
+			int errorAlmacenar = generaryEnviarProgramacionFactura(fac, isGenerarEnvio);
+
+			if (errorAlmacenar == 0) {
+				fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADA.getId());
+				if (isGenerarEnvio) {
+					fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADA.getId());
+				}
+				facProgMapper.updateByPrimaryKey(fac);
+				LOGGER.info("OK TODO, CAMBIO DE ESTADOS");
+			} else {
+				tratarErrorAlmacenarFactura(errorAlmacenar, fac, isGenerarEnvio);
+			}
+
+			commit(tx);
+
+		} catch (Exception e) {
+			LOGGER.error("ERROR GENERAL EN TRY GENERAR/ENVIAR.");
+			rollBack(tx);
+
+			fac.setLogerror(nombreFichero);
+			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADAERRORES.getId());
+			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADAERRORES.getId());
+
+			if (isGenerarEnvio) {
+				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
+			}
+
+			facProgMapper.updateByPrimaryKey(fac);
+			commit(tx);
+
+			throw e;
 		}
-		
 	}
 
 	private String tratarErrorAlmacenarFactura(int errorAlmacenar, FacFacturacionprogramada fac, boolean isGenerarEnvio) {
+
 		String logError = getNombreFicheroLogConfirmacion(fac);
 		String msjAviso;
-		LOGGER.error("ERROR AL ALMACENAR FACTURA, RETORNO="+errorAlmacenar);
+		LOGGER.error("ERROR AL ALMACENAR FACTURA, RETORNO=" + errorAlmacenar);
+
 		switch (errorAlmacenar) {
-		case 1:// ERROR EN GENERAR PDF
-			msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF;
-			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADAERRORES.getId());
-			fac.setLogerror(logError);
-			if(isGenerarEnvio) {
-				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
-			}
-			break;
-		case 2:
-			msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_ENVIO;
-			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADA.getId());
-			if(isGenerarEnvio) {
+			case 1:// ERROR EN GENERAR PDF
+				LOGGER.error("ERROR AL ALMACENAR FACTURA. RETORNO = " + errorAlmacenar);
+				msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF;
+				fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADAERRORES.getId());
 				fac.setLogerror(logError);
-				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
-			}
-			break;
-		default:
-			msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF;
-			fac.setLogerror(logError);
-			fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADAERRORES.getId());
-			if(isGenerarEnvio) {
-				fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
-			}
-			break;
+				if (isGenerarEnvio) {
+					fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
+				}
+				break;
+			case 2:
+				LOGGER.error("ERROR AL ALMACENAR FACTURA. RETORNO = " + errorAlmacenar);
+				msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_ENVIO;
+				fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADA.getId());
+				if (isGenerarEnvio) {
+					fac.setLogerror(logError);
+					fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
+				}
+				break;
+			default:
+				msjAviso = MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF;
+				fac.setLogerror(logError);
+				fac.setIdestadopdf(FacEstadosFacturacion.PDF_FINALIZADAERRORES.getId());
+				if (isGenerarEnvio) {
+					fac.setIdestadoenvio(FacEstadosFacturacion.ENVIO_FINALIZADAERRORES.getId());
+				}
+				LOGGER.error("ERROR GENERAL GENERAR/ENVIAR FACTURA. CAMBIO DE ESTADOS");
+				break;
 		}
+
 		facProgMapper.updateByPrimaryKey(fac);
 		return msjAviso;
 	}
 
-	private int generaryEnviarProgramacionFactura(FacFacturacionprogramada fac) {
-		// TODO Auto-generated method stub
-		return 0;
+	private int generaryEnviarProgramacionFactura(FacFacturacionprogramada fac, boolean isGenerarEnvio) {
+
+		int salida = 0;
+		boolean existeAlgunErrorPdf = false;
+		boolean existeAlgunErrorEnvio = false;
+
+		try {
+
+			// Obtengo las facturas a almacenar
+			List<FacturaFacturacionProgramadaDTO> facturaFacturacionProgramadaDTOList = facFacturaExtendsMapper.getFacturasDeFacturacionProgramada(fac.getIdinstitucion().toString(), fac.getIdseriefacturacion().toString(), fac.getIdprogramacion().toString());
+
+			if (facturaFacturacionProgramadaDTOList == null || facturaFacturacionProgramadaDTOList.size() < 1) {
+				throw new Exception("No existen facturas generadas");
+			}
+
+			LOGGER.info("ALMACENAR >> " + fac.getIdinstitucion() + " " + fac.getIdseriefacturacion() + " " + fac.getIdprogramacion());
+
+			// Obtengo la plantilla a utilizar
+			List<FacPlantillafacturacion> facPlantillafacturacionList = facPlantillafacturacionExtendsMapper.getPlantillaSerieFacturacion(fac.getIdinstitucion().toString(), fac.getIdseriefacturacion().toString());
+			String sPlantilla = facPlantillafacturacionList.get(0).getPlantillapdf();
+
+			// Obtencion de la ruta donde se almacenan temporalmente los ficheros formato FOP
+			String rutaTemporal = getProperty(FACTURACION_DIRECTORIO_FISICO_TEMPORAL_FACTURAS_JAVA) + getProperty(FACTURACION__DIRECTORIO_TEMPORAL_FACTURAS_JAVA) + File.separator + fac.getIdinstitucion();
+			SIGAHelper.mkdirs(rutaTemporal);
+
+			// Obtencion de la ruta de donde se obtiene la plantilla adecuada
+			String rutaPlantilla = getProperty(FACTURACION_DIRECTORIO_FISICO_PLANTILLA_FACTURA_JAVA) + getProperty(FACTURACION_DIRECTORIO_PLANTILLA_FACTURA_JAVA) + File.separator + fac.getIdinstitucion() + File.separator + sPlantilla;
+			File rutaModelo = new File(rutaPlantilla);
+
+			//Comprobamos que exista la ruta y sino la creamos
+			if (!rutaModelo.exists()) {
+				throw new Exception("La ruta de acceso a la plantilla de la factura no existe");
+			}
+
+			LOGGER.info("ALMACENAR >> TERMINA DE OBTENER PLANTILLAS Y DATOS GENERALES");
+
+			// recorro todas las facturas para ir creando lo sinformes pertinentes
+
+			LOGGER.info("ALMACENAR >> NUMERO DE FACTURAS: " + facturaFacturacionProgramadaDTOList.size());
+
+			String idFactura = "";
+
+			/** CR7 - Se saca fuera ya que siempre se usa la misma plantilla para tdas las facturas **/
+			//SE SELECCIONA LA PLANTILLA MAIL
+			FacFacturacionprogramadaExample facFacturacionprogramadaExample = new FacFacturacionprogramadaExample();
+			facFacturacionprogramadaExample.createCriteria()
+					.andIdinstitucionEqualTo(fac.getIdinstitucion())
+					.andIdseriefacturacionEqualTo(fac.getIdseriefacturacion())
+					.andIdprogramacionEqualTo(fac.getIdprogramacion());
+
+			List<FacFacturacionprogramada> facFacturacionprogramadaList = facProgMapper.selectByExample(facFacturacionprogramadaExample);
+
+			Integer plantillaMail = null;
+
+			if (facFacturacionprogramadaList != null && facFacturacionprogramadaList.size() > 0 && facFacturacionprogramadaList.get(0).getIdtipoplantillamail() != null) {
+				plantillaMail = facFacturacionprogramadaList.get(0).getIdtipoplantillamail();
+			}
+
+			//Aunque nos ha fallado esta factura es posible que la siguiente, no.
+			//POR LO TANTO no COMPROBAMOS QUE HAYA SIDO CORRECTO EL CAMBIO ANTERIOR
+			for (FacturaFacturacionProgramadaDTO f : facturaFacturacionProgramadaDTOList) {
+
+				try {
+
+					idFactura = f.getIdFactura();
+					String idPersona = f.getIdPersona().toString();
+					String numFactura = f.getNumeroFactura();
+
+					LOGGER.info("ALMACENAR " + idFactura + " >> FACTURA: " + idFactura);
+
+					// TRY del proceso de generacion de la factura en PDF
+					File filePDF = null;
+
+					try {
+
+						// PROCESO DE CREAR EL PDF
+						// RGG 15/02/2007 CAMBIOS PARA INFORME MASTER REPOR
+
+
+
+					}catch (Exception e) {
+
+					}
+
+
+				}catch (Exception e) {
+
+				}
+
+			}
+
+
+		} catch (Exception e) {
+
+		}
+
+		return salida;
 	}
 
 	public void encolarTraspasoFacturas(FacFacturacionprogramada fac) throws BusinessException
