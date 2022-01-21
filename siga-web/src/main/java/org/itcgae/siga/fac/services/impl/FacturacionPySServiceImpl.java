@@ -164,6 +164,9 @@ import org.itcgae.siga.db.entities.FacTiposproduincluenfactuKey;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfact;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactExample;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
+import org.itcgae.siga.db.entities.FcsPagosEstadospagos;
+import org.itcgae.siga.db.entities.FcsPagosEstadospagosExample;
+import org.itcgae.siga.db.entities.FcsPagosEstadospagosKey;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
@@ -189,6 +192,7 @@ import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
+import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
 import org.itcgae.siga.db.mappers.GenDiasletraMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -378,6 +382,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private GenDiccionarioMapper genDiccionarioMapper;
+
+	@Autowired
+	private FcsPagosEstadospagosMapper fcsPagosEstadospagosMapper;
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -2973,8 +2980,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				FacAbono abonoUpdate = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
 
 				// renegociar
-				if (item.getIdAccion().equalsIgnoreCase("7")
-						&& (abonoUpdate.getEstado() == 6 || abonoUpdate.getEstado() == 5)) {
+				if (item.getIdAccion().equalsIgnoreCase("7")) {
 
 					renegociarAbono(item, facHistoricoInsert, abonoUpdate, usuario);
 				}
@@ -2983,38 +2989,42 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				/**
 				 * Id accion abono por caja no existe
 				 */
-				if (item.getIdAccion().equalsIgnoreCase("10") && abonoUpdate.getEstado() == 6) {
+				if (item.getIdAccion().equalsIgnoreCase("4") && abonoUpdate.getEstado() == 6) {
 
 					nuevoAbono(item, facHistoricoInsert, abonoUpdate, usuario);
 				}
 			}
 
-			// renegociar
-			if (item.getIdAccion().equalsIgnoreCase("7") && (facHistoricoInsert.getEstado() == 2
-					|| facHistoricoInsert.getEstado() == 4 || facHistoricoInsert.getEstado() == 5)) {
+			else {
 
-				renegociarFactura(item, facHistoricoInsert, facUpdate, usuario);
+				// renegociar
+				if (item.getIdAccion().equalsIgnoreCase("7") && (facHistoricoInsert.getEstado() == 2
+						|| facHistoricoInsert.getEstado() == 4 || facHistoricoInsert.getEstado() == 5)) {
+
+					renegociarFactura(item, facHistoricoInsert, facUpdate, usuario);
+				}
+
+				// nuevo cobro
+				if (item.getIdAccion().equalsIgnoreCase("4") && facHistoricoInsert.getEstado() == 2) {
+
+					nuevoCobroFactura(item, facHistoricoInsert, facUpdate, usuario);
+				}
+
+				// devolver
+				if (item.getIdAccion().equalsIgnoreCase("6") && facHistoricoInsert.getEstado() == 1
+						&& facHistoricoInsert.getIdtipoaccion() == 5) {
+
+					devolverFactura(item, facHistoricoInsert, facUpdate, usuario);
+				}
+
+				// anular
+				if (item.getIdAccion().equalsIgnoreCase("8") && facHistoricoInsert.getEstado() != 7
+						&& facHistoricoInsert.getEstado() != 8) {
+
+					anularFactura(item, facHistoricoInsert, facUpdate, usuario);
+				}
 			}
-
-			// nuevo cobro
-			if (item.getIdAccion().equalsIgnoreCase("4") && facHistoricoInsert.getEstado() == 2) {
-
-				nuevoCobroFactura(item, facHistoricoInsert, facUpdate, usuario);
-			}
-
-			// devolver
-			if (item.getIdAccion().equalsIgnoreCase("6") && facHistoricoInsert.getEstado() == 1
-					&& facHistoricoInsert.getIdtipoaccion() == 5) {
-
-				devolverFactura(item, facHistoricoInsert, facUpdate, usuario);
-			}
-
-			// anular
-			if (item.getIdAccion().equalsIgnoreCase("8") && facHistoricoInsert.getEstado() != 7
-					&& facHistoricoInsert.getEstado() != 8) {
-
-				anularFactura(item, facHistoricoInsert, facUpdate, usuario);
-			}
+			
 
 			insertResponseDTO.setId(facHistoricoInsert.getIdfactura());
 		}
@@ -3126,10 +3136,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		else
 			facHistoricoInsert.setEstado((short) 5);
 
-		if (item.getIdEstado().equalsIgnoreCase("2")) {
+		if (abonoUpdate.getEstado() == 6) {
 			facHistoricoInsert.setIdformapago((short) 30);
 			facHistoricoInsert.setEstado((short) 2);
-		} else if (item.getIdEstado().equalsIgnoreCase("5")) {
+		} else if (abonoUpdate.getEstado() == 5) {
 			facHistoricoInsert.setIdformapago((short) 20);
 			facHistoricoInsert.setEstado((short) 5);
 
@@ -3154,7 +3164,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		renegociacionInsert.setIdrenegociacion(facHistoricoInsert.getIdrenegociacion());
 
 		// abono
-		abonoUpdate.setEstado(Short.valueOf(item.getEstado()));
 		abonoUpdate.setIdpersona(facHistoricoInsert.getIdpersona());
 		abonoUpdate.setIdcuenta(facHistoricoInsert.getIdcuenta());
 		abonoUpdate.setIdpersonadeudor(facHistoricoInsert.getIdpersonadeudor());
@@ -3941,7 +3950,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				if(cont != 10){
 					errorMessage.deleteCharAt(errorMessage.length()-2);
 				}
-				throw new Exception(errorMessage.toString());
+				throw new BusinessException(errorMessage.toString());
 			}
 
 			else {
@@ -4776,5 +4785,49 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 
 		return XLSFile;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public DeleteResponseDTO eliminarAbonoSJCSCaja(EstadosPagosItem item, HttpServletRequest request) throws Exception {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		deleteResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("insertarEstadosPagos() -> Entrada al servicio para crear una entrada al historico de factura");
+
+		if (usuario != null && item.getIdAccion().equalsIgnoreCase("4")) {
+
+			//Recuperar abono
+			FacAbonoKey abonoKey = new FacAbonoKey();
+			abonoKey.setIdabono(Long.valueOf(item.getIdAbono()));
+			abonoKey.setIdinstitucion(usuario.getIdinstitucion());
+
+			FacAbono abonoSJCS = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
+
+			//Elimina el pago
+			List<FcsPagosEstadospagos> estadosAbono = new ArrayList<>();
+
+			FcsPagosEstadospagosExample fcsPagosEstadospagosExample = new FcsPagosEstadospagosExample();
+			fcsPagosEstadospagosExample.createCriteria().andIdpagosjgEqualTo(abonoSJCS.getIdpagosjg()).
+				andIdinstitucionEqualTo(abonoSJCS.getIdinstitucion());
+			fcsPagosEstadospagosExample.setOrderByClause("IDESTADOPAGOSJG");
+
+			estadosAbono = fcsPagosEstadospagosMapper.selectByExample(fcsPagosEstadospagosExample);
+
+			if(estadosAbono.get(estadosAbono.size()-1).getIdestadopagosjg() != 30){
+				//No se ha pagado
+			}
+
+
+			deleteResponseDTO.setStatus(HttpStatus.OK.toString());
+		}
+
+		LOGGER.info("insertarEstadosPagos() -> Salida del servicio para crear una entrada al historico de factura");
+
+		return deleteResponseDTO;
 	}
 }

@@ -49,6 +49,7 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -796,8 +797,12 @@ public class FacturacionPySController {
 		try {
 			response = this.facturacionService.eliminarFicheroAdeudos(item, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
+		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -907,5 +912,19 @@ public class FacturacionPySController {
 	ResponseEntity<InputStreamResource> descargarFichaFacturacion(@RequestBody List<FacFacturacionprogramadaItem> facturacionItems, HttpServletRequest request) throws Exception {
 		return facturacionService.descargarFichaFacturacion(facturacionItems, request);
 
+	}
+
+	@PostMapping(value = "/eliminarAbonoSJCSCaja")
+	ResponseEntity<DeleteResponseDTO> eliminarAbonoSJCSCaja(@RequestBody EstadosPagosItem item,
+														   HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = facturacionService.eliminarAbonoSJCSCaja(item, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
