@@ -10,6 +10,7 @@ import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.UsosSufijosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.services.cen.providers.CenSolimodidireccionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.fac.providers.FacSeriefacturacionExtendsSqlProvider;

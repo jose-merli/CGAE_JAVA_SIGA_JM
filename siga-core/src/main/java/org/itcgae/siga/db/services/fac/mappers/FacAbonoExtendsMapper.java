@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.mappers.FacAbonoMapper;
@@ -101,12 +102,25 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
     @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getPagosCerrados")
     List<FacAbono> getPagosCerrados(Short idInstitucion, String anio);
 
-	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonosBanco")
-	List<FacAbono> getAbonosBanco(Short idInstitucion, String bancosCodigo, Short idSufijo);
-
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNuevoNumeroAbono")
 	@Results({
 			@Result(column = "NUEVOCONTADOR", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getNuevoNumeroAbono(String idInstitucion, String idContador);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonosBanco")
+	List<FacAbono> getAbonosBanco(Short idInstitucion, String bancosCodigo, Short idSufijo, List<String> idAbonos);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonosBancoSjcs")
+	List<FacAbono> getAbonosBancoSjcs(Short idInstitucion, String bancosCodigo, Short idSufijo, List<String> idAbonos);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getBancosSufijosSjcs")
+	@Results({
+		@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSUFIJO", property = "idSufijo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROPSEPA", property = "propSEPA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROPOTROS", property = "propOtros", jdbcType = JdbcType.VARCHAR)
+	})
+	List<FicherosAbonosItem> getBancosSufijosSjcs(Short idInstitucion);
+
 }

@@ -484,8 +484,28 @@ public class FacturacionPySController {
 		try {
 			response = facturacionService.nuevoFicheroTransferencias(abonoItems, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
+		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/nuevoFicheroTransferenciasSjcs")
+	ResponseEntity<InsertResponseDTO> nuevoFicheroTransferenciasSjcs(@RequestBody List<FacturaItem> abonoItems,
+																 HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionService.nuevoFicheroTransferenciasSjcs(abonoItems, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
