@@ -94,4 +94,20 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 
 		return sql.toString();
 	}
+
+	public String getFacturasDevueltasEnDisquete(Short idInstitucion, String idDisqueteDevoluciones) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("ld.*");
+
+		sql.FROM("FAC_LINEADEVOLUDISQBANCO ld");
+		sql.INNER_JOIN("FAC_FACTURAINCLUIDAENDISQUETE fid ON (fid.IDINSTITUCION = ld.IDINSTITUCION AND fid.IDFACTURAINCLUIDAENDISQUETE = ld.IDFACTURAINCLUIDAENDISQUETE AND fid.IDDISQUETECARGOS = ld.IDDISQUETECARGOS)");
+		sql.INNER_JOIN("FAC_FACTURA fac ON (fac.IDINSTITUCION = fid.IDINSTITUCION AND fac.IDFACTURA = fid.IDFACTURA)");
+
+		sql.WHERE("ld.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("ld.IDDISQUETEDEVOLUCIONES = " + idDisqueteDevoluciones);
+
+		return sql.toString();
+	}
 }
