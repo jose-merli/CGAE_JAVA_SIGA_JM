@@ -5,6 +5,7 @@ import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.FoUtils;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmLenguajesMapper;
@@ -17,7 +18,13 @@ import org.itcgae.siga.db.services.fac.mappers.FacPlantillafacturacionExtendsMap
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.nio.channels.FileChannel;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -51,7 +58,7 @@ public class FacturacionHelper {
     @Autowired
     private AdmLenguajesMapper admLenguajesMapper;
 
-    public File generarPdfFacturaFirmada(String idFactura, String idPersona, String numeroFactura, String idInstitucion) throws Exception {
+    public File generarPdfFacturaFirmada(String idFactura, String idInstitucion) throws Exception {
 
         File ficheroPDF;
 
@@ -232,7 +239,7 @@ public class FacturacionHelper {
             ficheroPDF = new File(rutaServidorDescargas + File.separator + nombreFicheroPDF + ".pdf");
             LOGGER.info("RUTA DONDE SE UBICAR EL INFORME. " + ficheroPDF);
             LOGGER.info("ANTES DE GENERAR EL PDF.");
-            convertFO2PDF(ficheroFOP, ficheroPDF, rutaTmp.getParent());
+            FoUtils.convertFO2PDF(ficheroFOP, ficheroPDF, rutaTmp.getParent());
             LOGGER.info("PDF GENERADO.");
 
         } catch (Exception e) {
@@ -248,38 +255,6 @@ public class FacturacionHelper {
         }
 
         return ficheroPDF;
-    }
-
-    private synchronized void convertFO2PDF(File fo, File pdf, String sBaseDir) throws Exception {
-
-        // OJO, Muy importante!
-        // 1. Este metodo ha de ser sincronizado para que solo se ejecute de forma atomica.
-        //    Esto es por culpa de la configuracion que se establece a nivel global (org.apache.fop.configuration.Configuration)
-        // 2. Y ha de ser estatico (de clase) para que funcione de verdad;
-        //    Si no lo fuera, en cada instancia (objeto) creado de MasterReport se podria ejecutar este metodo sin sincronizacion con las demas instancias.
-        //    De hecho, esto es lo que pasaba: se mezclaban las imagenes de un FO con las de otro.
-
-        OutputStream out = null;
-        FileOutputStream fileOut = null;
-
-        try {
-
-            LOGGER.info(">>> baseDir:" + sBaseDir);
-
-//            org.apache.fop.configuration.Configuration.put("baseDir", sBaseDir);
-//            org.apache.fop.configuration.Configuration.put("fontBaseDir", SIGAReferences.getReference(SIGAReferences.RESOURCE_FILES.FOP_DIR.getFileName()));
-//            new Options(SIGAReferences.getInputReference(SIGAReferences.RESOURCE_FILES.FOP));
-
-        } catch (Exception e) {
-            throw new Exception("Error transformando PDF desde FOP - Fichero:" + sBaseDir + " - Mensaje:" + e.getLocalizedMessage());
-        } finally {
-            try {
-                out.close();
-                fileOut.close();
-            } catch (Exception e) {
-            }
-        }
-
     }
 
     private void setFileContent(File file, String content) throws Exception {

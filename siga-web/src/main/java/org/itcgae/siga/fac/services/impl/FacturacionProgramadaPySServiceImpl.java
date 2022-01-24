@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaExtendsDTO;
+import org.itcgae.siga.DTO.fac.FacFicherosDescargaBean;
 import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAHelper;
@@ -22,9 +23,11 @@ import org.itcgae.siga.db.mappers.EcomColaMapper;
 import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacPlantillafacturacionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionProgramadaPySService;
 import org.itcgae.siga.services.impl.WSCommons;
@@ -33,6 +36,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import javax.transaction.Status;
+import javax.transaction.UserTransaction;
 
 @Service
 public class FacturacionProgramadaPySServiceImpl implements IFacturacionProgramadaPySService {
@@ -106,6 +112,15 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
 	@Autowired
 	private FacPlantillafacturacionExtendsMapper facPlantillafacturacionExtendsMapper;
+
+	@Autowired
+	private FacturacionHelper facturacionHelper;
+
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+
+	@Autowired
+	private FacSeriefacturacionExtendsMapper facSeriefacturacionExtendsMapper;
 	
 
 	private Map<Short, CenInstitucion> mInstituciones;
@@ -433,6 +448,9 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
 			//Aunque nos ha fallado esta factura es posible que la siguiente, no.
 			//POR LO TANTO no COMPROBAMOS QUE HAYA SIDO CORRECTO EL CAMBIO ANTERIOR
+			ArrayList<FacFicherosDescargaBean> listaFicherosPDFDescarga = new ArrayList<>();
+			ArrayList<File> listaFicheros = new ArrayList<>();
+			FacFicherosDescargaBean facFicherosDescargaBean = null;
 			for (FacturaFacturacionProgramadaDTO f : facturaFacturacionProgramadaDTOList) {
 
 				try {
@@ -450,18 +468,70 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
 						// PROCESO DE CREAR EL PDF
 						// RGG 15/02/2007 CAMBIOS PARA INFORME MASTER REPOR
+						filePDF = facturacionHelper.generarPdfFacturaFirmada(idFactura, f.getIdInstitucion().toString());
+
+						if (filePDF == null) {
+							throw new Exception("Error al generar la factura. Fichero devuelto es nulo.");
+						} else {
+
+							// Obtenemos el nombre de la persona de la factura
+							String nombreColegiado = "";
+							if (idPersona != null && !"".equalsIgnoreCase(idPersona)) {
+								nombreColegiado = obtenerNombreApellidos(idPersona);
+								if (nombreColegiado != null && !"".equalsIgnoreCase(nombreColegiado)) {
+									nombreColegiado = eliminarAcentosYCaracteresEspeciales(nombreColegiado) + "-";
+								} else {
+									nombreColegiado = "";
+								}
+							}
 
 
+							FacSeriefacturacionExample facSeriefacturacionExample = new FacSeriefacturacionExample();
+							facSeriefacturacionExample.createCriteria()
+									.andIdseriefacturacionEqualTo(fac.getIdseriefacturacion())
+									.andIdinstitucionEqualTo(f.getIdInstitucion());
 
-					}catch (Exception e) {
+							List<FacSeriefacturacion> facSeriefacturacionList = facSeriefacturacionExtendsMapper.selectByExample(facSeriefacturacionExample);
 
+							if (facSeriefacturacionList != null && facSeriefacturacionList.size() > 0) {
+								FacSeriefacturacion beanSerieFacturacion = facSeriefacturacionList.get(0);
+								facFicherosDescargaBean.setFormatoDescarga(beanSerieFacturacion.getIdNombreDescargaFac().intValue());
+								facFicherosDescargaBean.setFichero(filePDF);
+								facFicherosDescargaBean.setNombreFacturaFichero(nombreColegiado);
+								listaFicherosPDFDescarga.add(facFicherosDescargaBean);
+							}
+
+							listaFicheros.add(filePDF);
+
+						}
+
+						LOGGER.info("ALMACENAR " + idFactura + " >> FACTURA GENERADA EN PDF");
+
+					} catch (Exception e) {
+						LOGGER.error("ALMACENAR " + idFactura + " >> ERROR EN PROCESO DE FOP A PDF: " + e.getMessage());
+
+						// ESCRIBO EN EL LOG
+//						log.writeLogFactura("PDF",idPersona,numFactura,"Error en el proceso de generaci�n de facturas PDF: "+ee.getLiteral(userbean.getLanguage()));
+						salida = 1;
+						//Aunque nos ha fallado esta factura es posible que la siguiente, no.
+						//POR LO TANTO no cazamos la excepcion
+						//throw ee;
+						existeAlgunErrorPdf = true;
 					}
 
+					LOGGER.error("ALMACENAR " + idFactura + " >> VAMOS A VER SI ENVIARMOS: ENVIAR:" + isGenerarEnvio + " CORRECTO:" + (filePDF != null));
 
-				}catch (Exception e) {
 
+					/***************    ENVIO FACTURAS *****************/
+					if (isGenerarEnvio && filePDF != null) {
+//						enviarProgramacionFactura(idPersona, institucion.toString(), idFactura, plantillaMail, numFactura, filePDF, log, salida, existeAlgunErrorEnvio, tx);
+					}
+
+				} catch (Exception e) {
+					throw e;
 				}
 
+				LOGGER.info("ALMACENAR " + idFactura + " >> PROCESO DE FACTURA OK ");
 			}
 
 
@@ -470,6 +540,139 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		}
 
 		return salida;
+	}
+
+//	private void enviarProgramacionFactura(String idPersona, String idInstitucion, String idFactura, Integer plantillaMail, String numeroFactura, File ficheroPdf,
+//			/*SIGALogging log,*/ int salida, boolean existeAlgunErrorEnvio, UserTransaction tx) throws Exception {
+//
+//		UsrBean userbean = this.usrbean;
+//
+//		try {
+//			LOGGER.info("ALMACENAR " + idFactura + " >> PROCESO DE ENVIO", 10);
+//
+//			//Obtenemos el bean del envio:
+//			CenPersonaAdm admPersona = new CenPersonaAdm(userbean);
+//			String descripcion = "Envio factura " + numeroFactura + " - " + admPersona.obtenerNombreApellidos(idPersona);
+//			Envio envio = new Envio(userbean, descripcion);
+//
+//			// Bean envio
+//			EnvEnviosBean enviosBean = envio.enviosBean;
+//
+//			// RGG
+//			GenParametrosAdm paramAdm = new GenParametrosAdm(userbean);
+//			String preferencia = paramAdm.getValor(idInstitucion, "ENV", "TIPO_ENVIO_PREFERENTE", "1");
+//			Integer valorPreferencia = Envio.calculaTipoEnvio(preferencia);
+//			enviosBean.setIdTipoEnvios(valorPreferencia);
+//
+//			// Preferencia del tipo de envio si el usuario tiene uno:
+//			CenDireccionesAdm direccionAdm = new CenDireccionesAdm(userbean);
+//			Hashtable<?, ?> direccion = direccionAdm.getEntradaDireccionEspecifica(idPersona, idInstitucion, preferencia);
+//
+//			if (direccion == null || direccion.size() == 0) {
+//				direccion = direccionAdm.getEntradaDireccionEspecifica(idPersona, idInstitucion, "3");// si no hay direccion preferente mail, buscamos la de correo
+//				if (direccion == null || direccion.size() == 0) {
+//					direccion = direccionAdm.getEntradaDireccionEspecifica(idPersona, idInstitucion, "2");// si no hay direccion de despacho, buscamos la de despacho
+//					if (direccion == null || direccion.size() == 0) {
+//						direccion = direccionAdm.getEntradaDireccionEspecifica(idPersona, idInstitucion, "");// si no hay direccion de despacho, buscamos cualquier direcci�n.
+//						if (direccion == null || direccion.size() == 0) {
+//							LOGGER.info("ALMACENAR " + idFactura + " >> NO TIENE DIRECCION PREFERENTE " + preferencia, 10);
+//							throw new Exception("No se ha encontrado direccion de la persona para el tipo de envio preferente: " + preferencia);
+//						}
+//					}
+//				}
+//			}
+//
+//			if (plantillaMail != null) {
+//				enviosBean.setIdPlantillaEnvios(plantillaMail);
+//				// Creacion documentos
+//				Documento documento = new Documento(ficheroPdf, "Factura " + ficheroPdf.getName());
+//				Vector<Documento> documentos = new Vector<Documento>(1);
+//				documentos.add(documento);
+//
+//				/*************** INICIO TRANSACCION ***************/
+//				if (tx != null)
+//					tx.begin();
+//
+//				// Genera el envio:
+//				envio.generarEnvio(idPersona, EnvDestinatariosBean.TIPODESTINATARIO_CENPERSONA, documentos, null, null);
+//				if (tx != null)
+//					tx.commit();
+//				LOGGER.info("ALMACENAR " + idFactura + " >> ENVIO GENERADO OK");
+//				/*************** FIN TRANSACCION ***************/
+//
+//			} else {
+//				throw new Exception("No se han encontrado plantillas para el envio de facturas");
+//			}
+//
+//		} catch (Exception eee) {
+//			try { // Tratamiento rollback
+//				if (tx != null && Status.STATUS_ACTIVE == tx.getStatus()) {
+//					tx.rollback();
+//				}
+//			} catch (Exception e2) {
+//			}
+//
+//			LOGGER.error("ALMACENAR " + idFactura + " >> ERROR EN PROCESO DE ENVIO: " + eee);
+//			// ESCRIBO EN EL LOG
+////			log.writeLogFactura("ENVIO",idPersona,numeroFactura,"message.facturacion.error.envio.factura"+eee.toString());
+//			salida = 2;
+//			//Aunque nos ha fallado esta factura es posible que la siguiente, no.
+//			//POR LO TANTO no cazamos la excepcion
+//			//throw eee;
+//			existeAlgunErrorEnvio = true;
+//		}
+//	}
+
+	private String obtenerNombreApellidos(String idPersona) throws Exception {
+
+		String nombre = "";
+
+		try {
+
+			CenPersona cenPersona = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(idPersona));
+
+			if (cenPersona != null) {
+
+				nombre = cenPersona.getNombre();
+
+				if (cenPersona.getApellidos1() != null && !cenPersona.getApellidos1().equals("#NA")) {
+					nombre += " " + cenPersona.getApellidos1();
+				}
+
+				if (cenPersona.getApellidos2() != null && !cenPersona.getApellidos2().equals("#NA")) {
+					nombre += " " + cenPersona.getApellidos2();
+				}
+
+			}
+
+		} catch (Exception e) {
+			throw new Exception("Error al obtener el nombre y apellidos", e);
+		}
+
+		return nombre;
+	}
+
+	/**
+	 * Función que elimina acentos y caracteres especiales de una cadena de texto.
+	 *
+	 * @param input
+	 * @return cadena de texto limpia de acentos y caracteres especiales.
+	 */
+	private String eliminarAcentosYCaracteresEspeciales(String input) {
+
+		// Cadena de caracteres original a sustituir.
+		String original = "áàäéèëíìïóòöúùuñÁÀÄÉÈËÍÌÏÓÒÖÚÙÜÑçÇ!\"#$%&'()*+-,./:;<=>?@[\\]^_`{|}~";
+
+		// Cadena de caracteres ASCII que reemplazarán los originales.
+		String ascii = "aaaeeeiiiooouuunAAAEEEIIIOOOUUUNcC                                ";
+		String output = input;
+
+		for (int i = 0; i < original.length(); i++) {
+			// Reemplazamos los caracteres especiales.
+			output = output.replace(original.charAt(i), ascii.charAt(i));
+		}// for i
+
+		return output;
 	}
 
 	public void encolarTraspasoFacturas(FacFacturacionprogramada fac) throws BusinessException
