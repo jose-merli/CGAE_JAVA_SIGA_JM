@@ -1528,4 +1528,6 @@ public class SigaConstants {
 
 	//Expedientes - FIN
 
+    public static final String PARAMETRO_LOG_COLALETRADOS_LEVEL = "log.colaLetrados.level";
+
 }

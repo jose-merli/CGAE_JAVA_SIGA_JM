@@ -17,6 +17,7 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
+import org.itcgae.siga.DTO.fac.FacDisqueteDevolucionesNuevoItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -64,6 +65,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -781,6 +783,20 @@ public class FacturacionPySController {
 
 		try {
 			response = this.facturacionService.nuevoFicheroAdeudos(item, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/nuevoFicheroDevoluciones")
+	ResponseEntity<InsertResponseDTO> nuevoFicheroDevoluciones(@ModelAttribute FacDisqueteDevolucionesNuevoItem item,
+														  HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = this.facturacionService.nuevoFicheroDevoluciones(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
