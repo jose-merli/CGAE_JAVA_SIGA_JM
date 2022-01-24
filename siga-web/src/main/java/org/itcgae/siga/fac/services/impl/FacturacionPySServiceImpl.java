@@ -6,6 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,8 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -33,7 +38,18 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
@@ -71,10 +87,12 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.FacAbonoItem;
@@ -88,6 +106,7 @@ import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
 import org.itcgae.siga.db.entities.CenCliente;
@@ -167,6 +186,7 @@ import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
 import org.itcgae.siga.db.entities.FcsPagosEstadospagos;
 import org.itcgae.siga.db.entities.FcsPagosEstadospagosExample;
 import org.itcgae.siga.db.entities.FcsPagosEstadospagosKey;
+import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
@@ -199,6 +219,7 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -386,7 +407,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FcsPagosEstadospagosMapper fcsPagosEstadospagosMapper;
+	
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
+	private static final int EXCEL_ROW_FLUSH = 1000;
+	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias,
@@ -4882,4 +4908,393 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		return deleteResponseDTO;
 	}
+	
+	@Override
+	public ResponseFileDTO generateExcel(TarjetaPickListSerieDTO etiquetas, HttpServletRequest request) {
+
+		LOGGER.info("generateExcel() -> Entrada del servicio para generar el excel de los colegiados");
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		ResponseFileDTO response = new ResponseFileDTO();
+		File excel = null;
+		String  etiquetasArray = null ;
+		List<Map<String, Object>> result = null;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"generateExcel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"generateExcel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				etiquetasArray = etiquetas.getIdSerieFacturacion();
+
+				String sentencia = selectColegiados(idInstitucion,etiquetas.getIdSerieFacturacion(), usuario.getIdlenguaje());
+
+				LOGGER.info(
+						"generateExcel() / conConsultasExtendsMapper.ejecutarConsultaString() -> Entrada a conConsultasExtendsMapper para obtener lista de colegiados");
+
+				result = conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+
+				LOGGER.info(
+						"generateExcel() / conConsultasExtendsMapper.ejecutarConsultaString() -> Salida a conConsultasExtendsMapper para obtener lista de colegiados");
+
+				if (result != null && result.size() > 0) {
+
+					try {
+						Workbook workBook = crearExcel(result);
+						
+						// Obtenemos la ruta temporal
+						GenPropertiesKey key = new GenPropertiesKey();
+						key.setFichero(SigaConstants.FICHERO_SIGA);
+						key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+
+						LOGGER.info(
+								"generateExcel() / genPropertiesMapper.selectByPrimaryKey() -> Entrada a genPropertiesMapper para obtener la ruta donde generar el excel");
+
+						GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
+
+						LOGGER.info(
+								"generateExcel() / genPropertiesMapper.selectByPrimaryKey() -> Salida a genPropertiesMapper para obtener la ruta donde generar el excel");
+
+						String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion
+								+ SigaConstants.pathSeparator + SigaConstants.carpetaTmp;
+
+						File aux = new File(rutaTmp);
+						// creo directorio si no existe
+						aux.mkdirs();
+
+						GenDiccionarioKey keyDiccionario = new GenDiccionarioKey();
+						keyDiccionario.setIdlenguaje(usuario.getIdlenguaje());
+						keyDiccionario.setIdrecurso("censo.nombre.fichero.generarexcel");
+
+						LOGGER.info(
+								"generateExcel() / genPropertiesMapper.selectByPrimaryKey() -> Entrada a genPropertiesMapper para obtener la ruta donde generar el excel");
+
+						GenDiccionario nombreFicherosSalida = genDiccionarioMapper.selectByPrimaryKey(keyDiccionario);
+
+						LOGGER.info(
+								"generateExcel() / genPropertiesMapper.selectByPrimaryKey() -> Salida a genPropertiesMapper para obtener la ruta donde generar el excel");
+
+						String nombreFichero = nombreFicherosSalida.getDescripcion() + new Date().getTime() + ".xlsx";
+						excel = new File(rutaTmp, nombreFichero);
+						FileOutputStream fileOut;
+
+						fileOut = new FileOutputStream(rutaTmp + SigaConstants.pathSeparator + nombreFichero);
+						workBook.write(fileOut);
+						fileOut.close();
+						workBook.close();
+
+						response.setFile(excel);
+						response.setResultados(true);
+
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				} else {
+					response.setResultados(false);
+				}
+
+			}
+
+		}
+
+		LOGGER.info("generateExcel() -> Salida del servicio para generar el excel de los colegiados");
+
+		return response;
+
+	}
+
+	private Workbook crearExcel(List<Map<String, Object>> result) {
+
+		LOGGER.info("crearExcel() -> Entrada del servicio para crear el excel con los datos de los colegiados");
+
+		// Creamos el libro de excel
+		Workbook workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
+		Sheet sheet = workbook.createSheet("Query");
+
+		// Le aplicamos estilos a las cabeceras
+		Font headerFont = workbook.createFont();
+		headerFont.setBold(true);
+		// headerFont.setItalic(true);
+		headerFont.setFontHeightInPoints((short) 14);
+		headerFont.setColor(IndexedColors.BLUE.getIndex());
+		CellStyle headerCellStyle = workbook.createCellStyle();
+		headerCellStyle.setFont(headerFont);
+
+		Row headerRow = sheet.createRow(0);
+
+		// Recorremos el map y vamos metiendo celdas
+		List<String> columnsKey = new ArrayList<String>();
+		int rowNum = 1;
+		int index = 0;
+		Row row = null;
+
+		Map<Integer, CellStyle> mapaEstilos = new HashMap<Integer, CellStyle>();
+
+		CellStyle cellStyleNum = workbook.createCellStyle();
+		cellStyleNum.setAlignment(CellStyle.ALIGN_RIGHT);
+		
+		CellStyle cellStyleString = workbook.createCellStyle();
+		cellStyleString.setAlignment(CellStyle.ALIGN_LEFT);
+		
+		Object campo = null;
+		XSSFRichTextString textCell = null;
+		
+		if (result.size() > 0) {
+			for (String value : result.get(0).keySet()) {
+				Cell cell = headerRow.createCell(index);
+				cell.setCellValue(value);
+				cell.setCellStyle(headerCellStyle);
+				columnsKey.add(value);
+				index++;
+			}
+
+			for (Map<String, Object> map : result) {
+				
+				if (map != null) {
+	
+					row = sheet.createRow(rowNum++);
+					int cell = 0;
+	
+					
+					for (int j = 0; j < columnsKey.size(); j++) {
+						campo = map.get(columnsKey.get(j).trim());
+						
+						if (campo == null || campo.toString().trim() == "") {
+							row.createCell(cell).setCellValue("");
+						} else {
+							Cell celda = row.createCell(cell);
+							if (campo instanceof Number) {
+								if (!mapaEstilos.containsKey(cell)) {
+									mapaEstilos.put(cell, cellStyleNum);
+								}
+								celda.setCellType(Cell.CELL_TYPE_NUMERIC);
+								celda.setCellValue(Double.parseDouble(campo.toString()));
+								
+							} else if (campo instanceof Date) {
+								if (!mapaEstilos.containsKey(cell)) {
+									mapaEstilos.put(cell, cellStyleString);
+								}
+								
+								CreationHelper creationHelper = workbook.getCreationHelper();
+								
+								celda.setCellValue((Date) campo);
+								
+								CellStyle style1 = workbook.createCellStyle();
+								style1.setDataFormat(creationHelper.createDataFormat().getFormat(
+										"dd/mm/yyyy hh:mm"));
+								celda.setCellStyle(style1);
+								
+							} else {
+								if (!mapaEstilos.containsKey(cell)) {
+									mapaEstilos.put(cell, cellStyleString);
+								}
+								
+								celda.setCellType(Cell.CELL_TYPE_STRING);
+								textCell = new XSSFRichTextString(campo.toString());
+								celda.setCellValue(textCell);
+							}
+						}
+						cell++;
+						
+					}
+				}
+			}
+
+			for (int i = 0; i < index; i++) {
+				//sheet.autoSizeColumn(j);
+				if (mapaEstilos.containsKey(i)) {
+					sheet.setDefaultColumnStyle(i, mapaEstilos.get(i));
+				}
+			}
+		}
+
+		LOGGER.info("crearExcel() -> Salida del servicio para crear el excel con los datos de los colegiados");
+
+		return workbook;
+
+	}
+
+	private String selectColegiados(Short idInstitucion,String etiquetas, String idLenguaje) {
+
+		LOGGER.info(
+				"selectColegiados() -> Entrada del servicio para obtener la sentencia para obtener la lista de colegiados");
+
+		SQL sql = new SQL();
+
+		// En el caso de que venga de la pantalla de busqueda colegiados/no colegiados,
+		// tendremos que preparar el filtro de instituciones
+		String instituciones = "";
+		
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		sql.SELECT_DISTINCT("f_siga_getncol_ncom(col.idinstitucion,col.idpersona) AS NcolNcom");
+        sql.SELECT("decode (col.comunitario,'1','SI','0','NO') AS Comunitario");
+        sql.SELECT("per.nombre AS Nombre");
+        sql.SELECT("per.apellidos1 AS Apellido1");
+        sql.SELECT("per.apellidos2 AS Apellido2");
+        sql.SELECT("f_siga_getrecurso(tip.descripcion,1) AS TipoIdentificacion");
+        sql.SELECT("per.nifcif AS NifCif");
+        sql.SELECT("Per.Fechanacimiento AS FechadeNacimiento");
+        sql.SELECT("f_siga_getrecurso(est.descripcion,1) AS EstadoCivil");
+        sql.SELECT("per.naturalde AS Naturalde");
+        sql.SELECT("decode (per.fallecido,'1','SI','NO') AS Fallecido");
+        sql.SELECT("decode (per.sexo,'M','MUEJR','HOMBRE') AS Sexo");
+        sql.SELECT("Cli.Fechaalta AS Fechaalta");
+        sql.SELECT("f_siga_getrecurso(tra.descripcion,1) AS Tratamiento");
+        sql.SELECT("cli.caracter AS Caracter");
+        sql.SELECT("cli.publicidad AS Publicidad");
+        sql.SELECT("cli.comisiones AS Comisiones");
+        sql.SELECT("cli.guiajudicial AS GuiaJudicial");
+        sql.SELECT("cli.abonosbanco AS AbonosBanco");
+        sql.SELECT("cli.cargosbanco AS CargosBanco");
+        sql.SELECT("decode (cli.idlenguaje,'1','Castellano','2','Catalá','3','Euskera','4','Galego') AS Lenguaje");
+        sql.SELECT("cli.fotografia AS Fotografia");
+        sql.SELECT("cli.asientocontable AS AsientoContable");
+        sql.SELECT("Cli.Fechacarga AS FechaCarga");
+        sql.SELECT("cli.letrado AS Letrado");
+        sql.SELECT("Cli.Fechaactualizacion AS FechaActualizacion");
+        sql.SELECT("Cli.Fechaexportcenso AS FechaExportCenso");
+        sql.SELECT("cli.noenviarrevista AS NoenviaRevista");
+        sql.SELECT("cli.noaparecerredabogacia AS NoapareceRedAbogacia");
+        sql.SELECT("Col.Fechapresentacion AS FechaPresentacion");
+        sql.SELECT("Col.Fechaincorporacion AS FechaIncorporacion");
+        sql.SELECT("col.indtitulacion AS IndTitulacion");
+        sql.SELECT("col.jubilacioncuota AS JubilacionCuota");
+        sql.SELECT("decode (col.situacionejercicio,'1','Alta','0','Baja') AS SituacionEjercicio");
+        sql.SELECT("decode (col.situacionresidente,'1','SI','0','NO') AS SituacionResidente");
+        sql.SELECT("col.situacionempresa AS SituacionEmpresa");
+        sql.SELECT("Col.Fechajura AS FechaJura");
+        sql.SELECT("Col.Fechatitulacion AS FechaTitulacion");
+        sql.SELECT("decode (col.otroscolegios,'1','SI','0','NO') as OtrosColegios");
+        sql.SELECT("Col.Fechadeontologia AS FechaDeontologia");
+        sql.SELECT("Col.Fechamovimiento AS FechaMovimiento");
+        sql.SELECT("f_siga_getrecurso(ts.nombre,1) AS TipoSeguro");
+        sql.SELECT("col.cuentacontablesjcs AS CuentaContableSJCS");
+        sql.SELECT("decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitacion','50','Suspension Ejercicio','60','Baja por Deceso','Baja por Deceso') AS EstadoColegial");
+        sql.SELECT("f_siga_getfechaestadocolegial(col.idpersona,col.idinstitucion,sysdate)   AS FechaEstado");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,1) AS Domicilio");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,2) AS CodigoPostal");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,11) AS Telefono1");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,12) AS Telefono2");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,13) AS Movil");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,14) AS Fax1");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,15) AS Fax2");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,16) AS CorreoElectronico");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,17) AS PaginaWeb");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,3) AS Poblacion");
+        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,4) AS Provincia");
+        sql.SELECT("f_siga_getdireccioncliente1(col.idinstitucion,col.idpersona,3,5) AS Pais");
+        sql.SELECT("(SELECT LISTAGG( UPPER(f_siga_getrecurso(gc.nombre,"+idLenguaje+")), ', ') as Etiquetas "
+        		+ "FROM CEN_GRUPOSCLIENTE gc "
+        		+ "inner join FAC_TIPOCLIINCLUIDOENSERIEFAC ga on ( gc.idgrupo = ga.idgrupo and gc.idinstitucion = ga.idinstitucion) "
+        		+ "INNER JOIN CEN_GRUPOSCLIENTE_CLIENTE ce on (gc.idgrupo = ce.idgrupo and gc.idinstitucion = ce.idinstitucion) "
+        		+ "WHERE gc.idinstitucion=col.idinstitucion and ga.idseriefacturacion = tfa.idseriefacturacion "
+        		+ "and ce.idpersona = col.idpersona group by ce.idpersona) as Etiquetas ");
+        
+		sql.FROM("cen_colegiado col");
+
+		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
+		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
+		
+		//PARA ETIQUETAS
+		sql.INNER_JOIN("cen_gruposcliente_cliente gcli on (col.idpersona = gcli.idpersona and col.idinstitucion = gcli.idinstitucion)");	
+		sql.INNER_JOIN("FAC_TIPOCLIINCLUIDOENSERIEFAC tfa on (gcli.idgrupo = tfa.idgrupo and gcli.idinstitucion = tfa.idinstitucion)");
+		sql.INNER_JOIN("CEN_GRUPOSCLIENTE cgc on (tfa.idinstitucion = cgc.idinstitucion and cgc.idgrupo = tfa.idgrupo)");
+		
+		
+		
+		if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
+			if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
+				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+				//sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+			}
+			else{
+				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and inst.cen_inst_IDINSTITUCION  =  cli.idinstitucion)");
+				//sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and inst.cen_inst_IDINSTITUCION  =  cli2.idinstitucion)");
+			}
+			
+		}else {
+            sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
+			sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and col.idinstitucion = cli2.idinstitucion)");
+		}
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
+						+ " and datcol.fechaestado < sysdate))");
+		
+		sql.INNER_JOIN("cen_tipoidentificacion tip on (per.idtipoidentificacion = tip.idtipoidentificacion)");
+		sql.LEFT_OUTER_JOIN("cen_estadocivil est on ( est.idestadocivil = per.idestadocivil)");
+		sql.LEFT_OUTER_JOIN(" cen_tratamiento tra on (tra.idtratamiento = cli.idtratamiento)");
+		sql.LEFT_OUTER_JOIN(" cen_tiposseguro ts  on ( col.idtiposseguro = ts.idtiposseguro)") ;     
+		
+
+		if(!instituciones.equals("")) {
+			sql.WHERE("COL.IDINSTITUCION IN (" + instituciones + ")");
+		} else {
+			if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
+				if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
+					sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+				}
+				else{
+                    sql.WHERE("inst.cen_inst_IDINSTITUCION = '" + idInstitucion + "'");
+
+				}
+				
+			}
+		}
+		
+		sql.WHERE("per.idtipoidentificacion not in '20'");
+		sql.WHERE("tfa.idseriefacturacion IN (" + etiquetas + ")");		
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+		
+		List<Short> idInstituciones = new ArrayList<>();
+		idInstituciones.add(idInstitucion);
+		idInstituciones.add(SigaConstants.IDINSTITUCION_0_SHORT);
+		
+		genParametrosExample.createCriteria().andIdinstitucionIn(idInstituciones)
+		.andParametroEqualTo("EXPORTAR_COLEGIADOS_ACOGIDOS_A_LOPD");
+		
+		genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+		
+		
+		List<GenParametros> genParametros = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+		
+		if(genParametros != null && genParametros.size() > 0) {
+			
+			GenParametros parametro = genParametros.get(0);
+			
+			if(parametro.getValor().equals("N")) {
+				sql.WHERE("(decode(cli.noaparecerredabogacia,null,0,cli.noaparecerredabogacia) <> 1)");
+			}
+		}
+
+		LOGGER.info(
+				"selectColegiados() -> Salida del servicio para obtener la sentencia para obtener la lista de colegiados");
+		
+		sql.ORDER_BY("NOMBRE");
+		LOGGER.info(sql.toString());
+		return sql.toString();
+
+	}
+	
 }
