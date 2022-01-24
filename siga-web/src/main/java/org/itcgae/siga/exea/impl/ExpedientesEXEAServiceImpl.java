@@ -5,6 +5,7 @@ import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeRequestDocumen
 import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeResponseDocument;
 import es.cgae.consultatramites.token.schema.UsuarioType;
 import ieci.tdw.ispac.services.ws.server.*;
+import org.apache.axis2.context.OperationContext;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -141,6 +142,10 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     @Autowired
     private CenComunidadesautonomasMapper cenComunidadesautonomasMapper;
+
+    private OperationContext operationContext;
+
+
 
     @Override
     public StringDTO isEXEActivoInstitucion(HttpServletRequest request) {
@@ -830,6 +835,65 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
     }
 
     @Override
+    public ResponseEntity<InputStreamResource> getJustificante(HttpServletRequest request, String claveConsulta) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ResponseEntity<InputStreamResource> res = null;
+        InputStream fileStream = null;
+        HttpHeaders headers = new HttpHeaders();
+
+        try {
+
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+            LOGGER.info(
+                    "ExpedientesEXEAServiceImpl.getJustificante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            LOGGER.info(
+                    "ExpedientesEXEAServiceImpl.getJustificante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (usuarios != null && !usuarios.isEmpty() && !UtilidadesString.esCadenaVacia(claveConsulta)) {
+
+                String urlWS = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.EXEA_URL_WEBSERVICES_REGTEL, idInstitucion.toString()).getValor();
+                ConsultaAdjuntoDocument consultaAdjuntoDocument = ConsultaAdjuntoDocument.Factory.newInstance();
+                ConsultaAdjuntoDocument.ConsultaAdjunto consultaAdjunto = consultaAdjuntoDocument.addNewConsultaAdjunto();
+                consultaAdjunto.setClaveConsulta(claveConsulta);
+                consultaAdjunto.setNroSecuenciaAdjunto(-1);
+
+                ConsultaAdjuntoResponseDocument consultaAdjuntoResponseDocument = _clientExpedientesEXEA.getJustificante(consultaAdjuntoDocument, urlWS);
+
+                if(consultaAdjuntoResponseDocument != null
+                        && consultaAdjuntoResponseDocument.getConsultaAdjuntoResponse() != null
+                        && SigaConstants.OK.equals(consultaAdjuntoResponseDocument.getConsultaAdjuntoResponse().getRespuesta().getCodigo())){
+
+                    ConsultaAdjuntoResponseDocument.ConsultaAdjuntoResponse consultaAdjuntoResponse = consultaAdjuntoResponseDocument.getConsultaAdjuntoResponse();
+                    byte [] fichero = consultaAdjuntoResponse.getAdjunto().getFicheroAdjunto();
+                    fileStream = new ByteArrayInputStream(fichero);
+
+                    String tipoMime = getMimeType("." + consultaAdjuntoResponse.getAdjunto().getNombreOriginalArchivo().split("\\.")[1]);
+
+                    headers.setContentType(MediaType.parseMediaType(tipoMime));
+
+                    headers.set("Content-Disposition",
+                            "attachment; filename=\"" + consultaAdjuntoResponse.getAdjunto().getNombreOriginalArchivo() + "\"");
+                }
+                res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+                        HttpStatus.OK);
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "ExpedientesEXEAServiceImpl.getJustificante() -> Se ha producido un error al descargar el justificante",
+                    e);
+        }
+
+        return res;
+    }
+
+    @Override
     @Transactional
     public DeleteResponseDTO eliminarDocumentoSolIncorp(HttpServletRequest request, String idSolicitud, List<DocumentacionIncorporacionItem> documentos) {
         String token = request.getHeader("Authorization");
@@ -983,6 +1047,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                                 LOGGER.info("iniciarTramiteColegiacionEXEA() / Numero registro REGTEL: " + numRegistro);
                                 //Seteamos numero registro
                                 solicitudincorporacion.setNumRegistro(numRegistro);
+                                solicitudincorporacion.setClaveconsultaregtel(claveConsulta);
                                 //Pasamos de pendiente documentacion a pendiente aprobacion
                                 solicitudincorporacion.setIdestado(SigaConstants.INCORPORACION_PENDIENTE_APROBACION);
                                 solicitudincorporacion.setFechaestado(new Date());
@@ -993,7 +1058,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                                 if(affectedRows == 1){
                                     LOGGER.info("iniciarTramiteColegiacionEXEA() / Actualizado en BBDD");
                                     updateResponseDTO.setStatus(SigaConstants.OK);
-                                    updateResponseDTO.setId(solicitudincorporacion.getIdsolicitud().toString() + ";" + solicitudincorporacion.getNumRegistro());
+                                    updateResponseDTO.setId(solicitudincorporacion.getIdsolicitud().toString() + ";" + solicitudincorporacion.getNumRegistro() + ";" + solicitudincorporacion.getClaveconsultaregtel());
                                 }else{
                                     error.setCode(500);
                                     error.setDescription("Error al actualizar la solicitud");
