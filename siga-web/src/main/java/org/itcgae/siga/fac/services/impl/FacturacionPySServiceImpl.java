@@ -1,12 +1,18 @@
 package org.itcgae.siga.fac.services.impl;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +40,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.openxml4j.opc.internal.FileHelper;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
@@ -44,6 +51,7 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
+import org.itcgae.siga.DTO.fac.FacDisqueteDevolucionesNuevoItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -116,6 +124,7 @@ import org.itcgae.siga.db.entities.FacDisqueteabonosKey;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetecargosKey;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
+import org.itcgae.siga.db.entities.FacDisquetedevolucionesExample;
 import org.itcgae.siga.db.entities.FacDisquetedevolucionesKey;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaDevolucion;
@@ -137,6 +146,7 @@ import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineaabonoKey;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
+import org.itcgae.siga.db.entities.FacLineadevoludisqbancoExample;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbancoKey;
 import org.itcgae.siga.db.entities.FacLineafactura;
 import org.itcgae.siga.db.entities.FacLineafacturaExample;
@@ -2570,6 +2580,74 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return ficherosDevolucionesDTO;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
+	public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
+			throws Exception {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		insertResponseDTO.setError(error);
+
+		SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("nuevoFicheroAdeudos() -> Entrada al servicio para crear un fichero de adeudos");
+
+		if (usuario != null) {
+
+			// Comprobar los campos obligatorios
+			if ( Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
+					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
+				throw new Exception("general.message.camposObligatorios");
+			}
+
+			Object[] param_in = new Object[11]; // Parametros de entrada del PL
+
+			// Ruta del fichero
+
+			String pathFichero = getProperty("facturacion.directorioBancosOracle");
+
+			String sBarra = "";
+			if (pathFichero.indexOf("/") > -1) sBarra = "/";
+			if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
+			pathFichero += sBarra + usuario.getIdinstitucion().toString();
+
+			// Parámetros de entrada
+			param_in[0] = usuario.getIdinstitucion();
+			param_in[1] = Objects.nonNull(ficheroAdeudosItem.getIdseriefacturacion()) ? ficheroAdeudosItem.getIdseriefacturacion() : "";
+			param_in[2] = Objects.nonNull(ficheroAdeudosItem.getIdprogramacion()) ? ficheroAdeudosItem.getIdprogramacion() : "";
+			param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
+			param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
+			param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
+			param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
+			param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
+			param_in[8] = pathFichero;
+			param_in[9] = usuario.getIdusuario();
+			param_in[10] = usuario.getIdlenguaje();
+
+			String[] resultado = commons.callPLProcedureFacturacionPyS(
+					"{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
+
+			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
+			if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
+				throw new Exception(resultado[2]);
+			} else {
+				if (!resultado[1].equals("0")) {
+					throw new Exception("general.mensaje.error.bbdd");
+				}
+			}
+			insertResponseDTO.setId(resultado[0]);
+		}
+
+		LOGGER.info("nuevoFicheroAdeudos() -> Salida del servicio para crear un fichero de adeudos");
+
+		return insertResponseDTO;
+	}
+
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems,
@@ -3812,7 +3890,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
+	public InsertResponseDTO nuevoFicheroDevoluciones(FacDisqueteDevolucionesNuevoItem ficherosDevolucionesItemItem, HttpServletRequest request)
 			throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -3823,59 +3901,288 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		// Conseguimos información del usuario logeado
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 
-		LOGGER.info("nuevoFicheroAdeudos() -> Entrada al servicio para crear un fichero de adeudos");
+		LOGGER.info("nuevoFicheroDevoluciones() -> Entrada al servicio para crear un fichero de devoluciones");
 
 		if (usuario != null) {
-			// Comprobar los campos obligatorios
-			if ( Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
-					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
-					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
-					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
-					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
-				throw new Exception("general.message.camposObligatorios");
-			}
+			String rutaServidor = getProperty("facturacion.directorioFisicoDevolucionesJava") + getProperty("facturacion.directorioDevolucionesJava");
+			String rutaOracle = getProperty("facturacion.directorioDevolucionesOracle");
 
-			Object[] param_in = new Object[11]; // Parametros de entrada del PL
+			Boolean comision = false;
+			String idDisqueteDevoluciones = "";
 
-			// Ruta del fichero
+			// Obtenemos la ruta del servidor
+			rutaServidor += File.separator + usuario.getIdinstitucion();
+			String nombreFichero = idDisqueteDevoluciones + ".d19";
 
-			String pathFichero = getProperty("facturacion.directorioBancosOracle");
 
-			String sBarra = "";
-			if (pathFichero.indexOf("/") > -1) sBarra = "/";
-			if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
-			pathFichero += sBarra + usuario.getIdinstitucion().toString();
+			// Obtenemos la ruta de Oracle
+			String barra 	= "";
+			if (rutaOracle.indexOf("/") > -1)
+				barra = "/";
+			if (rutaOracle.indexOf("\\") > -1)
+				barra = "\\";
 
-			// Parámetros de entrada
-			param_in[0] = usuario.getIdinstitucion();
-			param_in[1] = Objects.nonNull(ficheroAdeudosItem.getIdseriefacturacion()) ? ficheroAdeudosItem.getIdseriefacturacion() : "";
-			param_in[2] = Objects.nonNull(ficheroAdeudosItem.getIdprogramacion()) ? ficheroAdeudosItem.getIdprogramacion() : "";
-			param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
-			param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
-			param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
-			param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
-			param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
-			param_in[8] = pathFichero;
-			param_in[9] = usuario.getIdusuario();
-			param_in[10] = usuario.getIdlenguaje();
+			rutaOracle 	+= barra + usuario.getIdinstitucion() + barra;
 
-			String[] resultado = commons.callPLProcedureFacturacionPyS(
-					"{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
+			// Procesar y subir archivo para el fichero de devoluciones
+			InputStream newFile = ficherosDevolucionesItemItem != null
+					&& ficherosDevolucionesItemItem.getUploadFile() != null
+					? ficherosDevolucionesItemItem.getUploadFile().getInputStream() : null;
+			subirFicheroDisquete(newFile, rutaServidor, nombreFichero);
 
-			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
-			if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
-				throw new Exception(resultado[2]);
-			} else {
-				if (!resultado[1].equals("0")) {
-					throw new Exception("general.mensaje.error.bbdd");
+			// Presentación del fichero de devoluciones
+			String[] resultado = actualizacionTablasDevoluciones(usuario.getIdinstitucion(), rutaOracle,
+					nombreFichero, usuario.getIdlenguaje(), usuario.getIdusuario());
+
+			String codretorno = resultado[0];
+			String fechaDevolucion = resultado[2];
+
+			boolean renegociarAutomaticamente = false;
+			boolean conComision = false;
+			if (codretorno.equalsIgnoreCase("0")) {
+				if (renegociarAutomaticamente) {
+					// TODO Terminar función
+					FacDisquetedevolucionesExample facturasDevueltasExample = new FacDisquetedevolucionesExample();
+					facturasDevueltasExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
+
+					List<FacLineadevoludisqbanco> facturasDevueltas = facDisquetedevolucionesExtendsMapper.getFacturasDevueltasEnDisquete(usuario.getIdinstitucion(), idDisqueteDevoluciones);
+
+					for (FacLineadevoludisqbanco facturaDevuelta: facturasDevueltas) {
+						if (conComision)
+							aplicarComisionAFactura(facturaDevuelta, conComision, usuario, fechaDevolucion);
+
+						FacFacturaincluidaendisqueteKey facturaincluidaendisqueteKey = new FacFacturaincluidaendisqueteKey();
+						facturaincluidaendisqueteKey.setIdinstitucion(facturaDevuelta.getIdinstitucion());
+						facturaincluidaendisqueteKey.setIddisquetecargos(facturaDevuelta.getIddisquetecargos());
+						facturaincluidaendisqueteKey.setIdfacturaincluidaendisquete(facturaDevuelta.getIdfacturaincluidaendisquete());
+
+						FacFacturaincluidaendisquete facturaincluidaendisquete = facFacturaincluidaendisqueteMapper.selectByPrimaryKey(facturaincluidaendisqueteKey);
+
+						FacFacturaKey facturaKey = new FacFacturaKey();
+						facturaKey.setIdinstitucion(facturaincluidaendisquete.getIdinstitucion());
+						facturaKey.setIdfactura(facturaincluidaendisquete.getIdfactura());
+
+						FacFactura factura = facFacturaExtendsMapper.selectByPrimaryKey(facturaKey);
+
+						// insertarRenegociacion();
+					}
+				} else {
+					if (conComision) {
+						// Identificamos los disquetes devueltos asociados al fichero de devoluciones
+						FacLineadevoludisqbancoExample devolucionesExample = new FacLineadevoludisqbancoExample();
+						devolucionesExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+								.andIddisquetedevolucionesGreaterThanOrEqualTo(Long.parseLong(idDisqueteDevoluciones));
+
+						List<FacLineadevoludisqbanco> devoluciones = facLineadevoludisqbancoMapper.selectByExample(devolucionesExample);
+
+						// Aplicamos la comision a cada devolucion
+						for (FacLineadevoludisqbanco devolucion: devoluciones) {
+							aplicarComisionAFactura(devolucion, conComision, usuario, fechaDevolucion);
+						}
+					}
 				}
 			}
-			insertResponseDTO.setId(resultado[0]);
+
 		}
 
-		LOGGER.info("nuevoFicheroAdeudos() -> Salida del servicio para crear un fichero de adeudos");
+		LOGGER.info("nuevoFicheroDevoluciones() -> Salida del servicio para crear un fichero de devoluciones");
 
 		return insertResponseDTO;
+	}
+
+	private void subirFicheroDisquete(InputStream ficheroOriginal, String rutaServidor, String nombreFichero) {
+		LOGGER.info("subirFicheroDisquete() -> Entrada al servicio para subir el fichero de devoluciones");
+
+		String rutaFichero = rutaServidor + File.separator + nombreFichero;
+		InputStream stream =null;
+		BufferedReader rdr = null;
+		BufferedWriter out = null;
+
+		try {
+			stream = ficheroOriginal;
+			new File(rutaServidor).mkdirs();
+
+			rdr = new BufferedReader(new InputStreamReader(stream));
+			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(rutaFichero),"ISO-8859-1"));
+
+			boolean esXML = false;
+			boolean controlarDocument = true;
+
+			String nombreFicheroDevoluciones = nombreFichero;
+			if (nombreFicheroDevoluciones.toUpperCase().endsWith("XML")) {
+				esXML = true;
+			}
+
+			String linea = "";
+			while (linea!=null && linea.trim().equals("")) {
+				linea = rdr.readLine();
+			}
+
+			while (linea!=null) {
+
+				String lineaFichero = linea;
+
+				// Control que valida si es un fichero XML
+				if (!esXML && linea.indexOf("<")>=0) {
+					esXML = true;
+				}
+
+				// Control que realiza una serie de cambios cuando es XML
+				if (esXML) {
+
+					// Comienzo a buscar por la primera letra
+					int buscador = 0;
+
+					// Control de longitud de linea
+					while (buscador < linea.length()) {
+
+						// Busco < (principio de etiqueta)
+						buscador = linea.indexOf("<", buscador);
+
+						// Si no tiene etiqueta pinto la linea
+						if (buscador < 0) {
+							break;
+
+						}
+
+						// Si tiene < pasamos de letra
+						buscador++;
+
+						// Comprueba que tenga por lo menos alguna letra mas
+						if (linea.length() < buscador) {
+							break;
+						}
+
+						// Obtengo la siguiente letra al <
+						char letra = linea.charAt(buscador);
+
+						// Si no encuentra </ es que es una apertura de etiqueta
+						if (letra != '/') {
+
+							final String etiquetaDocument = "DOCUMENT";
+
+							// Control de si hay que validar la etiqueta DOCUMENT
+							if (controlarDocument && linea.length() > buscador + etiquetaDocument.length()) {
+
+								// Obtengo el nombre de la etiqueta
+								String buscaDocument = linea.substring(buscador, buscador + etiquetaDocument.length());
+
+								// Compruebo si la etiqueta es DOCUMENT
+								if (buscaDocument.equalsIgnoreCase(etiquetaDocument)) {
+
+									// Hay que buscar el final de la etiqueta DOCUMENT
+									int buscadorDocument = linea.indexOf(">", buscador + etiquetaDocument.length());
+
+									// Encuento el final de la etiqueta DOCUMENT
+									if (buscadorDocument > 0) {
+
+										// Elimino los atributos de la etiqueta DOCUMENT
+										linea = linea.substring(0, buscador + etiquetaDocument.length()) + linea.substring(buscadorDocument);
+
+										// Indico que hay que buscar despues de la etiqueta DOCUMENT
+										buscador += etiquetaDocument.length();
+
+										// Indicamos que ya hemos controlado la etiqueta DOCUMENT
+										controlarDocument = false;
+									}
+								}
+							}
+
+							// Pasamos a la siguiente letra
+							buscador++;
+							continue;
+						}
+
+						// Encuentro </ y buscamos el final de la etiqueta
+						buscador = linea.indexOf(">", buscador);
+
+						// Encuento el final de la etiqueta </...>
+						if (buscador<0) {
+							break;
+						}
+
+						// Pasamos a la siguiente letra >
+						buscador++;
+
+						// ponemos un retorno de linea al finalizar cada etiqueta final, porque asi evitamos un xml en una linea inmensa
+						lineaFichero = linea.substring(0, buscador);
+
+						// Escribimos la linea
+						out.write(lineaFichero);
+						out.write("\n");
+
+						// Eliminamos los datos escritos
+						linea = linea.substring(buscador);
+
+						// Volvemos a empezar
+						buscador = 0;
+					}
+
+					// Guardamos la linea tal como esta ahora
+					lineaFichero = linea;
+				} // FIN WHILE
+
+				// Comprueba si queda algo por escribir de la linea
+				if (!lineaFichero.trim().equals("")) {
+
+					// Escribimos la linea
+					out.write(lineaFichero);
+					out.write("\n");
+				}
+
+				// Obtenemos la siguiente linea
+				linea = "";
+				while (linea!=null && linea.trim().equals("")) {
+					linea = rdr.readLine();
+				}
+			}
+
+			// close the stream
+			stream.close();
+			out.close();
+			rdr.close();
+		} catch (FileNotFoundException e) {
+			throw new BusinessException("facturacion.nuevoFichero.literal.errorAcceso");
+		} catch (IOException e) {
+			throw new BusinessException("facturacion.nuevoFichero.literal.errorLectura");
+		}
+
+		LOGGER.info("subirFicheroDisquete() -> Saliendo del servicio para subir el fichero de devoluciones");
+	}
+
+	private String[] actualizacionTablasDevoluciones(Short institucion, String path, String fichero, String idioma, Integer usuario) throws Exception {
+		LOGGER.info("actualizacionTablasDevoluciones() -> Entrada al servicio para presentar el fichero de devoluciones");
+
+		String resultado[] = new String[3];
+		String codigoError_FicNoEncontrado = "5397";	// C�digo de error, el fichero no se ha encontrado.
+		String codretorno  = codigoError_FicNoEncontrado;
+		try	{
+			int i=0;
+			while (i<3 && codretorno.equalsIgnoreCase(codigoError_FicNoEncontrado)){
+				i++;
+				Thread.sleep(1000);
+				Object[] param_in = new Object[5];
+				param_in[0] = institucion;
+				param_in[1] = path;
+				param_in[2] = fichero;
+				param_in[3] = idioma;
+				param_in[4] = usuario;
+				resultado = commons.callPLProcedureFacturacionPyS(
+						"{call PKG_SIGA_CARGOS.DEVOLUCIONES(?,?,?,?,?,?,?,?)}", 3, param_in);
+				codretorno = resultado[0];
+			}
+
+		} catch (Exception e){
+			throw new Exception("actualizacionTableroDevoluciones() -> Proc:PKG_SIGA_CARGOS.DEVOLUCIONES " + resultado[1]);
+		}
+
+		LOGGER.info("actualizacionTablasDevoluciones() -> Saliendo del servicio para presentar el fichero de devoluciones");
+
+		return resultado;
+	}
+
+	private void aplicarComisionAFactura(FacLineadevoludisqbanco lineaDevolucion, Boolean conComision, AdmUsuarios usuario, String fechaDevolucion) {
+
 	}
 
 	@Override
