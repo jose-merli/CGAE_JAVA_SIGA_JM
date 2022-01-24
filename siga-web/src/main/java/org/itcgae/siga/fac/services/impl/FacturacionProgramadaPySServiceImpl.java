@@ -822,7 +822,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		params[7] = "";
 		params[8] = generaRutaFicheroPago(fac);
 		params[9] = USUARIO_AUTO;
-		params[10] = getLenguajeInstitucion(fac.getIdinstitucion());
+		params[10] = Integer.parseInt(getLenguajeInstitucion(fac.getIdinstitucion()));
 		return params;
 	}
 
@@ -1174,7 +1174,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 		params[0] = fac.getIdinstitucion();
 		params[1] = fac.getIdseriefacturacion();
 		params[2] = fac.getIdprogramacion();
-		params[3] = getLenguajeInstitucion(fac.getIdinstitucion());
+		params[3] = Integer.parseInt(getLenguajeInstitucion(fac.getIdinstitucion()));
 		params[4] = ""; // IdPeticion
 		params[5] = USUARIO_AUTO;
 		return params;
