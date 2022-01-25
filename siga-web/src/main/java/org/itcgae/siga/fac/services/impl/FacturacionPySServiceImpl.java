@@ -5134,17 +5134,20 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null && idInstitucion != null) {
 
-			//Recorrer el array y establecer fechabaja a dia de hoy o a null dependiendo de 
+			//Recorrer el array y establecer fechabaja a dia de hoy o a null dependiendo de si estaba activado o desactivado el registro
 			for(FacRegistroFichConta facRegistroFichConta: facRegistrosFichConta) {
-				FacRegistrofichconta beanUpdate = new FacRegistrofichconta();
 				
-				beanUpdate.setIdcontabilidad((long)facRegistroFichConta.getIdContabilidad());
-				beanUpdate.setIdcontabilidad((long) idInstitucion);
+				FacRegistrofichconta pk = new FacRegistrofichconta();
+				
+				pk.setIdcontabilidad((long)facRegistroFichConta.getIdContabilidad());
+				pk.setIdinstitucion(idInstitucion);
+				
+				FacRegistrofichconta beanUpdate = facRegistroFichContaExtendsMapper.selectByPrimaryKey(pk);
 				
 				if(facRegistroFichConta.getFechaBaja() == null) {
-					//beanUpdate.setFechaBaja(new Date()) EJECUTAR MYBATTIS PARA FECHABAJA
+					beanUpdate.setFechabaja(new Date());
 				}else {
-					//beanUpdate.setFechaBaja(null); EJECUTAR MYBATTIS PARA FECHABAJA
+					beanUpdate.setFechabaja(null);
 				}
 				
 				int resultado = facRegistroFichContaExtendsMapper.updateByPrimaryKey(beanUpdate);

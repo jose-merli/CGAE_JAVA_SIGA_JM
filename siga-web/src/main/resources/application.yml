@@ -45,7 +45,8 @@ application:
     /certificaciones/descargarLogReintegrosXunta: [628]
     /certificaciones/descargarInformeIncidencias: [628]
     /certificaciones/accionXuntaEnvios: [628]
-# Permisos para el módulo de ProductosYServicios
+
+    # Permisos para el módulo de ProductosYServicios
     /pys/solicitarCompra: [39A]
     /pys/aprobarCompra: [39B]
     /pys/denegarPeticion: [39]
@@ -87,4 +88,10 @@ application:
     /pys/borrarSuscripcionesBajas: [415]
 
     # Fin permisos para el módulo de ProductosYServicios
+
+    #Inicio permisos para el modulo Facturacion PyS
+    facturacionPyS/guardarRegistroFichConta: [417]
+    facturacionPyS/desactivarReactivarRegistroFichConta: [418]
+
+    #Fin permisos para el modulo Facturacion PyS
 
