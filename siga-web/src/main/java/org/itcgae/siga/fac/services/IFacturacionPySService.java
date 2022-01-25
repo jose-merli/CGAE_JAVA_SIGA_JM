@@ -200,7 +200,10 @@ public interface IFacturacionPySService {
 	public FacRegistroFichContaDTO maxIdContabilidad(HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
+	
+	public DeleteResponseDTO desactivarReactivarRegistroFichConta(List <FacRegistroFichConta> facRegistrosFichConta,
+			HttpServletRequest request) throws Exception;
 
 	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, String idProgramacion, HttpServletRequest request) throws Exception;
 
