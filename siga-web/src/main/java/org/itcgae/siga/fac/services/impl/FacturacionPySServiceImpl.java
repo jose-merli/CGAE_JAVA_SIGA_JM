@@ -273,9 +273,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private FacBancoinstitucionExtendsMapper facBancoinstitucionExtendsMapper;
 
 	@Autowired
-	private FacFacturaMapper facFacturaMapper;
-
-	@Autowired
 	private AdmContadorMapper admContadorMapper;
 
 	@Autowired
@@ -3892,24 +3889,21 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public InsertResponseDTO nuevoFicheroDevoluciones(FacDisqueteDevolucionesNuevoItem ficherosDevolucionesItemItem, HttpServletRequest request)
+	public InsertResponseDTO nuevoFicheroDevoluciones(FacDisqueteDevolucionesNuevoItem ficherosDevolucionesItem, HttpServletRequest request)
 			throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		insertResponseDTO.setError(error);
-
-		SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
 
 		// Conseguimos información del usuario logeado
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 
 		LOGGER.info("nuevoFicheroDevoluciones() -> Entrada al servicio para crear un fichero de devoluciones");
 
-		if (usuario != null) {
+		if (usuario != null && ficherosDevolucionesItem != null) {
 			String rutaServidor = getProperty("facturacion.directorioFisicoDevolucionesJava") + getProperty("facturacion.directorioDevolucionesJava");
 			String rutaOracle = getProperty("facturacion.directorioDevolucionesOracle");
 
-			Boolean comision = false;
 			String idDisqueteDevoluciones = "";
 
 			// Obtenemos la ruta del servidor
@@ -3924,27 +3918,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (rutaOracle.indexOf("\\") > -1)
 				barra = "\\";
 
-			// Parámetros de entrada
-			param_in[0] = usuario.getIdinstitucion();
-			param_in[1] = Objects.nonNull(ficheroAdeudosItem.getIdseriefacturacion()) ? Integer.parseInt(ficheroAdeudosItem.getIdseriefacturacion()) : "";
-			param_in[2] = Objects.nonNull(ficheroAdeudosItem.getIdprogramacion()) ? Integer.parseInt(ficheroAdeudosItem.getIdprogramacion()) : "";
-			param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
-			param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
-			param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
-			param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
-			param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
-			param_in[8] = pathFichero;
-			param_in[9] = usuario.getIdusuario();
-			param_in[10] = Integer.parseInt(usuario.getIdlenguaje());
-			
-			String[] resultado = commons.callPLProcedureFacturacionPyS(
-					"{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
 			rutaOracle 	+= barra + usuario.getIdinstitucion() + barra;
 
 			// Procesar y subir archivo para el fichero de devoluciones
-			InputStream newFile = ficherosDevolucionesItemItem != null
-					&& ficherosDevolucionesItemItem.getUploadFile() != null
-					? ficherosDevolucionesItemItem.getUploadFile().getInputStream() : null;
+			InputStream newFile = ficherosDevolucionesItem.getUploadFile() != null
+					? ficherosDevolucionesItem.getUploadFile().getInputStream() : null;
 			subirFicheroDisquete(newFile, rutaServidor, nombreFichero);
 
 			// Presentación del fichero de devoluciones
@@ -3954,11 +3932,25 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			String codretorno = resultado[0];
 			String fechaDevolucion = resultado[2];
 
-			boolean renegociarAutomaticamente = false;
-			boolean conComision = false;
+			boolean conComision = ficherosDevolucionesItem.getConComision() != null ? ficherosDevolucionesItem.getConComision() : false;
 			if (codretorno.equalsIgnoreCase("0")) {
+				if (conComision) {
+					// Identificamos los disquetes devueltos asociados al fichero de devoluciones
+					FacLineadevoludisqbancoExample devolucionesExample = new FacLineadevoludisqbancoExample();
+					devolucionesExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+							.andIddisquetedevolucionesGreaterThanOrEqualTo(Long.parseLong(idDisqueteDevoluciones));
+
+					List<FacLineadevoludisqbanco> devoluciones = facLineadevoludisqbancoMapper.selectByExample(devolucionesExample);
+
+					// Aplicamos la comision a cada devolucion
+					for (FacLineadevoludisqbanco devolucion: devoluciones) {
+						if (conComision)
+							aplicarComisionAFactura(devolucion, conComision, usuario, fechaDevolucion);
+					}
+				}
+				/*
+				En caso de que fuera necesaria la renegociación automática
 				if (renegociarAutomaticamente) {
-					// TODO Terminar función
 					FacDisquetedevolucionesExample facturasDevueltasExample = new FacDisquetedevolucionesExample();
 					facturasDevueltasExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
 
@@ -3983,21 +3975,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 						// insertarRenegociacion();
 					}
-				} else {
-					if (conComision) {
-						// Identificamos los disquetes devueltos asociados al fichero de devoluciones
-						FacLineadevoludisqbancoExample devolucionesExample = new FacLineadevoludisqbancoExample();
-						devolucionesExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
-								.andIddisquetedevolucionesGreaterThanOrEqualTo(Long.parseLong(idDisqueteDevoluciones));
-
-						List<FacLineadevoludisqbanco> devoluciones = facLineadevoludisqbancoMapper.selectByExample(devolucionesExample);
-
-						// Aplicamos la comision a cada devolucion
-						for (FacLineadevoludisqbanco devolucion: devoluciones) {
-							aplicarComisionAFactura(devolucion, conComision, usuario, fechaDevolucion);
-						}
-					}
 				}
+				*/
+
+			} else if(codretorno.equals("5420")) {
+
+			} else if(codretorno.equals("5397")) {
+
+			} else if(codretorno.equals("5404")) {
+
 			}
 
 		}
@@ -4204,6 +4190,208 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
+	public DeleteResponseDTO eliminarFicheroDevoluciones(FicherosDevolucionesItem ficherosDevolucionesItem, HttpServletRequest request)
+			throws Exception {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		deleteResponseDTO.setError(error);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("eliminarFicheroDevoluciones() -> Entrada al servicio para eliminar un fichero de devoluciones");
+
+		if (usuario != null) {
+			FacHistoricofacturaExample facturaNoDevueltaExample = new FacHistoricofacturaExample();
+
+			List<FacFactura> facturasNoDevueltas = null;// facHistoricofacturaExtendsMapper.selectByExample(facturaNoDevueltaExample);
+			facturaNoDevueltaExample.setOrderByClause("");
+
+			//Devolver las factruas no devueltas
+			if(facturasNoDevueltas.size() > 0){
+				GenDiccionarioKey diccionarioKey = new GenDiccionarioKey();
+				diccionarioKey.setIdrecurso("general.message.error.realiza.accion");
+				diccionarioKey.setIdlenguaje(usuario.getIdlenguaje());
+
+				StringBuilder errorMessage = new StringBuilder();
+				errorMessage.append(genDiccionarioMapper.selectByPrimaryKey(diccionarioKey).getDescripcion() + ": ");
+				int cont = 0;
+				for (FacFactura facturasDevueltas : facturasNoDevueltas){
+					errorMessage.append(facturasDevueltas.getNumerofactura());
+					cont++;
+					if(cont == 10){
+						errorMessage.append(" ...");
+						break;
+					}
+					else {
+						errorMessage.append(", ");
+					}
+				}
+				if(cont != 10){
+					errorMessage.deleteCharAt(errorMessage.length()-2);
+				}
+				throw new BusinessException(errorMessage.toString());
+			} else {
+				FacLineadevoludisqbancoExample lineasDisqueteExample = new FacLineadevoludisqbancoExample();
+				lineasDisqueteExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andIddisquetedevolucionesEqualTo(Long.parseLong(ficherosDevolucionesItem.getIdDisqueteDevoluciones()));
+
+				// Se itera sobre las facturas asociadas al disquete de devoluciones y se eliminan las relaciones
+				List<FacLineadevoludisqbanco> lineasDisquete = facLineadevoludisqbancoMapper.selectByExample(lineasDisqueteExample);
+				for (FacLineadevoludisqbanco linea: lineasDisquete) {
+					// Buscamos la línea que contiene la información de la factura
+					FacFacturaincluidaendisqueteKey facturaincluidaendisqueteKey = new FacFacturaincluidaendisqueteKey();
+					facturaincluidaendisqueteKey.setIdinstitucion(linea.getIdinstitucion());
+					facturaincluidaendisqueteKey.setIddisquetecargos(linea.getIddisquetecargos());
+					facturaincluidaendisqueteKey.setIdfacturaincluidaendisquete(linea.getIdfacturaincluidaendisquete());
+
+					FacFacturaincluidaendisquete facturaincluidaendisquete = facFacturaincluidaendisqueteMapper.selectByPrimaryKey(facturaincluidaendisqueteKey);
+
+					// Buscamos la factura asociada al diquete de cargos
+					FacFacturaKey facturaKey = new FacFacturaKey();
+					facturaKey.setIdinstitucion(facturaincluidaendisquete.getIdinstitucion());
+					facturaKey.setIdfactura(facturaincluidaendisquete.getIdfactura());
+
+					// Restauramos la factura al estado anterior
+					FacFactura facturaActual = facFacturaExtendsMapper.selectByPrimaryKey(facturaKey);
+
+					FacHistoricofacturaExample historicofacturaExample = new FacHistoricofacturaExample();
+					historicofacturaExample.createCriteria().andIdfacturaEqualTo(facturaActual.getIdfactura()).
+							andIdinstitucionEqualTo(facturaActual.getIdinstitucion());
+
+					List<FacHistoricofactura> historicoActual = facHistoricofacturaExtendsMapper.selectByExample(historicofacturaExample);
+					FacHistoricofactura estadoAnterior = historicoActual.get(historicoActual.size() - 2);
+
+					facturaActual.setEstado(estadoAnterior.getEstado());
+					facturaActual.setImptotalporpagar(estadoAnterior.getImptotalporpagar());
+					facturaActual.setImptotalanticipado(estadoAnterior.getImptotalanticipado());
+					facturaActual.setImptotalpagado(estadoAnterior.getImptotalpagado());
+					facturaActual.setImptotalpagadoporbanco(estadoAnterior.getImptotalpagadoporbanco());
+					facturaActual.setComisionidfactura(estadoAnterior.getComisionidfactura());
+					facturaActual.setIdcuentadeudor(estadoAnterior.getIdcuentadeudor());
+					facturaActual.setIdpersonadeudor(estadoAnterior.getIdpersonadeudor());
+					facturaActual.setIdformapago(estadoAnterior.getIdformapago());
+					facturaActual.setUsumodificacion(estadoAnterior.getUsumodificacion());
+					facturaActual.setFechamodificacion(estadoAnterior.getFechamodificacion());
+					facturaActual.setImptotalpagadosolocaja(estadoAnterior.getImptotalpagadosolocaja());
+					facturaActual.setImptotalpagadoporcaja(estadoAnterior.getImptotalpagadoporcaja());
+					facturaActual.setImptotalpagadosolotarjeta(estadoAnterior.getImptotalpagadosolotarjeta());
+					facturaActual.setImptotalcompensado(estadoAnterior.getImptotalcompensado());
+
+					facHistoricofacturaExtendsMapper.deleteByPrimaryKey(historicoActual.get(historicoActual.size()-1));
+					facFacturaExtendsMapper.updateByPrimaryKey(facturaActual);
+					facLineadevoludisqbancoMapper.deleteByPrimaryKey(linea);
+				}
+
+				// Finalmente se elimina el disquete de devoluciones
+				FacDisquetedevolucionesKey key = new FacDisquetedevolucionesKey();
+				key.setIdinstitucion(usuario.getIdinstitucion());
+				key.setIddisquetedevoluciones(Long.parseLong(ficherosDevolucionesItem.getIdDisqueteDevoluciones()));
+
+				facDisquetedevolucionesExtendsMapper.deleteByPrimaryKey(key);
+			}
+
+			throw new Exception();
+			/*
+			//Buscar las facturas que no tengan estado pagado por banco
+			List<FacFactura> facturasNoPagadas = new ArrayList<>();
+			facturasNoPagadas = facHistoricofacturaExtendsMapper.facturasDevueltasEnDisquete(ficheroAdeudosItem.getIdDisqueteCargos(), ficheroAdeudosItem.getIdInstitucion());
+
+
+			//Devolver las factruas no pagadas
+			if(facturasNoPagadas.size() > 0){
+				GenDiccionarioKey diccionarioKey = new GenDiccionarioKey();
+				diccionarioKey.setIdrecurso("general.message.error.realiza.accion");
+				diccionarioKey.setIdlenguaje(usuario.getIdlenguaje());
+
+				StringBuilder errorMessage = new StringBuilder();
+				errorMessage.append(genDiccionarioMapper.selectByPrimaryKey(diccionarioKey).getDescripcion() + ": ");
+				int cont = 0;
+				for (FacFactura facturasDevueltas : facturasNoPagadas){
+					errorMessage.append(facturasDevueltas.getNumerofactura());
+					cont++;
+					if(cont == 10){
+						errorMessage.append(" ...");
+						break;
+					}
+					else {
+						errorMessage.append(", ");
+					}
+				}
+				if(cont != 10){
+					errorMessage.deleteCharAt(errorMessage.length()-2);
+				}
+				throw new BusinessException(errorMessage.toString());
+			}
+
+			else {
+
+				//Buscar pagos del disquete
+				FacFacturaincluidaendisqueteExample facFacturaincluidaendisqueteExample = new FacFacturaincluidaendisqueteExample();
+
+				facFacturaincluidaendisqueteExample.createCriteria().
+						andIdinstitucionEqualTo(Short.valueOf(ficheroAdeudosItem.getIdInstitucion())).
+						andIddisquetecargosEqualTo(Long.valueOf(ficheroAdeudosItem.getIdDisqueteCargos()));
+
+				List<FacFacturaincluidaendisquete> listaPagos = facFacturaincluidaendisqueteMapper.selectByExample(facFacturaincluidaendisqueteExample);
+
+
+				//Eliminar los pagos del historico de factura y restaurar la factura, borrar pago por banco y finalmente el disquete
+				FacFactura facturaActual;
+				FacFacturaKey facturaKey = new FacFacturaKey();
+				facturaKey.setIdinstitucion(Short.valueOf(ficheroAdeudosItem.getIdInstitucion()));
+
+				for (FacFacturaincluidaendisquete pago : listaPagos){
+
+					facturaKey.setIdfactura(pago.getIdfactura());
+
+					facturaActual = facFacturaExtendsMapper.selectByPrimaryKey(facturaKey);
+
+					FacHistoricofacturaExample historicofacturaExample = new FacHistoricofacturaExample();
+					historicofacturaExample.createCriteria().andIdfacturaEqualTo(facturaActual.getIdfactura()).
+							andIdinstitucionEqualTo(facturaActual.getIdinstitucion());
+
+					List<FacHistoricofactura> historicoActual = facHistoricofacturaExtendsMapper.selectByExample(historicofacturaExample);
+					FacHistoricofactura estadoAnterior = historicoActual.get(historicoActual.size() - 2);
+
+					facturaActual.setEstado(estadoAnterior.getEstado());
+					facturaActual.setImptotalporpagar(estadoAnterior.getImptotalporpagar());
+					facturaActual.setImptotalanticipado(estadoAnterior.getImptotalanticipado());
+					facturaActual.setImptotalpagado(estadoAnterior.getImptotalpagado());
+					facturaActual.setImptotalpagadoporbanco(estadoAnterior.getImptotalpagadoporbanco());
+					facturaActual.setComisionidfactura(estadoAnterior.getComisionidfactura());
+					facturaActual.setIdcuentadeudor(estadoAnterior.getIdcuentadeudor());
+					facturaActual.setIdpersonadeudor(estadoAnterior.getIdpersonadeudor());
+					facturaActual.setIdformapago(estadoAnterior.getIdformapago());
+					facturaActual.setUsumodificacion(estadoAnterior.getUsumodificacion());
+					facturaActual.setFechamodificacion(estadoAnterior.getFechamodificacion());
+					facturaActual.setImptotalpagadosolocaja(estadoAnterior.getImptotalpagadosolocaja());
+					facturaActual.setImptotalpagadoporcaja(estadoAnterior.getImptotalpagadoporcaja());
+					facturaActual.setImptotalpagadosolotarjeta(estadoAnterior.getImptotalpagadosolotarjeta());
+					facturaActual.setImptotalcompensado(estadoAnterior.getImptotalcompensado());
+
+					facHistoricofacturaExtendsMapper.deleteByPrimaryKey(historicoActual.get(historicoActual.size()-1));
+					facFacturaMapper.updateByPrimaryKey(facturaActual);
+					facFacturaincluidaendisqueteMapper.deleteByPrimaryKey(pago);
+				}
+
+				FacDisquetecargosKey disquetecargosKey = new FacDisquetecargosKey();
+				disquetecargosKey.setIddisquetecargos(Long.valueOf(ficheroAdeudosItem.getIdDisqueteCargos()));
+				disquetecargosKey.setIdinstitucion(Short.valueOf(ficheroAdeudosItem.getIdInstitucion()));
+
+				facDisquetecargosExtendsMapper.deleteByPrimaryKey(disquetecargosKey);
+			}
+			*/
+			// deleteResponseDTO.setStatus(HttpStatus.OK.toString());
+		}
+
+		LOGGER.info("eliminarFicheroDevoluciones() -> Salida del servicio para eliminar un fichero de devoluciones");
+
+		return deleteResponseDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO actualizarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
 			throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -4376,7 +4564,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					facturaActual.setImptotalcompensado(estadoAnterior.getImptotalcompensado());
 
 					facHistoricofacturaExtendsMapper.deleteByPrimaryKey(historicoActual.get(historicoActual.size()-1));
-					facFacturaMapper.updateByPrimaryKey(facturaActual);
+					facFacturaExtendsMapper.updateByPrimaryKey(facturaActual);
 					facFacturaincluidaendisqueteMapper.deleteByPrimaryKey(pago);
 				}
 

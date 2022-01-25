@@ -43,6 +43,4 @@ public interface FacDisquetedevolucionesExtendsMapper extends FacDisquetedevoluc
 	})
 	List<FacturasIncluidasItem> getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma);
 
-	@SelectProvider(type = FacDisquetedevolucionesExtendsSqlProvider.class, method = "getFacturasDevueltasEnDisquete")
-	List<FacLineadevoludisqbanco> getFacturasDevueltasEnDisquete(Short idInstitucion, String idDisqueteDevoluciones);
 }

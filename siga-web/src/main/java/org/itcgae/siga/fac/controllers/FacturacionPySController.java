@@ -804,6 +804,24 @@ public class FacturacionPySController {
 		}
 	}
 
+	@PostMapping(value = "/eliminarFicheroDevoluciones")
+	ResponseEntity<DeleteResponseDTO> eliminarFicheroDevoluciones(@RequestBody FicherosDevolucionesItem item,
+															 HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = this.facturacionService.eliminarFicheroDevoluciones(item, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@PostMapping(value = "/actualizarFicheroAdeudos")
 	ResponseEntity<UpdateResponseDTO> actualizarFicheroAdeudos(@RequestBody FicherosAdeudosItem item,
 			HttpServletRequest request) {
