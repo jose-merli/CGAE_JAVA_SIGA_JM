@@ -45,7 +45,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //estados
-        if (!item.getEstadosFiltroAb().isEmpty()) {
+        if (item.getEstadosFiltroAb()!=null && !item.getEstadosFiltroAb().isEmpty()) {
             StringBuilder aux = new StringBuilder();
             for (String s : item.getEstadosFiltroAb()) {
                 aux.append(s).append(",");

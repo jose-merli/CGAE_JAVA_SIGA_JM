@@ -9,8 +9,29 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGALogging;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.*;
+import org.itcgae.siga.db.entities.AdmInforme;
+import org.itcgae.siga.db.entities.AdmInformeExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.EcomColaParametros;
+import org.itcgae.siga.db.entities.FacFacturacionprogramada;
+import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
+import org.itcgae.siga.db.entities.FacPlantillafacturacion;
+import org.itcgae.siga.db.entities.FacSeriefacturacion;
+import org.itcgae.siga.db.entities.FacSeriefacturacionExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.mappers.AdmInformeMapper;
+import org.itcgae.siga.db.mappers.CenInstitucionMapper;
+import org.itcgae.siga.db.mappers.EcomColaMapper;
+import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
@@ -30,7 +51,12 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -239,7 +265,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
             transactionManager.rollback(transactionStatus);
         }
     }
-
 
     private void commit(TransactionStatus transactionStatus) {
         if (transactionStatus != null && !transactionStatus.isCompleted()) {
@@ -704,7 +729,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
         facProgMapper.updateByPrimaryKey(fac);
     }
 
-
     private void informarTraspasoEcomCola(FacFacturacionprogramada fac) {
         EcomCola ecomCola = new EcomCola();
         ecomCola.setIdinstitucion(fac.getIdinstitucion());
@@ -720,7 +744,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
         insertarColaParametros(ecomCola, map);
     }
-
 
     private void insertarColaParametros(EcomCola ecomCola, HashMap<String, String> map) {
         try {
@@ -760,7 +783,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
     private void tratarExcepcionesConfirmarFacturacion(FacFacturacionprogramada fac, TransactionStatus transactionStatus, Exception e) {
         rollBack(transactionStatus);// TODO Auto-generated method stub
         LOGGER.error("ERROR AL CONFIRMAR Y PRESENTAR: " + e);
-//		(SIGALogging) log.error("CONFIRMACION","N/A","N/A","Error en proceso de confirmaci�n: " + e.getMessage());
+//		(SIGALogging) log.error("CONFIRMACION","N/A","N/A","Error en proceso de confirmacion: " + e.getMessage());
         String nombreFichero = getNombreFicheroLogConfirmacion(fac);
         fac.setIdestadoconfirmacion(FacEstadosFacturacion.ERROR_CONFIRMACION.getId());
         fac.setFechaconfirmacion(null);
@@ -831,7 +854,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
         params[7] = "";
         params[8] = generaRutaFicheroPago(fac);
         params[9] = USUARIO_AUTO;
-        params[10] = getLenguajeInstitucion(fac.getIdinstitucion());
+        params[10] = Integer.parseInt(getLenguajeInstitucion(fac.getIdinstitucion()));
         return params;
     }
 
@@ -905,7 +928,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
         }
     }
 
-
     private TransactionStatus getNewLongTransaction() {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setTimeout(getTimeoutLargo());
@@ -941,7 +963,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
         return resultado;
     }
-
 
     private void logResultadoError(FacFacturacionprogramada fac) {
         LOGGER.error("### Fin GENERACION (Serie:" + fac.getIdseriefacturacion() + "; IdProgramacion:" + fac.getIdprogramacion() + "), finalizada con errores");
@@ -1171,7 +1192,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
                     + fac.getIdseriefacturacion() + "; IdProgramacion:" + fac.getIdprogramacion() + "; CodigoError:"
                     + e.getMessage() + ")");
         }
-
     }
 
     private boolean esTimeout(Exception e) {
@@ -1183,7 +1203,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
         params[0] = fac.getIdinstitucion();
         params[1] = fac.getIdseriefacturacion();
         params[2] = fac.getIdprogramacion();
-        params[3] = getLenguajeInstitucion(fac.getIdinstitucion());
+        params[3] = Integer.parseInt(getLenguajeInstitucion(fac.getIdinstitucion()));
         params[4] = ""; // IdPeticion
         params[5] = USUARIO_AUTO;
         return params;
@@ -1233,7 +1253,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
         return value;
     }
 
-
     private String getParametro(final String key) {
         return getParametro(key, null, null);
     }
@@ -1259,6 +1278,5 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
         return value;
     }
-
 
 }
