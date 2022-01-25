@@ -181,7 +181,10 @@ public interface IFacturacionPySService {
 	public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
 			throws Exception;
 
-	InsertResponseDTO nuevoFicheroDevoluciones(FacDisqueteDevolucionesNuevoItem ficherosDevolucionesItemItem, HttpServletRequest request)
+	InsertResponseDTO nuevoFicheroDevoluciones(FacDisqueteDevolucionesNuevoItem ficherosDevolucionesItem, HttpServletRequest request)
+			throws Exception;
+
+	DeleteResponseDTO eliminarFicheroDevoluciones(FicherosDevolucionesItem ficherosDevolucionesItem, HttpServletRequest request)
 			throws Exception;
 
 	public UpdateResponseDTO actualizarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
@@ -205,7 +208,10 @@ public interface IFacturacionPySService {
 	public FacRegistroFichContaDTO maxIdContabilidad(HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
+	
+	public DeleteResponseDTO desactivarReactivarRegistroFichConta(List <FacRegistroFichConta> facRegistrosFichConta,
+			HttpServletRequest request) throws Exception;
 
 	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, String idProgramacion, HttpServletRequest request) throws Exception;
 
