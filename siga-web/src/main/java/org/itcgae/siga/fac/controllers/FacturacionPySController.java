@@ -923,7 +923,7 @@ public class FacturacionPySController {
 
 	@PostMapping(value = "/guardarRegistroFichConta")
 	ResponseEntity<UpdateResponseDTO> guardarRegistroFichConta(@RequestBody FacRegistroFichConta facRegistroFichConta,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception{
 
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
@@ -933,6 +933,21 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping(value = "/desactivarReactivarRegistroFichConta")
+	ResponseEntity<DeleteResponseDTO> desactivarReactivarRegistroFichConta(@RequestBody List <FacRegistroFichConta> facRegistrosFichConta,
+			HttpServletRequest request) throws Exception{
+
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = facturacionService.desactivarReactivarRegistroFichConta(facRegistrosFichConta, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

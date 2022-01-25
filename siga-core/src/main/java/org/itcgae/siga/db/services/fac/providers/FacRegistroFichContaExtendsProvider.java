@@ -72,6 +72,10 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 		sql.WHERE("F.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("ROWNUM <= " + tamMaximo);
 		
+		if(!facRegistroFichConta.isHistorico()) {
+			sql.WHERE("F.FECHA IS NULL");
+		}
+		
 		sql.ORDER_BY("F.IDCONTABILIDAD DESC");
 		
 		LOGGER.info(sql.toString());

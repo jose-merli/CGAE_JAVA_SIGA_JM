@@ -5076,24 +5076,33 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		AdmUsuarios usuario = new AdmUsuarios();
+		
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
 
-		if (idInstitucion != null) {
+		if (idInstitucion != null && usuario != null) {
 
 			FacRegistrofichconta beanRegistro = new FacRegistrofichconta();
 			beanRegistro.setIdcontabilidad(Long.valueOf(facRegistroFichConta.getIdContabilidad()));
+			beanRegistro.setIdinstitucion(idInstitucion);
+			
 			beanRegistro.setFechacreacion(facRegistroFichConta.getFechaCreacion());
 			beanRegistro.setNombrefichero(facRegistroFichConta.getNombreFichero());
 			beanRegistro.setFechadesde(facRegistroFichConta.getFechaExportacionDesde());
 			beanRegistro.setFechahasta(facRegistroFichConta.getFechaExportacionHasta());
 			beanRegistro.setFechamodificacion(new Date());
-			beanRegistro.setEstado(new Short("1"));
+			beanRegistro.setUsumodificacion(usuario.getIdusuario());
+			beanRegistro.setEstado(new Short("1"));//ESTADO PROGRAMADO
+			
+			beanRegistro.setNumeroasientos(0L);//PROVISIONAL
 
-			int resultado = facRegistroFichContaExtendsMapper.insert(beanRegistro);
+			int resultado = facRegistroFichContaExtendsMapper.insertSelective(beanRegistro);
 
 			if (resultado == 1) {
 				updateResponseDTO.setStatus(SigaConstants.CODE_200.toString());
@@ -5106,6 +5115,55 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		}
 
 		return updateResponseDTO;
+	}
+	
+	@Override
+	public DeleteResponseDTO desactivarReactivarRegistroFichConta(List <FacRegistroFichConta> facRegistrosFichConta,
+			HttpServletRequest request)
+			throws Exception {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		deleteResponseDTO.setError(error);
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Conseguimos información del usuario logeado
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+		LOGGER.info("deleteResponseDTO() -> Entrada al servicio para desactivar/reactivar un fichero de exportacion de contabilidad");
+
+		if (usuario != null && idInstitucion != null) {
+
+			//Recorrer el array y establecer fechabaja a dia de hoy o a null dependiendo de 
+			for(FacRegistroFichConta facRegistroFichConta: facRegistrosFichConta) {
+				FacRegistrofichconta beanUpdate = new FacRegistrofichconta();
+				
+				beanUpdate.setIdcontabilidad((long)facRegistroFichConta.getIdContabilidad());
+				beanUpdate.setIdcontabilidad((long) idInstitucion);
+				
+				if(facRegistroFichConta.getFechaBaja() == null) {
+					//beanUpdate.setFechaBaja(new Date()) EJECUTAR MYBATTIS PARA FECHABAJA
+				}else {
+					//beanUpdate.setFechaBaja(null); EJECUTAR MYBATTIS PARA FECHABAJA
+				}
+				
+				int resultado = facRegistroFichContaExtendsMapper.updateByPrimaryKey(beanUpdate);
+				
+				if (resultado == 1) {
+					deleteResponseDTO.setStatus(SigaConstants.CODE_200.toString());
+					LOGGER.info("desactivarReactivarRegistroFichConta() -> Registro con id " + beanUpdate.getIdcontabilidad() + " activado/desactivado con exito.");
+				} else {
+					deleteResponseDTO.setStatus(SigaConstants.CODE_400.toString());
+					LOGGER.info("desactivarReactivarRegistroFichConta() -> Registro con id " + beanUpdate.getIdcontabilidad() + " activado/desactivado sin exito.");
+				}
+				
+			}
+
+		}
+
+		LOGGER.info("deleteResponseDTO() -> Salida del servicio para desactivar/reactivar un fichero de exportacion de contabilidad");
+
+		return deleteResponseDTO;
 	}
 
 	@Override
