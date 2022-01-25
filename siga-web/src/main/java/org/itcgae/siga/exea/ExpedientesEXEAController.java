@@ -132,8 +132,8 @@ public class ExpedientesEXEAController {
         return response;
     }
 
-    @GetMapping(value = "/getJustificante", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<InputStreamResource> getJustificante(HttpServletRequest request, @RequestParam String claveConsulta) {
+    @PostMapping(value = "/getJustificante", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<InputStreamResource> getJustificante(HttpServletRequest request, @RequestBody String claveConsulta) {
         ResponseEntity<InputStreamResource> response = expedientesEXEAService.getJustificante(request, claveConsulta);
         return response;
     }

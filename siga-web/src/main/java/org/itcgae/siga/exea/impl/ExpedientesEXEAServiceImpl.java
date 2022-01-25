@@ -54,14 +54,17 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.*;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.*;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -858,28 +861,54 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             if (usuarios != null && !usuarios.isEmpty() && !UtilidadesString.esCadenaVacia(claveConsulta)) {
 
                 String urlWS = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.EXEA_URL_WEBSERVICES_REGTEL, idInstitucion.toString()).getValor();
-                ConsultaAdjuntoDocument consultaAdjuntoDocument = ConsultaAdjuntoDocument.Factory.newInstance();
-                ConsultaAdjuntoDocument.ConsultaAdjunto consultaAdjunto = consultaAdjuntoDocument.addNewConsultaAdjunto();
-                consultaAdjunto.setClaveConsulta(claveConsulta);
-                consultaAdjunto.setNroSecuenciaAdjunto(-1);
 
-                ConsultaAdjuntoResponseDocument consultaAdjuntoResponseDocument = _clientExpedientesEXEA.getJustificante(consultaAdjuntoDocument, urlWS);
+                SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+                SOAPConnection soapConnection = soapConnectionFactory.createConnection();
 
-                if(consultaAdjuntoResponseDocument != null
-                        && consultaAdjuntoResponseDocument.getConsultaAdjuntoResponse() != null
-                        && SigaConstants.OK.equals(consultaAdjuntoResponseDocument.getConsultaAdjuntoResponse().getRespuesta().getCodigo())){
+                MessageFactory messageFactory = MessageFactory.newInstance();
+                SOAPMessage soapRequest = messageFactory.createMessage();
 
-                    ConsultaAdjuntoResponseDocument.ConsultaAdjuntoResponse consultaAdjuntoResponse = consultaAdjuntoResponseDocument.getConsultaAdjuntoResponse();
-                    byte [] fichero = consultaAdjuntoResponse.getAdjunto().getFicheroAdjunto();
-                    fileStream = new ByteArrayInputStream(fichero);
+                SOAPPart soapPart = soapRequest.getSOAPPart();
+                //Create this based on the SOAP request XML, you can use SOAP UI to get the XML as you like
+                String myNamespace = "ereg";
+                String myNamespaceURI = "http://www.redabogacia.org/regtel/ws/eregtel";
 
-                    String tipoMime = getMimeType("." + consultaAdjuntoResponse.getAdjunto().getNombreOriginalArchivo().split("\\.")[1]);
+                // SOAP Envelope
+                SOAPEnvelope envelope = soapPart.getEnvelope();
+                envelope.addNamespaceDeclaration(myNamespace, myNamespaceURI);
 
-                    headers.setContentType(MediaType.parseMediaType(tipoMime));
+                // SOAP Body
+                SOAPBody soapBody = envelope.getBody();
+                SOAPElement soapBodyElem = soapBody.addChildElement("ConsultaAdjunto", myNamespace);
+
+                SOAPElement claveConsultaElem = soapBodyElem.addChildElement("claveConsulta", myNamespace);
+                claveConsultaElem.addTextNode(claveConsulta);
+
+                SOAPElement numSecElement = soapBodyElem.addChildElement("nroSecuenciaAdjunto", myNamespace);
+                numSecElement.addTextNode("-1");
+
+                SOAPMessage soapResponse = soapConnection.call(soapRequest, urlWS);
+                int numOfAttachments = soapResponse.countAttachments();
+                if(numOfAttachments > 0){
+                    Iterator attachments = soapResponse.getAttachments();
+                    while(attachments.hasNext()){
+                        AttachmentPart attachment = (AttachmentPart) attachments.next();
+                        byte [] fichero = attachment.getRawContentBytes();
+                        fileStream = new ByteArrayInputStream(fichero);
+                        headers.setContentType(MediaType.parseMediaType(attachment.getContentType()));
+                    }
+
+                    Iterator itr = soapResponse.getSOAPBody().getChildElements();
+                    javax.xml.soap.Node nodoConsultaAdjuntoResponse = (javax.xml.soap.Node) itr.next();
+                    Node adjunto = nodoConsultaAdjuntoResponse.getFirstChild();
+                    String nombreArchivo = adjunto.getChildNodes().item(1).getTextContent();
 
                     headers.set("Content-Disposition",
-                            "attachment; filename=\"" + consultaAdjuntoResponse.getAdjunto().getNombreOriginalArchivo() + "\"");
+                            "attachment; filename=\"" + nombreArchivo + "\"");
                 }
+
+                soapConnection.close();
+                
                 res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
                         HttpStatus.OK);
             }
