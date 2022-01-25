@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.fac.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.FacFacturaSqlProvider;
 
 import java.text.SimpleDateFormat;
@@ -61,7 +62,13 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         facturas.LEFT_OUTER_JOIN("gen_recursos r ON (ef.descripcion = r.idrecurso AND r.idlenguaje =" + idLenguaje + ")");
 
         //filtros
-        facturas.WHERE("f.idinstitucion =" + idInstitucion);
+        if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+            facturas.WHERE("f.idinstitucion =" + idInstitucion);
+        } else {
+            if (item.getIdInstitucion() != null) {
+                facturas.WHERE("f.idinstitucion =" + item.getIdInstitucion());
+            }
+        }
 
         if(item.getFacturasPendientesDesde() != null || item.getFacturasPendientesHasta() != null) {
             facturas.WHERE("c.idpersona IN (" + facturasPendientes.toString() + ")");
@@ -141,7 +148,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //numero colegiado
-        if(item.getNumeroColegiado()!=null) {
+        if(item.getNumeroColegiado() != null) {
             facturas.WHERE("col.NCOLEGIADO="+item.getNumeroColegiado());
         }
 
