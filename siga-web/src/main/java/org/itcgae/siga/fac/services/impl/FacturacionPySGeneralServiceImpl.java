@@ -771,6 +771,51 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 		return comboDTO;
 	}
+	
+	@Override
+	public ComboDTO2 comboSeriesFacturacionConDesc(HttpServletRequest request) throws Exception {
+
+		ComboDTO2 comboDTO = new ComboDTO2();
+		List<ComboItem2> comboItems;
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.debug(
+				"FacturacionPySGeneralServiceImpl.comboSeriesFacturacion() -> Entrada al servicio para recuperar el combo de series de facturacion");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"FacturacionPySGeneralServiceImpl.comboSeriesFacturacion() -> obteniendo datos para el el combo de series de facturación");
+
+			FacSeriefacturacionExample example = new FacSeriefacturacionExample();
+			example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion()).andFechabajaIsNull();
+
+			List<FacSeriefacturacion> seriesFac = facSeriefacturacionMapper.selectByExample(example);
+
+			if (seriesFac.size() > 0) {
+
+				comboItems = seriesFac.stream().map(m -> {
+
+					ComboItem2 item = new ComboItem2();
+
+					item.setValue(String.valueOf(m.getIdseriefacturacion()));
+					item.setLabel1(m.getNombreabreviado());
+					item.setLabel2(m.getDescripcion());
+
+					return item;
+
+				}).collect(Collectors.toList());
+
+				comboDTO.setCombooItems(comboItems);
+			}
+		}
+
+		LOGGER.debug("comboCuentasBancarias() -> Salida del servicio para obtener el combo de cuentas bancarias");
+
+		return comboDTO;
+	}
 
 	@Override
 	public ComboDTO2 comboTiposIVA(HttpServletRequest request) throws Exception {
@@ -792,6 +837,36 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			// Logica
 			comboItems = pySTipoIvaExtendsMapper.comboTiposIVA(idioma);
+
+			comboDTO.setCombooItems(comboItems);
+
+		}
+
+		LOGGER.debug("comboTiposIVA() -> Salida del servicio para obtener el combo de tipos de IVA");
+
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO2 comboTiposIVACuentaBancariaEntidad(String idTipoIVA,HttpServletRequest request) throws Exception {
+		ComboDTO2 comboDTO = new ComboDTO2();
+
+		List<ComboItem2> comboItems;
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.debug("comboTiposIVA() -> Entrada al servicio para recuperar el combo de tipos de IVA");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.debug(
+					"comboTiposIVA() / pySTipoIvaExtendsMapper.comboTiposIVA() -> Entrada a pySTipoIvaExtendsMapper para obtener el combo de tipos de IVA");
+
+			String idioma = usuario.getIdlenguaje();
+
+			// Logica
+			comboItems = pySTipoIvaExtendsMapper.comboIVACuentasBancariasEntidad(idTipoIVA,idioma);
 
 			comboDTO.setCombooItems(comboItems);
 

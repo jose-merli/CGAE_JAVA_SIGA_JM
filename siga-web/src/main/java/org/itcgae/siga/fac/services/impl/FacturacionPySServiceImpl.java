@@ -1903,7 +1903,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					item.setNombre(admContador.getNombre());
 					item.setPrefijo(admContador.getPrefijo());
 					item.setSufijo(admContador.getSufijo());
-					item.setContador(String.valueOf(admContador.getContador()));
+					if(admContador.getContador() == 0) {
+						item.setContador("1");
+					}else {
+						item.setContador(String.valueOf(admContador.getContador()));
+					}
+					//item.setContador(String.valueOf(admContador.getContador()));
 
 					contadorSeriesItems.add(item);
 				}
@@ -1953,7 +1958,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					item.setNombre(admContador.getNombre());
 					item.setPrefijo(admContador.getPrefijo());
 					item.setSufijo(admContador.getSufijo());
-					item.setContador(String.valueOf(admContador.getContador()));
+					//	item.setContador(String.valueOf(admContador.getContador()));
+					if(admContador.getContador() == 0) {
+						item.setContador("1");
+					}else {
+						item.setContador(String.valueOf(admContador.getContador()));
+					}
+					
 
 					contadorSeriesItems.add(item);
 				}
@@ -5217,7 +5228,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		ResponseFileDTO response = new ResponseFileDTO();
 		File excel = null;
-		String  etiquetasArray = null ;
 		List<Map<String, Object>> result = null;
 
 		if (null != idInstitucion) {
@@ -5236,8 +5246,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
-				
-				etiquetasArray = etiquetas.getIdSerieFacturacion();
 
 				String sentencia = selectColegiados(idInstitucion,etiquetas.getIdSerieFacturacion(), usuario.getIdlenguaje());
 
