@@ -73,7 +73,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //estados
-        if (!item.getEstadosFiltroFac().isEmpty()) {
+        if (null!=item.getEstadosFiltroFac() && !item.getEstadosFiltroFac().isEmpty()) {
             StringBuilder aux = new StringBuilder();
             for (String s : item.getEstadosFiltroFac()) {
                 aux.append(s).append(",");
@@ -277,7 +277,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         SQL query = new SQL();
 
-        query.SELECT("MAX(IDFACTURA)+1 AS ID");
+        query.SELECT("MAX(TO_NUMBER(IDFACTURA))+1 AS ID");
         query.FROM("FAC_FACTURA ff");
         query.WHERE("IDINSTITUCION ="+idInstitucion);
 

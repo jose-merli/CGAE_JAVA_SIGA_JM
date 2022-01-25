@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturasIncluidasItem;
 import org.itcgae.siga.DTO.fac.FicherosDevolucionesItem;
+import org.itcgae.siga.db.entities.FacFactura;
+import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
 import org.itcgae.siga.db.mappers.FacDisquetedevolucionesMapper;
 import org.itcgae.siga.db.services.fac.providers.FacDisquetedevolucionesExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -40,4 +42,5 @@ public interface FacDisquetedevolucionesExtendsMapper extends FacDisquetedevoluc
 			@Result(column = "PENDIENTETOTAL", property = "pendienteTotal", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturasIncluidasItem> getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma);
+
 }

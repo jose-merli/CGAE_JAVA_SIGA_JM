@@ -1952,6 +1952,16 @@ public class WSCommons {
 		return valid;
 	}
 
+	/**
+	 * Parametros tiene que venir como tipo String, int, short o long (no vale otro tipo si no, no funciona el for para settear los parametros de entrada)
+	 * @param functionDefinition
+	 * @param outParameters
+	 * @param inParameters
+	 * @return
+	 * @throws IOException
+	 * @throws NamingException
+	 * @throws SQLException
+	 */
 	public String[] callPLProcedureFacturacionPyS(String functionDefinition, int outParameters, Object[] inParameters)
 			throws IOException, NamingException, SQLException {
 
@@ -1972,8 +1982,14 @@ public class WSCommons {
 
 			// input Parameters
 			for (int i = 0; i < size; i++) {
-
-				cs.setString(i + 1, inParameters[i].toString());
+				 
+				if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
+					 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
+				 }
+				 
+				if (inParameters[i] instanceof String){
+					cs.setString(i+1, inParameters[i].toString());
+				 }
 			}
 
 			// output Parameters
