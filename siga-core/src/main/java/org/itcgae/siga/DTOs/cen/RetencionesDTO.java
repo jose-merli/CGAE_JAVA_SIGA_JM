@@ -12,7 +12,18 @@ public class RetencionesDTO {
 	
 	private List<RetencionesItem> retencionesItemList;
 	private Error error;
+	private boolean activo;
 	
+	public boolean isActivo() {
+		return activo;
+	}
+
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
+
+
 	/**
 	 *
 	 */

@@ -62,8 +62,7 @@ public class GestorContadores {
             throw new Exception("Error al modificar los datos del contador", e);
         }
     }
-    
-    public void setContador(AdmContador datosContadorNuevo, String numRegNuevo, boolean remesa) throws Exception {
+ public void setContador(AdmContador datosContadorNuevo, String numRegNuevo, boolean remesa) throws Exception {
         // registro contador que se obtiene de la tabla ADM_CONTADORES con el
         // idinstitucion y el idcontador
         AdmContador gcOriginal = null;
@@ -83,8 +82,8 @@ public class GestorContadores {
         } catch (Exception e) {
             throw new Exception("Error al modificar los datos del contador", e);
         }
-    }
-
+    }	
+																												  
     public int getSiguienteNumContador(AdmContador contador) throws Exception {
         int contadorSiguiente = 0;
         AdmContador gcOriginal = null;

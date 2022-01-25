@@ -75,7 +75,7 @@ public interface IConsultasService {
 	
 	public QueryBuilderDTO constructorConsultas(HttpServletRequest request, QueryBuilderDTO queryBuilderDTO) throws Exception;
 	
-	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta);
+	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta, String idInstitucion);
 	
 	public ConfigColumnasQueryBuilderDTO obtenerConfigColumnasQueryBuilder(HttpServletRequest request);
 	

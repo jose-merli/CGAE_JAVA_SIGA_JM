@@ -44,5 +44,20 @@ public class ScsAcreditacionSqlExtendsProvider extends ScsAcreditacionSqlProvide
 
 		return sql.toString();
 	}
+
+	public String getIDAcreditaciones(String idInstitucion, String idFacturacion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("ACREDITACION.IDACREDITACION");
+		if(idFacturacion != null) {
+			sql.WHERE("ACREDITACION.IDACREDITACION  WHERE IDFACTURACION = "+ idFacturacion +" AND IDINSTITUCION = " + idInstitucion);
+		}
+		sql.FROM("SCS_ACREDITACION ACREDITACION");
+
+		sql.ORDER_BY("IDACREDITACION");
+
+		return sql.toString();
+	}
 	
 }

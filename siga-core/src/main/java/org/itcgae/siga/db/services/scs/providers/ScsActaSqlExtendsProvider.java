@@ -13,17 +13,25 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 
 	public String busquedaActas(ActasItem actasItem, Short idInstitucion) {
 
-		String fechaReunion = "0";
-		String fechaResolucion = "0";
+		String fechaReuniondesde = "0";
+		String fechaReunionhasta = "0";
+		String fechaResoluciondesde = "0";
+		String fechaResolucionhasta = "0";
 
-		if (actasItem.getFechareunion() != null) {
-			fechaReunion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechareunion());
-
+		if (actasItem.getFechareuniondesde() != null) {
+			fechaReuniondesde = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechareuniondesde());
 		}
+		if (actasItem.getFechareunionhasta() != null) {
+			fechaReunionhasta = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechareunionhasta());
+		}
+		
 		LOGGER.info("*******************fechaResolucion********************" + actasItem.getFecharesolucion() + " "
 				+ actasItem.getAnioacta() + " " + actasItem.getIdpresidente());
-		if (actasItem.getFecharesolucion() != null) {
-			fechaResolucion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFecharesolucion());
+		if (actasItem.getFecharesoluciondesde() != null) {
+			fechaResoluciondesde = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFecharesoluciondesde());
+		}
+		if (actasItem.getFecharesolucionhasta() != null) {
+			fechaResolucionhasta = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFecharesolucionhasta());
 		}
 
 		SQL sql = new SQL();
@@ -46,12 +54,19 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 			sql.WHERE("ACT.NUMEROACTA LIKE'%" + actasItem.getNumeroacta() + "%'");
 		}
 
-		if (fechaResolucion != "0") {
-			LOGGER.info("*******************fechaResolucion********************" + fechaResolucion);
-			sql.WHERE("TRUNC(FECHARESOLUCION) = TO_DATE('" + fechaResolucion + "', 'DD/MM/RRRR')");
+		if (fechaResoluciondesde != "0") {
+			LOGGER.info("*******************fechaResolucion********************" + fechaResoluciondesde);
+			sql.WHERE("TRUNC(FECHARESOLUCION) >= TO_DATE('" + fechaResoluciondesde + "', 'DD/MM/RRRR')");
 		}
-		if (fechaReunion != "0") {
-			sql.WHERE("TRUNC(FECHAREUNION) = TO_DATE('" + fechaReunion + "', 'DD/MM/RRRR')");
+		if (fechaResolucionhasta != "0") {
+			LOGGER.info("*******************fechaResolucion********************" + fechaResolucionhasta);
+			sql.WHERE("TRUNC(FECHARESOLUCION) <= TO_DATE('" + fechaResolucionhasta + "', 'DD/MM/RRRR')");
+		}
+		if (fechaReuniondesde != "0") {
+			sql.WHERE("TRUNC(FECHAREUNION) >= TO_DATE('" + fechaReuniondesde + "', 'DD/MM/RRRR')");
+		}
+		if (fechaReunionhasta != "0") {
+			sql.WHERE("TRUNC(FECHAREUNION) <= TO_DATE('" + fechaReunionhasta + "', 'DD/MM/RRRR')");
 		}
 
 		if (actasItem.getIdpresidente() != null) {

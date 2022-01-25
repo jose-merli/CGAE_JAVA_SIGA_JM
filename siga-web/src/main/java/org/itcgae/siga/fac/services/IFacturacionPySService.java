@@ -13,6 +13,7 @@ import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
+import org.itcgae.siga.DTO.fac.FacDisqueteDevolucionesNuevoItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -45,12 +46,16 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
+import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface IFacturacionPySService {
 
@@ -132,6 +137,13 @@ public interface IFacturacionPySService {
 	public FicherosAbonosDTO getFicherosTransferencias(FicherosAbonosItem item, HttpServletRequest request)
 			throws Exception;
 
+    public InsertResponseDTO nuevoFicheroTransferencias(List<FacturaItem> abonoItems, HttpServletRequest request) throws Exception;
+
+    public InsertResponseDTO nuevoFicheroTransferenciasSjcs(List<FacturaItem> abonoItems, HttpServletRequest request) throws Exception;
+
+    public DeleteResponseDTO eliminarFicheroTransferencias(FicherosAbonosItem ficherosAbonosItem, HttpServletRequest request)
+			throws Exception;
+
 	public FicherosDevolucionesDTO getFicherosDevoluciones(FicherosDevolucionesItem item, HttpServletRequest request)
 			throws Exception;
 
@@ -140,14 +152,7 @@ public interface IFacturacionPySService {
 
 	public FacturaDTO getFacturas(FacturaItem item, HttpServletRequest request) throws Exception;
 
-	public FacturaDTO getFactura(String idFactura, String tipo, HttpServletRequest request) throws Exception;
-
-	public FacPresentacionAdeudosDTO presentacionAdeudos(FacPresentacionAdeudosItem presentacionAdeudoItem,
-			HttpServletRequest request) throws Exception;
-
-	public FacRegenerarPresentacionAdeudosDTO regenerarPresentacionAdeudos(
-			FacRegenerarPresentacionAdeudosItem regenerarPresentacionAdeudoItem, HttpServletRequest request)
-			throws Exception;
+	public FacturaDTO getFactura(String idFactura, String idAbono, String tipo, HttpServletRequest request) throws Exception;
 
 	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facturacionProg,
 			HttpServletRequest request) throws Exception;
@@ -173,13 +178,25 @@ public interface IFacturacionPySService {
 
 	public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO actualizarFicheroAdeudos(FacDisquetecargos updateItem, HttpServletRequest request)
+	public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
+			throws Exception;
+
+	InsertResponseDTO nuevoFicheroDevoluciones(FacDisqueteDevolucionesNuevoItem ficherosDevolucionesItem, HttpServletRequest request)
+			throws Exception;
+
+	DeleteResponseDTO eliminarFicheroDevoluciones(FicherosDevolucionesItem ficherosDevolucionesItem, HttpServletRequest request)
+			throws Exception;
+
+	public UpdateResponseDTO actualizarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
 			throws Exception;
 
 	public UpdateResponseDTO actualizarFicheroDevoluciones(FacDisquetedevoluciones updateItem,
 			HttpServletRequest request) throws Exception;
 
-	public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request)
+    public DeleteResponseDTO eliminarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
+            throws Exception;
+
+    public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request)
 			throws Exception;
 
 	public FacturasIncluidasDTO getFacturasIncluidas(String idFichero, String tipoFichero, HttpServletRequest request)
@@ -191,9 +208,25 @@ public interface IFacturacionPySService {
 	public FacRegistroFichContaDTO maxIdContabilidad(HttpServletRequest request) throws Exception;
 
 	public UpdateResponseDTO guardarRegistroFichConta(FacRegistroFichConta facRegistroFichConta,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
+	
+	public DeleteResponseDTO desactivarReactivarRegistroFichConta(List <FacRegistroFichConta> facRegistrosFichConta,
+			HttpServletRequest request) throws Exception;
 
 	public InformeFacturacionDTO getInformeFacturacion(String idSerieFacturacion, String idProgramacion, HttpServletRequest request) throws Exception;
 
-	public ResponseEntity<InputStreamResource> descargarFichaFacturacion(String idFactura, HttpServletRequest request) throws Exception;
+
+	public ResponseEntity<InputStreamResource> descargarFicheroAdeudos(List<FicherosAdeudosItem> ficheroAdeudosItems, HttpServletRequest request)
+			throws Exception;
+
+	public ResponseEntity<InputStreamResource> descargarFicheroTransferencias(List<FicherosAbonosItem> ficheroAbonosItems, HttpServletRequest request) throws Exception;
+
+	public ResponseEntity<InputStreamResource> descargarFicheroDevoluciones(List<FicherosDevolucionesItem> ficheroDevolucionesItems, HttpServletRequest request) throws Exception;
+
+	public ResponseEntity<InputStreamResource> descargarFichaFacturacion(List<FacFacturacionprogramadaItem> facturacionItems, HttpServletRequest request) throws Exception;
+
+	public DeleteResponseDTO eliminarAbonoSJCSCaja(EstadosPagosItem item, HttpServletRequest request) throws Exception;
+
+	public ResponseFileDTO generateExcel(TarjetaPickListSerieDTO etiquetas, HttpServletRequest request);
+
 }

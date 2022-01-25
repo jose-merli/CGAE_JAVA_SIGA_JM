@@ -343,7 +343,17 @@ public String selectDireccionesSolEsp(String idPersona, String idDireccion,Strin
 		return sql.toString();
 	}
 	
+	public String getIdProvinciaImpreso190(String idPersona, String idinstitucion, int tipoDireccionFac ) {
+		SQL sql = new SQL();
+		sql.SELECT("IDPROVINCIA");
+		sql.FROM("CEN_DIRECCIONES");
+		sql.WHERE("IDINSTITUCION = "+idinstitucion);
+		sql.WHERE("IDPERSONA = "+idPersona);
+		sql.WHERE("IDDIRECCION = F_SIGA_GETIDDIRECCION_TIPOPREF(" + idinstitucion +","+idPersona+","+ tipoDireccionFac +")");
 		
+		
+		return sql.toString();
+	}
 	
 	
 	

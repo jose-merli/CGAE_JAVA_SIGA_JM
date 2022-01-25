@@ -17,7 +17,11 @@ public class ActasItem {
 	private String nombresecretario;
 	private String nombrepresidente;
 	private Date fecharesolucion;
+	private Date fecharesoluciondesde;
+	private Date fecharesolucionhasta;
 	private Date fechareunion;
+	private Date fechareuniondesde;
+	private Date fechareunionhasta;
 	private String horainicio;
 	private String horafin;
 	private String idinstitucion;
@@ -100,11 +104,35 @@ public class ActasItem {
 	public void setFecharesolucion(Date fecharesolucion) {
 		this.fecharesolucion = fecharesolucion;
 	}
+	public Date getFecharesoluciondesde() {
+		return fecharesoluciondesde;
+	}
+	public void setFecharesoluciondesde(Date fecharesoluciondesde) {
+		this.fecharesoluciondesde = fecharesoluciondesde;
+	}
+	public Date getFecharesolucionhasta() {
+		return fecharesolucionhasta;
+	}
+	public void setFecharesolucionhasta(Date fecharesolucionhasta) {
+		this.fecharesolucionhasta = fecharesolucionhasta;
+	}
 	public Date getFechareunion() {
 		return fechareunion;
 	}
 	public void setFechareunion(Date fechareunion) {
 		this.fechareunion = fechareunion;
+	}
+	public Date getFechareuniondesde() {
+		return fechareuniondesde;
+	}
+	public void setFechareuniondesde(Date fechareuniondesde) {
+		this.fechareuniondesde = fechareuniondesde;
+	}
+	public Date getFechareunionhasta() {
+		return fechareunionhasta;
+	}
+	public void setFechareunionhasta(Date fechareunionhasta) {
+		this.fechareunionhasta = fechareunionhasta;
 	}
 	public String getHorainicio() {
 		return horainicio;

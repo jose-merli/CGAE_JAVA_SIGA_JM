@@ -54,4 +54,7 @@ public interface FacDisquetecargosExtendsMapper extends FacDisquetecargosMapper 
 			@Result(column = "PENDIENTETOTAL", property = "pendienteTotal", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturasIncluidasItem> getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma);
+	
+	@SelectProvider(type = FacDisquetecargosExtendsSqlProvider.class, method = "getRenegociacionFactura")
+    String getRenegociacionFactura(String institucion, String factura);
 }

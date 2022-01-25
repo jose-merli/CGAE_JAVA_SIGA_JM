@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -8,13 +10,10 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsActuacionasistenciaSqlExtendsProvider;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-@Primary
+//@Primary
 public interface ScsActuacionasistenciaExtendsMapper extends ScsActuacionasistenciaMapper {
 
     @SelectProvider(type= ScsActuacionasistenciaSqlExtendsProvider.class, method="comboCosteFijoTipoActuacion")

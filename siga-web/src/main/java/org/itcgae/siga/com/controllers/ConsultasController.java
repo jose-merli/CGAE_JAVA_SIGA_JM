@@ -228,8 +228,8 @@ public class ConsultasController {
 	
 	//SQL
 	@GetMapping(value = "/pys/obtenerDatosConsulta")
-	ResponseEntity<ConstructorConsultasDTO> obtenerDatosConsulta(HttpServletRequest request, @RequestParam String idConsulta) { 
-		ConstructorConsultasDTO response = _consultasService.obtenerDatosConsulta(request, idConsulta);
+	ResponseEntity<ConstructorConsultasDTO> obtenerDatosConsulta(HttpServletRequest request, @RequestParam String idConsulta, @RequestParam String idInstitucion) { 
+		ConstructorConsultasDTO response = _consultasService.obtenerDatosConsulta(request, idConsulta, idInstitucion);
 		if (response.getError() == null)
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
 		else

@@ -381,12 +381,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				}
 				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
+				//Con el format logramos que siempre una longitud de 10 precedida por 0s
 				solicitud.setNumOperacion(
-						"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR: Necesita
-																											// confirmacion
-																											// de que es
-																											// el valor
-																											// correcto
+						"1" + idInstitucion.toString() + String.format("%010d", idPersona) + fechaActual.toString()); 
 				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
 				solicitud.setFechamodificacion(new Date());
 
@@ -407,7 +404,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				// Al no necesitar aprobación, se crea el registro de compra
 				// inmediatamente
-				if (aprobNecesaria.getValor() == "N") {
+				if (aprobNecesaria.getValor().equals("N")) {
 					
 					this.aprobarCompra(request, ficha);
 
@@ -507,13 +504,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				}
 				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
+				//Con el format logramos que siempre una longitud de 10 precedida por 0s
 				solicitud.setNumOperacion(
-						"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR:
-																											// Necesita
-																											// confirmacion
-																											// de que es
-																											// el valor
-																											// correcto
+						"1" + idInstitucion.toString() + String.format("%010d", idPersona) + fechaActual.toString());
+				
 				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
 				solicitud.setFechamodificacion(new Date());
 
@@ -535,7 +529,11 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				// Al no necesitar aprobación, se crea el registro de suscripcion
 				// inmediatamente. Aunque el nombre del parametro puede inducir error,
 				// tambien hace referencia a servicios como se indica en el documento funcional.
-				if (aprobNecesaria.getValor() == "N") {
+				LOGGER.info("solicitarSuscripcion() EL VALOR QUE TENEMOS PARA LA NECESIDAD DE APROBACION ES "+aprobNecesaria.getValor());
+				if (aprobNecesaria.getValor().equals("N")) {
+					LOGGER.info(
+							"solicitarSuscripcion() / aprobarSuscripcion() -> Entrada a  aprobarSuscripcion ya que la institucion aprueba las solicitudes automaticamente");
+
 
 					this.aprobarSuscripcion(request, ficha);
 
@@ -609,9 +607,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 					
-					// Al necesitar aprobación, se crea el registro de suscripcion
-					// inmediatamente. Esto es a diferencia del servicio de solicitud.
-					if (aprobNecesaria.getValor().equals("S")) {
 
 					
 						LOGGER.info(
@@ -633,17 +628,16 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							suscripcion.setIdserviciosinstitucion((long) servicio.getIdServiciosInstitucion());
 							
 							//Obtenemos el id para la nueva suscripcion
-							PysSuscripcionExample susExample = new PysSuscripcionExample();
-							
-							susExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-							
 							LOGGER.info(
-									"aprobarSuscripcion() / pysSuscripcionMapper.countByExample() -> Entrada a pysSuscripcionMapper para obtener el id para la nueva suscripcion");
+									"aprobarSuscripcion() / pysSuscripcionMapper.getNewIdCola() -> Entrada a pysSuscripcionMapper para obtener el id para la nueva suscripcion");
 							
-							long newIdSus = pysSuscripcionMapper.countByExample(susExample) + 1;
+							PysSuscripcion sus = new PysSuscripcion();
+							
+							sus.setIdinstitucion(idInstitucion);
+							long newIdSus = pysSuscripcionMapper.getNewIdSus(sus);
 
 							LOGGER.info(
-									"aprobarSuscripcion() / pysSuscripcionMapper.countByExample() -> Salida de pysSuscripcionMapper para obtener el id para la nueva suscripcion");
+									"aprobarSuscripcion() / pysSuscripcionMapper.getNewIdCola() -> Salida de pysSuscripcionMapper para obtener el id para la nueva suscripcion");
 							
 							suscripcion.setIdsuscripcion(newIdSus);
 							suscripcion.setDescripcion(servicio.getDescripcion());
@@ -657,7 +651,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							else{
 								suscripcion.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
 							}
-							if(ficha.getIdFormaPagoSeleccionada().equals("80")) {
+							if(ficha.getIdFormaPagoSeleccionada().equals("80") || ficha.getIdFormaPagoSeleccionada().equals("20")) {
 								suscripcion.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
 							}
 							else {
@@ -680,7 +674,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								"aprobarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de suscripcion");
 
 					}
-				}
+				
 
 				
 				updateResponseDTO.setStatus("200");
@@ -743,9 +737,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 					
-					// Al necesitar aprobación, se crea el registro de compra
-					// inmediatamente. Esto es a diferencia del servicio de solicitud.
-					if (aprobNecesaria.getValor().equals("S")) {
 
 					
 						LOGGER.info(
@@ -778,7 +769,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
 								compra.setNofacturable("0");
 							}
-							if(ficha.getIdFormaPagoSeleccionada().equals("80")) {
+							if(ficha.getIdFormaPagoSeleccionada().equals("80") || ficha.getIdFormaPagoSeleccionada().equals("20")) {
 								compra.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
 							}
 							else {
@@ -802,7 +793,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de compra");
 
 					}
-				}
+				
 
 				
 				updateResponseDTO.setStatus("200");
@@ -867,8 +858,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				solicitudBaja.setTipopeticion("B");
 				solicitudBaja.setIdestadopeticion((short) 20);
 				Long fechaActual = new Date().getTime();
+				//Con el format logramos que siempre una longitud de 10 precedida por 0s
 				solicitudBaja.setNumOperacion(
-						"1" + idInstitucion.toString() + solicitudAlta.getIdpersona() + fechaActual.toString());
+						"1" + idInstitucion.toString() + String.format("%010d", solicitudAlta.getIdpersona()) + fechaActual.toString());
 
 				response = pysPeticioncomprasuscripcionMapper.insert(solicitudBaja);
 				if (response == 0)
@@ -1182,7 +1174,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					productoSolicitado.setNofacturable("0");
 				}
 				//En el caso que la forma de pago sea domiciliación bancaria
-				if(peticion.getIdFormaPagoSeleccionada().equals("80")) {
+				if(peticion.getIdFormaPagoSeleccionada().equals("80") || peticion.getIdFormaPagoSeleccionada().equals("20")) {
 					productoSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
 				}
 				else {
@@ -1384,6 +1376,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							
 							facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturaIn(idFacturasPeticion);
 							
+							facturaExample.setOrderByClause("fechaEmision desc");
 
 							LOGGER.info(
 									"getFacturasPeticion() / facFacturaMapper.selectByExample() -> Entrada a facFacturaMapper para recuperar las posibles facturas asociadas a la peticion de compra");
@@ -1432,6 +1425,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtiposerviciosEqualTo(suscripcion.getIdtiposervicios())
 								.andIdservicioEqualTo(suscripcion.getIdservicio()).andIdserviciosinstitucionEqualTo(suscripcion.getIdserviciosinstitucion())
 								.andIdsuscripcionEqualTo(suscripcion.getIdsuscripcion());
+								
+								facturaExample.setOrderByClause("fechaInicio desc");
 							
 								LOGGER.info(
 										"getFacturasPeticion() / facFacturacionsuscripcionMapper.selectByExample() -> Entrada a facFacturacionsuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
@@ -1668,7 +1663,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								if(monedero != null) {
 									monedero.setIdPeticion(nSolicitud);
 									monedero.setTipo("2"); //En el front se procesará y representará como "Monedero"
-									monedero.setIdAnticipo(null);
+									monedero.setIdAnticipo(monedero.getIdAnticipo());
 	
 									descuentosListaPeticion.add(monedero);
 	
@@ -2038,8 +2033,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							solicitudBaja.setTipopeticion("B");
 							solicitudBaja.setIdestadopeticion((short) 20);
 							Long fechaActual = new Date().getTime();
+							//Con el format logramos que siempre una longitud de 10 precedida por 0s
 							solicitudBaja.setNumOperacion(
-									"1" + idInstitucion.toString() + solicitudAlta.getIdpersona() + fechaActual.toString());
+									"1" + idInstitucion.toString() + String.format("%010d", solicitudAlta.getIdpersona()) + fechaActual.toString());
+
 							
 							LOGGER.info(
 									"anularPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para solicitar la anulacion una petición");
@@ -2332,18 +2329,18 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				servicioSolicitado.setIdpersona(idPersona);
 				servicioSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
 				//Si se ha seleccionado como forma de pago "No facturable"
-//				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
-//					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
-//					//que no tendra cuenta bancaria seleccionada.
-//					servicioSolicitado.setIdformapago((short) 80);
+				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
+					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
+					//que no tendra cuenta bancaria seleccionada.
+					servicioSolicitado.setIdformapago((short) 80);
 //					servicioSolicitado.setNofacturable("1");
-//				}
-//				else{
+				}
+				else{
 					servicioSolicitado.setIdformapago(Short.valueOf(peticion.getIdFormaPagoSeleccionada()));
 //					servicioSolicitado.setNofacturable("0");
-//				}
+				}
 				//En el caso que la forma de pago sea domiciliación bancaria
-				if(peticion.getIdFormaPagoSeleccionada().equals("80")) {
+				if(peticion.getIdFormaPagoSeleccionada().equals("80") || peticion.getIdFormaPagoSeleccionada().equals("20")) {
 					servicioSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
 				}
 				else {
@@ -2358,8 +2355,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					servicioSolicitado.setIdservicio((long) servicio.getIdServicio());
 					servicioSolicitado.setIdtiposervicios((short) servicio.getIdTipoServicios());
 					servicioSolicitado.setIdserviciosinstitucion((long) servicio.getIdServiciosInstitucion());
-					servicioSolicitado.setIdpreciosservicios(Short.valueOf(servicio.getIdPrecioServicio()));
-					servicioSolicitado.setIdperiodicidad(Short.valueOf(servicio.getIdPeriodicidad()));
+					if(servicio.getIdPrecioServicio() != null) {
+						servicioSolicitado.setIdpreciosservicios(Short.valueOf(servicio.getIdPrecioServicio()));
+						servicioSolicitado.setIdperiodicidad(Short.valueOf(servicio.getIdPeriodicidad()));
+					}
+					else {
+						servicioSolicitado.setIdpreciosservicios(null);
+						servicioSolicitado.setIdperiodicidad(null);
+					}
 					
 					//REVISAR: 
 					servicioSolicitado.setAceptado("A");

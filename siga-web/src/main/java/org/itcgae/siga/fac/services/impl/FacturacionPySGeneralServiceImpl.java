@@ -18,8 +18,6 @@ import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionExample;
-import org.itcgae.siga.db.entities.FacPlantillafacturacion;
-import org.itcgae.siga.db.entities.FacPlantillafacturacionExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionExample;
 import org.itcgae.siga.db.entities.FacSufijo;
@@ -27,6 +25,10 @@ import org.itcgae.siga.db.entities.FacSufijoExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.ModClasecomunicaciones;
+import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.PysProductos;
 import org.itcgae.siga.db.entities.PysProductosExample;
 import org.itcgae.siga.db.entities.PysServicios;
@@ -36,11 +38,14 @@ import org.itcgae.siga.db.mappers.FacPlantillafacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModClasecomunicacionesExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacEstadoconfirmfactExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacEstadosabonoExtendsMapper;
@@ -91,9 +96,6 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	private FacFormapagoserieExtendsMapper facFormapagoserieExtendsMapper;
 
 	@Autowired
-	private FacPlantillafacturacionMapper facPlantillafacturacionMapper;
-
-	@Autowired
 	FacSeriefacturacionMapper facSeriefacturacionMapper;
 
 	@Autowired
@@ -131,6 +133,12 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 	@Autowired
 	private FacMotivodevolucionExtendsMapper facMotivodevolucionExtendsMapper;
+
+	@Autowired
+	private ModClasecomunicacionesMapper modClasecomunicacionesMapper;
+
+	@Autowired
+	private ModModeloComunicacionExtendsMapper modModeloComunicacionExtendsMapper;
 
 	@Override
 	public ComboDTO comboCuentasBancarias(HttpServletRequest request) throws Exception {
@@ -666,7 +674,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 	}
 
 	@Override
-	public ComboDTO comboModelosComunicacion(HttpServletRequest request) throws Exception {
+	public ComboDTO comboModelosComunicacion(Boolean esRectificativa, HttpServletRequest request) throws Exception {
 		ComboDTO comboDTO = new ComboDTO();
 
 		List<ComboItem> comboItems;
@@ -678,24 +686,38 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 		usuario = authenticationProvider.checkAuthentication(request);
 
 		if (usuario != null) {
-			LOGGER.debug(
-					"comboModelosComunicacion() / modModeloComunicacionExtendsMapper.selectByExample() -> Entrada a modModeloComunicacionExtendsMapper para obtener los modelos de comunicación");
 
 			// Logica
-			FacPlantillafacturacionExample modeloExample = new FacPlantillafacturacionExample();
-			modeloExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion());
-			modeloExample.setOrderByClause("descripcion");
 
-			List<FacPlantillafacturacion> modelos = facPlantillafacturacionMapper.selectByExample(modeloExample);
+			// Obtenemos la clase de comunicación dependiendo de si buscamos modelos de factura o de factura rectificativa
+			ModClasecomunicacionesExample claseExample = new ModClasecomunicacionesExample();
+			if (esRectificativa) {
+				claseExample.createCriteria().andNombreEqualTo("Facturas rectificativas");
+			} else {
+				claseExample.createCriteria().andNombreEqualTo("Facturas");
+			}
+
+			List<ModClasecomunicaciones> clases = modClasecomunicacionesMapper.selectByExample(claseExample);
+
+			// Obtenemos los modelos de la clase de comunicación seleccionada (si existe la clase)
+			List<ModModelocomunicacion> modelos = new ArrayList<>();
+			if (clases != null && !clases.isEmpty()) {
+				ModModelocomunicacionExample comunicacionExample = new ModModelocomunicacionExample();
+				comunicacionExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+						.andIdclasecomunicacionEqualTo(clases.get(0).getIdclasecomunicacion())
+						.andFechabajaIsNull();
+				comunicacionExample.setOrderByClause("nombre");
+
+				modelos = modModeloComunicacionExtendsMapper.selectByExample(comunicacionExample);
+			}
+
 			comboItems = modelos.stream().map(m -> {
 				ComboItem item = new ComboItem();
-				item.setValue(String.valueOf(m.getIdplantilla()));
-				item.setLabel(m.getDescripcion());
+				item.setValue(String.valueOf(m.getIdmodelocomunicacion()));
+				item.setLabel(m.getNombre());
 				return item;
 			}).collect(Collectors.toList());
 
-			LOGGER.debug(
-					"comboModelosComunicacion() / modModeloComunicacionExtendsMapper.selectByExample() -> Saliendo de modModeloComunicacionExtendsMapper para obtener los modelos de comunicación");
 
 			comboDTO.setCombooItems(comboItems);
 		}
@@ -926,7 +948,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 				item.setLabel(parametros.get(0).getValor());
 			} else {
-				item.setLabel("0");
+				item.setLabel("7");
 			}
 
 			comboItems.add(item);
@@ -944,7 +966,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
 			} else {
-				item.setLabel("0");
+				item.setLabel("4");
 			}
 
 			comboItems.add(item);
@@ -962,7 +984,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
 			} else {
-				item.setLabel("0");
+				item.setLabel("3");
 			}
 
 			comboItems.add(item);
@@ -980,7 +1002,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			if (null != parametros && parametros.size() > 0) {
 				item.setLabel(parametros.get(0).getValor());
 			} else {
-				item.setLabel("0");
+				item.setLabel("3");
 			}
 
 			comboItems.add(item);

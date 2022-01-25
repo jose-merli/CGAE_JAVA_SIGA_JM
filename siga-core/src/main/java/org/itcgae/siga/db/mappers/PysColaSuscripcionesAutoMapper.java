@@ -160,4 +160,12 @@ public interface PysColaSuscripcionesAutoMapper {
         "where IDCOLASUSCRIPCION = #{idcolasuscripcion,jdbcType=DECIMAL}"
     })
     int updateByPrimaryKey(PysColaSuscripcionesAuto record);
+    
+    @Select({
+        "select",
+        "NVL(max(IDCOLASUSCRIPCION) +1, 1)",
+        "from PYS_COLA_SUSCRIPCIONES_AUTO",
+        "where rownum <= 1"
+    })
+    int getNewIdCola();
 }

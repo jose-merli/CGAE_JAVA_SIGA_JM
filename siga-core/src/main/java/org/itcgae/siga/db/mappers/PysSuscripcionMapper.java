@@ -215,4 +215,12 @@ public interface PysSuscripcionMapper {
           "and IDSUSCRIPCION = #{idsuscripcion,jdbcType=DECIMAL}"
     })
     int updateByPrimaryKey(PysSuscripcion record);
+    
+    @Select({
+        "select",
+        "NVL(max(IDSUSCRIPCION) +1, 1)",
+        "from PYS_SUSCRIPCION",
+        "where idinstitucion= #{idinstitucion,jdbcType=DECIMAL}"
+    })
+    int getNewIdSus(PysSuscripcion idInstitucion);
 }

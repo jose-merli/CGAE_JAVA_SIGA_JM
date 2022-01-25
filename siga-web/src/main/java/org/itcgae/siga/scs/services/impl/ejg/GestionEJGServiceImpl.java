@@ -1103,7 +1103,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     }
 
     @Override
-    public ComboDTO comboActaAnnio(String idActa, String anioActa, HttpServletRequest request) {
+    public ComboDTO comboActaAnnio(String anioacta, String idacta, HttpServletRequest request) {
         // TODO Auto-generated method stub
         // Conseguimos información del usuario logeado
         String token = request.getHeader("Authorization");
@@ -1123,7 +1123,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
             if (usuarios != null && usuarios.size() > 0) {
                 LOGGER.info(
                         "comboActaAnnio() / scsActacomisionExtendsMapper.getActaAnnio() -> Entrada a scsActacomisionExtendsMapper para obtener los combo");
-                comboItems = scsActacomisionExtendsMapper.getActaAnnio(idInstitucion.toString(), idActa, anioActa);
+                comboItems = scsActacomisionExtendsMapper.getActaAnnio(idInstitucion.toString(), anioacta, idacta);
                 LOGGER.info(
                         "comboActaAnnio() / scsActacomisionExtendsMapper.getActaAnnio() -> Salida a scsActacomisionExtendsMapper para obtener los combo");
                 if (comboItems != null) {

@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.FacBancoinstitucionMapper;
 import org.itcgae.siga.db.services.fac.providers.FacBancoinstitucionSqlExtendsProvider;
+import org.itcgae.siga.db.services.fac.providers.FacFacturaExtendsSqlProvider;
 import org.itcgae.siga.db.services.fac.providers.FacSeriefacturacionExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -51,5 +52,22 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "getNextIdCuentaBancaria")
 	@Results({ @Result(column = "bancos_codigo", property = "newId", jdbcType = JdbcType.VARCHAR) })
 	NewIdDTO getNextIdCuentaBancaria(Short idInstitucion);
+
+	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "getBancosCodigo")
+	@Results({
+			@Result(column = "BANCOS_CODIGO", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getBancosCodigo(String idInstitucion, String idFactura);
+
+	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "getPorcentajeIva")
+	@Results({
+			@Result(column = "VALOR", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getPorcentajeIva(String idInstitucion, String bancoCodigo);
+	
+	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "comboPropTranferencia")
+    @Results({@Result(column = "IBAN", property = "label", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "BANCOS_CODIGO", property = "value", jdbcType = JdbcType.VARCHAR)})
+    List<ComboItem> comboCuentasBanc(Short idInstitucion);
 	
 }

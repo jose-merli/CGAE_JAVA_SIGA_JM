@@ -10,6 +10,779 @@ import org.springframework.stereotype.Component;
 @Component
 public class SigaConstants {
 
+    public static String parametroRutaAlmacenFicheros = "gen.ficheros.path";
+
+    public enum ERROR_SERVER {
+        XML_NO_VALIDO(null), CLI_NOAUTORIZADO("La IP recibida en la petición no está autorizada."),
+        CLI_IP_NO_ENCONTRADA("La ip no se ha encontrado."), CLI_NOVALIDO("Esquema de petición datos no válido."),
+        CLI_NOACTIVO("El colegio que realiza la petición no tiene activo el servicio."),
+        CLI_CODIGO_NO_EXISTE("El código del colegio no existe."),
+        CLI_VERSION_INCORRECTA("La versión recibida no existe o no es la correspondiente al esquema utilizado."),
+        CLI_ERROR_DATOS_INTERNO(
+                "Los datos que se reciben no son válidos para enviar una respuesta correcta en el servicio."),
+        CLI_OTROS_ERRORES_INTERNOS("Error de causas externas."), CLI_COLEGIO_NULO("El colegio no puede ser nulo."),
+        CLI_PAGINA_YA_INSERTADA("La página ya ha sido insertada para esa carga"),
+        CLI_CAMPO_NO_VALIDO("La longitud es superior a la máxima permitida"),
+        CLI_ORDEN_FECHAS_INCORRECTO("La fecha hasta no puede ser menor a la fecha desde"),
+        CLI_HORA_EJECUCION_NO_PERMITIDO("No está permitida la ejecución del servicio a esta hora"),
+        CLI_COLEGIO_NO_EXISTE("Alguno de los colegios no existe en el sistema"),
+        CLI_INCONCORDANCIA_EN_PAGINAS("El número de página no puede ser superior al total de páginas.");
+
+        private String mensajeError = null;
+
+        private ERROR_SERVER(String mensajeError) {
+            this.mensajeError = mensajeError;
+        }
+
+        public String getMensajeError() {
+            return mensajeError;
+        }
+    }
+
+    public static enum ECOM_CEN_ROLES {
+        ABOGADO("ABO", "ABOGADO", "Abogado"), NOEJERCIENTE("CNE", "COLEGIADO_NO_EJERCIENTE", "Colegiado No Ejerciente"),
+        PERSONAL("PER", "PERSONAL", "Personal"), DECANO("DEC", "DECANO", "Decano"),
+        MIEMBROJUNTA("MJU", "MIEMBRO_JUNTA", "Miembro de Junta"), CONSEJERO("CON", "CONSEJERO", "Consejero"),
+        DIRECTIVO("DIR", "DIRECTIVO", "Directivo"), INSCRITO("INS", "ABOGADO_INSCRITO", "Abogado inscrito"),
+        ABOGADOEUROPEO("CCB", "ABOGADO_ADVOCAT_AVOGADO_ABOKATU", "Abogado Advocat Avogado Abokatu"),
+        ADMINISTRADOR("ADM", "ADMINISTRADOR", "Administrador"),
+        ADMINISTRADORUNICO("ADMUNI", "ADMINISTRADOR_UNICO", "Administrador Único"),
+        ADMINISTRADORSOLIDARIO("ADMSOL", "ADMINISTRADOR_SOLIDARIO", "Administrador Solidario"),
+        AUTORIZADO("AUT", "AUTORIZADO", "Autorizado"),
+        REPRESENTANTELEGAL("REP", "RESPRESENTANTE_LEGAL", "Representante Legal"),
+        REPRESENTANTEVOLUNTARIO("REPVOL", "RESPRESENTANTE_VOLUNTARIO", "Representante Voluntario"),
+        SECRETARIO("SEC", "SECRETARIO", "Secretario"), VICEDECANO("VICDEC", "VICEDECANO", "Vicedecano"),
+        SIGAADMIN("SAD", "SIGA-Admin", "SIGA-Admin");
+
+        private String codigo = null;
+        private String recurso = null;
+        private String descripcion = null;
+
+        private ECOM_CEN_ROLES(String codigo, String recurso, String descripcion) {
+            this.codigo = codigo;
+            this.recurso = recurso;
+            this.descripcion = descripcion;
+        }
+
+        public String getCodigo() {
+            return codigo;
+        }
+
+        public String getRecurso() {
+            return recurso;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+    }
+
+    public enum ERROR_CLIENT {
+        XML_NO_VALIDO(null), SERV_NODISPONIBLE("Servicio no disponible."),
+        SERV_CERTNOAUT(
+                "En el caso de comunicaciones con certificado de cliente que el certificado presentado no esté autorizado."),
+        CLI_NOVALIDO("Esquema de petición datos no válido."),
+        CLI_NOACTIVO("El colegio que realiza la petición no tiene activo el servicio."),
+        SERV_FECHANOVALIDO("Para el servidor el rango de fechas solicitado no es válido."),
+        SERV_COLEGIONOVALIDO("Para el servidor el código del colegio recibido no es válido."),
+        SERV_NUMPAGINANOVALIDO("Para el servidor el número de página solicitado no existe o no es la esperada.."),
+        SERV_VERSION_INCORRECTA(
+                "La versión recibida no existe o no es la correspondiente al esquema utilizado en la petición."),
+        SERV_OTRO_ERROR("Cualquier otro error no catalogado."),
+        SERV_NOVALIDO("La respuesta no tiene un formato válido");
+
+        private String mensajeError = null;
+
+        private ERROR_CLIENT(String mensajeError) {
+            this.mensajeError = mensajeError;
+        }
+
+        public String getMensajeError() {
+            return mensajeError;
+        }
+    }
+
+    public enum ID_TIPO_CARGA {
+        SERV_SOC(new Short("1")), CLI_SOC(new Short("2"));
+
+        private Short tipo = null;
+
+        private ID_TIPO_CARGA(Short tipo) {
+            this.tipo = tipo;
+        }
+
+        public Short getTipo() {
+            return tipo;
+        }
+    }
+
+    public static enum TIPO_XML {
+        PETICION_SERVICIO_CARGAS(new Short("1"), "petición servicio"),
+        RESPUESTA_SERVICIO_CARGAS(new Short("2"), "respuesta servicio"),
+        PETICION_CLIENTE_CARGAS(new Short("3"), "petición cliente"),
+        RESPUESTA_CLIENTE_CARGAS(new Short("4"), "respuesta cliente"),
+        PETICION_SERVICIO_ECOS(new Short("5"), "petición servicio ECOS"),
+        RESPUESTA_CLIENTE_ECOS(new Short("6"), "respuesta cliente ECOS"),
+        PETICION_WS_PUBLICADOR(new Short("7"), "petición servicio"),
+        RESPUESTA_WS_PUBLICADOR(new Short("8"), "respuesta servicio"),
+        PETICION_SERVICIO_FUSIONADOR(new Short("9"), "petición servicio"),
+        RESPUESTA_SERVICIO_FUSIONADOR(new Short("10"), "respuesta servicio");
+
+        private final Short codigo;
+        private final String descripcion;
+
+        TIPO_XML(Short codigo, String descripcion) {
+            this.codigo = codigo;
+            this.descripcion = descripcion;
+        }
+
+        public Short getCodigo() {
+            return codigo;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public static TIPO_XML getEnum(Short codigo) {
+            for (TIPO_XML sc : values()) {
+                if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+                    return sc;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static enum MODULO {
+        CARGAS(new Short("1"), "CARGAS"), ADMINISTRACION(new Short("2"), "ADMINISTRACION"),
+        PUBLICACION(new Short("3"), "PUBLICACION"), FUSIONADOR(new Short("4"), "FUSIONADOR");
+
+        private final Short codigo;
+        private final String descripcion;
+
+        MODULO(Short codigo, String descripcion) {
+            this.codigo = codigo;
+            this.descripcion = descripcion;
+        }
+
+        public Short getCodigo() {
+            return codigo;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public static MODULO getEnum(Short codigo) {
+            for (MODULO sc : values()) {
+                if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+                    return sc;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static enum ESTADO_CARGAS {
+        ESTADO_PENDIENTE(new Short("1"), "Carga pendiente"), ESTADO_PROCESANDO(new Short("2"), "Carga procesando"),
+        ESTADO_PROCESADO(new Short("3"), "Carga procesada"),
+        ESTADO_ERROR_FORMATO(new Short("4"), "Carga con errores de formato"),
+        ESTADO_ERROR_GENERAL(new Short("5"), "Carga finalizada con error");
+
+        private final Short codigo;
+        private final String descripcion;
+
+        ESTADO_CARGAS(Short codigo, String descripcion) {
+            this.codigo = codigo;
+            this.descripcion = descripcion;
+        }
+
+        public Short getCodigo() {
+            return codigo;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public static ESTADO_CARGAS getEnum(Short codigo) {
+            for (ESTADO_CARGAS sc : values()) {
+                if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+                    return sc;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static enum CEN_TIPOCAMBIO {
+
+        ALTA_COLEGIACION(new Short("1"), "Alta Colegiación"), BAJA_COLEGIACION(new Short("2"), "Baja Colegiación"),
+        ALTA_EJERCICIO(new Short("3"), "Alta Ejercicio"), BAJA_EJERCICIO(new Short("4"), "Baja Ejercicio"),
+        INHABILITACION(new Short("5"), "Inhabilitación"), SUSPENSION_EJERCICIO(new Short("6"), "Suspensión Ejercicio"),
+        MODIFICACION_DATOS_GENERALES(new Short("10"), "Modificación Datos Generales"),
+        MODIFICACION_DATOS_COLEGIALES(new Short("20"), "Modificación Datos Colegiales"),
+        MODIFICACION_DIRECCIONES(new Short("30"), "Modificación Direcciones"),
+        MODIFICACION_CUENTAS_BANCARIAS(new Short("40"), "Modificación Cuentas Bancarias"),
+        MODIFICACION_DATOS_CV(new Short("50"), "Modificación Datos CV"),
+        MODIFICACION_COMPONENTES(new Short("60"), "Modificación Componentes"),
+        MODIFICACION_DATOS_FACTURACIÓN(new Short("70"), "Modificación Datos Facturación"),
+        MODIFICACION_DATOS_TURNO(new Short("80"), "Modificación Datos Turno"),
+        MODIFICACION_DATOS_EXPEDIENTES(new Short("90"), "Modificación Datos Expedientes"),
+        MODIFICACION_OTROS_DATOS(new Short("99"), "Modificación Otros Datos"),
+        OBSERVACIONES(new Short("100"), "Observaciones"),
+        DESIGNACION_MODIFICACION(new Short("101"), "Designación. Modificación"),
+        DESIGNACION_JUSTIFICACION(new Short("102"), "Designación. Justificación"),
+        DESIGNACION_ALTA_DE_ACTUACIONES(new Short("103"), "Designación. Alta de Actuaciones"),
+        ASISTENCIA_ALTA(new Short("104"), "Asistencia. Alta"),
+        ASISTENCIA_MODIFICACION(new Short("105"), "Asistencia. Modificación"),
+        ASISTENCIA_ALTA_DE_ACTUACIONES(new Short("106"), "Asistencia. Alta de Actuaciones"),
+        DESIGNACION_MODIFICACION_DE_ACTUACIONES(new Short("107"), "Designación. Modificación de Actuaciones"),
+        DESIGNACION_ELIMINACION_DE_ACTUACIONES(new Short("108"), "Designación. Eliminación de Actuaciones"),
+        EJG_CREACION_NUEVO_EJG(new Short("120"), "EJG. Creación nuevo EJG"),
+        EJG_MODIFICACION_DATOS_GENERALES(new Short("121"), "EJG. Modificación datos generales"),
+        EJG_MODIFICACION_SERVICIOS_TRAMITACION(new Short("122"), "EJG. Modificación servicios de tramitación"),
+        EJG_ANADIR_FAMILIAR_NUEVO(new Short("123"), "EJG. Se añade un familiar nuevo"),
+        EJG_BORRAR_FAMILIAR(new Short("124"), "EJG. Se borra un familiar"),
+        EJG_ACTIVAR_FAMILIAR_BORRADO(new Short("125"), "EJG. Se activa un familiar borrado"),
+        EJG_ANADIR_ESTADO_MANUALMENTE(new Short("126"), "EJG. Añadido estado manualmente"),
+        EJG_ESTADO_BORRADO_MANUALMENTE(new Short("127"), "EJG. Estado borrado manualmente"),
+        EJG_ESTADO_MODIFICADO(new Short("128"), "EJG. Estado modificado"),
+        EJG_DOCUMENTO_ANADIDO(new Short("129"), "EJG. Documento añadido"),
+        EJG_DOCUMENTO_ELIMINADO(new Short("130"), "EJG. Documento eliminado"),
+        EJG_DOCUMENTO_MODIFICADO(new Short("131"), "EJG. Documento modificado"),
+        EJG_FICHERO_ANADIDO_A_UN_DOCUMENTO(new Short("132"), "EJG. Fichero añadido a un documento"),
+        EJG_FICHERO_ELIMINADO_DE_UN_DOCUMENTO(new Short("133"), "EJG. Fichero eliminado de un documentoEJG. Fichero eliminado de un documento"),
+        EJG_CREACION_DICTAMEN(new Short("134"), "EJG. Creacion de un dictamen"),
+        EJG_ELIMINACION_DICTAMEN(new Short("135"), "EJG. Eliminación de un dictamen"),
+        EJG_MODIFICACION_DICTAMEN(new Short("136"), "EJG. Modificación de un dictamen"),
+        EJG_CREACION_RESOLUCION(new Short("137"), "EJG. Eliminación de un dictamen"),
+        EJG_MODIFICACION_IMPUGNACION(new Short("138"), "EJG. Modificación de una impugnación"),
+        EJG_DESIGNACION_ASOCIADA(new Short("139"), "EJG. Designación asociada"),
+        EJG_ASISTENCIA_ASOCIADA(new Short("140"), "EJG. Asistencia asociada"),
+        EJG_SOJ_ASOCIADO(new Short("141"), "EJG. SOJ asociado"),
+        EJG_RELACION_ELIMINADA(new Short("142"), "EJG. Relación eliminada");
+
+
+        private final Short idTipoCambio;
+        private final String descripcionTipoCambio;
+
+        private CEN_TIPOCAMBIO(Short idTipoCambio, String descripcionTipoCambio) {
+            this.idTipoCambio = idTipoCambio;
+            this.descripcionTipoCambio = descripcionTipoCambio;
+        }
+
+        public Short getIdTipoCambio() {
+            return idTipoCambio;
+        }
+
+        public String getDescripcionTipoCambio() {
+            return descripcionTipoCambio;
+        }
+
+        public static CEN_TIPOCAMBIO getEnum(Short idTipoCambio) {
+            for (CEN_TIPOCAMBIO sc : values()) {
+                if (sc.getIdTipoCambio().shortValue() == idTipoCambio.shortValue()) {
+                    return sc;
+                }
+            }
+            return null;
+        }
+
+    }
+
+    public static enum OBJETIVO {
+        DESTINATARIOS(new Long("1"), "DESTINATARIOS"), MULTIDOCUMENTO(new Long("2"), "MULTIDOCUMENTO"),
+        CONDICIONAL(new Long("3"), "CONDICIONAL"), DATOS(new Long("4"), "DATOS");
+
+        private final Long codigo;
+        private final String descripcion;
+
+        OBJETIVO(Long codigo, String descripcion) {
+            this.codigo = codigo;
+            this.descripcion = descripcion;
+        }
+
+        public Long getCodigo() {
+            return codigo;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public static OBJETIVO getEnum(Short codigo) {
+            for (OBJETIVO sc : values()) {
+                if (sc.getCodigo().longValue() == codigo.longValue()) {
+                    return sc;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static enum SUFIJOS {
+        NOMBRE_COLEGIADO(new Short("1"), "NOMBRE_COLEGIADO"), NUMERO_COLEGIADO(new Short("2"), "NUMERO_COLEGIADO"),
+        IDENTIFICACION(new Short("3"), "IDENTIFICACION");
+
+        private final Short codigo;
+        private final String descripcion;
+
+        SUFIJOS(Short codigo, String descripcion) {
+            this.codigo = codigo;
+            this.descripcion = descripcion;
+        }
+
+        public Short getCodigo() {
+            return codigo;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public static SUFIJOS getEnum(Short codigo) {
+            for (SUFIJOS sc : values()) {
+                if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+                    return sc;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static enum FORMATO_SALIDA {
+        XLS(new Short("1"), "xlsx"), DOC(new Short("2"), "docx"), PDF(new Short("3"), "pdf"),
+        PDF_FIRMADO(new Short("4"), "pdf");
+
+        private final Short codigo;
+        private final String descripcion;
+
+        FORMATO_SALIDA(Short codigo, String descripcion) {
+            this.codigo = codigo;
+            this.descripcion = descripcion;
+        }
+
+        public Short getCodigo() {
+            return codigo;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public static FORMATO_SALIDA getEnum(Short codigo) {
+            for (FORMATO_SALIDA sc : values()) {
+                if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+                    return sc;
+                }
+            }
+            return null;
+        }
+    }
+
+    // Estados facturacion
+    public static enum ESTADO_FACTURACION {
+        ESTADO_FACTURACION_ABIERTA(10), ESTADO_FACTURACION_EJECUTADA(20), ESTADO_FACTURACION_LISTA_CONSEJO(30),
+        ESTADO_FACTURACION_EN_EJECUCION(40), ESTADO_FACTURACION_PROGRAMADA(50),
+        ESTADO_FACTURACION_VALIDACION_NO_CORRECTA(60), ESTADO_FACTURACION_ENVIO_NO_ACEPTADO(70),
+        ESTADO_FACTURACION_ENVIO_NO_DISPONIBLE(80), ESTADO_FACTURACION_ENVIO_EN_PROCESO(90);
+
+        private Integer codigo;
+
+        private ESTADO_FACTURACION(Integer codigo) {
+            this.codigo = codigo;
+        }
+
+        public Integer getCodigo() {
+            return this.codigo;
+        }
+    }
+
+    public static enum CargaMasivaDatosCVVo {
+
+        COLEGIADONUMERO("COLEGIADONUMERO"), PERSONANIF("PERSONANIF"), C_FECHAINICIO("C_FECHAINICIO"),
+        C_FECHAFIN("C_FECHAFIN"), C_CREDITOS("C_CREDITOS"), FECHAVERIFICACION("FECHAVERIFICACION"),
+        TIPOCVCOD("TIPOCVCOD"), SUBTIPOCV1COD("SUBTIPOCV1COD"), SUBTIPOCV2COD("SUBTIPOCV2COD"),
+        PERSONANOMBRE("PERSONANOMBRE"), C_IDPERSONA("C_IDPERSONA"), TIPOCVNOMBRE("TIPOCVNOMBRE"),
+        C_IDTIPOCV("C_IDTIPOCV"), SUBTIPOCV1NOMBRE("SUBTIPOCV1NOMBRE"), C_IDTIPOCVSUBTIPO1("C_IDTIPOCVSUBTIPO1"),
+        SUBTIPOCV2NOMBRE("SUBTIPOCV2NOMBRE"), C_IDTIPOCVSUBTIPO2("C_IDTIPOCVSUBTIPO2"), ERRORES("ERRORES"),
+        C_DESCRIPCION("C_DESCRIPCION");
+
+        private final String campo;
+
+        private CargaMasivaDatosCVVo(String campo) {
+            this.campo = campo;
+        }
+
+        public String getCampo() {
+            return campo;
+        }
+    }
+
+    public static enum HISTORICOCAMBIOGF {
+        DATOSGENERALES((short) 10), DATOSCARGAMASIVA((short) 50);
+
+        private short id = 0;
+
+        HISTORICOCAMBIOGF(short id) {
+            this.id = id;
+        }
+
+        public short getId() {
+            return this.id;
+        }
+    }
+
+    public static enum HISTORICOCAMBIOCV {
+        DATOSGENERALES((short) 10), DATOSCV((short) 50);
+
+        private short id = 0;
+
+        HISTORICOCAMBIOCV(short id) {
+            this.id = id;
+        }
+
+        public short getId() {
+            return this.id;
+        }
+    }
+
+    public static enum PARAMETRO_GENERAL {
+        MAX_FILE_SIZE("10485760");
+
+        private String valor = null;
+
+        private PARAMETRO_GENERAL(String valor) {
+            this.valor = valor;
+        }
+
+        public final String getValor() {
+            return this.valor;
+        }
+
+        public void setValor(String valor) {
+            this.valor = valor;
+        }
+    }
+
+    public static enum GEN_PARAMETROS {
+        PATH_DOCUMENTOSADJUNTOS
+    }
+
+    public static enum ENVIOS_MASIVOS_LOG_EXTENSION {
+        xls, xlsx
+    }
+
+
+
+    public static enum ECOM_ESTADOSCOLA {
+        INICIAL((short) 1), EJECUTANDOSE((short) 2), REINTENTANDO((short) 3), ERROR((short) 4), FINAL((short) 5),
+        ERROR_VALIDACION((short) 6);
+
+        private short id = -1;
+
+        private ECOM_ESTADOSCOLA(short id) {
+            this.id = id;
+        }
+
+        public short getId() {
+            return this.id;
+        }
+
+    }
+
+    public static enum ECOM_OPERACION {
+        ECOM2_INIT_PARAMETROS_GENERALES(206),
+        ECOM2_XUNTA_JE(18),
+        ECOM2_CAT_VALIDA_JUSTIFICACION(69),
+        CAT_ENVIA_RESP_JUSTIFICACION(74),
+        PCAJG_ALCALA_JE_FICHERO_ERROR(56),
+    	XUNTA_ENVIO_JUSTIFICACION (27),
+		XUNTA_ENVIO_REINTEGROS (28),
+		TRASPASAR_FACTURAS_CREARCLIENTE_NAVISION(61);
+
+        public static ECOM_OPERACION getEnum(Integer codigo) {
+            for (ECOM_OPERACION sc : values()) {
+                if (sc.getId() == codigo) {
+                    return sc;
+                }
+            }
+            return null;
+        }
+
+        private int id = -1;
+
+        private ECOM_OPERACION(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return this.id;
+        }
+    }
+
+    public static enum GEN_PROPERTIES_FICHERO {
+        eCOM2_LOG4J
+    }
+
+    public static final String PARAMETRO_PROPOSITO_TRANSFERENCIA_SEPA = "PROPOSITO_TRANSFERENCIA_SEPA";
+    public static final String PARAMETRO_PROPOSITO_OTRA_TRANFERENCIA = "PROPOSITO_OTRA_TRANSFERENCIA";
+
+    public static final String MODULO_FACTURACION = "FAC";
+
+    // Estados Pago SJCS
+    public static final String ESTADO_PAGO_ABIERTO = "10";
+    public static final String ESTADO_PAGO_EJECUTADO = "20";
+    public static final String ESTADO_PAGO_CERRADO = "30";
+
+    public static final String CRITERIOS_PAGO_FACTURACION = "F";
+    public static final String CRITERIOS_PAGO_PAGOS = "P";
+
+    public static final int LISTA_PAGO_SOLO_INCLUIR_MOROSOS = 0;
+    public static final int LISTA_PAGO_SOLO_INCLUIR_NO_MOROSOS = 1;
+    public static final int LISTA_PAGO_TODOS = 2;
+
+    public static final int CASO_MVNOASOCIADO = 1;
+    public static final int CASO_MVASOCIADOAGRUPOFACT = 2;
+    public static final int CASO_MVASOCIADOAFACTURACION = 3;
+
+    public static final String PATH_PREVISIONES_BD = "PATH_PREVISIONES_BD";
+    public static final String PATH_PREVISIONES = "PATH_PREVISIONES";
+    public static final String MODULO_FCS = "FCS";
+    public static final String MODULO_CER = "CER";
+    public static final String CONTADOR_ABONOS_PAGOSJG = "FAC_ABONOS_FCS";
+
+    // Fcatura/abono Contabilizada
+    public static final String FACTURA_ABONO_CONTABILIZADA = "S";
+    public static final String FACTURA_ABONO_NO_CONTABILIZADA = "N";
+
+    public static final String MODULO_FACTURACION_SJCS = "FCS";
+
+    public static final String DEDUCIR_COBROS_AUTOMATICO = "DEDUCIR_COBROS_AUTOMATICO";
+
+    public static final String TIPO_APUNTE_COMPENSADO = "C";
+
+    //Estado Facturas
+    public static final String ESTADO_FACTURA_PAGADA = "1";
+    public static final String ESTADO_FACTURA_CAJA = "2";
+    public static final String ESTADO_FACTURA_BANCO = "5";
+    public static final String ESTADO_FACTURA_ENREVISION = "7";
+    public static final String ESTADO_FACTURA_ANULADA = "8";
+    public static final String ESTADO_FACTURA_DEVUELTA = "4";
+
+    public static final String PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF = "facturacion.directorioFisicoFacturaPDFJava";
+    public static final String PARAMETRO_DIRECTORIO_FACTURA_PDF = "facturacion.directorioFacturaPDFJava";
+    public static final String PARAMETRO_PATH_CERTIFICADOS_DIGITALES = "PATH_CERTIFICADOS_DIGITALES";
+    public static final String PARAMETRO_NOMBRE_CERTIFICADOS_DIGITALES = "NOMBRE_CERTIFICADOS_DIGITALES";
+    public static final String PARAMETRO_CLAVE_CERTIFICADOS_DIGITALES = "CLAVE_CERTIFICADOS_DIGITALES";
+    public static final String FILE_SEP = System.getProperty("file.separator");
+
+    public static final String CODIGO_PROVINCIA_CEUTA = "51";
+    public static final String CODIGO_PROVINCIA_MELILLA = "52";
+
+    //	Tipo de identificaci�n
+    public static final int TIPO_IDENTIFICACION_NIF = 10;
+    public static final int TIPO_IDENTIFICACION_CIF = 20;
+    public static final int TIPO_IDENTIFICACION_TRESIDENTE = 40;
+    public static final int TIPO_IDENTIFICACION_PASAPORTE = 30;
+    public static final int TIPO_IDENTIFICACION_OTRO = 50;
+
+    public static final String SEPARADOR = "	";
+
+    public static final String IMPRESO190_ENCODING = "ISO-8859-1";
+
+    public static final String TIPO_SOPORTE_CARTUCHO = "C";
+    public static final String TIPO_SOPORTE_TELEMATICO = "T";
+    public static final String TIPO_SOPORTE_DISQUETE = "D";
+    public static final String PATH_IMPRESO190 = "PATH_IMPRESO190";
+
+    public static final String SOJ = "SOJ";
+
+    public static final String PARAMETRO_PCAJG_TIPO = "PCAJG_TIPO";
+    public static final int TIPO_CAJG_XML_SANTIAGO = 6;
+    public static final int TIPO_CAJG_CATALANES = 2;
+
+    	
+    public enum Consejos {
+        C_CATALUNYA("AC0900"),
+        EUSKAL_K_("AC1600"),
+        C_ANDALUZ("AC0100"),
+        C_VALENCI("AC1500"),
+        C_GALEGA("AC1100"),
+        C_CASTILLA_Y_LEON("AC0700"),
+        C_CASTILLA_LA_MANCHA("AC0800"),
+        C_MADRID("AC1200"),
+        C_CANARIO("AC0500"),
+        C_ARAGON("AC0200");
+
+        private String codigoExt;
+
+        private Consejos(String codigoExt) {
+            this.codigoExt = codigoExt;
+        }
+
+        public String getCodigoExt() {
+            return codigoExt;
+        }
+
+        public void setCodigoExt(String codigoExt) {
+            this.codigoExt = codigoExt;
+        }
+    }
+
+	
+	
+	public static enum OPERACION {
+		ASIGNA_OBTENER_PROCURADOR (1)
+		, ASIGNA_ENVIO_DOCUMENTO (2)
+		, EJIS_OBTENER_DESTINATARIOS (3)
+		, EJIS_COMUNICACION_DESIGNA_ABOGADO_PROCURADOR (4)
+		, ASIGNA_CONSULTA_NUMERO (5)		
+		, INIT_PARAMETROS_GENERALES(6)
+		, XUNTA_FICHERO_RESPUESTA (7)
+		, EJIS_COMUNICACION_SOL_SUSP_PROCEDIMIENTO(8)
+		, EJIS_NOTIFICACIONES_PENDIENTES(9)
+		, EJIS_PROCESAR_SOL_ABG_PRO(10)
+		, EJIS_PROCESAR_RESPUESTAS(11)
+		, XUNTA_RESOLUCIONES(12)
+		, GV_VALIDACION_EXPEDIENTES(13)
+		, GV_ENVIO_EXPEDIENTES(14)
+		, ASIGNA_RESOLUCIONES(15)		
+		, EJIS_NOTIFICACIONES_ERRONEAS(16)
+		, EJIS_OBTENER_TIPOS_PROCEDIMIENTO(17)
+		, XUNTA_JE(18)
+		, GV_RESOLUCIONES(19)
+		, XUNTA_JE_PROCURADORES(20)
+		, EJIS_PROCESAR_RESOLUCION_IMPUGNACION(21)	
+		, CENSO_OBTENER_COLEGIADOS(22)
+		, EJIS_SOLICITUD_IMPUGNACION_RESOL_AJG(23)
+		, EJIS_COMUNICACION_RESOLUCION_SOL_AJG(24)
+		, XUNTA_VERIFICAR_CERTIFICACION (25)
+		, XUNTA_VERIFICAR_REINTEGROS (26)
+		, XUNTA_ENVIO_JUSTIFICACION (27)
+		, XUNTA_ENVIO_REINTEGROS (28)
+		, ASIGNA_VALIDA_EXPEDIENTES(29)
+		, ASIGNA_ENVIA_EXPEDIENTES(30)
+		, CENSO_PROCESO_COLEGIADOS_REMESA(31)
+		, CENSO_ENVIO_MAIL_INCIDENCIAS(32)
+		, MEDIADORES_CONCURSALES_XML(33)
+		, CV_DATOS_CONTACTO_COLEGIADO (34)
+		, CV_GUARDIAS_COLEGIADO (35)
+		, GVA_VALIDACION_EXPEDIENTES(36)
+		, GVA_ENVIO_EXPEDIENTES(37)
+		, MUTUALIDAD_ENVIO_CERTIFICADOS_FINALIZADOS(38)
+		, CV_OBTENER_LLAMADAS_ACEPTADAS (39)
+		, EJIS_ANDALUCIA_VALIDACION_EXPEDIENTES(40)
+		, EJIS_ANDALUCIA_ENVIO_EXPEDIENTES(41)
+		, CAT_RESOLUCIONES_PDF(42)
+		, XUNTA_VERIFICAR_JUSTIFICACION (43)
+		, CENSO_CARGA_EXCEL(44)
+		, MJU_REPORT_INCIDENCIAS(45)
+		, MJU_REPORT_MAIL_INCIDENCIAS_EXCEL_CGAE(46)
+		, CENSO_ELIMINA_REMESA(47)
+		, PCAJG_ALCALA_ENVIO_INFORME_ECONOMICO(48)
+		, ASIGNA_MODIFICAR_DATOS_SOLICITANTE(49)
+		, ASIGNA_MODIFICAR_PRETENSIONES_A_DEFENDER(50)
+		, ASIGNA_MODIFICAR_INTERVIENTES(51)
+		, ASIGNA_MODIFICAR_TURNADO_ABOGADO(52)
+		, ASIGNA_MODIFICAR_CALIFICACION(53)
+		, ASIGNA_MODIFICAR_TURNADO_PROCURADOR(54)
+		, ASIGNA_ENVIO_CENSO(55)
+		, PCAJG_ALCALA_JE_FICHERO_ERROR(56)
+		, XUNTA_VALIDA_CARGA_EXPEDIENTES(57)
+		, XUNTA_CARGA_EXPEDIENTES(58)
+		, PCAJG_ALCALA_VALIDA_INFORME_ECONOMICO(59)
+		, XUNTA_VERIFICA_CARGA_EXPEDIENTES(60)
+		, TRASPASAR_FACTURAS_CREARCLIENTE_NAVISION(61)
+		, TRASPASAR_FACTURAS_CREARFACTURA_NAVISION(62)
+		,EJIS_VALIDA_ENVIO_EXPEDIENTES(63)
+		,EJIS_ENVIO_EXPEDIENTES(64)
+		,ATLANTE_ACUSES_ERRONEOS(66)
+		,ATLANTE_ACUSES_NOERRONEOS(67)
+//		, EEJG_SOLICITUD_INFORMACION(68)
+		, CAT_VALIDA_JUSTIFICACION(69)
+		, CAT_ENVIA_JUSTIFICACION_CICAC(70)
+		,CAT_ENVIA_JUSTIFICACION_GEN(71)
+		,CAT_PROC_JUSTIFICACION_PROC(73)
+		,CAT_ENVIA_RESP_JUSTIFICACION(74), 
+		CAT_RECIBE_JUSTIFICACION_FTP_ICA(75),
+		PCAJG_ALCALA_VALIDA_DOCUMENTACION(76),
+		PCAJG_ALCALA_ENVIO_DOCUMENTACION(77),
+		PERICLES_ENVIA_EXPEDIENTE(78),
+		PERICLES_ENVIA_DOCUMENTO(79),
+		ENVIA_PUNTO_NEUTRO_JUDICIAL(80),
+		EEJG_SOLICITUD_PETICION_INFOAAPP(81),
+		EEJG_CONSULTA_INFORMACION_COMPLETA_AAPP(82);
+		
+		
+		
+		;
+
+		public static OPERACION getEnum(Integer codigo){
+			for(OPERACION sc : values()){
+				if (sc.getId()==codigo){
+					return sc;
+				}
+			}
+			return null;
+		}
+		
+		
+		private int id = -1;
+		
+		private OPERACION(int id) {			
+			this.id = id;
+		}
+		public int getId() {
+			return this.id;
+		}
+	}
+    
+
+    // Estados certificación
+    public enum ESTADO_CERTIFICACION {
+
+        ESTADO_CERTIFICACION_ABIERTA("1"),
+        ESTADO_CERTIFICACION_VALIDANDO("2"),
+        ESTADO_CERTIFICACION_NO_VALIDADA("3"),
+        ESTADO_CERTIFICACION_VALIDADA("4"),
+        ESTADO_CERTIFICACION_ENVIANDO("5"),
+        ESTADO_CERTIFICACION_ENVIO_CON_ERRORES("6"),
+        ESTADO_CERTIFICACION_CERRADA("7");
+
+        private String codigo;
+
+        ESTADO_CERTIFICACION(String codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getCodigo() {
+            return this.codigo;
+        }
+    }
+
+    // Procesos certificación
+    public enum PROCESO_CERTIFICACION {
+
+        PROCESO_CERTIFICACION_JUSTIFICACION("873016"),
+        PROCESO_CERTIFICACION_REINTEGRO("873017"),
+        PROCESO_CERTIFICACION_CERTIFICACION("873018");
+
+        private String recurso;
+
+        PROCESO_CERTIFICACION(String recurso) {
+            this.recurso = recurso;
+        }
+
+        public String getRecurso() {
+            return this.recurso;
+        }
+    }
+
+    public static final String SEQUENCE_CERTIFICACIONES = "SEQ_FCS_CERTIFICACIONES";
+
 	public static String ACUERDO = "Acuerdo";
 	public static String FIN = "Fin";
 	public static String FIRMEZA = "Firmeza";
@@ -190,70 +963,6 @@ public class SigaConstants {
 	public static final String MODULO_CENSO = "CEN";
 	public static final String PARAMETRO_CONTADOR_UNICO = "CONTADOR_UNICO_NCOLEGIADO_NCOMUNIT";
 
-	public enum ERROR_SERVER {
-		XML_NO_VALIDO(null), CLI_NOAUTORIZADO("La IP recibida en la petición no está autorizada."),
-		CLI_IP_NO_ENCONTRADA("La ip no se ha encontrado."), CLI_NOVALIDO("Esquema de petición datos no válido."),
-		CLI_NOACTIVO("El colegio que realiza la petición no tiene activo el servicio."),
-		CLI_CODIGO_NO_EXISTE("El código del colegio no existe."),
-		CLI_VERSION_INCORRECTA("La versión recibida no existe o no es la correspondiente al esquema utilizado."),
-		CLI_ERROR_DATOS_INTERNO(
-				"Los datos que se reciben no son válidos para enviar una respuesta correcta en el servicio."),
-		CLI_OTROS_ERRORES_INTERNOS("Error de causas externas."), CLI_COLEGIO_NULO("El colegio no puede ser nulo."),
-		CLI_PAGINA_YA_INSERTADA("La página ya ha sido insertada para esa carga"),
-		CLI_CAMPO_NO_VALIDO("La longitud es superior a la máxima permitida"),
-		CLI_ORDEN_FECHAS_INCORRECTO("La fecha hasta no puede ser menor a la fecha desde"),
-		CLI_HORA_EJECUCION_NO_PERMITIDO("No está permitida la ejecución del servicio a esta hora"),
-		CLI_COLEGIO_NO_EXISTE("Alguno de los colegios no existe en el sistema"),
-		CLI_INCONCORDANCIA_EN_PAGINAS("El número de página no puede ser superior al total de páginas.");
-
-		private String mensajeError = null;
-
-		private ERROR_SERVER(String mensajeError) {
-			this.mensajeError = mensajeError;
-		}
-
-		public String getMensajeError() {
-			return mensajeError;
-		}
-	}
-
-	public static enum ECOM_CEN_ROLES {
-		ABOGADO("ABO", "ABOGADO", "Abogado"), NOEJERCIENTE("CNE", "COLEGIADO_NO_EJERCIENTE", "Colegiado No Ejerciente"),
-		PERSONAL("PER", "PERSONAL", "Personal"), DECANO("DEC", "DECANO", "Decano"),
-		MIEMBROJUNTA("MJU", "MIEMBRO_JUNTA", "Miembro de Junta"), CONSEJERO("CON", "CONSEJERO", "Consejero"),
-		DIRECTIVO("DIR", "DIRECTIVO", "Directivo"), INSCRITO("INS", "ABOGADO_INSCRITO", "Abogado inscrito"),
-		ABOGADOEUROPEO("CCB", "ABOGADO_ADVOCAT_AVOGADO_ABOKATU", "Abogado Advocat Avogado Abokatu"),
-		ADMINISTRADOR("ADM", "ADMINISTRADOR", "Administrador"),
-		ADMINISTRADORUNICO("ADMUNI", "ADMINISTRADOR_UNICO", "Administrador Único"),
-		ADMINISTRADORSOLIDARIO("ADMSOL", "ADMINISTRADOR_SOLIDARIO", "Administrador Solidario"),
-		AUTORIZADO("AUT", "AUTORIZADO", "Autorizado"),
-		REPRESENTANTELEGAL("REP", "RESPRESENTANTE_LEGAL", "Representante Legal"),
-		REPRESENTANTEVOLUNTARIO("REPVOL", "RESPRESENTANTE_VOLUNTARIO", "Representante Voluntario"),
-		SECRETARIO("SEC", "SECRETARIO", "Secretario"), VICEDECANO("VICDEC", "VICEDECANO", "Vicedecano"),
-		SIGAADMIN("SAD", "SIGA-Admin", "SIGA-Admin");
-
-		private String codigo = null;
-		private String recurso = null;
-		private String descripcion = null;
-
-		private ECOM_CEN_ROLES(String codigo, String recurso, String descripcion) {
-			this.codigo = codigo;
-			this.recurso = recurso;
-			this.descripcion = descripcion;
-		}
-
-		public String getCodigo() {
-			return codigo;
-		}
-
-		public String getRecurso() {
-			return recurso;
-		}
-
-		public String getDescripcion() {
-			return descripcion;
-		}
-	}
 
 	public static String getTipoUsuario(String rol) {
 		if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.PERSONAL.getDescripcion())
@@ -363,378 +1072,6 @@ public class SigaConstants {
 	public static final int TIPO_CAMBIO_HISTORICO_ASISTENCIAALTA = 104;
 	public static final int TIPO_CAMBIO_HISTORICO_ASISTENCIAMODIFICACION = 105;
 	public static final int TIPO_CAMBIO_HISTORICO_ASISTENCIAALTAACTUACION = 106;
-
-	public enum ERROR_CLIENT {
-		XML_NO_VALIDO(null), SERV_NODISPONIBLE("Servicio no disponible."),
-		SERV_CERTNOAUT(
-				"En el caso de comunicaciones con certificado de cliente que el certificado presentado no esté autorizado."),
-		CLI_NOVALIDO("Esquema de petición datos no válido."),
-		CLI_NOACTIVO("El colegio que realiza la petición no tiene activo el servicio."),
-		SERV_FECHANOVALIDO("Para el servidor el rango de fechas solicitado no es válido."),
-		SERV_COLEGIONOVALIDO("Para el servidor el código del colegio recibido no es válido."),
-		SERV_NUMPAGINANOVALIDO("Para el servidor el número de página solicitado no existe o no es la esperada.."),
-		SERV_VERSION_INCORRECTA(
-				"La versión recibida no existe o no es la correspondiente al esquema utilizado en la petición."),
-		SERV_OTRO_ERROR("Cualquier otro error no catalogado."),
-		SERV_NOVALIDO("La respuesta no tiene un formato válido");
-
-		private String mensajeError = null;
-
-		private ERROR_CLIENT(String mensajeError) {
-			this.mensajeError = mensajeError;
-		}
-
-		public String getMensajeError() {
-			return mensajeError;
-		}
-	}
-
-	public enum ID_TIPO_CARGA {
-		SERV_SOC(new Short("1")), CLI_SOC(new Short("2"));
-
-		private Short tipo = null;
-
-		private ID_TIPO_CARGA(Short tipo) {
-			this.tipo = tipo;
-		}
-
-		public Short getTipo() {
-			return tipo;
-		}
-	}
-
-	public static enum TIPO_XML {
-		PETICION_SERVICIO_CARGAS(new Short("1"), "petición servicio"),
-		RESPUESTA_SERVICIO_CARGAS(new Short("2"), "respuesta servicio"),
-		PETICION_CLIENTE_CARGAS(new Short("3"), "petición cliente"),
-		RESPUESTA_CLIENTE_CARGAS(new Short("4"), "respuesta cliente"),
-		PETICION_SERVICIO_ECOS(new Short("5"), "petición servicio ECOS"),
-		RESPUESTA_CLIENTE_ECOS(new Short("6"), "respuesta cliente ECOS"),
-		PETICION_WS_PUBLICADOR(new Short("7"), "petición servicio"),
-		RESPUESTA_WS_PUBLICADOR(new Short("8"), "respuesta servicio"),
-		PETICION_SERVICIO_FUSIONADOR(new Short("9"), "petición servicio"),
-		RESPUESTA_SERVICIO_FUSIONADOR(new Short("10"), "respuesta servicio");
-
-		private final Short codigo;
-		private final String descripcion;
-
-		TIPO_XML(Short codigo, String descripcion) {
-			this.codigo = codigo;
-			this.descripcion = descripcion;
-		}
-
-		public Short getCodigo() {
-			return codigo;
-		}
-
-		public String getDescripcion() {
-			return descripcion;
-		}
-
-		public static TIPO_XML getEnum(Short codigo) {
-			for (TIPO_XML sc : values()) {
-				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
-					return sc;
-				}
-			}
-			return null;
-		}
-	}
-
-	public static enum MODULO {
-		CARGAS(new Short("1"), "CARGAS"), ADMINISTRACION(new Short("2"), "ADMINISTRACION"),
-		PUBLICACION(new Short("3"), "PUBLICACION"), FUSIONADOR(new Short("4"), "FUSIONADOR");
-
-		private final Short codigo;
-		private final String descripcion;
-
-		MODULO(Short codigo, String descripcion) {
-			this.codigo = codigo;
-			this.descripcion = descripcion;
-		}
-
-		public Short getCodigo() {
-			return codigo;
-		}
-
-		public String getDescripcion() {
-			return descripcion;
-		}
-
-		public static MODULO getEnum(Short codigo) {
-			for (MODULO sc : values()) {
-				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
-					return sc;
-				}
-			}
-			return null;
-		}
-	}
-
-	public static enum ESTADO_CARGAS {
-		ESTADO_PENDIENTE(new Short("1"), "Carga pendiente"), ESTADO_PROCESANDO(new Short("2"), "Carga procesando"),
-		ESTADO_PROCESADO(new Short("3"), "Carga procesada"),
-		ESTADO_ERROR_FORMATO(new Short("4"), "Carga con errores de formato"),
-		ESTADO_ERROR_GENERAL(new Short("5"), "Carga finalizada con error");
-
-		private final Short codigo;
-		private final String descripcion;
-
-		ESTADO_CARGAS(Short codigo, String descripcion) {
-			this.codigo = codigo;
-			this.descripcion = descripcion;
-		}
-
-		public Short getCodigo() {
-			return codigo;
-		}
-
-		public String getDescripcion() {
-			return descripcion;
-		}
-
-		public static ESTADO_CARGAS getEnum(Short codigo) {
-			for (ESTADO_CARGAS sc : values()) {
-				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
-					return sc;
-				}
-			}
-			return null;
-		}
-	}
-
-	public static enum CEN_TIPOCAMBIO {
-
-		ALTA_COLEGIACION(new Short("1"), "Alta Colegiación"), BAJA_COLEGIACION(new Short("2"), "Baja Colegiación"),
-		ALTA_EJERCICIO(new Short("3"), "Alta Ejercicio"), BAJA_EJERCICIO(new Short("4"), "Baja Ejercicio"),
-		INHABILITACION(new Short("5"), "Inhabilitación"), SUSPENSION_EJERCICIO(new Short("6"), "Suspensión Ejercicio"),
-		MODIFICACION_DATOS_GENERALES(new Short("10"), "Modificación Datos Generales"),
-		MODIFICACION_DATOS_COLEGIALES(new Short("20"), "Modificación Datos Colegiales"),
-		MODIFICACION_DIRECCIONES(new Short("30"), "Modificación Direcciones"),
-		MODIFICACION_CUENTAS_BANCARIAS(new Short("40"), "Modificación Cuentas Bancarias"),
-		MODIFICACION_DATOS_CV(new Short("50"), "Modificación Datos CV"),
-		MODIFICACION_COMPONENTES(new Short("60"), "Modificación Componentes"),
-		MODIFICACION_DATOS_FACTURACIÓN(new Short("70"), "Modificación Datos Facturación"),
-		MODIFICACION_DATOS_TURNO(new Short("80"), "Modificación Datos Turno"),
-		MODIFICACION_DATOS_EXPEDIENTES(new Short("90"), "Modificación Datos Expedientes"),
-		MODIFICACION_OTROS_DATOS(new Short("99"), "Modificación Otros Datos"),
-		OBSERVACIONES(new Short("100"), "Observaciones"),
-		DESIGNACION_MODIFICACION(new Short("101"), "Designación. Modificación"),
-		DESIGNACION_JUSTIFICACION(new Short("102"), "Designación. Justificación"),
-		DESIGNACION_ALTA_DE_ACTUACIONES(new Short("103"), "Designación. Alta de Actuaciones"),
-		ASISTENCIA_ALTA(new Short("104"), "Asistencia. Alta"),
-		ASISTENCIA_MODIFICACION(new Short("105"), "Asistencia. Modificación"),
-		ASISTENCIA_ALTA_DE_ACTUACIONES(new Short("106"), "Asistencia. Alta de Actuaciones"),
-		DESIGNACION_MODIFICACION_DE_ACTUACIONES(new Short("107"), "Designación. Modificación de Actuaciones"),
-		DESIGNACION_ELIMINACION_DE_ACTUACIONES(new Short("108"), "Designación. Eliminación de Actuaciones"),
-		EJG_CREACION_NUEVO_EJG(new Short("120"), "EJG. Creación nuevo EJG"),
-		EJG_MODIFICACION_DATOS_GENERALES(new Short("121"), "EJG. Modificación datos generales"),
-		EJG_MODIFICACION_SERVICIOS_TRAMITACION(new Short("122"), "EJG. Modificación servicios de tramitación"),
-		EJG_ANADIR_FAMILIAR_NUEVO(new Short("123"), "EJG. Se añade un familiar nuevo"),
-		EJG_BORRAR_FAMILIAR(new Short("124"), "EJG. Se borra un familiar"),
-		EJG_ACTIVAR_FAMILIAR_BORRADO(new Short("125"), "EJG. Se activa un familiar borrado"),
-		EJG_ANADIR_ESTADO_MANUALMENTE(new Short("126"), "EJG. Añadido estado manualmente"),
-		EJG_ESTADO_BORRADO_MANUALMENTE(new Short("127"), "EJG. Estado borrado manualmente"),
-		EJG_ESTADO_MODIFICADO(new Short("128"), "EJG. Estado modificado"),
-		EJG_DOCUMENTO_ANADIDO(new Short("129"), "EJG. Documento añadido"),
-		EJG_DOCUMENTO_ELIMINADO(new Short("130"), "EJG. Documento eliminado"),
-		EJG_DOCUMENTO_MODIFICADO(new Short("131"), "EJG. Documento modificado"),
-		EJG_FICHERO_ANADIDO_A_UN_DOCUMENTO(new Short("132"), "EJG. Fichero añadido a un documento"),
-		EJG_FICHERO_ELIMINADO_DE_UN_DOCUMENTO(new Short("133"), "EJG. Fichero eliminado de un documentoEJG. Fichero eliminado de un documento"),
-		EJG_CREACION_DICTAMEN(new Short("134"), "EJG. Creacion de un dictamen"),
-		EJG_ELIMINACION_DICTAMEN(new Short("135"), "EJG. Eliminación de un dictamen"),
-		EJG_MODIFICACION_DICTAMEN(new Short("136"), "EJG. Modificación de un dictamen"),
-		EJG_CREACION_RESOLUCION(new Short("137"), "EJG. Eliminación de un dictamen"),
-		EJG_MODIFICACION_IMPUGNACION(new Short("138"), "EJG. Modificación de una impugnación"),
-		EJG_DESIGNACION_ASOCIADA(new Short("139"), "EJG. Designación asociada"),
-		EJG_ASISTENCIA_ASOCIADA(new Short("140"), "EJG. Asistencia asociada"),
-		EJG_SOJ_ASOCIADO(new Short("141"), "EJG. SOJ asociado"),
-		EJG_RELACION_ELIMINADA(new Short("142"), "EJG. Relación eliminada");
-
-
-		private final Short idTipoCambio;
-		private final String descripcionTipoCambio;
-
-		private CEN_TIPOCAMBIO(Short idTipoCambio, String descripcionTipoCambio) {
-			this.idTipoCambio = idTipoCambio;
-			this.descripcionTipoCambio = descripcionTipoCambio;
-		}
-
-		public Short getIdTipoCambio() {
-			return idTipoCambio;
-		}
-
-		public String getDescripcionTipoCambio() {
-			return descripcionTipoCambio;
-		}
-
-		public static CEN_TIPOCAMBIO getEnum(Short idTipoCambio) {
-			for (CEN_TIPOCAMBIO sc : values()) {
-				if (sc.getIdTipoCambio().shortValue() == idTipoCambio.shortValue()) {
-					return sc;
-				}
-			}
-			return null;
-		}
-
-	}
-
-	public static enum OBJETIVO {
-		DESTINATARIOS(new Long("1"), "DESTINATARIOS"), MULTIDOCUMENTO(new Long("2"), "MULTIDOCUMENTO"),
-		CONDICIONAL(new Long("3"), "CONDICIONAL"), DATOS(new Long("4"), "DATOS");
-
-		private final Long codigo;
-		private final String descripcion;
-
-		OBJETIVO(Long codigo, String descripcion) {
-			this.codigo = codigo;
-			this.descripcion = descripcion;
-		}
-
-		public Long getCodigo() {
-			return codigo;
-		}
-
-		public String getDescripcion() {
-			return descripcion;
-		}
-
-		public static OBJETIVO getEnum(Short codigo) {
-			for (OBJETIVO sc : values()) {
-				if (sc.getCodigo().longValue() == codigo.longValue()) {
-					return sc;
-				}
-			}
-			return null;
-		}
-	}
-
-	public static enum SUFIJOS {
-		NOMBRE_COLEGIADO(new Short("1"), "NOMBRE_COLEGIADO"), NUMERO_COLEGIADO(new Short("2"), "NUMERO_COLEGIADO"),
-		IDENTIFICACION(new Short("3"), "IDENTIFICACION");
-
-		private final Short codigo;
-		private final String descripcion;
-
-		SUFIJOS(Short codigo, String descripcion) {
-			this.codigo = codigo;
-			this.descripcion = descripcion;
-		}
-
-		public Short getCodigo() {
-			return codigo;
-		}
-
-		public String getDescripcion() {
-			return descripcion;
-		}
-
-		public static SUFIJOS getEnum(Short codigo) {
-			for (SUFIJOS sc : values()) {
-				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
-					return sc;
-				}
-			}
-			return null;
-		}
-	}
-
-	public static enum FORMATO_SALIDA {
-		XLS(new Short("1"), "xlsx"), DOC(new Short("2"), "docx"), PDF(new Short("3"), "pdf"),
-		PDF_FIRMADO(new Short("4"), "pdf");
-
-		private final Short codigo;
-		private final String descripcion;
-
-		FORMATO_SALIDA(Short codigo, String descripcion) {
-			this.codigo = codigo;
-			this.descripcion = descripcion;
-		}
-
-		public Short getCodigo() {
-			return codigo;
-		}
-
-		public String getDescripcion() {
-			return descripcion;
-		}
-
-		public static FORMATO_SALIDA getEnum(Short codigo) {
-			for (FORMATO_SALIDA sc : values()) {
-				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
-					return sc;
-				}
-			}
-			return null;
-		}
-	}
-
-	// Estados facturacion
-	public static enum ESTADO_FACTURACION {
-		ESTADO_FACTURACION_ABIERTA(10), ESTADO_FACTURACION_EJECUTADA(20), ESTADO_FACTURACION_LISTA_CONSEJO(30),
-		ESTADO_FACTURACION_EN_EJECUCION(40), ESTADO_FACTURACION_PROGRAMADA(50),
-		ESTADO_FACTURACION_VALIDACION_NO_CORRECTA(60), ESTADO_FACTURACION_ENVIO_NO_ACEPTADO(70),
-		ESTADO_FACTURACION_ENVIO_NO_DISPONIBLE(80), ESTADO_FACTURACION_ENVIO_EN_PROCESO(90);
-
-		private Integer codigo;
-
-		private ESTADO_FACTURACION(Integer codigo) {
-			this.codigo = codigo;
-		}
-
-		public Integer getCodigo() {
-			return this.codigo;
-		}
-	}
-
-	public static enum CargaMasivaDatosCVVo {
-
-		COLEGIADONUMERO("COLEGIADONUMERO"), PERSONANIF("PERSONANIF"), C_FECHAINICIO("C_FECHAINICIO"),
-		C_FECHAFIN("C_FECHAFIN"), C_CREDITOS("C_CREDITOS"), FECHAVERIFICACION("FECHAVERIFICACION"),
-		TIPOCVCOD("TIPOCVCOD"), SUBTIPOCV1COD("SUBTIPOCV1COD"), SUBTIPOCV2COD("SUBTIPOCV2COD"),
-		PERSONANOMBRE("PERSONANOMBRE"), C_IDPERSONA("C_IDPERSONA"), TIPOCVNOMBRE("TIPOCVNOMBRE"),
-		C_IDTIPOCV("C_IDTIPOCV"), SUBTIPOCV1NOMBRE("SUBTIPOCV1NOMBRE"), C_IDTIPOCVSUBTIPO1("C_IDTIPOCVSUBTIPO1"),
-		SUBTIPOCV2NOMBRE("SUBTIPOCV2NOMBRE"), C_IDTIPOCVSUBTIPO2("C_IDTIPOCVSUBTIPO2"), ERRORES("ERRORES"),
-		C_DESCRIPCION("C_DESCRIPCION");
-
-		private final String campo;
-
-		private CargaMasivaDatosCVVo(String campo) {
-			this.campo = campo;
-		}
-
-		public String getCampo() {
-			return campo;
-		}
-	}
-
-	public static enum HISTORICOCAMBIOGF {
-		DATOSGENERALES((short) 10), DATOSCARGAMASIVA((short) 50);
-
-		private short id = 0;
-
-		HISTORICOCAMBIOGF(short id) {
-			this.id = id;
-		}
-
-		public short getId() {
-			return this.id;
-		}
-	}
-
-	public static enum HISTORICOCAMBIOCV {
-		DATOSGENERALES((short) 10), DATOSCV((short) 50);
-
-		private short id = 0;
-
-		HISTORICOCAMBIOCV(short id) {
-			this.id = id;
-		}
-
-		public short getId() {
-			return this.id;
-		}
-	}
 
 	public static final String PLAZAS_DISPO_SI = "1";
 
@@ -1028,27 +1365,7 @@ public class SigaConstants {
 	public static final String CENSO_WS_SITUACION_BAJACOLEGIO = "BAJACOLEGIO";
 	public static final String CENSO_WS_SITUACION_INSCRITO = "INSCRITO";
 
-	public static enum PARAMETRO_GENERAL {
-		MAX_FILE_SIZE("10485760");
 
-		private String valor = null;
-
-		private PARAMETRO_GENERAL(String valor) {
-			this.valor = valor;
-		}
-
-		public final String getValor() {
-			return this.valor;
-		}
-
-		public void setValor(String valor) {
-			this.valor = valor;
-		}
-	}
-
-	public static enum GEN_PARAMETROS {
-		PATH_DOCUMENTOSADJUNTOS
-	}
 
 	public static String DATEST_FORMAT_MIN = "dd/MM/yyyy HH:mm";
 	public static String DATEST_FORMAT_MIN_SEC = "dd/MM/yyyy HH:mm:ss";
@@ -1063,9 +1380,6 @@ public class SigaConstants {
 
 	public static String ENVIOS_MASIVOS_LOG_NOMBRE_FICHERO = "informeEnvio.log";
 
-	public static enum ENVIOS_MASIVOS_LOG_EXTENSION {
-		xls, xlsx
-	}
 
 	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
 	public static String EXPRESION_REGULAR_MAIL2 = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
@@ -1107,49 +1421,6 @@ public class SigaConstants {
 
 	public static final Short ID_INSTITUCION_0 = 0;
 
-	public static enum ECOM_ESTADOSCOLA {
-		INICIAL((short) 1), EJECUTANDOSE((short) 2), REINTENTANDO((short) 3), ERROR((short) 4), FINAL((short) 5),
-		ERROR_VALIDACION((short) 6);
-
-		private short id = -1;
-
-		ECOM_ESTADOSCOLA(short id) {
-			this.id = id;
-		}
-
-		public short getId() {
-			return this.id;
-		}
-
-	}
-
-	public static enum ECOM_OPERACION {
-		ECOM2_INIT_PARAMETROS_GENERALES(206);
-
-		public static ECOM_OPERACION getEnum(Integer codigo) {
-			for (ECOM_OPERACION sc : values()) {
-				if (sc.getId() == codigo) {
-					return sc;
-				}
-			}
-			return null;
-		}
-
-		private int id = -1;
-
-		private ECOM_OPERACION(int id) {
-			this.id = id;
-		}
-
-		public int getId() {
-			return this.id;
-		}
-	}
-
-	public static enum GEN_PROPERTIES_FICHERO {
-		eCOM2_LOG4J
-	}
-
 	public static Integer USUMODIFICACION_0 = 0;
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
 	
@@ -1179,7 +1450,7 @@ public class SigaConstants {
 	public static String EEJG_IDSISTEMA ="";
 	public static String EEJG_URLWS ="";
 	public static String SIGAFRONT_VERSION = "202109071016";
-	public static String SIGAWEB_VERSION = "1.0.76_1";
+	public static String SIGAWEB_VERSION = "1.0.78_0";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";
@@ -1193,5 +1464,70 @@ public class SigaConstants {
 	public static final String C_PPN_IDTIPOPRODUCTO = "PPN_IDTIPOPRODUCTO";
     public static final String C_PPN_IDPRODUCTO = "PPN_IDPRODUCTO";
     public static final String C_PPN_IDPRODUCTOINSTITUCION = "PPN_IDPRODUCTOINSTITUCION";
+    
+	public static final String C_IDFACTURACION = "IDFACTURACION";
+
+	// Estados de FAC_ABONO
+    public static final Short FAC_ABONO_ESTADO_PAGADO = 1;
+    public static final Short FAC_ABONO_ESTADO_PENDIENTE_BANCO = 5;
+    public static final Short FAC_ABONO_ESTADO_PENDIENTE_CAJA = 6;
+    public static final Short FAC_ABONO_DESTINATARIOABONO_SOCIEDAD = 0;
+    public static final Short FAC_ABONO_DESTINATARIOABONO_SJCS = 1;
+    public static final Short FAC_ABONO_DESTINATARIOABONO_NORMAL = 2;
+
+    public static final String PCAJG_ALC_CAM_PATH = "PCAJG_ALC_CAM_PATH";
+    public static final String IDFACTURACION = "IDFACTURACION";
+
+    public static final String  PARAMETRO_FACTURACION_DIRECTORIO_FISICO_PLANTILLA_FACTURA_JAVA = "facturacion.directorioFisicoPlantillaFacturaJava";
+    public static final String  PARAMETRO_FACTURACION_DIRECTORIO_PLANTILLA_FACTURA_JAVA = "facturacion.directorioPlantillaFacturaJava";
+
+	//Expedientes - INICIO
+	public static final String RECURSO_MENU_EXP_EXEA = "menu.expedientesexea";
+	public static final String PARAM_MENU_EXEA_ACTIVO = "EXPEDIENTES_EXEA_ACTIVOS";
+	public static final String ID_APLICACION_PARAM = "ID_APLICACION";
+	public static final String EXEA_AUTENTICACION_URL_PARAM = "URL_EXEA_AUTENTICACION";
+	public static final String EXEA_SYNC_IP_PARAM = "EXEA_SYNC_IPS";
+	public static final String EXEA_WEBSERVICES_ADDIN_PARAM = "URL_WEBSERVICES_ADDIN";
+	public static final String EXEA_NOMBRE_FORM_BUSQ = "NOMBRE_FORM_BUSQUEDA";
+	public static final String EXEA_NOMBRE_GRUPO = "NOMBRE_GRUPO";
+	public static final String EXEA_URL_WEBSERVICES_REGTEL = "URL_WEBSERVICES_REGTEL";
+	public static final String ID_SEDE_PARAM = "ID_SEDE";
+	public static final String EXPEDIENTE_ACEPTADO_EXEA = "Aceptado";
+	public static final String EXPEDIENTE_DENEGADO_EXEA = "Rechazado";
+	public static final short SANCION_EN_SUSPENSO = 8;
+	public static final short INCORPORACION_PENDIENTE_APROBACION = 20;
+	public static final short INCORPORACION_PENDIENTE_DOCUMENTACION = 10;
+
+	public enum ERROR_SINCRONIZACION_EXEA {
+		FORMATO_NOVALIDO("Formato XML de petición no correcto."),
+		SERV_NODISPONIBLE("Servicio no disponible."),
+		IP_NOVALIDA("La IP desde la que se ha recibido la petición no está autorizada."),
+		IDENTIFICACION_NOVALIDA("La identificación del colegiado no es válida."),
+		COLEGIO_NOVALIDO("El código del colegio recibido no es válido."),
+		NUMCOLEGIADO_NOVALIDO("Número de colegiado no válido para el colegio indicado."),
+		COLEGIADO_NOENCONTRADO("No se encuentra en el sistema ningún colegiado con la identificación facilitada."),
+		COLEGIADO_ENCONTRADO("No es posible el alta del colegiado debido a que existe ya en el sistema."),
+		POBLACION_NOENCONTRADA("Población indicada no ha sido identificada."),
+		PROVINCIA_NOVALIDA("Provincia desconocida."),
+		PAIS_NOVALIDO("País desconocido."),
+		TIPOVIA_NOVALIDA("Tipo de vía desconocida."),
+		SANCION_NOENCONTRADA("La sanción correspondiente a la referencia recibida no ha sido encontrada en el sistema."),
+		EXPEDIENTE_NOENCONTRADO("El expediente recibido en la petición no ha sido encontrado en el sistema."),
+		OTRO_ERROR("Se ha producido un error en el procesado de la petición.");
+
+		private String mensajeError = null;
+
+		private ERROR_SINCRONIZACION_EXEA(String mensajeError) {
+			this.mensajeError = mensajeError;
+		}
+
+		public String getMensajeError() {
+			return mensajeError;
+		}
+	}
+
+	//Expedientes - FIN
+
+    public static final String PARAMETRO_LOG_COLALETRADOS_LEVEL = "log.colaLetrados.level";
 
 }

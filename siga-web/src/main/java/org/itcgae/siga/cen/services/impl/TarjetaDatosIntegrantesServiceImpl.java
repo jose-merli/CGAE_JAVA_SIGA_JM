@@ -9,11 +9,15 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosLiquidacionIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosLiquidacionIntegrantesSearchItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesDeleteDTO;
@@ -30,14 +34,20 @@ import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenComponentes;
+import org.itcgae.siga.db.entities.CenHistoricoLiquidacionsjcs;
+import org.itcgae.siga.db.entities.CenHistoricoLiquidacionsjcsExample;
+import org.itcgae.siga.db.entities.CenHistoricoLiquidacionsjcsKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.CenComponentesMapper;
+import org.itcgae.siga.db.mappers.CenHistoricoLiquidacionsjcsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegioprocuradorExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenHistoricoLiquidacionsjcsExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -45,6 +55,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenProvinciasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegrantesService {
@@ -56,6 +67,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 	@Autowired
 	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
+	
+	@Autowired
+	private CenComponentesMapper cenComponentesMapper;
 
 	@Autowired
 	private CenColegioprocuradorExtendsMapper cenColegioprocuradorExtendsMapper;
@@ -79,6 +93,12 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
+	@Autowired
+	private CenHistoricoLiquidacionsjcsExtendsMapper cenHistoricoLiquidacionsjcsExtendsMapper;
+	
+	@Autowired 
+	private CenHistoricoLiquidacionsjcsMapper cenHistoricoLiquidacionsjcsMapper;
 
 	@Override
 	public DatosIntegrantesDTO searchIntegrantesData(int numPagina, DatosIntegrantesSearchDTO datosIntegrantesSearchDTO,
@@ -693,4 +713,377 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		cenNocolegiado.setSociedadsj("0");
 		return cenNocolegiado;
 	}
-}
+
+	@Override
+	public DatosLiquidacionIntegrantesSearchDTO listadoHistoricoLiquidacion(DatosLiquidacionIntegrantesSearchItem datosLiquidacion, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		LOGGER.debug("listadoHistoricoLiquidacion() -> Entrada al servicio para la búsqueda de las altas y bajas que ha tenido el colegiado referentes al pago de SJCS a través de la sociedad");
+
+		List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacionItem = new ArrayList<DatosLiquidacionIntegrantesSearchItem>();
+		DatosLiquidacionIntegrantesSearchDTO datosLiquidacionDTO = new DatosLiquidacionIntegrantesSearchDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.debug(
+					"listadoHistoricoLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.debug(
+					"listadoHistoricoLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				LOGGER.debug(
+						"listadoHistoricoLiquidacion() / cenHistoricoLiquidacionsjcsExtendsMapper.selectLiquidacion() -> Entrada a cenHistoricoLiquidacionsjcsExtendsMapper para busqueda de histórico de liquidacion");
+				datosLiquidacion.setIdInstitucion(idInstitucion.toString());
+				datosLiquidacionItem = cenHistoricoLiquidacionsjcsExtendsMapper.selectLiquidacion(datosLiquidacion);
+				LOGGER.debug(
+						"listadoHistoricoLiquidacion() / cenHistoricoLiquidacionsjcsExtendsMapper.selectLiquidacion() -> Salida de cenHistoricoLiquidacionsjcsExtendsMapper");
+
+				datosLiquidacionDTO.setDatosLiquidacionItem(datosLiquidacionItem);
+			} else {
+				LOGGER.warn(
+						"listadoHistoricoLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("listadoHistoricoLiquidacion() -> idInstitucion del token nula");
+		}
+
+		LOGGER.debug("listadoHistoricoLiquidacion() -> Salida del servicio para buscar las altas y bajas que ha tenido el colegiado referente al pago SJCS a través de la sociedad");
+		
+		return datosLiquidacionDTO;
+	}
+	
+	
+	    @Transactional
+		public DeleteResponseDTO eliminarLiquidacion(List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacion, HttpServletRequest request) {
+			// TODO Auto-generated method stub
+			LOGGER.debug("eliminarLiquidacion() -> Entrada al servicio para eliminar el pago liquidado referente a una sociedad");
+
+			DeleteResponseDTO dpd = new DeleteResponseDTO();
+			AdmUsuarios usuario = new AdmUsuarios();
+			int response = 0;
+			int updateSociedad = 0;
+			int responseUpdateFecha = 0;
+			
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.debug(
+						"eliminarLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.debug(
+						"eliminarLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					LOGGER.debug(
+							"eliminarLiquidacion() / cenHistoricoLiquidacionsjcsMapper.deleteByPrimaryKey() -> Entrada a cenHistoricoLiquidacionsjcsMapper para borrar la liquidacion");
+					if(datosLiquidacion != null) {
+						
+						DatosLiquidacionIntegrantesSearchItem objetoNuevo = new DatosLiquidacionIntegrantesSearchItem();
+						DatosLiquidacionIntegrantesSearchItem objetoAnterior = new DatosLiquidacionIntegrantesSearchItem();
+							
+						for(DatosLiquidacionIntegrantesSearchItem Liquidacion: datosLiquidacion) {
+							
+							if(Liquidacion.isAnterior()) {
+								 objetoAnterior = new DatosLiquidacionIntegrantesSearchItem();
+								 objetoAnterior.setAnterior(Liquidacion.isAnterior());
+								 objetoAnterior.setFechaFin(Liquidacion.getFechaFin());
+								 objetoAnterior.setFechaInicio(Liquidacion.getFechaInicio());
+								 objetoAnterior.setFechaModificacion(Liquidacion.getFechaModificacion());
+								 objetoAnterior.setIdComponente(Liquidacion.getIdComponente());
+								 objetoAnterior.setIdHistorico(Liquidacion.getIdHistorico());
+								 objetoAnterior.setIdInstitucion(Liquidacion.getIdInstitucion());
+								 objetoAnterior.setIdPersona(Liquidacion.getIdPersona());
+								 objetoAnterior.setObservaciones(Liquidacion.getObservaciones());
+								 objetoAnterior.setSociedad(Liquidacion.getSociedad());
+								 objetoAnterior.setUsuModificacion(Liquidacion.getUsuModificacion());
+							}
+							
+							if(!Liquidacion.isAnterior()) {
+								 objetoNuevo = new DatosLiquidacionIntegrantesSearchItem();
+								 objetoNuevo.setAnterior(Liquidacion.isAnterior());
+								 objetoNuevo.setFechaFin(Liquidacion.getFechaFin());
+								 objetoNuevo.setFechaInicio(Liquidacion.getFechaInicio());
+								 objetoNuevo.setFechaModificacion(Liquidacion.getFechaModificacion());
+								 objetoNuevo.setIdComponente(Liquidacion.getIdComponente());
+								 objetoNuevo.setIdHistorico(Liquidacion.getIdHistorico());
+								 objetoNuevo.setIdInstitucion(Liquidacion.getIdInstitucion());
+								 objetoNuevo.setIdPersona(Liquidacion.getIdPersona());
+								 objetoNuevo.setObservaciones(Liquidacion.getObservaciones());
+								 objetoNuevo.setSociedad(Liquidacion.getSociedad());
+								 objetoNuevo.setUsuModificacion(Liquidacion.getUsuModificacion());
+							}
+						}
+					
+						
+					CenHistoricoLiquidacionsjcsKey datos = new CenHistoricoLiquidacionsjcsKey();
+					datos.setIdhistorico(Short.parseShort(objetoNuevo.getIdHistorico()));
+					datos.setIdinstitucion(Short.parseShort(objetoNuevo.getIdInstitucion()));
+					datos.setIdpersona(Long.parseLong(objetoNuevo.getIdPersona()));
+					datos.setIdcomponente(Short.parseShort(objetoNuevo.getIdComponente()));
+					response = cenHistoricoLiquidacionsjcsMapper.deleteByPrimaryKey(datos);
+					
+					LOGGER.debug(
+							"eliminarLiquidacion() / cenComponentesExtendsMapper.selectIntegrantes() -> Salida de cenHistoricoLiquidacionsjcsMapper para borrar la liquidacion");
+
+					if(response == 1) {
+						
+						//hacer el update de ese componente con esa persona en el campo sociedad a 1 a lo contrario que estaba
+						CenComponentes updateRecord = new CenComponentes();
+						
+						updateRecord.setFechamodificacion(new Date());
+						
+						if(objetoAnterior.getSociedad().equals("Alta")) {
+							updateRecord.setSociedad("0");
+						}else {
+							updateRecord.setSociedad("1");
+						}
+						
+						updateRecord.setIdinstitucion(idInstitucion);
+						updateRecord.setIdcomponente(Short.parseShort(objetoAnterior.getIdComponente()));
+						updateRecord.setIdpersona(Long.parseLong(objetoAnterior.getIdPersona()));
+										
+						updateSociedad = cenComponentesMapper.updateByPrimaryKeySelective(updateRecord);
+						
+						if(updateSociedad == 1) {
+							
+							CenHistoricoLiquidacionsjcs updateFechaAnterior = new CenHistoricoLiquidacionsjcs();
+							updateFechaAnterior.setIdhistorico(Short.parseShort(objetoAnterior.getIdHistorico()));
+							updateFechaAnterior.setIdinstitucion(Short.parseShort(objetoAnterior.getIdInstitucion()));
+							updateFechaAnterior.setIdpersona(Long.parseLong(objetoAnterior.getIdPersona()));
+							updateFechaAnterior.setIdcomponente(Short.parseShort(objetoAnterior.getIdComponente()));
+							updateFechaAnterior.setFechafin(null);
+							responseUpdateFecha = cenHistoricoLiquidacionsjcsMapper.updateByPrimaryKeySelective(updateFechaAnterior);
+						}
+					}
+				}
+					
+					dpd.setStatus(SigaConstants.OK);
+					if (response == 0 || updateSociedad == 0 || responseUpdateFecha == 0) {
+						dpd.setStatus(SigaConstants.KO);
+						LOGGER.warn("eliminarLiquidacion() / cenHistoricoLiquidacionsjcsMapper.deleteByPrimaryKey() -> "
+								+ dpd.getStatus() + ". No se pudo eliminar la liquidacion");
+
+					}
+				}
+
+			} else {
+				dpd.setStatus(SigaConstants.KO);
+				LOGGER.warn("eliminarLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> " + dpd.getStatus()
+						+ ". No existen ningún usuario en base de datos");
+			}
+
+			LOGGER.debug("eliminarLiquidacion() -> Salida del servicio para eliminar una liquidacion");
+			return dpd;
+		}
+	    
+	    @Transactional
+		public InsertResponseDTO insertHistoricoLiquidacion(List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacion, HttpServletRequest request) {
+			// TODO Auto-generated method stub
+			LOGGER.debug("insertHistoricoLiquidacion() -> Entrada al servicio para insertar un histórico");
+
+			InsertResponseDTO ins = new InsertResponseDTO();
+			int response = 0;
+			int updateFecha = 0;
+			int updateSociedad = 0;
+			
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.debug(
+						"insertHistoricoLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.debug(
+						"insertHistoricoLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					LOGGER.debug(
+							"insertHistoricoLiquidacion() / cenHistoricoLiquidacionsjcsMapper.updateSociedadComponentes() -> Entrada a cenHistoricoLiquidacionsjcsMapper para actualizar el campo sociedad");
+					
+				
+			if(datosLiquidacion != null) {
+				
+				DatosLiquidacionIntegrantesSearchItem objetoNuevo = new DatosLiquidacionIntegrantesSearchItem();
+				DatosLiquidacionIntegrantesSearchItem objetoAnterior = new DatosLiquidacionIntegrantesSearchItem();
+					
+				for(DatosLiquidacionIntegrantesSearchItem Liquidacion: datosLiquidacion) {
+					
+					if(Liquidacion.isAnterior()) {
+						 objetoAnterior = new DatosLiquidacionIntegrantesSearchItem();
+						 objetoAnterior.setAnterior(Liquidacion.isAnterior());
+						 objetoAnterior.setFechaFin(Liquidacion.getFechaFin());
+						 objetoAnterior.setFechaInicio(Liquidacion.getFechaInicio());
+						 objetoAnterior.setFechaModificacion(Liquidacion.getFechaModificacion());
+						 objetoAnterior.setIdComponente(Liquidacion.getIdComponente());
+						 objetoAnterior.setIdHistorico(Liquidacion.getIdHistorico());
+						 objetoAnterior.setIdInstitucion(Liquidacion.getIdInstitucion());
+						 objetoAnterior.setIdPersona(Liquidacion.getIdPersona());
+						 objetoAnterior.setObservaciones(Liquidacion.getObservaciones());
+						 objetoAnterior.setSociedad(Liquidacion.getSociedad());
+						 objetoAnterior.setUsuModificacion(Liquidacion.getUsuModificacion());
+					}
+					
+					if(!Liquidacion.isAnterior()) {
+						 objetoNuevo = new DatosLiquidacionIntegrantesSearchItem();
+						 objetoNuevo.setAnterior(Liquidacion.isAnterior());
+						 objetoNuevo.setFechaFin(Liquidacion.getFechaFin());
+						 objetoNuevo.setFechaInicio(Liquidacion.getFechaInicio());
+						 objetoNuevo.setFechaModificacion(Liquidacion.getFechaModificacion());
+						 objetoNuevo.setIdComponente(Liquidacion.getIdComponente());
+						 objetoNuevo.setIdHistorico(Liquidacion.getIdHistorico());
+						 objetoNuevo.setIdInstitucion(Liquidacion.getIdInstitucion());
+						 objetoNuevo.setIdPersona(Liquidacion.getIdPersona());
+						 objetoNuevo.setObservaciones(Liquidacion.getObservaciones());
+						 objetoNuevo.setSociedad(Liquidacion.getSociedad());
+						 objetoNuevo.setUsuModificacion(Liquidacion.getUsuModificacion());
+					}
+				}
+				
+				
+					CenComponentes updateRecord = new CenComponentes();
+					
+					updateRecord.setFechamodificacion(new Date());
+					
+					if(objetoNuevo.getSociedad().equals("1")) {
+						updateRecord.setSociedad("1");
+					}else {
+						updateRecord.setSociedad("0");
+					}
+					
+					updateRecord.setIdinstitucion(idInstitucion);
+					updateRecord.setIdcomponente(Short.parseShort(objetoNuevo.getIdComponente()));
+					updateRecord.setIdpersona(Long.parseLong(objetoNuevo.getIdPersona()));
+									
+					updateSociedad = cenComponentesMapper.updateByPrimaryKeySelective(updateRecord);
+					
+					
+					//ahora voy a meter en el objeto anterior, como fecha fin, la fecha de inicio del objeto nuevo
+					if(objetoAnterior.getFechaInicio() != null && objetoNuevo != null && updateSociedad == 1) {
+						//primero hago un selectByExample para averiguar el idHistorico y para averiguar que existe
+						CenHistoricoLiquidacionsjcsExample select = new CenHistoricoLiquidacionsjcsExample();
+						
+						select.createCriteria().andIdhistoricoEqualTo(Short.parseShort(objetoAnterior.getIdHistorico())).andIdinstitucionEqualTo(idInstitucion).andIdcomponenteEqualTo(Short.parseShort(objetoAnterior.getIdComponente())).andIdpersonaEqualTo(Long.parseLong(objetoAnterior.getIdPersona())).andFechainicioEqualTo(objetoAnterior.getFechaInicio()).andUsumodificacionEqualTo(objetoAnterior.getUsuModificacion());
+						
+						List<CenHistoricoLiquidacionsjcs> objetoSelect = cenHistoricoLiquidacionsjcsMapper.selectByExample(select);
+						
+						if(objetoSelect != null) {
+							
+							CenHistoricoLiquidacionsjcs upd = new CenHistoricoLiquidacionsjcs();
+							
+							upd.setIdinstitucion(idInstitucion);
+							upd.setFechamodificacion(new Date());
+							upd.setFechafin(objetoNuevo.getFechaInicio());
+							upd.setUsumodificacion(objetoSelect.get(0).getUsumodificacion());
+							upd.setIdcomponente(objetoSelect.get(0).getIdcomponente());
+							upd.setIdpersona(objetoSelect.get(0).getIdpersona());	
+							upd.setIdhistorico(objetoSelect.get(0).getIdhistorico());
+							updateFecha = cenHistoricoLiquidacionsjcsMapper.updateByPrimaryKeySelective(upd);
+						}
+						
+					}
+
+					if((updateFecha == 1 && updateSociedad == 1) || updateSociedad == 1) { 
+						CenHistoricoLiquidacionsjcs record = new CenHistoricoLiquidacionsjcs();
+						
+						record.setIdinstitucion(idInstitucion);
+						record.setFechamodificacion(new Date());
+						record.setFechainicio(objetoNuevo.getFechaInicio());
+						record.setObservaciones(objetoNuevo.getObservaciones());
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						record.setIdcomponente(Short.parseShort(objetoNuevo.getIdComponente()));
+						record.setIdpersona(Long.parseLong(objetoNuevo.getIdPersona()));	
+						record.setSociedad(updateRecord.getSociedad());
+						
+						response = cenHistoricoLiquidacionsjcsMapper.insertSelective(record);
+					}
+				}
+			
+			
+					
+					LOGGER.debug(
+							"insertHistoricoLiquidacion() / cenComponentesExtendsMapper.updateSociedadComponentes() -> Salida de cenHistoricoLiquidacionsjcsMapper para actualizar el campo sociedad");
+
+					ins.setStatus(SigaConstants.OK);
+					if ((updateFecha == 0 && updateSociedad == 0) || updateSociedad == 0 || response == 0) {
+						ins.setStatus(SigaConstants.KO);
+						LOGGER.warn("insertHistoricoLiquidacion() / cenHistoricoLiquidacionsjcsMapper.deleteByPrimaryKey() -> "
+								+ ins.getStatus() + ". No se pudo insertar la liquidacion");
+
+					}
+				}
+
+			} else {
+				ins.setStatus(SigaConstants.KO);
+				LOGGER.warn("insertHistoricoLiquidacion() / admUsuariosExtendsMapper.selectByExample() -> " + ins.getStatus()
+						+ ". No existen ningún usuario en base de datos");
+			}
+
+			LOGGER.debug("insertHistoricoLiquidacion() -> Salida del servicio para eliminar una liquidacion");
+			return ins;
+		}
+	    
+	    @Override
+		public Boolean buscarPagosColegiados(DatosLiquidacionIntegrantesSearchItem datosLiquidacion, HttpServletRequest request) {
+			// TODO Auto-generated method stub
+			LOGGER.debug("buscarPagosColegiados() -> Entrada al servicio para la búsqueda de los pagos de un colegiado en un periodo de fecha");
+			int datosLiquidacionItem = 0;
+			Boolean eliminar = false;
+
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.debug(
+						"buscarPagosColegiados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.debug(
+						"buscarPagosColegiados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					LOGGER.debug(
+							"buscarPagosColegiados() / cenHistoricoLiquidacionsjcsExtendsMapper.buscarPagosColegiados() -> Entrada para la búsqueda de pagos");
+					datosLiquidacion.setIdInstitucion(idInstitucion.toString());
+					datosLiquidacionItem = cenHistoricoLiquidacionsjcsExtendsMapper.buscarPagosColegiados(datosLiquidacion);
+					LOGGER.debug(
+							"buscarPagosColegiados() / cenHistoricoLiquidacionsjcsExtendsMapper.buscarPagosColegiados() -> Salida para la búsqueda de pagos");
+
+					if(datosLiquidacionItem > 0) {
+						eliminar = false;
+					}else {
+						eliminar = true;
+					}
+				} else {
+					LOGGER.warn(
+							"buscarPagosColegiados() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+			} else {
+				LOGGER.warn("buscarPagosColegiados() -> idInstitucion del token nula");
+			}
+
+			LOGGER.debug("buscarPagosColegiados() -> Salida al servicio para la búsqueda de los pagos de un colegiado en un periodo de fecha");
+			
+			return eliminar;
+		}
+
+	}

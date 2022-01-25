@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
+import org.itcgae.siga.DTO.fac.ComboPreciosSuscripcionDTO;
+import org.itcgae.siga.DTO.fac.ComboPreciosSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
@@ -27,6 +29,7 @@ import org.itcgae.siga.DTO.fac.TiposServiciosItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
@@ -1488,5 +1491,92 @@ public class ServiciosServiceImpl implements IServiciosService {
 		LOGGER.info("eliminarPrecio() -> Salida del servicio para eliminar precios del servicio");
 
 		return deleteResponseDTO;
+	}
+	
+	@Override
+	public ComboPreciosSuscripcionDTO comboPreciosServPers(HttpServletRequest request, Long idPersona, int idServicio, int idTipoServicios, int idServiciosInstitucion) {
+		ComboPreciosSuscripcionDTO comboDTO = new ComboPreciosSuscripcionDTO();
+		Error error = new Error();
+
+		LOGGER.info("comboCondicionSuscripcion() -> Entrada al servicio para recuperar el combo de condicion de precios del servicio con anotaciones para saber si la persona cumple los criterios o no");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"comboPreciosServPers() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboPreciosServPers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					
+					List<ComboPreciosSuscripcionItem> listaComboPrecios = null;
+					String idioma = usuarios.get(0).getIdlenguaje();
+					if(idPersona != null) {
+						LOGGER.info(
+								"comboPreciosServPers() / pysPreciosServiciosExtendsMapper.comboPreciosServPers() -> Entrada a pysPreciosserviciosExtendsMapper para recuperar el combo de precios del servicio con anotaciones para saber si la persona cumple los criterios o no");
+
+						listaComboPrecios = pysPreciosServiciosExtendsMapper
+							.comboPreciosServPers(idioma, idInstitucion, idPersona.toString(), String.valueOf(idServicio), String.valueOf(idTipoServicios), String.valueOf(idServiciosInstitucion));
+						
+						LOGGER.info(
+								"comboPreciosServPers() / pysPreciosServiciosExtendsMapper.comboPreciosServPers() -> Salida de pysPreciosserviciosExtendsMapper para recuperar el combo de precios del servicio con anotaciones para saber si la persona cumple los criterios o no");
+
+						
+						for(ComboPreciosSuscripcionItem precio : listaComboPrecios) {
+							if(precio.getValido() != null){
+								String val = null;
+								try {
+									val = pysPreciosServiciosExtendsMapper
+									.checkCriterioPrecio(precio.getValido());
+								} catch (Exception e) {
+									LOGGER.error(
+											"TiposServiciosServiceImpl.comboPreciosServPers() -> Se ha producido un error al ejecutar la consulta de criterio de un precio",
+											e);
+									val = null;
+								}
+								if(val != null) {
+									precio.setValido("1");
+								}
+								else {
+									precio.setValido("0");
+								}
+							}
+							else {
+								precio.setValido("1");
+							}
+						}
+					}
+
+					
+					if (listaComboPrecios != null && listaComboPrecios.size() > 0) {
+						comboDTO.setPreciosSuscripcionItem(listaComboPrecios);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposServiciosServiceImpl.comboPreciosServPers() -> Se ha producido un error al recuperar el combo de precios del servicio con anotaciones para saber si la persona cumple los criterios o no",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboPreciosServPers() -> Salida del servicio para recuperar el combo de condicion de precios del servicio con anotaciones para saber si la persona cumple los criterios o no");
+
+		return comboDTO;
 	}
 }

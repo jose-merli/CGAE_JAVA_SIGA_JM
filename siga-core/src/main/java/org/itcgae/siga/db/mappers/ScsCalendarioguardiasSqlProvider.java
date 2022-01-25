@@ -501,6 +501,7 @@ public class ScsCalendarioguardiasSqlProvider {
 	   
 	   public String getGeneracionEnProceso() {
 		   SQL sql = new SQL();
+		   
 			sql.SELECT("IDPROGCALENDARIO");
 			sql.FROM("SCS_PROG_CALENDARIOS PC");
 			sql.WHERE("PROCESANDOGENERACION = " + 1);

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.db.mappers.ScsActacomisionMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsActacomisionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -21,5 +22,5 @@ public interface ScsActacomisionExtendsMapper extends ScsActacomisionMapper {
 			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 
 	})
-	List<ComboItem> getActaAnnio(String idInstitucion, String idActa, String anioActa);
+	List<ComboItem> getActaAnnio(String idInstitucion, String anioacta, String idacta);
 }

@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 
 public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlProvider {
 
-    public String getFicherosTransferencias(FicherosAbonosItem item, String idInstitucion) {
+    public String getFicherosTransferencias(FicherosAbonosItem item, String idInstitucion, String idioma) {
 
         SQL principal = new SQL();
         SQL totalRemesa = new SQL();
@@ -31,7 +31,8 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
 
         principal.SELECT("c.idinstitucion,c.iddisqueteabono, c.fecha, b.bancos_codigo, b.DESCRIPCION CUENTA_ENTIDAD, c.nombrefichero,"
                 + "c.idsufijo,( s.sufijo || ' - ' || s.concepto ) sufijo, ("+totalRemesa.toString()+") AS totalimporte, ("+numRecibos.toString()+") AS numfacturas");
-
+        principal.SELECT("(SELECT fp.CODIGO || ' ' || f_siga_getrecurso(fp.NOMBRE, " + idioma + ") FROM FAC_PROPOSITOS fp WHERE fp.IDPROPOSITO = idpropsepa) propSEPA");
+        principal.SELECT("(SELECT fp.CODIGO || ' ' || f_siga_getrecurso(fp.NOMBRE, 1) FROM FAC_PROPOSITOS fp WHERE fp.IDPROPOSITO = idpropotros) propOtros");
 
         principal.FROM("fac_disqueteabonos c");
         principal.INNER_JOIN("fac_bancoinstitucion b ON (c.idinstitucion=b.idinstitucion AND c.bancos_codigo=b.bancos_codigo)");
@@ -105,6 +106,16 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
         sql.WHERE("ff.IDINSTITUCION = "+idInstitucion);
         sql.WHERE("ff2.IDDISQUETEABONO ="+idFichero);
         sql.GROUP_BY("gr.DESCRIPCION,ff.IDCUENTA");
+
+        return sql.toString();
+    }
+
+    public String getNextIdDisqueteAbono(Short idInstitucion) {
+        SQL sql = new SQL();
+
+        sql.SELECT("(NVL(MAX(da.iddisqueteabono),0) + 1)");
+        sql.FROM("fac_disqueteabonos da");
+        sql.WHERE("da.idinstitucion = " + idInstitucion);
 
         return sql.toString();
     }

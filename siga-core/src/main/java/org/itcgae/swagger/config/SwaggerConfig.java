@@ -3,7 +3,6 @@ package org.itcgae.swagger.config;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +36,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter  {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.protocols(Collections.singleton("http"))
 				.select()
-				.apis(RequestHandlerSelectors.basePackage("org.itcgae.siga"))
+				.apis(RequestHandlerSelectors.basePackage("org.itcgae.siga.scs.controllers.facturacionsjcs"))
 				.paths(PathSelectors.any())
 				.build()
 				.apiInfo(getApiInfo())

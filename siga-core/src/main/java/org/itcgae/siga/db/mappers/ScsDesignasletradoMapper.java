@@ -67,7 +67,7 @@ public interface ScsDesignasletradoMapper {
         "USUMODIFICACION, OBSERVACIONES, ",
         "FECHARENUNCIA, MOTIVOSRENUNCIA, ",
         "FECHARENUNCIASOLICITA, IDTIPOMOTIVO, ",
-        "IDINSTITUCIONORIGEN)",
+        "IDINSTITUCIONORIGEN, INSTITUCIONCOLEGIADO)",
         "values (#{idinstitucion,jdbcType=DECIMAL}, #{idturno,jdbcType=DECIMAL}, ",
         "#{anio,jdbcType=DECIMAL}, #{numero,jdbcType=DECIMAL}, #{idpersona,jdbcType=DECIMAL}, ",
         "#{fechadesigna,jdbcType=TIMESTAMP}, #{manual,jdbcType=DECIMAL}, ",
@@ -75,7 +75,7 @@ public interface ScsDesignasletradoMapper {
         "#{usumodificacion,jdbcType=DECIMAL}, #{observaciones,jdbcType=VARCHAR}, ",
         "#{fecharenuncia,jdbcType=TIMESTAMP}, #{motivosrenuncia,jdbcType=VARCHAR}, ",
         "#{fecharenunciasolicita,jdbcType=TIMESTAMP}, #{idtipomotivo,jdbcType=DECIMAL}, ",
-        "#{idinstitucionorigen,jdbcType=DECIMAL})"
+        "#{idinstitucionorigen,jdbcType=DECIMAL}, ", "#{institucioncolegiado,jdbcType=VARCHAR})"
     })
     int insert(ScsDesignasletrado record);
 

@@ -25,4 +25,7 @@ public class FicherosAbonosItem {
 
 	String idSufijo;
 	String numRecibos;
+
+	String propSEPA;
+	String propOtros;
 }

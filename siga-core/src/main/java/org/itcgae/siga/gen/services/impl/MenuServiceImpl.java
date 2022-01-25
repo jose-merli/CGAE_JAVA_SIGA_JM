@@ -31,6 +31,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;*/
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -49,37 +50,7 @@ import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
-import org.itcgae.siga.db.entities.AdmConfig;
-import org.itcgae.siga.db.entities.AdmConfigExample;
-import org.itcgae.siga.db.entities.AdmGestorinterfaz;
-import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
-import org.itcgae.siga.db.entities.AdmPerfil;
-import org.itcgae.siga.db.entities.AdmPerfilExample;
-import org.itcgae.siga.db.entities.AdmPerfilKey;
-import org.itcgae.siga.db.entities.AdmPerfilRol;
-import org.itcgae.siga.db.entities.AdmPerfilRolExample;
-import org.itcgae.siga.db.entities.AdmRol;
-import org.itcgae.siga.db.entities.AdmRolExample;
-import org.itcgae.siga.db.entities.AdmTiposacceso;
-import org.itcgae.siga.db.entities.AdmTiposaccesoKey;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteKey;
-import org.itcgae.siga.db.entities.CenColegiado;
-import org.itcgae.siga.db.entities.CenColegiadoKey;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
-import org.itcgae.siga.db.entities.GenMenu;
-import org.itcgae.siga.db.entities.GenMenuExample;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilMapper;
@@ -97,7 +68,9 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.exp.mappers.ExpProcedimientosExeaExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.UserCgae;
@@ -124,13 +97,13 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Autowired
 	private AdmRolMapper admRolMapper;
-	
+
 	@Autowired
 	private AdmPerfilExtendsMapper perfilMapper;
 
 	@Autowired
 	private AdmPerfilRolMapper perfilRolMapper;
-	
+
 	@Autowired
 	private AdmUsuariosMapper usuarioMapper;
 
@@ -168,7 +141,13 @@ public class MenuServiceImpl implements IMenuService {
 	private CenColegiadoMapper cenColegiadoMapper;
 
 	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+
+	@Autowired
 	private CenClienteMapper cenClienteMapper;
+
+	@Autowired
+	private ExpProcedimientosExeaExtendsMapper expProcedimientosExeaExtendsMapper;
 
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -302,6 +281,21 @@ public class MenuServiceImpl implements IMenuService {
 
 			}
 
+			//Miramos si trae la opcion de menu Expedientes EXEA, si es así pero el colegio no tiene procedimientos de EXEA configurados o no tiene ninguno de colegiacion, la quitamos
+			if(items != null && !items.isEmpty()
+				&&  items.stream().anyMatch(menuItem -> SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel()))){
+
+				ExpProcedimientosExeaExample expProcedimientosExeaExample = new ExpProcedimientosExeaExample();
+				expProcedimientosExeaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+				List<ExpProcedimientosExea> procedimientosExea = expProcedimientosExeaExtendsMapper.selectByExample(expProcedimientosExeaExample);
+				//Si la institucion no tiene procedimientos de EXEA o no tiene ninguno que sea de colegiacion, quitamos la opcion de menu EXPEDIENTES EXEA
+				if(procedimientosExea == null
+					|| procedimientosExea.isEmpty()
+					|| !procedimientosExea.stream().anyMatch(procedimiento -> 1 == procedimiento.getEsColegiacion())){
+
+						items = items.stream().filter(menuItem -> !SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel())).collect(Collectors.toList());
+				}
+			}
 			response.setMenuItems(items);
 		}
 
@@ -437,7 +431,6 @@ public class MenuServiceImpl implements IMenuService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		//String idInstitucionCert = validaInstitucionCertificado(request);
 		List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
-		
 		if((institucionList == null || institucionList.isEmpty()) && idInstitucion == null) {
 			throw new BadCredentialsException("Institucion No válida");
 		}
@@ -770,7 +763,7 @@ public class MenuServiceImpl implements IMenuService {
 
 			LOGGER.debug("Recorremos la lista de instituciones: "+lista.size() + " instituciones encontradas");
 			for(CenInstitucion institucion : lista) {
-	
+
 				if (institucion.getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
 					LOGGER.debug("El usuario tiene rol en la institucion 2000 en CAS");
 					encontrado = true;
@@ -823,7 +816,7 @@ public class MenuServiceImpl implements IMenuService {
 		}
 
 	}
-	
+
 	private String getUserRoutLogoutCAS() {
 
 		GenParametrosExample example = new GenParametrosExample();
@@ -835,7 +828,7 @@ public class MenuServiceImpl implements IMenuService {
 		}else {
 			return "";
 		}
-		
+
 	}
 
 	@Override
@@ -911,11 +904,10 @@ public class MenuServiceImpl implements IMenuService {
 		}
 		LOGGER.info("setIdiomaUsuario() --> Salida del servicio de cambio de idioma");
 		return response;
-	}	
-	
+	}
+
 	private String getInstitucionRequest(HttpServletRequest request) {
 		String idInstitucion = null;
-		
 		try {
 			String roles = (String) request.getHeader("CAS-roles");
 			if(roles!=null) {
@@ -937,29 +929,28 @@ public class MenuServiceImpl implements IMenuService {
 		if (idInstitucion == null){
 			idInstitucion = "";
 		}
-
 		return idInstitucion;
 	}
-	
+
 	private List<String> getInstitucionesUsuarioRequest(HttpServletRequest request) {
 		List<String> respuesta = new ArrayList<String>();
 		try {
 			String roles = (String) request.getHeader("CAS-roles");
 			String [] rolesList = roles.split("::");
-			
+
 			for(String rol: rolesList) {
 				String[] attributes = rol.split(" ");
 				respuesta.add(attributes[0]);
 			}
-			
+
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage(),e);
 		}
-		
-	
+
+
 		return respuesta;
 	}
-	
+
 	private List<String> getRolesUsuarioRequest(HttpServletRequest request, String idInstitucion) {
 		List<String> respuesta = new ArrayList<String>();
 		try {
@@ -967,7 +958,7 @@ public class MenuServiceImpl implements IMenuService {
 			String [] rolesList = roles.split("::");
 			int primero, ultimo = 0;
 			String tipoUsuario = "";
-			
+
 			for(String rol: rolesList) {
 				tipoUsuario = "";
 				String rolObtenido = "";
@@ -985,7 +976,7 @@ public class MenuServiceImpl implements IMenuService {
 						primero = 1; //Si no es numerico, el rol empieza en el segundo atributo
 						ultimo = attributes.length -1; //Acaba en el ultimo atributo
 					}
-					
+
 					for(int i=primero;i<=ultimo ; i++) {
 						String constructRol = "";
 						if (i != ultimo) {
@@ -999,20 +990,20 @@ public class MenuServiceImpl implements IMenuService {
 						}
 						tipoUsuario += constructRol;
 					}
-					
-					rolObtenido = SigaConstants.getTipoUsuario(tipoUsuario);	
-					
+
+					rolObtenido = SigaConstants.getTipoUsuario(tipoUsuario);
+
 					if(!respuesta.contains(rolObtenido)) {
 						respuesta.add(rolObtenido);
 					}
 				}
 			}
-			
+
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage(),e);
 		}
-		
-	
+
+
 		return respuesta;
 	}
 
@@ -1058,19 +1049,19 @@ public class MenuServiceImpl implements IMenuService {
 
 		return idInstitucion;
 	}*/
-	
+
 	@Override
 	public UpdateResponseDTO validaUsuario(HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		try{
 			//List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
-			
+
 			LOGGER.debug("Validamos el usuario");
 			LOGGER.debug("Obtenemos de la request las instituciones del usuario en CAS");
 			List<String> institucionesList = getInstitucionesUsuarioRequest(request);
 			LOGGER.debug("Obtenemos de la lista de instituciones de base de datos");
 			List<CenInstitucion> institucionList = getlistIdInstitucionByListCodExterno(institucionesList);
-			
+
 			if(institucionList == null || institucionList.isEmpty()) {
 				throw new BadCredentialsException("Usuario no válido");
 			}
@@ -1084,7 +1075,7 @@ public class MenuServiceImpl implements IMenuService {
 				}
 				lista.add(inst.getIdinstitucion());
 			}
-			
+
 			String dni = (String) request.getHeader("CAS-username");
 			LOGGER.debug("Comprobamos si la el usuario tiene rol en la institución 2000");
 			AdmUsuariosExample  usuarioExampple = new AdmUsuariosExample();
@@ -1098,7 +1089,7 @@ public class MenuServiceImpl implements IMenuService {
 			if (null != usuarios && usuarios.size()>0) {
 				throw new BadCredentialsException("Usuario no válido");
 			}
-			
+
 			usuarioExampple = new AdmUsuariosExample();
 			if(idInstitucion != null) {
 				usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
@@ -1107,12 +1098,12 @@ public class MenuServiceImpl implements IMenuService {
 				usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionIn(lista).andNifEqualTo(dni);
 			}
 			usuarios = usuarioMapper.selectByExample(usuarioExampple);
-			
+
 			if (null != usuarios && usuarios.size()>0) {
 				throw new BadCredentialsException("Usuario no válido");
 			}
-			
-				
+
+
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage(),e);
 		}
@@ -1130,23 +1121,23 @@ public class MenuServiceImpl implements IMenuService {
 
 		HashMap<String, String> permisos = UserTokenUtils.getPermisosFromJWTToken(token);
 		for(int i = 0; i<controlItem.size(); i++) {
-		PermisoItem permisoItem = new PermisoItem();
-		permisoItem.setDerechoacceso(permisos.get(controlItem.get(i).getIdProceso()));
-		permisoItem.setData(controlItem.get(i).getIdProceso());
-		permisosItem.add(permisoItem);
+			PermisoItem permisoItem = new PermisoItem();
+			permisoItem.setDerechoacceso(permisos.get(controlItem.get(i).getIdProceso()));
+			permisoItem.setData(controlItem.get(i).getIdProceso());
+			permisosItem.add(permisoItem);
 		}
 		response.setPermisoItems(permisosItem);
 
 		return response;
 	}
-	
+
 	@Override
 	public ParamsItem getEnvParams(HttpServletRequest request) {
 		ParamsItem paramsItem = new ParamsItem();
 		List<GenProperties> prop = new ArrayList<GenProperties>();
 		// Obtenemos atributos del usuario logeado
 		LOGGER.debug("Obtenemos atributos del usuario logeado");
-		
+
 		GenPropertiesExample propertiesExample = new GenPropertiesExample();
 		propertiesExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.entorno");
 		prop = genPropertiesMapper.selectByExample(propertiesExample);
@@ -1161,28 +1152,28 @@ public class MenuServiceImpl implements IMenuService {
 //		propertiesWebExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.webversion");
 //		prop = genPropertiesMapper.selectByExample(propertiesWebExample);
 		paramsItem.setSigaWebVersion(SigaConstants.SIGAWEB_VERSION);
-		
+
 //		comboItem.setLabel(cenInstitucion.getAbreviatura());
 //		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
 		return paramsItem;
 	}
-	
+
 	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
 		if(codExterno != null && !codExterno.isEmpty()) {
 			CenInstitucionExample example = new CenInstitucionExample();
 			example.createCriteria().andCodigoextEqualTo(codExterno);
-			
+
 			return institucionMapper.selectByExample(example);
 		}else {
 			return null;
 		}
 	}
-	
+
 	public List<CenInstitucion> getlistIdInstitucionByListCodExterno(List<String> listCodExterno) {
 		if(listCodExterno != null && !listCodExterno.isEmpty()) {
 			CenInstitucionExample example = new CenInstitucionExample();
 			example.createCriteria().andCodigoextIn(listCodExterno);
-			
+
 			return institucionMapper.selectByExample(example);
 		}else {
 			return null;
@@ -1192,41 +1183,41 @@ public class MenuServiceImpl implements IMenuService {
 	@Override
 	public ComboDTO getInstitucionesUsuario(HttpServletRequest request) {
 		// Cargamos el combo de Instituciones
-				ComboDTO response = new ComboDTO();
-				
-				List<String> institucionesList = getInstitucionesUsuarioRequest(request);
+		ComboDTO response = new ComboDTO();
 
-				CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
-				exampleInstitucion.setDistinct(true);
-				exampleInstitucion.createCriteria().andCodigoextIn(institucionesList);
-				exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
+		List<String> institucionesList = getInstitucionesUsuarioRequest(request);
 
-				List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
-				List<ComboItem> combos = new ArrayList<ComboItem>();
-				//ComboItem comboBlanco = new ComboItem();
-				//comboBlanco.setValue("");
-				//comboBlanco.setLabel("");
-				//combos.add(comboBlanco);
-				if (null != instituciones && instituciones.size() > 0) {
-					for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
-						CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
-						ComboItem combo = new ComboItem();
-						combo.setValue(cenInstitucion.getIdinstitucion().toString());
-						if (null != cenInstitucion.getFechaenproduccion()) {
+		CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+		exampleInstitucion.setDistinct(true);
+		exampleInstitucion.createCriteria().andCodigoextIn(institucionesList);
+		exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
 
-							combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
-									+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
-						} else {
-							combo.setLabel(cenInstitucion.getAbreviatura());
-						}
+		List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
+		List<ComboItem> combos = new ArrayList<ComboItem>();
+		//ComboItem comboBlanco = new ComboItem();
+		//comboBlanco.setValue("");
+		//comboBlanco.setLabel("");
+		//combos.add(comboBlanco);
+		if (null != instituciones && instituciones.size() > 0) {
+			for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
+				CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
+				ComboItem combo = new ComboItem();
+				combo.setValue(cenInstitucion.getIdinstitucion().toString());
+				if (null != cenInstitucion.getFechaenproduccion()) {
 
-						combos.add(combo);
-					}
-
+					combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
+							+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
+				} else {
+					combo.setLabel(cenInstitucion.getAbreviatura());
 				}
 
-				response.setCombooItems(combos);
-				return response;
+				combos.add(combo);
+			}
+
+		}
+
+		response.setCombooItems(combos);
+		return response;
 
 	}
 
@@ -1234,7 +1225,7 @@ public class MenuServiceImpl implements IMenuService {
 	public ComboDTO getRolesUsuario(HttpServletRequest request, String idInstitucion) {
 		// Cargamos el combo de roles
 		ComboDTO response = new ComboDTO();
-		
+
 		List<String> rolesList = getRolesUsuarioRequest(request, idInstitucion);
 
 		AdmRolExample exampleRol = new AdmRolExample();
@@ -1244,14 +1235,14 @@ public class MenuServiceImpl implements IMenuService {
 
 		List<AdmRol> roles = admRolMapper.selectByExample(exampleRol);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
-		
+
 		if (null != roles && roles.size() > 0) {
 			for (Iterator<AdmRol> iterator = roles.iterator(); iterator.hasNext();) {
 				AdmRol rol = (AdmRol) iterator.next();
 				ComboItem combo = new ComboItem();
 				combo.setValue(rol.getIdrol().toString());
 				combo.setLabel(rol.getDescripcion());
-				
+
 				combos.add(combo);
 			}
 
@@ -1269,20 +1260,20 @@ public class MenuServiceImpl implements IMenuService {
 	public ComboDTO getPerfilesColegioRol(LoginMultipleItem loginMultipleItem) {
 		// Cargamos el combo de Perfil
 		ComboDTO response = new ComboDTO();
-		
+
 		AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
 		examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(loginMultipleItem.getIdInstitucion())).
-			andIdrolEqualTo(loginMultipleItem.getRol());
+				andIdrolEqualTo(loginMultipleItem.getRol());
 		List<AdmPerfilRol> perfilesRol = perfilRolMapper.selectByExample(examplePerfilRol);
 
 		List<String> listaPerfilesRol = new ArrayList<String>();
 		for(AdmPerfilRol perfil : perfilesRol) {
 			listaPerfilesRol.add(perfil.getIdperfil());
 		}
-		
+
 		AdmPerfilExample examplePerfil = new AdmPerfilExample();
 		examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(loginMultipleItem.getIdInstitucion())).
-			andIdperfilIn(listaPerfilesRol).andFechaBajaIsNull();
+				andIdperfilIn(listaPerfilesRol).andFechaBajaIsNull();
 		examplePerfil.setOrderByClause(" DESCRIPCION ASC ");
 		List<AdmPerfil> perfiles = perfilMapper.selectComboPerfilByExample(examplePerfil);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
@@ -1305,7 +1296,7 @@ public class MenuServiceImpl implements IMenuService {
 	public StringDTO getTokenOldSiga(HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		UserCgae userDesarrollo = UserTokenUtils.gerUserFromJWTToken(token);
-		
+
 		String header = "";
 		try {
 			header = UserTokenUtils.generateTokenOldSiga(userDesarrollo);
@@ -1317,22 +1308,68 @@ public class MenuServiceImpl implements IMenuService {
 		respuesta.setValor(header);
 		return respuesta;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO eliminaCookie(HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
-		
+
 		LOGGER.debug("Eliminando cookies");
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie: cookies) {
-         LOGGER.debug("Cookie: " + cookie.getName() );
-         cookie.setMaxAge(0);
-         cookie.setValue(null);
-         cookie.setPath("/"); 
-        }
+		Cookie[] cookies = request.getCookies();
+		for (Cookie cookie: cookies) {
+			LOGGER.debug("Cookie: " + cookie.getName() );
+			cookie.setMaxAge(0);
+			cookie.setValue(null);
+			cookie.setPath("/");
+		}
 
 		response.setStatus(SigaConstants.OK);
 		return response;
 	}
 
+	@Override
+	public ColegiadoItem isColegiado(HttpServletRequest request) {
+		LOGGER.info("isColegiado() ->  Entrada al servicio para saber si el usuario logeado es colegiado");
+		// Obtenemos si el usuario logeado es colegiado o administrador
+		ColegiadoItem colegiadoItem = null;
+
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		CenPersonaExample cenPersonaExample = new CenPersonaExample();
+		cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
+
+		LOGGER.info(
+				"isColegiado() / cenPersonaMapper.selectByExample() -> Entrada a cenPersonaMapper para obtener idpersona del usuario logeado");
+
+		List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(cenPersonaExample);
+
+		LOGGER.info(
+				"isColegiado() / cenPersonaMapper.selectByExample() -> Salida a cenPersonaMapper para obtener idpersona del usuario logeado");
+
+		if (null != cenPersona && cenPersona.size() > 0) {
+
+			CenPersona usuario = cenPersona.get(0);
+
+			LOGGER.info(
+					"isColegiado() / cenColegiadoExtendsMapper.selectByExample() -> Entrada a cenColegiadoExtendsMapper para saber si es colegiado");
+
+			List<ColegiadoItem> colegiadoItems = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion,
+					usuario.getIdpersona().toString());
+
+			LOGGER.info(
+					"isColegiado() / cenColegiadoExtendsMapper.selectByExample() -> Salida a cenColegiadoExtendsMapper para saber si es colegiado");
+
+			if (null != colegiadoItems && colegiadoItems.size() > 0) {
+				colegiadoItem = colegiadoItems.get(0);
+			}
+
+		}
+
+		LOGGER.info("isColegiado() ->  Salida al servicio para saber si el usuario logeado es colegiado");
+
+		return colegiadoItem;
+
+	}
 }

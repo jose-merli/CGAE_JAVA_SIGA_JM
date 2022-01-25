@@ -87,6 +87,7 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         queryLineas.SELECT("linea.fechaefectiva as fecha"); 
     	queryLineas.SELECT("CASE WHEN linea.liquidacion = 1 then 'Liquidacion' \r\n"
     			+ "when linea.idLinea = 0 then anti.descripcion \r\n"
+    			+ "when servIns.DESCRIPCION is null then 'Ingreso' \r\n"
     			+ "else servIns.DESCRIPCION end as concepto"); 
     	queryLineas.SELECT("anti.CTACONTABLE as cuentacontable "); 
     	queryLineas.SELECT("case when linea.liquidacion = 1 then linea.IMPORTEANTICIPADO * -1 \r\n"

@@ -59,7 +59,7 @@ public interface ScsIncompatibilidadguardiasExtendsMapper extends ScsIncompatibi
 		@Result(column = "DIASSEPARACIONGUARDIAS", property = "diasSeparacionGuardias", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<IncompatibilidadesItem> getListadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion,  String idGuardia, Integer tamMaximo);
+	List<IncompatibilidadesItem> getListadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion, Integer tamMaximo);
 	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "deleteIncompatibilidades")
 	void deleteIncompatibilidades(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible);

@@ -60,10 +60,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				Per.Apellidos1,\r\n" + 
 					"				DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2,\r\n" + 
 					"				Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,\r\n" + 
+					"				Gua.IDGRUPOGUARDIA_ULTIMO ,\r\n" + 
 					"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
 					"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 					"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,\r\n" + 
-					"				Ins.ORDEN AS ORDENINSC,\r\n" + 
 					"				Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado,\r\n" + 
 					"				Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
 					"				Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
@@ -154,6 +154,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				Per.Apellidos1,\r\n" + 
 					"				DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2,\r\n" + 
 					"				Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,\r\n" + 
+					"				Gua.IDGRUPOGUARDIA_ULTIMO ,\r\n" + 
 					"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
 					"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 					"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,\r\n" + 
@@ -245,7 +246,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"		WHERE\r\n" + 
 					"			tabla_nueva.orden <= tabla_nueva2.orden\r\n" + 
 					"		ORDER BY\r\n" + 
-					"			tabla_nueva.orden ASC) ) consulta_total  ORDER BY ORDENINSC");
+					"			tabla_nueva.orden ASC) ) consulta_total ");
 		else 
 			sql.SELECT("ROWNUM AS orden_cola, consulta.* FROM (SELECT(CASE\r\n" + 
 					"                                 WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
@@ -266,6 +267,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"                          Per.Apellidos1,\r\n" + 
 					"                          DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2,\r\n" + 
 					"                          Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,\r\n" + 
+					"						   Gua.IDGRUPOGUARDIA_ULTIMO ,\r\n" + 
 					"                          DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
 					"                          Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 					"                          Ins.Fechavalidacion AS ANTIGUEDADCOLA,\r\n" + 
@@ -1467,7 +1469,7 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		"            cen_persona" + 
 		"        WHERE" + 
 		"            cen_persona.idpersona = scs_inscripcionguardia.idpersona" + 
-		"    ) AS letrado, ",
+		"    ) AS letrado, "+
 		"scs_turno.nombre AS nombre_turno",
 		"scs_turno.idzona AS idzona",
 		"(" + 
@@ -1525,14 +1527,10 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		//Left Join
 		sql.JOIN("gen_recursos_catalogos ON scs_tiposguardias.descripcion = gen_recursos_catalogos.idrecurso");
 		
-		sql.WHERE(
-		//"scs_guardiasturno.fechabaja IS NULL",
-		//"scs_turno.fechabaja IS NULL",
-		//"scs_inscripcionguardia.fechasuscripcion IS NOT NULL",
-		"scs_inscripcionguardia.idpersona = " + idpersona,
-		"scs_inscripcionguardia.idinstitucion = " + idInstitucion,
-		"scs_inscripcionguardia.IDGUARDIA = " + guardia,
-		"gen_recursos_catalogos.idlenguaje = " + admUsuarios.getIdlenguaje());
+		sql.WHERE("scs_inscripcionguardia.idpersona = " + idpersona);
+		sql.WHERE("scs_inscripcionguardia.idinstitucion = " + idInstitucion);
+		sql.WHERE("scs_inscripcionguardia.IDGUARDIA = " + guardia);
+		sql.WHERE("gen_recursos_catalogos.idlenguaje = " + admUsuarios.getIdlenguaje());
 		return sql.toString();
 	}
 	

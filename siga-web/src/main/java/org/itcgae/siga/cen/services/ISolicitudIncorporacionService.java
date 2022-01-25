@@ -5,6 +5,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
+import org.itcgae.siga.DTOs.exea.DocumentacionIncorporacionDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface ISolicitudIncorporacionService {
@@ -24,4 +25,5 @@ public interface ISolicitudIncorporacionService {
 	 public SolIncorporacionItem numColegiadoSearch(SolIncorporacionItem solIncorporacionItem, HttpServletRequest request);
 	public SolIncorporacionItem nifExistenteSearch(SolIncorporacionItem solIncorporacionItem,
 			HttpServletRequest request);
+	public DocumentacionIncorporacionDTO getDocRequerida (HttpServletRequest request, String tipoColegiacion, String tipoSolicitud, String modalidad, String idSolicitud);
 }

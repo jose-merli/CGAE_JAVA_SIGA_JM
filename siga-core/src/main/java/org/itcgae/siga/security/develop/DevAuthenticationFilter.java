@@ -14,6 +14,9 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -21,7 +24,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-
+@Primary
 public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 	
 	
@@ -33,7 +36,10 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	private SigaUserDetailsService userDetailsService;
 
 	private static String tokenHeaderAuthKey;
-
+	
+	@Autowired
+	private static ApplicationContext context;
+	
 	public DevAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
 			String tokenHeaderAuthKey, SigaUserDetailsService userDetailsService2) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));

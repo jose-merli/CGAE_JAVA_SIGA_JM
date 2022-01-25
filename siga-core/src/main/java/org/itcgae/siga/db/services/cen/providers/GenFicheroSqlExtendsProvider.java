@@ -25,4 +25,15 @@ public class GenFicheroSqlExtendsProvider extends GenFicheroSqlProvider{
 	public String nextIdGenFichero() {
 		return "select SEQ_GENFICHERO.Nextval as IDFICHERO from dual";
 	}
+
+	public String selectMaxIdFicheroByIdInstitucion(String idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("max(IDFICHERO) as IDFICHERO");
+		sql.FROM("GEN_FICHERO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
 }

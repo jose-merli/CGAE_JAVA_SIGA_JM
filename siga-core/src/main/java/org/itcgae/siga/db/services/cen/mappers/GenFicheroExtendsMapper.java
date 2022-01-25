@@ -30,4 +30,10 @@ public interface GenFicheroExtendsMapper extends GenFicheroMapper{
 	@Results({
 		@Result(column = "IDFICHERO", property="IDFICHERO", jdbcType = JdbcType.VARCHAR)})
 	String nextIdGenFichero();
+	
+	@SelectProvider(type = GenFicheroSqlExtendsProvider.class, method = "selectMaxIdFicheroByIdInstitucion")
+	@Results({
+		@Result(column = "IDFICHERO", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	NewIdDTO selectMaxIdFicheroByIdInstitucion(String idInstitucion);
 }

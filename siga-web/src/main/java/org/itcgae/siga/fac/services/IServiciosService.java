@@ -3,6 +3,7 @@ package org.itcgae.siga.fac.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
+import org.itcgae.siga.DTO.fac.ComboPreciosSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
@@ -16,6 +17,7 @@ import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.springframework.web.bind.annotation.RequestBody;
 
 public interface IServiciosService {
@@ -33,6 +35,8 @@ public interface IServiciosService {
 	public ComboDTO comboPeriodicidad(HttpServletRequest request);
 	public InsertResponseDTO crearEditarPrecios(FichaTarjetaPreciosDTO listaPrecios, HttpServletRequest request);
 	public DeleteResponseDTO eliminarPrecio(FichaTarjetaPreciosDTO precios, HttpServletRequest request);
+	public ComboPreciosSuscripcionDTO comboPreciosServPers(HttpServletRequest request, Long idPersona, int idServicio,
+			int idTipoServicios, int idServiciosInstitucion);
 	
 
 }

@@ -37,5 +37,31 @@ public class FcsPagoColegiadoSqlExtendsProvider extends FcsPagoColegiadoSqlProvi
 		
 		return sql.toString();
 	}
+	
+	
+	
+	public String getIrpfByPago(String institucion, String pagos) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDPERSONAIMPRESO,"
+				+ "Sum(importeirpf) As TOTALIMPORTEIRPF, "
+				+ "Sum(importepagado) As TOTALIMPORTEPAGADO,"
+				+ "CLAVEM190   FROM (SELECT IDPERDESTINO AS IDPERSONAIMPRESO,"
+				+ "  	(-1) * IMPIRPF  AS importeirpf, IMPOFICIO + IMPASISTENCIA + IMPEJG + IMPSOJ + IMPMOVVAR AS importepagado, "
+				+ " NVL((SELECT CLAVEM190 FROM  SCS_MAESTRORETENCIONES Ret  WHERE Ret.IDRETENCION = Pag.IDRETENCION), 'G01') AS CLAVEM190"
+				+ "  FROM FCS_PAGO_COLEGIADO Pag"
+				+ "  WHERE IDINSTITUCION = " + institucion
+				+ "  AND IDPAGOSJG IN ( "+ pagos +")"
+				+ "  AND PORCENTAJEIRPF > 0 "
+				+ "  AND ("
+				+ "IMPOFICIO > 0 or  "
+				+ "IMPASISTENCIA > 0 or "
+				+ "IMPEJG > 0 or  "
+				+ "IMPSOJ > 0 ) )"
+				+ "GROUP BY IDPERSONAIMPRESO, CLAVEM190");
+		
+		
+		return sql.toString();
+	}
 }
 

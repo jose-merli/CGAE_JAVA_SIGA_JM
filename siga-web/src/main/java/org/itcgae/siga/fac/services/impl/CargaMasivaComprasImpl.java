@@ -36,7 +36,10 @@ import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasDTO;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
 import org.itcgae.siga.DTO.fac.CargaMasivaDatosCompItem;
+import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltroCargaMasivaCompras;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
@@ -68,6 +71,7 @@ import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
+import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionMapper;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionMapper;
 import org.itcgae.siga.db.mappers.PysProductossolicitadosMapper;
 import org.itcgae.siga.db.mappers.PysTipoivaMapper;
@@ -139,6 +143,9 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 	
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
+	
+	@Autowired
+	private GestionFichaCompraSuscripcionServiceImpl gestionFichaCompraSuscripcionServiceImpl;
 	
 	@Override
 	public InputStreamResource descargarModelo(HttpServletRequest request)
@@ -286,18 +293,26 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 				
 				if(CargaMasivaDatosCompItems.size() != 0 && !CargaMasivaDatosCompItems.isEmpty()) {
 					
+					//Se comprueba si alguna de las filas a dado error
+					boolean found = false;
+					int i=0;
+					while(i<CargaMasivaDatosCompItems.size() && found == false) {
+						CargaMasivaDatosCompItem CargaMasivaDatosCompItem = CargaMasivaDatosCompItems.get(i);
+						if(CargaMasivaDatosCompItem.getErrores() != null) {
+							found = true;
+						}
+						i++;
+					}
+					
+					
 					for (CargaMasivaDatosCompItem CargaMasivaDatosCompItem : CargaMasivaDatosCompItems) {
 
 						LOGGER.debug("cargarFichero() / Se van leyendo los ficheros cargados en la lista");
 						
 						LOGGER.debug("cargarFichero() / Si no se ha detectado errores leyendo el excel introducido");
-						if (CargaMasivaDatosCompItem.getErrores() == null) {
+						if (CargaMasivaDatosCompItem.getErrores() == null && !found) {
 
 							LOGGER.debug("cargarFichero() / Insertamos el la solicitud de compra ");
-							PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
-
-							solicitud.setFecha(new Date());
-							solicitud.setIdinstitucion(idInstitucion);
 							
 							Long idPersona = null;
 							if(CargaMasivaDatosCompItem.getNifCifCliente() != null) {
@@ -315,55 +330,22 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 								
 								idPersona = cenColegiadoMapper.selectByExample(colegiadoExample).get(0).getIdpersona();
 							}
-							solicitud.setIdpersona(idPersona);
-							Object ficha;
+							//Se obtiene un producto con el codigo introducido
+							PysProductosinstitucionExample productoInsExample = new PysProductosinstitucionExample();
+								
+							productoInsExample.createCriteria().andCodigoextEqualTo(CargaMasivaDatosCompItem.getCodigoProducto());
 							
-							MaxIdDto newId = pysPeticioncomprasuscripcionExtendsMapper.selectNuevoId(idInstitucion);
-							solicitud.setIdpeticion((Long.valueOf(newId.getIdMax())));
-							solicitud.setTipopeticion("A");
+							PysProductosinstitucion productoCodigo = pysProductosinstitucionMapper.selectByExample(productoInsExample).get(0);
 							
-							solicitud.setIdestadopeticion((short) 10);
+
+							FichaCompraSuscripcionItem ficha = new FichaCompraSuscripcionItem();
 							
-							solicitud.setFecha(new Date());
-							Long fechaActual = new Date().getTime();
-							solicitud.setNumOperacion(
-									"1" + idInstitucion.toString() + idPersona + fechaActual.toString()); // REVISAR: Necesita
-																														// confirmacion
-																														// de que es
-																														// el valor
-																														// correcto
-							solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
-							solicitud.setFechamodificacion(new Date());
-
-							int response = pysPeticioncomprasuscripcionExtendsMapper.insert(solicitud);
-							if (response == 0)
-								throw new Exception("Error al insertar la solicitud de compra en la BBDD.");
-
-							LOGGER.info(
-									"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
-
-							LOGGER.info(
-									"solicitarCompra() / updateProductosPeticion() -> Entrada a pysProductossolicitadosMapper para introducir los productos solicitado");
-
-							PysProductossolicitados productoSolicitado = new PysProductossolicitados();
-							
-							productoSolicitado.setFechamodificacion(new Date());
-							productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-							productoSolicitado.setIdinstitucion(idInstitucion);
-							productoSolicitado.setIdpersona(idPersona);
-							productoSolicitado.setIdpeticion(Long.valueOf(newId.getIdMax()));
-							
-							productoSolicitado.setIdproducto(CargaMasivaDatosCompItem.getIdProducto());
-							productoSolicitado.setIdtipoproducto(CargaMasivaDatosCompItem.getIdTipoProducto());
-							productoSolicitado.setIdproductoinstitucion(CargaMasivaDatosCompItem.getIdProductoInstitucion());
 							
 							//Se comprueba si el producto es "No facturable"
 							if(CargaMasivaDatosCompItem.getNoFacturable().equals("1")) {
 								//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
 								//que no tendra cuenta bancaria seleccionada.
-								productoSolicitado.setIdformapago((short) 80);
-								productoSolicitado.setNofacturable("1");
+								ficha.setIdFormaPagoSeleccionada("-1");
 								
 							}
 							//Se escoge una forma de pago por secretaria asociada con el producto 
@@ -374,39 +356,47 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 								pagoProductoExample.createCriteria().andIdproductoEqualTo(CargaMasivaDatosCompItem.getIdProducto()).andIdproductoinstitucionEqualTo(CargaMasivaDatosCompItem.getIdProductoInstitucion())
 								.andIdtipoproductoEqualTo(CargaMasivaDatosCompItem.getIdTipoProducto()).andInternetEqualTo("S").andIdinstitucionEqualTo(idInstitucion);
 								
-								productoSolicitado.setIdformapago(pysFormapagoproductoMapper.selectByExample(pagoProductoExample).get(0).getIdformapago());
+								ficha.setIdFormaPagoSeleccionada(pysFormapagoproductoMapper.selectByExample(pagoProductoExample).get(0).getIdformapago().toString());
 								
-								productoSolicitado.setNofacturable("0");
 								
 								//Si es domiciliación bancaria se eligen una cuenta bancaria asociada al cliente
-								if(productoSolicitado.getIdformapago().equals("80")) {
+								if(ficha.getIdFormaPagoSeleccionada().equals("80")) {
 									
 									CenCuentasbancariasExample cuentaExample = new CenCuentasbancariasExample();
 									
 									cuentaExample.createCriteria().andIdpersonaEqualTo(idPersona).andIdinstitucionEqualTo(idInstitucion);
 									
-									productoSolicitado.setIdcuenta(cenCuentasbancariasMapper.selectByExample(cuentaExample).get(0).getIdcuenta());
+									ficha.setCuentaBancSelecc(cenCuentasbancariasMapper.selectByExample(cuentaExample).get(0).getIdcuenta().toString());
 								}
 							}
-
 							
-							productoSolicitado.setValor(CargaMasivaDatosCompItem.getValor());
 							
-							productoSolicitado.setIdtipoiva(CargaMasivaDatosCompItem.getIdTipoIva());
-
-							//REVISAR: 
-							productoSolicitado.setAceptado("A");
-
-							productoSolicitado.setOrden((short) 1);
-							productoSolicitado.setCantidad(Integer.valueOf(CargaMasivaDatosCompItem.getCantidadProducto()));
-							productoSolicitado.setFecharecepcionsolicitud(CargaMasivaDatosCompItem.getFechaCompra());
-							//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
-							//, por lo tanto, la actual.
-							productoSolicitado.setIdinstitucionorigen(idInstitucion);
-
-							response = pysProductossolicitadosMapper.insert(productoSolicitado);
-							if (response == 0)
-								throw new Exception("Error al insertar un producto solicitado en la BBDD.");
+							ficha.setIdPersona(idPersona);
+							
+							ListaProductosCompraItem prod = new ListaProductosCompraItem();
+							
+							prod.setIdtipoproducto(CargaMasivaDatosCompItem.getIdTipoProducto());
+							prod.setIdproductoinstitucion(Integer.valueOf(CargaMasivaDatosCompItem.getIdProductoInstitucion().toString()));
+							prod.setIdproducto(Integer.valueOf(CargaMasivaDatosCompItem.getIdProducto().toString()));
+							
+							prod.setPrecioUnitario(CargaMasivaDatosCompItem.getValor().toString());
+							prod.setNoFacturable(CargaMasivaDatosCompItem.getNoFacturable());
+							prod.setCantidad(CargaMasivaDatosCompItem.getCantidadProducto());
+							prod.setIdPersona(idPersona.toString());
+							prod.setIdtipoiva(CargaMasivaDatosCompItem.getIdTipoIva().toString());
+							prod.setOrden("1");
+							prod.setCantidad(CargaMasivaDatosCompItem.getCantidadProducto());
+							
+							
+							ficha.setProductos(Arrays.asList(prod));
+							
+							PysPeticioncomprasuscripcion pet = new PysPeticioncomprasuscripcion ();
+							
+							pet.setIdinstitucion(idInstitucion);
+							
+							ficha.setnSolicitud(String.valueOf(pysPeticioncomprasuscripcionExtendsMapper.getNewIdPet(pet)));
+							
+							gestionFichaCompraSuscripcionServiceImpl.solicitarCompra(request, ficha);
 
 
 							LOGGER.info(
@@ -417,7 +407,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 							// Se introduce el documento en el historico
 							LOGGER.debug("cargarFichero() -> Se introduce el documento en el historico");
 							insertaCenHistoricoCompras(CargaMasivaDatosCompItem, usuario);
-						}else {
+						}else if(CargaMasivaDatosCompItem.getErrores() != null){
 							errores += CargaMasivaDatosCompItem.getErrores();
 							error.setDescription(errores);
 							deleteResponseDTO.setError(error);
@@ -546,7 +536,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 		descripcion.append("\n");
 		descripcion.append("- NombreCliente: ");
 		descripcion.append(
-				CargaMasivaDatosCompItem.getNombreCliente() != null ? simpleDateFormat.format(CargaMasivaDatosCompItem.getNombreCliente())
+				CargaMasivaDatosCompItem.getNombreCliente() != null ? CargaMasivaDatosCompItem.getNombreCliente()
 						: "");
 		
 		descripcion.append("\n");
@@ -562,9 +552,9 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 						: "");
 		
 		descripcion.append("\n");
-		descripcion.append("- NumColegiadoCliente: ");
+		descripcion.append("- NombreProducto: ");
 		descripcion.append(
-				CargaMasivaDatosCompItem.getNumColegiadoCliente() != null ? CargaMasivaDatosCompItem.getNumColegiadoCliente()
+				CargaMasivaDatosCompItem.getNombreProducto() != null ? CargaMasivaDatosCompItem.getNombreProducto()
 						: "");
 
 		cenHistorico.setDescripcion(descripcion.toString());

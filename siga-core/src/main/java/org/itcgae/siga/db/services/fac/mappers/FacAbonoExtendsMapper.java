@@ -3,14 +3,18 @@ package org.itcgae.siga.db.services.fac.mappers;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.mappers.FacAbonoMapper;
 import org.itcgae.siga.db.services.fac.providers.FacAbonoExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -19,7 +23,7 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonos")
 	@Results({
-			@Result(column = "idabono", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idabono", property = "idAbono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numeroabono", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fecha", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "facturacion", property = "facturacion", jdbcType = JdbcType.VARCHAR),
@@ -30,6 +34,7 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 			@Result(column = "nombreinst", property = "nombreInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "imptotal", property = "importefacturado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "imptotalporpagar", property = "importeAdeudadoPendiente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idEstado", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numcomunicaciones", property = "comunicacionesFacturas", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ultcomunicacion", property = "ultimaComunicacion", jdbcType = JdbcType.VARCHAR),
@@ -40,9 +45,11 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbono")
 	@Results({
 			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDABONO", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROABONO", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPTOTAL", property = "importefacturado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPTOTALNETO", property = "importeNeto", jdbcType = JdbcType.VARCHAR),
@@ -76,4 +83,44 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getNewAbonoID(String idInstitucion);
+	
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNuevoID")
+    Long getNuevoID(String idInstitucion);
+
+    @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getIdAbonosPorPago")
+    List<Long> getIdAbonosPorPago(Short idInstitucion, Integer idPagosjg);
+
+    @UpdateProvider(type = FacAbonoExtendsSqlProvider.class, method = "restableceValoresAbono")
+    int restableceValoresAbono(Short idInstitucion, Long idDisqueteAbono);
+
+    @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "hayAbonoPosterior")
+    List<FacAbono> hayAbonoPosterior(Short idInstitucion, Integer idPago);
+
+    @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonoAnterior")
+    List<Long> getAbonoAnterior(Short idInstitucion, String fecha);
+    
+    @SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getPagosCerrados")
+    List<FacAbono> getPagosCerrados(Short idInstitucion, String anio);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNuevoNumeroAbono")
+	@Results({
+			@Result(column = "NUEVOCONTADOR", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getNuevoNumeroAbono(String idInstitucion, String idContador);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonosBanco")
+	List<FacAbono> getAbonosBanco(Short idInstitucion, String bancosCodigo, Short idSufijo, List<String> idAbonos);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonosBancoSjcs")
+	List<FacAbono> getAbonosBancoSjcs(Short idInstitucion, String bancosCodigo, Short idSufijo, List<String> idAbonos);
+
+	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getBancosSufijosSjcs")
+	@Results({
+		@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSUFIJO", property = "idSufijo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROPSEPA", property = "propSEPA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROPOTROS", property = "propOtros", jdbcType = JdbcType.VARCHAR)
+	})
+	List<FicherosAbonosItem> getBancosSufijosSjcs(Short idInstitucion);
+
 }

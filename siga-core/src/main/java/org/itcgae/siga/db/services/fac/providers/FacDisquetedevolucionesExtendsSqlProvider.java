@@ -17,7 +17,7 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
         String fecha;
 
 		//query principal
-		principal.SELECT("fd.IDINSTITUCION, dd.IDDISQUETEDEVOLUCIONES, dd.FECHAGENERACION, b.DESCRIPCION as CUENTA_ENTIDAD, "
+		principal.SELECT("fd.IDINSTITUCION, dd.IDDISQUETEDEVOLUCIONES, dd.FECHAGENERACION, dd.NOMBREFICHERO, b.DESCRIPCION as CUENTA_ENTIDAD, "
 				+ "COUNT(*) NUMEROFACTURAS, SUM(fd.IMPORTE) IMPORTETOTAL, dd.BANCOS_CODIGO, fs.SUFIJO");
 		principal.FROM("FAC_FACTURAINCLUIDAENDISQUETE fd");
 		principal.INNER_JOIN("FAC_LINEADEVOLUDISQBANCO lin ON (fd.IDINSTITUCION = lin.IDINSTITUCION "
@@ -26,7 +26,7 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		principal.INNER_JOIN("FAC_BANCOINSTITUCION b ON (fd.IDINSTITUCION = b.IDINSTITUCION AND dd.BANCOS_CODIGO = b.BANCOS_CODIGO)");
 		principal.LEFT_OUTER_JOIN("FAC_SUFIJO fs ON (fd.IDINSTITUCION = fs.IDINSTITUCION AND b.IDSUFIJOSJCS = fs.IDSUFIJO)");
 		principal.WHERE("fd.idinstitucion="+idInstitucion);
-		principal.GROUP_BY("fd.IDINSTITUCION, dd.IDDISQUETEDEVOLUCIONES, dd.FECHAGENERACION, b.COMISIONDESCRIPCION, b.DESCRIPCION, dd.BANCOS_CODIGO, fs.SUFIJO");
+		principal.GROUP_BY("fd.IDINSTITUCION, dd.IDDISQUETEDEVOLUCIONES, dd.FECHAGENERACION, dd.NOMBREFICHERO, b.COMISIONDESCRIPCION, b.DESCRIPCION, dd.BANCOS_CODIGO, fs.SUFIJO");
 		principal.ORDER_BY("dd.IDDISQUETEDEVOLUCIONES DESC");
 
 		//query completa
@@ -94,4 +94,5 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 
 		return sql.toString();
 	}
+
 }

@@ -23,4 +23,10 @@ public interface FcsEstadosFacturacionExtendsMapper extends FcsEstadosfacturacio
 	})
 	List<ComboItem> estadosFacturacion(String idLenguaje);	
 	
+	@SelectProvider(type = FcsEstadoFacturacionSqlExtendsProvider.class, method = "estadosPagos")
+	@Results({ 
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADOPAGOSJG", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> estadosPagos(String idLenguaje);		
 }

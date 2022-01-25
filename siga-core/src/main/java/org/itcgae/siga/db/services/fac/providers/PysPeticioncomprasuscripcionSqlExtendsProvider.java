@@ -406,7 +406,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.LEFT_OUTER_JOIN("cen_colegiado col on col.idpersona = pet.idpersona and col.idinstitucion = pet.idinstitucion");
 		sql.INNER_JOIN("pys_productosinstitucion prodIns on prodIns.idinstitucion = prodSol.idinstitucion and prodIns.idproducto = prodSol.idProducto \r\n"
 				+ "and prodIns.idTipoProducto = prodSol.idTipoProducto and prodIns.idProductoInstitucion = prodSol.idProductoInstitucion");
-		sql.INNER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = prodSol.idtipoiva");
+		sql.LEFT_OUTER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = prodSol.idtipoiva");
 		sql.LEFT_OUTER_JOIN("pys_peticioncomprasuscripcion petBaja on petBaja.idinstitucion = pet.idinstitucion and petBaja.idpeticionalta = pet.idpeticion");
 		sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = compra.idfactura and fact.idinstitucion = compra.idinstitucion");
 		sql.LEFT_OUTER_JOIN("fac_estadoFactura estFact on estFact.idestado = fact.estado");
@@ -461,7 +461,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
-			sql.WHERE("pet.fecha >= to_date('"+strDate+" 00:00:00' ,'dd/MM/YY HH24:MI:SS')");
+			sql.WHERE("to_char(pet.fecha) >= to_date('"+strDate+" 00:00:00' ,'dd/MM/YY HH24:MI:SS')");
 		}
 
 		if(filtro.getFechaSolicitudHasta() != null) {
@@ -469,7 +469,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
-			sql.WHERE("pet.fecha <= to_date('"+strDate+" 23:59:00','dd/MM/YY HH24:MI:SS')");
+			sql.WHERE("to_char(pet.fecha) <= to_date('"+strDate+" 23:59:00','dd/MM/YY HH24:MI:SS')");
 		}
 		
 		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
@@ -531,6 +531,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ "group by gen.fechasolicitud, gen.nsolicitud, gen.idpersona, gen.nidentificacion, gen.ncolegiado, gen.apellidosnombre, gen.nprod, gen.idformapago, gen.desformapago, \r\n"
 						+ "gen.imptotal, gen.fechadenegada, gen.fechasolicitadaanulacion, gen.fechaefectiva, gen.fechaanulada, gen.estadofactura, gen.solicitarbaja, gen.facturas";
 				
+				LOGGER.info(query.toString());
 				
 				return query;
 		
@@ -590,38 +591,123 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 		SQL sql = new SQL();
 
-		sql.SELECT_DISTINCT("pet.fecha as fechaSolicitud");
-		sql.SELECT_DISTINCT("pet.idPeticion as nSolicitud");
-		sql.SELECT_DISTINCT("pet.idPersona as idPersona");
-		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
-		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
-		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
-		//REVISAR COUNT que siempre devuelve 200
-//		sql.SELECT_DISTINCT(
-//				"CASE WHEN COUNT(1) OVER (ORDER BY servIns.descripcion) >1 THEN FIRST_VALUE(servIns.descripcion) OVER (ORDER BY suscripcion.fechasuscripcion) || '...'\r\n"
-//						+ "ELSE FIRST_VALUE(servIns.descripcion) OVER (ORDER BY suscripcion.fechasuscripcion) || '[ ' || precioServ.descripcion || ' ]'  END as concepto \r\n");
-//		sql.SELECT_DISTINCT("servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' as concepto");
-		sql.SELECT_DISTINCT("CASE WHEN suscripcion.fechabaja is not null or petBaja.fecha is null THEN servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' "
-				+ "ELSE servIns.descripcion END as concepto");
-		sql.SELECT_DISTINCT("servSol.idformapago as idformapago \r\n");
-		sql.SELECT_DISTINCT("CASE WHEN servIns.noFacturable = '1' THEN 'No facturable'\r\n"
-				+ "ELSE f_siga_getrecurso(formPago.descripcion, " + idioma + ") END as desFormaPago");
-//		sql.SELECT_DISTINCT("(servSol.VALOR*servSol.cantidad)*(1+TIVA.VALOR/100) AS impTotal \r\n");
-
-		sql.SELECT_DISTINCT(
-				"CASE WHEN suscripcion.fechasuscripcion is null THEN petBaja.fecha \r\n" + "ELSE null END as fechaDenegada \r\n");
-		sql.SELECT_DISTINCT("CASE WHEN suscripcion.fechasuscripcion is not null THEN petBaja.fecha \r\n"
-				+ "ELSE null END as fechaSolicitadaAnulacion \r\n");
-		sql.SELECT_DISTINCT("suscripcion.fechasuscripcion as fechaEfectiva");
-		sql.SELECT_DISTINCT("suscripcion.fechaBaja as fechaAnulada");
-		sql.SELECT_DISTINCT("f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'" + idioma + "') AS estadoFactura");
-		sql.SELECT_DISTINCT("CASE WHEN SUBSTR(precioServ.valor, 1, 1) = ',' THEN \r\n"
-				+ "'0' || precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, "+idioma+") || ')' \r\n"
-						+ "ELSE precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, "+idioma+") || ')' END as PrecioPerio");
-		sql.SELECT_DISTINCT("suscripcion.fechasuscripcion as fechasuscripcion");
-		sql.SELECT_DISTINCT("suscripcion.fechabaja as fechabaja");
-		sql.SELECT_DISTINCT("SUM(servIns.solicitarBaja)-COUNT(servIns.solicitarBaja) as solicitarBaja");
-		sql.SELECT_DISTINCT("case when factSus.idfactura is null then '0' else '1' end as facturas");
+		sql.SELECT_DISTINCT("pet.fecha AS fechasolicitud,\r\n"
+				+ "    pet.idpeticion AS nsolicitud,\r\n"
+				+ "    pet.idpersona AS idpersona,\r\n"
+				+ "    per.nifcif AS nidentificacion,\r\n"
+				+ "    col.ncolegiado,\r\n"
+				+ "    per.apellidos1\r\n"
+				+ "     || ' '\r\n"
+				+ "     || per.apellidos2\r\n"
+				+ "     || ','\r\n"
+				+ "     || per.nombre AS apellidosnombre,\r\n"
+				+ "        CASE\r\n"
+				+ "            WHEN suscripcion.fechabaja IS NOT NULL THEN servins.descripcion\r\n"
+				+ "            WHEN precioserv.descripcion IS NULL THEN servins.descripcion\r\n"
+				+ "             || '[ '\r\n"
+				+ "             || regexp_substr(\r\n"
+				+ "                f_siga_calculoprecioservicio(\r\n"
+				+ "                    servins.idinstitucion,\r\n"
+				+ "                    servins.idtiposervicios,\r\n"
+				+ "                    servins.idservicio,\r\n"
+				+ "                    servins.idserviciosinstitucion,\r\n"
+				+ "                    pet.idpersona,\r\n"
+				+ "                    1\r\n"
+				+ "                ),\r\n"
+				+ "                '[^#]+',\r\n"
+				+ "                1,\r\n"
+				+ "                6\r\n"
+				+ "            )\r\n"
+				+ "             || ' ]'\r\n"
+				+ "            ELSE servins.descripcion\r\n"
+				+ "             || '[ '\r\n"
+				+ "             || precioserv.descripcion\r\n"
+				+ "             || ' ]'\r\n"
+				+ "        END\r\n"
+				+ "    AS concepto,\r\n"
+				+ "    servsol.idformapago AS idformapago,\r\n"
+				+ "        CASE\r\n"
+				+ "            WHEN servins.nofacturable = '1' THEN 'No facturable'\r\n"
+				+ "            ELSE f_siga_getrecurso(\r\n"
+				+ "                formpago.descripcion,\r\n"
+				+ "                1\r\n"
+				+ "            )\r\n"
+				+ "        END\r\n"
+				+ "    AS desformapago,\r\n"
+				+ "        CASE\r\n"
+				+ "            WHEN suscripcion.fechasuscripcion IS NULL THEN petbaja.fecha\r\n"
+				+ "            ELSE NULL\r\n"
+				+ "        END\r\n"
+				+ "    AS fechadenegada,\r\n"
+				+ "        CASE\r\n"
+				+ "            WHEN suscripcion.fechasuscripcion IS NOT NULL THEN petbaja.fecha\r\n"
+				+ "            ELSE NULL\r\n"
+				+ "        END\r\n"
+				+ "    AS fechasolicitadaanulacion,\r\n"
+				+ "    suscripcion.fechasuscripcion AS fechaefectiva,\r\n"
+				+ "    suscripcion.fechabaja AS fechaanulada,\r\n"
+				+ "    f_siga_getrecurso_etiqueta(\r\n"
+				+ "        estfact.descripcion,\r\n"
+				+ "        '1'\r\n"
+				+ "    ) AS estadofactura,\r\n"
+				+ "        CASE\r\n"
+				+ "            WHEN substr(\r\n"
+				+ "                precioserv.valor,\r\n"
+				+ "                1,\r\n"
+				+ "                1\r\n"
+				+ "            ) = ','THEN '0'\r\n"
+				+ "             || precioserv.valor\r\n"
+				+ "             || ' ('\r\n"
+				+ "             || f_siga_getrecurso(\r\n"
+				+ "                periodicidad.descripcion,\r\n"
+				+ "                1\r\n"
+				+ "            )\r\n"
+				+ "             || ')'\r\n"
+				+ "            WHEN precioserv.descripcion IS NULL THEN regexp_substr(\r\n"
+				+ "                f_siga_calculoprecioservicio(\r\n"
+				+ "                    servins.idinstitucion,\r\n"
+				+ "                    servins.idtiposervicios,\r\n"
+				+ "                    servins.idservicio,\r\n"
+				+ "                    servins.idserviciosinstitucion,\r\n"
+				+ "                    pet.idpersona,\r\n"
+				+ "                    1\r\n"
+				+ "                ),\r\n"
+				+ "                '[^#]+',\r\n"
+				+ "                1,\r\n"
+				+ "                1\r\n"
+				+ "            )\r\n"
+				+ "             || '( '\r\n"
+				+ "             || regexp_substr(\r\n"
+				+ "                    f_siga_calculoprecioservicio(\r\n"
+				+ "                        servins.idinstitucion,\r\n"
+				+ "                        servins.idtiposervicios,\r\n"
+				+ "                        servins.idservicio,\r\n"
+				+ "                        servins.idserviciosinstitucion,\r\n"
+				+ "                        pet.idpersona,\r\n"
+				+ "                        1\r\n"
+				+ "                    ),\r\n"
+				+ "                    '[^#]+',\r\n"
+				+ "                    1,\r\n"
+				+ "                    5\r\n"
+				+ "                )\r\n"
+				+ "             || ' )'\r\n"
+				+ "            ELSE precioserv.valor\r\n"
+				+ "             || ' ('\r\n"
+				+ "             || f_siga_getrecurso(\r\n"
+				+ "                periodicidad.descripcion,\r\n"
+				+ "                1\r\n"
+				+ "            )\r\n"
+				+ "             || ')'\r\n"
+				+ "        END\r\n"
+				+ "    AS precioperio,\r\n"
+				+ "    suscripcion.fechasuscripcion AS fechasuscripcion,\r\n"
+				+ "    suscripcion.fechabaja AS fechabaja,\r\n"
+				+ "    SUM(servins.solicitarbaja) - COUNT(servins.solicitarbaja) AS solicitarbaja,\r\n"
+				+ "        CASE\r\n"
+				+ "            WHEN factsus.idfactura IS NULL THEN '0'\r\n"
+				+ "            ELSE '1'\r\n"
+				+ "        END\r\n"
+				+ "    AS facturas");
 
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet"); 
 
@@ -636,7 +722,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.INNER_JOIN(
 				"pys_serviciosinstitucion servIns on servIns.idinstitucion = servSol.idinstitucion and servIns.idservicio = servSol.idservicio \r\n"
 						+ "and servIns.idTipoServicios = servSol.idTipoServicios and servIns.idServiciosInstitucion = servSol.idServiciosInstitucion");
-		sql.INNER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = servIns.idtipoiva");
+		sql.LEFT_OUTER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = servIns.idtipoiva");
 		sql.LEFT_OUTER_JOIN("pys_preciosservicios precioServ on precioServ.idinstitucion = servSol.idinstitucion and precioServ.idservicio = servSol.idservicio \r\n"
 				+ "and precioServ.idTipoServicios = servSol.idTipoServicios and precioServ.idServiciosInstitucion = servSol.idServiciosInstitucion "
 				+ "and precioServ.idperiodicidad = servSol.idperiodicidad and precioServ.idPreciosServicios = servSol.idPreciosServicios");
@@ -649,7 +735,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.LEFT_OUTER_JOIN("fac_facturacionSuscripcion factSusBis ON (factSusBis.idservicio = suscripcion.idservicio \r\n"
 				+ "and factSusBis.idTipoServicios = suscripcion.idTipoServicios and factSusBis.idServiciosInstitucion = suscripcion.idServiciosInstitucion \r\n"
 				+ "and factSusBis.idinstitucion = suscripcion.idinstitucion and factSusBis.idsuscripcion = suscripcion.idsuscripcion AND \r\n"
-			   + "(factSus.idfactura < factSusBis.idfactura))");
+			   + "(factSus.fechainicio < factSusBis.fechainicio))");
 		sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = factSus.idfactura \r\n"
 				+ "and fact.idinstitucion = suscripcion.idinstitucion");
 		
@@ -712,8 +798,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			//Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
 			sql.WHERE(
 					"(suscripcion.fechaSuscripcion is not null and "
-					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
-					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
+					+ "to_char(suscripcion.fechaSuscripcion) <= to_date('" + strDate + "','dd/MM/YY') and"
+					+ "(suscripcion.fechaBaja is null or to_char(suscripcion.fechaBaja) > to_date('" + strDate + "','dd/MM/YY')))");
 		}
 		//REVISAR: No se busca correctamente con alos anteriores al 2000
 		if (filtro.getFechaSolicitudDesde() != null) {
@@ -721,7 +807,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql
 					.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
-			sql.WHERE("pet.fecha >= to_date('" + strDate + "','dd/MM/YY')");
+			sql.WHERE("to_char(pet.fecha) >= to_date('" + strDate + "','dd/MM/YY')");
 		}
 	
 		if (filtro.getFechaSolicitudHasta() != null) {
@@ -729,7 +815,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql
 					.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
-			sql.WHERE("pet.fecha <= to_date('" + strDate + "','dd/MM/YY')");
+			sql.WHERE("to_char(pet.fecha) <= to_date('" + strDate + "','dd/MM/YY')");
 		}
 		
 		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
@@ -770,19 +856,106 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 //		private String importe; // valor aplicado durante la compra (importe total)
 		sql.WHERE("rownum <= 200");
 		
-		sql.GROUP_BY("servIns.solicitarBaja, pet.fecha, pet.idPeticion, pet.idPersona, per.nifcif, col.NCOLEGIADO \r\n"
-				+ ", per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre \r\n"
-				+ ", CASE WHEN suscripcion.fechabaja is not null or petBaja.fecha is null THEN servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' ELSE servIns.descripcion END , servSol.idformapago\r\n"
-				+ ", CASE WHEN servIns.noFacturable = '1' THEN 'No facturable'\r\n"
-				+ "ELSE f_siga_getrecurso(formPago.descripcion, 1) END , CASE WHEN suscripcion.fechasuscripcion is null THEN petBaja.fecha \r\n"
-				+ "ELSE null END\r\n"
-				+ ", CASE WHEN suscripcion.fechasuscripcion is not null THEN petBaja.fecha \r\n"
-				+ "ELSE null END\r\n"
-				+ ", suscripcion.fechasuscripcion, suscripcion.fechaBaja, f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'1'), CASE WHEN SUBSTR(precioServ.valor, 1, 1) = ',' THEN \r\n"
-				+ "'0' || precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, 1) || ')' \r\n"
-				+ "ELSE precioServ.valor || ' (' || f_siga_getrecurso(periodicidad.descripcion, 1) || ')' END, suscripcion.fechasuscripcion , suscripcion.fechabaja\r\n"
-				+ ", case when factSus.idfactura is null then '0' else '1' end");
+		sql.GROUP_BY("servins.solicitarbaja,\r\n"
+				+ "    pet.fecha,\r\n"
+				+ "    pet.idpeticion,\r\n"
+				+ "    pet.idpersona,\r\n"
+				+ "    per.nifcif,\r\n"
+				+ "    col.ncolegiado,\r\n"
+				+ "    per.apellidos1 || ' ' || per.apellidos2 || ',' || per.nombre,\r\n"
+				+ "    CASE\r\n"
+				+ "        WHEN suscripcion.fechabaja IS NOT NULL THEN servins.descripcion\r\n"
+				+ "        WHEN precioserv.descripcion IS NULL THEN servins.descripcion\r\n"
+				+ "             || '[ '\r\n"
+				+ "             || regexp_substr(\r\n"
+				+ "                f_siga_calculoprecioservicio(\r\n"
+				+ "                    servins.idinstitucion,\r\n"
+				+ "                    servins.idtiposervicios,\r\n"
+				+ "                    servins.idservicio,\r\n"
+				+ "                    servins.idserviciosinstitucion,\r\n"
+				+ "                    pet.idpersona,\r\n"
+				+ "                    1\r\n"
+				+ "                ),\r\n"
+				+ "                '[^#]+',\r\n"
+				+ "                1,\r\n"
+				+ "                6\r\n"
+				+ "            )\r\n"
+				+ "             || ' ]'\r\n"
+				+ "        ELSE servins.descripcion || '[ ' || precioserv.descripcion || ' ]'\r\n"
+				+ "    END, \r\n"
+				+ "    servsol.idformapago,\r\n"
+				+ "    CASE\r\n"
+				+ "        WHEN servins.nofacturable = '1' THEN 'No facturable'\r\n"
+				+ "        ELSE f_siga_getrecurso(\r\n"
+				+ "            formpago.descripcion,\r\n"
+				+ "            1\r\n"
+				+ "        )\r\n"
+				+ "    END,\r\n"
+				+ "    CASE\r\n"
+				+ "        WHEN suscripcion.fechasuscripcion IS NULL THEN petbaja.fecha\r\n"
+				+ "        ELSE NULL\r\n"
+				+ "    END,\r\n"
+				+ "    CASE\r\n"
+				+ "        WHEN suscripcion.fechasuscripcion IS NOT NULL THEN petbaja.fecha\r\n"
+				+ "        ELSE NULL\r\n"
+				+ "    END,\r\n"
+				+ "    suscripcion.fechasuscripcion,\r\n"
+				+ "    suscripcion.fechabaja,\r\n"
+				+ "    f_siga_getrecurso_etiqueta(\r\n"
+				+ "        estfact.descripcion,\r\n"
+				+ "        '1'\r\n"
+				+ "    ),\r\n"
+				+ "    CASE\r\n"
+				+ "        WHEN substr(\r\n"
+				+ "            precioserv.valor,\r\n"
+				+ "            1,\r\n"
+				+ "            1\r\n"
+				+ "        ) = ','THEN '0' || precioserv.valor || ' (' || f_siga_getrecurso(\r\n"
+				+ "            periodicidad.descripcion,\r\n"
+				+ "            1\r\n"
+				+ "        ) || ')'\r\n"
+				+ "        WHEN precioserv.descripcion IS NULL THEN regexp_substr(\r\n"
+				+ "                f_siga_calculoprecioservicio(\r\n"
+				+ "                    servins.idinstitucion,\r\n"
+				+ "                    servins.idtiposervicios,\r\n"
+				+ "                    servins.idservicio,\r\n"
+				+ "                    servins.idserviciosinstitucion,\r\n"
+				+ "                    pet.idpersona,\r\n"
+				+ "                    1\r\n"
+				+ "                ),\r\n"
+				+ "                '[^#]+',\r\n"
+				+ "                1,\r\n"
+				+ "                1\r\n"
+				+ "            )\r\n"
+				+ "             || '( '\r\n"
+				+ "             || regexp_substr(\r\n"
+				+ "                    f_siga_calculoprecioservicio(\r\n"
+				+ "                        servins.idinstitucion,\r\n"
+				+ "                        servins.idtiposervicios,\r\n"
+				+ "                        servins.idservicio,\r\n"
+				+ "                        servins.idserviciosinstitucion,\r\n"
+				+ "                        pet.idpersona,\r\n"
+				+ "                        1\r\n"
+				+ "                    ),\r\n"
+				+ "                    '[^#]+',\r\n"
+				+ "                    1,\r\n"
+				+ "                    5\r\n"
+				+ "                )\r\n"
+				+ "             || ' )'\r\n"
+				+ "        ELSE precioserv.valor || ' (' || f_siga_getrecurso(\r\n"
+				+ "            periodicidad.descripcion,\r\n"
+				+ "            1\r\n"
+				+ "        ) || ')'\r\n"
+				+ "    END,\r\n"
+				+ "    suscripcion.fechasuscripcion,\r\n"
+				+ "    suscripcion.fechabaja,\r\n"
+				+ "    CASE\r\n"
+				+ "        WHEN factsus.idfactura IS NULL THEN '0'\r\n"
+				+ "        ELSE '1'\r\n"
+				+ "    END");
 
+		LOGGER.info(sql.toString());
+		
 		return sql.toString();
 	}
 
@@ -844,6 +1017,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.WHERE("servSol.idpeticion = " + idPeticion);
 
 		sql.ORDER_BY(" servIns.DESCRIPCION");
+		
+
+		LOGGER.info("CONSULTA SERVICIOS SUSCRIPCION: \r\n"+ sql.toString());
 
 		return sql.toString();
 	}
@@ -898,7 +1074,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		sql.WHERE("rownum <= 200");
 		
-		LOGGER.debug(sql.toString());
+		LOGGER.info(sql.toString());
 
 		return sql.toString();
 	}

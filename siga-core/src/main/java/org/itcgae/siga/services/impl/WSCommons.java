@@ -23,7 +23,9 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import javax.transaction.Transaction;
 
+import com.exea.sincronizacion.redabogacia.*;
 import org.apache.xmlbeans.XmlObject;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
@@ -257,6 +259,83 @@ public class WSCommons {
 			} else {
 				errorType.setXmlError("Sin error xml");
 			}
+		}else if(xmlObjectResponse instanceof ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse){
+
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((ObtenerNumColegiacionResponseDocument.ObtenerNumColegiacionResponse) xmlObjectResponse).addNewError();
+
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
+
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+
+		}else if(xmlObjectResponse instanceof AltaColegiadoResponseDocument.AltaColegiadoResponse){
+
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((AltaColegiadoResponseDocument.AltaColegiadoResponse) xmlObjectResponse).addNewError();
+
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+
+		}else if(xmlObjectResponse instanceof AltaSancionResponseDocument.AltaSancionResponse){
+
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((AltaSancionResponseDocument.AltaSancionResponse) xmlObjectResponse).addNewError();
+
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
+
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+
+		}else if(xmlObjectResponse instanceof UpdateEstadoExpedienteResponseDocument.UpdateEstadoExpedienteResponse){
+
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((UpdateEstadoExpedienteResponseDocument.UpdateEstadoExpedienteResponse) xmlObjectResponse).addNewError();
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
+
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+
+		}else if(xmlObjectResponse instanceof ActualizacionSancionResponseDocument.ActualizacionSancionResponse){
+
+			com.exea.sincronizacion.redabogacia.ErrorType errorType = ((ActualizacionSancionResponseDocument.ActualizacionSancionResponse) xmlObjectResponse).addNewError();
+			if(ERROR_SERVER.XML_NO_VALIDO.name().equals(codigo)) {
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.FORMATO_NOVALIDO.name());
+				errorType.setDescripcion(message);
+			}else if(ERROR_SERVER.CLI_IP_NO_ENCONTRADA.name().equals(codigo)){
+				errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.name());
+				errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.IP_NOVALIDA.getMensajeError());
+			}
+
+			if(xmlObjectRequest != null){
+				errorType.setXmlRequest(xmlObjectRequest.xmlText());
+			}
+
 		}
 
 		throw new ValidationException(message);
@@ -1873,6 +1952,16 @@ public class WSCommons {
 		return valid;
 	}
 
+	/**
+	 * Parametros tiene que venir como tipo String, int, short o long (no vale otro tipo si no, no funciona el for para settear los parametros de entrada)
+	 * @param functionDefinition
+	 * @param outParameters
+	 * @param inParameters
+	 * @return
+	 * @throws IOException
+	 * @throws NamingException
+	 * @throws SQLException
+	 */
 	public String[] callPLProcedureFacturacionPyS(String functionDefinition, int outParameters, Object[] inParameters)
 			throws IOException, NamingException, SQLException {
 
@@ -1893,8 +1982,14 @@ public class WSCommons {
 
 			// input Parameters
 			for (int i = 0; i < size; i++) {
-
-				cs.setString(i + 1, inParameters[i].toString());
+				 
+				if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
+					 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
+				 }
+				 
+				if (inParameters[i] instanceof String){
+					cs.setString(i+1, inParameters[i].toString());
+				 }
 			}
 
 			// output Parameters
@@ -1923,5 +2018,6 @@ public class WSCommons {
 		}
 
 		return result;
-	}
+	}	
+	
 }

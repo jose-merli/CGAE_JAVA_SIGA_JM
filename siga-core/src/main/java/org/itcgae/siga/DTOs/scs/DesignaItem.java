@@ -97,7 +97,8 @@ public class DesignaItem {
 	private int existeDesignaJuzgadoProcedimiento;
 	private String idPersona;  
 	private Error error = null;
-	
+	private String institucioncolegiado;
+
 	 public DesignaItem error(Error error) {
 		 this.error = error;
 		 return this;
@@ -730,7 +731,7 @@ public class DesignaItem {
 		return idModulos;
 	}
 	/**
-	 * @param idModulo the idModulo to set
+	 * @param
 	 */
 	public void setIdModulos(String[] idModulos) {
 		this.idModulos = idModulos;
@@ -963,7 +964,13 @@ public class DesignaItem {
 	public void setExisteDesignaJuzgadoProcedimiento(int existeDesignaJuzgadoProcedimiento) {
 		this.existeDesignaJuzgadoProcedimiento = existeDesignaJuzgadoProcedimiento;
 	}
-	
+
+	public String getInstitucioncolegiado() {
+		return institucioncolegiado;
+	}
+	public void setInstitucioncolegiado(String institucioncolegiado) {
+		this.institucioncolegiado = institucioncolegiado;
+	}
 	
 	public String getIdPersona() {
 		return idPersona;

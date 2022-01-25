@@ -1345,10 +1345,10 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			}
 
 		if (calendarioItem.getIdTurno() != null && calendarioItem.getIdTurno() != "") {
-		sql.WHERE("hpc.IDTURNO IN ( " + calendarioItem.getIdTurno() + " ) OR hpc.idturno is null");
+		sql.WHERE("(hpc.IDTURNO IN ( " + calendarioItem.getIdTurno() + " ) OR hpc.idturno is null)");
 		}
 		if (calendarioItem.getIdGuardia() != null && calendarioItem.getIdGuardia() != "") {
-		sql.WHERE("hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+") OR hpc.IDGUARDIA is null");
+		sql.WHERE("(hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+") OR hpc.IDGUARDIA is null)");
 		}
 		
 		//sql.WHERE("NOT EXISTS (" + sql2 + ")");
@@ -3544,20 +3544,22 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
        return sql.toString();
 	}
 
-	public String getIdGuardiaByName( String name) {
+	public String getIdGuardiaByName( String name, String idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT("IDGUARDIA");
 		sql.FROM("SCS_GUARDIASTURNO");
 		sql.WHERE("NOMBRE = '"+ name + "'");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 //		sql.WHERE("FECHABAJA IS NULL");
 		return sql.toString();
 	}
 
-	public String getIdTurnoByName( String name) {
+	public String getIdTurnoByName( String name, String idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT("IDTURNO");
 		sql.FROM("SCS_TURNO");
 		sql.WHERE("NOMBRE = '"+ name+ "'");
+		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
 //		sql.WHERE("FECHABAJA IS NULL");
 		return sql.toString();
 	}
