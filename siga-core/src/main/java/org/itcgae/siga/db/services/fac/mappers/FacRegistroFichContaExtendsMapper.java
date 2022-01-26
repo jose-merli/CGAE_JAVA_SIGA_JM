@@ -25,7 +25,8 @@ public interface FacRegistroFichContaExtendsMapper extends FacRegistrofichcontaM
 		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROASIENTOS", property = "numAsientos", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "NOMBREESTADO", property = "nombreEstado", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "NOMBREESTADO", property = "nombreEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 	})
 	List<FacRegistroFichConta> search(FacRegistroFichConta facRegistroFichConta, Short idInstitucion, Integer tamMaximo,String idLenguaje);
 	

@@ -10,18 +10,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScheduledFacturacionPySServiceImpl implements IScheduledFacturacionPySService {
 
-	private Logger LOGGER = Logger.getLogger(ScheduledFacturacionPySServiceImpl.class);
-	
-	@Autowired
-	private IFacturacionProgramadaPySService facturacionPySService;
-	
-		
-	@Scheduled(fixedDelay = 3000L)
-	@Override
-	public void ejecutaProcesoFacturacionPyS() {
-		LOGGER.info("ScheduledFacturacionPySServiceImpl --> ejecutaProcesoFacturacionPyS --> ENTRA ejecutaProcesoFacturacionPyS");
-		facturacionPySService.ejecutaProcesoFacturacionPyS();
-		LOGGER.info("ScheduledFacturacionPySServiceImpl --> ejecutaProcesoFacturacionPyS --> SALE ejecutaProcesoFacturacionPyS");
-	}
+    private Logger LOGGER = Logger.getLogger(ScheduledFacturacionPySServiceImpl.class);
+
+    @Autowired
+    private IFacturacionProgramadaPySService facturacionPySService;
+
+//    @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacionPyS}")
+    @Override
+    public void ejecutaProcesoFacturacionPyS() {
+        LOGGER.info("ScheduledFacturacionPySServiceImpl --> ENTRA ejecutaProcesoFacturacionPyS()");
+        facturacionPySService.ejecutaProcesoFacturacionPyS();
+        LOGGER.info("ScheduledFacturacionPySServiceImpl --> SALE ejecutaProcesoFacturacionPyS()");
+    }
 
 }

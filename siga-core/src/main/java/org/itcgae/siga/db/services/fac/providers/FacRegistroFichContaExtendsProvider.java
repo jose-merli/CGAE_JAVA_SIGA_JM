@@ -27,6 +27,7 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 		sql.SELECT("F.NOMBREFICHERO");
 		sql.SELECT("F.ESTADO");
 		sql.SELECT("GEN.DESCRIPCION as NOMBREESTADO");
+		sql.SELECT("F.FECHABAJA");
 		
 		sql.FROM("FAC_REGISTROFICHCONTA F");
 		sql.LEFT_OUTER_JOIN("FAC_ESTADOCONTAB E ON (F.ESTADO = E.IDESTADO)");
@@ -71,6 +72,10 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 		sql.WHERE("F.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("ROWNUM <= " + tamMaximo);
 		
+		if(!facRegistroFichConta.isHistorico()) {
+			sql.WHERE("F.FECHABAJA IS NULL");
+		}
+		
 		sql.ORDER_BY("F.IDCONTABILIDAD DESC");
 		
 		LOGGER.info(sql.toString());
@@ -80,10 +85,11 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 	public String getMaxIdFacRegistroFichConta(Short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("MAX(IDCONTABILIDAD)+1 as IDCONTABILIDAD");
+		sql.SELECT("NVL((MAX(IDCONTABILIDAD)+1),1) as IDCONTABILIDAD");
 		sql.FROM("FAC_REGISTROFICHCONTA");
 		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
 		LOGGER.info(sql.toString());
 		return sql.toString();
+		
 	}
 }
