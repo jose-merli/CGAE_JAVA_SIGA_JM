@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -1171,12 +1172,25 @@ public class SigaConstants {
 	public static final String TIPO_CARGA = "GF";
 	public static final String C_FECHAINICIO = "FECHAINICIO";
 	public static final String C_FECHAFIN = "FECHAFIN";
-
+	
+	//FICHERO CONTABILIDAD
+	public static final String ASIENTO = "facturacion.exportacionesyotros.contabilidad.asiento";
+	public static final String FECHA = "facturacionSJCS.facturacionesYPagos.fecha";
+	public static final String CUENTA = "facturacion.exportacionesyotros.contabilidad.cuenta";
+	public static final String CONCEPTO = "facturacionSJCS.facturacionesYPagos.conceptos";
+	public static final String DOCUMENTO = "justiciaGratuita.ejg.documentacion.Documento";
+	public static final String DEBE = "facturacion.exportacionesyotros.contabilidad.debe";
+	public static final String HABER = "facturacion.exportacionesyotros.contabilidad.haber";
+	public static final String BASEIMP = "facturacion.exportacionesyotros.contabilidad.baseimp";
+	public static final String TIPOIVA = "facturacion.facturas.lineas.tipoIVA";
+	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
+	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, C_IDGRUPO, GENERAL,
 			ACCION, C_FECHAINICIO);
 
 	public static final List<String> CAMPOSLOGGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, PERSONANOMBRE,
 			C_IDPERSONA, C_IDGRUPO, GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO, ERRORES);
+	
 
 	public static final String tipoExcelXls = "xls";
 	public static final String tipoExcelXlsx = "xlsx";

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
+import org.itcgae.siga.db.entities.FacRegistrofichconta;
 import org.itcgae.siga.db.mappers.FacRegistrofichcontaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacRegistroFichContaExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -35,4 +36,24 @@ public interface FacRegistroFichContaExtendsMapper extends FacRegistrofichcontaM
 		@Result(column = "IDCONTABILIDAD", property = "idContabilidad", jdbcType = JdbcType.VARCHAR)
 	})
 	FacRegistroFichConta getMaxIdFacRegistroFichConta(Short idInstitucion);
+	
+	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerFacturas")
+	@Results({
+		@Result(column = "IDFACTURA", property = "idContabilidad", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NUMEROFACTURA", property = "fechaCreacion", jdbcType = JdbcType.DATE),
+		@Result(column = "IMPNETO", property = "fechaExportacionDesde", jdbcType = JdbcType.DATE),
+		@Result(column = "IMPIVA", property = "fechaExportacionHasta", jdbcType = JdbcType.DATE),
+		@Result(column = "IVA", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "numAsientos", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAEMISION", property = "estado", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "nombreEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CTAPRODUCTOSERVICIO", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "CTAIVA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "CONFDEUDOR", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "CONFINGRESOS", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "CTAINGRESOS", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "CONFDEUDOR", property = "fechaBaja", jdbcType = JdbcType.DATE),
+	})
+	List<FacRegistroFichConta> obtenerFacturas(FacRegistrofichconta facRegistroFichConta);
+	
 }
