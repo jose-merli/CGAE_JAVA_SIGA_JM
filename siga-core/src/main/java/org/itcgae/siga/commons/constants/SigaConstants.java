@@ -1485,6 +1485,7 @@ public class SigaConstants {
 	public static final short SANCION_EN_SUSPENSO = 8;
 	public static final short INCORPORACION_PENDIENTE_APROBACION = 20;
 	public static final short INCORPORACION_PENDIENTE_DOCUMENTACION = 10;
+	public static final String COD_DOC_ANEXO_PARAM = "COD_DOC_ANEXO";
 
 	public enum ERROR_SINCRONIZACION_EXEA {
 		FORMATO_NOVALIDO("Formato XML de petición no correcto."),

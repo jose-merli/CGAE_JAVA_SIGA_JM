@@ -906,7 +906,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                     String nombreArchivo = adjunto.getChildNodes().item(1).getTextContent();
 
                     headers.set("Content-Disposition",
-                            "attachment; filename=\"" + nombreArchivo + "\"");
+                            "attachment; filename=" + nombreArchivo);
                 }
 
                 soapConnection.close();
