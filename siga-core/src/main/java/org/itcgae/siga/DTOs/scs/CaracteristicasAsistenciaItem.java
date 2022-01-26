@@ -26,6 +26,7 @@ public class CaracteristicasAsistenciaItem {
     private String numeroProcedimiento;
     private String nig;
     private String descOrigenContacto;
+    private String idJuzgado;
 
     public String getIdOrigenContacto() {
         return idOrigenContacto;
@@ -211,7 +212,15 @@ public class CaracteristicasAsistenciaItem {
         this.descOrigenContacto = descOrigenContacto;
     }
 
-    @Override
+    public String getIdJuzgado() {
+		return idJuzgado;
+	}
+
+	public void setIdJuzgado(String idJuzgado) {
+		this.idJuzgado = idJuzgado;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
