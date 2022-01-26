@@ -916,10 +916,9 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
         if(!UtilidadesString.esCadenaVacia(cenSancion.getObservaciones()) && !UtilidadesString.esCadenaVacia(sancion.getObservaciones())){
             cenSancion.setObservaciones(cenSancion.getObservaciones()
-                    + " <" + SigaConstants.DATE_FORMAT.format(new Date()) + "> " +
-                    "Observacion añadida por actualizacion de estado a traves de EXEA: " + sancion.getObservaciones());
+                    + " \n[" + SigaConstants.DATE_FORMAT.format(new Date()) + "] " +  sancion.getObservaciones());
         }else if(!UtilidadesString.esCadenaVacia(sancion.getObservaciones())){
-            cenSancion.setObservaciones("<" + SigaConstants.DATE_FORMAT.format(new Date()) + "> Observacion añadida por actualizacion de estado a traves de EXEA: " + sancion.getObservaciones());
+            cenSancion.setObservaciones("\n[" + SigaConstants.DATE_FORMAT.format(new Date()) + "] " + sancion.getObservaciones());
         }
 
         if(sancion.getFechaInicio() != null){

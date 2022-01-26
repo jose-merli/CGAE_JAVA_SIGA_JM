@@ -719,7 +719,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                     Long idFichero = uploadFile(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucionSol,
                             nombreFichero, extension, idSolicitud);
 
-                    if(!"002".equals(documentacionIncorporacionItem.getCodDocEXEA())) {
+                    String codDocAnexo = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.COD_DOC_ANEXO_PARAM, idInstitucion.toString()).getValor();
+
+                    if(!codDocAnexo.equals(documentacionIncorporacionItem.getCodDocEXEA())) {
                         CenDocumentacionpresentada cenDocumentacionpresentada = new CenDocumentacionpresentada();
                         cenDocumentacionpresentada.setIdsolicitud(Long.valueOf(idSolicitud));
                         cenDocumentacionpresentada.setIddocumentacion(Short.valueOf(documentacionIncorporacionItem.getIdDocumentacion()));
@@ -908,7 +910,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                 }
 
                 soapConnection.close();
-                
+
                 res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
                         HttpStatus.OK);
             }
@@ -959,7 +961,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                         file.delete();
                     }
 
-                    if(!"002".equals(doc.getCodDocEXEA())) {
+                    String codDocAnexo = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.COD_DOC_ANEXO_PARAM, idInstitucion.toString()).getValor();
+
+                    if(!codDocAnexo.equals(doc.getCodDocEXEA())) {
                         CenDocumentacionpresentadaKey cenDocumentacionpresentadaKey = new CenDocumentacionpresentadaKey();
                         cenDocumentacionpresentadaKey.setIddocumentacion(Short.valueOf(doc.getIdDocumentacion()));
                         cenDocumentacionpresentadaKey.setIdsolicitud(Long.valueOf(idSolicitud));
@@ -1073,10 +1077,12 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                                 && SigaConstants.OK.equals(consultaAsientoResponseDocument.getConsultaAsientoResponse().getRespuesta().getCodigo())){
 
                                 String numRegistro = registroEntradaResponseDocument.getRegistroEntradaResponse().getDatosRespuesta().getCodigoRegistro();
+                                String numExpediente = consultaAsientoResponseDocument.getConsultaAsientoResponse().getAsiento().getDatosExpedienteAsiento().getNumeroExpediente();
                                 LOGGER.info("iniciarTramiteColegiacionEXEA() / Numero registro REGTEL: " + numRegistro);
                                 //Seteamos numero registro
                                 solicitudincorporacion.setNumRegistro(numRegistro);
                                 solicitudincorporacion.setClaveconsultaregtel(claveConsulta);
+                                solicitudincorporacion.setNumExpediente(numExpediente);
                                 //Pasamos de pendiente documentacion a pendiente aprobacion
                                 solicitudincorporacion.setIdestado(SigaConstants.INCORPORACION_PENDIENTE_APROBACION);
                                 solicitudincorporacion.setFechaestado(new Date());
@@ -1087,7 +1093,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                                 if(affectedRows == 1){
                                     LOGGER.info("iniciarTramiteColegiacionEXEA() / Actualizado en BBDD");
                                     updateResponseDTO.setStatus(SigaConstants.OK);
-                                    updateResponseDTO.setId(solicitudincorporacion.getIdsolicitud().toString() + ";" + solicitudincorporacion.getNumRegistro() + ";" + solicitudincorporacion.getClaveconsultaregtel());
+                                    updateResponseDTO.setId(solicitudincorporacion.getIdsolicitud().toString() + ";" + solicitudincorporacion.getNumRegistro() + ";" + solicitudincorporacion.getClaveconsultaregtel() + ";" + solicitudincorporacion.getNumExpediente());
                                 }else{
                                     error.setCode(500);
                                     error.setDescription("Error al actualizar la solicitud");
