@@ -1,9 +1,12 @@
 package org.itcgae.siga.db.services.fac.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.db.mappers.PysTipoivaSqlProvider;
 
 public class PySTipoIvaSqlExtendsProvider extends PysTipoivaSqlProvider{
+	
+	private Logger LOGGER = Logger.getLogger(this.getClass());
 	
 	public String comboIva(String idioma) {
 		SQL sql = new SQL();
@@ -30,6 +33,22 @@ public class PySTipoIvaSqlExtendsProvider extends PysTipoivaSqlProvider{
 		
 		sql.ORDER_BY("NLSSORT(DESCRIPCION, 'NLS_SORT=BINARY')");
 		
+		return sql.toString();
+	}
+	
+	public String comboIVACuentasBancariasEntidad(String tipoIva,String idioma) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDTIPOIVA");
+		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
+		sql.SELECT("VALOR");
+		sql.FROM("PYS_TIPOIVA");
+		
+		sql.WHERE("FECHABAJA IS NULL OR IDTIPOIVA = " + tipoIva);
+		sql.ORDER_BY("NLSSORT(DESCRIPCION, 'NLS_SORT=BINARY')");
+		
+		
+		LOGGER.info(sql.toString());
 		return sql.toString();
 	}
 

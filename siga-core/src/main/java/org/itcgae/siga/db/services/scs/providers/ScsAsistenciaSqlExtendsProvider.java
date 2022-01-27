@@ -632,8 +632,8 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				"TO_CHAR(da.fechaentrada,'DD/MM/YYYY') fechaentrada",
 				"p.idpersona");
 		SQL.FROM("scs_documentacionasi DA");
-		SQL.INNER_JOIN("ADM_USUARIOS ADM ON ADM.IDUSUARIO = DA.USUMODIFICACION AND ADM.IDINSTITUCION = DA.IDINSTITUCION");
-		SQL.INNER_JOIN("CEN_PERSONA P ON ADM.NIF = P.NIFCIF");
+		SQL.LEFT_OUTER_JOIN("ADM_USUARIOS ADM ON ADM.IDUSUARIO = DA.USUMODIFICACION AND ADM.IDINSTITUCION = DA.IDINSTITUCION");
+		SQL.LEFT_OUTER_JOIN("CEN_PERSONA P ON ADM.NIF = P.NIFCIF");
 
 		SQL.WHERE("DA.ANIO = '"+anio+"' AND DA.NUMERO = '"+numero+"' AND da.idinstitucion = "+idInstitucion);
 		if(!UtilidadesString.esCadenaVacia(idActuacion)){

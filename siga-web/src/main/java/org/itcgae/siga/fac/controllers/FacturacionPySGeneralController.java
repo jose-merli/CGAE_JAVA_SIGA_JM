@@ -95,6 +95,21 @@ public class FacturacionPySGeneralController {
 		}
 	}
 
+	@GetMapping(value = "/comboSeriesFacturacionConDesc")
+	ResponseEntity<ComboDTO2> comboSeriesFacturacionConDesc(HttpServletRequest request) {
+		ComboDTO2 response = new ComboDTO2();
+
+		try {
+			response = facturacionGeneralService.comboSeriesFacturacionConDesc(request);
+
+			return new ResponseEntity<ComboDTO2>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO2>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@GetMapping(value = "/comboEtiquetas")
 	ResponseEntity<ComboDTO> comboEtiquetas(HttpServletRequest request) {
 		ComboDTO response = new ComboDTO();
@@ -277,6 +292,21 @@ public class FacturacionPySGeneralController {
 		}
 	}
 
+	@GetMapping(value = "/comboIVACuentasBancariasEntidad")
+	ResponseEntity<ComboDTO2> comboIVACuentasBancariasEntidad(@RequestParam(required = false) String idTipoIVA, HttpServletRequest request) {
+		ComboDTO2 response = new ComboDTO2();
+
+		try {
+			response = facturacionGeneralService.comboTiposIVACuentaBancariaEntidad(idTipoIVA, request);
+
+			return new ResponseEntity<ComboDTO2>(response, HttpStatus.OK);
+		} catch (Exception e) {
+
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<ComboDTO2>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@GetMapping(value = "/parametrosSEPA")
 	ResponseEntity<ComboDTO> parametrosSEPA(@RequestParam(required = false) String idInstitucion,
 			HttpServletRequest request) {

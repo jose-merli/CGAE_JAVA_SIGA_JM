@@ -1893,7 +1893,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					item.setNombre(admContador.getNombre());
 					item.setPrefijo(admContador.getPrefijo());
 					item.setSufijo(admContador.getSufijo());
-					item.setContador(String.valueOf(admContador.getContador()));
+					if(admContador.getContador() == 0) {
+						item.setContador("1");
+					}else {
+						item.setContador(String.valueOf(admContador.getContador()));
+					}
+					//item.setContador(String.valueOf(admContador.getContador()));
 
 					contadorSeriesItems.add(item);
 				}
@@ -1943,7 +1948,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					item.setNombre(admContador.getNombre());
 					item.setPrefijo(admContador.getPrefijo());
 					item.setSufijo(admContador.getSufijo());
-					item.setContador(String.valueOf(admContador.getContador()));
+					//	item.setContador(String.valueOf(admContador.getContador()));
+					if(admContador.getContador() == 0) {
+						item.setContador("1");
+					}else {
+						item.setContador(String.valueOf(admContador.getContador()));
+					}
+					
 
 					contadorSeriesItems.add(item);
 				}
@@ -4971,17 +4982,20 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null && idInstitucion != null) {
 
-			//Recorrer el array y establecer fechabaja a dia de hoy o a null dependiendo de 
+			//Recorrer el array y establecer fechabaja a dia de hoy o a null dependiendo de si estaba activado o desactivado el registro
 			for(FacRegistroFichConta facRegistroFichConta: facRegistrosFichConta) {
-				FacRegistrofichconta beanUpdate = new FacRegistrofichconta();
 				
-				beanUpdate.setIdcontabilidad((long)facRegistroFichConta.getIdContabilidad());
-				beanUpdate.setIdcontabilidad((long) idInstitucion);
+				FacRegistrofichconta pk = new FacRegistrofichconta();
+				
+				pk.setIdcontabilidad((long)facRegistroFichConta.getIdContabilidad());
+				pk.setIdinstitucion(idInstitucion);
+				
+				FacRegistrofichconta beanUpdate = facRegistroFichContaExtendsMapper.selectByPrimaryKey(pk);
 				
 				if(facRegistroFichConta.getFechaBaja() == null) {
-					//beanUpdate.setFechaBaja(new Date()) EJECUTAR MYBATTIS PARA FECHABAJA
+					beanUpdate.setFechabaja(new Date());
 				}else {
-					//beanUpdate.setFechaBaja(null); EJECUTAR MYBATTIS PARA FECHABAJA
+					beanUpdate.setFechabaja(null);
 				}
 				
 				int resultado = facRegistroFichContaExtendsMapper.updateByPrimaryKey(beanUpdate);
@@ -5245,6 +5259,283 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		return XLSFile;
 	}
+	
+	//INICIO METODOS FICHERO CONTABILIDAD
+	private boolean generarFicheroContabilidad(FacRegistrofichconta registroFacRegistroFichConta, String idioma) throws Exception	{
+
+		LOGGER.info("generarFicheroContabilidad() -> Entrada al metodo que crea el fichero de contabilidad");
+		
+		boolean correcto = false;
+		
+		//REVISAR EL MOVER ESTE BLOQUE A OTRO METODO EN UN FUTURO
+		//1. Cambiar el estado del registro a ENPROCESO
+		LOGGER.info("generarFicheroContabilidad() 1. Cambiar el estado del registro a ENPROCESO -> Entrada a "
+				+ "facRegistroFichContaExtendsMapper para actualizar el estado a en proceso");
+		registroFacRegistroFichConta.setEstado((short) 2);
+		
+		int respuestaCambioEstado = facRegistroFichContaExtendsMapper.updateByPrimaryKeySelective(registroFacRegistroFichConta);
+		
+		if(respuestaCambioEstado == 1) {
+			LOGGER.info("generarFicheroContabilidad() 1. Cambiar el estado del registro a ENPROCESO -> Registro "
+					+ "FacRegistrofichconta con id: " + registroFacRegistroFichConta.getIdcontabilidad() + " e institucion: " 
+					+ registroFacRegistroFichConta.getIdinstitucion() + " actualizado correctamente");
+		}else {
+			LOGGER.info("generarFicheroContabilidad() 1. Cambiar el estado del registro a ENPROCESO -> Registro "
+					+ "FacRegistrofichconta con id: " + registroFacRegistroFichConta.getIdcontabilidad() + " e institucion: " 
+					+ registroFacRegistroFichConta.getIdinstitucion() + " no pudo ser actualizado");
+			throw new Exception();
+		}
+		LOGGER.info("generarFicheroContabilidad() 1. Cambiar el estado del registro a ENPROCESO -> Salida de "
+				+ "facRegistroFichContaExtendsMapper para actualizar el estado a en proceso");
+		//REVISAR EL MOVER ESTE BLOQUE A OTRO METODO EN UN FUTURO
+		
+		
+		//2. Crearse la lista con las columnas (multiidioma)
+		List<String> camposContabilidad = Arrays.asList(UtilidadesString.getCampoMultidioma(SigaConstants.ASIENTO, idioma), 
+				UtilidadesString.getCampoMultidioma(SigaConstants.FECHA, idioma), 
+				UtilidadesString.getCampoMultidioma(SigaConstants.CUENTA, idioma),
+				UtilidadesString.getCampoMultidioma(SigaConstants.CONCEPTO, idioma),
+				UtilidadesString.getCampoMultidioma(SigaConstants.DOCUMENTO, idioma),
+				UtilidadesString.getCampoMultidioma(SigaConstants.DEBE, idioma),
+				UtilidadesString.getCampoMultidioma(SigaConstants.HABER, idioma),
+				UtilidadesString.getCampoMultidioma(SigaConstants.BASEIMP, idioma),
+				UtilidadesString.getCampoMultidioma(SigaConstants.TIPOIVA, idioma),
+				UtilidadesString.getCampoMultidioma(SigaConstants.CONTRAPARTIDA, idioma));
+		
+		//3. Obtenemos los datos y los añadimos al excel
+		Hashtable<String, Object> datosExcel = new Hashtable<String, Object>();
+
+		// SE PONEN COMMITS INTERMEDIOS PARA QUE EL PROCESO AGUANTE EL TIEMPO QUE TARDA.
+						
+		// -----------------------------------------------------------------------------------------------------------------
+		// Asiento 1 
+		// FACTURA. Apunta asiento contable de facturas generadas, no pagada.
+		// Ventas (700)	 			--> Bruto por servicio (1) --> 0
+		// IVA 				 	    --> Iva (2)		           --> 0
+		// Cliente(430.xxx)			--> 0		               --> Negocio(1)+Negocio(2)
+		// -----------------------------------------------------------------------------------------------------------------		    
+				    
+		//ClsLogging.writeFileLog("********* CONTABILIDAD ASIENTO 1",10);
+		datosExcel = generaAsiento1(datosExcel, registroFacRegistroFichConta);
+							
+		//Crear el excel se guardará en: ‘<ruta_base>/ficheros/contabilidad/XXXX/’ (donde XXXX es el idinstitucion).
+		this.createExcelFile(camposContabilidad, null);
+		
+		
+		LOGGER.info("generarFicheroContabilidad() -> Salida del metodo que crea el fichero de contabilidad");
+	
+
+		return correcto;
+	}
+	
+	//INICIO FACTURAS
+	// Tipos de asientos.
+		// nomenclatura de fichero: #cuenta , haber, debe
+		// 1------> 
+		// Ventas. (700) 					--> Bruto por servicio (1) 	--> 0
+		// IVA 								--> Iva (2)					--> 0
+		// Cliente(430.xxx)					--> 0						--> Negocio(1)+Negocio(2)	
+		private Hashtable<String, Object> generaAsiento1(Hashtable<String, Object> datosExcel, FacRegistrofichconta registroFacRegistroFichConta) throws Exception{
+			
+			String concepto 		= "";
+			String asientoClientes 	= ""; 
+			String asientoIngresos 	= ""; 
+			String asientoIVA 	    = "";  
+			Vector vLineasFacturas  = null; 
+			Hashtable hash          = null; 
+			Hashtable laHash        = null;
+			String select 			= null;  
+			String imp 				= null; 
+			String importeIva 		= null;
+			Vector vAsiento1		= new Vector();
+			int contador 			= 0;             
+	        Hashtable codigos 		= new Hashtable();		
+//			// Beans
+//			FacFacturaAdm facturaAdm 	= new FacFacturaAdm(this.usrbean);
+//			
+			try{
+				//List<String> listaFacturas = facRegistroFichContaExtendsMapper.obtenerFacturas(registroFacRegistroFichConta);
+				
+//				
+//				
+//				String fDesdeInc = fechaDesde; 
+//				   String fHastaInc = fechaHasta;
+//					if ((fDesdeInc != null && !fDesdeInc.trim().equals("")) || (fHastaInc != null && !fHastaInc.trim().equals(""))) {
+//						
+//						if (!fDesdeInc.equals(""))
+//							fDesdeInc = GstDate.getApplicationFormatDate("", fDesdeInc); 
+//						if (!fHastaInc.equals(""))
+//							fHastaInc = GstDate.getApplicationFormatDate("", fHastaInc);
+//						Vector vCondicion=GstDate.dateBetweenDesdeAndHastaBind("F.FECHAEMISION", fDesdeInc, fHastaInc,contador,codigos);
+//						
+//						contador=new Integer(vCondicion.get(0).toString()).intValue();
+//						select +=" AND " + vCondicion.get(1) ;
+//					}	
+//				
+//				select+=" ORDER BY 1 ";
+//
+//				vLineasFacturas = this.selectTablaBind(select,codigos);
+//				
+//				String idFacturaAnt = ""; 
+//				String idFactura = "";  
+//				
+//				for(int x=0;x<vLineasFacturas.size();x++){
+//				    hash = (Hashtable) vLineasFacturas.get(x);
+//					
+//				    idFactura = (String)hash.get("IDFACTURA");
+//					    
+//					// PARA CADA LINEA FACTURA COMPRUEBO LA CONFIGURACIÓN DE CUENTAS
+//				    String confClientes=(String)hash.get("CONFDEUDOR");
+//				    String confIngresos=(String)hash.get("CONFINGRESOS");
+//				    String ctaClientes=(String)hash.get("CTACLIENTES");
+//				    String ctaIngresos=(String)hash.get("CTAINGRESOS");
+//				 
+//				        
+//				    // importes
+//				    imp=UtilidadesNumero.redondea((String)hash.get("IMPNETO"), 2);
+//				    importeIva= UtilidadesNumero.redondea((String)hash.get("IMPIVA"), 2);
+//				    String valorIva= UtilidadesNumero.redondea((String)hash.get("IVA"), 2);
+//				   
+//				    
+//				    
+//				    // Control de iva 0
+//				    boolean ivacero=false;
+//				    try {
+//				        Double d = new Double(valorIva);
+//				        if (d.doubleValue()==0.0) 
+//				            ivacero=true;
+//				    } catch (NumberFormatException nf) {
+//				    }
+//				    
+//				    // concepto
+//					concepto = UtilidadesString.sustituirParaExcell(UtilidadesString.getMensajeIdioma(this.usrbean,CONCEPTO_ASIENTO1) + ": "+(String)hash.get("DESCRIPCION"));
+//					
+//					// asientos configurables
+//					asientoIVA = (String)hash.get("CTAIVA");
+//					if (confClientes.equals("F")) {
+//					    asientoClientes =  ctaClientes;
+//					} else {
+//					    asientoClientes =  ctaClientes + obtenerAsientoContable(this.usrbean.getLocation(),(String)hash.get("IDPERSONA"));
+//					}
+//					if (confIngresos.equals("F")) {
+//					    asientoIngresos =  ctaIngresos;
+//					} else if (confIngresos.equals("C")) {
+//					    asientoIngresos =  ctaIngresos + obtenerAsientoContable(this.usrbean.getLocation(),(String)hash.get("IDPERSONA"));
+//					} else {
+//					    asientoIngresos =  ctaIngresos + (String)hash.get("CTAPRODUCTOSERVICIO");
+//					}
+//					
+//					
+//					// aumentamos el contador de asientos
+//					asiento++;
+//					
+//					Hashtable hAsiento = new Hashtable();
+//					
+//					// Escribimos 1º APUNTE
+//					UtilidadesHash.set(hAsiento, "FECHA", 			UtilidadesHash.getShortDate(hash, FacFacturaBean.C_FECHAEMISION));
+//					UtilidadesHash.set(hAsiento, "CONCEPTO", 		concepto);
+//					UtilidadesHash.set(hAsiento, "DOCUMENTO", 		UtilidadesHash.getString(hash, "NUMEROFACTURA"));
+//					UtilidadesHash.set(hAsiento, "CUENTA", 		asientoClientes);
+//					UtilidadesHash.set(hAsiento, "DEBE", 			"" + (Double.parseDouble(imp) + Double.parseDouble(importeIva)));
+//					UtilidadesHash.set(hAsiento, "HABER", 			"0");
+//					UtilidadesHash.set(hAsiento, "BASEIMPONIBLE", 	"");
+//					UtilidadesHash.set(hAsiento, "IVA", 			"");
+//					UtilidadesHash.set(hAsiento, "CONTRAPARTIDA", 	asientoIngresos);
+//					pwcontabilidad.write(this.generarLineaAbono(asiento, hAsiento));
+//					
+//					// Escribimos 2º APUNTE
+//					hAsiento.clear();
+//					UtilidadesHash.set(hAsiento, "FECHA", 			UtilidadesHash.getShortDate(hash, FacFacturaBean.C_FECHAEMISION));
+//					UtilidadesHash.set(hAsiento, "CONCEPTO", 		concepto);
+//					UtilidadesHash.set(hAsiento, "DOCUMENTO", 		UtilidadesHash.getString(hash, "NUMEROFACTURA"));
+//					UtilidadesHash.set(hAsiento, "CUENTA", 		asientoIngresos);
+//					UtilidadesHash.set(hAsiento, "DEBE", 			"0");
+//					UtilidadesHash.set(hAsiento, "HABER", 			imp);
+//					UtilidadesHash.set(hAsiento, "BASEIMPONIBLE", 	"");
+//					UtilidadesHash.set(hAsiento, "IVA", 			"");
+//					UtilidadesHash.set(hAsiento, "CONTRAPARTIDA", 	asientoClientes);
+//					pwcontabilidad.write(this.generarLineaAbono(asiento, hAsiento));
+//					
+//					// Escribimos 3º APUNTE
+//					hAsiento.clear();
+//					UtilidadesHash.set(hAsiento, "FECHA", 			UtilidadesHash.getShortDate(hash, FacFacturaBean.C_FECHAEMISION));
+//					UtilidadesHash.set(hAsiento, "CONCEPTO", 		concepto);
+//					UtilidadesHash.set(hAsiento, "DOCUMENTO", 		UtilidadesHash.getString(hash, "NUMEROFACTURA"));
+//					UtilidadesHash.set(hAsiento, "CUENTA", 		asientoIVA);
+//					UtilidadesHash.set(hAsiento, "DEBE", 			"0");
+//					
+//					if (!ivacero) 
+//						UtilidadesHash.set(hAsiento, "HABER", 			importeIva);
+//					//MJM se hace un apunte con importe IVA 0 si no tiene IVA 
+//					//Esto es por la incidencia R1502_0055:
+//					//en la exportación de datos a contaplus no se tienen en cuenta las fac. con IVA 0 sino existe
+//					//asiento de IVA.
+//					else
+//						UtilidadesHash.set(hAsiento, "HABER", 			"0");
+//					
+//					UtilidadesHash.set(hAsiento, "BASEIMPONIBLE", 	imp);
+//					UtilidadesHash.set(hAsiento, "IVA", 			valorIva);
+//					UtilidadesHash.set(hAsiento, "CONTRAPARTIDA", 	asientoClientes);
+//					pwcontabilidad.write(this.generarLineaAbono(asiento, hAsiento));
+//				
+//					
+//					///////////////////////////////
+//					
+//					
+//					// ACTUALIZACION DE CONTABILIZADA
+//					if (!idFactura.equals(idFacturaAnt)) {
+//					    // Modificamos solamente cuando cambia la factura
+//					    
+//						laHash = new Hashtable();
+//						laHash.put("CONTABILIZADA",ClsConstants.FACTURA_ABONO_CONTABILIZADA);
+//						laHash.put("IDINSTITUCION",this.usrbean.getLocation());
+//						laHash.put("IDFACTURA",hash.get("IDFACTURA"));
+//						laHash.put("USUMODIFICACION",this.usrbean.getUserName());
+//						laHash.put("FECHAMODIFICACION","sysdate");
+//						
+//						vAsiento1.add(laHash);
+//						idFacturaAnt = idFactura;
+//					}
+//				}
+//				if(vAsiento1.size()>0){
+//					String contabilizada=(String)((Hashtable)vAsiento1.get(0)).get("CONTABILIZADA");
+//					String usuModificacion=(String)((Hashtable)vAsiento1.get(0)).get("USUMODIFICACION");
+//					String fechaModificacion=(String)((Hashtable)vAsiento1.get(0)).get("FECHAMODIFICACION");
+//					
+//					String sqlUpdate="UPDATE "+FacFacturaBean.T_NOMBRETABLA+" SET "+FacFacturaBean.C_CONTABILIZADA+"='"+contabilizada+"', "+FacFacturaBean.C_USUMODIFICACION+"="+usuModificacion+", "+FacFacturaBean.C_FECHAMODIFICACION+"="+fechaModificacion;
+//					int con = 0;
+//					tx.begin();
+//					for(int l = 0; l < vAsiento1.size(); l++){
+//					    con++;
+//					    if (con%numeroTransaccion==0) {
+//					        tx.commit();
+//					        tx.begin();
+//					    }
+//						String claves = (String)((Hashtable)vAsiento1.get(l)).get("IDFACTURA");
+//						Hashtable codigosUpdate = new Hashtable();
+//						codigosUpdate.put(new Integer(1),this.usrbean.getLocation());
+//						codigosUpdate.put(new Integer(2),claves);
+//						facturaAdm.insertSQLBind(sqlUpdate +" WHERE IDINSTITUCION=:1 AND IDFACTURA=:2",codigosUpdate);
+//					}
+//					tx.commit();
+//					
+//					
+//				}
+				//return datosExcel;
+			}
+			catch (Exception e) 
+			{
+//				pwcontabilidad.write("Error en asiento1: " + e.getMessage());
+//				try { tx.rollback(); } catch (Exception ee) {}
+//			    throw new ClsExceptions(e,"Error al generar asiento 1");
+			}
+			return datosExcel;
+		}
+		
+	//FIN fACTURAS
+	
+
+	//FIN METODOS FICHERO CONTABILIDAD
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -5300,7 +5591,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		ResponseFileDTO response = new ResponseFileDTO();
 		File excel = null;
-		String  etiquetasArray = null ;
 		List<Map<String, Object>> result = null;
 
 		if (null != idInstitucion) {
@@ -5319,8 +5609,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
-				
-				etiquetasArray = etiquetas.getIdSerieFacturacion();
 
 				String sentencia = selectColegiados(idInstitucion,etiquetas.getIdSerieFacturacion(), usuario.getIdlenguaje());
 
