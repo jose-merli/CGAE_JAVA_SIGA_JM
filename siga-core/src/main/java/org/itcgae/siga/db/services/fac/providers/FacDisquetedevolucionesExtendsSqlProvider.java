@@ -95,4 +95,14 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		return sql.toString();
 	}
 
+	public String getNextIdDisqueteDevoluciones(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("(NVL(MAX(dd.IDDISQUETEDEVOLUCIONES),0) + 1)");
+		sql.FROM("FAC_DISQUETEDEVOLUCIONES dd");
+		sql.WHERE("dd.idinstitucion = " + idInstitucion);
+
+		return sql.toString();
+	}
+
 }

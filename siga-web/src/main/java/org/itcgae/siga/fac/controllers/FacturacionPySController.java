@@ -784,8 +784,11 @@ public class FacturacionPySController {
 		try {
 			response = this.facturacionService.nuevoFicheroAdeudos(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
+		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -798,15 +801,18 @@ public class FacturacionPySController {
 		try {
 			response = this.facturacionService.nuevoFicheroDevoluciones(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
+		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PostMapping(value = "/eliminarFicheroDevoluciones")
 	ResponseEntity<DeleteResponseDTO> eliminarFicheroDevoluciones(@RequestBody FicherosDevolucionesItem item,
-															 HttpServletRequest request) {
+																  HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
@@ -815,8 +821,7 @@ public class FacturacionPySController {
 		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -861,8 +866,7 @@ public class FacturacionPySController {
 		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

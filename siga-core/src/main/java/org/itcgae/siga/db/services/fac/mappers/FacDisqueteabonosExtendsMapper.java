@@ -30,7 +30,8 @@ public interface FacDisqueteabonosExtendsMapper extends FacDisqueteabonosMapper 
 		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "totalimporte", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "propSEPA", property = "propSEPA", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "propOtros", property = "propOtros", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "propOtros", property = "propOtros", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fcs", property = "fcs", jdbcType = JdbcType.BOOLEAN)
 	})
 	List<FicherosAbonosItem> getFicherosTransferencias(FicherosAbonosItem item, String idInstitucion, String idioma);
 
