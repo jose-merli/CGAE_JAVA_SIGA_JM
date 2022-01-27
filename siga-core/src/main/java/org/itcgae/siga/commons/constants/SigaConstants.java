@@ -1184,6 +1184,18 @@ public class SigaConstants {
 	public static final String BASEIMP = "facturacion.exportacionesyotros.contabilidad.baseimp";
 	public static final String TIPOIVA = "facturacion.facturas.lineas.tipoIVA";
 	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
+	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
+	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO3		= "general.literal.asiento3"; 	    // Pago por caja. Factura 
+	public static final String CONCEPTO_ASIENTO3_2		= "general.literal.asiento3_2"; 	// Pago Anticipado. Factura 
+	public static final String CONCEPTO_ASIENTO4		= "general.literal.asiento4"; 	    // Pago por banco. Factura 
+	public static final String CONCEPTO_ASIENTO5		= "general.literal.asiento5"; 	    // Devolucion por banco. Factura Nº
+	public static final String CONCEPTO_ASIENTO6		= "general.literal.asiento6"; 	    // Pago por caja. Factura Rectificativa Nº 
+	public static final String CONCEPTO_ASIENTO7		= "general.literal.asiento7"; 	    // Pago por banco. Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO10		= "general.literal.asiento3_1";     // Pago por tarjeta. Factura
+	public static final String CONCEPTO_ASIENTO3_2010   = "general.literal.asiento3_2010";  // Compensación por caja
+	public static final String CONCEPTO_ASIENTO14		= "general.literal.asiento14";      // Alta de anticipos 
+	public static final String CONCEPTO_ASIENTO15		= "general.literal.asiento15";      // Liquidación de anticipos de Letrado por Baja Colegial
 	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, C_IDGRUPO, GENERAL,
 			ACCION, C_FECHAINICIO);
@@ -1543,5 +1555,23 @@ public class SigaConstants {
 	//Expedientes - FIN
 
     public static final String PARAMETRO_LOG_COLALETRADOS_LEVEL = "log.colaLetrados.level";
+
+    public enum FASES_PROCESO_FACTURACION_AUTOMATICA_PYS {
+        TRATAR_FACTURACION("1"),
+        TRATAR_CONFIRMACION("2"),
+        GENERAR_PDFS_Y_ENVIAR_FACTURAS_PROGRAMACION("3"),
+        GENERAR_ENVIOS_FACTURAS_PENDIENTES("4"),
+        COMPROBACION_TRASPASO_FACTURAS("5");
+
+        private String codigo;
+
+        FASES_PROCESO_FACTURACION_AUTOMATICA_PYS(String codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getCodigo() {
+            return this.codigo;
+        }
+    }
 
 }

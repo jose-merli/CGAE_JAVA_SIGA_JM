@@ -110,7 +110,7 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 		sql.SELECT(" P.CONFDEUDOR");
 		sql.SELECT(" P.CONFINGRESOS");
 		sql.SELECT(" P.CTAINGRESOS");
-		sql.SELECT(" P.CONFDEUDOR");
+		sql.SELECT(" P.CTACLIENTES");
 		
 		sql.FROM(" FAC_FACTURA F");
 		sql.FROM(" FAC_LINEAFACTURA L");
@@ -132,6 +132,70 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 		if(facRegistroFichConta.getFechahasta() != null) {
 			String fechaExportacionHasta = dateFormat.format(facRegistroFichConta.getFechahasta());
 			sql.WHERE("TRUNC(F.FECHAEMISION) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
+		}
+		
+		sql.ORDER_BY("1");
+
+		LOGGER.info(sql.toString());
+		return sql.toString();
+		
+	}
+	
+	public String obtenerAbonos(FacRegistrofichconta facRegistroFichConta) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" to_number(a.idabono) idabono");
+		sql.SELECT(" a.numeroabono");
+		sql.SELECT(" a.idpersona");
+		sql.SELECT(" a.fecha");
+		sql.SELECT(" -1 * la.cantidad * la.preciounitario AS impneto");
+		sql.SELECT(" -1 * round(la.cantidad * la.preciounitario * la.iva / 100, 2) AS impiva");
+		sql.SELECT(" la.iva");
+		sql.SELECT(" la.descripcionlinea AS descripcion");
+		sql.SELECT(" l.ctaproductoservicio");
+		sql.SELECT(" l.ctaiva");
+		sql.SELECT(" f.numerofactura");
+		sql.SELECT(" DECODE(f.idpersonadeudor, NULL, f.idpersona, f.idpersonadeudor) AS idpersona");
+		sql.SELECT(" d.devuelta");
+		sql.SELECT(" p.confdeudor");
+		sql.SELECT(" p.confingresos");
+		sql.SELECT(" p.ctaingresos");
+		sql.SELECT(" p.ctaclientes");
+		sql.SELECT(" f.imptotalpagadoporbanco");
+		sql.SELECT(" f.imptotalpagadoporcaja");
+		sql.SELECT(" (SELECT bancos_codigo FROM fac_disquetecargos WHERE idinstitucion = d.idinstitucion AND iddisquetecargos = d.iddisquetecargos) AS bancos_codigo");
+		
+		sql.FROM(" fac_abono a");
+		sql.FROM(" fac_factura f");
+		sql.FROM(" fac_lineaabono la");
+		sql.FROM(" fac_lineafactura l");
+		sql.FROM(" fac_facturacionprogramada p");
+		sql.FROM(" fac_facturaincluidaendisquete d");
+		
+		sql.WHERE(" a.idinstitucion = f.idinstitucion");
+		sql.WHERE(" a.idfactura = f.idfactura");
+		sql.WHERE(" a.idinstitucion = la.idinstitucion");
+		sql.WHERE(" a.idabono = la.idabono");
+		sql.WHERE(" la.idinstitucion = l.idinstitucion (+)");
+		
+		sql.WHERE(" la.idfactura = l.idfactura (+)");
+		sql.WHERE(" la.lineafactura = l.numerolinea (+)");
+		sql.WHERE(" f.idinstitucion = p.idinstitucion");
+		sql.WHERE(" f.idseriefacturacion = p.idseriefacturacion");
+		sql.WHERE(" f.idprogramacion = p.idprogramacion (+)");
+		sql.WHERE(" f.idfactura = d.idfactura (+)");
+		sql.WHERE(" f.idinstitucion = d.idinstitucion (+)");
+		sql.WHERE(" a.idpagosjg IS NULL");
+		sql.WHERE(" a.IDINSTITUCION = " + facRegistroFichConta.getIdinstitucion());
+		
+		if(facRegistroFichConta.getFechadesde() != null) {
+			String fechaExportacionDesde = dateFormat.format(facRegistroFichConta.getFechadesde());
+			sql.WHERE("TRUNC(a.FECHA) >= TO_DATE('" + fechaExportacionDesde + "', 'DD/MM/RRRR')");
+		}
+		
+		if(facRegistroFichConta.getFechahasta() != null) {
+			String fechaExportacionHasta = dateFormat.format(facRegistroFichConta.getFechahasta());
+			sql.WHERE("TRUNC(a.FECHA) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
 		
 		sql.ORDER_BY("1");
