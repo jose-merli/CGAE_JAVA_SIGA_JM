@@ -1414,9 +1414,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
         cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
 
-        //Si el tipo de solicitud es Ejerciente o No Ejerciente, insertamos el tipo direccion Despacho
-        if(TipoColegiacionType.E.equals(tipoColegiacion)
-            || TipoColegiacionType.N.equals(tipoColegiacion)){
+        //Si el tipo de solicitud es Ejerciente o Reincorporacion Ejerciente, insertamos el tipo direccion Despacho
+        if(TipoColegiacionType.E.equals(tipoColegiacion)){
 
             LOGGER.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() / Es ejerciente o no ejerciente, insertamos tipo direccion Despacho");
             tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
