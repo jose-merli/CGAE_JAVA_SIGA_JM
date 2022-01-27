@@ -2260,10 +2260,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				String idPropositoSEPA = getParametro("FAC", "PROPOSITO_TRANSFERENCIA_SEPA", usuario.getIdinstitucion());
 				String idPropositoOtros = getParametro("FAC", "PROPOSITO_OTRA_TRANSFERENCIA", usuario.getIdinstitucion());
 
+				/*
 				if (idPropositoSEPA.equals(""))
 					idPropositoSEPA = getParametro("FAC", "PROPOSITO_TRANSFERENCIA_SEPA", Short.parseShort("0"));
 				if (idPropositoOtros.equals(""))
 					idPropositoOtros = getParametro("FAC", "PROPOSITO_OTRA_TRANSFERENCIA",  Short.parseShort("0"));
+				 */
 
 				// Propósito SEPA
 				if (!UtilidadesString.esCadenaVacia(idPropositoSEPA)) {
@@ -2333,21 +2335,22 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				String idPropositoOtros = banco.getPropOtros();
 
 
-				if (idSufijo == null) {
+				if (bancosCodigo != null && idSufijo != null && idPropositoSEPA != null && idPropositoOtros != null) {
+					// Se agrupan los abonos de la petición por su banco y sufijo
+					List<FacAbono> abonosBanco = facAbonoExtendsMapper.getAbonosBancoSjcs(usuario.getIdinstitucion(), bancosCodigo, idSufijo,
+							abonoItems.stream().map(a -> a.getIdAbono()).collect(Collectors.toList()));
+
+					if (abonosBanco != null && !abonosBanco.isEmpty()) {
+						int resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, idPropositoSEPA, idPropositoOtros, usuario);
+
+						if (resultado == -1) {
+							throw new BusinessException("general.mensaje.error.bbdd");
+						}
+					}
+				} else {
 					throw new BusinessException("facturacion.ficheroBancarioTransferencias.errorSufijosSerie.mensajeCondicionesIncumplidas");
 				}
 
-				// Se agrupan los abonos de la petición por su banco y sufijo
-				List<FacAbono> abonosBanco = facAbonoExtendsMapper.getAbonosBancoSjcs(usuario.getIdinstitucion(), bancosCodigo, idSufijo,
-						abonoItems.stream().map(a -> a.getIdAbono()).collect(Collectors.toList()));
-
-				if (abonosBanco != null && !abonosBanco.isEmpty()) {
-					int resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, idPropositoSEPA, idPropositoOtros, usuario);
-
-					if (resultado == -1) {
-						throw new BusinessException("general.mensaje.error.bbdd");
-					}
-				}
 			}
 
 		}
@@ -3914,7 +3917,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		LOGGER.info("nuevoFicheroDevoluciones() -> Entrada al servicio para crear un fichero de devoluciones");
 
-		if (usuario != null && ficherosDevolucionesItem != null) {
+		boolean servicioGeneracionLibre = nuevoFicheroDevolucionesAsyncService.isAvailable();
+		if (usuario != null && ficherosDevolucionesItem != null && servicioGeneracionLibre) {
 			String rutaServidor = getProperty("facturacion.directorioFisicoDevolucionesJava") + getProperty("facturacion.directorioDevolucionesJava");
 			String rutaOracle = getProperty("facturacion.directorioDevolucionesOracle");
 
@@ -3942,11 +3946,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			boolean conComision = ficherosDevolucionesItem.getConComision() != null ? ficherosDevolucionesItem.getConComision() : false;
 
 			// Iniciamos la generación del fichero en un nuevo hilo
-			if (!nuevoFicheroDevolucionesAsyncService.isAvailable()) {
-				nuevoFicheroDevolucionesAsyncService.nuevoFicheroDevoluciones(idDisqueteDevoluciones, nombreFichero, rutaOracle, rutaServidor, conComision, usuario);
-			} else {
-				throw new BusinessException("facturacionPyS.ficherosDevoluciones.error.generando");
-			}
+			nuevoFicheroDevolucionesAsyncService.nuevoFicheroDevoluciones(idDisqueteDevoluciones, nombreFichero, rutaOracle, rutaServidor, conComision, usuario);
+
+		} else if (!servicioGeneracionLibre) {
+			throw new BusinessException("facturacionPyS.ficherosDevoluciones.error.generando");
 		}
 
 		LOGGER.info("nuevoFicheroDevoluciones() -> Salida del servicio para crear un fichero de devoluciones");

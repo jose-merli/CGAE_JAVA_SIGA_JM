@@ -91,7 +91,7 @@ public class NuevoFicheroDevolucionesAsyncServiceImpl implements INuevoFicheroDe
 
     @Override
     public boolean isAvailable() {
-        return NuevoFicheroDevolucionesAsyncServiceImpl.GENERACION_EN_PROCESO.get();
+        return !NuevoFicheroDevolucionesAsyncServiceImpl.GENERACION_EN_PROCESO.get();
     }
 
     @Override
@@ -103,7 +103,6 @@ public class NuevoFicheroDevolucionesAsyncServiceImpl implements INuevoFicheroDe
 
         if (NuevoFicheroDevolucionesAsyncServiceImpl.GENERACION_EN_PROCESO.compareAndSet(false, true)) {
             LOGGER.info("nuevoFicheroDevoluciones() -> Iniciando servicio en background para la generación de fichero de devoluciones");
-            Thread.sleep(30000);
 
             try {
                 // Presentación del fichero de devoluciones
