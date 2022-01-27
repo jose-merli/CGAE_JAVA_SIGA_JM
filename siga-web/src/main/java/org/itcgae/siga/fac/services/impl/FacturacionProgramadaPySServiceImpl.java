@@ -6,11 +6,10 @@ import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaExtendsDTO;
 import org.itcgae.siga.DTO.fac.FacFicherosDescargaBean;
 import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.FASES_PROCESO_FACTURACION_AUTOMATICA_PYS;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGALogging;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmInforme;
-import org.itcgae.siga.db.entities.AdmInformeExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -26,7 +25,6 @@ import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
-import org.itcgae.siga.db.mappers.AdmInformeMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
 import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
@@ -47,12 +45,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +63,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
     private static final String TRASPASO_FACTURAS_WS_ACTIVO = "TRASPASO_FACTURAS_WS_ACTIVO";
     private static final String MESSAGES_FACTURACION_CONFIRMACION_ERROR = "messages.facturacion.confirmacion.error";
     private static final String PROC_PAGOS_BANCO = "{call PKG_SIGA_CARGOS.PRESENTACION(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-    private static final String PROC_GENERACION_FACTURACION = "{call PKG_SIGA_FACTURACION.GENERACIONFACTURACION(?,?,?,?,?,?,?,?)}";
     private static final String PROC_CONFIRMACION_FACTURACION = "{call PKG_SIGA_FACTURACION.CONFIRMACIONFACTURACION(?,?,?,?,?,?,?,?)}";
     private static final String COD_OK = "0";
     private static final String COD_FACTURACION_CONFIRMACION_ERROR_PDF = "-208";
@@ -79,19 +73,8 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
     private static final String FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION = "facturacion.directorioFisicoLogProgramacion";
     private static final String LOG_XLS = ".log.xls";
     private static final String LOG_FAC_CONFIRMACION_PREFIX = "LOG_FAC_CONFIRMACION_";
-    private static final String TXT_ERR_NO_SE_HA_PODIDO_FACTURAR_NADA = "No se ha podido facturar nada. Compruebe la configuracion y el periodo indicado";
-    private static final String TIPO_ADM_INFORME_PREV = "PREV";
-    private static final Short DEFAULT_INSTITUCION = 0;
-    private static final String PROP_FACTURACION_DIRECTORIO_FISICO_PREVISIONES_JAVA = "facturacion.directorioFisicoPrevisionesJava";
-    private static final String PROP_FACTURACION_DIRECTORIO_PREVISIONES_JAVA = "facturacion.directorioPrevisionesJava";
-    private static final String LOG_FAC_SUFFIX = LOG_XLS;
-    private static final String LOG_FAC_PREFIX = "LOG_FAC";
-    private static final String FACTURACION_NUEVA_PREVISION_FACTURACION_MENSAJE_GENERACION_FICHERO_ERROR = "facturacion.nuevaPrevisionFacturacion.mensaje.generacionFicheroERROR";
     private static final String PROP_SIGA_JTA_TIMEOUT_PESADA = "siga.jta.timeout.pesada";
     private static final Integer DEFAULT_SIGA_JTA_TIMEOUT_PESADA = 2400;
-    private static final int CHUNK_SIZE = 10;
-    private static final String PROP_FACTURACION_PROGRAMACION_AUTOMATICA_MAX_MINUTOS_EN_EJECUCION = "facturacion.programacionAutomatica.maxMinutosEnEjecucion";
-    private static final Double DEFAULT_FACTURACION_PROGRAMACION_AUTOMATICA_MAX_MINUTOS_EN_EJECUCION = 120.0 / (24.0 * 60.0);
     private static final Integer USUARIO_AUTO = 0;
     private static final String DEFAULT_LENGUAJE = "1";
     private static final String[] CODIGOS_ERROR_FORMATO = {"-201", "-202", "-203", "-204"};
@@ -117,9 +100,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
     @Autowired
     private WSCommons wsCommons;
-
-    @Autowired
-    private AdmInformeMapper adInformeMapper;
 
     @Autowired
     private EcomColaMapper ecomColaMapper;
@@ -151,38 +131,37 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
     private Function<String, Boolean> s10ToBool = v -> v.equals("1") ? true : false;
     private Function<Boolean, String> boolToSN = v -> v ? "S" : "N";
 
+    private final String sNombreProceso = "ProcesoAutomaticoFacturacion";
+
     @Override
     public void ejecutaProcesoFacturacionPyS() {
-        /* la clase de referencia en SIGA Clásico es  com.siga.servlets.SIGASvlProcesoFacturacion */
-        Double tiempoMaximoEjecucion = getMaxMinutosEnEjecucion();
-        List<FacFacturacionprogramada> lFac = facProgMapper.getListaNFacturacionesProgramadasProcesar(CHUNK_SIZE,
-                tiempoMaximoEjecucion);
 
-        List<FacFacturacionprogramada> lFacConfirmar = facProgMapper.getListaNConfirmarFacturacionesProgramadas(CHUNK_SIZE);
+        try {
 
-        // estos "for" son temporales, hay que "mezclar" la ejecución de distintos estados de la facturación
-        // para que el funcionamiento sea similar al descrito en el DF.
-        for (FacFacturacionprogramada fac : lFac) {
-            tratarFacturacion(fac);
-        }
-        for (FacFacturacionprogramada fac : lFacConfirmar) {
-            tratarConfirmacion(fac);
-        }
+            ProcesoFacPyS procesoFacPyS = null;
 
-        /* lo mismo con
-         * 	generarPDFsYenviarFacturasProgramacion (reutiliza generarPdfEnvioProgramacionFactura)
-         *  generarEnviosFacturasPendientes
-         *  comprobacionTraspasoFacturas
-         * */
+            for (FASES_PROCESO_FACTURACION_AUTOMATICA_PYS fase : FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.values()) {
 
-        //TODO HAY QUE HACER TODO LO ANTERIOR POR CADA INSTITUCION
+                if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.TRATAR_FACTURACION.getCodigo())) {
+                    procesoFacPyS = new ProTratarFacturacion();
+                } else if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.TRATAR_CONFIRMACION.getCodigo())) {
+                    procesoFacPyS = new ProTratarConfirmacion();
+                } else if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.GENERAR_PDFS_Y_ENVIAR_FACTURAS_PROGRAMACION.getCodigo())) {
+                    procesoFacPyS = new ProGenerarPDFsYenviarFacturasProgramacion();
+                } else if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.GENERAR_ENVIOS_FACTURAS_PENDIENTES.getCodigo())) {
+                    procesoFacPyS = new ProGenerarEnviosFacturasPendientes();
+                } else if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.COMPROBACION_TRASPASO_FACTURAS.getCodigo())) {
+                    procesoFacPyS = new ProComprobacionTraspasoFacturas();
+                }
 
-        List<CenInstitucion> listaInstituciones = obtenerInstitucionesAlta();
+                procesoFacPyS.ejecutar();
 
-        for (CenInstitucion institucion : listaInstituciones) {
+            }
 
-            generarPDFsYenviarFacturasProgramacion(institucion.getIdinstitucion(), tiempoMaximoEjecucion);
-
+        } catch (Exception e) {
+            LOGGER.error("ERROR en proceso facturacion automatica");
+            LOGGER.error(" - Notificacion \"" + sNombreProceso + "\" ejecutada ERROR. : " + e.toString());
+            e.printStackTrace();
         }
 
     }
@@ -231,15 +210,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
             LOGGER.error("Error general al confirmar facturas (Proceso automatico) INSTITUCION: " + idInstitucion, e);
         }
 
-    }
-
-    private List<CenInstitucion> obtenerInstitucionesAlta() {
-
-        CenInstitucionExample cenInstitucionExample = new CenInstitucionExample();
-        cenInstitucionExample.setDistinct(true);
-        cenInstitucionExample.createCriteria().andFechaenproduccionIsNotNull();
-
-        return instMapper.selectByExample(cenInstitucionExample);
     }
 
     private void tratarConfirmacion(FacFacturacionprogramada fac) {
@@ -896,38 +866,6 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
         mInstituciones = lInst.stream().collect(Collectors.toMap(i -> i.getIdinstitucion(), i -> i));
     }
 
-    public void tratarFacturacionRapida(FacFacturacionprogramada fac /* habría que parametrizar el usuario que realiza la fact. rápida*/) {
-
-    }
-
-    private void tratarFacturacion(FacFacturacionprogramada fac) {
-        marcaEjecutandoGeneracion(fac);
-        generarFacturacion(fac);
-
-    }
-
-    private void generarFacturacion(FacFacturacionprogramada fac) {
-        String resultado[] = null;
-        TransactionStatus transactionStatus = getNewLongTransaction();
-        try {
-            resultado = llamadaProcGenerarFacturacion(fac, transactionStatus);
-        } catch (Exception e) {
-            rollBack(transactionStatus);
-        }
-
-        finalizaTransaccion(transactionStatus);
-    }
-
-    private void finalizaTransaccion(TransactionStatus transactionStatus) {
-        if (!transactionStatus.isCompleted()) {
-            if (transactionStatus.isRollbackOnly()) {
-                rollBack(transactionStatus);
-            } else {
-                commit(transactionStatus);
-            }
-        }
-    }
-
     private TransactionStatus getNewLongTransaction() {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setTimeout(getTimeoutLargo());
@@ -946,285 +884,14 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
         return idLenguaje;
     }
 
-    private String[] llamadaProcGenerarFacturacion(FacFacturacionprogramada fac, TransactionStatus transactionPrincipal)
-            throws Exception {
-        String[] resultado = null;
-        Object[] param_in = generaParametrosGeneracion(fac);
-
-        try {
-            resultado = wsCommons.callPLProcedureFacturacionPyS(
-                    PROC_GENERACION_FACTURACION, 2, param_in);
-
-        } catch (Exception e) {
-            tratarExcepcionEnLlamadaGeneracion(fac, e);
-        }
-
-        tratarResultadoProcGenerarFacturacion(fac, resultado, transactionPrincipal);
-
-        return resultado;
-    }
-
-    private void logResultadoError(FacFacturacionprogramada fac) {
-        LOGGER.error("### Fin GENERACION (Serie:" + fac.getIdseriefacturacion() + "; IdProgramacion:" + fac.getIdprogramacion() + "), finalizada con errores");
-    }
-
     private String getMensaje(String clave, Short idInstitucion) {
         String mensaje = null;
         return mensaje;
     }
 
-    private void tratarResultadoProcGenerarFacturacion(FacFacturacionprogramada fac, String[] resultado, TransactionStatus transactionPrincipal) {
-        String codretorno = resultado[0];
-        if (Arrays.asList(CODIGOS_ERROR_FORMATO).contains(codretorno)) {
-            throw new BusinessException(resultado[1]);
-
-        } else if (!codretorno.equals(COD_OK)) {
-            logResultadoError(fac);
-            String msgExc = msgErr(fac, codretorno);
-            throw new BusinessException(msgExc);
-
-        } else {
-            LOGGER.info("### Fin GENERACION (Serie:" + fac.getIdseriefacturacion() + "; IdProgramacion:" + fac.getIdprogramacion() + "), finalizada correctamente");
-
-            /** ACTUALIZAMOS ESTADO A GENERADA **/
-            actualizarAGenerada(fac);
-            commit(transactionPrincipal);
-
-
-            /****** INICIAMOS LA GENERACION DEL INFORME *******/
-            try {
-                LOGGER.info("### Inicio datosInforme GENERACION");
-                String nombreFichero = "GENERACION_" + fac.getIdseriefacturacion() + "_" + fac.getIdprogramacion();
-                String nameFile = generarInformesGeneracion(fac);
-                // Si la previsón está vacía
-                if (nameFile == null || nameFile.length() == 0) {
-                    LOGGER.info("### Inicio creación fichero log GENERACION sin datos");
-                    controlarEstadoErrorGeneracion(transactionPrincipal, fac, nombreFichero, FacEstadosFacturacion.GENERADA, null);
-                    LOGGER.info("### Fin creación fichero log GENERACION sin datos");
-
-                } else {
-                    LOGGER.info("### GENERACION finalizada correctamente con datos ");
-                    actualizarNombreFichero(fac, nameFile);
-                }
-            } catch (Exception e) {
-                LOGGER.error("### Excepcion " + e.getMessage());
-                String msgExc = msgErr(fac, e.getMessage());
-                throw new BusinessException(msgExc);
-            }
-        }
-
-    }
-
-    private void controlarEstadoErrorGeneracion(TransactionStatus transactionPrincipal, FacFacturacionprogramada fac,
-                                                String nombreFichero, FacEstadosFacturacion estadoFin, String mensaje) {
-        fac.setIdestadoconfirmacion(estadoFin.getId());
-        fac.setLogerror(LOG_FAC_PREFIX + nombreFichero + LOG_FAC_SUFFIX);
-        LOGGER.info("### GESTION ERROR GENERACION  ####");
-        LOGGER.info("### CAMBIANDO A ESTADO: " + estadoFin);
-        try {
-            facProgMapper.updateByPrimaryKey(fac);
-            logErrorFacturacion(fac);
-        } catch (Exception e) {
-            throw new BusinessException("### Error al actualizar el nombre del fichero de la GENERACION.", e);
-        }
-
-    }
-
-    private void logErrorFacturacion(FacFacturacionprogramada fac) throws Exception {
-        String pathFichero = getProperty(FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION);
-        Path pLog = Paths.get(pathFichero).resolve(fac.getIdinstitucion().toString()).resolve(fac.getLogerror());
-        Files.deleteIfExists(pLog);
-        try (PrintWriter log = new PrintWriter(pLog.toFile())) {
-            log.println(TXT_ERR_NO_SE_HA_PODIDO_FACTURAR_NADA);
-        } catch (Exception e) {
-            throw new BusinessException("Error al crear el fichero de log:" + pLog, e);
-        }
-    }
-
-    private void actualizarNombreFichero(FacFacturacionprogramada fac, String namefile) {
-        LOGGER.info("### GENERACION finalizada correctamente con datos ");
-        fac.setNombrefichero(namefile);
-        fac.setLogerror(null);
-        try {
-            facProgMapper.updateByPrimaryKey(fac);
-        } catch (Exception e) {
-            throw new BusinessException("### Error al actualizar el nombre del fichero de la GENERACION.");
-        }
-
-    }
-
-    private String generarInformesGeneracion(FacFacturacionprogramada fac) throws Exception {
-        String nameFile = null;
-        List<String> nameFiles = new ArrayList<String>();
-        Short idInstitucion = fac.getIdinstitucion();
-        Long idSerieFacturacion = fac.getIdseriefacturacion();
-        Long idprogramacion = fac.getIdprogramacion();
-
-        String nombreFichero = "GENERACION_" + idSerieFacturacion + "_" + idprogramacion;
-        String dirPrevisiones = getProperty(PROP_FACTURACION_DIRECTORIO_PREVISIONES_JAVA);
-        String sRutaFisicaJava = getProperty(PROP_FACTURACION_DIRECTORIO_FISICO_PREVISIONES_JAVA);
-        String sRutaJava = Paths.get(sRutaFisicaJava, dirPrevisiones, idInstitucion.toString()).toString();
-
-        List<AdmInforme> lInformes = getListaInformes();
-        for (AdmInforme admInforme : lInformes) {
-            nameFiles.add(generarInformeGeneracion(sRutaJava, nombreFichero, admInforme, fac));
-        }
-
-        if (nameFiles.size() > 0) {
-            nameFile = nameFiles.get(0);
-        } else {
-            nameFile = generaFicheroError(sRutaJava, nombreFichero);
-        }
-
-        return nameFile;
-    }
-
-    private String generaFicheroError(String sRutaJava, String nombreFichero) throws Exception {
-        Path pLog = Paths.get(sRutaJava).resolve(nombreFichero + ".XLS");
-        Files.deleteIfExists(pLog);
-        try (PrintWriter log = new PrintWriter(pLog.toFile())) {
-            log.println(TXT_ERR_NO_SE_HA_PODIDO_FACTURAR_NADA);
-        } catch (Exception e) {
-            throw new BusinessException("Error al crear el fichero de log:" + pLog, e);
-        }
-        return pLog.toFile().getName();
-    }
-
-    private String generarInformeGeneracion(String sRutaJava, String nombreFichero, AdmInforme admInforme,
-                                            FacFacturacionprogramada fac) {
-        // TODO: hay una llamada genérica a InformePersonalizable.generarInformeXLS. ¿procede?
-
-//			AdmInformeBean beanInforme = (AdmInformeBean) vInforme.get(dv);
-//
-//			ArrayList<HashMap<String, String>> filtrosInforme = new ArrayList<HashMap<String, String>>();
-//
-//			HashMap<String, String> filtro = new HashMap<String, String>();
-//			filtro.put(AdmTipoFiltroInformeBean.C_NOMBRECAMPO, "IDIOMA");
-//			filtro.put("VALOR", this.usrbean.getLanguageInstitucion().toString());
-//			filtrosInforme.add(filtro);
-//
-//			filtro = new HashMap<String, String>();
-//			filtro.put(AdmTipoFiltroInformeBean.C_NOMBRECAMPO, "IDSERIEFACTURACION");
-//			filtro.put("VALOR", idSerieFacturacion);
-//			filtrosInforme.add(filtro);
-//
-//			filtro = new HashMap<String, String>();
-//			filtro.put(AdmTipoFiltroInformeBean.C_NOMBRECAMPO, "IDPROGRAMACION");
-//			filtro.put("VALOR", idProgramacion);
-//			filtrosInforme.add(filtro);
-//
-//			filtro = new HashMap<String, String>();
-//			filtro.put(AdmTipoFiltroInformeBean.C_NOMBRECAMPO, "IDINSTITUCION");
-//			filtro.put("VALOR", idInstitucion);
-//			filtrosInforme.add(filtro);
-//
-//			beanInforme.setNombreSalida(nombreFichero);
-//
-//			ClsLogging.writeFileLog("### Inicio generaci�n fichero excel GENERACION", 7);
-//
-//			ArrayList<File> fichPrev = InformePersonalizable.generarInformeXLS(beanInforme, filtrosInforme, sRutaJava, this.usrbean);
-//
-//			ClsLogging.writeFileLog("### Fin generaci�n fichero excel GENERACION", 7);
-//
-//			if (fichPrev != null && fichPrev.size() > 0) {
-//				nameFile = fichPrev.get(0).getName();
-//			
-//			} else{
-//				//Generamos un fichero de Error
-//				File ficheroGenerado = null;
-//				BufferedWriter out;
-//				ficheroGenerado = new File (sRutaJava + File.separator + nombreFichero + ".xls");
-//				if (ficheroGenerado.exists())
-//					ficheroGenerado.delete();
-//				ficheroGenerado.createNewFile();
-//				out = new BufferedWriter(new FileWriter(ficheroGenerado));
-//				out.write("No se ha podido facturar nada. Compruebe la configuracion y el periodo indicado\t");
-//				out.close();	
-//				
-//				nameFile = ficheroGenerado.getName();
-//			}
-//		}
-//	}
-//
-//} catch (Exception e) {
-//	throw e;
-//}
-//
-        return null;
-
-    }
-
-    private List<AdmInforme> getListaInformes() {
-        AdmInformeExample ex = new AdmInformeExample();
-        ex.createCriteria().andIdtipoinformeLike(TIPO_ADM_INFORME_PREV).andIdinstitucionEqualTo(DEFAULT_INSTITUCION);
-        return adInformeMapper.selectByExample(ex);
-    }
-
-    private void actualizarAGenerada(FacFacturacionprogramada fac) {
-        LOGGER.info("### CAMBIANDO A ESTADO GENERADA ");
-        TransactionStatus newTransactionStatus = transactionManager.getTransaction(null);
-        try {
-            fac.setIdestadoconfirmacion(FacEstadosFacturacion.GENERADA.getId());
-            fac.setLogerror(null);
-            facProgMapper.updateByPrimaryKey(fac);
-            commit(newTransactionStatus);
-        } catch (Exception e) {
-            transactionManager.rollback(newTransactionStatus);
-            throw new BusinessException("### Error al actualizar el estado de la GENERACION.");
-        }
-    }
-
-    private String msgErr(FacFacturacionprogramada fac, String coderror) {
-        return getMensaje(FACTURACION_NUEVA_PREVISION_FACTURACION_MENSAJE_GENERACION_FICHERO_ERROR, fac.getIdinstitucion()) + "(Serie:" + fac.getIdseriefacturacion() + "; IdProgramacion:" + fac.getIdprogramacion() + "; CodigoError:" + coderror + ")";
-    }
-
-    private void tratarExcepcionEnLlamadaGeneracion(FacFacturacionprogramada fac, Exception e) {
-        String txtLog = "### Fin GENERACION - ERROR TIMEOUT (Serie:" + fac.getIdseriefacturacion() + "; IdProgramacion:"
-                + fac.getIdprogramacion() + "), excepcion " + e.getMessage();
-        LOGGER.info(txtLog);
-        if (esTimeout(e)) {
-            throw new BusinessException(
-                    "TimedOutException al generar una Facturacion (Serie:" + fac.getIdseriefacturacion()
-                            + "; IdProgramacion:" + fac.getIdprogramacion() + "; CodigoError:" + e.getMessage() + ")");
-
-        } else {
-            throw new BusinessException("facturacion.nuevaPrevisionFacturacion.mensaje.procesoPlSQLERROR" + "(Serie:"
-                    + fac.getIdseriefacturacion() + "; IdProgramacion:" + fac.getIdprogramacion() + "; CodigoError:"
-                    + e.getMessage() + ")");
-        }
-    }
-
-    private boolean esTimeout(Exception e) {
-        return e.getMessage().indexOf("TimedOutException") != -1 || e.getMessage().indexOf("timed out") != -1;
-    }
-
-    private Object[] generaParametrosGeneracion(FacFacturacionprogramada fac) {
-        Object[] params = new Object[6];
-        params[0] = fac.getIdinstitucion();
-        params[1] = fac.getIdseriefacturacion();
-        params[2] = fac.getIdprogramacion();
-        params[3] = Integer.parseInt(getLenguajeInstitucion(fac.getIdinstitucion()));
-        params[4] = ""; // IdPeticion
-        params[5] = USUARIO_AUTO;
-        return params;
-    }
-
     private int getTimeoutLargo() {
         Integer time = getProperty(PROP_SIGA_JTA_TIMEOUT_PESADA, Integer::valueOf, DEFAULT_SIGA_JTA_TIMEOUT_PESADA);
         return time;
-    }
-
-    private void marcaEjecutandoGeneracion(FacFacturacionprogramada fac) {
-        fac.setIdestadoconfirmacion(FacEstadosFacturacion.EJECUTANDO_GENERACION.getId());
-        fac.setUsumodificacion(USUARIO_AUTO);
-        fac.setFechamodificacion(new Date());
-        facProgMapper.updateByPrimaryKey(fac);
-    }
-
-    private Double getMaxMinutosEnEjecucion() {
-        Double minutos = getProperty(PROP_FACTURACION_PROGRAMACION_AUTOMATICA_MAX_MINUTOS_EN_EJECUCION, Double::valueOf, DEFAULT_FACTURACION_PROGRAMACION_AUTOMATICA_MAX_MINUTOS_EN_EJECUCION);
-        minutos = minutos / (24.0 * 60.0);
-        return minutos;
     }
 
     private String getProperty(final String key) {
