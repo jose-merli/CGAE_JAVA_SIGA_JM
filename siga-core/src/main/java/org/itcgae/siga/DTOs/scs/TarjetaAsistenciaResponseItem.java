@@ -49,6 +49,7 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 	private String numFacturadas;
 	private boolean diaDespuesDisabled;
 	private String guardiaRequeridaValidacion;
+	private String idJuzgado;
 
 	public String getGuardiaRequeridaValidacion() {
 		return guardiaRequeridaValidacion;
@@ -611,7 +612,13 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 		this.delitos = delitos;
 	}
 
+	public String getIdJuzgado() {
+		return idJuzgado;
+	}
 
+	public void setIdJuzgado(String idJuzgado) {
+		this.idJuzgado = idJuzgado;
+	}
 
 	@Override
 	public int hashCode() {

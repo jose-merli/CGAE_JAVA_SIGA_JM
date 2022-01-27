@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -1171,12 +1172,37 @@ public class SigaConstants {
 	public static final String TIPO_CARGA = "GF";
 	public static final String C_FECHAINICIO = "FECHAINICIO";
 	public static final String C_FECHAFIN = "FECHAFIN";
-
+	
+	//FICHERO CONTABILIDAD
+	public static final String ASIENTO = "facturacion.exportacionesyotros.contabilidad.asiento";
+	public static final String FECHA = "facturacionSJCS.facturacionesYPagos.fecha";
+	public static final String CUENTA = "facturacion.exportacionesyotros.contabilidad.cuenta";
+	public static final String CONCEPTO = "facturacionSJCS.facturacionesYPagos.conceptos";
+	public static final String DOCUMENTO = "justiciaGratuita.ejg.documentacion.Documento";
+	public static final String DEBE = "facturacion.exportacionesyotros.contabilidad.debe";
+	public static final String HABER = "facturacion.exportacionesyotros.contabilidad.haber";
+	public static final String BASEIMP = "facturacion.exportacionesyotros.contabilidad.baseimp";
+	public static final String TIPOIVA = "facturacion.facturas.lineas.tipoIVA";
+	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
+	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
+	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO3		= "general.literal.asiento3"; 	    // Pago por caja. Factura 
+	public static final String CONCEPTO_ASIENTO3_2		= "general.literal.asiento3_2"; 	// Pago Anticipado. Factura 
+	public static final String CONCEPTO_ASIENTO4		= "general.literal.asiento4"; 	    // Pago por banco. Factura 
+	public static final String CONCEPTO_ASIENTO5		= "general.literal.asiento5"; 	    // Devolucion por banco. Factura Nº
+	public static final String CONCEPTO_ASIENTO6		= "general.literal.asiento6"; 	    // Pago por caja. Factura Rectificativa Nº 
+	public static final String CONCEPTO_ASIENTO7		= "general.literal.asiento7"; 	    // Pago por banco. Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO10		= "general.literal.asiento3_1";     // Pago por tarjeta. Factura
+	public static final String CONCEPTO_ASIENTO3_2010   = "general.literal.asiento3_2010";  // Compensación por caja
+	public static final String CONCEPTO_ASIENTO14		= "general.literal.asiento14";      // Alta de anticipos 
+	public static final String CONCEPTO_ASIENTO15		= "general.literal.asiento15";      // Liquidación de anticipos de Letrado por Baja Colegial
+	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, C_IDGRUPO, GENERAL,
 			ACCION, C_FECHAINICIO);
 
 	public static final List<String> CAMPOSLOGGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, PERSONANOMBRE,
 			C_IDPERSONA, C_IDGRUPO, GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO, ERRORES);
+	
 
 	public static final String tipoExcelXls = "xls";
 	public static final String tipoExcelXlsx = "xlsx";

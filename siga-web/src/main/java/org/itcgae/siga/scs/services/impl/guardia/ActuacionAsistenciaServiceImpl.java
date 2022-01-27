@@ -148,7 +148,9 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             if("SÍ".equals(actuacionAsistenciaItem.getValidada())){
                                 actuacionAsistenciaItem.setEstado("VALIDADA");
                             }
-
+                            if("1".equals(actuacionAsistenciaItem.getAnulada().toString())){
+                            	actuacionAsistenciaItem.setEstado("ANULADA");
+                            }
                             //Buscamos la última operacion hecha
                             actuacionAsistenciaItem.setUltimaModificacion(this.searchHistorico(request, anioNumero, idActuacion).getResponseItems().get(0));
 
@@ -521,6 +523,11 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         if("1".equals(scsActuacionasistencia.getValidada())){
                             tarjeta.setEstado("VALIDADA");
                         }
+                        if("1".equals(scsActuacionasistencia.getAnulacion().toString())){
+                            tarjeta.setEstado("ANULADA");
+                        }
+                        tarjeta.setAnulada(scsActuacionasistencia.getAnulacion().toString());
+                        tarjeta.setValidada(scsActuacionasistencia.getValidada());
                         datosJustificacion.add(tarjeta);
                     }
 

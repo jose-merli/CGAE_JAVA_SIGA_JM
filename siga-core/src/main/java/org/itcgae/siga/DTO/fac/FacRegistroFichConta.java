@@ -24,18 +24,14 @@ public class FacRegistroFichConta {
 	private String nombreEstado;
 	private boolean nuevo;
 	private Date fechaBaja;
+	private boolean historico;
 	
-	public Date getFechabaja() {
-		return fechaBaja;
+	
+	public boolean isHistorico() {
+		return historico;
 	}
-	public void setFechabaja(Date fechabaja) {
-		this.fechaBaja = fechabaja;
-	}
-	public String getNombreEstado() {
-		return nombreEstado;
-	}
-	public void setNombreEstado(String nombreEstado) {
-		this.nombreEstado = nombreEstado;
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
 	}
 	public int getIdContabilidad() {
 		return idContabilidad;
@@ -121,19 +117,31 @@ public class FacRegistroFichConta {
 	public void setEstado(int estado) {
 		this.estado = estado;
 	}
+	public String getNombreEstado() {
+		return nombreEstado;
+	}
+	public void setNombreEstado(String nombreEstado) {
+		this.nombreEstado = nombreEstado;
+	}
 	public boolean isNuevo() {
 		return nuevo;
 	}
 	public void setNuevo(boolean nuevo) {
 		this.nuevo = nuevo;
 	}
-
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	
 	@Override
 	public int hashCode() {
-		return Objects.hash(estado, fechaCreacion, fechaCreacionDesde, fechaCreacionHasta, fechaExportacionDesde,
-				fechaExportacionHasta, fechaModificacion, fechaBaja, idContabilidad, idContabilidadDesde,
-				idContabilidadHasta, nombreEstado, nombreFichero, nuevo, numAsientos, numAsientosDesde,
-				numAsientosHasta);
+		return Objects.hash(estado, fechaBaja, fechaCreacion, fechaCreacionDesde, fechaCreacionHasta,
+				fechaExportacionDesde, fechaExportacionHasta, fechaModificacion, historico, idContabilidad,
+				idContabilidadDesde, idContabilidadHasta, nombreEstado, nombreFichero, nuevo, numAsientos,
+				numAsientosDesde, numAsientosHasta);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -144,19 +152,20 @@ public class FacRegistroFichConta {
 		if (getClass() != obj.getClass())
 			return false;
 		FacRegistroFichConta other = (FacRegistroFichConta) obj;
-		return estado == other.estado && Objects.equals(fechaCreacion, other.fechaCreacion)
+		return estado == other.estado && Objects.equals(fechaBaja, other.fechaBaja)
+				&& Objects.equals(fechaCreacion, other.fechaCreacion)
 				&& Objects.equals(fechaCreacionDesde, other.fechaCreacionDesde)
 				&& Objects.equals(fechaCreacionHasta, other.fechaCreacionHasta)
 				&& Objects.equals(fechaExportacionDesde, other.fechaExportacionDesde)
 				&& Objects.equals(fechaExportacionHasta, other.fechaExportacionHasta)
-				&& Objects.equals(fechaModificacion, other.fechaModificacion)
-				&& Objects.equals(fechaBaja, other.fechaBaja) && idContabilidad == other.idContabilidad
-				&& idContabilidadDesde == other.idContabilidadDesde && idContabilidadHasta == other.idContabilidadHasta
-				&& Objects.equals(nombreEstado, other.nombreEstado)
+				&& Objects.equals(fechaModificacion, other.fechaModificacion) && historico == other.historico
+				&& idContabilidad == other.idContabilidad && idContabilidadDesde == other.idContabilidadDesde
+				&& idContabilidadHasta == other.idContabilidadHasta && Objects.equals(nombreEstado, other.nombreEstado)
 				&& Objects.equals(nombreFichero, other.nombreFichero) && nuevo == other.nuevo
 				&& numAsientos == other.numAsientos && numAsientosDesde == other.numAsientosDesde
 				&& numAsientosHasta == other.numAsientosHasta;
 	}
+	
 	@Override
 	public String toString() {
 		return "FacRegistroFichConta [idContabilidad=" + idContabilidad + ", idContabilidadDesde=" + idContabilidadDesde
@@ -166,17 +175,7 @@ public class FacRegistroFichConta {
 				+ fechaExportacionHasta + ", numAsientos=" + numAsientos + ", numAsientosDesde=" + numAsientosDesde
 				+ ", numAsientosHasta=" + numAsientosHasta + ", fechaModificacion=" + fechaModificacion
 				+ ", nombreFichero=" + nombreFichero + ", estado=" + estado + ", nombreEstado=" + nombreEstado
-				+ ", nuevo=" + nuevo + ", fechabaja=" + fechaBaja + ", getFechabaja()=" + getFechabaja()
-				+ ", getNombreEstado()=" + getNombreEstado() + ", getIdContabilidad()=" + getIdContabilidad()
-				+ ", getIdContabilidadDesde()=" + getIdContabilidadDesde() + ", getIdContabilidadHasta()="
-				+ getIdContabilidadHasta() + ", getFechaCreacion()=" + getFechaCreacion() + ", getFechaCreacionDesde()="
-				+ getFechaCreacionDesde() + ", getFechaCreacionHasta()=" + getFechaCreacionHasta()
-				+ ", getFechaExportacionDesde()=" + getFechaExportacionDesde() + ", getFechaExportacionHasta()="
-				+ getFechaExportacionHasta() + ", getNumAsientos()=" + getNumAsientos() + ", getNumAsientosDesde()="
-				+ getNumAsientosDesde() + ", getNumAsientosHasta()=" + getNumAsientosHasta()
-				+ ", getFechaModificacion()=" + getFechaModificacion() + ", getNombreFichero()=" + getNombreFichero()
-				+ ", getEstado()=" + getEstado() + ", isNuevo()=" + isNuevo() + ", hashCode()=" + hashCode()
-				+ ", getClass()=" + getClass() + ", toString()=" + super.toString() + "]";
+				+ ", nuevo=" + nuevo + ", fechaBaja=" + fechaBaja + ", historico=" + historico + "]";
 	}
 	
 }

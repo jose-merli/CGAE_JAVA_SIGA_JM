@@ -39,6 +39,14 @@ public interface PySTipoIvaExtendsMapper extends PysTipoivaMapper{
 			@Result(column = "valor", property = "label2", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem2> comboTiposIVA(String idioma);
+	
+	@SelectProvider(type = PySTipoIvaSqlExtendsProvider.class, method = "comboIVACuentasBancariasEntidad")
+	@Results({
+			@Result(column = "IDTIPOIVA", property = "value", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "DESCRIPCION", property = "label1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VALOR", property = "label2", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem2> comboIVACuentasBancariasEntidad(String tipoIva,String idioma);
 
 	@SelectProvider(type = PySTipoIvaSqlExtendsProvider.class, method = "getC_CTAIVA")
 	@Results({

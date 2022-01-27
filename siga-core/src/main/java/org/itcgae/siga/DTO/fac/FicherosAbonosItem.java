@@ -28,4 +28,6 @@ public class FicherosAbonosItem {
 
 	String propSEPA;
 	String propOtros;
+
+	Boolean fcs;
 }
