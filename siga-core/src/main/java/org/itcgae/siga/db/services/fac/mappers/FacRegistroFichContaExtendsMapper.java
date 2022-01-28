@@ -10,6 +10,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.AbonoContabilidadItem;
 import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
 import org.itcgae.siga.DTO.fac.FacturasContabilidadItem;
+import org.itcgae.siga.DTO.fac.PagoPorBancoItem;
+import org.itcgae.siga.DTO.fac.PagoPorCajaItem;
 import org.itcgae.siga.db.entities.FacRegistrofichconta;
 import org.itcgae.siga.db.mappers.FacRegistrofichcontaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacRegistroFichContaExtendsProvider;
@@ -84,4 +86,30 @@ public interface FacRegistroFichContaExtendsMapper extends FacRegistrofichcontaM
 	})
 	List<AbonoContabilidadItem> obtenerAbonos(FacRegistrofichconta facRegistroFichConta);
 	
+	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerPagosPorCaja")
+	@Results({
+		@Result(column = "anticipo", property = "anticipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idfactura", property = "idfactura", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "numerofactura", property = "numerofactura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "confdeufor", property = "confdeufor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ctaclientes", property = "ctaclientes", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "importe", property = "importe", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "tipoapunte", property = "tipoapunte", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fecha", property = "fecha", jdbcType = JdbcType.DATE),
+	})
+	List<PagoPorCajaItem> obtenerPagosPorCaja(FacRegistrofichconta facRegistroFichConta);
+	
+	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerPagosPorBanco")
+	@Results({
+		@Result(column = "idfactura", property = "idfactura", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "numerofactura", property = "numerofactura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "importe", property = "importe", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "bancos_codigo", property = "bancos_codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "fechacreacion", property = "fechacreacion", jdbcType = JdbcType.DATE),
+		@Result(column = "confdeudor", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ctaclientes", property = "ctaclientes", jdbcType = JdbcType.VARCHAR)
+	})
+	List<PagoPorBancoItem> obtenerPagosPorBanco(FacRegistrofichconta facRegistroFichConta);
 }
