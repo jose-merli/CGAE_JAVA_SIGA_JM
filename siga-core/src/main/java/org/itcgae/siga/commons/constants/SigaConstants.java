@@ -1556,4 +1556,22 @@ public class SigaConstants {
 
     public static final String PARAMETRO_LOG_COLALETRADOS_LEVEL = "log.colaLetrados.level";
 
+    public enum FASES_PROCESO_FACTURACION_AUTOMATICA_PYS {
+        TRATAR_FACTURACION("1"),
+        TRATAR_CONFIRMACION("2"),
+        GENERAR_PDFS_Y_ENVIAR_FACTURAS_PROGRAMACION("3"),
+        GENERAR_ENVIOS_FACTURAS_PENDIENTES("4"),
+        COMPROBACION_TRASPASO_FACTURAS("5");
+
+        private String codigo;
+
+        FASES_PROCESO_FACTURACION_AUTOMATICA_PYS(String codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getCodigo() {
+            return this.codigo;
+        }
+    }
+
 }

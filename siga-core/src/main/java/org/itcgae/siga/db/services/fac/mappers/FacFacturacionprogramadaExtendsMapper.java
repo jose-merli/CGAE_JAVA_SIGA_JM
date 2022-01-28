@@ -127,7 +127,7 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
         @Result(column="IDESTADOTRASPASO", property="idestadotraspaso", jdbcType=JdbcType.DECIMAL),
         @Result(column="LOGTRASPASO", property="logtraspaso", jdbcType=JdbcType.VARCHAR)
     })
-    List<FacFacturacionprogramada> getListaNFacturacionesProgramadasProcesar(Integer rownum, Double tiempoMaximoEjecucion);
+    List<FacFacturacionprogramada> getListaNFacturacionesProgramadasProcesar(Double tiempoMaximoEjecucion);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getListaNConfirmarFacturacionesProgramadas")
     @ResultMap("facProgramadaResult")
