@@ -1,6 +1,7 @@
 package org.itcgae.siga.fac.services.impl;
 
 import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
@@ -8,11 +9,14 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.mappers.AdmInformeMapper;
 import org.itcgae.siga.db.mappers.AdmTipofiltroinformeMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmConsultainformeExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionprogramadaExtendsMapper;
 import org.itcgae.siga.services.impl.WSCommons;
@@ -35,7 +39,7 @@ public abstract class ProcesoFacPyS {
     protected static final String MESSAGES_FACTURACION_CONFIRMACION_ERROR_PDF = "messages.facturacion.confirmacion.errorPdf";
     protected static final String TRASPASO_FACTURAS_WS_ACTIVO = "TRASPASO_FACTURAS_WS_ACTIVO";
     protected static final String MESSAGES_FACTURACION_CONFIRMACION_ERROR = "messages.facturacion.confirmacion.error";
-    protected static final String PROC_PAGOS_BANCO = "{call PKG_SIGA_CARGOS.PRESENTACION(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    protected static final String PROC_CARGOS_PRESENTACION = "{call PKG_SIGA_CARGOS.PRESENTACION(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
     protected static final String PROC_GENERACION_FACTURACION = "{call PKG_SIGA_FACTURACION.GENERACIONFACTURACION(?,?,?,?,?,?,?,?)}";
     protected static final String PROC_CONFIRMACION_FACTURACION = "{call PKG_SIGA_FACTURACION.CONFIRMACIONFACTURACION(?,?,?,?,?,?,?,?)}";
     protected static final String COD_OK = "0";
@@ -66,6 +70,11 @@ public abstract class ProcesoFacPyS {
     protected static final String FACTURACION_DIRECTORIO_FISICO_PLANTILLA_FACTURA_JAVA = "facturacion.directorioFisicoPlantillaFacturaJava";
     protected static final String FACTURACION_DIRECTORIO_PLANTILLA_FACTURA_JAVA = "facturacion.directorioPlantillaFacturaJava";
     protected static final String INFORMES_DIRECTORIO_FISICO_SALIDA_INFORMES_JAVA = "informes.directorioFisicoSalidaInformesJava";
+    protected static final String FACTURACION_DIRECTORIO_BANCOS_ORACLE = "facturacion.directorioBancosOracle";
+    protected static final String FACTURACION_DIRECTORIO_FISICO_FACTURAS_PDF_JAVA = "facturacion.directorioFisicoFacturaPDFJava";
+    protected static final String FACTURACION_DIRECTORIO_FACTURA_PDF_JAVA = "facturacion.directorioFacturaPDFJava";
+    protected static final Short TRASPASO_PROGRAMADA = Short.valueOf("23");
+    protected static final Short CONFIRM_FINALIZADA = Short.valueOf("3");
 
     protected Map<Short, CenInstitucion> mInstituciones;
 
@@ -97,6 +106,8 @@ public abstract class ProcesoFacPyS {
     @Autowired
     protected AdmConsultainformeExtendsMapper admConsultainformeExtendsMapper;
 
+    @Autowired
+    protected GenRecursosMapper genRecursosMapper;
 
     public void ejecutar() {
 
@@ -211,6 +222,27 @@ public abstract class ProcesoFacPyS {
         }
 
         return value;
+    }
+
+    protected String getRecurso(String idRecurso) {
+        return getRecurso(idRecurso, null);
+    }
+
+    protected String getRecurso(String idRecurso, String idLenguaje) {
+
+        String respuesta = null;
+
+        GenRecursosKey genRecursosKey = new GenRecursosKey();
+        genRecursosKey.setIdrecurso(idRecurso);
+        genRecursosKey.setIdlenguaje(!UtilidadesString.esCadenaVacia(idLenguaje) ? idLenguaje : DEFAULT_LENGUAJE);
+
+        GenRecursos genRecursos = genRecursosMapper.selectByPrimaryKey(genRecursosKey);
+
+        if (genRecursos != null && !UtilidadesString.esCadenaVacia(genRecursos.getDescripcion())) {
+            respuesta = genRecursos.getDescripcion();
+        }
+
+        return respuesta;
     }
 
     protected void marcaEjecutandoGeneracion(FacFacturacionprogramada fac) {
