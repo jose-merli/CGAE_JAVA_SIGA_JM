@@ -43,6 +43,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.itcgae.siga.DTO.fac.AbonoContabilidadItem;
+import org.itcgae.siga.DTO.fac.AltaAnticipoItem;
+import org.itcgae.siga.DTO.fac.AnticiposPySItem;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
@@ -51,6 +53,7 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.DevolucionesItem;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
@@ -67,8 +70,10 @@ import org.itcgae.siga.DTO.fac.FacturasIncluidasDTO;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.InformeFacturacionDTO;
 import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
+import org.itcgae.siga.DTO.fac.LiquidacionAnticipoColegioItem;
 import org.itcgae.siga.DTO.fac.PagoPorBancoItem;
 import org.itcgae.siga.DTO.fac.PagoPorCajaItem;
+import org.itcgae.siga.DTO.fac.PagoPorTarjetaItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
@@ -175,6 +180,8 @@ import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
+import org.itcgae.siga.db.entities.PysAnticipoletrado;
+import org.itcgae.siga.db.entities.PysLineaanticipo;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
@@ -193,6 +200,7 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
+import org.itcgae.siga.db.mappers.PysAnticipoletradoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
@@ -393,6 +401,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private FacPagosporcajaMapper facPagosPorCajaMapper;
+	
+	@Autowired
+	private FacFacturaincluidaendisqueteMapper facFacturaIncluidaEnDisqueteMapper;
+	
+	@Autowired
+	private FacLineadevoludisqbancoMapper facLineaDevoluDisqBancoMapper;
+	
+	@Autowired
+	private PysAnticipoletradoMapper pysAnticipoLetradoMapper;
 
 	private static final int EXCEL_ROW_FLUSH = 1000;
 	
@@ -4428,6 +4445,65 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		// -----------------------------------------------------------------------------------------------------------------			
 					
 		datosExcel = generaAsiento4(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+		
+		// -----------------------------------------------------------------------------------------------------------------
+		// Asiento 5
+		// PAGO POR TARJETA 
+		// 5------> Tarjeta
+		// Cliente(430.xxx) 	-->  facturaincluidaendisquete 	--> 0
+		// Banco(572.2xxx) 		-->  0			 				--> facturaincludidaendisquete
+		// -----------------------------------------------------------------------------------------------------------------
+
+		datosExcel = generaAsiento5(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+		
+		// -----------------------------------------------------------------------------------------------------------------
+		// Asiento 6
+		// DEVOLUCION DE FACTURA POR BANCO 
+		// 6------>
+		// Banco(572.1xxxx) 			-->  facturaincluidaendisquete --> 0
+		// Cliente(430.xxx)				-->  0			 			   --> facturaincludidaendisquete
+		// Si hay gastos bancarios
+		// Banco(572.1xxxx) 			-->  GASTOSDEVOLUCION 			--> 0
+		// Gastos bancarios(626)		-->  0			 				--> GASTOSDEVOLUCION
+		// -----------------------------------------------------------------------------------------------------------------
+		
+		datosExcel = generaAsiento6(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+		
+		// -----------------------------------------------------------------------------------------------------------------
+		// Asiento 7
+		// ALTA DE ANTICIPOS DE SERVICIOS. 
+		// 7------> HABER --> BEDE
+		// Caja anticipos (572.3xxxx) 	-->  importe del anticipo 	--> 0
+		// Anticipos Cliente(438.xxx)	-->  0			 			--> importe del anticipo
+		
+		datosExcel = generaAsiento7(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+		
+		// -----------------------------------------------------------------------------------------------------------------
+		// Asiento 7A
+		// LIQUIDACION DE ANTICIPOS DE SERVICIOS AL COLEGIO. 
+		// 7A------> HABER --> BEDE
+		// Anticipos Cliente(438.xxx) 			-->  importe de liquidacion	--> 0
+		// Ingresos extraordinarios (778xxxx)	-->  0			 			--> importe de liquidacion
+		
+		datosExcel = generaAsiento7A(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+		
+		// -----------------------------------------------------------------------------------------------------------------
+		// Asiento 7B
+		// ANTICIPOS DE SERVICIOS Y PRODUCTOS
+		// 7B------> HABER --> BEDE
+		// Anticipos Cliente(438.xxx) 			-->  importe de liquidacion	--> 0
+		// Ingresos extraordinarios (778xxxx)	-->  0			 			--> importe de liquidacion
+		
+		datosExcel = generaAsiento7B(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+		
+		// -----------------------------------------------------------------------------------------------------------------
+		// Asiento 2B
+		// PAGO POR BANCO (ABONOS) 
+		// 2B------>
+		// Banco (572.1xxx) 		-->  pagoabonobanco	 	--> 0
+		// Cliente(430.xxx)			-->  0			 		--> pagoabonobanco
+
+		datosExcel = generaAsiento2B(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
 									
 		//Crear el excel se guardará en: ‘<ruta_base>/ficheros/contabilidad/XXXX/’ (donde XXXX es el idinstitucion).
 		this.createExcelFile(camposContabilidad, datosExcel);
@@ -4833,7 +4909,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	//PAGO POR CAJA
 	private Vector<Hashtable<String, Object>> generaAsiento3(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception {
-        
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento3() --> Entrada al metodo para obtener y guardar la informacion de los pagos por caja en el excel");
+		
         String concepto = "";
         String conceptoCompensado = "";
         String asientoContable = null;
@@ -4953,7 +5030,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					
 					pagoPorCajaAcontabilizar.setContabilizado(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
 					pagoPorCajaAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
-					pagoPorCajaAcontabilizar.setIdfactura(pagoPorCajaAcontabilizar.getIdfactura());
+					pagoPorCajaAcontabilizar.setIdfactura(idFactura);
 					pagoPorCajaAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
 					pagoPorCajaAcontabilizar.setFechamodificacion(new Date());
 					
@@ -4989,19 +5066,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	//PAGO POR BANCO                                                                       
 	private Vector<Hashtable<String, Object>> generaAsiento4(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento4() --> Entrada al metodo para obtener y guardar la informacion de los pagos por banco en el excel");
 		
 	    String concepto 		    = "";
 		String asientoContable 	    = null; 
 		String asientoContableBanco = null;
-		Vector vPagoBanco           = null;
-		Hashtable hash 		        = null; 
-		Hashtable laHash 	        = null;
 		String select 		        = null; 
 		String imp                  = null;
-		Vector vAsiento4            = new Vector();
-		int contador                = 0;             
-        Hashtable codigos           = new Hashtable();
-
+		int contador                = 0;     
+		List<FacFacturaincluidaendisquete> listaPagosPorBancoAcontabilizar = new ArrayList<FacFacturaincluidaendisquete>();  
 
 		try{
 			
@@ -5009,107 +5082,798 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			String idFactura ="";
 			String idFacturaAnt ="";
-//
-//			// Descripcion del concepto
-//			concepto = UtilidadesString.sustituirParaExcell(UtilidadesString.getMensajeIdioma(this.usrbean,CONCEPTO_ASIENTO4));
-//			
-//			for(int x=0;x<vPagoBanco.size();x++){
-//				hash = (Hashtable) vPagoBanco.get(x);
-//
-//				asiento++;
-//				
-//				idFactura = (String)hash.get("IDFACTURA");
-//				
-//				imp = UtilidadesNumero.redondea((String)hash.get("IMPORTE"),2);
-//				
-//				String confClientes = (String)hash.get("CONFDEUDOR");
-//				String ctaClientes = (String)hash.get("CTACLIENTES");
-//				
-//				// Con el IDPERSONA, obtenemos de CEN_CLIENTE, el asiento contable.
-//				if (confClientes.equals("F")) {
-//				    asientoContable =  ctaClientes;
-//				} else {
-//				    asientoContable =  ctaClientes + obtenerAsientoContable(this.usrbean.getLocation(),(String)hash.get("IDPERSONA"));
-//				}
-//				
-//				// Con el BANCOS_CODIGO, obtenemos de FAC_BANCOINSTITUCION, el numerocuenta.
-//				asientoContableBanco	= obtenerAsientoContableBanco(this.usrbean.getLocation(),(String)hash.get("BANCOS_CODIGO"));  
-//				
-//				
-//				Hashtable a = new Hashtable();
-//				
-//				// Escribimos 1� asiento
-//				UtilidadesHash.set(a, "FECHA", 			UtilidadesHash.getShortDate(hash, "FECHACREACION"));
-//				UtilidadesHash.set(a, "CONCEPTO", 		concepto);
-//				UtilidadesHash.set(a, "DOCUMENTO", 		UtilidadesHash.getString(hash, "NUMEROFACTURA"));
-//				UtilidadesHash.set(a, "CUENTA", 		asientoContable);
-//				UtilidadesHash.set(a, "DEBE", 			"0");
-//				UtilidadesHash.set(a, "HABER", 			imp);
-//				UtilidadesHash.set(a, "CONTRAPARTIDA", 	asientoContableBanco);
-//				pwcontabilidad.write(this.generarLineaAbono(asiento, a));
-//				
-//				// Escribimos 2� asiento
-//				a.clear();
-//				UtilidadesHash.set(a, "FECHA", 			UtilidadesHash.getShortDate(hash, "FECHACREACION"));
-//				UtilidadesHash.set(a, "CONCEPTO", 		concepto);
-//				UtilidadesHash.set(a, "DOCUMENTO", 		UtilidadesHash.getString(hash, "NUMEROFACTURA"));
-//				UtilidadesHash.set(a, "CUENTA", 		asientoContableBanco);
-//				UtilidadesHash.set(a, "DEBE", 			imp);
-//				UtilidadesHash.set(a, "HABER", 			"0");
-//				UtilidadesHash.set(a, "CONTRAPARTIDA", 	asientoContable);
-//				pwcontabilidad.write(this.generarLineaAbono(asiento, a));
-//			
-//				/////////////////////////////////////////
-//				
-//				if (!idFactura.equals(idFacturaAnt)) {
-//					laHash = new Hashtable();
-//					laHash.put("CONTABILIZADA",ClsConstants.FACTURA_ABONO_CONTABILIZADA);
-//					laHash.put("IDINSTITUCION",this.usrbean.getLocation());
-//					laHash.put("IDFACTURA",hash.get("IDFACTURA"));
-//					laHash.put("USUMODIFICACION",this.usrbean.getUserName());
-//					laHash.put("FECHAMODIFICACION","sysdate");
-//					
-//					vAsiento4.add(laHash);
-//					idFacturaAnt = idFactura;
-//				}
-//			}
-//			
-//			if(vAsiento4.size()>0){
-//				String contabilizada=(String)((Hashtable)vAsiento4.get(0)).get("CONTABILIZADA");
-//				String usuModificacion=(String)((Hashtable)vAsiento4.get(0)).get("USUMODIFICACION");
-//				String fechaModificacion=(String)((Hashtable)vAsiento4.get(0)).get("FECHAMODIFICACION");
-//
-//				String sqlUpdate="UPDATE "+FacFacturaIncluidaEnDisqueteBean.T_NOMBRETABLA+" SET "+FacFacturaIncluidaEnDisqueteBean.C_CONTABILIZADA+"='"+contabilizada+"', "+FacFacturaIncluidaEnDisqueteBean.C_USUMODIFICACION+"="+usuModificacion+", "+FacFacturaIncluidaEnDisqueteBean.C_FECHAMODIFICACION+"="+fechaModificacion;
-//				int con = 0;
-//				tx.begin();
-//				for(int l = 0; l < vAsiento4.size(); l++){
-//				    con++;
-//				    if (con%numeroTransaccion==0) {
-//				        tx.commit();
-//				        tx.begin();
-//				    }
-//					String claves = (String)((Hashtable)vAsiento4.get(l)).get("IDFACTURA");
-//					Hashtable codigosUpdate = new Hashtable();
-//					codigosUpdate.put(new Integer(1),this.usrbean.getLocation());
-//					codigosUpdate.put(new Integer(2),claves);
-//					facturaIncludidaEnDisqueteAdm.insertSQLBind(sqlUpdate +" WHERE IDINSTITUCION=:1 AND IDFACTURA=:2",codigosUpdate);
-//				}
-//				tx.commit();
-//				
-//			}
-//			
+
+			// Descripcion del concepto
+			concepto = UtilidadesString.sustituirParaExcel(UtilidadesString.getMensajeIdioma(idioma,SigaConstants.CONCEPTO_ASIENTO4));
+		
+			for(int x=0;x<listaPagosPorBanco.size();x++){
+				PagoPorBancoItem pagoPorBancoItem = listaPagosPorBanco.get(x);
+
+				asiento++;
+				
+				idFactura = String.valueOf(pagoPorBancoItem.getIdfactura());
+				
+				imp = UtilidadesNumeros.redondea(String.valueOf(pagoPorBancoItem.getImporte()),2);
+				
+				String confClientes = pagoPorBancoItem.getConfdeudor();
+				String ctaClientes = pagoPorBancoItem.getCtaclientes();
+				
+				// Con el IDPERSONA, obtenemos de CEN_CLIENTE, el asiento contable.
+				if (confClientes.equals("F")) {
+				    asientoContable =  ctaClientes;
+				} else {
+				    asientoContable =  ctaClientes + obtenerAsientoContable(idInstitucion, String.valueOf(pagoPorBancoItem.getIdpersona()));
+				}
+				
+				// Con el BANCOS_CODIGO, obtenemos de FAC_BANCOINSTITUCION, el numerocuenta.
+				asientoContableBanco	= obtenerAsientoContableBanco(idInstitucion, pagoPorBancoItem.getBancos_codigo());
+				
+				Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+				
+				// Escribimos 1� apunte
+				datosHashtable.clear();
+				datosHashtable.put("ASIENTO", asiento);
+				datosHashtable.put("FECHA", pagoPorBancoItem.getFechacreacion());
+				datosHashtable.put("CONCEPTO", concepto);
+				datosHashtable.put("DOCUMENTO", pagoPorBancoItem.getNumerofactura());
+				datosHashtable.put("CUENTA", asientoContable);
+				datosHashtable.put("DEBE", "0");
+				datosHashtable.put("HABER", imp);
+				datosHashtable.put("BASEIMPONIBLE", "");
+				datosHashtable.put("IVA", "");
+				datosHashtable.put("CONTRAPARTIDA", asientoContableBanco);
+				datosHashtable = this.checkDatos(asiento, datosHashtable);
+				datosExcel.add(datosHashtable);						
+
+				// Escribimos 2� asiento
+				datosHashtable.clear();
+				datosHashtable.put("ASIENTO", asiento);
+				datosHashtable.put("FECHA", pagoPorBancoItem.getFechacreacion());
+				datosHashtable.put("CONCEPTO", concepto);
+				datosHashtable.put("DOCUMENTO", pagoPorBancoItem.getNumerofactura());
+				datosHashtable.put("CUENTA", asientoContableBanco);
+				datosHashtable.put("DEBE", imp);
+				datosHashtable.put("HABER", "0");
+				datosHashtable.put("BASEIMPONIBLE", "");
+				datosHashtable.put("IVA", "");
+				datosHashtable.put("CONTRAPARTIDA", asientoContable);
+				datosHashtable = this.checkDatos(asiento, datosHashtable);
+				datosExcel.add(datosHashtable);	
+				
+				if (!idFactura.equals(idFacturaAnt)) {
+					
+					// Solamente cuando cambia idfactura
+					FacFacturaincluidaendisquete pagoPorBancoAcontabilizar = new FacFacturaincluidaendisquete();
+					
+					pagoPorBancoAcontabilizar.setContabilizada(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
+					pagoPorBancoAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
+					pagoPorBancoAcontabilizar.setIdfactura(String.valueOf(pagoPorBancoItem.getIdfactura()));
+					pagoPorBancoAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
+					pagoPorBancoAcontabilizar.setFechamodificacion(new Date());
+					
+					listaPagosPorBancoAcontabilizar.add(pagoPorBancoAcontabilizar);
+					idFacturaAnt = idFactura;
+		
+				}
+			}
+			
+			if(listaPagosPorBancoAcontabilizar.size()>0){
+				
+				for (FacFacturaincluidaendisquete pagoPorBancoAcontabilizar : listaPagosPorBancoAcontabilizar) {
+					int respuestaActualizarPagoPorBancoContabilizado = facFacturaIncluidaEnDisqueteMapper.updateByPrimaryKeySelective(pagoPorBancoAcontabilizar);
+					
+					if(respuestaActualizarPagoPorBancoContabilizado == 1) {
+						LOGGER.info("generarFicheroContabilidad() --> generaAsiento4() --> facFacturaIncluidaEnDisqueteMapper.updateByPrimaryKeySelective() --> Pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfactura() + " contabilizado");
+					}else {
+						LOGGER.info("generarFicheroContabilidad() --> generaAsiento4() --> facFacturaIncluidaEnDisqueteMapper.updateByPrimaryKeySelective() --> El pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfactura() + " no pudo ser contabilizado");
+						throw new Exception("El pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfactura() + " no pudo ser contabilizado");
+					}
+				}
+				
+			}
+			
 		}catch (Exception e) 
 		{
-//			pwcontabilidad.write("Error en asiento4: " + e.getMessage());
-//			try { tx.rollback(); } catch (Exception ee) {}
-//		    throw new ClsExceptions(e,"Error al generar asiento 4");
+			throw new Exception("Error en generarFicheroContabilidad() --> generaAsiento4()",e);
 		}
+
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento4() --> Salida del metodo para obtener y guardar la informacion de los pagos por banco en el excel");
 		
 		return datosExcel;
 	}
-
 	
-	//FIN fACTURAS
+	//PAGO POR TARJETA 
+	private Vector<Hashtable<String, Object>> generaAsiento5(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento5() --> Entrada al metodo para obtener y guardar la informacion de los pagos por tarjeta en el excel");
+		
+	    String concepto 		= "";
+		String conceptoT 		= "";
+		String asientoContable 	= null;
+		String imp              = null;
+        List<FacPagosporcaja> listaPagosPorTarjetaAcontabilizar = new ArrayList<FacPagosporcaja>();  
+
+		try{
+
+			List<PagoPorTarjetaItem> listaPagosPorTarjeta = facRegistroFichContaExtendsMapper.obtenerPagosPorTarjeta(registroFacRegistroFichConta);
+			
+			String idFactura ="";
+			String idFacturaAnt ="";
+
+//			// Descripcion del concepto
+			conceptoT = UtilidadesString.sustituirParaExcel(UtilidadesString.getMensajeIdioma(idioma,SigaConstants.CONCEPTO_ASIENTO5));
+
+
+			for(int x=0;x<listaPagosPorTarjeta.size();x++){
+			    
+				asiento++;
+
+			    PagoPorTarjetaItem pagoPorTarjetaItem = listaPagosPorTarjeta.get(x);
+				idFactura = String.valueOf(pagoPorTarjetaItem.getIdfactura());
+				
+				imp = UtilidadesNumeros.redondea(String.valueOf(pagoPorTarjetaItem.getImporte()),2);
+				String confClientes = pagoPorTarjetaItem.getConfdeudor();
+				String ctaClientes = pagoPorTarjetaItem.getCtaclientes();
+				
+//				// Con el IDPERSONA, obtenemos de CEN_CLIENTE, el asiento contable.
+				if (confClientes.equals("F")) {
+				    asientoContable =  ctaClientes;
+				} else {
+				    asientoContable =  ctaClientes + obtenerAsientoContable(idInstitucion, String.valueOf(pagoPorTarjetaItem.getIdpersona()));
+				}
+				
+//				// SE CREA EL ASIENTO
+				Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+				
+				// Escribimos 1� apunte
+				datosHashtable.clear();
+				datosHashtable.put("ASIENTO", asiento);
+				datosHashtable.put("FECHA", pagoPorTarjetaItem.getFecha());
+				datosHashtable.put("CONCEPTO", conceptoT);
+				datosHashtable.put("DOCUMENTO", pagoPorTarjetaItem.getNumerofactura());
+				datosHashtable.put("CUENTA", asientoContable);
+				datosHashtable.put("DEBE", "0");
+				datosHashtable.put("HABER", imp);
+				datosHashtable.put("BASEIMPONIBLE", "");
+				datosHashtable.put("IVA", "");
+				datosHashtable.put("CONTRAPARTIDA", CONTABILIDAD_TARJETAS);
+				datosHashtable = this.checkDatos(asiento, datosHashtable);
+				datosExcel.add(datosHashtable);	
+
+//				// Escribimos 2� asiento
+				datosHashtable.clear();
+				datosHashtable.put("ASIENTO", asiento);
+				datosHashtable.put("FECHA", pagoPorTarjetaItem.getFecha());
+				datosHashtable.put("CONCEPTO", conceptoT);
+				datosHashtable.put("DOCUMENTO", pagoPorTarjetaItem.getNumerofactura());
+				datosHashtable.put("CUENTA", CONTABILIDAD_TARJETAS);
+				datosHashtable.put("DEBE", imp);
+				datosHashtable.put("HABER", "0");
+				datosHashtable.put("BASEIMPONIBLE", "");
+				datosHashtable.put("IVA", "");
+				datosHashtable.put("CONTRAPARTIDA", asientoContable);
+				datosHashtable = this.checkDatos(asiento, datosHashtable);
+				datosExcel.add(datosHashtable);	
+		
+				if (!idFactura.equals(idFacturaAnt)) {
+					// Solamente cuando cambia idfactura
+					FacPagosporcaja pagoPorTarjetaAcontabilizar = new FacPagosporcaja();
+					
+					pagoPorTarjetaAcontabilizar.setContabilizado(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
+					pagoPorTarjetaAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
+					pagoPorTarjetaAcontabilizar.setIdfactura(String.valueOf(pagoPorTarjetaItem.getIdfactura()));
+					pagoPorTarjetaAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
+					pagoPorTarjetaAcontabilizar.setFechamodificacion(new Date());
+					
+					listaPagosPorTarjetaAcontabilizar.add(pagoPorTarjetaAcontabilizar);
+					idFacturaAnt = idFactura;
+
+				}
+			}
+
+			if(listaPagosPorTarjetaAcontabilizar.size()>0){
+				
+				for (FacPagosporcaja pagoPorTarjetaAcontabilizar : listaPagosPorTarjetaAcontabilizar) {
+					int respuestaActualizarPagoPorTarjetaContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(pagoPorTarjetaAcontabilizar);
+					
+					if(respuestaActualizarPagoPorTarjetaContabilizado == 1) {
+						LOGGER.info("generarFicheroContabilidad() --> generaAsiento5() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Pago por tarjeta con id: " + pagoPorTarjetaAcontabilizar.getIdfactura() + " contabilizado");
+					}else {
+						LOGGER.info("generarFicheroContabilidad() --> generaAsiento5() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> El pago por tarjeta con id: " + pagoPorTarjetaAcontabilizar.getIdfactura() + " no pudo ser contabilizado");
+						throw new Exception("El pago por tarjeta con id: " + pagoPorTarjetaAcontabilizar.getIdfactura() + " no pudo ser contabilizado");
+					}
+				}
+				
+			}
+
+		}catch (Exception e) 
+		{
+			throw new Exception("Error en generarFicheroContabilidad() --> generaAsiento5()",e);
+		}
+		
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento5() --> Salida del metodo para obtener y guardar la informacion de los pagos por tarjeta en el excel");
+		return datosExcel;
+	}
+	
+	//DEVOLUCIONES                                                                       
+	private Vector<Hashtable<String, Object>> generaAsiento6(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento6() --> Entrada al metodo para obtener y guardar la informacion de las devoluciones en el excel");
+		
+		String concepto 		    = "";
+		String conceptoComision     = "";
+		String asientoContable 	    = null; 
+		String asientoContableBanco = null; 
+		String gastosDevolucion     = null; 
+		String cargarCliente 		= null;
+		String select 				= null; 
+		String imp 					= null;
+		int contador 				= 0;
+		
+		List<FacLineadevoludisqbanco> listaDevolucionesAcontabilizar = new ArrayList<FacLineadevoludisqbanco>();
+  
+		try {
+			
+			List<DevolucionesItem> listaDevoluciones = facRegistroFichContaExtendsMapper.obtenerDevoluciones(registroFacRegistroFichConta);
+			
+			String idDisquete ="";
+			String idDisqueteAnt ="";
+
+			// Descripcion del concepto
+			concepto = UtilidadesString.sustituirParaExcel(UtilidadesString.getMensajeIdioma(idioma, SigaConstants.CONCEPTO_ASIENTO5));
+			
+			for(int x=0;x<listaDevoluciones.size();x++){
+				asiento++;
+
+				DevolucionesItem devolucion = listaDevoluciones.get(x);
+
+				idDisquete = String.valueOf(devolucion.getIddisquetedevoluciones());
+				
+				imp = UtilidadesNumeros.redondea(String.valueOf(devolucion.getImporte()), 2);
+				
+				String confClientes = devolucion.getConfdeudor();
+				String ctaClientes = devolucion.getCtaclientes();
+				
+				// Con el IDPERSONA, obtenemos de CEN_CLIENTE, el asiento contable.
+				if (confClientes.equals("F")) {
+				    asientoContable =  ctaClientes;
+				} else {
+				    asientoContable =  ctaClientes + obtenerAsientoContable(idInstitucion, String.valueOf(devolucion.getIdpersona()));
+				}
+				
+				gastosDevolucion = String.valueOf(devolucion.getGastosdevolucion());
+				cargarCliente = devolucion.getCargarcliente();
+
+				// Con el BANCOS_CODIGO, obtenemos de FAC_BANCOINSTITUCION, el numerocuenta.
+				asientoContableBanco	= obtenerAsientoContableBanco(idInstitucion, devolucion.getBancos_codigo());  
+
+				Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+				
+				// Escribimos 1� apunte
+				datosHashtable.clear();
+				datosHashtable.put("ASIENTO", asiento);
+				datosHashtable.put("FECHA", devolucion.getFechageneracion());
+				datosHashtable.put("CONCEPTO", concepto);
+				datosHashtable.put("DOCUMENTO", devolucion.getNumerofactura());
+				datosHashtable.put("CUENTA", asientoContable);
+				datosHashtable.put("DEBE", imp);
+				datosHashtable.put("HABER", "0");
+				datosHashtable.put("BASEIMPONIBLE", "");
+				datosHashtable.put("IVA", "");
+				datosHashtable.put("CONTRAPARTIDA", asientoContableBanco);
+				datosHashtable = this.checkDatos(asiento, datosHashtable);
+				datosExcel.add(datosHashtable);	
+				
+				// Escribimos 2� asiento
+				datosHashtable.clear();
+				datosHashtable.put("ASIENTO", asiento);
+				datosHashtable.put("FECHA", devolucion.getFechageneracion());
+				datosHashtable.put("CONCEPTO", concepto);
+				datosHashtable.put("DOCUMENTO", devolucion.getNumerofactura());
+				datosHashtable.put("CUENTA", asientoContableBanco);
+				datosHashtable.put("DEBE", "0");
+				datosHashtable.put("HABER", imp);
+				datosHashtable.put("BASEIMPONIBLE", "");
+				datosHashtable.put("IVA", "");
+				datosHashtable.put("CONTRAPARTIDA", asientoContable);
+				datosHashtable = this.checkDatos(asiento, datosHashtable);
+				datosExcel.add(datosHashtable);	
+		
+				if (!idDisqueteAnt.equals(idDisquete)) {
+					FacLineadevoludisqbanco devolucionAcontabilizar = new FacLineadevoludisqbanco();
+					
+					devolucionAcontabilizar.setContabilizada(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
+					devolucionAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
+					devolucionAcontabilizar.setIddisquetedevoluciones(Long.valueOf(devolucion.getIddisquetedevoluciones()));
+					devolucionAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
+					devolucionAcontabilizar.setFechamodificacion(new Date());
+					
+					listaDevolucionesAcontabilizar.add(devolucionAcontabilizar);
+					idDisqueteAnt = idDisquete;					
+					
+				}
+			}
+			
+			if(listaDevolucionesAcontabilizar.size()>0){
+				
+				for (FacLineadevoludisqbanco devolucionAcontabilizar : listaDevolucionesAcontabilizar) {
+					int respuestaActualizarDevolucionContabilizado = facLineaDevoluDisqBancoMapper.updateByPrimaryKeySelective(devolucionAcontabilizar);
+					
+					if(respuestaActualizarDevolucionContabilizado == 1) {
+						LOGGER.info("generarFicheroContabilidad() --> generaAsiento6() --> facLineaDevoluDisqBancoMapper.updateByPrimaryKeySelective() --> Devolucion con id: " + devolucionAcontabilizar.getIddisquetedevoluciones() + " contabilizada");
+					}else {
+						LOGGER.info("generarFicheroContabilidad() --> generaAsiento6() --> facLineaDevoluDisqBancoMapper.updateByPrimaryKeySelective() --> Devolucion con id: " + devolucionAcontabilizar.getIddisquetedevoluciones() + " no pudo ser contabilizada");
+						throw new Exception("Devolucion con id: " + devolucionAcontabilizar.getIddisquetedevoluciones() + " no pudo ser contabilizada");
+					}
+				}
+				
+			}
+			
+			
+		}
+		catch (Exception e) {
+			throw new Exception("Error en generarFicheroContabilidad() --> generaAsiento6()",e);
+		}
+		
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento6() --> Salida del metodo para obtener y guardar la informacion de devoluciones en el excel");
+		return datosExcel;
+	}
+	
+	//ALTA DE ANTICIPOS
+	private Vector<Hashtable<String, Object>> generaAsiento7(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento7() --> Entrada al metodo para obtener y guardar la informacion de las altas de anticipos en el excel");
+		
+		String concepto 		            = "";
+		String asientoContable 	            = null; 
+		String asientoContableCajaAnticipos = null;
+		String imp 							= null;
+		
+		List<PysAnticipoletrado> listaAltasAnticiposAcontabilizar = new ArrayList<PysAnticipoletrado>();
+			
+		try{
+					
+			List<AltaAnticipoItem> listaAltasAnticipos = facRegistroFichContaExtendsMapper.obtenerAltasAnticipos(registroFacRegistroFichConta);
+
+				String idAnticipo ="";
+				String idAnticipoAnt ="";
+
+				for(int x=0;x<listaAltasAnticipos.size();x++)
+				{
+					AltaAnticipoItem altaAnticipoItem = listaAltasAnticipos.get(x);
+
+					asiento++;
+					
+					// Descripcion del concepto
+					concepto = UtilidadesString.sustituirParaExcel(UtilidadesString.getMensajeIdioma(idioma, SigaConstants.CONCEPTO_ASIENTO7) + " " + altaAnticipoItem.getDescripcion());
+					
+					idAnticipo = String.valueOf(altaAnticipoItem.getIdanticipo());
+					
+					imp = UtilidadesNumeros.redondea(String.valueOf(altaAnticipoItem.getImporteinicial()),2);
+					
+					String ctaClientes = altaAnticipoItem.getCtacontable();
+					
+					// Con el IDPERSONA, obtenemos de CEN_CLIENTE, el asiento contable.
+				    asientoContable =  ctaClientes + obtenerAsientoContable(idInstitucion, String.valueOf(altaAnticipoItem.getIdpersona()));
+					
+					// Con el BANCOS_CODIGO, obtenemos de FAC_BANCOINSTITUCION, el numerocuenta.
+				    asientoContableCajaAnticipos	= CONTABILIDAD_CAJA_ANTICIPOS;
+
+				    Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+					
+					// Escribimos 1� apunte
+					datosHashtable.clear();
+					datosHashtable.put("ASIENTO", asiento);
+					datosHashtable.put("FECHA", altaAnticipoItem.getFecha());
+					datosHashtable.put("CONCEPTO", concepto);
+					datosHashtable.put("DOCUMENTO", altaAnticipoItem.getIdanticipo());
+					datosHashtable.put("CUENTA", asientoContable);
+					datosHashtable.put("DEBE", imp);
+					datosHashtable.put("HABER", "0");
+					datosHashtable.put("BASEIMPONIBLE", "");
+					datosHashtable.put("IVA", "");
+					datosHashtable.put("CONTRAPARTIDA", asientoContableCajaAnticipos);
+					datosHashtable = this.checkDatos(asiento, datosHashtable);
+					datosExcel.add(datosHashtable);	
+					
+		
+					
+					// Escribimos 2� asiento
+					datosHashtable.clear();
+					datosHashtable.put("ASIENTO", asiento);
+					datosHashtable.put("FECHA", altaAnticipoItem.getFecha());
+					datosHashtable.put("CONCEPTO", concepto);
+					datosHashtable.put("DOCUMENTO", altaAnticipoItem.getIdanticipo());
+					datosHashtable.put("CUENTA", asientoContableCajaAnticipos);
+					datosHashtable.put("DEBE", "0");
+					datosHashtable.put("HABER", imp);
+					datosHashtable.put("BASEIMPONIBLE", "");
+					datosHashtable.put("IVA", "");
+					datosHashtable.put("CONTRAPARTIDA", asientoContable);
+					datosHashtable = this.checkDatos(asiento, datosHashtable);
+					datosExcel.add(datosHashtable);	
+					
+					if (!idAnticipo.equals(idAnticipoAnt)) {
+						PysAnticipoletrado altaAnticipoAcontabilizar = new PysAnticipoletrado();
+						
+						altaAnticipoAcontabilizar.setContabilizado(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
+						altaAnticipoAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
+						altaAnticipoAcontabilizar.setIdpersona(Long.valueOf(altaAnticipoItem.getIdpersona()));
+						altaAnticipoAcontabilizar.setIdanticipo((short) altaAnticipoItem.getIdanticipo());
+						altaAnticipoAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
+						altaAnticipoAcontabilizar.setFechamodificacion(new Date());
+						
+						listaAltasAnticiposAcontabilizar.add(altaAnticipoAcontabilizar);
+						idAnticipoAnt = idAnticipo;		
+						
+					}
+				}
+				
+				if(listaAltasAnticiposAcontabilizar.size()>0){
+					
+					for (PysAnticipoletrado altaAnticipoAcontabilizar : listaAltasAnticiposAcontabilizar) {
+						int respuestaActualizarAltaAnticipoContabilizado = pysAnticipoLetradoMapper.updateByPrimaryKeySelective(altaAnticipoAcontabilizar);
+						
+						if(respuestaActualizarAltaAnticipoContabilizado == 1) {
+							LOGGER.info("generarFicheroContabilidad() --> generaAsiento7() --> pysAnticipoLetradoMapper.updateByPrimaryKeySelective() --> Alta de anticipo con id: " + altaAnticipoAcontabilizar.getIdanticipo() + " contabilizada");
+						}else {
+							LOGGER.info("generarFicheroContabilidad() --> generaAsiento7() --> pysAnticipoLetradoMapper.updateByPrimaryKeySelective() --> Alta de anticipo con id: " + altaAnticipoAcontabilizar.getIdanticipo() + " no pudo ser contabilizada");
+							throw new Exception("Alta de anticipo con id: " + altaAnticipoAcontabilizar.getIdanticipo() + " no pudo ser contabilizada");
+						}
+					}
+					
+				}
+							
+			}
+			catch (Exception e) 
+			{
+				throw new Exception("Error en generarFicheroContabilidad() --> generaAsiento7()",e);
+			}
+			
+			LOGGER.info("generarFicheroContabilidad() --> generaAsiento7() --> Salida del metodo para obtener y guardar la informacion de altas de anticipo en el excel");
+		
+		return datosExcel;
+	}
+	
+	//LIQUIDACION DE ANTICIPOS PARA EL COLEGIO
+	private Vector<Hashtable<String, Object>> generaAsiento7A(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento7A() --> Entrada al metodo para obtener y guardar la informacion de las liquidaciones de anticipos para el colegio en el excel");
+		
+		String concepto 		            = "";
+		String asientoContableIngresosExtra = null;
+		String imp 							= null;
+
+		try{
+
+			List<LiquidacionAnticipoColegioItem> listaLiquidacionesAnticiposColegio = facRegistroFichContaExtendsMapper.obtenerLiquidacionesAnticiposColegios(registroFacRegistroFichConta);
+
+			String idAnticipo ="";
+			String idAnticipoAnt ="";
+
+			//Descripcion del concepto
+			concepto = UtilidadesString.sustituirParaExcel(UtilidadesString.getMensajeIdioma(idioma, SigaConstants.CONCEPTO_ASIENTO7A));
+						
+			for(int x=0;x<listaLiquidacionesAnticiposColegio.size();x++){
+				
+					LiquidacionAnticipoColegioItem liquidacionAnticipoColegio = listaLiquidacionesAnticiposColegio.get(x);
+
+					asiento++;
+					
+					idAnticipo = String.valueOf(liquidacionAnticipoColegio.getIdanticipo());
+					
+					imp = UtilidadesNumeros.redondea(String.valueOf(liquidacionAnticipoColegio.getImporteanticipado()),2);
+					
+					String asientoCliente= obtenerAsientoContable(idInstitucion, String.valueOf(liquidacionAnticipoColegio.getIdpersona()));
+					String asientoAnticiposCliente = ANTICIPOS_CLI + asientoCliente;
+					
+					String ctaClientes = CONTABILIDAD_CAJA_ANTICIPOS;
+					
+					
+					// Con el BANCOS_CODIGO, obtenemos de FAC_BANCOINSTITUCION, el numerocuenta.
+				    asientoContableIngresosExtra	= CONTABILIDAD_INGRESOS_EXTRA;
+									
+				    Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+					
+					// Escribimos 1� apunte
+					datosHashtable.clear();
+					datosHashtable.put("ASIENTO", asiento);
+					datosHashtable.put("FECHA", liquidacionAnticipoColegio.getFechaefectiva());
+					datosHashtable.put("CONCEPTO", concepto);
+					datosHashtable.put("DOCUMENTO", liquidacionAnticipoColegio.getIdanticipo());
+					datosHashtable.put("CUENTA", asientoContableIngresosExtra);
+					datosHashtable.put("DEBE", imp);
+					datosHashtable.put("HABER", "0");
+					datosHashtable.put("BASEIMPONIBLE", "");
+					datosHashtable.put("IVA", "");
+					datosHashtable.put("CONTRAPARTIDA", asientoAnticiposCliente);
+					datosHashtable = this.checkDatos(asiento, datosHashtable);
+					datosExcel.add(datosHashtable);	
+									
+					// Escribimos 2� asiento
+					datosHashtable.clear();
+					datosHashtable.put("ASIENTO", asiento);
+					datosHashtable.put("FECHA", liquidacionAnticipoColegio.getFechaefectiva());
+					datosHashtable.put("CONCEPTO", concepto);
+					datosHashtable.put("DOCUMENTO", liquidacionAnticipoColegio.getIdanticipo());
+					datosHashtable.put("CUENTA", asientoAnticiposCliente);
+					datosHashtable.put("DEBE", "0");
+					datosHashtable.put("HABER", imp);
+					datosHashtable.put("BASEIMPONIBLE", "");
+					datosHashtable.put("IVA", "");
+					datosHashtable.put("CONTRAPARTIDA", asientoContableIngresosExtra);
+					datosHashtable = this.checkDatos(asiento, datosHashtable);
+					datosExcel.add(datosHashtable);
+					
+				}
+				
+		
+			}
+			catch (Exception e) {
+				throw new Exception("Error en generarFicheroContabilidad() --> generaAsiento7A()",e);
+			}
+			
+			LOGGER.info("generarFicheroContabilidad() --> generaAsiento7A() --> Salida del metodo para obtener y guardar la informacion de liquidaciones de anticipos colegio en el excel");
+			
+			return datosExcel;
+	}
+	
+	//ANTICIPOS DE PRODUCTOS Y SERVICIOS - PAGOS POR CAJA
+	private Vector<Hashtable<String, Object>> generaAsiento7B(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento7B() --> Entrada al metodo para obtener y guardar la informacion de los anticipos de pys - pagos por caja en el excel");
+
+		String concepto 		        = "";
+		String conceptoAnticipo 		= "";
+		String asientoContable 	        = null;
+		String select 		            = null; 
+		String imp                      = null;
+		
+		List<FacPagosporcaja> listaAnticiposPySAcontabilizar = new ArrayList<FacPagosporcaja>();
+
+		try {
+			
+			List<AnticiposPySItem> listaAnticiposPyS = facRegistroFichContaExtendsMapper.obtenerAnticiposPyS(registroFacRegistroFichConta);
+				
+			String idFactura ="";
+			String idFacturaAnt ="";
+			
+			concepto = UtilidadesString.sustituirParaExcel(UtilidadesString.getMensajeIdioma(idioma, SigaConstants.CONCEPTO_ASIENTO3));
+			conceptoAnticipo = UtilidadesString.sustituirParaExcel(UtilidadesString.getMensajeIdioma(idioma, SigaConstants.CONCEPTO_ASIENTO3_2));
+				
+			for(int x=0;x<listaAnticiposPyS.size();x++) {
+					
+					asiento++;
+					
+					AnticiposPySItem anticipoPyS = listaAnticiposPyS.get(x);
+					idFactura = String.valueOf(anticipoPyS.getIdfactura());
+					
+					imp = UtilidadesNumeros.redondea(String.valueOf(anticipoPyS.getImporte()),2);
+					String confClientes = anticipoPyS.getConfdeudor();
+					String ctaClientes = anticipoPyS.getCtaclientes();
+					String anticipo = anticipoPyS.getAnticipo();
+					
+					// Con el IDPERSONA, obtenemos de CEN_CLIENTE, el asiento contable.
+					String asientoCliente= obtenerAsientoContable(idInstitucion, String.valueOf(anticipoPyS.getIdpersona()));
+					if (confClientes.equals("F")) {
+					    asientoContable =  ctaClientes;
+					} else {
+					    asientoContable =  ctaClientes + asientoCliente;
+					}
+					String asientoAnticiposCliente = ANTICIPOS_CLI + asientoCliente;
+					
+					Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+					
+					// PAGO ANTICIPADO
+					// Escribimos 1 apunte
+					datosHashtable.clear();
+					datosHashtable.put("ASIENTO", asiento);
+					datosHashtable.put("FECHA", anticipoPyS.getFecha());
+					datosHashtable.put("CONCEPTO", conceptoAnticipo);
+					datosHashtable.put("DOCUMENTO", anticipoPyS.getNumerofactura());
+					datosHashtable.put("CUENTA", asientoContable);
+					datosHashtable.put("DEBE", "0");
+					datosHashtable.put("HABER", imp);
+					datosHashtable.put("BASEIMPONIBLE", "");
+					datosHashtable.put("IVA", "");
+					datosHashtable.put("CONTRAPARTIDA", asientoAnticiposCliente);
+					datosHashtable = this.checkDatos(asiento, datosHashtable);
+					datosExcel.add(datosHashtable);	
+		
+					// Escribimos 2 apunte
+					datosHashtable.clear();
+					datosHashtable.put("ASIENTO", asiento);
+					datosHashtable.put("FECHA", anticipoPyS.getFecha());
+					datosHashtable.put("CONCEPTO", conceptoAnticipo);
+					datosHashtable.put("DOCUMENTO", anticipoPyS.getNumerofactura());
+					datosHashtable.put("CUENTA", asientoAnticiposCliente);
+					datosHashtable.put("DEBE", imp);
+					datosHashtable.put("HABER", "0");
+					datosHashtable.put("BASEIMPONIBLE", "");
+					datosHashtable.put("IVA", "");
+					datosHashtable.put("CONTRAPARTIDA", asientoContable);
+					datosHashtable = this.checkDatos(asiento, datosHashtable);
+					datosExcel.add(datosHashtable);
+					
+					if (!idFactura.equals(idFacturaAnt)) {
+					    // Solamente cuando cambia idfactura
+						FacPagosporcaja anticipoPySAcontabilizar = new FacPagosporcaja();
+						
+						anticipoPySAcontabilizar.setContabilizado(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
+						anticipoPySAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
+						anticipoPySAcontabilizar.setIdfactura(idFactura);
+						anticipoPySAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
+						anticipoPySAcontabilizar.setFechamodificacion(new Date());
+						
+						listaAnticiposPySAcontabilizar.add(anticipoPySAcontabilizar);
+						idFacturaAnt = idFactura;		
+						
+					}
+				}
+				
+				if(listaAnticiposPySAcontabilizar.size()>0){
+					
+					for (FacPagosporcaja anticipoPySAcontabilizar : listaAnticiposPySAcontabilizar) {
+						int respuestaActualizarAnticiposPySContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(anticipoPySAcontabilizar);
+						
+						if(respuestaActualizarAnticiposPySContabilizado == 1) {
+							LOGGER.info("generarFicheroContabilidad() --> generaAsiento7B() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Anticipo PyS con id: " + anticipoPySAcontabilizar.getIdfactura() + " contabilizado");
+						}else {
+							LOGGER.info("generarFicheroContabilidad() --> generaAsiento7B() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Anticipo PyS con id: " + anticipoPySAcontabilizar.getIdfactura() + " no pudo ser contabilizado");
+							throw new Exception("Anticipo PyS con id: " + anticipoPySAcontabilizar.getIdfactura() + " no pudo ser contabilizado");
+						}
+					}
+					
+				}
+				
+			}
+			catch (Exception e) 
+			{
+				throw new Exception("Error en generarFicheroContabilidad() --> generaAsiento7B()",e);
+			}
+			
+		LOGGER.info("generarFicheroContabilidad() --> generaAsiento7B() --> Salida del metodo para obtener y guardar la informacion de anticipos PyS en el excel");
+		return datosExcel;
+	}
+	
+	//PAGO POR BANCO: ABONO
+	private Vector<Hashtable<String, Object>> generaAsiento2B(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
+
+//		String concepto 			= "";
+//		String asientoContable 		= null; 
+//		String asientoContableBanco = null;
+//		String imp 					= null;
+//		String idFactAnt="";
+//		String idAbonoAnt="";
+//		String ctaproductservAnt="";
+//		
+//		try{
+//			select= " SELECT abonoincluida.idabono idabono, abono.numeroabono numeroabono, abonoincluida.iddisqueteabono iddisqueteabono, "+
+//			" abonoincluida.importeabonado importe, disqueteabono.bancos_codigo bancos_codigo, abono.idpersona idpersona, "+
+//			" disqueteabono.fecha fecha, abono.estado, factura.numerofactura numerofactura, "+
+//			" P.CONFINGRESOS, P.CTAINGRESOS, P.CONFDEUDOR, P.CTACLIENTES,  L.CTAPRODUCTOSERVICIO, abono.idfactura idfactura "+		
+//			" FROM fac_abonoincluidoendisquete abonoincluida, fac_disqueteabonos disqueteabono, fac_abono abono, fac_factura factura, FAC_FACTURACIONPROGRAMADA P, fac_lineaabono la, fac_lineafactura l "+
+//			" WHERE P.IDINSTITUCION = FACTURA.IDINSTITUCION AND P.IDSERIEFACTURACION = FACTURA.IDSERIEFACTURACION AND P.IDPROGRAMACION = FACTURA.IDPROGRAMACION (+)" +
+//			" AND    la.idinstitucion = abono.idinstitucion "+
+//			" AND    la.idabono = abono.idabono "+ 
+//			" AND    la.idfactura = abono.idfactura "+ 
+//			" AND    la.idinstitucion = l.idinstitucion "+ 
+//			" AND    la.idfactura = l.idfactura "+
+//			" AND    la.lineafactura = l.numerolinea (+)"+
+//			" and abono.idinstitucion = factura.idinstitucion" +
+//			" and abono.idfactura = factura.idfactura "+
+//			" and abono.idinstitucion = abonoincluida.idinstitucion "+
+//			" AND abono.idabono = abonoincluida.idabono "+
+//			" AND abonoincluida.idinstitucion = disqueteabono.idinstitucion "+
+//			" AND abonoincluida.iddisqueteabono = disqueteabono.iddisqueteabono "+
+//			" AND abono.idpagosjg IS NULL "+
+//			" and abono.idinstitucion = "+ this.usrbean.getLocation() +
+//			" and abono.estado = 1 "+
+//			" and (exists (select pagocaja.IDFACTURA from fac_pagosporcaja pagocaja "+
+//			" where abono.idinstitucion = pagocaja.idinstitucion and abono.idfactura = pagocaja.idfactura and pagocaja.idabono is null) "+
+//			" or   exists (select disquete2.IDFACTURA from FAC_FACTURAINCLUIDAENDISQUETE disquete2 " +
+//			" where abono.idinstitucion = disquete2.idinstitucion and abono.idfactura = disquete2.idfactura and disquete2.DEVUELTA like 'N') ) ";
+//			if(!fechaDesde.equals("") && !fechaHasta.equals(""))
+//				select+=" AND disqueteabono.FECHA >= TO_DATE('"+GstDate.getApplicationFormatDate("",fechaDesde)+"','YYYY/MM/DD hh24:mi:ss') AND disqueteabono.FECHA <= TO_DATE('"+GstDate.getApplicationFormatDate("",fechaHasta)+"','YYYY/MM/DD hh24:mi:ss')";
+//			else if(!fechaDesde.equals(""))
+//				select+=" AND disqueteabono.FECHA >= TO_DATE('"+GstDate.getApplicationFormatDate("",fechaDesde)+"','YYYY/MM/DD hh24:mi:ss')";
+//			else if(!fechaHasta.equals(""))
+//				select+=" AND disqueteabono.FECHA <= TO_DATE('"+GstDate.getApplicationFormatDate("",fechaHasta)+"','YYYY/MM/DD hh24:mi:ss')";
+//			vAbono=(Vector)this.selectTabla(select);
+//			int con=0;
+//			tx.begin();
+//			for(int x=0;x<vAbono.size();x++){
+//			    con++;
+//			    if (con%numeroTransaccion==0) {
+//			        tx.commit();
+//			        tx.begin(); 
+//			    }
+//				hash = (Hashtable) vAbono.get(x);
+//				imp = (String) hash.get("IMPORTE");
+//			
+//				//Para que no salgan asientos repetidos (sal�a uno por l�nea de factura del mismo CTAPRODUCTOSERVICIO y no procede porque hay que mostrar l�neas de pagos de abonos no de facturas)
+//				if((idFactAnt.equals((String)hash.get("IDFACTURA"))==false)||
+//					   (idAbonoAnt.equals((String)hash.get("IDABONO"))==false)||
+//					   (ctaproductservAnt.equals((String)hash.get("CTAPRODUCTOSERVICIO"))==false))
+//					{
+//					
+//					String confIngresos=(String)hash.get("CONFINGRESOS");
+//					String ctaIngresos=(String)hash.get("CTAINGRESOS");
+//					String confClientes=(String)hash.get("CONFDEUDOR");
+//					String ctaClientes=(String)hash.get("CTACLIENTES");
+//					
+//					String asientoIngresos="";
+//					String asientoClientes="";
+//					
+//					if (confClientes.equals("F")) {
+//					    asientoClientes =  ctaClientes;
+//					} else {
+//					    asientoClientes =  ctaClientes + obtenerAsientoContable(this.usrbean.getLocation(),(String)hash.get("IDPERSONA"));
+//					}
+//					
+//					if (confIngresos.equals("F")) {
+//					    asientoIngresos =  ctaIngresos;
+//					} else if (confIngresos.equals("C")) {
+//					    asientoIngresos =  ctaIngresos + obtenerAsientoContable(this.usrbean.getLocation(),(String)hash.get("IDPERSONA"));
+//					} else {
+//					    asientoIngresos =  ctaIngresos + (String)hash.get("CTAPRODUCTOSERVICIO");
+//					}
+//					// Descripcion del concepto
+//					concepto = UtilidadesString.sustituirParaExcell(UtilidadesString.getMensajeIdioma(this.usrbean,CONCEPTO_ASIENTO7)+ ": "+(String)hash.get("NUMEROFACTURA"));
+//					// RGG concepto  = obtenerDescripcion(CONCEPTO_ASIENTO7,usr.getLanguage(),usr);
+//					
+//					asiento++;
+//	
+//					Hashtable a = new Hashtable();
+//					
+//					// Escribimos 1� asiento
+//					UtilidadesHash.set(a, "FECHA", 			UtilidadesHash.getShortDate(hash, "FECHA"));
+//					UtilidadesHash.set(a, "CONCEPTO", 		concepto);
+//					UtilidadesHash.set(a, "DOCUMENTO", 		UtilidadesHash.getString(hash, "NUMEROABONO"));
+//					UtilidadesHash.set(a, "CUENTA", 		asientoIngresos);
+//					UtilidadesHash.set(a, "DEBE", 			imp);
+//					UtilidadesHash.set(a, "HABER", 			"0");
+//					UtilidadesHash.set(a, "BASEIMPONIBLE", 	"");
+//					UtilidadesHash.set(a, "IVA", 			"");
+//					UtilidadesHash.set(a, "CONTRAPARTIDA", 	asientoClientes);
+//					pwcontabilidad.write(this.generarLineaAbono(asiento, a));				
+//				
+//					// Escribimos 2� asiento
+//					a.clear();
+//					UtilidadesHash.set(a, "FECHA", 			UtilidadesHash.getShortDate(hash, "FECHA"));
+//					UtilidadesHash.set(a, "CONCEPTO", 		concepto);
+//					UtilidadesHash.set(a, "DOCUMENTO", 		UtilidadesHash.getString(hash, "NUMEROABONO"));
+//					UtilidadesHash.set(a, "CUENTA", 		asientoClientes);
+//					UtilidadesHash.set(a, "DEBE", 			"0");
+//					UtilidadesHash.set(a, "HABER", 			imp);
+//					UtilidadesHash.set(a, "BASEIMPONIBLE", 	"");
+//					UtilidadesHash.set(a, "IVA", 			"");
+//					UtilidadesHash.set(a, "CONTRAPARTIDA", 	asientoIngresos);
+//					pwcontabilidad.write(this.generarLineaAbono(asiento, a));
+//					
+//					idFactAnt=(String)hash.get("IDFACTURA");
+//					idAbonoAnt=(String)hash.get("IDABONO");
+//					ctaproductservAnt=(String)hash.get("CTAPRODUCTOSERVICIO");
+//					
+//				}
+//				///////////////////////////////////////////////////////
+//				
+//				String[] claves = {"IDINSTITUCION","IDABONO"};
+//				String[] campos = {"CONTABILIZADO","USUMODIFICACION","FECHAMODIFICACION"};
+//				laHash = new Hashtable();
+//				laHash.put("CONTABILIZADO",ClsConstants.FACTURA_ABONO_CONTABILIZADA);
+//				laHash.put("IDINSTITUCION",this.usrbean.getLocation());
+//				laHash.put("IDABONO",hash.get("IDABONO"));
+//				laHash.put("USUMODIFICACION",this.usrbean.getUserName());
+//				laHash.put("FECHAMODIFICACION","sysdate");
+//				facAbonoIncluidoEnDisqueteAdm.updateDirect(laHash,claves,campos);
+//			}
+//			tx.commit();
+//			
+//			return pwcontabilidad;
+//		}
+//		catch (Exception e) {
+//			pwcontabilidad.write("Error en asiento2D: " + e.getMessage());
+//			try { tx.rollback(); } catch (Exception ee) {}
+//		    throw new ClsExceptions(e,"Error al generar asiento 2D");
+//		}
+	}	
+
 	
 	private String obtenerAsientoContable(String idInstitucion, String idpersona) throws Exception
 	{

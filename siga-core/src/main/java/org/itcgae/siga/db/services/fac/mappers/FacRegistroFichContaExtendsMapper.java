@@ -8,10 +8,15 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.AbonoContabilidadItem;
+import org.itcgae.siga.DTO.fac.AltaAnticipoItem;
+import org.itcgae.siga.DTO.fac.AnticiposPySItem;
+import org.itcgae.siga.DTO.fac.DevolucionesItem;
 import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
 import org.itcgae.siga.DTO.fac.FacturasContabilidadItem;
+import org.itcgae.siga.DTO.fac.LiquidacionAnticipoColegioItem;
 import org.itcgae.siga.DTO.fac.PagoPorBancoItem;
 import org.itcgae.siga.DTO.fac.PagoPorCajaItem;
+import org.itcgae.siga.DTO.fac.PagoPorTarjetaItem;
 import org.itcgae.siga.db.entities.FacRegistrofichconta;
 import org.itcgae.siga.db.mappers.FacRegistrofichcontaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacRegistroFichContaExtendsProvider;
@@ -112,4 +117,69 @@ public interface FacRegistroFichContaExtendsMapper extends FacRegistrofichcontaM
 		@Result(column = "ctaclientes", property = "ctaclientes", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PagoPorBancoItem> obtenerPagosPorBanco(FacRegistrofichconta facRegistroFichConta);
+	
+	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerPagosPorTarjeta")
+	@Results({
+		@Result(column = "idfactura", property = "idfactura", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "numerofactura", property = "numerofactura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "tarjeta", property = "tarjeta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "confdeudor", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ctaclientes", property = "ctaclientes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "importe", property = "importe", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "fecha", property = "fecha", jdbcType = JdbcType.DATE)
+	})
+	List<PagoPorTarjetaItem> obtenerPagosPorTarjeta(FacRegistrofichconta facRegistroFichConta);
+	
+	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerDevoluciones")
+	@Results({
+		@Result(column = "idfactura", property = "idfactura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "importe", property = "importe", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "iddisquetedevoluciones", property = "iddisquetedevoluciones", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "gastosdevolucion", property = "gastosdevolucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "cargarcliente", property = "cargarcliente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "bancos_codigo", property = "bancos_codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idpersona_1", property = "idpersona_1", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "fechageneracion", property = "fechageneracion", jdbcType = JdbcType.DATE),
+		@Result(column = "numerofactura", property = "numerofactura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "confdeudor", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ctaclientes", property = "ctaclientes", jdbcType = JdbcType.NUMERIC),
+	})
+	List<DevolucionesItem> obtenerDevoluciones(FacRegistrofichconta facRegistroFichConta);
+	
+	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerAltasAnticipos")
+	@Results({
+		@Result(column = "idanticipo", property = "idanticipo", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "importeinicial", property = "importeinicial", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "fecha", property = "fecha", jdbcType = JdbcType.DATE)
+	})
+	List<AltaAnticipoItem> obtenerAltasAnticipos(FacRegistrofichconta facRegistroFichConta);
+	
+	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerLiquidacionesAnticiposColegios")
+	@Results({
+		@Result(column = "idanticipo", property = "idanticipo", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "importeanticipado", property = "importeanticipado", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "fechaefectiva", property = "fechaefectiva", jdbcType = JdbcType.DATE)
+	})
+	List<LiquidacionAnticipoColegioItem> obtenerLiquidacionesAnticiposColegios(FacRegistrofichconta facRegistroFichConta);
+	
+	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerAnticiposPyS")
+	@Results({
+		@Result(column = "anticipo", property = "anticipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idfactura", property = "idfactura", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "numerofactura", property = "numerofactura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "tarjeta", property = "tarjeta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "confdeudor", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ctaclientes", property = "ctaclientes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "importe", property = "importe", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "fecha", property = "fecha", jdbcType = JdbcType.DATE),
+		@Result(column = "numerolinea", property = "numerolinea", jdbcType = JdbcType.NUMERIC),
+	})
+	List<AnticiposPySItem> obtenerAnticiposPyS(FacRegistrofichconta facRegistroFichConta);	
+	
 }
