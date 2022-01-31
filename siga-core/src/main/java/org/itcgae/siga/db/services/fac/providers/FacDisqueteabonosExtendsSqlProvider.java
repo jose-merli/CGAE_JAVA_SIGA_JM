@@ -29,7 +29,7 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
         numRecibos.FROM("fac_abonoincluidoendisquete");
         numRecibos.WHERE("idinstitucion = c.idinstitucion AND iddisqueteabono = c.iddisqueteabono");
 
-        principal.SELECT("c.idinstitucion,c.iddisqueteabono, c.fecha, b.bancos_codigo, b.DESCRIPCION CUENTA_ENTIDAD, c.nombrefichero,"
+        principal.SELECT("c.idinstitucion,c.iddisqueteabono, c.fecha, b.bancos_codigo, b.DESCRIPCION CUENTA_ENTIDAD, c.nombrefichero, c.fcs, "
                 + "c.idsufijo,( s.sufijo || ' - ' || s.concepto ) sufijo, ("+totalRemesa.toString()+") AS totalimporte, ("+numRecibos.toString()+") AS numfacturas");
         principal.SELECT("(SELECT fp.CODIGO || ' ' || f_siga_getrecurso(fp.NOMBRE, " + idioma + ") FROM FAC_PROPOSITOS fp WHERE fp.IDPROPOSITO = idpropsepa) propSEPA");
         principal.SELECT("(SELECT fp.CODIGO || ' ' || f_siga_getrecurso(fp.NOMBRE, 1) FROM FAC_PROPOSITOS fp WHERE fp.IDPROPOSITO = idpropotros) propOtros");
@@ -39,7 +39,12 @@ public class FacDisqueteabonosExtendsSqlProvider extends FacDisqueteabonosSqlPro
         principal.LEFT_OUTER_JOIN("fac_sufijo s ON (s.idinstitucion=c.idinstitucion AND s.idsufijo=c.idsufijo)");
 
         principal.WHERE("c.idinstitucion="+idInstitucion);
-        principal.WHERE("c.fcs='0'");
+
+        if (item.getFcs() != null && item.getFcs()) {
+            principal.WHERE("c.fcs='1'");
+        } else {
+            principal.WHERE("c.fcs='0'");
+        }
 
         //CUENTA BANCARIA
         if(item.getBancosCodigo()!=null) {

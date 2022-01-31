@@ -675,4 +675,17 @@ public class UtilidadesString {
 
 		return esValido;
 	}
+	
+	  public static String sustituirParaExcel(String sCadena)
+	  {
+	    String sSalida="";
+
+	    if (sCadena==null) return sSalida;
+	    sSalida = sCadena.replaceAll("\t", " ");
+	    sSalida = sSalida.replaceAll("\n\r", " ");
+	    sSalida = sSalida.replaceAll("\n", " ");
+	    sSalida = sSalida.replaceAll("\r", " ");
+	    //sSalida = sSalida.replaceAll("", "\u20ac");
+	    return sSalida;
+	  }
 }

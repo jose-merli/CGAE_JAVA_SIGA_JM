@@ -223,61 +223,56 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
 
         return sql.toString();
     }
-    
-	public String getListaNFacturacionesProgramadasProcesar(Integer rownum, Double tiempoMaximoEjecucionBloqueada) {
-		SQL sql = new SQL();
-		sql.SELECT("FAC_FACTURACIONPROGRAMADA.*");
-		sql.FROM("FAC_FACTURACIONPROGRAMADA", "FAC_SERIEFACTURACION");
-		sql.WHERE("FAC_FACTURACIONPROGRAMADA.FECHAREALGENERACION IS NULL ",
-				"FAC_FACTURACIONPROGRAMADA.FECHAPREVISTAGENERACION IS NOT NULL ",
-				"FAC_FACTURACIONPROGRAMADA.FECHAPREVISTAGENERACION <= SYSDATE ",
-				"FAC_FACTURACIONPROGRAMADA.IDINSTITUCION=FAC_SERIEFACTURACION.IDINSTITUCION",
-				"FAC_FACTURACIONPROGRAMADA.IDSERIEFACTURACION=FAC_SERIEFACTURACION.IDSERIEFACTURACION",
-				"(FAC_FACTURACIONPROGRAMADA.IDESTADOCONFIRMACION= " + FacEstadosFacturacion.GENERACION_PROGRAMADA
-						+ " OR ( FAC_FACTURACIONPROGRAMADA.IDESTADOCONFIRMACION  = "
-						+ FacEstadosFacturacion.EJECUTANDO_GENERACION + " AND SYSDATE - "
-						+ tiempoMaximoEjecucionBloqueada + " > FAC_SERIEFACTURACION.FECHAMODIFICACION  )) ");
-		sql.ORDER_BY("FAC_FACTURACIONPROGRAMADA.FECHAPREVISTAGENERACION");
-		SQL sql2 = new SQL();
-		sql2.SELECT("*");
-		sql2.FROM("(" + sql.toString() + ") C ");
-		sql2.WHERE("rownum<=" + rownum);
 
-		return sql2.toString();
-	}
-    
-    
-	public String getListaNConfirmarFacturacionesProgramadas(Integer rownum) {
-		SQL sql = new SQL();
-		final String sEstadosValidos = String.join(FacEstadosFacturacion.GENERADA.toString(), FacEstadosFacturacion.CONFIRM_PROGRAMADA.toString());
-		
-		SQL sqlSubSelect = new SQL();
-		sqlSubSelect.SELECT("1");
-		sqlSubSelect.FROM("FAC_FACTURACIONPROGRAMADA PREVIA");
-		sqlSubSelect.WHERE("PREVIA.IDSERIEFACTURACION=FAC_FACTURACIONPROGRAMADA.IDSERIEFACTURACION",
-							"PREVIA.VISIBLE='S'",
-							"PREVIA.IDESTADOCONFIRMACION<>"+ FacEstadosFacturacion.CONFIRM_FINALIZADA);
-		
-		sql.SELECT("FAC_FACTURACIONPROGRAMADA.*");
-		sql.FROM("FAC_FACTURACIONPROGRAMADA", "FAC_SERIEFACTURACION");
-		sql.WHERE("FAC_FACTURACIONPROGRAMADA.FECHAREALGENERACION IS NULL ",
-				"FAC_FACTURACIONPROGRAMADA.FECHAPREVISTACONFIRM IS NOT NULL ",
-				"FAC_FACTURACIONPROGRAMADA.FECHAPREVISTACONFIRM <= SYSDATE ",
-				"FAC_FACTURACIONPROGRAMADA.VISIBLE = 'S'",
-				"FAC_FACTURACIONPROGRAMADA.IDESTADOCONFIRMACION IN (" + sEstadosValidos + " )",
-				"FAC_FACTURACIONPROGRAMADA.IDINSTITUCION=FAC_SERIEFACTURACION.IDINSTITUCION",
-				"FAC_FACTURACIONPROGRAMADA.IDSERIEFACTURACION=FAC_SERIEFACTURACION.IDSERIEFACTURACION",
-				"NOT EXISTS ( " + sqlSubSelect.toString() + ") ");
-				
-				
-		sql.ORDER_BY("FAC_FACTURACIONPROGRAMADA.FECHAPREVISTACONFIRM");
-		
-		SQL sql2 = new SQL();
-		sql2.SELECT("*");
-		sql2.FROM("(" + sql.toString() + ") C ");
-		sql2.WHERE("rownum<=" + rownum);
-		return sql2.toString();
-	}
+    public String getListaNFacturacionesProgramadasProcesar(Double tiempoMaximoEjecucionBloqueada, String idInstitucion) {
+        SQL sql = new SQL();
+        sql.SELECT("FAC_FACTURACIONPROGRAMADA.*");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA", "FAC_SERIEFACTURACION");
+        sql.WHERE("FAC_FACTURACIONPROGRAMADA.IDINSTITUCION = " + idInstitucion,
+                "FAC_FACTURACIONPROGRAMADA.FECHAREALGENERACION IS NULL ",
+                "FAC_FACTURACIONPROGRAMADA.FECHAPREVISTAGENERACION IS NOT NULL ",
+                "FAC_FACTURACIONPROGRAMADA.FECHAPREVISTAGENERACION <= SYSDATE ",
+                "FAC_FACTURACIONPROGRAMADA.IDINSTITUCION=FAC_SERIEFACTURACION.IDINSTITUCION",
+                "FAC_FACTURACIONPROGRAMADA.IDSERIEFACTURACION=FAC_SERIEFACTURACION.IDSERIEFACTURACION",
+                "(FAC_FACTURACIONPROGRAMADA.IDESTADOCONFIRMACION= " + FacEstadosFacturacion.GENERACION_PROGRAMADA
+                        + " OR ( FAC_FACTURACIONPROGRAMADA.IDESTADOCONFIRMACION  = "
+                        + FacEstadosFacturacion.EJECUTANDO_GENERACION + " AND SYSDATE - "
+                        + tiempoMaximoEjecucionBloqueada + " > FAC_SERIEFACTURACION.FECHAMODIFICACION  )) ");
+        sql.ORDER_BY("FAC_FACTURACIONPROGRAMADA.FECHAPREVISTAGENERACION");
+
+        return sql.toString();
+    }
+
+
+    public String getListaNConfirmarFacturacionesProgramadas(String idInstitucion) {
+
+        final String sEstadosValidos = String.join(FacEstadosFacturacion.GENERADA.toString(), FacEstadosFacturacion.CONFIRM_PROGRAMADA.toString());
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("1");
+        subQuery.FROM("FAC_FACTURACIONPROGRAMADA PREVIA");
+        subQuery.WHERE("PREVIA.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("PREVIA.IDSERIEFACTURACION = SF.IDSERIEFACTURACIONPREVIA");
+        subQuery.WHERE("PREVIA.VISIBLE = 'S'");
+        subQuery.WHERE("PREVIA.IDESTADOCONFIRMACION <> " + FacEstadosFacturacion.CONFIRM_FINALIZADA.getId());
+
+        SQL sql = new SQL();
+        sql.SELECT("FP.*");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP, FAC_SERIEFACTURACION SF");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTACONFIRM <= SYSDATE");
+        sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
+        sql.WHERE("FP.VISIBLE = 'S'");
+        sql.WHERE("FP.IDESTADOCONFIRMACION IN (" + sEstadosValidos + " )");
+        sql.WHERE("FP.IDINSTITUCION = SF.IDINSTITUCION");
+        sql.WHERE("FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("AND NOT EXISTS (" + subQuery + ")");
+
+        sql.ORDER_BY("FP.FECHAPREVISTACONFIRM");
+
+        return sql.toString();
+    }
 	
 	public String isSerieFacturacionActiva(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion) {
 		SQL sql=new SQL();

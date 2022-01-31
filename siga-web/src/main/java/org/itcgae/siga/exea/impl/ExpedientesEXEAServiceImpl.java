@@ -5,6 +5,7 @@ import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeRequestDocumen
 import es.cgae.consultatramites.token.schema.AutenticarUsuarioSedeResponseDocument;
 import es.cgae.consultatramites.token.schema.UsuarioType;
 import ieci.tdw.ispac.services.ws.server.*;
+import org.apache.axis2.context.OperationContext;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.mappers.CenComunidadesautonomasMapper;
 import org.itcgae.siga.db.mappers.CenDocumentacionpresentadaMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -52,14 +54,17 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.*;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.*;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -137,6 +142,13 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     @Autowired
     private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
+
+    @Autowired
+    private CenComunidadesautonomasMapper cenComunidadesautonomasMapper;
+
+    private OperationContext operationContext;
+
+
 
     @Override
     public StringDTO isEXEActivoInstitucion(HttpServletRequest request) {
@@ -707,7 +719,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                     Long idFichero = uploadFile(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucionSol,
                             nombreFichero, extension, idSolicitud);
 
-                    if(!"002".equals(documentacionIncorporacionItem.getCodDocEXEA())) {
+                    String codDocAnexo = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.COD_DOC_ANEXO_PARAM, idInstitucion.toString()).getValor();
+
+                    if(!codDocAnexo.equals(documentacionIncorporacionItem.getCodDocEXEA())) {
                         CenDocumentacionpresentada cenDocumentacionpresentada = new CenDocumentacionpresentada();
                         cenDocumentacionpresentada.setIdsolicitud(Long.valueOf(idSolicitud));
                         cenDocumentacionpresentada.setIddocumentacion(Short.valueOf(documentacionIncorporacionItem.getIdDocumentacion()));
@@ -826,6 +840,91 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
     }
 
     @Override
+    public ResponseEntity<InputStreamResource> getJustificante(HttpServletRequest request, String claveConsulta) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ResponseEntity<InputStreamResource> res = null;
+        InputStream fileStream = null;
+        HttpHeaders headers = new HttpHeaders();
+
+        try {
+
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+            LOGGER.info(
+                    "ExpedientesEXEAServiceImpl.getJustificante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            LOGGER.info(
+                    "ExpedientesEXEAServiceImpl.getJustificante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (usuarios != null && !usuarios.isEmpty() && !UtilidadesString.esCadenaVacia(claveConsulta)) {
+
+                String urlWS = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.EXEA_URL_WEBSERVICES_REGTEL, idInstitucion.toString()).getValor();
+
+                SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+                SOAPConnection soapConnection = soapConnectionFactory.createConnection();
+
+                MessageFactory messageFactory = MessageFactory.newInstance();
+                SOAPMessage soapRequest = messageFactory.createMessage();
+
+                SOAPPart soapPart = soapRequest.getSOAPPart();
+                //Create this based on the SOAP request XML, you can use SOAP UI to get the XML as you like
+                String myNamespace = "ereg";
+                String myNamespaceURI = "http://www.redabogacia.org/regtel/ws/eregtel";
+
+                // SOAP Envelope
+                SOAPEnvelope envelope = soapPart.getEnvelope();
+                envelope.addNamespaceDeclaration(myNamespace, myNamespaceURI);
+
+                // SOAP Body
+                SOAPBody soapBody = envelope.getBody();
+                SOAPElement soapBodyElem = soapBody.addChildElement("ConsultaAdjunto", myNamespace);
+
+                SOAPElement claveConsultaElem = soapBodyElem.addChildElement("claveConsulta", myNamespace);
+                claveConsultaElem.addTextNode(claveConsulta);
+
+                SOAPElement numSecElement = soapBodyElem.addChildElement("nroSecuenciaAdjunto", myNamespace);
+                numSecElement.addTextNode("-1");
+
+                SOAPMessage soapResponse = soapConnection.call(soapRequest, urlWS);
+                int numOfAttachments = soapResponse.countAttachments();
+                if(numOfAttachments > 0){
+                    Iterator attachments = soapResponse.getAttachments();
+                    while(attachments.hasNext()){
+                        AttachmentPart attachment = (AttachmentPart) attachments.next();
+                        byte [] fichero = attachment.getRawContentBytes();
+                        fileStream = new ByteArrayInputStream(fichero);
+                        headers.setContentType(MediaType.parseMediaType(attachment.getContentType()));
+                    }
+
+                    Iterator itr = soapResponse.getSOAPBody().getChildElements();
+                    javax.xml.soap.Node nodoConsultaAdjuntoResponse = (javax.xml.soap.Node) itr.next();
+                    Node adjunto = nodoConsultaAdjuntoResponse.getFirstChild();
+                    String nombreArchivo = adjunto.getChildNodes().item(1).getTextContent();
+
+                    headers.set("Content-Disposition",
+                            "attachment; filename=" + nombreArchivo);
+                }
+
+                soapConnection.close();
+
+                res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+                        HttpStatus.OK);
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "ExpedientesEXEAServiceImpl.getJustificante() -> Se ha producido un error al descargar el justificante",
+                    e);
+        }
+
+        return res;
+    }
+
+    @Override
     @Transactional
     public DeleteResponseDTO eliminarDocumentoSolIncorp(HttpServletRequest request, String idSolicitud, List<DocumentacionIncorporacionItem> documentos) {
         String token = request.getHeader("Authorization");
@@ -862,7 +961,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                         file.delete();
                     }
 
-                    if(!"002".equals(doc.getCodDocEXEA())) {
+                    String codDocAnexo = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.COD_DOC_ANEXO_PARAM, idInstitucion.toString()).getValor();
+
+                    if(!codDocAnexo.equals(doc.getCodDocEXEA())) {
                         CenDocumentacionpresentadaKey cenDocumentacionpresentadaKey = new CenDocumentacionpresentadaKey();
                         cenDocumentacionpresentadaKey.setIddocumentacion(Short.valueOf(doc.getIdDocumentacion()));
                         cenDocumentacionpresentadaKey.setIdsolicitud(Long.valueOf(idSolicitud));
@@ -976,9 +1077,12 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                                 && SigaConstants.OK.equals(consultaAsientoResponseDocument.getConsultaAsientoResponse().getRespuesta().getCodigo())){
 
                                 String numRegistro = registroEntradaResponseDocument.getRegistroEntradaResponse().getDatosRespuesta().getCodigoRegistro();
+                                String numExpediente = consultaAsientoResponseDocument.getConsultaAsientoResponse().getAsiento().getDatosExpedienteAsiento().getNumeroExpediente();
                                 LOGGER.info("iniciarTramiteColegiacionEXEA() / Numero registro REGTEL: " + numRegistro);
                                 //Seteamos numero registro
                                 solicitudincorporacion.setNumRegistro(numRegistro);
+                                solicitudincorporacion.setClaveconsultaregtel(claveConsulta);
+                                solicitudincorporacion.setNumExpediente(numExpediente);
                                 //Pasamos de pendiente documentacion a pendiente aprobacion
                                 solicitudincorporacion.setIdestado(SigaConstants.INCORPORACION_PENDIENTE_APROBACION);
                                 solicitudincorporacion.setFechaestado(new Date());
@@ -989,7 +1093,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                                 if(affectedRows == 1){
                                     LOGGER.info("iniciarTramiteColegiacionEXEA() / Actualizado en BBDD");
                                     updateResponseDTO.setStatus(SigaConstants.OK);
-                                    updateResponseDTO.setId(solicitudincorporacion.getIdsolicitud().toString() + ";" + solicitudincorporacion.getNumRegistro());
+                                    updateResponseDTO.setId(solicitudincorporacion.getIdsolicitud().toString() + ";" + solicitudincorporacion.getNumRegistro() + ";" + solicitudincorporacion.getClaveconsultaregtel() + ";" + solicitudincorporacion.getNumExpediente());
                                 }else{
                                     error.setCode(500);
                                     error.setDescription("Error al actualizar la solicitud");
@@ -1549,6 +1653,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     private RegistroEntradaDocument fillRegistroEntradaDocument (CenSolicitudincorporacion cenSolicitudincorporacion, Short idInstitucion, String asunto) throws IOException, NoSuchAlgorithmException, TransformerException, ParserConfigurationException {
         RegistroEntradaDocument registroEntradaDocument = null;
+        LOGGER.info("fillRegistroEntradaDocument() / INICIO");
 
         //Obtenemos el codigo del procedimiento de colegiacion de exea para la institucion
         ExpProcedimientosExeaExample expProcedimientosExeaExample = new ExpProcedimientosExeaExample();
@@ -1606,6 +1711,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             RegistroEntradaDocument.RegistroEntrada.Adjuntos adjuntos = registroEntrada.addNewAdjuntos();
             CenDocumentacionpresentadaExample cenDocumentacionpresentadaExample = new CenDocumentacionpresentadaExample();
             cenDocumentacionpresentadaExample.createCriteria().andIdsolicitudEqualTo(cenSolicitudincorporacion.getIdsolicitud());
+            LOGGER.info("fillRegistroEntradaDocument() / Datos especificos: " + registroEntrada.getDatosEspecificos());
 
             List<CenDocumentacionpresentada> documentosSolicitud = cenDocumentacionpresentadaMapper.selectByExample(cenDocumentacionpresentadaExample);
 
@@ -1648,6 +1754,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
         }
 
+        LOGGER.info("fillRegistroEntradaDocument() / FIN");
         return registroEntradaDocument;
     }
 
@@ -1702,9 +1809,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         if(Short.valueOf((short)10) == solicitudincorporacion.getIdtipoidentificacion()){ //NIF-DNI
             tipoDocIdent.appendChild(doc.createTextNode("D"));
         }else if(Short.valueOf((short)40) == solicitudincorporacion.getIdtipoidentificacion()){ //NIE
-            tipoDocIdent.appendChild(doc.createTextNode("N"));
+            tipoDocIdent.appendChild(doc.createTextNode("X"));
         }else{ //Pasaporte
-            tipoDocIdent.appendChild(doc.createTextNode("P"));
+            tipoDocIdent.appendChild(doc.createTextNode("T"));
         }
         solicitanteElement.appendChild(tipoDocIdent);
 
@@ -1778,9 +1885,10 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         emailElement.appendChild(doc.createTextNode(solicitudincorporacion.getCorreoelectronico()));
         detallesElement.appendChild(emailElement);
 
-        Element coberturaElement = doc.createElement("coberturaSocial");
+        //Ya no se pasa
+        /*Element coberturaElement = doc.createElement("coberturaSocial");
         coberturaElement.appendChild(doc.createTextNode("RT"));
-        detallesElement.appendChild(coberturaElement);
+        detallesElement.appendChild(coberturaElement);*/
 
         if(solicitudincorporacion.getIdestadocivil() != null){
             String cdgoEstadoCivil = cenEstadocivilExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdestadocivil()).getCodigoejis().substring(0,1);
@@ -1790,11 +1898,11 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         }
 
         Element autorizaCesionElement = doc.createElement("autorizaCesion");
-        autorizaCesionElement.appendChild(doc.createTextNode("MA"));
+        autorizaCesionElement.appendChild(doc.createTextNode(SigaConstants.NO));
         detallesElement.appendChild(autorizaCesionElement);
 
         Element cniElement = doc.createElement("solicitarCNI");
-        cniElement.appendChild(doc.createTextNode(SigaConstants.SI));
+        cniElement.appendChild(doc.createTextNode(SigaConstants.NO));
         detallesElement.appendChild(cniElement);
 
         Element reincorpElement = doc.createElement("reincorporacion");
@@ -1854,11 +1962,13 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         codPaisElement.appendChild(doc.createTextNode(cdgoExtPais));
         postalElement.appendChild(codPaisElement);
 
+        CenProvincias cenProvincias = cenProvinciasExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdprovincia());
+        String codExtComAut = cenComunidadesautonomasMapper.selectByPrimaryKey(cenProvincias.getIdcomunidadautonoma()).getCodigoext();
         Element codComunidadElement = doc.createElement("codComunidad");
-        codComunidadElement.appendChild(doc.createTextNode("13")); //FIXME - Preguntar como debe ir informado, no usamos comunidad aut en siga
+        codComunidadElement.appendChild(doc.createTextNode(codExtComAut));
         postalElement.appendChild(codComunidadElement);
 
-        String codExtProvincia = cenProvinciasExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdprovincia()).getCodigoext();
+        String codExtProvincia = cenProvincias.getCodigoext();
         Element codProvinciaElement = doc.createElement("codProvincia");
         codProvinciaElement.appendChild(doc.createTextNode(codExtProvincia));
         postalElement.appendChild(codProvinciaElement);
@@ -1874,21 +1984,21 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         codPostalElement.appendChild(doc.createTextNode(solicitudincorporacion.getCodigopostal()));
         postalElement.appendChild(codPostalElement);
 
-        Element tipoViaElement = doc.createElement("tipoVia");
+        /*Element tipoViaElement = doc.createElement("tipoVia");
         tipoViaElement.appendChild(doc.createTextNode("CL"));
-        postalElement.appendChild(tipoViaElement);
+        postalElement.appendChild(tipoViaElement);*/
 
         Element nombreViaElement = doc.createElement("nombreVia");
-        nombreViaElement.appendChild(doc.createTextNode("Prueba")); //FIXME
+        nombreViaElement.appendChild(doc.createTextNode(solicitudincorporacion.getDomicilio())); //FIXME
         postalElement.appendChild(nombreViaElement);
 
-        Element numeroViaElement = doc.createElement("numeroVia");
+        /*Element numeroViaElement = doc.createElement("numeroVia");
         numeroViaElement.appendChild(doc.createTextNode("1")); //FIXME
         postalElement.appendChild(numeroViaElement);
 
         Element restoDirElement = doc.createElement("restoDir");
         restoDirElement.appendChild(doc.createTextNode("1 A")); //FIXME
-        postalElement.appendChild(restoDirElement);
+        postalElement.appendChild(restoDirElement);*/
         //NODO DIRECCION POSTAL - FIN
 
         if(!UtilidadesString.esCadenaVacia(solicitudincorporacion.getTelefono1())

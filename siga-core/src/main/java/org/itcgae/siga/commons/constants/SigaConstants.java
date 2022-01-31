@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -571,6 +572,7 @@ public class SigaConstants {
     public static final String ESTADO_FACTURA_ENREVISION = "7";
     public static final String ESTADO_FACTURA_ANULADA = "8";
     public static final String ESTADO_FACTURA_DEVUELTA = "4";
+    public static final String ESTADO_FACTURA_LISTA_PARA_FICHERO = "6";
 
     public static final String PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF = "facturacion.directorioFisicoFacturaPDFJava";
     public static final String PARAMETRO_DIRECTORIO_FACTURA_PDF = "facturacion.directorioFacturaPDFJava";
@@ -1171,12 +1173,37 @@ public class SigaConstants {
 	public static final String TIPO_CARGA = "GF";
 	public static final String C_FECHAINICIO = "FECHAINICIO";
 	public static final String C_FECHAFIN = "FECHAFIN";
-
+	
+	//FICHERO CONTABILIDAD
+	public static final String ASIENTO = "facturacion.exportacionesyotros.contabilidad.asiento";
+	public static final String FECHA = "facturacionSJCS.facturacionesYPagos.fecha";
+	public static final String CUENTA = "facturacion.exportacionesyotros.contabilidad.cuenta";
+	public static final String CONCEPTO = "facturacionSJCS.facturacionesYPagos.conceptos";
+	public static final String DOCUMENTO = "justiciaGratuita.ejg.documentacion.Documento";
+	public static final String DEBE = "facturacion.exportacionesyotros.contabilidad.debe";
+	public static final String HABER = "facturacion.exportacionesyotros.contabilidad.haber";
+	public static final String BASEIMP = "facturacion.exportacionesyotros.contabilidad.baseimp";
+	public static final String TIPOIVA = "facturacion.facturas.lineas.tipoIVA";
+	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
+	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
+	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura 
+	public static final String CONCEPTO_ASIENTO3_2		= "general.literal.asiento3_2"; 	// Pago Anticipado. Factura 
+	public static final String CONCEPTO_ASIENTO4		= "general.literal.asiento4"; 	    // Pago por banco. Factura 
+	public static final String CONCEPTO_ASIENTO5		= "general.literal.asiento5"; 	    // Devolucion por banco. Factura Nº
+	public static final String CONCEPTO_ASIENTO6		= "general.literal.asiento6"; 	    // Pago por caja. Factura Rectificativa Nº 
+	public static final String CONCEPTO_ASIENTO7		= "general.literal.asiento7"; 	    // Pago por banco. Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO10		= "general.literal.asiento3_1";     // Pago por tarjeta. Factura
+	public static final String CONCEPTO_ASIENTO3_2010   = "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2010";  // Compensación por caja
+	public static final String CONCEPTO_ASIENTO14		= "general.literal.asiento14";      // Alta de anticipos 
+	public static final String CONCEPTO_ASIENTO15		= "general.literal.asiento15";      // Liquidación de anticipos de Letrado por Baja Colegial
+	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, C_IDGRUPO, GENERAL,
 			ACCION, C_FECHAINICIO);
 
 	public static final List<String> CAMPOSLOGGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, PERSONANOMBRE,
 			C_IDPERSONA, C_IDGRUPO, GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO, ERRORES);
+	
 
 	public static final String tipoExcelXls = "xls";
 	public static final String tipoExcelXlsx = "xlsx";
@@ -1497,6 +1524,7 @@ public class SigaConstants {
 	public static final short SANCION_EN_SUSPENSO = 8;
 	public static final short INCORPORACION_PENDIENTE_APROBACION = 20;
 	public static final short INCORPORACION_PENDIENTE_DOCUMENTACION = 10;
+	public static final String COD_DOC_ANEXO_PARAM = "COD_DOC_ANEXO";
 
 	public enum ERROR_SINCRONIZACION_EXEA {
 		FORMATO_NOVALIDO("Formato XML de petición no correcto."),
@@ -1529,5 +1557,23 @@ public class SigaConstants {
 	//Expedientes - FIN
 
     public static final String PARAMETRO_LOG_COLALETRADOS_LEVEL = "log.colaLetrados.level";
+
+    public enum FASES_PROCESO_FACTURACION_AUTOMATICA_PYS {
+        TRATAR_FACTURACION("1"),
+        TRATAR_CONFIRMACION("2"),
+        GENERAR_PDFS_Y_ENVIAR_FACTURAS_PROGRAMACION("3"),
+        GENERAR_ENVIOS_FACTURAS_PENDIENTES("4"),
+        COMPROBACION_TRASPASO_FACTURAS("5");
+
+        private String codigo;
+
+        FASES_PROCESO_FACTURACION_AUTOMATICA_PYS(String codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getCodigo() {
+            return this.codigo;
+        }
+    }
 
 }
