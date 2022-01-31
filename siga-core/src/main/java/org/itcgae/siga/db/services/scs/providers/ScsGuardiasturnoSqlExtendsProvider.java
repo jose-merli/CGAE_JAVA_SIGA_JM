@@ -1337,13 +1337,18 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if (calendarioItem.getFechaProgramadaHasta() != null && calendarioItem.getFechaProgramadaHasta() != "") {
 		sql.WHERE("PC.FECHAPROGRAMACION <= " + "TO_DATE('" +  calendarioItem.getFechaProgramadaHasta() + "','dd/MM/yyyy HH24:mi:ss')");
 		}
+//		if (calendarioItem.getFechaCalendarioDesde() != null && calendarioItem.getFechaCalendarioDesde() != "") {
+//		sql.WHERE("trunc(PC.FECHACALINICIO) >= " + "TO_DATE('" + calendarioItem.getFechaCalendarioDesde()+ "','DD/MM/YYYY')");
+//		}
+//		if (calendarioItem.getFechaCalendarioHasta() != null && calendarioItem.getFechaCalendarioHasta() != "") {
+//			sql.WHERE("trunc(PC.FECHACALFIN) <= " + "TO_DATE('" + calendarioItem.getFechaCalendarioHasta() + "','DD/MM/YYYY')");
+//			}
 		if (calendarioItem.getFechaCalendarioDesde() != null && calendarioItem.getFechaCalendarioDesde() != "") {
-		sql.WHERE("trunc(PC.FECHACALINICIO) >= " + "TO_DATE('" + calendarioItem.getFechaCalendarioDesde()+ "','DD/MM/YYYY')");
+			sql.WHERE("trunc(PC.FECHACALFIN) >= " + "TO_DATE('" + calendarioItem.getFechaCalendarioDesde() + "','DD/MM/YYYY')");
 		}
 		if (calendarioItem.getFechaCalendarioHasta() != null && calendarioItem.getFechaCalendarioHasta() != "") {
-			sql.WHERE("trunc(PC.FECHACALFIN) <= " + "TO_DATE('" + calendarioItem.getFechaCalendarioHasta() + "','DD/MM/YYYY')");
-			}
-
+			sql.WHERE("trunc(PC.FECHACALINICIO) <= " + "TO_DATE('" + calendarioItem.getFechaCalendarioHasta()+ "','DD/MM/YYYY')");	
+		}
 		if (calendarioItem.getIdTurno() != null && calendarioItem.getIdTurno() != "") {
 		sql.WHERE("(hpc.IDTURNO IN ( " + calendarioItem.getIdTurno() + " ) OR hpc.idturno is null)");
 		}
