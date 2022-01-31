@@ -387,9 +387,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private FacBancoinstitucionMapper facBancoInstitucionMapper;
-	
-	@Autowired
-	private FacPagosporcajaMapper facPagosPorCajaMapper;
 
 	private static final int EXCEL_ROW_FLUSH = 1000;
 	
@@ -4964,7 +4961,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if(listaPagosPorCajaAcontabilizar.size() > 0){
 				
 				for (FacPagosporcaja pagoPorCajaAcontabilizar : listaPagosPorCajaAcontabilizar) {
-					int respuestaActualizarPagoPorCajaContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(pagoPorCajaAcontabilizar);
+					int respuestaActualizarPagoPorCajaContabilizado = facPagosporcajaMapper.updateByPrimaryKeySelective(pagoPorCajaAcontabilizar);
 					
 					if(respuestaActualizarPagoPorCajaContabilizado == 1) {
 						LOGGER.info("generarFicheroContabilidad() --> generaAsiento3() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Pago por caja con id: " + pagoPorCajaAcontabilizar.getIdfactura() + " contabilizado");
