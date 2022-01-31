@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.CenDocumentsolicitudinstituSqlProvider;
 
 public class CenDocumentsolicitudinstituSqlExtendsProvider extends CenDocumentsolicitudinstituSqlProvider {
 
-    public String getDocRequerida(Short idInstitucion, String tipoColegiacion, String tipoSolicitud, String modalidadDocumentacion, String idLenguaje, String idSolicitud){
+    public String getDocRequerida(Short idInstitucion, String tipoColegiacion, String tipoSolicitud, String modalidadDocumentacion, String idLenguaje, String idSolicitud, String codDocAnexo){
         SQL SQL = new SQL();
 
         SQL.SELECT("DS.IDDOCUMENTACION",
@@ -34,10 +34,10 @@ public class CenDocumentsolicitudinstituSqlExtendsProvider extends CenDocumentso
                 "IDTIPOSOLICITUD = '"+tipoSolicitud+"'",
                 "IDMODALIDAD = '"+modalidadDocumentacion+"'",
                 "FECHA_BAJA IS NULL",
-                "CODIGOEXT != '002'");
+                "CODIGOEXT != '"+codDocAnexo+"'");
         if(!UtilidadesString.esCadenaVacia(idSolicitud)) {
             SQL.OR();
-            SQL.WHERE("(CODIGOEXT = '002' AND IDFICHERO IS NOT NULL)");
+            SQL.WHERE("(CODIGOEXT = '"+codDocAnexo+"' AND IDFICHERO IS NOT NULL)");
         }
         SQL.ORDER_BY("OBLIGATORIO DESC");
         return SQL.toString();

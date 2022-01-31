@@ -27,6 +27,7 @@ public interface ExpedientesEXEAService {
     InsertResponseDTO sincronizarDocumentacionEXEA(HttpServletRequest request, List<DocumentacionIncorporacionItem> documentacionEXEA);
     InsertResponseDTO subirDocumentoSolIncorp(MultipartHttpServletRequest request);
     ResponseEntity<InputStreamResource> descargarDocumentosSolIncorp(List<DocumentacionIncorporacionItem> documentos, HttpServletRequest request);
+    ResponseEntity<InputStreamResource> getJustificante(HttpServletRequest request, String claveConsulta);
     DeleteResponseDTO eliminarDocumentoSolIncorp(HttpServletRequest request, String idSolicitud, List<DocumentacionIncorporacionItem> documentos);
     UpdateResponseDTO iniciarTramiteColegiacionEXEA(HttpServletRequest request, String idSolicitud);
 }

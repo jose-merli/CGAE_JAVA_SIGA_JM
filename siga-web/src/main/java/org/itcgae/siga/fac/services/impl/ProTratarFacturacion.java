@@ -38,16 +38,14 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         try {
 
             TransactionStatus transactionStatus = getNewLongTransaction();
-            boolean alMenosUnafacturacionProgramadaEncontrada = false;
 
             // Obtencion de la propiedad que contiene el tiempo de espera que se les da a las facturaciones en ejcucion no generadas por alguna anomalia
             Double tiempoMaximoEjecucion = getMaxMinutosEnEjecucion();
 
-            List<FacFacturacionprogramada> facFacturacionprogramadaList = facProgMapper.getListaNFacturacionesProgramadasProcesar(tiempoMaximoEjecucion);
+            List<FacFacturacionprogramada> facFacturacionprogramadaList = facProgMapper.getListaNFacturacionesProgramadasProcesar(tiempoMaximoEjecucion, idInstitucion);
 
             if (facFacturacionprogramadaList != null && facFacturacionprogramadaList.size() > 0) {
 
-                alMenosUnafacturacionProgramadaEncontrada = true;
                 FacFacturacionprogramada facFacturacionprogramada = facFacturacionprogramadaList.get(0);
 
                 try {

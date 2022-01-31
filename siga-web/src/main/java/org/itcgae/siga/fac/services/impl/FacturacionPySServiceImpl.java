@@ -392,9 +392,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-
-	@Autowired
-	private INuevoFicheroDevolucionesAsyncService nuevoFicheroDevolucionesAsyncService;
 	
 	@Autowired
 	private FacBancoinstitucionMapper facBancoInstitucionMapper;
@@ -3759,6 +3756,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facItem,
 			HttpServletRequest request) throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
@@ -5043,7 +5041,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if(listaPagosPorCajaAcontabilizar.size() > 0){
 				
 				for (FacPagosporcaja pagoPorCajaAcontabilizar : listaPagosPorCajaAcontabilizar) {
-					int respuestaActualizarPagoPorCajaContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(pagoPorCajaAcontabilizar);
+					int respuestaActualizarPagoPorCajaContabilizado = facPagosporcajaMapper.updateByPrimaryKeySelective(pagoPorCajaAcontabilizar);
 					
 					if(respuestaActualizarPagoPorCajaContabilizado == 1) {
 						LOGGER.info("generarFicheroContabilidad() --> generaAsiento3() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Pago por caja con id: " + pagoPorCajaAcontabilizar.getIdfactura() + " contabilizado");
