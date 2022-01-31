@@ -4501,7 +4501,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		// Banco (572.1xxx) 		-->  pagoabonobanco	 	--> 0
 		// Cliente(430.xxx)			-->  0			 		--> pagoabonobanco
 
-		datosExcel = generaAsiento2B(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+		//datosExcel = generaAsiento2B(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
 									
 		//Crear el excel se guardará en: ‘<ruta_base>/ficheros/contabilidad/XXXX/’ (donde XXXX es el idinstitucion).
 		this.createExcelFile(camposContabilidad, datosExcel);
@@ -5730,7 +5730,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 	
 	//PAGO POR BANCO: ABONO
-	private Vector<Hashtable<String, Object>> generaAsiento2B(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
+	//private Vector<Hashtable<String, Object>> generaAsiento2B(Vector<Hashtable<String, Object>> datosExcel, FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception{
 
 //		String concepto 			= "";
 //		String asientoContable 		= null; 
@@ -5870,7 +5870,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 //			try { tx.rollback(); } catch (Exception ee) {}
 //		    throw new ClsExceptions(e,"Error al generar asiento 2D");
 //		}
-	}	
+//	}	
 
 	
 	private String obtenerAsientoContable(String idInstitucion, String idpersona) throws Exception
