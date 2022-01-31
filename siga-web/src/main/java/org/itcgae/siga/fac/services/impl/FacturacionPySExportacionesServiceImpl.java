@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FacDisqueteDevolucionesNuevoItem;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
@@ -30,11 +31,13 @@ import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisqueteabonosKey;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
+import org.itcgae.siga.db.entities.FacDisquetecargosExample;
 import org.itcgae.siga.db.entities.FacDisquetecargosKey;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 import org.itcgae.siga.db.entities.FacDisquetedevolucionesKey;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaKey;
+import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteExample;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteKey;
@@ -203,14 +206,13 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         return ficherosAdeudosDTO;
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
             throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         Error error = new Error();
         insertResponseDTO.setError(error);
-
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
 
         // Conseguimos información del usuario logeado
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
@@ -225,50 +227,100 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                     || Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
                     || Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
                     || Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
-                throw new Exception("general.message.camposObligatorios");
+                throw new BusinessException("general.message.camposObligatorios");
             }
 
-            Object[] param_in = new Object[11]; // Parametros de entrada del PL
-
-            // Ruta del fichero
-
-            String pathFichero = getProperty("facturacion.directorioBancosOracle");
-
-            String sBarra = "";
-            if (pathFichero.indexOf("/") > -1) sBarra = "/";
-            if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
-            pathFichero += sBarra + usuario.getIdinstitucion().toString();
-
-            // Parámetros de entrada
-            param_in[0] = usuario.getIdinstitucion();
-            param_in[1] = Objects.nonNull(ficheroAdeudosItem.getIdseriefacturacion()) ? ficheroAdeudosItem.getIdseriefacturacion() : "";
-            param_in[2] = Objects.nonNull(ficheroAdeudosItem.getIdprogramacion()) ? ficheroAdeudosItem.getIdprogramacion() : "";
-            param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
-            param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
-            param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
-            param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
-            param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
-            param_in[8] = pathFichero;
-            param_in[9] = usuario.getIdusuario();
-            param_in[10] = usuario.getIdlenguaje();
-
-            String[] resultado = commons.callPLProcedureFacturacionPyS(
-                    "{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
-
-            String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
-            if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
-                throw new BusinessException(resultado[2]);
-            } else {
-                if (!resultado[1].equals("0")) {
-                    throw new BusinessException("general.mensaje.error.bbdd");
+            // En caso de que el fichero sea para facturas sueltas, se establecen los estados de las facturas
+            // correspondientes al estado LISTA_PARA_FICHERO
+            if (Objects.nonNull(ficheroAdeudosItem.getFacturasGeneracion()) && !ficheroAdeudosItem.getFacturasGeneracion().isEmpty()) {
+                for (String idFactura: ficheroAdeudosItem.getFacturasGeneracion()) {
+                    FacFacturaKey key = new FacFacturaKey();
+                    key.setIdinstitucion(usuario.getIdinstitucion());
+                    key.setIdfactura(idFactura);
+                    FacFactura factura = facFacturaExtendsMapper.selectByPrimaryKey(key);
+                    if (Objects.nonNull(factura) && factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO))) {
+                        factura.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_LISTA_PARA_FICHERO));
+                        facFacturaExtendsMapper.updateByPrimaryKey(factura);
+                    }
                 }
+
+                procesarNuevoFicheroAdeudos("", "", ficheroAdeudosItem, usuario);
+
+                // Se restauran aquellas facturas que no han podido formar parte de ningún fichero
+                for (String idFactura: ficheroAdeudosItem.getFacturasGeneracion()) {
+                    FacFacturaKey key = new FacFacturaKey();
+                    key.setIdinstitucion(usuario.getIdinstitucion());
+                    key.setIdfactura(idFactura);
+                    FacFactura factura = facFacturaExtendsMapper.selectByPrimaryKey(key);
+                    if (Objects.nonNull(factura) && factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_LISTA_PARA_FICHERO))) {
+                        factura.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO));
+                        facFacturaExtendsMapper.updateByPrimaryKey(factura);
+                    }
+                }
+            } else if (Objects.nonNull(ficheroAdeudosItem.getFacturacionesGeneracion()) && !ficheroAdeudosItem.getFacturacionesGeneracion().isEmpty()) {
+                for (FacFacturacionprogramadaItem facturacion: ficheroAdeudosItem.getFacturacionesGeneracion()) {
+                    FacDisquetecargosExample disqueteExample = new FacDisquetecargosExample();
+                    disqueteExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+                            .andIdseriefacturacionEqualTo(Long.parseLong(facturacion.getIdSerieFacturacion()))
+                            .andIdprogramacionEqualTo(Long.parseLong(facturacion.getIdProgramacion()));
+
+                    if (facDisquetecargosExtendsMapper.countByExample(disqueteExample) > 0) {
+                        throw new BusinessException("facturacionPyS.ficheroAdeudos.error.facturacion");
+                    } else {
+                        procesarNuevoFicheroAdeudos(facturacion.getIdSerieFacturacion(), facturacion.getIdProgramacion(), ficheroAdeudosItem, usuario);
+                    }
+                }
+            } else {
+                throw new BusinessException("facturacionPyS.ficheroAdeudos.error.nuevo");
             }
-            insertResponseDTO.setId(resultado[0]);
         }
 
         LOGGER.info("nuevoFicheroAdeudos() -> Salida del servicio para crear un fichero de adeudos");
 
         return insertResponseDTO;
+    }
+
+    private void procesarNuevoFicheroAdeudos(String idSerieFacturacion, String idProgramacion, FicherosAdeudosItem ficheroAdeudosItem, AdmUsuarios usuario) throws Exception {
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
+        Object[] param_in = new Object[11]; // Parametros de entrada del PL
+
+        // Ruta del fichero
+
+        String pathFichero = getProperty("facturacion.directorioBancosOracle");
+
+        String sBarra = "";
+        if (pathFichero.indexOf("/") > -1) sBarra = "/";
+        if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
+        pathFichero += sBarra + usuario.getIdinstitucion().toString();
+
+        // Parámetros de entrada
+        param_in[0] = usuario.getIdinstitucion();
+        param_in[1] = idSerieFacturacion;
+        param_in[2] = idProgramacion;
+        param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
+        param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
+        param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
+        param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
+        param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
+        param_in[8] = pathFichero;
+        param_in[9] = usuario.getIdusuario();
+        param_in[10] = usuario.getIdlenguaje();
+
+        String[] resultado = commons.callPLProcedureFacturacionPyS(
+                "{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
+
+        String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
+        if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
+            throw new BusinessException(resultado[2]);
+        } else {
+            if (!resultado[1].equals("0")) {
+                throw new BusinessException("general.mensaje.error.bbdd");
+            }
+        }
+
+        // Restaurar facturas a su estado inicial
+        if (resultado[0].equals("0") && resultado[1].equals("0"))
+            throw new BusinessException("facturacionPyS.ficheroAdeudos.error.nuevo");
     }
 
     @Override
@@ -288,12 +340,13 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
         if (usuario != null) {
             // Comprobar los campos obligatorios
-            if (Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
+            if (Objects.isNull(ficheroAdeudosItem.getIdDisqueteCargos())
+                    || Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
                     || Objects.isNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
                     || Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
                     || Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
                     || Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
-                throw new Exception("general.message.camposObligatorios");
+                throw new BusinessException("general.message.camposObligatorios");
             }
 
             Object[] param_in = new Object[9]; // Parametros de entrada del PL
@@ -339,10 +392,10 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
             if (Arrays.asList(codigosErrorFormato).contains(resultado[0])) {
-                throw new Exception(resultado[1]);
+                throw new BusinessException(resultado[1]);
             } else {
                 if (!resultado[1].equals("0")) {
-                    throw new Exception("general.mensaje.error.bbdd");
+                    throw new BusinessException("general.mensaje.error.bbdd");
                 }
             }
         }
@@ -589,9 +642,6 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             boolean conComision = ficherosDevolucionesItem.getConComision() != null ? ficherosDevolucionesItem.getConComision() : false;
             procesarNuevoFicheroDevoluciones(idDisqueteDevoluciones, nombreFichero, rutaOracle, rutaServidor, conComision, usuario);
-            // Iniciamos la generación del fichero en un nuevo hilo
-            //nuevoFicheroDevolucionesAsyncService.nuevoFicheroDevoluciones(idDisqueteDevoluciones, nombreFichero, rutaOracle, rutaServidor, conComision, usuario);
-            // throw new BusinessException("facturacionPyS.ficherosDevoluciones.error.generando");
         }
 
         LOGGER.info("nuevoFicheroDevoluciones() -> Salida del servicio para crear un fichero de devoluciones");
@@ -1244,12 +1294,12 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 String idPropositoSEPA = getParametro("FAC", "PROPOSITO_TRANSFERENCIA_SEPA", usuario.getIdinstitucion());
                 String idPropositoOtros = getParametro("FAC", "PROPOSITO_OTRA_TRANSFERENCIA", usuario.getIdinstitucion());
 
-				/*
+
 				if (idPropositoSEPA.equals(""))
 					idPropositoSEPA = getParametro("FAC", "PROPOSITO_TRANSFERENCIA_SEPA", Short.parseShort("0"));
 				if (idPropositoOtros.equals(""))
 					idPropositoOtros = getParametro("FAC", "PROPOSITO_OTRA_TRANSFERENCIA",  Short.parseShort("0"));
-				 */
+
 
                 // Propósito SEPA
                 if (!UtilidadesString.esCadenaVacia(idPropositoSEPA)) {
@@ -1314,27 +1364,21 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             for (FicherosAbonosItem banco: bancosSufijos) {
 
                 String bancosCodigo = banco.getBancosCodigo();
-                Short idSufijo = Short.parseShort(banco.getIdSufijo());
+                Short idSufijo = banco.getIdSufijo() == null ? null : Short.parseShort(banco.getIdSufijo());
                 String idPropositoSEPA = banco.getPropSEPA();
                 String idPropositoOtros = banco.getPropOtros();
 
+                // Se agrupan los abonos de la petición por su banco y sufijo
+                List<FacAbono> abonosBanco = facAbonoExtendsMapper.getAbonosBancoSjcs(usuario.getIdinstitucion(), bancosCodigo, idSufijo,
+                        abonoItems.stream().map(a -> a.getIdAbono()).collect(Collectors.toList()));
 
-                if (bancosCodigo != null && idSufijo != null && idPropositoSEPA != null && idPropositoOtros != null) {
-                    // Se agrupan los abonos de la petición por su banco y sufijo
-                    List<FacAbono> abonosBanco = facAbonoExtendsMapper.getAbonosBancoSjcs(usuario.getIdinstitucion(), bancosCodigo, idSufijo,
-                            abonoItems.stream().map(a -> a.getIdAbono()).collect(Collectors.toList()));
+                if (abonosBanco != null && !abonosBanco.isEmpty()) {
+                    int resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, idPropositoSEPA, idPropositoOtros, usuario);
 
-                    if (abonosBanco != null && !abonosBanco.isEmpty()) {
-                        int resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, idPropositoSEPA, idPropositoOtros, usuario);
-
-                        if (resultado == -1) {
-                            throw new BusinessException("general.mensaje.error.bbdd");
-                        }
+                    if (resultado == -1) {
+                        throw new BusinessException("general.mensaje.error.bbdd");
                     }
-                } else {
-                    throw new BusinessException("facturacion.ficheroBancarioTransferencias.errorSufijosSerie.mensajeCondicionesIncumplidas");
                 }
-
             }
 
         }
@@ -1386,8 +1430,12 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             FacAbono abonoToUpdate = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
 
+            if (abonoToUpdate.getImppendienteporabonar() == null)
+                continue;
+
             Double importeAbonado = abonoToUpdate.getImppendienteporabonar().doubleValue();
-            if (importeAbonado == 0)
+
+            if (importeAbonado == 0.0)
                 continue;
 
             numeroAbonosIncluidosEnDisquete++;
