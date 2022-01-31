@@ -8,10 +8,7 @@ import ieci.tdw.ispac.services.ws.server.GetExpedienteDocument;
 import ieci.tdw.ispac.services.ws.server.GetExpedienteResponseDocument;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.ws.config.*;
-import org.redabogacia.regtel.ws.eregtel.ConsultaAsientoDocument;
-import org.redabogacia.regtel.ws.eregtel.ConsultaAsientoResponseDocument;
-import org.redabogacia.regtel.ws.eregtel.RegistroEntradaDocument;
-import org.redabogacia.regtel.ws.eregtel.RegistroEntradaResponseDocument;
+import org.redabogacia.regtel.ws.eregtel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
@@ -111,6 +108,23 @@ public class ClientExpedientesEXEA extends WebServiceGatewaySupport {
 
         }catch(Exception e) {
             LOGGER.error("ClientExpedientesEXEA -> Error al consultar el expediente: " + e.getMessage(), e);
+            throw e;
+        }
+
+        return response;
+    }
+
+    public ConsultaAdjuntoResponseDocument getJustificante (ConsultaAdjuntoDocument request, String uriService){
+
+        ConsultaAdjuntoResponseDocument response;
+
+        try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfigRegTel.class))
+        {
+            RegTelClient client = context.getBean(RegTelClient.class);
+            response = client.getJustificante(request,uriService);
+
+        }catch(Exception e) {
+            LOGGER.error("ClientExpedientesEXEA -> Error al consultar el adjunto: " + e.getMessage(), e);
             throw e;
         }
 

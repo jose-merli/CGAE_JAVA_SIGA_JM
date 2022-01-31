@@ -68,6 +68,24 @@ public class SolIncorporacionItem {
 	private String nombreBanco;
 	private Date fechaEstadoSolicitud;
 	private String numRegistro;
+	private String claveConsulta;
+	private String numExpediente;
+
+	public String getNumExpediente() {
+		return numExpediente;
+	}
+
+	public void setNumExpediente(String numExpediente) {
+		this.numExpediente = numExpediente;
+	}
+
+	public String getClaveConsulta() {
+		return claveConsulta;
+	}
+
+	public void setClaveConsulta(String claveConsulta) {
+		this.claveConsulta = claveConsulta;
+	}
 
 	public String getNumRegistro() {
 		return numRegistro;

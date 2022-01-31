@@ -1187,14 +1187,14 @@ public class SigaConstants {
 	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
 	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
 	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
-	public static final String CONCEPTO_ASIENTO3		= "general.literal.asiento3"; 	    // Pago por caja. Factura 
+	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura 
 	public static final String CONCEPTO_ASIENTO3_2		= "general.literal.asiento3_2"; 	// Pago Anticipado. Factura 
 	public static final String CONCEPTO_ASIENTO4		= "general.literal.asiento4"; 	    // Pago por banco. Factura 
 	public static final String CONCEPTO_ASIENTO5		= "general.literal.asiento5"; 	    // Devolucion por banco. Factura Nº
 	public static final String CONCEPTO_ASIENTO6		= "general.literal.asiento6"; 	    // Pago por caja. Factura Rectificativa Nº 
 	public static final String CONCEPTO_ASIENTO7		= "general.literal.asiento7"; 	    // Pago por banco. Factura Rectificativa Nº
 	public static final String CONCEPTO_ASIENTO10		= "general.literal.asiento3_1";     // Pago por tarjeta. Factura
-	public static final String CONCEPTO_ASIENTO3_2010   = "general.literal.asiento3_2010";  // Compensación por caja
+	public static final String CONCEPTO_ASIENTO3_2010   = "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2010";  // Compensación por caja
 	public static final String CONCEPTO_ASIENTO14		= "general.literal.asiento14";      // Alta de anticipos 
 	public static final String CONCEPTO_ASIENTO15		= "general.literal.asiento15";      // Liquidación de anticipos de Letrado por Baja Colegial
 	
@@ -1524,6 +1524,7 @@ public class SigaConstants {
 	public static final short SANCION_EN_SUSPENSO = 8;
 	public static final short INCORPORACION_PENDIENTE_APROBACION = 20;
 	public static final short INCORPORACION_PENDIENTE_DOCUMENTACION = 10;
+	public static final String COD_DOC_ANEXO_PARAM = "COD_DOC_ANEXO";
 
 	public enum ERROR_SINCRONIZACION_EXEA {
 		FORMATO_NOVALIDO("Formato XML de petición no correcto."),
