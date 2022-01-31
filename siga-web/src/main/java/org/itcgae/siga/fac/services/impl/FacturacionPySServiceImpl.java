@@ -384,9 +384,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-
-	@Autowired
-	private INuevoFicheroDevolucionesAsyncService nuevoFicheroDevolucionesAsyncService;
 	
 	@Autowired
 	private FacBancoinstitucionMapper facBancoInstitucionMapper;
@@ -3742,6 +3739,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO insertarProgramacionFactura(FacFacturacionprogramadaItem facItem,
 			HttpServletRequest request) throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
