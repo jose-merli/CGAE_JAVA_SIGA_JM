@@ -62,12 +62,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         facturas.LEFT_OUTER_JOIN("gen_recursos r ON (ef.descripcion = r.idrecurso AND r.idlenguaje =" + idLenguaje + ")");
 
         //filtros
-        if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
-            facturas.WHERE("f.idinstitucion =" + idInstitucion);
-        } else {
-            if (item.getIdInstitucion() != null) {
-                facturas.WHERE("f.idinstitucion =" + item.getIdInstitucion());
-            }
+        if (item.getIdInstitucion() != null) {
+            facturas.WHERE("f.idinstitucion =" + item.getIdInstitucion());
         }
 
         if(item.getFacturasPendientesDesde() != null || item.getFacturasPendientesHasta() != null) {
