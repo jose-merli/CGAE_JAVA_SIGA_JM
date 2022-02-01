@@ -1187,16 +1187,15 @@ public class SigaConstants {
 	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
 	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
 	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
-	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura 
+	public static final String CONCEPTO_ASIENTO2B		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2B"; 	    // Pago por banco. Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura
 	public static final String CONCEPTO_ASIENTO3_2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2"; 	// Pago Anticipado. Factura 
 	public static final String CONCEPTO_ASIENTO4		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento4"; 	    // Pago por banco. Factura 
 	public static final String CONCEPTO_ASIENTO5		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento5";     // Pago por tarjeta. Factura
 	public static final String CONCEPTO_ASIENTO6		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento6"; 	    // Devolucion por banco. Factura Nº
 	public static final String CONCEPTO_ASIENTO7		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento7";      // Alta de anticipos
 	public static final String CONCEPTO_ASIENTO7A		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento7A";      // Liquidación de anticipos de Letrado por Baja Colegial
-	//public static final String CONCEPTO_ASIENTO6		= "general.literal.asiento6"; 	    // Pago por caja. Factura Rectificativa Nº 
-	//public static final String CONCEPTO_ASIENTO7		= "general.literal.asiento7"; 	    // Pago por banco. Factura Rectificativa Nº
-	
+
 	public static final String CONCEPTO_ASIENTO3_2010   = "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2010";  // Compensación por caja
 	
 	
