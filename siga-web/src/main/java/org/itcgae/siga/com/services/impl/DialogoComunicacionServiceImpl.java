@@ -823,7 +823,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											SigaConstants.OBJETIVO.CONDICIONAL.getCodigo(),
 											Short.parseShort(String.valueOf(usuario.getIdusuario())),
 											idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
-											Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+											Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+											Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
 								}
 
 								// Guardamos la consulta de destinatarios
@@ -834,7 +835,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo(),
 										Short.parseShort(String.valueOf(usuario.getIdusuario())),
 										idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
-										Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+										Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+										Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
 
 								// Reemplazamos los campos para las consultas de la plantilla de envio
 
@@ -849,7 +851,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												Long.parseLong(consultaPlantilla.getIdObjetivo()),
 												Short.parseShort(String.valueOf(usuario.getIdusuario())), null,
 												Long.parseLong(plantilla.getIdInforme()),
-												Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+												Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+												Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
 									}
 								}
 								
@@ -886,7 +889,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(),
 												Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar,
 												Long.parseLong(plantilla.getIdInforme()),
-												Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+												Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+												Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
 									}
 
 									List<Map<String, Object>> resultMulti;
@@ -1139,7 +1143,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												SigaConstants.OBJETIVO.CONDICIONAL.getCodigo(),
 												Short.parseShort(String.valueOf(usuario.getIdusuario())),
 												idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
-												Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+												Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+												Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
 									}
 
 									// Guardamos la consulta de destinatarios
@@ -1150,7 +1155,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo(),
 											Short.parseShort(String.valueOf(usuario.getIdusuario())),
 											idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
-											Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+											Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+											Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
 
 									// Reemplazamos los campos para las consultas de la plantilla de envio
 
@@ -1165,7 +1171,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 													Long.parseLong(consultaPlantilla.getIdObjetivo()),
 													Short.parseShort(String.valueOf(usuario.getIdusuario())), null,
 													Long.parseLong(plantilla.getIdInforme()),
-													Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+													Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+													Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
 										}
 									}
 									
@@ -1217,7 +1224,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(),
 									Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar,
 									Long.parseLong(plantilla.getIdInforme()),
-									Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+									Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+									Short.parseShort(String.valueOf(consultaMulti.getIdInstitucion())));
 						}
 
 						List<Map<String, Object>> resultMulti;
@@ -1873,6 +1881,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								consultaEnvioEntity.setIdinforme(consultaEnvio.getIdInforme());
 								consultaEnvioEntity.setIdmodelocomunicacion(consultaEnvio.getIdModeloComunicacion());
 								consultaEnvioEntity.setSufijo(consultaEnvio.getSufijo());
+								consultaEnvioEntity.setIdinstitucionconsulta(consultaEnvio.getIdInstitucionConsulta());
 								_envConsultasenvioMapper.insert(consultaEnvioEntity);
 								
 								
@@ -2337,7 +2346,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return listaFicheros;
 	}
 	
-	private List<ConsultaEnvioItem> guardarDatosConsultas(List<ConsultaEnvioItem> listaConsultasEnvio, Long idConsulta, String consulta, Short idInstitucion, Long idObjetivo, Short idUsuario, Long idPlantilla, Long idInforme, Long idModelo) {
+	private List<ConsultaEnvioItem> guardarDatosConsultas(List<ConsultaEnvioItem> listaConsultasEnvio, Long idConsulta, String consulta, Short idInstitucion, Long idObjetivo, Short idUsuario, Long idPlantilla, Long idInforme, Long idModelo, Short idInstitucionConsulta) {
 		
 		if(listaConsultasEnvio == null) {
 			listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
@@ -2352,6 +2361,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		consultaEnvio.setIdPlantillaDoc(idPlantilla);
 		consultaEnvio.setIdInforme(idInforme);
 		consultaEnvio.setIdModeloComunicacion(idModelo);
+		consultaEnvio.setIdInstitucionConsulta(idInstitucionConsulta);
 		listaConsultasEnvio.add(consultaEnvio);
 		
 		return listaConsultasEnvio;
@@ -2513,7 +2523,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			String nombreConsulta = consultaDatos.getDescripcion();
 			if(esEnvio){
 				//Guardamos la consulta datos															
-				listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consultaDatos.getIdConsulta()),consultaEjecutarDatos,usuario.getIdinstitucion(), SigaConstants.OBJETIVO.DATOS.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+				listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consultaDatos.getIdConsulta()),consultaEjecutarDatos,usuario.getIdinstitucion(), SigaConstants.OBJETIVO.DATOS.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), Short.parseShort(String.valueOf(consultaDatos.getIdInstitucion())));
 			}
 			
 			List<Map<String, Object>> resultDatos;
