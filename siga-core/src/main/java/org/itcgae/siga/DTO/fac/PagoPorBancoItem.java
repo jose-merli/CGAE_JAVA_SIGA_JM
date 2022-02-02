@@ -5,6 +5,8 @@ import java.util.Objects;
 
 public class PagoPorBancoItem {
 
+	private int iddisquetecargos;
+	private int idfacturaincluidaendisquete;
 	private int idfactura;
 	private String numerofactura;
 	private float importe;
@@ -14,6 +16,18 @@ public class PagoPorBancoItem {
 	private String confdeudor;
 	private String ctaclientes;
 	
+	public int getIddisquetecargos() {
+		return iddisquetecargos;
+	}
+	public void setIddisquetecargos(int iddisquetecargos) {
+		this.iddisquetecargos = iddisquetecargos;
+	}
+	public int getIdfacturaincluidaendisquete() {
+		return idfacturaincluidaendisquete;
+	}
+	public void setIdfacturaincluidaendisquete(int idfacturaincluidaendisquete) {
+		this.idfacturaincluidaendisquete = idfacturaincluidaendisquete;
+	}
 	public int getIdfactura() {
 		return idfactura;
 	}
@@ -65,8 +79,8 @@ public class PagoPorBancoItem {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(bancos_codigo, confdeudor, ctaclientes, fechacreacion, idfactura, idpersona, importe,
-				numerofactura);
+		return Objects.hash(bancos_codigo, confdeudor, ctaclientes, fechacreacion, iddisquetecargos, idfactura,
+				idfacturaincluidaendisquete, idpersona, importe, numerofactura);
 	}
 	
 	@Override
@@ -80,21 +94,19 @@ public class PagoPorBancoItem {
 		PagoPorBancoItem other = (PagoPorBancoItem) obj;
 		return Objects.equals(bancos_codigo, other.bancos_codigo) && Objects.equals(confdeudor, other.confdeudor)
 				&& Objects.equals(ctaclientes, other.ctaclientes) && Objects.equals(fechacreacion, other.fechacreacion)
-				&& idfactura == other.idfactura && idpersona == other.idpersona
+				&& iddisquetecargos == other.iddisquetecargos && idfactura == other.idfactura
+				&& idfacturaincluidaendisquete == other.idfacturaincluidaendisquete && idpersona == other.idpersona
 				&& Float.floatToIntBits(importe) == Float.floatToIntBits(other.importe)
 				&& Objects.equals(numerofactura, other.numerofactura);
 	}
 	
 	@Override
 	public String toString() {
-		return "PagoPorBancoItem [idfactura=" + idfactura + ", numerofactura=" + numerofactura + ", importe=" + importe
-				+ ", bancos_codigo=" + bancos_codigo + ", idpersona=" + idpersona + ", fechacreacion=" + fechacreacion
-				+ ", confdeudor=" + confdeudor + ", ctaclientes=" + ctaclientes + ", getIdfactura()=" + getIdfactura()
-				+ ", getNumerofactura()=" + getNumerofactura() + ", getImporte()=" + getImporte()
-				+ ", getBancos_codigo()=" + getBancos_codigo() + ", getIdpersona()=" + getIdpersona()
-				+ ", getFechacreacion()=" + getFechacreacion() + ", getConfdeudor()=" + getConfdeudor()
-				+ ", getCtaclientes()=" + getCtaclientes() + ", hashCode()=" + hashCode() + ", getClass()=" + getClass()
-				+ ", toString()=" + super.toString() + "]";
+		return "PagoPorBancoItem [iddisquetecargos=" + iddisquetecargos + ", idfacturaincluidaendisquete="
+				+ idfacturaincluidaendisquete + ", idfactura=" + idfactura + ", numerofactura=" + numerofactura
+				+ ", importe=" + importe + ", bancos_codigo=" + bancos_codigo + ", idpersona=" + idpersona
+				+ ", fechacreacion=" + fechacreacion + ", confdeudor=" + confdeudor + ", ctaclientes=" + ctaclientes
+				+ "]";
 	}
 	
 }

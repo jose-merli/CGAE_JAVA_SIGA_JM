@@ -9,6 +9,7 @@ public class DevolucionesItem {
 	private int idpersona;
 	private float importe;
 	private int iddisquetedevoluciones;
+	private String idrecibo;
 	private float gastosdevolucion;
 	private String cargarcliente;
 	private String bancos_codigo;
@@ -20,6 +21,12 @@ public class DevolucionesItem {
 	
 	public String getIdfactura() {
 		return idfactura;
+	}
+	public String getIdrecibo() {
+		return idrecibo;
+	}
+	public void setIdrecibo(String idrecibo) {
+		this.idrecibo = idrecibo;
 	}
 	public void setIdfactura(String idfactura) {
 		this.idfactura = idfactura;
@@ -94,7 +101,7 @@ public class DevolucionesItem {
 	@Override
 	public int hashCode() {
 		return Objects.hash(bancos_codigo, cargarcliente, confdeudor, ctaclientes, fechageneracion, gastosdevolucion,
-				iddisquetedevoluciones, idfactura, idpersona, idpersona_1, importe, numerofactura);
+				iddisquetedevoluciones, idfactura, idpersona, idpersona_1, idrecibo, importe, numerofactura);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -111,6 +118,7 @@ public class DevolucionesItem {
 				&& Float.floatToIntBits(gastosdevolucion) == Float.floatToIntBits(other.gastosdevolucion)
 				&& iddisquetedevoluciones == other.iddisquetedevoluciones && Objects.equals(idfactura, other.idfactura)
 				&& idpersona == other.idpersona && idpersona_1 == other.idpersona_1
+				&& Objects.equals(idrecibo, other.idrecibo)
 				&& Float.floatToIntBits(importe) == Float.floatToIntBits(other.importe)
 				&& Objects.equals(numerofactura, other.numerofactura);
 	}
@@ -118,10 +126,11 @@ public class DevolucionesItem {
 	@Override
 	public String toString() {
 		return "DevolucionesItem [idfactura=" + idfactura + ", idpersona=" + idpersona + ", importe=" + importe
-				+ ", iddisquetedevoluciones=" + iddisquetedevoluciones + ", gastosdevolucion=" + gastosdevolucion
-				+ ", cargarcliente=" + cargarcliente + ", bancos_codigo=" + bancos_codigo + ", idpersona_1="
-				+ idpersona_1 + ", fechageneracion=" + fechageneracion + ", numerofactura=" + numerofactura
-				+ ", confdeudor=" + confdeudor + ", ctaclientes=" + ctaclientes + "]";
+				+ ", iddisquetedevoluciones=" + iddisquetedevoluciones + ", idrecibo=" + idrecibo
+				+ ", gastosdevolucion=" + gastosdevolucion + ", cargarcliente=" + cargarcliente + ", bancos_codigo="
+				+ bancos_codigo + ", idpersona_1=" + idpersona_1 + ", fechageneracion=" + fechageneracion
+				+ ", numerofactura=" + numerofactura + ", confdeudor=" + confdeudor + ", ctaclientes=" + ctaclientes
+				+ "]";
 	}
 	
 }

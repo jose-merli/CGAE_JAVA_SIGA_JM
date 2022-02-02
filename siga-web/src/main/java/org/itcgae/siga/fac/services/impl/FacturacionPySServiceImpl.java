@@ -4409,7 +4409,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 //	}
 //	
 	
-	@Async
 	private boolean generarFicheroContabilidad(FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception	{
 
 		LOGGER.info("generarFicheroContabilidad() -> Entrada al metodo que crea el fichero de contabilidad");
@@ -4464,7 +4463,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// Cliente(430.xxx)			--> 0		               --> Negocio(1)+Negocio(2)
 			// -----------------------------------------------------------------------------------------------------------------		    
 					    
-			datosExcel = generaAsiento1(datosExcel, registroFacRegistroFichConta, idioma, idInstitucion, usuario);
+			//datosExcel = generaAsiento1(datosExcel, registroFacRegistroFichConta, idioma, idInstitucion, usuario);
 			
 			// -----------------------------------------------------------------------------------------------------------------
 			// Asiento 2 
@@ -4475,7 +4474,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// IVA (477)					--> 0					--> abono(2)
 			// -----------------------------------------------------------------------------------------------------------------
 								
-			datosExcel = generaAsiento2(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+			//datosExcel = generaAsiento2(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
 			
 			// -----------------------------------------------------------------------------------------------------------------
 			// Asiento 3
@@ -4485,7 +4484,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// Caja(570) 		 	-->  0			 --> pagoporcaja
 			// -----------------------------------------------------------------------------------------------------------------
 						
-			datosExcel = generaAsiento3(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+			//datosExcel = generaAsiento3(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
 			
 			// -----------------------------------------------------------------------------------------------------------------
 			// PAGO POR BANCO 
@@ -4494,7 +4493,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// Banco(572.1xxx) 		-->  0			 				--> facturaincludidaendisquete
 			// -----------------------------------------------------------------------------------------------------------------			
 						
-			datosExcel = generaAsiento4(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+			//datosExcel = generaAsiento4(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
 			
 			// -----------------------------------------------------------------------------------------------------------------
 			// Asiento 5
@@ -4504,7 +4503,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// Banco(572.2xxx) 		-->  0			 				--> facturaincludidaendisquete
 			// -----------------------------------------------------------------------------------------------------------------
 	
-			datosExcel = generaAsiento5(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
+			//datosExcel = generaAsiento5(datosExcel,registroFacRegistroFichConta,idioma, idInstitucion, usuario);
 			
 			// -----------------------------------------------------------------------------------------------------------------
 			// Asiento 6
@@ -4562,8 +4561,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			//Guardarlo en ‘<ruta_base>/ficheros/contabilidad/XXXX/’ (donde XXXX es el idinstitucion).
 			Date dateLog = new Date(0);
 			FicheroVo ficheroVo = new FicheroVo();
-			String rutaBase = cargasMasivasGFServiceImpl.getDirectorioFichero(Short.valueOf(idInstitucion));//RUTABASE???
+			String rutaBase = cargasMasivasGFServiceImpl.getDirectorioFichero(Short.valueOf(idInstitucion));//RUTABASE???		
 			ficheroVo.setDirectorio(rutaBase + "ficheros/contabilidad/"+ idInstitucion +"/");
+			//ficheroVo.setDirectorio("C:\Users\aavalosmoreno\Desktop\");
 			LOGGER.info(dateLog + ": Entrada a la subida del fichero de contabilidad con id: " + registroFacRegistroFichConta.getIdcontabilidad() + " subido en la ruta: " + ficheroVo.getDirectorio());
 
 			ficheroVo.setNombre(registroFacRegistroFichConta.getNombrefichero());
@@ -5058,7 +5058,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				idFactura = String.valueOf(pagoPorCaja.getIdfactura());
 				
 				imp = UtilidadesNumeros.redondea( String.valueOf(pagoPorCaja.getImporte()),2);
-				String confClientes = pagoPorCaja.getConfdeufor();
+				String confClientes = pagoPorCaja.getConfdeudor();
 				String ctaClientes = pagoPorCaja.getCtaclientes();
 				String tipoApunte = pagoPorCaja.getTipoapunte();
 				
@@ -5151,6 +5151,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					pagoPorCajaAcontabilizar.setContabilizado(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
 					pagoPorCajaAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
 					pagoPorCajaAcontabilizar.setIdfactura(idFactura);
+					pagoPorCajaAcontabilizar.setIdpagoporcaja((short) pagoPorCaja.getIdpagoporcaja());
 					pagoPorCajaAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
 					pagoPorCajaAcontabilizar.setFechamodificacion(new Date());
 					
@@ -5266,8 +5267,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					FacFacturaincluidaendisquete pagoPorBancoAcontabilizar = new FacFacturaincluidaendisquete();
 					
 					pagoPorBancoAcontabilizar.setContabilizada(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
+					
 					pagoPorBancoAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
-					pagoPorBancoAcontabilizar.setIdfactura(String.valueOf(pagoPorBancoItem.getIdfactura()));
+					pagoPorBancoAcontabilizar.setIddisquetecargos(Long.valueOf(pagoPorBancoItem.getIddisquetecargos()));
+					pagoPorBancoAcontabilizar.setIdfacturaincluidaendisquete(pagoPorBancoItem.getIdfacturaincluidaendisquete());
+					
 					pagoPorBancoAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
 					pagoPorBancoAcontabilizar.setFechamodificacion(new Date());
 					
@@ -5334,14 +5338,14 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				String confClientes = pagoPorTarjetaItem.getConfdeudor();
 				String ctaClientes = pagoPorTarjetaItem.getCtaclientes();
 				
-//				// Con el IDPERSONA, obtenemos de CEN_CLIENTE, el asiento contable.
+				// Con el IDPERSONA, obtenemos de CEN_CLIENTE, el asiento contable.
 				if (confClientes.equals("F")) {
 				    asientoContable =  ctaClientes;
 				} else {
 				    asientoContable =  ctaClientes + obtenerAsientoContable(idInstitucion, String.valueOf(pagoPorTarjetaItem.getIdpersona()));
 				}
 				
-//				// SE CREA EL ASIENTO
+				// SE CREA EL ASIENTO
 				Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
 				
 				// Escribimos 1� apunte
@@ -5503,6 +5507,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					devolucionAcontabilizar.setContabilizada(SigaConstants.FACTURA_ABONO_CONTABILIZADA);
 					devolucionAcontabilizar.setIdinstitucion(Short.valueOf(idInstitucion));
 					devolucionAcontabilizar.setIddisquetedevoluciones(Long.valueOf(devolucion.getIddisquetedevoluciones()));
+					devolucionAcontabilizar.setIdrecibo(devolucion.getIdrecibo());
 					devolucionAcontabilizar.setUsumodificacion(Integer.valueOf(usuario));
 					devolucionAcontabilizar.setFechamodificacion(new Date());
 					
@@ -6012,7 +6017,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		
 			if(facBancoInstitucion == null)
 			    throw new Exception("No se ha encontrado la cuenta contable en fac_bancoinstitucion");
-			asientoContable =  facBancoInstitucion.getAsientocontable();
+			if(facBancoInstitucion.getAsientocontable() != null) {
+				asientoContable =  facBancoInstitucion.getAsientocontable();
+			}
 		}
 		catch(Exception e)
 		{
@@ -6022,10 +6029,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	private Hashtable<String, Object> checkDatos (int asiento, Hashtable<String, Object> datos)
-	{									 	
-		Double importeDebe = (Double) datos.get("DEBE");
-		Double importeHaber = (Double) datos.get("HABER");
-		Double baseImponible = (Double) datos.get("BASEIMPONIBLE");
+	{						
+		
+		Double importeDebe = Double.valueOf(datos.get("DEBE").toString());
+		Double importeHaber = Double.valueOf(datos.get("HABER").toString());
+		Double baseImponible = null;
+		if(!datos.get("BASEIMPONIBLE").equals("")) {
+			baseImponible = Double.valueOf(datos.get("BASEIMPONIBLE").toString());
+		}
+		
 		String baseImp = "";
 		if(importeDebe<0.0){
 			importeHaber = -1 * importeDebe;
@@ -6045,7 +6057,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			datos.remove("baseImp");
 			datos.put("BASEIMPONIBLE", baseImp);
 		}else{
-			if(datos.get("BASEIMPONIBLE") != null) {
+			if(baseImponible != null) {
 				baseImp = baseImponible.toString().replace('.', ',');
 			}else {
 				baseImp = "";
