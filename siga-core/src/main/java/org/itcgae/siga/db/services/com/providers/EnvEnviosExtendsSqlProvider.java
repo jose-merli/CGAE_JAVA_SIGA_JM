@@ -420,4 +420,11 @@ public class EnvEnviosExtendsSqlProvider {
         return query.toString();
     }
 
+    public String getNewIdEnvio() {
+        SQL sql = new SQL();
+        sql.SELECT("SEQ_ENV_ENVIOS.NEXTVAL");
+        sql.FROM("DUAL");
+        return sql.toString();
+    }
+
 }

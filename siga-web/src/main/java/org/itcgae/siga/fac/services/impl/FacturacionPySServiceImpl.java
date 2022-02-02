@@ -195,7 +195,7 @@ import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
 import org.itcgae.siga.db.mappers.FacHistoricofacturaMapper;
 import org.itcgae.siga.db.mappers.FacLineadevoludisqbancoMapper;
 import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
-import org.itcgae.siga.db.mappers.FacPagosporcajaMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacPagosporcajaExtendsMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
@@ -232,6 +232,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMap
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPagoabonoefectivoExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacPagosporcajaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPropositosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
@@ -335,7 +336,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private FacRenegociacionMapper facRenegociacionMapper;
 
 	@Autowired
-	private FacPagosporcajaMapper facPagosporcajaMapper;
+	private FacPagosporcajaExtendsMapper facPagosPorCajaMapper;
 	
 	@Autowired
 	private FacHistoricofacturaMapper facHistoricofacturaMapper;
@@ -3112,7 +3113,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				.andIdinstitucionEqualTo(usuario.getIdinstitucion());
 		examplePagos.setOrderByClause("IDPAGOPORCAJA");
 
-		List<FacPagosporcaja> listPagos = facPagosporcajaMapper.selectByExample(examplePagos);
+		List<FacPagosporcaja> listPagos = facPagosPorCajaMapper.selectByExample(examplePagos);
 		if (!listPagos.isEmpty())
 			facHistoricoInsert.setIdpagoporcaja((short) (listPagos.get(listPagos.size() - 1).getIdpagoporcaja() + 1));
 		else
@@ -3150,7 +3151,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		// saves
 		facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
-		facPagosporcajaMapper.insert(pagosCajaInsert);
+		facPagosPorCajaMapper.insert(pagosCajaInsert);
 		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 	}
 
@@ -3565,7 +3566,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					.andIdinstitucionEqualTo(usuario.getIdinstitucion());
 			example.setOrderByClause("IDPAGOPORCAJA");
 
-			List<FacPagosporcaja> listPagos = facPagosporcajaMapper.selectByExample(examplePagos);
+			List<FacPagosporcaja> listPagos = facPagosPorCajaMapper.selectByExample(examplePagos);
 
 			FacPagosporcaja pagosCajaDelete = listPagos.get(listPagos.size() - 1);
 
@@ -3586,7 +3587,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// saves
 			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
 			facHistoricofacturaExtendsMapper.deleteByPrimaryKey(facHistoricoList.get(facHistoricoList.size() - 1));
-			facPagosporcajaMapper.deleteByPrimaryKey(pagosCajaDelete);
+			facPagosPorCajaMapper.deleteByPrimaryKey(pagosCajaDelete);
 
 			deleteResponseDTO.setStatus(HttpStatus.OK.toString());
 		}
@@ -5042,7 +5043,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if(listaPagosPorCajaAcontabilizar.size() > 0){
 				
 				for (FacPagosporcaja pagoPorCajaAcontabilizar : listaPagosPorCajaAcontabilizar) {
-					int respuestaActualizarPagoPorCajaContabilizado = facPagosporcajaMapper.updateByPrimaryKeySelective(pagoPorCajaAcontabilizar);
+					int respuestaActualizarPagoPorCajaContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(pagoPorCajaAcontabilizar);
 					
 					if(respuestaActualizarPagoPorCajaContabilizado == 1) {
 						LOGGER.info("generarFicheroContabilidad() --> generaAsiento3() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Pago por caja con id: " + pagoPorCajaAcontabilizar.getIdfactura() + " contabilizado");
@@ -5272,7 +5273,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if(listaPagosPorTarjetaAcontabilizar.size()>0){
 				
 				for (FacPagosporcaja pagoPorTarjetaAcontabilizar : listaPagosPorTarjetaAcontabilizar) {
-					int respuestaActualizarPagoPorTarjetaContabilizado = facPagosporcajaMapper.updateByPrimaryKeySelective(pagoPorTarjetaAcontabilizar);
+					int respuestaActualizarPagoPorTarjetaContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(pagoPorTarjetaAcontabilizar);
 					
 					if(respuestaActualizarPagoPorTarjetaContabilizado == 1) {
 						LOGGER.info("generarFicheroContabilidad() --> generaAsiento5() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Pago por tarjeta con id: " + pagoPorTarjetaAcontabilizar.getIdfactura() + " contabilizado");
@@ -5708,7 +5709,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				if(listaAnticiposPySAcontabilizar.size()>0){
 					
 					for (FacPagosporcaja anticipoPySAcontabilizar : listaAnticiposPySAcontabilizar) {
-						int respuestaActualizarAnticiposPySContabilizado = facPagosporcajaMapper.updateByPrimaryKeySelective(anticipoPySAcontabilizar);
+						int respuestaActualizarAnticiposPySContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(anticipoPySAcontabilizar);
 						
 						if(respuestaActualizarAnticiposPySContabilizado == 1) {
 							LOGGER.info("generarFicheroContabilidad() --> generaAsiento7B() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Anticipo PyS con id: " + anticipoPySAcontabilizar.getIdfactura() + " contabilizado");
