@@ -41,6 +41,7 @@ public interface FacAbonoSJCSExtendsMapper extends FacAbonoMapper{
 		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREFACTURACION", property = "nombreFacturacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IRPF", property = "importeIRPF", jdbcType = JdbcType.VARCHAR),
 	})
 	List<FacAbonoItem> buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje);	
 	

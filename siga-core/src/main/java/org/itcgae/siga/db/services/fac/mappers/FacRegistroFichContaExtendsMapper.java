@@ -96,8 +96,9 @@ public interface FacRegistroFichContaExtendsMapper extends FacRegistrofichcontaM
 	@Results({
 		@Result(column = "anticipo", property = "anticipo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idfactura", property = "idfactura", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "idpagoporcaja", property = "idpagoporcaja", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "numerofactura", property = "numerofactura", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "confdeufor", property = "confdeufor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "confdeudor", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ctaclientes", property = "ctaclientes", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "importe", property = "importe", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "tipoapunte", property = "tipoapunte", jdbcType = JdbcType.VARCHAR),
@@ -108,6 +109,8 @@ public interface FacRegistroFichContaExtendsMapper extends FacRegistrofichcontaM
 	
 	@SelectProvider(type = FacRegistroFichContaExtendsProvider.class, method = "obtenerPagosPorBanco")
 	@Results({
+		@Result(column = "iddisquetecargos", property = "iddisquetecargos", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "idfacturaincluidaendisquete", property = "idfacturaincluidaendisquete", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "idfactura", property = "idfactura", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "numerofactura", property = "numerofactura", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "importe", property = "importe", jdbcType = JdbcType.NUMERIC),
@@ -138,6 +141,7 @@ public interface FacRegistroFichContaExtendsMapper extends FacRegistrofichcontaM
 		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "importe", property = "importe", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "iddisquetedevoluciones", property = "iddisquetedevoluciones", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "idrecibo", property = "idrecibo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "gastosdevolucion", property = "gastosdevolucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "cargarcliente", property = "cargarcliente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "bancos_codigo", property = "bancos_codigo", jdbcType = JdbcType.VARCHAR),

@@ -7,9 +7,10 @@ public class PagoPorCajaItem {
 	
 	private String anticipo;
 	private int idfactura;
+	private int idpagoporcaja;
 	private String numerofactura;
 	private String tarjeta;
-	private String confdeufor;
+	private String confdeudor;
 	private String ctaclientes;
 	private float importe;
 	private String tipoapunte;
@@ -21,6 +22,12 @@ public class PagoPorCajaItem {
 	}
 	public void setAnticipo(String anticipo) {
 		this.anticipo = anticipo;
+	}
+	public int getIdpagoporcaja() {
+		return idpagoporcaja;
+	}
+	public void setIdpagoporcaja(int idpagoporcaja) {
+		this.idpagoporcaja = idpagoporcaja;
 	}
 	public int getIdfactura() {
 		return idfactura;
@@ -40,11 +47,11 @@ public class PagoPorCajaItem {
 	public void setTarjeta(String tarjeta) {
 		this.tarjeta = tarjeta;
 	}
-	public String getConfdeufor() {
-		return confdeufor;
+	public String getConfdeudor() {
+		return confdeudor;
 	}
-	public void setConfdeufor(String confdeufor) {
-		this.confdeufor = confdeufor;
+	public void setConfdeudor(String confdeudor) {
+		this.confdeudor = confdeudor;
 	}
 	public String getCtaclientes() {
 		return ctaclientes;
@@ -76,13 +83,11 @@ public class PagoPorCajaItem {
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
-	
 	@Override
 	public int hashCode() {
-		return Objects.hash(anticipo, confdeufor, ctaclientes, fecha, idfactura, idpersona, importe, numerofactura,
-				tarjeta, tipoapunte);
+		return Objects.hash(anticipo, confdeudor, ctaclientes, fecha, idfactura, idpagoporcaja, idpersona, importe,
+				numerofactura, tarjeta, tipoapunte);
 	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -92,19 +97,20 @@ public class PagoPorCajaItem {
 		if (getClass() != obj.getClass())
 			return false;
 		PagoPorCajaItem other = (PagoPorCajaItem) obj;
-		return Objects.equals(anticipo, other.anticipo) && Objects.equals(confdeufor, other.confdeufor)
+		return Objects.equals(anticipo, other.anticipo) && Objects.equals(confdeudor, other.confdeudor)
 				&& Objects.equals(ctaclientes, other.ctaclientes) && Objects.equals(fecha, other.fecha)
-				&& idfactura == other.idfactura && idpersona == other.idpersona
+				&& idfactura == other.idfactura && idpagoporcaja == other.idpagoporcaja && idpersona == other.idpersona
 				&& Float.floatToIntBits(importe) == Float.floatToIntBits(other.importe)
 				&& Objects.equals(numerofactura, other.numerofactura) && Objects.equals(tarjeta, other.tarjeta)
 				&& Objects.equals(tipoapunte, other.tipoapunte);
 	}
-	
 	@Override
 	public String toString() {
-		return "PagoPorCajaItem [anticipo=" + anticipo + ", idfactura=" + idfactura + ", numerofactura=" + numerofactura
-				+ ", tarjeta=" + tarjeta + ", confdeufor=" + confdeufor + ", ctaclientes=" + ctaclientes + ", importe="
-				+ importe + ", tipoapunte=" + tipoapunte + ", idpersona=" + idpersona + ", fecha=" + fecha + "]";
+		return "PagoPorCajaItem [anticipo=" + anticipo + ", idfactura=" + idfactura + ", idpagoporcaja=" + idpagoporcaja
+				+ ", numerofactura=" + numerofactura + ", tarjeta=" + tarjeta + ", confdeudor=" + confdeudor
+				+ ", ctaclientes=" + ctaclientes + ", importe=" + importe + ", tipoapunte=" + tipoapunte
+				+ ", idpersona=" + idpersona + ", fecha=" + fecha + "]";
 	}
+
 	
 }
