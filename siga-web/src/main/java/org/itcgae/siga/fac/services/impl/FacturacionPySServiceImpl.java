@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +55,8 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.DevolucionesItem;
+import org.itcgae.siga.DTO.fac.EstadosAbonosDTO;
+import org.itcgae.siga.DTO.fac.EstadosAbonosItem;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
@@ -228,6 +231,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacTiposproduincluenfactuExtendsM
 import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacPagoabonoefectivoExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPropositosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
@@ -337,7 +341,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private FacHistoricofacturaMapper facHistoricofacturaMapper;
 
 	@Autowired
-	private FacPagoabonoefectivoMapper facPagoabonoefectivoMapper;
+	private FacPagoabonoefectivoExtendsMapper facPagoabonoefectivoExtendsMapper;
 
 	@Autowired
 	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
@@ -395,9 +399,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private FacBancoinstitucionMapper facBancoInstitucionMapper;
-	
-	@Autowired
-	private FacPagosporcajaMapper facPagosPorCajaMapper;
 	
 	@Autowired
 	private FacFacturaincluidaendisqueteMapper facFacturaIncluidaEnDisqueteMapper;
@@ -3037,7 +3038,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				.andIdinstitucionEqualTo(usuario.getIdinstitucion());
 		exampleAbonos.setOrderByClause("IDPAGOABONO");
 
-		List<FacPagoabonoefectivo> listPagos = facPagoabonoefectivoMapper.selectByExample(exampleAbonos);
+		List<FacPagoabonoefectivo> listPagos = facPagoabonoefectivoExtendsMapper.selectByExample(exampleAbonos);
 		if (!listPagos.isEmpty())
 			abonoCajaInsert.setIdpagoabono((listPagos.get(listPagos.size() - 1).getIdpagoabono() + 1));
 		else
@@ -3072,7 +3073,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			abonoUpdate.setEstado((short) 1);
 
 		facAbonoExtendsMapper.updateByPrimaryKey(abonoUpdate);
-		facPagoabonoefectivoMapper.insert(abonoCajaInsert);
+		facPagoabonoefectivoExtendsMapper.insert(abonoCajaInsert);
 	}
 
 	private void nuevoCobroFactura(EstadosPagosItem item, FacHistoricofactura facHistoricoInsert, FacFactura facUpdate,
@@ -5271,7 +5272,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if(listaPagosPorTarjetaAcontabilizar.size()>0){
 				
 				for (FacPagosporcaja pagoPorTarjetaAcontabilizar : listaPagosPorTarjetaAcontabilizar) {
-					int respuestaActualizarPagoPorTarjetaContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(pagoPorTarjetaAcontabilizar);
+					int respuestaActualizarPagoPorTarjetaContabilizado = facPagosporcajaMapper.updateByPrimaryKeySelective(pagoPorTarjetaAcontabilizar);
 					
 					if(respuestaActualizarPagoPorTarjetaContabilizado == 1) {
 						LOGGER.info("generarFicheroContabilidad() --> generaAsiento5() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Pago por tarjeta con id: " + pagoPorTarjetaAcontabilizar.getIdfactura() + " contabilizado");
@@ -5707,7 +5708,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				if(listaAnticiposPySAcontabilizar.size()>0){
 					
 					for (FacPagosporcaja anticipoPySAcontabilizar : listaAnticiposPySAcontabilizar) {
-						int respuestaActualizarAnticiposPySContabilizado = facPagosPorCajaMapper.updateByPrimaryKeySelective(anticipoPySAcontabilizar);
+						int respuestaActualizarAnticiposPySContabilizado = facPagosporcajaMapper.updateByPrimaryKeySelective(anticipoPySAcontabilizar);
 						
 						if(respuestaActualizarAnticiposPySContabilizado == 1) {
 							LOGGER.info("generarFicheroContabilidad() --> generaAsiento7B() --> facPagosPorCajaMapper.updateByPrimaryKeySelective() --> Anticipo PyS con id: " + anticipoPySAcontabilizar.getIdfactura() + " contabilizado");
@@ -6043,6 +6044,44 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("insertarEstadosPagos() -> Salida del servicio para crear una entrada al historico de factura");
 
 		return deleteResponseDTO;
+	}
+
+	@Override
+	public EstadosAbonosDTO getEstadosAbonosSJCS(String idAbono, HttpServletRequest request) throws Exception {
+		EstadosAbonosDTO estadosPagosDTO = new EstadosAbonosDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getEstadosAbonosSJCS() -> Entrada al servicio para obtener el historico del abono SJCS");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info("facPagoabonoefectivoExtendsMapper.getEstadosAbonosSJCS() -> obteniendo el historico del abono SJCS");
+
+			List<EstadosAbonosItem> result = facPagoabonoefectivoExtendsMapper.getEstadosAbonosSJCS(idAbono,
+					usuario.getIdinstitucion(), usuario.getIdlenguaje());
+
+			// Se calcula el importe pendiente para cada una de las líneas
+			if (result != null && result.size() > 1) {
+				Float total = result.get(0).getImportePendiente();
+				for (int i = 0; i < result.size(); i++) {
+					Float movimiento = result.get(i).getMovimiento();
+					if (total != null && movimiento != null) {
+						total -= movimiento;
+						result.get(i).setImportePendiente(UtilidadesNumeros.redondea(total, 2));
+					}
+				}
+			}
+
+			estadosPagosDTO.setEstadosAbonosItems(result);
+		}
+
+		LOGGER.info(
+				"FacturacionPySServiceImpl.getEstadosAbonosSJCS() -> Salida del servicio  para obtener el historico del abono sjcs");
+
+		return estadosPagosDTO;
 	}
 	
 	@Override
