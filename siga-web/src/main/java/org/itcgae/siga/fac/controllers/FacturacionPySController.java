@@ -15,6 +15,7 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.EstadosAbonosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTO.fac.FacDisqueteDevolucionesNuevoItem;
@@ -749,6 +750,24 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<EstadosPagosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/getEstadosAbonosSJCS")
+	ResponseEntity<EstadosAbonosDTO> getEstadosAbonosSJCS(@RequestParam String idAbono, HttpServletRequest request) {
+		EstadosAbonosDTO response = new EstadosAbonosDTO();
+
+		try {
+			response = facturacionService.getEstadosAbonosSJCS(idAbono, request);
+
+			if (response.getEstadosAbonosItems().size() == 200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
+			return new ResponseEntity<EstadosAbonosDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<EstadosAbonosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

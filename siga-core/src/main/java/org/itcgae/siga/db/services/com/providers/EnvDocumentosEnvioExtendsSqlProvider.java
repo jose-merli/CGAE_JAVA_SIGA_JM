@@ -24,4 +24,13 @@ public class EnvDocumentosEnvioExtendsSqlProvider {
 		return sql.toString();
 	}
 
+	public String getNewIdDocumento(String idInstitucion, String idEnvio) {
+		SQL sql = new SQL();
+		sql.SELECT(" (NVL(MAX(IDDOCUMENTO), 0) + 1) AS MAXVALOR");
+		sql.FROM("ENV_DOCUMENTOS");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDENVIO = " + idEnvio);
+		return sql.toString();
+	}
+
 }

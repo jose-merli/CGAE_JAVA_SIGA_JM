@@ -61,12 +61,16 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         facturas.LEFT_OUTER_JOIN("fac_estadofactura ef ON (ef.idestado = f.estado)");
         facturas.LEFT_OUTER_JOIN("gen_recursos r ON (ef.descripcion = r.idrecurso AND r.idlenguaje =" + idLenguaje + ")");
 
-        //filtros
-        if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
-            facturas.WHERE("f.idinstitucion =" + idInstitucion);
+        //filtro
+        if (idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+            if (item.getIdInstitucion() != null) {
+                facturas.WHERE("f.idinstitucion = " + item.getIdInstitucion());
+            }
         } else {
             if (item.getIdInstitucion() != null) {
-                facturas.WHERE("f.idinstitucion =" + item.getIdInstitucion());
+                facturas.WHERE("f.idinstitucion = " + item.getIdInstitucion());
+            } else {
+                facturas.WHERE("f.idinstitucion = " + idInstitucion);
             }
         }
 

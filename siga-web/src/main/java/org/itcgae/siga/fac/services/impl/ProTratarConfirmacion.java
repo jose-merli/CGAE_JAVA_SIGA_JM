@@ -8,7 +8,9 @@ import org.itcgae.siga.commons.utils.SIGALogging;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmInforme;
 import org.itcgae.siga.db.entities.AdmInformeExample;
+import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
+import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.springframework.transaction.TransactionStatus;
@@ -24,9 +26,10 @@ import java.util.function.Function;
 
 public class ProTratarConfirmacion extends ProcesoFacPyS {
 
-    private Logger LOGGER = Logger.getLogger(ProTratarConfirmacion.class);
+    private final Logger LOGGER = Logger.getLogger(ProTratarConfirmacion.class);
 
-    private Function<Boolean, String> boolTo10 = v -> v ? "1" : "0";
+    private final Function<Boolean, String> boolTo10 = v -> v ? "1" : "0";
+    private final Function<String, Boolean> s10ToBool = v -> v.equals("1");
 
     @Override
     protected void execute(String idInstitucion) {
@@ -36,7 +39,7 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
             LOGGER.info("CONFIRMAR PROGRAMACIONES FACTURAS INSTITUCION: " + idInstitucion);
 
             // ficheros de log
-            SIGALogging log = null;
+            SIGALogging log;
 
             // obtenciOn de las facturaciones programadas y pendientes con fecha de prevista confirmacion pasada a ahora
             List<FacFacturacionprogramada> facFacturacionprogramadaList = facProgMapper.getListaNConfirmarFacturacionesProgramadas(idInstitucion);
@@ -128,7 +131,6 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
 
             Long idSerieFacturacion = facFacturacionprogramada.getIdseriefacturacion();
             Long idProgramacion = facFacturacionprogramada.getIdprogramacion();
-            String usuMod = USUARIO_AUTO.toString();
             String pathFichero = generaRutaFicheroPago(facFacturacionprogramada);
 
             // Se confirma la facturacion
@@ -223,9 +225,9 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
 
                                 LOGGER.info("### Inicio generacion fichero excel CONFIRMACION");
 
-                                ArrayList<File> listaFicherosConfirmacion = null;/* = InformePersonalizable.generarInformeXLS(informe, filtrosInforme, ruta, this.usrbean);*/
+                                ArrayList<File> listaFicherosConfirmacion = generarInformeXLS(informe, filtrosInforme, ruta, facFacturacionprogramada.getIdinstitucion().toString());
 
-                                LOGGER.info("### Fin generaci�n fichero excel CONFIRMACION");
+                                LOGGER.info("### Fin generacion fichero excel CONFIRMACION");
 
                                 // Si no se generan los informes de confirmacion
                                 if (listaFicherosConfirmacion == null || listaFicherosConfirmacion.size() == 0) {
@@ -272,7 +274,7 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
                 //INSERTAMOS EN LA COLA LA OPERACION CREARCLIENTE(): (NO HAY PROBLEMA PORQUE SI EL CLIENTE YA EXISTE LO ACTUALIZA, Y HACE UN INTENTO DE TRASPASAR UNICAMENTE LAS FACTURAS QUE TENGA SIN TRASPASAR, QUE ES LO QUE NOS INTERESA).
                 facAactualizar.setIdestadotraspaso(TRASPASO_PROGRAMADA);
                 Short idInstitucion = facFacturacionprogramada.getIdinstitucion();
-//                encolarTraspasoFacturas(idInstitucion, idSerieFacturacion, idProgramacion);
+                encolarTraspasoFacturas(idInstitucion, idSerieFacturacion, idProgramacion);
 
             } else {
                 facAactualizar.setIdestadoconfirmacion(CONFIRM_FINALIZADA); //Si entramos por aqui es que ya hemos confirmado previamente
@@ -284,7 +286,7 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
             boolean isGenerarEnvio = facFacturacionprogramada.getEnvio() != null && facFacturacionprogramada.getEnvio().trim().equals("1") && (facFacturacionprogramada.getEnvio() == null || facFacturacionprogramada.getEnvio().equalsIgnoreCase("1"));
 
             if (isGenerarPdf) {
-//                msjAviso = this.generarPdfEnvioProgramacionFactura(beanP, req, log, idSerieFacturacion, idProgramacion, claves, hashNew, isGenerarEnvio, tx);
+                msjAviso = generarPdfEnvioProgramacionFactura(facFacturacionprogramada, log, idSerieFacturacion, idProgramacion, facAactualizar, isGenerarEnvio, tx);
             }
 
         } catch (Exception e) {
@@ -354,6 +356,69 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
         if (!codretorno.equals(COD_OK)) {
             throw new Exception(getRecurso(MSG_FACTURACION_CONFIRMAR_FACTURACION_MENSAJE_GENERACION_DISQUETES_ERROR) + resultado[2]);
         }
+    }
+
+    private void encolarTraspasoFacturas(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion) throws Exception {
+
+        short estado;
+
+        //CONSULTA DE LA SERIE DE FACTURACION (idinstitucion e idseriefacturacion) PARA VER SI HAY QUE TRASPASARLA O NO: FAC_FACTURACION.TRASPASOFACTURAS (1, 0):
+        //SI LA TRANSFERENCIA DE FACTURAS ACTIVA ES NAVISION Y ESTA ACTIVA LA SERIE DE FACTURACION:
+        if (isServicioTraspasoFacturasActivo(idInstitucion) && isSerieFacturacionActiva(idInstitucion, idSerieFacturacion, idProgramacion)) {
+
+            //INSERTAMOS EN LA COLA LA OPERACION CREARCLIENTE(): (NO HAY PROBLEMA PORQUE SI EL CLIENTE YA EXISTE LO ACTUALIZA, Y HACE UN INTENTO DE TRASPASAR UNICAMENTE LAS FACTURAS QUE TENGA SIN TRASPASAR, QUE ES LO QUE NOS INTERESA).
+            HashMap map = new HashMap<String, String>();
+            map.put("IDINSTITUCION", idInstitucion);
+            map.put("IDSERIEFACTURACION", idSerieFacturacion);
+            map.put("IDPROGRAMACION", idProgramacion);
+
+            estado = FacEstadosFacturacion.TRASPASO_PROGRAMADA.getId();
+
+            EcomCola ecomColaCrearCliente = new EcomCola();
+            ecomColaCrearCliente.setIdinstitucion(idInstitucion);
+            ecomColaCrearCliente.setIdoperacion(SigaConstants.ECOM_OPERACION.TRASPASAR_FACTURAS_CREARCLIENTE_NAVISION.getId());
+
+            insertaColaConParametros(ecomColaCrearCliente, map);
+
+        } else { //EN CASO DE ANADIR NUEVOS METODOS DE TRASPASO, IR ANADIENDO LLAMADAS AQUI.
+            estado = FacEstadosFacturacion.TRASPASO_NOAPLICA.getId();
+        }
+
+        //CAMBIO DE ESTADO DE TRASPASO DE LA FACTURACION:
+
+        FacFacturacionprogramada fac = new FacFacturacionprogramada();
+        fac.setIdinstitucion(idInstitucion);
+        fac.setIdprogramacion(idProgramacion);
+        fac.setIdseriefacturacion(idSerieFacturacion);
+        fac.setFechamodificacion(new Date());
+        fac.setIdestadotraspaso(estado);
+
+        facProgMapper.updateByPrimaryKeySelective(fac);
+    }
+
+    private boolean isServicioTraspasoFacturasActivo(Short idInstitucion) {
+
+        String valor = "0";
+
+        GenParametros parametro = getParametro(idInstitucion, SigaConstants.MODULO_ECOM, TRASPASO_FACTURAS_WS_ACTIVO);
+
+        if (parametro != null && parametro.getValor() != null) {
+            valor = parametro.getValor();
+        }
+
+        return s10ToBool.apply(valor);
+    }
+
+    private boolean isSerieFacturacionActiva(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion) {
+        boolean bResultado = false;
+
+        try {
+            bResultado = facProgMapper.isSerieFacturacionActiva(idInstitucion, idSerieFacturacion, idProgramacion);
+        } catch (Exception e) {
+            LOGGER.error("@@@ Error al tratar de recuperar si la Serie de Facturación " + idSerieFacturacion + " está activa." + e);
+        }
+
+        return bResultado;
     }
 
 

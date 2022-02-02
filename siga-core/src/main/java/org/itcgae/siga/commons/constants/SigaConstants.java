@@ -1187,16 +1187,15 @@ public class SigaConstants {
 	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
 	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
 	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
-	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura 
+	public static final String CONCEPTO_ASIENTO2B		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2B"; 	    // Pago por banco. Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura
 	public static final String CONCEPTO_ASIENTO3_2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2"; 	// Pago Anticipado. Factura 
 	public static final String CONCEPTO_ASIENTO4		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento4"; 	    // Pago por banco. Factura 
 	public static final String CONCEPTO_ASIENTO5		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento5";     // Pago por tarjeta. Factura
 	public static final String CONCEPTO_ASIENTO6		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento6"; 	    // Devolucion por banco. Factura Nº
 	public static final String CONCEPTO_ASIENTO7		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento7";      // Alta de anticipos
 	public static final String CONCEPTO_ASIENTO7A		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento7A";      // Liquidación de anticipos de Letrado por Baja Colegial
-	//public static final String CONCEPTO_ASIENTO6		= "general.literal.asiento6"; 	    // Pago por caja. Factura Rectificativa Nº 
-	//public static final String CONCEPTO_ASIENTO7		= "general.literal.asiento7"; 	    // Pago por banco. Factura Rectificativa Nº
-	
+
 	public static final String CONCEPTO_ASIENTO3_2010   = "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2010";  // Compensación por caja
 	
 	
@@ -1579,4 +1578,54 @@ public class SigaConstants {
         }
     }
 
+    public static final String MODULO_ECOM = "ECOM";
+
+    public enum ENV_ENVIOS_ESTADOS {
+        ESTADO_INICIAL((short) 1),
+        ESTADO_PROCESADO((short) 2),
+        ESTADO_PROCESADO_ERRORES((short) 3),
+        ESTADO_PENDIENTE_AUTOMATICO((short) 4),
+        ESTADO_PROCESANDO((short) 5);
+
+        private short id;
+
+        ENV_ENVIOS_ESTADOS(short id) {
+            this.id = id;
+        }
+
+        public short getId() {
+            return this.id;
+        }
+
+    }
+
+    public static final String TIPODESTINATARIO_CENPERSONA = "CEN_PERSONA";
+
+    public static final String K_TIPOCAMPO_F="F";
+    public static final String K_TIPOCAMPO_E="E";
+    public static final String K_TIPOCAMPO_A="A";
+    public static final String K_TIPOCAMPO_S="S";
+
+    public static final String K_IDCAMPO_ASUNTO="1";
+    public static final String K_IDCAMPO_CUERPO="2";
+    public static final String K_IDCAMPO_SMS="1";
+
+    public static final String ID_PAIS_ESPANA ="191";
+
+    public static final int K_CORREO_ELECTRONICO = 1;
+    public static final int K_CORREO_ORDINARIO = 2;
+    public static final int K_FAX = 3;
+    public static final int K_SMS = 4;
+    public static final int K_BUROSMS = 5;
+    public static final int K_ENVIOTELEMATICO = 6;
+    public static final int K_DOCUMENTACIONLETRADO  = 7;
+
+    public static final String TIPODESTINATARIO_SCSPERSONAJG = "SCS_PERSONAJG";
+    public static final String TIPODESTINATARIO_SCSJUZGADO = "SCS_JUZGADO";
+    public static final String TIPODESTINATARIO_SCSPROCURADOR = "SCS_PROCURADOR";
+    public static final String TIPODESTINATARIO_SCSCONTRARIOSJG = "SCS_CONTRARIOSJG";
+
+    public static final String DATE_FORMAT_JAVA = "yyyy/MM/dd HH:mm:ss";
+
+    public static final String PATH_DOCUMENTOSADJUNTOS = "PATH_DOCUMENTOSADJUNTOS";
 }
