@@ -928,7 +928,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		return e;
 	}
 
-	private String getDirectorioFichero(Short idInstitucion) {
+	public String getDirectorioFichero(Short idInstitucion) {
 		Date dateLog = new Date();
 		LOGGER.info(dateLog + ":inicio.CargaMasivaDatosGFImpl.getDirectorioFichero");
 		
