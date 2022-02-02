@@ -89,7 +89,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         if (!UtilidadesString.esCadenaVacia(facturacionProgramada.getCompraSuscripcion())) {
             switch (facturacionProgramada.getCompraSuscripcion()) {
                 case "0":
-                    sql.WHERE("(facprog.fechainicioproductos IS NOT NULL OR facprog.fechafinproductos IS NOT NULL AND facprog.fechainicioservicios IS NOT NULL AND facprog.fechafinservicios IS NOT NULL)");
+                    sql.WHERE("((facprog.fechainicioproductos IS NOT NULL OR facprog.fechafinproductos IS NOT NULL) AND (facprog.fechainicioservicios IS NOT NULL OR facprog.fechafinservicios IS NOT NULL))");
                     break;
                 case "1":
                     sql.WHERE("((facprog.fechainicioproductos IS NOT NULL OR facprog.fechafinproductos IS NOT NULL) AND (facprog.fechainicioservicios IS NULL AND facprog.fechafinservicios IS NULL))");
@@ -273,18 +273,19 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
 
         return sql.toString();
     }
-	
-	public String isSerieFacturacionActiva(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion) {
-		SQL sql=new SQL();
-		sql.SELECT("CASE WHEN count(*) >0 THEN 1 ELSE 0 END existe");
-		sql.FROM("FAC_FACTURACIONPROGRAMADA");
-		sql.WHERE("IDINSTITUCION='"+ idInstitucion+"'",
-				"IDSERIEFACTURACION='"+ idSerieFacturacion+"'",
-				"IDPROGRAMACION='"+ idProgramacion+"'",
-				"TRASPASOFACTURAS='1'"
-				);
-		return sql.toString();
-	}
+
+    public String isSerieFacturacionActiva(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion) {
+        SQL sql = new SQL();
+
+        sql.SELECT("CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END EXISTE");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.IDSERIEFACTURACION = " + idSerieFacturacion);
+        sql.WHERE("FP.IDPROGRAMACION = " + idProgramacion);
+        sql.WHERE("FP.TRASPASOFACTURAS = '1'");
+
+        return sql.toString();
+    }
 
     public String getFacturacionesProgramadasYPendientes(Short idInstitucion, Double tiempoMaximoEjecucion) {
 

@@ -3,12 +3,14 @@ package org.itcgae.siga.db.services.com.mappers;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.services.com.providers.EnvEnviosExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ import java.util.List;
 
 @Service
 @Primary
-public interface EnvEnviosExtendsMapper {
+public interface EnvEnviosExtendsMapper extends EnvEnviosMapper {
           
       @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectEnvios")
       @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
@@ -157,4 +159,8 @@ public interface EnvEnviosExtendsMapper {
 
     @DeleteProvider(type = EnvEnviosExtendsSqlProvider.class, method = "eliminarEnviosPago")
     int eliminarEnviosPago(Short idInstitucion, List<String> idPagos);
+
+    @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "getNewIdEnvio")
+    Integer getNewIdEnvio();
+
 }
