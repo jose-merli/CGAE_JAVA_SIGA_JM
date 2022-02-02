@@ -572,6 +572,7 @@ public class SigaConstants {
     public static final String ESTADO_FACTURA_ENREVISION = "7";
     public static final String ESTADO_FACTURA_ANULADA = "8";
     public static final String ESTADO_FACTURA_DEVUELTA = "4";
+    public static final String ESTADO_FACTURA_LISTA_PARA_FICHERO = "6";
 
     public static final String PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF = "facturacion.directorioFisicoFacturaPDFJava";
     public static final String PARAMETRO_DIRECTORIO_FACTURA_PDF = "facturacion.directorioFacturaPDFJava";
@@ -1186,16 +1187,18 @@ public class SigaConstants {
 	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
 	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
 	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
-	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura 
-	public static final String CONCEPTO_ASIENTO3_2		= "general.literal.asiento3_2"; 	// Pago Anticipado. Factura 
-	public static final String CONCEPTO_ASIENTO4		= "general.literal.asiento4"; 	    // Pago por banco. Factura 
-	public static final String CONCEPTO_ASIENTO5		= "general.literal.asiento5"; 	    // Devolucion por banco. Factura Nº
-	public static final String CONCEPTO_ASIENTO6		= "general.literal.asiento6"; 	    // Pago por caja. Factura Rectificativa Nº 
-	public static final String CONCEPTO_ASIENTO7		= "general.literal.asiento7"; 	    // Pago por banco. Factura Rectificativa Nº
-	public static final String CONCEPTO_ASIENTO10		= "general.literal.asiento3_1";     // Pago por tarjeta. Factura
+	public static final String CONCEPTO_ASIENTO2B		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2B"; 	    // Pago por banco. Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura
+	public static final String CONCEPTO_ASIENTO3_2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2"; 	// Pago Anticipado. Factura 
+	public static final String CONCEPTO_ASIENTO4		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento4"; 	    // Pago por banco. Factura 
+	public static final String CONCEPTO_ASIENTO5		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento5";     // Pago por tarjeta. Factura
+	public static final String CONCEPTO_ASIENTO6		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento6"; 	    // Devolucion por banco. Factura Nº
+	public static final String CONCEPTO_ASIENTO7		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento7";      // Alta de anticipos
+	public static final String CONCEPTO_ASIENTO7A		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento7A";      // Liquidación de anticipos de Letrado por Baja Colegial
+
 	public static final String CONCEPTO_ASIENTO3_2010   = "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2010";  // Compensación por caja
-	public static final String CONCEPTO_ASIENTO14		= "general.literal.asiento14";      // Alta de anticipos 
-	public static final String CONCEPTO_ASIENTO15		= "general.literal.asiento15";      // Liquidación de anticipos de Letrado por Baja Colegial
+	
+	
 	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, C_IDGRUPO, GENERAL,
 			ACCION, C_FECHAINICIO);
@@ -1523,6 +1526,7 @@ public class SigaConstants {
 	public static final short SANCION_EN_SUSPENSO = 8;
 	public static final short INCORPORACION_PENDIENTE_APROBACION = 20;
 	public static final short INCORPORACION_PENDIENTE_DOCUMENTACION = 10;
+	public static final String COD_DOC_ANEXO_PARAM = "COD_DOC_ANEXO";
 
 	public enum ERROR_SINCRONIZACION_EXEA {
 		FORMATO_NOVALIDO("Formato XML de petición no correcto."),

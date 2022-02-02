@@ -383,7 +383,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 				if (usuarios != null && usuarios.size() > 0) {
 
-					List<DocumentacionIncorporacionItem> documentosInstitucion = cenDocumentsolicitudinstituExtendsMapper.getDocRequerida(idInstitucion,tipoColegiacion,tipoSolicitud,modalidad,usuarios.get(0).getIdlenguaje(), idSolicitud);
+					String codDocAnexo = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.COD_DOC_ANEXO_PARAM, idInstitucion.toString()).getValor();
+
+					List<DocumentacionIncorporacionItem> documentosInstitucion = cenDocumentsolicitudinstituExtendsMapper.getDocRequerida(idInstitucion,tipoColegiacion,tipoSolicitud,modalidad,usuarios.get(0).getIdlenguaje(), idSolicitud, codDocAnexo);
 
 					documentacionIncorporacionDTO.setDocumentacionIncorporacionItem(documentosInstitucion);
 
