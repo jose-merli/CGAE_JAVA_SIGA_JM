@@ -21,6 +21,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
@@ -48,10 +49,10 @@ import org.itcgae.siga.commons.constants.SigaConstants;
  */
 public class UtilidadesString {
 
-
-
-
 	private static Logger LOGGER = Logger.getLogger(UtilidadesString.class);
+
+	private static List<String> DIGITOS_COMIENZO_MOVIL = Arrays.asList("6","7");
+	private static Pattern patternDigitos = Pattern.compile("^[0-9]*$");
 
 
 	static public String getMensajeIdioma(String idioma, String key) {
@@ -688,4 +689,57 @@ public class UtilidadesString {
 	    //sSalida = sSalida.replaceAll("", "\u20ac");
 	    return sSalida;
 	  }
+
+	/**
+	 * Valida un numero de movil para enviar sms por el servicio ECOS
+	 * El numero debe de tener el formato (+xx)6xxxxxxxx o (+xx)7xxxxxxxx
+	 *
+	 * @param numeroTelefono
+	 * @return
+	 */
+	public static boolean esNumMovilECOS(String numeroTelefono) {
+		boolean bEsNumMovilECOS = false;
+		if (numeroTelefono != null && numeroTelefono.length() >= 9) {
+			String numeroSinPrefijo = "";
+			if (numeroTelefono.startsWith("(+34)"))
+				numeroSinPrefijo = numeroTelefono.substring(5);
+			else
+				numeroSinPrefijo = getNumeroConPrefijoECOS(numeroTelefono).substring(5);
+			if (numeroSinPrefijo.length() == 9 && sonDigitos(numeroSinPrefijo) &&
+					DIGITOS_COMIENZO_MOVIL.contains(Character.toString(numeroSinPrefijo.charAt(0))))
+				bEsNumMovilECOS = true;
+		}
+		return bEsNumMovilECOS;
+	}
+
+	public static boolean sonDigitos(String numero) {
+		if (numero == null)
+			return false;
+		else
+			return patternDigitos.matcher(numero).find();
+	}
+
+	/**
+	 * Devuelve un numero de telefono con el prefijo de Espana entre parentesis (+34).
+	 * Si ya tiene prefijo y no es el de espana (contiene el + pero no
+	 * seguido de 34/034/0034) se obviara el + y se tomara como un numero sin prefijo.
+	 *
+	 * @param numero
+	 * @return
+	 */
+	public static String getNumeroConPrefijoECOS(String numero) {
+		String prefijo = "+34";
+		if (numero.startsWith("+")) {
+			numero = numero.substring(1);
+			if (numero.startsWith("34"))
+				numero = numero.substring(2);
+			else if (numero.startsWith("034"))
+				numero = numero.substring(3);
+			else if (numero.startsWith("0034"))
+				numero = numero.substring(4);
+		}
+		numero = "(" + prefijo + ")" + numero;
+		LOGGER.info("NUMERO DE TELEFONO CON PREFIJO:" + numero);
+		return numero;
+	}
 }
