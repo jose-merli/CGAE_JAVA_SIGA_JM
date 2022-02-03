@@ -32,10 +32,9 @@ public class ProGenerarEnviosFacturasPendientes extends ProcesoFacPyS {
             // Obtencion de las facturaciones programadas y pendientes con fecha de prevista confirmacion pasada a ahora
             List<FacFacturacionprogramadaExtendsDTO> vDatos = facProgMapper.getFacturacionesProGenerarEnviosFacturasPendientes(Short.valueOf(idInstitucion), tiempoMaximoEjecucionBloqueada);
 
-            for (int i = 0; i < vDatos.size(); i++) {
+            for (FacFacturacionprogramada factBean : vDatos) {
 
                 // PROCESO PARA CADA FACTURACION PROGRAMADA
-                FacFacturacionprogramada factBean = vDatos.get(i);
 
                 LOGGER.info("ENVIAR FACTURACION PROGRAMADA: " + idInstitucion + " " + factBean.getIdseriefacturacion() + " " + factBean.getIdprogramacion());
 

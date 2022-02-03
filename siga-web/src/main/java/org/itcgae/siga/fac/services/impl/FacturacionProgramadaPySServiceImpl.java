@@ -10,8 +10,15 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
     private final Logger LOGGER = Logger.getLogger(FacturacionProgramadaPySServiceImpl.class);
 
+    private static Boolean alguienEjecutando = Boolean.FALSE;
+
     @Override
     public void ejecutaProcesoFacturacionPyS() {
+
+        if (isAlguienEjecutando()) {
+            LOGGER.debug("YA SE ESTA EJECUTANDO EL PROCESO AUTOMATICO DE FACTURACION DE PYS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+            return;
+        }
 
         final String sNombreProceso = "ProcesoAutomaticoFacturacion";
 
@@ -34,6 +41,7 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
                 }
 
                 if (procesoFacPyS != null) {
+                    setAlguienEjecutando();
                     procesoFacPyS.ejecutar();
                 }
 
@@ -43,7 +51,33 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
             LOGGER.error("ERROR en proceso facturacion automatica");
             LOGGER.error(" - Notificacion \"" + sNombreProceso + "\" ejecutada ERROR. : " + e);
             e.printStackTrace();
+        } finally {
+            setNadieEjecutando();
         }
 
     }
+
+    public static boolean isAlguienEjecutando() {
+        synchronized (FacturacionProgramadaPySServiceImpl.alguienEjecutando) {
+            if (!FacturacionProgramadaPySServiceImpl.alguienEjecutando) {
+                FacturacionProgramadaPySServiceImpl.alguienEjecutando = Boolean.TRUE;
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    public static void setAlguienEjecutando() {
+        synchronized (FacturacionProgramadaPySServiceImpl.alguienEjecutando) {
+            FacturacionProgramadaPySServiceImpl.alguienEjecutando = Boolean.TRUE;
+        }
+    }
+
+    public static void setNadieEjecutando() {
+        synchronized (FacturacionProgramadaPySServiceImpl.alguienEjecutando) {
+            FacturacionProgramadaPySServiceImpl.alguienEjecutando = Boolean.FALSE;
+        }
+    }
+
 }

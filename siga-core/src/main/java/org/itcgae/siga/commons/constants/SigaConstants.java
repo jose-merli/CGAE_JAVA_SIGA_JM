@@ -1628,4 +1628,18 @@ public class SigaConstants {
     public static final String DATE_FORMAT_JAVA = "yyyy/MM/dd HH:mm:ss";
 
     public static final String PATH_DOCUMENTOSADJUNTOS = "PATH_DOCUMENTOSADJUNTOS";
+
+    public static final String ESTADO_TRASPASADA_ERROR = "E";
+    public static final String ESTADO_TRASPASADA_NAV_OK = "1";
+
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_FROM = "TRASPASO_FACTURAS_MAILRESUMEN_FROM";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_BCC = "TRASPASO_FACTURAS_MAILRESUMEN_BCC";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_BODY = "TRASPASO_FACTURAS_MAILRESUMEN_BODY";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_ASUNTO = "TRASPASO_FACTURAS_MAILRESUMEN_ASUNTO";
+
+    public static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_HOST = "mail.smtp.actualizacioncenso.host";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_PORT = "mail.smtp.actualizacioncenso.port";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_USER = "mail.smtp.actualizacioncenso.user";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_PWD = "mail.smtp.actualizacioncenso.pwd";
 }
