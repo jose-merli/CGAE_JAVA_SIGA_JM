@@ -58,6 +58,7 @@ import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
 import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.fac.services.IContabilidadExportacionService;
 import org.itcgae.siga.fac.services.IFacturacionPySExportacionesService;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,9 @@ public class FacturacionPySController {
 
 	@Autowired
 	private IFacturacionPySExportacionesService facturacionPySExportacionesService;
+	
+	@Autowired
+	private IContabilidadExportacionService contabilidadExportacionService;
 
 	@GetMapping(value = "/getCuentasBancarias")
 	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(@RequestParam(required = false) String idCuenta,
@@ -914,7 +918,7 @@ public class FacturacionPySController {
 			HttpServletRequest request) {
 		FacRegistroFichContaDTO response = new FacRegistroFichContaDTO();
 		try {
-			response = facturacionService.search(facRegistroFichConta, request);
+			response = contabilidadExportacionService.search(facRegistroFichConta, request);
 			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -926,7 +930,7 @@ public class FacturacionPySController {
 	ResponseEntity<FacRegistroFichContaDTO> maxIdContabilidad(HttpServletRequest request) {
 		FacRegistroFichContaDTO response = new FacRegistroFichContaDTO();
 		try {
-			response = facturacionService.maxIdContabilidad(request);
+			response = contabilidadExportacionService.maxIdContabilidad(request);
 			return new ResponseEntity<FacRegistroFichContaDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -941,7 +945,7 @@ public class FacturacionPySController {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 
 		try {
-			response = facturacionService.guardarRegistroFichConta(facRegistroFichConta, request);
+			response = contabilidadExportacionService.guardarRegistroFichConta(facRegistroFichConta, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -956,7 +960,7 @@ public class FacturacionPySController {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
-			response = facturacionService.desactivarReactivarRegistroFichConta(facRegistrosFichConta, request);
+			response = contabilidadExportacionService.desactivarReactivarRegistroFichConta(facRegistrosFichConta, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
