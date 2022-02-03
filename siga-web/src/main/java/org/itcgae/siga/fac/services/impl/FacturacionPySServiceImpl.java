@@ -97,6 +97,7 @@ import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.FicherosService;
+import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.cen.services.impl.CargasMasivasGFServiceImpl;
 import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -420,7 +421,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private CargasMasivasGFServiceImpl cargasMasivasGFServiceImpl;
 	
 	@Autowired
-	private FicherosService ficherosService;
+	private IFicherosService ficherosService;
 
 	private static final int EXCEL_ROW_FLUSH = 1000;
 	
@@ -4202,6 +4203,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (resultado == 1) {
 				updateResponseDTO.setStatus(SigaConstants.CODE_200.toString());
 				updateResponseDTO.setId(beanRegistro.getIdcontabilidad().toString());
+				
+				FacRegistrofichconta ficheroProgramado = facRegistroFichContaExtendsMapper.selectByPrimaryKey(beanRegistro);
+				
+				this.generarFicheroContabilidad(ficheroProgramado, usuario.getIdlenguaje(), String.valueOf(idInstitucion) ,String.valueOf(usuario.getIdusuario()));
 			} else {
 				updateResponseDTO.setStatus(SigaConstants.CODE_400.toString());
 				updateResponseDTO.setId(beanRegistro.getIdcontabilidad().toString());
@@ -4211,6 +4216,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		return updateResponseDTO;
 	}
+	
 	
 	@Override
 	public DeleteResponseDTO desactivarReactivarRegistroFichConta(List <FacRegistroFichConta> facRegistrosFichConta,
