@@ -326,8 +326,8 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
 
         sql.FROM("FAC_ABONO abono");
         sql.LEFT_OUTER_JOIN("FAC_FACTURA factura ON (factura.IDINSTITUCION = abono.IDINSTITUCION AND factura.IDFACTURA = abono.IDFACTURA)");
-        sql.LEFT_OUTER_JOIN("FAC_SERIEFACTURACION_BANCO banco ON (factura.IDINSTITUCION = banco.IDINSTITUCION AND factura.IDSERIEFACTURACION = banco.IDSERIEFACTURACION)");
         sql.LEFT_OUTER_JOIN("FCS_PAGOSJG pago ON (abono.IDINSTITUCION = pago.IDINSTITUCION AND abono.IDPAGOSJG = pago.IDPAGOSJG)");
+        sql.LEFT_OUTER_JOIN("FAC_BANCOINSTITUCION banco ON (abono.IDINSTITUCION = banco.IDINSTITUCION AND pago.BANCOS_CODIGO = banco.BANCOS_CODIGO)");
 
         sql.WHERE("abono.IDINSTITUCION = " + idInstitucion);
 
@@ -341,7 +341,6 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         sql.WHERE("pago.BANCOS_CODIGO = " + bancosCodigo);
         sql.WHERE("pago.IDSUFIJO = " + idSufijo);
         sql.WHERE("abono.ESTADO = " + SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
-        sql.WHERE("abono.IMPPENDIENTEPORABONAR <> 0.0");
 
         return sql.toString();
     }
@@ -361,7 +360,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         sql.WHERE("abono.IDPAGOSJG IS NOT NULL");
         sql.WHERE("abono.ESTADO = " + SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
         sql.WHERE("abono.IMPPENDIENTEPORABONAR <> 0.0");
-        sql.WHERE("abono.FECHABAJA IS NOT NULL");
+        sql.WHERE("banco.FECHABAJA IS NULL");
 
         return sql.toString();
     }
