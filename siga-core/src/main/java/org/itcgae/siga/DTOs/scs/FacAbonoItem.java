@@ -18,6 +18,7 @@ public class FacAbonoItem {
 	private String numeroAbono;
 	private String observaciones;
 	private String forma;
+	private String importeIRPF;
 	
 	private int estado;
 	private String estadoNombre;
@@ -369,6 +370,12 @@ public class FacAbonoItem {
 	}
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
+	}
+	public String getImporteIRPF() {
+		return importeIRPF;
+	}
+	public void setImporteIRPF(String importeIRPF) {
+		this.importeIRPF = importeIRPF;
 	}
 	
 	

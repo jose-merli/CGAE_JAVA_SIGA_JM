@@ -98,6 +98,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -2006,4 +2008,13 @@ public abstract class ProcesoFacPyS {
 
     }
 
+    protected Path getPathLogConfirmacion(FacFacturacionprogramada fac) {
+        String nombreFichero = getNombreFicheroLogConfirmacion(fac);
+        String pathFichero = getProperty(FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION);
+        return Paths.get(pathFichero).resolve(fac.getIdinstitucion().toString()).resolve(nombreFichero);
+    }
+
+    protected String getNombreFicheroLogConfirmacion(FacFacturacionprogramada fac) {
+        return LOG_FAC_CONFIRMACION_PREFIX + fac.getIdseriefacturacion() + "_" + fac.getIdprogramacion() + LOG_XLS;
+    }
 }

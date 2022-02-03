@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaExtendsDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmInforme;
 import org.itcgae.siga.db.entities.AdmInformeExample;
@@ -35,7 +36,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
             // Obtencion de la propiedad que contiene el tiempo de espera que se les da a las facturaciones en ejcucion no generadas por alguna anomalia
             Double tiempoMaximoEjecucion = getMaxMinutosEnEjecucion();
 
-            List<FacFacturacionprogramada> facFacturacionprogramadaList = facProgMapper.getListaNFacturacionesProgramadasProcesar(tiempoMaximoEjecucion, idInstitucion);
+            List<FacFacturacionprogramadaExtendsDTO> facFacturacionprogramadaList = facProgMapper.getFacturacionesProTratarFacturacion(Short.valueOf(idInstitucion), tiempoMaximoEjecucion);
 
             if (facFacturacionprogramadaList != null && facFacturacionprogramadaList.size() > 0) {
 

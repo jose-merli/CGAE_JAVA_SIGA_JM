@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaExtendsDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGALogging;
@@ -42,7 +43,7 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
             SIGALogging log;
 
             // obtenciOn de las facturaciones programadas y pendientes con fecha de prevista confirmacion pasada a ahora
-            List<FacFacturacionprogramada> facFacturacionprogramadaList = facProgMapper.getListaNConfirmarFacturacionesProgramadas(idInstitucion);
+            List<FacFacturacionprogramadaExtendsDTO> facFacturacionprogramadaList = facProgMapper.getFacturacionesProTratarConfirmacion(Short.valueOf(idInstitucion));
 
             if (facFacturacionprogramadaList != null && facFacturacionprogramadaList.size() > 0) {
 
@@ -83,16 +84,6 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
             LOGGER.error("@@@ Error general al confirmar facturas (Proceso automatico) INSTITUCION:" + idInstitucion, e);
         }
 
-    }
-
-    private Path getPathLogConfirmacion(FacFacturacionprogramada fac) {
-        String nombreFichero = getNombreFicheroLogConfirmacion(fac);
-        String pathFichero = getProperty(FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION);
-        return Paths.get(pathFichero).resolve(fac.getIdinstitucion().toString()).resolve(nombreFichero);
-    }
-
-    private String getNombreFicheroLogConfirmacion(FacFacturacionprogramada fac) {
-        return LOG_FAC_CONFIRMACION_PREFIX + fac.getIdseriefacturacion() + "_" + fac.getIdprogramacion() + LOG_XLS;
     }
 
     private void confirmarProgramacionFactura(FacFacturacionprogramada facFacturacionprogramada, boolean archivarFacturacion, SIGALogging log, boolean generarPagosBanco, boolean soloGenerarFactura, int iTransaccionInterna,
