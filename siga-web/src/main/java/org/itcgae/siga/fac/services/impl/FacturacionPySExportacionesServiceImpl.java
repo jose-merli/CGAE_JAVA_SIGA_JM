@@ -530,15 +530,12 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     public ResponseEntity<InputStreamResource> descargarFicheroAdeudos(List<FicherosAdeudosItem> ficheroAdeudosItems, HttpServletRequest request) throws Exception {
         ResponseEntity<InputStreamResource> res = null;
 
-        String directorioFisico = "facturacion.directorioFisicoPagosBancosJava";
-        String directorio = "facturacion.directorioPagosBancosJava";
-
         // Conseguimos información del usuario logeado
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 
         LOGGER.info("descargarFicheroAdeudos() -> Entrada al servicio para descargar ficheros de adeudos");
 
-        String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+        String pathFichero = getProperty(FICHERO_ADEUDOS_SERVER_PATH) + getProperty(FICHERO_ADEUDOS_SERVER_DIR)
                 + File.separator + usuario.getIdinstitucion();
 
         List<File> listaFicheros = ficheroAdeudosItems.stream().flatMap(item -> {
