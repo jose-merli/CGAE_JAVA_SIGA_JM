@@ -134,6 +134,8 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			sql.WHERE("TRUNC(F.FECHAEMISION) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
 		
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
+		
 		sql.ORDER_BY("1");
 
 		LOGGER.info(sql.toString());
@@ -198,6 +200,8 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			sql.WHERE("TRUNC(a.FECHA) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
 		
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
+		
 		sql.ORDER_BY("1");
 
 		LOGGER.info(sql.toString());
@@ -244,6 +248,8 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			sql.WHERE("TRUNC(a.FECHA) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
 		
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
+		
 		sql.ORDER_BY("2");
 
 		LOGGER.info(sql.toString());
@@ -289,7 +295,7 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			sql.WHERE("TRUNC(b.FECHACREACION) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
 		
-		sql.WHERE(" ROWNUM <= 40");//PROVISIONAL
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
 		
 		sql.ORDER_BY("1");
 
@@ -331,6 +337,8 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			String fechaExportacionHasta = dateFormat.format(facRegistroFichConta.getFechahasta());
 			sql.WHERE("TRUNC(fecha) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
+		
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
 		
 		sql.ORDER_BY("1");
 
@@ -384,7 +392,7 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			sql.WHERE("TRUNC(c.fechageneracion) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
 		
-		sql.WHERE(" ROWNUM <= 40");//PROVISIONAL
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
 		
 		sql.ORDER_BY(" c.iddisquetedevoluciones");
 
@@ -416,6 +424,8 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			sql.WHERE("TRUNC(fecha) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
 		
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
+		
 		sql.ORDER_BY(" idanticipo");
 
 		LOGGER.info(sql.toString());
@@ -444,6 +454,8 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			String fechaExportacionHasta = dateFormat.format(facRegistroFichConta.getFechahasta());
 			sql.WHERE("TRUNC(fechaefectiva) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
+		
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
 		
 		sql.ORDER_BY(" idanticipo");
 
@@ -541,7 +553,8 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 		//FIN ANTICIPADO SERVICIOS
 		
 		sqlFinal = "SELECT * FROM ("+ sql.toString() + " UNION " + sql2.toString() + ") ORDER BY 2";
-
+		//sqlFinal = "SELECT * FROM ("+ sql.toString() + " UNION " + sql2.toString() + ") WHERE ROWNUM <= 40 ORDER BY 2";//PROVISIONAL WHERE ROWNUM <= 40
+		
 		LOGGER.info(sql.toString());
 		return sqlFinal;
 	}
@@ -627,6 +640,8 @@ public class FacRegistroFichContaExtendsProvider extends FacRegistrofichcontaSql
 			String fechaExportacionHasta = dateFormat.format(facRegistroFichConta.getFechahasta());
 			sql.WHERE("TRUNC(disqueteabono.fecha) <= TO_DATE('" + fechaExportacionHasta + "', 'DD/MM/RRRR')");
 		}
+		
+		//sql.WHERE(" ROWNUM <= 40");//PARA PRUEBAS DEBIDO A CANTIDAD DE DATOS
 
 		LOGGER.info(sql.toString());
 		return sql.toString();

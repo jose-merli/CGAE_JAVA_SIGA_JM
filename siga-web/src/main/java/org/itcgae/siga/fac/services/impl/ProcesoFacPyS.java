@@ -83,6 +83,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsJuzgadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProcuradorExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;
+import org.itcgae.siga.services.IEnviosCommonsService;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -136,6 +137,7 @@ public abstract class ProcesoFacPyS {
     protected static final String FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION = "facturacion.directorioFisicoLogProgramacion";
     protected static final String LOG_XLS = ".log.xls";
     protected static final String LOG_FAC_CONFIRMACION_PREFIX = "LOG_FAC_CONFIRMACION_";
+    protected static final String LOG_FAC_TRASPASO_PREFIX = "LOG_FAC_TRASPASO_";
     protected static final String TXT_ERR_NO_SE_HA_PODIDO_FACTURAR_NADA = "No se ha podido facturar nada. Compruebe la configuracion y el periodo indicado";
     protected static final String TIPO_ADM_INFORME_PREV = "PREV";
     protected static final Short DEFAULT_INSTITUCION = 0;
@@ -249,6 +251,9 @@ public abstract class ProcesoFacPyS {
 
     @Autowired
     protected EnvDocumentosExtendsMapper envDocumentosExtendsMapper;
+
+    @Autowired
+    protected IEnviosCommonsService enviosCommonsService;
 
     public void ejecutar() {
 

@@ -1175,16 +1175,6 @@ public class SigaConstants {
 	public static final String C_FECHAFIN = "FECHAFIN";
 	
 	//FICHERO CONTABILIDAD
-	public static final String ASIENTO = "facturacion.exportacionesyotros.contabilidad.asiento";
-	public static final String FECHA = "facturacionSJCS.facturacionesYPagos.fecha";
-	public static final String CUENTA = "facturacion.exportacionesyotros.contabilidad.cuenta";
-	public static final String CONCEPTO = "facturacionSJCS.facturacionesYPagos.conceptos";
-	public static final String DOCUMENTO = "justiciaGratuita.ejg.documentacion.Documento";
-	public static final String DEBE = "facturacion.exportacionesyotros.contabilidad.debe";
-	public static final String HABER = "facturacion.exportacionesyotros.contabilidad.haber";
-	public static final String BASEIMP = "facturacion.exportacionesyotros.contabilidad.baseimp";
-	public static final String TIPOIVA = "facturacion.facturas.lineas.tipoIVA";
-	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
 	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
 	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
 	public static final String CONCEPTO_ASIENTO2B		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2B"; 	    // Pago por banco. Factura Rectificativa Nº
@@ -1628,4 +1618,18 @@ public class SigaConstants {
     public static final String DATE_FORMAT_JAVA = "yyyy/MM/dd HH:mm:ss";
 
     public static final String PATH_DOCUMENTOSADJUNTOS = "PATH_DOCUMENTOSADJUNTOS";
+
+    public static final String ESTADO_TRASPASADA_ERROR = "E";
+    public static final String ESTADO_TRASPASADA_NAV_OK = "1";
+
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_FROM = "TRASPASO_FACTURAS_MAILRESUMEN_FROM";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_BCC = "TRASPASO_FACTURAS_MAILRESUMEN_BCC";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_BODY = "TRASPASO_FACTURAS_MAILRESUMEN_BODY";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_ASUNTO = "TRASPASO_FACTURAS_MAILRESUMEN_ASUNTO";
+
+    public static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_HOST = "mail.smtp.actualizacioncenso.host";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_PORT = "mail.smtp.actualizacioncenso.port";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_USER = "mail.smtp.actualizacioncenso.user";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_PWD = "mail.smtp.actualizacioncenso.pwd";
 }
