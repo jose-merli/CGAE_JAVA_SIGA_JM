@@ -68,4 +68,9 @@ public interface IGestionFichaCompraSuscripcionService {
 
 	UpdateResponseDTO anadirAnticipoCompra(HttpServletRequest request, ListaDescuentosPeticionItem anticipo)
 			throws Exception;
+
+	InsertResponseDTO facturarCompra(HttpServletRequest request, String nSolicitud) throws Exception;
+
+	InsertResponseDTO facturarCompraMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
 }

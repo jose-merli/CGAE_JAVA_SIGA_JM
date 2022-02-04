@@ -45,6 +45,7 @@ application:
     /certificaciones/descargarLogReintegrosXunta: [628]
     /certificaciones/descargarInformeIncidencias: [628]
     /certificaciones/accionXuntaEnvios: [628]
+
 # Permisos para el módulo de ProductosYServicios
     /pys/solicitarCompra: [39A]
     /pys/aprobarCompra: [39B]
@@ -55,6 +56,7 @@ application:
     /pys/actualizarServicioSuscripcion: [39E]
     /pys/anularSuscripcion: [39F]
     /pys/aprobarSuscripcion: [39H]
+	/pys/facturarCompra: [39I]
 
     /cargaMasivaCompras/cargarFichero: [39A]
     /pys/savePagoCompraSuscripcion: [39]
