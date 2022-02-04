@@ -74,7 +74,10 @@ import org.itcgae.siga.fac.services.IContabilidadExportacionService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ContabilidadExportacionServiceImpl implements IContabilidadExportacionService {
 	
 	@Autowired
@@ -376,6 +379,7 @@ public class ContabilidadExportacionServiceImpl implements IContabilidadExportac
 				return traduccion != null ? traduccion.getDescripcion() : "";
 			}
 			
+			@Async
 			private boolean generarFicheroContabilidad(FacRegistrofichconta registroFacRegistroFichConta, String idioma, String idInstitucion, String usuario) throws Exception	{
 
 				LOGGER.info("generarFicheroContabilidad() -> Entrada al metodo que crea el fichero de contabilidad");
