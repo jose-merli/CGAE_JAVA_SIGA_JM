@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
@@ -1091,7 +1092,12 @@ public class FacturacionPySController {
 				return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.NO_CONTENT);
 			}			
 		}
+
 	}
 	
+	@RequestMapping(value = "/descargarFicherosContabilidad", method = RequestMethod.POST, produces = "application/zip")
+	ResponseEntity<InputStreamResource> descargarFicherosContabilidad(@RequestBody List <FacRegistroFichConta> facRegistrosFichConta, HttpServletRequest request) {
+		return contabilidadExportacionService.descargarFicherosContabilidad(facRegistrosFichConta, request);		
+	}
 	
 }
