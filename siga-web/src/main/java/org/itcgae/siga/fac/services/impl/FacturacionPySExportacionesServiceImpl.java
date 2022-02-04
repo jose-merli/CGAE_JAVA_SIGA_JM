@@ -516,6 +516,27 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 disquetecargosKey.setIdinstitucion(Short.valueOf(ficheroAdeudosItem.getIdInstitucion()));
 
                 facDisquetecargosExtendsMapper.deleteByPrimaryKey(disquetecargosKey);
+
+                // A continuación, se elimina el fichero
+                // Ruta del fichero
+                String pathFicheroServer = getProperty(FICHERO_ADEUDOS_SERVER_PATH) + getProperty(FICHERO_ADEUDOS_SERVER_DIR);
+
+                String sBarra = "";
+                if (pathFicheroServer.indexOf("/") > -1) sBarra = "/";
+                if (pathFicheroServer.indexOf("\\") > -1) sBarra = "\\";
+                pathFicheroServer += sBarra + usuario.getIdinstitucion().toString();
+
+                // Se borran todos os ficheros que contenga el identificador del fichero de adeudos
+                File directorioFicheros = new File(pathFicheroServer);
+                if (directorioFicheros.exists() && directorioFicheros.isDirectory()){
+                    File[] ficheros = directorioFicheros.listFiles();
+                    for (int x=0; x<ficheros.length; x++){
+                        String nombreFichero = ficheros[x].getName();
+                        if (nombreFichero.startsWith(ficheroAdeudosItem.getIdDisqueteCargos() + ".")) {
+                            ficheros[x].delete();
+                        }
+                    }
+                }
             }
 
             deleteResponseDTO.setStatus(HttpStatus.OK.toString());
@@ -1189,9 +1210,26 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             facDisquetedevolucionesExtendsMapper.deleteByPrimaryKey(key);
 
-            // A continuación, se eliminan los ficheros de adeudos
-            String pathFichero = getProperty(FICHERO_TRANSFERENCIAS_SERVER_PATH) + getProperty(FICHERO_TRANSFERENCIAS_SERVER_DIR)
-                    + File.separator + usuario.getIdinstitucion();
+            // A continuación, se elimina el fichero
+            // Ruta del fichero
+            String pathFicheroServer = getProperty(FICHERO_DEVOLUCIONES_SERVER_PATH) + getProperty(FICHERO_DEVOLUCIONES_SERVER_DIR);
+
+            String sBarra = "";
+            if (pathFicheroServer.indexOf("/") > -1) sBarra = "/";
+            if (pathFicheroServer.indexOf("\\") > -1) sBarra = "\\";
+            pathFicheroServer += sBarra + usuario.getIdinstitucion().toString();
+
+            // Se borran todos os ficheros que contenga el identificador del fichero de devoluciones
+            File directorioFicheros = new File(pathFicheroServer);
+            if (directorioFicheros.exists() && directorioFicheros.isDirectory()){
+                File[] ficheros = directorioFicheros.listFiles();
+                for (int x=0; x<ficheros.length; x++){
+                    String nombreFichero = ficheros[x].getName();
+                    if (nombreFichero.startsWith(ficherosDevolucionesItem.getIdDisqueteDevoluciones() + ".")) {
+                        ficheros[x].delete();
+                    }
+                }
+            }
 
             deleteResponseDTO.setStatus(HttpStatus.OK.toString());
         }

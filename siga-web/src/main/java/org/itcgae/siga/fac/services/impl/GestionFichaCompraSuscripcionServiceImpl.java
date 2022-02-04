@@ -2520,6 +2520,114 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		return updateResponseDTO;
 	}
 	
+	@Override
+	@Transactional
+	public InsertResponseDTO facturarCompraMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("facturarCompraMultiple() -> Entrada al servicio para facturar una o varias peticiones");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"facturarCompraMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"facturarCompraMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"facturarPeticionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para facturar una o varias compras");
+
+				//Se guardaran aqui los numeros de solicitud de aquellas solicitudes no validas por el estado en el que vienen
+				error.setDescription("");
+				for(FichaCompraSuscripcionItem peticion : peticiones) {
+					if(peticion.getFechaAnulada() == null && peticion.getFechaAceptada() != null && peticion.getFechaSolicitadaAnulacion() == null) {
+						this.facturarCompra(request, peticion.getnSolicitud());
+					}
+					else {
+						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
+					}
+				}
+
+				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));
+				
+				
+				LOGGER.info(
+						"facturarCompraMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para facturar una o varias compras");
+
+				LOGGER.info(
+						"facturarCompraMultiple() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para facturar una o varias compras");
+			}
+
+			LOGGER.info(
+					"facturarCompraMultiple() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para facturar una o varias compras");
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.debug("facturarCompraMultiple() -> Salida del servicio para facturar una o varias compras");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO facturarCompra(HttpServletRequest request, String nSolicitud) throws Exception {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("facturarCompra() -> Entrada al servicio para facturar una compra");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		//Este String sirve para saber si el usuario conectado es una colegiado o no.
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"facturarCompra() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"facturarCompra() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+						
+					//CODIGO A INTRODUCIR
+						
+				}
+			}
+
+		insertResponseDTO.setError(error);
+		LOGGER.debug("facturarCompra() -> Salida del servicio para facturar una compra");
+
+		return insertResponseDTO;
+	}
 	
 }
 	
