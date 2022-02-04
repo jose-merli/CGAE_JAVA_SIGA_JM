@@ -37,7 +37,6 @@ import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 import org.itcgae.siga.db.entities.FacDisquetedevolucionesKey;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaKey;
-import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteExample;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteKey;
@@ -113,6 +112,20 @@ import java.util.stream.Collectors;
 public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySExportacionesService {
 
     private Logger LOGGER = Logger.getLogger(FacturacionPySExportacionesServiceImpl.class);
+
+    private final String FICHERO_DEVOLUCIONES_SERVER_PATH = "facturacion.directorioFisicoDevolucionesJava";
+    private final String FICHERO_DEVOLUCIONES_SERVER_DIR = "facturacion.directorioDevolucionesJava";
+    private final String FICHERO_DEVOLUCIONES_ORACLE_DIR = "facturacion.directorioDevolucionesOracle";
+    private final String FICHERO_DEVOLUCIONES_EXTENSION = ".d19";
+
+    private final String FICHERO_TRANSFERENCIAS_SERVER_PATH = "facturacion.directorioFisicoAbonosBancosJava";
+    private final String FICHERO_TRANSFERENCIAS_SERVER_DIR = "facturacion.directorioAbonosBancosJava";
+    private final String FICHERO_TRANSFERENCIAS_ORACLE_DIR = "facturacion.directorioAbonosBancosOracle";
+    private final String FICHERO_TRANSFERENCIAS_PREFIJO = "facturacion.prefijo.ficherosAbonos";
+
+    private final String FICHERO_ADEUDOS_SERVER_PATH = "facturacion.directorioFisicoPagosBancosJava";
+    private final String FICHERO_ADEUDOS_SERVER_DIR = "facturacion.directorioPagosBancosJava";
+    private final String FICHERO_ADEUDOS_ORACLE_DIR = "facturacion.directorioBancosOracle";
 
     @Autowired
     private CgaeAuthenticationProvider authenticationProvider;
@@ -285,13 +298,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         Object[] param_in = new Object[11]; // Parametros de entrada del PL
 
         // Ruta del fichero
-
-        String pathFichero = getProperty("facturacion.directorioBancosOracle");
-
-        String sBarra = "";
-        if (pathFichero.indexOf("/") > -1) sBarra = "/";
-        if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
-        pathFichero += sBarra + usuario.getIdinstitucion().toString();
+        String pathFichero = getProperty(FICHERO_ADEUDOS_ORACLE_DIR).toUpperCase() + usuario.getIdinstitucion();
 
         // Parámetros de entrada
         param_in[0] = usuario.getIdinstitucion();
@@ -319,7 +326,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         }
 
         // Restaurar facturas a su estado inicial
-        if (resultado[0].equals("0") && resultado[1].equals("0"))
+        if (resultado[1].equals("0") && resultado[0].equals("0"))
             throw new BusinessException("facturacionPyS.ficheroAdeudos.error.nuevo");
     }
 
@@ -352,15 +359,16 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             Object[] param_in = new Object[9]; // Parametros de entrada del PL
 
             // Ruta del fichero
-            String pathFichero = getProperty("facturacion.directorioBancosOracle");
+            String pathFicheroOracle = getProperty(FICHERO_ADEUDOS_ORACLE_DIR).toUpperCase() + usuario.getIdinstitucion();
+            String pathFicheroServer = getProperty(FICHERO_ADEUDOS_SERVER_PATH) + getProperty(FICHERO_ADEUDOS_SERVER_DIR);
 
             String sBarra = "";
-            if (pathFichero.indexOf("/") > -1) sBarra = "/";
-            if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
-            pathFichero += sBarra + usuario.getIdinstitucion().toString();
+            if (pathFicheroServer.indexOf("/") > -1) sBarra = "/";
+            if (pathFicheroServer.indexOf("\\") > -1) sBarra = "\\";
+            pathFicheroServer += sBarra + usuario.getIdinstitucion().toString();
 
             // Se borran todos os ficheros que contenga el identificador del fichero de abonos
-            File directorioFicheros = new File(pathFichero);
+            File directorioFicheros = new File(pathFicheroServer);
             if (directorioFicheros.exists() && directorioFicheros.isDirectory()){
                 File[] ficheros = directorioFicheros.listFiles();
                 for (int x=0; x<ficheros.length; x++){
@@ -376,6 +384,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 }
             }
 
+
             // Parámetros de entrada
             param_in[0] = usuario.getIdinstitucion();
             param_in[1] = Integer.parseInt(ficheroAdeudosItem.getIdDisqueteCargos());
@@ -384,7 +393,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
             param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
             param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
-            param_in[7] = pathFichero;
+            param_in[7] = pathFicheroOracle;
             param_in[8] = Integer.parseInt(usuario.getIdlenguaje());
 
             String[] resultado = commons.callPLProcedureFacturacionPyS(
@@ -394,7 +403,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             if (Arrays.asList(codigosErrorFormato).contains(resultado[0])) {
                 throw new BusinessException(resultado[1]);
             } else {
-                if (!resultado[1].equals("0")) {
+                if (!resultado[0].equals("0")) {
                     throw new BusinessException("general.mensaje.error.bbdd");
                 }
             }
@@ -521,15 +530,12 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     public ResponseEntity<InputStreamResource> descargarFicheroAdeudos(List<FicherosAdeudosItem> ficheroAdeudosItems, HttpServletRequest request) throws Exception {
         ResponseEntity<InputStreamResource> res = null;
 
-        String directorioFisico = "facturacion.directorioFisicoPagosBancosJava";
-        String directorio = "facturacion.directorioPagosBancosJava";
-
         // Conseguimos información del usuario logeado
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 
         LOGGER.info("descargarFicheroAdeudos() -> Entrada al servicio para descargar ficheros de adeudos");
 
-        String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+        String pathFichero = getProperty(FICHERO_ADEUDOS_SERVER_PATH) + getProperty(FICHERO_ADEUDOS_SERVER_DIR)
                 + File.separator + usuario.getIdinstitucion();
 
         List<File> listaFicheros = ficheroAdeudosItems.stream().flatMap(item -> {
@@ -616,24 +622,14 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         LOGGER.info("nuevoFicheroDevoluciones() -> Entrada al servicio para crear un fichero de devoluciones");
 
         if (usuario != null && ficherosDevolucionesItem != null) {
-            String rutaServidor = getProperty("facturacion.directorioFisicoDevolucionesJava") + getProperty("facturacion.directorioDevolucionesJava");
-            String rutaOracle = getProperty("facturacion.directorioDevolucionesOracle");
+            String rutaServidor = getProperty(FICHERO_DEVOLUCIONES_SERVER_PATH) + getProperty(FICHERO_DEVOLUCIONES_SERVER_DIR);
+            String rutaOracle =  getProperty(FICHERO_DEVOLUCIONES_ORACLE_DIR).toUpperCase() + usuario.getIdinstitucion();
 
             String idDisqueteDevoluciones = facDisquetedevolucionesExtendsMapper.getNextIdDisqueteDevoluciones(usuario.getIdinstitucion());
 
             // Obtenemos la ruta del servidor
             rutaServidor += File.separator + usuario.getIdinstitucion();
-            String nombreFichero = idDisqueteDevoluciones + ".d19";
-
-
-            // Obtenemos la ruta de Oracle
-            String barra 	= "";
-            if (rutaOracle.indexOf("/") > -1)
-                barra = "/";
-            if (rutaOracle.indexOf("\\") > -1)
-                barra = "\\";
-
-            rutaOracle 	+= barra + usuario.getIdinstitucion() + barra;
+            String nombreFichero = idDisqueteDevoluciones + FICHERO_DEVOLUCIONES_EXTENSION;
 
             // Procesar y subir archivo para el fichero de devoluciones
             InputStream newFile = ficherosDevolucionesItem.getUploadFile() != null
@@ -641,7 +637,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             subirFicheroDisquete(newFile, rutaServidor, nombreFichero);
 
             boolean conComision = ficherosDevolucionesItem.getConComision() != null ? ficherosDevolucionesItem.getConComision() : false;
-            procesarNuevoFicheroDevoluciones(idDisqueteDevoluciones, nombreFichero, rutaOracle, rutaServidor, conComision, usuario);
+            procesarNuevoFicheroDevoluciones(idDisqueteDevoluciones, nombreFichero, rutaOracle, conComision, usuario);
         }
 
         LOGGER.info("nuevoFicheroDevoluciones() -> Salida del servicio para crear un fichero de devoluciones");
@@ -659,7 +655,8 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
         try {
             stream = ficheroOriginal;
-            new File(rutaServidor).mkdirs();
+            File dir = new File(rutaServidor);
+            dir.mkdirs();
 
             rdr = new BufferedReader(new InputStreamReader(stream));
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(rutaFichero),"ISO-8859-1"));
@@ -810,8 +807,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     }
 
     private void procesarNuevoFicheroDevoluciones(String idDisqueteDevoluciones, String nombreFichero,
-                                         String rutaOracle, String rutaServidor,
-                                         Boolean conComision, AdmUsuarios usuario) throws Exception {
+                                         String rutaOracle, Boolean conComision, AdmUsuarios usuario) throws Exception {
 
         LOGGER.info("nuevoFicheroDevoluciones() -> Iniciando servicio en background para la generación de fichero de devoluciones");
 
@@ -1193,6 +1189,10 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             facDisquetedevolucionesExtendsMapper.deleteByPrimaryKey(key);
 
+            // A continuación, se eliminan los ficheros de adeudos
+            String pathFichero = getProperty(FICHERO_TRANSFERENCIAS_SERVER_PATH) + getProperty(FICHERO_TRANSFERENCIAS_SERVER_DIR)
+                    + File.separator + usuario.getIdinstitucion();
+
             deleteResponseDTO.setStatus(HttpStatus.OK.toString());
         }
 
@@ -1205,15 +1205,12 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     public ResponseEntity<InputStreamResource> descargarFicheroDevoluciones(List<FicherosDevolucionesItem> ficheroDevolucionesItems, HttpServletRequest request) throws Exception {
         ResponseEntity<InputStreamResource> res = null;
 
-        String directorioFisico = "facturacion.directorioFisicoDevolucionesJava";
-        String directorio = "facturacion.directorioDevolucionesJava";
-
         // Conseguimos información del usuario logeado
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 
         LOGGER.info("descargarFicheroDevoluciones() -> Entrada al servicio para descargar ficheros de devoluciones");
 
-        String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+        String pathFichero = getProperty(FICHERO_DEVOLUCIONES_SERVER_PATH) + getProperty(FICHERO_DEVOLUCIONES_SERVER_DIR)
                 + File.separator + usuario.getIdinstitucion();
 
         List<File> listaFicheros = ficheroDevolucionesItems.stream().map(item -> {
@@ -1349,6 +1346,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     public InsertResponseDTO nuevoFicheroTransferenciasSjcs(List<FacturaItem> abonoItems, HttpServletRequest request) throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         AdmUsuarios usuario = new AdmUsuarios();
+        int resultado = -1;
 
         LOGGER.info(
                 "FacturacionPySExportacionesServiceImpl.nuevoFicheroTransferencias() -> Entrada al servicio para generar un nuevo fichero de transferencias");
@@ -1373,12 +1371,13 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                         abonoItems.stream().map(a -> a.getIdAbono()).collect(Collectors.toList()));
 
                 if (abonosBanco != null && !abonosBanco.isEmpty()) {
-                    int resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, idPropositoSEPA, idPropositoOtros, usuario);
-
-                    if (resultado == -1) {
-                        throw new BusinessException("general.mensaje.error.bbdd");
-                    }
+                    resultado = this.prepararFicheroTransferencias(fcs, usuario.getIdinstitucion(), bancosCodigo, idSufijo, abonosBanco, idPropositoSEPA, idPropositoOtros, usuario);
                 }
+
+            }
+
+            if (resultado == -1) {
+                throw new BusinessException("general.mensaje.error.bbdd");
             }
 
         }
@@ -1397,7 +1396,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                                               String idPropositoOtros,
                                               AdmUsuarios usuario) throws Exception {
         Long idDisqueteAbono = facDisqueteabonosExtendsMapper.getNextIdDisqueteAbono(idInstitucion);
-        String nombreFichero = getProperty("facturacion.prefijo.ficherosAbonos") + idDisqueteAbono;
+        String nombreFichero = getProperty(FICHERO_TRANSFERENCIAS_PREFIJO) + idDisqueteAbono;
 
         // Creación del nuevo fichero de transferencias
         FacDisqueteabonos record = new FacDisqueteabonos();
@@ -1431,12 +1430,12 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             FacAbono abonoToUpdate = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
 
             if (abonoToUpdate.getImppendienteporabonar() == null)
-                continue;
+                throw new BusinessException("general.mensaje.error.bbdd");
 
-            Double importeAbonado = abonoToUpdate.getImppendienteporabonar().doubleValue();
+            BigDecimal importeAbonado = abonoToUpdate.getImppendienteporabonar();
 
-            if (importeAbonado == 0.0)
-                continue;
+            if (importeAbonado.doubleValue() == 0.0)
+                throw new BusinessException("general.mensaje.error.bbdd");
 
             numeroAbonosIncluidosEnDisquete++;
 
@@ -1445,7 +1444,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             recordAbono.setIdinstitucion(idInstitucion);
             recordAbono.setIdabono(abono.getIdabono());
             recordAbono.setIddisqueteabono(idDisqueteAbono);
-            recordAbono.setImporteabonado(new BigDecimal(importeAbonado).setScale(2, RoundingMode.DOWN));
+            recordAbono.setImporteabonado(importeAbonado);
             recordAbono.setContabilizado("N");
 
             recordAbono.setFechamodificacion(new Date());
@@ -1453,16 +1452,16 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             facAbonoincluidoendisqueteExtendsMapper.insert(recordAbono);
 
             // Actualización de los importes
-            Double impPendientePorAbonar = abonoToUpdate.getImppendienteporabonar().doubleValue() - importeAbonado;
-            Double impTotalAbonado = abonoToUpdate.getImptotalabonado().doubleValue() + importeAbonado;
-            Double impTotalAbonadoPorBanco = abonoToUpdate.getImptotalabonadoporbanco().doubleValue() + importeAbonado;
+            BigDecimal impPendientePorAbonar = abonoToUpdate.getImppendienteporabonar().subtract(importeAbonado);
+            BigDecimal impTotalAbonado = abonoToUpdate.getImptotalabonado().add(importeAbonado);
+            BigDecimal impTotalAbonadoPorBanco = abonoToUpdate.getImptotalabonadoporbanco().add(importeAbonado);
 
-            abonoToUpdate.setImppendienteporabonar(new BigDecimal(impPendientePorAbonar).setScale(2, RoundingMode.DOWN));
-            abonoToUpdate.setImptotalabonado(new BigDecimal(impTotalAbonado).setScale(2, RoundingMode.DOWN));
-            abonoToUpdate.setImptotalabonadoporbanco(new BigDecimal(impTotalAbonadoPorBanco).setScale(2, RoundingMode.DOWN));
+            abonoToUpdate.setImppendienteporabonar(impPendientePorAbonar.setScale(2, RoundingMode.DOWN));
+            abonoToUpdate.setImptotalabonado(impTotalAbonado.setScale(2, RoundingMode.DOWN));
+            abonoToUpdate.setImptotalabonadoporbanco(impTotalAbonadoPorBanco.setScale(2, RoundingMode.DOWN));
 
             //  Actualización del estado
-            if (impPendientePorAbonar <= 0) {
+            if (impPendientePorAbonar.doubleValue() <= 0) {
                 abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PAGADO);
             } else if (abonoToUpdate.getIdcuenta() != null) {
                 abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
@@ -1474,15 +1473,11 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         }
 
         if (numeroAbonosIncluidosEnDisquete == 0) {
-            return 0;
+            throw new BusinessException("general.mensaje.error.bbdd");
         }
 
         // Obtener la ruta del fichero
-        String directorioFisico = "facturacion.directorioFisicoAbonosBancosJava";
-        String directorio = "facturacion.directorioAbonosBancosJava";
-
-        String rutaServidor = getProperty(directorioFisico) + getProperty(directorio)
-                + File.separator + usuario.getIdinstitucion();
+        String rutaServidor = getProperty(FICHERO_TRANSFERENCIAS_ORACLE_DIR).toUpperCase() + usuario.getIdinstitucion();
 
         Object[] param_in = new Object[7]; // Parametros de entrada del PL
 
@@ -1589,27 +1584,27 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                     FacAbono abonoToUpdate = facAbonoExtendsMapper.selectByPrimaryKey(keyAbono);
 
                     if (abonoToUpdate != null) {
-                        Double importeAbonado = abonoIncluido.getImporteabonado().doubleValue();
+                        BigDecimal importeAbonado = abonoIncluido.getImporteabonado();
 
                         // Compruebo que el importe por abonar y el importe abonado están inicializados
                         if (abonoToUpdate.getImppendienteporabonar() == null)
                             abonoToUpdate.setImppendienteporabonar(BigDecimal.ZERO);
                         if (abonoToUpdate.getImptotalabonado() == null)
-                            abonoToUpdate.setImptotalabonado(BigDecimal.valueOf(importeAbonado));
+                            abonoToUpdate.setImptotalabonado(importeAbonado);
                         if (abonoToUpdate.getImptotalabonadoporbanco() == null)
-                            abonoToUpdate.setImptotalabonadoporbanco(BigDecimal.valueOf(importeAbonado));
+                            abonoToUpdate.setImptotalabonadoporbanco(importeAbonado);
 
                         // Actualización de los importes
-                        Double impPendientePorAbonar = abonoToUpdate.getImppendienteporabonar().doubleValue() + importeAbonado;
-                        Double impTotalAbonado = abonoToUpdate.getImptotalabonado().doubleValue() - importeAbonado;
-                        Double impTotalAbonadoPorBanco = abonoToUpdate.getImptotalabonadoporbanco().doubleValue() - importeAbonado;
+                        BigDecimal impPendientePorAbonar = abonoToUpdate.getImppendienteporabonar().add(importeAbonado);
+                        BigDecimal impTotalAbonado = abonoToUpdate.getImptotalabonado().subtract(importeAbonado);
+                        BigDecimal impTotalAbonadoPorBanco = abonoToUpdate.getImptotalabonadoporbanco().subtract(importeAbonado);
 
-                        abonoToUpdate.setImppendienteporabonar(new BigDecimal(impPendientePorAbonar).setScale(2, RoundingMode.DOWN));
-                        abonoToUpdate.setImptotalabonado(new BigDecimal(impTotalAbonado).setScale(2, RoundingMode.DOWN));
-                        abonoToUpdate.setImptotalabonadoporbanco(new BigDecimal(impTotalAbonadoPorBanco).setScale(2, RoundingMode.DOWN));
+                        abonoToUpdate.setImppendienteporabonar(impPendientePorAbonar.setScale(2, RoundingMode.DOWN));
+                        abonoToUpdate.setImptotalabonado(impTotalAbonado.setScale(2, RoundingMode.DOWN));
+                        abonoToUpdate.setImptotalabonadoporbanco(impTotalAbonadoPorBanco.setScale(2, RoundingMode.DOWN));
 
                         //  Actualización del estado
-                        if (impPendientePorAbonar <= 0) {
+                        if (impPendientePorAbonar.doubleValue() <= 0) {
                             abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PAGADO);
                         } else if (abonoToUpdate.getIdcuenta() != null) {
                             abonoToUpdate.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
@@ -1627,11 +1622,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             facDisqueteabonosExtendsMapper.deleteByPrimaryKey(keyDisquete);
 
             // A continuación, se eliminan los ficheros de adeudos
-
-            String directorioFisico = "facturacion.directorioFisicoAbonosBancosJava";
-            String directorio = "facturacion.directorioAbonosBancosJava";
-
-            String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+            String pathFichero = getProperty(FICHERO_TRANSFERENCIAS_SERVER_PATH) + getProperty(FICHERO_TRANSFERENCIAS_SERVER_DIR)
                     + File.separator + usuario.getIdinstitucion();
 
             String nombreFichero = disquete.getNombrefichero();
@@ -1665,15 +1656,12 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     public ResponseEntity<InputStreamResource> descargarFicheroTransferencias(List<FicherosAbonosItem> ficheroAbonosItems, HttpServletRequest request) throws Exception {
         ResponseEntity<InputStreamResource> res = null;
 
-        String directorioFisico = "facturacion.directorioFisicoAbonosBancosJava";
-        String directorio = "facturacion.directorioAbonosBancosJava";
-
         // Conseguimos información del usuario logeado
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 
         LOGGER.info("descargarFicheroTransferencias() -> Entrada al servicio para descargar ficheros de transferencias");
 
-        String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+        String pathFichero = getProperty(FICHERO_TRANSFERENCIAS_SERVER_PATH) + getProperty(FICHERO_TRANSFERENCIAS_SERVER_DIR)
                 + File.separator + usuario.getIdinstitucion();
 
         List<File> listaFicheros = ficheroAbonosItems.stream().flatMap(item -> {
