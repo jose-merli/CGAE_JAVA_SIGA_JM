@@ -2595,7 +2595,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.debug("facturarCompra() -> Entrada al servicio para anular una compra");
+		LOGGER.debug("facturarCompra() -> Entrada al servicio para facturar una compra");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -2624,7 +2624,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			}
 
 		insertResponseDTO.setError(error);
-		LOGGER.debug("facturarCompra() -> Salida del servicio para anular una compra");
+		LOGGER.debug("facturarCompra() -> Salida del servicio para facturar una compra");
 
 		return insertResponseDTO;
 	}
