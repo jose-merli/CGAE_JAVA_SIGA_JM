@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.CenPoblacionesSqlProvider;
 
 public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
@@ -35,9 +36,11 @@ public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
 		sql.SELECT("PRIORIDAD");	
 		
 		sql.FROM("CEN_POBLACIONES");
-		sql.WHERE("IDPROVINCIA ='" + idProvincia + "'");
+		if(!UtilidadesString.esCadenaVacia(idProvincia)) {
+			sql.WHERE("IDPROVINCIA ='" + idProvincia + "'");
+		}
 		sql.WHERE(filtroTextoBusquedas("NOMBRE", filtro));
-		sql.ORDER_BY("NOMBRE");
+		sql.ORDER_BY("PRIORIDAD, NOMBRE");
 
 		return sql.toString();
 		

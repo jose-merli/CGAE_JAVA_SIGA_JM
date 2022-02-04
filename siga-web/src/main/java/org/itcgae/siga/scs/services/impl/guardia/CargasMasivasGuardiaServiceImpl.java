@@ -1113,7 +1113,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					if (cargaMasivaDatosITItem.getIdGuardia() != null && cargaMasivaDatosITItem.getIdGuardia() != "") {
 
 						// 2. Si las guardias para el turno son obligatorias, no se podrá realizar.
-						if (!listGu.get(0).getObligatoriedad().equals("0")) {
+						if (listGu.get(0).getObligatoriedad().equals("0")) {
 
 							// 3. Si la inscripción en la guardia ya existe de alta para la fecha efectiva
 							// indicada, no se podrá realizar.

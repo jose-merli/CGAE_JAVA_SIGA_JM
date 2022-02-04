@@ -6,6 +6,7 @@
  */
 package org.itcgae.siga.commons.utils;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +21,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
@@ -32,6 +34,12 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 
+
+
+
+
+
+
 /**
  * @author daniel.campos
  *
@@ -42,6 +50,10 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 public class UtilidadesString {
 
 	private static Logger LOGGER = Logger.getLogger(UtilidadesString.class);
+
+	private static List<String> DIGITOS_COMIENZO_MOVIL = Arrays.asList("6","7");
+	private static Pattern patternDigitos = Pattern.compile("^[0-9]*$");
+
 
 	static public String getMensajeIdioma(String idioma, String key) {
 
@@ -112,6 +124,7 @@ public class UtilidadesString {
 
 	}
 
+
 	/**
 	 * Funcion que elimina acentos y caracteres especiales de una cadena de texto.
 	 * 
@@ -144,6 +157,7 @@ public class UtilidadesString {
 		}
 	}
 
+
 	public static String filtroTextoBusquedas(String columna, String cadena) {
 		StringBuilder cadenaWhere = new StringBuilder();
 		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN') ");
@@ -168,6 +182,7 @@ public class UtilidadesString {
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
 		return format.parse(string);
+
 
 	}
 
@@ -235,11 +250,14 @@ public class UtilidadesString {
 			return null;
 	}
 
+
 	// Los siguientes son los tipos que no pueden repetirse dentro de un cliente
 	public static final Integer[] tiposDireccionUnicos = {
 			SigaConstants.TIPO_DIRECCION_CENSOWEB, SigaConstants.TIPO_DIRECCION_GUARDIA,
 			SigaConstants.TIPO_DIRECCION_FACTURACION, SigaConstants.TIPO_DIRECCION_TRASPASO_OJ
 	};
+
+
 
 	public static String traduceNota(Double nota) {
 		String notaString = "";
@@ -364,12 +382,19 @@ public class UtilidadesString {
 			return content;
 		} catch (IOException e) {
 			try {
+
+
+
+
+
 				is.close();
 
 			} catch (Exception eee) {}
 
 			throw new Exception("Error en la lectura del fichero", e);
 		}
+
+
 	}
 
 	public static void setFileContent(File ficheroFOP, String sPlantillaFO) throws Exception {
@@ -468,6 +493,58 @@ public class UtilidadesString {
 			retorno = texto.substring(inicio + marcaInicial.length(), fin);
 		}
 		return retorno;
+	}
+	
+	/**
+	 * Metodo de utilidad para rellenar una cadena size veces con el caracter filler
+	 *
+	 * @param text
+	 * @param size
+	 * @param filler
+	 * @return
+	 */
+	public static String fillCadena(String text, int size, String filler){
+		String cadena = "";
+
+		if (!esCadenaVacia(text) && !esCadenaVacia(filler)) {
+			if (text != "") {
+				int lengthCad = size - text.length();
+
+				if (lengthCad == 0 || lengthCad < 0) {
+					return text;
+				} else if (lengthCad >= 1) {
+					for (int i = 0; i < lengthCad; i++) {
+						cadena += filler;
+					}
+
+					return cadena + text;
+				}
+			} else {
+				return text;
+			}
+		}
+
+		return text;
+	}
+	
+	
+	public static String getCampoMultidioma (String campo, String idioma){
+		if (esCadenaVacia(campo)) return "";
+		if (esCadenaVacia(idioma)) idioma = "1";
+
+		String alias = campo;
+		int i = campo.indexOf(".");
+		if (i >= 0) {
+			alias = campo.substring(i+1);
+		}
+		return " F_SIGA_GETRECURSO (" + campo + "," + idioma + ") " + alias + " ";
+	}
+
+	public static String getCampoMultidiomaSimple (String campo, String idioma){
+		if (esCadenaVacia(campo)) return "";
+		if (esCadenaVacia(idioma)) idioma = "1";
+
+		return " F_SIGA_GETRECURSO (" + campo + "," + idioma + ")  ";
 	}
 
 	/**
@@ -598,5 +675,71 @@ public class UtilidadesString {
 		}
 
 		return esValido;
+	}
+	
+	  public static String sustituirParaExcel(String sCadena)
+	  {
+	    String sSalida="";
+
+	    if (sCadena==null) return sSalida;
+	    sSalida = sCadena.replaceAll("\t", " ");
+	    sSalida = sSalida.replaceAll("\n\r", " ");
+	    sSalida = sSalida.replaceAll("\n", " ");
+	    sSalida = sSalida.replaceAll("\r", " ");
+	    //sSalida = sSalida.replaceAll("", "\u20ac");
+	    return sSalida;
+	  }
+
+	/**
+	 * Valida un numero de movil para enviar sms por el servicio ECOS
+	 * El numero debe de tener el formato (+xx)6xxxxxxxx o (+xx)7xxxxxxxx
+	 *
+	 * @param numeroTelefono
+	 * @return
+	 */
+	public static boolean esNumMovilECOS(String numeroTelefono) {
+		boolean bEsNumMovilECOS = false;
+		if (numeroTelefono != null && numeroTelefono.length() >= 9) {
+			String numeroSinPrefijo = "";
+			if (numeroTelefono.startsWith("(+34)"))
+				numeroSinPrefijo = numeroTelefono.substring(5);
+			else
+				numeroSinPrefijo = getNumeroConPrefijoECOS(numeroTelefono).substring(5);
+			if (numeroSinPrefijo.length() == 9 && sonDigitos(numeroSinPrefijo) &&
+					DIGITOS_COMIENZO_MOVIL.contains(Character.toString(numeroSinPrefijo.charAt(0))))
+				bEsNumMovilECOS = true;
+		}
+		return bEsNumMovilECOS;
+	}
+
+	public static boolean sonDigitos(String numero) {
+		if (numero == null)
+			return false;
+		else
+			return patternDigitos.matcher(numero).find();
+	}
+
+	/**
+	 * Devuelve un numero de telefono con el prefijo de Espana entre parentesis (+34).
+	 * Si ya tiene prefijo y no es el de espana (contiene el + pero no
+	 * seguido de 34/034/0034) se obviara el + y se tomara como un numero sin prefijo.
+	 *
+	 * @param numero
+	 * @return
+	 */
+	public static String getNumeroConPrefijoECOS(String numero) {
+		String prefijo = "+34";
+		if (numero.startsWith("+")) {
+			numero = numero.substring(1);
+			if (numero.startsWith("34"))
+				numero = numero.substring(2);
+			else if (numero.startsWith("034"))
+				numero = numero.substring(3);
+			else if (numero.startsWith("0034"))
+				numero = numero.substring(4);
+		}
+		numero = "(" + prefijo + ")" + numero;
+		LOGGER.info("NUMERO DE TELEFONO CON PREFIJO:" + numero);
+		return numero;
 	}
 }

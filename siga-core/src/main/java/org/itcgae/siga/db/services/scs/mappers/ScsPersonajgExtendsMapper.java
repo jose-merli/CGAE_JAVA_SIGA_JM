@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.ScsPersonaJGBean;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
@@ -102,5 +103,25 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 
 	})
 	List<UnidadFamiliarEJGItem> unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
+
+	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "getPersonaJG")
+	@Results({
+			@Result(column = "NOMBRE", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DIRECCION", property = "direccion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "EXISTEDOMICILIO", property = "existeDomicilio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CODIGOPOSTAL", property = "codigoPostal", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPAIS", property = "idPais", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PERIDPROVINCIA", property = "perIdProvicncia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPOBLACION", property = "idPoblacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FAX", property = "fax", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CORREOELECTRONICO", property = "correoElectronico", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "POBLACION", property = "poblacionStr", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PROIDPROVINCIA", property = "proIdProvincia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PROVINCIA", property = "provinciaStr", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ScsPersonaJGBean> getPersonaJG(Long idPersonaJG, Integer idInstitucion);
 
 }

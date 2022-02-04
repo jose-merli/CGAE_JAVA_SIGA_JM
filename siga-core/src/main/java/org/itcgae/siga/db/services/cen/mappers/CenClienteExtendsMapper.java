@@ -50,6 +50,5 @@ public interface CenClienteExtendsMapper extends CenClienteMapper{
 	})
 	
 	List<StringDTO> getTratamiento(String idInstitucion, String idPersona, int idIdioma);
-	
 
 }

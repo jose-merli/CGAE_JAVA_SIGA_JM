@@ -18,11 +18,11 @@ public class ScsConjuntoguardiasSqlExtendsProvider extends ScsConjuntoguardiasSq
         }
 
             if (!UtilidadesString.esCadenaVacia(filtro.getLugar())) {
-            SQL.WHERE("UPPER(cg.lugar)=UPPER('" + filtro.getLugar() + "')");
+            SQL.WHERE("UPPER(cg.lugar) LIKE UPPER('%" + filtro.getLugar() + "%')");
         }
 
             if (!UtilidadesString.esCadenaVacia(filtro.getNombre())) {
-            SQL.WHERE("UPPER(cg.descripcion)=UPPER('" + filtro.getNombre() + "')");
+            SQL.WHERE("UPPER(cg.descripcion) LIKE UPPER('%" + filtro.getNombre() + "%')");
         }
 
             if (!UtilidadesString.esCadenaVacia(filtro.getIdGrupoZona())) {

@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.fac.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.FacFacturaSqlProvider;
 
 import java.text.SimpleDateFormat;
@@ -60,8 +61,18 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         facturas.LEFT_OUTER_JOIN("fac_estadofactura ef ON (ef.idestado = f.estado)");
         facturas.LEFT_OUTER_JOIN("gen_recursos r ON (ef.descripcion = r.idrecurso AND r.idlenguaje =" + idLenguaje + ")");
 
-        //filtros
-        facturas.WHERE("f.idinstitucion =" + idInstitucion);
+        //filtro
+        if (idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+            if (item.getIdInstitucion() != null) {
+                facturas.WHERE("f.idinstitucion = " + item.getIdInstitucion());
+            }
+        } else {
+            if (item.getIdInstitucion() != null) {
+                facturas.WHERE("f.idinstitucion = " + item.getIdInstitucion());
+            } else {
+                facturas.WHERE("f.idinstitucion = " + idInstitucion);
+            }
+        }
 
         if(item.getFacturasPendientesDesde() != null || item.getFacturasPendientesHasta() != null) {
             facturas.WHERE("c.idpersona IN (" + facturasPendientes.toString() + ")");
@@ -73,7 +84,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //estados
-        if (item.getEstadosFiltroFac() != null) {
+        if (null!=item.getEstadosFiltroFac() && !item.getEstadosFiltroFac().isEmpty()) {
             StringBuilder aux = new StringBuilder();
             for (String s : item.getEstadosFiltroFac()) {
                 aux.append(s).append(",");
@@ -141,7 +152,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //numero colegiado
-        if(item.getNumeroColegiado()!=null) {
+        if(item.getNumeroColegiado() != null) {
             facturas.WHERE("col.NCOLEGIADO="+item.getNumeroColegiado());
         }
 
@@ -277,7 +288,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         SQL query = new SQL();
 
-        query.SELECT("MAX(IDFACTURA)+1 AS ID");
+        query.SELECT("MAX(TO_NUMBER(IDFACTURA))+1 AS ID");
         query.FROM("FAC_FACTURA ff");
         query.WHERE("IDINSTITUCION ="+idInstitucion);
 
@@ -298,6 +309,24 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         // Where
         sql.WHERE("fs.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("fs.IDSERIEFACTURACION = " + idSerieFacturacion);
+
+        return sql.toString();
+    }
+
+    public String getFacturasDeFacturacionProgramada(String institucion, String seriefacturacion, String idProgramacion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("F.IDFACTURA");
+        sql.SELECT("F.NUMEROFACTURA");
+        sql.SELECT("F.IDINSTITUCION");
+        sql.SELECT("F.IDPERSONA");
+        sql.SELECT("FP.IDESTADOPDF");
+        sql.FROM("FAC_FACTURA F");
+        sql.INNER_JOIN("FAC_FACTURACIONPROGRAMADA FP ON F.IDINSTITUCION = FP.IDINSTITUCION AND F.IDSERIEFACTURACION = FP.IDSERIEFACTURACION AND F.IDPROGRAMACION = FP.IDPROGRAMACION");
+        sql.WHERE("F.IDINSTITUCION = " + institucion);
+        sql.WHERE("F.IDSERIEFACTURACION = " + seriefacturacion);
+        sql.WHERE("F.IDPROGRAMACION = " + idProgramacion);
+        sql.ORDER_BY("F.FECHAEMISION");
 
         return sql.toString();
     }

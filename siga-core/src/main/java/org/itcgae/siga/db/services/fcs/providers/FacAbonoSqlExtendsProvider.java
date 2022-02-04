@@ -28,9 +28,10 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		sql.SELECT("PA.nombre AS NOMBREPAGO");
 		sql.SELECT("GEN.DESCRIPCION AS ESTADONOMBRE");
 		sql.SELECT("PA.IDPAGOSJG, PA.IDFACTURACION, A.IDFACTURA");
-		sql.SELECT("F.NOMBRE as NOMBREFACTURACION");
+		sql.SELECT("F.NOMBRE as NOMBREFACTURACION, FL.PRECIOUNITARIO AS IRPF");
 		
 		sql.FROM("FAC_ABONO A");
+		sql.INNER_JOIN("FAC_LINEAABONO FL ON (A.IDABONO = FL.IDABONO AND FL.IDINSTITUCION = A.IDINSTITUCION)");
 		sql.INNER_JOIN("FCS_PAGOSJG PA on A.IDPAGOSJG = PA.IDPAGOSJG AND A.idinstitucion = PA.idinstitucion");
 		sql.INNER_JOIN("FCS_FACTURACIONJG  F ON (PA.IDFACTURACION = F.IDFACTURACION AND PA.IDINSTITUCION = F.IDINSTITUCION) ");
 		sql.INNER_JOIN("FCS_FACT_GRUPOFACT_HITO G ON (G.IDINSTITUCION = F.IDINSTITUCION AND G.IDFACTURACION = F.IDFACTURACION)");
@@ -95,8 +96,12 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
             sql.WHERE("A.IDABONO IN (" + transferencia.toString() + ")");
         }
         
+        if(facAbonoItem.getNombreSociedad() != null) sql.WHERE("UPPER(P.NOMBRE) LIKE UPPER('%"+facAbonoItem.getNombreSociedad() + "%')");
+        
+        if(facAbonoItem.getIdInstitucion() != null ) sql.WHERE("COL.IDINSTITUCION = " + facAbonoItem.getIdInstitucion());
         
 		sql.WHERE("A.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("FL.DESCRIPCIONLINEA = 'IRPF'");
 		sql.WHERE("A.IDPAGOSJG IS NOT NULL");
 		sql.ORDER_BY("A.NUMEROABONO DESC");
 		sql.WHERE("ROWNUM <= 200");

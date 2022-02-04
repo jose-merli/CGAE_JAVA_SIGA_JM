@@ -59,4 +59,22 @@ public class WebServiceServerConfig {
 		xsds.setInline(true);
 		return xsds;
 	}
+
+	@Bean(name = "SincronizacionEXEAService")
+	public DefaultWsdl11Definition sincronizacionEXEAWsdl11Definition(@Qualifier("sincronizacionEXEASchema") XsdSchemaCollection sincronizacionEXEACollection) {
+		DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+		wsdl11Definition.setPortTypeName("SincronizacionEXEATypePort");
+		wsdl11Definition.setLocationUri("/ws/SincronizacionEXEAService");
+		wsdl11Definition.setTargetNamespace("urn:redabogacia.sincronizacion.exea.com");
+		wsdl11Definition.setSchemaCollection(sincronizacionEXEACollection);
+
+		return wsdl11Definition;
+	}
+
+	@Bean(name= "sincronizacionEXEASchema")
+	public XsdSchemaCollection sincronizacionEXEASchema(){
+		CommonsXsdSchemaCollection xsds = new CommonsXsdSchemaCollection(new ClassPathResource("xsd/SincronizacionEXEA/v1/SincronizacionEXEA.xsd"));
+		xsds.setInline(true);
+		return xsds;
+	}
 }

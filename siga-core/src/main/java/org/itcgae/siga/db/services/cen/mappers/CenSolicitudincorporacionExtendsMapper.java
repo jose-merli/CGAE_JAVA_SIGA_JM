@@ -10,13 +10,14 @@ import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.cen.providers.CenSolicitudincorporacionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface CenSolicitudincorporacionExtendsMapper {
+public interface CenSolicitudincorporacionExtendsMapper extends CenSolicitudincorporacionMapper {
 
 	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "selectSolicitudes")
 	@Results({ @Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
@@ -74,6 +75,9 @@ public interface CenSolicitudincorporacionExtendsMapper {
 			@Result(column = "NUMEROCUENTA", property = "numeroCuenta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "BANCO", property = "banco", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUM_REGISTRO", property = "numRegistro", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CLAVECONSULTAREGTEL", property = "claveConsulta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUM_EXPEDIENTE", property = "numExpediente", jdbcType = JdbcType.VARCHAR),
 	@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)
 			})
 	List<SolIncorporacionItem> getSolicitudes(SolicitudIncorporacionSearchDTO solIncorporacionSearchDTO, String idLenguage);

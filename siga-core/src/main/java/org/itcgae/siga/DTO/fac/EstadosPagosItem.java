@@ -27,4 +27,6 @@ public class EstadosPagosItem {
 	String comentario;
 	String cuentaBanco;
 	Boolean comision;
+	String comisionIdFactura;
+	String comisionFactura;
 }

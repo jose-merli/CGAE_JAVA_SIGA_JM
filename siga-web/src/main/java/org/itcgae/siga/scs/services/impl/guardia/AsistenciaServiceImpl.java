@@ -1412,6 +1412,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 							asistencia.setNumero(Long.valueOf(numeroAsistencia));
 							asistencia.setAnio(Short.valueOf(anioAsistencia));
+							if (tarjetaAsistenciaResponseItem.getIdJuzgado() != null && ! tarjetaAsistenciaResponseItem.getIdJuzgado().isEmpty())
+							asistencia.setJuzgado(Long.valueOf(tarjetaAsistenciaResponseItem.getIdJuzgado()));
 
 							// Validamos guardias colegiado
 							try {
@@ -4089,9 +4091,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							caractasistencia.setOtrasdescripcion(null);
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getAsesoramiento())) {
-							caractasistencia.setAsesoramiento("1");
-						} else {
-							caractasistencia.setAsesoramiento("0");
+							if (caracteristicasAsistenciaItem.getAsesoramiento().equals("true")) {
+								caractasistencia.setAsesoramiento("1");
+							} else {
+								caractasistencia.setAsesoramiento("0");
+							}
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getMinisterioFiscal())
 								&& "S".equals(caracteristicasAsistenciaItem.getMinisterioFiscal())) {
@@ -4121,6 +4125,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else {
 							caractasistencia.setIdpersona(null);
 						}
+						
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getIdJuzgado())) {
+							caractasistencia.setIdjuzgado(Long.valueOf(caracteristicasAsistenciaItem.getIdJuzgado()));
+						}
 						caractasistencia.setNumeroprocedimiento(caracteristicasAsistenciaItem.getNumeroProcedimiento());
 						caractasistencia.setNig(caracteristicasAsistenciaItem.getNig());
 						caractasistencia.setFechamodificacion(new Date());
@@ -4134,6 +4142,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						caractasistencia.setIdinstitucion(idInstitucion);
 						caractasistencia.setFechamodificacion(new Date());
 						caractasistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getIdJuzgado())) {
+							caractasistencia.setIdjuzgado(Long.valueOf(caracteristicasAsistenciaItem.getIdJuzgado()));
+						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getIdOrigenContacto())) {
 							caractasistencia.setIdorigencontacto(
 									Long.valueOf(caracteristicasAsistenciaItem.getIdOrigenContacto()));
@@ -4206,7 +4217,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							caractasistencia.setOtrasdescripcion(null);
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getAsesoramiento())) {
-							caractasistencia.setAsesoramiento(caracteristicasAsistenciaItem.getAsesoramiento());
+							if (caracteristicasAsistenciaItem.getAsesoramiento().equals("true")) {
+								caractasistencia.setAsesoramiento("1");
+							} else {
+								caractasistencia.setAsesoramiento("0");
+							}
 						} else {
 							caractasistencia.setAsesoramiento(null);
 						}
@@ -4342,7 +4357,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						}
 						caracteristicasAsistenciaItem.setNumeroProcedimiento(caractasistencia.getNumeroprocedimiento());
 						caracteristicasAsistenciaItem.setNig(caractasistencia.getNig());
-
+						caracteristicasAsistenciaItem.setIdJuzgado(caractasistencia.getIdjuzgado().toString());
 						caracteristicasAsistenciaDTO.getCaracteristicasAsistenciaItems()
 								.add(caracteristicasAsistenciaItem);
 					}
@@ -4438,7 +4453,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							scsActuacionasistenciaKey.setIdinstitucion(idInstitucion);
 							scsActuacionasistencia = scsActuacionasistenciaExtendsMapper
 									.selectByPrimaryKey(scsActuacionasistenciaKey);
-							actuacion.setAnulada("0");
+							//actuacion.setAnulada("0");
 
 							if (scsActuacionasistencia != null && "1".equals(scsActuacionasistencia.getFacturado())) {
 								facturada = true;

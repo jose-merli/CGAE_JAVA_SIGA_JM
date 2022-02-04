@@ -7,11 +7,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.WebApplicationInitializer;
 
 @SpringBootApplication
 @EnableScheduling
+@EnableAsync
 @MapperScan({"org.itcgae.siga.db.mappers","org.itcgae.siga.db.services"})
 @Import(SwaggerConfig.class)
 public class Application extends SpringBootServletInitializer implements WebApplicationInitializer {

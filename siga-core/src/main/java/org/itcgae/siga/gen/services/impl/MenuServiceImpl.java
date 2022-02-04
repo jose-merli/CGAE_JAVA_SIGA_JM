@@ -50,37 +50,7 @@ import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
-import org.itcgae.siga.db.entities.AdmConfig;
-import org.itcgae.siga.db.entities.AdmConfigExample;
-import org.itcgae.siga.db.entities.AdmGestorinterfaz;
-import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
-import org.itcgae.siga.db.entities.AdmPerfil;
-import org.itcgae.siga.db.entities.AdmPerfilExample;
-import org.itcgae.siga.db.entities.AdmPerfilKey;
-import org.itcgae.siga.db.entities.AdmPerfilRol;
-import org.itcgae.siga.db.entities.AdmPerfilRolExample;
-import org.itcgae.siga.db.entities.AdmRol;
-import org.itcgae.siga.db.entities.AdmRolExample;
-import org.itcgae.siga.db.entities.AdmTiposacceso;
-import org.itcgae.siga.db.entities.AdmTiposaccesoKey;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteKey;
-import org.itcgae.siga.db.entities.CenColegiado;
-import org.itcgae.siga.db.entities.CenColegiadoKey;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
-import org.itcgae.siga.db.entities.GenMenu;
-import org.itcgae.siga.db.entities.GenMenuExample;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilMapper;
@@ -100,6 +70,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.exp.mappers.ExpProcedimientosExeaExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.UserCgae;
@@ -174,6 +145,9 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
+
+	@Autowired
+	private ExpProcedimientosExeaExtendsMapper expProcedimientosExeaExtendsMapper;
 
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -307,6 +281,21 @@ public class MenuServiceImpl implements IMenuService {
 
 			}
 
+			//Miramos si trae la opcion de menu Expedientes EXEA, si es así pero el colegio no tiene procedimientos de EXEA configurados o no tiene ninguno de colegiacion, la quitamos
+			if(items != null && !items.isEmpty()
+				&&  items.stream().anyMatch(menuItem -> SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel()))){
+
+				ExpProcedimientosExeaExample expProcedimientosExeaExample = new ExpProcedimientosExeaExample();
+				expProcedimientosExeaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+				List<ExpProcedimientosExea> procedimientosExea = expProcedimientosExeaExtendsMapper.selectByExample(expProcedimientosExeaExample);
+				//Si la institucion no tiene procedimientos de EXEA o no tiene ninguno que sea de colegiacion, quitamos la opcion de menu EXPEDIENTES EXEA
+				if(procedimientosExea == null
+					|| procedimientosExea.isEmpty()
+					|| !procedimientosExea.stream().anyMatch(procedimiento -> 1 == procedimiento.getEsColegiacion())){
+
+						items = items.stream().filter(menuItem -> !SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel())).collect(Collectors.toList());
+				}
+			}
 			response.setMenuItems(items);
 		}
 
@@ -442,16 +431,12 @@ public class MenuServiceImpl implements IMenuService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		//String idInstitucionCert = validaInstitucionCertificado(request);
 		List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
-		if((institucionList == null || institucionList.isEmpty()) && idInstitucion == null) {
+
+		if(institucionList == null || institucionList.isEmpty()) {
 			throw new BadCredentialsException("Institucion No válida");
 		}
-		String idInstitucionRequest = null;
-		if(institucionList != null && !institucionList.isEmpty()){
-			idInstitucionRequest = institucionList.get(0).getIdinstitucion().toString();
-		}else {
-			idInstitucionRequest = idInstitucion.toString();
-		}
-		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucionRequest));
+		String idInstitucionRequest = institucionList.get(0).getIdinstitucion().toString();
+		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
 		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem,idInstitucionRequest);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
@@ -919,20 +904,19 @@ public class MenuServiceImpl implements IMenuService {
 
 	private String getInstitucionRequest(HttpServletRequest request) {
 		String idInstitucion = null;
-
 		try {
 			String roles = (String) request.getHeader("CAS-roles");
-			if(roles!=null) {
-				String defaultRole = null;
-				String [] roleAttributes;
-				String [] rolesList = roles.split("::");
-				if(rolesList.length > 1) {
-					defaultRole = (String) request.getHeader("CAS-defaultRole");
-					roleAttributes = defaultRole.split(" ");
-				}else {
-					roleAttributes = roles.split(" ");
-				}
-					
+			String defaultRole = null;
+			String [] roleAttributes;
+			String [] rolesList = roles.split("::");
+			if(rolesList.length > 1) {
+				defaultRole = (String) request.getHeader("CAS-defaultRole");
+				roleAttributes = defaultRole.split(" ");
+			}else {
+				roleAttributes = roles.split(" ");
+			}
+			
+			if(roleAttributes != null) {
 				idInstitucion = roleAttributes[0];
 			}
 
@@ -942,7 +926,6 @@ public class MenuServiceImpl implements IMenuService {
 		if (idInstitucion == null){
 			idInstitucion = "";
 		}
-
 		return idInstitucion;
 	}
 

@@ -72,7 +72,7 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		}
 
 		//programacion
-		if(item.getIdseriefacturacion()!=null) {
+		if(!UtilidadesString.esCadenaVacia(item.getIdprogramacion())) {
 			principal.WHERE("c.idprogramacion = "+item.getIdprogramacion());
 		}
 		

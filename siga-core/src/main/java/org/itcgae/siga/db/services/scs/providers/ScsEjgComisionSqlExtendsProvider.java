@@ -30,6 +30,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlPresidente.SELECT("pon.IDPONENTE as value, f_siga_getrecurso(pon.nombre," + idLenguaje + ") as nombre");
 		sqlPresidente.FROM("scs_ponente pon");
 		sqlPresidente.WHERE("pon.idinstitucion = " + idInstitucion);
+		sqlPresidente.ORDER_BY("nombre");
 		LOGGER.info("*******************comboPresidente********************" + sqlPresidente.toString());
 		return sqlPresidente.toString();
 	}
