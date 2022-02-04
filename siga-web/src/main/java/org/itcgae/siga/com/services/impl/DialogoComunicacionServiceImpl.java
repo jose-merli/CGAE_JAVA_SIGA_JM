@@ -1008,6 +1008,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			String nombrePlantilla = "";
 			Long idPlantillaGenerar = null;
 			boolean esExcel = false;
+			List<ModPlantilladocumento> listaPlantilla = null;
 			//Obtenemos el nombre de la plantilla
 			if(plantilla.getIdPlantillas() != null){
 				
@@ -1030,250 +1031,249 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - INICIO");
 				example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(usuario.getIdlenguaje());
-				List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
+				listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
 				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - FIN");
 				
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existen multiples plantillas asociadas al informe  - INICIO");
-				if(listaPlantilla != null && listaPlantilla.size() == 1){
-					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
-					nombrePlantilla = plantillaDoc.getPlantilla();
-					idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
-				}else if(listaPlantilla != null && listaPlantilla.size() > 1){
-					LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
-					throw new BusinessException("Exiten multiples plantillas asociada al informe en el idioma del usuario");
-				}else{
+				
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existe una plantilla asociada al informe  - INICIO");
+				if(listaPlantilla == null || listaPlantilla.size() < 1){
 					LOGGER.error("No hay plantilla asociada para el informe en el idioma del usuario");
 					throw new BusinessException("No hay plantilla asociada para el informe en el idioma del usuario");
 				}
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existen multiples plantillas asociadas al informe  - FIN");
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existe una plantilla asociada al informe  - FIN");
 			}
-			LOGGER.info("Rendimiento inicio ejecucion consultas " );
 			
-			LOGGER.info("Rendimiento inicio ejecucion consultas condicionales" );
-			LOGGER.debug("Obtenemos las consultas condicional: " + plantilla.getIdPlantillas());
-			List<ConsultaItem> consultasItemCondicional = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
-
-			if(consultasItemCondicional != null && consultasItemCondicional.size() > 0){
+			for (ModPlantilladocumento plantillaDoc: listaPlantilla) {
+				nombrePlantilla = plantillaDoc.getPlantilla();
+				idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
+				LOGGER.info("Rendimiento inicio ejecucion consultas " );
 				
-				LOGGER.debug("Número de consultas condicionales: " + consultasItemCondicional.size());
-				
-				for(ConsultaItem consulta:consultasItemCondicional){
+				LOGGER.info("Rendimiento inicio ejecucion consultas condicionales" );
+				LOGGER.debug("Obtenemos las consultas condicional: " + plantilla.getIdPlantillas());
+				List<ConsultaItem> consultasItemCondicional = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
+	
+				if(consultasItemCondicional != null && consultasItemCondicional.size() > 0){
 					
-					consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio);
+					LOGGER.debug("Número de consultas condicionales: " + consultasItemCondicional.size());
 					
-					idConsultaEjecutarCondicional = Long.parseLong(consulta.getIdConsulta());
-					
-					List<Map<String, Object>> result;
-					try {
- 
-						LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ejecutamos la consulta "+consultaEjecutarCondicional);
-						result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarCondicional, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()),consulta.getDescripcion());
-						LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ha sido ejecutada la consulta "+consultaEjecutarCondicional);
- 
-					} catch (BusinessSQLException e) {
-						LOGGER.error(e);
-						throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
-					} catch (Exception e) {
-						LOGGER.error(e);
-						throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
-					}
-					
-					if(result != null && result.size() > 0){
-						LOGGER.debug("Se cumple la consulta condicional del informe: " + plantilla.getIdInforme());
-						continua = true;								
-					}else{
-						continua = false;
-						LOGGER.info("La consulta condicional no ha devuelto resultados");
-					}
-				}						
-			}else{
-				LOGGER.debug("No hay consulta condicional para el informe: " + plantilla.getIdInforme());
-				continua = true;
-			}
-			LOGGER.info("Rendimiento fin ejecucion consultas condicionales" );
-//							
-			LOGGER.info("Rendimiento inicio ejecucion consultas destinatarios" );
-			if (continua) {
-				LOGGER.debug("Obtenemos la consulta de destinatario: " + plantilla.getIdInforme());
-				List<ConsultaItem> consultasItemDest = _modPlantillaDocumentoConsultaExtendsMapper
-						.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
-								Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
-								plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
-
-				if (consultasItemDest != null && consultasItemDest.size() > 0) {
-
-					LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
-					for (ConsultaItem consulta : consultasItemDest) {
-						String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
-								mapaClave, esEnvio);
-
+					for(ConsultaItem consulta:consultasItemCondicional){
+						
+						consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio);
+						
+						idConsultaEjecutarCondicional = Long.parseLong(consulta.getIdConsulta());
+						
 						List<Map<String, Object>> result;
 						try {
- 
-							result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDestinatarios, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()),consulta.getDescripcion());	
-							
-							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ejecuta la consulta de destinatarios: " + consultaEjecutarDestinatarios);
-							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se envía a la dirección: " + result);
- 
+	 
+							LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ejecutamos la consulta "+consultaEjecutarCondicional);
+							result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarCondicional, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()),consulta.getDescripcion());
+							LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ha sido ejecutada la consulta "+consultaEjecutarCondicional);
+	 
 						} catch (BusinessSQLException e) {
 							LOGGER.error(e);
-							throw new BusinessException(
-									"Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(),
-									e);
+							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
 						} catch (Exception e) {
-							LOGGER.warn("Error al ejejcutar la consulta" + e);
-							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(),
-									e);
+							LOGGER.error(e);
+							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
 						}
-
-						if (result != null && result.size() > 0) {
-							LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
-
-							for (Map<String, Object> dest : result) {
-								LOGGER.debug("Guardamos el resultado de la query para cada destinatario");
-								if (esEnvio) {
-									LOGGER.debug("Guardamos las consultas para la generación del envio");
-
-									// Guardamos la consulta condicional
-
-									if (idConsultaEjecutarCondicional != null) {
+						
+						if(result != null && result.size() > 0){
+							LOGGER.debug("Se cumple la consulta condicional del informe: " + plantilla.getIdInforme());
+							continua = true;								
+						}else{
+							continua = false;
+							LOGGER.info("La consulta condicional no ha devuelto resultados");
+						}
+					}						
+				}else{
+					LOGGER.debug("No hay consulta condicional para el informe: " + plantilla.getIdInforme());
+					continua = true;
+				}
+				LOGGER.info("Rendimiento fin ejecucion consultas condicionales" );
+	//							
+				LOGGER.info("Rendimiento inicio ejecucion consultas destinatarios" );
+				if (continua) {
+					LOGGER.debug("Obtenemos la consulta de destinatario: " + plantilla.getIdInforme());
+					List<ConsultaItem> consultasItemDest = _modPlantillaDocumentoConsultaExtendsMapper
+							.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
+									Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+									plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
+	
+					if (consultasItemDest != null && consultasItemDest.size() > 0) {
+	
+						LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
+						for (ConsultaItem consulta : consultasItemDest) {
+							String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
+									mapaClave, esEnvio);
+	
+							List<Map<String, Object>> result;
+							try {
+	 
+								result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDestinatarios, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()),consulta.getDescripcion());	
+								
+								LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ejecuta la consulta de destinatarios: " + consultaEjecutarDestinatarios);
+								LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se envía a la dirección: " + result);
+	 
+							} catch (BusinessSQLException e) {
+								LOGGER.error(e);
+								throw new BusinessException(
+										"Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(),
+										e);
+							} catch (Exception e) {
+								LOGGER.warn("Error al ejejcutar la consulta" + e);
+								throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(),
+										e);
+							}
+	
+							if (result != null && result.size() > 0) {
+								LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
+	
+								for (Map<String, Object> dest : result) {
+									LOGGER.debug("Guardamos el resultado de la query para cada destinatario");
+									if (esEnvio) {
+										LOGGER.debug("Guardamos las consultas para la generación del envio");
+	
+										// Guardamos la consulta condicional
+	
+										if (idConsultaEjecutarCondicional != null) {
+											listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
+													idConsultaEjecutarCondicional, consultaEjecutarCondicional,
+													usuario.getIdinstitucion(),
+													SigaConstants.OBJETIVO.CONDICIONAL.getCodigo(),
+													Short.parseShort(String.valueOf(usuario.getIdusuario())),
+													idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
+													Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+													Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
+										}
+	
+										// Guardamos la consulta de destinatarios
+	
 										listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
-												idConsultaEjecutarCondicional, consultaEjecutarCondicional,
+												Long.parseLong(consulta.getIdConsulta()), consultaEjecutarDestinatarios,
 												usuario.getIdinstitucion(),
-												SigaConstants.OBJETIVO.CONDICIONAL.getCodigo(),
+												SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo(),
 												Short.parseShort(String.valueOf(usuario.getIdusuario())),
 												idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
 												Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
 												Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
-									}
-
-									// Guardamos la consulta de destinatarios
-
-									listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
-											Long.parseLong(consulta.getIdConsulta()), consultaEjecutarDestinatarios,
-											usuario.getIdinstitucion(),
-											SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo(),
-											Short.parseShort(String.valueOf(usuario.getIdusuario())),
-											idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
-											Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
-											Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
-
-									// Reemplazamos los campos para las consultas de la plantilla de envio
-
-									if (listaConsultasPlantillaEnvio != null
-											&& listaConsultasPlantillaEnvio.size() > 0) {
-										for (ConsultaItem consultaPlantilla : listaConsultasPlantillaEnvio) {
-											String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario,
-													dialogo, consultaPlantilla, mapaClave, esEnvio);
-											listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
-													Long.parseLong(consultaPlantilla.getIdConsulta()),
-													consultaPlantillaEnvio, usuario.getIdinstitucion(),
-													Long.parseLong(consultaPlantilla.getIdObjetivo()),
-													Short.parseShort(String.valueOf(usuario.getIdusuario())), null,
-													Long.parseLong(plantilla.getIdInforme()),
-													Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
-													Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
+	
+										// Reemplazamos los campos para las consultas de la plantilla de envio
+	
+										if (listaConsultasPlantillaEnvio != null
+												&& listaConsultasPlantillaEnvio.size() > 0) {
+											for (ConsultaItem consultaPlantilla : listaConsultasPlantillaEnvio) {
+												String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario,
+														dialogo, consultaPlantilla, mapaClave, esEnvio);
+												listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
+														Long.parseLong(consultaPlantilla.getIdConsulta()),
+														consultaPlantillaEnvio, usuario.getIdinstitucion(),
+														Long.parseLong(consultaPlantilla.getIdObjetivo()),
+														Short.parseShort(String.valueOf(usuario.getIdusuario())), null,
+														Long.parseLong(plantilla.getIdInforme()),
+														Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+														Short.parseShort(String.valueOf(consulta.getIdInstitucion())));
+											}
 										}
+										
+										obtenerDatosDestinatario(destinatario,dest);
+	
+	
+									} else {
+										esDestinatario = true;
 									}
-									
-									obtenerDatosDestinatario(destinatario,dest);
-
-
-								} else {
-									esDestinatario = true;
+	
+									numFicheros = 0;
+	
+									hDatosGenerales = new HashMap<String, Object>();
+									hDatosGenerales.putAll(dest);
+	
+									hDatosFinal = new HashMap<String, Object>();
 								}
-
-								numFicheros = 0;
-
-								hDatosGenerales = new HashMap<String, Object>();
-								hDatosGenerales.putAll(dest);
-
-								hDatosFinal = new HashMap<String, Object>();
+							} else {
+								LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
 							}
-						} else {
-							LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
 						}
+					}else {
+						LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
 					}
-				}else {
-					LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
-				}
-				LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
-				
-				
-				
-				LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
-				List<ConsultaItem> consultasItemMulti = _modPlantillaDocumentoConsultaExtendsMapper
-						.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
-								Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
-								plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
-				boolean consultasDestinatarioEjecutadas = Boolean.FALSE;
-				if (!(null != modelosComunicacionItem.getIdClaseComunicacion() &&  modelosComunicacionItem.getIdClaseComunicacion().equals("5"))) {
-					 consultasDestinatarioEjecutadas = consultasItemDest.size() > 0;
-				}
-				
-				if (consultasItemMulti != null && consultasItemMulti.size() > 0) {
-					LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento" );
-					for (ConsultaItem consultaMulti : consultasItemMulti) {
-						String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti,
-								mapaClave, esEnvio);
-
-						if (esEnvio) {
-							// Guardamos la consulta multidocumento
-							listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
-									Long.parseLong(consultaMulti.getIdConsulta()), consultaEjecutarMulti,
-									usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(),
-									Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar,
-									Long.parseLong(plantilla.getIdInforme()),
+					LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
+					
+					
+					
+					LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
+					List<ConsultaItem> consultasItemMulti = _modPlantillaDocumentoConsultaExtendsMapper
+							.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
 									Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
-									Short.parseShort(String.valueOf(consultaMulti.getIdInstitucion())));
-						}
-
-						List<Map<String, Object>> resultMulti;
-						try {
-							resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
-									Long.valueOf(consultaMulti.getIdConsulta()),Short.valueOf(consultaMulti.getIdInstitucion()),consultaMulti.getDescripcion());
-							LOGGER.info("Se ejecuta la consulta MULTI");
-							if(resultMulti != null && resultMulti.size() > 0){
-								for(int k = 0;k<resultMulti.size();k++){
-									// Por cada registro generamos un documento
-									numFicheros++;
-									generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
-											listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-											hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-											nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
-								}														
-							}
-								
-						} catch (BusinessSQLException e) {
-							LOGGER.error(e);
-							throw new BusinessException("Error al ejecutar la consulta "
-									+ consultaMulti.getDescripcion() + " " + e.getMessage(), e);
-						} catch (Exception e) {
-							LOGGER.error(e);
-							throw new BusinessException(
-									"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
-						}
-						
+									plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
+					boolean consultasDestinatarioEjecutadas = Boolean.FALSE;
+					if (!(null != modelosComunicacionItem.getIdClaseComunicacion() &&  modelosComunicacionItem.getIdClaseComunicacion().equals("5"))) {
+						 consultasDestinatarioEjecutadas = consultasItemDest.size() > 0;
 					}
-					LOGGER.info("Rendimiento fin ejecucion consultas multidocumento" );
-				}else {
-					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
-							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-							nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+					
+					if (consultasItemMulti != null && consultasItemMulti.size() > 0) {
+						LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento" );
+						for (ConsultaItem consultaMulti : consultasItemMulti) {
+							String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti,
+									mapaClave, esEnvio);
+	
+							if (esEnvio) {
+								// Guardamos la consulta multidocumento
+								listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
+										Long.parseLong(consultaMulti.getIdConsulta()), consultaEjecutarMulti,
+										usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(),
+										Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar,
+										Long.parseLong(plantilla.getIdInforme()),
+										Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+										Short.parseShort(String.valueOf(consultaMulti.getIdInstitucion())));
+							}
+	
+							List<Map<String, Object>> resultMulti;
+							try {
+								resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
+										Long.valueOf(consultaMulti.getIdConsulta()),Short.valueOf(consultaMulti.getIdInstitucion()),consultaMulti.getDescripcion());
+								LOGGER.info("Se ejecuta la consulta MULTI");
+								if(resultMulti != null && resultMulti.size() > 0){
+									for(int k = 0;k<resultMulti.size();k++){
+										// Por cada registro generamos un documento
+										numFicheros++;
+										generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+												listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+												hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+												nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+									}														
+								}
+									
+							} catch (BusinessSQLException e) {
+								LOGGER.error(e);
+								throw new BusinessException("Error al ejecutar la consulta "
+										+ consultaMulti.getDescripcion() + " " + e.getMessage(), e);
+							} catch (Exception e) {
+								LOGGER.error(e);
+								throw new BusinessException(
+										"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
+							}
+							
+						}
+						LOGGER.info("Rendimiento fin ejecucion consultas multidocumento" );
+					}else {
+						generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+								listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+								hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+								nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+					}
+				
+	//				if (ejecutarConsulta) {
+	//					// Por cada resultado ejecutamos las consultas de datos
+	//					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+	//							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+	//							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+	//							nombrePlantilla, esEnvio, esExcel, esDestinatario);
+	//				} 
 				}
-			
-//				if (ejecutarConsulta) {
-//					// Por cada resultado ejecutamos las consultas de datos
-//					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
-//							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-//							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-//							nombrePlantilla, esEnvio, esExcel, esDestinatario);
-//				} 
+				
+				LOGGER.info("Rendimiento fin tratamiento modelo de comunicacion: " + r);
+				r++;
 			}
-			
-			LOGGER.info("Rendimiento fin tratamiento modelo de comunicacion: " + r);
-			r++;
 		}			
 	//	return existeConsulta;
 	}
