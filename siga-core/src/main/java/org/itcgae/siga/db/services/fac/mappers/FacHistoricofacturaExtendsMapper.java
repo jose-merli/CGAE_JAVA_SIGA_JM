@@ -100,4 +100,8 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 			@Result(column = "ENVIOTRASPASO", property = "enviotraspaso", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacFactura> facturasDevueltasEnDisquete(String idDisquetecargos, String idInstitucion);
+
+	@SelectProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "getNextIdHstorico")
+	Short getNextIdHstorico(Short idInstitucion, String idFactura);
+
 }

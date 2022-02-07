@@ -59,6 +59,10 @@ public class FacturacionHelper {
     private AdmLenguajesMapper admLenguajesMapper;
 
     public File generarPdfFacturaFirmada(String idFactura, String idInstitucion) throws Exception {
+        return generarPdfFacturaFirmada(idFactura, idInstitucion, false);
+    }
+
+    public File generarPdfFacturaFirmada(String idFactura, String idInstitucion, boolean bRegenerar) throws Exception {
 
         File ficheroPDF;
 
@@ -71,7 +75,7 @@ public class FacturacionHelper {
         try {
 
             // Generamos el fichero pdf de la factura
-            ficheroPDF = generarPdfFacturaFirmada(facFactura, false);
+            ficheroPDF = generarPdfFacturaFirmada(facFactura, bRegenerar);
 
         } catch (Exception e) {
             throw e;
