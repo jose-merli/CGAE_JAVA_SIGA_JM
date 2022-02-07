@@ -565,6 +565,11 @@ public class SigaConstants {
 
     public static final String TIPO_APUNTE_COMPENSADO = "C";
 
+    // Tipos de formas de pago de Productos y Servicios
+    public static final String TIPO_FORMAPAGO_TARJETA	= "10";
+    public static final String TIPO_FORMAPAGO_FACTURA	= "20";
+    public static final String TIPO_FORMAPAGO_METALICO	= "30";
+
     //Estado Facturas
     public static final String ESTADO_FACTURA_PAGADA = "1";
     public static final String ESTADO_FACTURA_CAJA = "2";
