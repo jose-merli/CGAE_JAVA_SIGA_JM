@@ -224,4 +224,15 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
 		return query.toString();
 	}
+
+	public String getNextIdHstorico(Short idInstitucion, String idFactura) {
+		SQL sql = new SQL();
+
+		sql.SELECT("(NVL(MAX(HIS.IDHISTORICO),0) + 1)");
+		sql.FROM("FAC_HISTORICOFACTURA HIS");
+		sql.WHERE("HIS.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("HIS.IDFACTURA = " + idFactura);
+
+		return sql.toString();
+	}
 }
