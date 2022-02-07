@@ -86,8 +86,8 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
 
     }
 
-    private void confirmarProgramacionFactura(FacFacturacionprogramada facFacturacionprogramada, boolean archivarFacturacion, SIGALogging log, boolean generarPagosBanco, boolean soloGenerarFactura, int iTransaccionInterna,
-                                              boolean esFacturacionRapida) throws Exception {
+    protected void confirmarProgramacionFactura(FacFacturacionprogramada facFacturacionprogramada, boolean archivarFacturacion, SIGALogging log, boolean generarPagosBanco, boolean soloGenerarFactura, int iTransaccionInterna,
+                                                boolean esFacturacionRapida) throws Exception {
 
         TransactionStatus tx = null;
 
@@ -195,8 +195,8 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
                             filtro.put("VALOR", facFacturacionprogramada.getIdinstitucion().toString());
                             filtrosInforme.add(filtro);
 
-                            String ruta = Paths.get(getProperty(FACTURACION_DIRECTORIO_FISICO_FACTURAS_PDF_JAVA))
-                                    .resolve(getProperty(FACTURACION_DIRECTORIO_FACTURA_PDF_JAVA))
+                            String ruta = Paths.get(getProperty(FACTURACION_DIRECTORIO_FISICO_FACTURAS_PDF_JAVA) +
+                                            getProperty(FACTURACION_DIRECTORIO_FACTURA_PDF_JAVA))
                                     .resolve(facFacturacionprogramada.getIdinstitucion().toString())
                                     .resolve(idSerieFacturacion.toString()).resolve("_" + idProgramacion).toString();
 

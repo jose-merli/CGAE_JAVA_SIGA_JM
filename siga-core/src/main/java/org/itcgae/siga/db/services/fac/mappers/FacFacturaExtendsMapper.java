@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTO.fac.FacturasFacturacionRapidaDTO;
 import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
@@ -122,4 +123,17 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "IDESTADOPDF", property = "idEstadoPdf", jdbcType = JdbcType.DECIMAL)
 	})
 	List<FacturaFacturacionProgramadaDTO> getFacturasDeFacturacionProgramada(String institucion, String seriefacturacion, String idProgramacion);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "obtenerFacturasFacturacionRapida")
+	@Results({
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROFACTURA", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDSERIEFACTURACION", property = "idSerieFacturacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPROGRAMACION", property = "idProgramacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPETICION", property = "idPeticion", jdbcType = JdbcType.DECIMAL)
+	})
+	List<FacturasFacturacionRapidaDTO> obtenerFacturasFacturacionRapida(String idInstitucion, String idPeticion, String idSolicitudCertificado);
 }
