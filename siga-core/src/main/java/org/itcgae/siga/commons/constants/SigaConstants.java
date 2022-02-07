@@ -1632,4 +1632,9 @@ public class SigaConstants {
     public static final String MAIL_SMTP_ACTUALIZACIONCENSO_PORT = "mail.smtp.actualizacioncenso.port";
     public static final String MAIL_SMTP_ACTUALIZACIONCENSO_USER = "mail.smtp.actualizacioncenso.user";
     public static final String MAIL_SMTP_ACTUALIZACIONCENSO_PWD = "mail.smtp.actualizacioncenso.pwd";
+
+    // Estado peticion compra
+    public static final String ESTADO_PETICION_COMPRA_PENDIENTE = "10";
+    public static final String ESTADO_PETICION_COMPRA_PROCESADA = "20";
+    public static final String ESTADO_PETICION_COMPRA_BAJA	= "30";
 }

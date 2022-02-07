@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.fac.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FacFacturaSqlProvider;
 
 import java.text.SimpleDateFormat;
@@ -328,6 +329,30 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         sql.WHERE("F.IDPROGRAMACION = " + idProgramacion);
         sql.ORDER_BY("F.FECHAEMISION");
 
+        return sql.toString();
+    }
+
+    public String obtenerFacturasFacturacionRapida(String idInstitucion, String idPeticion, String idSolicitudCertificado) {
+        SQL sql = new SQL();
+        sql.SELECT_DISTINCT("F.IDINSTITUCION, F.IDPERSONA, F.IDFACTURA, F.NUMEROFACTURA, F.IDSERIEFACTURACION, F.IDPROGRAMACION, F.ESTADO, C.IDPETICION");
+        sql.FROM("FAC_FACTURA F, PYS_COMPRA C");
+        sql.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("C.IDINSTITUCION = F.IDINSTITUCION");
+        sql.WHERE("C.IDFACTURA = F.IDFACTURA");
+        if (!UtilidadesString.esCadenaVacia(idPeticion)) {
+            sql.WHERE("C.IDPETICION = " + idPeticion);
+        } else {
+            SQL subQuery = new SQL();
+            subQuery.SELECT("1");
+            subQuery.FROM("CER_SOLICITUDCERTIFICADOS CER");
+            subQuery.WHERE("C.IDINSTITUCION = CER.IDINSTITUCION");
+            subQuery.WHERE("C.IDPETICION = CER.IDPETICIONPRODUCTO");
+            subQuery.WHERE("C.IDTIPOPRODUCTO = CER.PPN_IDTIPOPRODUCTO");
+            subQuery.WHERE("C.IDPRODUCTO = CER.PPN_IDPRODUCTO");
+            subQuery.WHERE("C.IDPRODUCTOINSTITUCION = CER.PPN_IDPRODUCTOINSTITUCION");
+            subQuery.WHERE("CER.IDSOLICITUD = " + idSolicitudCertificado);
+            sql.WHERE("EXISTS (" + subQuery + ")");
+        }
         return sql.toString();
     }
 }
