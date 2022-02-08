@@ -36,6 +36,7 @@ import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -167,6 +168,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 					byteArray = Files.readAllBytes(archivo.toPath());
 				}
 
+				WSCommons.fileBytes(byteArray, pathfinal + nombrefichero);
+				
 				documento.setFileName(nombrefichero);
 				documento.setDatos(byteArray);
 				documento.setPathDocumento(pathfinal);

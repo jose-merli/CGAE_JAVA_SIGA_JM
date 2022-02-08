@@ -544,6 +544,26 @@ public class WSCommons {
 		return file;
 	}
 	
+	public static File fileBytes(byte[] datos, String path) throws IOException {
+		File file = new File(path);
+		FileOutputStream fos = new FileOutputStream(file);
+		boolean closed = false;
+		
+		try {
+			fos.write(datos);
+			fos.flush();
+			
+			fos.close();
+			closed = true;
+		} finally {
+			if (!closed) {
+				fos.close();
+			}
+		}
+		
+		return file;
+	}
+	
 	/**
 	 * Crea un boolean sacando el valor de un numero (si es 1 true, sino false)
 	 * @param busqueda
