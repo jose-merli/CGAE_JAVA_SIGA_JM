@@ -756,12 +756,12 @@ public class FacturacionPySController {
 		}
 	}
 
-	@GetMapping(value = "/getEstadosAbonosSJCS")
-	ResponseEntity<EstadosAbonosDTO> getEstadosAbonosSJCS(@RequestParam String idAbono, HttpServletRequest request) {
+	@GetMapping(value = "/getEstadosAbonos")
+	ResponseEntity<EstadosAbonosDTO> getEstadosAbonos(@RequestParam String idAbono, HttpServletRequest request) {
 		EstadosAbonosDTO response = new EstadosAbonosDTO();
 
 		try {
-			response = facturacionPySFacturasService.getEstadosAbonosSJCS(idAbono, request);
+			response = facturacionPySFacturasService.getEstadosAbonos(idAbono, request);
 
 			if (response.getEstadosAbonosItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
@@ -802,13 +802,13 @@ public class FacturacionPySController {
 		}
 	}
 
-	@PostMapping(value = "/compensarAbonoSJCS")
-	ResponseEntity<InsertResponseDTO> compensarAbonoSJCS(@RequestBody EstadosAbonosItem item,
+	@PostMapping(value = "/compensarAbono")
+	ResponseEntity<InsertResponseDTO> compensarAbono(@RequestBody EstadosAbonosItem item,
 															 HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
-			response = facturacionPySFacturasService.compensarAbonoSJCS(item, request);
+			response = facturacionPySFacturasService.compensarAbono(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -819,13 +819,30 @@ public class FacturacionPySController {
 		}
 	}
 
-	@PostMapping(value = "/pagarPorCajaAbonoSJCS")
-	ResponseEntity<InsertResponseDTO> pagarPorCajaAbonoSJCS(@RequestBody EstadosAbonosItem item,
+	@PostMapping(value = "/compensarAbonoVarios")
+	ResponseEntity<InsertResponseDTO> compensarAbonoVarios(@RequestBody List<EstadosAbonosItem> items,
+													 HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.compensarAbonoVarios(items, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/pagarPorCajaAbono")
+	ResponseEntity<InsertResponseDTO> pagarPorCajaAbono(@RequestBody EstadosAbonosItem item,
 														 HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
-			response = facturacionPySFacturasService.pagarPorCajaAbonoSJCS(item, request);
+			response = facturacionPySFacturasService.pagarPorCajaAbono(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -836,13 +853,30 @@ public class FacturacionPySController {
 		}
 	}
 
-	@PostMapping(value = "/eliminarPagoPorCajaAbonoSJCS")
-	ResponseEntity<DeleteResponseDTO> eliminarPagoPorCajaAbonoSJCS(@RequestBody EstadosAbonosItem item,
+	@PostMapping(value = "/pagarPorCajaAbonoVarios")
+	ResponseEntity<InsertResponseDTO> pagarPorCajaAbonoVarios(@RequestBody List<EstadosAbonosItem> items,
+														   HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.pagarPorCajaAbonoVarios(items, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/eliminarPagoPorCajaAbono")
+	ResponseEntity<DeleteResponseDTO> eliminarPagoPorCajaAbono(@RequestBody EstadosAbonosItem item,
 															HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
-			response = facturacionPySFacturasService.eliminarPagoPorCajaAbonoSJCS(item, request);
+			response = facturacionPySFacturasService.eliminarPagoPorCajaAbono(item, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -853,13 +887,30 @@ public class FacturacionPySController {
 		}
 	}
 
-	@PostMapping(value = "/renegociarAbonoSJCS")
-	ResponseEntity<InsertResponseDTO> renegociarAbonoSJCS(@RequestBody EstadosAbonosItem item,
+	@PostMapping(value = "/renegociarAbono")
+	ResponseEntity<InsertResponseDTO> renegociarAbono(@RequestBody EstadosAbonosItem item,
 															HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
-			response = facturacionPySFacturasService.renegociarAbonoSJCS(item, request);
+			response = facturacionPySFacturasService.renegociarAbono(item, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/renegociarAbonoVarios")
+	ResponseEntity<InsertResponseDTO> renegociarAbonoVarios(@RequestBody List<EstadosAbonosItem> items,
+															  HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.renegociarAbonoVarios(items, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
