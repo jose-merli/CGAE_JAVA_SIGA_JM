@@ -1654,9 +1654,4 @@ public class SigaConstants {
     public static final String PRODUCTO_BAJA = "B";
     public static final String PRODUCTO_PENDIENTE_GENERAR_PDF= "G";
 
-    // Tipos de formas de pago de Productos y Servicios
-    public static final int TIPO_FORMAPAGO_TARJETA = 10;
-    public static final int TIPO_FORMAPAGO_FACTURA = 20;
-    public static final int TIPO_FORMAPAGO_METALICO = 30;
-
 }
