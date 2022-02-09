@@ -28,7 +28,7 @@ public class EstadosAbonosItem {
 	String cuentaBancaria;
 	String idDisqueteAbono;
 
-	Float movimiento;
-	Float importePendiente;
+	String movimiento;
+	String importePendiente;
 
 }

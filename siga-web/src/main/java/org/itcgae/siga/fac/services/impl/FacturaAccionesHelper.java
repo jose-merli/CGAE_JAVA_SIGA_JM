@@ -4,6 +4,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.entities.FacAbonoKey;
 import org.itcgae.siga.db.entities.FacFactura;
@@ -22,6 +23,7 @@ import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacDisquetecargosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
@@ -61,6 +63,9 @@ public class FacturaAccionesHelper {
 
     @Autowired
     private FacRenegociacionMapper facRenegociacionMapper;
+
+    @Autowired
+    private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
 
     @Autowired
     private GenDiccionarioMapper genDiccionarioMapper;
@@ -215,13 +220,13 @@ public class FacturaAccionesHelper {
         pagoAbonoEfectivo.setIdabono(idAbono);
 
         // Obtenemos el id del nuevo pago abono a insertar
-        Long newIdPagoAbono = facPagoabonoefectivoExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString(),
-                idAbono.toString());
+        Long newIdPagoAbono = facPagoabonoefectivoExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString(), idAbono.toString());
         pagoAbonoEfectivo.setIdpagoabono(newIdPagoAbono);
 
         pagoAbonoEfectivo.setImporte(importe.setScale(2, RoundingMode.DOWN));
         pagoAbonoEfectivo.setContabilizado(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
 
+        pagoAbonoEfectivo.setFecha(new Date());
         pagoAbonoEfectivo.setFechamodificacion(new Date());
         pagoAbonoEfectivo.setUsumodificacion(usuario.getIdusuario());
 
@@ -407,12 +412,22 @@ public class FacturaAccionesHelper {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void renegociarAbono(Long idAbono, Short idFormaPago, Long idPersona, Short idCuenta, AdmUsuarios usuario) {
+    public int renegociarAbono(Long idAbono, Short idCuenta, AdmUsuarios usuario) {
+        int resultado;
         FacAbonoKey abonoKey = new FacAbonoKey();
         abonoKey.setIdinstitucion(usuario.getIdinstitucion());
         abonoKey.setIdabono(idAbono);
 
         FacAbono abono = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
+
+        if (abono.getEstado().equals(SigaConstants.FAC_ABONO_ESTADO_PAGADO))
+            throw new BusinessException("El abono ya ha sido pagado");
+
+        if (abono.getImptotalneto().compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessException("El importe total es cero");
+
+        if (abono.getImppendienteporabonar().compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessException("El importe pendiente es cero");
 
         if (idCuenta == null)
             abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA);
@@ -420,17 +435,27 @@ public class FacturaAccionesHelper {
             abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
 
         if (abono.getEstado() == SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA) {
-            //abono.setidc(Short.parseShort(SigaConstants.TIPO_FORMAPAGO_METALICO));
-            //facHistoricoInsert.setEstado((short) 2);
             abono.setIdcuenta(null);
         } else if (abono.getEstado() == SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO) {
-            if (abono.getIdpersonadeudor() != null) {
-                abono.setIdpersona(abono.getIdpersonadeudor());
-            }
             abono.setIdcuenta(idCuenta);
+
+            CenCuentasbancariasKey bancoKey = new CenCuentasbancarias();
+            bancoKey.setIdinstitucion(usuario.getIdinstitucion());
+            bancoKey.setIdcuenta(idCuenta);
+            bancoKey.setIdpersona(abono.getIdpersona());
+
+            CenCuentasbancarias banco = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(bancoKey);
+
+            if (banco == null)
+                throw new BusinessException("No existe la cuenta bancaria asociada");
         }
 
-        facAbonoExtendsMapper.updateByPrimaryKey(abono);
+        resultado = facAbonoExtendsMapper.updateByPrimaryKey(abono);
+
+        if (resultado <= 0)
+            throw new BusinessException("Error al actualizar los datos del abono");
+
+        return resultado;
     }
 
     @Transactional(rollbackFor = Exception.class)

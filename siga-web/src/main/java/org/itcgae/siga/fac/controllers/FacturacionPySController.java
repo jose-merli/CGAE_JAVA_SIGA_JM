@@ -761,7 +761,7 @@ public class FacturacionPySController {
 		EstadosAbonosDTO response = new EstadosAbonosDTO();
 
 		try {
-			response = facturacionService.getEstadosAbonosSJCS(idAbono, request);
+			response = facturacionPySFacturasService.getEstadosAbonosSJCS(idAbono, request);
 
 			if (response.getEstadosAbonosItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
@@ -827,8 +827,11 @@ public class FacturacionPySController {
 		try {
 			response = facturacionPySFacturasService.pagarPorCajaAbonoSJCS(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
+		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -841,8 +844,11 @@ public class FacturacionPySController {
 		try {
 			response = facturacionPySFacturasService.eliminarPagoPorCajaAbonoSJCS(item, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
+		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -855,8 +861,11 @@ public class FacturacionPySController {
 		try {
 			response = facturacionPySFacturasService.renegociarAbonoSJCS(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
+		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

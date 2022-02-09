@@ -2413,6 +2413,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idAbono,
 						usuario.getIdinstitucion().toString());
 
+				items.get(0).setCuentasBanco(cenCuentasbancariasExtendsMapper.getComboCuentas(
+						items.get(0).getIdDeudor() == null ? items.get(0).getIdCliente() : items.get(0).getIdDeudor(),
+						usuario.getIdinstitucion().toString()));
+
 				facturaDTO.setFacturasItems(items);
 			}
 
@@ -4160,44 +4164,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("insertarEstadosPagos() -> Salida del servicio para crear una entrada al historico de factura");
 
 		return deleteResponseDTO;
-	}
-
-	@Override
-	public EstadosAbonosDTO getEstadosAbonosSJCS(String idAbono, HttpServletRequest request) throws Exception {
-		EstadosAbonosDTO estadosPagosDTO = new EstadosAbonosDTO();
-		AdmUsuarios usuario = new AdmUsuarios();
-
-		LOGGER.info(
-				"FacturacionPySServiceImpl.getEstadosAbonosSJCS() -> Entrada al servicio para obtener el historico del abono SJCS");
-
-		// Conseguimos información del usuario logeado
-		usuario = authenticationProvider.checkAuthentication(request);
-
-		if (usuario != null) {
-			LOGGER.info("facPagoabonoefectivoExtendsMapper.getEstadosAbonosSJCS() -> obteniendo el historico del abono SJCS");
-
-			List<EstadosAbonosItem> result = facPagoabonoefectivoExtendsMapper.getEstadosAbonosSJCS(idAbono,
-					usuario.getIdinstitucion(), usuario.getIdlenguaje());
-
-			// Se calcula el importe pendiente para cada una de las líneas
-			if (result != null && result.size() > 1) {
-				Float total = result.get(0).getImportePendiente();
-				for (int i = 0; i < result.size(); i++) {
-					Float movimiento = result.get(i).getMovimiento();
-					if (total != null && movimiento != null) {
-						total -= movimiento;
-						result.get(i).setImportePendiente(UtilidadesNumeros.redondea(total, 2));
-					}
-				}
-			}
-
-			estadosPagosDTO.setEstadosAbonosItems(result);
-		}
-
-		LOGGER.info(
-				"FacturacionPySServiceImpl.getEstadosAbonosSJCS() -> Salida del servicio  para obtener el historico del abono sjcs");
-
-		return estadosPagosDTO;
 	}
 	
 	@Override

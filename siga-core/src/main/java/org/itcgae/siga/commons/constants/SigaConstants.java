@@ -1642,4 +1642,16 @@ public class SigaConstants {
     public static final String ESTADO_PETICION_COMPRA_PENDIENTE = "10";
     public static final String ESTADO_PETICION_COMPRA_PROCESADA = "20";
     public static final String ESTADO_PETICION_COMPRA_BAJA	= "30";
+
+    // Tipo de peticion compra
+    public static final String TIPO_PETICION_COMPRA_ALTA = "A";
+    public static final String TIPO_PETICION_COMPRA_BAJA = "B";
+
+    // Estado Productos
+    public static final String PRODUCTO_PENDIENTE = "P";
+    public static final String PRODUCTO_ACEPTADO = "A";
+    public static final String PRODUCTO_DENEGADO = "D";
+    public static final String PRODUCTO_BAJA = "B";
+    public static final String PRODUCTO_PENDIENTE_GENERAR_PDF= "G";
+
 }
