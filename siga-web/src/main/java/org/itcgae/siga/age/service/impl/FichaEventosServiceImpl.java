@@ -228,6 +228,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
+	
+	@Autowired
+	private ExcelHelper excelHelper;
 
 	@Override
 	@Transactional(timeout=2400)
@@ -918,7 +921,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, "Lista de Inscritos");
+		File XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, "Lista de Inscritos");
 
 		LOGGER.info("createExcelAssistanceFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -2940,7 +2943,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");

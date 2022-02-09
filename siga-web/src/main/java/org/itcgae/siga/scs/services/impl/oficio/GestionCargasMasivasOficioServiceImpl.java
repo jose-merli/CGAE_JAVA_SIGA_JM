@@ -205,6 +205,9 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 	@Autowired
 	private BusquedaColegiadosServiceImpl busquedaColegiadosServiceImpl;
 	
+	@Autowired
+	private ExcelHelper excelHelper;
+	
 	@Override
 //	public ResponseEntity<FileOutputStream> descargarModelo(HttpServletRequest request, String turnos, String guardias, String tipo) 
 	public ResponseEntity<InputStreamResource> descargarModelo(HttpServletRequest request, String turnos, String guardias, String tipo) 
@@ -549,7 +552,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFileIT() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 
 		CenCargamasiva cenCargamasivacv = new CenCargamasiva();
 
@@ -803,7 +806,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					error.setMessage("No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK);
 				} else {
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGIT, datosLog);
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGIT, datosLog);
 
 					cenCargamasivacv.setTipocarga("IT");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -1342,10 +1345,10 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
 		File XLSFile;
 		if(tipo.equals("IT")) {
-			XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloIT);
+			XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloIT);
 		}
 		else {
-			XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloBT);
+			XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloBT);
 
 		}
 		return XLSFile;
@@ -1444,7 +1447,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFileBT() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 
 		CenCargamasiva cenCargamasivacv = new CenCargamasiva();
 
@@ -1523,7 +1526,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					error.setMessage("No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK); 
 				}else {
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGBT, datosLog);
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGBT, datosLog);
 
 					cenCargamasivacv.setTipocarga("BT");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());

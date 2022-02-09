@@ -406,6 +406,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private ExcelHelper excelHelper;
 
 	private static final int EXCEL_ROW_FLUSH = 1000;
 	
@@ -4106,7 +4109,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
+		File XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
 
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 

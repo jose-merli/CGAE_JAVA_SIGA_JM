@@ -147,6 +147,9 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 	@Autowired
 	private GestionFichaCompraSuscripcionServiceImpl gestionFichaCompraSuscripcionServiceImpl;
 	
+	@Autowired
+	private ExcelHelper excelHelper;
+	
 	@Override
 	public InputStreamResource descargarModelo(HttpServletRequest request)
 			throws IOException, EncryptedDocumentException, InvalidFormatException {
@@ -260,7 +263,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 		// Extraer la debugrmación del excel
 		LOGGER.debug("cargarFichero() -> Extraer los datos del archivo");
 		try {
-			datos = ExcelHelper.parseExcelFile(file.getBytes());
+			datos = this.excelHelper.parseExcelFile(file.getBytes());
 		} catch (BusinessException | IOException e1) {
 			// TODO Auto-generated catch block
 			LOGGER.error(e1.getStackTrace());
@@ -426,7 +429,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 					
 					int result = 0;
 					try {
-						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCP, datosLog);
+						byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCP, datosLog);
 
 						cenCargamasivacv.setTipocarga("CP");
 						cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());

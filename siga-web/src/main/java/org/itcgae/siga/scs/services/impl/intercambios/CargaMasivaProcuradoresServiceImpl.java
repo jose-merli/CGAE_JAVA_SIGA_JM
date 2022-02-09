@@ -154,6 +154,9 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
+	@Autowired
+	private ExcelHelper excelHelper;
+	
 	@Override
 	public InputStreamResource descargarModelo(HttpServletRequest request)
 			throws IOException, EncryptedDocumentException, InvalidFormatException {
@@ -285,7 +288,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		// Extraer la debugrmación del excel
 		LOGGER.debug("cargarFichero() -> Extraer los datos del archivo");
 		try {
-			datos = ExcelHelper.parseExcelFile(file.getBytes());
+			datos = this.excelHelper.parseExcelFile(file.getBytes());
 		} catch (BusinessException | IOException e1) {
 			// TODO Auto-generated catch block
 			LOGGER.error(e1.getStackTrace());
@@ -415,7 +418,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 					
 					int result = 0;
 					try {
-						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOG_PD, datosLog);
+						byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOG_PD, datosLog);
 
 						cenCargamasivacv.setTipocarga("PD");
 						cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());

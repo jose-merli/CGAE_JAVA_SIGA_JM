@@ -1,17 +1,31 @@
 package org.itcgae.siga.fac.services.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.DVConstraint;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.itcgae.siga.DTO.fac.AbonoContabilidadItem;
 import org.itcgae.siga.DTO.fac.AltaAnticipoItem;
 import org.itcgae.siga.DTO.fac.AnticiposPySItem;
@@ -110,6 +124,9 @@ public class GeneracionFicheroContabilidadService {
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
 	
+	@Autowired
+	private ExcelHelper excelHelper;
+	
 
 	private Logger LOGGER = Logger.getLogger(ContabilidadExportacionServiceImpl.class);
 
@@ -131,7 +148,7 @@ public class GeneracionFicheroContabilidadService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
+		File XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
 
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -1088,10 +1105,10 @@ public class GeneracionFicheroContabilidadService {
 						int respuestaActualizarPagoPorBancoContabilizado = facFacturaIncluidaEnDisqueteMapper.updateByPrimaryKeySelective(pagoPorBancoAcontabilizar);
 						
 						if(respuestaActualizarPagoPorBancoContabilizado == 1) {
-							LOGGER.info("generarFicheroContabilidad() --> generaAsiento4() --> facFacturaIncluidaEnDisqueteMapper.updateByPrimaryKeySelective() --> Pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfactura() + " contabilizado");
+							LOGGER.info("generarFicheroContabilidad() --> generaAsiento4() --> facFacturaIncluidaEnDisqueteMapper.updateByPrimaryKeySelective() --> Pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfacturaincluidaendisquete() + " contabilizado");
 						}else {
-							LOGGER.info("generarFicheroContabilidad() --> generaAsiento4() --> facFacturaIncluidaEnDisqueteMapper.updateByPrimaryKeySelective() --> El pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfactura() + " no pudo ser contabilizado");
-							throw new Exception("El pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfactura() + " no pudo ser contabilizado");
+							LOGGER.info("generarFicheroContabilidad() --> generaAsiento4() --> facFacturaIncluidaEnDisqueteMapper.updateByPrimaryKeySelective() --> El pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfacturaincluidaendisquete() + " no pudo ser contabilizado");
+							throw new Exception("El pago por banco con id: " + pagoPorBancoAcontabilizar.getIdfacturaincluidaendisquete() + " no pudo ser contabilizado");
 						}
 					}
 					
