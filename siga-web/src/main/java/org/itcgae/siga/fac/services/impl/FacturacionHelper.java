@@ -4,10 +4,22 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.FacFicherosDescargaBean;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.FoUtils;
 import org.itcgae.siga.commons.utils.SIGAHelper;
-import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.entities.AdmLenguajes;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
+import org.itcgae.siga.db.entities.FacFactura;
+import org.itcgae.siga.db.entities.FacFacturaKey;
+import org.itcgae.siga.db.entities.FacPlantillafacturacion;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmLenguajesMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -20,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +42,12 @@ import java.nio.channels.FileChannel;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class FacturacionHelper {
@@ -489,7 +506,7 @@ public class FacturacionHelper {
         return respuesta;
     }
 
-    private static KeyStore getKeyStore(String keyStoreType, String certificadoDigitalPath, String pwdCertificadoDigital) throws Exception {
+    private KeyStore getKeyStore(String keyStoreType, String certificadoDigitalPath, String pwdCertificadoDigital) throws Exception {
 
         KeyStore keyStore = KeyStore.getInstance(keyStoreType);
         InputStream inputStream = new FileInputStream(certificadoDigitalPath);
@@ -500,6 +517,94 @@ public class FacturacionHelper {
         }
 
         return keyStore;
+    }
+
+    public void doZipGeneracionRapida(String rutaServidorDescargasZip, String nombreFichero, ArrayList<FacFicherosDescargaBean> ficherosPDF) throws Exception {
+        // Generar Zip
+        File ficZip = null;
+        byte[] buffer = new byte[8192];
+        int leidos;
+        ZipOutputStream outTemp = null;
+
+        try {
+            LOGGER.info("DESCARGA DE FACTURAS: numero de facturas = " + ficherosPDF.size());
+
+            if ((ficherosPDF != null) && (ficherosPDF.size() > 0)) {
+
+                ficZip = new File(rutaServidorDescargasZip + nombreFichero + ".zip");
+
+                // RGG
+                if (ficZip.exists()) {
+                    ficZip.delete();
+                    LOGGER.info("DESCARGA DE FACTURAS: el fichero zip ya existia. Se elimina");
+                }
+
+                outTemp = new ZipOutputStream(new FileOutputStream(ficZip));
+
+                for (int i = 0; i < ficherosPDF.size(); i++) {
+
+                    File auxFile = ficherosPDF.get(i).getFichero();
+                    LOGGER.info("DESCARGA DE FACTURAS: fichero numero " + i + " longitud=" + auxFile.length());
+                    if (auxFile.exists() && !auxFile.getAbsolutePath().equalsIgnoreCase(ficZip.getAbsolutePath())) {
+                        ZipEntry ze = null;
+                        String[] nombreFicherosarrays;
+
+                        switch (ficherosPDF.get(i).getFormatoDescarga()) {
+                            case 1:
+                                nombreFicherosarrays = auxFile.getName().split("-", 2);
+                                ze = new ZipEntry(nombreFicherosarrays[1]);
+                                break;
+                            case 2:
+                                //Quitamos la extension y anadimos el nombre mas la extension
+                                String[] separacionExtensionDelFichero = auxFile.getName().split(Pattern.quote("."));
+                                String[] separacionNombreColegiado = ficherosPDF.get(i).getNombreFacturaFichero().split("-");
+                                nombreFicherosarrays = separacionExtensionDelFichero[0].split("-", 2);
+
+                                ze = new ZipEntry(nombreFicherosarrays[1] + "-" + separacionNombreColegiado[0] + "." + separacionExtensionDelFichero[1]);
+                                break;
+                            case 3:
+                                nombreFicherosarrays = auxFile.getName().split("-", 2);
+                                ze = new ZipEntry(ficherosPDF.get(i).getNombreFacturaFichero() + nombreFicherosarrays[1]);
+                                break;
+                            case -1: //Tipos de ficheros especiales cuyo nombre no se ha de modificar
+                                ze = new ZipEntry(auxFile.getName());
+                                break;
+
+                            default:
+                                nombreFicherosarrays = auxFile.getName().split("-", 2);
+                                ze = new ZipEntry(ficherosPDF.get(i).getNombreFacturaFichero() + nombreFicherosarrays[1]);
+                                break;
+                        }
+                        outTemp.putNextEntry(ze);
+                        FileInputStream fis = new FileInputStream(auxFile);
+
+                        buffer = new byte[8192];
+
+                        while ((leidos = fis.read(buffer, 0, buffer.length)) > 0) {
+                            outTemp.write(buffer, 0, leidos);
+                        }
+
+                        fis.close();
+                        outTemp.closeEntry();
+                    }
+                }
+                LOGGER.info("DESCARGA DE FACTURAS: ok ");
+
+                outTemp.close();
+
+            }
+        } catch (FileNotFoundException e) {
+            throw new Exception("Error al crear fichero zip", e);
+        } catch (IOException e) {
+            throw new Exception("Error al crear fichero zip", e);
+        } finally {
+            try {
+                outTemp.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }

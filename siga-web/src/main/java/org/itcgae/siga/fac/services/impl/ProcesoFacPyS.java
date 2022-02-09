@@ -94,10 +94,8 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -115,8 +113,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @Service
 public abstract class ProcesoFacPyS {
@@ -292,6 +288,13 @@ public abstract class ProcesoFacPyS {
     protected TransactionStatus getNewLongTransaction() {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setTimeout(getTimeoutLargo());
+        def.setName("transGenFac");
+        return transactionManager.getTransaction(def);
+    }
+
+    protected TransactionStatus getNeTransaction() {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setTimeout(Integer.parseInt("30"));
         def.setName("transGenFac");
         return transactionManager.getTransaction(def);
     }
@@ -1200,95 +1203,7 @@ public abstract class ProcesoFacPyS {
     }
 
     protected void doZip(String rutaServidorDescargasZip, String nombreFichero, ArrayList<FacFicherosDescargaBean> ficherosPDF) throws Exception {
-        doZipGeneracionRapida(rutaServidorDescargasZip, nombreFichero, ficherosPDF);
-    }
-
-    protected void doZipGeneracionRapida(String rutaServidorDescargasZip, String nombreFichero, ArrayList<FacFicherosDescargaBean> ficherosPDF) throws Exception {
-        // Generar Zip
-        File ficZip = null;
-        byte[] buffer = new byte[8192];
-        int leidos;
-        ZipOutputStream outTemp = null;
-
-        try {
-            LOGGER.info("DESCARGA DE FACTURAS: numero de facturas = " + ficherosPDF.size());
-
-            if ((ficherosPDF != null) && (ficherosPDF.size() > 0)) {
-
-                ficZip = new File(rutaServidorDescargasZip + nombreFichero + ".zip");
-
-                // RGG
-                if (ficZip.exists()) {
-                    ficZip.delete();
-                    LOGGER.info("DESCARGA DE FACTURAS: el fichero zip ya existia. Se elimina");
-                }
-
-                outTemp = new ZipOutputStream(new FileOutputStream(ficZip));
-
-                for (int i = 0; i < ficherosPDF.size(); i++) {
-
-                    File auxFile = ficherosPDF.get(i).getFichero();
-                    LOGGER.info("DESCARGA DE FACTURAS: fichero numero " + i + " longitud=" + auxFile.length());
-                    if (auxFile.exists() && !auxFile.getAbsolutePath().equalsIgnoreCase(ficZip.getAbsolutePath())) {
-                        ZipEntry ze = null;
-                        String[] nombreFicherosarrays;
-
-                        switch (ficherosPDF.get(i).getFormatoDescarga()) {
-                            case 1:
-                                nombreFicherosarrays = auxFile.getName().split("-", 2);
-                                ze = new ZipEntry(nombreFicherosarrays[1]);
-                                break;
-                            case 2:
-                                //Quitamos la extension y anadimos el nombre mas la extension
-                                String[] separacionExtensionDelFichero = auxFile.getName().split(Pattern.quote("."));
-                                String[] separacionNombreColegiado = ficherosPDF.get(i).getNombreFacturaFichero().split("-");
-                                nombreFicherosarrays = separacionExtensionDelFichero[0].split("-", 2);
-
-                                ze = new ZipEntry(nombreFicherosarrays[1] + "-" + separacionNombreColegiado[0] + "." + separacionExtensionDelFichero[1]);
-                                break;
-                            case 3:
-                                nombreFicherosarrays = auxFile.getName().split("-", 2);
-                                ze = new ZipEntry(ficherosPDF.get(i).getNombreFacturaFichero() + nombreFicherosarrays[1]);
-                                break;
-                            case -1: //Tipos de ficheros especiales cuyo nombre no se ha de modificar
-                                ze = new ZipEntry(auxFile.getName());
-                                break;
-
-                            default:
-                                nombreFicherosarrays = auxFile.getName().split("-", 2);
-                                ze = new ZipEntry(ficherosPDF.get(i).getNombreFacturaFichero() + nombreFicherosarrays[1]);
-                                break;
-                        }
-                        outTemp.putNextEntry(ze);
-                        FileInputStream fis = new FileInputStream(auxFile);
-
-                        buffer = new byte[8192];
-
-                        while ((leidos = fis.read(buffer, 0, buffer.length)) > 0) {
-                            outTemp.write(buffer, 0, leidos);
-                        }
-
-                        fis.close();
-                        outTemp.closeEntry();
-                    }
-                }
-                LOGGER.info("DESCARGA DE FACTURAS: ok ");
-
-                outTemp.close();
-
-            }
-        } catch (FileNotFoundException e) {
-            throw new Exception("Error al crear fichero zip", e);
-        } catch (IOException e) {
-            throw new Exception("Error al crear fichero zip", e);
-        } finally {
-            try {
-                outTemp.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
+        facturacionHelper.doZipGeneracionRapida(rutaServidorDescargasZip, nombreFichero, ficherosPDF);
     }
 
     protected List<EntradaDireccionEspecificaDTO> getEntradaDireccionEspecifica(String idPersona, String idInstitucion, String idDireccion) {

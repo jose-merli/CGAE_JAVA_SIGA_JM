@@ -89,12 +89,12 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
     protected void confirmarProgramacionFactura(FacFacturacionprogramada facFacturacionprogramada, boolean archivarFacturacion, SIGALogging log, boolean generarPagosBanco, boolean soloGenerarFactura, int iTransaccionInterna,
                                                 boolean esFacturacionRapida) throws Exception {
 
-        TransactionStatus tx = null;
+        TransactionStatus tx;
 
-        if (iTransaccionInterna == 1) {
+        if (iTransaccionInterna == 1 || iTransaccionInterna == 0) {
             tx = getNewLongTransaction();
-        } else if (iTransaccionInterna == 2) {
-            //TODO POR DEFINIR
+        } else {
+            tx = getNeTransaction();
         }
 
         String msjAviso = null;
