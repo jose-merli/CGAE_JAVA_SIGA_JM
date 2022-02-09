@@ -134,6 +134,8 @@ import org.itcgae.siga.db.entities.FacClienincluidoenseriefactur;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
+import org.itcgae.siga.db.entities.FacEstadofactura;
+import org.itcgae.siga.db.entities.FacEstadofacturaExample;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaDevolucion;
 import org.itcgae.siga.db.entities.FacFacturaKey;
@@ -158,6 +160,7 @@ import org.itcgae.siga.db.entities.FacLineafacturaExample;
 import org.itcgae.siga.db.entities.FacLineafacturaKey;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
+import org.itcgae.siga.db.entities.FacPagoabonoefectivoKey;
 import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
 import org.itcgae.siga.db.entities.FacRegistrofichconta;
@@ -243,6 +246,7 @@ import org.itcgae.siga.db.services.fcs.mappers.FacPagoabonoefectivoExtendsMapper
 import org.itcgae.siga.db.services.fcs.mappers.FacPagosporcajaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPropositosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -2293,74 +2297,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		}
 
 		return 1;
-	}
-
-	@Transactional(rollbackFor = Exception.class)
-	public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
-			throws Exception {
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-		insertResponseDTO.setError(error);
-
-		SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
-
-		// Conseguimos información del usuario logeado
-		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
-
-		LOGGER.info("nuevoFicheroAdeudos() -> Entrada al servicio para crear un fichero de adeudos");
-
-		if (usuario != null) {
-
-			// Comprobar los campos obligatorios
-			if ( Objects.isNull(ficheroAdeudosItem.getFechaPresentacion())
-					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosPrimeros())
-					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosRecurrentes())
-					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosCOR())
-					|| Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
-				throw new Exception("general.message.camposObligatorios");
-			}
-
-			Object[] param_in = new Object[11]; // Parametros de entrada del PL
-
-			// Ruta del fichero
-
-			String pathFichero = getProperty("facturacion.directorioBancosOracle");
-
-			String sBarra = "";
-			if (pathFichero.indexOf("/") > -1) sBarra = "/";
-			if (pathFichero.indexOf("\\") > -1) sBarra = "\\";
-			pathFichero += sBarra + usuario.getIdinstitucion().toString();
-
-			// Parámetros de entrada
-			param_in[0] = usuario.getIdinstitucion();
-			param_in[1] = Objects.nonNull(ficheroAdeudosItem.getIdseriefacturacion()) ? ficheroAdeudosItem.getIdseriefacturacion() : "";
-			param_in[2] = Objects.nonNull(ficheroAdeudosItem.getIdprogramacion()) ? ficheroAdeudosItem.getIdprogramacion() : "";
-			param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
-			param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
-			param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
-			param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
-			param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
-			param_in[8] = pathFichero;
-			param_in[9] = usuario.getIdusuario();
-			param_in[10] = usuario.getIdlenguaje();
-
-			String[] resultado = commons.callPLProcedureFacturacionPyS(
-					"{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
-
-			String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
-			if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
-				throw new BusinessException(resultado[2]);
-			} else {
-				if (!resultado[1].equals("0")) {
-					throw new BusinessException("general.mensaje.error.bbdd");
-				}
-			}
-			insertResponseDTO.setId(resultado[0]);
-		}
-
-		LOGGER.info("nuevoFicheroAdeudos() -> Salida del servicio para crear un fichero de adeudos");
-
-		return insertResponseDTO;
 	}
 
 	@Override

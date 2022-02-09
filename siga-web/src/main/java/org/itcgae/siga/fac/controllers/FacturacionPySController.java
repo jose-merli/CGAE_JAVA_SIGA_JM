@@ -1,6 +1,5 @@
 package org.itcgae.siga.fac.controllers;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,7 +7,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
@@ -17,6 +15,7 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTO.fac.EstadosAbonosDTO;
+import org.itcgae.siga.DTO.fac.EstadosAbonosItem;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTO.fac.FacDisqueteDevolucionesNuevoItem;
@@ -46,21 +45,17 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
-import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.FacAbonoItem;
-import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
-import org.itcgae.siga.db.entities.FacDisquetecargos;
-import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IContabilidadExportacionService;
 import org.itcgae.siga.fac.services.IFacturacionPySExportacionesService;
+import org.itcgae.siga.fac.services.IFacturacionPySFacturasService;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -89,6 +84,9 @@ public class FacturacionPySController {
 	
 	@Autowired
 	private IContabilidadExportacionService contabilidadExportacionService;
+
+	@Autowired
+	private IFacturacionPySFacturasService facturacionPySFacturasService;
 
 	@GetMapping(value = "/getCuentasBancarias")
 	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(@RequestParam(required = false) String idCuenta,
@@ -801,6 +799,65 @@ public class FacturacionPySController {
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/compensarAbonoSJCS")
+	ResponseEntity<InsertResponseDTO> compensarAbonoSJCS(@RequestBody EstadosAbonosItem item,
+															 HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.compensarAbonoSJCS(item, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/pagarPorCajaAbonoSJCS")
+	ResponseEntity<InsertResponseDTO> pagarPorCajaAbonoSJCS(@RequestBody EstadosAbonosItem item,
+														 HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.pagarPorCajaAbonoSJCS(item, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/eliminarPagoPorCajaAbonoSJCS")
+	ResponseEntity<DeleteResponseDTO> eliminarPagoPorCajaAbonoSJCS(@RequestBody EstadosAbonosItem item,
+															HttpServletRequest request) {
+		DeleteResponseDTO response = new DeleteResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.eliminarPagoPorCajaAbonoSJCS(item, request);
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/renegociarAbonoSJCS")
+	ResponseEntity<InsertResponseDTO> renegociarAbonoSJCS(@RequestBody EstadosAbonosItem item,
+															HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.renegociarAbonoSJCS(item, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
