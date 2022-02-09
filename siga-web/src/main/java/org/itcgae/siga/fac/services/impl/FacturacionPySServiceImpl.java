@@ -786,7 +786,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					&& cuentaBancaria.getComisionCuentaContable().trim().length() <= 20) {
 				record.setComisioncuentacontable(cuentaBancaria.getComisionCuentaContable().trim());
 			} else {
-				record.setAsientocontable(null);
+				record.setComisioncuentacontable(null);
 			}
 
 			// Actualización de la tarjeta de configuración
