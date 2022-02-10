@@ -22,7 +22,7 @@ public interface FacPagoabonoefectivoExtendsMapper extends FacPagoabonoefectivoM
     @DeleteProvider(type = FacPagoabonoefectivoSqlExtendsProvider.class, method = "deleteDeshacerCierre")
     int deleteDeshacerCierre(Short idInstitucion, List<Integer> idPagos);
 
-    @SelectProvider(type = FacPagoabonoefectivoSqlExtendsProvider.class, method = "getEstadosAbonosSJCS")
+    @SelectProvider(type = FacPagoabonoefectivoSqlExtendsProvider.class, method = "getEstadosAbonos")
     @Results({
         @Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
         @Result(column = "FECHAMODIFICACION", property = "fechaModificaion", jdbcType = JdbcType.DATE),
@@ -40,5 +40,5 @@ public interface FacPagoabonoefectivoExtendsMapper extends FacPagoabonoefectivoM
         @Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
         @Result(column = "NUMEROABONO", property = "numeroAbono", jdbcType = JdbcType.VARCHAR),
     })
-    List<EstadosAbonosItem> getEstadosAbonosSJCS(String idAbono, Short idInstitucion, String idioma);
+    List<EstadosAbonosItem> getEstadosAbonos(String idAbono, Short idInstitucion, String idioma);
 }

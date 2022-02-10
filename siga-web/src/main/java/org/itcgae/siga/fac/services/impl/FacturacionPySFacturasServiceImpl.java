@@ -47,23 +47,24 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
     @Autowired
     private FacPagoabonoefectivoExtendsMapper facPagoabonoefectivoExtendsMapper;
 
+    @Autowired
     private GenRecursosMapper genRecursosMapper;
 
     @Override
-    public EstadosAbonosDTO getEstadosAbonosSJCS(String idAbono, HttpServletRequest request) throws Exception {
+    public EstadosAbonosDTO getEstadosAbonos(String idAbono, HttpServletRequest request) throws Exception {
         EstadosAbonosDTO estadosPagosDTO = new EstadosAbonosDTO();
         AdmUsuarios usuario = new AdmUsuarios();
 
         LOGGER.info(
-                "FacturacionPySServiceImpl.getEstadosAbonosSJCS() -> Entrada al servicio para obtener el historico del abono SJCS");
+                "FacturacionPySServiceImpl.getEstadosAbonos() -> Entrada al servicio para obtener el historico del abono");
 
         // Conseguimos información del usuario logeado
         usuario = authenticationProvider.checkAuthentication(request);
 
         if (usuario != null) {
-            LOGGER.info("facPagoabonoefectivoExtendsMapper.getEstadosAbonosSJCS() -> obteniendo el historico del abono SJCS");
+            LOGGER.info("facPagoabonoefectivoExtendsMapper.getEstadosAbonos() -> obteniendo el historico del abono");
 
-            List<EstadosAbonosItem> result = facPagoabonoefectivoExtendsMapper.getEstadosAbonosSJCS(idAbono,
+            List<EstadosAbonosItem> result = facPagoabonoefectivoExtendsMapper.getEstadosAbonos(idAbono,
                     usuario.getIdinstitucion(), usuario.getIdlenguaje());
 
             // Se calcula el importe pendiente para cada una de las líneas
@@ -82,19 +83,19 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         }
 
         LOGGER.info(
-                "FacturacionPySServiceImpl.getEstadosAbonosSJCS() -> Salida del servicio  para obtener el historico del abono sjcs");
+                "FacturacionPySServiceImpl.getEstadosAbonos() -> Salida del servicio  para obtener el historico del abono");
 
         return estadosPagosDTO;
     }
 
     @Override
-    public InsertResponseDTO compensarAbonoSJCS(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception {
+    public InsertResponseDTO compensarAbono(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         AdmUsuarios usuario = new AdmUsuarios();
         String idFactura = null;
 
         LOGGER.info(
-                "FacturacionPySFacturasImpl.compensarAbonoSJCS() -> Entrando al servicio  para compensar una abono SJCS");
+                "FacturacionPySFacturasImpl.compensarAbono() -> Entrando al servicio  para compensar un abono");
 
         // Conseguimos información del usuario logeado
         usuario = authenticationProvider.checkAuthentication(request);
@@ -108,13 +109,19 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
             List<FacFactura> facturas = facFacturaExtendsMapper.selectByExample(facturaExample);
 
             if (facturas == null || facturas.isEmpty())
-                throw new BusinessException("No existe una factura con ese número de factura");
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.numeroAbono");
 
-            if (facturas.get(0).getImptotalporpagar().compareTo(new BigDecimal(nuevoEstado.getMovimiento())) < 0)
-                throw new BusinessException("La factura con ese número no tiene tanto importe pendiente");
+            FacFactura factura = facturas.get(0);
+
+            if (!factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA))
+                    || !factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO)))
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.estado");
+
+            if (factura.getImptotalporpagar().compareTo(new BigDecimal(nuevoEstado.getMovimiento())) < 0)
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.importe");
 
             // Procedemos a compensar el abono
-            facturaAccionesHelper.compensarAbono(Long.parseLong(nuevoEstado.getIdAbono()), facturas.get(0).getIdfactura(),
+            facturaAccionesHelper.compensarAbono(Long.parseLong(nuevoEstado.getIdAbono()), factura.getIdfactura(),
                     new BigDecimal(nuevoEstado.getMovimiento()), usuario);
         } else {
             FacAbonoKey abonoKey = new FacAbonoKey();
@@ -125,7 +132,10 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
 
             // El sistema buscará las facturas pendientes de cobro del colegiado/sociedad al que corresponde este Abono SJCS
             FacFacturaExample facturaExample = new FacFacturaExample();
-            facturaExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+            facturaExample.or().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+                    .andEstadoEqualTo(Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO))
+                    .andIdpersonaEqualTo(abono.getIdpersona());
+            facturaExample.or().andIdinstitucionEqualTo(usuario.getIdinstitucion())
                     .andEstadoEqualTo(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA))
                     .andIdpersonaEqualTo(abono.getIdpersona());
             facturaExample.setOrderByClause("fechaemision");
@@ -136,7 +146,7 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
             BigDecimal importePendiente = new BigDecimal(nuevoEstado.getMovimiento());
             if (importePendiente.compareTo(facturas.stream().map(FacFactura::getImptotalporpagar)
                     .reduce(BigDecimal::add).orElse(BigDecimal.ZERO)) > 0)
-                throw new BusinessException("La factura con ese número no tiene tanto importe pendiente");
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.importe");
 
             for (FacFactura factura: facturas) {
                 // Procedemos a compensar el abono con cada una de las facturas
@@ -155,18 +165,49 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         }
 
         LOGGER.info(
-                "FacturacionPySFacturasImpl.compensarAbonoSJCS() -> Salida del servicio  para compensar un abono SJCS");
+                "FacturacionPySFacturasImpl.compensarAbono() -> Salida del servicio  para compensar un abono");
 
         return insertResponseDTO;
     }
 
     @Override
-    public InsertResponseDTO pagarPorCajaAbonoSJCS(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception {
+    public InsertResponseDTO compensarAbonoVarios(List<EstadosAbonosItem> nuevosEstados, HttpServletRequest request) throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         AdmUsuarios usuario = new AdmUsuarios();
 
         LOGGER.info(
-                "FacturacionPySFacturasImpl.pagarPorCajaAbonoSJCS() -> Entrando al servicio  para pagar una abono SJCS");
+                "FacturacionPySFacturasImpl.compensarAbonoVarios() -> Entrando al servicio  para compensar varios abonos");
+
+        // Conseguimos información del usuario logeado
+        usuario = authenticationProvider.checkAuthentication(request);
+
+        int abonos = 0;
+        for (EstadosAbonosItem estadosAbonosItem: nuevosEstados) {
+            try {
+                compensarAbono(estadosAbonosItem, request);
+                abonos++;
+            } catch (Exception e) {
+                LOGGER.warn("FacturacionPySFacturasImpl.compensarAbonoVarios() -> Error al compensar el abono con id="
+                        + estadosAbonosItem.getIdAbono() + ". Error: " + e.getMessage());
+            }
+        }
+
+        // Número de abonos que han pasado exitósamente por la acción de compensación
+        insertResponseDTO.setId(String.valueOf(abonos));
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.compensarAbonoSJCSVarios() -> Salida del servicio  para compensar varios abonos");
+
+        return insertResponseDTO;
+    }
+
+    @Override
+    public InsertResponseDTO pagarPorCajaAbono(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception {
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        AdmUsuarios usuario = new AdmUsuarios();
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.pagarPorCajaAbono() -> Entrando al servicio  para pagar una abono");
 
         // Conseguimos información del usuario logeado
         usuario = authenticationProvider.checkAuthentication(request);
@@ -175,18 +216,49 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
                 new BigDecimal(nuevoEstado.getMovimiento()), usuario);
 
         LOGGER.info(
-                "FacturacionPySFacturasImpl.pagarPorCajaAbonoSJCS() -> Salida del servicio  para pagar un abono SJCS");
+                "FacturacionPySFacturasImpl.pagarPorCajaAbono() -> Salida del servicio  para pagar un abono");
 
         return insertResponseDTO;
     }
 
     @Override
-    public DeleteResponseDTO eliminarPagoPorCajaAbonoSJCS(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception {
+    public InsertResponseDTO pagarPorCajaAbonoVarios(List<EstadosAbonosItem> nuevosEstados, HttpServletRequest request) throws Exception {
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        AdmUsuarios usuario = new AdmUsuarios();
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.pagarPorCajaAbonoVarios() -> Entrando al servicio para pagar varios abonos por caja");
+
+        // Conseguimos información del usuario logeado
+        usuario = authenticationProvider.checkAuthentication(request);
+
+        int abonos = 0;
+        for (EstadosAbonosItem estadosAbonosItem: nuevosEstados) {
+            try {
+                compensarAbono(estadosAbonosItem, request);
+                abonos++;
+            } catch (Exception e) {
+                LOGGER.warn("FacturacionPySFacturasImpl.pagarPorCajaAbonoVarios() -> Error al pagar por caja el abono con id="
+                        + estadosAbonosItem.getIdAbono() + ". Error: " + e.getMessage());
+            }
+        }
+
+        // Número de abonos que han pasado exitósamente por la acción de nuevo abono
+        insertResponseDTO.setId(String.valueOf(abonos));
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.pagarPorCajaAbonoSJCSVarios() -> Salida del servicio  para pagar varios abonos por caja");
+
+        return insertResponseDTO;
+    }
+
+    @Override
+    public DeleteResponseDTO eliminarPagoPorCajaAbono(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception {
         DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
         AdmUsuarios usuario = new AdmUsuarios();
 
         LOGGER.info(
-                "FacturacionPySFacturasImpl.eliminarPagoPorCajaAbonoSJCS() -> Entrando al servicio  para pagar una abono SJCS");
+                "FacturacionPySFacturasImpl.eliminarPagoPorCajaAbono() -> Entrando al servicio  para eliminar un abono");
 
         // Conseguimos información del usuario logeado
         usuario = authenticationProvider.checkAuthentication(request);
@@ -194,18 +266,18 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         facturaAccionesHelper.eliminarUltimoPagoPorCaja(Long.parseLong(nuevoEstado.getIdAbono()), usuario);
 
         LOGGER.info(
-                "FacturacionPySFacturasImpl.eliminarPagoPorCajaAbonoSJCS() -> Salida del servicio  para pagar un abono SJCS");
+                "FacturacionPySFacturasImpl.eliminarPagoPorCajaAbono() -> Salida del servicio  para eliminar un abono");
 
         return deleteResponseDTO;
     }
 
     @Override
-    public InsertResponseDTO renegociarAbonoSJCS(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception {
+    public InsertResponseDTO renegociarAbono(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         AdmUsuarios usuario = new AdmUsuarios();
 
         LOGGER.info(
-                "FacturacionPySFacturasImpl.renegociarAbonoSJCS() -> Entrando al servicio  para pagar una abono SJCS");
+                "FacturacionPySFacturasImpl.renegociarAbono() -> Entrando al servicio  para renegociar una abono");
 
         // Conseguimos información del usuario logeado
         usuario = authenticationProvider.checkAuthentication(request);
@@ -214,7 +286,37 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         facturaAccionesHelper.renegociarAbono(Long.parseLong(nuevoEstado.getIdAbono()), idCuenta, usuario);
 
         LOGGER.info(
-                "FacturacionPySFacturasImpl.renegociarAbonoSJCS() -> Salida del servicio  para pagar un abono SJCS");
+                "FacturacionPySFacturasImpl.renegociarAbono() -> Salida del servicio  para renegociar un abono");
+
+        return insertResponseDTO;
+    }
+
+    @Override
+    public InsertResponseDTO renegociarAbonoVarios(List<EstadosAbonosItem> nuevosEstados, HttpServletRequest request) throws Exception {
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        AdmUsuarios usuario = new AdmUsuarios();
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.renegociarAbonoVarios() -> Entrando al servicio para pagar varios abonos por caja");
+
+        // Conseguimos información del usuario logeado
+        usuario = authenticationProvider.checkAuthentication(request);
+
+        int abonos = 0;
+        for (EstadosAbonosItem estadosAbonosItem: nuevosEstados) {
+            try {
+                renegociarAbono(estadosAbonosItem, request);
+                abonos++;
+            } catch (Exception e) {
+                LOGGER.warn("FacturacionPySFacturasImpl.renegociarAbonoVarios() -> Error al renegociar el abono con id=" + estadosAbonosItem.getIdAbono());
+            }
+        }
+
+        // Número de abonos que han pasado exitósamente por la acción de renegociación
+        insertResponseDTO.setId(String.valueOf(abonos));
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.renegociarAbonoVarios() -> Salida del servicio  para renegociar varios abonos por caja");
 
         return insertResponseDTO;
     }

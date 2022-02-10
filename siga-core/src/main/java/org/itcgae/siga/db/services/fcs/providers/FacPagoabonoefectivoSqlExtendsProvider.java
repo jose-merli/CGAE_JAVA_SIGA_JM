@@ -36,7 +36,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         return query.toString();
     }
 
-    public String getEstadosAbonosSJCS(String idAbono, Short idInstitucion, String idioma) {
+    public String getEstadosAbonos(String idAbono, Short idInstitucion, String idioma) {
 
         String pagosCaja = getEstadosPagosCaja(idAbono, idInstitucion, idioma);
         String compensacion = getEstadosCompensacion(idAbono, idInstitucion, idioma);
@@ -51,7 +51,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
                 + ") UNION (" + compensacion
                 + ") UNION (" + abonoBanco
                 + ") UNION (" + pendienteBanco
-                + ") UNION (" + pendienteCaja
+                //+ ") UNION (" + pendienteCaja
                 + ") UNION (" + emisionPago + "))");
         principal.ORDER_BY("IDTABLA ASC", "FECHA ASC", "FECHAMODIFICACION ASC", "IDENTIFICADOR ASC");
 
@@ -90,9 +90,8 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
 
         SQL pagosCajaMinus = new SQL();
         pagosCajaMinus.SELECT("fp.IDPAGOABONO");
-        pagosCajaMinus.FROM("FAC_PAGOABONOEFECTIVO fp");
         pagosCajaMinus.FROM("FAC_PAGOSPORCAJA fpc");
-        pagosCajaMinus.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono);
+        pagosCajaMinus.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono + "AND fp.IDPAGOABONO = fpc.IDPAGOABONO");
         pagosCajaMinus.WHERE("fp.IDINSTITUCION = fpc.IDINSTITUCION AND fp.IDABONO = fpc.IDABONO AND fp.IDPAGOABONO = fpc.IDPAGOABONO");
 
         pagosCaja.WHERE("NOT EXISTS (" + pagosCajaMinus.toString() + ")");
