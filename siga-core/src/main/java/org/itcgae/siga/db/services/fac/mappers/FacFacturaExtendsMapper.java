@@ -36,7 +36,15 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numcomunicaciones", property = "comunicacionesFacturas", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ultcomunicacion", property = "ultimaComunicacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "tipo", property = "tipo", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "tipo", property = "tipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFORMAPAGO", property = "idFormaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREFORMAPAGO", property = "nombreFormaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "estado_max_historico", property = "estadoUlt", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "imptotalporpagar_max", property = "importePorPagarUlt", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "imptotalpagado_max", property = "importePagadoUlt", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idaccionult", property = "idAccionUlt", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechamodificacionult", property = "fechaModificacionUlt", jdbcType = JdbcType.VARCHAR),
+			
 	})
 	List<FacturaItem> getFacturas(FacturaItem item, String idInstitucion, String idLenguaje);
 
