@@ -47,6 +47,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				"	tip.idhitoconfiguracion,"
 						+ "		hit.idturno,"
 						+ "		hit.idguardia,"
+						+ "(SELECT NOMBRE FROM SCS_TURNO WHERE IDINSTITUCION = hit.IDINSTITUCION AND IDTURNO = hit.idturno) NOMBRE,"
 						+ "		gua.fechabaja,"
 				+ "    f_siga_getrecurso( "
 				+ "        tip.descripcion, "
