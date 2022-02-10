@@ -155,10 +155,10 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
         SQL subQuery = new SQL();
         subQuery.SELECT("MAX(DISQ.FECHACREACION)");
         subQuery.FROM("FAC_DISQUETECARGOS DISQ");
-        subQuery.WHERE("FID.IDINSTITUCION = DISQ.IDINSTITUCION");
-        subQuery.WHERE("FID.IDDISQUETECARGOS = DISQ.IDDISQUETECARGOS");
-        subQuery.WHERE("FID.IDINSTITUCION = " + institucion);
-        subQuery.WHERE("FID.IDFACTURA = " + factura);
+        subQuery.WHERE("FAC_FACTURAINCLUIDAENDISQUETE.IDINSTITUCION = DISQ.IDINSTITUCION");
+        subQuery.WHERE("FAC_FACTURAINCLUIDAENDISQUETE.IDDISQUETECARGOS = DISQ.IDDISQUETECARGOS");
+        subQuery.WHERE("FAC_FACTURAINCLUIDAENDISQUETE.IDINSTITUCION = " + institucion);
+        subQuery.WHERE("FAC_FACTURAINCLUIDAENDISQUETE.IDFACTURA = " + factura);
         sql.WHERE("FAC_DISQUETECARGOS.FECHACREACION IN (" + subQuery.toString() + ")");
 
         return sql.toString();

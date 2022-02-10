@@ -93,9 +93,11 @@ public class CertificacionFacSJCSServicesCatalunyaHelper {
 	@Autowired
 	private JeCertanexoValerroneoMapper certAnexValerroneoMapper;
 	
-	
 	@Autowired
 	private GestionEconomicaCatalunyaMapper gestionEconomicaCatalunyaMapper;
+	
+	@Autowired
+	private ExcelHelper excelHelper;
 
 	public void valida(GestionEconomicaCatalunyaItem justificacionVo, AdmUsuarios admUsr) throws BusinessException  {
 		TIPOINTERCAMBIO tipo = TIPOINTERCAMBIO.getEnum(justificacionVo.getIdTipoIntercambio());
@@ -665,7 +667,7 @@ private File getFileErroresValidacionJustificacion(GestionEconomicaCatalunyaItem
 		
 		List<String> camposError = new ArrayList<String>(); 
 		camposError.add(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR);
-		byte[] bytesJustificaio = ExcelHelper.createExcelBytes(camposError, datos);
+		byte[] bytesJustificaio = this.excelHelper.createExcelBytes(camposError, datos);
 		File logFile = SIGAServicesHelper.createFile(bytesJustificaio,jsutificaioneFile.getParent(),jsutificaioneFile.getName());
 		LOGGER.debug("Fin getFileErroresValidacionJustificacion");
 		
@@ -707,7 +709,7 @@ private  File getFileErroresValidacionDevolucion(GestionEconomicaCatalunyaItem i
 	
 	List<String> camposError = new ArrayList<String>(); 
 	camposError.add(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR);
-	byte[] bytesJustificaio = ExcelHelper.createExcelBytes(camposError, datos);
+	byte[] bytesJustificaio = this.excelHelper.createExcelBytes(camposError, datos);
 	
 	File logFile = SIGAServicesHelper.createFile(bytesJustificaio,jsutificaioneFile.getParent(),jsutificaioneFile.getName());
 	LOGGER.debug("Fin getFileErroresValidacionDevolucion");
@@ -755,7 +757,7 @@ private File getFileErroresValidacionCertificacionIca(GestionEconomicaCatalunyaI
 	}
 	List<String> camposError = new ArrayList<String>(); 
 	camposError.add(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR);
-	byte[] bytesJustificaio = ExcelHelper.createExcelBytes(camposError, datos);
+	byte[] bytesJustificaio = this.excelHelper.createExcelBytes(camposError, datos);
 	
 	File logFile = SIGAServicesHelper.createFile(bytesJustificaio,jsutificaioneFile.getParent(),jsutificaioneFile.getName());
 	LOGGER.debug("Fin getFileErroresValidacionCertificacionIca");
@@ -804,7 +806,7 @@ private File getFileErroresValidacionCertificacionAnexo(GestionEconomicaCataluny
 	}
 	List<String> camposError = new ArrayList<String>(); 
 	camposError.add(GestionEnvioInformacionEconomicaCatalunyaService.JUSTIFICACION_ERROR);
-	byte[] bytesJustificaio = ExcelHelper.createExcelBytes(camposError, datos);
+	byte[] bytesJustificaio = this.excelHelper.createExcelBytes(camposError, datos);
 	
 	File logFile = SIGAServicesHelper.createFile(bytesJustificaio,jsutificaioneFile.getParent(),jsutificaioneFile.getName());
 	LOGGER.debug("Fin getFileErroresValidacionCertificacionAnexo");

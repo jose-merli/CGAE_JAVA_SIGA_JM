@@ -22,14 +22,17 @@ public interface FacPagoabonoefectivoExtendsMapper extends FacPagoabonoefectivoM
     @DeleteProvider(type = FacPagoabonoefectivoSqlExtendsProvider.class, method = "deleteDeshacerCierre")
     int deleteDeshacerCierre(Short idInstitucion, List<Integer> idPagos);
 
-    @SelectProvider(type = FacPagoabonoefectivoSqlExtendsProvider.class, method = "getEstadosAbonosSJCS")
+    @SelectProvider(type = FacPagoabonoefectivoSqlExtendsProvider.class, method = "getEstadosAbonos")
     @Results({
         @Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
         @Result(column = "FECHAMODIFICACION", property = "fechaModificaion", jdbcType = JdbcType.DATE),
         @Result(column = "MODO", property = "accion", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
         @Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
-        @Result(column = "IMPORTE", property = "movimiento", jdbcType = JdbcType.FLOAT),
-        @Result(column = "IMPORTE_PENDIENTE", property = "importePendiente", jdbcType = JdbcType.FLOAT),
+        @Result(column = "IMPORTE", property = "movimiento", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IMPORTE_PENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IDDISQUETEABONO", property = "idDisqueteAbono", jdbcType = JdbcType.VARCHAR),
         @Result(column = "BANCO", property = "cuentaBancaria", jdbcType = JdbcType.VARCHAR),
         @Result(column = "IDENTIFICADOR", property = "identificador", jdbcType = JdbcType.VARCHAR),
         @Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
@@ -37,5 +40,5 @@ public interface FacPagoabonoefectivoExtendsMapper extends FacPagoabonoefectivoM
         @Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
         @Result(column = "NUMEROABONO", property = "numeroAbono", jdbcType = JdbcType.VARCHAR),
     })
-    List<EstadosAbonosItem> getEstadosAbonosSJCS(String idAbono, Short idInstitucion, String idioma);
+    List<EstadosAbonosItem> getEstadosAbonos(String idAbono, Short idInstitucion, String idioma);
 }

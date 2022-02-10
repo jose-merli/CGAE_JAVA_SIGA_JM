@@ -406,6 +406,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private ExcelHelper excelHelper;
 
 	private static final int EXCEL_ROW_FLUSH = 1000;
 	
@@ -528,6 +531,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				cuenta.setDescripcionRepetida(listaCuentasBancarias.stream()
 						.anyMatch(c2 -> !cuenta.getBancosCodigo().equals(c2.getBancosCodigo())
 								&& cuenta.getDescripcion().equals(c2.getDescripcion())));
+				
+				if (cuenta.getSjcs() == true) {
+					cuenta.setSjcsFiltro("si");
+				} else {
+					cuenta.setSjcsFiltro("no");
+				}
 			});
 			LOGGER.info("getCuentasBancarias() ->" + listaCuentasBancarias.toString());
 
@@ -783,7 +792,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					&& cuentaBancaria.getComisionCuentaContable().trim().length() <= 20) {
 				record.setComisioncuentacontable(cuentaBancaria.getComisionCuentaContable().trim());
 			} else {
-				record.setAsientocontable(null);
+				record.setComisioncuentacontable(null);
 			}
 
 			// Actualización de la tarjeta de configuración
@@ -2409,6 +2418,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (tipo.equalsIgnoreCase("ABONO")) {
 				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idAbono,
 						usuario.getIdinstitucion().toString());
+
+				items.get(0).setCuentasBanco(cenCuentasbancariasExtendsMapper.getComboCuentas(
+						items.get(0).getIdDeudor() == null ? items.get(0).getIdCliente() : items.get(0).getIdDeudor(),
+						usuario.getIdinstitucion().toString()));
 
 				facturaDTO.setFacturasItems(items);
 			}
@@ -4106,7 +4119,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
+		File XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
 
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -4157,44 +4170,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("insertarEstadosPagos() -> Salida del servicio para crear una entrada al historico de factura");
 
 		return deleteResponseDTO;
-	}
-
-	@Override
-	public EstadosAbonosDTO getEstadosAbonosSJCS(String idAbono, HttpServletRequest request) throws Exception {
-		EstadosAbonosDTO estadosPagosDTO = new EstadosAbonosDTO();
-		AdmUsuarios usuario = new AdmUsuarios();
-
-		LOGGER.info(
-				"FacturacionPySServiceImpl.getEstadosAbonosSJCS() -> Entrada al servicio para obtener el historico del abono SJCS");
-
-		// Conseguimos información del usuario logeado
-		usuario = authenticationProvider.checkAuthentication(request);
-
-		if (usuario != null) {
-			LOGGER.info("facPagoabonoefectivoExtendsMapper.getEstadosAbonosSJCS() -> obteniendo el historico del abono SJCS");
-
-			List<EstadosAbonosItem> result = facPagoabonoefectivoExtendsMapper.getEstadosAbonosSJCS(idAbono,
-					usuario.getIdinstitucion(), usuario.getIdlenguaje());
-
-			// Se calcula el importe pendiente para cada una de las líneas
-			if (result != null && result.size() > 1) {
-				Float total = result.get(0).getImportePendiente();
-				for (int i = 0; i < result.size(); i++) {
-					Float movimiento = result.get(i).getMovimiento();
-					if (total != null && movimiento != null) {
-						total -= movimiento;
-						result.get(i).setImportePendiente(UtilidadesNumeros.redondea(total, 2));
-					}
-				}
-			}
-
-			estadosPagosDTO.setEstadosAbonosItems(result);
-		}
-
-		LOGGER.info(
-				"FacturacionPySServiceImpl.getEstadosAbonosSJCS() -> Salida del servicio  para obtener el historico del abono sjcs");
-
-		return estadosPagosDTO;
 	}
 	
 	@Override

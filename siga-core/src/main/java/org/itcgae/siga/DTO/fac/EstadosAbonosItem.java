@@ -17,11 +17,18 @@ public class EstadosAbonosItem {
 	String numeroFactura;
 	String idPagosjg;
 
+	String idAccion;
 	String accion;
-	String estado;
-	String cuentaBancaria;
 
-	Float movimiento;
-	Float importePendiente;
+	String idEstado;
+	String estado;
+
+	String idFormaPago;
+	String idCuenta;
+	String cuentaBancaria;
+	String idDisqueteAbono;
+
+	String movimiento;
+	String importePendiente;
 
 }

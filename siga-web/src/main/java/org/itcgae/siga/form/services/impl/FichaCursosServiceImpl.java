@@ -250,6 +250,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
+	
+	@Autowired
+	private ExcelHelper excelHelper;
 
 	@Override
 	public void updateEstadoCursoAuto() {
@@ -1679,7 +1682,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, "PlantillaInscripciones");
+		File XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, "PlantillaInscripciones");
 
 		LOGGER.info("createExcelInscriptionsFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -1781,7 +1784,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		// Extraer la información del excel
 		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
 		String nombreFichero = file.getOriginalFilename();
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 		Vector<Hashtable<String, Object>> datosLog = new Vector<Hashtable<String, Object>>();
 		Hashtable<String, Object> datosHashtable = null;
 
@@ -1893,7 +1896,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				}
 
 				// Generamos el fichero de errores
-				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
+				byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
 
 				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
 				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);

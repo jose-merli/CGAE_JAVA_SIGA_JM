@@ -120,6 +120,9 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 	@Autowired
 	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
+	
+	@Autowired
+	private ExcelHelper excelHelper;
 
 	private Logger LOGGER = Logger.getLogger(CargasMasivasGFServiceImpl.class);
 
@@ -133,7 +136,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
+		File XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
 
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -251,7 +254,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 		Vector<Hashtable<String, Object>> datosLog = new Vector<Hashtable<String, Object>>();
 		Hashtable<String, Object> datosHashtable = null;
 		Map<String, String> revisionLetradoMap = null;
@@ -380,7 +383,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 					
 				} else {
 
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
 
 					cenCargamasivaGF.setTipocarga(SigaConstants.TIPO_CARGA);
 					cenCargamasivaGF.setIdinstitucion(idInstitucion);

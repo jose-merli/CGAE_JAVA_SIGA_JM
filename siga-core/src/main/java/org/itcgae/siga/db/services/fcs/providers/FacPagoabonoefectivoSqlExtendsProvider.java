@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.fcs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.FacPagoabonoefectivoSqlProvider;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         return query.toString();
     }
 
-    public String getEstadosAbonosSJCS(String idAbono, Short idInstitucion, String idioma) {
+    public String getEstadosAbonos(String idAbono, Short idInstitucion, String idioma) {
 
         String pagosCaja = getEstadosPagosCaja(idAbono, idInstitucion, idioma);
         String compensacion = getEstadosCompensacion(idAbono, idInstitucion, idioma);
@@ -50,7 +51,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
                 + ") UNION (" + compensacion
                 + ") UNION (" + abonoBanco
                 + ") UNION (" + pendienteBanco
-                + ") UNION (" + pendienteCaja
+                //+ ") UNION (" + pendienteCaja
                 + ") UNION (" + emisionPago + "))");
         principal.ORDER_BY("IDTABLA ASC", "FECHA ASC", "FECHAMODIFICACION ASC", "IDENTIFICADOR ASC");
 
@@ -70,39 +71,31 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         pagosCaja.SELECT("fp.FECHA");
         pagosCaja.SELECT("fp.FECHAMODIFICACION");
         pagosCaja.SELECT("F_SIGA_GETRECURSO_ETIQUETA('facturacion.abonosPagos.datosPagoAbono.abonoCaja', " + idioma + ") AS MODO");
-        pagosCaja.SELECT("F_SIGA_GETRECURSO_ETIQUETA('general.literal.pagado', " + idioma + ") AS ESTADO");
+        pagosCaja.SELECT("TO_CHAR(fa.estado) AS IDESTADO");
+        pagosCaja.SELECT("(SELECT gr.DESCRIPCION " +
+                "FROM FAC_ESTADOABONO fe " +
+                "INNER JOIN GEN_RECURSOS gr ON (fe.DESCRIPCION = gr.IDRECURSO) " +
+                "WHERE fe.IDESTADO = fa.ESTADO AND gr.IDLENGUAJE = " + idioma + ") ESTADO");
         pagosCaja.SELECT("fp.IMPORTE");
         pagosCaja.SELECT("NULL AS IMPORTE_PENDIENTE");
+        pagosCaja.SELECT("NULL AS IDCUENTA");
         pagosCaja.SELECT("'' AS BANCO");
+        pagosCaja.SELECT("NULL AS IDDISQUETEABONO");
         pagosCaja.SELECT("NULL AS IDPAGOSJG");
 
         pagosCaja.FROM("FAC_PAGOABONOEFECTIVO fp");
+        pagosCaja.FROM("FAC_ABONO fa");
         pagosCaja.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono);
+        pagosCaja.WHERE("fp.IDINSTITUCION = fa.IDINSTITUCION AND fp.IDABONO = fa.IDABONO");
 
         SQL pagosCajaMinus = new SQL();
-
-        pagosCajaMinus.SELECT("2 AS IDTABLA");
-        pagosCajaMinus.SELECT("fp.IDINSTITUCION");
-        pagosCajaMinus.SELECT("fp.IDPAGOABONO AS IDENTIFICADOR");
-        pagosCajaMinus.SELECT("NULL AS IDFACTURA");
-        pagosCajaMinus.SELECT("NULL AS NUMEROFACTURA");
-        pagosCajaMinus.SELECT("fp.IDABONO");
-        pagosCajaMinus.SELECT("NULL AS NUMEROABONO");
-        pagosCajaMinus.SELECT("fp.FECHA");
-        pagosCajaMinus.SELECT("fp.FECHAMODIFICACION");
-        pagosCajaMinus.SELECT("F_SIGA_GETRECURSO_ETIQUETA('facturacion.abonosPagos.datosPagoAbono.abonoCaja', " + idioma + ") AS MODO");
-        pagosCajaMinus.SELECT("F_SIGA_GETRECURSO_ETIQUETA('general.literal.pagado', 1) AS ESTADO");
-        pagosCajaMinus.SELECT("fp.IMPORTE");
-        pagosCajaMinus.SELECT("NULL AS IMPORTE_PENDIENTE");
-        pagosCajaMinus.SELECT("'' AS BANCO");
-        pagosCajaMinus.SELECT("NULL AS IDPAGOSJG");
-
-        pagosCajaMinus.FROM("FAC_PAGOABONOEFECTIVO fp");
+        pagosCajaMinus.SELECT("fp.IDPAGOABONO");
         pagosCajaMinus.FROM("FAC_PAGOSPORCAJA fpc");
-        pagosCajaMinus.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono);
+        pagosCajaMinus.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono + "AND fp.IDPAGOABONO = fpc.IDPAGOABONO");
         pagosCajaMinus.WHERE("fp.IDINSTITUCION = fpc.IDINSTITUCION AND fp.IDABONO = fpc.IDABONO AND fp.IDPAGOABONO = fpc.IDPAGOABONO");
 
-        return pagosCaja.toString() + " MINUS (" + pagosCajaMinus.toString() + ")";
+        pagosCaja.WHERE("NOT EXISTS (" + pagosCajaMinus.toString() + ")");
+        return pagosCaja.toString();
     }
 
     private String getEstadosCompensacion(String idAbono, Short idInstitucion, String idioma) {
@@ -118,18 +111,26 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         compensacion.SELECT("fp.FECHA");
         compensacion.SELECT("fp.FECHAMODIFICACION");
         compensacion.SELECT("INITCAP(F_SIGA_GETRECURSO_ETIQUETA('facturacion.pagosFactura.accion.compensacion', " + idioma + ")) AS MODO");
-        compensacion.SELECT("F_SIGA_GETRECURSO_ETIQUETA('general.literal.pendienteabonobanco', " + idioma + ") AS ESTADO");
+        compensacion.SELECT("TO_CHAR(fa.ESTADO) as IDESTADO");
+        compensacion.SELECT("(SELECT gr.DESCRIPCION " +
+                "FROM FAC_ESTADOABONO fe " +
+                "INNER JOIN GEN_RECURSOS gr ON (fe.DESCRIPCION = gr.IDRECURSO) " +
+                "WHERE fe.IDESTADO = fa.ESTADO AND gr.IDLENGUAJE = " + idioma + ") ESTADO");
         compensacion.SELECT("fp.IMPORTE");
         compensacion.SELECT("NULL AS IMPORTE_PENDIENTE");
+        compensacion.SELECT("NULL AS IDCUENTA");
         compensacion.SELECT("'' AS BANCO");
+        compensacion.SELECT("NULL AS IDDISQUETEABONO");
         compensacion.SELECT("NULL AS IDPAGOSJG");
 
         compensacion.FROM("FAC_PAGOABONOEFECTIVO fp");
         compensacion.FROM("FAC_PAGOSPORCAJA fpc");
         compensacion.FROM("FAC_FACTURA ff");
+        compensacion.FROM("FAC_ABONO fa");
         compensacion.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono);
         compensacion.WHERE("fp.IDINSTITUCION = fpc.IDINSTITUCION AND fp.IDABONO = fpc.IDABONO AND fp.IDPAGOABONO = fpc.IDPAGOABONO");
         compensacion.WHERE("fp.IDINSTITUCION = ff.IDINSTITUCION AND fpc.IDFACTURA = ff.IDFACTURA ");
+        compensacion.WHERE("fp.IDINSTITUCION = fa.IDINSTITUCION AND fp.IDABONO = fa.IDABONO");
 
         return compensacion.toString();
     }
@@ -158,10 +159,13 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         abonoBanco.SELECT("ad.FECHAMODIFICACION AS FECHA");
         abonoBanco.SELECT("ad.FECHAMODIFICACION");
         abonoBanco.SELECT("F_SIGA_GETRECURSO_ETIQUETA('facturacion.abonosPagos.datosPagoAbono.abonoBanco', " + idioma + ") AS MODO");
+        abonoBanco.SELECT("'" + SigaConstants.FAC_ABONO_ESTADO_PAGADO + "' AS IDESTADO");
         abonoBanco.SELECT("F_SIGA_GETRECURSO_ETIQUETA('general.literal.pagado', " + idioma + ") AS ESTADO");
         abonoBanco.SELECT("ad.IMPORTEABONADO AS IMPORTE");
         abonoBanco.SELECT("NULL AS IMPORTE_PENDIENTE");
+        abonoBanco.SELECT("fa.IDCUENTA");
         abonoBanco.SELECT("(" + cuentaBancaria.toString() + ") AS BANCO");
+        abonoBanco.SELECT("ad.IDDISQUETEABONO AS IDDISQUETEABONO");
         abonoBanco.SELECT("NULL AS IDPAGOSJG");
 
         abonoBanco.FROM("FAC_ABONOINCLUIDOENDISQUETE ad");
@@ -196,10 +200,13 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         pendienteBanco.SELECT("fa.FECHA");
         pendienteBanco.SELECT("fa.FECHAMODIFICACION");
         pendienteBanco.SELECT("F_SIGA_GETRECURSO_ETIQUETA('facturacion.abonosPagos.datosPagoAbono.abonoBanco', " + idioma + ") AS MODO");
+        pendienteBanco.SELECT("'" + SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO + "' AS IDESTADO");
         pendienteBanco.SELECT("F_SIGA_GETRECURSO_ETIQUETA('general.literal.pendienteabonobanco', " + idioma + ") AS ESTADO");
         pendienteBanco.SELECT("0 AS IMPORTE");
         pendienteBanco.SELECT("fa.IMPPENDIENTEPORABONAR AS IMPORTE_PENDIENTE");
+        pendienteBanco.SELECT("fa.IDCUENTA");
         pendienteBanco.SELECT("(" + cuentaBancaria.toString() + ") AS BANCO");
+        pendienteBanco.SELECT("NULL AS IDDISQUETEABONO");
         pendienteBanco.SELECT("fa.IDPAGOSJG");
 
         pendienteBanco.FROM("FAC_ABONO fa");
@@ -222,10 +229,13 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         pendienteCaja.SELECT("fa.FECHA");
         pendienteCaja.SELECT("fa.FECHAMODIFICACION");
         pendienteCaja.SELECT("F_SIGA_GETRECURSO_ETIQUETA('facturacion.abonosPagos.datosPagoAbono.abonoCaja', " + idioma + ") AS MODO");
+        pendienteCaja.SELECT("'" + SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA + "' AS IDESTADO");
         pendienteCaja.SELECT("F_SIGA_GETRECURSO_ETIQUETA('general.literal.pendienteabonocaja', " + idioma + ") AS ESTADO");
         pendienteCaja.SELECT("0 AS IMPORTE");
         pendienteCaja.SELECT("fa.IMPPENDIENTEPORABONAR AS IMPORTE_PENDIENTE");
+        pendienteCaja.SELECT("NULL AS IDCUENTA");
         pendienteCaja.SELECT("'' AS BANCO");
+        pendienteCaja.SELECT("NULL AS IDDISQUETEABONO");
         pendienteCaja.SELECT("fa.IDPAGOSJG");
 
         pendienteCaja.FROM("FAC_ABONO fa");
@@ -248,10 +258,13 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         emisionPago.SELECT("fa.FECHA");
         emisionPago.SELECT("fa.FECHAMODIFICACION");
         emisionPago.SELECT("INITCAP(F_SIGA_GETRECURSO_ETIQUETA('facturacion.pagosAbonos.accion.emisionPago', " + idioma + ")) AS MODO");
+        emisionPago.SELECT("'" + SigaConstants.ESTADO_FACTURA_ENREVISION + "' AS IDESTADO");
         emisionPago.SELECT("F_SIGA_GETRECURSO_ETIQUETA('facturacion.pagosAbonos.estado.revision', " + idioma + ") AS ESTADO");
         emisionPago.SELECT("0 AS IMPORTE");
         emisionPago.SELECT("fa.IMPTOTAL AS IMPORTE_PENDIENTE");
+        emisionPago.SELECT("NULL AS IDCUENTA");
         emisionPago.SELECT("'' AS BANCO");
+        emisionPago.SELECT("NULL AS IDDISQUETEABONO");
         emisionPago.SELECT("NULL AS IDPAGOSJG");
 
         emisionPago.FROM("FAC_ABONO fa");
