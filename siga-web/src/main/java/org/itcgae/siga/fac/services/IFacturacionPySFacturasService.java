@@ -27,4 +27,5 @@ public interface IFacturacionPySFacturasService {
     public InsertResponseDTO renegociarAbono(EstadosAbonosItem nuevoEstado, HttpServletRequest request) throws Exception;
 
     public InsertResponseDTO renegociarAbonoVarios(List<EstadosAbonosItem> nuevosEstados, HttpServletRequest request) throws Exception;
+
 }

@@ -109,13 +109,19 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
             List<FacFactura> facturas = facFacturaExtendsMapper.selectByExample(facturaExample);
 
             if (facturas == null || facturas.isEmpty())
-                throw new BusinessException("No existe una factura con ese número de factura");
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.numeroAbono");
 
-            if (facturas.get(0).getImptotalporpagar().compareTo(new BigDecimal(nuevoEstado.getMovimiento())) < 0)
-                throw new BusinessException("La factura con ese número no tiene tanto importe pendiente");
+            FacFactura factura = facturas.get(0);
+
+            if (!factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA))
+                    || !factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO)))
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.estado");
+
+            if (factura.getImptotalporpagar().compareTo(new BigDecimal(nuevoEstado.getMovimiento())) < 0)
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.importe");
 
             // Procedemos a compensar el abono
-            facturaAccionesHelper.compensarAbono(Long.parseLong(nuevoEstado.getIdAbono()), facturas.get(0).getIdfactura(),
+            facturaAccionesHelper.compensarAbono(Long.parseLong(nuevoEstado.getIdAbono()), factura.getIdfactura(),
                     new BigDecimal(nuevoEstado.getMovimiento()), usuario);
         } else {
             FacAbonoKey abonoKey = new FacAbonoKey();
@@ -126,7 +132,10 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
 
             // El sistema buscará las facturas pendientes de cobro del colegiado/sociedad al que corresponde este Abono SJCS
             FacFacturaExample facturaExample = new FacFacturaExample();
-            facturaExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+            facturaExample.or().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+                    .andEstadoEqualTo(Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO))
+                    .andIdpersonaEqualTo(abono.getIdpersona());
+            facturaExample.or().andIdinstitucionEqualTo(usuario.getIdinstitucion())
                     .andEstadoEqualTo(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA))
                     .andIdpersonaEqualTo(abono.getIdpersona());
             facturaExample.setOrderByClause("fechaemision");
@@ -137,7 +146,7 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
             BigDecimal importePendiente = new BigDecimal(nuevoEstado.getMovimiento());
             if (importePendiente.compareTo(facturas.stream().map(FacFactura::getImptotalporpagar)
                     .reduce(BigDecimal::add).orElse(BigDecimal.ZERO)) > 0)
-                throw new BusinessException("La factura con ese número no tiene tanto importe pendiente");
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.importe");
 
             for (FacFactura factura: facturas) {
                 // Procedemos a compensar el abono con cada una de las facturas

@@ -74,7 +74,7 @@ public class FacturaAccionesHelper {
     private FacturacionHelper facturacionHelper;
 
     @Transactional(rollbackFor = Exception.class)
-    public BigDecimal compensarAbono(Long idAbono, String idFactura, BigDecimal importeFactura, AdmUsuarios usuario) throws Exception {
+    public BigDecimal compensarAbono(Long idAbono, String idFactura, BigDecimal importeFactura, AdmUsuarios usuario) {
         FacAbono abono = new FacAbono();
         FacPagoabonoefectivo pagoAbono = new FacPagoabonoefectivo();
         FacPagosporcaja pagoCaja = new FacPagosporcaja();
