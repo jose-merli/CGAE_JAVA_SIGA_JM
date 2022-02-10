@@ -18,6 +18,7 @@ public class FacturacionSJCSException extends Exception {
     public FacturacionSJCSException(String mensaje, Exception e) {
         super(mensaje, e);
         LOGGER.error(mensaje);
+        LOGGER.error(e.getMessage());
         this.description = "";
     }
 
@@ -30,6 +31,7 @@ public class FacturacionSJCSException extends Exception {
     public FacturacionSJCSException(String mensaje, Exception e, String description) {
         super(mensaje, e);
         LOGGER.error(mensaje);
+        LOGGER.error(e.getMessage());
         this.description = description;
     }
 
