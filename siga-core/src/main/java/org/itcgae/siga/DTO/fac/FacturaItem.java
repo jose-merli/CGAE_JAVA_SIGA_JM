@@ -40,6 +40,10 @@ public class FacturaItem {
 	String importeAdeudadoHasta;
 	String importeAdeudadoDesde;
 
+	//Pago
+	String idFormaPago;
+	String nombreFormaPago;
+	
 	//importes factura
 	String importeAnticipado;
 	String importeCompensado;
@@ -47,6 +51,7 @@ public class FacturaItem {
 	String importeBanco;
 	String importePagado;
 	String importeAdeudadoPendiente;
+	String idAccion;
 
 	//importes abono
 	String importeAnuladoAb;
@@ -78,6 +83,13 @@ public class FacturaItem {
 	String descripcionDeudor;
 	String abreviaturaDeudor;
 
+	//EstadosPagos
+	String estadoUlt;
+	String importePorPagarUlt;
+	String importePagadoUlt;
+	String idAccionUlt;
+	String fechaModificacionUlt;
+	
 	//observaciones factura
 	String observacionesFactura;
 	String observacionesFicheroFactura;

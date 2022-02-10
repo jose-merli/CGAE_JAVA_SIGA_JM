@@ -777,12 +777,14 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/insertarEstadosPagos")
-	ResponseEntity<InsertResponseDTO> insertarEstadosPagos(@RequestBody EstadosPagosItem item,
+	ResponseEntity<InsertResponseDTO> insertarEstadosPagos(@RequestBody List<EstadosPagosItem> items,
 			HttpServletRequest request) {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
-			response = facturacionService.insertarEstadosPagos(item, request);
+			for(EstadosPagosItem item : items) {
+				response = facturacionService.insertarEstadosPagos(item, request);
+			}
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -791,12 +793,14 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/eliminarEstadosPagos")
-	ResponseEntity<DeleteResponseDTO> borrarCuentasBancarias(@RequestBody EstadosPagosItem item,
+	ResponseEntity<DeleteResponseDTO> eliminarEstadosPagos(@RequestBody List <EstadosPagosItem> items,
 			HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
-			response = facturacionService.eliminarEstadosPagos(item, request);
+			for(EstadosPagosItem item : items) {
+				response =	facturacionService.eliminarEstadosPagos(item, request);	
+			}
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
