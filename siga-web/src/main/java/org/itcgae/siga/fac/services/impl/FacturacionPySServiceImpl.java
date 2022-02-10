@@ -531,6 +531,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				cuenta.setDescripcionRepetida(listaCuentasBancarias.stream()
 						.anyMatch(c2 -> !cuenta.getBancosCodigo().equals(c2.getBancosCodigo())
 								&& cuenta.getDescripcion().equals(c2.getDescripcion())));
+				
+				if (cuenta.getSjcs() == true) {
+					cuenta.setSjcsFiltro("si");
+				} else {
+					cuenta.setSjcsFiltro("no");
+				}
 			});
 			LOGGER.info("getCuentasBancarias() ->" + listaCuentasBancarias.toString());
 

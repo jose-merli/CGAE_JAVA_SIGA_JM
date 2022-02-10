@@ -32,6 +32,7 @@ public class CuentasBancariasItem {
 	private String configConceptoAmpliado;
 
 	private Boolean sjcs;
+	private String sjcsFiltro;
 	private String idSufijoSjcs;
 	private String sufijoSjcs;
 	private String concepto;
@@ -243,6 +244,14 @@ public class CuentasBancariasItem {
 	public void setSufijoSjcs(String sufijoSjcs) {
 		this.sufijoSjcs = sufijoSjcs;
 	}
+	
+	public String getSjcsFiltro() {
+		return sjcsFiltro;
+	}
+
+	public void setSjcsFiltro(String sjcsFiltro) {
+		this.sjcsFiltro = sjcsFiltro;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -308,6 +317,7 @@ public class CuentasBancariasItem {
 				", configLugaresQueMasSecuencia='" + configLugaresQueMasSecuencia + '\'' +
 				", configConceptoAmpliado='" + configConceptoAmpliado + '\'' +
 				", sjcs=" + sjcs +
+				", sjcsFiltro=" + sjcsFiltro +
 				", idSufijoSjcs='" + idSufijoSjcs + '\'' +
 				", sufijoSjcs='" + sufijoSjcs + '\'' +
 				", concepto='" + concepto + '\'' +

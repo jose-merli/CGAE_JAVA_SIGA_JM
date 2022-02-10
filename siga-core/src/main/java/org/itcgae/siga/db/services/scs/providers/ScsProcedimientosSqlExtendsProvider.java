@@ -40,7 +40,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		
 		sql.FROM("SCS_PRETENSION procedimiento");
 		sql.WHERE("procedimiento.idinstitucion = '" + idInstitucion + "'");
-		if(UtilidadesString.esCadenaVacia(idJurisdiccion))
+		if(!UtilidadesString.esCadenaVacia(idJurisdiccion))
 		sql.WHERE("procedimiento.idjurisdiccion = '"+idJurisdiccion+"'");
 		sql.WHERE("procedimiento.fechabaja is null");
 		sql.ORDER_BY("nombre");

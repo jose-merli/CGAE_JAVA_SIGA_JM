@@ -51,7 +51,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
                 + ") UNION (" + compensacion
                 + ") UNION (" + abonoBanco
                 + ") UNION (" + pendienteBanco
-                + ") UNION (" + pendienteCaja
+                //+ ") UNION (" + pendienteCaja
                 + ") UNION (" + emisionPago + "))");
         principal.ORDER_BY("IDTABLA ASC", "FECHA ASC", "FECHAMODIFICACION ASC", "IDENTIFICADOR ASC");
 
