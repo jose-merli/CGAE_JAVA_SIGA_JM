@@ -29,4 +29,5 @@ public class EstadosPagosItem {
 	Boolean comision;
 	String comisionIdFactura;
 	String comisionFactura;
+	String modo;
 }
