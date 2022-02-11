@@ -215,6 +215,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "                hit2.idturno = hit.idturno "
 				+ "            AND "
 				+ "                hit2.idguardia = hit.idguardia "
+				+ "             AND hit2.agrupar = hit.agrupar "
 				+ "            AND "
 				+ "                hit2.idhito = "
 				+ "                    CASE hit.idhito "

@@ -789,12 +789,14 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/eliminarEstadosPagos")
-	ResponseEntity<DeleteResponseDTO> borrarCuentasBancarias(@RequestBody EstadosPagosItem item,
+	ResponseEntity<DeleteResponseDTO> eliminarEstadosPagos(@RequestBody EstadosPagosItem item,
 			HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
-			response = facturacionService.eliminarEstadosPagos(item, request);
+			
+			response =	facturacionService.eliminarEstadosPagos(item, request);	
+			
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
