@@ -103,10 +103,7 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
     List<FacAbono> getPagosCerrados(Short idInstitucion, String anio);
 
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNuevoNumeroAbono")
-	@Results({
-			@Result(column = "NUEVOCONTADOR", property = "value", jdbcType = JdbcType.VARCHAR)
-	})
-	List<ComboItem> getNuevoNumeroAbono(String idInstitucion, String idContador);
+	String getNuevoNumeroAbono(String idInstitucion, String idContador);
 
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getAbonosBanco")
 	List<FacAbono> getAbonosBanco(Short idInstitucion, String bancosCodigo, Short idSufijo, List<String> idAbonos);

@@ -2717,7 +2717,20 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getEstadosPagos() -> obteniendo el historico de la factura");
 
-			List<EstadosPagosItem> result = facHistoricofacturaExtendsMapper.getEstadosPagos(idFactura,
+			FacFactura factura = new FacFactura();
+			String idFacturaParent = idFactura;
+
+			do {
+				FacFacturaKey key = new FacFacturaKey();
+				key.setIdinstitucion(usuario.getIdinstitucion());
+				key.setIdfactura(idFacturaParent);
+				factura = facFacturaExtendsMapper.selectByPrimaryKey(key);
+
+				if (factura != null && factura.getComisionidfactura() != null)
+					idFacturaParent = factura.getComisionidfactura();
+			} while (factura != null && factura.getComisionidfactura() != null);
+
+			List<EstadosPagosItem> result = facHistoricofacturaExtendsMapper.getEstadosPagos(idFacturaParent,
 					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 
 			estadosPagosDTO.setEstadosPagosItems(result);
@@ -3144,7 +3157,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		devolucion.setIdInstitucion(usuario.getIdinstitucion());
 		devolucion.setUsuModificacion(usuario.getIdusuario());
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMDD");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		String fecha = dateFormat.format(item.getFechaModificaion());
 
 		devolucion.setFechaDevolucion(fecha);
@@ -3451,7 +3464,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		abonoInsert.setIdabono(Long.valueOf(
 				facAbonoExtendsMapper.getNewAbonoID(String.valueOf(usuario.getIdinstitucion())).get(0).getValue()));
 
-		abonoInsert.setNumeroabono(facAbonoExtendsMapper.getNuevoNumeroAbono(facUpdate.getIdinstitucion().toString(), "FAC_ABONOS_GENERAL").get(0).getValue());
+		abonoInsert.setNumeroabono(facAbonoExtendsMapper.getNuevoNumeroAbono(facUpdate.getIdinstitucion().toString(), "FAC_ABONOS_GENERAL"));
 
 		abonoInsert.setEstado((short) 6);
 

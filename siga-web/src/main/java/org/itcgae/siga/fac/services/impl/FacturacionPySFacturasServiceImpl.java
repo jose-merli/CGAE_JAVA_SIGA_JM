@@ -3,8 +3,10 @@ package org.itcgae.siga.fac.services.impl;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.EstadosAbonosDTO;
 import org.itcgae.siga.DTO.fac.EstadosAbonosItem;
+import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -12,19 +14,25 @@ import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.entities.FacAbonoKey;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaExample;
+import org.itcgae.siga.db.entities.FacFacturaKey;
+import org.itcgae.siga.db.entities.FacHistoricofactura;
+import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacHistoricofacturaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPagoabonoefectivoExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySFacturasService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -46,6 +54,9 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
 
     @Autowired
     private FacPagoabonoefectivoExtendsMapper facPagoabonoefectivoExtendsMapper;
+
+    @Autowired
+    private FacHistoricofacturaExtendsMapper facHistoricofacturaExtendsMapper;
 
     @Autowired
     private GenRecursosMapper genRecursosMapper;
@@ -320,5 +331,100 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
 
         return insertResponseDTO;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public InsertResponseDTO insertarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception {
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        Error error = new Error();
+        insertResponseDTO.setError(error);
+
+        // Conseguimos información del usuario logeado
+        AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+        LOGGER.info("insertarEstadosPagos() -> Entrada al servicio para crear una entrada al historico de factura");
+
+        if (usuario != null) {
+            /*
+            // renegociar
+            if (item.getIdAccion().equalsIgnoreCase("7") && (item.getEstado() == "2"
+                    || facHistoricoInsert.getEstado() == 4 || facHistoricoInsert.getEstado() == 5)) {
+
+                //renegociarFactura(item, facHistoricoInsert, facUpdate, usuario);
+            }
+
+
+             */
+            // nuevo cobro
+            if (item.getIdAccion().equalsIgnoreCase("4")) {
+                BigDecimal importe = new BigDecimal(item.getImpTotalPagado());
+                facturaAccionesHelper.pagarFacturaPorCaja(item.getIdFactura(), importe, item.getComentario(), item.getFechaModificaion(), usuario);
+            }
+
+            // devolver
+            if (item.getIdAccion().equalsIgnoreCase("6")) {
+                // Ultima entrada del historico de facturas
+                FacHistoricofacturaExample example = new FacHistoricofacturaExample();
+                example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+                        .andIdfacturaEqualTo(item.getIdFactura());
+                example.setOrderByClause("IDHISTORICO");
+                List<FacHistoricofactura> facHistoricoList = facHistoricofacturaExtendsMapper.selectByExample(example);
+
+                FacHistoricofactura facHistoricoInsert = facHistoricoList.get(facHistoricoList.size() - 1);
+
+                facturaAccionesHelper.devolverFactura(facHistoricoInsert.getIddisquetecargos(), facHistoricoInsert.getIdfacturaincluidaendisquete(),
+                        item.getFechaModificaion(), item.getComentario(), item.getComision() != null ? item.getComision() : false, usuario);
+            }
+
+            /*
+            // anular
+            if (item.getIdAccion().equalsIgnoreCase("8") && facHistoricoInsert.getEstado() != 7
+                    && facHistoricoInsert.getEstado() != 8) {
+
+                //anularFactura(item, facHistoricoInsert, facUpdate, usuario);
+            }
+
+
+             */
+
+            //insertResponseDTO.setId(facHistoricoInsert.getIdfactura());
+        }
+
+        LOGGER.info("insertarEstadosPagos() -> Salida del servicio para crear una entrada al historico de factura");
+
+        return insertResponseDTO;
+    }
+
+    @Override
+    public InsertResponseDTO insertarEstadosPagosVarios(List<EstadosPagosItem> nuevosEstados, HttpServletRequest request) throws Exception {
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        AdmUsuarios usuario = new AdmUsuarios();
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.insertarEstadosPagosVarios() -> Entrando al servicio para insertar un nuevo estado de factura");
+
+        // Conseguimos información del usuario logeado
+        usuario = authenticationProvider.checkAuthentication(request);
+
+        int facturas = 0;
+        for (EstadosPagosItem estadosPagosItem: nuevosEstados) {
+            try {
+                insertarEstadosPagos(estadosPagosItem, request);
+                facturas++;
+            } catch (Exception e) {
+                LOGGER.warn("FacturacionPySFacturasImpl.insertarEstadosPagosVarios() -> Error al insertar un nuevo estado para la factura con id=" + estadosPagosItem.getIdFactura());
+            }
+        }
+
+        // Número de abonos que han pasado exitósamente por la acción de renegociación
+        insertResponseDTO.setId(String.valueOf(facturas));
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.insertarEstadosPagosVarios() -> Salida del servicio para insertar un nuevo estado de factura");
+
+        return insertResponseDTO;
+    }
+
+
 
 }

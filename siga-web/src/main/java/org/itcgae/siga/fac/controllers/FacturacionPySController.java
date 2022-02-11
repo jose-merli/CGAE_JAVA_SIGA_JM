@@ -780,7 +780,7 @@ public class FacturacionPySController {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
-			response = facturacionService.insertarEstadosPagos(item, request);
+			response = facturacionPySFacturasService.insertarEstadosPagos(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
