@@ -359,7 +359,8 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
             // renegociar
             if (item.getIdAccion().equalsIgnoreCase("7")) {
 
-                facturaAccionesHelper.renegociarFactura(item.getModo(), item.getIdFactura(), Short.parseShort(item.getCuentaBanco()),
+                Short idCuenta = UtilidadesString.esCadenaVacia(item.getCuentaBanco()) ? null : Short.parseShort(item.getCuentaBanco());
+                facturaAccionesHelper.renegociarFactura(item.getModo(), item.getIdFactura(), idCuenta,
                         item.getFechaModificaion(), item.getComentario(), usuario);
             }
 

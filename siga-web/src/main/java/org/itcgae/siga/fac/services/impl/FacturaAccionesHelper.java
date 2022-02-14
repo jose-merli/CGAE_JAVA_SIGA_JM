@@ -20,31 +20,28 @@ import org.itcgae.siga.db.entities.FacDisquetedevoluciones;
 import org.itcgae.siga.db.entities.FacDisquetedevolucionesKey;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaKey;
+import org.itcgae.siga.db.entities.FacFacturacionsuscripcion;
+import org.itcgae.siga.db.entities.FacFacturacionsuscripcionExample;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteExample;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteKey;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
-import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
-import org.itcgae.siga.db.entities.FacLineadevoludisqbancoExample;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbancoKey;
 import org.itcgae.siga.db.entities.FacLineafactura;
 import org.itcgae.siga.db.entities.FacLineafacturaExample;
-import org.itcgae.siga.db.entities.FacLineafacturaKey;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
-import org.itcgae.siga.db.entities.FacPagoabonoefectivoKey;
 import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
-import org.itcgae.siga.db.entities.FacPagosporcajaKey;
 import org.itcgae.siga.db.entities.FacRenegociacion;
-import org.itcgae.siga.db.entities.FacRenegociacionExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.FacFacturacionsuscripcionMapper;
 import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
 import org.itcgae.siga.db.mappers.FacLineadevoludisqbancoMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
@@ -71,16 +68,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class FacturaAccionesHelper {
@@ -143,6 +136,9 @@ public class FacturaAccionesHelper {
 
     @Autowired
     private FacLineaabonoExtendsMapper facLineaabonoExtendsMapper;
+
+    @Autowired
+    private FacFacturacionsuscripcionMapper facFacturacionsuscripcionMapper;
 
     @Autowired
     private GenDiccionarioMapper genDiccionarioMapper;
@@ -590,6 +586,7 @@ public class FacturaAccionesHelper {
                 cuentaBancariaKey.setIdpersona(factura.getIdpersona());
                 cuentaBancariaKey.setIdcuenta(factura.getIdcuenta());
 
+                // Obtener la Cuenta activa única
                 cuentaBancaria = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(cuentaBancariaKey);
 
                 if (cuentaBancaria != null && cuentaBancaria.getIdcuenta() != null
@@ -655,6 +652,8 @@ public class FacturaAccionesHelper {
         renegociacion.setIdinstitucion(usuario.getIdinstitucion());
         renegociacion.setIdpersona(factura.getIdpersona());
         renegociacion.setImporte(factura.getImptotalporpagar());
+        renegociacion.setFechamodificacion(new Date());
+        renegociacion.setUsumodificacion(usuario.getIdusuario());
 
         // Fecha de renegociación de la petición
         if (fecha != null) {
@@ -715,8 +714,7 @@ public class FacturaAccionesHelper {
     }
 
     private CenCuentasbancarias getCuentaActivaServiciosActivos(Long idPersona, Short idInstitucion) {
-        // TODO: Segundo punto de la renegociación masiva
-        return null;
+        return cenCuentasbancariasExtendsMapper.getCuentaActivaServiciosActivos(idInstitucion, idPersona);
     }
 
     private List<CenCuentasbancarias> getCuentasActivas(Long idPersona, Short idInstitucion) {
@@ -797,6 +795,7 @@ public class FacturaAccionesHelper {
         return resultado;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public int anularFactura(String idFactura, Date fecha, String observaciones, AdmUsuarios usuario) {
         int resultado;
 
@@ -1000,6 +999,19 @@ public class FacturaAccionesHelper {
         }
 
         return resultado;
+    }
+
+    private void moverFacturacionSuscripcion(String idFactura, Short idInstitucion) {
+        FacFacturacionsuscripcionExample suscripcionExample = new FacFacturacionsuscripcionExample();
+        suscripcionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                .andIdfacturaEqualTo(idFactura);
+
+        List<FacFacturacionsuscripcion> suscripciones = facFacturacionsuscripcionMapper.selectByExample(suscripcionExample);
+        for (FacFacturacionsuscripcion suscripcion: suscripciones) {
+
+            BeanUtils.copyProperties(suscripcion, null);
+            //FacfacturacionsuscripcionA
+        }
     }
 
     private void incrementarContador(String idContador, Short idInstitucion) {
