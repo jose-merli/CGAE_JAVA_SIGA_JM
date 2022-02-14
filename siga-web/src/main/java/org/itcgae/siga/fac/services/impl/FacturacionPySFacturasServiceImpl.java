@@ -385,16 +385,11 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
                         item.getFechaModificaion(), item.getComentario(), item.getComision() != null ? item.getComision() : false, usuario);
             }
 
-            /*
+
             // anular
-            if (item.getIdAccion().equalsIgnoreCase("8") && facHistoricoInsert.getEstado() != 7
-                    && facHistoricoInsert.getEstado() != 8) {
-
-                //anularFactura(item, facHistoricoInsert, facUpdate, usuario);
+            if (item.getIdAccion().equalsIgnoreCase("8")) {
+                facturaAccionesHelper.anularFactura(item.getIdFactura(), item.getFechaModificaion(), item.getComentario(), usuario);
             }
-
-
-             */
 
             //insertResponseDTO.setId(facHistoricoInsert.getIdfactura());
         }
