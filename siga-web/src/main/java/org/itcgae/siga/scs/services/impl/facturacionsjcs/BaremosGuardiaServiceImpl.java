@@ -96,7 +96,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guardia.setBaremo(lBaremos.get(i).getBaremo());
 						guardia.setnDias(lBaremos.get(i).getNDias());
 						guar.add(guardia);
-						if(!(hitoActual.equals(lBaremos.get(i+1).getIdHito()))) {
+						if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))  ) {
 							lBaremos.get(i).setGuardiasObj(guar);
 						}
 					}else {
@@ -111,7 +111,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guardia.setBaremo(lBaremos.get(i).getBaremo());
 						guardia.setnDias(lBaremos.get(i).getNDias());
 						guar.add(guardia);
-						if(!(hitoActual.equals(lBaremos.get(i+1).getIdHito()))) {
+						if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
 							lBaremos.get(i).setGuardiasObj(guar);
 						}
 					}
@@ -125,7 +125,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					guardia.setBaremo(lBaremos.get(i).getBaremo());
 					guardia.setnDias(lBaremos.get(i).getNDias());
 					guar.add(guardia);
-					if(!(hitoActual.equals(lBaremos.get(i+1).getIdHito()))) {
+					if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
 						lBaremos.get(i).setGuardiasObj(guar);
 					}
 				}
