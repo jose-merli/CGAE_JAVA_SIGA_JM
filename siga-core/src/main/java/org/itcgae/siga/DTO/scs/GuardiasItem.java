@@ -41,9 +41,8 @@ public class GuardiasItem {
 	private String porGrupos;
 	private Date fechabaja;
 	private boolean historico;
-	
-	
-	
+	private String baremo;
+	private String nDias;
 	
 	public String getIdPersonaUltimo() {
 		return idPersonaUltimo;
@@ -410,7 +409,20 @@ public class GuardiasItem {
 	}
 	public void setSeleccionFestivos(String seleccionFestivos) {
 		this.seleccionFestivos = seleccionFestivos;
+	}
+	public String getBaremo() {
+		return baremo;
+	}
+	public void setBaremo(String baremo) {
+		this.baremo = baremo;
+	}
+	public String getnDias() {
+		return nDias;
+	}
+	public void setnDias(String nDias) {
+		this.nDias = nDias;
 	} 
 
+	
 	
 }

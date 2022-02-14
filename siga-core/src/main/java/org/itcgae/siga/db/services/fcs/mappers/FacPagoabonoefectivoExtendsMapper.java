@@ -39,6 +39,7 @@ public interface FacPagoabonoefectivoExtendsMapper extends FacPagoabonoefectivoM
         @Result(column = "NUMEROFACTURA", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
         @Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
         @Result(column = "NUMEROABONO", property = "numeroAbono", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "COMENTARIO", property = "comentario", jdbcType = JdbcType.VARCHAR),
     })
     List<EstadosAbonosItem> getEstadosAbonos(String idAbono, Short idInstitucion, String idioma);
 }

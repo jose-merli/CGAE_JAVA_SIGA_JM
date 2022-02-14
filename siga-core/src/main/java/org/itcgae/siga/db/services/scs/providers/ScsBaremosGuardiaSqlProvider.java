@@ -36,18 +36,19 @@ public class ScsBaremosGuardiaSqlProvider {
 			}
 		
 		SQL sql = new SQL();
-		sql.SELECT("	tip.idhitoconfiguracion,"
-				+ "		hit.idturno,"
-				+ "		 tur.NOMBRE AS NOMBRETURNO,"
-				+ "		hit.idguardia,"
-				+ "		gua.fechabaja,"
-				+ "	LISTAGG( "
+		sql.SELECT(
+				"	LISTAGG( "
 				+ "        gua.nombre, "
 				+ "        ',' "
 				+ "    ) WITHIN GROUP(ORDER BY gua.nombre) guardias, "
 				+ "    gua.diasguardia "
 				+ "     || ' ' "
-				+ "     || gua.tipodiasguardia n_dias, "
+				+ "     || gua.tipodiasguardia n_dias, "+
+				"	tip.idhitoconfiguracion,"
+						+ "		hit.idturno,"
+						+ "		hit.idguardia,"
+						+ "(SELECT NOMBRE FROM SCS_TURNO WHERE IDINSTITUCION = hit.IDINSTITUCION AND IDTURNO = hit.idturno) NOMBRE,"
+						+ "		gua.fechabaja,"
 				+ "    f_siga_getrecurso( "
 				+ "        tip.descripcion, "
 				+ "        1 "
@@ -214,6 +215,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "                hit2.idturno = hit.idturno "
 				+ "            AND "
 				+ "                hit2.idguardia = hit.idguardia "
+				+ "             AND hit2.agrupar = hit.agrupar "
 				+ "            AND "
 				+ "                hit2.idhito = "
 				+ "                    CASE hit.idhito "
@@ -295,8 +297,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				}else {
 					sql.FROM("scs_hitofacturableguardia hit,"
 							+ "    scs_hitofacturable tip,"
-							+ "    scs_guardiasturno gua,"
-							+ "		scs_turno tur");
+							+ "    scs_guardiasturno gua");
 				}
 				
 				sql.WHERE(" hit.idhito = tip.idhito"
@@ -310,10 +311,7 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "        hit.idhito IN ("
 						+ "            7,9,25,22,5,20,44,1,12,13"
 						+ "        )"
-						+ "		AND"
-						+ "		tur.idinstitucion = gua.idinstitucion"
-						+ "		AND"
-						+ "		tur.IDTURNO = gua.IDTURNO");
+						);
 				sql.WHERE("hit.idinstitucion = " + idinstitucion);
 				if(guardias != "") {
 					sql.WHERE("gua.idguardia IN( " + guardias +")");
@@ -343,10 +341,9 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "    hit.diasaplicables,"
 						+ "    hit.agrupar,"
 						+ "    hit.idhito,"
-						+ "    tur.NOMBRE,"
 						+ "   gua.fechabaja,"
 						+ "tip.idhitoconfiguracion");
-				sql.ORDER_BY("2, 1");
+				sql.ORDER_BY("hit.idhito, hit.idguardia");
 		return sql.toString();
 	}
 }

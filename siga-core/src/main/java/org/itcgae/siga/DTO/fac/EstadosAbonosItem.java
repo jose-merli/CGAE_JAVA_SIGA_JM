@@ -31,4 +31,6 @@ public class EstadosAbonosItem {
 	String movimiento;
 	String importePendiente;
 
+	String comentario;
+
 }

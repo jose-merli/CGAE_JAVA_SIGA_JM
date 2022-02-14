@@ -122,12 +122,19 @@ public class FacturacionPySController {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
-			response = this.facturacionService.borrarCuentasBancarias(cuentasBancarias, request);
+			if (cuentasBancarias.size() > 1){
+				response = this.facturacionService.borrarCuentasBancarias(cuentasBancarias, request);
+			} else {
+				response = this.facturacionService.borrarCuentasBancariasIndividual(cuentasBancarias.get(0), request);
+			}
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (BusinessException be) {
+			response.setError(UtilidadesString.creaError(be.getMessage()));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 
 	@PostMapping(value = "/reactivarCuentasBancarias")
@@ -780,7 +787,21 @@ public class FacturacionPySController {
 		InsertResponseDTO response = new InsertResponseDTO();
 
 		try {
-			response = facturacionService.insertarEstadosPagos(item, request);
+			response = facturacionPySFacturasService.insertarEstadosPagos(item, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping(value = "/insertarEstadosPagosVarios")
+	ResponseEntity<InsertResponseDTO> insertarEstadosPagos(@RequestBody List <EstadosPagosItem> items,
+			HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.insertarEstadosPagosVarios(items, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -789,12 +810,14 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/eliminarEstadosPagos")
-	ResponseEntity<DeleteResponseDTO> borrarCuentasBancarias(@RequestBody EstadosPagosItem item,
+	ResponseEntity<DeleteResponseDTO> eliminarEstadosPagos(@RequestBody EstadosPagosItem item,
 			HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
-			response = facturacionService.eliminarEstadosPagos(item, request);
+			
+			response =	facturacionService.eliminarEstadosPagos(item, request);	
+			
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
