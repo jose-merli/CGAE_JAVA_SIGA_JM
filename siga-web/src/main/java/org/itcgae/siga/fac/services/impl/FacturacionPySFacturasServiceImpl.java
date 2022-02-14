@@ -17,6 +17,10 @@ import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
+import org.itcgae.siga.db.entities.GenDiccionario;
+import org.itcgae.siga.db.entities.GenDiccionarioKey;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacAbonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
@@ -82,10 +86,16 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
             if (result != null && result.size() > 1) {
                 BigDecimal total = new BigDecimal(result.get(0).getImportePendiente());
                 for (int i = 0; i < result.size(); i++) {
+                    EstadosAbonosItem item = result.get(i);
                     BigDecimal movimiento = new BigDecimal(result.get(i).getMovimiento());
                     if (total != null && movimiento != null) {
                         total = total.subtract(movimiento).setScale(2, RoundingMode.DOWN);
-                        result.get(i).setImportePendiente(total.toString());
+                        item.setImportePendiente(total.toString());
+
+                        if (total.compareTo(BigDecimal.ZERO) == 0) {
+                            item.setIdEstado(SigaConstants.FAC_ABONO_ESTADO_PAGADO.toString());
+                            item.setEstado(getRecurso("general.literal.pagado", usuario.getIdlenguaje()));
+                        }
                     }
                 }
             }
@@ -224,7 +234,7 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         usuario = authenticationProvider.checkAuthentication(request);
 
         facturaAccionesHelper.pagarAbonoPorCaja(Long.parseLong(nuevoEstado.getIdAbono()), null,
-                new BigDecimal(nuevoEstado.getMovimiento()), usuario);
+                new BigDecimal(nuevoEstado.getMovimiento()), nuevoEstado.getComentario(), usuario);
 
         LOGGER.info(
                 "FacturacionPySFacturasImpl.pagarPorCajaAbono() -> Salida del servicio  para pagar un abono");
@@ -423,6 +433,12 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         return insertResponseDTO;
     }
 
-
+    private String getRecurso(String idrecurso, String idioma) {
+        GenRecursosKey keyParametros = new GenRecursosKey();
+        keyParametros.setIdrecurso(idrecurso);
+        keyParametros.setIdlenguaje(idioma);
+        GenRecursos traduccion = genRecursosMapper.selectByPrimaryKey(keyParametros);
+        return traduccion != null ? traduccion.getDescripcion() : "";
+    }
 
 }

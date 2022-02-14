@@ -71,17 +71,15 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         pagosCaja.SELECT("fp.FECHA");
         pagosCaja.SELECT("fp.FECHAMODIFICACION");
         pagosCaja.SELECT("F_SIGA_GETRECURSO_ETIQUETA('facturacion.abonosPagos.datosPagoAbono.abonoCaja', " + idioma + ") AS MODO");
-        pagosCaja.SELECT("TO_CHAR(fa.estado) AS IDESTADO");
-        pagosCaja.SELECT("(SELECT gr.DESCRIPCION " +
-                "FROM FAC_ESTADOABONO fe " +
-                "INNER JOIN GEN_RECURSOS gr ON (fe.DESCRIPCION = gr.IDRECURSO) " +
-                "WHERE fe.IDESTADO = fa.ESTADO AND gr.IDLENGUAJE = " + idioma + ") ESTADO");
+        pagosCaja.SELECT("'" + SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA + "' AS IDESTADO");
+        pagosCaja.SELECT("F_SIGA_GETRECURSO_ETIQUETA('general.literal.pendienteabonocaja', " + idioma + ") ESTADO");
         pagosCaja.SELECT("fp.IMPORTE");
         pagosCaja.SELECT("NULL AS IMPORTE_PENDIENTE");
         pagosCaja.SELECT("NULL AS IDCUENTA");
         pagosCaja.SELECT("'' AS BANCO");
         pagosCaja.SELECT("NULL AS IDDISQUETEABONO");
         pagosCaja.SELECT("NULL AS IDPAGOSJG");
+        pagosCaja.SELECT("fp.OBSERVACIONES AS COMENTARIO");
 
         pagosCaja.FROM("FAC_PAGOABONOEFECTIVO fp");
         pagosCaja.FROM("FAC_ABONO fa");
@@ -111,17 +109,15 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         compensacion.SELECT("fp.FECHA");
         compensacion.SELECT("fp.FECHAMODIFICACION");
         compensacion.SELECT("INITCAP(F_SIGA_GETRECURSO_ETIQUETA('facturacion.pagosFactura.accion.compensacion', " + idioma + ")) AS MODO");
-        compensacion.SELECT("TO_CHAR(fa.ESTADO) as IDESTADO");
-        compensacion.SELECT("(SELECT gr.DESCRIPCION " +
-                "FROM FAC_ESTADOABONO fe " +
-                "INNER JOIN GEN_RECURSOS gr ON (fe.DESCRIPCION = gr.IDRECURSO) " +
-                "WHERE fe.IDESTADO = fa.ESTADO AND gr.IDLENGUAJE = " + idioma + ") ESTADO");
+        compensacion.SELECT("'" + SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA + "' AS IDESTADO");
+        compensacion.SELECT("F_SIGA_GETRECURSO_ETIQUETA('general.literal.pendienteabonocaja', " + idioma + ") AS ESTADO");
         compensacion.SELECT("fp.IMPORTE");
         compensacion.SELECT("NULL AS IMPORTE_PENDIENTE");
         compensacion.SELECT("NULL AS IDCUENTA");
         compensacion.SELECT("'' AS BANCO");
         compensacion.SELECT("NULL AS IDDISQUETEABONO");
         compensacion.SELECT("NULL AS IDPAGOSJG");
+        compensacion.SELECT("NULL AS COMENTARIO");
 
         compensacion.FROM("FAC_PAGOABONOEFECTIVO fp");
         compensacion.FROM("FAC_PAGOSPORCAJA fpc");
@@ -167,6 +163,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         abonoBanco.SELECT("(" + cuentaBancaria.toString() + ") AS BANCO");
         abonoBanco.SELECT("ad.IDDISQUETEABONO AS IDDISQUETEABONO");
         abonoBanco.SELECT("NULL AS IDPAGOSJG");
+        abonoBanco.SELECT("NULL AS COMENTARIO");
 
         abonoBanco.FROM("FAC_ABONOINCLUIDOENDISQUETE ad");
         abonoBanco.FROM("FAC_ABONO fa");
@@ -208,6 +205,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         pendienteBanco.SELECT("(" + cuentaBancaria.toString() + ") AS BANCO");
         pendienteBanco.SELECT("NULL AS IDDISQUETEABONO");
         pendienteBanco.SELECT("fa.IDPAGOSJG");
+        pendienteBanco.SELECT("NULL AS COMENTARIO");
 
         pendienteBanco.FROM("FAC_ABONO fa");
         pendienteBanco.WHERE("fa.IDINSTITUCION = " + idInstitucion + " AND fa.IDABONO = " + idAbono);
@@ -237,6 +235,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         pendienteCaja.SELECT("'' AS BANCO");
         pendienteCaja.SELECT("NULL AS IDDISQUETEABONO");
         pendienteCaja.SELECT("fa.IDPAGOSJG");
+        pendienteCaja.SELECT("NULL AS COMENTARIO");
 
         pendienteCaja.FROM("FAC_ABONO fa");
         pendienteCaja.WHERE("fa.IDINSTITUCION = " + idInstitucion + " AND fa.IDABONO = " + idAbono);
@@ -266,6 +265,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         emisionPago.SELECT("'' AS BANCO");
         emisionPago.SELECT("NULL AS IDDISQUETEABONO");
         emisionPago.SELECT("NULL AS IDPAGOSJG");
+        emisionPago.SELECT("NULL AS COMENTARIO");
 
         emisionPago.FROM("FAC_ABONO fa");
         emisionPago.WHERE("fa.IDINSTITUCION = " + idInstitucion + " AND fa.IDABONO = " + idAbono);
