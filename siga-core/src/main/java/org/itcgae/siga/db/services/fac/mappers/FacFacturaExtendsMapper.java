@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.DatoImpresionInformeFacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturasFacturacionRapidaDTO;
@@ -144,4 +145,7 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "IDPETICION", property = "idPeticion", jdbcType = JdbcType.DECIMAL)
 	})
 	List<FacturasFacturacionRapidaDTO> obtenerFacturasFacturacionRapida(String idInstitucion, String idPeticion, String idSolicitudCertificado);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getDatosImpresionInformeFactura")
+	DatoImpresionInformeFacturaDTO getDatosImpresionInformeFactura(String idInstitucion, String idFactura);
 }

@@ -34,10 +34,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 
-
-
-
-
+import javax.swing.text.MaskFormatter;
 
 
 /**
@@ -742,4 +739,119 @@ public class UtilidadesString {
 		LOGGER.info("NUMERO DE TELEFONO CON PREFIJO:" + numero);
 		return numero;
 	}
+
+	public static String mostrarIBANConAsteriscos (String iban) {
+		try	{
+			// Verficamos si el iban tiene espacios
+			iban = iban.trim().replaceAll(" ", "");
+			String ibanInicio = iban.substring(0,8);
+			String ibanFin = iban.substring(iban.length()-4);
+			String asteriscos = "";
+			int longitudIbanMedio = iban.substring(8,iban.length()-4).length();
+
+			for(int i = 0; i < longitudIbanMedio; i++) {
+				asteriscos = "*" + asteriscos;
+			}
+			return mostrarDatoMascara(ibanInicio + asteriscos + ibanFin,"AA AA AAAA **** **** **** **** **** **** **");
+		}
+		catch (Exception e) {
+			return "";
+		}
+	}
+
+	public static String mostrarDatoMascara (Object o,String mask) {
+		String a = "";
+		try {
+			if (o!=null) {
+				MaskFormatter mf = new MaskFormatter(mask);
+				mf.setValueContainsLiteralCharacters(false);
+				a = mf.valueToString(o.toString());
+			}
+		} catch (ParseException e) {
+			LOGGER.error("Error al utilizar la mascara");
+			return "";
+		}
+
+		return mostrarDatoJSP(a);
+	}
+
+	public static String mostrarDatoJSP (Object o) {
+		String a = "";
+		if (o!=null) {
+			a = o.toString();
+		}
+		if (a.trim().equals(""))
+			return "&nbsp";
+		else
+			return entidades(a);
+	}
+
+	public static String entidades(String sCadena) {
+		String sSalida="";
+
+		if (sCadena==null) return sSalida;
+
+		sSalida = sCadena.replaceAll("&", "&amp;");
+		sSalida = sSalida.replaceAll("á", "&aacute;");
+		sSalida = sSalida.replaceAll("Á", "&Aacute;");
+		sSalida = sSalida.replaceAll("é", "&eacute;");
+		sSalida = sSalida.replaceAll("É", "&Eacute;");
+		sSalida = sSalida.replaceAll("í", "&iacute;");
+		sSalida = sSalida.replaceAll("Í", "&Iacute;");
+		sSalida = sSalida.replaceAll("ó", "&oacute;");
+		sSalida = sSalida.replaceAll("Ó", "&Oacute;");
+		sSalida = sSalida.replaceAll("ú", "&uacute;");
+		sSalida = sSalida.replaceAll("Ú", "&Uacute;");
+		sSalida = sSalida.replaceAll("ñ", "&ntilde;");
+		sSalida = sSalida.replaceAll("Ñ", "&Ntilde;");
+		sSalida = sSalida.replaceAll("<", "&lt;");
+		sSalida = sSalida.replaceAll(">", "&gt;");
+		sSalida = sSalida.replaceAll("\"", "&quot;");
+		sSalida = sSalida.replaceAll("¡", "&iexcl;");
+		sSalida = sSalida.replaceAll("´", "&acute;");
+		sSalida = sSalida.replaceAll("`", "&acute;");
+		sSalida = sSalida.replaceAll("¿", "&iquest;");
+		sSalida = sSalida.replaceAll("¨", "&uml;");
+		sSalida = sSalida.replaceAll("À", "&Agrave;");
+		sSalida = sSalida.replaceAll("à", "&agrave;");
+		sSalida = sSalida.replaceAll("Â", "&Acirc;");
+		sSalida = sSalida.replaceAll("â", "&acirc;");
+		sSalida = sSalida.replaceAll("Ä", "&Auml;");
+		sSalida = sSalida.replaceAll("ä", "&auml;");
+		sSalida = sSalida.replaceAll("È", "&Egrave;");
+		sSalida = sSalida.replaceAll("Ê", "&Ecirc;");
+		sSalida = sSalida.replaceAll("Ë", "&Euml;");
+		sSalida = sSalida.replaceAll("è", "&egrave;");
+		sSalida = sSalida.replaceAll("ê", "&ecirc;");
+		sSalida = sSalida.replaceAll("ë", "&euml;");
+		sSalida = sSalida.replaceAll("Ì", "&Igrave;");
+		sSalida = sSalida.replaceAll("Î", "&Icirc;");
+		sSalida = sSalida.replaceAll("Ï", "&Iuml;");
+		sSalida = sSalida.replaceAll("ì", "&igrave;");
+		sSalida = sSalida.replaceAll("î", "&icirc;");
+		sSalida = sSalida.replaceAll("ï", "&iuml;");
+		sSalida = sSalida.replaceAll("Ò", "&Ograve;");
+		sSalida = sSalida.replaceAll("Ô", "&Ocirc;");
+		sSalida = sSalida.replaceAll("Ö", "&Ouml;");
+		sSalida = sSalida.replaceAll("ò", "&ograve;");
+		sSalida = sSalida.replaceAll("ô", "&ocirc;");
+		sSalida = sSalida.replaceAll("ö", "&ouml;");
+		sSalida = sSalida.replaceAll("Ù", "&Ugrave;");
+		sSalida = sSalida.replaceAll("Û", "&Ucirc;");
+		sSalida = sSalida.replaceAll("Ü", "&Uuml;");
+		sSalida = sSalida.replaceAll("ù", "&ugrave;");
+		sSalida = sSalida.replaceAll("û", "&ucirc;");
+		sSalida = sSalida.replaceAll("ü", "&uuml;");
+		sSalida = sSalida.replaceAll("ý", "&yacute;");
+		sSalida = sSalida.replaceAll("Ý", "&Yacute;");
+		sSalida = sSalida.replaceAll("ÿ", "&yuml;");
+		sSalida = sSalida.replaceAll("ç", "&ccedil;");
+		sSalida = sSalida.replaceAll("Ç", "&Ccedil;");
+		//sSalida = sSalida.replaceAll("'", "&apos;");
+		sSalida = sSalida.replaceAll("\r\n", "<BR>");
+		sSalida = sSalida.replaceAll("\n\r", "<BR>");
+		sSalida = sSalida.replaceAll("\n", "<BR>");
+		return sSalida;
+	}
+
 }

@@ -4,15 +4,24 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.DatoImpresionInformeFacturaDTO;
+import org.itcgae.siga.DTO.fac.EntradaDireccionEspecificaDTO;
 import org.itcgae.siga.DTO.fac.FacFicherosDescargaBean;
+import org.itcgae.siga.DTO.fac.LineaImpresionInformeDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.FoUtils;
 import org.itcgae.siga.commons.utils.SIGAHelper;
+import org.itcgae.siga.commons.utils.UtilidadesNumeros;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmLenguajes;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenMandatosCuentasbancarias;
+import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacPlantillafacturacion;
@@ -20,15 +29,27 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.mappers.AdmLenguajesMapper;
+import org.itcgae.siga.db.mappers.CenInstitucionMapper;
+import org.itcgae.siga.db.mappers.CenMandatosCuentasbancariasMapper;
+import org.itcgae.siga.db.mappers.CenPaisMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacLineafacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacPlantillafacturacionExtendsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,12 +59,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.lang.reflect.Field;
 import java.nio.channels.FileChannel;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -74,6 +99,32 @@ public class FacturacionHelper {
 
     @Autowired
     private AdmLenguajesMapper admLenguajesMapper;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private GenRecursosMapper genRecursosMapper;
+
+    @Autowired
+    private CenInstitucionMapper cenInstitucionMapper;
+
+    @Autowired
+    private CenPersonaMapper cenPersonaMapper;
+
+    @Autowired
+    private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
+
+    @Autowired
+    private CenPaisMapper cenPaisMapper;
+
+    @Autowired
+    private CenMandatosCuentasbancariasMapper cenMandatosCuentasbancariasMapper;
+
+    @Autowired
+    private FacLineafacturaExtendsMapper facLineafacturaExtendsMapper;
+
+    private final String CTR = "%%";
 
     public File generarPdfFacturaFirmada(String idFactura, String idInstitucion) throws Exception {
         return generarPdfFacturaFirmada(idFactura, idInstitucion, false);
@@ -223,7 +274,7 @@ public class FacturacionHelper {
                 String contenidoPlantilla = obtenerContenidoPlantilla(rutaPlantilla, nombrePlantilla);
 
                 LOGGER.info("ANTES DE GENERAR EL INFORME.");
-                fPdf = generarInforme(rutaServidorTmp, contenidoPlantilla, rutaAlmacen, nombrePDF, idFacturaParametro);
+                fPdf = generarInforme(rutaServidorTmp, contenidoPlantilla, rutaAlmacen, nombrePDF, idFacturaParametro, facFactura.getIdinstitucion());
                 LOGGER.info("DESPUES DE GENERAR EL INFORME EN  " + rutaAlmacen);
 
             }
@@ -235,7 +286,7 @@ public class FacturacionHelper {
         return fPdf;
     }
 
-    public File generarInforme(String rutaServidorTmp, String contenidoPlantilla, String rutaServidorDescargas, String nombreFicheroPDF, String idFactura) throws Exception {
+    public File generarInforme(String rutaServidorTmp, String contenidoPlantilla, String rutaServidorDescargas, String nombreFicheroPDF, String idFactura, Short idInstitucion) throws Exception {
 
         File ficheroFOP = null;
         File ficheroPDF = null;
@@ -252,7 +303,7 @@ public class FacturacionHelper {
 
             // Generacion del fichero .FOP para este usuario a partir de la plantilla .FO
             LOGGER.info("ANTES DE REEMPLAZAR LOS DATOS DE LA PLANTILLA.");
-            String content = reemplazarDatos(contenidoPlantilla, idFactura);
+            String content = reemplazarDatos(contenidoPlantilla, idFactura, idInstitucion.toString());
             LOGGER.info("DESPUES DE REEMPLAZAR LOS DATOS DE LA PLANTILLA.");
             setFileContent(ficheroFOP, content);
 
@@ -299,8 +350,425 @@ public class FacturacionHelper {
         }
     }
 
-    private String reemplazarDatos(String plantillaFO, String idFactura) {
-        return plantillaFO;
+    private String reemplazarDatos(String plantillaFO, String idFacturaDemonio, String idInstitucion) throws Exception {
+        Hashtable htDatos = null;
+
+        String plantilla = plantillaFO;
+        String idFactura = idFacturaDemonio;
+        String institucion = idInstitucion;
+
+        //Cargar datos fijos
+        htDatos = cargarDatosFijos(institucion, idFactura);
+
+        //Cargar listado de letrados en cola
+        List<LineaImpresionInformeDTO> vLineasFactura = getLineasImpresionInforme(institucion, idFactura);
+        plantilla = reemplazaRegistros(plantilla, vLineasFactura, null, "LINEAFACTURA");
+
+
+        {    // Comprobamos si tenemos que mostar el texto de "exento de iva" (si hay algun registro con iva = 0.0%)
+            htDatos.put("EXENTO_IVA", "");
+            if (vLineasFactura != null) {
+                for (int i = 0; i < vLineasFactura.size(); i++) {
+                    LineaImpresionInformeDTO h = vLineasFactura.get(i);
+                    Float f = Float.valueOf(String.valueOf(h.getIva_linea_aux()));
+                    if (f != null) {
+                        if (f.doubleValue() == 0.0f) {
+                            String idioma = "1";
+                            htDatos.put("EXENTO_IVA", getMensajeIdioma(idioma, "messages.factura.LIVA"));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        plantilla = reemplazaVariables(htDatos, plantilla);
+        return plantilla;
+    }
+
+    public List<LineaImpresionInformeDTO> getLineasImpresionInforme(String institucion, String idFactura) {
+        List<LineaImpresionInformeDTO> vLineasFactura = facLineafacturaExtendsMapper.getLineasImpresionInforme(institucion, idFactura);
+
+        for (LineaImpresionInformeDTO linea : vLineasFactura) {
+            double importeNeto = UtilidadesNumeros.redondea(new Double(linea.getCantidad_linea()).doubleValue() * new Double(linea.getPrecio_linea()).doubleValue(), 2);
+            double importeIva = UtilidadesNumeros.redondea(new Double(linea.getCantidad_linea()).doubleValue() * new Double(linea.getPrecio_linea()).doubleValue() * new Double(linea.getIva_linea()).doubleValue() / 100, 2);
+            double importeTotal = importeNeto + importeIva;
+
+            linea.setNeto_linea(UtilidadesNumeros.formato(new Double(importeNeto).toString()));
+            linea.setImporte_iva_linea(UtilidadesNumeros.formato(new Double(importeIva).toString()));
+            linea.setTotal_linea(UtilidadesNumeros.formato(new Double(importeTotal).toString()));
+
+            linea.setIva_linea_aux(Float.valueOf(String.valueOf(linea.getIva_linea())));
+            linea.setIva_linea(UtilidadesNumeros.formato(Float.valueOf(String.valueOf(linea.getIva_linea())).floatValue()));
+            linea.setPrecio_linea(UtilidadesNumeros.formato(Float.valueOf(String.valueOf(linea.getPrecio_linea())).floatValue()));
+        }
+
+        return vLineasFactura;
+    }
+
+    public String reemplazaVariables(Hashtable htDatos, String plantillaFO) {
+        return UtilidadesString.reemplazaParametros(plantillaFO, CTR, htDatos);
+    }
+
+    public String reemplazaRegistros(String plantillaFO, List<LineaImpresionInformeDTO> registros, Hashtable htDatos, String delim) throws Exception {
+        String plantilla = plantillaFO;
+        String delimIni = CTR + "INI_" + delim + CTR;
+        String delimFin = CTR + "FIN_" + delim + CTR;
+        String sAux = "";
+
+        // RGG 09/07/2008
+        if (registros == null || registros.isEmpty()) {
+            LOGGER.info("MASTERREPORT: no hay registros");
+            // cuando no existen datos se busca la marca INI_TODO_xxx para sustituirla por NADA.
+            // Estas marcas deben estas fuera de las que pretendemos cambiar con datos.
+            delimIni = CTR + "INI_TODO_" + delim + CTR;
+            delimFin = CTR + "FIN_TODO_" + delim + CTR;
+            sAux = "";
+        } else {
+
+            String delimTodoIni = CTR + "INI_TODO_" + delim + CTR;
+            String delimTodoFin = CTR + "FIN_TODO_" + delim + CTR;
+
+            String auxAux = UtilidadesString.encuentraEntreMarcas(plantilla, delimTodoIni, delimTodoFin);
+
+            plantilla = UtilidadesString.reemplazaEntreMarcasCon(plantilla, delimTodoIni, delimTodoFin, auxAux);
+
+            if (registros != null && !registros.isEmpty()) {
+
+                String plantillaRegistro = UtilidadesString.encuentraEntreMarcas(plantilla, delimIni, delimFin);
+                int size = registros.size();
+                LOGGER.info("MASTERREPORT: TAMANIO DEL VECTOR PARA REEMPLAZAR DATOS: " + size);
+                for (int i = 0; i < size; i++) {
+                    LineaImpresionInformeDTO rObj = registros.get(i);
+                    Hashtable row = new Hashtable();
+                    //ClsLogging.writeFileLog("MASTERREPORT: REGISTRO: "+i,10);
+
+                    // CONVERTIMOS EL OBJETO A HASHTABLE
+                    Field[] fields = rObj.getClass().getDeclaredFields();
+                    for (Field field : fields) {
+                        String name = field.getName();
+                        field.setAccessible(true);
+                        Object resultValue = field.get(rObj);
+                        if (resultValue != null) {
+                            row.put(name, resultValue);
+                        }
+                    }
+
+                    sAux += UtilidadesString.reemplazaParametros(plantillaRegistro, CTR, row);
+
+                }
+            }
+        }
+
+        plantilla = UtilidadesString.reemplazaEntreMarcasCon(plantilla, delimIni, delimFin, sAux);
+
+        return plantilla;
+    }
+
+    public Hashtable cargarDatosFijos(String institucion, String idFactura) throws Exception {
+        Hashtable ht = getDatosImpresionInformeFactura(institucion, idFactura);
+        return ht;
+    }
+
+    public Hashtable getDatosImpresionInformeFactura(String idInstitucion, String idFactura) throws Exception {
+        Hashtable nuevo = new Hashtable();
+
+        try {
+
+            DatoImpresionInformeFacturaDTO factura = facFacturaExtendsMapper.getDatosImpresionInformeFactura(idInstitucion, idFactura);
+
+            if (factura != null) {
+
+                // RGG 15/02/2007 OBTENEMOS LOS VALORES, CALCULAMOS OTROS Y CAMBIAMOS LAS ETIQUETAS
+                String sIdInstitucion = factura.getIdinstitucion();
+                CenInstitucion cenInstitucion = cenInstitucionMapper.selectByPrimaryKey(Short.valueOf(sIdInstitucion));
+                nuevo.put("NOMBRE_COLEGIO", cenInstitucion.getNombre());
+
+                Long idPersona = cenInstitucion.getIdpersona();
+                CenPersona cenPersona = cenPersonaMapper.selectByPrimaryKey(idPersona);
+                nuevo.put("CIF_COLEGIO", cenPersona.getNifcif());
+
+                // direccion institucion
+                EntradaDireccionEspecificaDTO direccion = cenDireccionesExtendsMapper.getEntradaDireccionEspecifica(idPersona.toString(), sIdInstitucion, SigaConstants.TIPO_DIR_CENSOWEB).get(0);
+
+                nuevo.put("DIRECCION_COLEGIO", direccion.getDomicilio());
+
+                String sPais = direccion.getIdPais();
+
+                if (sPais != null) {
+
+                    String sCodigoPostal = direccion.getCodigoPostal();
+                    String sPoblacion = direccion.getPoblacion();
+                    String sProvincia = direccion.getProvincia();
+
+                    if ((sPais.equals("") || sPais.equals(SigaConstants.ID_PAIS_ESPANA)) && sCodigoPostal != null && sPoblacion != null && sProvincia != null) {
+                        nuevo.put("CODIGO_POSTAL_POBLACION_PROVINCIA_COLEGIO", sCodigoPostal + ", " + sPoblacion + ", " + sProvincia);
+                    } else {
+                        String sPoblacionExtranjera = direccion.getPoblacionExtranjera();
+                        String pais = cenPaisMapper.selectByPrimaryKey(sPais).getNombre();
+                        nuevo.put("CODIGO_POSTAL_POBLACION_PROVINCIA_COLEGIO", sCodigoPostal + ", " + sPoblacionExtranjera + ", " + pais);
+                    }
+
+                } else {
+                    nuevo.put("CODIGO_POSTAL_POBLACION_PROVINCIA_COLEGIO", "-");
+                }
+
+                StringBuilder resultado = new StringBuilder();
+                direccion = cenDireccionesExtendsMapper.getEntradaDireccionEspecifica(idPersona.toString(), sIdInstitucion, SigaConstants.TIPO_DIR_CENSOWEB).get(0);
+
+                String sTelefono1 = direccion.getTelefono1();
+                if (sTelefono1 != null && !sTelefono1.equals("")) {
+                    resultado.append(sTelefono1);
+                    nuevo.put("TELEFONO1", sTelefono1);
+                }
+
+                String sTelefono2 = direccion.getTelefono2();
+                if (sTelefono2 != null && !sTelefono2.equals("")) {
+                    if (resultado.length() > 0) {
+                        resultado.append(", ");
+                    }
+                    resultado.append(sTelefono2);
+                }
+
+                String sMovil = direccion.getMovil();
+                if (sMovil != null && !sMovil.equals("")) {
+                    if (resultado.length() > 0) {
+                        resultado.append(", ");
+                    }
+                    resultado.append(sMovil);
+                }
+
+                String sCorreoElectronico = direccion.getCorreoElectronico();
+                if (sCorreoElectronico != null && !sCorreoElectronico.equals("")) {
+                    if (resultado.length() > 0) {
+                        resultado.append(" ");
+                    }
+                    resultado.append(sCorreoElectronico);
+                }
+                nuevo.put("TELEFONOS_EMAIL_COLEGIO", resultado.toString());
+
+                // TRATAMIENTO PARA LA PERSONA DE LA FACTURA
+                idPersona = Long.valueOf(factura.getIdpersona());
+
+                String nombre = obtenerNombreApellidos(idPersona.toString());
+                if (nombre != null && !nombre.equals("")) {
+                    nuevo.put("NOMBRE_CLIENTE", nombre);
+                } else {
+                    nuevo.put("NOMBRE_CLIENTE", "-");
+                }
+
+                direccion = cenDireccionesExtendsMapper.getEntradaDireccionEspecifica(idPersona.toString(), sIdInstitucion, SigaConstants.TIPO_DIR_FACTURACION).get(0);
+                if (direccion == null) {
+                    throw new Exception("messages.censo.direcciones.facturacion");
+                }
+
+                String sDomicilio = direccion.getDomicilio();
+                if (sDomicilio != null && !sDomicilio.equals("")) {
+                    nuevo.put("DIRECCION_CLIENTE", sDomicilio);
+                } else {
+                    nuevo.put("DIRECCION_CLIENTE", "-");
+                }
+
+                sPais = direccion.getIdPais();
+                if (sPais != null) {
+                    String sCodigoPostal = direccion.getCodigoPostal();
+                    String sPoblacion = direccion.getPoblacion();
+                    String sProvincia = direccion.getProvincia();
+                    if ((sPais.equals("") || sPais.equals(SigaConstants.ID_PAIS_ESPANA)) && sCodigoPostal != null && sPoblacion != null && sProvincia != null) {
+                        nuevo.put("CODIGO_POSTAL_POBLACION_PROVINCIA_CLIENTE", sCodigoPostal + ", " + sPoblacion + ", " + sProvincia);
+                    } else {
+                        String sPoblacionExtranjera = direccion.getPoblacionExtranjera();
+                        String pais = cenPaisMapper.selectByPrimaryKey(sPais).getNombre();
+                        nuevo.put("CODIGO_POSTAL_POBLACION_PROVINCIA_CLIENTE", sCodigoPostal + ", " + sPoblacionExtranjera + ", " + pais);
+                    }
+                } else {
+                    nuevo.put("CODIGO_POSTAL_POBLACION_PROVINCIA_CLIENTE", "-");
+                }
+
+                resultado = new StringBuilder();
+                sTelefono1 = direccion.getTelefono1();
+                if (sTelefono1 != null && !sTelefono1.equals("")) {
+                    resultado.append(sTelefono1);
+                } else {
+                    resultado.append("-");
+                }
+
+                sTelefono2 = direccion.getTelefono2();
+                if (sTelefono2 != null && !sTelefono2.equals("")) {
+                    if (resultado.length() > 0) {
+                        resultado.append(", ");
+                    }
+                    resultado.append(sTelefono2);
+                }
+
+                sMovil = direccion.getMovil();
+                if (sMovil != null && !sMovil.equals("")) {
+                    if (resultado.length() > 0) {
+                        resultado.append(", ");
+                    }
+                    resultado.append(sMovil);
+                }
+                nuevo.put("TELEFONOS_CLIENTE", resultado.toString());
+
+                sCorreoElectronico = direccion.getCorreoElectronico();
+                if (sCorreoElectronico != null && !sCorreoElectronico.equals("")) {
+                    nuevo.put("EMAIL_CLIENTE", sCorreoElectronico);
+                } else {
+                    nuevo.put("EMAIL_CLIENTE", "-");
+                }
+
+                String sNif = cenPersonaMapper.selectByPrimaryKey(idPersona).getNifcif();
+                if (sNif != null && !sNif.equals("")) {
+                    nuevo.put("NIFCIF_CLIENTE", sNif);
+                } else {
+                    nuevo.put("NIFCIF_CLIENTE", "-");
+                }
+
+                String sNumeroFactura = factura.getNumerofactura();
+                if (sNumeroFactura != null && !sNumeroFactura.equals("")) {
+                    nuevo.put("NUMERO_FACTURA", sNumeroFactura);
+                } else {
+                    nuevo.put("NUMERO_FACTURA", "-");
+                }
+
+                SimpleDateFormat sdf = new SimpleDateFormat(SigaConstants.TIMESTAMP_BBDD);
+                Date d = sdf.parse(factura.getFechaemision());
+                sdf.applyPattern(SigaConstants.DATEST_FORMAT_ONLYDATE);
+                String sFechaFactura = sdf.format(d);
+                if (sFechaFactura != null && !sFechaFactura.equals("")) {
+                    nuevo.put("FECHA_FACTURA", sFechaFactura);
+                } else {
+                    nuevo.put("FECHA_FACTURA", "-");
+                }
+
+                CenColegiadoKey cenColegiadoKey = new CenColegiadoKey();
+                cenColegiadoKey.setIdpersona(idPersona);
+                cenColegiadoKey.setIdinstitucion(Short.valueOf(sIdInstitucion));
+                CenColegiado cenColegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(cenColegiadoKey);
+
+                String sNumeroColegiado = "";
+
+                if (cenColegiado != null) {
+                    sNumeroColegiado = cenColegiado.getComunitario().equalsIgnoreCase(SigaConstants.DB_TRUE) ? cenColegiado.getNcomunitario() : cenColegiado.getNcolegiado();
+                }
+
+                if (sNumeroColegiado != null && !sNumeroColegiado.equals("")) {
+                    nuevo.put("NUMERO_COLEGIADO_FACTURA", sNumeroColegiado);
+                } else {
+                    nuevo.put("NUMERO_COLEGIADO_FACTURA", "-");
+                }
+
+                String sIdCuentaDeudor = factura.getIdcuentadeudor();
+                String sFormaPago;
+                if (sIdCuentaDeudor != null && !sIdCuentaDeudor.equals("")) {
+                    sFormaPago = getMensajeIdioma("1", "facturacion.abonosPagos.boton.pagoDomiciliacionBanco");
+                } else {
+                    String sIdCuenta = factura.getIdcuenta();
+                    if (sIdCuenta != null && !sIdCuenta.equals("")) {
+                        String sIBAN = factura.getIban();
+                        String sTitular = factura.getTitular();
+                        sFormaPago = UtilidadesString.mostrarIBANConAsteriscos(sIBAN);
+                        nuevo.put("TITULARCUENTA", sTitular);
+
+                        CenMandatosCuentasbancariasExample hMandatosCuentasBancarias = new CenMandatosCuentasbancariasExample();
+                        CenMandatosCuentasbancariasExample.Criteria criteria = hMandatosCuentasBancarias.createCriteria();
+                        criteria.andIdinstitucionEqualTo(Short.valueOf(sIdInstitucion))
+                                .andIdpersonaEqualTo(idPersona)
+                                .andIdcuentaEqualTo(Short.valueOf(sIdCuenta));
+
+
+                        List<CenMandatosCuentasbancarias> vMandatosCuentasBancarias = null;
+                        String sIdMandato = factura.getIdmandato();
+                        String sRefMandatoSepa = factura.getRefmandatosepa();
+                        if (sIdMandato != null && !"".equals(sIdMandato)) {
+                            criteria.andIdmandatoEqualTo(Short.valueOf(sIdMandato));
+                            vMandatosCuentasBancarias = cenMandatosCuentasbancariasMapper.selectByExample(hMandatosCuentasBancarias);
+                        } else if (sRefMandatoSepa != null && !"".equals(sRefMandatoSepa)) {
+                            criteria.andRefmandatosepaEqualTo(sRefMandatoSepa);
+                            vMandatosCuentasBancarias = cenMandatosCuentasbancariasMapper.selectByExample(hMandatosCuentasBancarias);
+                        }
+                        if (vMandatosCuentasBancarias != null && vMandatosCuentasBancarias.size() > 0) {
+                            CenMandatosCuentasbancarias bMandatosCuentasBancarias = vMandatosCuentasBancarias.get(0);
+                            String sNifCifDeudor = bMandatosCuentasBancarias.getDeudorId();
+                            nuevo.put("NIFCIF_TITULAR", sNifCifDeudor);
+                        }
+                    } else {
+                        sFormaPago = getMensajeIdioma("1", "facturacion.abonosPagos.boton.pagoCaja");
+                    }
+                }
+                nuevo.put("FORMA_PAGO_FACTURA", sFormaPago);
+
+                String sObservaciones = factura.getObservaciones() == null ? "" : factura.getObservaciones();
+                nuevo.put("OBSERVACIONES", sObservaciones);
+
+                String sObservacionesInforme = factura.getObservinforme() == null ? "" : factura.getObservinforme();
+                nuevo.put("OBSERVINFORME", sObservacionesInforme);
+
+                String sDescripcionEstado = factura.getDescripcion_estado();
+                sDescripcionEstado = getMensajeIdioma("1", sDescripcionEstado);
+                nuevo.put("ESTADO", sDescripcionEstado);
+
+                // formateo de valores
+                nuevo.put("ANTICIPADO", UtilidadesNumeros.formato(factura.getAnticipado()));
+                nuevo.put("COMPENSADO", UtilidadesNumeros.formato(factura.getCompensado()));
+                nuevo.put("POR_CAJA", UtilidadesNumeros.formato(factura.getPor_caja()));
+                nuevo.put("POR_SOLOCAJA", UtilidadesNumeros.formato(factura.getPor_solocaja()));
+                nuevo.put("POR_SOLOTARJETA", UtilidadesNumeros.formato(factura.getPor_solotarjeta()));
+                nuevo.put("POR_BANCO", UtilidadesNumeros.formato(factura.getPor_banco()));
+                nuevo.put("TOTAL_FACTURA", UtilidadesNumeros.formato(factura.getTotal_factura()));
+                nuevo.put("TOTAL_PAGOS", UtilidadesNumeros.formato(factura.getTotal_pagos()));
+                nuevo.put("PENDIENTE_PAGAR", UtilidadesNumeros.formato(factura.getPendiente_pagar()));
+                nuevo.put("IMPORTE_NETO", UtilidadesNumeros.formato(factura.getImporte_neto()));
+                nuevo.put("IMPORTE_IVA", UtilidadesNumeros.formato(factura.getImporte_iva()));
+
+            }
+
+        } catch (Exception e) {
+            throw new Exception("Error al obtener los datos para el informe de una factura.", e);
+        }
+
+        return nuevo;
+    }
+
+    public String obtenerNombreApellidos(String idPersona) throws Exception {
+
+        String nombre = "";
+
+        try {
+
+            CenPersona cenPersona = cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona));
+
+            if (cenPersona != null) {
+
+                nombre = cenPersona.getNombre();
+
+                if (cenPersona.getApellidos1() != null && !cenPersona.getApellidos1().equals("#NA")) {
+                    nombre += " " + cenPersona.getApellidos1();
+                }
+
+                if (cenPersona.getApellidos2() != null && !cenPersona.getApellidos2().equals("#NA")) {
+                    nombre += " " + cenPersona.getApellidos2();
+                }
+
+            }
+
+        } catch (Exception e) {
+            throw new Exception("Error al obtener el nombre y apellidos", e);
+        }
+
+        return nombre;
+    }
+
+
+    public String getMensajeIdioma(String idLenguaje, String idRecurso) {
+
+        GenRecursosKey genRecursosKey = new GenRecursosKey();
+        genRecursosKey.setIdlenguaje(idLenguaje);
+        genRecursosKey.setIdrecurso(idRecurso);
+
+        GenRecursos genRecursos = genRecursosMapper.selectByPrimaryKey(genRecursosKey);
+
+        return genRecursos.getDescripcion();
     }
 
     // OBTENCION DE LA PLANTILLA FO:
@@ -372,11 +840,11 @@ public class FacturacionHelper {
         return nombreFichero;
     }
 
-    private String getProperty(final String parametro) {
+    public String getProperty(final String parametro) {
         return getProperty(parametro, null);
     }
 
-    private String getProperty(final String parametro, final String fichero) {
+    public String getProperty(final String parametro, final String fichero) {
 
         String valor = null;
 
@@ -607,4 +1075,17 @@ public class FacturacionHelper {
 
     }
 
+    public TransactionStatus getNewLongTransaction(int timeout) {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setTimeout(timeout);
+        def.setName("transGenFac");
+        return transactionManager.getTransaction(def);
+    }
+
+    public TransactionStatus getNeTransaction() {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setTimeout(Integer.parseInt("30"));
+        def.setName("transGenFac");
+        return transactionManager.getTransaction(def);
+    }
 }

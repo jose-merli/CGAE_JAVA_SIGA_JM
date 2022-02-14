@@ -14,6 +14,7 @@ import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Service
 public class ProComprobacionTraspasoFacturas extends ProcesoFacPyS {
 
     private final Logger LOGGER = Logger.getLogger(ProComprobacionTraspasoFacturas.class);
@@ -51,7 +53,7 @@ public class ProComprobacionTraspasoFacturas extends ProcesoFacPyS {
                     hashNew.setIdprogramacion(factBean.getIdprogramacion());
                     hashNew.setIdseriefacturacion(factBean.getIdseriefacturacion());
 
-                    TransactionStatus tx = getNewLongTransaction();
+                    TransactionStatus tx = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
 
                     cambiarEstadoTraspasoFacturacion(factBean, hashNew, tx);
 

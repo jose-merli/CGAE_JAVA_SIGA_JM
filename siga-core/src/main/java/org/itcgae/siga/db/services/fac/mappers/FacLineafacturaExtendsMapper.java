@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FacturaLineaItem;
+import org.itcgae.siga.DTO.fac.LineaImpresionInformeDTO;
 import org.itcgae.siga.db.mappers.FacLineafacturaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacLineafacturaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -32,4 +33,8 @@ public interface FacLineafacturaExtendsMapper extends FacLineafacturaMapper {
 			@Result(column = "idCodigoBanco", property = "idCodigoBanco", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturaLineaItem> getLineasFactura(String idFactura, String idInstitucion);
+
+	@SelectProvider(type = FacLineafacturaExtendsSqlProvider.class, method = "getLineasImpresionInforme")
+	List<LineaImpresionInformeDTO> getLineasImpresionInforme(String idInstitucion, String idFactura);
+
 }

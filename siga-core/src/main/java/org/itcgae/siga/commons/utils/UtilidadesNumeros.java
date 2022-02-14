@@ -2,6 +2,9 @@ package org.itcgae.siga.commons.utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 
 public class UtilidadesNumeros {
 	
@@ -49,6 +52,40 @@ public class UtilidadesNumeros {
 	static public float redondea (float numero, int precision) {
 	    double d = numero;
 	    return (float) redondea(d, precision);
+	}
+
+	static public String formato (float numero)
+	{
+		return formatear(""+numero,true);
+	}
+
+	public static String formato(String numero) {
+		return formatear(numero, true);
+	}
+
+	private static String formatear(String sNumero, boolean bMiles) {
+		try {
+			String sNumeroAux = sNumero.replaceAll(",", ".");
+
+			Double dNumero = new Double(sNumeroAux);
+
+			DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
+			DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+
+			dfs.setDecimalSeparator(',');  //Separador de decimales.
+			dfs.setGroupingSeparator('.'); //Separador de miles.
+
+			df.setMinimumFractionDigits(2); //Manimo 2 decimales.
+			df.setMaximumFractionDigits(2); //Maximo 2 decimales.
+
+			df.setGroupingUsed(bMiles); //Muestra el separador de miles en funcion del parametro.
+
+			df.setDecimalFormatSymbols(dfs);
+
+			return df.format(dNumero); //Formatea el numero.
+		} catch (Exception e) {
+			return sNumero; //En caso de error se devuelve el numero tal cual, sin formatear.
+		}
 	}
 	
 }

@@ -122,12 +122,19 @@ public class FacturacionPySController {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
-			response = this.facturacionService.borrarCuentasBancarias(cuentasBancarias, request);
+			if (cuentasBancarias.size() > 1){
+				response = this.facturacionService.borrarCuentasBancarias(cuentasBancarias, request);
+			} else {
+				response = this.facturacionService.borrarCuentasBancariasIndividual(cuentasBancarias.get(0), request);
+			}
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (BusinessException be) {
+			response.setError(UtilidadesString.creaError(be.getMessage()));
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 
 	@PostMapping(value = "/reactivarCuentasBancarias")

@@ -421,6 +421,72 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.info("borrarCuentasBancarias() -> Entrada al servicio para dar de baja las cuentas bancarias");
+		
+		int totalCuentasBancarias = cuentasBancarias.size();
+		int cuentasBancariasEliminadas = 0;
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		if (usuario != null) {
+			LOGGER.info(
+					"borrarCuentasBancarias() / facBancoInstitucionExtendsMapper.getCuentasBancarias() -> Entrada a facBancoInstitucionExtendsMapper para establecer la fecha de baja");
+			
+			// Logica
+			for (CuentasBancariasItem cuenta : cuentasBancarias) {
+				List<CuentasBancariasItem> cuentaResults = facBancoinstitucionExtendsMapper.getCuentasBancarias(cuenta.getBancosCodigo(),
+						usuario.getIdinstitucion());
+
+				if (cuentaResults != null && !cuentaResults.isEmpty()) {
+					// No se puede borrar una cuenta bancaria que esta siendo utilizada
+					boolean enUso = Integer.parseInt(cuentaResults.get(0).getNumUsos()) > 0;
+					if (!enUso) {
+						FacBancoinstitucionKey cuentasbancariasKey = new FacBancoinstitucionKey();
+						cuentasbancariasKey.setIdinstitucion(usuario.getIdinstitucion());
+						cuentasbancariasKey.setBancosCodigo(cuenta.getBancosCodigo());
+	
+						// Borrado físico si numFicheros es 0
+						if (Integer.parseInt(cuenta.getNumFicheros()) < 1) {
+							this.facBancoinstitucionExtendsMapper.deleteByPrimaryKey(cuentasbancariasKey);
+						} else {
+							FacBancoinstitucion cuentaCambio = this.facBancoinstitucionExtendsMapper
+									.selectByPrimaryKey(cuentasbancariasKey);
+							if (cuentaCambio != null) {
+								cuentaCambio.setFechabaja(new Date());
+								this.facBancoinstitucionExtendsMapper.updateByPrimaryKey(cuentaCambio);
+							}
+						}
+						
+						cuentasBancariasEliminadas++;
+					}
+				}
+			}
+		}
+		
+		if (cuentasBancariasEliminadas == 0) {
+			throw new BusinessException(cuentasBancariasEliminadas + " cuentas eliminadas de " + totalCuentasBancarias);
+		}
+
+		deleteResponseDTO.setStatus(HttpStatus.OK.toString());
+		
+		Error error = new Error();
+		
+		error.setMessage(cuentasBancariasEliminadas + " cuentas eliminadas de " + totalCuentasBancarias);
+		deleteResponseDTO.setError(error);
+		LOGGER.info("borrarCuentasBancarias() -> Salida del servicio para eliminar las cuentas bancarias");
+
+		return deleteResponseDTO;
+	}
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public DeleteResponseDTO borrarCuentasBancariasIndividual(CuentasBancariasItem cuentaBancaria,
+			HttpServletRequest request) throws Exception {
+
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("borrarCuentasBancarias() -> Entrada al servicio para dar de baja las cuentas bancarias");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
@@ -430,31 +496,29 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					"borrarCuentasBancarias() / facBancoInstitucionExtendsMapper.getCuentasBancarias() -> Entrada a facBancoInstitucionExtendsMapper para establecer la fecha de baja");
 
 			// Logica
-			for (CuentasBancariasItem cuenta : cuentasBancarias) {
-				List<CuentasBancariasItem> cuentaResults = facBancoinstitucionExtendsMapper.getCuentasBancarias(cuenta.getBancosCodigo(),
-						usuario.getIdinstitucion());
+			List<CuentasBancariasItem> cuentaResults = facBancoinstitucionExtendsMapper.getCuentasBancarias(cuentaBancaria.getBancosCodigo(),
+					usuario.getIdinstitucion());
 
-				if (cuentaResults != null && !cuentaResults.isEmpty()) {
-					// No se puede borrar una cuenta bancaria que esta siendo utilizada
-					boolean enUso = Integer.parseInt(cuentaResults.get(0).getNumUsos()) > 0;
-					if (enUso) {
-						throw new Exception("facturacionPyS.cuentasBancarias.eliminar.errorUsos");
-					}
+			if (cuentaResults != null && !cuentaResults.isEmpty()) {
+				// No se puede borrar una cuenta bancaria que esta siendo utilizada
+				boolean enUso = Integer.parseInt(cuentaResults.get(0).getNumUsos()) > 0;
+				if (enUso) {
+					throw new BusinessException("facturacionPyS.cuentasBancarias.eliminar.errorUsos");
+				}
 
-					FacBancoinstitucionKey cuentasbancariasKey = new FacBancoinstitucionKey();
-					cuentasbancariasKey.setIdinstitucion(usuario.getIdinstitucion());
-					cuentasbancariasKey.setBancosCodigo(cuenta.getBancosCodigo());
+				FacBancoinstitucionKey cuentasbancariasKey = new FacBancoinstitucionKey();
+				cuentasbancariasKey.setIdinstitucion(usuario.getIdinstitucion());
+				cuentasbancariasKey.setBancosCodigo(cuentaBancaria.getBancosCodigo());
 
-					// Borrado físico si numFicheros es 0
-					if (Integer.parseInt(cuenta.getNumFicheros()) < 1) {
-						this.facBancoinstitucionExtendsMapper.deleteByPrimaryKey(cuentasbancariasKey);
-					} else {
-						FacBancoinstitucion cuentaCambio = this.facBancoinstitucionExtendsMapper
-								.selectByPrimaryKey(cuentasbancariasKey);
-						if (cuentaCambio != null) {
-							cuentaCambio.setFechabaja(new Date());
-							this.facBancoinstitucionExtendsMapper.updateByPrimaryKey(cuentaCambio);
-						}
+				// Borrado físico si numFicheros es 0
+				if (Integer.parseInt(cuentaBancaria.getNumFicheros()) < 1) {
+					this.facBancoinstitucionExtendsMapper.deleteByPrimaryKey(cuentasbancariasKey);
+				} else {
+					FacBancoinstitucion cuentaCambio = this.facBancoinstitucionExtendsMapper
+							.selectByPrimaryKey(cuentasbancariasKey);
+					if (cuentaCambio != null) {
+						cuentaCambio.setFechabaja(new Date());
+						this.facBancoinstitucionExtendsMapper.updateByPrimaryKey(cuentaCambio);
 					}
 				}
 			}

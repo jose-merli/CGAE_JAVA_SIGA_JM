@@ -79,32 +79,81 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 			List<BaremosRequestItem> lBaremos = baremosGuardiaMapper.searchBaremosGuardia(baremosGuardiaItem,
 					idInstitucion);
 			int keyForTabla = 0;
-			for (BaremosRequestItem baremo : lBaremos) {
-				List<GuardiasItem> guar = new ArrayList<GuardiasItem>();
-				GuardiasItem guardiaLaborables = new GuardiasItem();
-				GuardiasItem guardiaFestivos = new GuardiasItem();
-				String[] dias = baremo.getDias().toString().split("\n");
-				guardiaLaborables.setNombre(baremo.getGuardias() + " - LABORABLES");
-				guardiaLaborables.setIdGuardia(baremo.getIdGuardia());
-				guardiaLaborables.setDiasGuardia(dias[0]);
-				guardiaLaborables.setFechabaja(baremo.getFechabaja());
-
-				guardiaFestivos.setNombre(baremo.getGuardias() + " - FESTIVOS");
-				guardiaFestivos.setIdGuardia(baremo.getIdGuardia());
-				guardiaFestivos.setDiasGuardia(dias[1]);
-				guardiaFestivos.setFechabaja(baremo.getFechabaja());
-
-				guar.add(guardiaLaborables);
-				guar.add(guardiaFestivos);
-				baremo.setGuardiasObj(guar);
-				/*
-				 * Damos un Key a cada registro para poder crear el desplegable de cada fila en
-				 * la tabla. Este valor no se almacena en BBDD. Solo se utiliza para cuando se
-				 * haga click se despliegue las guardias correspondientes. Antes se utilizaba el
-				 * IdTurno pero este puede ser el mismo para varias guardias con distintos
-				 * Baremos. De esta manera se evita que se despliegue otro registros.
-				 */
-				baremo.setKeyForTabla(keyForTabla++);
+			String hitoActual;
+			List<GuardiasItem> guar = new ArrayList<GuardiasItem>();
+			for(int i = 0; i< lBaremos.size(); i++) {
+				hitoActual = lBaremos.get(i).getIdHito();
+		//for (BaremosRequestItem baremo : lBaremos) {	
+				if(i > 0) {
+					if(hitoActual.equals(lBaremos.get(i-1).getIdHito())) {
+						//MISMO HITO
+						GuardiasItem guardia = new GuardiasItem();
+						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
+						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
+						guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
+						guardia.setDiasGuardia(dias[0]);
+						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
+						guardia.setBaremo(lBaremos.get(i).getBaremo());
+						guardia.setnDias(lBaremos.get(i).getNDias());
+						guar.add(guardia);
+						if(!(hitoActual.equals(lBaremos.get(i+1).getIdHito()))) {
+							lBaremos.get(i).setGuardiasObj(guar);
+						}
+					}else {
+						//DIFERENTE HITO
+						guar = new ArrayList<GuardiasItem>();
+						GuardiasItem guardia = new GuardiasItem();
+						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
+						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
+						guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
+						guardia.setDiasGuardia(dias[0]);
+						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
+						guardia.setBaremo(lBaremos.get(i).getBaremo());
+						guardia.setnDias(lBaremos.get(i).getNDias());
+						guar.add(guardia);
+						if(!(hitoActual.equals(lBaremos.get(i+1).getIdHito()))) {
+							lBaremos.get(i).setGuardiasObj(guar);
+						}
+					}
+				}else {
+					GuardiasItem guardia = new GuardiasItem();
+					String[] dias = lBaremos.get(i).getDias().toString().split("\n");
+					guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
+					guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
+					guardia.setDiasGuardia(dias[0]);
+					guardia.setFechabaja(lBaremos.get(i).getFechabaja());
+					guardia.setBaremo(lBaremos.get(i).getBaremo());
+					guardia.setnDias(lBaremos.get(i).getNDias());
+					guar.add(guardia);
+					if(!(hitoActual.equals(lBaremos.get(i+1).getIdHito()))) {
+						lBaremos.get(i).setGuardiasObj(guar);
+					}
+				}
+				
+//				GuardiasItem guardiaLaborables = new GuardiasItem();
+//				GuardiasItem guardiaFestivos = new GuardiasItem();
+//				String[] dias = baremo.getDias().toString().split("\n");
+//				guardiaLaborables.setNombre(baremo.getGuardias() + " - LABORABLES");
+//				guardiaLaborables.setIdGuardia(baremo.getIdGuardia());
+//				guardiaLaborables.setDiasGuardia(dias[0]);
+//				guardiaLaborables.setFechabaja(baremo.getFechabaja());
+//
+//				guardiaFestivos.setNombre(baremo.getGuardias() + " - FESTIVOS");
+//				guardiaFestivos.setIdGuardia(baremo.getIdGuardia());
+//				guardiaFestivos.setDiasGuardia(dias[1]);
+//				guardiaFestivos.setFechabaja(baremo.getFechabaja());
+//
+				
+//				guar.add(guardiaFestivos);
+//				baremo.setGuardiasObj(guar);
+//				/*
+//				 * Damos un Key a cada registro para poder crear el desplegable de cada fila en
+//				 * la tabla. Este valor no se almacena en BBDD. Solo se utiliza para cuando se
+//				 * haga click se despliegue las guardias correspondientes. Antes se utilizaba el
+//				 * IdTurno pero este puede ser el mismo para varias guardias con distintos
+//				 * Baremos. De esta manera se evita que se despliegue otro registros.
+//				 */
+//				baremo.setKeyForTabla(keyForTabla++);
 			}
 			error.setCode(200);
 			baremosRequestDTO.setBaremosRequestItems(lBaremos);
