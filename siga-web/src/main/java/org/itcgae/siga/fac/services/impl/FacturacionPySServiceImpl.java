@@ -2733,6 +2733,37 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			List<EstadosPagosItem> result = facHistoricofacturaExtendsMapper.getEstadosPagos(idFacturaParent,
 					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 
+			if (!UtilidadesString.esCadenaVacia(result.get(result.size() - 1).getIdAbono())) {
+				List<EstadosPagosItem> abono = facPagoabonoefectivoExtendsMapper.getEstadosAbonos(result.get(result.size() - 1).getIdAbono(),
+						usuario.getIdinstitucion(), usuario.getIdlenguaje()).stream()
+						.map(e -> {
+							EstadosPagosItem item = new EstadosPagosItem();
+
+							item.setFechaModificaion(e.getFecha());
+							item.setIdAccion(e.getIdAccion());
+							item.setAccion(e.getAccion());
+							item.setIdFactura(e.getIdFactura());
+							item.setIdAbono(e.getIdAbono());
+							item.setNumeroFactura(e.getNumeroAbono());
+							item.setNumeroAbono(e.getNumeroAbono());
+
+							if (!UtilidadesString.esCadenaVacia(e.getNumeroAbono()))
+								item.setEnlaceAbono(true);
+							if (!UtilidadesString.esCadenaVacia(e.getNumeroFactura()))
+								item.setEnlaceFactura(true);
+
+							item.setEstado(e.getEstado());
+							item.setImpTotalPagado(e.getMovimiento());
+							item.setImpTotalPorPagar(e.getImportePendiente());
+							item.setCuentaBanco(e.getCuentaBancaria());
+
+							return item;
+						}).collect(Collectors.toList());
+
+				result.addAll(abono);
+			}
+
+
 			estadosPagosDTO.setEstadosPagosItems(result);
 		}
 
