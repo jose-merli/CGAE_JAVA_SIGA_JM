@@ -256,7 +256,7 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         int abonos = 0;
         for (EstadosAbonosItem estadosAbonosItem: nuevosEstados) {
             try {
-                compensarAbono(estadosAbonosItem, request);
+            	pagarPorCajaAbono(estadosAbonosItem, request);
                 abonos++;
             } catch (Exception e) {
                 LOGGER.warn("FacturacionPySFacturasImpl.pagarPorCajaAbonoVarios() -> Error al pagar por caja el abono con id="
