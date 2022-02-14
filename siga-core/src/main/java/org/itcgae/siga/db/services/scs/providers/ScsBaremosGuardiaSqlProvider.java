@@ -343,7 +343,7 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "    hit.idhito,"
 						+ "   gua.fechabaja,"
 						+ "tip.idhitoconfiguracion");
-				sql.ORDER_BY("2, 1");
+				sql.ORDER_BY("hit.idhito, hit.idguardia");
 		return sql.toString();
 	}
 }
