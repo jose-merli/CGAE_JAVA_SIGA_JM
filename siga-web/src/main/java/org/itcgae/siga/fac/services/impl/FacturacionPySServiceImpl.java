@@ -2524,9 +2524,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				FacFactura updateItem = facFacturaExtendsMapper.selectByPrimaryKey(key);
 
 				if (item.getObservacionesFactura() != null)
-					updateItem.setObservaciones(item.getObservacionesFactura());
+					updateItem.setObservaciones(item.getObservacionesFactura().replace("<p>", "").replace("</p>", ""));
 				if (item.getObservacionesFicheroFactura() != null)
-					updateItem.setObservinforme(item.getObservacionesFicheroFactura());
+					updateItem.setObservinforme(item.getObservacionesFicheroFactura().replace("<p>", "").replace("</p>", ""));
+				if(updateItem.getObservaciones().length()>255 || updateItem.getObservinforme().length()>255) {
+					throw new BusinessException("facturacion.facturas.numeroMaxCaracteres");
+				}
 
 				facFacturaExtendsMapper.updateByPrimaryKey(updateItem);
 
