@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.services;
 
 import org.itcgae.siga.DTO.fac.EstadosAbonosDTO;
 import org.itcgae.siga.DTO.fac.EstadosAbonosItem;
+import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -30,8 +31,10 @@ public interface IFacturacionPySFacturasService {
 
     public InsertResponseDTO renegociarAbonoVarios(List<EstadosAbonosItem> nuevosEstados, HttpServletRequest request) throws Exception;
 
-    @Transactional(rollbackFor = Exception.class)
-    InsertResponseDTO insertarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
+    public EstadosPagosDTO getEstadosPagos(String idFactura, HttpServletRequest request) throws Exception;
 
-    InsertResponseDTO insertarEstadosPagosVarios(List<EstadosPagosItem> nuevosEstados, HttpServletRequest request) throws Exception;
+    public InsertResponseDTO insertarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
+
+    public InsertResponseDTO insertarEstadosPagosVarios(List<EstadosPagosItem> nuevosEstados, HttpServletRequest request) throws Exception;
+
 }

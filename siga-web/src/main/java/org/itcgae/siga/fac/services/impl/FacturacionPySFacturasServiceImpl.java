@@ -3,6 +3,7 @@ package org.itcgae.siga.fac.services.impl;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.EstadosAbonosDTO;
 import org.itcgae.siga.DTO.fac.EstadosAbonosItem;
+import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -38,6 +39,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFacturasService {
@@ -340,6 +342,45 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
                 "FacturacionPySFacturasImpl.renegociarAbonoVarios() -> Salida del servicio  para renegociar varios abonos por caja");
 
         return insertResponseDTO;
+    }
+
+    @Override
+    public EstadosPagosDTO getEstadosPagos(String idFactura, HttpServletRequest request) throws Exception {
+        EstadosPagosDTO estadosPagosDTO = new EstadosPagosDTO();
+        AdmUsuarios usuario = new AdmUsuarios();
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.getEstadosPagos() -> Entrada al servicio para obtener el historico de la factura");
+
+        // Conseguimos información del usuario logeado
+        usuario = authenticationProvider.checkAuthentication(request);
+
+        if (usuario != null) {
+            LOGGER.info("FacturacionPySFacturasImpl.getEstadosPagos() -> obteniendo el historico de la factura");
+
+            FacFactura factura = new FacFactura();
+            String idFacturaParent = idFactura;
+
+            do {
+                FacFacturaKey key = new FacFacturaKey();
+                key.setIdinstitucion(usuario.getIdinstitucion());
+                key.setIdfactura(idFacturaParent);
+                factura = facFacturaExtendsMapper.selectByPrimaryKey(key);
+
+                if (factura != null && factura.getComisionidfactura() != null)
+                    idFacturaParent = factura.getComisionidfactura();
+            } while (factura != null && factura.getComisionidfactura() != null);
+
+            List<EstadosPagosItem> result = facHistoricofacturaExtendsMapper.getEstadosPagos(idFacturaParent,
+                    usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+
+            estadosPagosDTO.setEstadosPagosItems(result);
+        }
+
+        LOGGER.info(
+                "FacturacionPySFacturasImpl.getEstadosPagos() -> Salida del servicio  para obtener el historico de la factura");
+
+        return estadosPagosDTO;
     }
 
     @Override

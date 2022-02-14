@@ -161,8 +161,6 @@ public interface IFacturacionPySService {
 
 	public ComunicacionCobroDTO getComunicacionCobro(String idFactura, HttpServletRequest request) throws Exception;
 
-	public EstadosPagosDTO getEstadosPagos(String idFactura, HttpServletRequest request) throws Exception;
-
     public InsertResponseDTO insertarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
 
 	public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
