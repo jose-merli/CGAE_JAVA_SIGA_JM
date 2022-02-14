@@ -89,7 +89,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -123,7 +122,7 @@ public abstract class ProcesoFacPyS {
     protected static final String TRASPASO_FACTURAS_WS_ACTIVO = "TRASPASO_FACTURAS_WS_ACTIVO";
     protected static final String PROC_CARGOS_PRESENTACION = "{call PKG_SIGA_CARGOS.PRESENTACION(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
     protected static final String PROC_GENERACION_FACTURACION = "{call PKG_SIGA_FACTURACION.GENERACIONFACTURACION(?,?,?,?,?,?,?,?)}";
-    protected static final String PROC_CONFIRMACION_FACTURACION = "{call PKG_SIGA_FACTURACION.CONFIRMACIONFACTURACION(?,?,?,?,?,?,?,?)}";
+    protected static final String PROC_CONFIRMACION_FACTURACION = "{call PKG_SIGA_FACTURACION.CONFIRMACIONFACTURACION(?,?,?,?,?,?)}";
     protected static final String COD_OK = "0";
     protected static final String COD_FACTURACION_CONFIRMACION_ERROR_PDF = "-208";
     protected static final String COD_FACTURACION_CONFIRMAR_CONTADOR_REPETIDO = "-205";
@@ -285,20 +284,6 @@ public abstract class ProcesoFacPyS {
         return time;
     }
 
-    protected TransactionStatus getNewLongTransaction() {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setTimeout(getTimeoutLargo());
-        def.setName("transGenFac");
-        return transactionManager.getTransaction(def);
-    }
-
-    protected TransactionStatus getNeTransaction() {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setTimeout(Integer.parseInt("30"));
-        def.setName("transGenFac");
-        return transactionManager.getTransaction(def);
-    }
-
     protected void rollBack(TransactionStatus transactionStatus) {
         if (transactionStatus != null && !transactionStatus.isCompleted()) {
             transactionManager.rollback(transactionStatus);
@@ -342,6 +327,8 @@ public abstract class ProcesoFacPyS {
 
         if (convert != null) {
             value = convert.apply(sValue);
+        } else {
+            value = (T) sValue;
         }
 
         return value;
@@ -360,7 +347,8 @@ public abstract class ProcesoFacPyS {
 
         GenParametros genParametro = genParametrosMapper.selectByPrimaryKey(genParametrosKey);
 
-        if (genParametro == null || genParametro.getValor() == null) {
+        if (genParametro == null && !UtilidadesString.esCadenaVacia(valorDefecto)) {
+            genParametro = new GenParametros();
             genParametro.setValor(valorDefecto);
         }
 

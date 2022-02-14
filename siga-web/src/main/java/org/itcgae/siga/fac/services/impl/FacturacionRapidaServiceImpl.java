@@ -11,12 +11,9 @@ import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.UtilidadesNumeros;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.PysCompra;
 import org.itcgae.siga.db.entities.PysCompraExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
@@ -28,7 +25,6 @@ import org.itcgae.siga.db.entities.PysProductossolicitadosExample;
 import org.itcgae.siga.db.entities.PysProductossolicitadosKey;
 import org.itcgae.siga.db.entities.PysServiciossolicitadosExample;
 import org.itcgae.siga.db.entities.PysTipoiva;
-import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.PysServiciossolicitadosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
@@ -48,7 +44,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -71,7 +66,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
     private CgaeAuthenticationProvider authenticationProvider;
 
     @Autowired
-    protected PlatformTransactionManager transactionManager;
+    private PlatformTransactionManager transactionManager;
 
     @Autowired
     private PysCompraExtendsMapper pysCompraExtendsMapper;
@@ -107,10 +102,12 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
     private FacturacionHelper facturacionHelper;
 
     @Autowired
-    private GenPropertiesMapper genPropertiesMapper;
+    private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
     @Autowired
-    private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+    private ProTratarConfirmacion proTratarConfirmacion;
+
+    private static final String PROP_SIGA_JTA_TIMEOUT_PESADA = "siga.jta.timeout.pesada";
 
     @Override
     public ComboDTO getSeleccionSerieFacturacion(HttpServletRequest request, String idInstitucion, String idPeticion) throws Exception {
@@ -235,11 +232,9 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
 
     private final Function<Integer, Boolean> i10ToBool = v -> v.intValue() == 1;
 
-    private TransactionStatus getNeTransaction() {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setTimeout(Integer.parseInt("30"));
-        def.setName("transGenFacRap");
-        return transactionManager.getTransaction(def);
+    private int getTimeoutLargo() {
+        Integer time = Integer.valueOf(facturacionHelper.getProperty(PROP_SIGA_JTA_TIMEOUT_PESADA));
+        return time;
     }
 
     private void rollBack(TransactionStatus transactionStatus) {
@@ -307,7 +302,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
 
         try {
 
-            tx = getNeTransaction();
+            tx = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
 
             // Listas necesarias para el proceso
             List<PysCompra> vCompras = new ArrayList<>();
@@ -412,7 +407,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                         throw new Exception("messages.facturacionRapidaCompra.estadoBaja");
 
                     } else if (beanPeticionCompraSuscripcion.getIdestadopeticion().toString().equals(SigaConstants.ESTADO_PETICION_COMPRA_PENDIENTE)) { // Esta en estado pendiente. Hay que aprobarla
-                        beanPeticionCompraSuscripcion = aprobarCompras(vCompras);
+                        beanPeticionCompraSuscripcion = aprobarCompras(vCompras, usuario);
                     }
                 }
 
@@ -420,8 +415,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 FacFacturacionprogramada programacion = procesarFacturacionRapidaCompras(beanPeticionCompraSuscripcion, vCompras, beanSerieCandidata, usuario);
 
                 // CONFIRMACION RAPIDA (en este caso la transaccion se gestiona dentro la transaccion)
-                ProTratarConfirmacion proTratarConfirmacion = new ProTratarConfirmacion();
-                proTratarConfirmacion.confirmarProgramacionFactura(programacion, false, null, false, false, 0, true);
+                proTratarConfirmacion.confirmarProgramacionFactura(programacion, false, null, false, false, true, tx);
 
                 if (idSolicitudCertificado != null) { // CERTIFICADO
 
@@ -456,7 +450,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                     String idPersona = obj.getIdPersona().toString();
                     nombreColegiado = "";
                     if (idPersona != null && !"".equalsIgnoreCase(idPersona)) {
-                        nombreColegiado = obtenerNombreApellidos(idPersona);
+                        nombreColegiado = facturacionHelper.obtenerNombreApellidos(idPersona);
                         if (nombreColegiado != null && !"".equalsIgnoreCase(nombreColegiado)) {
                             nombreColegiado = UtilidadesString.eliminarAcentosYCaracteresEspeciales(nombreColegiado) + "-";
                         } else {
@@ -536,7 +530,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
 
     }
 
-    private PysPeticioncomprasuscripcion aprobarCompras(List<PysCompra> vCompras) throws Exception {
+    private PysPeticioncomprasuscripcion aprobarCompras(List<PysCompra> vCompras, AdmUsuarios usuario) throws Exception {
         PysPeticioncomprasuscripcion beanPeticionCompraSuscripcion = null;
 
         try {
@@ -545,7 +539,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             for (PysCompra beanCompra : vCompras) {
 
                 if (beanCompra.getNofacturable() != null && beanCompra.getNofacturable().equals("0")) { //Si no es NO FACTURABLE
-                    if (!confirmarProducto(beanCompra.getIdinstitucion().intValue(), beanCompra.getIdpeticion(), beanCompra.getIdtipoproducto().intValue(), beanCompra.getIdproducto(), beanCompra.getIdproductoinstitucion(), new Double(0), "0")) {
+                    if (!confirmarProducto(beanCompra.getIdinstitucion().intValue(), beanCompra.getIdpeticion(), beanCompra.getIdtipoproducto().intValue(), beanCompra.getIdproducto(), beanCompra.getIdproductoinstitucion(), new Double(0), "0", usuario)) {
                         throw new Exception("Error al confirmar producto");
                     }
                 }
@@ -570,7 +564,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
         return beanPeticionCompraSuscripcion;
     }
 
-    private boolean confirmarProducto(Integer idInstitucion, Long idPeticion, Integer idTipoProducto, Long idProducto, Long idProductoInstitucion, Double importeAnticipado, String fechaEfectiva) throws Exception {
+    private boolean confirmarProducto(Integer idInstitucion, Long idPeticion, Integer idTipoProducto, Long idProducto, Long idProductoInstitucion, Double importeAnticipado, String fechaEfectiva, AdmUsuarios usuario) throws Exception {
 
         try {
 
@@ -656,10 +650,29 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 }
 
                 compraBean.setIdtipoiva(productoBean.getIdtipoiva());
+                compraBean.setFechamodificacion(new Date());
+                compraBean.setUsumodificacion(usuario.getIdusuario());
 
-                if (pysCompraExtendsMapper.insert(compraBean) == 0) {
-                    return false;
+                // Comprobamos si existe el objeto compra, si existe lo actualizamos si no realizamos la inserccion
+                PysCompraExample pysCompraExample = new PysCompraExample();
+                pysCompraExample.createCriteria().andIdinstitucionEqualTo(compraBean.getIdinstitucion())
+                        .andIdpeticionEqualTo(compraBean.getIdpeticion())
+                        .andIdproductoEqualTo(compraBean.getIdproducto())
+                        .andIdtipoproductoEqualTo(compraBean.getIdtipoproducto())
+                        .andIdproductoinstitucionEqualTo(compraBean.getIdproductoinstitucion());
+
+                long numCompras = pysCompraExtendsMapper.countByExample(pysCompraExample);
+
+                if (numCompras == 0) {
+                    if (pysCompraExtendsMapper.insert(compraBean) == 0) {
+                        return false;
+                    }
+                } else if (numCompras == 1) {
+                    if (pysCompraExtendsMapper.updateByPrimaryKeySelective(compraBean) == 0) {
+                        return false;
+                    }
                 }
+
 
                 // 3. Verificamos si los articulos de la peticion estan en un estado distinto de PENDIENTE
                 long productos_serviciosPendientes = getNumProductosServiciosPendientes(idInstitucion, idPeticion);
@@ -864,6 +877,9 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             String descripcion = beanSerieCandidata.getNombreabreviado() + " [" + idFacturacionProgramada + "]";
             beanFacturacionProgramada.setDescripcion(descripcion);
 
+            beanFacturacionProgramada.setFechamodificacion(new Date());
+            beanFacturacionProgramada.setUsumodificacion(usuario.getIdusuario());
+
             if (facFacturacionprogramadaExtendsMapper.insert(beanFacturacionProgramada) == 0) {
                 throw new Exception("Error al insertar cliente incluido en serie");
             }
@@ -888,7 +904,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 throw new Exception(resultado[1]);
 
             } else if (!codretorno.equals("0")) {
-                throw new Exception("Error al generar la Facturaci�n rapida: " + resultado[1]);
+                throw new Exception("Error al generar la Facturacion rapida: " + resultado[1]);
             }
 
             // Desbloquea la facturacion programada
@@ -923,7 +939,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
         try {
 
             // Obtenemos las rutas del zip
-            String rutaAlmacen = getProperty("facturacion.directorioFisicoFacturaPDFJava") + getProperty("facturacion.directorioFacturaPDFJava") + File.separator + idInstitucion;
+            String rutaAlmacen = facturacionHelper.getProperty("facturacion.directorioFisicoFacturaPDFJava") + facturacionHelper.getProperty("facturacion.directorioFacturaPDFJava") + File.separator + idInstitucion;
             String rutaFicheroZip = rutaAlmacen + File.separator + idPeticion + ".zip";
             ficheroZip = new File(rutaFicheroZip);
 
@@ -965,7 +981,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 String nombreColegiado = "";
                 nombreColegiado = "";
                 if (idPersona != null && !"".equalsIgnoreCase(idPersona)) {
-                    nombreColegiado = obtenerNombreApellidos(idPersona);
+                    nombreColegiado = facturacionHelper.obtenerNombreApellidos(idPersona);
                     if (nombreColegiado != null && !"".equalsIgnoreCase(nombreColegiado)) {
                         nombreColegiado = UtilidadesString.eliminarAcentosYCaracteresEspeciales(nombreColegiado) + "-";
                     } else {
@@ -1010,63 +1026,6 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
         }
 
         return ficheroZip;
-    }
-
-    private String getProperty(final String parametro) {
-        return getProperty(null, parametro);
-    }
-
-    private String getProperty(final String fichero, final String parametro) {
-
-        String respuesta = null;
-
-        GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
-        GenPropertiesExample.Criteria criteria = genPropertiesExample.createCriteria();
-
-        if (fichero != null) {
-            criteria.andFicheroEqualTo(fichero);
-        }
-
-        if (parametro != null) {
-            criteria.andParametroEqualTo(parametro);
-        }
-
-        List<GenProperties> genPropertiesList = genPropertiesMapper.selectByExample(genPropertiesExample);
-
-        if (genPropertiesList != null && !genPropertiesList.isEmpty()) {
-            respuesta = genPropertiesList.get(0).getValor();
-        }
-
-        return respuesta;
-    }
-
-    private String obtenerNombreApellidos(String idPersona) throws Exception {
-
-        String nombre = "";
-
-        try {
-
-            CenPersona cenPersona = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(idPersona));
-
-            if (cenPersona != null) {
-
-                nombre = cenPersona.getNombre();
-
-                if (cenPersona.getApellidos1() != null && !cenPersona.getApellidos1().equals("#NA")) {
-                    nombre += " " + cenPersona.getApellidos1();
-                }
-
-                if (cenPersona.getApellidos2() != null && !cenPersona.getApellidos2().equals("#NA")) {
-                    nombre += " " + cenPersona.getApellidos2();
-                }
-
-            }
-
-        } catch (Exception e) {
-            throw new Exception("Error al obtener el nombre y apellidos", e);
-        }
-
-        return nombre;
     }
 
 }

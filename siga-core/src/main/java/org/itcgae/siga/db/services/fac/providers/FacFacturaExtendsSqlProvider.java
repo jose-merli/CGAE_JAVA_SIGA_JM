@@ -355,4 +355,45 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
         return sql.toString();
     }
+
+    public String getDatosImpresionInformeFactura(String idInstitucion, String idFactura) {
+        SQL sql = new SQL();
+        sql.SELECT("F.IDINSTITUCION");
+        sql.SELECT("F.IDFACTURA");
+        sql.SELECT("F.NUMEROFACTURA");
+        sql.SELECT("F.FECHAEMISION");
+        sql.SELECT("F.OBSERVACIONES");
+        sql.SELECT("F.OBSERVINFORME");
+        sql.SELECT("F.IDPERSONA");
+        sql.SELECT("F.IDCUENTA");
+        sql.SELECT("F.IDCUENTADEUDOR");
+        sql.SELECT("C.IBAN");
+        sql.SELECT("C.CBO_CODIGO");
+        sql.SELECT("C.CODIGOSUCURSAL");
+        sql.SELECT("C.DIGITOCONTROL");
+        sql.SELECT("F.IMPTOTALNETO AS IMPORTE_NETO");
+        sql.SELECT("F.IMPTOTALIVA AS IMPORTE_IVA");
+        sql.SELECT("F.IMPTOTAL AS TOTAL_FACTURA");
+        sql.SELECT("F.IMPTOTALPAGADO AS TOTAL_PAGOS");
+        sql.SELECT("F.IMPTOTALANTICIPADO AS ANTICIPADO");
+        sql.SELECT("F.IMPTOTALCOMPENSADO AS COMPENSADO");
+        sql.SELECT("F.IMPTOTALPAGADOPORBANCO AS POR_BANCO");
+        sql.SELECT("F.IMPTOTALPAGADOPORCAJA AS POR_CAJA");
+        sql.SELECT("F.IMPTOTALPAGADOSOLOCAJA AS POR_SOLOCAJA");
+        sql.SELECT("F.IMPTOTALPAGADOSOLOTARJETA AS POR_SOLOTARJETA");
+        sql.SELECT("F.IMPTOTALPORPAGAR AS PENDIENTE_PAGAR");
+        sql.SELECT("LPAD(SUBSTR(C.NUMEROCUENTA, 7), 10, '*') AS NUMEROCUENTA");
+        sql.SELECT("C.TITULAR");
+        sql.SELECT("F.IDMANDATO");
+        sql.SELECT("F.COMISIONIDFACTURA");
+        sql.SELECT("EF.DESCRIPCION AS DESCRIPCION_ESTADO");
+        sql.SELECT("F.REFMANDATOSEPA");
+        sql.FROM("FAC_FACTURA F " +
+                "LEFT JOIN CEN_CUENTASBANCARIAS C ON C.IDPERSONA = F.IDPERSONA AND C.IDINSTITUCION = F.IDINSTITUCION AND C.IDCUENTA = F.IDCUENTA " +
+                "INNER JOIN FAC_ESTADOFACTURA EF ON F.ESTADO = EF.IDESTADO");
+        sql.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("F.IDFACTURA = " + idFactura);
+        return sql.toString();
+    }
+
 }

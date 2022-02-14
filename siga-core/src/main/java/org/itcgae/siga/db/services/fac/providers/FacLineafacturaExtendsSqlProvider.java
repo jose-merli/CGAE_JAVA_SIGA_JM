@@ -28,4 +28,26 @@ public class FacLineafacturaExtendsSqlProvider extends FacLineafacturaSqlProvide
 
         return query.toString();
     }
+
+    public String getLineasImpresionInforme(String idInstitucion, String idFactura) {
+        SQL sql = new SQL();
+        sql.SELECT("LF.IDINSTITUCION");
+        sql.SELECT("LF.IDFACTURA");
+        sql.SELECT("LF.NUMEROLINEA");
+        sql.SELECT("LF.CANTIDAD AS CANTIDAD_LINEA");
+        sql.SELECT("LF.CTAPRODUCTOSERVICIO");
+        sql.SELECT("LF.CTAIVA");
+        sql.SELECT("LF.PRECIOUNITARIO AS PRECIO_LINEA");
+        sql.SELECT("LF.IVA AS IVA_LINEA");
+        sql.SELECT("TO_CHAR(C.FECHA, 'DD/MM/RRRR') AS FECHA_COMPRA");
+        sql.SELECT("F_SIGA_DESCLINEAFACT(" + idInstitucion + ", " + idFactura + ", LF.NUMEROLINEA) AS DESCRIPCION_LINEA");
+        sql.FROM("FAC_LINEAFACTURA LF, PYS_COMPRA C");
+        sql.WHERE("LF.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("LF.IDFACTURA = " + idFactura);
+        sql.WHERE("C.NUMEROLINEA (+)= LF.NUMEROLINEA");
+        sql.WHERE("C.IDFACTURA (+)= LF.IDFACTURA");
+        sql.WHERE("C.IDINSTITUCION (+)= LF.IDINSTITUCION");
+        sql.ORDER_BY("LF.NUMEROORDEN ASC, LF.NUMEROLINEA ASC");
+        return sql.toString();
+    }
 }

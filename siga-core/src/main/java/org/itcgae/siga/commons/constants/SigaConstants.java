@@ -1654,4 +1654,6 @@ public class SigaConstants {
     public static final String PRODUCTO_BAJA = "B";
     public static final String PRODUCTO_PENDIENTE_GENERAR_PDF= "G";
 
+    public static final String TIMESTAMP_BBDD = "yyyy-MM-dd HH:mm:ss";
+
 }

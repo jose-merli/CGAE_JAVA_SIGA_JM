@@ -8,6 +8,7 @@ import org.itcgae.siga.db.entities.AdmInforme;
 import org.itcgae.siga.db.entities.AdmInformeExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.exception.BusinessException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import java.io.BufferedWriter;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+@Service
 public class ProTratarFacturacion extends ProcesoFacPyS {
 
     private final Logger LOGGER = Logger.getLogger(ProTratarFacturacion.class);
@@ -31,7 +33,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
 
         try {
 
-            TransactionStatus transactionStatus = getNewLongTransaction();
+            TransactionStatus transactionStatus = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
 
             // Obtencion de la propiedad que contiene el tiempo de espera que se les da a las facturaciones en ejcucion no generadas por alguna anomalia
             Double tiempoMaximoEjecucion = getMaxMinutosEnEjecucion();
@@ -75,7 +77,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         String resultado[] = new String[2];
         try {
 
-            transactionStatus = getNewLongTransaction();
+            transactionStatus = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
             nombreFichero = "GENERACION_" + fac.getIdseriefacturacion() + "_" + fac.getIdprogramacion();
 
             // Carga los parametros

@@ -14,6 +14,7 @@ import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import java.io.File;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
+@Service
 public class ProTratarConfirmacion extends ProcesoFacPyS {
 
     private final Logger LOGGER = Logger.getLogger(ProTratarConfirmacion.class);
@@ -70,7 +72,7 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
 
                 try {
 
-                    confirmarProgramacionFactura(facFacturacionprogramada, false, log, true, false, 1, false);
+                    confirmarProgramacionFactura(facFacturacionprogramada, false, log, true, false, false, null);
 
                 } catch (Exception e) {
                     LOGGER.error("@@@ Error al confirmar facturas (Proceso automatico) Programacion:", e);
@@ -86,20 +88,16 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
 
     }
 
-    protected void confirmarProgramacionFactura(FacFacturacionprogramada facFacturacionprogramada, boolean archivarFacturacion, SIGALogging log, boolean generarPagosBanco, boolean soloGenerarFactura, int iTransaccionInterna,
-                                                boolean esFacturacionRapida) throws Exception {
-
-        TransactionStatus tx;
-
-        if (iTransaccionInterna == 1 || iTransaccionInterna == 0) {
-            tx = getNewLongTransaction();
-        } else {
-            tx = getNeTransaction();
-        }
+    protected void confirmarProgramacionFactura(FacFacturacionprogramada facFacturacionprogramada, boolean archivarFacturacion, SIGALogging log, boolean generarPagosBanco, boolean soloGenerarFactura,
+                                                boolean esFacturacionRapida, TransactionStatus tx) throws Exception {
 
         String msjAviso = null;
 
         try {
+
+            if (tx == null) {
+                tx = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
+            }
 
             // fichero de log
 

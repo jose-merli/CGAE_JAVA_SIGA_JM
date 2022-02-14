@@ -9,12 +9,14 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class ProGenerarEnviosFacturasPendientes extends ProcesoFacPyS {
 
     private final Logger LOGGER = Logger.getLogger(ProGenerarEnviosFacturasPendientes.class);
@@ -63,7 +65,7 @@ public class ProGenerarEnviosFacturasPendientes extends ProcesoFacPyS {
                     facAactualizar.setFechaconfirmacion(new Date());
                     facAactualizar.setIdestadoconfirmacion(FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.getId());
 
-                    TransactionStatus tx = getNewLongTransaction();
+                    TransactionStatus tx = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
                     generarPdfEnvioProgramacionFactura(factBean, log, factBean.getIdseriefacturacion(), factBean.getIdprogramacion(), facAactualizar, true, tx);
 
                 } catch (Exception e) {
