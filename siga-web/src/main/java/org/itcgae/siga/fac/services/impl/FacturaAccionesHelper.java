@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.services.impl;
 
+import io.jsonwebtoken.lang.Collections;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -9,6 +10,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.entities.FacAbonoKey;
@@ -19,6 +21,7 @@ import org.itcgae.siga.db.entities.FacDisquetedevolucionesKey;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
+import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteExample;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteKey;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
@@ -54,6 +57,7 @@ import org.itcgae.siga.db.services.fac.mappers.FacDisquetedevolucionesExtendsMap
 import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacHistoricofacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineafacturaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacRenegociacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPagoabonoefectivoExtendsMapper;
@@ -65,11 +69,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FacturaAccionesHelper {
@@ -126,6 +135,9 @@ public class FacturaAccionesHelper {
 
     @Autowired
     private PySTipoIvaExtendsMapper pySTipoIvaExtendsMapper;
+
+    @Autowired
+    private FacRenegociacionExtendsMapper facRenegociacionExtendsMapper;
 
     @Autowired
     private GenDiccionarioMapper genDiccionarioMapper;
@@ -522,44 +534,109 @@ public class FacturaAccionesHelper {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int renegociarFactura(String idFactura, Short idFormaPago, Short idCuenta, Date fecha, String observaciones, AdmUsuarios usuario) throws Exception {
+    public int renegociarFactura(String modo, String idFactura, Short idCuenta, Date fecha, String observaciones, AdmUsuarios usuario) throws Exception {
         FacFacturaKey facturaKey = new FacFacturaKey();
         facturaKey.setIdinstitucion(usuario.getIdinstitucion());
         facturaKey.setIdfactura(idFactura);
 
         Short nuevoEstado = null;
+        Short idFormaPago = null;
         FacFactura factura = facFacturaExtendsMapper.selectByPrimaryKey(facturaKey);
 
         boolean actualizarFacturaEnDisco = false;
+
+        // Comprobamos primero si el estado de la factura es correcto para renegociación
+        if (!Collections.arrayToList(new String[]{
+                SigaConstants.ESTADO_FACTURA_CAJA,
+                SigaConstants.ESTADO_FACTURA_BANCO,
+                SigaConstants.ESTADO_FACTURA_DEVUELTA
+        }).contains(factura.getEstado().toString()))
+            throw new BusinessException("El estado de la factura es incorrecto");
 
         if (factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_DEVUELTA))
                 && UtilidadesString.esCadenaVacia(factura.getComisionidfactura()))
             actualizarFacturaEnDisco = true;
 
+        CenCuentasbancariasKey cuentaBancariaKey;
+        CenCuentasbancarias cuentaBancaria;
+        switch (modo) {
+            case "caja":
+                if (factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA)))
+                    throw new BusinessException("La factura ya se encuentra pendiente de cobro por caja");
 
-        if (idFormaPago.equals(Short.parseShort(SigaConstants.TIPO_FORMAPAGO_METALICO))) {
-            if (factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA)))
-                return 1;
+                idFormaPago = Short.parseShort(SigaConstants.TIPO_FORMAPAGO_METALICO);
+                nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA);
+                idCuenta = null;
+                break;
 
-            idFormaPago = Short.parseShort(SigaConstants.TIPO_FORMAPAGO_METALICO);
-            nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA);
-            idCuenta = null;
+            case "cuentaFactura_activa":
+                if (factura.getIdcuenta() == null)
+                    throw new BusinessException("No tenia cuenta asociada para poder renegociarla por la misma cuenta");
 
-        } else if (idFormaPago.equals(Short.parseShort(SigaConstants.TIPO_FORMAPAGO_FACTURA))) {
-            if (factura.getIdcuenta() == null)
-                return 2;
+                idFormaPago = Short.parseShort(SigaConstants.TIPO_FORMAPAGO_FACTURA);
+                nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO);
 
-            idFormaPago = Short.parseShort(SigaConstants.TIPO_FORMAPAGO_FACTURA);
-            nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO);
+                cuentaBancariaKey = new CenCuentasbancariasKey();
+                cuentaBancariaKey.setIdinstitucion(usuario.getIdinstitucion());
+                cuentaBancariaKey.setIdpersona(factura.getIdpersona());
+                cuentaBancariaKey.setIdcuenta(factura.getIdcuenta());
 
-            CenCuentasbancarias cuentaBancaria = null;
-            if (cuentaBancaria != null && cuentaBancaria.getIdcuenta() != null) {
-                idCuenta = cuentaBancaria.getIdcuenta();
-            } else {
-                return 3;
-            }
-        } else if (false) {
+                cuentaBancaria = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(cuentaBancariaKey);
 
+                if (cuentaBancaria != null && cuentaBancaria.getIdcuenta() != null
+                        && cuentaBancaria.getFechabaja() == null && (cuentaBancaria.getAbonocargo().equals("C")
+                        || cuentaBancaria.getAbonocargo().equals("T")))
+                    idCuenta = cuentaBancaria.getIdcuenta();
+                else
+                    throw new BusinessException("No encuentra la cuenta para renegociar");
+                break;
+
+            case "cuentaFactura_activa_masClientes":
+
+                idFormaPago = Short.parseShort(SigaConstants.TIPO_FORMAPAGO_FACTURA);
+                nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO);
+
+                if (factura.getIdcuenta() != null) {
+                    cuentaBancariaKey = new CenCuentasbancariasKey();
+                    cuentaBancariaKey.setIdinstitucion(usuario.getIdinstitucion());
+                    cuentaBancariaKey.setIdpersona(factura.getIdpersona());
+                    cuentaBancariaKey.setIdcuenta(factura.getIdcuenta());
+
+                    cuentaBancaria = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(cuentaBancariaKey);
+
+                    if (cuentaBancaria != null && cuentaBancaria.getIdcuenta() != null
+                            && cuentaBancaria.getFechabaja() == null && (cuentaBancaria.getAbonocargo().equals("C")
+                            || cuentaBancaria.getAbonocargo().equals("T")))
+                        idCuenta = cuentaBancaria.getIdcuenta();
+                    else
+                        throw new BusinessException("No encuentra la cuenta para renegociar");
+                } else {
+                    cuentaBancaria = getCuentaActivaUnica(factura.getIdpersona(), usuario.getIdinstitucion());
+
+                    if (cuentaBancaria != null) {
+                        idCuenta = cuentaBancaria.getIdcuenta();
+                    } else {
+                        cuentaBancaria = getCuentaActivaServiciosActivos(factura.getIdpersona(), usuario.getIdinstitucion());
+
+                        if (cuentaBancaria != null) {
+                            idCuenta = cuentaBancaria.getIdcuenta();
+                        } else {
+                            throw new BusinessException("No encuentra la cuenta para renegociar");
+                        }
+                    }
+                }
+                break;
+
+            case "otroBanco":
+                idFormaPago = Short.parseShort(SigaConstants.TIPO_FORMAPAGO_FACTURA);
+                nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO);
+
+                if (idCuenta == null)
+                    throw new BusinessException("No ha indicado el banco por el que renegociar");
+                break;
+
+            default:
+                throw new BusinessException("El modo de renegociación es incorrecto");
         }
 
         // Insertamos un nuevo registro en FAC_RENEGOCIACION
@@ -570,13 +647,14 @@ public class FacturaAccionesHelper {
         renegociacion.setIdpersona(factura.getIdpersona());
         renegociacion.setImporte(factura.getImptotalporpagar());
 
+        // Fecha de renegociación de la petición
         if (fecha != null) {
             renegociacion.setFecharenegociacion(fecha);
         } else {
             renegociacion.setFecharenegociacion(new Date());
         }
 
-
+        // Actualizamos el idCuenta
         if (idCuenta != null) {
             renegociacion.setIdcuenta(idCuenta);
             factura.setIdcuenta(idCuenta);
@@ -584,7 +662,7 @@ public class FacturaAccionesHelper {
             factura.setIdcuenta(null);
         }
 
-        Short newIdRenegociacion = null; // TODO
+        Short newIdRenegociacion = facRenegociacionExtendsMapper.getNuevoID(usuario.getIdinstitucion(), idFactura);
         renegociacion.setIdrenegociacion(newIdRenegociacion);
 
         int resultado;
@@ -595,17 +673,20 @@ public class FacturaAccionesHelper {
         if (resultado <= 0)
             throw new BusinessException("Error al insertar la renegociación");
 
+        // Actualizamos el disquete
+        if (actualizarFacturaEnDisco)
+            actualizarRenegociacionEnDisquete(idFactura, newIdRenegociacion, usuario);
+
         // Actualizamos el estado y forma de pago de la factura
         factura.setEstado(nuevoEstado);
         factura.setIdformapago(idFormaPago);
-        factura.setFechamodificacion(new Date());
-        factura.setUsumodificacion(usuario.getIdusuario());
+        resultado = actualizarFacturaRenegociacion(factura, usuario);
 
-        resultado = facFacturaExtendsMapper.updateByPrimaryKey(factura);
         if (resultado <= 0)
             throw new BusinessException("Error al actualizar la factura");
-        consultarActNuevoEstadoFactura(factura, true);
 
+
+        // Actualizamos el historico de la factura
         resultado = insertarHistoricoFacParametros(usuario.getIdinstitucion(), idFactura, (short) 7, null, null,
                 null, null, null, newIdRenegociacion, null, null);
 
@@ -613,6 +694,29 @@ public class FacturaAccionesHelper {
             throw new BusinessException("No se ha insertado en el histórico de la facturación");
 
         return 0;
+    }
+
+    private CenCuentasbancarias getCuentaActivaUnica(Long idPersona, Short idInstitucion) {
+        List<CenCuentasbancarias> cuentas = getCuentasActivas(idPersona, idInstitucion);
+
+        if (cuentas == null || cuentas.size() != 1)
+            return null;
+        else
+            return cuentas.get(0);
+    }
+
+    private CenCuentasbancarias getCuentaActivaServiciosActivos(Long idPersona, Short idInstitucion) {
+        // TODO: Segundo punto de la renegociación masiva
+        return null;
+    }
+
+    private List<CenCuentasbancarias> getCuentasActivas(Long idPersona, Short idInstitucion) {
+        CenCuentasbancariasExample cuentaExample = new CenCuentasbancariasExample();
+        cuentaExample.createCriteria().andIdpersonaEqualTo(idPersona)
+                .andIdinstitucionEqualTo(idInstitucion)
+                .andFechabajaIsNull().andAbonocargoIn(Arrays.asList("T", "C"));
+
+        return cenCuentasbancariasExtendsMapper.selectByExample(cuentaExample);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -816,6 +920,20 @@ public class FacturaAccionesHelper {
         admContadorExtendsMapper.updateByPrimaryKey(contador);
     }
 
+    private int actualizarFacturaRenegociacion(FacFactura facturaToSave, AdmUsuarios usuario) {
+        facturaToSave.setFechamodificacion(new Date());
+        facturaToSave.setUsumodificacion(usuario.getIdusuario());
+        int resultado = facFacturaExtendsMapper.updateByPrimaryKey(facturaToSave);
+        try {
+            //TODO: Si no se produce error regeneramos el pdf
+            facturacionHelper.generarPdfFacturaFirmada(facturaToSave.getIdfactura(),
+                    facturaToSave.getIdinstitucion().toString(), Boolean.TRUE);
+        } catch (Exception e) {
+            LOGGER.warn("Excepcion en la generación del informe de factura");
+        }
+
+        return resultado;
+    }
 
     private String consultarActNuevoEstadoFactura(FacFactura facturaBean, boolean actualizar) throws BusinessException {
 
@@ -883,6 +1001,26 @@ public class FacturaAccionesHelper {
         }
 
         return nuevoEstado;
+    }
+
+    private void actualizarRenegociacionEnDisquete(String idFactura, Short idRenegociacion, AdmUsuarios usuario) {
+        FacFacturaincluidaendisqueteExample example = new FacFacturaincluidaendisqueteExample();
+        example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+                .andIdfacturaEqualTo(idFactura)
+                .andIdrenegociacionIsNull();
+
+        List<FacFacturaincluidaendisquete> facturasIncluidas = facFacturaincluidaendisqueteMapper.selectByExample(example);
+
+        if (facturasIncluidas != null && !facturasIncluidas.isEmpty()) {
+            for (FacFacturaincluidaendisquete facturaIncluida: facturasIncluidas) {
+                facturaIncluida.setIdrenegociacion(idRenegociacion);
+                facturaIncluida.setFechamodificacion(new Date());
+                facturaIncluida.setUsumodificacion(usuario.getIdusuario());
+
+                facFacturaincluidaendisqueteMapper.updateByPrimaryKey(facturaIncluida);
+            }
+        }
+
     }
 
     public void devolverFactura(Long idDisqueteCargos, Integer idFacturaIncluida, Date fecha, String observaciones, boolean comision, AdmUsuarios usuario) throws Exception {

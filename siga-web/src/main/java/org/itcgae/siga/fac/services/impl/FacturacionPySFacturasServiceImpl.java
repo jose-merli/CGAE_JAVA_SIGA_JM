@@ -345,16 +345,14 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         LOGGER.info("insertarEstadosPagos() -> Entrada al servicio para crear una entrada al historico de factura");
 
         if (usuario != null) {
-            /*
-            // renegociar
-            if (item.getIdAccion().equalsIgnoreCase("7") && (item.getEstado() == "2"
-                    || facHistoricoInsert.getEstado() == 4 || facHistoricoInsert.getEstado() == 5)) {
 
-                //renegociarFactura(item, facHistoricoInsert, facUpdate, usuario);
+            // renegociar
+            if (item.getIdAccion().equalsIgnoreCase("7")) {
+
+                facturaAccionesHelper.renegociarFactura(item.getModo(), item.getIdFactura(), Short.parseShort(item.getCuentaBanco()),
+                        item.getFechaModificaion(), item.getComentario(), usuario);
             }
 
-
-             */
             // nuevo cobro
             if (item.getIdAccion().equalsIgnoreCase("4")) {
                 BigDecimal importe = new BigDecimal(item.getImpTotalPagado());
