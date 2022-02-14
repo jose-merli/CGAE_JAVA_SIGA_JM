@@ -787,6 +787,20 @@ public class FacturacionPySController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PostMapping(value = "/insertarEstadosPagosVarios")
+	ResponseEntity<InsertResponseDTO> insertarEstadosPagos(@RequestBody List <EstadosPagosItem> items,
+			HttpServletRequest request) {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = facturacionPySFacturasService.insertarEstadosPagosVarios(items, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@PostMapping(value = "/eliminarEstadosPagos")
 	ResponseEntity<DeleteResponseDTO> eliminarEstadosPagos(@RequestBody EstadosPagosItem item,

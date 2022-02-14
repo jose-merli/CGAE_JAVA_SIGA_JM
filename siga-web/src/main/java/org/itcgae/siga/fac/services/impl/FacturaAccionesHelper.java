@@ -651,7 +651,7 @@ public class FacturaAccionesHelper {
         BigDecimal impTotalPorPagar = factura.getImptotalporpagar().subtract(importe);
 
         factura.setImptotalpagadoporcaja(impTotalPagadoPorCaja.setScale(2, RoundingMode.DOWN));
-        factura.setImptotalpagadosolotarjeta(impTotalPagadoSoloCaja.setScale(2, RoundingMode.DOWN));
+        factura.setImptotalpagadosolocaja(impTotalPagadoSoloCaja.setScale(2, RoundingMode.DOWN));
         factura.setImptotalpagado(impTotalPagado.setScale(2, RoundingMode.DOWN));
         factura.setImptotalporpagar(impTotalPorPagar.setScale(2, RoundingMode.DOWN));
 
