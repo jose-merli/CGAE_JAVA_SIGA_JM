@@ -750,7 +750,7 @@ public class FacturacionPySController {
 		EstadosPagosDTO response = new EstadosPagosDTO();
 
 		try {
-			response = facturacionService.getEstadosPagos(idFactura, request);
+			response = facturacionPySFacturasService.getEstadosPagos(idFactura, request);
 
 			if (response.getEstadosPagosItems().size() == 200) {
 				response.setError(UtilidadesString.creaInfoResultados());
