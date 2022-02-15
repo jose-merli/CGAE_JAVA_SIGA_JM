@@ -81,6 +81,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 			int keyForTabla = 0;
 			String hitoActual;
 			List<GuardiasItem> guar = new ArrayList<GuardiasItem>();
+			int indiceNuevo = 0;
 			for(int i = 0; i< lBaremos.size(); i++) {
 				hitoActual = lBaremos.get(i).getIdHito();
 		//for (BaremosRequestItem baremo : lBaremos) {	
@@ -95,12 +96,14 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 						guardia.setBaremo(lBaremos.get(i).getBaremo());
 						guardia.setnDias(lBaremos.get(i).getNDias());
-						guar.add(guardia);
-						if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))  ) {
-							lBaremos.get(i).setGuardiasObj(guar);
-						}
+						//guar.add(guardia);
+						//if(i+1 != lBaremos.size()) {
+								//&& (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))  ) {
+						lBaremos.get(indiceNuevo).getGuardiasObj().add(guardia);
+						//}
 					}else {
 						//DIFERENTE HITO
+						indiceNuevo = i;
 						guar = new ArrayList<GuardiasItem>();
 						GuardiasItem guardia = new GuardiasItem();
 						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
@@ -111,11 +114,13 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guardia.setBaremo(lBaremos.get(i).getBaremo());
 						guardia.setnDias(lBaremos.get(i).getNDias());
 						guar.add(guardia);
-						if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
-							lBaremos.get(i).setGuardiasObj(guar);
-						}
+						//if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
+						lBaremos.get(i).setGuardiasObj(guar);
+						lBaremos.get(i).setKeyForTabla(keyForTabla++);
+						//}
 					}
 				}else {
+					indiceNuevo = i;
 					GuardiasItem guardia = new GuardiasItem();
 					String[] dias = lBaremos.get(i).getDias().toString().split("\n");
 					guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
@@ -124,10 +129,18 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 					guardia.setBaremo(lBaremos.get(i).getBaremo());
 					guardia.setnDias(lBaremos.get(i).getNDias());
+
+					guardia.setNumMinimoSimple(lBaremos.get(i).getNumMinimoSimple());
+					guardia.setSimpleOImporteIndividual(lBaremos.get(i).getSimpleOImporteIndividual());
+					guardia.setNaPartir(lBaremos.get(i).getNaPartir());
+					guardia.setMaximo(lBaremos.get(i).getMaximo());
+					guardia.setPorDia(lBaremos.get(i).getPorDia());
+
 					guar.add(guardia);
-					if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
-						lBaremos.get(i).setGuardiasObj(guar);
-					}
+					//if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
+					lBaremos.get(i).setGuardiasObj(guar);
+					lBaremos.get(i).setKeyForTabla(keyForTabla++);
+					//}
 				}
 				
 //				GuardiasItem guardiaLaborables = new GuardiasItem();
@@ -155,6 +168,14 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 //				 */
 //				baremo.setKeyForTabla(keyForTabla++);
 			}
+
+			lBaremos.removeIf ( s -> s.getGuardiasObj() == null );
+
+			//for(int i = 0; i<lBaremos.size(); i++){
+			//	if(lBaremos.get(i).getGuardiasObj() == null){
+			//		lBaremos.remove(i);
+			//	}
+			//}
 			error.setCode(200);
 			baremosRequestDTO.setBaremosRequestItems(lBaremos);
 

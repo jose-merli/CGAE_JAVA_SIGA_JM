@@ -2,6 +2,7 @@
 package org.itcgae.siga.DTO.scs;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class GuardiasItem {
 
@@ -43,6 +44,12 @@ public class GuardiasItem {
 	private boolean historico;
 	private String baremo;
 	private String nDias;
+	private Short numMinimoSimple;
+	private Short simpleOImporteIndividual;
+	private Short naPartir;
+	private Short maximo;
+	private String porDia;
+
 	
 	public String getIdPersonaUltimo() {
 		return idPersonaUltimo;
@@ -250,179 +257,164 @@ public class GuardiasItem {
 	public void setFechabaja(Date fechabaja) {
 		this.fechabaja = fechabaja;
 	}
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((area == null) ? 0 : area.hashCode());
-		result = prime * result + ((duracion == null) ? 0 : duracion.hashCode());
-		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
-		result = prime * result + ((grupoFacturacion == null) ? 0 : grupoFacturacion.hashCode());
-		result = prime * result + ((grupoZona == null) ? 0 : grupoZona.hashCode());
-		result = prime * result + ((idGuardia == null) ? 0 : idGuardia.hashCode());
-		result = prime * result + ((idTurno == null) ? 0 : idTurno.hashCode());
-		result = prime * result + ((jurisdiccion == null) ? 0 : jurisdiccion.hashCode());
-		result = prime * result + ((letradosGuardia == null) ? 0 : letradosGuardia.hashCode());
-		result = prime * result + ((letradosIns == null) ? 0 : letradosIns.hashCode());
-		result = prime * result + ((materia == null) ? 0 : materia.hashCode());
-		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
-		result = prime * result + ((obligatoriedad == null) ? 0 : obligatoriedad.hashCode());
-		result = prime * result + ((partidaJudicial == null) ? 0 : partidaJudicial.hashCode());
-		result = prime * result + ((partidaPresupuestaria == null) ? 0 : partidaPresupuestaria.hashCode());
-		result = prime * result + ((tipoDia == null) ? 0 : tipoDia.hashCode());
-		result = prime * result + ((tipoGuardia == null) ? 0 : tipoGuardia.hashCode());
-		result = prime * result + ((tipoTurno == null) ? 0 : tipoTurno.hashCode());
-		result = prime * result + ((validaJustificacion == null) ? 0 : validaJustificacion.hashCode());
-		result = prime * result + ((zona == null) ? 0 : zona.hashCode());
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GuardiasItem other = (GuardiasItem) obj;
-		if (area == null) {
-			if (other.area != null)
-				return false;
-		} else if (!area.equals(other.area))
-			return false;
-		if (duracion == null) {
-			if (other.duracion != null)
-				return false;
-		} else if (!duracion.equals(other.duracion))
-			return false;
-		if (fechabaja == null) {
-			if (other.fechabaja != null)
-				return false;
-		} else if (!fechabaja.equals(other.fechabaja))
-			return false;
-		if (grupoFacturacion == null) {
-			if (other.grupoFacturacion != null)
-				return false;
-		} else if (!grupoFacturacion.equals(other.grupoFacturacion))
-			return false;
-		if (grupoZona == null) {
-			if (other.grupoZona != null)
-				return false;
-		} else if (!grupoZona.equals(other.grupoZona))
-			return false;
-		if (idGuardia == null) {
-			if (other.idGuardia != null)
-				return false;
-		} else if (!idGuardia.equals(other.idGuardia))
-			return false;
-		if (idTurno == null) {
-			if (other.idTurno != null)
-				return false;
-		} else if (!idTurno.equals(other.idTurno))
-			return false;
-		if (jurisdiccion == null) {
-			if (other.jurisdiccion != null)
-				return false;
-		} else if (!jurisdiccion.equals(other.jurisdiccion))
-			return false;
-		if (letradosGuardia == null) {
-			if (other.letradosGuardia != null)
-				return false;
-		} else if (!letradosGuardia.equals(other.letradosGuardia))
-			return false;
-		if (letradosIns == null) {
-			if (other.letradosIns != null)
-				return false;
-		} else if (!letradosIns.equals(other.letradosIns))
-			return false;
-		if (materia == null) {
-			if (other.materia != null)
-				return false;
-		} else if (!materia.equals(other.materia))
-			return false;
-		if (nombre == null) {
-			if (other.nombre != null)
-				return false;
-		} else if (!nombre.equals(other.nombre))
-			return false;
-		if (obligatoriedad == null) {
-			if (other.obligatoriedad != null)
-				return false;
-		} else if (!obligatoriedad.equals(other.obligatoriedad))
-			return false;
-		if (partidaJudicial == null) {
-			if (other.partidaJudicial != null)
-				return false;
-		} else if (!partidaJudicial.equals(other.partidaJudicial))
-			return false;
-		if (partidaPresupuestaria == null) {
-			if (other.partidaPresupuestaria != null)
-				return false;
-		} else if (!partidaPresupuestaria.equals(other.partidaPresupuestaria))
-			return false;
-		if (tipoDia == null) {
-			if (other.tipoDia != null)
-				return false;
-		} else if (!tipoDia.equals(other.tipoDia))
-			return false;
-		if (tipoGuardia == null) {
-			if (other.tipoGuardia != null)
-				return false;
-		} else if (!tipoGuardia.equals(other.tipoGuardia))
-			return false;
-		if (tipoTurno == null) {
-			if (other.tipoTurno != null)
-				return false;
-		} else if (!tipoTurno.equals(other.tipoTurno))
-			return false;
-		if (validaJustificacion == null) {
-			if (other.validaJustificacion != null)
-				return false;
-		} else if (!validaJustificacion.equals(other.validaJustificacion))
-			return false;
-		if (zona == null) {
-			if (other.zona != null)
-				return false;
-		} else if (!zona.equals(other.zona))
-			return false;
-		return true;
-	}
-	
-	@Override
-	public String toString() {
-		return "GuardiasItem [idGuardia=" + idGuardia + ", idTurno=" + idTurno + ", nombre=" + nombre + ", area=" + area
-				+ ", materia=" + materia + ", grupoZona=" + grupoZona + ", zona=" + zona + ", obligatoriedad="
-				+ obligatoriedad + ", duracion=" + duracion + ", validaJustificacion=" + validaJustificacion
-				+ ", partidaJudicial=" + partidaJudicial + ", jurisdiccion=" + jurisdiccion + ", grupoFacturacion="
-				+ grupoFacturacion + ", partidaPresupuestaria=" + partidaPresupuestaria + ", tipoTurno=" + tipoTurno
-				+ ", tipoGuardia=" + tipoGuardia + ", tipoDia=" + tipoDia + ", letradosGuardia=" + letradosGuardia
-				+ ", letradosIns=" + letradosIns + ", fechabaja=" + fechabaja + "]";
-	}
-	public String getSeleccionLaborables() {
-		return seleccionLaborables;
-	}
-	public void setSeleccionLaborables(String seleccionLaborables) {
-		this.seleccionLaborables = seleccionLaborables;
-	}
-	public String getSeleccionFestivos() {
-		return seleccionFestivos;
-	}
-	public void setSeleccionFestivos(String seleccionFestivos) {
-		this.seleccionFestivos = seleccionFestivos;
-	}
+
 	public String getBaremo() {
 		return baremo;
 	}
+
 	public void setBaremo(String baremo) {
 		this.baremo = baremo;
 	}
+
 	public String getnDias() {
 		return nDias;
 	}
+
 	public void setnDias(String nDias) {
 		this.nDias = nDias;
-	} 
+	}
 
-	
-	
+	public Short getNumMinimoSimple() {
+		return numMinimoSimple;
+	}
+
+	public void setNumMinimoSimple(Short numMinimoSimple) {
+		this.numMinimoSimple = numMinimoSimple;
+	}
+
+	public Short getSimpleOImporteIndividual() {
+		return simpleOImporteIndividual;
+	}
+
+	public void setSimpleOImporteIndividual(Short simpleOImporteIndividual) {
+		this.simpleOImporteIndividual = simpleOImporteIndividual;
+	}
+
+	public Short getNaPartir() {
+		return naPartir;
+	}
+
+	public void setNaPartir(Short naPartir) {
+		this.naPartir = naPartir;
+	}
+
+	public Short getMaximo() {
+		return maximo;
+	}
+
+	public void setMaximo(Short maximo) {
+		this.maximo = maximo;
+	}
+
+	public String getPorDia() {
+		return porDia;
+	}
+
+	public void setPorDia(String porDia) {
+		this.porDia = porDia;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		GuardiasItem that = (GuardiasItem) o;
+		return isHistorico() == that.isHistorico() &&
+				Objects.equals(getIdGuardia(), that.getIdGuardia()) &&
+				Objects.equals(getIdTurno(), that.getIdTurno()) &&
+				Objects.equals(getIdOrdenacionColas(), that.getIdOrdenacionColas()) &&
+				Objects.equals(getIdPersonaUltimo(), that.getIdPersonaUltimo()) &&
+				Objects.equals(getTurno(), that.getTurno()) &&
+				Objects.equals(getNombre(), that.getNombre()) &&
+				Objects.equals(getDescripcion(), that.getDescripcion()) &&
+				Objects.equals(getDescripcionPago(), that.getDescripcionPago()) &&
+				Objects.equals(getDescripcionFacturacion(), that.getDescripcionFacturacion()) &&
+				Objects.equals(getArea(), that.getArea()) &&
+				Objects.equals(getMateria(), that.getMateria()) &&
+				Objects.equals(getGrupoZona(), that.getGrupoZona()) &&
+				Objects.equals(getZona(), that.getZona()) &&
+				Objects.equals(getObligatoriedad(), that.getObligatoriedad()) &&
+				Objects.equals(getDuracion(), that.getDuracion()) &&
+				Objects.equals(getValidaJustificacion(), that.getValidaJustificacion()) &&
+				Objects.equals(getPartidaJudicial(), that.getPartidaJudicial()) &&
+				Objects.equals(getJurisdiccion(), that.getJurisdiccion()) &&
+				Objects.equals(getGrupoFacturacion(), that.getGrupoFacturacion()) &&
+				Objects.equals(getPartidaPresupuestaria(), that.getPartidaPresupuestaria()) &&
+				Objects.equals(getTipoTurno(), that.getTipoTurno()) &&
+				Objects.equals(getTipoGuardia(), that.getTipoGuardia()) &&
+				Objects.equals(getTipoDia(), that.getTipoDia()) &&
+				Objects.equals(getTipoDiasGuardia(), that.getTipoDiasGuardia()) &&
+				Objects.equals(getTipoDiasPeriodo(), that.getTipoDiasPeriodo()) &&
+				Objects.equals(getLetradosGuardia(), that.getLetradosGuardia()) &&
+				Objects.equals(getLetradosIns(), that.getLetradosIns()) &&
+				Objects.equals(seleccionLaborables, that.seleccionLaborables) &&
+				Objects.equals(seleccionFestivos, that.seleccionFestivos) &&
+				Objects.equals(getDiasPeriodo(), that.getDiasPeriodo()) &&
+				Objects.equals(getDiasGuardia(), that.getDiasGuardia()) &&
+				Objects.equals(getDiasSeparacionGuardias(), that.getDiasSeparacionGuardias()) &&
+				Objects.equals(getEnvioCentralita(), that.getEnvioCentralita()) &&
+				Objects.equals(getPorGrupos(), that.getPorGrupos()) &&
+				Objects.equals(getFechabaja(), that.getFechabaja()) &&
+				Objects.equals(getBaremo(), that.getBaremo()) &&
+				Objects.equals(getnDias(), that.getnDias()) &&
+				Objects.equals(getNumMinimoSimple(), that.getNumMinimoSimple()) &&
+				Objects.equals(getSimpleOImporteIndividual(), that.getSimpleOImporteIndividual()) &&
+				Objects.equals(getNaPartir(), that.getNaPartir()) &&
+				Objects.equals(getMaximo(), that.getMaximo()) &&
+				Objects.equals(getPorDia(), that.getPorDia());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getIdGuardia(), getIdTurno(), getIdOrdenacionColas(), getIdPersonaUltimo(), getTurno(), getNombre(), getDescripcion(), getDescripcionPago(), getDescripcionFacturacion(), getArea(), getMateria(), getGrupoZona(), getZona(), getObligatoriedad(), getDuracion(), getValidaJustificacion(), getPartidaJudicial(), getJurisdiccion(), getGrupoFacturacion(), getPartidaPresupuestaria(), getTipoTurno(), getTipoGuardia(), getTipoDia(), getTipoDiasGuardia(), getTipoDiasPeriodo(), getLetradosGuardia(), getLetradosIns(), seleccionLaborables, seleccionFestivos, getDiasPeriodo(), getDiasGuardia(), getDiasSeparacionGuardias(), getEnvioCentralita(), getPorGrupos(), getFechabaja(), isHistorico(), getBaremo(), getnDias(), getNumMinimoSimple(), getSimpleOImporteIndividual(), getNaPartir(), getMaximo(), getPorDia());
+	}
+
+	@Override
+	public String toString() {
+		return "GuardiasItem{" +
+				"idGuardia='" + idGuardia + '\'' +
+				", idTurno='" + idTurno + '\'' +
+				", idOrdenacionColas='" + idOrdenacionColas + '\'' +
+				", idPersonaUltimo='" + idPersonaUltimo + '\'' +
+				", turno='" + turno + '\'' +
+				", nombre='" + nombre + '\'' +
+				", descripcion='" + descripcion + '\'' +
+				", descripcionPago='" + descripcionPago + '\'' +
+				", descripcionFacturacion='" + descripcionFacturacion + '\'' +
+				", area='" + area + '\'' +
+				", materia='" + materia + '\'' +
+				", grupoZona='" + grupoZona + '\'' +
+				", zona='" + zona + '\'' +
+				", obligatoriedad='" + obligatoriedad + '\'' +
+				", duracion='" + duracion + '\'' +
+				", validaJustificacion='" + validaJustificacion + '\'' +
+				", partidaJudicial='" + partidaJudicial + '\'' +
+				", jurisdiccion='" + jurisdiccion + '\'' +
+				", grupoFacturacion='" + grupoFacturacion + '\'' +
+				", partidaPresupuestaria='" + partidaPresupuestaria + '\'' +
+				", tipoTurno='" + tipoTurno + '\'' +
+				", tipoGuardia='" + tipoGuardia + '\'' +
+				", tipoDia='" + tipoDia + '\'' +
+				", tipoDiasGuardia='" + tipoDiasGuardia + '\'' +
+				", tipoDiasPeriodo='" + tipoDiasPeriodo + '\'' +
+				", letradosGuardia='" + letradosGuardia + '\'' +
+				", letradosIns='" + letradosIns + '\'' +
+				", seleccionLaborables='" + seleccionLaborables + '\'' +
+				", seleccionFestivos='" + seleccionFestivos + '\'' +
+				", diasPeriodo='" + diasPeriodo + '\'' +
+				", diasGuardia='" + diasGuardia + '\'' +
+				", diasSeparacionGuardias='" + diasSeparacionGuardias + '\'' +
+				", envioCentralita='" + envioCentralita + '\'' +
+				", porGrupos='" + porGrupos + '\'' +
+				", fechabaja=" + fechabaja +
+				", historico=" + historico +
+				", baremo='" + baremo + '\'' +
+				", nDias='" + nDias + '\'' +
+				", numMinimoSimple=" + numMinimoSimple +
+				", simpleOImporteIndividual=" + simpleOImporteIndividual +
+				", naPartir=" + naPartir +
+				", maximo=" + maximo +
+				", porDia='" + porDia + '\'' +
+				'}';
+	}
 }
