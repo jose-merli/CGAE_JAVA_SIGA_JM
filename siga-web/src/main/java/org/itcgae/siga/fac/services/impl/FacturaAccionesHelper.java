@@ -27,6 +27,7 @@ import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteExample;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteKey;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
+import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbancoKey;
@@ -36,6 +37,7 @@ import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
 import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
 import org.itcgae.siga.db.entities.FacPagosporcaja;
 import org.itcgae.siga.db.entities.FacPagosporcajaExample;
+import org.itcgae.siga.db.entities.FacPagosporcajaKey;
 import org.itcgae.siga.db.entities.FacRenegociacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
@@ -798,6 +800,62 @@ public class FacturaAccionesHelper {
             throw new BusinessException("Error al insertar el histórico de la facturación");
 
         return resultado;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int eliminarUltimoCobroPorCaja(String idFactura, AdmUsuarios usuario) {
+
+        FacFacturaKey facturaKey = new FacFacturaKey();
+        facturaKey.setIdinstitucion(usuario.getIdinstitucion());
+        facturaKey.setIdfactura(idFactura);
+
+        FacFactura factura = facFacturaExtendsMapper.selectByPrimaryKey(facturaKey);
+
+        if (factura == null)
+            throw new BusinessException("No se ha encontrado la factura");
+
+        // Ultima entrada del historico de facturas
+        FacHistoricofacturaExample example = new FacHistoricofacturaExample();
+        example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+                .andIdfacturaEqualTo(idFactura);
+        example.setOrderByClause("IDHISTORICO");
+        List<FacHistoricofactura> facHistoricoList = facHistoricofacturaExtendsMapper.selectByExample(example);
+
+        if (facHistoricoList == null || facHistoricoList.size() < 2)
+            throw new BusinessException("No existe información en el histórico de facturas");
+
+        FacHistoricofactura facHistoricoAnterior = facHistoricoList.get(facHistoricoList.size() - 2);
+        FacHistoricofactura facHistoricoEliminar = facHistoricoList.get(facHistoricoList.size() - 1);
+
+        FacPagosporcajaKey pagosporcajaKey = new FacPagosporcajaKey();
+        pagosporcajaKey.setIdinstitucion(usuario.getIdinstitucion());
+        pagosporcajaKey.setIdfactura(idFactura);
+        pagosporcajaKey.setIdpagoporcaja(facHistoricoEliminar.getIdpagoporcaja());
+
+        // Devolvemos la factura al estado anterior
+        factura.setImptotalpagadoporcaja(facHistoricoAnterior.getImptotalpagadoporcaja().setScale(2, RoundingMode.DOWN));
+        factura.setImptotalpagadosolocaja(facHistoricoAnterior.getImptotalpagadosolocaja().setScale(2, RoundingMode.DOWN));
+        factura.setImptotalpagado(facHistoricoAnterior.getImptotalpagado().setScale(2, RoundingMode.DOWN));
+        factura.setImptotalporpagar(facHistoricoAnterior.getImptotalporpagar().setScale(2, RoundingMode.DOWN));
+
+        factura.setFechamodificacion(new Date());
+        factura.setUsumodificacion(usuario.getIdusuario());
+        factura.setEstado(facHistoricoAnterior.getEstado());
+
+        int resultado = facFacturaExtendsMapper.updateByPrimaryKey(factura);
+        if (resultado <= 0)
+            throw new BusinessException("Error al actualizar la factura");
+
+        resultado = facHistoricofacturaExtendsMapper.deleteByPrimaryKey(facHistoricoEliminar);
+        if (resultado <= 0)
+            throw new BusinessException("Error al eliminar el último estado del histórico");
+
+        resultado = facPagosporcajaExtendsMapper.deleteByPrimaryKey(pagosporcajaKey);
+        if (resultado <= 0)
+            throw new BusinessException("Error al eliminar el último cobro por caja");
+
+
+        return 0;
     }
 
     @Transactional(rollbackFor = Exception.class)

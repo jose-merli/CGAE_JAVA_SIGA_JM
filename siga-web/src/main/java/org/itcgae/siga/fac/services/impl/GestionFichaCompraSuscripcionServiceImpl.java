@@ -345,8 +345,12 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
 
 				PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
-
-				solicitud.setFecha(new Date());
+				
+				if(ficha.getFechaCompra()!=null) {
+					solicitud.setFecha(ficha.getFechaCompra());
+				}else {
+					solicitud.setFecha(new Date());	
+				}
 				solicitud.setIdinstitucion(idInstitucion);
 				solicitud.setIdpersona(idPersona);
 				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
@@ -359,7 +363,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				else {
 					solicitud.setIdestadopeticion((short) 10);
 				}
-				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
 				//Con el format logramos que siempre una longitud de 10 precedida por 0s
 				solicitud.setNumOperacion(

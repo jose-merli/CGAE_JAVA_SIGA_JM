@@ -33,8 +33,9 @@ public class InsertResponseDTO   {
   public void setStatus(String status) {
     this.status = status;
   }
-  
+
   /**
+   * EstadosPagosDTO
    **/
   public InsertResponseDTO id(String id) {
     this.id = id;
@@ -50,9 +51,9 @@ public class InsertResponseDTO   {
     this.id = id;
   }
 
-  
+
   /**
-   **/
+   */
   public InsertResponseDTO error(Error error) {
     this.error = error;
     return this;

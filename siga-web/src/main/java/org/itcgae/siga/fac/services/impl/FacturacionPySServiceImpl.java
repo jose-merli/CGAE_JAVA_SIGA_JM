@@ -3515,71 +3515,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		facHistoricofacturaExtendsMapper.insert(facHistoricoInsert);
 	}
 
-	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception {
-		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		Error error = new Error();
-		deleteResponseDTO.setError(error);
-
-		// Conseguimos información del usuario logeado
-		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
-
-		LOGGER.info("insertarEstadosPagos() -> Entrada al servicio para crear una entrada al historico de factura");
-
-		if (usuario != null && item.getIdAccion().equalsIgnoreCase("4")) {
-
-			// factura
-			FacFacturaKey facKey = new FacFacturaKey();
-			facKey.setIdinstitucion(usuario.getIdinstitucion());
-			facKey.setIdfactura(item.getIdFactura());
-			FacFactura facUpdate = facFacturaExtendsMapper.selectByPrimaryKey(facKey);
-
-			// ultima entrada
-			FacHistoricofacturaExample example = new FacHistoricofacturaExample();
-			example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
-					.andIdfacturaEqualTo(item.getIdFactura());
-			example.setOrderByClause("IDHISTORICO");
-			List<FacHistoricofactura> facHistoricoList = facHistoricofacturaExtendsMapper.selectByExample(example);
-
-			FacHistoricofactura facHistorico = facHistoricoList.get(facHistoricoList.size() - 2);
-
-			FacPagosporcajaExample examplePagos = new FacPagosporcajaExample();
-			examplePagos.createCriteria().andIdfacturaEqualTo(item.getIdFactura())
-					.andIdinstitucionEqualTo(usuario.getIdinstitucion());
-			example.setOrderByClause("IDPAGOPORCAJA");
-
-			List<FacPagosporcaja> listPagos = facPagosPorCajaMapper.selectByExample(examplePagos);
-
-			FacPagosporcaja pagosCajaDelete = listPagos.get(listPagos.size() - 1);
-
-			// factura
-			facUpdate.setImptotalpagado(facUpdate.getImptotalpagado().add(facHistorico.getImptotalpagado()));
-			facUpdate.setImptotalpagadoporcaja(
-					facUpdate.getImptotalpagadoporcaja().add(facHistorico.getImptotalpagado()));
-			facUpdate.setImptotalpagadosolocaja(
-					facUpdate.getImptotalpagadosolocaja().add(facHistorico.getImptotalpagado()));
-			facUpdate.setImptotalporpagar(facUpdate.getImptotalporpagar().subtract(facHistorico.getImptotalpagado()));
-			facUpdate.setFechamodificacion(new Date());
-			facUpdate.setUsumodificacion(usuario.getIdusuario());
-			facUpdate.setEstado(facHistorico.getEstado());
-			facUpdate.setIdformapago(facHistorico.getIdformapago());
-			facUpdate.setIdcuenta(facHistorico.getIdcuenta());
-			facUpdate.setIdcuentadeudor(facHistorico.getIdcuentadeudor());
-
-			// saves
-			facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
-			facHistoricofacturaExtendsMapper.deleteByPrimaryKey(facHistoricoList.get(facHistoricoList.size() - 1));
-			facPagosPorCajaMapper.deleteByPrimaryKey(pagosCajaDelete);
-
-			deleteResponseDTO.setStatus(HttpStatus.OK.toString());
-		}
-
-		LOGGER.info("insertarEstadosPagos() -> Salida del servicio para crear una entrada al historico de factura");
-
-		return deleteResponseDTO;
-	}
-
 	private void subirFicheroDisquete(InputStream ficheroOriginal, String rutaServidor, String nombreFichero) {
 		LOGGER.info("subirFicheroDisquete() -> Entrada al servicio para subir el fichero de devoluciones");
 
@@ -4714,7 +4649,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			sql.FROM("FAC_ABONO A");
 			sql.INNER_JOIN("FCS_PAGOSJG PA on A.IDPAGOSJG = PA.IDPAGOSJG AND A.idinstitucion = PA.idinstitucion");
 			sql.INNER_JOIN("FCS_FACTURACIONJG  F ON (PA.IDFACTURACION = F.IDFACTURACION AND PA.IDINSTITUCION = F.IDINSTITUCION) ");
-			sql.INNER_JOIN("FCS_FACT_GRUPOFACT_HITO G ON (G.IDINSTITUCION = F.IDINSTITUCION AND G.IDFACTURACION = F.IDFACTURACION)");
 			sql.INNER_JOIN("CEN_CLIENTE C ON (C.IDPERSONA = A.IDPERSONA AND C.IDINSTITUCION = A.IDINSTITUCION)");
 			sql.INNER_JOIN("CEN_PERSONA P ON (P.IDPERSONA = A.IDPERSONA)");
 			sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = P.IDPERSONA AND COL.IDINSTITUCION = A.IDINSTITUCION)");
@@ -4759,10 +4693,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	        }
 	        if(facAbonoItem.getContabilizada()!=null && facAbonoItem.getContabilizada().equalsIgnoreCase("N")) {
 	        	sql.WHERE("A.contabilizada = 'N'");
-	        }
-	        
-	        if(facAbonoItem.getGrupoFacturacionNombre() != null) {
-	        	sql.WHERE("G.IDGRUPOFACTURACION =" + facAbonoItem.getGrupoFacturacionNombre());
 	        }
 
 	        if(facAbonoItem.getNumIdentificadorSociedad() != null ) {
