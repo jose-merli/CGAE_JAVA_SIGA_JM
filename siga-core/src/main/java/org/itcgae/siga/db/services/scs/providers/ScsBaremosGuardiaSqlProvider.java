@@ -48,7 +48,7 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "		hit.idturno,"
 						+ "		hit.idguardia,"
 						+ "     hit.IDHITO,"
-						+ "(SELECT NOMBRE FROM SCS_TURNO WHERE IDINSTITUCION = hit.IDINSTITUCION AND IDTURNO = hit.idturno) NOMBRE,"
+						+ "(SELECT NOMBRE FROM SCS_TURNO WHERE IDINSTITUCION = hit.IDINSTITUCION AND IDTURNO = hit.idturno) NOMBRETURNO,"
 						+ "		gua.fechabaja,"
 				+ "    f_siga_getrecurso( "
 				+ "        tip.descripcion, "
@@ -328,7 +328,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				}else {
 					sql.WHERE("gua.fechabaja is not null");
 				}
-				sql.WHERE("rownum <= 200");
+				//sql.WHERE("rownum <= 200");
 				
 				sql.GROUP_BY("hit.idinstitucion,"
 						+ "    hit.idturno,"
