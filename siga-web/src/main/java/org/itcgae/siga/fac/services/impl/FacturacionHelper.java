@@ -14,6 +14,7 @@ import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.UtilidadesNumeros;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmLenguajes;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
@@ -126,11 +127,11 @@ public class FacturacionHelper {
 
     private final String CTR = "%%";
 
-    public File generarPdfFacturaFirmada(String idFactura, String idInstitucion) throws Exception {
-        return generarPdfFacturaFirmada(idFactura, idInstitucion, false);
+    public File generarPdfFacturaFirmada(String idFactura, String idInstitucion, AdmUsuarios usuario) throws Exception {
+        return generarPdfFacturaFirmada(idFactura, idInstitucion, false, usuario);
     }
 
-    public File generarPdfFacturaFirmada(String idFactura, String idInstitucion, boolean bRegenerar) throws Exception {
+    public File generarPdfFacturaFirmada(String idFactura, String idInstitucion, boolean bRegenerar, AdmUsuarios usuario) throws Exception {
 
         File ficheroPDF;
 
@@ -143,7 +144,7 @@ public class FacturacionHelper {
         try {
 
             // Generamos el fichero pdf de la factura
-            ficheroPDF = generarPdfFacturaFirmada(facFactura, bRegenerar);
+            ficheroPDF = generarPdfFacturaFirmada(facFactura, bRegenerar, usuario);
 
         } catch (Exception e) {
             throw e;
@@ -152,13 +153,13 @@ public class FacturacionHelper {
         return ficheroPDF;
     }
 
-    private File generarPdfFacturaFirmada(FacFactura facFactura, boolean bRegenerar) throws Exception {
+    private File generarPdfFacturaFirmada(FacFactura facFactura, boolean bRegenerar, AdmUsuarios usuario) throws Exception {
 
         File fFicheroFirmado;
 
         try {
 
-            File filePDF = generarPdfFacturaSinFirmar(facFactura, bRegenerar);
+            File filePDF = generarPdfFacturaSinFirmar(facFactura, bRegenerar, usuario);
 
             if (filePDF == null) {
                 throw new Exception("Error al generar la factura. Fichero devuelto es nulo");
@@ -196,7 +197,7 @@ public class FacturacionHelper {
         return fFicheroFirmado;
     }
 
-    private File generarPdfFacturaSinFirmar(FacFactura facFactura, boolean bRegenerar) throws Exception {
+    private File generarPdfFacturaSinFirmar(FacFactura facFactura, boolean bRegenerar, AdmUsuarios usuario) throws Exception {
 
         File fPdf;
 
@@ -274,7 +275,7 @@ public class FacturacionHelper {
                 String contenidoPlantilla = obtenerContenidoPlantilla(rutaPlantilla, nombrePlantilla);
 
                 LOGGER.info("ANTES DE GENERAR EL INFORME.");
-                fPdf = generarInforme(rutaServidorTmp, contenidoPlantilla, rutaAlmacen, nombrePDF, idFacturaParametro, facFactura.getIdinstitucion());
+                fPdf = generarInforme(rutaServidorTmp, contenidoPlantilla, rutaAlmacen, nombrePDF, idFacturaParametro, facFactura.getIdinstitucion(), usuario);
                 LOGGER.info("DESPUES DE GENERAR EL INFORME EN  " + rutaAlmacen);
 
             }
@@ -286,7 +287,7 @@ public class FacturacionHelper {
         return fPdf;
     }
 
-    public File generarInforme(String rutaServidorTmp, String contenidoPlantilla, String rutaServidorDescargas, String nombreFicheroPDF, String idFactura, Short idInstitucion) throws Exception {
+    public File generarInforme(String rutaServidorTmp, String contenidoPlantilla, String rutaServidorDescargas, String nombreFicheroPDF, String idFactura, Short idInstitucion, AdmUsuarios usuario) throws Exception {
 
         File ficheroFOP = null;
         File ficheroPDF = null;
@@ -303,7 +304,7 @@ public class FacturacionHelper {
 
             // Generacion del fichero .FOP para este usuario a partir de la plantilla .FO
             LOGGER.info("ANTES DE REEMPLAZAR LOS DATOS DE LA PLANTILLA.");
-            String content = reemplazarDatos(contenidoPlantilla, idFactura, idInstitucion.toString());
+            String content = reemplazarDatos(contenidoPlantilla, idFactura, idInstitucion.toString(), usuario);
             LOGGER.info("DESPUES DE REEMPLAZAR LOS DATOS DE LA PLANTILLA.");
             setFileContent(ficheroFOP, content);
 
@@ -350,7 +351,7 @@ public class FacturacionHelper {
         }
     }
 
-    private String reemplazarDatos(String plantillaFO, String idFacturaDemonio, String idInstitucion) throws Exception {
+    private String reemplazarDatos(String plantillaFO, String idFacturaDemonio, String idInstitucion, AdmUsuarios usuario) throws Exception {
         Hashtable htDatos = null;
 
         String plantilla = plantillaFO;
@@ -358,7 +359,7 @@ public class FacturacionHelper {
         String institucion = idInstitucion;
 
         //Cargar datos fijos
-        htDatos = cargarDatosFijos(institucion, idFactura);
+        htDatos = cargarDatosFijos(institucion, idFactura, usuario);
 
         //Cargar listado de letrados en cola
         List<LineaImpresionInformeDTO> vLineasFactura = getLineasImpresionInforme(institucion, idFactura);
@@ -373,7 +374,7 @@ public class FacturacionHelper {
                     Float f = Float.valueOf(String.valueOf(h.getIva_linea_aux()));
                     if (f != null) {
                         if (f.doubleValue() == 0.0f) {
-                            String idioma = "1";
+                            String idioma = usuario.getIdlenguaje();
                             htDatos.put("EXENTO_IVA", getMensajeIdioma(idioma, "messages.factura.LIVA"));
                             break;
                         }
@@ -465,12 +466,12 @@ public class FacturacionHelper {
         return plantilla;
     }
 
-    public Hashtable cargarDatosFijos(String institucion, String idFactura) throws Exception {
-        Hashtable ht = getDatosImpresionInformeFactura(institucion, idFactura);
+    public Hashtable cargarDatosFijos(String institucion, String idFactura, AdmUsuarios usuario) throws Exception {
+        Hashtable ht = getDatosImpresionInformeFactura(institucion, idFactura, usuario);
         return ht;
     }
 
-    public Hashtable getDatosImpresionInformeFactura(String idInstitucion, String idFactura) throws Exception {
+    public Hashtable getDatosImpresionInformeFactura(String idInstitucion, String idFactura, AdmUsuarios usuario) throws Exception {
         Hashtable nuevo = new Hashtable();
 
         try {
@@ -661,7 +662,7 @@ public class FacturacionHelper {
                 String sIdCuentaDeudor = factura.getIdcuentadeudor();
                 String sFormaPago;
                 if (sIdCuentaDeudor != null && !sIdCuentaDeudor.equals("")) {
-                    sFormaPago = getMensajeIdioma("1", "facturacion.abonosPagos.boton.pagoDomiciliacionBanco");
+                    sFormaPago = getMensajeIdioma(usuario.getIdlenguaje(), "facturacion.abonosPagos.boton.pagoDomiciliacionBanco");
                 } else {
                     String sIdCuenta = factura.getIdcuenta();
                     if (sIdCuenta != null && !sIdCuenta.equals("")) {
@@ -693,7 +694,7 @@ public class FacturacionHelper {
                             nuevo.put("NIFCIF_TITULAR", sNifCifDeudor);
                         }
                     } else {
-                        sFormaPago = getMensajeIdioma("1", "facturacion.abonosPagos.boton.pagoCaja");
+                        sFormaPago = getMensajeIdioma(usuario.getIdlenguaje(), "facturacion.abonosPagos.boton.pagoCaja");
                     }
                 }
                 nuevo.put("FORMA_PAGO_FACTURA", sFormaPago);
@@ -705,7 +706,7 @@ public class FacturacionHelper {
                 nuevo.put("OBSERVINFORME", sObservacionesInforme);
 
                 String sDescripcionEstado = factura.getDescripcion_estado();
-                sDescripcionEstado = getMensajeIdioma("1", sDescripcionEstado);
+                sDescripcionEstado = getMensajeIdioma(usuario.getIdlenguaje(), sDescripcionEstado);
                 nuevo.put("ESTADO", sDescripcionEstado);
 
                 // formateo de valores

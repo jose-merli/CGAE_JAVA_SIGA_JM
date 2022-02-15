@@ -370,4 +370,248 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         return sql.toString();
     }
 
+    public String getNumTotalFacturacionesProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada) {
+        SQL sql = new SQL();
+        sql.SELECT("COUNT(1) TOTAL");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAREALGENERACION IS NULL");
+        sql.WHERE("FP.FECHAPREVISTAGENERACION IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTAGENERACION <= SYSDATE");
+        sql.WHERE(MessageFormat.format("(FP.IDESTADOCONFIRMACION = {0} OR (FP.IDESTADOCONFIRMACION = {1} AND SYSDATE - {2} > FP.FECHAMODIFICACION))",
+                FacEstadoConfirmacionFact.GENERACION_PROGRAMADA.getId(), FacEstadoConfirmacionFact.EJECUTANDO_GENERACION.getId(), tiempoMaximoEjecucionBloqueada));
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+        return sql.toString();
+    }
+
+    public String getPosicionFacturacionProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada,
+                                                             String idSerieFacturacion, String idProgramacion) {
+        SQL sql = new SQL();
+        sql.SELECT("FP.*");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAREALGENERACION IS NULL");
+        sql.WHERE("FP.FECHAPREVISTAGENERACION IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTAGENERACION <= SYSDATE");
+        sql.WHERE(MessageFormat.format("(FP.IDESTADOCONFIRMACION = {0} OR (FP.IDESTADOCONFIRMACION = {1} AND SYSDATE - {2} > FP.FECHAMODIFICACION))",
+                FacEstadoConfirmacionFact.GENERACION_PROGRAMADA.getId(), FacEstadoConfirmacionFact.EJECUTANDO_GENERACION.getId(), tiempoMaximoEjecucionBloqueada));
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+
+        SQL a = new SQL();
+        a.SELECT("ROWNUM POSICION");
+        a.SELECT("A.*");
+        a.FROM("( " + sql + " ) A");
+
+        SQL b = new SQL();
+        b.SELECT("B.POSICION");
+        b.FROM("(" + a + " ) B");
+        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
+        b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
+        b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
+
+        return b.toString();
+    }
+
+    public String getNumTotalFacturacionesProTratarConfirmacion(Short idInstitucion) {
+        SQL subQuery = new SQL();
+        subQuery.SELECT("1");
+        subQuery.FROM("FAC_FACTURACIONPROGRAMADA PREVIA");
+        subQuery.WHERE("PREVIA.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("PREVIA.IDSERIEFACTURACION = SF.IDSERIEFACTURACIONPREVIA");
+        subQuery.WHERE("PREVIA.VISIBLE = 'S'");
+        subQuery.WHERE(MessageFormat.format("PREVIA.IDESTADOCONFIRMACION <> {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
+
+        SQL sql = new SQL();
+        sql.SELECT("COUNT(1) TOTAL");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTACONFIRM <= SYSDATE");
+        sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
+        sql.WHERE("FP.VISIBLE = 'S'");
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION IN({0})", String.join(FacEstadoConfirmacionFact.GENERADA.toString(), FacEstadoConfirmacionFact.CONFIRM_PROGRAMADA.toString())));
+        sql.WHERE(MessageFormat.format("NOT EXISTS ({0})", subQuery.toString()));
+        sql.ORDER_BY("FP.FECHAPREVISTACONFIRM");
+        return sql.toString();
+    }
+
+    public String getPosicionFacturacionProTratarConfirmacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion) {
+        SQL subQuery = new SQL();
+        subQuery.SELECT("1");
+        subQuery.FROM("FAC_FACTURACIONPROGRAMADA PREVIA");
+        subQuery.WHERE("PREVIA.IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("PREVIA.IDSERIEFACTURACION = SF.IDSERIEFACTURACIONPREVIA");
+        subQuery.WHERE("PREVIA.VISIBLE = 'S'");
+        subQuery.WHERE(MessageFormat.format("PREVIA.IDESTADOCONFIRMACION <> {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
+
+        SQL sql = new SQL();
+        sql.SELECT("FP.*");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTACONFIRM <= SYSDATE");
+        sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
+        sql.WHERE("FP.VISIBLE = 'S'");
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION IN({0})", String.join(FacEstadoConfirmacionFact.GENERADA.toString(), FacEstadoConfirmacionFact.CONFIRM_PROGRAMADA.toString())));
+        sql.WHERE(MessageFormat.format("NOT EXISTS ({0})", subQuery.toString()));
+        sql.ORDER_BY("FP.FECHAPREVISTACONFIRM");
+
+        SQL a = new SQL();
+        a.SELECT("ROWNUM POSICION");
+        a.SELECT("A.*");
+        a.FROM("( " + sql + " ) A");
+
+        SQL b = new SQL();
+        b.SELECT("B.POSICION");
+        b.FROM("(" + a + " ) B");
+        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
+        b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
+        b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
+
+        return b.toString();
+    }
+
+    public String getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada) {
+        SQL sql = new SQL();
+        sql.SELECT("COUNT(1) TOTAL");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTACONFIRM <= SYSDATE");
+        sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION = {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
+        sql.WHERE(MessageFormat.format("(FP.IDESTADOPDF = {0} OR (FP.IDESTADOPDF = {1} AND SYSDATE - {2} > FP.FECHAMODIFICACION))",
+                FacEstadoConfirmacionFact.PDF_PROGRAMADA.toString(), FacEstadoConfirmacionFact.PDF_PROCESANDO.toString(), tiempoMaximoEjecucionBloqueada));
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+        return sql.toString();
+    }
+
+    public String getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
+        SQL sql = new SQL();
+        sql.SELECT("FP.*");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTACONFIRM <= SYSDATE");
+        sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION = {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
+        sql.WHERE(MessageFormat.format("(FP.IDESTADOPDF = {0} OR (FP.IDESTADOPDF = {1} AND SYSDATE - {2} > FP.FECHAMODIFICACION))",
+                FacEstadoConfirmacionFact.PDF_PROGRAMADA.toString(), FacEstadoConfirmacionFact.PDF_PROCESANDO.toString(), tiempoMaximoEjecucionBloqueada));
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+
+        SQL a = new SQL();
+        a.SELECT("ROWNUM POSICION");
+        a.SELECT("A.*");
+        a.FROM("( " + sql + " ) A");
+
+        SQL b = new SQL();
+        b.SELECT("B.POSICION");
+        b.FROM("(" + a + " ) B");
+        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
+        b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
+        b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
+
+        return b.toString();
+    }
+
+    public String getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada) {
+        SQL sql = new SQL();
+        sql.SELECT("COUNT(1) TOTAL");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTACONFIRM <= SYSDATE");
+        sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION = {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
+        sql.WHERE(MessageFormat.format("FP.IDESTADOPDF = {0}", FacEstadoConfirmacionFact.PDF_FINALIZADA.toString()));
+        sql.WHERE(MessageFormat.format("(FP.IDESTADOENVIO = {0} OR (FP.IDESTADOENVIO = {1} AND SYSDATE - {2} > FP.FECHAMODIFICACION))",
+                FacEstadoConfirmacionFact.ENVIO_PROGRAMADA.toString(), FacEstadoConfirmacionFact.ENVIO_PROCESANDO.toString(), tiempoMaximoEjecucionBloqueada));
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+        return sql.toString();
+    }
+
+    public String getPosicionFacturacionProGenerarEnviosFacturasPendientes(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
+        SQL sql = new SQL();
+        sql.SELECT("FP.*");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
+        sql.WHERE("FP.FECHAPREVISTACONFIRM <= SYSDATE");
+        sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION = {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
+        sql.WHERE(MessageFormat.format("FP.IDESTADOPDF = {0}", FacEstadoConfirmacionFact.PDF_FINALIZADA.toString()));
+        sql.WHERE(MessageFormat.format("(FP.IDESTADOENVIO = {0} OR (FP.IDESTADOENVIO = {1} AND SYSDATE - {2} > FP.FECHAMODIFICACION))",
+                FacEstadoConfirmacionFact.ENVIO_PROGRAMADA.toString(), FacEstadoConfirmacionFact.ENVIO_PROCESANDO.toString(), tiempoMaximoEjecucionBloqueada));
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+
+        SQL a = new SQL();
+        a.SELECT("ROWNUM POSICION");
+        a.SELECT("A.*");
+        a.FROM("( " + sql + " ) A");
+
+        SQL b = new SQL();
+        b.SELECT("B.POSICION");
+        b.FROM("(" + a + " ) B");
+        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
+        b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
+        b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
+
+        return b.toString();
+    }
+
+    public String getNumTotalFacturacionesProComprobacionTraspasoFacturas(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada) {
+        SQL subQuery = new SQL();
+        subQuery.SELECT("1");
+        subQuery.FROM("FAC_FACTURA F");
+        subQuery.WHERE("F.IDINSTITUCION = FP.IDINSTITUCION");
+        subQuery.WHERE("F.IDSERIEFACTURACION = FP.IDSERIEFACTURACION");
+        subQuery.WHERE("F.IDPROGRAMACION = FP.IDPROGRAMACION");
+        subQuery.WHERE("F.TRASPASADA IS NULL");
+
+        SQL sql = new SQL();
+        sql.SELECT("COUNT(1) TOTAL");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHACONFIRMACION IS NOT NULL");
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION = {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
+        sql.WHERE(MessageFormat.format("FP.IDESTADOTRASPASO = {0}", FacEstadoConfirmacionFact.TRASPASO_PROCESANDO.toString()));
+        sql.WHERE(MessageFormat.format("(NOT EXISTS ({0}) OR SYSDATE - {1} > FP.FECHAMODIFICACION)", subQuery.toString(), tiempoMaximoEjecucionBloqueada));
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+        return sql.toString();
+    }
+
+    public String getPosicionFacturacionProComprobacionTraspasoFacturas(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
+        SQL subQuery = new SQL();
+        subQuery.SELECT("1");
+        subQuery.FROM("FAC_FACTURA F");
+        subQuery.WHERE("F.IDINSTITUCION = FP.IDINSTITUCION");
+        subQuery.WHERE("F.IDSERIEFACTURACION = FP.IDSERIEFACTURACION");
+        subQuery.WHERE("F.IDPROGRAMACION = FP.IDPROGRAMACION");
+        subQuery.WHERE("F.TRASPASADA IS NULL");
+
+        SQL sql = new SQL();
+        sql.SELECT("FP.*");
+        sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
+        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("FP.FECHACONFIRMACION IS NOT NULL");
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION = {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
+        sql.WHERE(MessageFormat.format("FP.IDESTADOTRASPASO = {0}", FacEstadoConfirmacionFact.TRASPASO_PROCESANDO.toString()));
+        sql.WHERE(MessageFormat.format("(NOT EXISTS ({0}) OR SYSDATE - {1} > FP.FECHAMODIFICACION)", subQuery.toString(), tiempoMaximoEjecucionBloqueada));
+        sql.ORDER_BY("FP.FECHAPREVISTAGENERACION");
+
+        SQL a = new SQL();
+        a.SELECT("ROWNUM POSICION");
+        a.SELECT("A.*");
+        a.FROM("( " + sql + " ) A");
+
+        SQL b = new SQL();
+        b.SELECT("B.POSICION");
+        b.FROM("(" + a + " ) B");
+        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
+        b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
+        b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
+
+        return b.toString();
+    }
+
 }

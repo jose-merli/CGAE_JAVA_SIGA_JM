@@ -271,7 +271,7 @@ public class FacturaAccionesHelper {
                     throw new BusinessException("Error al insertar la factura");
 
                 // Actualizar el estado de la factura
-                consultarActNuevoEstadoFactura(factura, true);
+                consultarActNuevoEstadoFactura(factura, true, usuario);
 
                 // Insertar nuevo estado en historico de facturas
                 resultado = insertarHistoricoFacParametros(factura.getIdinstitucion(), factura.getIdfactura(), (short) 10, pagoCaja.getIdpagoporcaja(),
@@ -407,7 +407,7 @@ public class FacturaAccionesHelper {
                     throw new BusinessException("Error al actualizar los importes de la factura");
 
                 // Actualizamos el nuevo estado de la factura
-                consultarActNuevoEstadoFactura(factura, true);
+                consultarActNuevoEstadoFactura(factura, true, usuario);
             } else {
                 facturaKey = new FacFacturaKey();
                 facturaKey.setIdinstitucion(usuario.getIdinstitucion());
@@ -789,7 +789,7 @@ public class FacturaAccionesHelper {
             throw new BusinessException("Error al actualizar los importes de la factura");
 
         // Actualizamos el importe de la factura
-        consultarActNuevoEstadoFactura(factura, true);
+        consultarActNuevoEstadoFactura(factura, true, usuario);
 
         resultado = insertarHistoricoFacParametros(usuario.getIdinstitucion(), idFactura, (short) 4, newIdPagoCaja,
                 null, null, null, null, null, null, null);
@@ -1008,7 +1008,7 @@ public class FacturaAccionesHelper {
         try {
             //TODO: Si no se produce error regeneramos el pdf
             facturacionHelper.generarPdfFacturaFirmada(factura.getIdfactura(),
-                    factura.getIdinstitucion().toString(), Boolean.TRUE);
+                    factura.getIdinstitucion().toString(), Boolean.TRUE, usuario);
         } catch (Exception e) {
             LOGGER.warn("Excepcion en la generación del informe de factura");
         }
@@ -1051,7 +1051,7 @@ public class FacturaAccionesHelper {
         try {
             //TODO: Si no se produce error regeneramos el pdf
             facturacionHelper.generarPdfFacturaFirmada(facturaToSave.getIdfactura(),
-                    facturaToSave.getIdinstitucion().toString(), Boolean.TRUE);
+                    facturaToSave.getIdinstitucion().toString(), Boolean.TRUE, usuario);
         } catch (Exception e) {
             LOGGER.warn("Excepcion en la generación del informe de factura");
         }
@@ -1059,7 +1059,7 @@ public class FacturaAccionesHelper {
         return resultado;
     }
 
-    private String consultarActNuevoEstadoFactura(FacFactura facturaBean, boolean actualizar) throws BusinessException {
+    private String consultarActNuevoEstadoFactura(FacFactura facturaBean, boolean actualizar, AdmUsuarios usuario) throws BusinessException {
 
         String nuevoEstado = "";
 
@@ -1113,7 +1113,7 @@ public class FacturaAccionesHelper {
                     try {
                         //TODO: Si no se produce error regeneramos el pdf
                         facturacionHelper.generarPdfFacturaFirmada(facturaLocalBean.getIdfactura(),
-                                facturaLocalBean.getIdinstitucion().toString(), Boolean.TRUE);
+                                facturaLocalBean.getIdinstitucion().toString(), Boolean.TRUE, usuario);
                     } catch (Exception e) {
                         LOGGER.warn("Excepcion en la generación del informe de factura");
                     }
@@ -1257,7 +1257,7 @@ public class FacturaAccionesHelper {
 
             try {
                 // Si no se produce error regeneramos el pdf con la información de la factura
-                facturacionHelper.generarPdfFacturaFirmada(facUpdate.getIdfactura(), facUpdate.getIdinstitucion().toString(), true);
+                facturacionHelper.generarPdfFacturaFirmada(facUpdate.getIdfactura(), facUpdate.getIdinstitucion().toString(), true, usuario);
             } catch (Exception ex) {
                 LOGGER.warn("aplicarComisionAFactura() -> Error al generar el pdf con la información de la factura");
             }
