@@ -2524,9 +2524,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				FacFactura updateItem = facFacturaExtendsMapper.selectByPrimaryKey(key);
 
 				if (item.getObservacionesFactura() != null)
-					updateItem.setObservaciones(item.getObservacionesFactura());
+					updateItem.setObservaciones(item.getObservacionesFactura().replace("<p>", "").replace("</p>", ""));
 				if (item.getObservacionesFicheroFactura() != null)
-					updateItem.setObservinforme(item.getObservacionesFicheroFactura());
+					updateItem.setObservinforme(item.getObservacionesFicheroFactura().replace("<p>", "").replace("</p>", ""));
+				if(updateItem.getObservaciones().length()>255 || updateItem.getObservinforme().length()>255) {
+					throw new BusinessException("facturacion.facturas.numeroMaxCaracteres");
+				}
 
 				facFacturaExtendsMapper.updateByPrimaryKey(updateItem);
 
@@ -2765,76 +2768,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				"FacturacionPySServiceImpl.getLineasFactura() -> Salida del servicio  para obtener las lineas de la factura");
 
 		return comunicacionCobroDTO;
-	}
-
-	@Override
-	public EstadosPagosDTO getEstadosPagos(String idFactura, HttpServletRequest request) throws Exception {
-		EstadosPagosDTO estadosPagosDTO = new EstadosPagosDTO();
-		AdmUsuarios usuario = new AdmUsuarios();
-
-		LOGGER.info(
-				"FacturacionPySServiceImpl.getEstadosPagos() -> Entrada al servicio para obtener el historico de la factura");
-
-		// Conseguimos información del usuario logeado
-		usuario = authenticationProvider.checkAuthentication(request);
-
-		if (usuario != null) {
-			LOGGER.info("FacturacionPySServiceImpl.getEstadosPagos() -> obteniendo el historico de la factura");
-
-			FacFactura factura = new FacFactura();
-			String idFacturaParent = idFactura;
-
-			do {
-				FacFacturaKey key = new FacFacturaKey();
-				key.setIdinstitucion(usuario.getIdinstitucion());
-				key.setIdfactura(idFacturaParent);
-				factura = facFacturaExtendsMapper.selectByPrimaryKey(key);
-
-				if (factura != null && factura.getComisionidfactura() != null)
-					idFacturaParent = factura.getComisionidfactura();
-			} while (factura != null && factura.getComisionidfactura() != null);
-
-			List<EstadosPagosItem> result = facHistoricofacturaExtendsMapper.getEstadosPagos(idFacturaParent,
-					usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
-
-			if (!UtilidadesString.esCadenaVacia(result.get(result.size() - 1).getIdAbono())) {
-				List<EstadosPagosItem> abono = facPagoabonoefectivoExtendsMapper.getEstadosAbonos(result.get(result.size() - 1).getIdAbono(),
-						usuario.getIdinstitucion(), usuario.getIdlenguaje()).stream()
-						.map(e -> {
-							EstadosPagosItem item = new EstadosPagosItem();
-
-							item.setFechaModificaion(e.getFecha());
-							item.setIdAccion(e.getIdAccion());
-							item.setAccion(e.getAccion());
-							item.setIdFactura(e.getIdFactura());
-							item.setIdAbono(e.getIdAbono());
-							item.setNumeroFactura(e.getNumeroAbono());
-							item.setNumeroAbono(e.getNumeroAbono());
-
-							if (!UtilidadesString.esCadenaVacia(e.getNumeroAbono()))
-								item.setEnlaceAbono(true);
-							if (!UtilidadesString.esCadenaVacia(e.getNumeroFactura()))
-								item.setEnlaceFactura(true);
-
-							item.setEstado(e.getEstado());
-							item.setImpTotalPagado(e.getMovimiento());
-							item.setImpTotalPorPagar(e.getImportePendiente());
-							item.setCuentaBanco(e.getCuentaBancaria());
-
-							return item;
-						}).collect(Collectors.toList());
-
-				result.addAll(abono);
-			}
-
-
-			estadosPagosDTO.setEstadosPagosItems(result);
-		}
-
-		LOGGER.info(
-				"FacturacionPySServiceImpl.getEstadosPagos() -> Salida del servicio  para obtener el historico de la factura");
-
-		return estadosPagosDTO;
 	}
 
 	@Override
@@ -4781,7 +4714,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			sql.FROM("FAC_ABONO A");
 			sql.INNER_JOIN("FCS_PAGOSJG PA on A.IDPAGOSJG = PA.IDPAGOSJG AND A.idinstitucion = PA.idinstitucion");
 			sql.INNER_JOIN("FCS_FACTURACIONJG  F ON (PA.IDFACTURACION = F.IDFACTURACION AND PA.IDINSTITUCION = F.IDINSTITUCION) ");
-			sql.INNER_JOIN("FCS_FACT_GRUPOFACT_HITO G ON (G.IDINSTITUCION = F.IDINSTITUCION AND G.IDFACTURACION = F.IDFACTURACION)");
 			sql.INNER_JOIN("CEN_CLIENTE C ON (C.IDPERSONA = A.IDPERSONA AND C.IDINSTITUCION = A.IDINSTITUCION)");
 			sql.INNER_JOIN("CEN_PERSONA P ON (P.IDPERSONA = A.IDPERSONA)");
 			sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = P.IDPERSONA AND COL.IDINSTITUCION = A.IDINSTITUCION)");
@@ -4826,10 +4758,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	        }
 	        if(facAbonoItem.getContabilizada()!=null && facAbonoItem.getContabilizada().equalsIgnoreCase("N")) {
 	        	sql.WHERE("A.contabilizada = 'N'");
-	        }
-	        
-	        if(facAbonoItem.getGrupoFacturacionNombre() != null) {
-	        	sql.WHERE("G.IDGRUPOFACTURACION =" + facAbonoItem.getGrupoFacturacionNombre());
 	        }
 
 	        if(facAbonoItem.getNumIdentificadorSociedad() != null ) {

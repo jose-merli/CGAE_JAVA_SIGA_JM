@@ -21,6 +21,7 @@ import org.itcgae.siga.db.entities.FacDisquetedevolucionesKey;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacFacturacionsuscripcion;
+import org.itcgae.siga.db.entities.FacFacturacionsuscripcionAnu;
 import org.itcgae.siga.db.entities.FacFacturacionsuscripcionExample;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
 import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteExample;
@@ -41,6 +42,7 @@ import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.FacFacturacionsuscripcionAnuMapper;
 import org.itcgae.siga.db.mappers.FacFacturacionsuscripcionMapper;
 import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
 import org.itcgae.siga.db.mappers.FacLineadevoludisqbancoMapper;
@@ -139,6 +141,9 @@ public class FacturaAccionesHelper {
 
     @Autowired
     private FacFacturacionsuscripcionMapper facFacturacionsuscripcionMapper;
+
+    @Autowired
+    private FacFacturacionsuscripcionAnuMapper facFacturacionsuscripcionAnuMapper;
 
     @Autowired
     private GenDiccionarioMapper genDiccionarioMapper;
@@ -820,9 +825,8 @@ public class FacturaAccionesHelper {
 
         FacAbono abono = new FacAbono();
 
-        String newObservaciones = observaciones != null
-                ? observaciones : (getTraduccion("messages.informes.abono.mensajeFactura", usuario.getIdlenguaje()) + " " + factura.getNumerofactura());
-        abono.setObservaciones(newObservaciones);
+        abono.setObservaciones(getTraduccion("messages.informes.abono.mensajeFactura", usuario.getIdlenguaje()) + " " + factura.getNumerofactura());
+        abono.setMotivos(observaciones);
 
         Long newIdAbono = facAbonoExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString());
         abono.setIdabono(newIdAbono);
@@ -830,7 +834,7 @@ public class FacturaAccionesHelper {
         abono.setIdinstitucion(usuario.getIdinstitucion());
         abono.setIdabono(newIdAbono);
 
-        // TODO: Escribir el motivo
+        // Escribir el motivo
         abono.setMotivos(getTraduccion("facturacion.altaAbonos.literal.devolucion", usuario.getIdlenguaje()) + " " + "motivo");
         abono.setFecha(fecha);
         abono.setContabilizada(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
@@ -838,6 +842,8 @@ public class FacturaAccionesHelper {
 
         abono.setIdpersona(factura.getIdpersona());
         abono.setIdpersonadeudor(factura.getIdpersonadeudor());
+        abono.setUsumodificacion(usuario.getIdusuario());
+        abono.setFechamodificacion(new Date());
 
 
         // Actualizar importes de la factura
@@ -857,7 +863,7 @@ public class FacturaAccionesHelper {
         incrementarContador(serie.getIdcontadorAbonos(), usuario.getIdinstitucion());
 
         // Insertamos el abono
-        resultado = facAbonoExtendsMapper.insert(abono);
+        resultado = facAbonoExtendsMapper.insertSelective(abono);
         if (resultado <= 0)
             throw new BusinessException("Error en insertar abono Devolucion");
 
@@ -867,59 +873,68 @@ public class FacturaAccionesHelper {
         abonoKey.setIdabono(newIdAbono);
 
         abono = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
-        if (importeCompensado.compareTo(BigDecimal.ZERO) <= 0)
-            throw new BusinessException("El importe a compensar no es válido");
 
-        // Insertamos el pago abono efectivo
-        FacPagoabonoefectivo pagoAbono = new FacPagoabonoefectivo();
-        pagoAbono.setIdinstitucion(usuario.getIdinstitucion());
-        pagoAbono.setIdabono(newIdAbono);
+        if (importeCompensado.compareTo(BigDecimal.ZERO) > 0) {
+            // Insertamos el pago abono efectivo
+            FacPagoabonoefectivo pagoAbono = new FacPagoabonoefectivo();
+            pagoAbono.setIdinstitucion(usuario.getIdinstitucion());
+            pagoAbono.setIdabono(newIdAbono);
 
-        Long newIdPagoAbono = facPagoabonoefectivoExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString(), newIdAbono.toString());
-        pagoAbono.setIdpagoabono(newIdPagoAbono);
+            Long newIdPagoAbono = facPagoabonoefectivoExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString(), newIdAbono.toString());
+            pagoAbono.setIdpagoabono(newIdPagoAbono);
 
-        pagoAbono.setImporte(importeCompensado.setScale(2, RoundingMode.DOWN));
-        pagoAbono.setFecha(fecha);
-        pagoAbono.setContabilizado(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
+            pagoAbono.setImporte(importeCompensado.setScale(2, RoundingMode.DOWN));
+            pagoAbono.setFecha(fecha);
+            pagoAbono.setContabilizado(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
 
-        resultado = facPagoabonoefectivoExtendsMapper.insert(pagoAbono);
-        if (resultado <= 0)
-            throw new BusinessException("Error al insertar el pago abono efectivo");
+            pagoAbono.setFechamodificacion(new Date());
+            pagoAbono.setUsumodificacion(usuario.getIdusuario());
+            resultado = facPagoabonoefectivoExtendsMapper.insertSelective(pagoAbono);
+            if (resultado <= 0)
+                throw new BusinessException("Error al insertar el pago abono efectivo");
 
-        // Insertamos el pago abono por caja
-        FacPagosporcaja pagoCaja = new FacPagosporcaja();
-        pagoCaja.setIdinstitucion(usuario.getIdinstitucion());
-        pagoCaja.setIdfactura(factura.getIdfactura());
+            // Insertamos el pago abono por caja
+            FacPagosporcaja pagoCaja = new FacPagosporcaja();
+            pagoCaja.setIdinstitucion(usuario.getIdinstitucion());
+            pagoCaja.setIdfactura(factura.getIdfactura());
 
-        Short newIdPagoCaja = facPagosporcajaExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString(), factura.getIdfactura());
-        pagoCaja.setIdpagoporcaja(newIdPagoCaja);
+            Short newIdPagoCaja = facPagosporcajaExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString(), factura.getIdfactura());
+            pagoCaja.setIdpagoporcaja(newIdPagoCaja);
 
-        pagoCaja.setFecha(fecha);
-        pagoCaja.setTarjeta("N");
-        pagoCaja.setTipoapunte(SigaConstants.TIPO_APUNTE_COMPENSADO);
-        pagoCaja.setObservaciones(getTraduccion("messages.abonos.literal.compensa", usuario.getIdlenguaje()) + " " + nuevoNumeroAbono);
-        pagoCaja.setContabilizado(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
-        pagoCaja.setImporte(importeCompensado.setScale(2, RoundingMode.DOWN));
-        pagoCaja.setIdabono(newIdAbono);
-        pagoCaja.setIdpagoabono(newIdPagoAbono);
+            pagoCaja.setFecha(fecha);
+            pagoCaja.setTarjeta("N");
+            pagoCaja.setTipoapunte(SigaConstants.TIPO_APUNTE_COMPENSADO);
+            pagoCaja.setObservaciones(getTraduccion("messages.abonos.literal.compensa", usuario.getIdlenguaje()) + " " + nuevoNumeroAbono);
+            pagoCaja.setContabilizado(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
+            pagoCaja.setImporte(importeCompensado.setScale(2, RoundingMode.DOWN));
+            pagoCaja.setIdabono(newIdAbono);
+            pagoCaja.setIdpagoabono(newIdPagoAbono);
 
-        resultado = facPagosporcajaExtendsMapper.insert(pagoCaja);
-        if (resultado <= 0)
-            throw new BusinessException("Error al insertar el pago abono por caja");
+            pagoCaja.setFechamodificacion(new Date());
+            pagoCaja.setUsumodificacion(usuario.getIdusuario());
+            resultado = facPagosporcajaExtendsMapper.insertSelective(pagoCaja);
+            if (resultado <= 0)
+                throw new BusinessException("Error al insertar el pago abono por caja");
 
-        BigDecimal impTotalCompensado = factura.getImptotalcompensado().add(importeCompensado);
-        BigDecimal impTotalPagado = factura.getImptotalpagado().add(importeCompensado);
-        BigDecimal impTotalPorPagar = factura.getImptotalporpagar().subtract(importeCompensado);
+            BigDecimal impTotalCompensado = factura.getImptotalcompensado().add(importeCompensado);
+            BigDecimal impTotalPagado = factura.getImptotalpagado().add(importeCompensado);
+            BigDecimal impTotalPorPagar = factura.getImptotalporpagar().subtract(importeCompensado);
 
-        factura.setImptotalcompensado(impTotalCompensado.setScale(2, RoundingMode.DOWN));
-        factura.setImptotalpagado(impTotalPagado.setScale(2, RoundingMode.DOWN));
-        factura.setImptotalporpagar(impTotalPorPagar.setScale(2, RoundingMode.DOWN));
+            factura.setImptotalcompensado(impTotalCompensado.setScale(2, RoundingMode.DOWN));
+            factura.setImptotalpagado(impTotalPagado.setScale(2, RoundingMode.DOWN));
+            factura.setImptotalporpagar(impTotalPorPagar.setScale(2, RoundingMode.DOWN));
 
-        factura.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_ANULADA));
+            factura.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_ANULADA));
 
-        resultado = facFacturaExtendsMapper.updateByPrimaryKey(factura);
-        if (resultado <= 0)
-            throw new BusinessException("Error al actualizar los importes de la factura");
+            resultado = facFacturaExtendsMapper.updateByPrimaryKey(factura);
+            if (resultado <= 0)
+                throw new BusinessException("Error al actualizar los importes de la factura");
+
+            // Mover las suscripciones a la tabla de suscripciones anuladas
+            moverFacturacionSuscripcion(factura.getIdfactura(), usuario.getIdinstitucion());
+        }
+
+
 
         // Líneas de factura
         FacLineafacturaExample lineafacturaExample = new FacLineafacturaExample();
@@ -943,6 +958,8 @@ public class FacturaAccionesHelper {
 
             lineaabono.setPreciounitario(lineafactura.getPreciounitario());
 
+            lineaabono.setUsumodificacion(usuario.getIdusuario());
+            lineaabono.setFechamodificacion(new Date());
             resultado = facLineaabonoExtendsMapper.insertSelective(lineaabono);
             if (resultado <= 0)
                 throw new BusinessException("Error al insertar la línea del abono");
@@ -970,12 +987,10 @@ public class FacturaAccionesHelper {
         if (resultado <= 0)
             throw new BusinessException("Error al actualizar el abono");
 
-        // Obtengo el abono insertado
-        abonoKey = new FacAbonoKey();
-        abonoKey.setIdinstitucion(usuario.getIdinstitucion());
-        abonoKey.setIdabono(newIdAbono);
-
-        abono = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
+        factura.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_ANULADA));
+        resultado = facFacturaExtendsMapper.updateByPrimaryKey(factura);
+        if (resultado <= 0)
+            throw new BusinessException("Error al actualizar el estado de la factura");
 
         // Añadimos al historico de la factura
 
@@ -998,6 +1013,9 @@ public class FacturaAccionesHelper {
             LOGGER.warn("Excepcion en la generación del informe de factura");
         }
 
+        // Mover las suscripciones a la tabla de suscripciones anuladas
+        moverFacturacionSuscripcion(factura.getIdfactura(), usuario.getIdinstitucion());
+
         return resultado;
     }
 
@@ -1008,10 +1026,12 @@ public class FacturaAccionesHelper {
 
         List<FacFacturacionsuscripcion> suscripciones = facFacturacionsuscripcionMapper.selectByExample(suscripcionExample);
         for (FacFacturacionsuscripcion suscripcion: suscripciones) {
-
-            BeanUtils.copyProperties(suscripcion, null);
-            //FacfacturacionsuscripcionA
+            FacFacturacionsuscripcionAnu suscripcionAnulada = new FacFacturacionsuscripcionAnu();
+            BeanUtils.copyProperties(suscripcion, suscripcionAnulada);
+            facFacturacionsuscripcionAnuMapper.insertSelective(suscripcionAnulada);
         }
+
+        facFacturacionsuscripcionMapper.deleteByExample(suscripcionExample);
     }
 
     private void incrementarContador(String idContador, Short idInstitucion) {

@@ -10,6 +10,16 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
 	public String getEstadosPagos(String idFactura, String idInstitucion, String idLenguaje) {
 
+		SQL cuentaBancaria = new SQL();
+
+		cuentaBancaria.SELECT("Case When Instr(banco.NOMBRE, '~', 2) > 1 Then Substr(banco.NOMBRE, 1, Instr(banco.NOMBRE, '~', 2) - 2) " +
+				"When Instr(banco.NOMBRE, '(') > 0 Then Substr(banco.NOMBRE, 1, Instr(banco.NOMBRE, '(') - 2) " +
+				"Else banco.NOMBRE End || ' (...' || Substr(cb.IBAN, -4) || ')'");
+		cuentaBancaria.FROM("CEN_CUENTASBANCARIAS cb");
+		cuentaBancaria.FROM("CEN_BANCOS banco");
+		cuentaBancaria.WHERE("cb.CBO_CODIGO = banco.CODIGO");
+		cuentaBancaria.WHERE("cb.IDINSTITUCION = FH.IDINSTITUCION AND cb.IDPERSONA = FH.IDPERSONA AND cb.IDCUENTA = FH.IDCUENTA");
+
 		SQL forward = new SQL();
 
 		forward.SELECT_DISTINCT("level as LVL");
@@ -18,7 +28,7 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 		forward.SELECT_DISTINCT("INITCAP(F_SIGA_GETRECURSO(FT.NOMBRE," + idLenguaje + ")) ACCION");
 		forward.SELECT_DISTINCT("FT.IDTIPOACCION, FH.ESTADO IDESTADO");
 		forward.SELECT_DISTINCT("INITCAP(GR.DESCRIPCION) ESTADO");
-		forward.SELECT_DISTINCT("CC.IBAN");
+		forward.SELECT_DISTINCT("( " + cuentaBancaria.toString() + " ) IBAN");
 		forward.SELECT_DISTINCT("FH.IMPTOTALPAGADO");
 		forward.SELECT_DISTINCT("FH.IMPTOTALPORPAGAR");
 		forward.SELECT_DISTINCT("CASE WHEN FT.IDTIPOACCION = 10 THEN TO_CHAR(FA.IDPAGOSJG) END IDSJCS");
@@ -41,7 +51,6 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 		forward.LEFT_OUTER_JOIN("FAC_TIPOSACCIONFACTURA FT ON (FT.IDTIPOACCION = FH.IDTIPOACCION)");
 		forward.LEFT_OUTER_JOIN("FAC_ESTADOFACTURA FE ON (FE.IDESTADO = FH.ESTADO)");
 		forward.LEFT_OUTER_JOIN("GEN_RECURSOS GR ON (GR.IDRECURSO = FE.DESCRIPCION AND GR.IDLENGUAJE = " + idLenguaje + ")");
-		forward.LEFT_OUTER_JOIN("CEN_CUENTASBANCARIAS CC ON (CC.IDCUENTA = FH.IDCUENTA AND CC.IDINSTITUCION = FH.IDINSTITUCION AND CC.IDPERSONA = FH.IDPERSONA)");
 
 
 		String backwardString = forward.toString()
