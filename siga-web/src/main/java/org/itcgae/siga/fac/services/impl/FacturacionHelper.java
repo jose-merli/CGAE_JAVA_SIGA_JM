@@ -446,7 +446,7 @@ public class FacturacionHelper {
                     // CONVERTIMOS EL OBJETO A HASHTABLE
                     Field[] fields = rObj.getClass().getDeclaredFields();
                     for (Field field : fields) {
-                        String name = field.getName();
+                        String name = field.getName().toUpperCase();
                         field.setAccessible(true);
                         Object resultValue = field.get(rObj);
                         if (resultValue != null) {
