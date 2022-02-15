@@ -92,10 +92,15 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
 						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
 						guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
-						guardia.setDiasGuardia(dias[0]);
+						guardia.setDiasGuardia(dias[0] + dias[1]);
 						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 						guardia.setBaremo(lBaremos.get(i).getBaremo());
 						guardia.setnDias(lBaremos.get(i).getNDias());
+						guardia.setNumMinimoSimple(lBaremos.get(i).getNumMinimoSimple());
+						guardia.setSimpleOImporteIndividual(lBaremos.get(i).getSimpleOImporteIndividual());
+						guardia.setNaPartir(lBaremos.get(i).getNaPartir());
+						guardia.setMaximo(lBaremos.get(i).getMaximo());
+						guardia.setPorDia(lBaremos.get(i).getPorDia());
 						//guar.add(guardia);
 						//if(i+1 != lBaremos.size()) {
 								//&& (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))  ) {
@@ -109,10 +114,16 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
 						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
 						guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
-						guardia.setDiasGuardia(dias[0]);
+						guardia.setDiasGuardia(dias[0] + dias[1]);
 						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 						guardia.setBaremo(lBaremos.get(i).getBaremo());
 						guardia.setnDias(lBaremos.get(i).getNDias());
+						guardia.setNumMinimoSimple(lBaremos.get(i).getNumMinimoSimple());
+						guardia.setSimpleOImporteIndividual(lBaremos.get(i).getSimpleOImporteIndividual());
+						guardia.setNaPartir(lBaremos.get(i).getNaPartir());
+						guardia.setMaximo(lBaremos.get(i).getMaximo());
+						guardia.setPorDia(lBaremos.get(i).getPorDia());
+
 						guar.add(guardia);
 						//if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
 						lBaremos.get(i).setGuardiasObj(guar);
@@ -125,7 +136,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					String[] dias = lBaremos.get(i).getDias().toString().split("\n");
 					guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
 					guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
-					guardia.setDiasGuardia(dias[0]);
+					guardia.setDiasGuardia(dias[0] + dias[1]);
 					guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 					guardia.setBaremo(lBaremos.get(i).getBaremo());
 					guardia.setnDias(lBaremos.get(i).getNDias());
