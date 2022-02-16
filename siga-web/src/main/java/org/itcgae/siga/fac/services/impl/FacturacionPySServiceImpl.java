@@ -72,6 +72,8 @@ import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
 import org.itcgae.siga.DTO.fac.FacturaLineaItem;
 import org.itcgae.siga.DTO.fac.FacturasContabilidadItem;
 import org.itcgae.siga.DTO.fac.FacturasIncluidasDTO;
+import org.itcgae.siga.DTO.fac.FaseFacturacionProgramadaDTO;
+import org.itcgae.siga.DTO.fac.FaseFacturacionProgramadaItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.InformeFacturacionDTO;
 import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
@@ -188,6 +190,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
@@ -4722,8 +4725,144 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			return sqlTotal.toString();
 		
 	}
-	
-	
-	
-	
+
+	@Override
+	public FaseFacturacionProgramadaDTO getFasesFacturacionProgramada(HttpServletRequest request, String idInstitucion, String idSerieFacturacion, String idProgramacion) throws Exception {
+
+		LOGGER.info("FacturacionPySServiceImpl.getEstadosFacturacionProgramada() --> ENTRADA al servicio para obtener las fases de una facturacion programada y su posicion dentro de ella");
+
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+		FaseFacturacionProgramadaDTO faseFacturacionProgramadaDTO = new FaseFacturacionProgramadaDTO();
+
+		if (usuario != null) {
+
+			FacFacturacionprogramadaKey facFacturacionprogramadaKey = new FacFacturacionprogramadaKey();
+			facFacturacionprogramadaKey.setIdinstitucion(Short.valueOf(idInstitucion));
+			facFacturacionprogramadaKey.setIdseriefacturacion(Long.valueOf(idSerieFacturacion));
+			facFacturacionprogramadaKey.setIdprogramacion(Long.valueOf(idProgramacion));
+			FacFacturacionprogramada facFacturacionprogramada = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(facFacturacionprogramadaKey);
+
+			GenDiccionarioKey genDiccionarioKey = new GenDiccionarioKey();
+			genDiccionarioKey.setIdlenguaje(usuario.getIdlenguaje());
+			genDiccionarioKey.setIdrecurso("factPyS.mensaje.fase.procesado");
+
+			final String literalProcesado = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+			genDiccionarioKey.setIdrecurso("factPyS.mensaje.fase.pendiente");
+			final String literalPendienteFase = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+			final String literarFase1 = "TRATAR FACTURACIÓN";
+			final String literarFase2 = "TRATAR CONFIRMACIÓN";
+			final String literarFase3 = "GENERAR PDFs Y ENVIAR FACTURAS PROGRAMACIÓN";
+			final String literarFase4 = "GENERAR ENVÍOS FACTURAS PENDIENTES";
+			final String literarFase5 = "COMPROBACIÓN TRASPASO FACTURAS";
+
+			SimpleDateFormat sdf = new SimpleDateFormat(SigaConstants.DATEST_FORMAT_MIN);
+			String fechaProgramacion = sdf.format(facFacturacionprogramada.getFechaprogramacion());
+
+			FaseFacturacionProgramadaItem fase1 = new FaseFacturacionProgramadaItem();
+			fase1.setOrden("10");
+			fase1.setNombreFase(literarFase1);
+			fase1.setFechaProgramacion(fechaProgramacion);
+			fase1.setPuestoEnCola(literalProcesado);
+
+			FaseFacturacionProgramadaItem fase2 = new FaseFacturacionProgramadaItem();
+			fase2.setOrden("20");
+			fase2.setNombreFase(literarFase2);
+			fase2.setFechaProgramacion(fechaProgramacion);
+			fase2.setPuestoEnCola(literalProcesado);
+
+			FaseFacturacionProgramadaItem fase3 = new FaseFacturacionProgramadaItem();
+			fase3.setOrden("30");
+			fase3.setNombreFase(literarFase3);
+			fase3.setFechaProgramacion(fechaProgramacion);
+			fase3.setPuestoEnCola(literalProcesado);
+
+			FaseFacturacionProgramadaItem fase4 = new FaseFacturacionProgramadaItem();
+			fase4.setOrden("40");
+			fase4.setNombreFase(literarFase4);
+			fase4.setFechaProgramacion(fechaProgramacion);
+			fase4.setPuestoEnCola(literalProcesado);
+
+			FaseFacturacionProgramadaItem fase5 = new FaseFacturacionProgramadaItem();
+			fase5.setOrden("50");
+			fase5.setNombreFase(literarFase5);
+			fase5.setFechaProgramacion(fechaProgramacion);
+			fase5.setPuestoEnCola(literalProcesado);
+
+			GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
+			genPropertiesExample.createCriteria().andParametroEqualTo("facturacion.programacionAutomatica.maxMinutosEnEjecucion");
+
+			Double minutos = Double.valueOf(genPropertiesMapper.selectByExample(genPropertiesExample).get(0).getValor());
+			minutos = minutos / (24.0 * 60.0);
+
+			Integer posicionFase1 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProTratarFacturacion(Short.valueOf(idInstitucion), minutos, idSerieFacturacion, idProgramacion);
+
+			if (posicionFase1 != null) {
+				Integer numTotalFase1 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProTratarFacturacion(Short.valueOf(idInstitucion), minutos);
+				fase1.setPuestoEnCola(posicionFase1 + "/" + numTotalFase1);
+				fase2.setPuestoEnCola(literalPendienteFase);
+				fase3.setPuestoEnCola(literalPendienteFase);
+				fase4.setPuestoEnCola(literalPendienteFase);
+				fase5.setPuestoEnCola(literalPendienteFase);
+			} else {
+				Integer posicionFase2 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProTratarConfirmacion(Short.valueOf(idInstitucion), idSerieFacturacion, idProgramacion);
+
+				if (posicionFase2 != null) {
+					Integer numTotalFase2 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProTratarConfirmacion(Short.valueOf(idInstitucion));
+					fase1.setPuestoEnCola(literalProcesado);
+					fase2.setPuestoEnCola(posicionFase2 + "/" + numTotalFase2);
+					fase3.setPuestoEnCola(literalPendienteFase);
+					fase4.setPuestoEnCola(literalPendienteFase);
+					fase5.setPuestoEnCola(literalPendienteFase);
+				} else {
+					Integer posicionFase3 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(Short.valueOf(idInstitucion), idSerieFacturacion, idProgramacion, minutos);
+
+					if (posicionFase3 != null) {
+						Integer numTotalFase3 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Short.valueOf(idInstitucion), minutos);
+						fase1.setPuestoEnCola(literalProcesado);
+						fase2.setPuestoEnCola(literalProcesado);
+						fase3.setPuestoEnCola(posicionFase3 + "/" + numTotalFase3);
+						fase4.setPuestoEnCola(literalPendienteFase);
+						fase5.setPuestoEnCola(literalPendienteFase);
+					} else {
+
+						Integer posicionFase4 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProGenerarEnviosFacturasPendientes(Short.valueOf(idInstitucion), idSerieFacturacion, idProgramacion, minutos);
+
+						if (posicionFase4 != null) {
+							Integer numTotalFase4 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Short.valueOf(idInstitucion), minutos);
+							fase1.setPuestoEnCola(literalProcesado);
+							fase2.setPuestoEnCola(literalProcesado);
+							fase3.setPuestoEnCola(literalProcesado);
+							fase4.setPuestoEnCola(posicionFase4 + "/" + numTotalFase4);
+							fase5.setPuestoEnCola(literalPendienteFase);
+						} else {
+
+							Integer posicionFase5 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProComprobacionTraspasoFacturas(Short.valueOf(idInstitucion), idSerieFacturacion, idProgramacion, minutos);
+
+							if (posicionFase5 != null) {
+								Integer numTotalFase5 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProComprobacionTraspasoFacturas(Short.valueOf(idInstitucion), minutos);
+								fase1.setPuestoEnCola(literalProcesado);
+								fase2.setPuestoEnCola(literalProcesado);
+								fase3.setPuestoEnCola(literalProcesado);
+								fase4.setPuestoEnCola(literalProcesado);
+								fase5.setPuestoEnCola(posicionFase5 + "/" + numTotalFase5);
+							}
+						}
+					}
+				}
+
+			}
+
+			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase1);
+			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase2);
+			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase3);
+			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase4);
+			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase5);
+
+		}
+
+		LOGGER.info("FacturacionPySServiceImpl.getEstadosFacturacionProgramada() --> SALIDA del servicio para obtener las fases de una facturacion programada y su posicion dentro de ella");
+
+		return faseFacturacionProgramadaDTO;
+	}
+
 }

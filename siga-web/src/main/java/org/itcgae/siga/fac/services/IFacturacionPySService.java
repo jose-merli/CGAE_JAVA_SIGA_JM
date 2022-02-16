@@ -29,6 +29,7 @@ import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
 import org.itcgae.siga.DTO.fac.FacturaLineaItem;
 import org.itcgae.siga.DTO.fac.FacturasIncluidasDTO;
+import org.itcgae.siga.DTO.fac.FaseFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -176,4 +177,5 @@ public interface IFacturacionPySService {
 
 	public ResponseFileDTO generateExcelAbonos(FacAbonoItem facAbonosItem, HttpServletRequest request) throws Exception;
 
+	FaseFacturacionProgramadaDTO getFasesFacturacionProgramada(HttpServletRequest request, String idInstitucion, String idSerieFacturacion, String idProgramacion) throws Exception;
 }
