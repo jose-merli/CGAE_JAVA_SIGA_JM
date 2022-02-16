@@ -38,6 +38,8 @@ public class GuardiasItem {
 	private String diasPeriodo;
 	private String diasGuardia;
 	private String diasSeparacionGuardias;
+
+
 	private String envioCentralita;
 	private String porGrupos;
 	private Date fechabaja;
@@ -50,7 +52,23 @@ public class GuardiasItem {
 	private Short maximo;
 	private String porDia;
 
-	
+
+
+	public String getSeleccionLaborables() {
+		return seleccionLaborables;
+	}
+
+	public void setSeleccionLaborables(String seleccionLaborables) {
+		this.seleccionLaborables = seleccionLaborables;
+	}
+
+	public String getSeleccionFestivos() {
+		return seleccionFestivos;
+	}
+
+	public void setSeleccionFestivos(String seleccionFestivos) {
+		this.seleccionFestivos = seleccionFestivos;
+	}
 	public String getIdPersonaUltimo() {
 		return idPersonaUltimo;
 	}

@@ -60,7 +60,7 @@ public class BaremosGuardiaController {
 	}
 	
 	@RequestMapping(value = "/saveBaremo",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BaremosGuardiaDTO> insertBaremosGuardia(@RequestBody List<BaremosGuardiaItem> baremosGuardiaItem, HttpServletRequest request) {
+	ResponseEntity<BaremosGuardiaDTO> insertBaremosGuardia(@RequestBody List<List<BaremosGuardiaItem>> baremosGuardiaItem, HttpServletRequest request) {
 		BaremosGuardiaDTO response = baremosGuardiaServices.saveBaremo(baremosGuardiaItem, request);
 		if (response.getError().getCode() == 200) {
             return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
