@@ -18,6 +18,8 @@ import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
+import org.itcgae.siga.db.entities.FacPagosporcaja;
+import org.itcgae.siga.db.entities.FacPagosporcajaExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenRecursos;
@@ -31,6 +33,7 @@ import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySFacturasService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -468,6 +471,27 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
                 "FacturacionPySFacturasImpl.insertarEstadosPagosVarios() -> Salida del servicio para insertar un nuevo estado de factura");
 
         return insertResponseDTO;
+    }
+
+    @Override
+    public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception {
+        DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+        Error error = new Error();
+        deleteResponseDTO.setError(error);
+
+        // Conseguimos información del usuario logeado
+        AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+
+        LOGGER.info("eliminarEstadosPagos() -> Entrada al servicio para eliminar una entrada del historico de factura");
+
+        if (usuario != null && item.getIdAccion().equalsIgnoreCase("4")) {
+            facturaAccionesHelper.eliminarUltimoCobroPorCaja(item.getIdFactura(), usuario);
+            deleteResponseDTO.setStatus(HttpStatus.OK.toString());
+        }
+
+        LOGGER.info("eliminarEstadosPagos() -> Salida del servicio para eliminar una entrada del historico de factura");
+
+        return deleteResponseDTO;
     }
 
     private String getRecurso(String idrecurso, String idioma) {

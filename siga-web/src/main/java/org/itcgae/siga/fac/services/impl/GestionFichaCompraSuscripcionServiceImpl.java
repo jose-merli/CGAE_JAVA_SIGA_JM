@@ -1,41 +1,23 @@
 package org.itcgae.siga.fac.services.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
-import org.itcgae.siga.DTO.fac.FiltroProductoItem;
-import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
+import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionDTO;
+import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionItem;
 import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaFacturasPeticionItem;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
-import org.itcgae.siga.DTO.fac.ListaProductosDTO;
-import org.itcgae.siga.DTO.fac.ListaProductosItem;
-import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
-import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
-import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
-import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenColegiado;
-import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.FacFactura;
@@ -54,11 +36,7 @@ import org.itcgae.siga.db.entities.PysCompraExample;
 import org.itcgae.siga.db.entities.PysLineaanticipo;
 import org.itcgae.siga.db.entities.PysLineaanticipoExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
-import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionKey;
-import org.itcgae.siga.db.entities.PysPreciosservicios;
-import org.itcgae.siga.db.entities.PysPreciosserviciosKey;
-import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.entities.PysProductossolicitados;
 import org.itcgae.siga.db.entities.PysProductossolicitadosExample;
 import org.itcgae.siga.db.entities.PysServicioanticipo;
@@ -92,15 +70,17 @@ import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysProductosinstitucionExtendsMapper;
 import org.itcgae.siga.fac.services.IGestionFichaCompraSuscripcionService;
-import org.itcgae.siga.fac.services.IProductosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionDTO;
-import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionItem;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCompraSuscripcionService {
@@ -365,8 +345,12 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
 
 				PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
-
-				solicitud.setFecha(new Date());
+				
+				if(ficha.getFechaCompra()!=null) {
+					solicitud.setFecha(ficha.getFechaCompra());
+				}else {
+					solicitud.setFecha(new Date());	
+				}
 				solicitud.setIdinstitucion(idInstitucion);
 				solicitud.setIdpersona(idPersona);
 				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
@@ -379,7 +363,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				else {
 					solicitud.setIdestadopeticion((short) 10);
 				}
-				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
 				//Con el format logramos que siempre una longitud de 10 precedida por 0s
 				solicitud.setNumOperacion(
@@ -2519,115 +2502,5 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 		return updateResponseDTO;
 	}
-	
-	@Override
-	@Transactional
-	public InsertResponseDTO facturarCompraMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
-			throws Exception {
-
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		LOGGER.debug("facturarCompraMultiple() -> Entrada al servicio para facturar una o varias peticiones");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		// Se comentan el try y el catch para que la anotación @Transactional funcione
-		// correctamente
-//		try {
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-			LOGGER.info(
-					"facturarCompraMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"facturarCompraMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (usuarios != null && !usuarios.isEmpty()) {
-				LOGGER.info(
-						"facturarPeticionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para facturar una o varias compras");
-
-				//Se guardaran aqui los numeros de solicitud de aquellas solicitudes no validas por el estado en el que vienen
-				error.setDescription("");
-				for(FichaCompraSuscripcionItem peticion : peticiones) {
-					if(peticion.getFechaAnulada() == null && peticion.getFechaAceptada() != null && peticion.getFechaSolicitadaAnulacion() == null) {
-						this.facturarCompra(request, peticion.getnSolicitud());
-					}
-					else {
-						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
-					}
-				}
-
-				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));
-				
-				
-				LOGGER.info(
-						"facturarCompraMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para facturar una o varias compras");
-
-				LOGGER.info(
-						"facturarCompraMultiple() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para facturar una o varias compras");
-			}
-
-			LOGGER.info(
-					"facturarCompraMultiple() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para facturar una o varias compras");
-
-			insertResponseDTO.setStatus("200");
-		}
-
-		insertResponseDTO.setError(error);
-		LOGGER.debug("facturarCompraMultiple() -> Salida del servicio para facturar una o varias compras");
-
-		return insertResponseDTO;
-	}
-	
-	@Override
-	@Transactional
-	public InsertResponseDTO facturarCompra(HttpServletRequest request, String nSolicitud) throws Exception {
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		LOGGER.debug("facturarCompra() -> Entrada al servicio para facturar una compra");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		//Este String sirve para saber si el usuario conectado es una colegiado o no.
-		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
-
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"facturarCompra() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"facturarCompra() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-						
-					//CODIGO A INTRODUCIR
-						
-				}
-			}
-
-		insertResponseDTO.setError(error);
-		LOGGER.debug("facturarCompra() -> Salida del servicio para facturar una compra");
-
-		return insertResponseDTO;
-	}
-	
 }
 	

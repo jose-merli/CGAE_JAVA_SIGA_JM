@@ -839,7 +839,10 @@ public abstract class ProcesoFacPyS {
 
                         // PROCESO DE CREAR EL PDF
                         // RGG 15/02/2007 CAMBIOS PARA INFORME MASTER REPOR
-                        filePDF = facturacionHelper.generarPdfFacturaFirmada(idFactura, f.getIdInstitucion().toString());
+                        AdmUsuarios usuario = new AdmUsuarios();
+                        usuario.setIdusuario(USUARIO_AUTO);
+                        usuario.setIdlenguaje(SigaConstants.LENGUAJE_DEFECTO);
+                        filePDF = facturacionHelper.generarPdfFacturaFirmada(idFactura, f.getIdInstitucion().toString(), usuario);
 
                         if (filePDF == null) {
                             throw new Exception(getRecurso("message.facturacion.error.fichero.nulo"));

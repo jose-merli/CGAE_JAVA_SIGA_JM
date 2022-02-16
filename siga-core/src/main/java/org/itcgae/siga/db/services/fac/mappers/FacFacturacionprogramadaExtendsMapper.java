@@ -333,4 +333,35 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
             @Result(column = "NOMBREABREVIADO", property = "nombreabreviado", jdbcType = JdbcType.VARCHAR)
     })
     List<FacFacturacionprogramadaExtendsDTO> getFacturacionesProComprobacionTraspasoFacturas(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProTratarFacturacion")
+    Integer getNumTotalFacturacionesProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProTratarFacturacion")
+    Integer getPosicionFacturacionProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada, String idSerieFacturacion, String idProgramacion);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProTratarConfirmacion")
+    Integer getNumTotalFacturacionesProTratarConfirmacion(Short idInstitucion);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProTratarConfirmacion")
+    Integer getPosicionFacturacionProTratarConfirmacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion")
+    Integer getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion")
+    Integer getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProGenerarEnviosFacturasPendientes")
+    Integer getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProGenerarEnviosFacturasPendientes")
+    Integer getPosicionFacturacionProGenerarEnviosFacturasPendientes(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProComprobacionTraspasoFacturas")
+    Integer getNumTotalFacturacionesProComprobacionTraspasoFacturas(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProComprobacionTraspasoFacturas")
+    Integer getPosicionFacturacionProComprobacionTraspasoFacturas(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
+
 }

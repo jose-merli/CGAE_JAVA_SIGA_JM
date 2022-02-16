@@ -437,7 +437,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
 
             try {
 
-                File fichero = generarInformeFacturacionRapida(idInstitucion, idPeticion, vFacturas);
+                File fichero = generarInformeFacturacionRapida(idInstitucion, idPeticion, vFacturas, usuario);
 
                 if (fichero == null) {
                     throw new Exception("Error al generar la factura. Fichero devuelto es nulo.");
@@ -919,21 +919,21 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
         return beanFacturacionProgramada;
     }
 
-    private File generarInformeFacturacionRapida(String idInstitucion, String idPeticion, List<FacturasFacturacionRapidaDTO> vFacturas) throws Exception {
+    private File generarInformeFacturacionRapida(String idInstitucion, String idPeticion, List<FacturasFacturacionRapidaDTO> vFacturas, AdmUsuarios usuario) throws Exception {
         File fichero;
 
         /** Si se trata solo de una factura, se devuelve directamente el fichero PDF **/
         if (vFacturas != null && vFacturas.size() == 1) {
-            fichero = facturacionHelper.generarPdfFacturaFirmada(vFacturas.get(0).getIdFactura(), vFacturas.get(0).getIdInstitucion().toString());
+            fichero = facturacionHelper.generarPdfFacturaFirmada(vFacturas.get(0).getIdFactura(), vFacturas.get(0).getIdInstitucion().toString(), usuario);
         } else {
             /** Si generan mas de una factura, se genera un zip con todas las facturas (PDF) **/
-            fichero = generarZipFacturacionRapida(idInstitucion, idPeticion, vFacturas);
+            fichero = generarZipFacturacionRapida(idInstitucion, idPeticion, vFacturas, usuario);
         }
 
         return fichero;
     }
 
-    private File generarZipFacturacionRapida(String idInstitucion, String idPeticion, List<FacturasFacturacionRapidaDTO> vFacturas) throws Exception {
+    private File generarZipFacturacionRapida(String idInstitucion, String idPeticion, List<FacturasFacturacionRapidaDTO> vFacturas, AdmUsuarios usuario) throws Exception {
         File ficheroZip = null;
 
         try {
@@ -968,7 +968,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 String idSerieFacturacion = hFactura.getIdSerieFacturacion().toString();
                 String idInstitucionFac = hFactura.getIdInstitucion().toString();
 
-                File ficheroPdf = facturacionHelper.generarPdfFacturaFirmada(hFactura.getIdFactura(), hFactura.getIdInstitucion().toString());
+                File ficheroPdf = facturacionHelper.generarPdfFacturaFirmada(hFactura.getIdFactura(), hFactura.getIdInstitucion().toString(), usuario);
 
                 // Comprobamos que exista el fichero pdf de la factura
                 if (ficheroPdf == null) {

@@ -332,59 +332,75 @@ public class GuardiasItem {
 		this.porDia = porDia;
 	}
 
+	public String getSeleccionLaborables() {
+		return seleccionLaborables;
+	}
+
+	public void setSeleccionLaborables(String seleccionLaborables) {
+		this.seleccionLaborables = seleccionLaborables;
+	}
+
+	public String getSeleccionFestivos() {
+		return seleccionFestivos;
+	}
+
+	public void setSeleccionFestivos(String seleccionFestivos) {
+		this.seleccionFestivos = seleccionFestivos;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		GuardiasItem that = (GuardiasItem) o;
-		return isHistorico() == that.isHistorico() &&
-				Objects.equals(getIdGuardia(), that.getIdGuardia()) &&
-				Objects.equals(getIdTurno(), that.getIdTurno()) &&
-				Objects.equals(getIdOrdenacionColas(), that.getIdOrdenacionColas()) &&
-				Objects.equals(getIdPersonaUltimo(), that.getIdPersonaUltimo()) &&
-				Objects.equals(getTurno(), that.getTurno()) &&
-				Objects.equals(getNombre(), that.getNombre()) &&
-				Objects.equals(getDescripcion(), that.getDescripcion()) &&
-				Objects.equals(getDescripcionPago(), that.getDescripcionPago()) &&
-				Objects.equals(getDescripcionFacturacion(), that.getDescripcionFacturacion()) &&
-				Objects.equals(getArea(), that.getArea()) &&
-				Objects.equals(getMateria(), that.getMateria()) &&
-				Objects.equals(getGrupoZona(), that.getGrupoZona()) &&
-				Objects.equals(getZona(), that.getZona()) &&
-				Objects.equals(getObligatoriedad(), that.getObligatoriedad()) &&
-				Objects.equals(getDuracion(), that.getDuracion()) &&
-				Objects.equals(getValidaJustificacion(), that.getValidaJustificacion()) &&
-				Objects.equals(getPartidaJudicial(), that.getPartidaJudicial()) &&
-				Objects.equals(getJurisdiccion(), that.getJurisdiccion()) &&
-				Objects.equals(getGrupoFacturacion(), that.getGrupoFacturacion()) &&
-				Objects.equals(getPartidaPresupuestaria(), that.getPartidaPresupuestaria()) &&
-				Objects.equals(getTipoTurno(), that.getTipoTurno()) &&
-				Objects.equals(getTipoGuardia(), that.getTipoGuardia()) &&
-				Objects.equals(getTipoDia(), that.getTipoDia()) &&
-				Objects.equals(getTipoDiasGuardia(), that.getTipoDiasGuardia()) &&
-				Objects.equals(getTipoDiasPeriodo(), that.getTipoDiasPeriodo()) &&
-				Objects.equals(getLetradosGuardia(), that.getLetradosGuardia()) &&
-				Objects.equals(getLetradosIns(), that.getLetradosIns()) &&
+		return historico == that.historico &&
+				Objects.equals(idGuardia, that.idGuardia) &&
+				Objects.equals(idTurno, that.idTurno) &&
+				Objects.equals(idOrdenacionColas, that.idOrdenacionColas) &&
+				Objects.equals(idPersonaUltimo, that.idPersonaUltimo) &&
+				Objects.equals(turno, that.turno) &&
+				Objects.equals(nombre, that.nombre) &&
+				Objects.equals(descripcion, that.descripcion) &&
+				Objects.equals(descripcionPago, that.descripcionPago) &&
+				Objects.equals(descripcionFacturacion, that.descripcionFacturacion) &&
+				Objects.equals(area, that.area) &&
+				Objects.equals(materia, that.materia) &&
+				Objects.equals(grupoZona, that.grupoZona) &&
+				Objects.equals(zona, that.zona) &&
+				Objects.equals(obligatoriedad, that.obligatoriedad) &&
+				Objects.equals(duracion, that.duracion) &&
+				Objects.equals(validaJustificacion, that.validaJustificacion) &&
+				Objects.equals(partidaJudicial, that.partidaJudicial) &&
+				Objects.equals(jurisdiccion, that.jurisdiccion) &&
+				Objects.equals(grupoFacturacion, that.grupoFacturacion) &&
+				Objects.equals(partidaPresupuestaria, that.partidaPresupuestaria) &&
+				Objects.equals(tipoTurno, that.tipoTurno) &&
+				Objects.equals(tipoGuardia, that.tipoGuardia) &&
+				Objects.equals(tipoDia, that.tipoDia) &&
+				Objects.equals(tipoDiasGuardia, that.tipoDiasGuardia) &&
+				Objects.equals(tipoDiasPeriodo, that.tipoDiasPeriodo) &&
+				Objects.equals(letradosGuardia, that.letradosGuardia) &&
+				Objects.equals(letradosIns, that.letradosIns) &&
 				Objects.equals(seleccionLaborables, that.seleccionLaborables) &&
 				Objects.equals(seleccionFestivos, that.seleccionFestivos) &&
-				Objects.equals(getDiasPeriodo(), that.getDiasPeriodo()) &&
-				Objects.equals(getDiasGuardia(), that.getDiasGuardia()) &&
-				Objects.equals(getDiasSeparacionGuardias(), that.getDiasSeparacionGuardias()) &&
-				Objects.equals(getEnvioCentralita(), that.getEnvioCentralita()) &&
-				Objects.equals(getPorGrupos(), that.getPorGrupos()) &&
-				Objects.equals(getFechabaja(), that.getFechabaja()) &&
-				Objects.equals(getBaremo(), that.getBaremo()) &&
-				Objects.equals(getnDias(), that.getnDias()) &&
-				Objects.equals(getNumMinimoSimple(), that.getNumMinimoSimple()) &&
-				Objects.equals(getSimpleOImporteIndividual(), that.getSimpleOImporteIndividual()) &&
-				Objects.equals(getNaPartir(), that.getNaPartir()) &&
-				Objects.equals(getMaximo(), that.getMaximo()) &&
-				Objects.equals(getPorDia(), that.getPorDia());
+				Objects.equals(diasPeriodo, that.diasPeriodo) &&
+				Objects.equals(diasGuardia, that.diasGuardia) &&
+				Objects.equals(diasSeparacionGuardias, that.diasSeparacionGuardias) &&
+				Objects.equals(envioCentralita, that.envioCentralita) &&
+				Objects.equals(porGrupos, that.porGrupos) &&
+				Objects.equals(fechabaja, that.fechabaja) &&
+				Objects.equals(baremo, that.baremo) &&
+				Objects.equals(nDias, that.nDias) &&
+				Objects.equals(numMinimoSimple, that.numMinimoSimple) &&
+				Objects.equals(simpleOImporteIndividual, that.simpleOImporteIndividual) &&
+				Objects.equals(naPartir, that.naPartir) &&
+				Objects.equals(maximo, that.maximo) &&
+				Objects.equals(porDia, that.porDia);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getIdGuardia(), getIdTurno(), getIdOrdenacionColas(), getIdPersonaUltimo(), getTurno(), getNombre(), getDescripcion(), getDescripcionPago(), getDescripcionFacturacion(), getArea(), getMateria(), getGrupoZona(), getZona(), getObligatoriedad(), getDuracion(), getValidaJustificacion(), getPartidaJudicial(), getJurisdiccion(), getGrupoFacturacion(), getPartidaPresupuestaria(), getTipoTurno(), getTipoGuardia(), getTipoDia(), getTipoDiasGuardia(), getTipoDiasPeriodo(), getLetradosGuardia(), getLetradosIns(), seleccionLaborables, seleccionFestivos, getDiasPeriodo(), getDiasGuardia(), getDiasSeparacionGuardias(), getEnvioCentralita(), getPorGrupos(), getFechabaja(), isHistorico(), getBaremo(), getnDias(), getNumMinimoSimple(), getSimpleOImporteIndividual(), getNaPartir(), getMaximo(), getPorDia());
+		return Objects.hash(idGuardia, idTurno, idOrdenacionColas, idPersonaUltimo, turno, nombre, descripcion, descripcionPago, descripcionFacturacion, area, materia, grupoZona, zona, obligatoriedad, duracion, validaJustificacion, partidaJudicial, jurisdiccion, grupoFacturacion, partidaPresupuestaria, tipoTurno, tipoGuardia, tipoDia, tipoDiasGuardia, tipoDiasPeriodo, letradosGuardia, letradosIns, seleccionLaborables, seleccionFestivos, diasPeriodo, diasGuardia, diasSeparacionGuardias, envioCentralita, porGrupos, fechabaja, historico, baremo, nDias, numMinimoSimple, simpleOImporteIndividual, naPartir, maximo, porDia);
 	}
 
 	@Override
@@ -435,4 +451,5 @@ public class GuardiasItem {
 				", porDia='" + porDia + '\'' +
 				'}';
 	}
+	
 }

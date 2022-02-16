@@ -22,6 +22,7 @@ public class FichaCompraSuscripcionItem {
 	private Date fechaAceptada;
 	private Date fechaSolicitadaAnulacion;
 	private Date fechaAnulada;
+	private Date fechaCompra;
 	
 	//TARJETA PRODUCTOS
 	private String idFormasPagoComunes;
@@ -202,6 +203,12 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setImpAnti(BigDecimal impAnti) {
 		this.impAnti = impAnti;
+	}
+	public Date getFechaCompra() {
+		return fechaCompra;
+	}
+	public void setFechaCompra(Date fechaCompra) {
+		this.fechaCompra = fechaCompra;
 	}
 
 }

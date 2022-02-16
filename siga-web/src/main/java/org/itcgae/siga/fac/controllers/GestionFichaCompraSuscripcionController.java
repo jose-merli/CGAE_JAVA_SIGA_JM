@@ -208,19 +208,5 @@ public class GestionFichaCompraSuscripcionController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	@PostMapping(value = "/pys/facturarCompraMultiple")
-	ResponseEntity<InsertResponseDTO> facturararCompraMultiple(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem[] peticiones) throws Exception {
-		InsertResponseDTO response = gestionFichaCompraSuscripcionService.facturarCompraMultiple(request, peticiones);
-		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@PostMapping(value = "/pys/facturarCompra")
-	ResponseEntity<InsertResponseDTO> facturarCompra(HttpServletRequest request, @RequestBody String nSolicitud) throws Exception {
-		InsertResponseDTO response = gestionFichaCompraSuscripcionService.facturarCompra(request, nSolicitud);
-		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
+
 }
