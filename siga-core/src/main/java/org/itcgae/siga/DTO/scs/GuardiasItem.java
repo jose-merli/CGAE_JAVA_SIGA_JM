@@ -54,21 +54,7 @@ public class GuardiasItem {
 
 
 
-	public String getSeleccionLaborables() {
-		return seleccionLaborables;
-	}
 
-	public void setSeleccionLaborables(String seleccionLaborables) {
-		this.seleccionLaborables = seleccionLaborables;
-	}
-
-	public String getSeleccionFestivos() {
-		return seleccionFestivos;
-	}
-
-	public void setSeleccionFestivos(String seleccionFestivos) {
-		this.seleccionFestivos = seleccionFestivos;
-	}
 	public String getIdPersonaUltimo() {
 		return idPersonaUltimo;
 	}
