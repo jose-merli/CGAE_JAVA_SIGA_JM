@@ -38,6 +38,8 @@ public class GuardiasItem {
 	private String diasPeriodo;
 	private String diasGuardia;
 	private String diasSeparacionGuardias;
+
+
 	private String envioCentralita;
 	private String porGrupos;
 	private Date fechabaja;
@@ -50,7 +52,9 @@ public class GuardiasItem {
 	private Short maximo;
 	private String porDia;
 
-	
+
+
+
 	public String getIdPersonaUltimo() {
 		return idPersonaUltimo;
 	}

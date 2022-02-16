@@ -267,7 +267,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 	@Override
 	@Transactional
-	public BaremosGuardiaDTO saveBaremo(List<BaremosGuardiaItem> baremosGuardiaItem, HttpServletRequest request) {
+	public BaremosGuardiaDTO saveBaremo(List<List<BaremosGuardiaItem>> baremosGuardiaItem, HttpServletRequest request) {
 		Error error = new Error();
 		BaremosGuardiaDTO baremosGuardiaDTO = new BaremosGuardiaDTO();
 		String token = request.getHeader("Authorization");
@@ -291,30 +291,34 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 			if (usuarios != null && usuarios.size() > 0) {
 
 				if(!baremosGuardiaItem.isEmpty()) {
-					ScsHitofacturableguardiaExample hfe = new ScsHitofacturableguardiaExample();
-					hfe.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdturnoEqualTo(Integer.parseInt(baremosGuardiaItem.get(0).getIdTurno()))
-							.andIdguardiaEqualTo(Integer.parseInt(baremosGuardiaItem.get(0).getIdGuardia()));
-	
-					scsHitofacturableguardiaExtendsMapper.deleteByExample(hfe);
-	
-					for (BaremosGuardiaItem baremo : baremosGuardiaItem) {
-	
-						ScsHitofacturableguardia insertHito = new ScsHitofacturableguardia();
-	
-						insertHito.setIdhito(Long.parseLong(baremo.getIdHito()));
-						insertHito.setIdinstitucion(idInstitucion);
-						insertHito.setIdguardia(Integer.parseInt(baremo.getIdGuardia()));
-						insertHito.setIdturno(Integer.parseInt(baremo.getIdTurno()));
-						insertHito.setPreciohito(new BigDecimal(baremo.getPrecioHito()));
-						insertHito.setAgrupar(baremo.getAgrupar());
-						insertHito.setDiasaplicables(baremo.getDias());
-						insertHito.setFechamodificacion(new Date());
-						insertHito.setUsumodificacion(usuarios.get(0).getIdusuario());
-	
-						response = scsHitofacturableguardiaExtendsMapper.insertSelective(insertHito);
-	
+					for (List<BaremosGuardiaItem> baremoList : baremosGuardiaItem) {
+						ScsHitofacturableguardiaExample hfe = new ScsHitofacturableguardiaExample();
+						hfe.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdturnoEqualTo(Integer.parseInt(baremoList.get(0).getIdTurno()))
+								.andIdguardiaEqualTo(Integer.parseInt(baremoList.get(0).getIdGuardia()));
+
+						scsHitofacturableguardiaExtendsMapper.deleteByExample(hfe);
+
+						for (BaremosGuardiaItem baremo : baremoList) {
+
+							ScsHitofacturableguardia insertHito = new ScsHitofacturableguardia();
+
+							insertHito.setIdhito(Long.parseLong(baremo.getIdHito()));
+							insertHito.setIdinstitucion(idInstitucion);
+							insertHito.setIdguardia(Integer.parseInt(baremo.getIdGuardia()));
+							insertHito.setIdturno(Integer.parseInt(baremo.getIdTurno()));
+							insertHito.setPreciohito(new BigDecimal(baremo.getPrecioHito()));
+							insertHito.setAgrupar(baremo.getAgrupar());
+							insertHito.setDiasaplicables(baremo.getDias());
+							insertHito.setFechamodificacion(new Date());
+							insertHito.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+							response = scsHitofacturableguardiaExtendsMapper.insertSelective(insertHito);
+
+						}
 					}
+
+
 	
 					if (response != 0) {
 						error.setCode(200);

@@ -2809,15 +2809,20 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
         exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
         List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
+        String idsGrupo = "";
         	AdmUsuarios usuario = usuarios.get(0);
             usuario.setIdinstitucion(idInstitucion);
             idLenguaje=usuario.getIdlenguaje();    
             
 
 		if(null != idInstitucion) {
+			
+			if(facAbonoItem.getGrupoFacturacionNombre() != null) {
+			idsGrupo = facAbonoSJCSExtendsMapper.facturacionByGroup(facAbonoItem.getGrupoFacturacionNombre(), idInstitucion.toString());
+				
+			}
 	              
-         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem, idInstitucion.toString(), idLenguaje);
+         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem,idsGrupo, idInstitucion.toString(), idLenguaje);
          facAbonoDTO.setListaFacAbonoItem(listaFacAbonosItem);    
 	    
 		}

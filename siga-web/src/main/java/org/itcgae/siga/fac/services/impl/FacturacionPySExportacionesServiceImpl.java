@@ -363,6 +363,8 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 throw new BusinessException("general.message.camposObligatorios");
             }
 
+            actualizarRegistroFicheroAdeudos(ficheroAdeudosItem, usuario);
+
             Object[] param_in = new Object[9]; // Parametros de entrada del PL
 
             // Ruta del fichero
@@ -419,6 +421,23 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         LOGGER.info("actualizarFicheroAdeudos() -> Salida del servicio para actualizar un fichero de adeudos");
 
         return updateResponseDTO;
+    }
+
+    private void actualizarRegistroFicheroAdeudos(FicherosAdeudosItem ficheroAdeudos, AdmUsuarios usuario) {
+
+        FacDisquetecargosKey key = new FacDisquetecargosKey();
+        key.setIdinstitucion(usuario.getIdinstitucion());
+        key.setIddisquetecargos(Long.parseLong(ficheroAdeudos.getIdDisqueteCargos()));
+
+        FacDisquetecargos facDisquete = this.facDisquetecargosExtendsMapper.selectByPrimaryKey(key);
+        facDisquete.setFechapresentacion(ficheroAdeudos.getFechaPresentacion());
+        facDisquete.setFecharecibosprimeros(ficheroAdeudos.getFechaRecibosPrimeros());
+        facDisquete.setFecharecibosrecurrentes(ficheroAdeudos.getFechaRecibosRecurrentes());
+        facDisquete.setFechareciboscor1(ficheroAdeudos.getFechaRecibosCOR());
+        facDisquete.setFecharecibosb2b(ficheroAdeudos.getFechaRecibosB2B());
+
+        this.facDisquetecargosExtendsMapper.updateByPrimaryKey(facDisquete);
+
     }
 
     @Override

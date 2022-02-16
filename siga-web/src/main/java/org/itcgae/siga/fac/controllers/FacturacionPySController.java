@@ -1164,20 +1164,6 @@ public class FacturacionPySController {
 		return facturacionService.descargarFichaFacturacion(facturacionItems, request);
 
 	}
-
-	@PostMapping(value = "/eliminarAbonoSJCSCaja")
-	ResponseEntity<DeleteResponseDTO> eliminarAbonoSJCSCaja(@RequestBody EstadosPagosItem item,
-														   HttpServletRequest request) {
-		DeleteResponseDTO response = new DeleteResponseDTO();
-
-		try {
-			response = facturacionService.eliminarAbonoSJCSCaja(item, request);
-			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.getMessage()));
-			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 	
 	@RequestMapping(value = "/generarExcel", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	ResponseEntity<InputStreamResource> generateExcel(@RequestBody TarjetaPickListSerieDTO etiquetas, HttpServletRequest request) throws Exception {
