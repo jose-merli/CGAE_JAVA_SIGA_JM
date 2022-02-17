@@ -55,6 +55,7 @@ public class ProGenerarPDFsYenviarFacturasProgramacion extends ProcesoFacPyS {
 
                 Path plog = getPathLogConfirmacion(factBean);
                 SIGALogging log = new SIGALogging(plog.toString(), logLevel);
+                TransactionStatus tx = null;
 
                 try {
 
@@ -65,11 +66,15 @@ public class ProGenerarPDFsYenviarFacturasProgramacion extends ProcesoFacPyS {
                     facAactualizar.setFechaconfirmacion(new Date());
                     facAactualizar.setIdestadoconfirmacion(FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.getId());
 
-                    TransactionStatus tx = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
+                    tx = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
                     generarPdfEnvioProgramacionFactura(factBean, log, factBean.getIdseriefacturacion(), factBean.getIdprogramacion(), facAactualizar, true, tx);
 
                 } catch (Exception e) {
                     LOGGER.error("@@@ Error al confirmar facturas (Proceso automatico) Programacion:", e);
+                } finally {
+                    if (tx != null) {
+                        finalizaTransaccion(tx);
+                    }
                 }
 
             }
@@ -78,6 +83,5 @@ public class ProGenerarPDFsYenviarFacturasProgramacion extends ProcesoFacPyS {
             // Error general (No hacemos nada, para que continue con la siguiente institucion
             LOGGER.error("@@@ Error general al confirmar facturas (Proceso automatico) INSTITUCION:" + idInstitucion, e);
         }
-
     }
 }

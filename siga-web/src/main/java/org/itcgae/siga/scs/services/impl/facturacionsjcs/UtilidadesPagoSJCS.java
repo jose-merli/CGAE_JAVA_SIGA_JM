@@ -171,9 +171,9 @@ public class UtilidadesPagoSJCS {
                     // la persona de la tabla fcs_pago_colegiado
 
                     idPersonaDestino = colegiado.getIdperdestino().toString();
-
+                    LOGGER.info("getCuentaAbonoSJCS -> Entramos");
                     ArrayList<String> cuenta = getCuentaAbonoSJCS(idInstitucion, idPersonaDestino, usuario);
-
+                    LOGGER.info("getCuentaAbonoSJCS -> Salimos");
                     idCuenta = cuenta.get(2).equals("-1") ? null : cuenta.get(2);
 
                     if (idCuenta != null) {
@@ -181,9 +181,9 @@ public class UtilidadesPagoSJCS {
                         colegiado.setFechamodificacion(new Date());
                         colegiado.setUsumodificacion(usuario.getIdusuario());
                     }
-
+                    LOGGER.info("updateByPrimaryKeySelective -> Entramos");
                     fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective(colegiado);
-
+                    LOGGER.info("updateByPrimaryKeySelective -> Salimos");
                     importeTurnos = colegiado.getImpoficio().doubleValue();
                     importeGuardias = colegiado.getImpasistencia().doubleValue();
                     importeSoj = colegiado.getImpsoj().doubleValue();
@@ -195,18 +195,19 @@ public class UtilidadesPagoSJCS {
                     // obtiene el porcentajeIRPF del colegiado para utilizarlo al
                     // aplicar
                     // los movimientos varios y calcular el IRPF del importe bruto.
+                    LOGGER.info("obtenerIrpf -> Entramos");
                     porcentajeIRPF = obtenerIrpf(idInstitucion.toString(), idPersonaDestino,
                             !idPersonaDestino.equals(colegiado.getIdperorigen().toString()), usuario);
-
+                    LOGGER.info("obtenerIrpf -> Salimos");
                     // 2. Aplicar los movimientos varios
                     // Asocia todos los movimientos sin idpago al pago actual.
                     // Actualiza el porcentaje e importe IRPF para cada movimiento.
                     FcsMovimientosvarios fcsMovimientosvarios = new FcsMovimientosvarios();
                     fcsMovimientosvarios.setIdinstitucion(idInstitucion);
                     fcsMovimientosvarios.setIdpersona(colegiado.getIdperorigen());
-
+                    LOGGER.info("aplicarMovimientosVarios -> Entramos");
                     importeMovimientos = aplicarMovimientosVarios(fcsMovimientosvarios, idPago, importeSJCS, usuario);
-
+                    LOGGER.info("aplicarMovimientosVarios -> Salimos");
                     // 3. Obtener importe bruto como la suma de los movimientos varios y
                     // el total SJCS
                     double importeBruto = importeSJCS + importeMovimientos;
@@ -221,9 +222,10 @@ public class UtilidadesPagoSJCS {
                     // 5. Aplicar retenciones judiciales y no judiciales
                     //aalg Incidencia del 28-sep-2011. Se modifica el usuario de modificacion que se estaba
                     // cogiendo el idPersona en vez del userName
+                    LOGGER.info("aplicarRetencionesJudiciales -> Entramos");
                     aplicarRetencionesJudiciales(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(),
                             Double.toString(importeNeto), usuario.getIdusuario().toString(), usuario.getIdlenguaje(), usuario);
-
+                    LOGGER.info("aplicarRetencionesJudiciales -> Salimos");
                     // obtener el importe de las retenciones judiciales
                     importeRetenciones = getSumaRetenciones(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(), usuario);
 
@@ -237,9 +239,9 @@ public class UtilidadesPagoSJCS {
                     fcsPagoColegiado.setPorcentajeirpf(BigDecimal.valueOf(porcentajeIRPF));
                     fcsPagoColegiado.setImpmovvar(BigDecimal.valueOf(importeMovimientos));
                     fcsPagoColegiado.setImpret(BigDecimal.valueOf(importeRetenciones));
-
+                    LOGGER.info("fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective -> Entramos");
                     fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective(fcsPagoColegiado);
-
+                    LOGGER.info("fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective -> Salimos");
                 } // fin del for de colegiados
             }else{
                 throw new FacturacionSJCSException("Para ejecutar un pago este debe estar asociado a un colegiado.");
@@ -247,6 +249,8 @@ public class UtilidadesPagoSJCS {
 
 
         } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getStackTrace());
             throw new FacturacionSJCSException("Error en la obtención de los importes", e, "messages.factSJCS.error.importes");
         }
     }

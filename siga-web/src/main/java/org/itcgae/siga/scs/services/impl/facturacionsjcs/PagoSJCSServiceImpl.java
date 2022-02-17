@@ -1821,7 +1821,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                 if (null != usuarios && !usuarios.isEmpty()) {
                     if (FacturacionSJCSServicesImpl.isAlguienEjecutando()) {
-                        LOGGER.debug(
+                        LOGGER.info(
                                 "YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
                         insertResponseDTO.setStatus(SigaConstants.KO);
                         error.setCode(400);
@@ -1855,20 +1855,25 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                         // 1. El estado del pago debe ser abierto:
                         if (!estadoPago.equals(SigaConstants.ESTADO_PAGO_ABIERTO)) {
                             ponerEnEstadoAbierto = false;
+                            LOGGER.error("El pago no se encuentra en un estado correcto para realizar esta operación");
                             throw new FacturacionSJCSException("El pago no se encuentra en un estado correcto para realizar esta operación", "messages.factSJCS.error.estadoPagoNoCorrecto");
                         }
                         // 2. Criterios correctos del Turno:
                         if (!criterioTurno.equals(SigaConstants.CRITERIOS_PAGO_FACTURACION)) {
+                            LOGGER.error("No ha sido configurado el criterio de pago.");
                             throw new FacturacionSJCSException("No ha sido configurado el criterio de pago.", "messages.factSJCS.error.criterioPago");
                         }
 
                         //3. Si no se ha introducido importe a pagar el importe a facturar será cero
                         if (pago.getImporterepartir().doubleValue() == 0.00) {
+                            LOGGER.error("El importe a facturar será cero, introduzca importe a pagar distinto de cero.");
                             throw new FacturacionSJCSException("El importe a facturar será cero, introduzca importe a pagar distinto de cero.", "messages.facturacionSJCS.abono.sin.importe.pago");
                         }
 
                         utilidadesPagoSJCS.ejecutarPagoSJCS(pago, simular, idInstitucion, usuario);
                         }catch (Exception e){
+                            LOGGER.error(e.getMessage());
+                            LOGGER.error(e.getStackTrace());
                             throw e;
                         }finally {
                             FacturacionSJCSServicesImpl.setNadieEjecutando();
@@ -1879,12 +1884,15 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             }
 
         } catch (FacturacionSJCSException fe) {
+            LOGGER.error(fe.getMessage());
+            LOGGER.error(fe.getStackTrace());
             if (ponerEnEstadoAbierto) {
                 ponerPagoEstadoAbierto(pago, idInstitucion, usuarios.get(0));
             }
             error.setDescription(fe.getDescription());
         } catch (Exception e) {
-
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getStackTrace());
             if (simular && e.getMessage().equals("messages.facturacionSJCS.pago.simulado")) {
                 error.setDescription(null);
             } else {
@@ -3241,7 +3249,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                 if (null != usuarios && !usuarios.isEmpty()) {
                     if (FacturacionSJCSServicesImpl.isAlguienEjecutando()) {
-                        LOGGER.debug(
+                        LOGGER.info(
                                 "YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
                         updateResponseDTO.setStatus(SigaConstants.KO);
                         error.setCode(400);
@@ -3257,6 +3265,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                             utilidadesPagoSJCS.deshacerCierre(pago, idInstitucion, usuarios.get(0));
                         }catch (Exception e){
+                            LOGGER.error(e.getMessage());
+                            LOGGER.error(e.getStackTrace());
                             throw e;
                         }finally {
                             FacturacionSJCSServicesImpl.setNadieEjecutando();
@@ -3266,6 +3276,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             }
 
         } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getStackTrace());
             updateResponseDTO.setStatus(SigaConstants.KO);
             error.setCode(500);
             error.setDescription("general.message.error.realiza.accion");
