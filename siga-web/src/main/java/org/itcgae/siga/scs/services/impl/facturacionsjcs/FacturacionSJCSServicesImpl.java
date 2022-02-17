@@ -1653,7 +1653,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     private void facturacionesBloqueadas(CenInstitucion institucion) {
 
         LOGGER.info("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
-
+        LOGGER.debug("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
         List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
                 .facturacionesPorEstadoEjecucion(institucion.getIdinstitucion().toString());
 
@@ -1661,10 +1661,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             try {
                 // Insertamos el estado programada para las facturaciones en ejecucion
+                LOGGER.debug(" Insertamos el estado programada para las facturaciones en ejecucion");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
 
                 // Insertamos el estado En ejecucion para las facturaciones en ejecucion
+                LOGGER.debug("Insertamos el estado En ejecucion para las facturaciones en ejecucion");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
 

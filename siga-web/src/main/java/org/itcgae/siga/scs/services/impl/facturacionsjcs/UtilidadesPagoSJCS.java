@@ -598,10 +598,11 @@ public class UtilidadesPagoSJCS {
         if (importeNeto != null && importeNeto.contains(".")) {
             importeNeto = importeNeto.replace(".", ",");
         }
-
+        LOGGER.debug("Ejecutamos PL aplicarRetencionesJudiciales");
         // Aplicar las retenciones judiciales
         String resultado[] = ejecucionPlsPago.ejecutarPLAplicarRetencionesJudiciales(idInstitucion, idPagoJg, idPersonaSociedad, importeNeto, usuMod,
                 idioma);
+        LOGGER.debug("PL ejecutado: "+ resultado.length + "," + resultado[0]);
         // comprueba si el pl se ha ejecutado correctamente
         if (!resultado[0].equals("0")) {
             if (resultado[0].equals("11"))
