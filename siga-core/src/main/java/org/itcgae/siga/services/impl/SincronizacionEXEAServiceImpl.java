@@ -1,10 +1,7 @@
 package org.itcgae.siga.services.impl;
 
 import com.exea.sincronizacion.redabogacia.*;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
-import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
-import org.itcgae.siga.DTOs.cen.MaxIdDto;
-import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.cen.*;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
@@ -1646,8 +1643,20 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         }
 
         CenBancosExample cenBancosExample = new CenBancosExample();
-        cenBancosExample.createCriteria().andBicEqualTo(datosBancarios.getBIC())
-                .andNombreEqualTo(datosBancarios.getBanco());
+        if(UtilidadesString.esCadenaVacia(datosBancarios.getBanco())
+            || UtilidadesString.esCadenaVacia(datosBancarios.getBIC())){
+            DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO = new DatosBancariosSearchBancoDTO();
+            datosBancariosSearchBancoDTO.setiban(datosBancarios.getIBAN().substring(4, 8));
+            List<BancoBicItem> bancos = cenCuentasbancariasExtendsMapper.selectBanks(datosBancariosSearchBancoDTO);
+            if(bancos != null && !bancos.isEmpty()){
+                BancoBicItem banco = bancos.get(0);
+                cenBancosExample.createCriteria().andBicEqualTo(banco.getBic())
+                        .andNombreEqualTo(banco.getBanco());
+            }
+        }else {
+            cenBancosExample.createCriteria().andBicEqualTo(datosBancarios.getBIC())
+                    .andNombreEqualTo(datosBancarios.getBanco());
+        }
         List<CenBancos> cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
         //Buscamos el banco cen CEN_BANCOS, y si no esta registrado, lo insertamos
         if (null != cenBancos && !cenBancos.isEmpty()) {
@@ -2082,6 +2091,16 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                     errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.PROVINCIA_NOVALIDA.getMensajeError());
                     errorType.setXmlRequest("Sin error XML");
                 }
+            }
+        }
+
+        if(ok && request.getColegiado().getDatosBancarios() != null && request.getColegiado().getDatosBancarios().getIBAN().startsWith("ES")){
+            ok = UtilidadesString.validarIBAN(request.getColegiado().getDatosBancarios().getIBAN());
+            if(!ok){
+                ErrorType errorType = response.addNewError();
+                errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.name());
+                errorType.setDescripcion("IBAN no válido");
+                errorType.setXmlRequest("Sin error XML");
             }
         }
         return ok;
