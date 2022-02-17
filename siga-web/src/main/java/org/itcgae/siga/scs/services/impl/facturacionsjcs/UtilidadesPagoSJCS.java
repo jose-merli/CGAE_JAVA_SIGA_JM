@@ -616,6 +616,7 @@ public class UtilidadesPagoSJCS {
             }
         }catch(Exception e){
             LOGGER.error(e.getCause(), e);
+             throw new FacturacionSJCSException("Error al aplicar las retenciones judiciales", "messages.factSJCS.error.retencionesJudi");
         }
 
     }
