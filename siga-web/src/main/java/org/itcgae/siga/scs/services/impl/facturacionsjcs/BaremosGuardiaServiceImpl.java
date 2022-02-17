@@ -2,9 +2,7 @@ package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -391,5 +389,63 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 		return baremosGuardiaDTO;
 	}
+
+	@Override
+	public BaremosGuardiaDTO getTurnoGuarConf(String[] configuracion,HttpServletRequest request) {
+		BaremosGuardiaDTO baremosGuardiaDTO = new BaremosGuardiaDTO();
+		Error error = new Error();
+
+		LOGGER.info("getTurnoGuarConf() -> Entrada del servicio para obtener las guardias segun la configuracion ");
+
+		String token = request.getHeader("Authorization");
+//        String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<BaremosGuardiaItem> hitos = new ArrayList<>();
+
+		if (idInstitucion != null) {
+
+			if(configuracion.length != 0){
+				List<BaremosGuardiaItem> turnoGuardiaConf = scsHitofacturableguardiaExtendsMapper
+						.getTurnoGuarConf(idInstitucion.toString());
+				for(BaremosGuardiaItem conf : turnoGuardiaConf){
+					String[] h;
+					h = conf.getHitos().split("/");
+
+					int contador = 0;
+
+					for(int i=0;i < h.length;i++){
+						for(int j=0;j < configuracion.length;j++){
+							if(h[i].equals(configuracion[j])){
+								contador++;
+							}
+						}
+					}
+
+					if(contador == configuracion.length){
+						BaremosGuardiaItem hito = new BaremosGuardiaItem();
+						hito.setIdTurno(conf.getIdTurno());
+						hito.setIdGuardia(conf.getIdGuardia());
+						hito.setNomguardia(conf.getNomguardia());
+						hito.setNomturno(conf.getNomturno());
+						hitos.add(hito);
+					}
+				}
+				baremosGuardiaDTO.setBaremosGuardiaItems(hitos);
+				error.setCode(200);
+			}
+
+		} else {
+			LOGGER.warn("getTurnoGuarConf() -> idInstitucion del token nula");
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		baremosGuardiaDTO.setError(error);
+
+		LOGGER.info("getTurnoGuarConf() -> Salida del servicio para obtener las guardias segun la configuracion ");
+
+		return baremosGuardiaDTO;
+	}
+
 
 }
