@@ -565,6 +565,11 @@ public class SigaConstants {
 
     public static final String TIPO_APUNTE_COMPENSADO = "C";
 
+    // Tipos de formas de pago de Productos y Servicios
+    public static final String TIPO_FORMAPAGO_TARJETA	= "10";
+    public static final String TIPO_FORMAPAGO_FACTURA	= "20";
+    public static final String TIPO_FORMAPAGO_METALICO	= "30";
+
     //Estado Facturas
     public static final String ESTADO_FACTURA_PAGADA = "1";
     public static final String ESTADO_FACTURA_CAJA = "2";
@@ -572,6 +577,7 @@ public class SigaConstants {
     public static final String ESTADO_FACTURA_ENREVISION = "7";
     public static final String ESTADO_FACTURA_ANULADA = "8";
     public static final String ESTADO_FACTURA_DEVUELTA = "4";
+    public static final String ESTADO_FACTURA_LISTA_PARA_FICHERO = "6";
 
     public static final String PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF = "facturacion.directorioFisicoFacturaPDFJava";
     public static final String PARAMETRO_DIRECTORIO_FACTURA_PDF = "facturacion.directorioFacturaPDFJava";
@@ -1174,28 +1180,20 @@ public class SigaConstants {
 	public static final String C_FECHAFIN = "FECHAFIN";
 	
 	//FICHERO CONTABILIDAD
-	public static final String ASIENTO = "facturacion.exportacionesyotros.contabilidad.asiento";
-	public static final String FECHA = "facturacionSJCS.facturacionesYPagos.fecha";
-	public static final String CUENTA = "facturacion.exportacionesyotros.contabilidad.cuenta";
-	public static final String CONCEPTO = "facturacionSJCS.facturacionesYPagos.conceptos";
-	public static final String DOCUMENTO = "justiciaGratuita.ejg.documentacion.Documento";
-	public static final String DEBE = "facturacion.exportacionesyotros.contabilidad.debe";
-	public static final String HABER = "facturacion.exportacionesyotros.contabilidad.haber";
-	public static final String BASEIMP = "facturacion.exportacionesyotros.contabilidad.baseimp";
-	public static final String TIPOIVA = "facturacion.facturas.lineas.tipoIVA";
-	public static final String CONTRAPARTIDA = "facturacion.exportacionesyotros.contabilidad.contrapartida";
 	public static final String CONCEPTO_ASIENTO1		= "facturacionSJCS.facturacionesYPagos.factura"; 	    // Factura
 	public static final String CONCEPTO_ASIENTO2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2"; 	    // Factura Rectificativa Nº
-	public static final String CONCEPTO_ASIENTO3		= "general.literal.asiento3"; 	    // Pago por caja. Factura 
-	public static final String CONCEPTO_ASIENTO3_2		= "general.literal.asiento3_2"; 	// Pago Anticipado. Factura 
-	public static final String CONCEPTO_ASIENTO4		= "general.literal.asiento4"; 	    // Pago por banco. Factura 
-	public static final String CONCEPTO_ASIENTO5		= "general.literal.asiento5"; 	    // Devolucion por banco. Factura Nº
-	public static final String CONCEPTO_ASIENTO6		= "general.literal.asiento6"; 	    // Pago por caja. Factura Rectificativa Nº 
-	public static final String CONCEPTO_ASIENTO7		= "general.literal.asiento7"; 	    // Pago por banco. Factura Rectificativa Nº
-	public static final String CONCEPTO_ASIENTO10		= "general.literal.asiento3_1";     // Pago por tarjeta. Factura
-	public static final String CONCEPTO_ASIENTO3_2010   = "general.literal.asiento3_2010";  // Compensación por caja
-	public static final String CONCEPTO_ASIENTO14		= "general.literal.asiento14";      // Alta de anticipos 
-	public static final String CONCEPTO_ASIENTO15		= "general.literal.asiento15";      // Liquidación de anticipos de Letrado por Baja Colegial
+	public static final String CONCEPTO_ASIENTO2B		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento2B"; 	    // Pago por banco. Factura Rectificativa Nº
+	public static final String CONCEPTO_ASIENTO3		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3"; 	    // Pago por caja. Factura
+	public static final String CONCEPTO_ASIENTO3_2		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2"; 	// Pago Anticipado. Factura 
+	public static final String CONCEPTO_ASIENTO4		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento4"; 	    // Pago por banco. Factura 
+	public static final String CONCEPTO_ASIENTO5		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento5";     // Pago por tarjeta. Factura
+	public static final String CONCEPTO_ASIENTO6		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento6"; 	    // Devolucion por banco. Factura Nº
+	public static final String CONCEPTO_ASIENTO7		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento7";      // Alta de anticipos
+	public static final String CONCEPTO_ASIENTO7A		= "facturacion.exportacionesyotros.contabilidad.conceptoasiento7A";      // Liquidación de anticipos de Letrado por Baja Colegial
+
+	public static final String CONCEPTO_ASIENTO3_2010   = "facturacion.exportacionesyotros.contabilidad.conceptoasiento3_2010";  // Compensación por caja
+	
+	
 	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, C_IDGRUPO, GENERAL,
 			ACCION, C_FECHAINICIO);
@@ -1476,7 +1474,7 @@ public class SigaConstants {
 	public static String EEJG_IDSISTEMA ="";
 	public static String EEJG_URLWS ="";
 	public static String SIGAFRONT_VERSION = "202109071016";
-	public static String SIGAWEB_VERSION = "1.0.78_0";
+	public static String SIGAWEB_VERSION = "1.0.80_0";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";
@@ -1523,6 +1521,7 @@ public class SigaConstants {
 	public static final short SANCION_EN_SUSPENSO = 8;
 	public static final short INCORPORACION_PENDIENTE_APROBACION = 20;
 	public static final short INCORPORACION_PENDIENTE_DOCUMENTACION = 10;
+	public static final String COD_DOC_ANEXO_PARAM = "COD_DOC_ANEXO";
 
 	public enum ERROR_SINCRONIZACION_EXEA {
 		FORMATO_NOVALIDO("Formato XML de petición no correcto."),
@@ -1573,5 +1572,88 @@ public class SigaConstants {
             return this.codigo;
         }
     }
+
+    public static final String MODULO_ECOM = "ECOM";
+
+    public enum ENV_ENVIOS_ESTADOS {
+        ESTADO_INICIAL((short) 1),
+        ESTADO_PROCESADO((short) 2),
+        ESTADO_PROCESADO_ERRORES((short) 3),
+        ESTADO_PENDIENTE_AUTOMATICO((short) 4),
+        ESTADO_PROCESANDO((short) 5);
+
+        private short id;
+
+        ENV_ENVIOS_ESTADOS(short id) {
+            this.id = id;
+        }
+
+        public short getId() {
+            return this.id;
+        }
+
+    }
+
+    public static final String TIPODESTINATARIO_CENPERSONA = "CEN_PERSONA";
+
+    public static final String K_TIPOCAMPO_F="F";
+    public static final String K_TIPOCAMPO_E="E";
+    public static final String K_TIPOCAMPO_A="A";
+    public static final String K_TIPOCAMPO_S="S";
+
+    public static final String K_IDCAMPO_ASUNTO="1";
+    public static final String K_IDCAMPO_CUERPO="2";
+    public static final String K_IDCAMPO_SMS="1";
+
+    public static final String ID_PAIS_ESPANA ="191";
+
+    public static final int K_CORREO_ELECTRONICO = 1;
+    public static final int K_CORREO_ORDINARIO = 2;
+    public static final int K_FAX = 3;
+    public static final int K_SMS = 4;
+    public static final int K_BUROSMS = 5;
+    public static final int K_ENVIOTELEMATICO = 6;
+    public static final int K_DOCUMENTACIONLETRADO  = 7;
+
+    public static final String TIPODESTINATARIO_SCSPERSONAJG = "SCS_PERSONAJG";
+    public static final String TIPODESTINATARIO_SCSJUZGADO = "SCS_JUZGADO";
+    public static final String TIPODESTINATARIO_SCSPROCURADOR = "SCS_PROCURADOR";
+    public static final String TIPODESTINATARIO_SCSCONTRARIOSJG = "SCS_CONTRARIOSJG";
+
+    public static final String DATE_FORMAT_JAVA = "yyyy/MM/dd HH:mm:ss";
+
+    public static final String PATH_DOCUMENTOSADJUNTOS = "PATH_DOCUMENTOSADJUNTOS";
+
+    public static final String ESTADO_TRASPASADA_ERROR = "E";
+    public static final String ESTADO_TRASPASADA_NAV_OK = "1";
+
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_FROM = "TRASPASO_FACTURAS_MAILRESUMEN_FROM";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_BCC = "TRASPASO_FACTURAS_MAILRESUMEN_BCC";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_BODY = "TRASPASO_FACTURAS_MAILRESUMEN_BODY";
+    public static final String PARAMETRO_TRASPASO_FACTURAS_MAILRESUMEN_ASUNTO = "TRASPASO_FACTURAS_MAILRESUMEN_ASUNTO";
+
+    public static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_HOST = "mail.smtp.actualizacioncenso.host";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_PORT = "mail.smtp.actualizacioncenso.port";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_USER = "mail.smtp.actualizacioncenso.user";
+    public static final String MAIL_SMTP_ACTUALIZACIONCENSO_PWD = "mail.smtp.actualizacioncenso.pwd";
+
+    // Estado peticion compra
+    public static final String ESTADO_PETICION_COMPRA_PENDIENTE = "10";
+    public static final String ESTADO_PETICION_COMPRA_PROCESADA = "20";
+    public static final String ESTADO_PETICION_COMPRA_BAJA	= "30";
+
+    // Tipo de peticion compra
+    public static final String TIPO_PETICION_COMPRA_ALTA = "A";
+    public static final String TIPO_PETICION_COMPRA_BAJA = "B";
+
+    // Estado Productos
+    public static final String PRODUCTO_PENDIENTE = "P";
+    public static final String PRODUCTO_ACEPTADO = "A";
+    public static final String PRODUCTO_DENEGADO = "D";
+    public static final String PRODUCTO_BAJA = "B";
+    public static final String PRODUCTO_PENDIENTE_GENERAR_PDF= "G";
+
+    public static final String TIMESTAMP_BBDD = "yyyy-MM-dd HH:mm:ss";
 
 }

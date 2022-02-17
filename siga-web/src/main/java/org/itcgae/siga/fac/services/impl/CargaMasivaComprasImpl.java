@@ -147,6 +147,9 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 	@Autowired
 	private GestionFichaCompraSuscripcionServiceImpl gestionFichaCompraSuscripcionServiceImpl;
 	
+	@Autowired
+	private ExcelHelper excelHelper;
+	
 	@Override
 	public InputStreamResource descargarModelo(HttpServletRequest request)
 			throws IOException, EncryptedDocumentException, InvalidFormatException {
@@ -260,7 +263,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 		// Extraer la debugrmación del excel
 		LOGGER.debug("cargarFichero() -> Extraer los datos del archivo");
 		try {
-			datos = ExcelHelper.parseExcelFile(file.getBytes());
+			datos = this.excelHelper.parseExcelFile(file.getBytes());
 		} catch (BusinessException | IOException e1) {
 			// TODO Auto-generated catch block
 			LOGGER.error(e1.getStackTrace());
@@ -304,13 +307,12 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 						i++;
 					}
 					
-					
 					for (CargaMasivaDatosCompItem CargaMasivaDatosCompItem : CargaMasivaDatosCompItems) {
 
 						LOGGER.debug("cargarFichero() / Se van leyendo los ficheros cargados en la lista");
 						
 						LOGGER.debug("cargarFichero() / Si no se ha detectado errores leyendo el excel introducido");
-						if (CargaMasivaDatosCompItem.getErrores() == null && !found) {
+						if (CargaMasivaDatosCompItem.getErrores() == null) {
 
 							LOGGER.debug("cargarFichero() / Insertamos el la solicitud de compra ");
 							
@@ -372,6 +374,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 							
 							
 							ficha.setIdPersona(idPersona);
+							ficha.setFechaCompra(CargaMasivaDatosCompItem.getFechaCompra());
 							
 							ListaProductosCompraItem prod = new ListaProductosCompraItem();
 							
@@ -426,7 +429,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 					
 					int result = 0;
 					try {
-						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCP, datosLog);
+						byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCP, datosLog);
 
 						cenCargamasivacv.setTipocarga("CP");
 						cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -656,7 +659,21 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 			CargaMasivaDatosCompItem.setIdInstitucion(idInstitucion);
 			errorLinea = new StringBuffer();
 			
-			if(hashtable.get(SigaConstants.CP_NIF)!=null && !hashtable.get(SigaConstants.CP_NIF).toString().equals("") &&
+			if(hashtable.get(SigaConstants.CP_NCOLEGIADO)!=null && !hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("") &&
+					!hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("Requerido")){
+				CargaMasivaDatosCompItem.setNumColegiadoCliente(hashtable.get(SigaConstants.CP_NCOLEGIADO).toString());
+
+				CenColegiadoExample colegiadoExample = new CenColegiadoExample();
+
+				colegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(CargaMasivaDatosCompItem.getNumColegiadoCliente());								
+
+				if(!cenColegiadoMapper.selectByExample(colegiadoExample).isEmpty()) {
+					CargaMasivaDatosCompItem.setIdPersona(cenColegiadoMapper.selectByExample(colegiadoExample).get(0).getIdpersona());
+				}
+				else {
+					errorLinea.append("Cliente no encontrado por Num Colegiado. ");
+				}
+			}else if(hashtable.get(SigaConstants.CP_NIF)!=null && !hashtable.get(SigaConstants.CP_NIF).toString().equals("") &&
 					!hashtable.get(SigaConstants.CP_NIF).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.CP_NIF).toString().equals("Requerido")){
 
 				LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna NIF CLIENTE");
@@ -672,25 +689,10 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 				}else {
 					errorLinea.append("Cliente no encontrado por Nif. ");
 				}
-			}
-			else if(hashtable.get(SigaConstants.CP_NCOLEGIADO)!=null && !hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("") &&
-					!hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.CP_NCOLEGIADO).toString().equals("Requerido")){
-				CargaMasivaDatosCompItem.setNumColegiadoCliente(hashtable.get(SigaConstants.CP_NCOLEGIADO).toString());
-
-				CenColegiadoExample colegiadoExample = new CenColegiadoExample();
-
-				colegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(CargaMasivaDatosCompItem.getNumColegiadoCliente());								
-
-				if(!cenColegiadoMapper.selectByExample(colegiadoExample).isEmpty()) {
-					CargaMasivaDatosCompItem.setIdPersona(cenColegiadoMapper.selectByExample(colegiadoExample).get(0).getIdpersona());
-				}
-				else {
-					errorLinea.append("Cliente no encontrado por Num Colegiado. ");
-				}
 			}else{
 				errorLinea.append("Es obligatorio introducir el numero de colegiado o el NIF del cliente. ");
 			}
-		
+				
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna APELLIDOS CLIENTE");
 			if (hashtable.get(SigaConstants.CP_APELLIDOS_CLI) != null && !hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString().equals("") &&
 				!hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString().equals("Requerido")) {
@@ -702,23 +704,23 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna NOMBRE CLIENTE");
 			if (hashtable.get(SigaConstants.CP_NOMBRE_CLI) != null && !hashtable.get(SigaConstants.CP_NOMBRE_CLI).toString().equals("") &&
 				!hashtable.get(SigaConstants.CP_NOMBRE_CLI).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.CP_NOMBRE_CLI).toString().equals("Requerido")) {
-				CargaMasivaDatosCompItem.setApellidosCliente(hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString());
+				CargaMasivaDatosCompItem.setNombreCliente(hashtable.get(SigaConstants.CP_NOMBRE_CLI).toString());
 			}else{
 				errorLinea.append("Es obligatorio introducir el nombre del cliente. ");
 			}
 			
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna CANTIDAD PRODUCTO");
-			if(hashtable.get(SigaConstants.CP_CANT_PROD)!=null && !hashtable.get(SigaConstants.CP_CANT_PROD).toString().equals("") &&
+			if(hashtable.get(SigaConstants.CP_CANT_PROD)!=null && !hashtable.get(SigaConstants.CP_CANT_PROD).toString().equals("") && isNumber(hashtable.get(SigaConstants.CP_CANT_PROD).toString()) &&
 				!hashtable.get(SigaConstants.CP_CANT_PROD).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.CP_CANT_PROD).toString().equals("Requerido")){
 				CargaMasivaDatosCompItem.setCantidadProducto(hashtable.get(SigaConstants.CP_CANT_PROD).toString());
 			}else{
-				errorLinea.append("Es obligatorio introducir la cantidad del producto. ");
+				errorLinea.append("Es obligatorio introducir la cantidad del producto en formato de número entero. ");
 			}
 			
 			LOGGER.debug("parseExcelFileComp() / Obtenemos los datos de la columna NOMBRE CLIENTE");
 			if (hashtable.get(SigaConstants.CP_NOMBRE_PROD) != null && !hashtable.get(SigaConstants.CP_NOMBRE_PROD).toString().equals("") &&
 				!hashtable.get(SigaConstants.CP_NOMBRE_PROD).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.CP_NOMBRE_PROD).toString().equals("Requerido")) {
-				CargaMasivaDatosCompItem.setApellidosCliente(hashtable.get(SigaConstants.CP_APELLIDOS_CLI).toString());
+				CargaMasivaDatosCompItem.setNombreProducto(hashtable.get(SigaConstants.CP_NOMBRE_PROD).toString());
 			}else{
 				errorLinea.append("Es obligatorio introducir el nombre del producto. ");
 			}
@@ -806,6 +808,17 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 
 		LOGGER.debug(dateLog + " --> Fin CargaMasivaComprasServiceImpl getDirectorioFicheroSigaClassique");
 		return directorioFichero.toString();
+	}
+	
+	private boolean isNumber(String numeroString) {
+		
+		try {
+			Integer.parseInt(numeroString);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		
 	}
 
 	@Override

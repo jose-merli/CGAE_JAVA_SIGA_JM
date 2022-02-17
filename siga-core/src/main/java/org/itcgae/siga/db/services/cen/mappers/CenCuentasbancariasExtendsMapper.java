@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.services.cen.providers.CenCuentasbancariasSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -142,4 +143,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 			@Result(column = "IDCUENTA", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getComboCuentas(String idPersona, String idInstitucion);
+
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "getCuentaActivaServiciosActivos")
+	CenCuentasbancarias getCuentaActivaServiciosActivos(Short idInstitucion, Long idPersona);
 }

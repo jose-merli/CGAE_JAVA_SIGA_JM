@@ -2,6 +2,7 @@
 package org.itcgae.siga.DTO.scs;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class GuardiasItem {
 
@@ -37,14 +38,23 @@ public class GuardiasItem {
 	private String diasPeriodo;
 	private String diasGuardia;
 	private String diasSeparacionGuardias;
+
+
 	private String envioCentralita;
 	private String porGrupos;
 	private Date fechabaja;
 	private boolean historico;
-	
-	
-	
-	
+	private String baremo;
+	private String nDias;
+	private Short numMinimoSimple;
+	private Short simpleOImporteIndividual;
+	private Short naPartir;
+	private Short maximo;
+	private String porDia;
+
+
+
+
 	public String getIdPersonaUltimo() {
 		return idPersonaUltimo;
 	}
@@ -251,166 +261,181 @@ public class GuardiasItem {
 	public void setFechabaja(Date fechabaja) {
 		this.fechabaja = fechabaja;
 	}
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((area == null) ? 0 : area.hashCode());
-		result = prime * result + ((duracion == null) ? 0 : duracion.hashCode());
-		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
-		result = prime * result + ((grupoFacturacion == null) ? 0 : grupoFacturacion.hashCode());
-		result = prime * result + ((grupoZona == null) ? 0 : grupoZona.hashCode());
-		result = prime * result + ((idGuardia == null) ? 0 : idGuardia.hashCode());
-		result = prime * result + ((idTurno == null) ? 0 : idTurno.hashCode());
-		result = prime * result + ((jurisdiccion == null) ? 0 : jurisdiccion.hashCode());
-		result = prime * result + ((letradosGuardia == null) ? 0 : letradosGuardia.hashCode());
-		result = prime * result + ((letradosIns == null) ? 0 : letradosIns.hashCode());
-		result = prime * result + ((materia == null) ? 0 : materia.hashCode());
-		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
-		result = prime * result + ((obligatoriedad == null) ? 0 : obligatoriedad.hashCode());
-		result = prime * result + ((partidaJudicial == null) ? 0 : partidaJudicial.hashCode());
-		result = prime * result + ((partidaPresupuestaria == null) ? 0 : partidaPresupuestaria.hashCode());
-		result = prime * result + ((tipoDia == null) ? 0 : tipoDia.hashCode());
-		result = prime * result + ((tipoGuardia == null) ? 0 : tipoGuardia.hashCode());
-		result = prime * result + ((tipoTurno == null) ? 0 : tipoTurno.hashCode());
-		result = prime * result + ((validaJustificacion == null) ? 0 : validaJustificacion.hashCode());
-		result = prime * result + ((zona == null) ? 0 : zona.hashCode());
-		return result;
+
+	public String getBaremo() {
+		return baremo;
 	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GuardiasItem other = (GuardiasItem) obj;
-		if (area == null) {
-			if (other.area != null)
-				return false;
-		} else if (!area.equals(other.area))
-			return false;
-		if (duracion == null) {
-			if (other.duracion != null)
-				return false;
-		} else if (!duracion.equals(other.duracion))
-			return false;
-		if (fechabaja == null) {
-			if (other.fechabaja != null)
-				return false;
-		} else if (!fechabaja.equals(other.fechabaja))
-			return false;
-		if (grupoFacturacion == null) {
-			if (other.grupoFacturacion != null)
-				return false;
-		} else if (!grupoFacturacion.equals(other.grupoFacturacion))
-			return false;
-		if (grupoZona == null) {
-			if (other.grupoZona != null)
-				return false;
-		} else if (!grupoZona.equals(other.grupoZona))
-			return false;
-		if (idGuardia == null) {
-			if (other.idGuardia != null)
-				return false;
-		} else if (!idGuardia.equals(other.idGuardia))
-			return false;
-		if (idTurno == null) {
-			if (other.idTurno != null)
-				return false;
-		} else if (!idTurno.equals(other.idTurno))
-			return false;
-		if (jurisdiccion == null) {
-			if (other.jurisdiccion != null)
-				return false;
-		} else if (!jurisdiccion.equals(other.jurisdiccion))
-			return false;
-		if (letradosGuardia == null) {
-			if (other.letradosGuardia != null)
-				return false;
-		} else if (!letradosGuardia.equals(other.letradosGuardia))
-			return false;
-		if (letradosIns == null) {
-			if (other.letradosIns != null)
-				return false;
-		} else if (!letradosIns.equals(other.letradosIns))
-			return false;
-		if (materia == null) {
-			if (other.materia != null)
-				return false;
-		} else if (!materia.equals(other.materia))
-			return false;
-		if (nombre == null) {
-			if (other.nombre != null)
-				return false;
-		} else if (!nombre.equals(other.nombre))
-			return false;
-		if (obligatoriedad == null) {
-			if (other.obligatoriedad != null)
-				return false;
-		} else if (!obligatoriedad.equals(other.obligatoriedad))
-			return false;
-		if (partidaJudicial == null) {
-			if (other.partidaJudicial != null)
-				return false;
-		} else if (!partidaJudicial.equals(other.partidaJudicial))
-			return false;
-		if (partidaPresupuestaria == null) {
-			if (other.partidaPresupuestaria != null)
-				return false;
-		} else if (!partidaPresupuestaria.equals(other.partidaPresupuestaria))
-			return false;
-		if (tipoDia == null) {
-			if (other.tipoDia != null)
-				return false;
-		} else if (!tipoDia.equals(other.tipoDia))
-			return false;
-		if (tipoGuardia == null) {
-			if (other.tipoGuardia != null)
-				return false;
-		} else if (!tipoGuardia.equals(other.tipoGuardia))
-			return false;
-		if (tipoTurno == null) {
-			if (other.tipoTurno != null)
-				return false;
-		} else if (!tipoTurno.equals(other.tipoTurno))
-			return false;
-		if (validaJustificacion == null) {
-			if (other.validaJustificacion != null)
-				return false;
-		} else if (!validaJustificacion.equals(other.validaJustificacion))
-			return false;
-		if (zona == null) {
-			if (other.zona != null)
-				return false;
-		} else if (!zona.equals(other.zona))
-			return false;
-		return true;
+
+	public void setBaremo(String baremo) {
+		this.baremo = baremo;
 	}
-	
-	@Override
-	public String toString() {
-		return "GuardiasItem [idGuardia=" + idGuardia + ", idTurno=" + idTurno + ", nombre=" + nombre + ", area=" + area
-				+ ", materia=" + materia + ", grupoZona=" + grupoZona + ", zona=" + zona + ", obligatoriedad="
-				+ obligatoriedad + ", duracion=" + duracion + ", validaJustificacion=" + validaJustificacion
-				+ ", partidaJudicial=" + partidaJudicial + ", jurisdiccion=" + jurisdiccion + ", grupoFacturacion="
-				+ grupoFacturacion + ", partidaPresupuestaria=" + partidaPresupuestaria + ", tipoTurno=" + tipoTurno
-				+ ", tipoGuardia=" + tipoGuardia + ", tipoDia=" + tipoDia + ", letradosGuardia=" + letradosGuardia
-				+ ", letradosIns=" + letradosIns + ", fechabaja=" + fechabaja + "]";
+
+	public String getnDias() {
+		return nDias;
 	}
+
+	public void setnDias(String nDias) {
+		this.nDias = nDias;
+	}
+
+	public Short getNumMinimoSimple() {
+		return numMinimoSimple;
+	}
+
+	public void setNumMinimoSimple(Short numMinimoSimple) {
+		this.numMinimoSimple = numMinimoSimple;
+	}
+
+	public Short getSimpleOImporteIndividual() {
+		return simpleOImporteIndividual;
+	}
+
+	public void setSimpleOImporteIndividual(Short simpleOImporteIndividual) {
+		this.simpleOImporteIndividual = simpleOImporteIndividual;
+	}
+
+	public Short getNaPartir() {
+		return naPartir;
+	}
+
+	public void setNaPartir(Short naPartir) {
+		this.naPartir = naPartir;
+	}
+
+	public Short getMaximo() {
+		return maximo;
+	}
+
+	public void setMaximo(Short maximo) {
+		this.maximo = maximo;
+	}
+
+	public String getPorDia() {
+		return porDia;
+	}
+
+	public void setPorDia(String porDia) {
+		this.porDia = porDia;
+	}
+
 	public String getSeleccionLaborables() {
 		return seleccionLaborables;
 	}
+
 	public void setSeleccionLaborables(String seleccionLaborables) {
 		this.seleccionLaborables = seleccionLaborables;
 	}
+
 	public String getSeleccionFestivos() {
 		return seleccionFestivos;
 	}
+
 	public void setSeleccionFestivos(String seleccionFestivos) {
 		this.seleccionFestivos = seleccionFestivos;
-	} 
+	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		GuardiasItem that = (GuardiasItem) o;
+		return historico == that.historico &&
+				Objects.equals(idGuardia, that.idGuardia) &&
+				Objects.equals(idTurno, that.idTurno) &&
+				Objects.equals(idOrdenacionColas, that.idOrdenacionColas) &&
+				Objects.equals(idPersonaUltimo, that.idPersonaUltimo) &&
+				Objects.equals(turno, that.turno) &&
+				Objects.equals(nombre, that.nombre) &&
+				Objects.equals(descripcion, that.descripcion) &&
+				Objects.equals(descripcionPago, that.descripcionPago) &&
+				Objects.equals(descripcionFacturacion, that.descripcionFacturacion) &&
+				Objects.equals(area, that.area) &&
+				Objects.equals(materia, that.materia) &&
+				Objects.equals(grupoZona, that.grupoZona) &&
+				Objects.equals(zona, that.zona) &&
+				Objects.equals(obligatoriedad, that.obligatoriedad) &&
+				Objects.equals(duracion, that.duracion) &&
+				Objects.equals(validaJustificacion, that.validaJustificacion) &&
+				Objects.equals(partidaJudicial, that.partidaJudicial) &&
+				Objects.equals(jurisdiccion, that.jurisdiccion) &&
+				Objects.equals(grupoFacturacion, that.grupoFacturacion) &&
+				Objects.equals(partidaPresupuestaria, that.partidaPresupuestaria) &&
+				Objects.equals(tipoTurno, that.tipoTurno) &&
+				Objects.equals(tipoGuardia, that.tipoGuardia) &&
+				Objects.equals(tipoDia, that.tipoDia) &&
+				Objects.equals(tipoDiasGuardia, that.tipoDiasGuardia) &&
+				Objects.equals(tipoDiasPeriodo, that.tipoDiasPeriodo) &&
+				Objects.equals(letradosGuardia, that.letradosGuardia) &&
+				Objects.equals(letradosIns, that.letradosIns) &&
+				Objects.equals(seleccionLaborables, that.seleccionLaborables) &&
+				Objects.equals(seleccionFestivos, that.seleccionFestivos) &&
+				Objects.equals(diasPeriodo, that.diasPeriodo) &&
+				Objects.equals(diasGuardia, that.diasGuardia) &&
+				Objects.equals(diasSeparacionGuardias, that.diasSeparacionGuardias) &&
+				Objects.equals(envioCentralita, that.envioCentralita) &&
+				Objects.equals(porGrupos, that.porGrupos) &&
+				Objects.equals(fechabaja, that.fechabaja) &&
+				Objects.equals(baremo, that.baremo) &&
+				Objects.equals(nDias, that.nDias) &&
+				Objects.equals(numMinimoSimple, that.numMinimoSimple) &&
+				Objects.equals(simpleOImporteIndividual, that.simpleOImporteIndividual) &&
+				Objects.equals(naPartir, that.naPartir) &&
+				Objects.equals(maximo, that.maximo) &&
+				Objects.equals(porDia, that.porDia);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idGuardia, idTurno, idOrdenacionColas, idPersonaUltimo, turno, nombre, descripcion, descripcionPago, descripcionFacturacion, area, materia, grupoZona, zona, obligatoriedad, duracion, validaJustificacion, partidaJudicial, jurisdiccion, grupoFacturacion, partidaPresupuestaria, tipoTurno, tipoGuardia, tipoDia, tipoDiasGuardia, tipoDiasPeriodo, letradosGuardia, letradosIns, seleccionLaborables, seleccionFestivos, diasPeriodo, diasGuardia, diasSeparacionGuardias, envioCentralita, porGrupos, fechabaja, historico, baremo, nDias, numMinimoSimple, simpleOImporteIndividual, naPartir, maximo, porDia);
+	}
+
+	@Override
+	public String toString() {
+		return "GuardiasItem{" +
+				"idGuardia='" + idGuardia + '\'' +
+				", idTurno='" + idTurno + '\'' +
+				", idOrdenacionColas='" + idOrdenacionColas + '\'' +
+				", idPersonaUltimo='" + idPersonaUltimo + '\'' +
+				", turno='" + turno + '\'' +
+				", nombre='" + nombre + '\'' +
+				", descripcion='" + descripcion + '\'' +
+				", descripcionPago='" + descripcionPago + '\'' +
+				", descripcionFacturacion='" + descripcionFacturacion + '\'' +
+				", area='" + area + '\'' +
+				", materia='" + materia + '\'' +
+				", grupoZona='" + grupoZona + '\'' +
+				", zona='" + zona + '\'' +
+				", obligatoriedad='" + obligatoriedad + '\'' +
+				", duracion='" + duracion + '\'' +
+				", validaJustificacion='" + validaJustificacion + '\'' +
+				", partidaJudicial='" + partidaJudicial + '\'' +
+				", jurisdiccion='" + jurisdiccion + '\'' +
+				", grupoFacturacion='" + grupoFacturacion + '\'' +
+				", partidaPresupuestaria='" + partidaPresupuestaria + '\'' +
+				", tipoTurno='" + tipoTurno + '\'' +
+				", tipoGuardia='" + tipoGuardia + '\'' +
+				", tipoDia='" + tipoDia + '\'' +
+				", tipoDiasGuardia='" + tipoDiasGuardia + '\'' +
+				", tipoDiasPeriodo='" + tipoDiasPeriodo + '\'' +
+				", letradosGuardia='" + letradosGuardia + '\'' +
+				", letradosIns='" + letradosIns + '\'' +
+				", seleccionLaborables='" + seleccionLaborables + '\'' +
+				", seleccionFestivos='" + seleccionFestivos + '\'' +
+				", diasPeriodo='" + diasPeriodo + '\'' +
+				", diasGuardia='" + diasGuardia + '\'' +
+				", diasSeparacionGuardias='" + diasSeparacionGuardias + '\'' +
+				", envioCentralita='" + envioCentralita + '\'' +
+				", porGrupos='" + porGrupos + '\'' +
+				", fechabaja=" + fechabaja +
+				", historico=" + historico +
+				", baremo='" + baremo + '\'' +
+				", nDias='" + nDias + '\'' +
+				", numMinimoSimple=" + numMinimoSimple +
+				", simpleOImporteIndividual=" + simpleOImporteIndividual +
+				", naPartir=" + naPartir +
+				", maximo=" + maximo +
+				", porDia='" + porDia + '\'' +
+				'}';
+	}
 	
 }

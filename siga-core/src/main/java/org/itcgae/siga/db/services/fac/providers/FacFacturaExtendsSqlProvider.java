@@ -1,14 +1,18 @@
 package org.itcgae.siga.db.services.fac.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FacFacturaSqlProvider;
 
 import java.text.SimpleDateFormat;
 
 
 public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
+	
+	private Logger LOGGER = Logger.getLogger(this.getClass());
 
     public String getFacturas(FacturaItem item, String idInstitucion, String idLenguaje) {
 
@@ -19,6 +23,12 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         SQL devoluciones = new SQL();
         SQL facturas = new SQL();
         SQL sqlFacturas = new SQL();
+        SQL sqlEstadosPagos = new SQL();
+        SQL sqlUltimoEstado = new SQL();
+        SQL sqlUltimoImportePorPagar = new SQL();
+        SQL sqlUltimoAccion = new SQL();
+        SQL sqlUltimoFecha = new SQL();
+        SQL sqlUltimoPagado = new SQL();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String fecha;
@@ -46,14 +56,51 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         ultComunicacion.FROM("env_comunicacionmorosos m");
         ultComunicacion.WHERE("m.idinstitucion = f.idinstitucion AND m.idpersona = f.idpersona AND m.idfactura = f.idfactura");
 
+        //Ultimo estadosPagos
+        sqlEstadosPagos.SELECT("max(idhistorico)");
+        sqlEstadosPagos.FROM("fac_historicofactura hfl");
+        sqlEstadosPagos.WHERE("hfl.idfactura = hfac.idfactura and hfl.idinstitucion = hfac.idinstitucion");
+        
+        //Estado de UltimoEstadosPagos
+        sqlUltimoEstado.SELECT("estado");
+        sqlUltimoEstado.FROM("fac_historicofactura hfac");
+        sqlUltimoEstado.WHERE("hfac.idfactura = f.idfactura and hfac.idinstitucion = f.idinstitucion and hfac.idhistorico = ("+sqlEstadosPagos.toString()+")");
+        
+        //Ultimo  Importe Total por Pagar
+        sqlUltimoImportePorPagar.SELECT("imptotalporpagar");
+        sqlUltimoImportePorPagar.FROM("fac_historicofactura hfac");
+        sqlUltimoImportePorPagar.WHERE("hfac.idfactura = f.idfactura and hfac.idinstitucion = f.idinstitucion and hfac.idhistorico = ("+sqlEstadosPagos.toString()+")");
+        
+        //Ultimo  Importe Total por Pagado
+        sqlUltimoPagado.SELECT("imptotalpagado");
+        sqlUltimoPagado.FROM("fac_historicofactura hfac");
+        sqlUltimoPagado.WHERE("hfac.idfactura = f.idfactura and hfac.idinstitucion = f.idinstitucion and hfac.idhistorico = ("+sqlEstadosPagos.toString()+")");
+        
+        
+        //Ultima Accion
+        sqlUltimoAccion.SELECT("idtipoaccion");
+        sqlUltimoAccion.FROM("fac_historicofactura hfac");
+        sqlUltimoAccion.WHERE("hfac.idfactura = f.idfactura and hfac.idinstitucion = f.idinstitucion and hfac.idhistorico = ("+sqlEstadosPagos.toString()+")");
+        
+        //Ultima Fecha modificacion de EstadoPagos
+        sqlUltimoFecha.SELECT("fechamodificacion");
+        sqlUltimoFecha.FROM("fac_historicofactura hfac");
+        sqlUltimoFecha.WHERE("hfac.idfactura = f.idfactura and hfac.idinstitucion = f.idinstitucion and hfac.idhistorico = ("+sqlEstadosPagos.toString()+")");
+        
+        
         //select de facturas
         facturas.SELECT("'FACTURA' tipo,f.idfactura,f.numerofactura,f.idinstitucion,f.fechaemision fecha,f.idprogramacion,fp.descripcion facturacion,"
                 + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' ||  p.nombre, p.nombre) nombreCompleto,"
                 + "f.imptotal,f.imptotalporpagar,f.estado idestado,r.descripcion estado, (" + numComunicaciones.toString() + ") numcomunicaciones,"
-                + "(" + ultComunicacion.toString() + ") ultcomunicacion,p.idpersona");
-
+                + "(" + ultComunicacion.toString() + ") ultcomunicacion,p.idpersona,f.idformapago, F_SIGA_GETRECURSO(pf.DESCRIPCION,'"+idLenguaje+"') AS NOMBREFORMAPAGO");
+        
+        //Select para el ultimo estado pagos
+        facturas.SELECT("("+sqlUltimoEstado.toString()+") estado_max_historico, ("+sqlUltimoImportePorPagar.toString()+")"
+        		+ " imptotalporpagar_max,("+sqlUltimoAccion.toString()+") idaccionult ,("+sqlUltimoFecha.toString()+") fechamodificacionult ,("+sqlUltimoPagado.toString()+") imptotalpagado_max ");
+        
         //joins
         facturas.FROM("fac_factura f");
+        facturas.LEFT_OUTER_JOIN("pys_formapago pf on f.idformapago = pf.idformapago");
         facturas.INNER_JOIN("fac_facturacionprogramada fp ON (fp.idinstitucion = f.idinstitucion AND fp.idprogramacion = f.idprogramacion AND f.idseriefacturacion = fp.idseriefacturacion)");
         facturas.INNER_JOIN("cen_cliente c ON (c.idpersona = f.idpersona AND c.idinstitucion = f.idinstitucion)");
         facturas.INNER_JOIN("cen_persona p ON (p.idpersona = f.idpersona)");
@@ -61,12 +108,16 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         facturas.LEFT_OUTER_JOIN("fac_estadofactura ef ON (ef.idestado = f.estado)");
         facturas.LEFT_OUTER_JOIN("gen_recursos r ON (ef.descripcion = r.idrecurso AND r.idlenguaje =" + idLenguaje + ")");
 
-        //filtros
-        if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
-            facturas.WHERE("f.idinstitucion =" + idInstitucion);
+        //filtro
+        if (idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+            if (item.getIdInstitucion() != null) {
+                facturas.WHERE("f.idinstitucion = " + item.getIdInstitucion());
+            }
         } else {
             if (item.getIdInstitucion() != null) {
-                facturas.WHERE("f.idinstitucion =" + item.getIdInstitucion());
+                facturas.WHERE("f.idinstitucion = " + item.getIdInstitucion());
+            } else {
+                facturas.WHERE("f.idinstitucion = " + idInstitucion);
             }
         }
 
@@ -203,6 +254,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             sqlFacturas.WHERE("numcomunicaciones<=to_number(" + item.getComunicacionesFacturasHasta() + ",'99999999999999999.99')");
         }
 
+        LOGGER.info(sqlFacturas.toString());
+        
         return sqlFacturas.toString();
     }
 
@@ -326,4 +379,69 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         return sql.toString();
     }
+
+    public String obtenerFacturasFacturacionRapida(String idInstitucion, String idPeticion, String idSolicitudCertificado) {
+        SQL sql = new SQL();
+        sql.SELECT_DISTINCT("F.IDINSTITUCION, F.IDPERSONA, F.IDFACTURA, F.NUMEROFACTURA, F.IDSERIEFACTURACION, F.IDPROGRAMACION, F.ESTADO, C.IDPETICION");
+        sql.FROM("FAC_FACTURA F, PYS_COMPRA C");
+        sql.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("C.IDINSTITUCION = F.IDINSTITUCION");
+        sql.WHERE("C.IDFACTURA = F.IDFACTURA");
+        if (!UtilidadesString.esCadenaVacia(idPeticion)) {
+            sql.WHERE("C.IDPETICION = " + idPeticion);
+        } else {
+            SQL subQuery = new SQL();
+            subQuery.SELECT("1");
+            subQuery.FROM("CER_SOLICITUDCERTIFICADOS CER");
+            subQuery.WHERE("C.IDINSTITUCION = CER.IDINSTITUCION");
+            subQuery.WHERE("C.IDPETICION = CER.IDPETICIONPRODUCTO");
+            subQuery.WHERE("C.IDTIPOPRODUCTO = CER.PPN_IDTIPOPRODUCTO");
+            subQuery.WHERE("C.IDPRODUCTO = CER.PPN_IDPRODUCTO");
+            subQuery.WHERE("C.IDPRODUCTOINSTITUCION = CER.PPN_IDPRODUCTOINSTITUCION");
+            subQuery.WHERE("CER.IDSOLICITUD = " + idSolicitudCertificado);
+            sql.WHERE("EXISTS (" + subQuery + ")");
+        }
+        return sql.toString();
+    }
+
+    public String getDatosImpresionInformeFactura(String idInstitucion, String idFactura) {
+        SQL sql = new SQL();
+        sql.SELECT("F.IDINSTITUCION");
+        sql.SELECT("F.IDFACTURA");
+        sql.SELECT("F.NUMEROFACTURA");
+        sql.SELECT("F.FECHAEMISION");
+        sql.SELECT("F.OBSERVACIONES");
+        sql.SELECT("F.OBSERVINFORME");
+        sql.SELECT("F.IDPERSONA");
+        sql.SELECT("F.IDCUENTA");
+        sql.SELECT("F.IDCUENTADEUDOR");
+        sql.SELECT("C.IBAN");
+        sql.SELECT("C.CBO_CODIGO");
+        sql.SELECT("C.CODIGOSUCURSAL");
+        sql.SELECT("C.DIGITOCONTROL");
+        sql.SELECT("F.IMPTOTALNETO AS IMPORTE_NETO");
+        sql.SELECT("F.IMPTOTALIVA AS IMPORTE_IVA");
+        sql.SELECT("F.IMPTOTAL AS TOTAL_FACTURA");
+        sql.SELECT("F.IMPTOTALPAGADO AS TOTAL_PAGOS");
+        sql.SELECT("F.IMPTOTALANTICIPADO AS ANTICIPADO");
+        sql.SELECT("F.IMPTOTALCOMPENSADO AS COMPENSADO");
+        sql.SELECT("F.IMPTOTALPAGADOPORBANCO AS POR_BANCO");
+        sql.SELECT("F.IMPTOTALPAGADOPORCAJA AS POR_CAJA");
+        sql.SELECT("F.IMPTOTALPAGADOSOLOCAJA AS POR_SOLOCAJA");
+        sql.SELECT("F.IMPTOTALPAGADOSOLOTARJETA AS POR_SOLOTARJETA");
+        sql.SELECT("F.IMPTOTALPORPAGAR AS PENDIENTE_PAGAR");
+        sql.SELECT("LPAD(SUBSTR(C.NUMEROCUENTA, 7), 10, '*') AS NUMEROCUENTA");
+        sql.SELECT("C.TITULAR");
+        sql.SELECT("F.IDMANDATO");
+        sql.SELECT("F.COMISIONIDFACTURA");
+        sql.SELECT("EF.DESCRIPCION AS DESCRIPCION_ESTADO");
+        sql.SELECT("F.REFMANDATOSEPA");
+        sql.FROM("FAC_FACTURA F " +
+                "LEFT JOIN CEN_CUENTASBANCARIAS C ON C.IDPERSONA = F.IDPERSONA AND C.IDINSTITUCION = F.IDINSTITUCION AND C.IDCUENTA = F.IDCUENTA " +
+                "INNER JOIN FAC_ESTADOFACTURA EF ON F.ESTADO = EF.IDESTADO");
+        sql.WHERE("F.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("F.IDFACTURA = " + idFactura);
+        return sql.toString();
+    }
+
 }

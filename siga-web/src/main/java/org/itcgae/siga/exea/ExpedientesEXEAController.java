@@ -132,6 +132,12 @@ public class ExpedientesEXEAController {
         return response;
     }
 
+    @PostMapping(value = "/getJustificante", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<InputStreamResource> getJustificante(HttpServletRequest request, @RequestBody String claveConsulta) {
+        ResponseEntity<InputStreamResource> response = expedientesEXEAService.getJustificante(request, claveConsulta);
+        return response;
+    }
+
 
     @PostMapping(value = "/iniciarTramiteColegiacionEXEA", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UpdateResponseDTO> iniciarTramiteColegiacionEXEA(HttpServletRequest request, @RequestBody String idSolicitud) {

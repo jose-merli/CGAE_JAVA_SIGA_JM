@@ -80,66 +80,15 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
             @Result(column = "descripcion", property = "label", jdbcType = JdbcType.VARCHAR)
     })
     List<ComboItem> comboFacturaciones(Short idInstitucion);
-    
-    
-    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getListaNFacturacionesProgramadasProcesar")
-    @Results(id="facProgramadaResult", value={
-        @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
-        @Result(column="IDSERIEFACTURACION", property="idseriefacturacion", jdbcType=JdbcType.DECIMAL, id=true),
-        @Result(column="IDPROGRAMACION", property="idprogramacion", jdbcType=JdbcType.DECIMAL, id=true),
-        @Result(column="FECHAINICIOPRODUCTOS", property="fechainicioproductos", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHAFINPRODUCTOS", property="fechafinproductos", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHAINICIOSERVICIOS", property="fechainicioservicios", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHAFINSERVICIOS", property="fechafinservicios", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHAPROGRAMACION", property="fechaprogramacion", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHAPREVISTAGENERACION", property="fechaprevistageneracion", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHAMODIFICACION", property="fechamodificacion", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="USUMODIFICACION", property="usumodificacion", jdbcType=JdbcType.DECIMAL),
-        @Result(column="IDPREVISION", property="idprevision", jdbcType=JdbcType.DECIMAL),
-        @Result(column="FECHAREALGENERACION", property="fecharealgeneracion", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHACONFIRMACION", property="fechaconfirmacion", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="IDESTADOCONFIRMACION", property="idestadoconfirmacion", jdbcType=JdbcType.DECIMAL),
-        @Result(column="IDESTADOPDF", property="idestadopdf", jdbcType=JdbcType.DECIMAL),
-        @Result(column="IDESTADOENVIO", property="idestadoenvio", jdbcType=JdbcType.DECIMAL),
-        @Result(column="FECHAPREVISTACONFIRM", property="fechaprevistaconfirm", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="GENERAPDF", property="generapdf", jdbcType=JdbcType.VARCHAR),
-        @Result(column="ENVIO", property="envio", jdbcType=JdbcType.VARCHAR),
-        @Result(column="ARCHIVARFACT", property="archivarfact", jdbcType=JdbcType.VARCHAR),
-        @Result(column="FECHACARGO", property="fechacargo", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="CONFDEUDOR", property="confdeudor", jdbcType=JdbcType.VARCHAR),
-        @Result(column="CONFINGRESOS", property="confingresos", jdbcType=JdbcType.VARCHAR),
-        @Result(column="CTAINGRESOS", property="ctaingresos", jdbcType=JdbcType.VARCHAR),
-        @Result(column="CTACLIENTES", property="ctaclientes", jdbcType=JdbcType.VARCHAR),
-        @Result(column="VISIBLE", property="visible", jdbcType=JdbcType.VARCHAR),
-        @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.VARCHAR),
-        @Result(column="IDTIPOPLANTILLAMAIL", property="idtipoplantillamail", jdbcType=JdbcType.DECIMAL),
-        @Result(column="IDTIPOENVIOS", property="idtipoenvios", jdbcType=JdbcType.DECIMAL),
-        @Result(column="FECHAPRESENTACION", property="fechapresentacion", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHARECIBOSPRIMEROS", property="fecharecibosprimeros", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHARECIBOSRECURRENTES", property="fecharecibosrecurrentes", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHARECIBOSCOR1", property="fechareciboscor1", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="FECHARECIBOSB2B", property="fecharecibosb2b", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="NOMBREFICHERO", property="nombrefichero", jdbcType=JdbcType.VARCHAR),
-        @Result(column="LOGERROR", property="logerror", jdbcType=JdbcType.VARCHAR),
-        @Result(column="TRASPASO_PLANTILLA", property="traspasoPlantilla", jdbcType=JdbcType.VARCHAR),
-        @Result(column="TRASPASO_CODAUDITORIA_DEF", property="traspasoCodauditoriaDef", jdbcType=JdbcType.VARCHAR),
-        @Result(column="TRASPASOFACTURAS", property="traspasofacturas", jdbcType=JdbcType.VARCHAR),
-        @Result(column="IDESTADOTRASPASO", property="idestadotraspaso", jdbcType=JdbcType.DECIMAL),
-        @Result(column="LOGTRASPASO", property="logtraspaso", jdbcType=JdbcType.VARCHAR)
-    })
-    List<FacFacturacionprogramada> getListaNFacturacionesProgramadasProcesar(Double tiempoMaximoEjecucion);
-
-    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getListaNConfirmarFacturacionesProgramadas")
-    @ResultMap("facProgramadaResult")
-    List<FacFacturacionprogramada>  getListaNConfirmarFacturacionesProgramadas (Integer rownum);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "isSerieFacturacionActiva")
 	boolean isSerieFacturacionActiva(Short idInstitucion, Long idSerieFacturacion, Long idProgramacion);
 
-    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getFacturacionesProgramadasYPendientes")
-    @Results({@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
-            @Result(column = "IDSERIEFACTURACION", property = "idseriefacturacion", jdbcType = JdbcType.DECIMAL, id = true),
-            @Result(column = "IDPROGRAMACION", property = "idprogramacion", jdbcType = JdbcType.DECIMAL, id = true),
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getFacturacionesProTratarFacturacion")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDSERIEFACTURACION", property = "idseriefacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPROGRAMACION", property = "idprogramacion", jdbcType = JdbcType.DECIMAL),
             @Result(column = "FECHAINICIOPRODUCTOS", property = "fechainicioproductos", jdbcType = JdbcType.TIMESTAMP),
             @Result(column = "FECHAFINPRODUCTOS", property = "fechafinproductos", jdbcType = JdbcType.TIMESTAMP),
             @Result(column = "FECHAINICIOSERVICIOS", property = "fechainicioservicios", jdbcType = JdbcType.TIMESTAMP),
@@ -183,6 +132,236 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
             @Result(column = "IDMODELORECTIFICATIVA", property = "idmodelorectificativa", jdbcType = JdbcType.DECIMAL),
             @Result(column = "NOMBREABREVIADO", property = "nombreabreviado", jdbcType = JdbcType.VARCHAR)
     })
-    List<FacFacturacionprogramadaExtendsDTO> getFacturacionesProgramadasYPendientes(Short idInstitucion, Double tiempoMaximoEjecucion);
+    List<FacFacturacionprogramadaExtendsDTO> getFacturacionesProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getFacturacionesProTratarConfirmacion")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDSERIEFACTURACION", property = "idseriefacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPROGRAMACION", property = "idprogramacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAINICIOPRODUCTOS", property = "fechainicioproductos", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFINPRODUCTOS", property = "fechafinproductos", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAINICIOSERVICIOS", property = "fechainicioservicios", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFINSERVICIOS", property = "fechafinservicios", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAPROGRAMACION", property = "fechaprogramacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAPREVISTAGENERACION", property = "fechaprevistageneracion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPREVISION", property = "idprevision", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAREALGENERACION", property = "fecharealgeneracion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHACONFIRMACION", property = "fechaconfirmacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "IDESTADOCONFIRMACION", property = "idestadoconfirmacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDESTADOPDF", property = "idestadopdf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDESTADOENVIO", property = "idestadoenvio", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAPREVISTACONFIRM", property = "fechaprevistaconfirm", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "GENERAPDF", property = "generapdf", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ENVIO", property = "envio", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ARCHIVARFACT", property = "archivarfact", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHACARGO", property = "fechacargo", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "CONFDEUDOR", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CONFINGRESOS", property = "confingresos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CTAINGRESOS", property = "ctaingresos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CTACLIENTES", property = "ctaclientes", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDTIPOPLANTILLAMAIL", property = "idtipoplantillamail", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDTIPOENVIOS", property = "idtipoenvios", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSPRIMEROS", property = "fecharecibosprimeros", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSRECURRENTES", property = "fecharecibosrecurrentes", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSCOR1", property = "fechareciboscor1", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSB2B", property = "fecharecibosb2b", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "NOMBREFICHERO", property = "nombrefichero", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "LOGERROR", property = "logerror", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASO_PLANTILLA", property = "traspasoPlantilla", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASO_CODAUDITORIA_DEF", property = "traspasoCodauditoriaDef", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASOFACTURAS", property = "traspasofacturas", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDESTADOTRASPASO", property = "idestadotraspaso", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "LOGTRASPASO", property = "logtraspaso", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMODELOFACTURA", property = "idmodelofactura", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDMODELORECTIFICATIVA", property = "idmodelorectificativa", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "NOMBREABREVIADO", property = "nombreabreviado", jdbcType = JdbcType.VARCHAR)
+    })
+    List<FacFacturacionprogramadaExtendsDTO> getFacturacionesProTratarConfirmacion(Short idInstitucion);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getFacturacionesProGenerarPDFsYenviarFacturasProgramacion")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDSERIEFACTURACION", property = "idseriefacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPROGRAMACION", property = "idprogramacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAINICIOPRODUCTOS", property = "fechainicioproductos", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFINPRODUCTOS", property = "fechafinproductos", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAINICIOSERVICIOS", property = "fechainicioservicios", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFINSERVICIOS", property = "fechafinservicios", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAPROGRAMACION", property = "fechaprogramacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAPREVISTAGENERACION", property = "fechaprevistageneracion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPREVISION", property = "idprevision", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAREALGENERACION", property = "fecharealgeneracion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHACONFIRMACION", property = "fechaconfirmacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "IDESTADOCONFIRMACION", property = "idestadoconfirmacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDESTADOPDF", property = "idestadopdf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDESTADOENVIO", property = "idestadoenvio", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAPREVISTACONFIRM", property = "fechaprevistaconfirm", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "GENERAPDF", property = "generapdf", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ENVIO", property = "envio", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ARCHIVARFACT", property = "archivarfact", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHACARGO", property = "fechacargo", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "CONFDEUDOR", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CONFINGRESOS", property = "confingresos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CTAINGRESOS", property = "ctaingresos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CTACLIENTES", property = "ctaclientes", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDTIPOPLANTILLAMAIL", property = "idtipoplantillamail", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDTIPOENVIOS", property = "idtipoenvios", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSPRIMEROS", property = "fecharecibosprimeros", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSRECURRENTES", property = "fecharecibosrecurrentes", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSCOR1", property = "fechareciboscor1", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSB2B", property = "fecharecibosb2b", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "NOMBREFICHERO", property = "nombrefichero", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "LOGERROR", property = "logerror", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASO_PLANTILLA", property = "traspasoPlantilla", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASO_CODAUDITORIA_DEF", property = "traspasoCodauditoriaDef", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASOFACTURAS", property = "traspasofacturas", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDESTADOTRASPASO", property = "idestadotraspaso", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "LOGTRASPASO", property = "logtraspaso", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMODELOFACTURA", property = "idmodelofactura", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDMODELORECTIFICATIVA", property = "idmodelorectificativa", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "NOMBREABREVIADO", property = "nombreabreviado", jdbcType = JdbcType.VARCHAR)
+    })
+    List<FacFacturacionprogramadaExtendsDTO> getFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getFacturacionesProGenerarEnviosFacturasPendientes")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDSERIEFACTURACION", property = "idseriefacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPROGRAMACION", property = "idprogramacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAINICIOPRODUCTOS", property = "fechainicioproductos", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFINPRODUCTOS", property = "fechafinproductos", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAINICIOSERVICIOS", property = "fechainicioservicios", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFINSERVICIOS", property = "fechafinservicios", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAPROGRAMACION", property = "fechaprogramacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAPREVISTAGENERACION", property = "fechaprevistageneracion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPREVISION", property = "idprevision", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAREALGENERACION", property = "fecharealgeneracion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHACONFIRMACION", property = "fechaconfirmacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "IDESTADOCONFIRMACION", property = "idestadoconfirmacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDESTADOPDF", property = "idestadopdf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDESTADOENVIO", property = "idestadoenvio", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAPREVISTACONFIRM", property = "fechaprevistaconfirm", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "GENERAPDF", property = "generapdf", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ENVIO", property = "envio", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ARCHIVARFACT", property = "archivarfact", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHACARGO", property = "fechacargo", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "CONFDEUDOR", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CONFINGRESOS", property = "confingresos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CTAINGRESOS", property = "ctaingresos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CTACLIENTES", property = "ctaclientes", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDTIPOPLANTILLAMAIL", property = "idtipoplantillamail", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDTIPOENVIOS", property = "idtipoenvios", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSPRIMEROS", property = "fecharecibosprimeros", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSRECURRENTES", property = "fecharecibosrecurrentes", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSCOR1", property = "fechareciboscor1", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSB2B", property = "fecharecibosb2b", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "NOMBREFICHERO", property = "nombrefichero", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "LOGERROR", property = "logerror", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASO_PLANTILLA", property = "traspasoPlantilla", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASO_CODAUDITORIA_DEF", property = "traspasoCodauditoriaDef", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASOFACTURAS", property = "traspasofacturas", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDESTADOTRASPASO", property = "idestadotraspaso", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "LOGTRASPASO", property = "logtraspaso", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMODELOFACTURA", property = "idmodelofactura", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDMODELORECTIFICATIVA", property = "idmodelorectificativa", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "NOMBREABREVIADO", property = "nombreabreviado", jdbcType = JdbcType.VARCHAR)
+    })
+    List<FacFacturacionprogramadaExtendsDTO> getFacturacionesProGenerarEnviosFacturasPendientes(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getFacturacionesProComprobacionTraspasoFacturas")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDSERIEFACTURACION", property = "idseriefacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPROGRAMACION", property = "idprogramacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAINICIOPRODUCTOS", property = "fechainicioproductos", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFINPRODUCTOS", property = "fechafinproductos", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAINICIOSERVICIOS", property = "fechainicioservicios", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFINSERVICIOS", property = "fechafinservicios", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAPROGRAMACION", property = "fechaprogramacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAPREVISTAGENERACION", property = "fechaprevistageneracion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPREVISION", property = "idprevision", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAREALGENERACION", property = "fecharealgeneracion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHACONFIRMACION", property = "fechaconfirmacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "IDESTADOCONFIRMACION", property = "idestadoconfirmacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDESTADOPDF", property = "idestadopdf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDESTADOENVIO", property = "idestadoenvio", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAPREVISTACONFIRM", property = "fechaprevistaconfirm", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "GENERAPDF", property = "generapdf", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ENVIO", property = "envio", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ARCHIVARFACT", property = "archivarfact", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHACARGO", property = "fechacargo", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "CONFDEUDOR", property = "confdeudor", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CONFINGRESOS", property = "confingresos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CTAINGRESOS", property = "ctaingresos", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CTACLIENTES", property = "ctaclientes", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDTIPOPLANTILLAMAIL", property = "idtipoplantillamail", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDTIPOENVIOS", property = "idtipoenvios", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSPRIMEROS", property = "fecharecibosprimeros", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSRECURRENTES", property = "fecharecibosrecurrentes", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSCOR1", property = "fechareciboscor1", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHARECIBOSB2B", property = "fecharecibosb2b", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "NOMBREFICHERO", property = "nombrefichero", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "LOGERROR", property = "logerror", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASO_PLANTILLA", property = "traspasoPlantilla", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASO_CODAUDITORIA_DEF", property = "traspasoCodauditoriaDef", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TRASPASOFACTURAS", property = "traspasofacturas", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDESTADOTRASPASO", property = "idestadotraspaso", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "LOGTRASPASO", property = "logtraspaso", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDMODELOFACTURA", property = "idmodelofactura", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDMODELORECTIFICATIVA", property = "idmodelorectificativa", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "NOMBREABREVIADO", property = "nombreabreviado", jdbcType = JdbcType.VARCHAR)
+    })
+    List<FacFacturacionprogramadaExtendsDTO> getFacturacionesProComprobacionTraspasoFacturas(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProTratarFacturacion")
+    Integer getNumTotalFacturacionesProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProTratarFacturacion")
+    Integer getPosicionFacturacionProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada, String idSerieFacturacion, String idProgramacion);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProTratarConfirmacion")
+    Integer getNumTotalFacturacionesProTratarConfirmacion(Short idInstitucion);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProTratarConfirmacion")
+    Integer getPosicionFacturacionProTratarConfirmacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion")
+    Integer getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion")
+    Integer getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProGenerarEnviosFacturasPendientes")
+    Integer getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProGenerarEnviosFacturasPendientes")
+    Integer getPosicionFacturacionProGenerarEnviosFacturasPendientes(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProComprobacionTraspasoFacturas")
+    Integer getNumTotalFacturacionesProComprobacionTraspasoFacturas(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+
+    @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProComprobacionTraspasoFacturas")
+    Integer getPosicionFacturacionProComprobacionTraspasoFacturas(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
 
 }

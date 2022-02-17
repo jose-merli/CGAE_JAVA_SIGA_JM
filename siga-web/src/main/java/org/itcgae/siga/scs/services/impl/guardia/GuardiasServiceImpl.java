@@ -2634,7 +2634,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 			}
 		}
 
-		return datos.get(0);
+		if(datos== null || datos.size() == 0) {
+			return null;
+		}else {
+			return datos.get(0);
+		}
 	}
 
 	@Override

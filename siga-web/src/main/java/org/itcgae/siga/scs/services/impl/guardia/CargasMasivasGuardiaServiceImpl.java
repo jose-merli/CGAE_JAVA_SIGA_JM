@@ -44,6 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import net.bytebuddy.asm.Advice.This;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.DateFormat;
@@ -121,6 +123,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 	@Autowired
 	private ScsCalendarioguardiasMapper scsCalendarioguardiasMapper;
+	
+	@Autowired
+	private ExcelHelper excelHelper;
 
 	private static final String ESTADO_PENDIENTE = "5";
 
@@ -629,7 +634,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFileI() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 
 		CenCargamasiva cenCargamasivacv = new CenCargamasiva();
 
@@ -826,7 +831,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					error.setMessage("No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK);
 				} else {
-						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGI, datosLog);
+						byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGI, datosLog);
 	
 						cenCargamasivacv.setTipocarga("I");
 						cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -1556,11 +1561,11 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
 		File XLSFile;
 		if (tipo.equals("I")) {
-			XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloI);
+			XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloI);
 		} else if (tipo.equals("GC")) {
-			XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloGC);
+			XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloGC);
 		} else {
-			XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloC);
+			XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroModeloC);
 		}
 		return XLSFile;
 	}
@@ -1652,7 +1657,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFileGC() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 
 		CenCargamasiva cenCargamasivacv = new CenCargamasiva();
 
@@ -1828,7 +1833,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					error.setMessage("No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.KO);
 				} else {
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
 
 					cenCargamasivacv.setTipocarga("GC");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -1886,7 +1891,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFileC() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 
 		// Extraer la información del excel
 
@@ -2070,7 +2075,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					error.setMessage("No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK);
 				} else {
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
 
 					cenCargamasivacv.setTipocarga("C");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());

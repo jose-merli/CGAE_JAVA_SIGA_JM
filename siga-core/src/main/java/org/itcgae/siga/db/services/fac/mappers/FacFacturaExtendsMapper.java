@@ -4,8 +4,10 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.DatoImpresionInformeFacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
+import org.itcgae.siga.DTO.fac.FacturasFacturacionRapidaDTO;
 import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
@@ -35,7 +37,15 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numcomunicaciones", property = "comunicacionesFacturas", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ultcomunicacion", property = "ultimaComunicacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "tipo", property = "tipo", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "tipo", property = "tipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFORMAPAGO", property = "idFormaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREFORMAPAGO", property = "nombreFormaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "estado_max_historico", property = "estadoUlt", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "imptotalporpagar_max", property = "importePorPagarUlt", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "imptotalpagado_max", property = "importePagadoUlt", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idaccionult", property = "idAccionUlt", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechamodificacionult", property = "fechaModificacionUlt", jdbcType = JdbcType.VARCHAR),
+			
 	})
 	List<FacturaItem> getFacturas(FacturaItem item, String idInstitucion, String idLenguaje);
 
@@ -122,4 +132,20 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "IDESTADOPDF", property = "idEstadoPdf", jdbcType = JdbcType.DECIMAL)
 	})
 	List<FacturaFacturacionProgramadaDTO> getFacturasDeFacturacionProgramada(String institucion, String seriefacturacion, String idProgramacion);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "obtenerFacturasFacturacionRapida")
+	@Results({
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROFACTURA", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDSERIEFACTURACION", property = "idSerieFacturacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPROGRAMACION", property = "idProgramacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPETICION", property = "idPeticion", jdbcType = JdbcType.DECIMAL)
+	})
+	List<FacturasFacturacionRapidaDTO> obtenerFacturasFacturacionRapida(String idInstitucion, String idPeticion, String idSolicitudCertificado);
+
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getDatosImpresionInformeFactura")
+	DatoImpresionInformeFacturaDTO getDatosImpresionInformeFactura(String idInstitucion, String idFactura);
 }

@@ -431,16 +431,12 @@ public class MenuServiceImpl implements IMenuService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		//String idInstitucionCert = validaInstitucionCertificado(request);
 		List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
-		if((institucionList == null || institucionList.isEmpty()) && idInstitucion == null) {
+
+		if(institucionList == null || institucionList.isEmpty()) {
 			throw new BadCredentialsException("Institucion No válida");
 		}
-		String idInstitucionRequest = null;
-		if(institucionList != null && !institucionList.isEmpty()){
-			idInstitucionRequest = institucionList.get(0).getIdinstitucion().toString();
-		}else {
-			idInstitucionRequest = idInstitucion.toString();
-		}
-		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucionRequest));
+		String idInstitucionRequest = institucionList.get(0).getIdinstitucion().toString();
+		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
 		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem,idInstitucionRequest);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
@@ -910,19 +906,20 @@ public class MenuServiceImpl implements IMenuService {
 		String idInstitucion = null;
 		try {
 			String roles = (String) request.getHeader("CAS-roles");
-			if(roles!=null) {
-				String defaultRole = null;
-				String [] roleAttributes;
-				String [] rolesList = roles.split("::");
-				if(rolesList.length > 1) {
-					defaultRole = (String) request.getHeader("CAS-defaultRole");
-					roleAttributes = defaultRole.split(" ");
-				}else {
-					roleAttributes = roles.split(" ");
-				}
-					
+			String defaultRole = null;
+			String [] roleAttributes;
+			String [] rolesList = roles.split("::");
+			if(rolesList.length > 1) {
+				defaultRole = (String) request.getHeader("CAS-defaultRole");
+				roleAttributes = defaultRole.split(" ");
+			}else {
+				roleAttributes = roles.split(" ");
+			}
+			
+			if(roleAttributes != null) {
 				idInstitucion = roleAttributes[0];
 			}
+
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage(),e);
 		}

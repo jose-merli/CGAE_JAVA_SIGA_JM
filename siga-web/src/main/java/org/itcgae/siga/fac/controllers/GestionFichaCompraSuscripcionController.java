@@ -208,5 +208,5 @@ public class GestionFichaCompraSuscripcionController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 }

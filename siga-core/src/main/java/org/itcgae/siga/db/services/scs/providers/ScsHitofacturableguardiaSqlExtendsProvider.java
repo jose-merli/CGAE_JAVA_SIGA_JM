@@ -91,4 +91,45 @@ public class ScsHitofacturableguardiaSqlExtendsProvider extends ScsHitofacturabl
 		return sql.toString();
 	}
 
+	public String getTurnoGuarConf(String idInstitucion){
+		SQL sql = new SQL();
+
+
+		sql.SELECT("hitofac.idturno," +
+				"    hitofac.idguardia," +
+				"    t.nombre nomturno," +
+				"    g.nombre nomguardia," +
+				"    LISTAGG(" +
+				"        hitofac.idhito," +
+				"        '/'" +
+				"    ) WITHIN GROUP(ORDER BY" +
+				"        hitofac.idturno," +
+				"        hitofac.idguardia," +
+				"        t.nombre," +
+				"        g.nombre" +
+				"    ) \"hitos\"");
+
+		sql.FROM("scs_hitofacturableguardia hitofac");
+
+
+		sql.LEFT_OUTER_JOIN("scs_guardiasturno g ON " +
+				"        g.idguardia = hitofac.idguardia" +
+				"    AND " +
+				"        g.idinstitucion = hitofac.idinstitucion");
+
+		sql.LEFT_OUTER_JOIN(" scs_turno t ON " +
+				"        t.idturno = hitofac.idturno" +
+				"    AND " +
+				"        t.idinstitucion = hitofac.idinstitucion");
+
+		sql.WHERE("hitofac.IDINSTITUCION =" + idInstitucion);
+		sql.GROUP_BY(" hitofac.idturno," +
+				"    hitofac.idguardia," +
+				"    t.nombre," +
+				"    g.nombre");
+
+
+		return sql.toString();
+	}
+
 }

@@ -52,4 +52,15 @@ public interface ScsHitofacturableguardiaExtendsMapper extends ScsHitofacturable
 		
 	})
 	List<BaremosGuardiaItem> getGuardiasByConf(String idInstitucion);
+	@SelectProvider(type = ScsHitofacturableguardiaSqlExtendsProvider.class, method = "getTurnoGuarConf")
+	@Results({
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "HITOS", property = "hitos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMTURNO", property = "nomturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMGUARDIA", property = "nomguardia", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<BaremosGuardiaItem> getTurnoGuarConf(String idInstitucion);
 }

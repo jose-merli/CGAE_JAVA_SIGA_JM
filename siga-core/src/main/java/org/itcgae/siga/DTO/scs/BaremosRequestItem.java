@@ -24,6 +24,7 @@ public class BaremosRequestItem {
 	boolean historico;
 	int keyForTabla;
 	String idhitoconfiguracion;
+	String idHito;
 	
 	List<GuardiasItem> guardiasObj;
 }

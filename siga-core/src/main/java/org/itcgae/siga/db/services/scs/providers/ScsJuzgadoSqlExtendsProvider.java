@@ -80,8 +80,9 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("juzgado.IDJUZGADO");
-		sql.SELECT("juzgado.NOMBRE");
+//		sql.SELECT("juzgado.IDJUZGADO");
+		sql.SELECT("juzgado.IDJUZGADO, DECODE(CODIGOEXT2,NULL,NOMBRE, NOMBRE || ' - ' || CODIGOEXT2) nombre");
+//		sql.SELECT("juzgado.NOMBRE");
 		sql.FROM("SCS_JUZGADO juzgado");
 		sql.WHERE("juzgado.fechabaja is null");
 		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);

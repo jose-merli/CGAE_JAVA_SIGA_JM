@@ -1,17 +1,14 @@
 package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.fac.AdmConsultaInformeConsultaDTO;
 import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
-import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.utils.SIGAHelper;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaExtendsDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmInforme;
 import org.itcgae.siga.db.entities.AdmInformeExample;
-import org.itcgae.siga.db.entities.AdmTipofiltroinforme;
-import org.itcgae.siga.db.entities.AdmTipofiltroinformeExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.exception.BusinessException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import java.io.BufferedWriter;
@@ -24,30 +21,29 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+@Service
 public class ProTratarFacturacion extends ProcesoFacPyS {
 
-    private Logger LOGGER = Logger.getLogger(ProTratarFacturacion.class);
+    private final Logger LOGGER = Logger.getLogger(ProTratarFacturacion.class);
 
     @Override
     protected void execute(String idInstitucion) {
 
+        TransactionStatus transactionStatus = null;
+
         try {
 
-            TransactionStatus transactionStatus = getNewLongTransaction();
-            boolean alMenosUnafacturacionProgramadaEncontrada = false;
+            transactionStatus = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
 
             // Obtencion de la propiedad que contiene el tiempo de espera que se les da a las facturaciones en ejcucion no generadas por alguna anomalia
             Double tiempoMaximoEjecucion = getMaxMinutosEnEjecucion();
 
-            List<FacFacturacionprogramada> facFacturacionprogramadaList = facProgMapper.getListaNFacturacionesProgramadasProcesar(tiempoMaximoEjecucion);
+            List<FacFacturacionprogramadaExtendsDTO> facFacturacionprogramadaList = facProgMapper.getFacturacionesProTratarFacturacion(Short.valueOf(idInstitucion), tiempoMaximoEjecucion);
 
             if (facFacturacionprogramadaList != null && facFacturacionprogramadaList.size() > 0) {
 
-                alMenosUnafacturacionProgramadaEncontrada = true;
                 FacFacturacionprogramada facFacturacionprogramada = facFacturacionprogramadaList.get(0);
 
                 try {
@@ -70,6 +66,11 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
 
         } catch (Exception e) {
             LOGGER.error("### Error general al procesar facturas (INSTITUCION:" + idInstitucion + ")", e);
+
+        } finally {
+            if (transactionStatus != null) {
+                finalizaTransaccion(transactionStatus);
+            }
         }
     }
 
@@ -83,7 +84,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         String resultado[] = new String[2];
         try {
 
-            transactionStatus = getNewLongTransaction();
+            transactionStatus = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
             nombreFichero = "GENERACION_" + fac.getIdseriefacturacion() + "_" + fac.getIdprogramacion();
 
             // Carga los parametros
@@ -107,7 +108,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
 
             // Le cambio el estado a error
             try {
-                String sMensaje = null;
+                String sMensaje;
 
                 if (resultado[0] != null && Arrays.asList(CODIGOS_ERROR_FORMATO).contains(resultado[0])) {
                     sMensaje = resultado[1];
@@ -218,7 +219,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         String nameFile = null;
         String dirPrevisiones = getProperty(PROP_FACTURACION_DIRECTORIO_PREVISIONES_JAVA);
         String sRutaFisicaJava = getProperty(PROP_FACTURACION_DIRECTORIO_FISICO_PREVISIONES_JAVA);
-        String sRutaJava = Paths.get(sRutaFisicaJava, dirPrevisiones, idInstitucion.toString()).toString();
+        String sRutaJava = Paths.get(sRutaFisicaJava, dirPrevisiones, idInstitucion).toString();
         String nombreFichero = "GENERACION_" + idSerieFacturacion + "_" + idProgramacion;
 
         try {
@@ -254,14 +255,14 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
                     admInforme.setNombresalida(nombreFichero);
 
                     LOGGER.info("### Inicio generacion fichero excel GENERACION");
-                    ArrayList<File> fichPrev = generarInformeXLS(admInforme, sRutaJava, filtrosInforme);
+                    ArrayList<File> fichPrev = generarInformeXLS(admInforme, filtrosInforme, sRutaJava, fac.getIdinstitucion().toString());
                     LOGGER.info("### Fin generacion fichero excel GENERACION");
 
                     if (fichPrev != null && fichPrev.size() > 0) {
                         nameFile = fichPrev.get(0).getName();
                     } else {
                         //Generamos un fichero de Error
-                        File ficheroGenerado = null;
+                        File ficheroGenerado;
                         BufferedWriter out;
                         ficheroGenerado = new File(sRutaJava + File.separator + nombreFichero + ".xls");
                         if (ficheroGenerado.exists()) {
@@ -283,191 +284,6 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         }
 
         return nameFile;
-    }
-
-    private ArrayList<File> generarInformeXLS(AdmInforme informe, String sRutaJava, List<HashMap<String, String>> filtrosInforme) throws Exception {
-
-        // Variables
-        String sentencia;
-        List<LinkedHashMap<String, String>> datos;
-
-        // obteniendo ruta de almacenamiento
-        String idinstitucionInforme = informe.getIdinstitucion().toString();
-        String idinstitucion = /*usr.getLocation()*/"";
-
-        String rutaAlm = "";
-
-        if ((sRutaJava == null) || (sRutaJava.isEmpty())) {
-            rutaAlm = getProperty(INFORMES_DIRECTORIO_FISICO_SALIDA_INFORMES_JAVA) + File.separator + informe.getDirectorio() + File.separator + (idinstitucionInforme.equals("0") ? "2000" : idinstitucionInforme) + File.separator;
-        } else {
-            rutaAlm = sRutaJava;
-        }
-
-        // obteniendo los tipos de filtros obligatorios
-        AdmTipofiltroinformeExample admTipofiltroinformeExample = new AdmTipofiltroinformeExample();
-        admTipofiltroinformeExample.createCriteria().andIdtipoinformeEqualTo(informe.getIdtipoinforme())
-                .andObligatorioEqualTo(SigaConstants.DB_TRUE);
-        List<AdmTipofiltroinforme> tiposFiltro = admTipofiltroinformeMapper.selectByExample(admTipofiltroinformeExample);
-
-        // comprobando que los filtros obligatorios estan en la lista de filtros del informe
-        for (HashMap<String, String> filtro : filtrosInforme) {
-            filtro.put("OBLIGATORIO", SigaConstants.DB_FALSE);
-        }
-
-        String nombreCampo;
-        boolean encontrado;
-
-        for (AdmTipofiltroinforme tipoFiltro : tiposFiltro) {
-
-            nombreCampo = tipoFiltro.getNombrecampo();
-            encontrado = false;
-
-            for (HashMap<String, String> filtro : filtrosInforme) {
-                if (filtro.get("NOMBRECAMPO").equals(nombreCampo)) {
-                    filtro.put("OBLIGATORIO", SigaConstants.DB_TRUE);
-                    encontrado = true;
-                    break;
-                }
-            }
-
-            if (!encontrado)
-                throw new Exception("Problema en la configuracion del informe: No estan configurados todos los tipos de filtros obligatorios");
-        }
-
-        // obteniendo las consultas del informe
-        List<AdmConsultaInformeConsultaDTO> consultas = admConsultainformeExtendsMapper.getConsultasInforme(informe.getIdinstitucion().toString(), informe.getIdplantilla().toString());
-
-        // creando la ruta de salida
-        SIGAHelper.mkdirs(rutaAlm);
-
-        ArrayList<File> listaFicheros = new ArrayList<>();
-
-        // variables para los ficheros de salida
-        /**
-         * @TODO Habria que obtener un identificador unico: de momento se genera
-         *       el numero de usuario, que vale si el mismo usuario no ejecuta
-         *       informes a la vez (por ejemplo en dos navegadores).
-         *       Ademas, estaria bien dar un numero unico pero que sea algo
-         *       descriptivo?
-         */
-        String nombreFichero;
-        File ficheroGenerado = null;
-        BufferedWriter out;
-
-        for (AdmConsultaInformeConsultaDTO consulta : consultas) {
-
-            // sustituyendo los filtros en la consulta por los datos del informe
-            if ((sentencia = sustituirFiltrosConsulta(consulta, filtrosInforme)) == null) {  //CR7 - CAMBIAR LA CONSULTA 1027 - Datos previsiones facturacion
-                // falla si la consulta no tiene los filtros obligatorios
-                throw new Exception("Problema en la configuracion del informe: La consulta no lleva los filtros obligatorios o lleva de mas");
-            }
-
-            try {
-
-                /** @TODO Convendria que cambiar a selectBind */
-                datos = admConsultainformeExtendsMapper.selectCamposOrdenados(sentencia);
-
-            } catch (Exception sqle) {
-                String mensaje = sqle.getMessage();
-                if (mensaje.indexOf("TimedOutException") != -1
-                        || mensaje.indexOf("timed out") != -1) {
-                    throw new Exception("La consulta ha superado el tiempo permitido de ejecución y se ha anulado la acción para no cargar al sistema. Pruebe a ejecutarlo en otro momento de menos uso o póngase en contacto con el administrador del sistema.");
-                } else if (sqle.toString().indexOf("ORA-") != -1) {
-                    throw new Exception("Ha habido un problema durante la ejecucion de la consulta: " + consulta.getDescripcion() + ". Consulte al Administrador", sqle);
-                } else {
-                    throw new Exception("Problema indeterminado en la ejecucion de algunas consulta del informe. Consulte al administrador");
-                }
-            }
-
-            // Si no hay datos no se genera informe en esta iteracion
-            if (datos == null || datos.size() == 0) {
-                continue;
-            }
-
-            // generando el fichero
-            try {
-
-                if (informe.getIdtipoinforme().equalsIgnoreCase("PREV")) {
-                    //Si estamos generando un informe de previsiones
-                    nombreFichero = informe.getNombresalida() + ".xls";
-                } else {
-                    nombreFichero = informe.getNombresalida() + "_" + idinstitucion + "_" + USUARIO_AUTO + "_"
-                            + getFechaCompletaBD().replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "") + '_'
-                            + consulta.getNombre() + ".xls";
-                }
-
-                ficheroGenerado = new File(rutaAlm + File.separator + nombreFichero);
-
-                if (ficheroGenerado.exists()) {
-                    ficheroGenerado.delete();
-                }
-
-                ficheroGenerado.createNewFile();
-                out = new BufferedWriter(new FileWriter(ficheroGenerado));
-
-                // escribiendo las cabeceras
-                LinkedHashMap<String, String> hashOrdenado = datos.get(0);
-
-                for (Map.Entry<String, String> entry : hashOrdenado.entrySet()) {
-                    String key = entry.getKey();
-                    out.write(key + "\t");
-                }
-
-                out.newLine();
-
-                // escribiendo los resultados
-                for (Map.Entry<String, String> entry : hashOrdenado.entrySet()) {
-                    String value = entry.getValue();
-                    out.write(value + "\t");
-                }
-
-                out.newLine();
-
-                // cerrando el fichero
-                out.close();
-                listaFicheros.add(ficheroGenerado);
-
-            } catch (Exception sqle) {
-                throw new Exception("Problema en la generacion del fichero Excel", sqle);
-            }
-
-        }
-
-        return listaFicheros;
-    }
-
-    private String getFechaCompletaBD() {
-        return admConsultainformeExtendsMapper.getFechaCompletaBD();
-    }
-
-    private String sustituirFiltrosConsulta(AdmConsultaInformeConsultaDTO consulta, List<HashMap<String, String>> listaFiltros) {
-
-        String sentencia = consulta.getSentencia();
-
-        // quitando saltos de linea (para que salga mejor en LOG)
-        sentencia = sentencia.replaceAll("\n", " ");
-
-        // reemplazando filtros
-        String nombreCampo, obligatorio, valor;
-
-        for (HashMap<String, String> filtro : listaFiltros) {
-            nombreCampo = "%%" + filtro.get("NOMBRECAMPO").toUpperCase() + "%%";
-            obligatorio = filtro.get("OBLIGATORIO");
-            valor = filtro.get("VALOR");
-
-            if (sentencia.indexOf(nombreCampo) > -1) {
-                sentencia = sentencia.replaceAll(nombreCampo, valor);
-            } else if (obligatorio == SigaConstants.DB_TRUE && consulta.getGeneral() == SigaConstants.DB_FALSE) {
-                return null; // no estan todos los filtros obligatorios
-            }
-        }
-
-        // comprobando los campos que faltan por sustituir en la sentencia
-        if (sentencia.indexOf("%%") > -1) {
-            return null;
-        }
-
-        return sentencia;
     }
 
     private List<AdmInforme> getListaInformes() {

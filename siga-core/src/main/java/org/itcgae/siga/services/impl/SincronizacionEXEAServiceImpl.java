@@ -916,10 +916,9 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
         if(!UtilidadesString.esCadenaVacia(cenSancion.getObservaciones()) && !UtilidadesString.esCadenaVacia(sancion.getObservaciones())){
             cenSancion.setObservaciones(cenSancion.getObservaciones()
-                    + " <" + SigaConstants.DATE_FORMAT.format(new Date()) + "> " +
-                    "Observacion añadida por actualizacion de estado a traves de EXEA: " + sancion.getObservaciones());
+                    + " \n[" + SigaConstants.DATE_FORMAT.format(new Date()) + "] " +  sancion.getObservaciones());
         }else if(!UtilidadesString.esCadenaVacia(sancion.getObservaciones())){
-            cenSancion.setObservaciones("<" + SigaConstants.DATE_FORMAT.format(new Date()) + "> Observacion añadida por actualizacion de estado a traves de EXEA: " + sancion.getObservaciones());
+            cenSancion.setObservaciones("\n[" + SigaConstants.DATE_FORMAT.format(new Date()) + "] " + sancion.getObservaciones());
         }
 
         if(sancion.getFechaInicio() != null){
@@ -938,14 +937,17 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             case "FIR":
                 cenSancion.setFechafirmeza(sancion.getFechaEstado().getTime());
                 cenSancion.setChkfirmeza("1");
+                checkIfSancionEnSuspenso(cenSancion);
                 break;
 
             case "IMP": //Si se quiere pasar a impuesta quitamos el estado Firme vaciando los campos Fecha Firmeza y Check Firmeza
                 cenSancion.setFechaimposicion(sancion.getFechaEstado().getTime());
                 cenSancion.setFechafirmeza(null);
                 cenSancion.setChkfirmeza("0");
+                checkIfSancionEnSuspenso(cenSancion);
                 break;
         }
+        cenSancion.setFechamodificacion(new Date());
         affectedRows += cenSancionExtendsMapper.updateByPrimaryKey(cenSancion);
 
         //Si no es una sancion del CGAE y se ha pasado a FIRME o IMPUESTA hay que informarlo al CGAE
@@ -980,6 +982,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                     sancionCGAE.setChkfirmeza("0");
 
                 }
+                sancionCGAE.setFechamodificacion(new Date());
                 affectedRows += cenSancionExtendsMapper.updateByPrimaryKey(sancionCGAE);
             }else{
                 sancionCGAE = cenSancion;
@@ -987,6 +990,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 sancionCGAE.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
                 sancionCGAE.setIdinstitucionsancion(idInstitucion);
                 sancionCGAE.setIdinstitucionorigen(idInstitucion);
+                sancionCGAE.setFechamodificacion(new Date());
                 affectedRows += cenSancionExtendsMapper.insertSelective(sancionCGAE);
             }
 
@@ -995,6 +999,20 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
 
         return affectedRows;
+    }
+
+    private void checkIfSancionEnSuspenso(CenSancion cenSancion){
+        if(SigaConstants.SANCION_EN_SUSPENSO == cenSancion.getIdtiposancion()) { //Si esta en suspension y se cambia a FIRME o IMPUESTA, se recupera el idTipoSancion anterior
+            CenSancionKey cenSancionKey = new CenSancionKey();
+            cenSancionKey.setIdsancion(cenSancion.getIdsancion());
+            cenSancionKey.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
+            cenSancionKey.setIdpersona(cenSancion.getIdpersona());
+            CenSancion sancionCGAE = cenSancionExtendsMapper.selectByPrimaryKey(cenSancionKey);
+
+            if(sancionCGAE != null){
+                   cenSancion.setIdtiposancion(sancionCGAE.getIdtiposancion());
+            }
+        }
     }
 
 
@@ -1396,9 +1414,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
         cenDireccionTipodireccionExtendsMapper.insert(tipoDireccion );
 
-        //Si el tipo de solicitud es Ejerciente o No Ejerciente, insertamos el tipo direccion Despacho
-        if(TipoColegiacionType.E.equals(tipoColegiacion)
-            || TipoColegiacionType.N.equals(tipoColegiacion)){
+        //Si el tipo de solicitud es Ejerciente o Reincorporacion Ejerciente, insertamos el tipo direccion Despacho
+        if(TipoColegiacionType.E.equals(tipoColegiacion)){
 
             LOGGER.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() / Es ejerciente o no ejerciente, insertamos tipo direccion Despacho");
             tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
@@ -1525,8 +1542,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 datosColegiales.setFechaestado(colegiacionType.getFechaIncorporacion().getTime());
                 datosColegiales.setFechamodificacion(new Date());
 
-                if (TipoColegiacionType.E.equals(colegiacionType.getTipoSolicitud())
-                        || TipoColegiacionType.N.equals(colegiacionType.getTipoSolicitud())) {
+                if (TipoColegiacionType.E.equals(colegiacionType.getTipoSolicitud())) {
 
                     datosColegiales.setIdestado(Short.valueOf("20"));
 

@@ -39,7 +39,7 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 			@Result(column = "ENLACEABONO", property = "enlaceAbono", jdbcType = JdbcType.BOOLEAN),
 			@Result(column = "NUMEROABONO", property = "numeroAbono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDABONO", property = "idAbono", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOTAACCION", property = "notaAccion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "COMENTARIO", property = "comentario", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COMISIONIDFACTURA", property = "comisionIdFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COMISIONFACTURA", property = "comisionFactura", jdbcType = JdbcType.VARCHAR)
 	})
@@ -100,4 +100,8 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 			@Result(column = "ENVIOTRASPASO", property = "enviotraspaso", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacFactura> facturasDevueltasEnDisquete(String idDisquetecargos, String idInstitucion);
+
+	@SelectProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "getNextIdHstorico")
+	Short getNextIdHstorico(Short idInstitucion, String idFactura);
+
 }
