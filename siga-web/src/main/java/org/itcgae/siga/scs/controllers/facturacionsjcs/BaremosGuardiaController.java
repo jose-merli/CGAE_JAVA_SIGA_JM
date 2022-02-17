@@ -80,8 +80,8 @@ public class BaremosGuardiaController {
         }
 	}
 
-	@RequestMapping(value = "/getTurnoGuarConf",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BaremosGuardiaDTO> getTurnoGuarConf(String[] configuracion,HttpServletRequest request) {
+	@RequestMapping(value = "/getTurnoGuarConf",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BaremosGuardiaDTO> getTurnoGuarConf(@RequestBody String[] configuracion,HttpServletRequest request) {
 		BaremosGuardiaDTO response = baremosGuardiaServices.getTurnoGuarConf(configuracion,request);
 		if (response.getError().getCode() == 200) {
 			return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.OK);
