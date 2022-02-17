@@ -318,7 +318,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
         sql.WHERE("FP.VISIBLE = 'S'");
-        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION IN({0})", String.join(FacEstadoConfirmacionFact.GENERADA.toString(), FacEstadoConfirmacionFact.CONFIRM_PROGRAMADA.toString())));
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION IN({0}, {1})", FacEstadoConfirmacionFact.GENERADA.toString(), FacEstadoConfirmacionFact.CONFIRM_PROGRAMADA.toString()));
         sql.WHERE(MessageFormat.format("NOT EXISTS ({0})", subQuery.toString()));
         sql.ORDER_BY("FP.FECHAPREVISTACONFIRM");
         return sql.toString();
@@ -429,7 +429,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
         sql.WHERE("FP.VISIBLE = 'S'");
-        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION IN({0})", String.join(FacEstadoConfirmacionFact.GENERADA.toString(), FacEstadoConfirmacionFact.CONFIRM_PROGRAMADA.toString())));
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION IN({0}, {1})", FacEstadoConfirmacionFact.GENERADA.toString(), FacEstadoConfirmacionFact.CONFIRM_PROGRAMADA.toString()));
         sql.WHERE(MessageFormat.format("NOT EXISTS ({0})", subQuery.toString()));
         sql.ORDER_BY("FP.FECHAPREVISTACONFIRM");
         return sql.toString();
@@ -452,7 +452,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
         sql.WHERE("FP.VISIBLE = 'S'");
-        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION IN({0})", String.join(FacEstadoConfirmacionFact.GENERADA.toString(), FacEstadoConfirmacionFact.CONFIRM_PROGRAMADA.toString())));
+        sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION IN({0}, {1})", FacEstadoConfirmacionFact.GENERADA.toString(), FacEstadoConfirmacionFact.CONFIRM_PROGRAMADA.toString()));
         sql.WHERE(MessageFormat.format("NOT EXISTS ({0})", subQuery.toString()));
         sql.ORDER_BY("FP.FECHAPREVISTACONFIRM");
 
