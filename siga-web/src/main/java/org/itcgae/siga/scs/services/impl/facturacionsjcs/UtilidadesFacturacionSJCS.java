@@ -498,7 +498,7 @@ public class UtilidadesFacturacionSJCS {
     public FcsFacturacionjg ejecutarRegularizacionJG(FcsFacturacionjg item, CenInstitucion institucion) throws Exception {
     	LogErroresFacturacionSJCS logErroresFac = logErroresFacHelper.getLogErroresFacturacion(item.getIdinstitucion(),item.getIdfacturacion().toString());
         // proceso de facturacion
-
+        LOGGER.debug("Entra ejecutarRegularizacionJG");
         double importeTotal = 0;
         Double importeOficio = null, importeGuardia = null, importeSOJ = null, importeEJG = null;
 
@@ -515,10 +515,13 @@ public class UtilidadesFacturacionSJCS {
         // TURNOS DE OFICIO rgg 29-03-2005
         resultado = new String[3];
         try {
+            LOGGER.debug("PROC_FCS_REGULAR_TURNOS_OFI regularizacion entra");
             resultado = callPLProcedure(
                     "{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_TURNOS_OFI(?,?,?,?,?,?,?)}", 3,
                     param_in_facturacion);
+            LOGGER.debug("PROC_FCS_REGULAR_TURNOS_OFI regularizacion sale");
             if (!resultado[1].equals("0")) {
+                LOGGER.error("PROC_FCS_REGULAR_TURNOS_OFI regularizacion error");
             	String error = "Error en PL = " + (String) resultado[2];
                 LOGGER.error(error);
                 logErroresFac.logError(error);
