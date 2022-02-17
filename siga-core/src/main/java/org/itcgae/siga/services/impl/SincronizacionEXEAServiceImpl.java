@@ -935,8 +935,10 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 break;
 
             case "FIR":
+                if(cenSancion.getFechafirmeza() == null){
+                    cenSancion.setChkfirmeza("1");
+                }
                 cenSancion.setFechafirmeza(sancion.getFechaEstado().getTime());
-                cenSancion.setChkfirmeza("1");
                 checkIfSancionEnSuspenso(cenSancion);
                 break;
 
@@ -952,8 +954,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
         //Si no es una sancion del CGAE y se ha pasado a FIRME o IMPUESTA hay que informarlo al CGAE
         if(!SigaConstants.InstitucionGeneral.equals(idInstitucion.toString())
-            && ("FIR".equals(sancion.getEstadoSancion().toString())
-                || "IMP".equals(sancion.getEstadoSancion().toString()))){
+            && cenSancion.getFechafirmeza() != null && !SigaConstants.DB_TRUE.equals(cenSancion.getChkfirmeza())){
 
             CenSancionExample cenSancionExample = new CenSancionExample();
             cenSancionExample.createCriteria()
@@ -972,8 +973,10 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                 if("FIR".equals(sancion.getEstadoSancion().toString())){
 
+                    if(sancionCGAE.getFechafirmeza() == null){
+                        cenSancion.setChkfirmeza("1");
+                    }
                     sancionCGAE.setFechafirmeza(sancion.getFechaEstado().getTime());
-                    sancionCGAE.setChkfirmeza("1");
 
                 }else if("IMP".equals(sancion.getEstadoSancion().toString())){
 
@@ -984,17 +987,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 }
                 sancionCGAE.setFechamodificacion(new Date());
                 affectedRows += cenSancionExtendsMapper.updateByPrimaryKey(sancionCGAE);
-            }else{
-                sancionCGAE = cenSancion;
-                sancionCGAE.setIdsancionorigen(cenSancion.getIdsancion());
-                sancionCGAE.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
-                sancionCGAE.setIdinstitucionsancion(idInstitucion);
-                sancionCGAE.setIdinstitucionorigen(idInstitucion);
-                sancionCGAE.setFechamodificacion(new Date());
-                affectedRows += cenSancionExtendsMapper.insertSelective(sancionCGAE);
             }
-
-
         }
 
 
