@@ -326,10 +326,10 @@ public class UtilidadesFacturacionSJCS {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void ejecutarFacturacionJG(FcsFacturacionjg itemFac, CenInstitucion institucion) throws Exception {   	
+    public void ejecutarFacturacionJG(FcsFacturacionjg itemFac, CenInstitucion institucion) throws Exception {
         boolean prevision = false;
     	LogErroresFacturacionSJCS logErroresFac = logErroresFacHelper.getLogErroresFacturacion(itemFac.getIdinstitucion(),itemFac.getIdfacturacion().toString());
-
+        LOGGER.debug("Entramos ejecutarFacturacionJG");
         if (itemFac.getPrevision().equals("1")) {
             prevision = true;
         }
@@ -350,9 +350,12 @@ public class UtilidadesFacturacionSJCS {
         
         
         try {
+        LOGGER.debug("Ejecutamos PL PROC_FCS_FACTURAR_TURNOS_OFI");
         resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_TURNOS_OFI(?,?,?,?,?,?)}", 3,
                 param_in_facturacion);
+            LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_TURNOS_OFI");
         } catch(Exception e) {
+            LOGGER.debug("Error PL PROC_FCS_FACTURAR_TURNOS_OFI");
         	logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_TURNOS_OFI; " + e);
         }
         
@@ -379,9 +382,12 @@ public class UtilidadesFacturacionSJCS {
         resultado = new String[3];
         
         try {
+            LOGGER.debug("Ejecutamos PL PROC_FCS_FACTURAR_TURNOS_OFI");
         resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_GUARDIAS(?,?,?,?,?,?)}", 3,
                 param_in_facturacion);
+            LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_GUARDIAS");
         } catch(Exception e) {
+            LOGGER.debug("Error PL PROC_FCS_FACTURAR_GUARDIAS");
         	logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_GUARDIAS; " + e);
         }
         
@@ -405,9 +411,12 @@ public class UtilidadesFacturacionSJCS {
         param_in_facturacion[2] = itemFac.getUsumodificacion().toString(); // USUMODIFICACION
 
         resultado = new String[3];
+        LOGGER.debug("Ejecutamos PL PROC_FCS_FACTURAR_SOJ");
         resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_SOJ(?,?,?,?,?,?)}", 3,
                 param_in_facturacion);
+        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_SOJ");
         if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
+            LOGGER.debug("Error PL PROC_FCS_FACTURAR_SOJ");
         	String error = "Error en PL = " + (String) resultado[2];
             LOGGER.error(error);
             logErroresFac.logError(error);
@@ -427,9 +436,12 @@ public class UtilidadesFacturacionSJCS {
         param_in_facturacion[2] = itemFac.getUsumodificacion().toString(); // USUMODIFICACION
 
         resultado = new String[3];
+        LOGGER.debug("Ejecutamos PL PROC_FCS_FACTURAR_EJG");
         resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_EJG (?,?,?,?,?,?)}", 3,
                 param_in_facturacion);
+        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_EJG");
         if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
+            LOGGER.debug("Error PL PROC_FCS_FACTURAR_EJG");
         	String error = "Error en PL = " + (String) resultado[2];
             LOGGER.error(error);
             logErroresFac.logError(error);
@@ -486,7 +498,7 @@ public class UtilidadesFacturacionSJCS {
     public FcsFacturacionjg ejecutarRegularizacionJG(FcsFacturacionjg item, CenInstitucion institucion) throws Exception {
     	LogErroresFacturacionSJCS logErroresFac = logErroresFacHelper.getLogErroresFacturacion(item.getIdinstitucion(),item.getIdfacturacion().toString());
         // proceso de facturacion
-
+        LOGGER.debug("Entra ejecutarRegularizacionJG");
         double importeTotal = 0;
         Double importeOficio = null, importeGuardia = null, importeSOJ = null, importeEJG = null;
 
@@ -503,10 +515,13 @@ public class UtilidadesFacturacionSJCS {
         // TURNOS DE OFICIO rgg 29-03-2005
         resultado = new String[3];
         try {
+            LOGGER.debug("PROC_FCS_REGULAR_TURNOS_OFI regularizacion entra");
             resultado = callPLProcedure(
                     "{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_TURNOS_OFI(?,?,?,?,?,?,?)}", 3,
                     param_in_facturacion);
+            LOGGER.debug("PROC_FCS_REGULAR_TURNOS_OFI regularizacion sale");
             if (!resultado[1].equals("0")) {
+                LOGGER.error("PROC_FCS_REGULAR_TURNOS_OFI regularizacion error");
             	String error = "Error en PL = " + (String) resultado[2];
                 LOGGER.error(error);
                 logErroresFac.logError(error);

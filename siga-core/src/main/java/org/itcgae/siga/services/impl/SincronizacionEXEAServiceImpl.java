@@ -1,10 +1,7 @@
 package org.itcgae.siga.services.impl;
 
 import com.exea.sincronizacion.redabogacia.*;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
-import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
-import org.itcgae.siga.DTOs.cen.MaxIdDto;
-import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.cen.*;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
@@ -938,8 +935,10 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 break;
 
             case "FIR":
+                if(cenSancion.getFechafirmeza() == null){
+                    cenSancion.setChkfirmeza("1");
+                }
                 cenSancion.setFechafirmeza(sancion.getFechaEstado().getTime());
-                cenSancion.setChkfirmeza("1");
                 checkIfSancionEnSuspenso(cenSancion);
                 break;
 
@@ -955,8 +954,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
         //Si no es una sancion del CGAE y se ha pasado a FIRME o IMPUESTA hay que informarlo al CGAE
         if(!SigaConstants.InstitucionGeneral.equals(idInstitucion.toString())
-            && ("FIR".equals(sancion.getEstadoSancion().toString())
-                || "IMP".equals(sancion.getEstadoSancion().toString()))){
+            && cenSancion.getFechafirmeza() != null && !SigaConstants.DB_TRUE.equals(cenSancion.getChkfirmeza())){
 
             CenSancionExample cenSancionExample = new CenSancionExample();
             cenSancionExample.createCriteria()
@@ -975,8 +973,10 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                 if("FIR".equals(sancion.getEstadoSancion().toString())){
 
+                    if(sancionCGAE.getFechafirmeza() == null){
+                        cenSancion.setChkfirmeza("1");
+                    }
                     sancionCGAE.setFechafirmeza(sancion.getFechaEstado().getTime());
-                    sancionCGAE.setChkfirmeza("1");
 
                 }else if("IMP".equals(sancion.getEstadoSancion().toString())){
 
@@ -987,17 +987,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 }
                 sancionCGAE.setFechamodificacion(new Date());
                 affectedRows += cenSancionExtendsMapper.updateByPrimaryKey(sancionCGAE);
-            }else{
-                sancionCGAE = cenSancion;
-                sancionCGAE.setIdsancionorigen(cenSancion.getIdsancion());
-                sancionCGAE.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
-                sancionCGAE.setIdinstitucionsancion(idInstitucion);
-                sancionCGAE.setIdinstitucionorigen(idInstitucion);
-                sancionCGAE.setFechamodificacion(new Date());
-                affectedRows += cenSancionExtendsMapper.insertSelective(sancionCGAE);
             }
-
-
         }
 
 
@@ -1646,8 +1636,20 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         }
 
         CenBancosExample cenBancosExample = new CenBancosExample();
-        cenBancosExample.createCriteria().andBicEqualTo(datosBancarios.getBIC())
-                .andNombreEqualTo(datosBancarios.getBanco());
+        if(UtilidadesString.esCadenaVacia(datosBancarios.getBanco())
+            || UtilidadesString.esCadenaVacia(datosBancarios.getBIC())){
+            DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO = new DatosBancariosSearchBancoDTO();
+            datosBancariosSearchBancoDTO.setiban(datosBancarios.getIBAN().substring(4, 8));
+            List<BancoBicItem> bancos = cenCuentasbancariasExtendsMapper.selectBanks(datosBancariosSearchBancoDTO);
+            if(bancos != null && !bancos.isEmpty()){
+                BancoBicItem banco = bancos.get(0);
+                cenBancosExample.createCriteria().andBicEqualTo(banco.getBic())
+                        .andNombreEqualTo(banco.getBanco());
+            }
+        }else {
+            cenBancosExample.createCriteria().andBicEqualTo(datosBancarios.getBIC())
+                    .andNombreEqualTo(datosBancarios.getBanco());
+        }
         List<CenBancos> cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
         //Buscamos el banco cen CEN_BANCOS, y si no esta registrado, lo insertamos
         if (null != cenBancos && !cenBancos.isEmpty()) {
@@ -2082,6 +2084,16 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                     errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.PROVINCIA_NOVALIDA.getMensajeError());
                     errorType.setXmlRequest("Sin error XML");
                 }
+            }
+        }
+
+        if(ok && request.getColegiado().getDatosBancarios() != null && request.getColegiado().getDatosBancarios().getIBAN().startsWith("ES")){
+            ok = UtilidadesString.validarIBAN(request.getColegiado().getDatosBancarios().getIBAN());
+            if(!ok){
+                ErrorType errorType = response.addNewError();
+                errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.OTRO_ERROR.name());
+                errorType.setDescripcion("IBAN no válido");
+                errorType.setXmlRequest("Sin error XML");
             }
         }
         return ok;

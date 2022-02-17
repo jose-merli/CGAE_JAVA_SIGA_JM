@@ -510,10 +510,10 @@ public class FacturaAccionesHelper {
         if (abono.getEstado().equals(SigaConstants.FAC_ABONO_ESTADO_PAGADO))
             throw new BusinessException("facturacionSJCS.abonosSJCS.error.renegociar.estado");
 
-        if (abono.getImptotalneto().compareTo(BigDecimal.ZERO) <= 0)
+        if (abono.getImptotalneto() == null || abono.getImptotalneto().compareTo(BigDecimal.ZERO) <= 0)
             throw new BusinessException("facturacionSJCS.abonosSJCS.error.importeTotalCero");
 
-        if (abono.getImppendienteporabonar().compareTo(BigDecimal.ZERO) <= 0)
+        if (abono.getImppendienteporabonar() == null || abono.getImppendienteporabonar().compareTo(BigDecimal.ZERO) <= 0)
             throw new BusinessException("facturacionSJCS.abonosSJCS.error.importePendienteCero");
 
         if (idCuenta == null)

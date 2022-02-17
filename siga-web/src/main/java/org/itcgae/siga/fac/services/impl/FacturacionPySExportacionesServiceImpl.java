@@ -1293,13 +1293,10 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             FacAbono abonoToUpdate = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
 
-            if (abonoToUpdate.getImppendienteporabonar() == null)
-                throw new BusinessException("general.mensaje.error.bbdd");
-
             BigDecimal importeAbonado = abonoToUpdate.getImppendienteporabonar();
 
-            if (importeAbonado.doubleValue() == 0.0)
-                throw new BusinessException("general.mensaje.error.bbdd");
+            if (importeAbonado == null|| importeAbonado.doubleValue() == 0.0)
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.importePendienteCero");
 
             numeroAbonosIncluidosEnDisquete++;
 
