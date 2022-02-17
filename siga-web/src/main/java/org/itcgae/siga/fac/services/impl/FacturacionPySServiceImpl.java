@@ -2573,6 +2573,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarLineasAbono(FacturaLineaItem item, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
@@ -2590,31 +2591,43 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			genKey.setIdinstitucion(usuario.getIdinstitucion());
 			genKey.setModulo("FAC");
 
-			genKey.setParametro("MODIFICAR_DESCRIPCION");
-			boolean modificarDescripcion = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("0");
-
-			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
-			boolean modificarImporteUnitario = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("0");
+			Boolean modificarDescripcion = getParametro("FAC", "MODIFICAR_DESCRIPCION", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
+			Boolean modificarImporte = getParametro("FAC", "MODIFICAR_IMPORTE_UNITARIO", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
 
 			FacLineaabonoKey key = new FacLineaabonoKey();
 			key.setIdabono(Long.valueOf(item.getIdFactura()));
 			key.setNumerolinea(Long.valueOf(item.getNumeroLinea()));
 			key.setIdinstitucion(usuario.getIdinstitucion());
+
 			FacLineaabono updateItem = facLineaabonoExtendsMapper.selectByPrimaryKey(key);
 
-			if (modificarDescripcion && item.getDescripcion() != null) {
+			// Se actualiza la descripcion
+			if (modificarDescripcion && !UtilidadesString.esCadenaVacia(item.getDescripcion())) {
 				updateItem.setDescripcionlinea(item.getDescripcion());
 			}
 
-			if (modificarImporteUnitario && item.getPrecioUnitario() != null) {
-				updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
-			}
-
-			if (item.getCantidad() != null) {
-				updateItem.setCantidad(Integer.valueOf(item.getCantidad()));
+			if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
+				BigDecimal precioUnitario = new BigDecimal(item.getPrecioUnitario());
+				updateItem.setPreciounitario(precioUnitario.setScale(2, RoundingMode.DOWN));
 			}
 
 			facLineaabonoExtendsMapper.updateByPrimaryKey(updateItem);
+
+			/* Descomentar cuando el procedimiento PROC_SIGA_ACTESTADOABONO exista
+
+			if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
+				Object[] param_in = new Object[3]; // Parametros de entrada del PL
+
+				param_in[0] = usuario.getIdinstitucion();
+				param_in[1] = key.getIdabono();
+				param_in[2] = usuario.getIdusuario();
+				String[] resultado = commons.callPLProcedureFacturacionPyS("{call PROC_SIGA_ACTESTADOABONO(?,?,?,?,?)}", 2, param_in);
+				String codretorno = resultado[0];
+				if (!codretorno.equals(RET_OK))
+					throw new BusinessException("Error al actualizar el estado del abono");
+			}
+
+			 */
 
 			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
 		}
