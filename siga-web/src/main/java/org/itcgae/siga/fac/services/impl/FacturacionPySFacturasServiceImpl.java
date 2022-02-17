@@ -18,10 +18,6 @@ import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
-import org.itcgae.siga.db.entities.FacPagosporcaja;
-import org.itcgae.siga.db.entities.FacPagosporcajaExample;
-import org.itcgae.siga.db.entities.GenDiccionario;
-import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
@@ -40,9 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFacturasService {

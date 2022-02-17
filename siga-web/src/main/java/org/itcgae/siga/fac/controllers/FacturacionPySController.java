@@ -29,6 +29,7 @@ import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
 import org.itcgae.siga.DTO.fac.FacturaLineaItem;
 import org.itcgae.siga.DTO.fac.FacturasIncluidasDTO;
+import org.itcgae.siga.DTO.fac.FaseFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -50,6 +51,7 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.scs.FacAbonoItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.exception.BusinessException;
@@ -1162,20 +1164,6 @@ public class FacturacionPySController {
 		return facturacionService.descargarFichaFacturacion(facturacionItems, request);
 
 	}
-
-	@PostMapping(value = "/eliminarAbonoSJCSCaja")
-	ResponseEntity<DeleteResponseDTO> eliminarAbonoSJCSCaja(@RequestBody EstadosPagosItem item,
-														   HttpServletRequest request) {
-		DeleteResponseDTO response = new DeleteResponseDTO();
-
-		try {
-			response = facturacionService.eliminarAbonoSJCSCaja(item, request);
-			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setError(UtilidadesString.creaError(e.getMessage()));
-			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 	
 	@RequestMapping(value = "/generarExcel", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	ResponseEntity<InputStreamResource> generateExcel(@RequestBody TarjetaPickListSerieDTO etiquetas, HttpServletRequest request) throws Exception {
@@ -1253,6 +1241,20 @@ public class FacturacionPySController {
 	@RequestMapping(value = "/descargarFicherosContabilidad", method = RequestMethod.POST, produces = "application/zip")
 	ResponseEntity<InputStreamResource> descargarFicherosContabilidad(@RequestBody List <FacRegistroFichConta> facRegistrosFichConta, HttpServletRequest request) {
 		return contabilidadExportacionService.descargarFicherosContabilidad(facRegistrosFichConta, request);		
+	}
+
+	@GetMapping("/getFasesFacturacionProgramada")
+	ResponseEntity<FaseFacturacionProgramadaDTO> getFasesFacturacionProgramada(HttpServletRequest request, @RequestParam String idInstitucion, @RequestParam String idSerieFacturacion, @RequestParam String idProgramacion) {
+
+		FaseFacturacionProgramadaDTO response = null;
+
+		try {
+			response = facturacionService.getFasesFacturacionProgramada(request, idInstitucion, idSerieFacturacion, idProgramacion);
+			return ResponseEntity.ok().body(response);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
 	}
 	
 }

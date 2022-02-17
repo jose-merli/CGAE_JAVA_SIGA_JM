@@ -45,6 +45,7 @@ public class ProComprobacionTraspasoFacturas extends ProcesoFacPyS {
                 // PROCESO PARA CADA FACTURACION PROGRAMADA
 
                 LOGGER.info("ENVIAR FACTURACION PROGRAMADA: " + idInstitucion + " " + factBean.getIdseriefacturacion() + " " + factBean.getIdprogramacion());
+                TransactionStatus tx = null;
 
                 try {
 
@@ -53,12 +54,16 @@ public class ProComprobacionTraspasoFacturas extends ProcesoFacPyS {
                     hashNew.setIdprogramacion(factBean.getIdprogramacion());
                     hashNew.setIdseriefacturacion(factBean.getIdseriefacturacion());
 
-                    TransactionStatus tx = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
+                    tx = facturacionHelper.getNewLongTransaction(getTimeoutLargo());
 
                     cambiarEstadoTraspasoFacturacion(factBean, hashNew, tx);
 
                 } catch (Exception e) {
                     LOGGER.error("@@@ Error al traspasar facturas pendientes (Proceso automatico) Programacion: ", e);
+                } finally {
+                    if (tx != null) {
+                        finalizaTransaccion(tx);
+                    }
                 }
 
             }

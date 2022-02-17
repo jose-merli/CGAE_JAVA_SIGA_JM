@@ -44,7 +44,7 @@ public class EjecucionPlsPago {
         resultado = callPLProcedure("{call PKG_SIGA_PAGOS_SJCS.PROC_FCS_PAGO_TURNOS_OFI(?,?,?,?,?,?)}", 3, paramIn);
 
         if (!resultado[1].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[3]);
+            LOGGER.error("ejecutarPL_PagoTurnosOficio -> Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Turnos de Justicia Gratuita. Error en PL = " + (String) resultado[3],
                     "messages.factSJCS.error.pagoTurnosSJCS");
         }
@@ -67,7 +67,7 @@ public class EjecucionPlsPago {
         resultado = callPLProcedure("{call PKG_SIGA_PAGOS_SJCS.PROC_FCS_PAGO_GUARDIAS(?,?,?,?,?,?)}", 3, paramIn);
 
         if (!resultado[1].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[3]);
+            LOGGER.error("ejecutarPL_PagoGuardias -> Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Guardias de Justicia Gratuita. Error en PL = " + (String) resultado[3],
                     "messages.factSJCS.error.pagoGuardiasSJCS");
         }
@@ -90,7 +90,7 @@ public class EjecucionPlsPago {
         resultado = callPLProcedure("{call PKG_SIGA_PAGOS_SJCS.PROC_FCS_PAGO_SOJ(?,?,?,?,?,?)}", 3, paramIn);
 
         if (!resultado[1].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[3]);
+            LOGGER.error("ejecutarPL_PagoSOJ -> Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Expedientes SOJ de Justicia Gratuita. Error en PL = " + (String) resultado[3],
                     "messages.factSJCS.error.pagoExpedientesSogSJCS");
         }
@@ -113,7 +113,7 @@ public class EjecucionPlsPago {
         resultado = callPLProcedure("{call PKG_SIGA_PAGOS_SJCS.PROC_FCS_PAGO_EJG(?,?,?,?,?,?)}", 3, paramIn);
 
         if (!resultado[1].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[3]);
+            LOGGER.error("ejecutarPL_PagoEJG -> Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Expedientes EJG de Justicia Gratuita. Error en PL = " + (String) resultado[3],
                     "messages.factSJCS.error.pagoExpedientesEjgSJCS");
         }
@@ -196,7 +196,7 @@ public class EjecucionPlsPago {
             resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_EXPORTAR_TURNOS_OFI (?,?,?,?,?,?,?,?,?)}", 2, param_in);
             if (!resultado[0].equalsIgnoreCase("0")) {
                 //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
-                LOGGER.error("Error en PL = " + (String) resultado[1]);
+                LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
             }
 
         } catch (Exception e) {
@@ -227,7 +227,7 @@ public class EjecucionPlsPago {
             resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_EXPORTAR_GUARDIAS (?,?,?,?,?,?,?,?,?)}", 2, param_in);
             if (!resultado[0].equalsIgnoreCase("0")) {
                 //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
-                LOGGER.error("Error en PL = " + (String) resultado[1]);
+                LOGGER.error("ejecutarPLExportarGuardias -> Error en PL = " + (String) resultado[1]);
             }
 
         } catch (Exception e) {
@@ -251,7 +251,7 @@ public class EjecucionPlsPago {
             resultado = callPLProcedure("{call PROC_FACSJCS_DESCIERREPAGO (?,?,?,?)}", 2, param_in);
 
             if (!resultado[0].equalsIgnoreCase("0")) {
-                LOGGER.error("Error en PL = " + (String) resultado[1]);
+                LOGGER.error("ejecutarPLDeshacerCierre -> Error en PL = " + (String) resultado[1]);
             }
 
         } catch (Exception e) {

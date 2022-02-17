@@ -86,7 +86,6 @@ import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;
 import org.itcgae.siga.services.IEnviosCommonsService;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 
@@ -113,7 +112,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Service
 public abstract class ProcesoFacPyS {
 
     private Logger LOGGER = Logger.getLogger(ProcesoFacPyS.class);

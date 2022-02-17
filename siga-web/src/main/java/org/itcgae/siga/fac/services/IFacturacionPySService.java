@@ -29,6 +29,7 @@ import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
 import org.itcgae.siga.DTO.fac.FacturaLineaItem;
 import org.itcgae.siga.DTO.fac.FacturasIncluidasDTO;
+import org.itcgae.siga.DTO.fac.FaseFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosDTO;
 import org.itcgae.siga.DTO.fac.FicherosAbonosItem;
 import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
@@ -161,8 +162,6 @@ public interface IFacturacionPySService {
 
 	public ComunicacionCobroDTO getComunicacionCobro(String idFactura, HttpServletRequest request) throws Exception;
 
-    public InsertResponseDTO insertarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
-
 	public FacturasIncluidasDTO getFacturasIncluidas(String idFichero, String tipoFichero, HttpServletRequest request)
 			throws Exception;
 
@@ -170,10 +169,9 @@ public interface IFacturacionPySService {
 
 	public ResponseEntity<InputStreamResource> descargarFichaFacturacion(List<FacFacturacionprogramadaItem> facturacionItems, HttpServletRequest request) throws Exception;
 
-	public DeleteResponseDTO eliminarAbonoSJCSCaja(EstadosPagosItem item, HttpServletRequest request) throws Exception;
-
 	public ResponseFileDTO generateExcel(TarjetaPickListSerieDTO etiquetas, HttpServletRequest request)  throws Exception;
 
 	public ResponseFileDTO generateExcelAbonos(FacAbonoItem facAbonosItem, HttpServletRequest request) throws Exception;
 
+	FaseFacturacionProgramadaDTO getFasesFacturacionProgramada(HttpServletRequest request, String idInstitucion, String idSerieFacturacion, String idProgramacion) throws Exception;
 }

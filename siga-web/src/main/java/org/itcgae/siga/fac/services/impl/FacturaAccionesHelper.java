@@ -199,7 +199,7 @@ public class FacturaAccionesHelper {
             abono = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
 
             if (abono.getEstado().equals(SigaConstants.FAC_ABONO_ESTADO_PAGADO) || cantidadPendiente.compareTo(BigDecimal.ZERO) <= 0)
-                throw new BusinessException("Sólo se puede compensar un abono si no está abonado");
+                throw new BusinessException("facturacionSJCS.abonosSJCS.compensacion.deshabilitado");
 
             BigDecimal importePendientePorAbonar = abono.getImppendienteporabonar().subtract(importeCompensado);
             BigDecimal importeTotalAbonado = abono.getImptotalabonado().add(importeCompensado);
@@ -508,13 +508,13 @@ public class FacturaAccionesHelper {
         FacAbono abono = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
 
         if (abono.getEstado().equals(SigaConstants.FAC_ABONO_ESTADO_PAGADO))
-            throw new BusinessException("El abono ya ha sido pagado");
+            throw new BusinessException("facturacionSJCS.abonosSJCS.error.renegociar.estado");
 
         if (abono.getImptotalneto().compareTo(BigDecimal.ZERO) <= 0)
-            throw new BusinessException("El importe total es cero");
+            throw new BusinessException("facturacionSJCS.abonosSJCS.error.importeTotalCero");
 
         if (abono.getImppendienteporabonar().compareTo(BigDecimal.ZERO) <= 0)
-            throw new BusinessException("El importe pendiente es cero");
+            throw new BusinessException("facturacionSJCS.abonosSJCS.error.importePendienteCero");
 
         if (idCuenta == null)
             abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA);
@@ -534,7 +534,7 @@ public class FacturaAccionesHelper {
             CenCuentasbancarias banco = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(bancoKey);
 
             if (banco == null)
-                throw new BusinessException("No existe la cuenta bancaria asociada");
+                throw new BusinessException("facturacionSJCS.abonosSJCS.error.bancoAsociado");
         }
 
         resultado = facAbonoExtendsMapper.updateByPrimaryKey(abono);
@@ -546,7 +546,7 @@ public class FacturaAccionesHelper {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int renegociarFactura(String modo, String idFactura, Short idCuenta, Date fecha, String observaciones, AdmUsuarios usuario) throws Exception {
+    public void renegociarFactura(String modo, String idFactura, Short idCuenta, Date fecha, String observaciones, AdmUsuarios usuario) throws Exception {
         FacFacturaKey facturaKey = new FacFacturaKey();
         facturaKey.setIdinstitucion(usuario.getIdinstitucion());
         facturaKey.setIdfactura(idFactura);
@@ -563,7 +563,7 @@ public class FacturaAccionesHelper {
                 SigaConstants.ESTADO_FACTURA_BANCO,
                 SigaConstants.ESTADO_FACTURA_DEVUELTA
         }).contains(factura.getEstado().toString()))
-            throw new BusinessException("El estado de la factura es incorrecto");
+            throw new BusinessException("facturacionPyS.facturas.error.estado");
 
         if (factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_DEVUELTA))
                 && UtilidadesString.esCadenaVacia(factura.getComisionidfactura()))
@@ -574,7 +574,7 @@ public class FacturaAccionesHelper {
         switch (modo) {
             case "caja":
                 if (factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA)))
-                    throw new BusinessException("La factura ya se encuentra pendiente de cobro por caja");
+                    throw new BusinessException("facturacionPyS.facturas.error.caja");
 
                 idFormaPago = Short.parseShort(SigaConstants.TIPO_FORMAPAGO_METALICO);
                 nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA);
@@ -583,7 +583,7 @@ public class FacturaAccionesHelper {
 
             case "cuentaFactura_activa":
                 if (factura.getIdcuenta() == null)
-                    throw new BusinessException("No tenia cuenta asociada para poder renegociarla por la misma cuenta");
+                    throw new BusinessException("facturacionPyS.facturas.error.cuentaActiva");
 
                 idFormaPago = Short.parseShort(SigaConstants.TIPO_FORMAPAGO_FACTURA);
                 nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO);
@@ -601,7 +601,7 @@ public class FacturaAccionesHelper {
                         || cuentaBancaria.getAbonocargo().equals("T")))
                     idCuenta = cuentaBancaria.getIdcuenta();
                 else
-                    throw new BusinessException("No encuentra la cuenta para renegociar");
+                    throw new BusinessException("facturacionSJCS.abonosSJCS.error.bancoAsociado");
                 break;
 
             case "cuentaFactura_activa_masClientes":
@@ -622,7 +622,7 @@ public class FacturaAccionesHelper {
                             || cuentaBancaria.getAbonocargo().equals("T")))
                         idCuenta = cuentaBancaria.getIdcuenta();
                     else
-                        throw new BusinessException("No encuentra la cuenta para renegociar");
+                        throw new BusinessException("facturacionSJCS.abonosSJCS.error.bancoAsociado");
                 } else {
                     cuentaBancaria = getCuentaActivaUnica(factura.getIdpersona(), usuario.getIdinstitucion());
 
@@ -634,7 +634,7 @@ public class FacturaAccionesHelper {
                         if (cuentaBancaria != null) {
                             idCuenta = cuentaBancaria.getIdcuenta();
                         } else {
-                            throw new BusinessException("No encuentra la cuenta para renegociar");
+                            throw new BusinessException("facturacionSJCS.abonosSJCS.error.bancoAsociado");
                         }
                     }
                 }
@@ -645,7 +645,7 @@ public class FacturaAccionesHelper {
                 nuevoEstado = Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO);
 
                 if (idCuenta == null)
-                    throw new BusinessException("No ha indicado el banco por el que renegociar");
+                    throw new BusinessException("facturacionPyS.facturas.error.otroBancoAusente");
                 break;
 
             default:
@@ -654,7 +654,10 @@ public class FacturaAccionesHelper {
 
         // Insertamos un nuevo registro en FAC_RENEGOCIACION
         FacRenegociacion renegociacion = new FacRenegociacion();
-        renegociacion.setComentario(observaciones.trim());
+
+        if (!UtilidadesString.esCadenaVacia(observaciones))
+            renegociacion.setComentario(observaciones.trim());
+
         renegociacion.setIdfactura(idFactura);
         renegociacion.setIdinstitucion(usuario.getIdinstitucion());
         renegociacion.setIdpersona(factura.getIdpersona());
@@ -707,8 +710,6 @@ public class FacturaAccionesHelper {
 
         if (resultado <= 0)
             throw new BusinessException("No se ha insertado en el histórico de la facturación");
-
-        return 0;
     }
 
     private CenCuentasbancarias getCuentaActivaUnica(Long idPersona, Short idInstitucion) {
@@ -749,8 +750,13 @@ public class FacturaAccionesHelper {
         Short newIdPagoCaja = facPagosporcajaExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString(), idFactura);
         pagosCaja.setIdpagoporcaja(newIdPagoCaja);
 
+        if (importe.compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessException("facturacionSJCS.abonosSJCS.error.importeCero");
+
         pagosCaja.setImporte(importe);
-        pagosCaja.setObservaciones(observaciones);
+
+        if (!UtilidadesString.esCadenaVacia(observaciones))
+            pagosCaja.setObservaciones(observaciones.trim());
 
         // Actualizamos los importes de la factura
 
@@ -774,10 +780,10 @@ public class FacturaAccionesHelper {
         factura.setImptotalporpagar(impTotalPorPagar.setScale(2, RoundingMode.DOWN));
 
         if (factura.getImptotalporpagar().compareTo(BigDecimal.ZERO) < 0)
-            throw new BusinessException("El importe del pago debe ser menor o igual al importe pendiente de la factura");
+            throw new BusinessException("facturacionPyS.facturas.error.importeMenorAImportePendiente");
 
         if (factura.getFechaemision().compareTo(fechaPago) > 0)
-            throw new BusinessException("La fecha del pago por caja debe ser posterior a la fecha de emisión");
+            throw new BusinessException("facturacionPyS.facturas.error.fechaPosteriorFechaEmision");
 
 
         pagosCaja.setFechamodificacion(new Date());
@@ -859,9 +865,7 @@ public class FacturaAccionesHelper {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int anularFactura(String idFactura, Date fecha, String observaciones, AdmUsuarios usuario) {
-        int resultado;
-
+    public void anularFactura(String idFactura, Date fecha, String observaciones, AdmUsuarios usuario) {
         FacFacturaKey facturaKey = new FacFacturaKey();
         facturaKey.setIdinstitucion(usuario.getIdinstitucion());
         facturaKey.setIdfactura(idFactura);
@@ -872,10 +876,8 @@ public class FacturaAccionesHelper {
             throw new BusinessException("Error al obtener las facturas");
 
        if (!factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_ANULADA))) {
-            return insertarAbono(factura, fecha, observaciones, usuario);
+            insertarAbono(factura, fecha, observaciones, usuario);
        }
-
-        return 0;
     }
 
     private int insertarAbono(FacFactura factura, Date fecha, String observaciones, AdmUsuarios usuario) {
@@ -884,7 +886,9 @@ public class FacturaAccionesHelper {
         FacAbono abono = new FacAbono();
 
         abono.setObservaciones(getTraduccion("messages.informes.abono.mensajeFactura", usuario.getIdlenguaje()) + " " + factura.getNumerofactura());
-        abono.setMotivos(observaciones);
+
+        if (!UtilidadesString.esCadenaVacia(observaciones))
+            abono.setMotivos(observaciones.trim());
 
         Long newIdAbono = facAbonoExtendsMapper.getNuevoID(usuario.getIdinstitucion().toString());
         abono.setIdabono(newIdAbono);
@@ -893,7 +897,7 @@ public class FacturaAccionesHelper {
         abono.setIdabono(newIdAbono);
 
         // Escribir el motivo
-        abono.setMotivos(getTraduccion("facturacion.altaAbonos.literal.devolucion", usuario.getIdlenguaje()) + " " + "motivo");
+        //abono.setMotivos(getTraduccion("facturacion.altaAbonos.literal.devolucion", usuario.getIdlenguaje()) + " " + "motivo");
         abono.setFecha(fecha);
         abono.setContabilizada(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
         abono.setIdfactura(factura.getIdfactura());
@@ -1236,7 +1240,7 @@ public class FacturaAccionesHelper {
         resultado = commons.callPLProcedureFacturacionPyS("{call PKG_SIGA_CARGOS.DevolucionesManuales(?,?,?,?,?,?,?,?)}", 3, param_in);
 
         if (!resultado[0].equals("0")) {
-            throw new BusinessException("Fichero de devoluciones manuales: Error en el proceso de actualicacion de tablas de devolucion");
+            throw new BusinessException("facturacionPyS.facturas.error.devolucionesManuales");
         }
 
         String [] aListaIdDisquetesDevolucion = resultado[2].split(";");
@@ -1359,7 +1363,7 @@ public class FacturaAccionesHelper {
 
             // JPT - Devoluciones 117 - Calcula el importe del iva
             long IVAComision = Long.parseLong(facBancoinstitucionExtendsMapper.getPorcentajeIva(String.valueOf(bancoinstitucion.getIdinstitucion()), bancoinstitucion.getBancosCodigo()).get(0).getValue());
-            BigDecimal importeIVAComision = bancoinstitucion.getComisionimporte().multiply(BigDecimal.valueOf(IVAComision/100)).setScale(2, RoundingMode.DOWN);
+            BigDecimal importeIVAComision = bancoinstitucion.getComisionimporte().multiply(BigDecimal.valueOf(IVAComision)).divide(BigDecimal.valueOf(100)).setScale(2, RoundingMode.DOWN);
 
             // JPT - Devoluciones 117 - Calcula los importes de la factura final con los importes de la comision
             BigDecimal impTotalPorPagar = facturaComision.getImptotalporpagar().add(importeIVAComision.add(bancoinstitucion.getComisionimporte()));
@@ -1373,7 +1377,8 @@ public class FacturaAccionesHelper {
             facturaComision.setImptotalneto(impTotalNeto.setScale(2, RoundingMode.DOWN));
 
             // Se actualiza el estado del la última entrada que tendrá la factura en el histórico
-            facturaComision.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_ENREVISION));
+            facturaComision.setEstado(facturaComision.getIdcuenta() == null ? Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA)
+                    : Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO));
 
             facFacturaExtendsMapper.insertSelective(facturaComision);
 
@@ -1390,7 +1395,8 @@ public class FacturaAccionesHelper {
             facHistoricofacturaExtendsMapper.insertSelective(facHistoricoFacturaDevuelta);
 
             // CONFIRMACIÓN
-            facHistoricoFacturaDevuelta.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA));
+            facHistoricoFacturaDevuelta.setEstado(facturaComision.getIdcuenta() == null ? Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA)
+                    : Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO));
             facHistoricoFacturaDevuelta.setIdtipoaccion(Short.parseShort("2"));
             facHistoricoFacturaDevuelta.setIdhistorico(
                     facHistoricofacturaExtendsMapper.getNextIdHstorico(facturaComision.getIdinstitucion(),
@@ -1431,6 +1437,7 @@ public class FacturaAccionesHelper {
             lineaFactura.setDescripcion(bancoinstitucion.getComisiondescripcion());
             lineaFactura.setPreciounitario(bancoinstitucion.getComisionimporte());
             lineaFactura.setIdtipoiva(bancoinstitucion.getIdtipoiva());
+            lineaFactura.setIva(BigDecimal.valueOf(IVAComision));
             lineaFactura.setCtaproductoservicio(bancoinstitucion.getComisioncuentacontable());
             lineaFactura.setCtaiva(pySTipoIvaExtendsMapper.getC_CTAIVA(facUpdate.getIdinstitucion().toString(), bancoinstitucion.getIdtipoiva().toString()).get(0).getValue());
             lineaFactura.setIdformapago(facUpdate.getIdformapago());

@@ -32,6 +32,7 @@ public class BaremosGuardiaItem {
    String precioMin;
    String precioMax;
    Date fechaMod;
+   String hitos;
  
 //	public String getGuardias() {
 //		return guardias;

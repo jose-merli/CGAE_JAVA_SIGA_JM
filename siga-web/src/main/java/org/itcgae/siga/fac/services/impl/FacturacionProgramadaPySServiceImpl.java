@@ -3,6 +3,7 @@ package org.itcgae.siga.fac.services.impl;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants.FASES_PROCESO_FACTURACION_AUTOMATICA_PYS;
 import org.itcgae.siga.fac.services.IFacturacionProgramadaPySService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,39 +13,48 @@ public class FacturacionProgramadaPySServiceImpl implements IFacturacionPrograma
 
     private static Boolean alguienEjecutando = Boolean.FALSE;
 
+    @Autowired
+    private ProTratarFacturacion proTratarFacturacion;
+
+    @Autowired
+    private ProTratarConfirmacion proTratarConfirmacion;
+
+    @Autowired
+    private ProGenerarPDFsYenviarFacturasProgramacion proGenerarPDFsYenviarFacturasProgramacion;
+
+    @Autowired
+    private ProGenerarEnviosFacturasPendientes proGenerarEnviosFacturasPendientes;
+
+    @Autowired
+    private ProComprobacionTraspasoFacturas proComprobacionTraspasoFacturas;
+
     @Override
     public void ejecutaProcesoFacturacionPyS() {
-
-        if (isAlguienEjecutando()) {
-            LOGGER.debug("YA SE ESTA EJECUTANDO EL PROCESO AUTOMATICO DE FACTURACION DE PYS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
-            return;
-        }
 
         final String sNombreProceso = "ProcesoAutomaticoFacturacion";
 
         try {
 
-            ProcesoFacPyS procesoFacPyS = null;
+            if (isAlguienEjecutando()) {
+                LOGGER.debug("YA SE ESTA EJECUTANDO EL PROCESO AUTOMATICO DE FACTURACION DE PYS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+                return;
+            }
+
+            setAlguienEjecutando();
 
             for (FASES_PROCESO_FACTURACION_AUTOMATICA_PYS fase : FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.values()) {
 
                 if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.TRATAR_FACTURACION.getCodigo())) {
-                    procesoFacPyS = new ProTratarFacturacion();
+                    proTratarFacturacion.ejecutar();
                 } else if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.TRATAR_CONFIRMACION.getCodigo())) {
-                    procesoFacPyS = new ProTratarConfirmacion();
+                    proTratarConfirmacion.ejecutar();
                 } else if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.GENERAR_PDFS_Y_ENVIAR_FACTURAS_PROGRAMACION.getCodigo())) {
-                    procesoFacPyS = new ProGenerarPDFsYenviarFacturasProgramacion();
+                    proGenerarPDFsYenviarFacturasProgramacion.ejecutar();
                 } else if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.GENERAR_ENVIOS_FACTURAS_PENDIENTES.getCodigo())) {
-                    procesoFacPyS = new ProGenerarEnviosFacturasPendientes();
+                    proGenerarEnviosFacturasPendientes.ejecutar();
                 } else if (fase.getCodigo().equals(FASES_PROCESO_FACTURACION_AUTOMATICA_PYS.COMPROBACION_TRASPASO_FACTURAS.getCodigo())) {
-                    procesoFacPyS = new ProComprobacionTraspasoFacturas();
+                    proComprobacionTraspasoFacturas.ejecutar();
                 }
-
-                if (procesoFacPyS != null) {
-                    setAlguienEjecutando();
-                    procesoFacPyS.ejecutar();
-                }
-
             }
 
         } catch (Exception e) {
