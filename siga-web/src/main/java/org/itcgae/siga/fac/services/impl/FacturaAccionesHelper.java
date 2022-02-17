@@ -546,7 +546,7 @@ public class FacturaAccionesHelper {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int renegociarFactura(String modo, String idFactura, Short idCuenta, Date fecha, String observaciones, AdmUsuarios usuario) throws Exception {
+    public void renegociarFactura(String modo, String idFactura, Short idCuenta, Date fecha, String observaciones, AdmUsuarios usuario) throws Exception {
         FacFacturaKey facturaKey = new FacFacturaKey();
         facturaKey.setIdinstitucion(usuario.getIdinstitucion());
         facturaKey.setIdfactura(idFactura);
@@ -710,8 +710,6 @@ public class FacturaAccionesHelper {
 
         if (resultado <= 0)
             throw new BusinessException("No se ha insertado en el histórico de la facturación");
-
-        return 0;
     }
 
     private CenCuentasbancarias getCuentaActivaUnica(Long idPersona, Short idInstitucion) {
@@ -867,9 +865,7 @@ public class FacturaAccionesHelper {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int anularFactura(String idFactura, Date fecha, String observaciones, AdmUsuarios usuario) {
-        int resultado;
-
+    public void anularFactura(String idFactura, Date fecha, String observaciones, AdmUsuarios usuario) {
         FacFacturaKey facturaKey = new FacFacturaKey();
         facturaKey.setIdinstitucion(usuario.getIdinstitucion());
         facturaKey.setIdfactura(idFactura);
@@ -880,10 +876,8 @@ public class FacturaAccionesHelper {
             throw new BusinessException("Error al obtener las facturas");
 
        if (!factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_ANULADA))) {
-            return insertarAbono(factura, fecha, observaciones, usuario);
+            insertarAbono(factura, fecha, observaciones, usuario);
        }
-
-        return 0;
     }
 
     private int insertarAbono(FacFactura factura, Date fecha, String observaciones, AdmUsuarios usuario) {
@@ -903,7 +897,7 @@ public class FacturaAccionesHelper {
         abono.setIdabono(newIdAbono);
 
         // Escribir el motivo
-        abono.setMotivos(getTraduccion("facturacion.altaAbonos.literal.devolucion", usuario.getIdlenguaje()) + " " + "motivo");
+        //abono.setMotivos(getTraduccion("facturacion.altaAbonos.literal.devolucion", usuario.getIdlenguaje()) + " " + "motivo");
         abono.setFecha(fecha);
         abono.setContabilizada(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
         abono.setIdfactura(factura.getIdfactura());
@@ -1369,7 +1363,7 @@ public class FacturaAccionesHelper {
 
             // JPT - Devoluciones 117 - Calcula el importe del iva
             long IVAComision = Long.parseLong(facBancoinstitucionExtendsMapper.getPorcentajeIva(String.valueOf(bancoinstitucion.getIdinstitucion()), bancoinstitucion.getBancosCodigo()).get(0).getValue());
-            BigDecimal importeIVAComision = bancoinstitucion.getComisionimporte().multiply(BigDecimal.valueOf(IVAComision/100)).setScale(2, RoundingMode.DOWN);
+            BigDecimal importeIVAComision = bancoinstitucion.getComisionimporte().multiply(BigDecimal.valueOf(IVAComision)).divide(BigDecimal.valueOf(100)).setScale(2, RoundingMode.DOWN);
 
             // JPT - Devoluciones 117 - Calcula los importes de la factura final con los importes de la comision
             BigDecimal impTotalPorPagar = facturaComision.getImptotalporpagar().add(importeIVAComision.add(bancoinstitucion.getComisionimporte()));
@@ -1383,7 +1377,8 @@ public class FacturaAccionesHelper {
             facturaComision.setImptotalneto(impTotalNeto.setScale(2, RoundingMode.DOWN));
 
             // Se actualiza el estado del la última entrada que tendrá la factura en el histórico
-            facturaComision.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_ENREVISION));
+            facturaComision.setEstado(facturaComision.getIdcuenta() == null ? Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA)
+                    : Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO));
 
             facFacturaExtendsMapper.insertSelective(facturaComision);
 
@@ -1400,7 +1395,8 @@ public class FacturaAccionesHelper {
             facHistoricofacturaExtendsMapper.insertSelective(facHistoricoFacturaDevuelta);
 
             // CONFIRMACIÓN
-            facHistoricoFacturaDevuelta.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA));
+            facHistoricoFacturaDevuelta.setEstado(facturaComision.getIdcuenta() == null ? Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA)
+                    : Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO));
             facHistoricoFacturaDevuelta.setIdtipoaccion(Short.parseShort("2"));
             facHistoricoFacturaDevuelta.setIdhistorico(
                     facHistoricofacturaExtendsMapper.getNextIdHstorico(facturaComision.getIdinstitucion(),
@@ -1441,6 +1437,7 @@ public class FacturaAccionesHelper {
             lineaFactura.setDescripcion(bancoinstitucion.getComisiondescripcion());
             lineaFactura.setPreciounitario(bancoinstitucion.getComisionimporte());
             lineaFactura.setIdtipoiva(bancoinstitucion.getIdtipoiva());
+            lineaFactura.setIva(BigDecimal.valueOf(IVAComision));
             lineaFactura.setCtaproductoservicio(bancoinstitucion.getComisioncuentacontable());
             lineaFactura.setCtaiva(pySTipoIvaExtendsMapper.getC_CTAIVA(facUpdate.getIdinstitucion().toString(), bancoinstitucion.getIdtipoiva().toString()).get(0).getValue());
             lineaFactura.setIdformapago(facUpdate.getIdformapago());

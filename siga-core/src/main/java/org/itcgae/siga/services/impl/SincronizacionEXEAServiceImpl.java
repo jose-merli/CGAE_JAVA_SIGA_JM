@@ -108,6 +108,9 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
     @Autowired
     private ExpProcedimientosExeaExtendsMapper expProcedimientosExeaExtendsMapper;
 
+    @Autowired
+    private CenProvinciasExtendsMapper cenProvinciasExtendsMapper;
+
     /**
      * Metodo que recibe una peticion {@link ObtenerNumColegiacionRequestDocument} y, tras varias validaciones, devuelve o no el proximo numero de colegiado
      *
@@ -279,7 +282,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 errorType.setXmlRequest("Sin error XML");
                 LOGGER.error("SincronizacionEXEAServiceImpl.aprobarAltaColegiado() / ERROR CONTROLADO: Colegio inexsistente en BBDD - " + request.getColegiado().getColegiacion().getColegio().getCodigoColegio());
             }
-            if(idInstitucion != null) {
+            if(idInstitucion != null && validarDatos(request, response)) {
                 wsCommons.comprobarIP(responseDocument.getAltaColegiadoResponse(), ipCliente, idInstitucion, SigaConstants.EXEA_SYNC_IP_PARAM, SigaConstants.ERROR_SERVER.CLI_IP_NO_ENCONTRADA);
                 if (UtilidadesString.esCadenaVacia(numColegiado)) {
 
@@ -297,7 +300,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                         affectedRows += insertarDatosCliente(idPersona, idInstitucion);
 
-                        idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud(), idPersona);
+                        idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud(), idPersona, response);
 
                         affectedRows += insertarDatosColegiado(request.getColegiado().getColegiacion(), idInstitucion, idPersona, numColegiado, request.getNumeroExpediente());
 
@@ -399,7 +402,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                         affectedRows += insertarDatosCliente(idPersona, idInstitucion);
 
-                        idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud(), idPersona);
+                        idDireccion = insertarDatosDireccion(request.getColegiado().getLocalizacion(), idInstitucion , request.getColegiado().getColegiacion().getTipoSolicitud(), idPersona, response);
 
                         affectedRows += insertarDatosColegiado(request.getColegiado().getColegiacion(), idInstitucion, idPersona, numColegiado, request.getNumeroExpediente());
 
@@ -1309,7 +1312,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
      * @return
      */
     @Transactional
-    private Long insertarDatosDireccion (LocalizacionType localizacionType, Short idInstitucion, TipoColegiacionType.Enum tipoColegiacion, Long idPersona){
+    private Long insertarDatosDireccion (LocalizacionType localizacionType, Short idInstitucion, TipoColegiacionType.Enum tipoColegiacion, Long idPersona, AltaColegiadoResponseDocument.AltaColegiadoResponse response){
 
         LOGGER.info("SincronizacionEXEAServiceImpl.insertarDatosDireccion() - INICIO");
         Long idDireccion = null;
@@ -1329,12 +1332,28 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
             if(!UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getCodigoPoblacion())){
 
-                direccion.setIdpoblacion(localizacionType.getNacional().getPoblacion().getCodigoPoblacion());
+               CenPoblaciones poblacion = cenPoblacionesExtendsMapper.selectByPrimaryKey(localizacionType.getNacional().getPoblacion().getCodigoPoblacion());
+               if(poblacion != null) {
+                   direccion.setIdpoblacion(localizacionType.getNacional().getPoblacion().getCodigoPoblacion());
+               }else{
+                   ErrorType errorType = response.addNewError();
+                   errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
+                   errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
+                   errorType.setXmlRequest("Sin error XML");
+               }
 
             } else if(UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getCodigoPoblacion())
                 && !UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion())){
 
-                direccion.setIdpoblacion(getIdPoblacionFromDescripcion(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion()));
+                String idPoblacion = getIdPoblacionFromDescripcion(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion());
+                if(!UtilidadesString.esCadenaVacia(idPoblacion)) {
+                    direccion.setIdpoblacion(idPoblacion);
+                }else{
+                    ErrorType errorType = response.addNewError();
+                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
+                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
+                    errorType.setXmlRequest("Sin error XML");
+                }
 
             }
 
@@ -2025,5 +2044,46 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
         } catch (NamingException e) {
             throw e;
         }
+    }
+
+    private boolean validarDatos(AltaColegiadoRequestDocument.AltaColegiadoRequest request, AltaColegiadoResponseDocument.AltaColegiadoResponse response){
+        boolean ok = true;
+        if(request.getColegiado().getLocalizacion().getNacional() != null) { //Si es nacional, comprobamos poblacion y provincia
+            if (!UtilidadesString.esCadenaVacia(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion())) {
+
+                CenPoblaciones poblacion = cenPoblacionesExtendsMapper.selectByPrimaryKey(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion());
+                if (poblacion == null) {
+                    ok = false;
+                    ErrorType errorType = response.addNewError();
+                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
+                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
+                    errorType.setXmlRequest("Sin error XML");
+                }
+
+            } else if (UtilidadesString.esCadenaVacia(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion())
+                    && !UtilidadesString.esCadenaVacia(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion())) {
+
+                String idPoblacion = getIdPoblacionFromDescripcion(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion());
+                if (UtilidadesString.esCadenaVacia(idPoblacion)) {
+                    ok = false;
+                    ErrorType errorType = response.addNewError();
+                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
+                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
+                    errorType.setXmlRequest("Sin error XML");
+                }
+
+            }
+            if(ok){
+                CenProvincias cenProvincias = cenProvinciasExtendsMapper.selectByPrimaryKey(request.getColegiado().getLocalizacion().getNacional().getProvincia().getCodigoProvincia());
+                if(cenProvincias == null){
+                    ok = false;
+                    ErrorType errorType = response.addNewError();
+                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.PROVINCIA_NOVALIDA.name());
+                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.PROVINCIA_NOVALIDA.getMensajeError());
+                    errorType.setXmlRequest("Sin error XML");
+                }
+            }
+        }
+        return ok;
     }
 }

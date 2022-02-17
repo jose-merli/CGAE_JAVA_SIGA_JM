@@ -1589,6 +1589,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             procesarFacturacionSJCS();
 
         } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getStackTrace());
             throw e;
         } finally {
             setNadieEjecutando();
@@ -1888,6 +1890,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     institucion.getIdlenguaje());
 
         } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getStackTrace());
             throw new Exception("Error al exportar datos: " + e.getMessage());
         }
     }
@@ -1916,6 +1920,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             }
 
         } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getStackTrace());
             throw new Exception("Error al exportar datos: " + e.getMessage());
         }
 
