@@ -199,6 +199,8 @@ import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.PysAnticipoletrado;
 import org.itcgae.siga.db.entities.PysLineaanticipo;
+import org.itcgae.siga.db.entities.PysTipoiva;
+import org.itcgae.siga.db.entities.PysTipoivaExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
@@ -2520,46 +2522,40 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacFacturaExtendsMapper.updateByPrimaryKey -> guardando las lineas de una factura");
 
-			GenParametrosKey genKey = new GenParametros();
-			genKey.setIdinstitucion(usuario.getIdinstitucion());
-			genKey.setModulo("FAC");
-
-			genKey.setParametro("MODIFICAR_DESCRIPCION");
-			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarDescripcion = !(parametros == null || parametros.getValor().equals("0"));
-
-			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
-			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarImporteUnitario = !(parametros == null || parametros.getValor().equals("0"));
-
-			genKey.setParametro("MODIFICAR_IVA");
-			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarIVA = !(parametros == null || parametros.getValor().equals("0"));
+			Boolean modificarDescripcion = getParametro("FAC", "MODIFICAR_DESCRIPCION", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
+			Boolean modificarImporte = getParametro("FAC", "MODIFICAR_IMPORTE_UNITARIO", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
+			Boolean modificarIva = getParametro("FAC", "MODIFICAR_IVA", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
 
 			FacLineafacturaKey key = new FacLineafacturaKey();
 			key.setIdfactura(item.getIdFactura());
 			key.setNumerolinea(Long.valueOf(item.getNumeroLinea()));
 			key.setIdinstitucion(usuario.getIdinstitucion());
+
 			FacLineafactura updateItem = facLineafacturaExtendsMapper.selectByPrimaryKey(key);
 
-			if (modificarDescripcion && item.getDescripcion() != null) {
-				updateItem.setDescripcion(item.getDescripcion());
+			if (modificarDescripcion && !UtilidadesString.esCadenaVacia(item.getDescripcion())) {
+				updateItem.setDescripcion(item.getDescripcion().trim());
 			}
 
-			if (modificarImporteUnitario && item.getPrecioUnitario() != null) {
+			if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
 				updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
 			}
 
-			if (modificarIVA && item.getTipoIVA() != null) {
+			if (modificarIva && !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
 				updateItem.setIdtipoiva(Integer.valueOf(item.getIdTipoIVA()));
+
+				PysTipoivaExample tipoivaExample = new PysTipoivaExample();
+				tipoivaExample.createCriteria().andIdtipoivaEqualTo(updateItem.getIdtipoiva());
+
+				List<PysTipoiva> pysTipoivas = pySTipoIvaExtendsMapper.selectByExample(tipoivaExample);
+				if (pysTipoivas == null || pysTipoivas.isEmpty())
+					throw new BusinessException("No se encuentra el tipo de IVA indicado");
+
+				updateItem.setIva(pysTipoivas.get(0).getValor());
 			}
 
-			if (item.getCantidad() != null) {
+			if (!UtilidadesString.esCadenaVacia(item.getCantidad())) {
 				updateItem.setCantidad(Integer.valueOf(item.getCantidad()));
-			}
-
-			if (item.getImporteAnticipado() != null) {
-				updateItem.setImporteanticipado(BigDecimal.valueOf(Double.parseDouble(item.getImporteAnticipado())));
 			}
 
 			facLineafacturaExtendsMapper.updateByPrimaryKey(updateItem);
