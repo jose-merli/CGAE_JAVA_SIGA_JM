@@ -512,6 +512,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                     FacHistoricofacturaExample historicofacturaExample = new FacHistoricofacturaExample();
                     historicofacturaExample.createCriteria().andIdfacturaEqualTo(facturaActual.getIdfactura()).
                             andIdinstitucionEqualTo(facturaActual.getIdinstitucion());
+                    historicofacturaExample.setOrderByClause("idhistorico");
 
                     List<FacHistoricofactura> historicoActual = facHistoricofacturaExtendsMapper.selectByExample(historicofacturaExample);
                     FacHistoricofactura estadoAnterior = historicoActual.get(historicoActual.size() - 2);
@@ -999,6 +1000,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 FacHistoricofacturaExample historicofacturaExample = new FacHistoricofacturaExample();
                 historicofacturaExample.createCriteria().andIdfacturaEqualTo(facturaActual.getIdfactura()).
                         andIdinstitucionEqualTo(facturaActual.getIdinstitucion());
+                historicofacturaExample.setOrderByClause("idhistorico");
 
                 List<FacHistoricofactura> historicoActual = facHistoricofacturaExtendsMapper.selectByExample(historicofacturaExample);
                 FacHistoricofactura estadoAnterior = historicoActual.get(historicoActual.size() - 2);
