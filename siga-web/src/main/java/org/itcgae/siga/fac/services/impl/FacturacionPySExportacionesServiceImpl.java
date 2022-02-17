@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
@@ -704,6 +705,8 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             File dir = new File(rutaServidor);
             dir.mkdirs();
 
+            SIGAHelper.addPerm777(dir);
+
             rdr = new BufferedReader(new InputStreamReader(stream));
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(rutaFichero),"ISO-8859-1"));
 
@@ -892,7 +895,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
         String resultado[] = new String[3];
         String codigoError_FicNoEncontrado = "5397";	// Código de error, el fichero no se ha encontrado.
-        String codretorno  = codigoError_FicNoEncontrado;
+        String codretorno = codigoError_FicNoEncontrado;
         try	{
             int i=0;
             while (i<3 && codretorno.equalsIgnoreCase(codigoError_FicNoEncontrado)){
