@@ -378,7 +378,7 @@ public abstract class ProcesoFacPyS {
         fac.setIdestadoconfirmacion(FacEstadosFacturacion.EJECUTANDO_GENERACION.getId());
         fac.setUsumodificacion(USUARIO_AUTO);
         fac.setFechamodificacion(new Date());
-        facProgMapper.updateByPrimaryKey(fac);
+        facProgMapper.updateByPrimaryKeySelective(fac);
     }
 
     protected String getLenguajeInstitucion(Short idinstitucion) {

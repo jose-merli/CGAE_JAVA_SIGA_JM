@@ -206,7 +206,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         LOGGER.info("### CAMBIANDO A ESTADO GENERADA ");
         fac.setIdestadoconfirmacion(FacEstadosFacturacion.GENERADA.getId());
         fac.setLogerror(null);
-        if (facProgMapper.updateByPrimaryKey(fac) != 1) {
+        if (facProgMapper.updateByPrimaryKeySelective(fac) != 1) {
             throw new Exception("### Error al actualizar el estado de la GENERACION.");
         }
     }
@@ -300,7 +300,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         LOGGER.info("### CAMBIANDO A ESTADO: " + estadoFin);
         try {
 
-            if (facProgMapper.updateByPrimaryKey(fac) == 0) {
+            if (facProgMapper.updateByPrimaryKeySelective(fac) == 0) {
                 throw new Exception("Error al actualizar el estado de la generacion. finalizada con errores.");
             }
 
@@ -335,7 +335,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         fac.setNombrefichero(namefile);
         fac.setLogerror(null);
 
-        if (facProgMapper.updateByPrimaryKey(fac) != 1) {
+        if (facProgMapper.updateByPrimaryKeySelective(fac) != 1) {
             throw new Exception("### Error al actualizar el nombre del fichero de la GENERACION.");
         }
 

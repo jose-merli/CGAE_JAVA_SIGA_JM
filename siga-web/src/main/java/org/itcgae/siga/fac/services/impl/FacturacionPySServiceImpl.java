@@ -3671,6 +3671,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 		FaseFacturacionProgramadaDTO faseFacturacionProgramadaDTO = new FaseFacturacionProgramadaDTO();
+		boolean noHayInformacion = false;
 
 		if (usuario != null) {
 
@@ -3783,6 +3784,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 								fase3.setPuestoEnCola(literalProcesado);
 								fase4.setPuestoEnCola(literalProcesado);
 								fase5.setPuestoEnCola(posicionFase5 + "/" + numTotalFase5);
+							} else {
+								noHayInformacion = true;
 							}
 						}
 					}
@@ -3790,11 +3793,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			}
 
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase1);
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase2);
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase3);
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase4);
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase5);
+			if(noHayInformacion) {
+				Error error = new Error();
+				error.setCode(200);
+				error.setDescription("factPyS.mensaje.info.noDisponible");
+				faseFacturacionProgramadaDTO.setError(error);
+			} else {
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase1);
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase2);
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase3);
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase4);
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase5);
+			}
 
 		}
 
