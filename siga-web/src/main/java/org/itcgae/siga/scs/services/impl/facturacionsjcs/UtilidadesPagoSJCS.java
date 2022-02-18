@@ -605,9 +605,14 @@ public class UtilidadesPagoSJCS {
          try{
             String resultado[] = ejecucionPlsPago.ejecutarPLAplicarRetencionesJudiciales(idInstitucion, idPagoJg, idPersonaSociedad, importeNeto, usuMod,
                     idioma);
-            LOGGER.debug("PL ejecutado: "+ resultado.length + "," + resultado[0]);
+            if(resultado != null){
+                LOGGER.debug("PL ejecutado: "+ resultado.length + "," + resultado[0]);
+            }else{
+                LOGGER.debug("PL ejecutado: "+ resultado);
+            }
+
             // comprueba si el pl se ha ejecutado correctamente
-            if (!resultado[0].equals("0")) {
+            if (resultado != null && !resultado[0].equals("0")) {
                 if (resultado[0].equals("11"))
                     throw new FacturacionSJCSException("Se ha producido un error al calcular el importe de retención LEC. Seguramente no haya smi para el año o no esten configurados los tramos LEC",
                             "FactSJCS.mantRetencionesJ.plAplicarRetencionesJudiciales.error.tramosLEC");
