@@ -974,7 +974,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                 if("FIR".equals(sancion.getEstadoSancion().toString())){
 
                     if(sancionCGAE.getFechafirmeza() == null){
-                        cenSancion.setChkfirmeza("1");
+                        sancionCGAE.setChkfirmeza("1");
                     }
                     sancionCGAE.setFechafirmeza(sancion.getFechaEstado().getTime());
 
