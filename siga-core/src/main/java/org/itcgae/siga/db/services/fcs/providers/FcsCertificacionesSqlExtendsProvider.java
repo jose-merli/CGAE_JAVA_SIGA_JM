@@ -83,7 +83,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         sql1.GROUP_BY("CER.IDESTADOCERTIFICACION");
         sql1.GROUP_BY("F.IDPARTIDAPRESUPUESTARIA");
         sql1.GROUP_BY("P.NOMBREPARTIDA");
-        sql1.GROUP_BY("F_SIGA_GETRECURSO(EST.DESCRIPCION, 1)");
+        sql1.GROUP_BY("F_SIGA_GETRECURSO(EST.DESCRIPCION, "+idLenguaje+")");
 
         SQL sql = new SQL();
         sql.SELECT("*");

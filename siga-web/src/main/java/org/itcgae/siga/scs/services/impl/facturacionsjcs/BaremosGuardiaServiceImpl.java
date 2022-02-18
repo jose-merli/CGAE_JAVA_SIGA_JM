@@ -79,6 +79,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 			int keyForTabla = 0;
 			String hitoActual;
 			List<GuardiasItem> guar = new ArrayList<GuardiasItem>();
+			List<GuardiasItem> guarAux = new ArrayList<GuardiasItem>();
 			int indiceNuevo = 0;
 			for(int i = 0; i< lBaremos.size(); i++) {
 				hitoActual = lBaremos.get(i).getIdHito();
@@ -99,9 +100,11 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guardia.setNaPartir(lBaremos.get(i).getNaPartir());
 						guardia.setMaximo(lBaremos.get(i).getMaximo());
 						guardia.setPorDia(lBaremos.get(i).getPorDia());
+						guardia.setIdTurno(lBaremos.get(i).getIdTurno());
 						//guar.add(guardia);
 						//if(i+1 != lBaremos.size()) {
 								//&& (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))  ) {
+						guarAux.add(guardia);
 						lBaremos.get(indiceNuevo).getGuardiasObj().add(guardia);
 						//}
 					}else {
@@ -121,8 +124,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guardia.setNaPartir(lBaremos.get(i).getNaPartir());
 						guardia.setMaximo(lBaremos.get(i).getMaximo());
 						guardia.setPorDia(lBaremos.get(i).getPorDia());
-
+						guardia.setIdTurno(lBaremos.get(i).getIdTurno());
 						guar.add(guardia);
+						guarAux.add(guardia);
 						//if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
 						lBaremos.get(i).setGuardiasObj(guar);
 						lBaremos.get(i).setKeyForTabla(keyForTabla++);
@@ -138,7 +142,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 					guardia.setBaremo(lBaremos.get(i).getBaremo());
 					guardia.setnDias(lBaremos.get(i).getNDias());
-
+					guardia.setIdTurno(lBaremos.get(i).getIdTurno());
 					guardia.setNumMinimoSimple(lBaremos.get(i).getNumMinimoSimple());
 					guardia.setSimpleOImporteIndividual(lBaremos.get(i).getSimpleOImporteIndividual());
 					guardia.setNaPartir(lBaremos.get(i).getNaPartir());
@@ -146,47 +150,22 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					guardia.setPorDia(lBaremos.get(i).getPorDia());
 
 					guar.add(guardia);
+					guarAux.add(guardia);
 					//if((i+1 != lBaremos.size()) && (!(hitoActual.equals(lBaremos.get(i+1).getIdHito())))) {
 					lBaremos.get(i).setGuardiasObj(guar);
 					lBaremos.get(i).setKeyForTabla(keyForTabla++);
 					//}
 				}
-				
-//				GuardiasItem guardiaLaborables = new GuardiasItem();
-//				GuardiasItem guardiaFestivos = new GuardiasItem();
-//				String[] dias = baremo.getDias().toString().split("\n");
-//				guardiaLaborables.setNombre(baremo.getGuardias() + " - LABORABLES");
-//				guardiaLaborables.setIdGuardia(baremo.getIdGuardia());
-//				guardiaLaborables.setDiasGuardia(dias[0]);
-//				guardiaLaborables.setFechabaja(baremo.getFechabaja());
-//
-//				guardiaFestivos.setNombre(baremo.getGuardias() + " - FESTIVOS");
-//				guardiaFestivos.setIdGuardia(baremo.getIdGuardia());
-//				guardiaFestivos.setDiasGuardia(dias[1]);
-//				guardiaFestivos.setFechabaja(baremo.getFechabaja());
-//
-				
-//				guar.add(guardiaFestivos);
-//				baremo.setGuardiasObj(guar);
-//				/*
-//				 * Damos un Key a cada registro para poder crear el desplegable de cada fila en
-//				 * la tabla. Este valor no se almacena en BBDD. Solo se utiliza para cuando se
-//				 * haga click se despliegue las guardias correspondientes. Antes se utilizaba el
-//				 * IdTurno pero este puede ser el mismo para varias guardias con distintos
-//				 * Baremos. De esta manera se evita que se despliegue otro registros.
-//				 */
-//				baremo.setKeyForTabla(keyForTabla++);
 			}
 
 			lBaremos.removeIf ( s -> s.getGuardiasObj() == null );
 
-			//for(int i = 0; i<lBaremos.size(); i++){
-			//	if(lBaremos.get(i).getGuardiasObj() == null){
-			//		lBaremos.remove(i);
-			//	}
-			//}
 			error.setCode(200);
-			baremosRequestDTO.setBaremosRequestItems(lBaremos);
+			BaremosRequestItem baremoFinal = new BaremosRequestItem();
+			List<BaremosRequestItem> lBaremosFinal =  new ArrayList<>();
+			baremoFinal.setGuardiasObj(guarAux);
+			lBaremosFinal.add(baremoFinal);
+			baremosRequestDTO.setBaremosRequestItems(lBaremosFinal);
 
 		} else {
 			LOGGER.warn("searchBaremosGuardia() -> idInstitucion del token nula");
