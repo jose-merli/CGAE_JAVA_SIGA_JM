@@ -444,4 +444,29 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         return sql.toString();
     }
 
+    public String updateImportesFactura(String idFactura, Short idInstitucion, Integer idUsuario) {
+        SQL sql = new SQL();
+
+        sql.UPDATE("fac_factura");
+
+        sql.SET("imptotalneto = pkg_siga_totalesfactura.totalneto(idinstitucion, idfactura)");
+        sql.SET("imptotaliva = pkg_siga_totalesfactura.totaliva(idinstitucion, idfactura)");
+        sql.SET("imptotal = pkg_siga_totalesfactura.total(idinstitucion, idfactura)");
+        sql.SET("imptotalanticipado = pkg_siga_totalesfactura.totalanticipado(idinstitucion, idfactura)");
+        sql.SET("imptotalpagadoporcaja = pkg_siga_totalesfactura.totalpagadoporcaja(idinstitucion, idfactura)");
+        sql.SET("imptotalpagadosolocaja = pkg_siga_totalesfactura.totalpagadosolocaja(idinstitucion, idfactura)");
+        sql.SET("imptotalpagadosolotarjeta = pkg_siga_totalesfactura.totalpagadosolotarjeta(idinstitucion, idfactura)");
+        sql.SET("imptotalpagadoporbanco = pkg_siga_totalesfactura.totalpagadoporbanco(idinstitucion, idfactura)");
+        sql.SET("imptotalpagado = pkg_siga_totalesfactura.totalpagado(idinstitucion, idfactura)");
+        sql.SET("imptotalporpagar = pkg_siga_totalesfactura.pendienteporpagar(idinstitucion, idfactura)");
+        sql.SET("imptotalcompensado = pkg_siga_totalesfactura.totalcompensado(idinstitucion, idfactura)");
+        sql.SET("fechamodificacion = sysdate");
+        sql.SET("usumodificacion = " + idUsuario);
+
+        sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+        sql.WHERE("idfactura = '" + idFactura + "'");
+
+        return sql.toString();
+    }
+
 }

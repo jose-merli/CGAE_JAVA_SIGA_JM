@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.fac.mappers;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.DatoImpresionInformeFacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
@@ -148,4 +149,7 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getDatosImpresionInformeFactura")
 	DatoImpresionInformeFacturaDTO getDatosImpresionInformeFactura(String idInstitucion, String idFactura);
+
+	@UpdateProvider(type = FacFacturaExtendsSqlProvider.class, method = "updateImportesFactura")
+	int updateImportesFactura(String idFactura, Short idInstitucion, Integer idUsuario);
 }

@@ -15,9 +15,9 @@ public class FacLineafacturaExtendsSqlProvider extends FacLineafacturaSqlProvide
         tipoIVA.FROM("PYS_TIPOIVA pt");
         tipoIVA.WHERE("IDTIPOIVA = fl.IDTIPOIVA");
 
-        query.SELECT("IDFACTURA,IDTIPOIVA,NUMEROLINEA,DESCRIPCION,PRECIOUNITARIO,CANTIDAD,IMPORTEANTICIPADO,(PRECIOUNITARIO * CANTIDAD) importeNeto,"
-                + "((PRECIOUNITARIO * CANTIDAD) * (IVA / 100)) importeIVA,((PRECIOUNITARIO * CANTIDAD) * (1 + IVA / 100))importeTotal,( "
-                + tipoIVA.toString() + ")tipoIVA");
+        query.SELECT("IDFACTURA,IDTIPOIVA,NUMEROLINEA,DESCRIPCION, ROUND(PRECIOUNITARIO, 2) PRECIOUNITARIO, CANTIDAD, ROUND(IMPORTEANTICIPADO, 2) IMPORTEANTICIPADO, ROUND(PRECIOUNITARIO * CANTIDAD, 2) importeNeto,"
+                + "ROUND((PRECIOUNITARIO * CANTIDAD) * (IVA / 100), 2) importeIVA, ROUND((PRECIOUNITARIO * CANTIDAD) * (1 + IVA / 100), 2) importeTotal,( "
+                + tipoIVA.toString() + ") tipoIVA");
 
         query.FROM("FAC_LINEAFACTURA fl");
 
