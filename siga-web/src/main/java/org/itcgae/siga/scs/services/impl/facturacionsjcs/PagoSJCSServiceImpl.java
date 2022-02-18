@@ -3266,7 +3266,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                             utilidadesPagoSJCS.deshacerCierre(pago, idInstitucion, usuarios.get(0));
                         }catch (Exception e){
                             LOGGER.error(e.getMessage());
-                            LOGGER.error(e.getStackTrace());
+                            LOGGER.error(e.getCause());
+                            LOGGER.error(e);
                             throw e;
                         }finally {
                             FacturacionSJCSServicesImpl.setNadieEjecutando();
@@ -3277,7 +3278,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
-            LOGGER.error(e.getStackTrace());
+            LOGGER.error(e.getCause());
+            LOGGER.error(e);
             updateResponseDTO.setStatus(SigaConstants.KO);
             error.setCode(500);
             error.setDescription("general.message.error.realiza.accion");

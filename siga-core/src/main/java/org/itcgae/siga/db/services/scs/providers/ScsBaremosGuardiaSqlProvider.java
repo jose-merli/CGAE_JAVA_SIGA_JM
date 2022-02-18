@@ -328,7 +328,7 @@ public class ScsBaremosGuardiaSqlProvider {
 					sql.WHERE("gua.fechabaja is null");
 				}
 
-				//sql.WHERE("rownum <= 200");
+				sql.WHERE("rownum <= 200");
 				
 				sql.GROUP_BY("hit.idinstitucion,"
 						+ "    hit.idturno,"

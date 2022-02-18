@@ -751,57 +751,65 @@ public class UtilidadesPagoSJCS {
     public void deshacerCierre(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) throws Exception {
 
         LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> Entrada al servicio para deshacer el cierre del pago");
-
-        listaPagosDeshacerCierre = new ArrayList<>();
-        recursivaDeshacerCierre(idInstitucion, pago.getIdpagosjg());
-
-        // 3 - HACEMOS EL PASO 2 POR CADA PAGO ENCONTRADO
-
         List<Integer> idPagos = new ArrayList<>();
-        idPagos.add(pago.getIdpagosjg());
-        idPagos.addAll(listaPagosDeshacerCierre);
+        try{
+            listaPagosDeshacerCierre = new ArrayList<>();
+            recursivaDeshacerCierre(idInstitucion, pago.getIdpagosjg());
 
-        if (null != idPagos && !idPagos.isEmpty()) {
+            // 3 - HACEMOS EL PASO 2 POR CADA PAGO ENCONTRADO
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facLineaabonoExtendsMapper.deleteDeshacerCierre() -> Eliminamos las lineas de abono");
-            facLineaabonoExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facHistoricofacturaExtendsMapper.deleteDeshacerCierre() -> Eliminamos el historico de factura");
-            facHistoricofacturaExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
+            idPagos.add(pago.getIdpagosjg());
+            idPagos.addAll(listaPagosDeshacerCierre);
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facPagosporcajaExtendsMapper.deleteDeshacerCierre() -> Eliminamos los pagos por caja");
-            facPagosporcajaExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
+            if (null != idPagos && !idPagos.isEmpty()) {
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facPagoabonoefectivoExtendsMapper.deleteDeshacerCierre() -> Eliminamos los pagos en efectivo");
-            facPagoabonoefectivoExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facLineaabonoExtendsMapper.deleteDeshacerCierre() -> Eliminamos las lineas de abono");
+                facLineaabonoExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
 
-        }
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facHistoricofacturaExtendsMapper.deleteDeshacerCierre() -> Eliminamos el historico de factura");
+                facHistoricofacturaExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
 
-        LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.hayAbonoPosterior() -> Comprobamos si hay abonos posteriores a los relacionados con nuestro pago");
-        List<FacAbono> hayAbonoPosterior = facAbonoExtendsMapper.hayAbonoPosterior(idInstitucion, pago.getIdpagosjg());
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facPagosporcajaExtendsMapper.deleteDeshacerCierre() -> Eliminamos los pagos por caja");
+                facPagosporcajaExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
 
-        if (!hayAbonoPosterior.isEmpty()) {
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
-                    "con nuestro pago");
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facPagoabonoefectivoExtendsMapper.deleteDeshacerCierre() -> Eliminamos los pagos en efectivo");
+                facPagoabonoefectivoExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
 
-            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            String fecha = formato.format(hayAbonoPosterior.get(0).getFecha());
-
-            List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, fecha);
-
-            AdmContador admContador = new AdmContador();
-            admContador.setIdcontador(SigaConstants.CONTADOR_ABONOS_PAGOSJG);
-            admContador.setIdinstitucion(idInstitucion);
-
-            if (abonoAnterior.isEmpty()) {
-                admContador.setContador(0L);
-            } else {
-                admContador.setContador(abonoAnterior.get(0));
             }
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> admContadorExtendsMapper.updateByPrimaryKeySelective() -> Actualizamos el contador");
-            admContadorExtendsMapper.updateByPrimaryKeySelective(admContador);
-        }
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.hayAbonoPosterior() -> Comprobamos si hay abonos posteriores a los relacionados con nuestro pago");
+            List<FacAbono> hayAbonoPosterior = facAbonoExtendsMapper.hayAbonoPosterior(idInstitucion, pago.getIdpagosjg());
+
+            if (!hayAbonoPosterior.isEmpty()) {
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
+                        "con nuestro pago");
+
+                SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                String fecha = formato.format(hayAbonoPosterior.get(0).getFecha());
+
+                List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, fecha);
+
+                AdmContador admContador = new AdmContador();
+                admContador.setIdcontador(SigaConstants.CONTADOR_ABONOS_PAGOSJG);
+                admContador.setIdinstitucion(idInstitucion);
+
+                if (abonoAnterior.isEmpty()) {
+                    admContador.setContador(0L);
+                } else {
+                    admContador.setContador(abonoAnterior.get(0));
+                }
+
+                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> admContadorExtendsMapper.updateByPrimaryKeySelective() -> Actualizamos el contador");
+                admContadorExtendsMapper.updateByPrimaryKeySelective(admContador);
+            }
+        }catch (Exception e){
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getCause());
+            LOGGER.error(e);
+            throw new Exception("Error primera parte deshacer cierre", e);
+         }
+
 
         LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> acAbonoExtendsMapper.deleteByExample() -> Eliminamos los abonos relacionados con los pagos obtenidos");
         FacAbonoExample facAbonoExample = new FacAbonoExample();
@@ -833,6 +841,9 @@ public class UtilidadesPagoSJCS {
                 }
 
             }catch (Exception e){
+                LOGGER.error(e.getMessage());
+                LOGGER.error(e.getCause());
+                LOGGER.error(e);
                 throw new Exception("Error al insertar el nuevo estado de la facturacion", e);
             }
 
