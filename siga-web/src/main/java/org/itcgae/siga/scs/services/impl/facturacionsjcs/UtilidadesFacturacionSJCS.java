@@ -355,6 +355,9 @@ public class UtilidadesFacturacionSJCS {
                 param_in_facturacion);
             LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_TURNOS_OFI");
         } catch(Exception e) {
+            LOGGER.error(e.getCause());
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
             LOGGER.debug("Error PL PROC_FCS_FACTURAR_TURNOS_OFI");
         	logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_TURNOS_OFI; " + e);
         }
@@ -387,6 +390,9 @@ public class UtilidadesFacturacionSJCS {
                 param_in_facturacion);
             LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_GUARDIAS");
         } catch(Exception e) {
+            LOGGER.error(e.getCause());
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
             LOGGER.debug("Error PL PROC_FCS_FACTURAR_GUARDIAS");
         	logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_GUARDIAS; " + e);
         }
@@ -411,10 +417,18 @@ public class UtilidadesFacturacionSJCS {
         param_in_facturacion[2] = itemFac.getUsumodificacion().toString(); // USUMODIFICACION
 
         resultado = new String[3];
-        LOGGER.debug("Ejecutamos PL PROC_FCS_FACTURAR_SOJ");
-        resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_SOJ(?,?,?,?,?,?)}", 3,
-                param_in_facturacion);
-        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_SOJ");
+        try {
+            LOGGER.debug("Ejecutamos PL PROC_FCS_FACTURAR_SOJ");
+            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_SOJ(?,?,?,?,?,?)}", 3,
+                    param_in_facturacion);
+            LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_SOJ");
+        } catch(Exception e) {
+        LOGGER.error(e.getCause());
+        LOGGER.error(e.getMessage());
+        LOGGER.error(e);
+        LOGGER.debug("Error PL PROC_FCS_FACTURAR_SOJ");
+        logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_SOJ; " + e);
+    }
         if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
             LOGGER.debug("Error PL PROC_FCS_FACTURAR_SOJ");
         	String error = "Error en PL = " + (String) resultado[2];
@@ -434,12 +448,19 @@ public class UtilidadesFacturacionSJCS {
         param_in_facturacion[0] = itemFac.getIdinstitucion().toString(); // IDINSTITUCION
         param_in_facturacion[1] = itemFac.getIdfacturacion().toString(); // IDFACTURACION
         param_in_facturacion[2] = itemFac.getUsumodificacion().toString(); // USUMODIFICACION
-
-        resultado = new String[3];
-        LOGGER.debug("Ejecutamos PL PROC_FCS_FACTURAR_EJG");
-        resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_EJG (?,?,?,?,?,?)}", 3,
-                param_in_facturacion);
-        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_EJG");
+        try{
+            resultado = new String[3];
+            LOGGER.debug("Ejecutamos PL PROC_FCS_FACTURAR_EJG");
+            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_EJG (?,?,?,?,?,?)}", 3,
+                    param_in_facturacion);
+            LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_EJG");
+        } catch(Exception e) {
+            LOGGER.error(e.getCause());
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
+            LOGGER.debug("Error PL PROC_FCS_FACTURAR_EJG");
+            logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_EJG; " + e);
+        }
         if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
             LOGGER.debug("Error PL PROC_FCS_FACTURAR_EJG");
         	String error = "Error en PL = " + (String) resultado[2];
