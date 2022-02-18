@@ -257,7 +257,7 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         emisionPago.SELECT("fa.FECHA");
         emisionPago.SELECT("fa.FECHAMODIFICACION");
         emisionPago.SELECT("INITCAP(F_SIGA_GETRECURSO_ETIQUETA('facturacion.pagosAbonos.accion.emisionPago', " + idioma + ")) AS MODO");
-        emisionPago.SELECT("'" + SigaConstants.ESTADO_FACTURA_ENREVISION + "' AS IDESTADO");
+        emisionPago.SELECT("'" + SigaConstants.ESTADO_FACTURA_EN_REVISION + "' AS IDESTADO");
         emisionPago.SELECT("F_SIGA_GETRECURSO_ETIQUETA('facturacion.pagosAbonos.estado.revision', " + idioma + ") AS ESTADO");
         emisionPago.SELECT("0 AS IMPORTE");
         emisionPago.SELECT("fa.IMPTOTAL AS IMPORTE_PENDIENTE");
