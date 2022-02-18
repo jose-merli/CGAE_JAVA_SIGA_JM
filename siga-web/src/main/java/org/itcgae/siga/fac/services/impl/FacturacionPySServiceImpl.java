@@ -2508,6 +2508,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarLineasFactura(FacturaLineaItem item, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
@@ -2526,8 +2527,21 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			Boolean modificarImporte = getParametro("FAC", "MODIFICAR_IMPORTE_UNITARIO", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
 			Boolean modificarIva = getParametro("FAC", "MODIFICAR_IVA", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
 
+			// Buscamos la factura para comprobar que se encuentra en revisión
+			FacFacturaKey facturaKey = new FacFacturaKey();
+			facturaKey.setIdinstitucion(usuario.getIdinstitucion());
+			facturaKey.setIdfactura(item.getIdFactura());
+
+			FacFactura factura = facFacturaExtendsMapper.selectByPrimaryKey(facturaKey);
+
+			if (factura == null)
+				throw new BusinessException("No existe la factura indicada");
+
+			if (!factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION)))
+				throw new BusinessException("La factura no se en encuentra en estado En Revisión");
+
 			FacLineafacturaKey key = new FacLineafacturaKey();
-			key.setIdfactura(item.getIdFactura());
+			key.setIdfactura(factura.getIdfactura());
 			key.setNumerolinea(Long.valueOf(item.getNumeroLinea()));
 			key.setIdinstitucion(usuario.getIdinstitucion());
 
@@ -2554,11 +2568,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				updateItem.setIva(pysTipoivas.get(0).getValor());
 			}
 
-			if (!UtilidadesString.esCadenaVacia(item.getCantidad())) {
-				updateItem.setCantidad(Integer.valueOf(item.getCantidad()));
-			}
-
 			facLineafacturaExtendsMapper.updateByPrimaryKey(updateItem);
+
+			if (!UtilidadesString.esCadenaVacia(item.getPrecioUnitario())
+					|| !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
+				facFacturaExtendsMapper.updateImportesFactura(item.getIdFactura(), usuario.getIdinstitucion(), usuario.getIdusuario());
+			}
 
 			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
 		}

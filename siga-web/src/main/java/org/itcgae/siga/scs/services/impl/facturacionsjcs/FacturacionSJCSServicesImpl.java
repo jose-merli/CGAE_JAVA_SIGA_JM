@@ -1590,7 +1590,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
-            LOGGER.error(e.getStackTrace());
+            LOGGER.error(e.getCause());
             throw e;
         } finally {
             setNadieEjecutando();
@@ -1681,6 +1681,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
+                LOGGER.error(e.getCause());
+                LOGGER.error(e.getMessage());
                 LOGGER.error(e);
                 actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
                         item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
@@ -1892,8 +1894,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     institucion.getIdlenguaje());
 
         } catch (Exception e) {
+            LOGGER.error(e.getCause());
             LOGGER.error(e.getMessage());
-            LOGGER.error(e.getStackTrace());
+            LOGGER.error(e);
             throw new Exception("Error al exportar datos: " + e.getMessage());
         }
     }

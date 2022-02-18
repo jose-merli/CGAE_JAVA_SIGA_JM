@@ -38,7 +38,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //filtros
         abonos.WHERE("f.idinstitucion ="+idInstitucion);
-        abonos.WHERE(" and f.idpagosjg is null");
+        abonos.WHERE("f.idpagosjg is null");
 
         //numero factura
         if(item.getNumeroFactura()!=null) {

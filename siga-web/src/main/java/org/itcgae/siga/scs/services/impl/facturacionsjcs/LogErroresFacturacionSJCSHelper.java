@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -25,6 +26,8 @@ public class LogErroresFacturacionSJCSHelper {
     private static final String SUFIJO_LOG = ".log";
 
     private static final String LOG_ERRORES_FACTURACION = "LogErroresFacturacion";
+
+    private Logger LOGGER = Logger.getLogger(LogErroresFacturacionSJCSHelper.class);
 
     @Autowired
     private GenPropertiesMapper genPropertiesMapper;
@@ -91,6 +94,9 @@ public class LogErroresFacturacionSJCSHelper {
                 pw.printf(TEMPLATE_LOG_ERROR, formatter.format(LocalDateTime.now()), msg);
 
             } catch (IOException e) {
+                LOGGER.error(e.getCause());
+                LOGGER.error(e.getMessage());
+                LOGGER.error(e);
                 throw new FacturacionSJCSException("error en LogErroresFacturacionSJCSHelper: " + e);
             } finally {
                 if (null != fw) {
@@ -134,6 +140,9 @@ public class LogErroresFacturacionSJCSHelper {
                     }
 
                 } catch (IOException e) {
+                    LOGGER.error(e.getCause());
+                    LOGGER.error(e.getMessage());
+                    LOGGER.error(e);
                     throw new FacturacionSJCSException("error en LogErroresFacturacionSJCSHelper: " + e);
                 } finally {
                     if (null != fw) {

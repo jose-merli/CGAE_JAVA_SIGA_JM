@@ -574,7 +574,7 @@ public class SigaConstants {
     public static final String ESTADO_FACTURA_PAGADA = "1";
     public static final String ESTADO_FACTURA_CAJA = "2";
     public static final String ESTADO_FACTURA_BANCO = "5";
-    public static final String ESTADO_FACTURA_ENREVISION = "7";
+    public static final String ESTADO_FACTURA_EN_REVISION = "7";
     public static final String ESTADO_FACTURA_ANULADA = "8";
     public static final String ESTADO_FACTURA_DEVUELTA = "4";
     public static final String ESTADO_FACTURA_LISTA_PARA_FICHERO = "6";
