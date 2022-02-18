@@ -2537,9 +2537,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (factura == null)
 				throw new BusinessException("No existe la factura indicada");
 
-			if (!factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION)))
-				throw new BusinessException("facturacionPyS.facturas.lineas.error.facturaNoRevision");
-
 			FacLineafacturaKey key = new FacLineafacturaKey();
 			key.setIdfactura(factura.getIdfactura());
 			key.setNumerolinea(Long.valueOf(item.getNumeroLinea()));
@@ -2551,29 +2548,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				updateItem.setDescripcion(item.getDescripcion().trim());
 			}
 
-			if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
-				updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
-			}
-
-			if (modificarIva && !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
-				updateItem.setIdtipoiva(Integer.valueOf(item.getIdTipoIVA()));
-
-				PysTipoivaExample tipoivaExample = new PysTipoivaExample();
-				tipoivaExample.createCriteria().andIdtipoivaEqualTo(updateItem.getIdtipoiva());
-
-				List<PysTipoiva> pysTipoivas = pySTipoIvaExtendsMapper.selectByExample(tipoivaExample);
-				if (pysTipoivas == null || pysTipoivas.isEmpty())
-					throw new BusinessException("facturacionPyS.facturas.lineas.error.ivaIncorrecto");
-
-				updateItem.setIva(pysTipoivas.get(0).getValor());
-			}
-
-			facLineafacturaExtendsMapper.updateByPrimaryKey(updateItem);
-
-			if (!UtilidadesString.esCadenaVacia(item.getPrecioUnitario())
-					|| !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
-				facFacturaExtendsMapper.updateImportesFactura(item.getIdFactura(), usuario.getIdinstitucion(), usuario.getIdusuario());
-
+			if (factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION))) {
 				FacHistoricofacturaExample historicofacturaExample = new FacHistoricofacturaExample();
 				historicofacturaExample.createCriteria().andIdfacturaEqualTo(item.getIdFactura()).
 						andIdinstitucionEqualTo(usuario.getIdinstitucion());
@@ -2589,8 +2564,34 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				if (!ultimoEstado.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION)))
 					throw new BusinessException("facturacionPyS.facturas.lineas.error.historicoNoRevision");
 
-				facHistoricofacturaExtendsMapper.updateImportesHistoricoEmisionFactura(ultimoEstado.getIdfactura(), ultimoEstado.getIdhistorico(),
-						ultimoEstado.getIdinstitucion(), usuario.getIdusuario());
+				if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
+					updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
+				}
+
+				if (modificarIva && !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
+					updateItem.setIdtipoiva(Integer.valueOf(item.getIdTipoIVA()));
+
+					PysTipoivaExample tipoivaExample = new PysTipoivaExample();
+					tipoivaExample.createCriteria().andIdtipoivaEqualTo(updateItem.getIdtipoiva());
+
+					List<PysTipoiva> pysTipoivas = pySTipoIvaExtendsMapper.selectByExample(tipoivaExample);
+					if (pysTipoivas == null || pysTipoivas.isEmpty())
+						throw new BusinessException("facturacionPyS.facturas.lineas.error.ivaIncorrecto");
+
+					updateItem.setIva(pysTipoivas.get(0).getValor());
+				}
+
+				facLineafacturaExtendsMapper.updateByPrimaryKey(updateItem);
+
+				if (!UtilidadesString.esCadenaVacia(item.getPrecioUnitario())
+						|| !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
+					facFacturaExtendsMapper.updateImportesFactura(item.getIdFactura(), usuario.getIdinstitucion(), usuario.getIdusuario());
+					facHistoricofacturaExtendsMapper.updateImportesHistoricoEmisionFactura(ultimoEstado.getIdfactura(), ultimoEstado.getIdhistorico(),
+							ultimoEstado.getIdinstitucion(), usuario.getIdusuario());
+				}
+
+			} else {
+				facLineafacturaExtendsMapper.updateByPrimaryKey(updateItem);
 			}
 
 			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
