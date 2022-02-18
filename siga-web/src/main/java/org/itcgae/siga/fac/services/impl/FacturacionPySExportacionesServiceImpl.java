@@ -847,6 +847,13 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             stream.close();
             out.close();
             rdr.close();
+
+            File archivo = new File(rutaFichero);
+
+            if (archivo.exists()) {
+                SIGAHelper.addPerm777(archivo);
+            }
+
         } catch (FileNotFoundException e) {
             throw new BusinessException("facturacion.nuevoFichero.literal.errorAcceso");
         } catch (IOException e) {
