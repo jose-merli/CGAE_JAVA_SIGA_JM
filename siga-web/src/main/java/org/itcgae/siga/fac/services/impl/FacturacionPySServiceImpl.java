@@ -3697,11 +3697,16 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			final String literalProcesado = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
 			genDiccionarioKey.setIdrecurso("factPyS.mensaje.fase.pendiente");
 			final String literalPendienteFase = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
-			final String literarFase1 = "TRATAR FACTURACIÓN";
-			final String literarFase2 = "TRATAR CONFIRMACIÓN";
-			final String literarFase3 = "GENERAR PDFs Y ENVIAR FACTURAS PROGRAMACIÓN";
-			final String literarFase4 = "GENERAR ENVÍOS FACTURAS PENDIENTES";
-			final String literarFase5 = "COMPROBACIÓN TRASPASO FACTURAS";
+			genDiccionarioKey.setIdrecurso("factPyS.literal.proFacAut.fase1");
+			final String literarFase1 = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+			genDiccionarioKey.setIdrecurso("factPyS.literal.proFacAut.fase2");
+			final String literarFase2 = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+			genDiccionarioKey.setIdrecurso("factPyS.literal.proFacAut.fase3");
+			final String literarFase3 = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+			genDiccionarioKey.setIdrecurso("factPyS.literal.proFacAut.fase4");
+			final String literarFase4 = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+			genDiccionarioKey.setIdrecurso("factPyS.literal.proFacAut.fase5");
+			final String literarFase5 = genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
 
 			SimpleDateFormat sdf = new SimpleDateFormat(SigaConstants.DATEST_FORMAT_MIN);
 			String fechaProgramacion = sdf.format(facFacturacionprogramada.getFechaprogramacion());
