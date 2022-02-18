@@ -199,6 +199,8 @@ import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.PysAnticipoletrado;
 import org.itcgae.siga.db.entities.PysLineaanticipo;
+import org.itcgae.siga.db.entities.PysTipoiva;
+import org.itcgae.siga.db.entities.PysTipoivaExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
@@ -2520,46 +2522,40 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacFacturaExtendsMapper.updateByPrimaryKey -> guardando las lineas de una factura");
 
-			GenParametrosKey genKey = new GenParametros();
-			genKey.setIdinstitucion(usuario.getIdinstitucion());
-			genKey.setModulo("FAC");
-
-			genKey.setParametro("MODIFICAR_DESCRIPCION");
-			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarDescripcion = !(parametros == null || parametros.getValor().equals("0"));
-
-			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
-			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarImporteUnitario = !(parametros == null || parametros.getValor().equals("0"));
-
-			genKey.setParametro("MODIFICAR_IVA");
-			parametros = genParametrosMapper.selectByPrimaryKey(genKey);
-			boolean modificarIVA = !(parametros == null || parametros.getValor().equals("0"));
+			Boolean modificarDescripcion = getParametro("FAC", "MODIFICAR_DESCRIPCION", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
+			Boolean modificarImporte = getParametro("FAC", "MODIFICAR_IMPORTE_UNITARIO", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
+			Boolean modificarIva = getParametro("FAC", "MODIFICAR_IVA", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
 
 			FacLineafacturaKey key = new FacLineafacturaKey();
 			key.setIdfactura(item.getIdFactura());
 			key.setNumerolinea(Long.valueOf(item.getNumeroLinea()));
 			key.setIdinstitucion(usuario.getIdinstitucion());
+
 			FacLineafactura updateItem = facLineafacturaExtendsMapper.selectByPrimaryKey(key);
 
-			if (modificarDescripcion && item.getDescripcion() != null) {
-				updateItem.setDescripcion(item.getDescripcion());
+			if (modificarDescripcion && !UtilidadesString.esCadenaVacia(item.getDescripcion())) {
+				updateItem.setDescripcion(item.getDescripcion().trim());
 			}
 
-			if (modificarImporteUnitario && item.getPrecioUnitario() != null) {
+			if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
 				updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
 			}
 
-			if (modificarIVA && item.getTipoIVA() != null) {
+			if (modificarIva && !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
 				updateItem.setIdtipoiva(Integer.valueOf(item.getIdTipoIVA()));
+
+				PysTipoivaExample tipoivaExample = new PysTipoivaExample();
+				tipoivaExample.createCriteria().andIdtipoivaEqualTo(updateItem.getIdtipoiva());
+
+				List<PysTipoiva> pysTipoivas = pySTipoIvaExtendsMapper.selectByExample(tipoivaExample);
+				if (pysTipoivas == null || pysTipoivas.isEmpty())
+					throw new BusinessException("No se encuentra el tipo de IVA indicado");
+
+				updateItem.setIva(pysTipoivas.get(0).getValor());
 			}
 
-			if (item.getCantidad() != null) {
+			if (!UtilidadesString.esCadenaVacia(item.getCantidad())) {
 				updateItem.setCantidad(Integer.valueOf(item.getCantidad()));
-			}
-
-			if (item.getImporteAnticipado() != null) {
-				updateItem.setImporteanticipado(BigDecimal.valueOf(Double.parseDouble(item.getImporteAnticipado())));
 			}
 
 			facLineafacturaExtendsMapper.updateByPrimaryKey(updateItem);
@@ -2573,6 +2569,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarLineasAbono(FacturaLineaItem item, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
@@ -2590,31 +2587,43 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			genKey.setIdinstitucion(usuario.getIdinstitucion());
 			genKey.setModulo("FAC");
 
-			genKey.setParametro("MODIFICAR_DESCRIPCION");
-			boolean modificarDescripcion = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("0");
-
-			genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO");
-			boolean modificarImporteUnitario = !genParametrosMapper.selectByPrimaryKey(genKey).getValor().equals("0");
+			Boolean modificarDescripcion = getParametro("FAC", "MODIFICAR_DESCRIPCION", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
+			Boolean modificarImporte = getParametro("FAC", "MODIFICAR_IMPORTE_UNITARIO", usuario.getIdinstitucion()).equals(SigaConstants.DB_TRUE);
 
 			FacLineaabonoKey key = new FacLineaabonoKey();
 			key.setIdabono(Long.valueOf(item.getIdFactura()));
 			key.setNumerolinea(Long.valueOf(item.getNumeroLinea()));
 			key.setIdinstitucion(usuario.getIdinstitucion());
+
 			FacLineaabono updateItem = facLineaabonoExtendsMapper.selectByPrimaryKey(key);
 
-			if (modificarDescripcion && item.getDescripcion() != null) {
+			// Se actualiza la descripcion
+			if (modificarDescripcion && !UtilidadesString.esCadenaVacia(item.getDescripcion())) {
 				updateItem.setDescripcionlinea(item.getDescripcion());
 			}
 
-			if (modificarImporteUnitario && item.getPrecioUnitario() != null) {
-				updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
-			}
-
-			if (item.getCantidad() != null) {
-				updateItem.setCantidad(Integer.valueOf(item.getCantidad()));
+			if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
+				BigDecimal precioUnitario = new BigDecimal(item.getPrecioUnitario());
+				updateItem.setPreciounitario(precioUnitario.setScale(2, RoundingMode.DOWN));
 			}
 
 			facLineaabonoExtendsMapper.updateByPrimaryKey(updateItem);
+
+			/* Descomentar cuando el procedimiento PROC_SIGA_ACTESTADOABONO exista
+
+			if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
+				Object[] param_in = new Object[3]; // Parametros de entrada del PL
+
+				param_in[0] = usuario.getIdinstitucion();
+				param_in[1] = key.getIdabono();
+				param_in[2] = usuario.getIdusuario();
+				String[] resultado = commons.callPLProcedureFacturacionPyS("{call PROC_SIGA_ACTESTADOABONO(?,?,?,?,?)}", 2, param_in);
+				String codretorno = resultado[0];
+				if (!codretorno.equals(RET_OK))
+					throw new BusinessException("Error al actualizar el estado del abono");
+			}
+
+			 */
 
 			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));
 		}
@@ -3671,6 +3680,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 		FaseFacturacionProgramadaDTO faseFacturacionProgramadaDTO = new FaseFacturacionProgramadaDTO();
+		boolean noHayInformacion = false;
 
 		if (usuario != null) {
 
@@ -3783,6 +3793,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 								fase3.setPuestoEnCola(literalProcesado);
 								fase4.setPuestoEnCola(literalProcesado);
 								fase5.setPuestoEnCola(posicionFase5 + "/" + numTotalFase5);
+							} else {
+								noHayInformacion = true;
 							}
 						}
 					}
@@ -3790,11 +3802,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			}
 
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase1);
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase2);
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase3);
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase4);
-			faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase5);
+			if(noHayInformacion) {
+				Error error = new Error();
+				error.setCode(200);
+				error.setDescription("factPyS.mensaje.info.noDisponible");
+				faseFacturacionProgramadaDTO.setError(error);
+			} else {
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase1);
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase2);
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase3);
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase4);
+				faseFacturacionProgramadaDTO.getFaseFacturacionProgramadaItemList().add(fase5);
+			}
 
 		}
 

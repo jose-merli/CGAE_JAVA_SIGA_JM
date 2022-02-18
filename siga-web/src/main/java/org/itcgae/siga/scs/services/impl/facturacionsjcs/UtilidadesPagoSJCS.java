@@ -598,18 +598,30 @@ public class UtilidadesPagoSJCS {
         if (importeNeto != null && importeNeto.contains(".")) {
             importeNeto = importeNeto.replace(".", ",");
         }
-        LOGGER.debug("Ejecutamos PL aplicarRetencionesJudiciales");
+        LOGGER.debug("Ejecutamos PL aplicarRetencionesJudiciales: Entrada: " + "idInstitucion:" + idInstitucion +
+                "idPagoJg:" + idPagoJg + "idPersonaSociedad:" + idPersonaSociedad +  "importeNeto:" + importeNeto
+                + "idioma:" + idioma );
         // Aplicar las retenciones judiciales
-        String resultado[] = ejecucionPlsPago.ejecutarPLAplicarRetencionesJudiciales(idInstitucion, idPagoJg, idPersonaSociedad, importeNeto, usuMod,
-                idioma);
-        LOGGER.debug("PL ejecutado: "+ resultado.length + "," + resultado[0]);
-        // comprueba si el pl se ha ejecutado correctamente
-        if (!resultado[0].equals("0")) {
-            if (resultado[0].equals("11"))
-                throw new FacturacionSJCSException("Se ha producido un error al calcular el importe de retención LEC. Seguramente no haya smi para el año o no esten configurados los tramos LEC",
-                        "FactSJCS.mantRetencionesJ.plAplicarRetencionesJudiciales.error.tramosLEC");
-            else
-                throw new FacturacionSJCSException("Error al aplicar las retenciones judiciales", "messages.factSJCS.error.retencionesJudi");
+         try{
+            String resultado[] = ejecucionPlsPago.ejecutarPLAplicarRetencionesJudiciales(idInstitucion, idPagoJg, idPersonaSociedad, importeNeto, usuMod,
+                    idioma);
+            if(resultado != null){
+                LOGGER.debug("PL ejecutado: "+ resultado.length + "," + resultado[0]);
+            }else{
+                LOGGER.debug("PL ejecutado: "+ resultado);
+            }
+
+            // comprueba si el pl se ha ejecutado correctamente
+            if (resultado != null && !resultado[0].equals("0")) {
+                if (resultado[0].equals("11"))
+                    throw new FacturacionSJCSException("Se ha producido un error al calcular el importe de retención LEC. Seguramente no haya smi para el año o no esten configurados los tramos LEC",
+                            "FactSJCS.mantRetencionesJ.plAplicarRetencionesJudiciales.error.tramosLEC");
+                else
+                    throw new FacturacionSJCSException("Error al aplicar las retenciones judiciales", "messages.factSJCS.error.retencionesJudi");
+            }
+        }catch(Exception e){
+            LOGGER.error(e.getCause(), e);
+             throw new FacturacionSJCSException("Error al aplicar las retenciones judiciales", "messages.factSJCS.error.retencionesJudi");
         }
 
     }
