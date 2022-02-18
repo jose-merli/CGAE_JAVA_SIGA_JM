@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
 import org.itcgae.siga.db.entities.FacFactura;
@@ -103,5 +104,8 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 
 	@SelectProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "getNextIdHstorico")
 	Short getNextIdHstorico(Short idInstitucion, String idFactura);
+
+	@UpdateProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "updateImportesHistoricoEmisionFactura")
+	int updateImportesHistoricoEmisionFactura(String idFactura, Short idHistorico, Short idInstitucion, Integer idUsuario);
 
 }

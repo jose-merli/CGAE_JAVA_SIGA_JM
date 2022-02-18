@@ -1386,7 +1386,7 @@ public class FacturaAccionesHelper {
             FacHistoricofactura facHistoricoFacturaDevuelta = rellenarHistoricoFactura(facturaComision, usuario);
 
             // EMISIÓN
-            facHistoricoFacturaDevuelta.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_ENREVISION));
+            facHistoricoFacturaDevuelta.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION));
             facHistoricoFacturaDevuelta.setIdtipoaccion(Short.parseShort("1"));
             facHistoricoFacturaDevuelta.setComisionidfactura(facUpdate.getIdfactura());
             facHistoricoFacturaDevuelta.setIdhistorico(

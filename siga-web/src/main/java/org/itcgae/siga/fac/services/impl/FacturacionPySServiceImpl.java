@@ -2573,6 +2573,24 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (!UtilidadesString.esCadenaVacia(item.getPrecioUnitario())
 					|| !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
 				facFacturaExtendsMapper.updateImportesFactura(item.getIdFactura(), usuario.getIdinstitucion(), usuario.getIdusuario());
+
+				FacHistoricofacturaExample historicofacturaExample = new FacHistoricofacturaExample();
+				historicofacturaExample.createCriteria().andIdfacturaEqualTo(item.getIdFactura()).
+						andIdinstitucionEqualTo(usuario.getIdinstitucion());
+				historicofacturaExample.setOrderByClause("idhistorico");
+
+				List<FacHistoricofactura> historico = facHistoricofacturaExtendsMapper.selectByExample(historicofacturaExample);
+
+				if (historico == null || historico.isEmpty())
+					throw new BusinessException("No existen entradas en el histórico de la factura");
+
+				FacHistoricofactura ultimoEstado = historico.get(historico.size() - 1);
+
+				if (!ultimoEstado.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION)))
+					throw new BusinessException("El último elemento del histórico de la factura no se en encuentra En Revisión");
+
+				facHistoricofacturaExtendsMapper.updateImportesHistoricoEmisionFactura(ultimoEstado.getIdfactura(), ultimoEstado.getIdhistorico(),
+						ultimoEstado.getIdinstitucion(), usuario.getIdusuario());
 			}
 
 			updateResponseDTO.setId(String.valueOf(item.getIdFactura()));

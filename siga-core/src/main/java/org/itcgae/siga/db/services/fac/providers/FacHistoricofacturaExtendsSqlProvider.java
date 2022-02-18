@@ -240,25 +240,24 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
 	public String facturasDevueltasEnDisquete(String idDisquetecargos, String idInstitucion) {
 		SQL query = new SQL();
-		SQL subquery = new SQL();
+		SQL join = new SQL();
 
-		subquery.SELECT("MAX(fh2.IDHISTORICO)");
+		join.SELECT("MAX(fh2.IDHISTORICO) IDHISTORICO");
+		join.SELECT("ff2.IDFACTURA");
+		join.FROM("FAC_FACTURAINCLUIDAENDISQUETE ff2");
+		join.INNER_JOIN("FAC_HISTORICOFACTURA fh2 ON (fh2.IDINSTITUCION = ff2.IDINSTITUCION AND fh2.IDFACTURA = ff2.IDFACTURA)");
+		join.WHERE("ff2.IDINSTITUCION = " + idInstitucion + " AND ff2.IDDISQUETECARGOS = " + idDisquetecargos);
+		join.GROUP_BY("ff2.IDFACTURA");
 
-		subquery.FROM("FAC_HISTORICOFACTURA fh2");
 
-		subquery.WHERE("fh2.IDFACTURA = fh.IDFACTURA");
-		subquery.WHERE("fh2.IDDISQUETECARGOS = fh.IDDISQUETECARGOS");
-		subquery.WHERE("fh2.IDINSTITUCION = fh.IDINSTITUCION");
-
-		query.SELECT("ff.*");
+		query.SELECT_DISTINCT("ff.*");
 
 		query.FROM("FAC_HISTORICOFACTURA fh");
+		query.INNER_JOIN("( " + join.toString() + " ) maxhistorico ON (fh.IDFACTURA = maxhistorico.IDFACTURA AND fh.IDHISTORICO = maxhistorico.IDHISTORICO)");
 		query.INNER_JOIN("FAC_FACTURA ff ON(ff.IDFACTURA = fh.IDFACTURA AND ff.IDINSTITUCION = fh.IDINSTITUCION)");
 
-		query.WHERE("fh.IDDISQUETECARGOS = " + idDisquetecargos);
 		query.WHERE("fh.IDINSTITUCION = " + idInstitucion);
-		query.WHERE("fh.ESTADO = 1");
-		query.WHERE("fh.IDHISTORICO != (" + subquery.toString() + ")");
+		query.WHERE("(fh.IDTIPOACCION != 5 OR fh.IDTIPOACCION = 5 AND fh.ESTADO != 1)");
 
 		return query.toString();
 	}
@@ -273,4 +272,31 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
 		return sql.toString();
 	}
+
+	public String updateImportesHistoricoEmisionFactura(String idFactura, Short idHistorico, Short idInstitucion, Integer idUsuario) {
+		SQL sql = new SQL();
+
+		sql.UPDATE("fac_historicofactura");
+
+		sql.SET("imptotalneto = pkg_siga_totalesfactura.totalneto(idinstitucion, idfactura)");
+		sql.SET("imptotaliva = pkg_siga_totalesfactura.totaliva(idinstitucion, idfactura)");
+		sql.SET("imptotal = pkg_siga_totalesfactura.total(idinstitucion, idfactura)");
+		sql.SET("imptotalanticipado = pkg_siga_totalesfactura.totalanticipado(idinstitucion, idfactura)");
+		sql.SET("imptotalpagadoporcaja = pkg_siga_totalesfactura.totalpagadoporcaja(idinstitucion, idfactura)");
+		sql.SET("imptotalpagadosolocaja = pkg_siga_totalesfactura.totalpagadosolocaja(idinstitucion, idfactura)");
+		sql.SET("imptotalpagadosolotarjeta = pkg_siga_totalesfactura.totalpagadosolotarjeta(idinstitucion, idfactura)");
+		sql.SET("imptotalpagadoporbanco = pkg_siga_totalesfactura.totalpagadoporbanco(idinstitucion, idfactura)");
+		sql.SET("imptotalpagado = pkg_siga_totalesfactura.totalpagado(idinstitucion, idfactura)");
+		sql.SET("imptotalporpagar = pkg_siga_totalesfactura.pendienteporpagar(idinstitucion, idfactura)");
+		sql.SET("imptotalcompensado = pkg_siga_totalesfactura.totalcompensado(idinstitucion, idfactura)");
+		sql.SET("fechamodificacion = sysdate");
+		sql.SET("usumodificacion = " + idUsuario);
+
+		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE("idfactura = '" + idFactura + "'");
+		sql.WHERE("idhistorico = '" + idHistorico + "'");
+
+		return sql.toString();
+	}
+
 }
