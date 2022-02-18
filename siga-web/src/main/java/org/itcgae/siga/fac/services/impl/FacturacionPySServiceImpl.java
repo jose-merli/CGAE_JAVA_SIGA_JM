@@ -2538,7 +2538,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				throw new BusinessException("No existe la factura indicada");
 
 			if (!factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION)))
-				throw new BusinessException("La factura no se en encuentra en estado En Revisión");
+				throw new BusinessException("facturacionPyS.facturas.lineas.error.facturaNoRevision");
 
 			FacLineafacturaKey key = new FacLineafacturaKey();
 			key.setIdfactura(factura.getIdfactura());
@@ -2563,7 +2563,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				List<PysTipoiva> pysTipoivas = pySTipoIvaExtendsMapper.selectByExample(tipoivaExample);
 				if (pysTipoivas == null || pysTipoivas.isEmpty())
-					throw new BusinessException("No se encuentra el tipo de IVA indicado");
+					throw new BusinessException("facturacionPyS.facturas.lineas.error.ivaIncorrecto");
 
 				updateItem.setIva(pysTipoivas.get(0).getValor());
 			}
@@ -2582,12 +2582,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				List<FacHistoricofactura> historico = facHistoricofacturaExtendsMapper.selectByExample(historicofacturaExample);
 
 				if (historico == null || historico.isEmpty())
-					throw new BusinessException("No existen entradas en el histórico de la factura");
+					throw new BusinessException("facturacionPyS.facturas.lineas.error.noHistorico");
 
 				FacHistoricofactura ultimoEstado = historico.get(historico.size() - 1);
 
 				if (!ultimoEstado.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION)))
-					throw new BusinessException("El último elemento del histórico de la factura no se en encuentra En Revisión");
+					throw new BusinessException("facturacionPyS.facturas.lineas.error.historicoNoRevision");
 
 				facHistoricofacturaExtendsMapper.updateImportesHistoricoEmisionFactura(ultimoEstado.getIdfactura(), ultimoEstado.getIdhistorico(),
 						ultimoEstado.getIdinstitucion(), usuario.getIdusuario());

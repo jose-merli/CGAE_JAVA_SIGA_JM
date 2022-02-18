@@ -278,9 +278,6 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
 		sql.UPDATE("fac_historicofactura");
 
-		sql.SET("imptotalneto = pkg_siga_totalesfactura.totalneto(idinstitucion, idfactura)");
-		sql.SET("imptotaliva = pkg_siga_totalesfactura.totaliva(idinstitucion, idfactura)");
-		sql.SET("imptotal = pkg_siga_totalesfactura.total(idinstitucion, idfactura)");
 		sql.SET("imptotalanticipado = pkg_siga_totalesfactura.totalanticipado(idinstitucion, idfactura)");
 		sql.SET("imptotalpagadoporcaja = pkg_siga_totalesfactura.totalpagadoporcaja(idinstitucion, idfactura)");
 		sql.SET("imptotalpagadosolocaja = pkg_siga_totalesfactura.totalpagadosolocaja(idinstitucion, idfactura)");
