@@ -525,7 +525,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "case when nProd = 1 then MAX(prodIns.descripcion) else MAX(prodIns.descripcion) || '...' end as concepto\r\n"
 				+ " , gen.*\r\n"
 				+ "from (\r\n"+sql.toString()+") gen\r\n"
-						+ "INNER JOIN PYS_productosSolicitados prodSol on prodSol.idinstitucion=2005 and prodSol.idpeticion = gen.nsolicitud\r\n"
+						+ "INNER JOIN PYS_productosSolicitados prodSol on prodSol.idinstitucion="+idInstitucion+" and prodSol.idpeticion = gen.nsolicitud\r\n"
 						+ "INNER JOIN pys_productosinstitucion prodIns on prodIns.idinstitucion = prodSol.idinstitucion and prodIns.idproducto = prodSol.idProducto \r\n"
 						+ "and prodIns.idTipoProducto = prodSol.idTipoProducto and prodIns.idProductoInstitucion = prodSol.idProductoInstitucion\r\n"
 						+ "group by gen.fechasolicitud, gen.nsolicitud, gen.idpersona, gen.nidentificacion, gen.ncolegiado, gen.apellidosnombre, gen.nprod, gen.idformapago, gen.desformapago, \r\n"
