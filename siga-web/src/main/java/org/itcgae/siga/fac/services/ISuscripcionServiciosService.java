@@ -10,8 +10,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 public interface ISuscripcionServiciosService {
 
 	public ListaSuscripcionesDTO getListaSuscripciones(HttpServletRequest request, FiltrosSuscripcionesItem peticion);
-	
-	public void ejecutaSuscripcionesAutomaticas();
 
 	void ejecutaRevisionAutomatica();
 
