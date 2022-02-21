@@ -43,7 +43,6 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 	@Autowired
 	private ScsTipodocumentoEjgExtendsMapper scsDocumentacionEjgExtendsMapper;
 
-
 	@Autowired
 	private ScsDocumentoejgExtendsMapper scsDocumentoEjgExtendsMapper;
 	@Autowired
@@ -81,6 +80,13 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 							"searchDocumento() / scsDocumentacionEjgExtendsMapper.selectTipoSolicitud() -> Entrada a scsDocumentacionEjgExtendsMapper para obtener los documentos");
 
 					documentacionEjgItem.setIdInstitucion(idInstitucion);
+					
+					//Tratamiento apostrofes
+					documentacionEjgItem.setabreviaturaTipoDoc(this.tratamientoApostrofes(documentacionEjgItem.getabreviaturaTipoDoc()));
+					documentacionEjgItem.setdescripcionTipoDoc(this.tratamientoApostrofes(documentacionEjgItem.getdescripcionTipoDoc()));
+					documentacionEjgItem.setAbreviatura(this.tratamientoApostrofes(documentacionEjgItem.getAbreviatura()));
+					documentacionEjgItem.setdescripcionDoc(this.tratamientoApostrofes(documentacionEjgItem.getdescripcionDoc()));
+					
 					documentacionEjgItems = scsDocumentacionEjgExtendsMapper.searchDocumento(documentacionEjgItem,
 							usuarios.get(0).getIdlenguaje());
 
@@ -179,6 +185,20 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 		LOGGER.info("searchCourt() -> Salida del servicio para obtener los documentos");
 		return documentacionEjgDTO;
 	}
+	
+	private String tratamientoApostrofes (String cadena) {
+		if(cadena != null ) {
+			
+			if (cadena.contains("'")) {
+				return cadena.substring(0, cadena.indexOf("'")) + "'" + cadena.substring(cadena.lastIndexOf("'"), cadena.length());
+			}else {
+				return cadena;
+			}
+		
+		}else {
+			return "";
+		}
+	}
 
 	@Override
 	@Transactional
@@ -231,6 +251,8 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 						documentoejg.setIdinstitucion((short) documentacionejgItem.getIdInstitucion());
 						documentoejg.setAbreviatura(documentacionejgItem.getabreviaturaTipoDoc());
 						documentoejg.setDescripcion(documentacionejgItem.getCodigodescripcion());
+						documentoejg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						documentoejg.setFechamodificacion(new Date());
 
 						LOGGER.info(
 								"deleteAreas() / scsDocumentacionEjgMapper.deleteByExample() -> Entrada a scsDocumentacionEjgMapper para eliminar los tipo Documentos seleccionados");
@@ -381,6 +403,8 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 					tipoDoc.setAbreviatura(documentacionejgItem.getabreviaturaTipoDoc());
 					tipoDoc.setCodigoext(documentacionejgItem.getCodigoExt());
+					tipoDoc.setUsumodificacion(usuario.getIdusuario());
+					tipoDoc.setFechamodificacion(new Date());
 					tipoDoc.setIdinstitucion(idInstitucion);
 
 					LOGGER.info(
@@ -501,6 +525,8 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 					tipoDoc.setAbreviatura(documentacionejgItem.getabreviaturaTipoDoc());
 					tipoDoc.setCodigoext(documentacionejgItem.getCodigoExt());
 					tipoDoc.setIdinstitucion(idInstitucion);
+					tipoDoc.setUsumodificacion(usuario.getIdusuario());
+					tipoDoc.setFechamodificacion(new Date());
 
 					LOGGER.info(
 							"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Entrada a scsDocumentacionEjgExtendsMapper para insertar un nuevo documento");
@@ -725,6 +751,9 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 							documentoejg.setFechabaja(null);
 
 						}
+						
+						documentoejg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						documentoejg.setFechamodificacion(new Date());
 
 						LOGGER.info(
 								"deleteAreas() / scsDocumentoEjgExtendsMapper.deleteByExample() -> Entrada a scsDocumentoEjgExtendsMapper para eliminar los  Documentos seleccionados");
@@ -795,14 +824,18 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 						ScsDocumentoejg documento = new ScsDocumentoejg();
 						documento.setIddocumentoejg(Short.valueOf(documentoItem.getIdDocumento()));
-						documento.setCodigoext(documentoItem.getCodigoExt());
 						documento.setIdtipodocumentoejg(Short.valueOf(documentoItem.getIdTipoDocumento()));
 						documento.setIdinstitucion(idInstitucion);
+						
 						documento.setAbreviatura(documentoItem.getAbreviatura());
-
+						documento.setCodigoext(documentoItem.getCodigoExt());
+						documento.setUsumodificacion(usuarios.get(0).getIdusuario());
+						documento.setFechamodificacion(new Date());
+					
 						GenRecursosCatalogosExample example = new GenRecursosCatalogosExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdlenguajeEqualTo(usuarios.get(0).getIdlenguaje())
 								.andIdrecursoEqualTo(documentoItem.getCodigodescripcion());
+						
 						GenRecursosCatalogos gen = genRecursosCatalogosExtendsMapper.selectByExample(example).get(0);
 						gen.setDescripcion(documentoItem.getdescripcionDoc());
 
@@ -935,6 +968,8 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 						nuevoDoc.setCodigoext(documentacionejgItem.getCodigoExt());
 						nuevoDoc.setIdinstitucion(idInstitucion);
 						nuevoDoc.setIdtipodocumentoejg(Short.valueOf(documentacionejgItem.getIdTipoDocumento()));
+						nuevoDoc.setUsumodificacion(usuario.getIdusuario());
+						nuevoDoc.setFechamodificacion(new Date());
 
 						LOGGER.info(
 								"createTipoDoc() / scsDocumentoEjgExtendsMapper.insert() -> Entrada a scsDocumentacionEjgExtendsMapper para insertar un nuevo documento");
