@@ -449,12 +449,17 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 	}
 
 	public String isConsejo(String idInstitucion) {
+		SQL superQuery = new SQL();
 		SQL sql = new SQL();
 		sql.SELECT("IDINSTITUCION");
 		sql.SELECT("NOMBRE");
 		sql.FROM("CEN_INSTITUCION");
-		sql.WHERE("CEN_INST_IDINSTITUCION = '2000' AND IDINSTITUCION = '" + idInstitucion+"'");
-		return sql.toString();
+		sql.WHERE("IDINSTITUCION = 2000 OR (IDINSTITUCION > 3000 AND IDINSTITUCION < 3500)");
+		superQuery.SELECT("IDINSTITUCION");
+		superQuery.SELECT("NOMBRE");
+		superQuery.FROM("(" + sql + ")");
+		superQuery.WHERE("IDINSTITUCION = " + idInstitucion);
+		return superQuery.toString();
 	}
 
 	public String getInstitucionesConsejo(String idInstitucion) {

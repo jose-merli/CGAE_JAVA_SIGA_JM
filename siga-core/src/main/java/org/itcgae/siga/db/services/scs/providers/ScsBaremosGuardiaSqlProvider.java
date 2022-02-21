@@ -323,12 +323,12 @@ public class ScsBaremosGuardiaSqlProvider {
 				if(!facturaciones.equals("0")) {
 					sql.WHERE("hit.idfacturacion IN( " + facturaciones +")");
 				}
-				if(baremosGuardiaItem.isHistorico() == false) {
+
+				if(!baremosGuardiaItem.isHistorico()) {
 					sql.WHERE("gua.fechabaja is null");
-				}else {
-					sql.WHERE("gua.fechabaja is not null");
 				}
-				//sql.WHERE("rownum <= 200");
+
+				sql.WHERE("rownum <= 200");
 				
 				sql.GROUP_BY("hit.idinstitucion,"
 						+ "    hit.idturno,"
