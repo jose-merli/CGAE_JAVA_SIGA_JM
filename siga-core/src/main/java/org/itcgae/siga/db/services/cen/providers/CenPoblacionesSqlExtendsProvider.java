@@ -24,22 +24,26 @@ public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
 		
 		SQL sql = new SQL();
 
-		sql.SELECT("IDPOBLACION");
-		sql.SELECT("NOMBRE");
-		sql.SELECT("IDPROVINCIA");
-		sql.SELECT("FECHAMODIFICACION");
-		sql.SELECT("USUMODIFICACION");
-		sql.SELECT("IDPARTIDO");
-		sql.SELECT("CODIGOEXT");
-		sql.SELECT("INE");
-		sql.SELECT("IDPOBLACIONMUNICIPIO");
-		sql.SELECT("PRIORIDAD");	
+		sql.SELECT_DISTINCT("poblacion.IDPOBLACION");
+		sql.SELECT("poblacion.NOMBRE");
+		sql.SELECT("poblacion.IDPROVINCIA");
+		sql.SELECT("poblacion.FECHAMODIFICACION");
+		sql.SELECT("poblacion.USUMODIFICACION");
+		sql.SELECT("poblacion.IDPARTIDO");
+		sql.SELECT("poblacion.CODIGOEXT");
+		sql.SELECT("poblacion.INE");
+		sql.SELECT("poblacion.IDPOBLACIONMUNICIPIO");
+		sql.SELECT("poblacion.PRIORIDAD");	
 		
-		sql.FROM("CEN_POBLACIONES");
+		sql.FROM("CEN_POBLACIONES poblacion");
+		sql.FROM("scs_juzgado juzgado");
+		
 		if(!UtilidadesString.esCadenaVacia(idProvincia)) {
-			sql.WHERE("IDPROVINCIA ='" + idProvincia + "'");
+			sql.WHERE("poblacion.IDPROVINCIA ='" + idProvincia + "'");
 		}
-		sql.WHERE(filtroTextoBusquedas("NOMBRE", filtro));
+		sql.WHERE(filtroTextoBusquedas("poblacion.NOMBRE", filtro));
+		sql.WHERE("poblacion.idpoblacion = juzgado.idpoblacion");
+		
 		sql.ORDER_BY("PRIORIDAD, NOMBRE");
 
 		return sql.toString();

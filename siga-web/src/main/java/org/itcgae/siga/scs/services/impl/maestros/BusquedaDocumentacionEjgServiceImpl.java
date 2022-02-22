@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.DocumentacionEjgDTO;
 import org.itcgae.siga.DTOs.scs.DocumentacionEjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
@@ -82,10 +83,10 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 					documentacionEjgItem.setIdInstitucion(idInstitucion);
 					
 					//Tratamiento apostrofes
-					documentacionEjgItem.setabreviaturaTipoDoc(this.tratamientoApostrofes(documentacionEjgItem.getabreviaturaTipoDoc()));
-					documentacionEjgItem.setdescripcionTipoDoc(this.tratamientoApostrofes(documentacionEjgItem.getdescripcionTipoDoc()));
-					documentacionEjgItem.setAbreviatura(this.tratamientoApostrofes(documentacionEjgItem.getAbreviatura()));
-					documentacionEjgItem.setdescripcionDoc(this.tratamientoApostrofes(documentacionEjgItem.getdescripcionDoc()));
+					documentacionEjgItem.setabreviaturaTipoDoc(UtilidadesString.tratamientoApostrofes(documentacionEjgItem.getabreviaturaTipoDoc()));
+					documentacionEjgItem.setdescripcionTipoDoc(UtilidadesString.tratamientoApostrofes(documentacionEjgItem.getdescripcionTipoDoc()));
+					documentacionEjgItem.setAbreviatura(UtilidadesString.tratamientoApostrofes(documentacionEjgItem.getAbreviatura()));
+					documentacionEjgItem.setdescripcionDoc(UtilidadesString.tratamientoApostrofes(documentacionEjgItem.getdescripcionDoc()));
 					
 					documentacionEjgItems = scsDocumentacionEjgExtendsMapper.searchDocumento(documentacionEjgItem,
 							usuarios.get(0).getIdlenguaje());
@@ -184,20 +185,6 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 		}
 		LOGGER.info("searchCourt() -> Salida del servicio para obtener los documentos");
 		return documentacionEjgDTO;
-	}
-	
-	private String tratamientoApostrofes (String cadena) {
-		if(cadena != null ) {
-			
-			if (cadena.contains("'")) {
-				return cadena.substring(0, cadena.indexOf("'")) + "'" + cadena.substring(cadena.lastIndexOf("'"), cadena.length());
-			}else {
-				return cadena;
-			}
-		
-		}else {
-			return "";
-		}
 	}
 
 	@Override

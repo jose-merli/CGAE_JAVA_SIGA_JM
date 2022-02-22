@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.JuzgadoDTO;
 import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsJuzgado;
@@ -68,6 +69,9 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 				LOGGER.info(
 						"searchCourt() / scsJuzgadoExtendsMapper.selectTipoSolicitud() -> Entrada a scsJuzgadoExtendsMapper para obtener los juzgados");
 
+				//Tratamiento apostrofes
+				juzgadoItem.setNombre(UtilidadesString.tratamientoApostrofes(juzgadoItem.getNombre()));
+				
 				juzgadoItems = scsJuzgadoExtendsMapper.searchCourt(juzgadoItem, idInstitucion);
 
 				LOGGER.info(

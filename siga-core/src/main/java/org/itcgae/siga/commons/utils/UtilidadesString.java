@@ -853,5 +853,19 @@ public class UtilidadesString {
 		sSalida = sSalida.replaceAll("\n", "<BR>");
 		return sSalida;
 	}
+	
+	public static String tratamientoApostrofes (String cadena) {
+		if(cadena != null ) {
+			
+			if (cadena.contains("'")) {
+				return cadena.substring(0, cadena.indexOf("'")) + "'" + cadena.substring(cadena.lastIndexOf("'"), cadena.length());
+			}else {
+				return cadena;
+			}
+		
+		}else {
+			return "";
+		}
+	}
 
 }
