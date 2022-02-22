@@ -149,8 +149,14 @@ public class ServiciosController {
 	//Crea y edita en la tabla pys_preciosservicios usando la informacion de la tarjeta precios en la ficha servicio pantalla servicios en facturacion
 	@PostMapping(value="/pys/crearEditarPrecios")
 	ResponseEntity<InsertResponseDTO> crearEditarPrecios(@RequestBody FichaTarjetaPreciosDTO listaPrecios, HttpServletRequest request){
-		InsertResponseDTO response = serviciosService.crearEditarPrecios(listaPrecios, request);
-		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		InsertResponseDTO response = new InsertResponseDTO();
+		try {
+			response = serviciosService.crearEditarPrecios(listaPrecios, request);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.error(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	//Elimina el/los registro de precios en pys_preciosservicios de un servicio.
