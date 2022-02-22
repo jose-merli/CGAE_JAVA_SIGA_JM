@@ -33,7 +33,7 @@ public interface IServiciosService {
 	public DeleteResponseDTO borrarSuscripcionesBajas(BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request);
 	public FichaTarjetaPreciosDTO detalleTarjetaPrecios(HttpServletRequest request, ServicioDetalleDTO servicio);
 	public ComboDTO comboPeriodicidad(HttpServletRequest request);
-	public InsertResponseDTO crearEditarPrecios(FichaTarjetaPreciosDTO listaPrecios, HttpServletRequest request);
+	public InsertResponseDTO crearEditarPrecios(FichaTarjetaPreciosDTO listaPrecios, HttpServletRequest request) throws Exception;
 	public DeleteResponseDTO eliminarPrecio(FichaTarjetaPreciosDTO precios, HttpServletRequest request);
 	public ComboPreciosSuscripcionDTO comboPreciosServPers(HttpServletRequest request, Long idPersona, int idServicio,
 			int idTipoServicios, int idServiciosInstitucion);

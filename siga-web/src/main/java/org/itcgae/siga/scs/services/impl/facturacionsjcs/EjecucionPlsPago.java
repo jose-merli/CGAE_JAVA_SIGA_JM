@@ -249,12 +249,17 @@ public class EjecucionPlsPago {
             param_in[1] = fechaPago;
 
             resultado = callPLProcedure("{call PROC_FACSJCS_DESCIERREPAGO (?,?,?,?)}", 2, param_in);
-
+            LOGGER.info("Resultado del procedimiento PROC_FACSJCS_DESCIERREPAGO: " + resultado);
+            for(int i = 0; i < resultado.length; i++){
+                LOGGER.info("Resultado["+i+"]: " + resultado[i]);
+            }
             if (!resultado[0].equalsIgnoreCase("0")) {
                 LOGGER.error("ejecutarPLDeshacerCierre -> Error en PL = " + (String) resultado[1]);
             }
 
         } catch (Exception e) {
+            LOGGER.error(e.getCause());
+            e.printStackTrace();
             throw new Exception("Error al ejecutar el PL de deshacer cierre", e);
         }
 
