@@ -59,14 +59,17 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 	}
 	
 	//Obtiene los datos del combo categoria de productos (PYS_TIPOSPRODUCTOS)
-	public String comboTiposProductos(String idioma) {
+	public String comboTiposProductos(Short idInstitucion,String idioma) {
 		SQL sql = new SQL();
 		
-		sql.SELECT("IDTIPOPRODUCTO AS ID");
+		/*sql.SELECT("IDTIPOPRODUCTO AS ID");
 		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
-		
-		sql.FROM("PYS_TIPOSPRODUCTOS");
-		
+		sql.FROM("PYS_TIPOSPRODUCTOS");	
+		sql.ORDER_BY("DESCRIPCION");*/
+		sql.SELECT_DISTINCT("pp.IDTIPOPRODUCTO AS ID");
+		sql.SELECT("(select  f_siga_getrecurso (ps.DESCRIPCION,'" + idioma + "') from  PYS_TIPOSPRODUCTOS ps where ps.IDTIPOPRODUCTO = pp.IDTIPOPRODUCTO )DESCRIPCION");
+		sql.FROM("PYS_PRODUCTOS pp");
+		sql.WHERE("pp.idinstitucion = " + idInstitucion);
 		sql.ORDER_BY("DESCRIPCION");
 		
 		return sql.toString();

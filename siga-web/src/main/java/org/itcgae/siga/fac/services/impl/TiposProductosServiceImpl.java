@@ -195,7 +195,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					List<ComboItem> listaComboTiposProductos = pysTiposProductosExtendsMapper
-							.comboTiposProductos(idioma);
+							.comboTiposProductos(idInstitucion,idioma);
 
 					LOGGER.info(
 							"searchTiposProductos() / pysTiposProductosExtendsMapper.comboTiposProductos() -> Salida de pysTiposProductosExtendsMapper para recuperar el combo de tipos de productos");

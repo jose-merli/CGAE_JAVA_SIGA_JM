@@ -32,6 +32,9 @@ public interface PysServiciosinstitucionExtendsMapper extends PysServiciosinstit
 		@Result(column = "IDSERVICIOSINSTITUCION", property = "newId", jdbcType = JdbcType.VARCHAR),
 	})
 	NewIdDTO selectIdServicioinstitucionByIdServicio(Short idInstitucion, Long idServicio);
+
+	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "existsDescription")
+	long existsDescription(Long idServicio, Long idServiciosInstitucion, Short idTipoServicios, Short idInstitucion, String descripcion);
 	
 	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "getIndiceMaxServicio")
 	@Results({ 

@@ -47,7 +47,7 @@ public class FoUtils
      * @since 1.1.1
      */
     public static void convertFO2PDF( File fo, File pdf, String resourceDir )
-        throws TransformerException, SAXException, IOException
+        throws TransformerException
     {
         try ( OutputStream out = new BufferedOutputStream( new FileOutputStream( pdf ) ) )
         {
