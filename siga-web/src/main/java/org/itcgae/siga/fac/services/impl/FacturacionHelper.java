@@ -170,8 +170,11 @@ public class FacturacionHelper {
 
             // Genero una carpeta con las firmas
             String sRutaFirmas = filePDF.getParentFile().getPath() + File.separator + "firmas";
+
             File fRutaFirmas = new File(sRutaFirmas);
-            SIGAHelper.mkdirs(sRutaFirmas);
+
+            fRutaFirmas.mkdirs();
+            SIGAHelper.addPerm777(fRutaFirmas);
 
             if (!fRutaFirmas.canWrite()) {
                 throw new Exception("El path donde almacenar las facturas no tiene los permisos adecuados.");
@@ -227,7 +230,9 @@ public class FacturacionHelper {
                     + File.separator + facFactura.getIdinstitucion() + File.separator + idSerieIdProgramacion;
 
             File rutaPDF = new File(rutaAlmacen);
-            SIGAHelper.mkdirs(rutaAlmacen);
+
+            rutaPDF.mkdirs();
+            SIGAHelper.addPerm777(rutaPDF);
 
             if (!rutaPDF.canWrite()) {
                 throw new Exception("El path donde almacenar las facturas no tiene los permisos adecuados.");
@@ -299,8 +304,15 @@ public class FacturacionHelper {
 
             //Crea la ruta temporal
             rutaTmp = new File(rutaServidorTmp);
-            SIGAHelper.mkdirs(rutaServidorTmp);
             ficheroFOP = new File(rutaTmp + File.separator + nombreFicheroPDF + System.currentTimeMillis() + ".fo");
+
+            try {
+                ficheroFOP.getParentFile().mkdirs();
+                ficheroFOP.createNewFile();
+                SIGAHelper.addPerm777(ficheroFOP);
+            } catch (IOException ioe) {
+                throw new Exception("Error al crear el fichero de firmas");
+            }
 
             // Generacion del fichero .FOP para este usuario a partir de la plantilla .FO
             LOGGER.info("ANTES DE REEMPLAZAR LOS DATOS DE LA PLANTILLA.");
@@ -310,6 +322,15 @@ public class FacturacionHelper {
 
             //Crea el fichero. Si no existe el directorio de la institucion para la descarga lo crea.
             ficheroPDF = new File(rutaServidorDescargas + File.separator + nombreFicheroPDF + ".pdf");
+
+            try {
+                ficheroPDF.getParentFile().mkdirs();
+                ficheroPDF.createNewFile();
+                SIGAHelper.addPerm777(ficheroPDF);
+            } catch (IOException ioe) {
+                throw new Exception("Error al crear el fichero de firmas");
+            }
+
             LOGGER.info("RUTA DONDE SE UBICAR EL INFORME. " + ficheroPDF);
             LOGGER.info("ANTES DE GENERAR EL PDF.");
             FoUtils.convertFO2PDF(ficheroFOP, ficheroPDF, rutaTmp.getParent());
@@ -760,7 +781,6 @@ public class FacturacionHelper {
         return nombre;
     }
 
-
     public String getMensajeIdioma(String idLenguaje, String idRecurso) {
 
         GenRecursosKey genRecursosKey = new GenRecursosKey();
@@ -824,7 +844,6 @@ public class FacturacionHelper {
             throw new Exception("No es posible leer el fichero.", e);
         }
     }
-
 
     private String validarNombreFichero(String nombreFichero) {
 
