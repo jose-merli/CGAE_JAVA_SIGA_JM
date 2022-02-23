@@ -22,6 +22,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO2;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IProductosService;
 import org.itcgae.siga.fac.services.IServiciosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,8 +77,11 @@ public class ServiciosController {
 			 response = serviciosService.nuevoServicio(servicio, request);
 			
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		}catch(Exception e){
-			response.error(UtilidadesString.creaError(e.toString()));
+		} catch(BusinessException e) {
+			response.error(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch(Exception e) {
+			response.error(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
 	}
@@ -85,8 +89,18 @@ public class ServiciosController {
 	//Servicio que edita el registro en pys_serviciosinstitucion (tarjeta datos generales ficha servicio pantalla servicios en facturacion)
 	@PostMapping(value="/pys/editarServicio")
 	ResponseEntity<DeleteResponseDTO> editarServicio(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
-		DeleteResponseDTO response = serviciosService.editarServicio(servicio, request);
-		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		DeleteResponseDTO response = new DeleteResponseDTO();
+		try {
+			response = serviciosService.editarServicio(servicio, request);
+
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} catch(BusinessException e) {
+			response.error(UtilidadesString.creaError(e.getMessage()));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch(Exception e) {
+			response.error(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	//Trae toda la informacion de las distintas tarjetas de ficha servicio en pantalla servicios en facturacion necesaria al entrar por editar
