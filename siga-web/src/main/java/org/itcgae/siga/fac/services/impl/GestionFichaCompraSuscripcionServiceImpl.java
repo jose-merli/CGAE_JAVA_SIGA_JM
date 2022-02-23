@@ -2060,6 +2060,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			
 									
 									compra.setFechabaja(new Date());
+									compra.setFecha(new Date());
 									LOGGER.info(
 											"anularPeticion() / pysCompraMapper.updateByPrimaryKey() -> Entrada a pysCompraMapper para introducir la fecha de anulacion de la compra asociada a una peticion");
 									
