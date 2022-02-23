@@ -34,6 +34,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.PysFormapagoproducto;
@@ -45,6 +46,7 @@ import org.itcgae.siga.db.entities.PysPreciosserviciosKey;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
+import org.itcgae.siga.db.entities.PysServiciosinstitucionExample;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoserviciosMapper;
 import org.itcgae.siga.db.mappers.PysPreciosserviciosMapper;
@@ -56,6 +58,7 @@ import org.itcgae.siga.db.services.fac.mappers.PySTiposServiciosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysPreciosserviciosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosinstitucionExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IServiciosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -371,131 +374,139 @@ public class ServiciosServiceImpl implements IServiciosService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
+			LOGGER.info(
+					"nuevoServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"nuevoServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
 				LOGGER.info(
-						"nuevoServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"nuevoServicio() / pysServiciosInstitucionMapper.nuevoServicio() -> Entrada a pysServiciosInstitucionMapper para crear un servicio");
 
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				NewIdDTO idOrdenacion = pysServiciosInstitucionExtendsMapper.getIndiceMaxProducto(servicio, idInstitucion);
+				PysServiciosinstitucion servicioInstitucion = new PysServiciosinstitucion();
 
-				LOGGER.info(
-						"nuevoServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				servicioInstitucion.setIdinstitucion(idInstitucion);
+				servicioInstitucion.setIdtiposervicios((short) servicio.getIdtiposervicios());
+				servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
+				servicioInstitucion.setIdserviciosinstitucion(Long.parseLong(idOrdenacion.getNewId()));
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"nuevoServicio() / pysServiciosInstitucionMapper.nuevoServicio() -> Entrada a pysServiciosInstitucionMapper para crear un servicio");
-
-					NewIdDTO idOrdenacion = pysServiciosInstitucionExtendsMapper.getIndiceMaxProducto(servicio, idInstitucion);
-					PysServiciosinstitucion servicioInstitucion = new PysServiciosinstitucion();
-			
-					servicioInstitucion.setIdinstitucion(idInstitucion);
-					servicioInstitucion.setIdtiposervicios((short) servicio.getIdtiposervicios());
-					servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
-					servicioInstitucion.setIdserviciosinstitucion(Long.parseLong(idOrdenacion.getNewId()));
-					
-					servicioInstitucion.setDescripcion(servicio.getDescripcion());
-					servicioInstitucion.setCuentacontable(servicio.getCuentacontable());
-					servicioInstitucion.setSolicitarbaja(servicio.getPermitirbaja());
-					servicioInstitucion.setSolicitaralta(servicio.getPermitiralta());
-					servicioInstitucion.setAutomatico(servicio.getAutomatico());
-					servicioInstitucion.setIniciofinalponderado("P");
-					servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
-					servicioInstitucion.setNofacturable("1");
-					
-					if(servicio.getIdconsulta() != 0) {
-						String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
-						criterios = criterios.replace("<SELECT>", "");
-						criterios = criterios.replace("</SELECT>", "");
-						criterios = criterios.replace("<FROM>", "");
-						criterios = criterios.replace("</FROM>", "");
-						criterios = criterios.replace("<WHERE>", "");
-						criterios = criterios.replace("</WHERE>", "");
-
-						servicioInstitucion.setCriterios(criterios);
-					}
-									
-					servicioInstitucion.setFechabaja(null);
-					servicioInstitucion.setFechamodificacion(new Date());
-			
-					if(servicio.getCodigoext() != null) {
-						servicioInstitucion.setCodigoext(servicio.getCodigoext());
-					}else {  
-						servicioInstitucion.setCodigoext(servicio.getIdtiposervicios() + "|" + servicio.getIdservicio() + "|" + servicioInstitucion.getIdserviciosinstitucion());
-					}
-					
-					servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-					status = pysServiciosInstitucionMapper.insertSelective(servicioInstitucion);			
-					
-					if(status == 0) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						throw new Exception("No se ha podido crear el registro en PYS_SERVICIOSINSTITUCION");
-					}else if(status == 1) {
-						insertResponseDTO.setStatus(SigaConstants.OK);
-					}
-					
-					//Por defecto, al crear un Servicio, se creará una línea de Precio CERO, periodo MENSUAL y sin condiciones.
-					if(status == 1) {
-						LOGGER.info(
-								"nuevoServicio() / pysPreciosServiciosMapper -> Entrada a pysPreciosServiciosMapper para crear el precio por defecto del servicio");
-						
-						PysPreciosservicios pysPreciosServicios = new PysPreciosservicios();
-						
-						pysPreciosServicios.setIdinstitucion(idInstitucion);
-						pysPreciosServicios.setIdtiposervicios((short) servicio.getIdtiposervicios());
-						pysPreciosServicios.setIdservicio ((long) servicio.getIdservicio());
-						pysPreciosServicios.setIdserviciosinstitucion(Long.parseLong(idOrdenacion.getNewId()));
-						pysPreciosServicios.setIdperiodicidad((short) 1);//Mensual
-						
-						NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdtiposervicios(), pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
-						pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId())); 
-						
-						pysPreciosServicios.setValor(new BigDecimal(0));//A cero el precio por defecto
-						pysPreciosServicios.setCriterios("SELECT IDINSTITUCION, IDPERSONA FROM CEN_CLIENTE WHERE IDINSTITUCION = "+idInstitucion+"  AND IDPERSONA = @IDPERSONA@");//PROVISIONAL
-						pysPreciosServicios.setFechamodificacion(new Date());
-						pysPreciosServicios.setUsumodificacion(usuarios.get(0).getIdusuario());
-						pysPreciosServicios.setPordefecto("1");
-						pysPreciosServicios.setDescripcion("Precio por defecto");
-					
-						statusPrecioPorDefecto = pysPreciosServiciosMapper.insertSelective(pysPreciosServicios);
-						
-						if(statusPrecioPorDefecto == 0) {
-							insertResponseDTO.setStatus(SigaConstants.KO);
-							throw new Exception("No se ha podido crear el precio por defecto para el servicio");
-						}else if(statusPrecioPorDefecto == 1) {
-							insertResponseDTO.setStatus(SigaConstants.OK);
-						}
-						
-						LOGGER.info(
-								"nuevoServicio() / pysPreciosServiciosMapper -> Salida de pysPreciosServiciosMapper para crear el precio por defecto del servicio");
-					}
-					
-					
-					if(servicio.getAutomatico() != null) {
-						if(servicio.getAutomatico().equals("1") && status == 1) {
-							LOGGER.info(
-									"nuevoServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Entrada a ejecucionPlsServicios para comenzar el proceso de suscripcion automatica de servicios");
-						
-							
-							 String resultado[] = ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio(idInstitucion, servicio.getIdtiposervicios(), servicio.getIdservicio(), idOrdenacion.getNewId(), usuarios.get(0));
-							 
-							 if (!resultado[0].equalsIgnoreCase("0")) {
-						            LOGGER.error("Error en PL = " + (String) resultado[1]);
-						            throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);				          
-						      }
-							 
-								LOGGER.info(
-										"nuevoServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Salida de ejecucionPlsServicios, proceso de suscripcion automatica de servicios terminado");
-						}
-					}
-
-					LOGGER.info(
-							"nuevoServicio() / pysServiciosInstitucionMapper.nuevoServicio() -> Salida de pysServiciosInstitucionMapper para crear un servicio");
+				if (!UtilidadesString.esCadenaVacia(servicio.getDescripcion())) {
+					servicioInstitucion.setDescripcion(servicio.getDescripcion().trim());
+					Long countExisteDescripcion = pysServiciosInstitucionExtendsMapper.existsDescription(null,
+							null, null,	idInstitucion, servicio.getDescripcion());
+					if (countExisteDescripcion > 0)
+						throw new BusinessException("facturacion.fichaservicios.error.existeDescripcion");
 				}
 
+				servicioInstitucion.setDescripcion(servicio.getDescripcion());
+				servicioInstitucion.setCuentacontable(servicio.getCuentacontable());
+				servicioInstitucion.setSolicitarbaja(servicio.getPermitirbaja());
+				servicioInstitucion.setSolicitaralta(servicio.getPermitiralta());
+				servicioInstitucion.setAutomatico(servicio.getAutomatico());
+				servicioInstitucion.setIniciofinalponderado("P");
+				servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
+				servicioInstitucion.setNofacturable("1");
+
+				if(servicio.getIdconsulta() != 0) {
+					String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
+					criterios = criterios.replace("<SELECT>", "");
+					criterios = criterios.replace("</SELECT>", "");
+					criterios = criterios.replace("<FROM>", "");
+					criterios = criterios.replace("</FROM>", "");
+					criterios = criterios.replace("<WHERE>", "");
+					criterios = criterios.replace("</WHERE>", "");
+
+					servicioInstitucion.setCriterios(criterios);
+				}
+
+				servicioInstitucion.setFechabaja(null);
+				servicioInstitucion.setFechamodificacion(new Date());
+
+				if(servicio.getCodigoext() != null) {
+					servicioInstitucion.setCodigoext(servicio.getCodigoext());
+				}else {
+					servicioInstitucion.setCodigoext(servicio.getIdtiposervicios() + "|" + servicio.getIdservicio() + "|" + servicioInstitucion.getIdserviciosinstitucion());
+				}
+
+				servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				status = pysServiciosInstitucionMapper.insertSelective(servicioInstitucion);
+
+				if(status == 0) {
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					throw new Exception("No se ha podido crear el registro en PYS_SERVICIOSINSTITUCION");
+				}else if(status == 1) {
+					insertResponseDTO.setStatus(SigaConstants.OK);
+				}
+
+				//Por defecto, al crear un Servicio, se creará una línea de Precio CERO, periodo MENSUAL y sin condiciones.
+				if(status == 1) {
+					LOGGER.info(
+							"nuevoServicio() / pysPreciosServiciosMapper -> Entrada a pysPreciosServiciosMapper para crear el precio por defecto del servicio");
+
+					PysPreciosservicios pysPreciosServicios = new PysPreciosservicios();
+
+					pysPreciosServicios.setIdinstitucion(idInstitucion);
+					pysPreciosServicios.setIdtiposervicios((short) servicio.getIdtiposervicios());
+					pysPreciosServicios.setIdservicio ((long) servicio.getIdservicio());
+					pysPreciosServicios.setIdserviciosinstitucion(Long.parseLong(idOrdenacion.getNewId()));
+					pysPreciosServicios.setIdperiodicidad((short) 1);//Mensual
+
+					NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdtiposervicios(), pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
+					pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId()));
+
+					pysPreciosServicios.setValor(new BigDecimal(0));//A cero el precio por defecto
+					pysPreciosServicios.setCriterios("SELECT IDINSTITUCION, IDPERSONA FROM CEN_CLIENTE WHERE IDINSTITUCION = "+idInstitucion+"  AND IDPERSONA = @IDPERSONA@");//PROVISIONAL
+					pysPreciosServicios.setFechamodificacion(new Date());
+					pysPreciosServicios.setUsumodificacion(usuarios.get(0).getIdusuario());
+					pysPreciosServicios.setPordefecto("1");
+					pysPreciosServicios.setDescripcion("Precio por defecto");
+
+					statusPrecioPorDefecto = pysPreciosServiciosMapper.insertSelective(pysPreciosServicios);
+
+					if(statusPrecioPorDefecto == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						throw new Exception("No se ha podido crear el precio por defecto para el servicio");
+					}else if(statusPrecioPorDefecto == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					LOGGER.info(
+							"nuevoServicio() / pysPreciosServiciosMapper -> Salida de pysPreciosServiciosMapper para crear el precio por defecto del servicio");
+				}
+
+
+				if(servicio.getAutomatico() != null) {
+					if(servicio.getAutomatico().equals("1") && status == 1) {
+						LOGGER.info(
+								"nuevoServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Entrada a ejecucionPlsServicios para comenzar el proceso de suscripcion automatica de servicios");
+
+
+						 String resultado[] = ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio(idInstitucion, servicio.getIdtiposervicios(), servicio.getIdservicio(), idOrdenacion.getNewId(), usuarios.get(0));
+
+						 if (!resultado[0].equalsIgnoreCase("0")) {
+								LOGGER.error("Error en PL = " + (String) resultado[1]);
+								throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);
+						  }
+
+							LOGGER.info(
+									"nuevoServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Salida de ejecucionPlsServicios, proceso de suscripcion automatica de servicios terminado");
+					}
+				}
+
+				LOGGER.info(
+						"nuevoServicio() / pysServiciosInstitucionMapper.nuevoServicio() -> Salida de pysServiciosInstitucionMapper para crear un servicio");
 			}
+
+		}
 
 		
 		insertResponseDTO.setError(error);
@@ -506,6 +517,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 	
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public DeleteResponseDTO editarServicio(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
@@ -519,98 +531,98 @@ public class ServiciosServiceImpl implements IServiciosService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
+			LOGGER.info(
+					"editarServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"editarServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
 				LOGGER.info(
-						"editarServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"editarServicio() / pysServiciosInstitucionMapper.editarServicio() -> Entrada a pysServiciosInstitucionMapper para modificar un servicio");
 
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				PysServiciosinstitucion servicioInstitucion = new PysServiciosinstitucion();
 
-				LOGGER.info(
-						"editarServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				servicioInstitucion.setIdinstitucion(idInstitucion);
+				servicioInstitucion.setIdtiposervicios((short) servicio.getIdtiposervicios());
+				servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
+				servicioInstitucion.setIdserviciosinstitucion((long) servicio.getIdserviciosinstitucion());
 
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"editarServicio() / pysServiciosInstitucionMapper.editarServicio() -> Entrada a pysServiciosInstitucionMapper para modificar un servicio");
-					
-						PysServiciosinstitucion servicioInstitucion = new PysServiciosinstitucion();
-							
-						servicioInstitucion.setIdinstitucion(idInstitucion);
-						servicioInstitucion.setIdtiposervicios((short) servicio.getIdtiposervicios());
-						servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
-						servicioInstitucion.setIdserviciosinstitucion((long) servicio.getIdserviciosinstitucion());					
-						
-						servicioInstitucion.setDescripcion(servicio.getDescripcion());
-						servicioInstitucion.setSolicitarbaja(servicio.getPermitirbaja());
-						servicioInstitucion.setSolicitaralta(servicio.getPermitiralta());
-						servicioInstitucion.setFechamodificacion(new Date());
-						servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
-						servicioInstitucion.setCuentacontable(servicio.getCuentacontable());
-						
-						servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
-						servicioInstitucion.setAutomatico(servicio.getAutomatico());
-						
-						if(servicio.getIdconsulta() != 0 && servicio.getIdconsulta() != servicio.getServiciooriginal().getIdconsulta()) {
-							String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
-							criterios = criterios.replace("<SELECT>", "");
-							criterios = criterios.replace("</SELECT>", "");
-							criterios = criterios.replace("<FROM>", "");
-							criterios = criterios.replace("</FROM>", "");
-							criterios = criterios.replace("<WHERE>", "");
-							criterios = criterios.replace("</WHERE>", "");
-
-							servicioInstitucion.setCriterios(criterios);
-						}
-					
-						
-						if(servicio.getCodigoext() != null) {
-							servicioInstitucion.setCodigoext(servicio.getCodigoext());
-						}else {  
-							servicioInstitucion.setCodigoext(servicio.getIdtiposervicios() + "|" + servicio.getIdservicio() + "|" + servicioInstitucion.getIdserviciosinstitucion());
-						}
-					
-						
-						status = pysServiciosInstitucionMapper.updateByPrimaryKeySelective(servicioInstitucion);
-						
-						if(servicio.getAutomatico() != null) {
-							if(servicio.getAutomatico().equals("1") && status == 1) {
-								LOGGER.info(
-										"editarServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Entrada a ejecucionPlsServicios para comenzar el proceso de suscripcion automatica de servicios");
-							
-								
-								 String resultado[] = ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio(idInstitucion, servicio.getIdtiposervicios(), servicio.getIdservicio(), String.valueOf(servicio.getIdserviciosinstitucion()), usuarios.get(0));
-								 
-								 if (!resultado[0].equalsIgnoreCase("0")) {
-							            LOGGER.error("Error en PL = " + (String) resultado[1]);
-							            throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);				          
-							      }
-								 
-									LOGGER.info(
-											"editarServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Salida de ejecucionPlsServicios, proceso de suscripcion automatica de servicios terminado");
-							}
-						}
-					
-					if(status == 0) {
-						deleteResponseDTO.setStatus(SigaConstants.KO);
-						throw new Exception("No se ha podido editar el registro en PYS_SERVICIOSINSTITUCION");
-					}else if(status == 1) {
-						deleteResponseDTO.setStatus(SigaConstants.OK);
-					}
-					
-					LOGGER.info(
-							"editarServicio() / pysServiciosInstitucionMapper.editarServicio() -> Salida de pysServiciosInstitucionMapper para modificar un servicio");
+				if (!UtilidadesString.esCadenaVacia(servicio.getDescripcion())) {
+					servicioInstitucion.setDescripcion(servicio.getDescripcion().trim());
+					Long countExisteDescripcion = pysServiciosInstitucionExtendsMapper.existsDescription(servicioInstitucion.getIdservicio(),
+							servicioInstitucion.getIdserviciosinstitucion(), servicioInstitucion.getIdtiposervicios(),
+							servicioInstitucion.getIdinstitucion(), servicio.getDescripcion());
+					if (countExisteDescripcion > 0)
+						throw new BusinessException("facturacion.fichaservicios.error.existeDescripcion");
 				}
 
+				servicioInstitucion.setSolicitarbaja(servicio.getPermitirbaja());
+				servicioInstitucion.setSolicitaralta(servicio.getPermitiralta());
+				servicioInstitucion.setFechamodificacion(new Date());
+				servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+				servicioInstitucion.setCuentacontable(servicio.getCuentacontable());
+
+				servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
+				servicioInstitucion.setAutomatico(servicio.getAutomatico());
+
+				if(servicio.getIdconsulta() != 0 && servicio.getIdconsulta() != servicio.getServiciooriginal().getIdconsulta()) {
+					String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
+					criterios = criterios.replace("<SELECT>", "");
+					criterios = criterios.replace("</SELECT>", "");
+					criterios = criterios.replace("<FROM>", "");
+					criterios = criterios.replace("</FROM>", "");
+					criterios = criterios.replace("<WHERE>", "");
+					criterios = criterios.replace("</WHERE>", "");
+
+					servicioInstitucion.setCriterios(criterios);
+				}
+
+
+				if(servicio.getCodigoext() != null) {
+					servicioInstitucion.setCodigoext(servicio.getCodigoext());
+				}else {
+					servicioInstitucion.setCodigoext(servicio.getIdtiposervicios() + "|" + servicio.getIdservicio() + "|" + servicioInstitucion.getIdserviciosinstitucion());
+				}
+
+
+				status = pysServiciosInstitucionMapper.updateByPrimaryKeySelective(servicioInstitucion);
+
+				if(servicio.getAutomatico() != null) {
+					if(servicio.getAutomatico().equals("1") && status == 1) {
+						LOGGER.info(
+								"editarServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Entrada a ejecucionPlsServicios para comenzar el proceso de suscripcion automatica de servicios");
+
+
+						 String resultado[] = ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio(idInstitucion, servicio.getIdtiposervicios(), servicio.getIdservicio(), String.valueOf(servicio.getIdserviciosinstitucion()), usuarios.get(0));
+
+						 if (!resultado[0].equalsIgnoreCase("0")) {
+								LOGGER.error("Error en PL = " + (String) resultado[1]);
+								throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);
+						  }
+
+							LOGGER.info(
+									"editarServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Salida de ejecucionPlsServicios, proceso de suscripcion automatica de servicios terminado");
+					}
+				}
+
+				if(status == 0) {
+					deleteResponseDTO.setStatus(SigaConstants.KO);
+					throw new Exception("No se ha podido editar el registro en PYS_SERVICIOSINSTITUCION");
+				}else if(status == 1) {
+					deleteResponseDTO.setStatus(SigaConstants.OK);
+				}
+
+				LOGGER.info(
+						"editarServicio() / pysServiciosInstitucionMapper.editarServicio() -> Salida de pysServiciosInstitucionMapper para modificar un servicio");
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"ServiciosServiceImpl.editarServicio() -> Se ha producido un error al modificar un servicio",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
+
 		}
 
 		deleteResponseDTO.setError(error);

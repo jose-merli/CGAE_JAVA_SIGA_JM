@@ -134,6 +134,8 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 				LOGGER.info(
 						"searchModules() / scsProcedimientosMapper.selectByExample() -> Entrada a scsProcedimientosMapper para obtener los modulos");
 				modulosItem.setidInstitucion(idInstitucion.toString());
+				
+				modulosItem.setNombre(UtilidadesString.tratamientoApostrofes(modulosItem.getNombre()));
 				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosItem);
 
 				LOGGER.info(

@@ -31,7 +31,24 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		
 		return sql.toString();
 	}
-	
+
+	public String existsDescription(Long idServicio, Long idServiciosInstitucion, Short idTipoServicios, Short idInstitucion, String descripcion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("COUNT(*)");
+
+		sql.FROM("PYS_SERVICIOSINSTITUCION servicio");
+
+		if (idServicio != null && idServiciosInstitucion != null && idTipoServicios != null)
+			sql.WHERE("NOT (servicio.IDSERVICIO = '" + idServicio +"' AND servicio.IDSERVICIOSINSTITUCION = '" + idServiciosInstitucion + "' AND servicio.IDTIPOSERVICIOS = '" + idTipoServicios + "')");
+
+		sql.WHERE("servicio.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("servicio.DESCRIPCION = '" + descripcion.trim() + "'");
+
+		return sql.toString();
+	}
+
+
 	public String getIndiceMaxServicio(ServicioDetalleDTO servicio, Short idInstitucion) {
 		SQL sql = new SQL();
 		
