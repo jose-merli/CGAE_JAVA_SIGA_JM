@@ -51,7 +51,7 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
-	List<ComboItem> comboTiposProductos(String idioma);
+	List<ComboItem> comboTiposProductos(Short institucion, String idioma);
 	
 	//Realiza un borrado logico (establecer fechabaja = new Date()) o lo reactiva en caso de que esta inhabilitado.
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "activarDesactivarProducto")

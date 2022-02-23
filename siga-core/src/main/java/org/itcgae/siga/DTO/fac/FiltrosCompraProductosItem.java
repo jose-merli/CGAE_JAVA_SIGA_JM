@@ -7,6 +7,7 @@ public class FiltrosCompraProductosItem {
 		private String idPersona;
 		private Date fechaSolicitudDesde;
 		private Date fechaSolicitudHasta;
+		private Date fechaEfectiva;
 	    private String nSolicitud;
 	    private List<String> idCategoria;
 	    private List<String> idTipoProducto;
@@ -67,5 +68,11 @@ public class FiltrosCompraProductosItem {
 		}
 		public void setIdEstadoFactura(List<String> idEstadoFactura) {
 			this.idEstadoFactura = idEstadoFactura;
+		}
+		public Date getFechaEfectiva() {
+			return fechaEfectiva;
+		}
+		public void setFechaEfectiva(Date fechaEfectiva) {
+			this.fechaEfectiva = fechaEfectiva;
 		}
 }
