@@ -414,7 +414,8 @@ public class ServiciosServiceImpl implements IServiciosService {
 				servicioInstitucion.setIniciofinalponderado("P");
 				servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
 				servicioInstitucion.setNofacturable("1");
-
+				servicioInstitucion.setIdtipoiva(new Integer("3"));
+				
 				if(servicio.getIdconsulta() != 0) {
 					String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
 					criterios = criterios.replace("<SELECT>", "");
@@ -445,6 +446,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 					throw new Exception("No se ha podido crear el registro en PYS_SERVICIOSINSTITUCION");
 				}else if(status == 1) {
 					insertResponseDTO.setStatus(SigaConstants.OK);
+					insertResponseDTO.setId(servicioInstitucion.getIdserviciosinstitucion().toString());
 				}
 
 				//Por defecto, al crear un Servicio, se creará una línea de Precio CERO, periodo MENSUAL y sin condiciones.
