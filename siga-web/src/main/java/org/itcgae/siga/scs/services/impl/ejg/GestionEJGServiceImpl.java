@@ -3145,7 +3145,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				// Datos pre-designacion
 				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@INICIO
-				record.setNumeroprocedimiento(datos.getNumAnnioProcedimiento());
+				// record.setNumeroprocedimiento(datos.getNumAnnioProcedimiento());
+                record.setNumeroprocedimiento(datos.getProcedimiento());
 				// record.setAnioprocedimiento(datos.getAnnio());
 				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@FIN
                 record.setNig(datos.getNig());
