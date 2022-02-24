@@ -426,5 +426,49 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 		return baremosGuardiaDTO;
 	}
 
+	@Override
+	@Transactional
+	public BaremosRequestDTO searchBaremosFichaGuardia(String idGuardia, HttpServletRequest request) {
+		BaremosRequestDTO baremosRequestDTO = new BaremosRequestDTO();
+		Error error = new Error();
+
+		LOGGER.info("searchBaremosGuardia() -> Entrada del servicio para obtener baremos guardia ");
+
+		String token = request.getHeader("Authorization");
+//        String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			List<BaremosRequestItem> lBaremos = baremosGuardiaMapper.searchBaremosFichaGuardia(idGuardia,
+					idInstitucion);
+			for(BaremosRequestItem baremo : lBaremos){
+				baremo.setGuardias(baremo.getNomTurno() + "-" + baremo.getGuardias());
+			}
+			int keyForTabla = 0;
+			String hitoActual;
+			List<GuardiasItem> guar = new ArrayList<GuardiasItem>();
+			List<GuardiasItem> guarAux = new ArrayList<GuardiasItem>();
+			int indiceNuevo = 0;
+
+			error.setCode(200);
+			BaremosRequestItem baremoFinal = new BaremosRequestItem();
+			List<BaremosRequestItem> lBaremosFinal =  new ArrayList<>();
+			baremoFinal.setGuardiasObj(guarAux);
+			lBaremosFinal.add(baremoFinal);
+			baremosRequestDTO.setBaremosRequestItems(lBaremos);
+
+		} else {
+			LOGGER.warn("searchBaremosGuardia() -> idInstitucion del token nula");
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		baremosRequestDTO.setError(error);
+
+		LOGGER.info("searchBaremosGuardia() -> Salida del servicio para obtener baremos guardia");
+
+		return baremosRequestDTO;
+	}
 
 }
