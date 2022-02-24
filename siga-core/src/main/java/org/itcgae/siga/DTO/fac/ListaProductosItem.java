@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -24,6 +25,7 @@ public class ListaProductosItem {
 	private Date fechaBajaIva;
 	private String idFormasPago;
 	private String formasPagoInternet;
+	private String solicitarAlta;
 	private String solicitarBaja;
 	
 	public int getIdproducto() {
@@ -98,97 +100,73 @@ public class ListaProductosItem {
 	public void setFormapago(String formapago) {
 		this.formapago = formapago;
 	}
-	
+
+	public String getSolicitarAlta() {
+		return solicitarAlta;
+	}
+
+	public void setSolicitarAlta(String solicitarAlta) {
+		this.solicitarAlta = solicitarAlta;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		ListaProductosItem that = (ListaProductosItem) o;
+		return idproducto == that.idproducto &&
+				idtipoproducto == that.idtipoproducto &&
+				idproductoinstitucion == that.idproductoinstitucion &&
+				Objects.equals(idcontador, that.idcontador) &&
+				Objects.equals(descripcion, that.descripcion) &&
+				Objects.equals(valor, that.valor) &&
+				Objects.equals(fechabaja, that.fechabaja) &&
+				Objects.equals(tipo, that.tipo) &&
+				Objects.equals(categoria, that.categoria) &&
+				Objects.equals(iva, that.iva) &&
+				Objects.equals(precioiva, that.precioiva) &&
+				Objects.equals(formapago, that.formapago) &&
+				Objects.equals(noFacturable, that.noFacturable) &&
+				Objects.equals(idtipoiva, that.idtipoiva) &&
+				Objects.equals(valorIva, that.valorIva) &&
+				Objects.equals(fechaBajaIva, that.fechaBajaIva) &&
+				Objects.equals(idFormasPago, that.idFormasPago) &&
+				Objects.equals(formasPagoInternet, that.formasPagoInternet) &&
+				Objects.equals(solicitarAlta, that.solicitarAlta) &&
+				Objects.equals(solicitarBaja, that.solicitarBaja);
+	}
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((categoria == null) ? 0 : categoria.hashCode());
-		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
-		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
-		result = prime * result + ((formapago == null) ? 0 : formapago.hashCode());
-		result = prime * result + ((idcontador == null) ? 0 : idcontador.hashCode());
-		result = prime * result + idproducto;
-		result = prime * result + idproductoinstitucion;
-		result = prime * result + idtipoproducto;
-		result = prime * result + ((iva == null) ? 0 : iva.hashCode());
-		result = prime * result + ((precioiva == null) ? 0 : precioiva.hashCode());
-		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
-		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
-		return result;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ListaProductosItem other = (ListaProductosItem) obj;
-		if (categoria == null) {
-			if (other.categoria != null)
-				return false;
-		} else if (!categoria.equals(other.categoria))
-			return false;
-		if (descripcion == null) {
-			if (other.descripcion != null)
-				return false;
-		} else if (!descripcion.equals(other.descripcion))
-			return false;
-		if (fechabaja == null) {
-			if (other.fechabaja != null)
-				return false;
-		} else if (!fechabaja.equals(other.fechabaja))
-			return false;
-		if (formapago == null) {
-			if (other.formapago != null)
-				return false;
-		} else if (!formapago.equals(other.formapago))
-			return false;
-		if (idcontador == null) {
-			if (other.idcontador != null)
-				return false;
-		} else if (!idcontador.equals(other.idcontador))
-			return false;
-		if (idproducto != other.idproducto)
-			return false;
-		if (idproductoinstitucion != other.idproductoinstitucion)
-			return false;
-		if (idtipoproducto != other.idtipoproducto)
-			return false;
-		if (iva == null) {
-			if (other.iva != null)
-				return false;
-		} else if (!iva.equals(other.iva))
-			return false;
-		if (precioiva == null) {
-			if (other.precioiva != null)
-				return false;
-		} else if (!precioiva.equals(other.precioiva))
-			return false;
-		if (tipo == null) {
-			if (other.tipo != null)
-				return false;
-		} else if (!tipo.equals(other.tipo))
-			return false;
-		if (valor == null) {
-			if (other.valor != null)
-				return false;
-		} else if (!valor.equals(other.valor))
-			return false;
-		return true;
+		return Objects.hash(idproducto, idtipoproducto, idproductoinstitucion, idcontador, descripcion, valor, fechabaja, tipo, categoria, iva, precioiva, formapago, noFacturable, idtipoiva, valorIva, fechaBajaIva, idFormasPago, formasPagoInternet, solicitarAlta, solicitarBaja);
 	}
 
 	@Override
 	public String toString() {
-		return "ListaProductosItem [idproducto=" + idproducto + ", idtipoproducto=" + idtipoproducto
-				+ ", idproductoinstitucion=" + idproductoinstitucion + ", idcontador=" + idcontador + ", descripcion="
-				+ descripcion + ", valor=" + valor + ", fechabaja=" + fechabaja + ", tipo=" + tipo + ", categoria="
-				+ categoria + ", iva=" + iva + ", precioiva=" + precioiva + ", formapago=" + formapago + ", idtipoiva=" 
-				+ idtipoiva + ", valorIva=" + valorIva + ", noFacturable=" + noFacturable + "]";
+		return "ListaProductosItem{" +
+				"idproducto=" + idproducto +
+				", idtipoproducto=" + idtipoproducto +
+				", idproductoinstitucion=" + idproductoinstitucion +
+				", idcontador='" + idcontador + '\'' +
+				", descripcion='" + descripcion + '\'' +
+				", valor='" + valor + '\'' +
+				", fechabaja=" + fechabaja +
+				", tipo='" + tipo + '\'' +
+				", categoria='" + categoria + '\'' +
+				", iva='" + iva + '\'' +
+				", precioiva='" + precioiva + '\'' +
+				", formapago='" + formapago + '\'' +
+				", noFacturable='" + noFacturable + '\'' +
+				", idtipoiva='" + idtipoiva + '\'' +
+				", valorIva='" + valorIva + '\'' +
+				", fechaBajaIva=" + fechaBajaIva +
+				", idFormasPago='" + idFormasPago + '\'' +
+				", formasPagoInternet='" + formasPagoInternet + '\'' +
+				", solicitarAlta='" + solicitarAlta + '\'' +
+				", solicitarBaja='" + solicitarBaja + '\'' +
+				'}';
 	}
+
 	public String getIdtipoiva() {
 		return idtipoiva;
 	}
