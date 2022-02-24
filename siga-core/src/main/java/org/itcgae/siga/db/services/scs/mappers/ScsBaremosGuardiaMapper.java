@@ -108,4 +108,26 @@ public interface ScsBaremosGuardiaMapper {
 	@Result(column = "IDHITOCONFIGURACION", property = "idhitoconfiguracion", jdbcType = JdbcType.DECIMAL),
 })
 List<BaremosRequestItem> searchBaremosGuardia(BaremosGuardiaItem baremosGuardiaItem, Short idinstitucion);
+
+	@SelectProvider(type = ScsBaremosGuardiaSqlProvider.class, method = "searchBaremosFichaGuardia")
+	@Results({
+
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRETURNO", property = "nomTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "GUARDIAS", property = "guardias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "N_DIAS", property = "nDias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "BAREMO", property = "baremo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DIAS", property = "dias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DISPONIBILIDAD", property = "disponibilidad", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "NUM_MINIMO_SIMPLE", property = "numMinimoSimple", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "SIMPLE_O_IMPORTE_INDIVIDUAL", property = "simpleOImporteIndividual", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "NAPARTIR", property = "naPartir", jdbcType = JdbcType.INTEGER),
+			@Result(column = "MAXIMO", property = "maximo", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "POR_DIA", property = "porDia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+			@Result(column = "IDHITO", property = "idHito", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDHITOCONFIGURACION", property = "idhitoconfiguracion", jdbcType = JdbcType.DECIMAL),
+	})
+	List<BaremosRequestItem> searchBaremosFichaGuardia(String idGuardia, Short idinstitucion);
 }
