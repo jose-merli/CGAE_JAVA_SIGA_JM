@@ -37,11 +37,11 @@ public class ScsBaremosGuardiaSqlProvider {
 		
 		SQL sql = new SQL();
 		sql.SELECT(
-				"	LISTAGG( "
-				+ "        gua.nombre, "
-				+ "        ',' "
-				+ "    ) WITHIN GROUP(ORDER BY gua.nombre) guardias, "
-				+ "    gua.diasguardia "
+				//"	LISTAGG( "
+				//+ "        gua.nombre, "
+				//+ "        ',' "
+				//+ "    ) WITHIN GROUP(ORDER BY gua.nombre) guardias, "
+				"  rtrim(xmlagg(xmlelement(e,gua.nombre,', ').extract('//text()') order by gua.nombre).getclobval(),', ') guardias,  gua.diasguardia "
 				+ "     || ' ' "
 				+ "     || gua.tipodiasguardia n_dias, "+
 				"	tip.idhitoconfiguracion,"
@@ -289,15 +289,18 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "            ELSE 'Si'"
 				+ "        END"
 				+ "    por_dia");
-				
+
+				if(baremosGuardiaItem.isHistorico()){
+					sql.FROM("FCS_HISTORICO_HITOFACT  hit");
+				}else{
+					sql.FROM("scs_hitofacturableguardia hit");
+				}
 				if(!facturaciones.equals("0")) {
-					sql.FROM("FCS_HISTORICO_HITOFACT  hit,"
-							+ "    scs_hitofacturable tip,"
+					sql.FROM(" scs_hitofacturable tip,"
 							+ "    scs_guardiasturno gua,"
 							+ "		scs_turno tur");
 				}else {
-					sql.FROM("scs_hitofacturableguardia hit,"
-							+ "    scs_hitofacturable tip,"
+					sql.FROM(" scs_hitofacturable tip,"
 							+ "    scs_guardiasturno gua");
 				}
 				
@@ -309,9 +312,10 @@ public class ScsBaremosGuardiaSqlProvider {
 						+ "    AND"
 						+ "        hit.idguardia = gua.idguardia"
 						+ "    AND"
-						+ "        hit.idhito IN ("
-						+ "            7,9,25,22,5,20,44,1,12,13"
-						+ "        )"
+						+ "        (hit.idhito IN ( 25, 22, 20, 44, 1 ) "
+						+ " or ( hit.idhito in ( 7, 9, 5 ) and not exists (select 1 from SCS_HITOFACTURABLEGUARDIA hit2 where hit2.IDINSTITUCION = hit.IDINSTITUCION and hit2.IDTURNO = hit.IDTURNO and hit2.IDGUARDIA = hit.IDGUARDIA and nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD') and nvl(hit2.AGRUPAR, '0') = nvl(hit.AGRUPAR, '0') and hit2.IDHITO in ( 25, 22, 20)) ) "
+								+ "or ( hit.idhito in ( 12, 13 ) and hit.PRECIOHITO > 0 ) )"
+
 						);
 				sql.WHERE("hit.idinstitucion = " + idinstitucion);
 				if(guardias != "") {
@@ -328,7 +332,7 @@ public class ScsBaremosGuardiaSqlProvider {
 					sql.WHERE("gua.fechabaja is null");
 				}
 
-				sql.WHERE("rownum <= 200");
+				//sql.WHERE("rownum <= 200");
 				
 				sql.GROUP_BY("hit.idinstitucion,"
 						+ "    hit.idturno,"

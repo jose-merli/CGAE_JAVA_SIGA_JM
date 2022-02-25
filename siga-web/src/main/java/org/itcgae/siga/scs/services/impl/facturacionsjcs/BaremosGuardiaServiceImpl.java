@@ -89,7 +89,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						//MISMO HITO
 						GuardiasItem guardia = new GuardiasItem();
 						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
-						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
+						String[] parts = lBaremos.get(i).getGuardias().split(",");
+						lBaremos.get(i).setGuardias(parts[0]);
+						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + parts[0]);
 						guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
 						guardia.setDiasGuardia(dias[0] + dias[1]);
 						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
@@ -113,7 +115,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guar = new ArrayList<GuardiasItem>();
 						GuardiasItem guardia = new GuardiasItem();
 						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
-						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
+						String[] parts = lBaremos.get(i).getGuardias().split(",");
+						lBaremos.get(i).setGuardias(parts[0]);
+						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + parts[0]);
 						guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
 						guardia.setDiasGuardia(dias[0] + dias[1]);
 						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
@@ -136,7 +140,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					indiceNuevo = i;
 					GuardiasItem guardia = new GuardiasItem();
 					String[] dias = lBaremos.get(i).getDias().toString().split("\n");
-					guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + lBaremos.get(i).getGuardias());
+					String[] parts = lBaremos.get(i).getGuardias().split(",");
+					lBaremos.get(i).setGuardias(parts[0]);
+					guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + parts[0]);
 					guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
 					guardia.setDiasGuardia(dias[0] + dias[1]);
 					guardia.setFechabaja(lBaremos.get(i).getFechabaja());
@@ -389,25 +395,25 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 				for(BaremosGuardiaItem conf : turnoGuardiaConf){
 					String[] h;
 					h = conf.getHitos().split("/");
-
-					int contador = 0;
-
-					for(int i=0;i < h.length;i++){
-						for(int j=0;j < configuracion.length;j++){
-							if(h[i].equals(configuracion[j])){
-								contador++;
+					if(h.length == configuracion.length){
+						int contador = 0;
+						for(int i=0;i < h.length;i++){
+							for(int j=0;j < configuracion.length;j++){
+								if(h[i].equals(configuracion[j])){
+									contador++;
+								}
 							}
+						}
+						if(contador == configuracion.length){
+							BaremosGuardiaItem hito = new BaremosGuardiaItem();
+							hito.setIdTurno(conf.getIdTurno());
+							hito.setIdGuardia(conf.getIdGuardia());
+							hito.setNomguardia(conf.getNomguardia());
+							hito.setNomturno(conf.getNomturno());
+							hitos.add(hito);
 						}
 					}
 
-					if(contador == configuracion.length){
-						BaremosGuardiaItem hito = new BaremosGuardiaItem();
-						hito.setIdTurno(conf.getIdTurno());
-						hito.setIdGuardia(conf.getIdGuardia());
-						hito.setNomguardia(conf.getNomguardia());
-						hito.setNomturno(conf.getNomturno());
-						hitos.add(hito);
-					}
 				}
 				baremosGuardiaDTO.setBaremosGuardiaItems(hitos);
 				error.setCode(200);

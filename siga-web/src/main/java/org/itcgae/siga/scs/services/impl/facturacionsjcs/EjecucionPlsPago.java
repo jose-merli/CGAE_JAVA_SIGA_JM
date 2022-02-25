@@ -253,6 +253,9 @@ public class EjecucionPlsPago {
             }
             resultado = callPLProcedure("{call PROC_FACSJCS_DESCIERREPAGO (?,?,?,?)}", 2, param_in);
             LOGGER.info("Resultado del procedimiento PROC_FACSJCS_DESCIERREPAGO: " + resultado);
+            if(resultado == null){
+                return "";
+            }
             for(int i = 0; i < resultado.length; i++){
                 LOGGER.info("Resultado["+i+"]: " + resultado[i]);
             }
