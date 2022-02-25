@@ -50,6 +50,17 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 	})
 	List<FacturaItem> getFacturas(FacturaItem item, String idInstitucion, String idLenguaje);
 
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getFacturasByIdSolicitud")
+	@Results({
+			@Result(column = "idseriefacturacion", property = "idSerieFacturacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idprogramacion", property = "idProgramacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idinstitucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idfactura", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numerofactura", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<FacturaItem> getFacturasByIdSolicitud(String solicitudes, String idInstitucion);
 
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getFactura")
 	@Results({

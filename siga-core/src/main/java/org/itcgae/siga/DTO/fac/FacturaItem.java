@@ -20,6 +20,9 @@ public class FacturaItem {
 	String idEstado;
 	String estado;
 
+	String idProgramacion;
+	String idPersona;
+
 	String formaCobroFactura;
 	String formaCobroAbono;//Efectivo 'E', Banco 'B', Ambos 'A'
 
