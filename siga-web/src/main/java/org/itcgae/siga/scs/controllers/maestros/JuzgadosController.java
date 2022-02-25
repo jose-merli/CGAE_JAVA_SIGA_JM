@@ -123,4 +123,15 @@ public class JuzgadosController {
 
 	}
 	
+	@RequestMapping(value = "/gestionJuzgados/asociarModulosAJuzgados", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> asociarModulosAJuzgados(@RequestBody ProcedimientoDTO procedimientoDTO, HttpServletRequest request) {
+
+		UpdateResponseDTO response = gestionJuzgadosService.asociarModulosAJuzgados(procedimientoDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
 }

@@ -419,6 +419,103 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		return updateResponseDTO;
 	}
+	
+	@Override
+	public UpdateResponseDTO asociarModulosAJuzgados(ProcedimientoDTO procedimientoDTO, HttpServletRequest request) {
+		LOGGER.info("asociarModulosAJuzgados() ->  Entrada al servicio para asociar modulos masivamente a juzgados");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"asociarModulosAJuzgados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"asociarModulosAJuzgados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+
+					// Añadimos partidos
+					for (ProcedimientoItem procedimientoAdd : procedimientoDTO.getProcedimientosItems()) {
+
+						// Para cada procedimiento comprobamos si ya existe la relacion
+						ScsJuzgadoprocedimientoExample example = new ScsJuzgadoprocedimientoExample();
+						example.createCriteria().andIdprocedimientoEqualTo(procedimientoAdd.getIdProcedimiento())
+								.andIdjuzgadoEqualTo(Long.valueOf(procedimientoDTO.getIdJuzgado()))
+								.andIdinstitucionJuzgEqualTo(idInstitucion);
+
+						LOGGER.info(
+								"associateProcess() / scsJuzgadoProcedimientoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoProcedimientoExtendsMapper para buscar los procedimientos asociados a un juzgado");
+
+						List<ScsJuzgadoprocedimiento> procedimientoList = scsJuzgadoProcedimientoExtendsMapper
+								.selectByExample(example);
+
+						LOGGER.info(
+								"associateProcess() / scsJuzgadoProcedimientoExtendsMapper.selectByExample() -> Salida a scsJuzgadoProcedimientoExtendsMapper para buscar los procedimientos asociados a un juzgado");
+
+						// Si no existe la creamos
+						if (procedimientoList.isEmpty()) {
+
+							ScsJuzgadoprocedimiento procedimiento = new ScsJuzgadoprocedimiento();
+
+							procedimiento.setFechabaja(null);
+							procedimiento.setFechamodificacion(new Date());
+							procedimiento.setUsumodificacion(usuario.getIdusuario().intValue());
+							procedimiento.setIdinstitucion(idInstitucion);
+							procedimiento.setIdinstitucionJuzg(idInstitucion);
+							procedimiento.setIdjuzgado(Long.valueOf(procedimientoDTO.getIdJuzgado()));
+							procedimiento.setIdprocedimiento(procedimientoAdd.getIdProcedimiento());
+
+							LOGGER.info(
+									"associateProcess() / scsJuzgadoProcedimientoExtendsMapper.insert() -> Entrada a scsJuzgadoProcedimientoExtendsMapper para insertar un procedimiento");
+
+							response = scsJuzgadoProcedimientoExtendsMapper.insert(procedimiento);
+
+							LOGGER.info(
+									"associateProcess() / scsJuzgadoProcedimientoExtendsMapper.insert() -> Salida de scsJuzgadoProcedimientoExtendsMapper para insertar un procedimiento");
+
+						}
+					}
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else if (response == 1) {
+			error.setCode(200);
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("associateProcess() -> Salida del servicio para asociar procedimientos a juzgados");
+
+		return updateResponseDTO;
+	}
 
 	@Override
 	public UpdateResponseDTO updateCourt(JuzgadoItem juzgadoItem, HttpServletRequest request) {

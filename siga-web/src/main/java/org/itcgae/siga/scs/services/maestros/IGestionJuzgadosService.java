@@ -19,5 +19,6 @@ public interface IGestionJuzgadosService {
 	
 	public UpdateResponseDTO associateProcess(ProcedimientoDTO procedimientoDTO, HttpServletRequest request);
 	
+	public UpdateResponseDTO asociarModulosAJuzgados(ProcedimientoDTO procedimientoDTO, HttpServletRequest request);
 
 }
