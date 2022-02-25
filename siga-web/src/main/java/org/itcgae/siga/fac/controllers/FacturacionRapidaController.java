@@ -86,7 +86,7 @@ public class FacturacionRapidaController {
 
     }
 
-    @PostMapping("/descargarFacuras")
+    @PostMapping("/descargarFacturas")
     ResponseEntity<Resource> descargarFacturasBySolicitud(HttpServletRequest request, @RequestBody List<ListaCompraProductosItem> listaPeticiones) {
 
         try {
@@ -94,7 +94,7 @@ public class FacturacionRapidaController {
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "tipoFichero=" + (resource.getFilename().contains("pdf") ? "pdf" : "zip"));
+           // headers.add(HttpHeaders.CONTENT_DISPOSITION, "tipoFichero=" + (resource.getFilename().contains("pdf") ? "pdf" : "zip"));
             headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
             return ResponseEntity.ok().headers(headers).contentLength(resource.contentLength()).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);

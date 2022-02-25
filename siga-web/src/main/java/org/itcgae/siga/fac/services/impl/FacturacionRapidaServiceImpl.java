@@ -1032,8 +1032,17 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken( request.getHeader("Authorization") );
         String solicitudes = "";
 
-        for (ListaCompraProductosItem item : listaPeticiones) {
-            solicitudes += (item.getnSolicitud() + ", ");
+        
+        if(listaPeticiones.size() == 1) {
+        	solicitudes = (listaPeticiones.get(0).getnSolicitud());
+        }else {
+        	for (int i = 0; i < listaPeticiones.size(); i++) {
+            	if(i == listaPeticiones.size()-1) {
+            		solicitudes += (listaPeticiones.get(i).getnSolicitud());
+            	}else {
+            		solicitudes += (listaPeticiones.get(i).getnSolicitud() + ", ");
+            	}   			
+    		}
         }
 
         List<FacturaItem> facturas = facFacturaExtendsMapper.getFacturasByIdSolicitud(solicitudes, idInstitucion.toString());
