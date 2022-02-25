@@ -1032,17 +1032,17 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 							// Eliminamos las asociaciones con Servicios
 							FacTiposservinclsenfactExample servExample = new FacTiposservinclsenfactExample();
-							prodExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+							servExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
 									.andIdseriefacturacionEqualTo(idSerieFacturacion);
 
 							// Eliminamos las asociaciones con Etiquetas
 							FacTipocliincluidoenseriefacExample etiqExample = new FacTipocliincluidoenseriefacExample();
-							prodExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+							etiqExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
 									.andIdseriefacturacionEqualTo(idSerieFacturacion);
 
 							// Eliminamos las asociaciones con destinatarios individuales
 							FacClienincluidoenseriefacturExample destExample = new FacClienincluidoenseriefacturExample();
-							prodExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+							destExample.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
 									.andIdseriefacturacionEqualTo(idSerieFacturacion);
 
 							// Eliminamos las asociaciones con formas de pago

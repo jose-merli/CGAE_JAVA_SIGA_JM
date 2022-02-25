@@ -89,5 +89,15 @@ public class BaremosGuardiaController {
 			return new ResponseEntity<BaremosGuardiaDTO>(response, HttpStatus.FORBIDDEN);
 		}
 	}
+
+	@RequestMapping(value = "/baremosFichaGuardia",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BaremosRequestDTO> searchBaremosFichaGuardia(HttpServletRequest request, @RequestParam String idGuardia) {
+		BaremosRequestDTO response = baremosGuardiaServices.searchBaremosFichaGuardia(idGuardia, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<BaremosRequestDTO>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<BaremosRequestDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
 	
 }

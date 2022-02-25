@@ -4,10 +4,7 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.fac.DatoImpresionInformeFacturaDTO;
-import org.itcgae.siga.DTO.fac.EntradaDireccionEspecificaDTO;
-import org.itcgae.siga.DTO.fac.FacFicherosDescargaBean;
-import org.itcgae.siga.DTO.fac.LineaImpresionInformeDTO;
+import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.FoUtils;
 import org.itcgae.siga.commons.utils.SIGAHelper;
@@ -47,11 +44,12 @@ import org.itcgae.siga.db.services.fac.mappers.FacFacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineafacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacPlantillafacturacionExtendsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-
+import org.springframework.core.io.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -62,6 +60,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -1108,4 +1107,125 @@ public class FacturacionHelper {
         def.setName("transGenFac");
         return transactionManager.getTransaction(def);
     }
+
+    public Resource obtenerFicheros(List<FacturaItem> facturas) throws Exception {
+
+        try {
+            if (facturas.size() == 1) {
+
+                File filePDF = obtenerFicheroServer(facturas.get(0));
+                Resource resource = null;
+
+                if (filePDF != null) {
+                    resource = new ByteArrayResource(Files.readAllBytes(filePDF.toPath())) {
+                        public String getFilename() {
+                            return filePDF.getName();
+                        }
+                    };
+                }
+
+                return resource;
+
+            } else {
+
+                String rutaZip = getProperty(SigaConstants.PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF) + getProperty(SigaConstants.PARAMETRO_DIRECTORIO_FACTURA_PDF) +
+                        File.separator + facturas.get(0).getIdInstitucion() + File.separator + "ZIPFacturaTmp.zip";
+                ZipOutputStream outTemp = null;
+                Resource resource = null;
+
+                try {
+
+                    File ficheroZip = new File(rutaZip);
+                    ZipEntry zipEntry = null;
+                    File fileFactura = null;
+                    byte[] buffer = new byte[8192];
+                    int leidos;
+
+                    if (ficheroZip.exists()) {
+                        ficheroZip.delete();
+                    }
+
+                    outTemp = new ZipOutputStream(new FileOutputStream(ficheroZip));
+
+                    for (FacturaItem factura : facturas) {
+
+                        fileFactura = obtenerFicheroServer(factura);
+                        zipEntry = new ZipEntry(fileFactura.getAbsolutePath());
+                        outTemp.putNextEntry(zipEntry);
+
+                        FileInputStream fis = new FileInputStream(fileFactura);
+
+                        buffer = new byte[8192];
+
+                        while ((leidos = fis.read(buffer, 0, buffer.length)) > 0) {
+                            outTemp.write(buffer, 0, leidos);
+                        }
+
+                        fis.close();
+                        outTemp.closeEntry();
+                    }
+
+                    outTemp.close();
+
+                    if (ficheroZip != null) {
+                        resource = new ByteArrayResource(Files.readAllBytes(ficheroZip.toPath())) {
+                            public String getFilename() {
+                                return ficheroZip.getName();
+                            }
+                        };
+                    }
+
+                    return resource;
+
+                } catch(FileNotFoundException fnfe) {
+                    throw new Exception("No se ha encontrado la factura");
+                } catch(IOException ioe) {
+                    throw new Exception("Ha ocurrido un error al descargar el conjunto de ficheros");
+                }
+
+            }
+
+        } catch (IOException ioe) {
+            throw new Exception("Ha ocurrido un error al recoger los ficheros del servidor");
+        }
+
+    }
+
+    private File obtenerFicheroServer(FacturaItem factura) {
+
+        String idSerieIdProgramacion = factura.getIdSerieFacturacion() + "_" + factura.getIdProgramacion();
+        String rutaAlmacen = getProperty(SigaConstants.PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF) + getProperty(SigaConstants.PARAMETRO_DIRECTORIO_FACTURA_PDF) +
+                File.separator + factura.getIdInstitucion() + File.separator + idSerieIdProgramacion;
+        String nombrePDF = "";
+        String nColegiado = "";
+        File ficheroPDF;
+
+        // Obtenemos el numero de colegiado
+        CenColegiadoKey cenColegiadoKey = new CenColegiadoKey();
+        cenColegiadoKey.setIdinstitucion( Short.valueOf(factura.getIdInstitucion()) );
+        cenColegiadoKey.setIdpersona( Long.valueOf(factura.getIdPersona()) );
+        CenColegiado cenColegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(cenColegiadoKey);
+
+        if (cenColegiado != null) {
+            nColegiado = cenColegiado.getNcolegiado();
+        }
+
+        if (factura.getNumeroFactura() == null || factura.getNumeroFactura().equals("")) {
+            nombrePDF = nColegiado + "-" + factura.getIdFactura();
+        } else { // Contiene numero de factura, por lo tanto, esta confirmada
+            nombrePDF = nColegiado + "-" + validarNombreFichero(factura.getNumeroFactura());
+        }
+
+        ficheroPDF = new File(rutaAlmacen + File.separator + nombrePDF + ".pdf");
+
+        if (ficheroPDF.exists()) {
+
+            return ficheroPDF;
+
+        }
+
+        return null;
+
+    }
+
 }

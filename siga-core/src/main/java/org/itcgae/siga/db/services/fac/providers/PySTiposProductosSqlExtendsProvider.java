@@ -182,6 +182,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.SELECT(" concat(F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2), ' €') AS PRECIO_IVA");
 		sql.SELECT(" PRIN.IDCONTADOR");
 		sql.SELECT(" PRIN.NOFACTURABLE");
+		sql.SELECT(" PRIN.SOLICITARALTA");
 		sql.SELECT(" PRIN.SOLICITARBAJA");
 		
 		sql.FROM(" pys_productosinstitucion prin, pys_formapagoproducto fopa1, pys_formapago fo, pys_tipoiva tiva, pys_tiposproductos tproducto, pys_productos produc");
@@ -232,7 +233,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, "
 				+ "prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, "
 				+ "tiva.valor, prin.idcontador, PRIN.NOFACTURABLE, tiva.idtipoiva,  TIVA.DESCRIPCION,"
-				+ "tiva.fechabaja, PRIN.SOLICITARBAJA");
+				+ "tiva.fechabaja, PRIN.SOLICITARALTA, PRIN.SOLICITARBAJA");
 
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		

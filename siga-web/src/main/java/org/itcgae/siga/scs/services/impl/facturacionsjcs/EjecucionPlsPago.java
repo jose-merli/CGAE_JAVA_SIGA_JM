@@ -247,7 +247,10 @@ public class EjecucionPlsPago {
             Object[] param_in = new Object[2];
             param_in[0] = idInstitucion;
             param_in[1] = fechaPago;
-
+            LOGGER.info("Entrada al procedimiento PROC_FACSJCS_DESCIERREPAGO: " + param_in);
+            for(int i = 0; i < param_in.length; i++){
+                LOGGER.info("Resultado["+i+"]: " + param_in[i]);
+            }
             resultado = callPLProcedure("{call PROC_FACSJCS_DESCIERREPAGO (?,?,?,?)}", 2, param_in);
             LOGGER.info("Resultado del procedimiento PROC_FACSJCS_DESCIERREPAGO: " + resultado);
             for(int i = 0; i < resultado.length; i++){
