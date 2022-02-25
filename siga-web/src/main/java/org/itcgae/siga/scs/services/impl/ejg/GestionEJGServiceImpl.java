@@ -585,12 +585,17 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                     ejg.setGuardiaturnoIdguardia(Integer.parseInt(datos.getIdGuardia()));
                     ejg.setGuardiaturnoIdturno(Integer.parseInt(datos.getIdTurno()));
-                    ejg.setIdpersona(Long.parseLong(datos.getIdPersona()));
+
+                    // Persona de la tarjeta de Servicio de Tramitación (Opcional)
+                    if (!UtilidadesString.esCadenaVacia(datos.getIdPersona()))
+                        ejg.setIdpersona(Long.parseLong(datos.getIdPersona()));
+                    else
+                        ejg.setIdpersona(null);
 
                     LOGGER.info(
                             "guardarServiciosTramitacion() / scsEjgMapper.updateByPrimaryKeySelective() -> Entrada a scsEjgMapper para actualizar el ejg");
 
-                    response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
+                    response = scsEjgMapper.updateByPrimaryKey(ejg);
 
                     LOGGER.info(
                             "guardarServiciosTramitacion() / scsEjgMapper.updateByPrimaryKeySelective() -> Salida a scsEjgMapper para actualizar el ejg");
