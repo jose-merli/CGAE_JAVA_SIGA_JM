@@ -1,9 +1,7 @@
 package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.fac.FacEstadoConfirmacionFact;
-import org.itcgae.siga.DTO.fac.FacFicherosDescargaBean;
-import org.itcgae.siga.DTO.fac.FacturasFacturacionRapidaDTO;
+import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -37,6 +35,7 @@ import org.itcgae.siga.db.services.form.mappers.PysProductosinstitucionExtendsMa
 import org.itcgae.siga.db.services.form.mappers.PysProductossolicitadosExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionRapidaService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -1026,6 +1025,25 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
         }
 
         return ficheroZip;
+    }
+
+    public Resource descargarFacturasBySolicitud(HttpServletRequest request, List<ListaCompraProductosItem> listaPeticiones) throws Exception  {
+
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken( request.getHeader("Authorization") );
+        String solicitudes = "";
+
+        for (ListaCompraProductosItem item : listaPeticiones) {
+            solicitudes += (item.getnSolicitud() + ", ");
+        }
+
+        List<FacturaItem> facturas = facFacturaExtendsMapper.getFacturasByIdSolicitud(solicitudes, idInstitucion.toString());
+
+        try {
+            return this.facturacionHelper.obtenerFicheros(facturas);
+        } catch (Exception e) {
+            throw new Exception("Ha ocurrido un error al descargar las facturas");
+        }
+
     }
 
 }

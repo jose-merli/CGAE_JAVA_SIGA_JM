@@ -8,6 +8,7 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FacFacturaSqlProvider;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 
 public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
@@ -257,6 +258,38 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         LOGGER.info(sqlFacturas.toString());
         
         return sqlFacturas.toString();
+    }
+
+    public String getFacturasByIdSolicitud(String solicitudes, String idInstitucion) {
+
+        SQL queryCompras = new SQL();
+        SQL querySuscripciones = new SQL();
+        SQL query = new SQL();
+
+        queryCompras.SELECT("ff.*");
+        queryCompras.FROM("PYS_COMPRA pc, FAC_FACTURA ff");
+        queryCompras.WHERE("pc.IDINSTITUCION = ff.IDINSTITUCION AND pc.IDFACTURA = ff.IDFACTURA");
+        queryCompras.WHERE("pc.IDINSTITUCION = " + idInstitucion);
+        queryCompras.WHERE("pc.IDPETICION IN (" + solicitudes + ")");
+
+        querySuscripciones.SELECT("ff.*");
+        querySuscripciones.FROM("PYS_SUSCRIPCION ps, FAC_FACTURACIONSUSCRIPCION fs, FAC_FACTURA ff");
+        querySuscripciones.WHERE("ps.IDINSTITUCION = fs.IDINSTITUCION " +
+                                            "AND ps.IDTIPOSERVICIOS = fs.IDTIPOSERVICIOS " +
+                                            "AND ps.IDSERVICIO = fs.IDSERVICIO " +
+                                            "AND ps.IDSERVICIOSINSTITUCION = fs.IDSERVICIOSINSTITUCION " +
+                                            "AND ps.IDSUSCRIPCION = fs.IDSUSCRIPCION " +
+                                            "AND fs.IDINSTITUCION = ff.IDINSTITUCION " +
+                                            "AND fs.IDFACTURA = ff.IDFACTURA");
+        querySuscripciones.WHERE("ps.IDINSTITUCION = " + idInstitucion);
+        querySuscripciones.WHERE("ps.IDPETICION IN (" + solicitudes + ")");
+
+        query.SELECT("idseriefacturacion, idprogramacion, idinstitucion, idpersona, idfactura, numerofactura");
+        query.FROM(queryCompras + "UNION ALL" + querySuscripciones);
+
+        LOGGER.info(query.toString());
+
+        return query.toString();
     }
 
     public String getFactura(String idFactura, String idInstitucion) {
