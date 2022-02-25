@@ -284,8 +284,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         querySuscripciones.WHERE("ps.IDINSTITUCION = " + idInstitucion);
         querySuscripciones.WHERE("ps.IDPETICION IN (" + solicitudes + ")");
 
-        query.SELECT("idseriefacturacion, idprogramacion, idinstitucion, idpersona, idfactura, numerofactura");
-        query.FROM(queryCompras + "UNION ALL" + querySuscripciones);
+        query.SELECT("DISTINCT idseriefacturacion, idprogramacion, idinstitucion, idpersona, idfactura, numerofactura");
+        query.FROM("("+queryCompras + " UNION ALL " + querySuscripciones + ")");
 
         LOGGER.info(query.toString());
 

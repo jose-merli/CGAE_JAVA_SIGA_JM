@@ -1129,7 +1129,7 @@ public class FacturacionHelper {
             } else {
 
                 String rutaZip = getProperty(SigaConstants.PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF) + getProperty(SigaConstants.PARAMETRO_DIRECTORIO_FACTURA_PDF) +
-                        File.separator + facturas.get(0).getIdInstitucion() + File.separator + "ZIPFacturaTmp.zip";
+                        File.separator + facturas.get(0).getIdInstitucion() + File.separator + "Facturas.zip";
                 ZipOutputStream outTemp = null;
                 Resource resource = null;
 
@@ -1150,7 +1150,7 @@ public class FacturacionHelper {
                     for (FacturaItem factura : facturas) {
 
                         fileFactura = obtenerFicheroServer(factura);
-                        zipEntry = new ZipEntry(fileFactura.getAbsolutePath());
+                        zipEntry = new ZipEntry(fileFactura.getName());
                         outTemp.putNextEntry(zipEntry);
 
                         FileInputStream fis = new FileInputStream(fileFactura);
@@ -1174,7 +1174,7 @@ public class FacturacionHelper {
                             }
                         };
                     }
-
+                    ficheroZip.delete();
                     return resource;
 
                 } catch(FileNotFoundException fnfe) {
