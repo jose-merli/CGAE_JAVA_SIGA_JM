@@ -32,5 +32,6 @@ public class EstadosAbonosItem {
 	String importePendiente;
 
 	String comentario;
+	String modo;
 
 }

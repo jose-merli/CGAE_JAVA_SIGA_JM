@@ -230,13 +230,12 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 
 		SQL numServicios = new SQL();
 		numServicios.SELECT("BANCO.IDCUENTA");
-		numServicios.SELECT("BANCO.NUM_SERVICIOS_ASOCIADOS");
 		numServicios.SELECT("( " + countNumServicios.toString() + " ) AS NUM_SERVICIOS_ASOCIADOS");
 		numServicios.FROM("CEN_CUENTASBANCARIAS BANCO");
-		countNumServicios.WHERE("BANCO.IDINSTITUCION = '" + idInstitucion + "'");
-		countNumServicios.WHERE("BANCO.IDPERSONA = '" + idPersona + "'");
-		countNumServicios.WHERE("BANCO.FECHABAJA IS NULL");
-		countNumServicios.WHERE("BANCO.ABONOCARGO IN ('T', 'C')");
+		numServicios.WHERE("BANCO.IDINSTITUCION = '" + idInstitucion + "'");
+		numServicios.WHERE("BANCO.IDPERSONA = '" + idPersona + "'");
+		numServicios.WHERE("BANCO.FECHABAJA IS NULL");
+		numServicios.WHERE("BANCO.ABONOCARGO IN ('T', 'C')");
 
 		SQL principal = new SQL();
 		principal.SELECT("TABLA.IDCUENTA");

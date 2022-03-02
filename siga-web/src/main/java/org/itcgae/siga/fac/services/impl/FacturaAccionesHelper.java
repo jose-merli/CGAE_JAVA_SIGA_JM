@@ -499,11 +499,14 @@ public class FacturaAccionesHelper {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int renegociarAbono(Long idAbono, Short idCuenta, AdmUsuarios usuario) {
+    public int renegociarAbono(Long idAbono, Short idCuenta, AdmUsuarios usuario, String modo) {
         int resultado;
         FacAbonoKey abonoKey = new FacAbonoKey();
         abonoKey.setIdinstitucion(usuario.getIdinstitucion());
         abonoKey.setIdabono(idAbono);
+        
+        CenCuentasbancariasKey cuentaBancariaKey;
+        CenCuentasbancarias cuentaBancaria;
 
         FacAbono abono = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
 
@@ -515,28 +518,69 @@ public class FacturaAccionesHelper {
 
         if (abono.getImppendienteporabonar() == null || abono.getImppendienteporabonar().compareTo(BigDecimal.ZERO) <= 0)
             throw new BusinessException("facturacionSJCS.abonosSJCS.error.importePendienteCero");
+        
+        if( modo == null || modo.isEmpty()) {
+        	if (idCuenta == null)
+                abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA);
+            else
+                abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
 
-        if (idCuenta == null)
-            abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA);
-        else
-            abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
+            if (abono.getEstado() == SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA) {
+                abono.setIdcuenta(null);
+            } else if (abono.getEstado() == SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO) {
+                abono.setIdcuenta(idCuenta);
 
-        if (abono.getEstado() == SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA) {
-            abono.setIdcuenta(null);
-        } else if (abono.getEstado() == SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO) {
-            abono.setIdcuenta(idCuenta);
+                CenCuentasbancariasKey bancoKey = new CenCuentasbancarias();
+                bancoKey.setIdinstitucion(usuario.getIdinstitucion());
+                bancoKey.setIdcuenta(idCuenta);
+                bancoKey.setIdpersona(abono.getIdpersona());
 
-            CenCuentasbancariasKey bancoKey = new CenCuentasbancarias();
-            bancoKey.setIdinstitucion(usuario.getIdinstitucion());
-            bancoKey.setIdcuenta(idCuenta);
-            bancoKey.setIdpersona(abono.getIdpersona());
+                CenCuentasbancarias banco = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(bancoKey);
 
-            CenCuentasbancarias banco = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(bancoKey);
+                if (banco == null)
+                    throw new BusinessException("facturacionSJCS.abonosSJCS.error.bancoAsociado");
+            }
+        }else {
+            switch (modo) {
+            case "caja":
+            	 abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_CAJA);
+            	 abono.setIdcuenta(null);
+                break;
+            case "cuenta_activa":
+            	
+            	cuentaBancaria = getCuentaActivaUnica(abono.getIdpersona(), usuario.getIdinstitucion());
 
-            if (banco == null)
-                throw new BusinessException("facturacionSJCS.abonosSJCS.error.bancoAsociado");
+                if (cuentaBancaria != null) {
+                    idCuenta = cuentaBancaria.getIdcuenta();
+                } else {
+                    throw new BusinessException("facturacionSJCS.abonosSJCS.error.bancoAsociado");                   
+                }
+                
+                abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
+                abono.setIdcuenta(idCuenta);
+                
+                break;
+            case "cuentaFactura_activa_masClientes":
+                cuentaBancaria = getCuentaActivaServiciosActivos(abono.getIdpersona(), usuario.getIdinstitucion());
+
+                if (cuentaBancaria != null) {
+                    idCuenta = cuentaBancaria.getIdcuenta();
+                } else {
+                    throw new BusinessException("facturacionSJCS.abonosSJCS.error.bancoAsociado");
+                }
+
+                abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
+                abono.setIdcuenta(idCuenta);
+                break;
+                
+            default:
+                throw new BusinessException("El modo de renegociación es incorrecto");
+                
+            }
+
         }
 
+        
         resultado = facAbonoExtendsMapper.updateByPrimaryKey(abono);
 
         if (resultado <= 0)
