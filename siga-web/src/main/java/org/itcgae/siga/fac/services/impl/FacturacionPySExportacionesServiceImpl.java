@@ -18,17 +18,11 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmContador;
-import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.entities.FacAbonoKey;
 import org.itcgae.siga.db.entities.FacAbonoincluidoendisquete;
 import org.itcgae.siga.db.entities.FacAbonoincluidoendisqueteExample;
-import org.itcgae.siga.db.entities.FacBancoinstitucion;
-import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
 import org.itcgae.siga.db.entities.FacDisqueteabonos;
 import org.itcgae.siga.db.entities.FacDisqueteabonosKey;
 import org.itcgae.siga.db.entities.FacDisquetecargos;
@@ -45,12 +39,9 @@ import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbancoExample;
-import org.itcgae.siga.db.entities.FacLineafactura;
-import org.itcgae.siga.db.entities.FacLineafacturaExample;
 import org.itcgae.siga.db.entities.FacPropositos;
 import org.itcgae.siga.db.entities.FacPropositosExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
-import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
@@ -80,7 +71,6 @@ import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySExportacionesService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.services.impl.WSCommons;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -251,6 +241,9 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 throw new BusinessException("general.message.camposObligatorios");
             }
 
+            // Crea el directorio donde se almacenarán los ficheros de adeudos (si no existe)
+            createDirFicheroAdeudos(usuario.getIdinstitucion());
+
             // En caso de que el fichero sea para facturas sueltas, se establecen los estados de las facturas
             // correspondientes al estado LISTA_PARA_FICHERO
             if (Objects.nonNull(ficheroAdeudosItem.getFacturasGeneracion()) && !ficheroAdeudosItem.getFacturasGeneracion().isEmpty()) {
@@ -336,6 +329,23 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         // Restaurar facturas a su estado inicial
         if (resultado[1].equals("0") && resultado[0].equals("0"))
             throw new BusinessException("facturacionPyS.ficheroAdeudos.error.nuevo");
+    }
+
+    private void createDirFicheroAdeudos(Short idInstitucion) throws Exception {
+
+        // Ruta del fichero
+        String pathFicheroServer = getProperty(FICHERO_ADEUDOS_SERVER_PATH) + getProperty(FICHERO_ADEUDOS_SERVER_DIR);
+
+        String sBarra = "";
+        if (pathFicheroServer.indexOf("/") > -1) sBarra = "/";
+        if (pathFicheroServer.indexOf("\\") > -1) sBarra = "\\";
+        pathFicheroServer += sBarra + idInstitucion;
+
+        File directory = new File(pathFicheroServer);
+        if (!directory.exists()) {
+            directory.mkdirs();
+            SIGAHelper.addPerm777(directory);
+        }
     }
 
     @Override
