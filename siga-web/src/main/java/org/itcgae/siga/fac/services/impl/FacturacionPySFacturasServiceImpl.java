@@ -303,7 +303,7 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         usuario = authenticationProvider.checkAuthentication(request);
 
         Short idCuenta = UtilidadesString.esCadenaVacia(nuevoEstado.getIdCuenta()) ? null : Short.parseShort(nuevoEstado.getIdCuenta());
-        facturaAccionesHelper.renegociarAbono(Long.parseLong(nuevoEstado.getIdAbono()), idCuenta, usuario);
+        facturaAccionesHelper.renegociarAbono(Long.parseLong(nuevoEstado.getIdAbono()), idCuenta, usuario,nuevoEstado.getModo());
 
         LOGGER.info(
                 "FacturacionPySFacturasImpl.renegociarAbono() -> Salida del servicio  para renegociar un abono");
