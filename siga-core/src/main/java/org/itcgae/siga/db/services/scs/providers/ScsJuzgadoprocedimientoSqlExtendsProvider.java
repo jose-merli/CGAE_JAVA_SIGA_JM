@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.ScsJuzgadoprocedimientoSqlProvider;
 
 public class ScsJuzgadoprocedimientoSqlExtendsProvider extends ScsJuzgadoprocedimientoSqlProvider{
 
-	public String searchProcJudged(String idLenguaje, Short idInstitucion, String idJuzgado) {
+	public String searchProcJudged(String idLenguaje, Short idInstitucion, String idJuzgado, String historico) {
 		
 		SQL sql = new SQL();
 		
@@ -15,6 +15,8 @@ public class ScsJuzgadoprocedimientoSqlExtendsProvider extends ScsJuzgadoprocedi
 		sql.SELECT("proc.codigo");
 		sql.SELECT("proc.precio as importe");
 		sql.SELECT("juris.descripcion as jurisdiccion");
+		sql.SELECT("proc.fechadesdevigor");
+		sql.SELECT("proc.fechahastavigor");
 
 		sql.FROM("SCS_JUZGADOPROCEDIMIENTO procedimiento");
 		sql.INNER_JOIN("SCS_PROCEDIMIENTOS proc on proc.idprocedimiento = procedimiento.idprocedimiento and procedimiento.idinstitucion = proc.idinstitucion");
@@ -22,6 +24,11 @@ public class ScsJuzgadoprocedimientoSqlExtendsProvider extends ScsJuzgadoprocedi
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS juris on (juris.idrecurso = jurisdiccion.DESCRIPCION and idlenguaje = '" + idLenguaje + "')");;
 		
 		sql.WHERE("proc.idinstitucion = '" + idInstitucion + "'");
+		
+		if(historico.equals("false")) {
+			sql.WHERE("(proc.fechadesdevigor <= sysdate AND (proc.FECHAHASTAVIGOR > sysdate OR proc.fechahastavigor is null))");
+		}
+		
 		sql.WHERE("procedimiento.idjuzgado = '" + idJuzgado + "'");
 
 		sql.ORDER_BY("proc.nombre");

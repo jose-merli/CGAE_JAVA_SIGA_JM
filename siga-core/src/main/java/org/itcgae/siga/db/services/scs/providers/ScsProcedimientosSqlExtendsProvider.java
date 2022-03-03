@@ -58,7 +58,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 //GROUP BY procedimiento.idprocedimiento,  procedimiento.nombre, procedimiento.codigo, procedimiento.precio , procedimiento.complemento, procedimiento.vigente, procedimiento.idjurisdiccion, procedimiento.orden, procedimiento.codigoext, procedimiento.permitiraniadirletrado, procedimiento.fechadesdevigor, procedimiento.fechahastavigor, procedimiento.fechabaja, procedimiento.observaciones
 //ORDER BY nombre;
 
-	public String searchModulo(ModulosItem moduloItem) {
+	public String searchModulo(ModulosItem moduloItem, String idioma) {
 		
 		SQL sql = new SQL();
 		
@@ -77,6 +77,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		sql.SELECT("procedimiento.fechahastavigor");
 		sql.SELECT("procedimiento.fechabaja");
 		sql.SELECT("procedimiento.observaciones");
+		sql.SELECT("juris.descripcion AS jurisdicciondes");
 
 		sql.FROM("SCS_PROCEDIMIENTOS PROCEDIMIENTO");
 		
@@ -84,6 +85,13 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		
 		sql.LEFT_OUTER_JOIN("SCS_PRETENSIONESPROCED prepro on (prepro.idprocedimiento = procedimiento.idprocedimiento AND PREPRO.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION)");
 		sql.LEFT_OUTER_JOIN("SCS_PRETENSION pretension on (prepro.idpretension = pretension.idpretension AND pretension.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION AND PRETENSION.FECHABAJA IS NULL)");
+		sql.INNER_JOIN("scs_jurisdiccion jurisdiccion ON jurisdiccion.idjurisdiccion = procedimiento.idjurisdiccion");
+		sql.INNER_JOIN("gen_recursos_catalogos juris ON (\r\n"
+				+ "            juris.idrecurso = jurisdiccion.descripcion\r\n"
+				+ "        AND\r\n"
+				+ "            idlenguaje = '"+ idioma +"' \r\n"
+				+ "    )");
+		
 		if(moduloItem.getPrecio() == null) {
 			if(moduloItem.getNombre() != null && moduloItem.getNombre() != "") {
 				sql.WHERE("UPPER(procedimiento.nombre) like UPPER('%" + moduloItem.getNombre() + "%')");
@@ -107,10 +115,10 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		}
 		
 		if(!moduloItem.isHistorico()) {
-			sql.WHERE("procedimiento.fechabaja is null");
+			sql.WHERE("(procedimiento.fechadesdevigor <= sysdate AND (procedimiento.FECHAHASTAVIGOR > sysdate OR procedimiento.fechahastavigor is null))");
 		}
 		
-		sql.GROUP_BY("procedimiento.idprocedimiento,  procedimiento.nombre, procedimiento.codigo, procedimiento.precio , procedimiento.complemento, procedimiento.vigente, procedimiento.idjurisdiccion, procedimiento.orden, procedimiento.codigoext, procedimiento.permitiraniadirletrado, procedimiento.fechadesdevigor, procedimiento.fechahastavigor, procedimiento.fechabaja, procedimiento.observaciones");
+		sql.GROUP_BY("procedimiento.idprocedimiento,  procedimiento.nombre, procedimiento.codigo, procedimiento.precio , procedimiento.complemento, procedimiento.vigente, procedimiento.idjurisdiccion, procedimiento.orden, procedimiento.codigoext, procedimiento.permitiraniadirletrado, procedimiento.fechadesdevigor, procedimiento.fechahastavigor, procedimiento.fechabaja, procedimiento.observaciones, juris.descripcion");
 		sql.ORDER_BY("nombre"); 
 	
 		return sql.toString();

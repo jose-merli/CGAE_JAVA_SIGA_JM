@@ -227,7 +227,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 	}
 
 	@Override
-	public ProcedimientoDTO searchProcCourt(String idJuzgado, HttpServletRequest request) {
+	public ProcedimientoDTO searchProcCourt(String idJuzgado, String historico, HttpServletRequest request) {
 		LOGGER.info("searchProcCourt() -> Entrada al servicio para obtener los procedimientos asigandos a juzgados");
 
 		// Conseguimos información del usuario logeado
@@ -257,7 +257,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 						"searchProcCourt() / scsProcedimientosExtendsMapper.searchProcJudged() -> Entrada a scsProcedimientosExtendsMapper para obtener procedimientos asigandos a juzgados");
 
 				procedimientos = scsJuzgadoProcedimientoExtendsMapper.searchProcJudged(usuario.getIdlenguaje(),
-						idInstitucion, idJuzgado);
+						idInstitucion, idJuzgado, historico);
 
 				LOGGER.info(
 						"searchProcCourt() / scsProcedimientosExtendsMapper.searchProcJudged() -> Salida a scsProcedimientosExtendsMapper para obtener procedimientos asigandos a juzgados");

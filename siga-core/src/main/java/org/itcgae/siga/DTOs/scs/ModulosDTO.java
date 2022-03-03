@@ -12,6 +12,7 @@ public class ModulosDTO   {
   
   private List<ModulosItem> modulosItem = new ArrayList<ModulosItem>();
   private Error error = null;
+  private String baja;
 
   
   /**
@@ -22,7 +23,15 @@ public class ModulosDTO   {
     return this;
   }
   
-  @JsonProperty("modulosItem")
+  public String getBaja() {
+	return baja;
+}
+
+public void setBaja(String baja) {
+	this.baja = baja;
+}
+
+@JsonProperty("modulosItem")
   public List<ModulosItem> getModulosItem() {
     return modulosItem;
   }

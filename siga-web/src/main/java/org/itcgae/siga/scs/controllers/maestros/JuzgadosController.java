@@ -85,8 +85,8 @@ public class JuzgadosController {
 	}
 	
 	@RequestMapping(value = "/gestionJuzgados/searchProcCourt", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ProcedimientoDTO> searchProcJudged(@RequestParam("idJuzgado") String idJuzgado, HttpServletRequest request) { 
-		ProcedimientoDTO response = gestionJuzgadosService.searchProcCourt(idJuzgado, request);
+	ResponseEntity<ProcedimientoDTO> searchProcJudged(@RequestParam("idJuzgado") String idJuzgado, @RequestParam("historico") String historico, HttpServletRequest request) { 
+		ProcedimientoDTO response = gestionJuzgadosService.searchProcCourt(idJuzgado, historico, request);
 		return new ResponseEntity<ProcedimientoDTO >(response, HttpStatus.OK);
 	}
 	

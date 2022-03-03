@@ -24,8 +24,19 @@ public class ModulosItem {
 	private Date fechahastavigor;
 	private String observaciones;
 	private boolean historico;
+	private String jurisdiccionDes;
 	
 	
+	
+	
+	public String getJurisdiccionDes() {
+		return jurisdiccionDes;
+	}
+
+	public void setJurisdiccionDes(String jurisdiccionDes) {
+		this.jurisdiccionDes = jurisdiccionDes;
+	}
+
 	public String getIdProcedimiento() {
 		return idProcedimiento;
 	}
