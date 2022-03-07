@@ -586,7 +586,9 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
         String pathFichero = getProperty(FICHERO_ADEUDOS_SERVER_PATH) + getProperty(FICHERO_ADEUDOS_SERVER_DIR)
                 + File.separator + usuario.getIdinstitucion();
-
+        
+        LOGGER.info("descargarFicheroAdeudos() -> Directorio principal : " + pathFichero);
+        
         List<File> listaFicheros = ficheroAdeudosItems.stream().flatMap(item -> {
             FacDisquetecargosKey key = new FacDisquetecargosKey();
             key.setIdinstitucion(usuario.getIdinstitucion());
