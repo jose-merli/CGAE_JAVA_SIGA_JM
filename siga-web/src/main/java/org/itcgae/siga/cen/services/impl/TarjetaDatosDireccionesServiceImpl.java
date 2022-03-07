@@ -389,6 +389,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		ComboDTO poblacionesReturn = new ComboDTO();
 		List<CenPoblaciones> poblaciones = new ArrayList<CenPoblaciones>();
 
+		//Tratamiento apostrofes
+        filtro = UtilidadesString.tratamientoApostrofes(filtro);
+		
 		poblaciones = cenPoblacionesExtendsMapper.selectByFilter(filtro, idProvincia);
 
 		if (null != poblaciones && poblaciones.size() > 0) {

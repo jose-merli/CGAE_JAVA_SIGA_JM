@@ -16,6 +16,8 @@ public class ProcedimientoItem {
 	private String jurisdiccion;
 	private String codigo;
 	private String idJuzgado;
+	private Date fechadesdevigor;
+	private Date fechahastavigor;
 	
 
 	/**
@@ -23,6 +25,22 @@ public class ProcedimientoItem {
 	public ProcedimientoItem idProcedimiento(String idProcedimiento) {
 		this.idProcedimiento = idProcedimiento;
 		return this;
+	}
+
+	public Date getFechadesdevigor() {
+		return fechadesdevigor;
+	}
+
+	public void setFechadesdevigor(Date fechadesdevigor) {
+		this.fechadesdevigor = fechadesdevigor;
+	}
+
+	public Date getFechahastavigor() {
+		return fechahastavigor;
+	}
+
+	public void setFechahastavigor(Date fechahastavigor) {
+		this.fechahastavigor = fechahastavigor;
 	}
 
 	@JsonProperty("idProcedimiento")

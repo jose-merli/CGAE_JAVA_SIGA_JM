@@ -24,9 +24,11 @@ public interface ScsJuzgadoProcedimientoExtendsMapper extends ScsJuzgadoprocedim
 		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "JURISDICCION", property = "jurisdiccion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechadesdevigor", property = "fechadesdevigor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechahastavigor", property = "fechahastavigor", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<ProcedimientoItem> searchProcJudged(String idLenguaje, Short idInstitucion, String idJuzgado);
+	List<ProcedimientoItem> searchProcJudged(String idLenguaje, Short idInstitucion, String idJuzgado, String historico);
 	
 
 }

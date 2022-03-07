@@ -1506,6 +1506,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				}
 			}
 
+			// Forma de pago automática por defecto
+			if (isNewSerie) {
+				FacFormapagoserie formaPagoSerie = new FacFormapagoserie();
+				formaPagoSerie.setIdseriefacturacion(idSerieFacturacion);
+				formaPagoSerie.setIdinstitucion(usuario.getIdinstitucion());
+				formaPagoSerie.setIdformapago(Short.parseShort(SigaConstants.TIPO_FORMAPAGO_FACTURA));
+
+				formaPagoSerie.setUsumodificacion(usuario.getIdusuario());
+				formaPagoSerie.setFechamodificacion(new Date());
+				facFormapagoserieExtendsMapper.insert(formaPagoSerie);
+			}
+
 		}
 
 		updateResponseDTO.setId(String.valueOf(idSerieFacturacion));

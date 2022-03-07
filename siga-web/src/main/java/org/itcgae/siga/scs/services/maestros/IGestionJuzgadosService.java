@@ -11,7 +11,7 @@ public interface IGestionJuzgadosService {
 	
 	public ProcedimientoDTO searchProcess(HttpServletRequest request);
 	
-	public ProcedimientoDTO searchProcCourt(String idProc, HttpServletRequest request);
+	public ProcedimientoDTO searchProcCourt(String idProc, String historico, HttpServletRequest request);
 	
 	public InsertResponseDTO createCourt(JuzgadoItem juzgadoItem, HttpServletRequest request);
 	

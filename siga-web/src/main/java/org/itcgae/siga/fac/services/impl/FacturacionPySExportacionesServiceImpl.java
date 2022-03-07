@@ -18,11 +18,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmContador;
-import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.entities.FacAbonoKey;
 import org.itcgae.siga.db.entities.FacAbonoincluidoendisquete;
@@ -45,12 +41,12 @@ import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
 import org.itcgae.siga.db.entities.FacLineadevoludisqbancoExample;
-import org.itcgae.siga.db.entities.FacLineafactura;
-import org.itcgae.siga.db.entities.FacLineafacturaExample;
 import org.itcgae.siga.db.entities.FacPropositos;
 import org.itcgae.siga.db.entities.FacPropositosExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
-import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
+import org.itcgae.siga.db.entities.FcsPagosjg;
+import org.itcgae.siga.db.entities.FcsPagosjgKey;
+import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
@@ -76,11 +72,11 @@ import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPropositosExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsPagosjgExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySExportacionesService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.services.impl.WSCommons;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -198,6 +194,9 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     private FacBancoinstitucionExtendsMapper facBancoinstitucionExtendsMapper;
 
     @Autowired
+    private FcsPagosjgExtendsMapper fcsPagosjgExtendsMapper;
+
+    @Autowired
     private FacturaAccionesHelper facturaAccionesHelper;
 
     @Override
@@ -250,6 +249,9 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                     || Objects.isNull(ficheroAdeudosItem.getFechaRecibosB2B())) {
                 throw new BusinessException("general.message.camposObligatorios");
             }
+
+            // Crea el directorio donde se almacenarán los ficheros de adeudos (si no existe)
+            createDirFicheroAdeudos(usuario.getIdinstitucion());
 
             // En caso de que el fichero sea para facturas sueltas, se establecen los estados de las facturas
             // correspondientes al estado LISTA_PARA_FICHERO
@@ -336,6 +338,23 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         // Restaurar facturas a su estado inicial
         if (resultado[1].equals("0") && resultado[0].equals("0"))
             throw new BusinessException("facturacionPyS.ficheroAdeudos.error.nuevo");
+    }
+
+    private void createDirFicheroAdeudos(Short idInstitucion) {
+
+        // Ruta del fichero
+        String pathFicheroServer = getProperty(FICHERO_ADEUDOS_SERVER_PATH) + getProperty(FICHERO_ADEUDOS_SERVER_DIR);
+
+        String sBarra = "";
+        if (pathFicheroServer.indexOf("/") > -1) sBarra = "/";
+        if (pathFicheroServer.indexOf("\\") > -1) sBarra = "\\";
+        pathFicheroServer += sBarra + idInstitucion;
+
+        File directory = new File(pathFicheroServer);
+        if (!directory.exists()) {
+            directory.mkdirs();
+            SIGAHelper.addPerm777(directory);
+        }
     }
 
     @Override
@@ -1155,6 +1174,9 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         if (usuario != null) {
             String fcs = "0";
 
+            // Creamos el directorio donde se guardarán los nuevos ficheros en caso de que no exista
+            createDirFicheroTransferencias(usuario.getIdinstitucion());
+
             List<FacSeriefacturacionBanco> bancosSufijos = facSeriefacturacionBancoExtendsMapper.getBancosSufijos(usuario.getIdinstitucion());
 
             for (FacSeriefacturacionBanco banco: bancosSufijos) {
@@ -1226,10 +1248,72 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
         // Conseguimos información del usuario logeado
         usuario = authenticationProvider.checkAuthentication(request);
+        Short idInstitucion = usuario.getIdinstitucion();
 
         if (usuario != null) {
             String fcs = "1";
 
+            // Creamos el directorio donde se guardarán los nuevos ficheros en caso de que no exista
+            createDirFicheroTransferencias(usuario.getIdinstitucion());
+
+            // Se obtienen los abonos cuyos ficheros van a ser generados
+            List<FacAbono> abonos = abonoItems.stream().map(abono -> {
+                FacAbonoKey key = new FacAbonoKey();
+                key.setIdabono(Long.parseLong(abono.getIdAbono()));
+                key.setIdinstitucion(idInstitucion);
+                return facAbonoExtendsMapper.selectByPrimaryKey(key);
+            }).collect(Collectors.toList());
+
+            // No se permite generar el fichero si el abono ya ha sido pagodo o si el importe pendiente es null
+            List<String> numeroAbonosImporteIncorrecto = abonos.stream()
+                    .filter(abono -> abono.getImppendienteporabonar() == null
+                        || abono.getImppendienteporabonar().compareTo(BigDecimal.ZERO) == 0)
+                    .map(FacAbono::getNumeroabono)
+                    .collect(Collectors.toList());
+
+            List<String> numeroAbonosBancoIncorrecto = new ArrayList<>();
+            List<String> numeroAbonosSufijoIncorrecto = new ArrayList<>();
+            List<String> numeroAbonosPropositoIncorrecto = new ArrayList<>();
+
+            for (FacAbono abono: abonos) {
+                FcsPagosjgKey pagoKey = new FcsPagosjgKey();
+                pagoKey.setIdpagosjg(abono.getIdpagosjg());
+                pagoKey.setIdinstitucion(idInstitucion);
+                FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(pagoKey);
+
+                // No se permite generar el fichero si el pago no tiene sufijo
+                if (pago.getIdsufijo() == null)
+                    numeroAbonosSufijoIncorrecto.add(abono.getNumeroabono());
+
+                FacBancoinstitucionKey bancoKey = new FacBancoinstitucionKey();
+                bancoKey.setBancosCodigo(pago.getBancosCodigo());
+                bancoKey.setIdinstitucion(idInstitucion);
+
+                FacBancoinstitucion banco = facBancoinstitucionExtendsMapper.selectByPrimaryKey(bancoKey);
+                // No se permite generar el fichero si la cuenta bancaria está de baja
+                if (banco == null || banco.getFechabaja() != null)
+                    numeroAbonosBancoIncorrecto.add(abono.getNumeroabono());
+
+                // No se permite generar el fichero si el pago no  tiene idpropsepa o idpropotros
+                if (pago.getIdpropsepa() == null || pago.getIdpropotros() == null)
+                    numeroAbonosPropositoIncorrecto.add(abono.getNumeroabono());
+            }
+
+            // Se controla si algunas de las condiciones no se cumplen
+            if (!numeroAbonosImporteIncorrecto.isEmpty())
+                throw new BusinessException(getTraduccion("facturacion.ficheroAdeudos.error.importeInvalido", usuario.getIdlenguaje()).trim()
+                        + " " + joinWithLimit(", ", numeroAbonosImporteIncorrecto, 10));
+            if (!numeroAbonosSufijoIncorrecto.isEmpty())
+                throw new BusinessException(getTraduccion("facturacion.ficheroAdeudos.error.sufijoInvalido", usuario.getIdlenguaje()).trim()
+                        + " " + joinWithLimit(", ", numeroAbonosSufijoIncorrecto, 10));
+            if (!numeroAbonosBancoIncorrecto.isEmpty())
+                throw new BusinessException(getTraduccion("facturacion.ficheroAdeudos.error.cuentaInvalida", usuario.getIdlenguaje()).trim()
+                        + " " + joinWithLimit(", ", numeroAbonosBancoIncorrecto, 10));
+            if (!numeroAbonosPropositoIncorrecto.isEmpty())
+                throw new BusinessException(getTraduccion("facturacion.ficheroAdeudos.error.propInvalido", usuario.getIdlenguaje()).trim()
+                        + " " + joinWithLimit(", ", numeroAbonosPropositoIncorrecto, 10));
+
+            // Se inicia la generación de los ficheros
             List<FicherosAbonosItem> bancosSufijos = facAbonoExtendsMapper.getBancosSufijosSjcs(usuario.getIdinstitucion());
 
             for (FicherosAbonosItem banco: bancosSufijos) {
@@ -1259,6 +1343,23 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 "FacturacionPySExportacionesServiceImpl.nuevoFicheroTransferencias() -> Salida del servicio  para generar un nuevo fichero de transferencias");
 
         return insertResponseDTO;
+    }
+
+    private void createDirFicheroTransferencias(Short idInstitucion) {
+
+        // Ruta del fichero
+        String pathFicheroServer = getProperty(FICHERO_TRANSFERENCIAS_SERVER_PATH) + getProperty(FICHERO_TRANSFERENCIAS_SERVER_DIR);
+
+        String sBarra = "";
+        if (pathFicheroServer.indexOf("/") > -1) sBarra = "/";
+        if (pathFicheroServer.indexOf("\\") > -1) sBarra = "\\";
+        pathFicheroServer += sBarra + idInstitucion;
+
+        File directory = new File(pathFicheroServer);
+        if (!directory.exists()) {
+            directory.mkdirs();
+            SIGAHelper.addPerm777(directory);
+        }
     }
 
     private int prepararFicheroTransferencias(String fcs, Short idInstitucion,
@@ -1589,6 +1690,18 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         keyParametros.setIdinstitucion(idInstitucion);
         GenParametros property = genParametrosExtendsMapper.selectByPrimaryKey(keyParametros);
         return property != null ? property.getValor() : "";
+    }
+
+    private String getTraduccion(String idrecurso, String idioma) {
+        GenDiccionarioKey keyParametros = new GenDiccionarioKey();
+        keyParametros.setIdrecurso(idrecurso);
+        keyParametros.setIdlenguaje(idioma);
+        GenDiccionario traduccion = genDiccionarioMapper.selectByPrimaryKey(keyParametros);
+        return traduccion != null ? traduccion.getDescripcion() : "";
+    }
+
+    private String joinWithLimit(String delimiter, List<String> list, int limit) {
+        return list.stream().limit(limit).collect(Collectors.joining(delimiter)) + (list.size() > limit ? ", ..." : "");
     }
 
     private Short string2Short(String val) {

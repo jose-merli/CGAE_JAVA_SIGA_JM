@@ -136,7 +136,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 				modulosItem.setidInstitucion(idInstitucion.toString());
 				
 				modulosItem.setNombre(UtilidadesString.tratamientoApostrofes(modulosItem.getNombre()));
-				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosItem);
+				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosItem, usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"searchModules() / scsProcedimientosMapper.selectByExample() -> Salida a scsProcedimientosMapper para obtener los modulos");
@@ -696,19 +696,25 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 						modulo = scsProcedimientosExtendsMapper.selectByPrimaryKey(modulo);
 						
-						if(modulosItem.getFechabaja() == null) {
-							modulo.setFechabaja(new Date());
-						}else {
-							modulo.setFechabaja(null);
-						}
-						
 						modulo.setFechamodificacion(new Date());
 						modulo.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+						if(modulosDTO.getBaja().equals("bajalogica")) {
+							modulo.setFechahastavigor(modulosItem.getFechahastavigor());
+							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
+						}else if (modulosDTO.getBaja().equals("bajafisica")){
+							response = scsProcedimientosExtendsMapper.deleteByPrimaryKey(modulo);
+						}else if(modulosDTO.getBaja().equals("reactivar")) {
+							modulo.setFechahastavigor(null);
+							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
+						}
+						
+						
 						
 						LOGGER.info(
 								"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Entrada a scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
 
-						response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
+						
 
 						LOGGER.info(
 								"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Salida de scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
@@ -719,7 +725,11 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
-					error.setDescription("general.mensaje.error.bbdd");
+					if(!e.getCause().getMessage().contains("ORA-02292")){
+						error.setDescription("general.mensaje.error.bbdd");
+					}else {
+						error.setDescription("sjcs.maestros.modulos.eliminacionfisicaerrorenuso");
+					}
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -728,7 +738,6 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("areasmaterias.materias.ficha.eliminarError");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
