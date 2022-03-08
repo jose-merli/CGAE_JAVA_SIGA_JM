@@ -3139,6 +3139,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //				List<Integer> responses = new ArrayList<>();
 
 				for (DesignaItem designa : item) {
+					
+					ScsDesignasletradoExample exampleDesignasLetrado = new ScsDesignasletradoExample();
+					
+					exampleDesignasLetrado.createCriteria().andIdinstitucionEqualTo(idInstitucion).
+					andIdturnoEqualTo(designa.getIdTurno()).andAnioEqualTo((short) designa.getAno()).andNumeroEqualTo(new Long(designa.getNumero()));
+					
+					List <ScsDesignasletrado> listadoLetradosAsignadosADesigna = scsDesignasletradoMapper.selectByExample(exampleDesignasLetrado);
+					
+					if(listadoLetradosAsignadosADesigna.size() > 0) {
+						for (ScsDesignasletrado letradoAsignadoADesigna : listadoLetradosAsignadosADesigna) {
+							int responseEliminacionLetradoAsignadoADesigna = scsDesignasletradoMapper.deleteByPrimaryKey(letradoAsignadoADesigna);
+							
+							if(responseEliminacionLetradoAsignadoADesigna == 0) {
+								LOGGER.error("No se pudo eliminar el letrado con idpersona: " + letradoAsignadoADesigna.getIdpersona() + " asignado a la designa con idinstitucion: " + idInstitucion + ", idturno: " 
+										+ letradoAsignadoADesigna.getIdturno() + ", anio: " + letradoAsignadoADesigna.getAnio() + ", numero: " + letradoAsignadoADesigna.getNumero());
+							}else {
+								LOGGER.error("See pudo eliminar el letrado con idpersona: " + letradoAsignadoADesigna.getIdpersona() + " asignado a la designa con idinstitucion: " + idInstitucion + ", idturno: " 
+										+ letradoAsignadoADesigna.getIdturno() + ", anio: " + letradoAsignadoADesigna.getAnio() + ", numero: " + letradoAsignadoADesigna.getNumero());
+							}
+						}
+					}
 
 					ScsDesignaKey key = new ScsDesignaKey();
 					Short anio = new Short((short) designa.getAno());
@@ -3176,7 +3197,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					"DesignacionesServiceImpl.eliminarActDesigna() -> Se ha producido un error al anular las actuaciones asociadas a la designación",
 					e);
 			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
+            if(!e.getCause().getMessage().contains("ORA-02292")){
+                error.setDescription("general.mensaje.error.bbdd");
+            }else {
+                error.setDescription("sjcs.designaciones.enuso");
+            }
 			error.setMessage(e.getMessage());
 			deleteResponseDTO.setError(error);
 			deleteResponseDTO.setStatus(SigaConstants.KO);
