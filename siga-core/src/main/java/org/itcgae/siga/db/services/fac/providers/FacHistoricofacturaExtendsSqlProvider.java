@@ -27,7 +27,7 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 
 		String fechaEmision = "WHEN (FH.IDTIPOACCION = 1 OR FH.IDTIPOACCION = 2) THEN FF.FECHAEMISION ";
 		String fechaPagoCaja = "WHEN FH.IDTIPOACCION = 4 THEN PAGO.FECHA ";
-		String fechaPagoBanco = "WHEN FH.IDTIPOACCION = 5 THEN FINC.FECHAMODIFICACION ";
+		String fechaPagoBanco = "WHEN FH.IDTIPOACCION = 5 THEN FH.FECHAMODIFICACION ";
 		String fechaDevolucion = "WHEN FH.IDTIPOACCION = 6 THEN (LAG(FINC.FECHADEVOLUCION, 1) OVER (ORDER BY LEVEL, FH.IDHISTORICO)) "; // Se almacena en el pago por banco
 		String fechaRenegociacion = "WHEN FH.IDTIPOACCION = 7 THEN RENEGOCIACION.FECHARENEGOCIACION ";
 		String fechaAnulacion = "WHEN ((FH.IDTIPOACCION = 8 OR FH.IDTIPOACCION = 9) AND FA.FECHA IS NOT NULL) THEN FA.FECHA ";
