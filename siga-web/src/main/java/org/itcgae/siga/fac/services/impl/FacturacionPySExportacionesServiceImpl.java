@@ -1019,6 +1019,9 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 facturaincluidaendisqueteKey.setIdfacturaincluidaendisquete(linea.getIdfacturaincluidaendisquete());
 
                 FacFacturaincluidaendisquete facturaincluidaendisquete = facFacturaincluidaendisqueteMapper.selectByPrimaryKey(facturaincluidaendisqueteKey);
+                facturaincluidaendisquete.setDevuelta("N");
+                facturaincluidaendisquete.setFechadevolucion(null);
+                facFacturaincluidaendisqueteMapper.updateByPrimaryKey(facturaincluidaendisquete);
 
                 // Buscamos la factura asociada al diquete de cargos
                 FacFacturaKey facturaKey = new FacFacturaKey();
