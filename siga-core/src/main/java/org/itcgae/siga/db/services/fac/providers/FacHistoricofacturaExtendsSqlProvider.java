@@ -255,9 +255,15 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 		query.FROM("FAC_HISTORICOFACTURA fh");
 		query.INNER_JOIN("( " + join.toString() + " ) maxhistorico ON (fh.IDFACTURA = maxhistorico.IDFACTURA AND fh.IDHISTORICO = maxhistorico.IDHISTORICO)");
 		query.INNER_JOIN("FAC_FACTURA ff ON(ff.IDFACTURA = fh.IDFACTURA AND ff.IDINSTITUCION = fh.IDINSTITUCION)");
+		query.LEFT_OUTER_JOIN("FAC_FACTURAINCLUIDAENDISQUETE ff3 ON (fh.IDINSTITUCION = ff3.IDINSTITUCION AND fh.IDFACTURA = ff3.IDFACTURA AND ff3.IDDISQUETECARGOS = " + idDisquetecargos + ")");
 
 		query.WHERE("fh.IDINSTITUCION = " + idInstitucion);
-		query.WHERE("(fh.IDTIPOACCION != 5 OR fh.IDTIPOACCION = 5 AND fh.ESTADO != 1)");
+
+		// Se produce error al eliminar en las siguietnes situaciones:
+		// - Facturas con acción distinta de Pago por Banco
+		// - Facturas Pendientes de Pago por Banco
+		// - Facturas Pagadas por Banco que han sido Devueltas
+		query.WHERE("(fh.IDTIPOACCION != 5 OR fh.IDTIPOACCION = 5 AND (fh.ESTADO != 1 OR fh.ESTADO = 1 AND ff3.DEVUELTA = 'S'))");
 
 		return query.toString();
 	}
