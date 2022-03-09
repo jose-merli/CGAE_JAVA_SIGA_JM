@@ -3094,11 +3094,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		usuario = authenticationProvider.checkAuthentication(request);
 		Short idInstitucion = usuario.getIdinstitucion();
 
-		String directorioFisico = "facturacion.directorioFisicoPrevisionesJava";
-		String directorio = "facturacion.directorioPrevisionesJava";
+		String directorioFisico = "facturacion.directorioFisicoLogProgramacion";
 
-		String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
-				+ File.separator + usuario.getIdinstitucion();
+		String pathFichero = getProperty(directorioFisico) + File.separator + usuario.getIdinstitucion();
 
 		// Lista de ficheros de facturaciones programadas
 		List<File> listaFicheros = facturacionItems.stream().map(item -> {
@@ -3109,8 +3107,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			FacFacturacionprogramada facturacion = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
 
 			File file = null;
-			if (Objects.nonNull(facturacion) && Objects.nonNull(facturacion.getNombrefichero())) {
-				String nombreFichero = pathFichero + File.separator + facturacion.getNombrefichero();
+			if (Objects.nonNull(facturacion) && Objects.nonNull(facturacion.getLogerror())) {
+				String nombreFichero = pathFichero + File.separator + facturacion.getLogerror();
 				file = new File(nombreFichero);
 			}
 
