@@ -18,6 +18,7 @@ import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.cen.providers.CenInstitucionSqlExtendsProvider;
 import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
@@ -109,7 +110,6 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private FcsFactCertificacionesExtendsMapper fcsFactCertificacionesExtendsMapper;
-
 
     @Override
     public InsertResponseDTO tramitarCertificacion(TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request) {
@@ -643,6 +643,22 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
                     } else {
                         tamMaximo = null;
+                    }
+                    boolean isConsejo = false;
+                    if(idInstitucion == 2000 || idInstitucion == 3001 || idInstitucion == 3002 || idInstitucion == 3003
+                            || idInstitucion == 3004 || idInstitucion == 3005 || idInstitucion == 3006 || idInstitucion == 3007
+                            || idInstitucion == 3008
+                            || idInstitucion == 3009 || idInstitucion == 3010 || idInstitucion == 3500) {
+                        isConsejo = true;
+                        if (busquedaRetencionesRequestDTO.getIdInstitucionList() != null && busquedaRetencionesRequestDTO.getIdInstitucionList().isEmpty()) {
+                            List<ComboItem> institucionesConsejo = institucionesMapper.getInstitucionesConsejo(String.valueOf(idInstitucion));
+                            List<String> institucionesConsejofinal = new ArrayList<String>();
+                            for(int i = 0; i< institucionesConsejo.size() ; i++){
+                                institucionesConsejofinal.add(institucionesConsejo.get(i).getValue());
+                            }
+
+                            busquedaRetencionesRequestDTO.setIdInstitucionList(institucionesConsejofinal);
+                        }
                     }
 
                     LOGGER.info("CertificacionFacSJCSServicesImpl.buscarCertificaciones() -> fcsCertificacionesExtendsMapper.buscarCertificaciones() -> INICIO consulta de la busqueda de certificaciones");

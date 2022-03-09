@@ -42,7 +42,6 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
         if (busquedaRetencionesRequestDTO.getIdInstitucionList() != null && !busquedaRetencionesRequestDTO.getIdInstitucionList().isEmpty()) {
             sql1.WHERE("CER.IDINSTITUCION IN " + busquedaRetencionesRequestDTO.getIdInstitucionList().toString().replace("[", "(").replace("]", ")"));
         }
-
         if (busquedaRetencionesRequestDTO.getIdEstadoCertificacionList() != null && !busquedaRetencionesRequestDTO.getIdEstadoCertificacionList().isEmpty()) {
             sql1.WHERE("CER.IDESTADOCERTIFICACION IN " + busquedaRetencionesRequestDTO.getIdEstadoCertificacionList().toString().replace("[", "(").replace("]", ")"));
         }
