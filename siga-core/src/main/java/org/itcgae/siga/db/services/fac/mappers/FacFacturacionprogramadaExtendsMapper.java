@@ -335,33 +335,33 @@ public interface FacFacturacionprogramadaExtendsMapper extends FacFacturacionpro
     List<FacFacturacionprogramadaExtendsDTO> getFacturacionesProComprobacionTraspasoFacturas(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProTratarFacturacion")
-    Integer getNumTotalFacturacionesProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+    Integer getNumTotalFacturacionesProTratarFacturacion(Double tiempoMaximoEjecucionBloqueada);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProTratarFacturacion")
-    Integer getPosicionFacturacionProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada, String idSerieFacturacion, String idProgramacion);
+    Integer getPosicionFacturacionProTratarFacturacion(Double tiempoMaximoEjecucionBloqueada, String idSerieFacturacion, String idProgramacion);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProTratarConfirmacion")
-    Integer getNumTotalFacturacionesProTratarConfirmacion(Short idInstitucion);
+    Integer getNumTotalFacturacionesProTratarConfirmacion();
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProTratarConfirmacion")
-    Integer getPosicionFacturacionProTratarConfirmacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion);
+    Integer getPosicionFacturacionProTratarConfirmacion(String idSerieFacturacion, String idProgramacion);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion")
-    Integer getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+    Integer getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion( Double tiempoMaximoEjecucionBloqueada);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion")
-    Integer getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
+    Integer getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProGenerarEnviosFacturasPendientes")
-    Integer getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+    Integer getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Double tiempoMaximoEjecucionBloqueada);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProGenerarEnviosFacturasPendientes")
-    Integer getPosicionFacturacionProGenerarEnviosFacturasPendientes(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
+    Integer getPosicionFacturacionProGenerarEnviosFacturasPendientes(String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getNumTotalFacturacionesProComprobacionTraspasoFacturas")
-    Integer getNumTotalFacturacionesProComprobacionTraspasoFacturas(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada);
+    Integer getNumTotalFacturacionesProComprobacionTraspasoFacturas(Double tiempoMaximoEjecucionBloqueada);
 
     @SelectProvider(type = FacFacturacionprogramadaExtendsSqlProvider.class, method = "getPosicionFacturacionProComprobacionTraspasoFacturas")
-    Integer getPosicionFacturacionProComprobacionTraspasoFacturas(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
+    Integer getPosicionFacturacionProComprobacionTraspasoFacturas(String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada);
 
 }

@@ -3791,30 +3791,30 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			Double minutos = Double.valueOf(genPropertiesMapper.selectByExample(genPropertiesExample).get(0).getValor());
 			minutos = minutos / (24.0 * 60.0);
 
-			Integer posicionFase1 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProTratarFacturacion(Short.valueOf(idInstitucion), minutos, idSerieFacturacion, idProgramacion);
+			Integer posicionFase1 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProTratarFacturacion(minutos, idSerieFacturacion, idProgramacion);
 
 			if (posicionFase1 != null) {
-				Integer numTotalFase1 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProTratarFacturacion(Short.valueOf(idInstitucion), minutos);
+				Integer numTotalFase1 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProTratarFacturacion(minutos);
 				fase1.setPuestoEnCola(posicionFase1 + "/" + numTotalFase1);
 				fase2.setPuestoEnCola(literalPendienteFase);
 				fase3.setPuestoEnCola(literalPendienteFase);
 				fase4.setPuestoEnCola(literalPendienteFase);
 				fase5.setPuestoEnCola(literalPendienteFase);
 			} else {
-				Integer posicionFase2 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProTratarConfirmacion(Short.valueOf(idInstitucion), idSerieFacturacion, idProgramacion);
+				Integer posicionFase2 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProTratarConfirmacion(idSerieFacturacion, idProgramacion);
 
 				if (posicionFase2 != null) {
-					Integer numTotalFase2 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProTratarConfirmacion(Short.valueOf(idInstitucion));
+					Integer numTotalFase2 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProTratarConfirmacion();
 					fase1.setPuestoEnCola(literalProcesado);
 					fase2.setPuestoEnCola(posicionFase2 + "/" + numTotalFase2);
 					fase3.setPuestoEnCola(literalPendienteFase);
 					fase4.setPuestoEnCola(literalPendienteFase);
 					fase5.setPuestoEnCola(literalPendienteFase);
 				} else {
-					Integer posicionFase3 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(Short.valueOf(idInstitucion), idSerieFacturacion, idProgramacion, minutos);
+					Integer posicionFase3 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(idSerieFacturacion, idProgramacion, minutos);
 
 					if (posicionFase3 != null) {
-						Integer numTotalFase3 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Short.valueOf(idInstitucion), minutos);
+						Integer numTotalFase3 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion( minutos);
 						fase1.setPuestoEnCola(literalProcesado);
 						fase2.setPuestoEnCola(literalProcesado);
 						fase3.setPuestoEnCola(posicionFase3 + "/" + numTotalFase3);
@@ -3822,10 +3822,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 						fase5.setPuestoEnCola(literalPendienteFase);
 					} else {
 
-						Integer posicionFase4 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProGenerarEnviosFacturasPendientes(Short.valueOf(idInstitucion), idSerieFacturacion, idProgramacion, minutos);
+						Integer posicionFase4 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProGenerarEnviosFacturasPendientes(idSerieFacturacion, idProgramacion, minutos);
 
 						if (posicionFase4 != null) {
-							Integer numTotalFase4 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Short.valueOf(idInstitucion), minutos);
+							Integer numTotalFase4 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(minutos);
 							fase1.setPuestoEnCola(literalProcesado);
 							fase2.setPuestoEnCola(literalProcesado);
 							fase3.setPuestoEnCola(literalProcesado);
@@ -3833,10 +3833,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 							fase5.setPuestoEnCola(literalPendienteFase);
 						} else {
 
-							Integer posicionFase5 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProComprobacionTraspasoFacturas(Short.valueOf(idInstitucion), idSerieFacturacion, idProgramacion, minutos);
+							Integer posicionFase5 = facFacturacionprogramadaExtendsMapper.getPosicionFacturacionProComprobacionTraspasoFacturas(idSerieFacturacion, idProgramacion, minutos);
 
 							if (posicionFase5 != null) {
-								Integer numTotalFase5 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProComprobacionTraspasoFacturas(Short.valueOf(idInstitucion), minutos);
+								Integer numTotalFase5 = facFacturacionprogramadaExtendsMapper.getNumTotalFacturacionesProComprobacionTraspasoFacturas(minutos);
 								fase1.setPuestoEnCola(literalProcesado);
 								fase2.setPuestoEnCola(literalProcesado);
 								fase3.setPuestoEnCola(literalProcesado);

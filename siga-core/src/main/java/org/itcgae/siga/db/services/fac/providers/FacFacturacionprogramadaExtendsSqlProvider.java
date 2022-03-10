@@ -370,11 +370,10 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         return sql.toString();
     }
 
-    public String getNumTotalFacturacionesProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada) {
+    public String getNumTotalFacturacionesProTratarFacturacion( Double tiempoMaximoEjecucionBloqueada) {
         SQL sql = new SQL();
         sql.SELECT("COUNT(1) TOTAL");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHAREALGENERACION IS NULL");
         sql.WHERE("FP.FECHAPREVISTAGENERACION IS NOT NULL");
         sql.WHERE("TO_DATE(FP.FECHAPREVISTAGENERACION) <= SYSDATE");
@@ -384,12 +383,11 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         return sql.toString();
     }
 
-    public String getPosicionFacturacionProTratarFacturacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada,
+    public String getPosicionFacturacionProTratarFacturacion(Double tiempoMaximoEjecucionBloqueada,
                                                              String idSerieFacturacion, String idProgramacion) {
         SQL sql = new SQL();
         sql.SELECT("FP.*");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHAREALGENERACION IS NULL");
         sql.WHERE("FP.FECHAPREVISTAGENERACION IS NOT NULL");
         sql.WHERE("TO_DATE(FP.FECHAPREVISTAGENERACION) <= SYSDATE");
@@ -405,18 +403,16 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL b = new SQL();
         b.SELECT("B.POSICION");
         b.FROM("(" + a + " ) B");
-        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
         b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
         b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
 
         return b.toString();
     }
 
-    public String getNumTotalFacturacionesProTratarConfirmacion(Short idInstitucion) {
+    public String getNumTotalFacturacionesProTratarConfirmacion() {
         SQL subQuery = new SQL();
         subQuery.SELECT("1");
         subQuery.FROM("FAC_FACTURACIONPROGRAMADA PREVIA");
-        subQuery.WHERE("PREVIA.IDINSTITUCION = " + idInstitucion);
         subQuery.WHERE("PREVIA.IDSERIEFACTURACION = SF.IDSERIEFACTURACIONPREVIA");
         subQuery.WHERE("PREVIA.VISIBLE = 'S'");
         subQuery.WHERE(MessageFormat.format("PREVIA.IDESTADOCONFIRMACION <> {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
@@ -424,7 +420,6 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL sql = new SQL();
         sql.SELECT("COUNT(1) TOTAL");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
@@ -435,11 +430,10 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         return sql.toString();
     }
 
-    public String getPosicionFacturacionProTratarConfirmacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion) {
+    public String getPosicionFacturacionProTratarConfirmacion(String idSerieFacturacion, String idProgramacion) {
         SQL subQuery = new SQL();
         subQuery.SELECT("1");
         subQuery.FROM("FAC_FACTURACIONPROGRAMADA PREVIA");
-        subQuery.WHERE("PREVIA.IDINSTITUCION = " + idInstitucion);
         subQuery.WHERE("PREVIA.IDSERIEFACTURACION = SF.IDSERIEFACTURACIONPREVIA");
         subQuery.WHERE("PREVIA.VISIBLE = 'S'");
         subQuery.WHERE(MessageFormat.format("PREVIA.IDESTADOCONFIRMACION <> {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
@@ -447,7 +441,6 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL sql = new SQL();
         sql.SELECT("FP.*");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
@@ -464,18 +457,16 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL b = new SQL();
         b.SELECT("B.POSICION");
         b.FROM("(" + a + " ) B");
-        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
         b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
         b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
 
         return b.toString();
     }
 
-    public String getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada) {
+    public String getNumTotalFacturacionesProGenerarPDFsYenviarFacturasProgramacion(Double tiempoMaximoEjecucionBloqueada) {
         SQL sql = new SQL();
         sql.SELECT("COUNT(1) TOTAL");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
@@ -486,11 +477,10 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         return sql.toString();
     }
 
-    public String getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
+    public String getPosicionFacturacionProGenerarPDFsYenviarFacturasProgramacion( String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
         SQL sql = new SQL();
         sql.SELECT("FP.*");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
@@ -507,18 +497,16 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL b = new SQL();
         b.SELECT("B.POSICION");
         b.FROM("(" + a + " ) B");
-        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
         b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
         b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
 
         return b.toString();
     }
 
-    public String getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Short idInstitucion, Double tiempoMaximoEjecucionBloqueada) {
+    public String getNumTotalFacturacionesProGenerarEnviosFacturasPendientes(Double tiempoMaximoEjecucionBloqueada) {
         SQL sql = new SQL();
         sql.SELECT("COUNT(1) TOTAL");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
@@ -530,11 +518,10 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         return sql.toString();
     }
 
-    public String getPosicionFacturacionProGenerarEnviosFacturasPendientes(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
+    public String getPosicionFacturacionProGenerarEnviosFacturasPendientes(String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
         SQL sql = new SQL();
         sql.SELECT("FP.*");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHAPREVISTACONFIRM IS NOT NULL");
         sql.WHERE("TO_DATE(FP.FECHAPREVISTACONFIRM) <= SYSDATE");
         sql.WHERE("FP.FECHAREALGENERACION IS NOT NULL");
@@ -552,7 +539,6 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL b = new SQL();
         b.SELECT("B.POSICION");
         b.FROM("(" + a + " ) B");
-        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
         b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
         b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
 
@@ -580,7 +566,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         return sql.toString();
     }
 
-    public String getPosicionFacturacionProComprobacionTraspasoFacturas(Short idInstitucion, String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
+    public String getPosicionFacturacionProComprobacionTraspasoFacturas(String idSerieFacturacion, String idProgramacion, Double tiempoMaximoEjecucionBloqueada) {
         SQL subQuery = new SQL();
         subQuery.SELECT("1");
         subQuery.FROM("FAC_FACTURA F");
@@ -592,7 +578,6 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL sql = new SQL();
         sql.SELECT("FP.*");
         sql.FROM("FAC_FACTURACIONPROGRAMADA FP JOIN FAC_SERIEFACTURACION SF ON FP.IDINSTITUCION = SF.IDINSTITUCION AND FP.IDSERIEFACTURACION = SF.IDSERIEFACTURACION");
-        sql.WHERE("FP.IDINSTITUCION = " + idInstitucion);
         sql.WHERE("FP.FECHACONFIRMACION IS NOT NULL");
         sql.WHERE(MessageFormat.format("FP.IDESTADOCONFIRMACION = {0}", FacEstadoConfirmacionFact.CONFIRM_FINALIZADA.toString()));
         sql.WHERE(MessageFormat.format("FP.IDESTADOTRASPASO = {0}", FacEstadoConfirmacionFact.TRASPASO_PROCESANDO.toString()));
@@ -607,7 +592,6 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL b = new SQL();
         b.SELECT("B.POSICION");
         b.FROM("(" + a + " ) B");
-        b.WHERE("B.IDINSTITUCION = " + idInstitucion);
         b.WHERE("B.IDSERIEFACTURACION = " + idSerieFacturacion);
         b.WHERE("B.IDPROGRAMACION = " + idProgramacion);
 
