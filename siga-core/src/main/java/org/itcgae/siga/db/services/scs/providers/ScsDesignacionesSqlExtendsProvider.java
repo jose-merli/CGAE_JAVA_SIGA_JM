@@ -2154,7 +2154,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("dp.idinstitucion_proc");
 		
 		sql2.FROM("SCS_DESIGNAPROCURADOR dp");
-		sql2.INNER_JOIN("SCS_PROCURADOR p on dp.idprocurador = p.idprocurador and dp.idinstitucion = p.idinstitucion");
+		sql2.INNER_JOIN("SCS_PROCURADOR p on dp.idprocurador = p.idprocurador and dp.idinstitucion_proc = p.idinstitucion");
 		sql2.WHERE("dp.idinstitucion = " + idinstitucion);
 		sql2.WHERE("dp.idturno = " + idturno);
 		sql2.WHERE("dp.numero =" + num);
