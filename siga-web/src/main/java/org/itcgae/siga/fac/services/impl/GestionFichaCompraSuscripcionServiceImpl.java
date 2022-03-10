@@ -1373,6 +1373,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							
 							for(FacFactura factura : facturasPeticion) {
 								ListaFacturasPeticionItem f = new ListaFacturasPeticionItem();
+								f.setIdFactura(factura.getIdfactura());
 								f.setFechaFactura(factura.getFechaemision());
 								f.setEstado(factura.getEstado());
 								f.setImporte(factura.getImptotal());// REVISAR: ¿Preguntar sobre a que importe se refiere

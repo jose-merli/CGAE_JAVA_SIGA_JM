@@ -11,6 +11,7 @@ public class ListaFacturasPeticionItem {
 	private BigDecimal importe;
 	private Short estado;
 	private String desEstado;
+	private String idFactura;
 	
 	public String getTipo() {
 		return tipo;
@@ -47,5 +48,11 @@ public class ListaFacturasPeticionItem {
 	}
 	public void setDesEstado(String desEstado) {
 		this.desEstado = desEstado;
+	}
+	public String getIdFactura() {
+		return idFactura;
+	}
+	public void setIdFactura(String idFactura) {
+		this.idFactura = idFactura;
 	}
 }

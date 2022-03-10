@@ -794,9 +794,10 @@ public class FacturacionHelper {
     // OBTENCION DE LA PLANTILLA FO:
     public String obtenerContenidoPlantilla(String rutaServidorPlantillas, String nombrePlantilla) throws Exception {
 
-        LOGGER.info("*************** PLANTILLA : " + rutaServidorPlantillas + File.separator + nombrePlantilla);
+        LOGGER.info("*************** PLANTILLA ENTRADA: " + rutaServidorPlantillas + File.separator + nombrePlantilla);
         String barraPlantilla = "";
-
+        File plantillaFO = null;
+        
         if (rutaServidorPlantillas.indexOf("/") > -1) {
             barraPlantilla = "/";
         }
@@ -808,15 +809,19 @@ public class FacturacionHelper {
         if (barraPlantilla.equals("")) {
             barraPlantilla = File.separator;
         }
-
-        File plantillaFO = new File(rutaServidorPlantillas + barraPlantilla + nombrePlantilla);
-
-        if (!plantillaFO.exists()) {
-            throw new Exception("El directorio de plantillas no existe o no esta bien configurado");
-        } else if (!plantillaFO.canRead()) {
-            throw new Exception("Error dfe lectura del fichero FOP: " + plantillaFO.getAbsolutePath());
-        }
-
+        
+        try {
+            plantillaFO = new File(rutaServidorPlantillas + barraPlantilla + nombrePlantilla);
+            if (!plantillaFO.exists()) {
+                throw new Exception("El directorio de plantillas no existe o no esta bien configurado");
+            } else if (!plantillaFO.canRead()) {
+                throw new Exception("Error dfe lectura del fichero FOP: " + plantillaFO.getAbsolutePath());
+            }
+		} catch (Exception e) {
+			throw new Exception("ObtenerContenidoPlantilla ERROR: " + e.getMessage());
+		}
+        
+        LOGGER.info("*************** PLANTILLA SALIDA : " + rutaServidorPlantillas + File.separator + nombrePlantilla);
         return getFileContent(plantillaFO);
     }
 
