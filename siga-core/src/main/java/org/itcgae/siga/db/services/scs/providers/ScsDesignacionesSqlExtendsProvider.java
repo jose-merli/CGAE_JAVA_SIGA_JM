@@ -232,7 +232,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					"                            AND des.idinstitucion = turno.idinstitucion\r\n" + 
 					"    LEFT OUTER JOIN scs_juzgado             juzgado ON des.idjuzgado = juzgado.idjuzgado\r\n" + 
 					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n" + 
-					"    LEFT OUTER JOIN scs_defendidosdesigna   ded ON ded.anio = des.anio\r\n" + 
+					"    LEFT OUTER JOIN (select * from scs_defendidosdesigna where calidad is not null)   ded ON ded.anio = des.anio\r\n" + 
 					"                                                 AND ded.numero = des.numero\r\n" + 
 					"                                                 AND ded.idinstitucion = des.idinstitucion\r\n" + 
 					"                                                 AND ded.idturno = des.idturno\r\n" + 
