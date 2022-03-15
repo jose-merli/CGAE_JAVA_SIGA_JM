@@ -217,7 +217,7 @@ public interface ScsCalendarioguardiasMapper {
 	@SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "getLogName")
 	@Results(
 			)
-	String getLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String idTurno, String idGuardia);
+	String getLogName(String idInstitucion, String idTurno, String idGuardia, String idCalendarioGuardias);
 	
 	@SelectProvider(type = ScsCalendarioguardiasSqlProvider.class, method = "getGeneracionEnProceso")
 	@Results(

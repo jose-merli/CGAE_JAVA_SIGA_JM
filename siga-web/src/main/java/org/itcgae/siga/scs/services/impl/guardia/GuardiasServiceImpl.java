@@ -7857,6 +7857,31 @@ public class GuardiasServiceImpl implements GuardiasService {
 			// "Error al recuperar la posicion del ultimo letrado");
 		}
 	}
+	
+	private List<String> getCalendariosByIdCalendario(DatosCalendarioyProgramacionItem item, String idInstitucion) {
+		
+		List<GuardiaCalendarioItem> datos = new ArrayList<GuardiaCalendarioItem>();	
+		List<String> lista  = new ArrayList<>();
+		
+		datos = scsGuardiasturnoExtendsMapper.getGuardiasFromCalendar(item.getIdCalendarioProgramado(), idInstitucion,
+				item.getFechaDesde(), item.getFechaHasta());
+		for (int i = 0; i < datos.size(); i++) {
+			List<String> idCalendarioGuardia = scsGuardiasturnoExtendsMapper
+					.getIdCalendarioGuardiasFromTurnosGuardiasList(datos.get(i).getIdTurno(),
+							datos.get(i).getIdGuardia(), idInstitucion, item.getFechaDesde(), item.getFechaHasta());
+			if (idCalendarioGuardia.size() != 0) {
+				datos.get(i).setIdCalendarioGuardia(idCalendarioGuardia.get(0));
+			}
+			datos.get(i).setOrden(Integer.toString(i + 1));
+		}
+		
+		datos.forEach(dato -> {
+			lista.add(dato.getIdCalendarioGuardia());
+		});
+
+		
+		return lista;
+	}
 
 	@Override
 	public ByteArrayInputStream descargarZIPExcelLog(HttpServletRequest request,
@@ -7865,16 +7890,22 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<String> nombresFicherosList = new ArrayList<>();
-		calyprogItemList.forEach(calyprogItem -> {
-			String nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(),
-					calyprogItem.getIdCalendarioGuardias(), calyprogItem.getObservaciones(),
-					calyprogItem.getFechaDesde(), calyprogItem.getFechaHasta(), calyprogItem.getIdTurno(),
-					calyprogItem.getIdGuardia());
-			if (nombreLog != null) {
-				nombresFicherosList.add(nombreLog);
-			}
-
-		});
+		List<String> listaIdCalendarioGuardia = new ArrayList<>();;
+		String nombreLog = null;
+		
+		for (int i = 0; i < calyprogItemList.size(); i++) {
+			
+			listaIdCalendarioGuardia = getCalendariosByIdCalendario(calyprogItemList.get(i),idInstitucion.toString());
+			
+			for (int j = 0; j < listaIdCalendarioGuardia.size(); j++) {
+				 nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(),
+						calyprogItemList.get(i).getIdTurno(),calyprogItemList.get(i).getIdGuardia(), listaIdCalendarioGuardia.get(j).toString());
+				if (nombreLog != null) {
+					nombresFicherosList.add(nombreLog);
+				}
+			}		
+		}
+		
 		if (!nombresFicherosList.isEmpty()) {
 			ByteArrayOutputStream byteArrayOutputStream = null;
 
@@ -7887,7 +7918,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				for (String nombreFichero : nombresFicherosList) {
 					String pathFicheroSalida = "sjcs.directorioFisicoGeneracionCalendarios.{" + idInstitucion.toString()
 							+ "}";
-					pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString(), nombreFichero);
+					pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
 					String nombreFicheroSalida = nombreFichero + ".xlsx";
 					zipOutputStream.putNextEntry(new ZipEntry(nombreFicheroSalida));
 					String path = pathFicheroSalida + File.separator + nombreFicheroSalida;
@@ -7930,11 +7961,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String pathPlantilla = null;
 		String pathFicheroSalida = "sjcs.directorioFisicoGeneracionCalendarios.{" + idInstitucion.toString() + "}";
 		String nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(),
-				calyprogItem.getIdCalendarioGuardias(), calyprogItem.getObservaciones(), calyprogItem.getFechaDesde(),
-				calyprogItem.getFechaHasta(), calyprogItem.getIdTurno(), calyprogItem.getIdGuardia());
+				calyprogItem.getIdTurno(),calyprogItem.getIdGuardia(), calyprogItem.getIdCalendarioGuardias());
 
 		try {
-			pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString(), nombreLog);
+			pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
 			String nombreFicheroSalida = nombreLog + ".xlsx";
 			String path = pathFicheroSalida + nombreFicheroSalida;
 			File file = new File(path);
@@ -7961,7 +7991,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		try {
 			listaDatosExcelGeneracionCalendarios2.add(listaDatosExcelGeneracionCalendarios);
-			pathFicheroSalida = getRutaFicheroSalida(idInstitucion1.toString(), nombreLog.toString());
+			pathFicheroSalida = getRutaFicheroSalida(idInstitucion1.toString());
 			docGenerado = _generacionDocService.generarExcelGeneracionCalendario(pathFicheroSalida, nombreLog + ".xlsx",
 					listaDatosExcelGeneracionCalendarios2);
 		} catch (Exception e) {
@@ -7971,7 +8001,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return docGenerado;
 	}
 
-	private String getRutaFicheroSalida(String idInstitucion, String folder) {
+	private String getRutaFicheroSalida(String idInstitucion) {
 		GenPropertiesKey key = new GenPropertiesKey();
 		key.setFichero(SigaConstants.FICHERO_SIGA);
 		key.setParametro(SigaConstants.parametroRutaSalidaInformes);
@@ -7979,7 +8009,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
 
 		String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion
-				+ SigaConstants.pathSeparator + folder + SigaConstants.pathSeparator;
+				+ SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
 
 		return rutaTmp;
 	}

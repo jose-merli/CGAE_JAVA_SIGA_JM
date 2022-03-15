@@ -470,7 +470,7 @@ public class ScsCalendarioguardiasSqlProvider {
 //		return sql.toString();
 //	}  
 	   
-	   public String getLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String idTurno, String idGuardia) {
+	   public String getLogName(String idInstitucion, String idTurno, String idGuardia, String idCalendarioGuardias) {
 
 		SQL sql = new SQL();
 			sql.SELECT("LOG_GENERACION_NAME");
@@ -487,7 +487,9 @@ public class ScsCalendarioguardiasSqlProvider {
 			if (idGuardia != null && !idGuardia.isEmpty()) {
 				sql.WHERE("IDGUARDIA = " + idGuardia);
 			}
-
+			if (idCalendarioGuardias != null && !idCalendarioGuardias.isEmpty()) {
+				sql.WHERE("idCalendarioGuardias = " + idCalendarioGuardias);
+			}
 		return sql.toString();
 	}
 	   
