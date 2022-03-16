@@ -217,8 +217,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 					+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 					+ "  des.fechaestado fechaestado,juzgado.nombre as nombrejuzgado,  turno.nombre,";
-			sql +=  " colegiado.ncolegiado, persona.idpersona, persona.nombre as nombrepersona, persona.APELLIDOS1 as apellido1persona, persona.APELLIDOS2 as apellido2persona ,";
-			sql += " PER.NOMBRE AS NOMBREINTERESADO," + " PER.APELLIDO1, PER.APELLIDO2 ";
+			sql +=  " colegiado.ncolegiado, persona.idpersona, NVL(persona.nombre,'') as nombrepersona, NVL(persona.APELLIDOS1,'') as apellido1persona, NVL(persona.APELLIDOS2,'') as apellido2persona ,";
+			sql += " NVL(PER.NOMBRE,'') AS NOMBREINTERESADO," + " NVL(PER.APELLIDO1,'') as APELLIDO1, NVL(PER.APELLIDO2,'') as APELLIDO2 ";
 			
 			sql += " FROM scs_designa             des\r\n"; 
 				sql += "   LEFT OUTER JOIN scs_designasletrado     l ON l.anio = des.anio\r\n" + 
