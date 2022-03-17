@@ -813,9 +813,11 @@ public class FacturacionHelper {
         try {
             plantillaFO = new File(rutaServidorPlantillas + barraPlantilla + nombrePlantilla);
             if (!plantillaFO.exists()) {
+            	LOGGER.warn("El directorio de plantillas no existe o no esta bien configurado: " + plantillaFO.getAbsolutePath());
                 throw new Exception("El directorio de plantillas no existe o no esta bien configurado");
             } else if (!plantillaFO.canRead()) {
-                throw new Exception("Error dfe lectura del fichero FOP: " + plantillaFO.getAbsolutePath());
+            	LOGGER.error("Error de lectura del fichero FOP: " + plantillaFO.getAbsolutePath());
+                throw new Exception("Error de lectura del fichero FOP: " + plantillaFO.getAbsolutePath());
             }
 		} catch (Exception e) {
 			throw new Exception("ObtenerContenidoPlantilla ERROR: " + e.getMessage());
