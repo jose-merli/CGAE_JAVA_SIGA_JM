@@ -232,7 +232,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             facturas.WHERE("f.idfactura IN (" + devoluciones.toString() + ")");
         }
 
-        facturas.ORDER_BY("f.numerofactura DESC");
+        facturas.ORDER_BY("f.fechaemision DESC");
 
         //query completa facturas
         sqlFacturas.SELECT("*");
@@ -255,7 +255,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             sqlFacturas.WHERE("numcomunicaciones<=to_number(" + item.getComunicacionesFacturasHasta() + ",'99999999999999999.99')");
         }
 
-        LOGGER.info(sqlFacturas.toString());
+        //LOGGER.info(sqlFacturas.toString());
         
         return sqlFacturas.toString();
     }

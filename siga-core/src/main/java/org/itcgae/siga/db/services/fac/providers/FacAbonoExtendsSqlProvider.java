@@ -38,7 +38,8 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //filtros
         abonos.WHERE("f.idinstitucion ="+idInstitucion);
-        abonos.WHERE("f.idpagosjg is null");
+        //Quito esta condicion porque no salen facturas en la busqueda
+        //abonos.WHERE("f.idpagosjg is null");
 
         //numero factura
         if(item.getNumeroFactura()!=null) {
@@ -121,7 +122,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
             abonos.WHERE("idabono IN (" + transferencia.toString() + ")");
         }
 
-        abonos.ORDER_BY("f.numeroabono DESC");
+        abonos.ORDER_BY("f.fecha DESC");
 
         //query completa abonos
         sqlAbonos.SELECT("*");
