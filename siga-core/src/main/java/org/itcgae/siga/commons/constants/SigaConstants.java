@@ -842,6 +842,9 @@ public class SigaConstants {
 	public static String parametroRutaSalidaInformes = "informes.directorioFisicoSalidaInformesJava";
 	public static String rutaPlantillaSinClase = "plantillasSinClase";
 	public static String parametroSizePlantillas = "gen.ficheros.maxsize.bytes";
+	
+	public static String pathAbsolutoFiler = "path.absoluto.origenFiler"; 
+	public static String pathRelativoTemp = "path.relativo.temporalesDescarga"; 
 
 	public static String pathSeparator = "/";
 
@@ -864,7 +867,9 @@ public class SigaConstants {
 	public static Short IDINSTITUCION_0_SHORT = Short.valueOf(IDINSTITUCION_0);
 	public static String SI = "SI";
 	public static String NO = "NO";
-
+	
+	public static String minutosRevisionEnviosProcesando = "minutos.revision.envios.procesando"; 
+	
 	// Para la busqueda de criterios dinamicos de las consultas
 	public static final String TIPONUMERO = "N";
 	public static final String TIPOTEXTO = "A";
@@ -890,7 +895,12 @@ public class SigaConstants {
 	public static final String ALIASCORREO = "CORREOELECTRONICO";
 	public static final String ALIASDOMICILIO = "DOMICILIO";
 	public static final String ALIASMOVIL = "MOVIL";
-
+	public static final String ALIASCODIGOPOSTAL = "CODIGOPOSTAL";
+	public static final String ALIASIDPAIS = "IDPAIS";
+	public static final String ALIASIDPOBLACION = "IDPOBLACION";
+	public static final String ALIASIDPROVINCIA = "IDPROVINCIA";
+	public static final String ALIASPOBLACIONEXTRANJERA = "POBLACIONEXTRANJERA";
+	
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
 	public static final long ID_OBJETIVO_DESTINATARIOS = 1;
 	public static final int COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION = 10;
@@ -1111,11 +1121,11 @@ public class SigaConstants {
 
 	public static final Integer CURSO_ARCHIVADO = 1;
 
-	public static final long EMITIR_CERTIFICADO = 1;
-
-	public static final Short DESIGNAR_TUTOR = 0;
-	public static final Short ASIGNAR_TUTOR = 1;
-	public static final long ANUNCIADO_CURSO = 1;
+	public static final Long EMITIR_CERTIFICADO = new Long("1");
+	
+	public static final Short DESIGNAR_TUTOR = 0; 
+	public static final Short ASIGNAR_TUTOR = 1; 
+	public static final long ANUNCIADO_CURSO = 1; 
 	public static final long ABIERTO_CURSO = 0;
 	public static final long FINALIZADO_CURSO = 4;
 	public static final long CANCELADO_CURSO = 5;

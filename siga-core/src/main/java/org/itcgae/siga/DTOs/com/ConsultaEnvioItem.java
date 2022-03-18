@@ -16,6 +16,7 @@ public class ConsultaEnvioItem {
 	private String sufijo;
 	private String pathFichero;
 	private String nombreFichero;
+	private Short idInstitucionConsulta;
 	
 	public String getPathFichero() {
 		return pathFichero;
@@ -88,5 +89,11 @@ public class ConsultaEnvioItem {
 	}
 	public void setSufijo(String sufijo) {
 		this.sufijo = sufijo;
+	}
+	public Short getIdInstitucionConsulta() {
+		return idInstitucionConsulta;
+	}
+	public void setIdInstitucionConsulta(Short idInstitucionConsulta) {
+		this.idInstitucionConsulta = idInstitucionConsulta;
 	}
 }

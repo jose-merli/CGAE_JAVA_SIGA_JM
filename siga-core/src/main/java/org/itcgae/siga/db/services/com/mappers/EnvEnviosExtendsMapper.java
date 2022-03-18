@@ -162,5 +162,12 @@ public interface EnvEnviosExtendsMapper extends EnvEnviosMapper {
 
     @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "getNewIdEnvio")
     Integer getNewIdEnvio();
-
+	
+	@SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "obtenerEnviosIrrecuperables")
+      @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+    	  		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC)
+                
+      })
+      List<EnviosMasivosItem> obtenerEnviosIrrecuperables(Short horas);
 }

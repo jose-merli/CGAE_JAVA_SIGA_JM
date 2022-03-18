@@ -40,6 +40,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ERROR_SERVER;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_CARGAS;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.commons.utils.Validaciones;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.CargasWs;
@@ -48,6 +49,7 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
@@ -115,6 +117,7 @@ import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.Integran
 import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteFisico;
 import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteJuridico;
 import org.itcgae.sspp.ws.registroSociedades.ProfesionalAbogadoDocument.ProfesionalAbogado;
+import org.itcgae.sspp.ws.registroSociedades.ProfesionalAbogadoPropioDocument.ProfesionalAbogadoPropio;
 import org.itcgae.sspp.ws.registroSociedades.ProfesionalDocument.Profesional;
 import org.itcgae.sspp.ws.registroSociedades.RegistroSociedadDocument.RegistroSociedad;
 import org.itcgae.sspp.ws.registroSociedades.SociedadActualizacionDocument.SociedadActualizacion;
@@ -125,6 +128,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ibm.wsdl.util.StringUtils;
 
 @Service
 @Transactional
@@ -153,6 +158,9 @@ public class WSCommons {
 
 	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
+	
+	@Autowired
+	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoExtendsMapper;
 
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
@@ -583,7 +591,47 @@ public class WSCommons {
 		return fileZip;
 
 	}
-
+	
+	public static File fileBytes(List<DatosDocumentoItem> ficheros, String path) throws IOException {
+		File file = new File(path);
+		FileOutputStream fos = new FileOutputStream(file);
+		boolean closed = false;
+		
+		try {
+			fos.write(ficheros.get(0).getDatos());
+			fos.flush();
+			
+			fos.close();
+			closed = true;
+		} finally {
+			if (!closed) {
+				fos.close();
+			}
+		}
+		
+		return file;
+	}
+	
+	public static File fileBytes(byte[] datos, String path) throws IOException {
+		File file = new File(path);
+		FileOutputStream fos = new FileOutputStream(file);
+		boolean closed = false;
+		
+		try {
+			fos.write(datos);
+			fos.flush();
+			
+			fos.close();
+			closed = true;
+		} finally {
+			if (!closed) {
+				fos.close();
+			}
+		}
+		
+		return file;
+	}
+	
 	/**
 	 * Crea un boolean sacando el valor de un numero (si es 1 true, sino false)
 	 * 
@@ -663,36 +711,122 @@ public class WSCommons {
 					SociedadBaja sociedadBaja = SociedadBaja.Factory.newInstance();
 					sociedadBaja.setCIFNIF(sociedadBajaDTO.getNif());
 					sociedadBaja.setFechaBajaColegio(UtilidadesString.toCalendar(sociedadBajaDTO.getFechaBaja()));
-					registro.setSociedadBaja(sociedadBaja);
-					registrosList.add(registro);
+					if (validaSociedadBaja(sociedadBaja)) {
+						registro.setSociedadBaja(sociedadBaja );
+						registrosList.add(registro);
+					}
 				}
 			}
-			List<SociedadesEditadasDTO> sociedadesEditadas = cenNoColegiado.selectSociedadesEditar(idInstitucion,
-					peticion.getFechaDesde().getTime(), peticion.getFechaHasta().getTime());
-			if (null != sociedadesEditadas && sociedadesEditadas.size() > 0) {
-				List<SociedadActualizacion> sociedadesEditadasFinal = new ArrayList<SociedadActualizacion>();
-				for (SociedadesEditadasDTO regSociedad : sociedadesEditadas) {
-					SociedadActualizacion sociedadActualizacion = SociedadActualizacion.Factory.newInstance();
+				List<SociedadesEditadasDTO> sociedadesEditadas = cenNoColegiado.selectSociedadesEditar(idInstitucion,peticion.getFechaDesde().getTime(),peticion.getFechaHasta().getTime());
+				if (null != sociedadesEditadas && sociedadesEditadas.size()>0) {
+					List<SociedadActualizacion> sociedadesEditadasFinal = new ArrayList<SociedadActualizacion>();
+					for (SociedadesEditadasDTO regSociedad : sociedadesEditadas) {
+						SociedadActualizacion sociedadActualizacion = SociedadActualizacion.Factory.newInstance();
+						
+						boolean argPublicar = Boolean.TRUE;
 
-					boolean argPublicar = Boolean.FALSE;
-
-					sociedadActualizacion.setPublicar(argPublicar);
-					Resena argResena = Resena.Factory.newInstance();
-					if (regSociedad.getResena() != null) {
-						if (regSociedad.getResena().length() > 100) {
-							argResena.setStringValue(regSociedad.getResena().substring(0, 99));
-						} else {
-							argResena.setStringValue(regSociedad.getResena());
+						sociedadActualizacion.setPublicar(argPublicar);
+						Resena argResena = Resena.Factory.newInstance();
+						if(regSociedad.getResena()!=null){
+							if(regSociedad.getResena().length()>100){
+								argResena.setStringValue(regSociedad.getResena().substring(0, 99));
+							}else{
+								argResena.setStringValue(regSociedad.getResena());
+							}
 						}
-					}
-
-					sociedadActualizacion.setResena(argResena);
-					// sociedadActualizacion.setResena(argResena.getStringValue());
-					if (null != regSociedad.getObjetoSocial()) {
-						if (regSociedad.getObjetoSocial().length() >= 20) {
-							sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial().substring(0, 20));
-						} else {
-							sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+						//sociedadActualizacion.setResena(argResena);
+						if(argResena.getStringValue().length() >= 3) {
+							sociedadActualizacion.setResena(argResena.getStringValue());
+						}
+						if (null != regSociedad.getObjetoSocial()) {
+							if(regSociedad.getObjetoSocial().length()>=500){
+								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial().substring(0, 500));
+							}else{
+								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+							}
+						}
+						
+						//Insertamos los datos del registro
+						DatosRegistro argRegistro = DatosRegistro.Factory.newInstance();
+						argRegistro.setFechaCancelacion(UtilidadesString.toCalendar(regSociedad.getFechaCancelacion()));
+						argRegistro.setFechaInscripcion(UtilidadesString.toCalendar(regSociedad.getFechaInscripcion()));
+						argRegistro.setIdentificacionRegistro(regSociedad.getIdentificacionRegistro());
+						argRegistro.setNumeroRegistro(regSociedad.getNumeroRegistro());
+						sociedadActualizacion.setDatosRegistro(argRegistro);
+						
+						DatosPersona argNotario = DatosPersona.Factory.newInstance();
+						//Insertamos el Notario
+						Identificacion identificacion = Identificacion.Factory.newInstance();
+						if(regSociedad.getIdentificacionNotario()!=null){
+							if (Validaciones.validaNIE(regSociedad.getIdentificacionNotario())){
+								identificacion.setNIE(regSociedad.getIdentificacionNotario());
+							} else if (Validaciones.validaNIF(regSociedad.getIdentificacionNotario())) {
+								identificacion.setNIF(regSociedad.getIdentificacionNotario());
+							}
+							argNotario.setApellido1(regSociedad.getApellido1Notario());
+							argNotario.setApellido2(regSociedad.getApellido2Notario());
+							argNotario.setNombre(regSociedad.getNombreNotario());
+						}
+						if(identificacion.getNIF() != null) {
+							if(!identificacion.getNIF().isEmpty()) {
+								argNotario.setIdentificacion(identificacion);
+							}
+						} else if (identificacion.getNIE() != null) {
+							if(!identificacion.getNIE().isEmpty()) {
+								argNotario.setIdentificacion(identificacion);
+							}
+						}
+						sociedadActualizacion.setDatosNotario(argNotario);
+						
+						
+						//Insertamos los datos de la sociedad
+						DatosEntidad argSociedad = DatosEntidad.Factory.newInstance();
+						argSociedad.setCIFNIF(regSociedad.getSociedadNif());
+						argSociedad.setDenominacion(regSociedad.getSociedadDenominacion());
+						FormaSocial formaSocial = FormaSocial.Factory.newInstance();
+						if(regSociedad.getSociedadFormaSocial() != null){
+							if(regSociedad.getSociedadFormaSocial().length()>=20){
+								formaSocial.setStringValue(regSociedad.getSociedadFormaSocial().substring(0, 20));
+							}else{
+								formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
+							}
+						}
+						argSociedad.setFormaSocial(formaSocial);
+						sociedadActualizacion.setDatosSociedad(argSociedad);
+						sociedadActualizacion.setFechaAlta(UtilidadesString.toCalendar(regSociedad.getSociedadFechaAlta()));
+						sociedadActualizacion.setFechaConstitucion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
+						sociedadActualizacion.setFechaFin(UtilidadesString.toCalendar(regSociedad.getFechaFin()));
+						//sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+						//Insertamos los datos de la direccion
+						Direccion argDireccion = Direccion.Factory.newInstance();
+						argDireccion.setDomicilio(regSociedad.getDomicilio());
+						if(validarCodPostal(regSociedad.getCodigoPostal())) {
+							argDireccion.setCodigoPostal(regSociedad.getCodigoPostal());
+						}
+						//Provincia
+						Provincia provincia = Provincia.Factory.newInstance();
+						provincia.setDescripcionProvincia(regSociedad.getProvincia());
+						provincia.setCodigoProvincia(regSociedad.getCodigoProvincia());
+						argDireccion.setProvincia(provincia);
+						//Poblacion
+						Poblacion poblacion = Poblacion.Factory.newInstance();
+						poblacion.setDescripcionPoblacion(regSociedad.getPoblacion());
+						poblacion.setCodigoPoblacion(regSociedad.getCodigoPoblacion());
+						argDireccion.setPoblacion(poblacion);
+						//Correo electronico
+						CorreoElectronico cElectronico = CorreoElectronico.Factory.newInstance();
+						cElectronico.setStringValue(regSociedad.getCorreoElectronico());
+						cElectronico.setPublicar(Boolean.TRUE);
+						argDireccion.setCorreoElectronico(cElectronico);
+						int contador =0;
+						int contadorContacto = 0;
+						boolean telefono = false;
+						boolean movil = false;
+						boolean faxB = false;
+						//contactos
+						if(regSociedad.getTelefono1()!=null){
+							contador++;
+							telefono = true;
 						}
 					}
 
@@ -783,21 +917,38 @@ public class WSCommons {
 							contacto1.setTelefono(telefono1);
 							contactosArray[contadorContacto++] = contacto1;
 						}
-						if (movil) {
-							Contacto contacto1 = Contacto.Factory.newInstance();
-							TelefonoMovil movil1 = TelefonoMovil.Factory.newInstance();
-							movil1.setPublicar(Boolean.FALSE);
-							movil1.setStringValue(regSociedad.getMovil());
-							contacto1.setTelefonoMovil(movil1);
-							contactosArray[contadorContacto++] = contacto1;
+						Contacto[] contactosArray = null;
+						if(contador>0){
+							contactosArray = new Contacto[contador];
+								if(telefono){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									Telefono telefono1 = Telefono.Factory.newInstance();
+									telefono1.setPublicar(Boolean.TRUE);
+									telefono1.setStringValue(regSociedad.getTelefono1());
+									contacto1.setTelefono(telefono1);
+									contactosArray[contadorContacto++] = contacto1;
+								}if(movil){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									TelefonoMovil movil1 = TelefonoMovil.Factory.newInstance();
+									movil1.setPublicar(Boolean.TRUE);
+									movil1.setStringValue(regSociedad.getMovil());
+									contacto1.setTelefonoMovil(movil1);
+									contactosArray[contadorContacto++] = contacto1;
+								}if(faxB){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									Fax fax = Fax.Factory.newInstance();
+									fax.setPublicar(Boolean.TRUE);
+									fax.setStringValue(regSociedad.getFax1());
+									contacto1.setFax(fax);
+									contactosArray[contadorContacto++] = contacto1;
+								}
 						}
-						if (faxB) {
-							Contacto contacto1 = Contacto.Factory.newInstance();
-							Fax fax = Fax.Factory.newInstance();
-							fax.setPublicar(Boolean.FALSE);
-							fax.setStringValue(regSociedad.getFax1());
-							contacto1.setFax(fax);
-							contactosArray[contadorContacto++] = contacto1;
+						
+						argDireccion.setPaginaWeb(regSociedad.getPaginaWeb());
+						argDireccion.setContactoArray(contactosArray);
+						argDireccion.setPublicar(Boolean.TRUE);
+						if(validarDireccion(argDireccion)) {
+							sociedadActualizacion.setDireccion(argDireccion);
 						}
 					}
 
@@ -860,33 +1011,108 @@ public class WSCommons {
 									} else {
 										profesional.setNombreColegio(integrante.getDescripcionColegio());
 									}
-									profesional.setNumColegiado(integrante.getNumColegiado());
+									integranteFisico.setDatosCargo(cargo);
+									DatosPersona datosPersona = DatosPersona.Factory.newInstance();
+									datosPersona.setApellido1(integrante.getApellidos1());
+									datosPersona.setApellido2(integrante.getApellidos2());
+									datosPersona.setNombre(integrante.getNombre());
+									// Nos aseguramos que no se utilice la identificación del integrante anterior
+									identificacion = Identificacion.Factory.newInstance();
+									/* Si el integrante no tiene NIF ni NIE, no se le añade la identificación
+									 * NOTA IMPORTANTE: Para un profesionalAbogadoPropio SI es necesaria la identificación
+									 * independientemente de su tipo de documento, por tanto, si el integrante
+									 * es profesionalAbogadoPropio y no tiene NIF ni NIE, se deberá devolver como
+									 * profesionalAbogado
+									 */
+									if ("NIE".equals(integrante.getTipoIdentificacion())){
+										identificacion.setNIE(integrante.getNifCif());
+										datosPersona.setIdentificacion(identificacion);
+									} else if ("NIF".equals(integrante.getTipoIdentificacion()) ||
+											   "CIF".equals(integrante.getTipoIdentificacion())) {
+										identificacion.setNIF(integrante.getNifCif());
+										datosPersona.setIdentificacion(identificacion);
+									}
+									integranteFisico.setDatosPersona(datosPersona);
+									DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
+									Colegio colegio = Colegio.Factory.newInstance();
+									colegio.setCodigoColegio(integrante.getCodigoColegioCliente());
+									colegio.setDescripcionColegio(integrante.getDescripcionColegioCliente());
+									
+									int estadoColegial = 0;
+
+									// Obtenemos el estado colegial del integrante
+									CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
+									cenDatoscolegialesestadoExample.createCriteria()
+											.andIdinstitucionEqualTo(Short.valueOf(integrante.getIdInstitucionCliente()))
+											.andIdpersonaEqualTo(Long.valueOf(integrante.getIdPersona()));
+									cenDatoscolegialesestadoExample.setOrderByClause("fechaestado desc");
+
+									List<CenDatoscolegialesestado> cenDatoscolegialesestadosList = cenDatoscolegialesestadoExtendsMapper
+											.selectByExample(cenDatoscolegialesestadoExample);
+									
+									if (!cenDatoscolegialesestadosList.isEmpty()) {
+										estadoColegial = cenDatoscolegialesestadosList.get(0).getIdestado().intValue();
+									}
+									
 									if (integrante.getProfesion() != null) {
-										if (integrante.getProfesion().length() > 20) {
-											profesional.setProfesion(integrante.getProfesion().substring(0, 19));
-										} else {
-											profesional.setProfesion(integrante.getProfesion());
+										if(integrante.getProfesionalAbogado().equals("1")){
+											if (integrante.getCodigocolegio().equals(integrante.getCodigoColegioCliente())) {
+												ProfesionalAbogadoPropio profesionalAbogadoPropio =  ProfesionalAbogadoPropio.Factory.newInstance();
+												profesionalAbogadoPropio.setColegio(colegio);
+												profesionalAbogadoPropio.setNumColegiado(integrante.getNumColegiado());
+												profesionalAbogadoPropio.setIdentificacion(identificacion);
+												datosProfesional.setProfesionalAbogadoPropio(profesionalAbogadoPropio);
+											} else {
+												ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
+												profesionalAbogado.setColegio(colegio);
+												profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
+												datosProfesional.setProfesionalAbogado(profesionalAbogado);
+											}
+											
+										}else if (estadoColegial == 0){
+											Profesional profesional = Profesional.Factory.newInstance();
+											if(integrante.getCodigoColegioCliente()!=null){
+												profesional.setColegio(colegio);
+											}else{
+												profesional.setNombreColegio(integrante.getDescripcionColegioCliente());
+											}
+											profesional.setNumColegiado(integrante.getNumColegiado());
+											if(integrante.getProfesion().length()>20){
+												profesional.setProfesion(integrante.getProfesion().substring(0, 19));
+											}else{
+												profesional.setProfesion(integrante.getProfesion());
+											}
+											datosProfesional.setProfesional(profesional);
+										}
+										
+										if (integrante.getNumColegiado() != null) {
+											integranteFisico.setDatosProfesional(datosProfesional);
 										}
 									}
-									datosProfesional.setProfesional(profesional);
-								}
-								integranteFisico.setDatosProfesional(datosProfesional);
-								integranteUnitario.setIntegranteFisico(integranteFisico);
-								integranteUnitario.setFechaModificacion(
-										UtilidadesString.toCalendar(integrante.getFechaModificacion()));
-								integranteUnitario.setPublicar(Boolean.FALSE);
-							} else {
-								IntegranteJuridico integranteJuridico = IntegranteJuridico.Factory.newInstance();
-								DatosCargo cargoJuridico = DatosCargo.Factory.newInstance();
-								cargoJuridico.setCargo(integrante.getCargo());
-
-								cargoJuridico.setDescCargo(integrante.getDescripcionCargo());
-								if (integrante.getFechaCargo() != null) {
-									if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo().toString())) {
-										Date fechaCargoJuridico = dateFormat
-												.parse(integrante.getFechaCargo().toString());
-										cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+									
+									integranteUnitario.setIntegranteFisico(integranteFisico);
+									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
+									integranteUnitario.setPublicar(Boolean.TRUE);
+								}else{
+									IntegranteJuridico integranteJuridico = IntegranteJuridico.Factory.newInstance();
+									DatosCargo cargoJuridico = DatosCargo.Factory.newInstance();
+									cargoJuridico.setCargo(integrante.getCargo());
+									
+									cargoJuridico.setDescCargo(integrante.getDescripcionCargo());
+									if(integrante.getFechaCargo()!=null){
+										if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo().toString())) {
+											Date fechaCargoJuridico = dateFormat.parse(integrante.getFechaCargo().toString());
+											cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+										}
 									}
+									integranteJuridico.setDatosCargo(cargoJuridico);
+									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
+									integranteUnitario.setPublicar(Boolean.TRUE);
+									DatosEntidad datosEntidad = DatosEntidad.Factory.newInstance();
+									datosEntidad.setCIFNIF(integrante.getNifCif());
+									datosEntidad.setDenominacion(integrante.getNombre());
+									integranteJuridico.setDatosEntidad(datosEntidad);
+									integranteUnitario.setIntegranteJuridico(integranteJuridico);
 								}
 								integranteJuridico.setDatosCargo(cargoJuridico);
 								integranteUnitario.setFechaModificacion(
@@ -935,17 +1161,19 @@ public class WSCommons {
 						sociedadesEditadasResult.addAll(sociedadesEditadasFinal);
 						respuesta.setNumTotalPaginas((short) 1);
 					}
-				}
+					
+					try{
+						if (null != sociedadesEditadasResult && sociedadesEditadasResult.size()>0) {
+							
+							for (SociedadActualizacion sociedadActualizacion : sociedadesEditadasResult) {
 
-				try {
-					if (null != sociedadesEditadasResult && sociedadesEditadasResult.size() > 0) {
-
-						for (SociedadActualizacion sociedadActualizacion : sociedadesEditadasResult) {
-
-							RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
-							registro.setSociedadActualizacion(sociedadActualizacion);
-							registrosList.add(registro);
-
+								RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
+								
+								if (validaSociedadActualizacion(sociedadActualizacion)) {
+									registro.setSociedadActualizacion(sociedadActualizacion);
+									registrosList.add(registro);
+								}
+							}
 						}
 					}
 				} catch (AssertionError e) {
@@ -972,6 +1200,7 @@ public class WSCommons {
 		}
 
 	}
+	
 
 	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
 		CenInstitucionExample example = new CenInstitucionExample();
@@ -1949,75 +2178,88 @@ public class WSCommons {
 				}
 			}
 		}
-		return valid;
-	}
-
-	/**
-	 * Parametros tiene que venir como tipo String, int, short o long (no vale otro tipo si no, no funciona el for para settear los parametros de entrada)
-	 * @param functionDefinition
-	 * @param outParameters
-	 * @param inParameters
-	 * @return
-	 * @throws IOException
-	 * @throws NamingException
-	 * @throws SQLException
-	 */
-	public String[] callPLProcedureFacturacionPyS(String functionDefinition, int outParameters, Object[] inParameters)
-			throws IOException, NamingException, SQLException {
-
-		DataSource ds = null;
-		Connection con = null;
-		CallableStatement cs = null;
-		String result[] = null;
-
-		try {
-			if (outParameters > 0)
-				result = new String[outParameters];
-
-			ds = getOracleDataSource();
-			con = ds.getConnection();
-
-			cs = con.prepareCall(functionDefinition);
-			int size = inParameters.length;
-
-			// input Parameters
-			for (int i = 0; i < size; i++) {
-				 
-				if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
-					 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
-				 }
-				 
-				if (inParameters[i] instanceof String){
-					cs.setString(i+1, inParameters[i].toString());
-				 }
+		
+		private boolean validarCodPostal(String codPostal) {
+			boolean valid = false;
+			String regex = "\\d{5}";
+			if(codPostal != null && codPostal.matches(regex)) {
+				valid = true;
 			}
-
-			// output Parameters
-			for (int i = 0; i < outParameters; i++) {
-				cs.registerOutParameter(i + size + 1, Types.VARCHAR);
-			}
-
-			cs.execute();
-
-			for (int i = 0; i < outParameters; i++) {
-				result[i] = cs.getString(i + size + 1);
-			}
-		} catch (Exception e) {
-			LOGGER.error("WSCommons.callPLProcedureFacturacionPyS > ERROR al llamar al paquete de facturacionPyS. ", e);
-			throw e;
-		} finally {
-			if (con != null) {
-				con.close();
-				con = null;
-			}
-
-			if (cs != null) {
-				cs.close();
-				cs = null;
-			}
+			return valid;
 		}
-
-		return result;
-	}	
-	
+		
+		/**
+		 * Valida los dato de una sociedad dada de baja.
+		 * @param sociedadBaja
+		 * @return
+		 */
+		public boolean validaSociedadBaja(SociedadBaja sociedadBaja) {
+			boolean valid = false;
+			
+			// Comprueba si se ha proporcionado un CIF o NIF válido
+			if ( (Validaciones.validaNIF(sociedadBaja.getCIFNIF()) ||
+				  Validaciones.validaCIF(sociedadBaja.getCIFNIF()) ) && 
+			// Comprueba si existe la fecha de baja del colegio
+				sociedadBaja.getFechaBajaColegio() != null) {
+				valid = true;
+			}
+			
+			return valid;
+		}
+		
+		/**
+		 * Valida los datos de una sociedad.
+		 * @param sociedadActualizacion
+		 * @return
+		 */
+		private boolean validaSociedadActualizacion(SociedadActualizacion sociedadActualizacion) {
+			
+			// Comprueba si se ha proporcionado un CIF o NIF válido
+			if ( (Validaciones.validaNIF(sociedadActualizacion.getDatosSociedad().getCIFNIF()) ||
+				  Validaciones.validaCIF(sociedadActualizacion.getDatosSociedad().getCIFNIF()) ) &&
+			// Comprueba si existen los datos de la sociedad
+				sociedadActualizacion.getDatosSociedad() != null &&
+				sociedadActualizacion.getFechaAlta() != null &&
+				sociedadActualizacion.getFechaConstitucion() != null &&
+				sociedadActualizacion.getResena() != null &&
+				sociedadActualizacion.getDireccion() != null) {
+				
+					// Si existe el campo objeto social, comprueba si el valor no supera los 500 caracteres
+					if (sociedadActualizacion.getObjetoSocial() != null &&
+						sociedadActualizacion.getObjetoSocial().length() > 500) {
+						return false;
+					}
+					
+					// Comprueba que exista al menos un integrante en la sociedad
+					if (sociedadActualizacion.getIntegranteSociedadArray().length == 0) {
+						return false;
+					} else {
+						for (IntegranteSociedad integrante: sociedadActualizacion.getIntegranteSociedadArray()) {
+							
+							// Comprueba que los datos de los integrantes de la sociedad sean válidos
+							if (!Validaciones.validaIntegranteSociedad(integrante)) {
+								return false;
+							}
+						}
+							
+					}
+					
+					// Comprueba que los datos de la dirección de la sociedad sean válidos
+					if (sociedadActualizacion.getDireccion() == null ||
+						!Validaciones.validaDireccion(sociedadActualizacion.getDireccion())) {
+						return false;
+					}
+					
+					// Comprueba que los datos del notario de la sociedad sean válidos
+					if (sociedadActualizacion.getDatosNotario() != null &&
+						!Validaciones.validaDatosPersona(sociedadActualizacion.getDatosNotario())) {
+						return false;
+					}
+				} else {
+					return false;
+				}
+				
+			
+			return true;
+		}
 }

@@ -10,9 +10,8 @@ import org.itcgae.siga.DTOs.com.ConsultasSearch;
 public class ConConsultasExtendsSqlProvider {
 	
 	public String selectConsultas(Short idInstitucion, String idLenguaje, List<String> perfiles, ConsultasSearch filtros){
-			
 		SQL sql = new SQL();
-				
+			
 		sql.SELECT("CONSULTA.IDINSTITUCION");
 		sql.SELECT("CONSULTA.IDCONSULTA");
 		sql.SELECT("CONSULTA.DESCRIPCION");
@@ -35,23 +34,24 @@ public class ConConsultasExtendsSqlProvider {
 		sql.SELECT("(SELECT CAT2.DESCRIPCION FROM MOD_CLASECOMUNICACIONES CLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT2 ON CAT2.IDRECURSO = CLA.DESCRIPCION WHERE CLA.IDCLASECOMUNICACION = CONSULTA.IDCLASECOMUNICACION AND CLA. CAT2.IDLENGUAJE = '" + idLenguaje + "') AS NOMBRECLASE");
 		sql.FROM("CON_CONSULTA CONSULTA");
 		
-		String condicionPermisos = " EXISTS (SELECT 1 FROM MOD_PLANTILLADOC_CONSULTA PC"
-				+ " JOIN MOD_MODELO_PLANTILLADOCUMENTO MD ON MD.IDPLANTILLADOCUMENTO = PC.IDPLANTILLADOCUMENTO"
-				+ " JOIN MOD_MODELO_PERFILES MP ON MP.IDMODELOCOMUNICACION = MD.IDMODELOCOMUNICACION"
-				+ " WHERE PC.IDCONSULTA = CONSULTA.IDCONSULTA AND PC.IDINSTITUCION_CONSULTA = CONSULTA.IDINSTITUCION";
-		
-		if (perfiles != null && perfiles.size() > 0) {
-			condicionPermisos += " AND MP.IDPERFIL IN ('SIN_PERFIL'";//METEMOS SIN_PEFIL PARA QUE AL MENOS HAYA UNO Y NO PETE
-			for (String perfil : perfiles) {
-				condicionPermisos += ", " + perfil;
+		if(filtros.getPermisoejecucion()) {
+			String condicionPermisos = " EXISTS (SELECT 1 FROM MOD_PLANTILLADOC_CONSULTA PC"
+					+ " JOIN MOD_MODELO_PLANTILLADOCUMENTO MD ON MD.IDPLANTILLADOCUMENTO = PC.IDPLANTILLADOCUMENTO"
+					+ " JOIN MOD_MODELO_PERFILES MP ON MP.IDMODELOCOMUNICACION = MD.IDMODELOCOMUNICACION"
+					+ " WHERE PC.IDCONSULTA = CONSULTA.IDCONSULTA AND PC.IDINSTITUCION_CONSULTA = CONSULTA.IDINSTITUCION";
+			
+			if (perfiles != null && perfiles.size() > 0) {
+				condicionPermisos += " AND MP.IDPERFIL IN ('SIN_PERFIL'";//METEMOS SIN_PEFIL PARA QUE AL MENOS HAYA UNO Y NO PETE
+				for (String perfil : perfiles) {
+					condicionPermisos += ", " + perfil;
+				}
+				condicionPermisos += " )";
 			}
-			condicionPermisos += " )";
+			condicionPermisos += ")";
+			
+			sql.WHERE(condicionPermisos);
 		}
-		condicionPermisos += ")";
 		
-		sql.WHERE(condicionPermisos);
-		
-	
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
 			sql.WHERE("CONSULTA.IDCLASECOMUNICACION = '" + filtros.getIdClaseComunicacion() +"'");
 		}
@@ -77,7 +77,7 @@ public class ConConsultasExtendsSqlProvider {
 			if(filtros.getGenerica().equals("N")){
 				sql.WHERE("( (UPPER(CONSULTA.GENERAL) = 'N' OR CONSULTA.GENERAL = '0') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ") )");
 			}else if(filtros.getGenerica().equals("S")){
-				sql.WHERE("( (UPPER(CONSULTA.GENERAL) = 'S' OR CONSULTA.GENERAL = '1') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ") )");
+				sql.WHERE("( (UPPER(CONSULTA.GENERAL) = 'S' OR CONSULTA.GENERAL = '1') )");
 			}
 		}else {
 			sql.WHERE("( ( (upper(CONSULTA.GENERAL) = 'S' OR  CONSULTA.GENERAL = '1') AND (CONSULTA.IDINSTITUCION = 2000 OR CONSULTA.IDINSTITUCION = "+ idInstitucion + ") ) OR (UPPER(CONSULTA.GENERAL) = 'N' OR CONSULTA.GENERAL = '0') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ")  )");
@@ -86,6 +86,7 @@ public class ConConsultasExtendsSqlProvider {
 		sql.ORDER_BY("CONSULTA.DESCRIPCION");
 		
 		return sql.toString();
+
 	}
 
 	

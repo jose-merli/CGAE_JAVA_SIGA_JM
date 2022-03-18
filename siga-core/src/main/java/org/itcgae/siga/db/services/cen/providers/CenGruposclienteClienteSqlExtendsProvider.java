@@ -75,7 +75,8 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 			sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '1'");
 		}
 		sql.WHERE("per.idpersona = '"+idPersona+"'");
-		sql.WHERE(" cli.idinstitucion in ('2000', '"+ idInstitucion  + "')");
+		sql.WHERE(" cli.idinstitucion = '"+ idInstitucion  + "'");
+		sql.WHERE(" cli.idinstitucion_grupo in ('2000', '"+ idInstitucion  + "')");
 		sql.ORDER_BY("GENR.descripcion");
 		return sql.toString();
 	}

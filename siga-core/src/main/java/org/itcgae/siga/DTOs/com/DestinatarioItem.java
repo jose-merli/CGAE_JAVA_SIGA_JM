@@ -16,8 +16,39 @@ public class DestinatarioItem {
 	private ArrayList<ConsultaEnvioItem> listaConsultasEnvio;
 	private String tratamiento;
 	private String idioma;
+	private String direccion;
+	private String codigoPostal;
+	private String idPais;
+	private String idPoblacion;
+	private String idProvincia;
+	private String poblacionExtranjera;
 	
 	
+	
+	public String getCodigoPostal() {
+		return codigoPostal;
+	}
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+	public String getIdPais() {
+		return idPais;
+	}
+	public void setIdPais(String idPais) {
+		this.idPais = idPais;
+	}
+	public String getIdPoblacion() {
+		return idPoblacion;
+	}
+	public void setIdPoblacion(String idPoblacion) {
+		this.idPoblacion = idPoblacion;
+	}
+	public String getIdProvincia() {
+		return idProvincia;
+	}
+	public void setIdProvincia(String idProvincia) {
+		this.idProvincia = idProvincia;
+	}
 	public String getDomicilio() {
 		return domicilio;
 	}
@@ -89,5 +120,17 @@ public class DestinatarioItem {
 	}
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
+	}
+	public String getDireccion() {
+		return direccion;
+	}
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+	public String getPoblacionExtranjera() {
+		return poblacionExtranjera;
+	}
+	public void setPoblacionExtranjera(String poblacionExtranjera) {
+		this.poblacionExtranjera = poblacionExtranjera;
 	}
 }

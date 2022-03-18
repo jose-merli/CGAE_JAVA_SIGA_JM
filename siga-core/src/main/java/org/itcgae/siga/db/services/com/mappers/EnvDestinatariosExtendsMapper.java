@@ -34,7 +34,8 @@ public interface EnvDestinatariosExtendsMapper {
 		@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRECOMPLETO", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "CORREOELECTRONICO", property = "correoElectronico", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "CORREOELECTRONICO", property = "correoElectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DIRECCION", property = "direccion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<DestinatarioItem> selectDestinatariosComunicaciones(Short idInstitucion, String idEnvio);
 }

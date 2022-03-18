@@ -261,6 +261,14 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 							.andSufijoNumssppEqualTo(perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp());
 				}
 
+				if (perJuridicaDatosRegistralesUpdateDTO.getResena().length() < 3) {
+					Error error = new Error();
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					error.setMessage("La reseña no es válida");
+					updateResponseDTO.setError(error);
+					return updateResponseDTO;
+				}
+				
 				List<CenNocolegiado> nocolegiado = cenNocolegiadoExtendsMapper.selectByExample(exampleNocolegiado);
 
 				if (null != nocolegiado && nocolegiado.size() > 0) {

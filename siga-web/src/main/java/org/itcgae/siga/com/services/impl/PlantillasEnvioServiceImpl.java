@@ -284,6 +284,14 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillaEnviosExtendsMapper.updateByPrimaryKeyWithBLOBs(plantilla);
 						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
+						if (plantilla.getIdpersona() != null) {
+							respuesta.setDescription(String.valueOf(plantilla.getIdpersona()));
+						}
+						if(plantilla.getDescripcion() != null) {
+							respuesta.setCode(200);
+						} else {
+							respuesta.setCode(500);
+						}
 					} else {
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
 						NewIdDTO id = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
@@ -299,9 +307,12 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 						plantilla.setAntigua("N");
 						_envPlantillaEnviosExtendsMapper.insert(plantilla);
 						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
+						if(plantilla.getDescripcion() != null) {
+							respuesta.setCode(200);
+						} else {
+							respuesta.setCode(500);
+						}
 					}
-					respuesta.setCode(200);
-
 				}
 			} catch (Exception e) {
 				respuesta.setCode(500);

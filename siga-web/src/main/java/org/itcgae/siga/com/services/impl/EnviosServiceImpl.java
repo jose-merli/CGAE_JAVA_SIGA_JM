@@ -455,6 +455,128 @@ public class EnviosServiceImpl implements IEnviosService{
         
         
     }
+    
+    public Sheet creaLogGenericoExcel(EnvEnvios envEnvio) throws IOException, InvalidFormatException {
+        Sheet sheet = null;
+        if (envEnvio != null) {
+        	Workbook workbook = null;
+        	File file = _enviosMasivosService.getPathFicheroLOGEnvioMasivo(envEnvio.getIdinstitucion(), envEnvio.getIdenvio());
+        	
+        	if (file != null && file.exists()) {
+        		LOGGER.info("El fichero de log ya existe por tanto cargamos el excel: " + file.getAbsolutePath());
+        		FileInputStream fip = new FileInputStream(file);
+        		workbook = WorkbookFactory.create(fip);
+        		sheet = workbook.getSheetAt(0);
+        	} else {
+        		LOGGER.info("Creamos un nuevo excel para el log");
+        		workbook = new XSSFWorkbook();
+        		sheet = workbook.createSheet();
+                Row headerRow = sheet.createRow(0);
+                
+                int index = 0;
+                
+                for(String value : SigaConstants.columnsExcelLogEnvios) {
+                    Cell cell = headerRow.createCell(index++);
+                    cell.setCellValue(value);
+                }
+        	}
+            
+        }
+        return sheet;
+    }
+    
+    public void insertaExcelRowLogGenerico(EnvEnvios envEnvio, Sheet sheet, String mensaje) {
+		
+        if (sheet != null) {
+            Row row = sheet.createRow(sheet.getLastRowNum()+1);
+            
+            
+            CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
+    	    CreationHelper createHelper = sheet.getWorkbook().getCreationHelper();
+    	    short dateFormat = createHelper.createDataFormat().getFormat(SigaConstants.DATEST_FORMAT_MIN_SEC);
+    	    cellStyle.setDataFormat(dateFormat);
+    	    
+            for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
+                Cell cell = row.createCell(i);
+                switch (i) {
+                case 0://ENVIO
+                    cell.setCellValue(envEnvio.getIdenvio());
+                    break;
+                case 1://DESCRIPCION
+                    cell.setCellValue(envEnvio.getDescripcion());
+                    break;
+                case 2://FECHA ENVÍO
+                    cell.setCellValue(Calendar.getInstance());
+            	    cell.setCellStyle(cellStyle);
+                    break;
+                case 3://REMITENTE
+                    cell.setCellValue("");
+                    break;
+                case 4://CORREO REMITENTE
+                	cell.setCellValue("");
+                	break;
+                case 5://NIF/CIF
+                    cell.setCellValue("");
+                    break;
+                case 6://NOMBRE
+                    cell.setCellValue("");
+                    break;
+                case 7://APELLIDO 1
+                    cell.setCellValue("");
+                    break;
+                case 8://APELLIDO 2
+                    cell.setCellValue("");
+                    break;
+                case 9://MOVIL
+                    cell.setCellValue("");
+                    break;
+                case 10://CORREO ELECTRONICO
+                    cell.setCellValue("");
+                    break;
+                case 11://MENSAJE    
+                    cell.setCellValue(mensaje);
+                    break;
+                case 12://DOCUMENTOS
+                	cell.setCellValue("");	
+                    break;
+                default:
+                    break;
+                }
+                
+            }
+            
+        }
+        
+        
+    }
+    
+    public void writeCloseLogFileGenerico(Short idinstitucion, Long idenvio, Sheet sheet) {
+    	if (sheet != null) {
+    		
+    		try {
+    		
+	    		for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
+	                sheet.autoSizeColumn(i);
+	            }
+	    		
+	            File file = _enviosMasivosService.getPathFicheroLOGEnvioMasivo(idinstitucion, idenvio);
+	            
+	            FileOutputStream fileOut = new FileOutputStream(file);
+	            
+	            LOGGER.debug("Cerrando fichero... " + file.getAbsoluteFile());
+				
+	            sheet.getWorkbook().write(fileOut);
+	            fileOut.flush();
+	            fileOut.close();
+	            sheet.getWorkbook().close();
+	            
+	            LOGGER.debug("Fichero creado... " + file.getAbsoluteFile());
+            
+			} catch (Exception e) {
+				LOGGER.error(e);
+			}
+    	}
+	}
 
     private List<DestinatarioItem> limpiaCorreosDuplicados(List<DestinatarioItem> destinatarios) {
         List<DestinatarioItem> destinatariosCopia = new ArrayList<DestinatarioItem>();

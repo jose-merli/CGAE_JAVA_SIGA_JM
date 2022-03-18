@@ -41,6 +41,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.SELECT_DISTINCT("col.idpersona");
 			sql.SELECT_DISTINCT("col.idinstitucion");
 			sql.SELECT_DISTINCT("per.nifcif");
+			sql.SELECT_DISTINCT("col.comunitario");
 			sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
 			if (idInstitucion.equals(Short.parseShort("2000"))){
 				sql.SELECT_DISTINCT("cli2.noaparecerredabogacia as noaparecerredabogacia2");

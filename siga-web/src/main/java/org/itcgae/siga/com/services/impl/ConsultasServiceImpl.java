@@ -2323,7 +2323,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 							// controlando que el operador es "esta vacio"
 
-							if (!operador.equals(SigaConstants.IS_NULL) && !listaCampos.get(j).getValor().equals("")) {
+							if (!operador.equals(SigaConstants.IS_NULL) && listaCampos.get(j).getValor() != null
+									&& !listaCampos.get(j).getValor().equals("") ) {
 								if (listaCampos.get(j).getTipoDato().equals(SigaConstants.TIPOFECHA)) {
 									iParametroBind++;
 									criteriosDinamicos = "TO_DATE (:@" + iParametroBind + "@:"

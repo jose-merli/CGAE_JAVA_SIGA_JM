@@ -71,7 +71,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("cat.DESCRIPCION, plantilla.idtipoEnvios");
+		sql.SELECT("cat.DESCRIPCION, plantilla.idtipoEnvios, plantilla.IDPERSONA");
 		sql.FROM("ENV_PLANTILLASENVIOS plantilla");
 		sql.JOIN("env_tipoenvios tipo on tipo.IDTIPOENVIOS = plantilla.IDTIPOENVIOS");
 		sql.JOIN("GEN_RECURSOS_CATALOGOS cat on cat.IDRECURSO = tipo.NOMBRE and cat.IDLENGUAJE = '" + idLenguaje + "'");

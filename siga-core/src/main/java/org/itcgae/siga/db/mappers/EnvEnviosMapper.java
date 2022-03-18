@@ -64,7 +64,7 @@ public interface EnvEnviosMapper {
 			"#{fechabaja,jdbcType=TIMESTAMP}, #{csv,jdbcType=VARCHAR}, ",
 			"#{idsolicitudecos,jdbcType=VARCHAR}, #{envio,jdbcType=VARCHAR}, ",
 			"#{idmodelocomunicacion,jdbcType=DECIMAL})" })
-	@SelectKey(statement = "SELECT TO_NUMBER(TO_CHAR(SYSDATE, 'YYYY') || SEQ_ENV_ENVIOS.NEXTVAL) FROM DUAL", keyProperty = "idenvio", before = true, resultType = Long.class)
+	@SelectKey(statement = "SELECT TO_NUMBER(TO_CHAR(SYSDATE, 'YY') || SEQ_ENV_ENVIOS.NEXTVAL) FROM DUAL", keyProperty = "idenvio", before = true, resultType = Long.class)
 	int insert(EnvEnvios record);
 
 	/**
@@ -72,7 +72,7 @@ public interface EnvEnviosMapper {
 	 * @mbg.generated  Wed Jul 10 14:54:37 CEST 2019
 	 */
 	@InsertProvider(type = EnvEnviosSqlProvider.class, method = "insertSelective")
-	@SelectKey(statement = "SELECT TO_NUMBER(TO_CHAR(SYSDATE, 'YYYY') || SEQ_ENV_ENVIOS.NEXTVAL) FROM DUAL", keyProperty = "idenvio", before = true, resultType = Long.class)
+	@SelectKey(statement = "SELECT TO_NUMBER(TO_CHAR(SYSDATE, 'YY') || SEQ_ENV_ENVIOS.NEXTVAL) FROM DUAL", keyProperty = "idenvio", before = true, resultType = Long.class)
 	int insertSelective(EnvEnvios record);
 
 	/**

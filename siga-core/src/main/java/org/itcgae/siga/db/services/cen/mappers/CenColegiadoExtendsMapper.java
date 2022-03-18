@@ -47,6 +47,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOAPARECERREDABOGACIAFILTER", property = "noAparecerRedAbogaciaFilter", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SITUACIONRESIDENTEFILTER", property = "situacionResidenteFilter", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COMUNITARIO", property = "comunitario", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem, Integer tamMaximo);
 	

@@ -71,15 +71,9 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
         sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,3) AS nombrePoblacion");
         sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,16) AS CorreoElectronico");
 
-        sql.SELECT("(select idprovincia   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
-        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = tip.idinstitucion  and dir.idpersona = tip.idpersona  "
-        		+ "and dir.iddireccion = tip.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as provincia");
-        sql.SELECT("(select idpoblacion   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
-        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = tip.idinstitucion  and dir.idpersona = tip.idpersona  "
-        		+ "and dir.iddireccion = tip.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as poblacion");
-        sql.SELECT("(select idpais   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
-        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = tip.idinstitucion  and dir.idpersona = tip.idpersona  "
-        		+ "and dir.iddireccion = tip.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as pais");        
+        sql.SELECT(" f_siga_getdireccioncliente(cli.idinstitucion, cli.idpersona, 3, 8) as provincia");
+        sql.SELECT(" f_siga_getdireccioncliente(cli.idinstitucion, cli.idpersona, 3, 9) as poblacion");
+        sql.SELECT(" f_siga_getdireccioncliente(cli.idinstitucion, cli.idpersona, 3, 7) as pais");        
         
 
 		sql.FROM("CEN_PERSONA PER");

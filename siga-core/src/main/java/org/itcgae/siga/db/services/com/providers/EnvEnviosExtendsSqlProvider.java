@@ -334,6 +334,24 @@ public class EnvEnviosExtendsSqlProvider {
 
 		
     }
+    
+	public String obtenerEnviosIrrecuperables(Short minutos) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		String fecha = dateFormat.format(new Date(System.currentTimeMillis() - (minutos * 60) * 1000));
+		SQL sql = new SQL();
+
+		sql.SELECT("ENVIO.IDENVIO");
+		sql.SELECT("ENVIO.IDESTADO");
+		sql.SELECT("ENVIO.IDINSTITUCION");
+		
+		sql.FROM("ENV_ENVIOS ENVIO");
+
+		sql.WHERE(
+				"ENVIO.IDESTADO IN (5) AND ENVIO.FECHAMODIFICACION <= TO_DATE('"
+				+ fecha + "', 'DD/MM/YYYY HH24:MI:SS')");
+		sql.ORDER_BY("ENVIO.FECHA DESC");
+		return sql.toString();
+	}
 																						  																													 
     public String selectEnvioById(Short idInstitucion, String idLenguaje, String idEnvio) {
 																						  																												

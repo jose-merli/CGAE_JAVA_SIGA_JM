@@ -3187,19 +3187,21 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 									for (InscripcionItem inscripcion : inscriptionItemList) {
 
-										if (inscripcion.getEmitirCertificado() == SigaConstants.EMITIR_CERTIFICADO) {
-											// Añadimos los certificados si existen para el curso y calificacion
-											ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
-											certificadosCursoExample.createCriteria()
-													.andIdcursoEqualTo(Long.valueOf(inscripcion.getIdCurso()))
-													.andIdcalificacionEqualTo(inscripcion.getIdCalificacion());
+										if (inscripcion.getEmitirCertificado() == null) {
+											if (inscripcion.getEmitirCertificado().intValue() == SigaConstants.EMITIR_CERTIFICADO.intValue()) {
+												// Añadimos los certificados si existen para el curso y calificacion
+												ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
+												certificadosCursoExample.createCriteria()
+														.andIdcursoEqualTo(Long.valueOf(inscripcion.getIdCurso()))
+														.andIdcalificacionEqualTo(inscripcion.getIdCalificacion());
 
-											listCertificadosCurso = forCertificadosCursoExtendsMapper
-													.selectByExample(certificadosCursoExample);
+												listCertificadosCurso = forCertificadosCursoExtendsMapper
+														.selectByExample(certificadosCursoExample);
 
-											if (null != listCertificadosCurso && listCertificadosCurso.size() > 0) {
-												responseInsert = fichaInscripcionService
-														.generarSolicitudCertificados(inscripcion, request);
+												if (null != listCertificadosCurso && listCertificadosCurso.size() > 0) {
+													responseInsert = fichaInscripcionService
+															.generarSolicitudCertificados(inscripcion, request);
+												}
 											}
 										}
 
@@ -3276,6 +3278,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e.getStackTrace());
 					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");

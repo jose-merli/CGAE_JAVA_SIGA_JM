@@ -476,6 +476,15 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
+				if ("191".equals(datosDireccionesItem.getIdPais()) && datosDireccionesItem.getCodigoPostal().length() != 5) {
+					LOGGER.info(
+							"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					error.setMessage("Error al actualizar la direccion, código postal no válido");
+					updateResponseDTO.setError(error);
+					return updateResponseDTO;
+				}
+				
 				// Comprobamos si la persona es colegiado o no, ya que la obligatoriedad solo
 				// vale para los colegiados
 				CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();

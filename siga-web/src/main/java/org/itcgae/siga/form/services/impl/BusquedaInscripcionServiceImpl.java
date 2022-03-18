@@ -285,6 +285,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 			} else {
 				// arrayCursosIds = formateaListaCursosError(listInscripcionItem,
 				// idInstitucionToString);
+				arrayCursosIds.add("Sin plazas");
 				return arrayCursosIds;
 			}
 			break;

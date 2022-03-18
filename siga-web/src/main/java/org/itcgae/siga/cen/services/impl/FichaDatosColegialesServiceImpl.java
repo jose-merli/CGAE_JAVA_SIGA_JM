@@ -648,6 +648,34 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 									error.setMessage(resultadoPlTurno[1]);
 								}
 								response.setError(error);
+								
+								// AUDITORIA si se insertó un estado correctamente
+								
+								switch (Integer.parseInt(colegiadoItem.getSituacion())) {
+								case SigaConstants.ESTADO_COLEGIAL_SINEJERCER:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(null, datosColegiales, "INSERT", request, datosColegiales.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.BAJA_EJERCICIO, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								case SigaConstants.ESTADO_COLEGIAL_EJERCIENTE:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(null, datosColegiales, "INSERT", request, datosColegiales.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.ALTA_EJERCICIO, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								case SigaConstants.ESTADO_COLEGIAL_BAJACOLEGIAL:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(null, datosColegiales, "INSERT", request, datosColegiales.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.BAJA_COLEGIACION, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								case SigaConstants.ESTADO_COLEGIAL_INHABILITACION:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(null, datosColegiales, "INSERT", request, datosColegiales.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.INHABILITACION, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								case SigaConstants.ESTADO_COLEGIAL_SUSPENSION:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(null, datosColegiales, "INSERT", request, datosColegiales.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.SUSPENSION_EJERCICIO, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								default:
+									break;
+								}
+								
 							} else {
 								response.setStatus(SigaConstants.KO);
 								resultado = 0;
@@ -709,6 +737,12 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		Date fechaEstadoNueva = null;
 		Date colegiadoSiguienteFechaEstado = null;
 		boolean updateEstado = false;
+		
+		// Datos auditoria
+		CenDatoscolegialesestado estadoColegial = new CenDatoscolegialesestado();
+		CenDatoscolegialesestado estadoColegialUltimo = null;
+		ColegiadoItem colegiadoItemAuditoria = listColegiadoItem.get(0);
+		boolean actualizadoUltimoEstadoModificado = false;
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -889,6 +923,15 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 												|| (colegiadoItem.getFechaEstadoNueva() != null && colegiadoItem.getFechaEstadoNueva().compareTo(cenDatoscolegialesestadosBBDD.getFechaestado()) != 0)) {
 									updateDate = true;
 									updateEstado = true;
+									
+									// Preparamos los datos para la auditoria sólo si es el último estado el que se ha modificado
+									if (colegiadoItem.getFechaEstado() == colegiadoItemAuditoria.getFechaEstado()) {
+										actualizadoUltimoEstadoModificado = true;
+										populateEstadoColegial(colegiadoItemAuditoria, estadoColegial);
+										estadoColegial.setFechaestado(colegiadoItemAuditoria.getFechaEstado());
+										estadoColegialUltimo = datosColegiales;
+									}
+									
 								}
 							}
 
@@ -989,6 +1032,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						i++;
 					}
 					if (resultado > 0) {
+						
 						if (listColegiadoItem.get(0).getCambioEstado() != null
 								&& listColegiadoItem.get(0).getCambioEstado()) {
 
@@ -1027,6 +1071,38 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								}
 
 								response.setError(error);
+								
+								if (actualizadoUltimoEstadoModificado) {
+									populateEstadoColegial(colegiadoItemAuditoria, estadoColegial);
+									
+									// AUDITORIA si se actualizó un estado correctamente
+									if (estadoColegial.getIdestado() != null) {
+										switch ((int) estadoColegial.getIdestado()) {
+										case SigaConstants.ESTADO_COLEGIAL_SINEJERCER:
+											auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+													SigaConstants.CEN_TIPOCAMBIO.BAJA_EJERCICIO, idPersonaColegial);
+											break;
+										case SigaConstants.ESTADO_COLEGIAL_EJERCIENTE:
+											auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+													SigaConstants.CEN_TIPOCAMBIO.ALTA_EJERCICIO, idPersonaColegial);
+											break;
+										case SigaConstants.ESTADO_COLEGIAL_BAJACOLEGIAL:
+											auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+													SigaConstants.CEN_TIPOCAMBIO.BAJA_COLEGIACION, idPersonaColegial);
+											break;
+										case SigaConstants.ESTADO_COLEGIAL_INHABILITACION:
+											auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+													SigaConstants.CEN_TIPOCAMBIO.INHABILITACION, idPersonaColegial);
+											break;
+										case SigaConstants.ESTADO_COLEGIAL_SUSPENSION:
+											auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+													SigaConstants.CEN_TIPOCAMBIO.SUSPENSION_EJERCICIO, idPersonaColegial);
+											break;
+										default:
+											break;
+										}
+									}
+								}
 							} else {
 								response.setStatus(SigaConstants.KO);
 								resultado = 0;
@@ -1046,6 +1122,38 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							}
 						} else {
 							response.setStatus(SigaConstants.OK);
+							
+							if (actualizadoUltimoEstadoModificado) {
+								populateEstadoColegial(colegiadoItemAuditoria, estadoColegial);
+								
+								// AUDITORIA si se actualizó un estado correctamente
+								if (estadoColegial.getIdestado() != null) {
+									switch ((int) estadoColegial.getIdestado()) {
+									case SigaConstants.ESTADO_COLEGIAL_SINEJERCER:
+										auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+												SigaConstants.CEN_TIPOCAMBIO.BAJA_EJERCICIO, idPersonaColegial);
+										break;
+									case SigaConstants.ESTADO_COLEGIAL_EJERCIENTE:
+										auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+												SigaConstants.CEN_TIPOCAMBIO.ALTA_EJERCICIO, idPersonaColegial);
+										break;
+									case SigaConstants.ESTADO_COLEGIAL_BAJACOLEGIAL:
+										auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+												SigaConstants.CEN_TIPOCAMBIO.BAJA_COLEGIACION, idPersonaColegial);
+										break;
+									case SigaConstants.ESTADO_COLEGIAL_INHABILITACION:
+										auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+												SigaConstants.CEN_TIPOCAMBIO.INHABILITACION, idPersonaColegial);
+										break;
+									case SigaConstants.ESTADO_COLEGIAL_SUSPENSION:
+										auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+												SigaConstants.CEN_TIPOCAMBIO.SUSPENSION_EJERCICIO, idPersonaColegial);
+										break;
+									default:
+										break;
+									}
+								}
+							}
 						}
 						// Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se
 						// encargan de ello
@@ -1201,6 +1309,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 					List<CenDatoscolegialesestado> cenDatoscolegialesestadosList = cenDatoscolegialesestadoExtendsMapper
 							.selectByExample(cenDatoscolegialesestadoExample);
+					
+					CenDatoscolegialesestado estadoColegialUltimo = null;
 
 					// ACTUALIZAMOS CEN_COLEGIADO PARA ELIMINAR
 					CenColegiadoKey colegiadoKey = new CenColegiadoKey();
@@ -1249,6 +1359,13 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						// Obtenemos el estado colegial que tiene el colegiado guardado en bbdd
 						if (cenDatoscolegialesestadosList.size() > 1) {
 							cenDatoscolegialesestadoBBDD = cenDatoscolegialesestadosList.get(1);
+							
+							// Asignamos el estado colegial anterior al eliminado
+							estadoColegialUltimo = cenDatoscolegialesestadoBBDD;
+							
+						// Si no existe estado anterior, este será el que se está eliminando
+						} else if (cenDatoscolegialesestadosList.size() == 1) {
+							estadoColegialUltimo = cenDatoscolegialesestadosList.get(0);
 						}
 
 						// Obtenemos los tipos de direcciones que tiene el colegiado
@@ -1425,6 +1542,38 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								error.setMessage(resultadoPlTurno[1]);
 							}
 							response.setError(error);
+							
+							// AUDITORIA si se insertó un estado correctamente
+							
+							populateEstadoColegial(colegiadoItem, estadoColegial);
+							
+							if (estadoColegial.getIdestado() != null) {
+								switch ((int) estadoColegial.getIdestado()) {
+								case SigaConstants.ESTADO_COLEGIAL_SINEJERCER:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.BAJA_EJERCICIO, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								case SigaConstants.ESTADO_COLEGIAL_EJERCIENTE:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.ALTA_EJERCICIO, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								case SigaConstants.ESTADO_COLEGIAL_BAJACOLEGIAL:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.BAJA_COLEGIACION, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								case SigaConstants.ESTADO_COLEGIAL_INHABILITACION:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.INHABILITACION, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								case SigaConstants.ESTADO_COLEGIAL_SUSPENSION:
+									auditoriaCenHistoricoService.manageAuditoriaEstados(estadoColegial, estadoColegialUltimo, "UPDATE", request, estadoColegial.getObservaciones(),
+											SigaConstants.CEN_TIPOCAMBIO.SUSPENSION_EJERCICIO, Long.parseLong(colegiadoItem.getIdPersona()));
+									break;
+								default:
+									break;
+								}
+							}
+							
 						} else {
 							response.setStatus(SigaConstants.KO);
 							resultado = 0;
@@ -1463,6 +1612,34 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info(
 				"datosColegialesUpdateEstados() -> Salida del servicio para eliminar el estado colegial de un colegial determinado");
 		return response;
+	}
+
+	/**
+	 * Añade datos a un objeto CenDatoscolegialesestado
+	 * @param colegiadoItem Objeto de donde se obtienen los datos
+	 * @param estadoColegial Objeto a rellenar de datos
+	 */
+	private void populateEstadoColegial(ColegiadoItem colegiadoItem, CenDatoscolegialesestado estadoColegial) {
+		
+		// Asignamos el id
+		if ("No Ejerciente".equals(colegiadoItem.getEstadoColegial())) {
+			estadoColegial.setIdestado((short) SigaConstants.ESTADO_COLEGIAL_SINEJERCER);
+			
+		} else if ("Ejerciente".equals(colegiadoItem.getEstadoColegial())) {
+			estadoColegial.setIdestado((short) SigaConstants.ESTADO_COLEGIAL_EJERCIENTE);
+			
+		} else if ("Baja Colegial".equals(colegiadoItem.getEstadoColegial())) {
+			estadoColegial.setIdestado((short) SigaConstants.ESTADO_COLEGIAL_BAJACOLEGIAL);
+			
+		} else if (SigaConstants.CEN_TIPOCAMBIO.INHABILITACION.getDescripcionTipoCambio().equals(colegiadoItem.getEstadoColegial())) {
+			estadoColegial.setIdestado((short) SigaConstants.ESTADO_COLEGIAL_INHABILITACION);
+			
+		} else if (SigaConstants.CEN_TIPOCAMBIO.SUSPENSION_EJERCICIO.getDescripcionTipoCambio().equals(colegiadoItem.getEstadoColegial())) {
+			estadoColegial.setIdestado((short) SigaConstants.ESTADO_COLEGIAL_SUSPENSION);
+		}
+		
+		// Asignamos las observaciones
+		estadoColegial.setObservaciones(colegiadoItem.getObservaciones());	
 	}
 
 	@Override
@@ -1757,7 +1934,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				}
 				if (colegiadoItem.getSituacionResidente() != null) {
 					colegiado.setSituacionresidente(
-							colegiadoItem.getSituacionResidente().equalsIgnoreCase("1") ? "1" : "0");
+							colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
 				} else {
 					colegiado.setSituacionresidente("0");
 				}
