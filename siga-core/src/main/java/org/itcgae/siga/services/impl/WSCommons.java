@@ -717,116 +717,34 @@ public class WSCommons {
 					}
 				}
 			}
-				List<SociedadesEditadasDTO> sociedadesEditadas = cenNoColegiado.selectSociedadesEditar(idInstitucion,peticion.getFechaDesde().getTime(),peticion.getFechaHasta().getTime());
-				if (null != sociedadesEditadas && sociedadesEditadas.size()>0) {
-					List<SociedadActualizacion> sociedadesEditadasFinal = new ArrayList<SociedadActualizacion>();
-					for (SociedadesEditadasDTO regSociedad : sociedadesEditadas) {
-						SociedadActualizacion sociedadActualizacion = SociedadActualizacion.Factory.newInstance();
-						
+			List<SociedadesEditadasDTO> sociedadesEditadas = cenNoColegiado.selectSociedadesEditar(idInstitucion,
+					peticion.getFechaDesde().getTime(), peticion.getFechaHasta().getTime());
+			if (null != sociedadesEditadas && sociedadesEditadas.size() > 0) {
+				List<SociedadActualizacion> sociedadesEditadasFinal = new ArrayList<SociedadActualizacion>();
+				for (SociedadesEditadasDTO regSociedad : sociedadesEditadas) {
+					SociedadActualizacion sociedadActualizacion = SociedadActualizacion.Factory.newInstance();
+
 						boolean argPublicar = Boolean.TRUE;
 
-						sociedadActualizacion.setPublicar(argPublicar);
-						Resena argResena = Resena.Factory.newInstance();
-						if(regSociedad.getResena()!=null){
-							if(regSociedad.getResena().length()>100){
-								argResena.setStringValue(regSociedad.getResena().substring(0, 99));
-							}else{
-								argResena.setStringValue(regSociedad.getResena());
-							}
+					sociedadActualizacion.setPublicar(argPublicar);
+					Resena argResena = Resena.Factory.newInstance();
+					if (regSociedad.getResena() != null) {
+						if (regSociedad.getResena().length() > 100) {
+							argResena.setStringValue(regSociedad.getResena().substring(0, 99));
+						} else {
+							argResena.setStringValue(regSociedad.getResena());
 						}
+					}
+
 						//sociedadActualizacion.setResena(argResena);
 						if(argResena.getStringValue().length() >= 3) {
 							sociedadActualizacion.setResena(argResena.getStringValue());
 						}
-						if (null != regSociedad.getObjetoSocial()) {
+					if (null != regSociedad.getObjetoSocial()) {
 							if(regSociedad.getObjetoSocial().length()>=500){
 								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial().substring(0, 500));
-							}else{
-								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
-							}
-						}
-						
-						//Insertamos los datos del registro
-						DatosRegistro argRegistro = DatosRegistro.Factory.newInstance();
-						argRegistro.setFechaCancelacion(UtilidadesString.toCalendar(regSociedad.getFechaCancelacion()));
-						argRegistro.setFechaInscripcion(UtilidadesString.toCalendar(regSociedad.getFechaInscripcion()));
-						argRegistro.setIdentificacionRegistro(regSociedad.getIdentificacionRegistro());
-						argRegistro.setNumeroRegistro(regSociedad.getNumeroRegistro());
-						sociedadActualizacion.setDatosRegistro(argRegistro);
-						
-						DatosPersona argNotario = DatosPersona.Factory.newInstance();
-						//Insertamos el Notario
-						Identificacion identificacion = Identificacion.Factory.newInstance();
-						if(regSociedad.getIdentificacionNotario()!=null){
-							if (Validaciones.validaNIE(regSociedad.getIdentificacionNotario())){
-								identificacion.setNIE(regSociedad.getIdentificacionNotario());
-							} else if (Validaciones.validaNIF(regSociedad.getIdentificacionNotario())) {
-								identificacion.setNIF(regSociedad.getIdentificacionNotario());
-							}
-							argNotario.setApellido1(regSociedad.getApellido1Notario());
-							argNotario.setApellido2(regSociedad.getApellido2Notario());
-							argNotario.setNombre(regSociedad.getNombreNotario());
-						}
-						if(identificacion.getNIF() != null) {
-							if(!identificacion.getNIF().isEmpty()) {
-								argNotario.setIdentificacion(identificacion);
-							}
-						} else if (identificacion.getNIE() != null) {
-							if(!identificacion.getNIE().isEmpty()) {
-								argNotario.setIdentificacion(identificacion);
-							}
-						}
-						sociedadActualizacion.setDatosNotario(argNotario);
-						
-						
-						//Insertamos los datos de la sociedad
-						DatosEntidad argSociedad = DatosEntidad.Factory.newInstance();
-						argSociedad.setCIFNIF(regSociedad.getSociedadNif());
-						argSociedad.setDenominacion(regSociedad.getSociedadDenominacion());
-						FormaSocial formaSocial = FormaSocial.Factory.newInstance();
-						if(regSociedad.getSociedadFormaSocial() != null){
-							if(regSociedad.getSociedadFormaSocial().length()>=20){
-								formaSocial.setStringValue(regSociedad.getSociedadFormaSocial().substring(0, 20));
-							}else{
-								formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
-							}
-						}
-						argSociedad.setFormaSocial(formaSocial);
-						sociedadActualizacion.setDatosSociedad(argSociedad);
-						sociedadActualizacion.setFechaAlta(UtilidadesString.toCalendar(regSociedad.getSociedadFechaAlta()));
-						sociedadActualizacion.setFechaConstitucion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
-						sociedadActualizacion.setFechaFin(UtilidadesString.toCalendar(regSociedad.getFechaFin()));
-						//sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
-						//Insertamos los datos de la direccion
-						Direccion argDireccion = Direccion.Factory.newInstance();
-						argDireccion.setDomicilio(regSociedad.getDomicilio());
-						if(validarCodPostal(regSociedad.getCodigoPostal())) {
-							argDireccion.setCodigoPostal(regSociedad.getCodigoPostal());
-						}
-						//Provincia
-						Provincia provincia = Provincia.Factory.newInstance();
-						provincia.setDescripcionProvincia(regSociedad.getProvincia());
-						provincia.setCodigoProvincia(regSociedad.getCodigoProvincia());
-						argDireccion.setProvincia(provincia);
-						//Poblacion
-						Poblacion poblacion = Poblacion.Factory.newInstance();
-						poblacion.setDescripcionPoblacion(regSociedad.getPoblacion());
-						poblacion.setCodigoPoblacion(regSociedad.getCodigoPoblacion());
-						argDireccion.setPoblacion(poblacion);
-						//Correo electronico
-						CorreoElectronico cElectronico = CorreoElectronico.Factory.newInstance();
-						cElectronico.setStringValue(regSociedad.getCorreoElectronico());
-						cElectronico.setPublicar(Boolean.TRUE);
-						argDireccion.setCorreoElectronico(cElectronico);
-						int contador =0;
-						int contadorContacto = 0;
-						boolean telefono = false;
-						boolean movil = false;
-						boolean faxB = false;
-						//contactos
-						if(regSociedad.getTelefono1()!=null){
-							contador++;
-							telefono = true;
+						} else {
+							sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
 						}
 					}
 
@@ -842,12 +760,24 @@ public class WSCommons {
 					// Insertamos el Notario
 					Identificacion identificacion = Identificacion.Factory.newInstance();
 					if (regSociedad.getIdentificacionNotario() != null) {
+							if (Validaciones.validaNIE(regSociedad.getIdentificacionNotario())){
+								identificacion.setNIE(regSociedad.getIdentificacionNotario());
+							} else if (Validaciones.validaNIF(regSociedad.getIdentificacionNotario())) {
 						identificacion.setNIF(regSociedad.getIdentificacionNotario());
+							}
 						argNotario.setApellido1(regSociedad.getApellido1Notario());
 						argNotario.setApellido2(regSociedad.getApellido2Notario());
 						argNotario.setNombre(regSociedad.getNombreNotario());
 					}
+						if(identificacion.getNIF() != null) {
+							if(!identificacion.getNIF().isEmpty()) {
 					argNotario.setIdentificacion(identificacion);
+							}
+						} else if (identificacion.getNIE() != null) {
+							if(!identificacion.getNIE().isEmpty()) {
+								argNotario.setIdentificacion(identificacion);
+							}
+						}
 					sociedadActualizacion.setDatosNotario(argNotario);
 
 					// Insertamos los datos de la sociedad
@@ -865,14 +795,15 @@ public class WSCommons {
 					argSociedad.setFormaSocial(formaSocial);
 					sociedadActualizacion.setDatosSociedad(argSociedad);
 					sociedadActualizacion.setFechaAlta(UtilidadesString.toCalendar(regSociedad.getSociedadFechaAlta()));
-					sociedadActualizacion
-							.setFechaConstitucion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
+						sociedadActualizacion.setFechaConstitucion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
 					sociedadActualizacion.setFechaFin(UtilidadesString.toCalendar(regSociedad.getFechaFin()));
 					// sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
 					// Insertamos los datos de la direccion
 					Direccion argDireccion = Direccion.Factory.newInstance();
 					argDireccion.setDomicilio(regSociedad.getDomicilio());
+						if(validarCodPostal(regSociedad.getCodigoPostal())) {
 					argDireccion.setCodigoPostal(regSociedad.getCodigoPostal());
+						}
 					// Provincia
 					Provincia provincia = Provincia.Factory.newInstance();
 					provincia.setDescripcionProvincia(regSociedad.getProvincia());
@@ -886,7 +817,7 @@ public class WSCommons {
 					// Correo electronico
 					CorreoElectronico cElectronico = CorreoElectronico.Factory.newInstance();
 					cElectronico.setStringValue(regSociedad.getCorreoElectronico());
-					cElectronico.setPublicar(Boolean.FALSE);
+						cElectronico.setPublicar(Boolean.TRUE);
 					argDireccion.setCorreoElectronico(cElectronico);
 					int contador = 0;
 					int contadorContacto = 0;
@@ -912,49 +843,30 @@ public class WSCommons {
 						if (telefono) {
 							Contacto contacto1 = Contacto.Factory.newInstance();
 							Telefono telefono1 = Telefono.Factory.newInstance();
-							telefono1.setPublicar(Boolean.FALSE);
+									telefono1.setPublicar(Boolean.TRUE);
 							telefono1.setStringValue(regSociedad.getTelefono1());
 							contacto1.setTelefono(telefono1);
 							contactosArray[contadorContacto++] = contacto1;
-						}
-						Contacto[] contactosArray = null;
-						if(contador>0){
-							contactosArray = new Contacto[contador];
-								if(telefono){
-									Contacto contacto1 = Contacto.Factory.newInstance();
-									Telefono telefono1 = Telefono.Factory.newInstance();
-									telefono1.setPublicar(Boolean.TRUE);
-									telefono1.setStringValue(regSociedad.getTelefono1());
-									contacto1.setTelefono(telefono1);
-									contactosArray[contadorContacto++] = contacto1;
 								}if(movil){
-									Contacto contacto1 = Contacto.Factory.newInstance();
-									TelefonoMovil movil1 = TelefonoMovil.Factory.newInstance();
+							Contacto contacto1 = Contacto.Factory.newInstance();
+							TelefonoMovil movil1 = TelefonoMovil.Factory.newInstance();
 									movil1.setPublicar(Boolean.TRUE);
-									movil1.setStringValue(regSociedad.getMovil());
-									contacto1.setTelefonoMovil(movil1);
-									contactosArray[contadorContacto++] = contacto1;
+							movil1.setStringValue(regSociedad.getMovil());
+							contacto1.setTelefonoMovil(movil1);
+							contactosArray[contadorContacto++] = contacto1;
 								}if(faxB){
-									Contacto contacto1 = Contacto.Factory.newInstance();
-									Fax fax = Fax.Factory.newInstance();
+							Contacto contacto1 = Contacto.Factory.newInstance();
+							Fax fax = Fax.Factory.newInstance();
 									fax.setPublicar(Boolean.TRUE);
-									fax.setStringValue(regSociedad.getFax1());
-									contacto1.setFax(fax);
-									contactosArray[contadorContacto++] = contacto1;
-								}
-						}
-						
-						argDireccion.setPaginaWeb(regSociedad.getPaginaWeb());
-						argDireccion.setContactoArray(contactosArray);
-						argDireccion.setPublicar(Boolean.TRUE);
-						if(validarDireccion(argDireccion)) {
-							sociedadActualizacion.setDireccion(argDireccion);
+							fax.setStringValue(regSociedad.getFax1());
+							contacto1.setFax(fax);
+							contactosArray[contadorContacto++] = contacto1;
 						}
 					}
 
 					argDireccion.setPaginaWeb(regSociedad.getPaginaWeb());
 					argDireccion.setContactoArray(contactosArray);
-					argDireccion.setPublicar(Boolean.FALSE);
+						argDireccion.setPublicar(Boolean.TRUE);
 					if (validarDireccion(argDireccion)) {
 						sociedadActualizacion.setDireccion(argDireccion);
 					}
@@ -992,30 +904,6 @@ public class WSCommons {
 								datosPersona.setApellido1(integrante.getApellidos1());
 								datosPersona.setApellido2(integrante.getApellidos2());
 								datosPersona.setNombre(integrante.getNombre());
-								identificacion.setNIF(integrante.getNifCif());
-								datosPersona.setIdentificacion(identificacion);
-								integranteFisico.setDatosPersona(datosPersona);
-								DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
-								Colegio colegio = Colegio.Factory.newInstance();
-								colegio.setCodigoColegio(integrante.getCodigocolegio());
-								colegio.setDescripcionColegio(integrante.getDescripcionColegio());
-								if (integrante.getProfesionalAbogado().equals("1")) {
-									ProfesionalAbogado profesionalAbogado = ProfesionalAbogado.Factory.newInstance();
-									profesionalAbogado.setColegio(colegio);
-									profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
-									datosProfesional.setProfesionalAbogado(profesionalAbogado);
-								} else {
-									Profesional profesional = Profesional.Factory.newInstance();
-									if (integrante.getCodigocolegio() != null) {
-										profesional.setColegio(colegio);
-									} else {
-										profesional.setNombreColegio(integrante.getDescripcionColegio());
-									}
-									integranteFisico.setDatosCargo(cargo);
-									DatosPersona datosPersona = DatosPersona.Factory.newInstance();
-									datosPersona.setApellido1(integrante.getApellidos1());
-									datosPersona.setApellido2(integrante.getApellidos2());
-									datosPersona.setNombre(integrante.getNombre());
 									// Nos aseguramos que no se utilice la identificación del integrante anterior
 									identificacion = Identificacion.Factory.newInstance();
 									/* Si el integrante no tiene NIF ni NIE, no se le añade la identificación
@@ -1029,12 +917,12 @@ public class WSCommons {
 										datosPersona.setIdentificacion(identificacion);
 									} else if ("NIF".equals(integrante.getTipoIdentificacion()) ||
 											   "CIF".equals(integrante.getTipoIdentificacion())) {
-										identificacion.setNIF(integrante.getNifCif());
-										datosPersona.setIdentificacion(identificacion);
+								identificacion.setNIF(integrante.getNifCif());
+								datosPersona.setIdentificacion(identificacion);
 									}
-									integranteFisico.setDatosPersona(datosPersona);
-									DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
-									Colegio colegio = Colegio.Factory.newInstance();
+								integranteFisico.setDatosPersona(datosPersona);
+								DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
+								Colegio colegio = Colegio.Factory.newInstance();
 									colegio.setCodigoColegio(integrante.getCodigoColegioCliente());
 									colegio.setDescripcionColegio(integrante.getDescripcionColegioCliente());
 									
@@ -1114,52 +1002,47 @@ public class WSCommons {
 									integranteJuridico.setDatosEntidad(datosEntidad);
 									integranteUnitario.setIntegranteJuridico(integranteJuridico);
 								}
-								integranteJuridico.setDatosCargo(cargoJuridico);
-								integranteUnitario.setFechaModificacion(
-										UtilidadesString.toCalendar(integrante.getFechaModificacion()));
-								integranteUnitario.setPublicar(Boolean.FALSE);
-								DatosEntidad datosEntidad = DatosEntidad.Factory.newInstance();
-								datosEntidad.setCIFNIF(integrante.getNifCif());
-								datosEntidad.setDenominacion(integrante.getNombre());
-								integranteJuridico.setDatosEntidad(datosEntidad);
-								integranteUnitario.setIntegranteJuridico(integranteJuridico);
+								integrantesSociedad[i] = integranteUnitario;
+								i++;
 							}
-							integrantesSociedad[i] = integranteUnitario;
-							i++;
+							
+							sociedadActualizacion.setIntegranteSociedadArray(integrantesSociedad);
 						}
-
-						sociedadActualizacion.setIntegranteSociedadArray(integrantesSociedad);
+						
+						
+						
+						
+						sociedadesEditadasFinal.add(sociedadActualizacion);
+		
 					}
-
-					sociedadesEditadasFinal.add(sociedadActualizacion);
-
-				}
-				List<SociedadActualizacion> sociedadesEditadasResult = new ArrayList<>();
-
-				if (sociedadesEditadasFinal.size() == 0) {
-					LOGGER.info("No se ha encontrado ninguna sociedad con los filtros seleccionados");
-					respuesta.setNumTotalPaginas(totalPaginas);
-				} else {
-					if (peticion.getConPaginacion()) {
-						if (sociedadesEditadasFinal.size() >= peticion.getNumPagina() * tamanoPaginacion) {
-							sociedadesEditadasResult = sociedadesEditadasFinal.subList(
-									(peticion.getNumPagina() - 1) * tamanoPaginacion,
-									(peticion.getNumPagina() * tamanoPaginacion));
-						} else {
-							sociedadesEditadasResult = sociedadesEditadasFinal.subList(
-									(peticion.getNumPagina() - 1) * tamanoPaginacion, sociedadesEditadasFinal.size());
-						}
-
-						// Se calcula el numero total de paginas
-						totalPaginas = (short) (sociedadesEditadas.size() / tamanoPaginacion);
-						if (sociedadesEditadas.size() % tamanoPaginacion > 0) {
-							totalPaginas++;
-						}
+					List<SociedadActualizacion> sociedadesEditadasResult = new ArrayList<>();
+					
+					if (sociedadesEditadasFinal.size() == 0) {
+						LOGGER.info("No se ha encontrado ninguna sociedad con los filtros seleccionados");
 						respuesta.setNumTotalPaginas(totalPaginas);
-
 					} else {
-						sociedadesEditadasResult.addAll(sociedadesEditadasFinal);
-						respuesta.setNumTotalPaginas((short) 1);
+						if (peticion.getConPaginacion()) {
+							if (sociedadesEditadasFinal.size() >= peticion.getNumPagina() * tamanoPaginacion) {
+								sociedadesEditadasResult = sociedadesEditadasFinal.subList(
+								(peticion.getNumPagina() - 1) * tamanoPaginacion,
+										(peticion.getNumPagina() * tamanoPaginacion));
+							} else {
+								sociedadesEditadasResult = sociedadesEditadasFinal.subList(
+								(peticion.getNumPagina() - 1) * tamanoPaginacion,
+										sociedadesEditadasFinal.size());
+							}
+							
+							// Se calcula el numero total de paginas
+							totalPaginas = (short) (sociedadesEditadas.size() / tamanoPaginacion);
+							if (sociedadesEditadas.size() % tamanoPaginacion > 0) {
+								totalPaginas++;
+							}
+							respuesta.setNumTotalPaginas(totalPaginas);
+							
+						}else{
+							sociedadesEditadasResult.addAll(sociedadesEditadasFinal);
+							respuesta.setNumTotalPaginas((short)1);
+						}
 					}
 					
 					try{
@@ -1175,32 +1058,32 @@ public class WSCommons {
 								}
 							}
 						}
+					}catch(AssertionError e){
+						LOGGER.info("Excepcion añadiendo los registros en el nodo RegistroSociedad: " + e.getMessage());
 					}
-				} catch (AssertionError e) {
-					LOGGER.info("Excepcion añadiendo los registros en el nodo RegistroSociedad: " + e.getMessage());
+					
 				}
-
-			}
-
-			if (null != registrosList && registrosList.size() > 0) {
+				
+			if (null != registrosList && registrosList.size()>0) {
 				RegistroSociedad[] registrosReturn = new RegistroSociedad[registrosList.size()];
 				int i = 0;
 				for (RegistroSociedad registros : registrosList) {
 					registrosReturn[i] = registros;
-
+					
 					i++;
 				}
 				return registrosReturn;
-			} else {
+			}else {
 				return new RegistroSociedad[0];
 			}
 
 		} catch (Exception e) {
 			throw new BusinessException("Error al almacenar los datos de la sociedad", e);
 		}
-
-	}
+		
+		
 	
+	}
 
 	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
 		CenInstitucionExample example = new CenInstitucionExample();
@@ -1298,7 +1181,6 @@ public class WSCommons {
 						ColegiadoItem colegiadoItemRecuperado = estadosColegio.get(0);
 						idUltimoEstadoDestino = colegiadoItemRecuperado.getIdEstado();
 						fechaUltimoEstadoDestino = colegiadoItemRecuperado.getFechaEstado();
-						;
 					}
 
 					actualizacionesColegio = ecomCenDatosExtendsMapper.getInfoMantenimientoDuplicados(idPersonaOrigen,
@@ -1586,10 +1468,7 @@ public class WSCommons {
 			}
 		}
 		String msgSalida = "Fusión completada: se encuentran todos los datos de ´" + beanPersonaDestino.getNombre()
-				+ "´ en el registro con Num. ident. ´" + beanPersonaDestino.getNifcif() + "´"; // OJOOO: No se pueden
-																								// poner comillas dobles
-																								// ni simples porque
-																								// fallará la JSP
+		+"´ en el registro con Num. ident. ´"+beanPersonaDestino.getNifcif()+"´"; // OJOOO: No se pueden poner comillas dobles ni simples porque fallará la JSP
 		return msgSalida;
 
 	}
@@ -1883,8 +1762,7 @@ public class WSCommons {
 				String fin = "";
 				example.setIdrecurso("censo.preferente.correo");
 				if (p.indexOf(SigaConstants.TIPO_PREFERENTE_CORREO) >= 0)
-					fin += ", " + genRecursosMapper.selectByPrimaryKey(example).getDescripcion();// (idioma,
-																									// "censo.preferente.correo");
+					fin += ", " +  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();//(idioma, "censo.preferente.correo"); 
 				example.setIdrecurso("censo.preferente.mail");
 				if (p.indexOf(SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO) >= 0)
 					fin += ", " + genRecursosMapper.selectByPrimaryKey(example).getDescripcion();
@@ -1970,8 +1848,7 @@ public class WSCommons {
 			ColegiadoItem colegiadoItem = new ColegiadoItem();
 			colegiadoItem.setIdPersona(beanDir.getIdpersona().toString());
 			List<ColegiadoItem> colegiaciones = cenColegiadoExtendsMapper
-					.selectColegiaciones(beanDir.getIdinstitucion(), "1", colegiadoItem);// (beanDir.getIdPersona(),
-																							// beanDir.getIdInstitucion());
+			.selectColegiaciones(beanDir.getIdinstitucion(), "1", colegiadoItem );// (beanDir.getIdPersona(), beanDir.getIdInstitucion());
 			if ((null == colegiaciones || colegiaciones.size() == 0) && esLetrado.getValor().equals("0")) {
 				// no es colegiado o no tiene estado colegial y ademas no es letrado
 				error = "messages.censo.direcciones.tipoCorreo";
@@ -2108,8 +1985,7 @@ public class WSCommons {
 					throw tex;
 
 				} catch (SQLException ex) {
-					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
-																		// segunda vez deberia funcionar)
+					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la segunda vez deberia funcionar)
 						throw ex;
 					}
 				}
@@ -2178,6 +2054,8 @@ public class WSCommons {
 				}
 			}
 		}
+		return valid;
+	}
 		
 		private boolean validarCodPostal(String codPostal) {
 			boolean valid = false;
@@ -2262,4 +2140,73 @@ public class WSCommons {
 			
 			return true;
 		}
+	
+	/**
+	 * Parametros tiene que venir como tipo String, int, short o long (no vale otro tipo si no, no funciona el for para settear los parametros de entrada)
+	 * @param functionDefinition
+	 * @param outParameters
+	 * @param inParameters
+	 * @return
+	 * @throws IOException
+	 * @throws NamingException
+	 * @throws SQLException
+	 */
+	public String[] callPLProcedureFacturacionPyS(String functionDefinition, int outParameters, Object[] inParameters)
+			throws IOException, NamingException, SQLException {
+
+		DataSource ds = null;
+		Connection con = null;
+		CallableStatement cs = null;
+		String result[] = null;
+
+		try {
+			if (outParameters > 0)
+				result = new String[outParameters];
+
+			ds = getOracleDataSource();
+			con = ds.getConnection();
+
+			cs = con.prepareCall(functionDefinition);
+			int size = inParameters.length;
+
+			// input Parameters
+			for (int i = 0; i < size; i++) {
+				 
+				if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
+					 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
+				 }
+				 
+				if (inParameters[i] instanceof String){
+					cs.setString(i+1, inParameters[i].toString());
+				 }
+			}
+
+			// output Parameters
+			for (int i = 0; i < outParameters; i++) {
+				cs.registerOutParameter(i + size + 1, Types.VARCHAR);
+			}
+
+			cs.execute();
+
+			for (int i = 0; i < outParameters; i++) {
+				result[i] = cs.getString(i + size + 1);
+			}
+		} catch (Exception e) {
+			LOGGER.error("WSCommons.callPLProcedureFacturacionPyS > ERROR al llamar al paquete de facturacionPyS. ", e);
+			throw e;
+		} finally {
+			if (con != null) {
+				con.close();
+				con = null;
+			}
+
+			if (cs != null) {
+				cs.close();
+				cs = null;
+			}
+		}
+
+		return result;
+	}	
+	
 }

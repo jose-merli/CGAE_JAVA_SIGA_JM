@@ -411,7 +411,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			
 		} else {
 
-			byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
+			byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
 
 			cenCargamasivaGF.setTipocarga(SigaConstants.TIPO_CARGA);
 			cenCargamasivaGF.setIdinstitucion(idInstitucion);

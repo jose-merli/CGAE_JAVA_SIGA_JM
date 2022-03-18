@@ -1027,6 +1027,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			Long idPlantillaGenerar = null;
 			boolean esExcel = false;
 			boolean esFO = false;
+			List<ModPlantilladocumento> listaPlantilla = null;
+			//List<ModPlantilladocumento> listaPlantilla = new ArrayList<ModPlantilladocumento>();
 			//Obtenemos el nombre de la plantilla
 			if(plantilla.getIdPlantillas() != null){
 				
@@ -1047,10 +1049,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.debug("El formato de salida es Excel");
 				}
 				
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - INICIO");
 				example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(usuario.getIdlenguaje());
 				listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - FIN");
 				
 				if(listaPlantilla != null && listaPlantilla.size() == 1){
 					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
@@ -1066,7 +1066,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.error("No hay plantilla asociada para el informe en el idioma del usuario");
 					throw new BusinessException("No hay plantilla asociada para el informe en el idioma del usuario");
 				}
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existe una plantilla asociada al informe  - FIN");
 			}
 			
 			for (ModPlantilladocumento plantillaDoc: listaPlantilla) {
@@ -1222,9 +1221,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					}else {
 						LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
 					}
-				}else {
-					LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
-				}
 				LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
 				
 				
@@ -1252,23 +1248,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(),
 									Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar,
 									Long.parseLong(plantilla.getIdInforme()),
-									Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
-						}
-
-						List<Map<String, Object>> resultMulti;
-						try {
-							resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
-									Long.valueOf(consultaMulti.getIdConsulta()),Short.valueOf(consultaMulti.getIdInstitucion()),consultaMulti.getDescripcion());
-							LOGGER.info("Se ejecuta la consulta MULTI");
-							if(resultMulti != null && resultMulti.size() > 0){
-								for(int k = 0;k<resultMulti.size();k++){
-									// Por cada registro generamos un documento
-									numFicheros++;
-									generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
-											listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-											hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-											nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO);
-								}														
+										Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+										Short.parseShort(String.valueOf(consultaMulti.getIdInstitucion())));
 							}
 	
 							List<Map<String, Object>> resultMulti;
@@ -1283,7 +1264,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 												listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 												hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-												nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+												nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO);
 									}														
 								}
 									
@@ -1303,14 +1284,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 								listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 								hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-								nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+								nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas,esFO);
 					}
-					LOGGER.info("Rendimiento fin ejecucion consultas multidocumento" );
-				}else {
-					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
-							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-							nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas,esFO);
+				
+	//				if (ejecutarConsulta) {
+	//					// Por cada resultado ejecutamos las consultas de datos
+	//					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+	//							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+	//							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+	//							nombrePlantilla, esEnvio, esExcel, esDestinatario);
+	//				} 
 				}
 				
 				LOGGER.info("Rendimiento fin tratamiento modelo de comunicacion: " + r);
