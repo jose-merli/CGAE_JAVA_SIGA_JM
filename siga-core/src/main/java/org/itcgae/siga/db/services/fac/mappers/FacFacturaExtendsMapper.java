@@ -48,7 +48,7 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "fechamodificacionult", property = "fechaModificacionUlt", jdbcType = JdbcType.VARCHAR),
 			
 	})
-	List<FacturaItem> getFacturas(FacturaItem item, String idInstitucion, String idLenguaje);
+	List<FacturaItem> getFacturas(FacturaItem item, String idInstitucion, String idLenguaje, boolean filtrosSoloAbono, boolean filtrosSoloFactura);
 
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getFacturasByIdSolicitud")
 	@Results({

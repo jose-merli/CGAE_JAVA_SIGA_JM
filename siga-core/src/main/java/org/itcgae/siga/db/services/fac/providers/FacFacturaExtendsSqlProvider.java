@@ -8,33 +8,68 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FacFacturaSqlProvider;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 
 public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 	
 	private Logger LOGGER = Logger.getLogger(this.getClass());
 
-    public String getFacturas(FacturaItem item, String idInstitucion, String idLenguaje) {
-
-        SQL numComunicaciones = new SQL();
-        SQL ultComunicacion = new SQL();
-        SQL facturasPendientes = new SQL();
-        SQL adeudos = new SQL();
-        SQL devoluciones = new SQL();
-        SQL facturas = new SQL();
+	public String getFacturas(FacturaItem item, String idInstitucion, String idLenguaje, boolean filtrosSoloAbono, boolean filtrosSoloFactura) {
         SQL sqlFacturas = new SQL();
+        SQL sqlFinal = new SQL();
+        String queryFacturas = "";
+        String queryAbonos = "";
+
+        if (!(filtrosSoloAbono && !filtrosSoloFactura)) {
+			queryFacturas = getQueryFacturas(item, idInstitucion, idLenguaje);
+		}
+		
+		if (!(!filtrosSoloAbono && filtrosSoloFactura)) {
+			queryAbonos = getQueryAbonos(item, idInstitucion, idLenguaje);	
+		}
+
+        //query completa facturas
+        sqlFacturas.SELECT("*");
+        if(queryFacturas != null && !queryFacturas.isEmpty() && queryAbonos != null && !queryAbonos.isEmpty()){
+        	sqlFacturas.FROM("(" + queryFacturas + " UNION " + queryAbonos + ")");
+        }else if(queryFacturas != null && !queryFacturas.isEmpty()){
+        	sqlFacturas.FROM("(" + queryFacturas + ")");
+        }
+        else{
+        	sqlFacturas.FROM("(" + queryAbonos.toString() + ")");
+        }
+        sqlFacturas.ORDER_BY("fecha DESC");
+        	
+
+        //query completa facturas
+        sqlFinal.SELECT("*");
+        sqlFinal.FROM("(" + sqlFacturas.toString() + ")");
+        sqlFinal.WHERE("ROWNUM < 201");
+
+
+        //LOGGER.info(sqlFacturas.toString());
+        
+        return sqlFacturas.toString();
+    }
+
+    private String getQueryFacturas(FacturaItem item, String idInstitucion, String idLenguaje) {
+    	SQL facturas = new SQL();
+    	SQL facturasPendientes = new SQL();
+    	SQL numComunicaciones = new SQL();
+        SQL ultComunicacion = new SQL();
         SQL sqlEstadosPagos = new SQL();
         SQL sqlUltimoEstado = new SQL();
         SQL sqlUltimoImportePorPagar = new SQL();
+        SQL sqlUltimoPagado = new SQL();
         SQL sqlUltimoAccion = new SQL();
         SQL sqlUltimoFecha = new SQL();
-        SQL sqlUltimoPagado = new SQL();
-
+        SQL adeudos = new SQL();
+        SQL devoluciones = new SQL();
+        
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String fecha;
-
-        //num facturas pendientes
+		
+		//num facturas pendientes
         if(item.getFacturasPendientesDesde() != null || item.getFacturasPendientesHasta() != null){
             facturasPendientes.SELECT("IDPERSONA");
             facturasPendientes.FROM("FAC_FACTURA");
@@ -231,36 +266,143 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
             facturas.WHERE("f.idfactura IN (" + devoluciones.toString() + ")");
         }
-
-        facturas.ORDER_BY("f.fechaemision DESC");
-
-        //query completa facturas
-        sqlFacturas.SELECT("*");
-        sqlFacturas.FROM("(" + facturas.toString() + ")");
-        sqlFacturas.WHERE("ROWNUM < 201");
-
-        //num facturas pendiente
+		
+		//num facturas pendiente
         if (item.getFacturasPendientesDesde() != null && !item.getFacturasPendientesDesde().isEmpty()) {
-            //sqlFacturas.WHERE("TOTALPENDIENTE>=to_number(" + item.getFacturasPendientesDesde() + ",'99999999999999999.99')");
+            //facturas.WHERE("TOTALPENDIENTE>=to_number(" + item.getFacturasPendientesDesde() + ",'99999999999999999.99')");
         }
         if (item.getFacturasPendientesHasta() != null && !item.getFacturasPendientesHasta().isEmpty()) {
-            //sqlFacturas.WHERE("TOTALPENDIENTE<=to_number(" + item.getFacturasPendientesHasta() + ",'99999999999999999.99')");
+            //facturas.WHERE("TOTALPENDIENTE<=to_number(" + item.getFacturasPendientesHasta() + ",'99999999999999999.99')");
         }
-
-        //num comunicaciones
+		
+		//num comunicaciones
         if (item.getComunicacionesFacturasDesde() != null && !item.getComunicacionesFacturasDesde().isEmpty()) {
-            sqlFacturas.WHERE("numcomunicaciones>=to_number(" + item.getComunicacionesFacturasDesde() + ",'99999999999999999.99')");
+        	facturas.WHERE("numcomunicaciones>=to_number(" + item.getComunicacionesFacturasDesde() + ",'99999999999999999.99')");
         }
         if (item.getComunicacionesFacturasHasta() != null && !item.getComunicacionesFacturasHasta().isEmpty()) {
-            sqlFacturas.WHERE("numcomunicaciones<=to_number(" + item.getComunicacionesFacturasHasta() + ",'99999999999999999.99')");
+        	facturas.WHERE("numcomunicaciones<=to_number(" + item.getComunicacionesFacturasHasta() + ",'99999999999999999.99')");
+        }
+		
+		return facturas.toString();
+	}
+    
+    private String getQueryAbonos(FacturaItem item, String idInstitucion, String idLenguaje) {
+    	SQL transferencia = new SQL();
+        SQL abonos = new SQL();
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String fecha;
+		
+    	//select de abonos
+        abonos.SELECT("'ABONO' tipo,TO_CHAR(f.idabono) as idfactura, f.numeroabono as numerofactura,f.idinstitucion,f.fecha fecha, null AS  idprogramacion,"
+				+ " null AS  facturacion, nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident," 
+        		+ "nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' || p.nombre, p.nombre) nombreCompleto,"
+                + "f.imptotal imptotal,f.imppendienteporabonar imptotalporpagar,f.estado idestado,r.descripcion estado,"
+        		+ " null AS  numcomunicaciones, null AS  ultcomunicacion, p.idpersona, null AS idformapago, " + 
+        		"            null AS nombreformapago, " + 
+        		"            null AS estado_max_historico, " + 
+        		"            null AS imptotalporpagar_max, " + 
+        		"            null AS idaccionult, " + 
+        		"            null AS fechamodificacionult, " + 
+        		"            null AS imptotalpagado_max");
+
+        //joins
+        abonos.FROM("fac_abono f");
+        abonos.INNER_JOIN("cen_cliente c ON (c.idpersona = f.idpersona AND c.idinstitucion = f.idinstitucion)");
+        abonos.INNER_JOIN("cen_persona p ON (p.idpersona = f.idpersona)");
+        abonos.LEFT_OUTER_JOIN("cen_colegiado col ON (col.idpersona = p.idpersona AND col.idinstitucion = f.idinstitucion)");
+        abonos.LEFT_OUTER_JOIN("fac_estadoabono ef ON (ef.idestado = f.estado)");
+        abonos.LEFT_OUTER_JOIN("gen_recursos r ON (ef.descripcion = r.idrecurso  AND r.idlenguaje = "+ idLenguaje +")");
+
+        //filtros
+        abonos.WHERE("f.idinstitucion ="+idInstitucion);
+        //Quito esta condicion porque no salen facturas en la busqueda
+        //abonos.WHERE("f.idpagosjg is null");
+
+        //numero factura
+        if(item.getNumeroFactura()!=null) {
+            abonos.WHERE("UPPER(f.numeroabono) LIKE UPPER('%"+item.getNumeroFactura()+"%')");
         }
 
-        //LOGGER.info(sqlFacturas.toString());
-        
-        return sqlFacturas.toString();
-    }
+        //estados
+        if (item.getEstadosFiltroAb()!=null && !item.getEstadosFiltroAb().isEmpty()) {
+            StringBuilder aux = new StringBuilder();
+            for (String s : item.getEstadosFiltroAb()) {
+                aux.append(s).append(",");
+            }
+            aux.deleteCharAt(aux.length()-1);
+            abonos.WHERE("f.estado in (" + aux + ")");
+        }
 
-    public String getFacturasByIdSolicitud(String solicitudes, String idInstitucion) {
+        //forma de pago abono
+        if(item.getFormaCobroAbono()!=null && (item.getFormaCobroAbono().equalsIgnoreCase("E") || item.getFormaCobroAbono().equalsIgnoreCase("A"))) {
+            abonos.WHERE("f.IMPTOTALABONADOEFECTIVO > 0");
+        }
+        if(item.getFormaCobroAbono()!=null && (item.getFormaCobroAbono().equalsIgnoreCase("B") || item.getFormaCobroAbono().equalsIgnoreCase("A"))) {
+            abonos.WHERE("f.IMPTOTALABONADOPORBANCO > 0");
+        }
+
+        //importe facturado
+        if(item.getImportefacturadoDesde()!=null && !item.getImportefacturadoDesde().isEmpty()) {
+            abonos.WHERE("f.IMPTOTAL>=to_number("+item.getImportefacturadoDesde()+",'99999999999999999.99')");
+        }
+        if(item.getImportefacturadoHasta()!=null && !item.getImportefacturadoHasta().isEmpty()) {
+            abonos.WHERE("f.IMPTOTAL<=to_number("+item.getImportefacturadoHasta()+",'99999999999999999.99')");
+        }
+
+        //fecha emision
+        if(item.getFechaEmisionDesde()!=null) {
+            fecha = dateFormat.format(item.getFechaEmisionDesde());
+            abonos.WHERE("f.fecha >= TO_DATE('"+fecha+"', 'DD/MM/YYYY')");
+        }
+        if(item.getFechaEmisionHasta()!=null) {
+            fecha = dateFormat.format(item.getFechaEmisionHasta());
+            abonos.WHERE("f.fecha <= TO_DATE('"+fecha+"', 'DD/MM/YYYY')");
+        }
+
+        //contabilizado SI('S') NO('N')
+        if(item.getContabilizado()!=null && item.getContabilizado().equalsIgnoreCase("S")) {
+            abonos.WHERE("f.contabilizada = 'S'");
+        }
+        if(item.getContabilizado()!=null && item.getContabilizado().equalsIgnoreCase("N")) {
+            abonos.WHERE("f.contabilizada = 'N'");
+        }
+
+        //abono SJCS
+        if(item.getNumeroAbonoSJCS()!=null) {
+            abonos.WHERE("f.IDPAGOSJG="+item.getNumeroAbonoSJCS());
+        }
+
+        //id persona
+        if (item.getNumeroIdentificacion() != null) {
+            abonos.WHERE("UPPER(p.nifcif) LIKE UPPER('%"+item.getNumeroIdentificacion()+"%')");
+        }
+
+        //numero colegiado
+        if(item.getNumeroColegiado()!=null) {
+            abonos.WHERE("col.NCOLEGIADO="+item.getNumeroColegiado());
+        }
+
+        //nombre
+        if(item.getNombre()!=null) {
+            abonos.WHERE("UPPER(p.nombre) LIKE UPPER('%"+item.getNombre()+"%')");
+        }
+        if(item.getApellidos()!=null) {
+            abonos.WHERE("UPPER(p.apellidos1 || ' ' || nvl(p.apellidos2, '')) LIKE UPPER('%"+item.getApellidos()+"%')");
+        }
+
+        //fichero transferencia
+        if(item.getIdentificadorTransferencia()!=null){
+            transferencia.SELECT("idabono");
+            transferencia.FROM("fac_abonoincluidoendisquete");
+            transferencia.WHERE("idinstitucion = f.idinstitucion AND IDDISQUETEABONO = "+ item.getIdentificadorTransferencia());
+
+            abonos.WHERE("idabono IN (" + transferencia.toString() + ")");
+        }
+		return null;
+	}
+
+	public String getFacturasByIdSolicitud(String solicitudes, String idInstitucion) {
 
         SQL queryCompras = new SQL();
         SQL querySuscripciones = new SQL();
