@@ -87,6 +87,9 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "IMPORTEEJG", property = "importeEjg", jdbcType = JdbcType.VARCHAR),
     })
     List<FacturacionItem> getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax, String idLenguaje);
+    
+    @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getFactIdCertificaciones")
+    List<String> getFactIdCertificaciones(String idCertificacion, String idInstitucion);
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "comboFactByPartidaPresu")
     @Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
@@ -96,7 +99,7 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "comboFactNull")
     @Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)})
-    List<ComboItem> comboFactNull(String idinstitucion);
+    List<ComboItem> comboFactNull(String idinstitucion,String IdCertificados);
 
     @SelectProvider(type = FcsCertificacionesSqlExtendsProvider.class, method = "getMvariosAplicadosEnPagosEjecutadosPorPeriodo")
     @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),

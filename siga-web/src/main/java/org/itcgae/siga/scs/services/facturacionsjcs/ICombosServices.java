@@ -43,7 +43,7 @@ public interface ICombosServices {
 
     ComboDTO comboFactByPartidaPresu(String idpartidapresupuestaria, HttpServletRequest request);
 
-    ComboDTO comboFactNull(HttpServletRequest request);
+    ComboDTO comboFactNull(String idCertificacion,HttpServletRequest request);
 
     ComboDTO comboFactBaremos(HttpServletRequest request);
     

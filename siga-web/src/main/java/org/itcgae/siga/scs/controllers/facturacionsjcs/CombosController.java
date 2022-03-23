@@ -131,9 +131,9 @@ public class CombosController {
    		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
    	}
 
-    @RequestMapping(value="/combo/comboFactNull", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<ComboDTO> comboFactNull(HttpServletRequest request) {
-        ComboDTO response = combosServices.comboFactNull(request);
+    @PostMapping(value="/combo/comboFactNull")
+    ResponseEntity<ComboDTO> comboFactNull(@RequestBody String idCertificacion,HttpServletRequest request) {
+        ComboDTO response = combosServices.comboFactNull(idCertificacion,request);
         return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
     }
 
