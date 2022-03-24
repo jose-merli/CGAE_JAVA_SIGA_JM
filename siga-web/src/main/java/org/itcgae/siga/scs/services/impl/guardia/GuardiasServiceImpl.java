@@ -3282,6 +3282,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO insertGuardiaToCalendar(Boolean update, HttpServletRequest request, String idCalendar,
 			List<GuardiaCalendarioItem> itemList) {
 		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
@@ -3290,68 +3291,44 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-				if (usuarios != null && usuarios.size() > 0) {
-					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-					String today = formatter.format(new Date());
-					LOGGER.info(
-							"insertGuardiaToCalendar() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
-					String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(idCalendar,
-							idInstitucion.toString());
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni)
+					.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-					itemList.forEach(item -> {
-						if (!update) {
-							try {
-								String response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(
-										idConjuntoGuardia, idInstitucion.toString(), today, item);
-								String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar,
-										idConjuntoGuardia, idInstitucion.toString(), today, item);
-								if ((response == null || response2 == null) && error.getDescription() == null) {
-									error.setCode(400);
-									insertResponseDTO.setStatus(SigaConstants.KO);
-								} else if (error.getCode() == null) {
-									error.setCode(200);
-									insertResponseDTO.setStatus(SigaConstants.OK);
-								}
-							} catch (Exception e) {
-								error.setCode(500);
-								error.setDescription("general.mensaje.error.bbdd");
-								error.setMessage(e.getMessage());
-								insertResponseDTO.setError(error);
-							}
-						} else {
-							try {
-								scsGuardiasturnoExtendsMapper.updateGuardiaInCalendario(idCalendar, idConjuntoGuardia,
-										idInstitucion.toString(), today, item);
-								error.setCode(200);
-								insertResponseDTO.setStatus(SigaConstants.OK);
-							} catch (Exception e) {
-								error.setCode(500);
-								error.setDescription("general.mensaje.error.bbdd");
-								error.setMessage(e.getMessage());
-								insertResponseDTO.setError(error);
-							}
+			if (usuarios != null && usuarios.size() > 0) {
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+				String today = formatter.format(new Date());
+				LOGGER.info(
+						"insertGuardiaToCalendar() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
+				String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(idCalendar,
+						idInstitucion.toString());
+
+				itemList.forEach(item -> {
+					if (item.getNuevo() != null && item.getNuevo()) {
+						String response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(
+								idConjuntoGuardia, idInstitucion.toString(), today, item);
+						String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar,
+								idConjuntoGuardia, idInstitucion.toString(), today, item);
+						if ((response == null || response2 == null) && error.getDescription() == null) {
+							error.setCode(400);
+							insertResponseDTO.setStatus(SigaConstants.KO);
+						} else if (error.getCode() == null) {
+							error.setCode(200);
+							insertResponseDTO.setStatus(SigaConstants.OK);
 						}
+					} else {
+						scsGuardiasturnoExtendsMapper.updateGuardiaInCalendario(idCalendar, idConjuntoGuardia,
+								idInstitucion.toString(), today, item);
+						error.setCode(200);
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+				});
 
-					});
-
-					LOGGER.info("insertGuardiaToCalendar() -> Entrada para obtener los datos del calendario");
-				}
+				LOGGER.info("insertGuardiaToCalendar() -> Entrada para obtener los datos del calendario");
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"insertGuardiaToCalendar() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			error.setMessage(e.getMessage());
-			insertResponseDTO.setError(error);
 		}
 
 		insertResponseDTO.setError(error);

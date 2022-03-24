@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -19,6 +20,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
@@ -47,6 +49,7 @@ import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
+import org.itcgae.siga.scs.services.impl.guardia.GuardiasServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -59,6 +62,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @RestController
 @RequestMapping(value = "/guardia")
 public class GuardiaController {
+
+	private Logger LOGGER = Logger.getLogger(GuardiaController.class);
 
 	@Autowired
 	GuardiasService guardiasService;
@@ -325,14 +330,24 @@ public class GuardiaController {
 	ResponseEntity<InsertResponseDTO> insertGuardiaToCalendar(
 			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, Boolean update, String idCalendar,
 			HttpServletRequest request) {
-		InsertResponseDTO response = guardiasService.insertGuardiaToCalendar(update, request, idCalendar,
-				guardiaCalendarioItemList);
-		if (response.getStatus() == "OK" || response.getStatus() == "") {
+		InsertResponseDTO response = new InsertResponseDTO();
+
+		try {
+			response = guardiasService.insertGuardiaToCalendar(update, request, idCalendar,
+					guardiaCalendarioItemList);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		} else {
+		} catch (Exception e) {
+			LOGGER.error(
+					"insertGuardiaToCalendar() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
+					e);
+
+			Error error = new Error();
+			response.setError(error);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@PostMapping(value = "/deleteGuardiaCalendario", produces = MediaType.APPLICATION_JSON_VALUE)

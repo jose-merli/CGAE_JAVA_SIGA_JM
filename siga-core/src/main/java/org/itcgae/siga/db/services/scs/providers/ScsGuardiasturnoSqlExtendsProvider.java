@@ -713,6 +713,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	        sql.WHERE("PG.idProgCalendario = " + idCalendarProg);
 	        sql.WHERE("t.FECHABAJA IS NULL");
 	        sql.WHERE("g.FECHABAJA IS NULL");
+	        sql.ORDER_BY("PG.ORDEN");
 	    return sql.toString();
 	}
 	public String getIdCalendarioGuardiasFromTurnosGuardiasList(String turnos, String guardias, String idInstitucion, String fechaDesde, String fechaHasta) {
@@ -819,6 +820,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			subquery.SELECT_DISTINCT("USUMODIFICACION");
 			subquery.FROM("SCS_CONF_CONJUNTO_GUARDIAS CG");
 			subquery.WHERE("CG.IDCONJUNTOGUARDIA = " + idConjuntoGuardia);
+			subquery.WHERE("CG.IDINSTITUCION = " + idInstitucion);
 		}
 		SQL sql2 = new SQL();
 		sql2.INSERT_INTO("SCS_CONF_CONJUNTO_GUARDIAS CG");
@@ -838,7 +840,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			sql2.VALUES("ORDEN", item.getOrden());
 		}
 		if (today != null) {
-			sql2.VALUES("FECHAMODIFICACION", "'" + today + "'");
+			sql2.VALUES("FECHAMODIFICACION", "TO_DATE('" + today + "', 'DD/MM/YYYY')");
 		}
 		if (idConjuntoGuardia != null) {
 			sql2.VALUES("USUMODIFICACION", "( " + subquery.toString() + " )");
@@ -914,6 +916,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			subquery.SELECT_DISTINCT("USUMODIFICACION");
 			subquery.FROM("SCS_CONF_CONJUNTO_GUARDIAS CG");
 			subquery.WHERE("CG.IDCONJUNTOGUARDIA = " + idConjuntoGuardia);
+			subquery.WHERE("CG.IDINSTITUCION = " + idInstitucion);
+
 		}
 		SQL sql2 = new SQL();
 		sql2.INSERT_INTO("SCS_HCO_CONF_PROG_CALENDARIOS H");
@@ -936,7 +940,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			sql2.VALUES("ORDEN", item.getOrden());
 		}
 		if (today != null) {
-			sql2.VALUES("FECHAMODIFICACION", "'" + today + "'");
+			sql2.VALUES("FECHAMODIFICACION", "TO_DATE('" + today + "', 'DD/MM/YYYY')");
 		}
 		if (idConjuntoGuardia != null) {
 			sql2.VALUES("USUMODIFICACION", "( " + subquery.toString() + " )");

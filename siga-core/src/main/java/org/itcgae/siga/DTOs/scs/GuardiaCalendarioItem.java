@@ -8,6 +8,7 @@ public class GuardiaCalendarioItem {
 	private String idGuardia;
 	private String idTurno;
 	private String idCalendarioGuardia;
+	private Boolean nuevo;
 	
 	public String getOrden() {
 		return orden;
@@ -52,6 +53,11 @@ public class GuardiaCalendarioItem {
 		this.idCalendarioGuardia = idCalendarioGuardia;
 	}
 
+	public Boolean getNuevo() {
+		return nuevo;
+	}
 
-	
+	public void setNuevo(Boolean nuevo) {
+		this.nuevo = nuevo;
+	}
 }
