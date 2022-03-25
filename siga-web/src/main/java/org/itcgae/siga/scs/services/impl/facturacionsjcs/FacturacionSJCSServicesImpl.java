@@ -41,60 +41,7 @@ import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmConfig;
-import org.itcgae.siga.db.entities.AdmConfigExample;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
-import org.itcgae.siga.db.entities.FcsAplicaMovimientosvariosExample;
-import org.itcgae.siga.db.entities.FcsFactActuaciondesignaExample;
-import org.itcgae.siga.db.entities.FcsFactApunteExample;
-import org.itcgae.siga.db.entities.FcsFactEjgExample;
-import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
-import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionExample;
-import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
-import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
-import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
-import org.itcgae.siga.db.entities.FcsFactGuardiascolegiadoExample;
-import org.itcgae.siga.db.entities.FcsFactSojExample;
-import org.itcgae.siga.db.entities.FcsFacturacionEstadoEnvioExample;
-import org.itcgae.siga.db.entities.FcsFacturacionjg;
-import org.itcgae.siga.db.entities.FcsFacturacionjgExample;
-import org.itcgae.siga.db.entities.FcsHistoAcreditacionprocExample;
-import org.itcgae.siga.db.entities.FcsHistoTipoactcostefijoExample;
-import org.itcgae.siga.db.entities.FcsHistoricoAcreditacionExample;
-import org.itcgae.siga.db.entities.FcsHistoricoHitofactExample;
-import org.itcgae.siga.db.entities.FcsHistoricoProcedimientosExample;
-import org.itcgae.siga.db.entities.FcsHistoricoTipoactuacionExample;
-import org.itcgae.siga.db.entities.FcsHistoricoTipoasistcolegioExample;
-import org.itcgae.siga.db.entities.FcsMovimientosvarios;
-import org.itcgae.siga.db.entities.FcsMovimientosvariosExample;
-import org.itcgae.siga.db.entities.FcsMovimientosvariosKey;
-import org.itcgae.siga.db.entities.FcsTrazaErrorEjecucion;
-import org.itcgae.siga.db.entities.FcsTrazaErrorEjecucionExample;
-import org.itcgae.siga.db.entities.GenDiccionarioKey;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesKey;
-import org.itcgae.siga.db.entities.ScsActuacionasistencia;
-import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
-import org.itcgae.siga.db.entities.ScsActuacionasistenciaKey;
-import org.itcgae.siga.db.entities.ScsActuaciondesigna;
-import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
-import org.itcgae.siga.db.entities.ScsAsistencia;
-import org.itcgae.siga.db.entities.ScsAsistenciaExample;
-import org.itcgae.siga.db.entities.ScsAsistenciaKey;
-import org.itcgae.siga.db.entities.ScsCabeceraguardias;
-import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
-import org.itcgae.siga.db.entities.ScsEjg;
-import org.itcgae.siga.db.entities.ScsEjgExample;
-import org.itcgae.siga.db.entities.ScsEjgKey;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
-import org.itcgae.siga.db.entities.ScsSoj;
-import org.itcgae.siga.db.entities.ScsSojExample;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsFactActuaciondesignaMapper;
@@ -947,6 +894,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         InsertResponseDTO insertResponse = new InsertResponseDTO();
+        EjecucionPlsPago ejecucionPlsPago = new EjecucionPlsPago();
         org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
         insertResponse.setError(error);
         int response = 0;
@@ -963,28 +911,49 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             if (null != usuarios && usuarios.size() > 0) {
                 AdmUsuarios usuario = usuarios.get(0);
                 usuario.setIdinstitucion(idInstitucion);
-                FcsFacturacionjg record2 = new FcsFacturacionjg();
+                FcsFacturacionjg facturacion = new FcsFacturacionjg();
 
                 LOGGER.info("ejecutarFacturacion() -> Entrada para poner la facturacion como programada");
 
-                // GUARDAR DATOAS DE LA FACTURACION
+                // GUARDAR DATOS DE LA FACTURACION
                 try {
-                    // ACTUALIZAMOS LA PREVISION DE LA TABLA FCS_FACTURACIONJG
+
+                    // BUSCAMOS LA FACTURACIÓN
                     LOGGER.info("ejecutarFacturacion() -> Actualizar la prevision");
 
-                    record2.setPrevision("0");
-                    record2.setIdfacturacion(Integer.parseInt(idFacturacion));
-                    record2.setIdinstitucion(idInstitucion);
+                    FcsFacturacionjgKey key = new FcsFacturacionjgKey();
+                    key.setIdfacturacion(Integer.valueOf(idFacturacion));
+                    key.setIdinstitucion(idInstitucion);
 
-                    response = fcsFacturacionJGExtendsMapper.updateByPrimaryKeySelective(record2);
+                    facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(key);
+                    facturacion.setPrevision("0");
 
                     LOGGER.info("ejecutarFacturacion() -> Salida actualizar la prevision");
 
-                    // HACEMOS INSERT DEL ESTADO PROGRAMADA
-                    LOGGER.info("ejecutarFacturacion() -> Guardar datos en fcsFactEstadosfacturacion");
+                    // SI ENCONTRAMOS LA FACTURACIÓN, LA BORRAMOS TANTO DE LA BBDD COMO DEL SERVIDOR
+                    if (facturacion != null) {
+                        LOGGER.info("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
+                        ejecutarBorrarFacturacion(String.valueOf(facturacion.getIdinstitucion()), String.valueOf(facturacion.getIdfacturacion()));
+
+                        File ficheroFisico = new File(facturacion.getNombrefisico());
+
+                        if (ficheroFisico.exists()) {
+                            ficheroFisico.delete();
+                        }
+                        LOGGER.info("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
+                    }
+
+                    // HACEMOS INSERT DE UNA NUEVA FACTURACIÓN
+                    LOGGER.info("ejecutarFacturacion() -> Entrada insertar una nueva facturación");
+                    response = fcsFacturacionJGExtendsMapper.insert(facturacion);
+                    LOGGER.info("ejecutarFacturacion() -> Salida insertar una nueva facturación");
+
+                    // ACTUALIZAMOS EL ESTADO A PROGRAMADA
+                    LOGGER.info("ejecutarFacturacion() -> Entrada guardar datos en fcsFactEstadosfacturacion");
                     response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),
                             idInstitucion, Integer.valueOf(idFacturacion), usuario.getIdusuario());
                     LOGGER.info("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
+
                 } catch (Exception e) {
                     LOGGER.error(
                             "ERROR: FacturacionServicesImpl.ejecutarFacturacion() >  Al poner la facturacion como programada.",
@@ -1901,6 +1870,30 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         }
     }
 
+    public String ejecutarBorrarFacturacion(String idInstitucion, String idFacturacion ) throws Exception {
+        Object[] param_in; // Parametros de entrada del PL
+        String resultado[] = null; // Parametros de salida del PL
+
+        try {
+            param_in = new Object[2];
+            param_in[0] = idInstitucion;
+            param_in[1] = idFacturacion;
+
+            // Ejecucion del PL
+            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION (?,?,?,?)}", 2, param_in);
+            if (!resultado[0].equalsIgnoreCase("0")) {
+                //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
+                LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
+            }
+
+        } catch (Exception e) {
+            throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
+        }
+
+        // Resultado del PL
+        return resultado[0];
+    }
+
     public String ejecutarPLExportar(String nomPL, String idInstitucion, String idFacturacionDesde,
                                      String idFacturacionHasta, String idPersona, String pathFichero, String fichero, String idioma)
             throws Exception {
@@ -1919,7 +1912,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             // Ejecucion del PL
             resultado = callPLProcedure(
-                    "{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_EXPORTAR_TURNOS_OFI (?,?,?,?,?,?,?,?,?)}", 2, param_in);
+                    "{call "+nomPL + " (?,?,?,?,?,?,?,?,?)}", 2, param_in);
             if (!resultado[0].equalsIgnoreCase("0")) {
                 LOGGER.error("Error en PL = " + (String) resultado[1]);
             }
