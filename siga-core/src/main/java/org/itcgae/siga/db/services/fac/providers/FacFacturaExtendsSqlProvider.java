@@ -399,7 +399,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
             abonos.WHERE("idabono IN (" + transferencia.toString() + ")");
         }
-		return null;
+		return abonos.toString();
 	}
 
 	public String getFacturasByIdSolicitud(String solicitudes, String idInstitucion) {
