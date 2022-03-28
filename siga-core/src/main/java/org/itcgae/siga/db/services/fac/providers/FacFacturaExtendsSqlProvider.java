@@ -125,7 +125,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         
         
         //select de facturas
-        facturas.SELECT("'FACTURA' tipo,f.idfactura,f.numerofactura,f.idinstitucion,f.fechaemision fecha,f.idprogramacion,fp.descripcion facturacion,"
+        facturas.SELECT("'FACTURA' tipo,f.idfactura, NULL AS idabono,f.numerofactura,f.idinstitucion,f.fechaemision fecha,f.idprogramacion,fp.descripcion facturacion,"
                 + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' ||  p.nombre, p.nombre) nombreCompleto,"
                 + "f.imptotal,f.imptotalporpagar,f.estado idestado,r.descripcion estado, (" + numComunicaciones.toString() + ") numcomunicaciones,"
                 + "(" + ultComunicacion.toString() + ") ultcomunicacion,p.idpersona,f.idformapago, F_SIGA_GETRECURSO(pf.DESCRIPCION,'"+idLenguaje+"') AS NOMBREFORMAPAGO");
@@ -294,7 +294,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         String fecha;
 		
     	//select de abonos
-        abonos.SELECT("'ABONO' tipo,TO_CHAR(f.idabono) as idfactura, f.numeroabono as numerofactura,f.idinstitucion,f.fecha fecha, null AS  idprogramacion,"
+        abonos.SELECT("'ABONO' tipo, NULL AS idfactura, TO_CHAR(f.idabono) as idabono, f.numeroabono as numerofactura,f.idinstitucion,f.fecha fecha, null AS  idprogramacion,"
 				+ " null AS  facturacion, nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident," 
         		+ "nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' || p.nombre, p.nombre) nombreCompleto,"
                 + "f.imptotal imptotal,f.imppendienteporabonar imptotalporpagar,f.estado idestado,r.descripcion estado,"
