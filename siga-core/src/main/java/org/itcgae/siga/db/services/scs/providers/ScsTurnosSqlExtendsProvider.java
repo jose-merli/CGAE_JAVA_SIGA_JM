@@ -403,7 +403,7 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sqls3.SELECT(" * from(\r\n" +
 				"SELECT tabla_nueva.* FROM tabla_nueva, tabla_nueva2\r\n" +
 				"WHERE tabla_nueva.orden>tabla_nueva2.orden ORDER BY tabla_nueva.orden asc)\r\n" +
-				"UNION ALL\r\n" +
+				"UNION\r\n" +
 				"SELECT * FROM (SELECT tabla_nueva.* FROM tabla_nueva, tabla_nueva2\r\n" +
 				"WHERE tabla_nueva.orden<=tabla_nueva2.orden ORDER BY tabla_nueva.orden asc)\r\n" +
 				") consulta_total ");

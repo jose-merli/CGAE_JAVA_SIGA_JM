@@ -3930,7 +3930,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		scsSaltoscompensaciones.setSaltoocompensacion(saltoOCompensacion);
 		Date fechaBBDD = new SimpleDateFormat("yyyy-MM-dd").parse(diasGuardia.get(0).toString());
 		scsSaltoscompensaciones.setFechacumplimiento(fechaBBDD);
-		scsSaltoscompensaciones.setIdsaltosturno(Long.valueOf(letradoGuardia.getIdSaltoCompensacion()));
+
+		if (!UtilidadesString.esCadenaVacia(letradoGuardia.getIdSaltoCompensacion())) {
+			scsSaltoscompensaciones.setIdsaltosturno(Long.valueOf(letradoGuardia.getIdSaltoCompensacion()));
+		}
+
 		if (idGuardia != null) {
 			scsSaltoscompensaciones.setIdcalendarioguardias(idCalendarioGuardiasInt);
 		}
