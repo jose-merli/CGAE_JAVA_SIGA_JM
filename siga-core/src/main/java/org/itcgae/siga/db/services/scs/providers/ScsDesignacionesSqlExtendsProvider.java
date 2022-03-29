@@ -1298,11 +1298,17 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				" FROM scs_actuaciondesigna act, scs_procedimientos pro, scs_acreditacionprocedimiento acp, scs_acreditacion ac, ");
 		sql.append(" scs_tipoacreditacion tac, scs_juzgado j ");
 		sql.append(
-				" WHERE ac.idtipoacreditacion = tac.idtipoacreditacion AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado ");
+				" WHERE ac.idtipoacreditacion = tac.idtipoacreditacion  (+) "
+				+ "AND act.idinstitucion = j.idinstitucion (+) "
+				+ "AND act.idjuzgado=j.idjuzgado  (+)");
 		sql.append(
-				" AND act.idacreditacion = ac.idacreditacion AND act.idacreditacion = acp.idacreditacion AND act.idinstitucion_proc = acp.idinstitucion ");
+				" AND act.idacreditacion = ac.idacreditacion (+) "
+				+ "AND act.idacreditacion = acp.idacreditacion (+) "
+				+ "AND act.idinstitucion_proc = acp.idinstitucion (+) ");
 		sql.append(
-				" AND act.idprocedimiento = acp.idprocedimiento AND act.idinstitucion_proc = pro.idinstitucion AND act.idprocedimiento = pro.idprocedimiento ");
+				" AND act.idprocedimiento = acp.idprocedimiento  (+)"
+				+ "AND act.idinstitucion_proc = pro.idinstitucion (+) "
+				+ "AND act.idprocedimiento = pro.idprocedimiento (+) ");
 		sql.append(" AND act.idinstitucion = " + idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = "
 				+ anio + " AND act.numero = " + numero + " ");
 		
