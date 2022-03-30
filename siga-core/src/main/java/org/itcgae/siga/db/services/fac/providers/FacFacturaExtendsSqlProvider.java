@@ -30,13 +30,12 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //query completa facturas
         sqlFacturas.SELECT("*");
-        if(queryFacturas != null && !queryFacturas.isEmpty() && queryAbonos != null && !queryAbonos.isEmpty()){
+        if (!UtilidadesString.esCadenaVacia(queryFacturas) && !UtilidadesString.esCadenaVacia(queryAbonos)) {
         	sqlFacturas.FROM("(" + queryFacturas + " UNION " + queryAbonos + ")");
-        }else if(queryFacturas != null && !queryFacturas.isEmpty()){
+        } else if (!UtilidadesString.esCadenaVacia(queryFacturas)) {
         	sqlFacturas.FROM("(" + queryFacturas + ")");
-        }
-        else{
-        	sqlFacturas.FROM("(" + queryAbonos.toString() + ")");
+        } else {
+        	sqlFacturas.FROM("(" + queryAbonos + ")");
         }
         sqlFacturas.ORDER_BY("fecha DESC");
         	
@@ -49,7 +48,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //LOGGER.info(sqlFacturas.toString());
         
-        return sqlFacturas.toString();
+        return sqlFinal.toString();
     }
 
     private String getQueryFacturas(FacturaItem item, String idInstitucion, String idLenguaje) {
@@ -379,7 +378,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         }
 
         //numero colegiado
-        if(item.getNumeroColegiado()!=null) {
+        if(item.getNumeroColegiado() != null) {
             abonos.WHERE("col.NCOLEGIADO="+item.getNumeroColegiado());
         }
 
