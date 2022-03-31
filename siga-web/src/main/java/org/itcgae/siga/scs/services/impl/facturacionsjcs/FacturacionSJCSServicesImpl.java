@@ -911,74 +911,13 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             if (null != usuarios && usuarios.size() > 0) {
                 AdmUsuarios usuario = usuarios.get(0);
                 usuario.setIdinstitucion(idInstitucion);
-                FcsFacturacionjg facturacion;
-                List<FcsFactGrupofactHito> grupofactHito;
+                
                 LOGGER.info("ejecutarFacturacion() -> Entrada para poner la facturacion como programada");
 
                 // GUARDAR DATOS DE LA FACTURACION
                 try {
 
-                    // BUSCAMOS LA FACTURACIÓN
-                    LOGGER.info("ejecutarFacturacion() -> Actualizar la prevision");
-
-                    FcsFacturacionjgKey key = new FcsFacturacionjgKey();
-                    key.setIdfacturacion(Integer.valueOf(idFacturacion));
-                    key.setIdinstitucion(idInstitucion);
-
-                    facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(key);
-                    facturacion.setPrevision("0");
-
-                    //Obtener el estado de la facturacion y si solo tiene un estado y es abierta no borramos
-                    FcsFactEstadosfacturacionExample exampleEstado = new FcsFactEstadosfacturacionExample();
-                    exampleEstado.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-                                    .andIdfacturacionEqualTo(Integer.valueOf(idFacturacion));
-                    List<FcsFactEstadosfacturacion> estados = fcsFactEstadosfacturacionMapper.selectByExample(exampleEstado);
-
-                    LOGGER.info("ejecutarFacturacion() -> Salida actualizar la prevision");
-
-                    // SI ENCONTRAMOS LA FACTURACIÓN, ALMACENAMOS LOS CRITERIOS DE FACTURACIÓN
-                    // Y POSTERIORMENTE BORRAMOS LA FACTURACIÓN TANTO DE LA BBDD COMO DEL SERVIDOR
-                    if (facturacion != null && estados != null && estados.size()>1) {
-
-                        LOGGER.info("ejecutarFacturacion() -> Entrada recuperar criterios de facturacion");
-                        FcsFactGrupofactHitoExample example = new FcsFactGrupofactHitoExample();
-                        example.createCriteria().andIdinstitucionEqualTo(facturacion.getIdinstitucion())
-                                                .andIdfacturacionEqualTo(facturacion.getIdfacturacion());
-
-                        grupofactHito = fcsFactGrupofactHitoMapper.selectByExample(example);
-
-                        LOGGER.info("ejecutarFacturacion() -> Salida recuperar criterios de facturacion");
-                        LOGGER.info("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
-                        ejecutarBorrarFacturacion(String.valueOf(facturacion.getIdinstitucion()), String.valueOf(facturacion.getIdfacturacion()));
-
-                        File ficheroFisico = new File(facturacion.getNombrefisico());
-
-                        if (ficheroFisico.exists()) {
-                            ficheroFisico.delete();
-                        }
-                        LOGGER.info("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
-
-                        // HACEMOS INSERT DE UNA NUEVA FACTURACIÓN Y LOS CRITERIOS
-                        LOGGER.info("ejecutarFacturacion() -> Entrada insertar una nueva facturación y el criterio");
-                        response = fcsFacturacionJGExtendsMapper.insert(facturacion);
-                        for (FcsFactGrupofactHito criterio : grupofactHito) {
-                            response = fcsFactGrupofactHitoMapper.insert(criterio);
-                        }
-                        LOGGER.info("ejecutarFacturacion() -> Salida insertar una nueva facturación y el criterio");
-
-                        // HACEMOS INSERT DE LOS ESTADOS QUE TENIA LA FACTURACION
-                        LOGGER.info("ejecutarFacturacion() -> Entrada guardar datos en fcsFactEstadosfacturacion");
-                        for (FcsFactEstadosfacturacion estado : estados) {
-                            response = fcsFactEstadosfacturacionMapper.insert(estado);
-                        }
-                        LOGGER.info("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
-
-                    }
-                    // ACTUALIZAMOS EL ESTADO A PROGRAMADA
-                    LOGGER.info("ejecutarFacturacion() -> Entrada guardar datos en fcsFactEstadosfacturacion");
-                    response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),
-                            idInstitucion, Integer.valueOf(idFacturacion), usuario.getIdusuario());
-                    LOGGER.info("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
+                    response = prepararFacturacion(idInstitucion, idFacturacion, usuario.getIdusuario());
 
                 } catch (Exception e) {
                     LOGGER.error(
@@ -1014,7 +953,86 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         return insertResponse;
     }
 
-    @Override
+    @Transactional
+    private int prepararFacturacion(Short idInstitucion, String idFacturacion, Integer idUsuario) throws Exception {
+    	FcsFacturacionjg facturacion;
+    	int response = 0;
+    	// BUSCAMOS LA FACTURACIÓN
+        LOGGER.info("ejecutarFacturacion() -> Actualizar la prevision");
+
+        FcsFacturacionjgKey key = new FcsFacturacionjgKey();
+        key.setIdfacturacion(Integer.valueOf(idFacturacion));
+        key.setIdinstitucion(idInstitucion);
+
+        facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(key);
+        facturacion.setPrevision("0");
+
+        //Obtener el estado de la facturacion y si solo tiene un estado y es abierta no borramos
+        FcsFactEstadosfacturacionExample exampleEstado = new FcsFactEstadosfacturacionExample();
+        exampleEstado.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                        .andIdfacturacionEqualTo(Integer.valueOf(idFacturacion));
+        List<FcsFactEstadosfacturacion> estados = fcsFactEstadosfacturacionMapper.selectByExample(exampleEstado);
+
+        LOGGER.info("ejecutarFacturacion() -> Salida actualizar la prevision");
+
+        // SI ENCONTRAMOS LA FACTURACIÓN Y SE ESTÁ RECALCULANDO,
+        // ALMACENAMOS LOS CRITERIOS DE FACTURACIÓN
+        // Y POSTERIORMENTE BORRAMOS LA FACTURACIÓN TANTO DE LA BBDD COMO DEL SERVIDOR
+        if (facturacion != null && estados != null && estados.size()>1) {
+
+        	LOGGER.info("ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
+            response = limpiafacturacion(facturacion, estados);
+            LOGGER.info("ejecutarFacturacion() -> Salida limpieza de facturacion al recalcular facturacion");
+
+        }
+        // ACTUALIZAMOS EL ESTADO A PROGRAMADA
+        LOGGER.info("ejecutarFacturacion() -> Entrada guardar datos en fcsFactEstadosfacturacion");
+        response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),
+                idInstitucion, Integer.valueOf(idFacturacion), idUsuario);
+        LOGGER.info("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
+		return response;
+	}
+
+    private int limpiafacturacion(FcsFacturacionjg facturacion, List<FcsFactEstadosfacturacion> estados) throws Exception {
+    	List<FcsFactGrupofactHito> grupofactHito;
+    	int response = 0;
+    	LOGGER.info("ejecutarFacturacion() -> Entrada recuperar criterios de facturacion");
+        FcsFactGrupofactHitoExample example = new FcsFactGrupofactHitoExample();
+        example.createCriteria().andIdinstitucionEqualTo(facturacion.getIdinstitucion())
+                                .andIdfacturacionEqualTo(facturacion.getIdfacturacion());
+
+        grupofactHito = fcsFactGrupofactHitoMapper.selectByExample(example);
+
+        LOGGER.info("ejecutarFacturacion() -> Salida recuperar criterios de facturacion");
+        LOGGER.info("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
+        ejecutarBorrarFacturacion(facturacion);
+
+        File ficheroFisico = new File(facturacion.getNombrefisico());
+
+        if (ficheroFisico.exists()) {
+            ficheroFisico.delete();
+        }
+        LOGGER.info("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
+
+        // HACEMOS INSERT DE UNA NUEVA FACTURACIÓN Y LOS CRITERIOS
+        LOGGER.info("ejecutarFacturacion() -> Entrada insertar una nueva facturación y el criterio");
+        response = fcsFacturacionJGExtendsMapper.insert(facturacion);
+        for (FcsFactGrupofactHito criterio : grupofactHito) {
+            response = fcsFactGrupofactHitoMapper.insert(criterio);
+        }
+        LOGGER.info("ejecutarFacturacion() -> Salida insertar una nueva facturación y el criterio");
+
+        // HACEMOS INSERT DE LOS ESTADOS QUE TENIA LA FACTURACION
+        LOGGER.info("ejecutarFacturacion() -> Entrada guardar datos en fcsFactEstadosfacturacion");
+        for (FcsFactEstadosfacturacion estado : estados) {
+            response = fcsFactEstadosfacturacionMapper.insert(estado);
+        }
+        LOGGER.info("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
+		
+        return response;
+	}
+
+	@Override
     public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1896,14 +1914,14 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         }
     }
 
-    public String ejecutarBorrarFacturacion(String idInstitucion, String idFacturacion ) throws Exception {
+    public String ejecutarBorrarFacturacion(FcsFacturacionjg facturacion) throws Exception {
         Object[] param_in; // Parametros de entrada del PL
         String resultado[] = null; // Parametros de salida del PL
 
         try {
             param_in = new Object[2];
-            param_in[0] = idInstitucion;
-            param_in[1] = idFacturacion;
+            param_in[0] = String.valueOf(facturacion.getIdinstitucion());
+            param_in[1] = String.valueOf(facturacion.getIdfacturacion());
 
             // Ejecucion del PL
             resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION (?,?,?,?)}", 2, param_in);
