@@ -176,6 +176,11 @@ public class LogErroresFacturacionSJCSHelper {
         key.setParametro(SigaConstants.PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF);
         GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
         String rutaRaiz = rutaFicherosSalida.getValor();
+        LOGGER.debug("Fichero de LOG a descargar: " + rutaRaiz
+        		+ "/" + FacturacionSJCSHelper.JE_ABOGADOS
+        		+ "/" + String.valueOf(idInstitucion)
+        		+ "/" + LOG_ERRORES_FACTURACION
+        		+ "/" + PREFIJO_LOG + idFacturacion + SUFIJO_LOG);
         return Paths.get(rutaRaiz, FacturacionSJCSHelper.JE_ABOGADOS, String.valueOf(idInstitucion), LOG_ERRORES_FACTURACION, PREFIJO_LOG + idFacturacion + SUFIJO_LOG);
     }
 
