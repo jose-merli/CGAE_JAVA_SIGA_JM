@@ -983,6 +983,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
 	
+	public static String DEFAULT_EMAIL_FROM = "DEFAULT_EMAIL_FROM";
+	
 	public static enum ECOM_ESTADOSCOLA {
 		INICIAL ((short)1),
 		EJECUTANDOSE ((short)2),
