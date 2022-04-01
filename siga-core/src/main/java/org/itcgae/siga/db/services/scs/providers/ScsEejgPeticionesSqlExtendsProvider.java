@@ -42,7 +42,7 @@ public class ScsEejgPeticionesSqlExtendsProvider extends ScsEejgPeticionesSqlPro
 		
 		sql.WHERE("idinstitucion = "+ejg.getidInstitucion());
 		sql.WHERE("anio = "+ejg.getAnnio());
-		sql.WHERE("numero = "+ejg.getNumEjg());
+		sql.WHERE("numero = "+ejg.getNumero());
 		sql.WHERE("idtipoejg = "+ejg.getTipoEJG());
 		
 		//se coge el csv de las observaciones, se pone en este campo porque no cuadraba el csv en el item del ejg
