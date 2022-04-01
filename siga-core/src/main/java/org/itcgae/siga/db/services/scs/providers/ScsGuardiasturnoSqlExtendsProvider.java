@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.GuardiasTurnoItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaGrupoItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
@@ -801,7 +802,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		
 		SQL sql = new SQL();	
 			
-		 sql.SELECT("t.nombre as TURNO, g.nombre as GUARDIA, DECODE(PG.ESTADO, 2, 'No', 'Si') as GENERADO, g.IDGUARDIA as IDGUARDIA, t.idturno as IDTURNO");
+		 sql.SELECT_DISTINCT("t.nombre as TURNO, g.nombre as GUARDIA, DECODE(PG.ESTADO, 2, 'No', 'Si') as GENERADO, g.IDGUARDIA as IDGUARDIA, t.idturno as IDTURNO");
 	        sql.FROM("SCS_HCO_CONF_PROG_CALENDARIOS PG");
 	        sql.INNER_JOIN("scs_turno  t on PG.idturno = t.idturno and PG.idinstitucion = t.idinstitucion");
 	        sql.INNER_JOIN("scs_guardiasturno  g on PG.idguardia = g.idguardia and PG.idinstitucion = g.idinstitucion");
@@ -3511,13 +3512,13 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			sql.WHERE("FECHAINICIO >= TO_DATE('" + programacion.getFechaDesde() + "', 'dd/MM/yyyy')");
 		if (programacion.getFechaHasta() != null)
 			sql.WHERE("FECHA_FIN <= TO_DATE('" + programacion.getFechaHasta() + "', 'dd/MM/yyyy')");
-		if( programacion.getIdGuardia() != null)
+		if(!UtilidadesString.esCadenaVacia(programacion.getIdGuardia()))
 			sql.WHERE("IDGUARDIA = " + programacion.getIdGuardia());
-		if( programacion.getIdTurno() != null)
+		if(!UtilidadesString.esCadenaVacia(programacion.getIdTurno()))
 			sql.WHERE("IDTURNO = " + programacion.getIdTurno());
-		if( programacion.getIdInstitucion() != null)
+		if(!UtilidadesString.esCadenaVacia(programacion.getIdInstitucion()))
 			sql.WHERE("IDINSTITUCION = " + programacion.getIdInstitucion());
-		if( programacion.getIdCalendarioGuardia() != null)
+		if(!UtilidadesString.esCadenaVacia(programacion.getIdCalendarioGuardia()))
 			sql.WHERE("IDCALENDARIOGUARDIAS = " + programacion.getIdCalendarioGuardia());
 		
 		return sql.toString();

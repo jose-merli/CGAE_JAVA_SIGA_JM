@@ -3544,7 +3544,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						
 						//En una programación sin lista de guardias, no debería existir ningún control al guardar la tarjeta de Datos generales, 
 						//porque todavía no se sabe qué guardias se quieren generar. Luego, se deberían poder añadir las guardias y en el Guardar de 
-						//esas guardias es donde sí debería ir el control anterior. 
+						//esas guardias es donde sí debería ir el control anterior.
+
 					}else {
 						//programación con lista de guardias
 						// la comprobación debería ser que NO existieran calendarios generados en esas fechas o futuras; es decir, SELECT COUNT(*) GUARDIAS: si devuelve 0 entonces es correcto. 
@@ -3563,7 +3564,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 					}
 					if (!errorGuardiaAsociadas) {
-						if (calendarioItem.getIdCalG() == null) {
+						if (calendarioItem.getIdCalG() == null && !UtilidadesString.esCadenaVacia(calendarioItem.getIdCalendarioProgramado())) {
 							String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(
 									calendarioItem.getIdCalendarioProgramado(), idInstitucion.toString());
 							// idConjunto:
