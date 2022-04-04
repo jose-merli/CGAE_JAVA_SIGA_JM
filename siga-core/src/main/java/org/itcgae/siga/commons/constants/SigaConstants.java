@@ -983,6 +983,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
 	
+	public static String DEFAULT_EMAIL_FROM = "DEFAULT_EMAIL_FROM";
+	
 	public static enum ECOM_ESTADOSCOLA {
 		INICIAL ((short)1),
 		EJECUTANDOSE ((short)2),
@@ -1033,7 +1035,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static Integer USUMODIFICACION_0 = 0;
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
 	
-	public static String SIGAFRONT_VERSION = "1.0.71_17";
-	public static String SIGAWEB_VERSION = "1.0.71_17";
+	public static String SIGAFRONT_VERSION = "1.0.71_18";
+	public static String SIGAWEB_VERSION = "1.0.71_18";
 	
 }
