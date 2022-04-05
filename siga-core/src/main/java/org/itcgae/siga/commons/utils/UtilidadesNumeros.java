@@ -87,5 +87,13 @@ public class UtilidadesNumeros {
 			return sNumero; //En caso de error se devuelve el numero tal cual, sin formatear.
 		}
 	}
+
+	public static Integer tryParseInt(String value, Integer defaultVal) {
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			return defaultVal;
+		}
+	}
 	
 }

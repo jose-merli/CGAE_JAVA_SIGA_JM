@@ -367,7 +367,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		return sql.toString();
 	}
 	
-	public String getListaCompras(FiltrosCompraProductosItem filtro, Short idInstitucion, String idioma) throws ParseException {
+	public String getListaCompras(FiltrosCompraProductosItem filtro, Short idInstitucion, String idioma, Integer tamMax) throws ParseException {
 		
 		SQL sql = new SQL();
 		
@@ -412,7 +412,14 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.LEFT_OUTER_JOIN("fac_estadoFactura estFact on estFact.idestado = fact.estado");
 		
 		sql.WHERE("pet.idinstitucion = "+idInstitucion.toString());
-		sql.WHERE("rownum <= 200");
+
+		// Número de resultados parametrizado
+		if (tamMax != null && tamMax >= 0) {
+			sql.WHERE("rownum <= " + (tamMax + 1));
+		} else {
+			sql.WHERE("rownum <= 201");
+		}
+
 		
 		if(filtro.getIdEstadoSolicitud() != null && !filtro.getIdEstadoSolicitud().isEmpty()) {
 			//Recorremos el array de estados seleccionados
@@ -459,17 +466,17 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		if(filtro.getFechaSolicitudDesde() != null) {
 			DateFormat dateFormatFront = new SimpleDateFormat(
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
-			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
-			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
-			sql.WHERE("to_char(pet.fecha) >= to_date('"+strDate+" 00:00:00' ,'dd/MM/YY HH24:MI:SS')");
+			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/yyyy");
+			String strDate = dateFormatSql.format(filtro.getFechaSolicitudDesde());
+			sql.WHERE("pet.fecha >= to_date('"+strDate+" 00:00:00' ,'DD/MM/YYYY HH24:MI:SS')");
 		}
 
 		if(filtro.getFechaSolicitudHasta() != null) {
 			DateFormat dateFormatFront = new SimpleDateFormat(
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
-			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
-			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
-			sql.WHERE("to_char(pet.fecha) <= to_date('"+strDate+" 23:59:00','dd/MM/YY HH24:MI:SS')");
+			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/yyyy");
+			String strDate = dateFormatSql.format(filtro.getFechaSolicitudHasta());
+			sql.WHERE("pet.fecha <= to_date('"+strDate+" 23:59:00','DD/MM/YYYY HH24:MI:SS')");
 		}
 		
 		if (filtro.getIdCategoria() != null && !filtro.getIdCategoria().isEmpty()) {
