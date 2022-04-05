@@ -161,7 +161,7 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 						}
 
 						// Muestra un mensaje si la lista de resultados ha alcanzado el tamaño máximo de la consulta
-						if (tamMax < listaCompraProductos.getListaCompraProductosItems().size()
+						if (tamMax != null && tamMax < listaCompraProductos.getListaCompraProductosItems().size()
 								|| null == tamMax && 200 < listaCompraProductos.getListaCompraProductosItems().size()) {
 							listaCompraProductos.getListaCompraProductosItems().remove(listaCompraProductos.getListaCompraProductosItems().size() - 1);
 							error.setMessage("general.message.consulta.resultados");
