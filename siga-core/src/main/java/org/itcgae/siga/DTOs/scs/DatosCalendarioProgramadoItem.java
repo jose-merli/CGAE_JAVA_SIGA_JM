@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.List;
+
 public class DatosCalendarioProgramadoItem {
 	
 	private String idInstitucion;
@@ -21,6 +23,7 @@ public class DatosCalendarioProgramadoItem {
 	private Boolean facturado;
 	private Boolean asistenciasAsociadas;
 	private String idCalendarioGuardia;
+	List<GuardiaCalendarioItem> guardias;
 	
 	public String getFechaDesde() {
 		return fechaDesde;
@@ -131,6 +134,19 @@ public class DatosCalendarioProgramadoItem {
 		this.idCalendarioGuardia = idCalendarioGuardia;
 	}
 
-	
-	
+	public String getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(String fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public List<GuardiaCalendarioItem> getGuardias() {
+		return guardias;
+	}
+
+	public void setGuardias(List<GuardiaCalendarioItem> guardias) {
+		this.guardias = guardias;
+	}
 }

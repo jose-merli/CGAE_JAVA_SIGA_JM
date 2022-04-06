@@ -3451,7 +3451,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					pc.setFechamodificacion(new Date());
 					pc.setIdinstitucion(idInstitucion);
 					// int response2 = scsProgCalendariosMapper.updateByPrimaryKeySelective(pc);
-					int res = scsProgCalendariosMapper.updateProgCalendario(pc.getIdconjuntoguardia().toString(),
+					int res = scsProgCalendariosMapper.updateProgCalendario(pc.getIdconjuntoguardia(),
 							idInstitucion.toString(), calendarioItem.getFechaProgramacion(),
 							calendarioItem.getFechaDesde(), calendarioItem.getFechaHasta(), pc.getEstado().toString(),
 							pc.getFechamodificacion().toString(), pc.getUsumodificacion().toString(), null,
@@ -3596,21 +3596,24 @@ public class GuardiasServiceImpl implements GuardiasService {
 								historico.setUsumodificacion(usuario.getIdusuario());
 								int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
 							});
-						}else {
-							if (!calendarioItem.getIdGuardia().isEmpty() && !calendarioItem.getIdTurno().isEmpty()) {
-								ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
-								historico.setEstado(new Short(calendarioItem.getEstado()));
-								historico.setFechamodificacion(new Date());
-								historico.setIdconjuntoguardia(null);
-								historico.setIdguardia(Integer.parseInt(calendarioItem.getIdGuardia()));
-								historico.setIdinstitucion(idInstitucion);
-								// String idCalendarioProgramado =
-								// scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
-								historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
-								historico.setIdturno(Integer.parseInt(calendarioItem.getIdTurno()));
-								historico.setUsumodificacion(usuario.getIdusuario());
-								historico.setOrden(1);
-								int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
+						}else if (calendarioItem.getGuardias() != null && !calendarioItem.getGuardias().isEmpty()) {
+							for (GuardiaCalendarioItem item: calendarioItem.getGuardias()) {
+								if (!UtilidadesString.esCadenaVacia(item.getOrden()) && !UtilidadesString.esCadenaVacia(item.getGuardia())
+										&& !UtilidadesString.esCadenaVacia(item.getTurno())) {
+									ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
+									historico.setEstado(new Short(calendarioItem.getEstado()));
+									historico.setFechamodificacion(new Date());
+									historico.setIdconjuntoguardia(null);
+									historico.setIdguardia(Integer.parseInt(item.getGuardia()));
+									historico.setIdinstitucion(idInstitucion);
+									// String idCalendarioProgramado =
+									// scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
+									historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
+									historico.setIdturno(Integer.parseInt(item.getTurno()));
+									historico.setUsumodificacion(usuario.getIdusuario());
+									historico.setOrden(Integer.parseInt(item.getOrden()));
+									int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
+								}
 							}
 						}
 

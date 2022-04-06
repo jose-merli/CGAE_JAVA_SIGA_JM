@@ -267,7 +267,7 @@ public class ScsProgCalendariosSqlProvider {
     }
 
 
-	public String updateProgCalendario(String idconjuntoguardia, String idinstitucion, String fechaprogramacion, String fechacalinicio, String fechacalfin, String estado, String fechamodificacion, String usumodificacion, String idficherocalendario, String idprogcalendario) {
+	public String updateProgCalendario(Short idconjuntoguardia, String idinstitucion, String fechaprogramacion, String fechacalinicio, String fechacalfin, String estado, String fechamodificacion, String usumodificacion, String idficherocalendario, String idprogcalendario) {
 		SQL sql = new SQL();
 		sql.UPDATE("SCS_PROG_CALENDARIOS");
 		if (idconjuntoguardia != null) {
