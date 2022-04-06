@@ -666,6 +666,18 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 	
 	public String unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
+		SQL sqlEstado = new SQL();
+		SQL sqlFechaSolicitud = new SQL();
+		
+		sqlEstado.SELECT("eejg_p.estado");
+		sqlEstado.FROM("scs_eejg_peticiones eejg_p");
+		sqlEstado.WHERE("eejg_p.idpeticion = (select max(eejg_p.IDPETICION) from scs_eejg_peticiones eejg_p where eejg_p.idpersona = uf.idpersona)");
+		
+		sqlFechaSolicitud.SELECT("eejg_p.fechasolicitud");
+		sqlFechaSolicitud.FROM("scs_eejg_peticiones eejg_p");
+		sqlFechaSolicitud.WHERE("eejg_p.idpeticion = (select max(eejg_p.IDPETICION) from scs_eejg_peticiones eejg_p where eejg_p.idpersona = uf.idpersona)");
+		
+		
 		sql.SELECT("uf.idinstitucion," + 
 					" uf.idtipoejg," + 
 					" uf.anio," + 
@@ -681,9 +693,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 					" pjg.direccion," + 
 					" uf.encalidadde," + 
 					" pd.descripcion," + 
-					" eejg_p.estado," + 
-					" eejg_p.fechasolicitud,"
-					+ " uf.BIENESINMUEBLES,\r\n"
+					 " uf.BIENESINMUEBLES,\r\n"
 					+ "	uf.BIENESMUEBLES,\r\n"
 					+ "	uf.CIRCUNSTANCIAS_EXCEPCIONALES,\r\n"
 					+ "	uf.DESCRIPCIONINGRESOSANUALES,\r\n"
@@ -704,6 +714,8 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("case when pjg.idrepresentantejg is not null then repre.nif\r\n"
 				+ "else null end as nifRepresentante");
 		sql.SELECT("ejg.idpersonajg as solicitanteppal");
+		sql.SELECT(" ( " + sqlEstado.toString()+") estado ");
+		sql.SELECT(" ( " + sqlFechaSolicitud.toString()+") fechasolicitud ");
 		sql.FROM("scs_unidadfamiliarejg uf");
 		sql.JOIN("scs_ejg ejg on ejg.anio = uf.anio AND ejg.numero = uf.numero AND ejg.idtipoejg = uf.idtipoejg AND ejg.idinstitucion = uf.idinstitucion");
 		
@@ -723,12 +735,12 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 //		if(ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
 //			sql.WHERE("pjgP.idpersona = '" + ejgItem.getIdPersona() + "'");
 //		sql.WHERE("pjgP.idinstitucion = uf.idinstitucion ");
-		sql.LEFT_OUTER_JOIN("(\r\n"
+		/*sql.LEFT_OUTER_JOIN("(\r\n"
 				+ "SELECT * \r\n"
 				+ "        FROM scs_eejg_peticiones eejg_p\r\n"
 				+ "        WHERE eejg_p.numero = '" + ejgItem.getNumero() + "' and eejg_p.anio='" + ejgItem.getAnnio() + "' and eejg_p.idtipoejg = '" + ejgItem.getTipoEJG() + "' and eejg_p.idinstitucion = '" + idInstitucion + "'  \r\n"
 				+ "    )  eejg_p on eejg_p.idpersona=uf.idpersona");
-		//sql.WHERE("eejg_p.fechaconsulta=(SELECT MAX(p2.FECHACONSULTA) from scs_eejg_peticiones p2 where eejg_p.nif=p2.nif)");
+		*///sql.WHERE("eejg_p.fechaconsulta=(SELECT MAX(p2.FECHACONSULTA) from scs_eejg_peticiones p2 where eejg_p.nif=p2.nif)");
 		
 		
 		if (tamMaximo != null) {
