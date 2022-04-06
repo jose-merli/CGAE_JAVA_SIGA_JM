@@ -53,6 +53,7 @@ import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.EnvEnvios;
@@ -160,7 +161,9 @@ public class EnviosServiceImpl implements IEnviosService{
 		        
 		        parametro = _genParametrosMapper.selectByPrimaryKey(keyParam);
 		        
-		        remitenteFromPorDefecto = parametro.getValor();
+		        if (parametro != null) {
+		        	remitenteFromPorDefecto = parametro.getValor();
+		        }
 	        }
 	        
 	        
@@ -266,11 +269,24 @@ public class EnviosServiceImpl implements IEnviosService{
                         
                         //Se crea un nuevo Mensaje.
                         MimeMessage mensaje = new MimeMessage(sesion);
-                        mensaje.setFrom(new InternetAddress(defaultFrom,descFrom));
-						mensaje.setReplyTo(new javax.mail.Address[]
-								{
-									    new javax.mail.internet.InternetAddress(from, descFrom)
-									});
+                        
+                        //Si se ha asignado un correo por defecto y es válido
+                        if (defaultFrom != null && SIGAServicesHelper.isValidEmailAddress(defaultFrom)) {
+                        	
+                        	mensaje.setFrom(new InternetAddress(defaultFrom,descFrom));
+    						mensaje.setReplyTo(new javax.mail.Address[]
+    								{
+    									    new javax.mail.internet.InternetAddress(from, descFrom)
+    									});
+                        } else {
+                        	
+	                        mensaje.setFrom(new InternetAddress(from,descFrom));
+							mensaje.setReplyTo(new javax.mail.Address[]
+									{
+										    new javax.mail.internet.InternetAddress(from)
+										});
+                        }
+                        
 						mensaje.setSender(new InternetAddress(from,descFrom));
 						
                         InternetAddress toInternetAddress = new InternetAddress(sTo);
