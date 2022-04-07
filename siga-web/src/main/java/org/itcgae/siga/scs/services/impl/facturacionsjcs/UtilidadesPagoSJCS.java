@@ -5,16 +5,20 @@ import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.FacturacionGrupoPagoDTO;
 import org.itcgae.siga.DTOs.scs.MovimientoVarioDTO;
-import org.itcgae.siga.DTOs.scs.PerteneceAunaSociedadDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenComponentes;
+import org.itcgae.siga.db.entities.CenComponentesExample;
+import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.EnvProgrampagosExample;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.entities.FacAbonoExample;
@@ -31,6 +35,8 @@ import org.itcgae.siga.db.mappers.FacDisqueteabonosMapper;
 import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.env.mappers.EnvEnvioprogramadoExtendsMapper;
 import org.itcgae.siga.db.services.env.mappers.EnvProgrampagosExtendsMapper;
@@ -45,6 +51,7 @@ import org.itcgae.siga.db.services.fcs.mappers.FcsPagoColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsPagosjgExtendsMapper;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,23 +113,16 @@ public class UtilidadesPagoSJCS {
 
     @Autowired
     private AdmContadorExtendsMapper admContadorExtendsMapper;
+    
+    @Autowired
+    private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
+    
+    @Autowired
+    private CenComponentesExtendsMapper cenComponentesExtendsMapper;
 
     private static List<Integer> listaPagosDeshacerCierre = new ArrayList<>();
 
-
-    @Transactional(rollbackFor = Exception.class,timeout = 900)
     public void ejecutarPagoSJCS(FcsPagosjg pago, boolean simular, Short idInstitucion, AdmUsuarios usuario) throws Exception {
-
-        // Insertamos el estado del pago:
-        FcsPagosEstadospagos record = new FcsPagosEstadospagos();
-        record.setIdinstitucion(idInstitucion);
-        record.setIdpagosjg(pago.getIdpagosjg());
-        record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
-        record.setFechaestado(new Date());
-        record.setFechamodificacion(new Date());
-        record.setUsumodificacion(usuario.getIdusuario());
-
-        fcsPagosEstadospagosMapper.insertSelective(record);
 
         ejecucionPlsPago.ejecutarPL_PagoTurnosOficio(Integer.valueOf(idInstitucion.toString()), pago.getIdpagosjg(), usuario);
         ejecucionPlsPago.ejecutarPL_PagoGuardias(Integer.valueOf(idInstitucion.toString()), pago.getIdpagosjg(), usuario);
@@ -143,6 +143,7 @@ public class UtilidadesPagoSJCS {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class,timeout = 900)
     private void obtencionImportes(Short idInstitucion, String idPago, AdmUsuarios usuario) throws Exception {
 
         // variables para hacer el calculo del importe final a pagar
@@ -154,17 +155,35 @@ public class UtilidadesPagoSJCS {
         double importeIrpfTotal = 0.0d;
         String idCuenta;
         List<FcsPagoColegiado> colegiados = new ArrayList<FcsPagoColegiado>();
+        FcsFacturacionjg facturacion = null;
 
         try {
 
             // Recuperamos los colegiados a los que tenemos que pagar
             // aquellos incluidos en el pago o con movimientos varios pendientes
              colegiados = getColegiadosApagar(idInstitucion, idPago, SigaConstants.LISTA_PAGO_TODOS, usuario);
+             
+            //Obtenemos la facturacion para los calculos posteriores
+            //Obtiene la facturación del pago y sus grupos.
+             List<FacturacionGrupoPagoDTO> facturacionesGruposPagosList = getFacturacionesGruposPagos(idPago, idInstitucion.toString(), usuario);
+
+             Integer idFacturacion = null;
+
+             if (facturacionesGruposPagosList != null && !facturacionesGruposPagosList.isEmpty()) {
+                 idFacturacion = facturacionesGruposPagosList.get(0).getIdFacturacion();
+
+                 //Recuperamos las fechas desde y hasta de la facturación
+                 FcsFacturacionjgKey fcsFacturacionjgKey = new FcsFacturacionjgKey();
+                 fcsFacturacionjgKey.setIdinstitucion(idInstitucion);
+                 fcsFacturacionjgKey.setIdfacturacion(idFacturacion);
+                 facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(fcsFacturacionjgKey);
+             }
 
             // Si no existe un pago para el colegiado debe existir al menos un
             // MV
             // por lo que pasa a tratar los movimientos varios
             if(!colegiados.isEmpty() || colegiados.size() != 0){
+            	HashMap<String,Double> colegiadoMV = new HashMap<>();
                 for (FcsPagoColegiado colegiado : colegiados) {
 
                     // Obtenemos el idcuenta con el fin de actualizar el registro de
@@ -192,13 +211,7 @@ public class UtilidadesPagoSJCS {
                     // 1. Calcula el IMPORTE SJCS BRUTO
                     importeSJCS = importeTurnos + importeGuardias + importeSoj + importeEjg;
 
-                    // obtiene el porcentajeIRPF del colegiado para utilizarlo al
-                    // aplicar
-                    // los movimientos varios y calcular el IRPF del importe bruto.
-                    LOGGER.info("obtenerIrpf -> Entramos");
-                    porcentajeIRPF = obtenerIrpf(idInstitucion.toString(), idPersonaDestino,
-                            !idPersonaDestino.equals(colegiado.getIdperorigen().toString()), usuario);
-                    LOGGER.info("obtenerIrpf -> Salimos");
+                    
                     // 2. Aplicar los movimientos varios
                     // Asocia todos los movimientos sin idpago al pago actual.
                     // Actualiza el porcentaje e importe IRPF para cada movimiento.
@@ -206,10 +219,32 @@ public class UtilidadesPagoSJCS {
                     fcsMovimientosvarios.setIdinstitucion(idInstitucion);
                     fcsMovimientosvarios.setIdpersona(colegiado.getIdperorigen());
                     LOGGER.info("aplicarMovimientosVarios -> Entramos");
-                    importeMovimientos = aplicarMovimientosVarios(fcsMovimientosvarios, idPago, importeSJCS, usuario);
+                    importeMovimientos = aplicarMovimientosVarios(fcsMovimientosvarios, idPago, importeSJCS, usuario, facturacionesGruposPagosList, facturacion);
                     LOGGER.info("aplicarMovimientosVarios -> Salimos");
+                    
+                    colegiadoMV.put(idPersonaDestino, importeMovimientos);
+                } // fin del primer for de colegiados
+                
+                for (FcsPagoColegiado colegiado : colegiados) { 
+                	idPersonaDestino = colegiado.getIdperdestino().toString();
+                	// obtiene el porcentajeIRPF del colegiado para utilizarlo al
+                    // aplicar
+                    // los movimientos varios y calcular el IRPF del importe bruto.
+                    LOGGER.info("obtenerIrpf -> Entramos");
+                    porcentajeIRPF = obtenerIrpf(idInstitucion.toString(), idPersonaDestino,
+                            !idPersonaDestino.equals(colegiado.getIdperorigen().toString()), usuario);//obtenerla en la query ppal
+                    LOGGER.info("obtenerIrpf -> Salimos");
+                    
                     // 3. Obtener importe bruto como la suma de los movimientos varios y
                     // el total SJCS
+                    
+                    importeTurnos = colegiado.getImpoficio().doubleValue();
+                    importeGuardias = colegiado.getImpasistencia().doubleValue();
+                    importeSoj = colegiado.getImpsoj().doubleValue();
+                    importeEjg = colegiado.getImpejg().doubleValue();
+
+                    // Volvemos a calcular el IMPORTE SJCS BRUTO
+                    importeSJCS = importeTurnos + importeGuardias + importeSoj + importeEjg;
                     double importeBruto = importeSJCS + importeMovimientos;
 
                     // 4. Obtener el importe neto aplicando el IRPF
@@ -228,7 +263,9 @@ public class UtilidadesPagoSJCS {
                     LOGGER.info("aplicarRetencionesJudiciales -> Salimos");
                     // obtener el importe de las retenciones judiciales
                     importeRetenciones = getSumaRetenciones(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(), usuario);
-
+                    
+                    //Obtenemos del mapa el importeMovimientos obtenido previamente
+                    importeMovimientos = colegiadoMV.get(idPersonaDestino);
                     // Actualizar el irpf, movimientos varios y retenciones en
                     // fcs_pago_colegiado
                     FcsPagoColegiado fcsPagoColegiado = new FcsPagoColegiado();
@@ -242,7 +279,18 @@ public class UtilidadesPagoSJCS {
                     LOGGER.info("fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective -> Entramos");
                     fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective(fcsPagoColegiado);
                     LOGGER.info("fcsPagoColegiadoExtendsMapper.updateByPrimaryKeySelective -> Salimos");
-                } // fin del for de colegiados
+                } // fin del segundo for de colegiados
+                
+                // Insertamos el estado del pago:
+                FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+                record.setIdinstitucion(idInstitucion);
+                record.setIdpagosjg(Integer.valueOf(idPago));
+                record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
+                record.setFechaestado(new Date());
+                record.setFechamodificacion(new Date());
+                record.setUsumodificacion(usuario.getIdusuario());
+
+                fcsPagosEstadospagosMapper.insertSelective(record);
             }else{
                 throw new FacturacionSJCSException("Para ejecutar un pago este debe estar asociado a un colegiado.");
             }
@@ -291,6 +339,7 @@ public class UtilidadesPagoSJCS {
      * <br> Si la cuenta es -1 es que pasa a pagar por caja
      * @throws Exception En cualquier caso de error
      */
+    
     private ArrayList<String> getCuentaAbonoSJCS(Short idInstitucion, String idPersona, AdmUsuarios usuario) throws Exception {
 
         ArrayList<String> salida = new ArrayList<>();
@@ -298,17 +347,38 @@ public class UtilidadesPagoSJCS {
         try {
 
             // Buscamos si la persona pertenece a una sociedad y no tiene de baja la relacion
-            List<PerteneceAunaSociedadDTO> registros = fcsPagosjgExtendsMapper.perteneceAunaSociedad(idInstitucion, idPersona);
-
-            if (!registros.isEmpty()) { // Tiene registros activos en componentes
-                String sIdPersonaSociedad = registros.get(0).getIdPersona().toString();
-                String oIdCuenta = registros.get(0).getIdCuenta().toString();
+            //List<PerteneceAunaSociedadDTO> registros = fcsPagosjgExtendsMapper.perteneceAunaSociedad(idInstitucion, idPersona);
+            
+            CenComponentesExample exampleComponentes = new CenComponentesExample();
+            exampleComponentes.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+            	.andCenClienteIdpersonaEqualTo(Long.valueOf(idPersona))
+            	.andCenClienteIdinstitucionEqualTo(idInstitucion)
+            	.andSociedadEqualTo("1")
+            	.andFechabajaIsNull();
+			List<CenComponentes> listaComponentes = cenComponentesExtendsMapper.selectByExample(exampleComponentes);
+            
+            if (!listaComponentes.isEmpty()) { // Tiene registros activos en componentes
+                String sIdPersonaSociedad = listaComponentes.get(0).getIdpersona().toString();
+                String oIdCuenta = listaComponentes.get(0).getIdcuenta().toString();
                 salida.add(sIdPersonaSociedad);
 
                 if (oIdCuenta != null) {// Tiene una cuenta de abono asociada
 
                     // Comprobamos que la cuenta siga activa y sea ABONOSJSCS=1
-                    String cuentaAbono = fcsPagosjgExtendsMapper.tieneCuentaAbonoAsociada(idInstitucion, sIdPersonaSociedad, oIdCuenta);
+                	
+                	String cuentaAbono = null;
+                	
+                	CenCuentasbancariasExample example = new CenCuentasbancariasExample();
+                	example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                		.andIdpersonaEqualTo(Long.valueOf(sIdPersonaSociedad))
+                		.andAbonosjcsEqualTo("1")
+                		.andFechabajaIsNull()
+                		.andIdcuentaEqualTo(Short.valueOf(oIdCuenta));
+        	        List<CenCuentasbancarias> cuentas = cenCuentasbancariasExtendsMapper.selectByExample(example);
+                    if(cuentas!=null && cuentas.size()>0) {
+                    	cuentaAbono = cuentas.get(0).getIdcuenta().toString(); //fcsPagosjgExtendsMapper.tieneCuentaAbonoAsociada(idInstitucion, sIdPersonaSociedad, oIdCuenta);
+                	}
+                			
 
                     if (cuentaAbono != null) { // La sociedad tiene una cuenta de abono activa y es AbonoSJCS=1
                         salida.add(oIdCuenta);
@@ -322,10 +392,17 @@ public class UtilidadesPagoSJCS {
 
             } else { // No tiene registro en componentes, y por lo tanto, hay que buscar una cuenta bancaria activa de la persona con AbonoSJCS=1
                 salida.add(idPersona);
-                List<String> cuentas = fcsPagosjgExtendsMapper.getCuentaBancariaActiva(idInstitucion, idPersona);
+                CenCuentasbancariasExample example = new CenCuentasbancariasExample();
+            	example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+            		.andIdpersonaEqualTo(Long.valueOf(idPersona))
+            		.andAbonosjcsEqualTo("1")
+            		.andFechabajaIsNull();
+            	example.setOrderByClause("FECHAMODIFICACION DESC");
+    	        List<CenCuentasbancarias> cuentas = cenCuentasbancariasExtendsMapper.selectByExample(example);
+                //List<String> cuentas = fcsPagosjgExtendsMapper.getCuentaBancariaActiva(idInstitucion, idPersona);
 
                 if (!cuentas.isEmpty()) { // La persona tiene alguna cuenta de AbonoSJCS=1 activa
-                    salida.add(cuentas.get(0));
+                    salida.add(cuentas.get(0).getIdcuenta().toString());
                 } else { // La persona no tiene ninguna cuenta de AbonoSJCS=1 activa
                     salida.add("-1"); // paga por caja
                 }
@@ -347,6 +424,7 @@ public class UtilidadesPagoSJCS {
      * @return
      * @throws Exception
      */
+    
     private Double obtenerIrpf(String idInstitucion, String idPersonaSociedad,
                                boolean esSociedad, AdmUsuarios usuario) throws Exception {
 
@@ -380,10 +458,12 @@ public class UtilidadesPagoSJCS {
      * @param fcsMovimientosvarios
      * @param idPago
      * @param importeSJCS
+     * @param facturacionesGruposPagosList 
+     * @param facturacion 
      * @return
      * @throws Exception
      */
-    private double aplicarMovimientosVarios(FcsMovimientosvarios fcsMovimientosvarios, String idPago, double importeSJCS, AdmUsuarios usuario) throws Exception {
+    private double aplicarMovimientosVarios(FcsMovimientosvarios fcsMovimientosvarios, String idPago, double importeSJCS, AdmUsuarios usuario, List<FacturacionGrupoPagoDTO> facturacionesGruposPagosList, FcsFacturacionjg facturacion) throws Exception {
 
         // en esta variable se guarda el importe final de los movimientos varios
         double importeMovimientos = 0.0d;
@@ -412,37 +492,21 @@ public class UtilidadesPagoSJCS {
             //Se obtienen los movimientos del colegiado que no estén asociados ni a una facturación ni a un grupo. (Caso 1)
             movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), null, null, null, SigaConstants.CASO_MVNOASOCIADO, usuario));
 
-            //Obtiene la facturación del pago y sus grupos.
-            List<FacturacionGrupoPagoDTO> facturacionesGruposPagosList = getFacturacionesGruposPagos(idPago, fcsMovimientosvarios.getIdinstitucion().toString(), usuario);
+            if (facturacion != null) {
 
-            Integer idFacturacion = null;
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                String fechaDesde = sdf.format(facturacion.getFechadesde());
 
-            if (facturacionesGruposPagosList != null && !facturacionesGruposPagosList.isEmpty()) {
-                idFacturacion = facturacionesGruposPagosList.get(0).getIdFacturacion();
+                //Se obtienen los movimientos de la facturación que no tienen grupo asociado
+                // y que estén pendientes de aplicar de la facturación del pago y de facturaciones anteriores
+                movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), facturacion.getIdfacturacion().toString(), fechaDesde, null, SigaConstants.CASO_MVASOCIADOAFACTURACION, usuario));
 
-                //Recuperamos las fechas desde y hasta de la facturación
-                FcsFacturacionjgKey fcsFacturacionjgKey = new FcsFacturacionjgKey();
-                fcsFacturacionjgKey.setIdinstitucion(fcsMovimientosvarios.getIdinstitucion());
-                fcsFacturacionjgKey.setIdfacturacion(idFacturacion);
-                FcsFacturacionjg facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(fcsFacturacionjgKey);
-
-                if (idFacturacion != null) {
-
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                    String fechaDesde = sdf.format(facturacion.getFechadesde());
-
-                    //Se obtienen los movimientos de la facturación que no tienen grupo asociado
-                    // y que estén pendientes de aplicar de la facturación del pago y de facturaciones anteriores
-                    movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), idFacturacion.toString(), fechaDesde, null, SigaConstants.CASO_MVASOCIADOAFACTURACION, usuario));
-
-                    for (int i = 0; i < facturacionesGruposPagosList.size(); i++) {
-                        Short idGrupo = facturacionesGruposPagosList.get(i).getIdGrupoFacturacion();
-                        if (null != idGrupo) {
-                            //Se obtienen los movimientos del colegiado que tienen idfacturacion <= que la del pago y el grupo = grupo del pago que estamos tratando (Caso 2)
-                            movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), idFacturacion.toString(), fechaDesde, idGrupo.toString(), SigaConstants.CASO_MVASOCIADOAGRUPOFACT, usuario));
-                        }
+                for (int i = 0; i < facturacionesGruposPagosList.size(); i++) {
+                    Short idGrupo = facturacionesGruposPagosList.get(i).getIdGrupoFacturacion();
+                    if (null != idGrupo) {
+                        //Se obtienen los movimientos del colegiado que tienen idfacturacion <= que la del pago y el grupo = grupo del pago que estamos tratando (Caso 2)
+                        movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), facturacion.getIdfacturacion().toString(), fechaDesde, idGrupo.toString(), SigaConstants.CASO_MVASOCIADOAGRUPOFACT, usuario));
                     }
-
                 }
 
             }
@@ -590,6 +654,7 @@ public class UtilidadesPagoSJCS {
     /**
      * Devuelve el porcentaje de irpf a aplicar en un pago
      */
+    
     private void aplicarRetencionesJudiciales(String idInstitucion,
                                               String idPagoJg, String idPersonaSociedad, String importeNeto,
                                               String usuMod, String idioma, AdmUsuarios usuario) throws Exception {
@@ -626,6 +691,7 @@ public class UtilidadesPagoSJCS {
 
     }
 
+    
     private double getSumaRetenciones(String idInstitucion, String idPago, String idPersona, AdmUsuarios usuario) throws Exception {
 
         double importe;
