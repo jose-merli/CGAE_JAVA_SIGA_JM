@@ -62,6 +62,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         SQL sqlUltimoPagado = new SQL();
         SQL sqlUltimoAccion = new SQL();
         SQL sqlUltimoFecha = new SQL();
+        SQL sqlEstadoFac = new SQL();
+        SQL sqlFormaPago = new SQL();
         SQL adeudos = new SQL();
         SQL devoluciones = new SQL();
         
@@ -122,26 +124,49 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         sqlUltimoFecha.FROM("fac_historicofactura hfac");
         sqlUltimoFecha.WHERE("hfac.idfactura = f.idfactura and hfac.idinstitucion = f.idinstitucion and hfac.idhistorico = ("+sqlEstadosPagos.toString()+")");
         
+        //Descripcion estado
+        sqlEstadoFac.SELECT("r.descripcion");
+        sqlEstadoFac.FROM("fac_estadofactura   ef");
+        sqlEstadoFac.JOIN("gen_recursos        r ON ( ef.descripcion = r.idrecurso AND r.idlenguaje = " + idLenguaje + " )");
+        sqlEstadoFac.WHERE("ef.idestado = f.estado");
+        
+        //Descripcion forma de pago
+        sqlFormaPago.SELECT("r.descripcion");
+        sqlFormaPago.FROM("pys_formapago   pf");
+        sqlFormaPago.JOIN("gen_recursos    r ON ( pf.descripcion = r.idrecurso AND r.idlenguaje = " + idLenguaje + " )");
+        sqlFormaPago.WHERE("f.idformapago = pf.idformapago");
         
         //select de facturas
-        facturas.SELECT("'FACTURA' tipo,f.idfactura, NULL AS idabono,f.numerofactura,f.idinstitucion,f.fechaemision fecha,f.idprogramacion,fp.descripcion facturacion,"
-                + "nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident,nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' ||  p.nombre, p.nombre) nombreCompleto,"
-                + "f.imptotal,f.imptotalporpagar,f.estado idestado,r.descripcion estado, (" + numComunicaciones.toString() + ") numcomunicaciones,"
-                + "(" + ultComunicacion.toString() + ") ultcomunicacion,p.idpersona,f.idformapago, F_SIGA_GETRECURSO(pf.DESCRIPCION,'"+idLenguaje+"') AS NOMBREFORMAPAGO");
+        facturas.SELECT("'FACTURA' tipo");
+        facturas.SELECT("f.idfactura");
+        facturas.SELECT("NULL AS idabono");
+        facturas.SELECT("f.numerofactura");
+        facturas.SELECT("f.idinstitucion");
+        facturas.SELECT("f.fechaemision fecha");
+        facturas.SELECT("f.idprogramacion");
+        facturas.SELECT("fp.descripcion facturacion");
+        facturas.SELECT("nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident");
+        facturas.SELECT("nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' ||  p.nombre, p.nombre) nombreCompleto");
+        facturas.SELECT("f.imptotal");
+        facturas.SELECT("f.imptotalporpagar");
+     	facturas.SELECT("f.estado idestado");
+     	facturas.SELECT("(" + sqlEstadoFac.toString() + ") estado");
+     	facturas.SELECT("(" + numComunicaciones.toString() + ") numcomunicaciones");
+     	facturas.SELECT("(" + ultComunicacion.toString() + ") ultcomunicacion");
+     	facturas.SELECT("p.idpersona");
+     	facturas.SELECT("f.idformapago");
+     	facturas.SELECT("(" + sqlFormaPago.toString() + ") NOMBREFORMAPAGO");
         
         //Select para el ultimo estado pagos
-        facturas.SELECT("("+sqlUltimoEstado.toString()+") estado_max_historico, ("+sqlUltimoImportePorPagar.toString()+")"
-        		+ " imptotalporpagar_max,("+sqlUltimoAccion.toString()+") idaccionult ,("+sqlUltimoFecha.toString()+") fechamodificacionult ,("+sqlUltimoPagado.toString()+") imptotalpagado_max ");
+        facturas.SELECT("f.estado estado_max_historico, f.imptotalporpagar imptotalporpagar_max,"
+        		+ "null idaccionult, f.fechamodificacion fechamodificacionult, f.imptotalpagado imptotalpagado_max");
         
         //joins
         facturas.FROM("fac_factura f");
-        facturas.LEFT_OUTER_JOIN("pys_formapago pf on f.idformapago = pf.idformapago");
         facturas.INNER_JOIN("fac_facturacionprogramada fp ON (fp.idinstitucion = f.idinstitucion AND fp.idprogramacion = f.idprogramacion AND f.idseriefacturacion = fp.idseriefacturacion)");
         facturas.INNER_JOIN("cen_cliente c ON (c.idpersona = f.idpersona AND c.idinstitucion = f.idinstitucion)");
         facturas.INNER_JOIN("cen_persona p ON (p.idpersona = f.idpersona)");
         facturas.LEFT_OUTER_JOIN("cen_colegiado col ON (col.idpersona = p.idpersona AND col.idinstitucion = f.idinstitucion)");
-        facturas.LEFT_OUTER_JOIN("fac_estadofactura ef ON (ef.idestado = f.estado)");
-        facturas.LEFT_OUTER_JOIN("gen_recursos r ON (ef.descripcion = r.idrecurso AND r.idlenguaje =" + idLenguaje + ")");
 
         //filtro
         if (idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
@@ -155,7 +180,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
                 facturas.WHERE("f.idinstitucion = " + idInstitucion);
             }
         }
-
+        
         if(item.getFacturasPendientesDesde() != null || item.getFacturasPendientesHasta() != null) {
             facturas.WHERE("c.idpersona IN (" + facturasPendientes.toString() + ")");
         }
@@ -287,31 +312,49 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
     
     private String getQueryAbonos(FacturaItem item, String idInstitucion, String idLenguaje) {
     	SQL transferencia = new SQL();
+    	SQL estadoAbono = new SQL();
         SQL abonos = new SQL();
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String fecha;
+        
+        //estado abono
+        estadoAbono.SELECT("r.descripcion");
+        estadoAbono.FROM("fac_estadoabono   ef");
+        estadoAbono.JOIN("gen_recursos      r ON ( ef.descripcion = r.idrecurso AND r.idlenguaje = 1 )");
+        estadoAbono.WHERE("ef.idestado = f.estado");
 		
     	//select de abonos
-        abonos.SELECT("'ABONO' tipo, NULL AS idfactura, TO_CHAR(f.idabono) as idabono, f.numeroabono as numerofactura,f.idinstitucion,f.fecha fecha, null AS  idprogramacion,"
-				+ " null AS  facturacion, nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident," 
-        		+ "nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' || p.nombre, p.nombre) nombreCompleto,"
-                + "f.imptotal imptotal,f.imppendienteporabonar imptotalporpagar,f.estado idestado,r.descripcion estado,"
-        		+ " null AS  numcomunicaciones, null AS  ultcomunicacion, p.idpersona, null AS idformapago, " + 
-        		"            null AS nombreformapago, " + 
-        		"            null AS estado_max_historico, " + 
-        		"            null AS imptotalporpagar_max, " + 
-        		"            null AS idaccionult, " + 
-        		"            null AS fechamodificacionult, " + 
-        		"            null AS imptotalpagado_max");
+        abonos.SELECT("'ABONO' tipo");
+        abonos.SELECT("NULL AS idfactura");
+        abonos.SELECT("TO_CHAR(f.idabono) as idabono"); 
+        abonos.SELECT("f.numeroabono as numerofactura");
+        abonos.SELECT("f.idinstitucion");
+        abonos.SELECT("f.fecha fecha"); 
+        abonos.SELECT("null AS  idprogramacion");
+        abonos.SELECT("null AS  facturacion");
+        abonos.SELECT("nvl(nvl(col.ncolegiado,col.ncomunitario),p.nifcif) ncolident"); 
+        abonos.SELECT("nvl(p.apellidos1 || ' ' || nvl(p.apellidos2, '') || ', ' || p.nombre, p.nombre) nombreCompleto");
+        abonos.SELECT("f.imptotal imptotal");
+        abonos.SELECT("f.imppendienteporabonar imptotalporpagar");
+        abonos.SELECT("f.estado idestado");
+        abonos.SELECT(" ( " + estadoAbono.toString() + " ) estado");
+        abonos.SELECT("null AS  numcomunicaciones"); 
+        abonos.SELECT("null AS  ultcomunicacion"); 
+        abonos.SELECT("p.idpersona"); 
+        abonos.SELECT("null AS idformapago");  
+        abonos.SELECT("null AS nombreformapago");
+        abonos.SELECT("null AS estado_max_historico");
+        abonos.SELECT("null AS imptotalporpagar_max");
+        abonos.SELECT("null AS idaccionult");
+        abonos.SELECT("null AS fechamodificacionult");
+        abonos.SELECT("null AS imptotalpagado_max");
 
         //joins
         abonos.FROM("fac_abono f");
         abonos.INNER_JOIN("cen_cliente c ON (c.idpersona = f.idpersona AND c.idinstitucion = f.idinstitucion)");
         abonos.INNER_JOIN("cen_persona p ON (p.idpersona = f.idpersona)");
         abonos.LEFT_OUTER_JOIN("cen_colegiado col ON (col.idpersona = p.idpersona AND col.idinstitucion = f.idinstitucion)");
-        abonos.LEFT_OUTER_JOIN("fac_estadoabono ef ON (ef.idestado = f.estado)");
-        abonos.LEFT_OUTER_JOIN("gen_recursos r ON (ef.descripcion = r.idrecurso  AND r.idlenguaje = "+ idLenguaje +")");
 
         //filtros
         abonos.WHERE("f.idinstitucion ="+idInstitucion);
@@ -398,6 +441,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
             abonos.WHERE("idabono IN (" + transferencia.toString() + ")");
         }
+        
 		return abonos.toString();
 	}
 

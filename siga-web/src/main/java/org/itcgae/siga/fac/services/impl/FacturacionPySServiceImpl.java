@@ -2342,8 +2342,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					|| item.getFormaCobroAbono() != null
 					|| (item.getEstadosFiltroAb() != null && item.getEstadosFiltroAb().size() > 0);
 
-			items.addAll(facFacturaExtendsMapper.getFacturas(item, usuario.getIdinstitucion().toString(),
-						usuario.getIdlenguaje(),filtrosSoloAbono,filtrosSoloFactura));
+			items = facFacturaExtendsMapper.getFacturas(item, usuario.getIdinstitucion().toString(),
+						usuario.getIdlenguaje(),filtrosSoloAbono,filtrosSoloFactura);
 
 			facturaDTO.setFacturasItems(items);
 		}
