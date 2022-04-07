@@ -6,6 +6,7 @@ public class CalendariosProgDatosEntradaItem {
 	private String idTurno;
 	private String idGuardia;
 	private String idConjuntoGuardia;
+	private String idCalendarioProgramado;
 	private String estado;
 	private String fechaCalendarioDesde;
 	private String fechaCalendarioHasta;
@@ -60,7 +61,12 @@ public class CalendariosProgDatosEntradaItem {
 	public void setFechaProgramadaHasta(String fechaProgramadaHasta) {
 		this.fechaProgramadaHasta = fechaProgramadaHasta;
 	}
-	
-	
-	
+
+	public String getIdCalendarioProgramado() {
+		return idCalendarioProgramado;
+	}
+
+	public void setIdCalendarioProgramado(String idCalendarioProgramado) {
+		this.idCalendarioProgramado = idCalendarioProgramado;
+	}
 }

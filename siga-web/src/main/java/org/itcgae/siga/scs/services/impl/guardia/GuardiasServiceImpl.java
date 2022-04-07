@@ -3622,6 +3622,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							insertResponseDTO.setStatus(SigaConstants.KO);
 						} else if (error.getCode() == null) {
 							error.setCode(200);
+							insertResponseDTO.setId(nextIdCalendarioProgramado);
 							insertResponseDTO.setStatus(SigaConstants.OK);
 						}
 

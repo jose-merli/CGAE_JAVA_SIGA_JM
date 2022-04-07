@@ -1360,6 +1360,10 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if (calendarioItem.getIdGuardia() != null && calendarioItem.getIdGuardia() != "") {
 		sql.WHERE("(hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+") OR hpc.IDGUARDIA is null)");
 		}
+
+		if (!UtilidadesString.esCadenaVacia(calendarioItem.getIdCalendarioProgramado())) {
+			sql.WHERE("PC.IDPROGCALENDARIO = " + calendarioItem.getIdCalendarioProgramado());
+		}
 		
 		//sql.WHERE("NOT EXISTS (" + sql2 + ")");
 		
