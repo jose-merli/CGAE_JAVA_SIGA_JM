@@ -913,13 +913,10 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 	}
 	public String setGuardiaInCalendario(String idCalendar, String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item) {
 		SQL subquery = new SQL();
-		if (idConjuntoGuardia != null) {
-			subquery.SELECT_DISTINCT("USUMODIFICACION");
-			subquery.FROM("SCS_CONF_CONJUNTO_GUARDIAS CG");
-			subquery.WHERE("CG.IDCONJUNTOGUARDIA = " + idConjuntoGuardia);
-			subquery.WHERE("CG.IDINSTITUCION = " + idInstitucion);
+		subquery.SELECT_DISTINCT("USUMODIFICACION");
+		subquery.FROM("scs_prog_calendarios CG");
+		subquery.WHERE("CG.IDPROGCALENDARIO = " + idCalendar);
 
-		}
 		SQL sql2 = new SQL();
 		sql2.INSERT_INTO("SCS_HCO_CONF_PROG_CALENDARIOS H");
 		if (idCalendar != null) {
@@ -943,9 +940,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if (today != null) {
 			sql2.VALUES("FECHAMODIFICACION", "TO_DATE('" + today + "', 'DD/MM/YYYY')");
 		}
-		if (idConjuntoGuardia != null) {
-			sql2.VALUES("USUMODIFICACION", "( " + subquery.toString() + " )");
-		}
+
+		sql2.VALUES("USUMODIFICACION", "( " + subquery.toString() + " )");
 		
 //		if (item.getGenerado() != null) {
 //			sql2.VALUES("ESTADO", DECODE(PG.ESTADO, 2, 'No', 'Si'));

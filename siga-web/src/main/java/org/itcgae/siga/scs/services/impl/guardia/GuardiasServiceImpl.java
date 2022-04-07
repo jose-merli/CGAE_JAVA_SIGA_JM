@@ -3308,11 +3308,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				itemList.forEach(item -> {
 					if (item.getNuevo() != null && item.getNuevo()) {
-						String response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(
-								idConjuntoGuardia, idInstitucion.toString(), today, item);
+						String response = null;
+						if (idConjuntoGuardia != null) {
+							response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(
+									idConjuntoGuardia, idInstitucion.toString(), today, item);
+						}
 						String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar,
 								idConjuntoGuardia, idInstitucion.toString(), today, item);
-						if ((response == null || response2 == null) && error.getDescription() == null) {
+						if ((response == null && response2 == null) && error.getDescription() == null) {
 							error.setCode(400);
 							insertResponseDTO.setStatus(SigaConstants.KO);
 						} else if (error.getCode() == null) {
