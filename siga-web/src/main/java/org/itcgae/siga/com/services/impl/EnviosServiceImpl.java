@@ -45,6 +45,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
@@ -52,6 +53,8 @@ import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
@@ -120,6 +123,10 @@ public class EnviosServiceImpl implements IEnviosService{
         
     	Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
     	
+    	GenParametrosKey keyParam = new GenParametrosKey();
+    	GenParametros parametro = new GenParametros();
+    	String remitenteFromPorDefecto = null;
+    	
         try {
             
             EnvEnviosKey envEnviosKey = new EnvEnviosKey();
@@ -132,6 +139,35 @@ public class EnviosServiceImpl implements IEnviosService{
                 throw new BusinessException("No se ha encontrado el envío");
             }
             
+            
+            // OBTENCIÓN DE PARÁMETRO REMITENTE POR DEFECTO DE LA INSTITUCIÓN ACTUAL
+            
+	        keyParam.setIdinstitucion(Short.valueOf(idInstitucion));
+	        keyParam.setModulo(SigaConstants.MODULO_CENSO);
+	        keyParam.setParametro(SigaConstants.DEFAULT_EMAIL_FROM);
+	        
+	        parametro = _genParametrosMapper.selectByPrimaryKey(keyParam);
+	        
+	        // COMPROBACIÓN PARÁMETRO OBTENIDO
+	        
+	        if (parametro != null && parametro.getValor() != null) {
+	        	remitenteFromPorDefecto = parametro.getValor();
+	        } else {
+	        	
+	        	// OBTENCIÓN DE PARÁMETRO REMITENTE POR DEFECTO DE LA INSTITUCIÓN POR DEFECTO
+	        	
+	        	keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+		        keyParam.setModulo(SigaConstants.MODULO_CENSO);
+		        keyParam.setParametro(SigaConstants.DEFAULT_EMAIL_FROM);
+		        
+		        parametro = _genParametrosMapper.selectByPrimaryKey(keyParam);
+		        
+		        if (parametro != null) {
+		        	remitenteFromPorDefecto = parametro.getValor();
+		        }
+	        }
+	        
+	        
             // OBTENCIÓN DE SERVIDOR DE CORREO
             
             LOGGER.debug("Configuramos el envio de correo");
@@ -151,6 +187,8 @@ public class EnviosServiceImpl implements IEnviosService{
             
             //Remitente
             String from = remitente.getCorreoElectronico();
+            String defaultFrom = remitenteFromPorDefecto;
+            
             String descFrom = "";
 
             if(remitente.getDescripcion()!=null) {
@@ -232,11 +270,24 @@ public class EnviosServiceImpl implements IEnviosService{
                         
                         //Se crea un nuevo Mensaje.
                         MimeMessage mensaje = new MimeMessage(sesion);
-                        mensaje.setFrom(new InternetAddress(from,descFrom));
-						mensaje.setReplyTo(new javax.mail.Address[]
-								{
-									    new javax.mail.internet.InternetAddress(from)
-									});
+                        
+                        //Si se ha asignado un correo por defecto y es válido
+                        if (defaultFrom != null && SIGAServicesHelper.isValidEmailAddress(defaultFrom)) {
+                        	
+                        	mensaje.setFrom(new InternetAddress(defaultFrom,descFrom));
+    						mensaje.setReplyTo(new javax.mail.Address[]
+    								{
+    									    new javax.mail.internet.InternetAddress(from, descFrom)
+    									});
+                        } else {
+                        	
+	                        mensaje.setFrom(new InternetAddress(from,descFrom));
+							mensaje.setReplyTo(new javax.mail.Address[]
+									{
+										    new javax.mail.internet.InternetAddress(from)
+										});
+                        }
+                        
 						mensaje.setSender(new InternetAddress(from,descFrom));
 						
                         InternetAddress toInternetAddress = new InternetAddress(sTo);

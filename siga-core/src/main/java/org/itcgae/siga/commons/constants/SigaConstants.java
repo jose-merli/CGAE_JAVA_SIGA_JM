@@ -1490,6 +1490,8 @@ public class SigaConstants {
 	public static final String ACREDITACION_TIPO_FIN = "2";
 	public static final String ACREDITACION_TIPO_COMPLETA = "3";
 	
+	public static String DEFAULT_EMAIL_FROM = "DEFAULT_EMAIL_FROM";
+	
 	//Remesa Resultados
 	public static final String CONTADOR_REMESAS_RESULTADOS= "REMESARESULTEJG";
 	public static final String MAX_NUM_LINEAS_FICHERO = "MAX_NUM_LINEAS_FICH";
@@ -1665,5 +1667,7 @@ public class SigaConstants {
     public static final String PRODUCTO_PENDIENTE_GENERAR_PDF= "G";
 
     public static final String TIMESTAMP_BBDD = "yyyy-MM-dd HH:mm:ss";
+	
 
+	
 }

@@ -391,6 +391,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				documento.setDatos(Files.readAllBytes(file.toPath()));
 				documento.setFileName(nombreFicheroSalida);
 				documento.setPathDocumento(pathFicheroSalida);
+				documento.setDocumentoFile(new File(pathFicheroSalida + nombreFicheroSalida));
 			} else {
 				documento = null;
 			}

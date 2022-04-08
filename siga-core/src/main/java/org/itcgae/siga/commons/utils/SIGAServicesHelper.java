@@ -18,6 +18,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.log4j.Logger;
+import java.util.regex.Pattern;
+
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -166,5 +169,16 @@ public class SIGAServicesHelper {
 		}
 
 		return returnFile;
+	}
+
+	/**
+	 * Comprueba si un email es válido.
+	 * @param email Correo electrónico a validar
+	 * @return true si es válido, de lo contrario false
+	 */
+	public static boolean isValidEmailAddress(String email) {
+
+		Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL2, Pattern.CASE_INSENSITIVE);
+        return EXPRESION_REGULAR_PATTERN_MAIL.matcher(email).matches() ;
 	}
 }

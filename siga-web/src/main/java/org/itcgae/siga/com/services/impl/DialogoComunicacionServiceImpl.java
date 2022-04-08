@@ -1216,6 +1216,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								}
 							} else {
 								LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
+								throw new BusinessException("La consulta de destinatarios no ha devuelto resultados");
 							}
 						}
 					}else {
