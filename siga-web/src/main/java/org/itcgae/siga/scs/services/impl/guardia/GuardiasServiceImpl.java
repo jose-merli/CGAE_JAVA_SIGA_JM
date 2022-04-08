@@ -3491,13 +3491,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 					}
 					hco.setUsumodificacion(usuarios.get(0).getUsumodificacion());
 					hco.setFechamodificacion(new Date());
-					int response3 = scsHcoConfProgCalendariosMapper.updateByPrimaryKeySelective(hco);
-					String response4 = scsGuardiasturnoExtendsMapper.updateCalendarioProgramado3(calendarioItem,
+					scsHcoConfProgCalendariosMapper.updateByPrimaryKeySelective(hco);
+					scsGuardiasturnoExtendsMapper.updateCalendarioProgramado3(calendarioItem,
 							idInstitucion.toString());
-					if (response3 == 0 && error.getDescription() == null) {
-						error.setCode(400);
-						insertResponseDTO.setStatus(SigaConstants.KO);
-					} else if (error.getCode() == null) {
+
+					if (error.getCode() == null) {
 						error.setCode(200);
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
