@@ -158,7 +158,7 @@ public interface ScsProgCalendariosMapper {
 	int updateByPrimaryKeySelective(ScsProgCalendarios record);
 
 	@UpdateProvider(type = ScsProgCalendariosSqlProvider.class, method = "updateProgCalendario")
-	int updateProgCalendario(String idconjuntoguardia, String idinstitucion, String fechaprogramacion, String fechacalinicio, String fechacalfin, String estado, String fechamodificacion, String usumodificacion, String idficherocalendario, String idprogcalendario);
+	int updateProgCalendario(Short idconjuntoguardia, String idinstitucion, String fechaprogramacion, String fechacalinicio, String fechacalfin, String estado, String fechamodificacion, String usumodificacion, String idficherocalendario, String idprogcalendario);
 
 
     /**

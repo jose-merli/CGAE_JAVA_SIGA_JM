@@ -566,12 +566,12 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getSaltos")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
-		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.NUMERIC),
 	        @Result(column = "IDSALTOSTURNO", property = "idSaltoCompensacion", jdbcType = JdbcType.NUMERIC),
 		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "SALTOOCOMPENSACION", property = "saltoocompensacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
-			@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "MOTIVOS", property = "motivos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHACUMPLIMIENTO", property = "fechacumplimiento", jdbcType = JdbcType.DATE),
 			@Result(column = "IDCALENDARIOGUARDIAS", property = "idcalendarioguardias", jdbcType = JdbcType.NUMERIC),
@@ -586,12 +586,12 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getCompensaciones")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
-		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.NUMERIC),
 	        @Result(column = "IDSALTOSTURNO", property = "idSaltoCompensacion", jdbcType = JdbcType.NUMERIC),
 		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "SALTOOCOMPENSACION", property = "saltoocompensacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
-			@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "MOTIVOS", property = "motivos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHACUMPLIMIENTO", property = "fechacumplimiento", jdbcType = JdbcType.DATE),
 			@Result(column = "IDCALENDARIOGUARDIAS", property = "idcalendarioguardias", jdbcType = JdbcType.NUMERIC),

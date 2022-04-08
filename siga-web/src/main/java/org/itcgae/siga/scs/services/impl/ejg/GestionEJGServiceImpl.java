@@ -1384,29 +1384,38 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                             // obtenemos la peticion y el idXML
                             LOGGER.debug(
                                     "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
-
-                            List<ScsEejgPeticiones> peticiones = scsEejgPeticionesExtendsMapper
-                                    .getPeticionesPorEJG(ejg);
-
-                            if (peticiones != null && peticiones.size() > 0) {
-
-                                for (ScsEejgPeticiones peticion : peticiones) {
-                                    if (!UtilidadesString.esCadenaVacia(peticion.getCsv())) {
-                                        // obtenemos los datos del fichero
-                                        LOGGER.debug(
-                                                "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
-                                        Map<Integer, Map<String, String>> mapInformeEejg = eejgServiceImpl
-                                                .getDatosInformeEejg(ejg, peticion);
-
-                                        LOGGER.debug(
-                                                "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
-                                        DatosDocumentoItem documento = eejgServiceImpl.getInformeEejg(mapInformeEejg,
-                                                ejg.getidInstitucion());
-
-                                        ficheros.add(documento);
-                                    }
-                                }
-                            }
+                            
+                            ScsEjgExample exampleEjg = new ScsEjgExample();
+							exampleEjg.createCriteria().andAnioEqualTo(Short.valueOf(ejg.getAnnio()))
+								.andIdinstitucionEqualTo(Short.valueOf(ejg.getidInstitucion()))
+								.andNumejgEqualTo(ejg.getNumEjg()).andIdtipoejgEqualTo(Short.valueOf(ejg.getTipoEJG()));
+							
+							List<ScsEjg> expedientes = scsEjgExtendsMapper.selectByExample(exampleEjg );
+							if(!expedientes.isEmpty()) {
+								ejg.setNumero(expedientes.get(0).getNumero().toString());
+	                            List<ScsEejgPeticiones> peticiones = scsEejgPeticionesExtendsMapper
+	                                    .getPeticionesPorEJG(ejg);
+	
+	                            if (peticiones != null && peticiones.size() > 0) {
+	
+	                                for (ScsEejgPeticiones peticion : peticiones) {
+	                                    if (!UtilidadesString.esCadenaVacia(peticion.getCsv())) {
+	                                        // obtenemos los datos del fichero
+	                                        LOGGER.debug(
+	                                                "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
+	                                        Map<Integer, Map<String, String>> mapInformeEejg = eejgServiceImpl
+	                                                .getDatosInformeEejg(ejg, peticion);
+	
+	                                        LOGGER.debug(
+	                                                "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
+	                                        DatosDocumentoItem documento = eejgServiceImpl.getInformeEejg(mapInformeEejg,
+	                                                ejg.getidInstitucion());
+	
+	                                        ficheros.add(documento);
+	                                    }
+	                                }
+	                            }
+							}
 
                         }
                     }

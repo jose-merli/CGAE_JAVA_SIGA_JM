@@ -14,11 +14,16 @@ import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesNumeros;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.fac.services.ICompraProductosService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -32,6 +37,9 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Autowired
 	private GestionFichaCompraSuscripcionServiceImpl gestionFichaCompraSuscripcionServiceImpl;
@@ -127,7 +135,9 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 						LOGGER.info(
 								"getListaCompraProductos() / pysPeticioncomprasuscripcionExtendsMapper.getListaCompras() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener las peticiones de compra que cumplan las condiciones");
 
-						listaCompraProductos.setListaCompraProductosItems(pysPeticioncomprasuscripcionExtendsMapper.getListaCompras(peticion, idInstitucion, usuarios.get(0).getIdlenguaje()));
+						// Se parametriza el número de resultados en función del parámetro TAM_MAX_CONSULTA_JG
+						Integer tamMax = UtilidadesNumeros.tryParseInt(getParametro(SigaConstants.MODULO_SCS, SigaConstants.TAM_MAX_CONSULTA_JG, idInstitucion), null);
+						listaCompraProductos.setListaCompraProductosItems(pysPeticioncomprasuscripcionExtendsMapper.getListaCompras(peticion, idInstitucion, usuarios.get(0).getIdlenguaje(), tamMax));
 						
 						//Revisamos las fechas obtenidas para determinar el idestado que se devuelve
 						for(ListaCompraProductosItem compraProductos : listaCompraProductos.getListaCompraProductosItems()) {
@@ -149,7 +159,14 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 //							compraProductos.setImporte(totalCompra.toString());
 						
 						}
-						
+
+						// Muestra un mensaje si la lista de resultados ha alcanzado el tamaño máximo de la consulta
+						if (tamMax != null && tamMax < listaCompraProductos.getListaCompraProductosItems().size()
+								|| null == tamMax && 200 < listaCompraProductos.getListaCompraProductosItems().size()) {
+							listaCompraProductos.getListaCompraProductosItems().remove(listaCompraProductos.getListaCompraProductosItems().size() - 1);
+							error.setMessage("general.message.consulta.resultados");
+						}
+
 						
 						
 						LOGGER.info(
@@ -173,6 +190,21 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 		
 		return listaCompraProductos;
 		
+	}
+
+	private String getParametro(String modulo, String parametro, Short idInstitucion) {
+		GenParametrosKey keyParametros = new GenParametrosKey();
+		keyParametros.setModulo(modulo);
+		keyParametros.setParametro(parametro);
+		keyParametros.setIdinstitucion(idInstitucion);
+		GenParametros property = genParametrosExtendsMapper.selectByPrimaryKey(keyParametros);
+
+		if (property == null) {
+			keyParametros.setIdinstitucion(SigaConstants.ID_INSTITUCION_0);
+			property = genParametrosExtendsMapper.selectByPrimaryKey(keyParametros);
+		}
+
+		return property != null ? property.getValor() : "";
 	}
 
 

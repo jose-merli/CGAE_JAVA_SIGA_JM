@@ -134,7 +134,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             LOGGER.info("FacturacionRapidaServiceImpl.getSeleccionSerieFacturacion() --> pysCompraExtendsMapper.obtenerComprasPeticion() --> SALIDA del servicio para obtener las compras de la peticion");
 
             if (vCompras == null || vCompras.size() == 0) {
-                throw new Exception("messages.facturacionRapidaCompra.noElementosFacturables");
+                throw new Exception("No existen elementos facturables");
             }
 
             // Obtiene las facturas de una peticion de una solicitud de compra de productos
@@ -355,7 +355,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
 
                     vCompras = pysCompraExtendsMapper.obtenerComprasPeticion(idInstitucion, idPeticion);
                     if (vCompras.size() == 0) {
-                        throw new Exception("messages.facturacionRapidaCompra.noElementosFacturables");
+                        throw new Exception("No existen elementos facturables");
                     }
 
                 } // else {} // Esta facturado => vFacturas => No Tx
@@ -370,7 +370,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                     List<FacSeriefacturacion> series = obtenerSeriesAdecuadas(vCompras);
                     if (series == null || series.size() != 1) {
                         // LIBERAMOS EL BLOQUEO DE LAS TABLAS Y LA TRANSACCION
-                        throw new Exception("messages.facturacionRapidaCompra.noSerieAdecuada");
+                        throw new Exception("No se ha encontrado una serie de facturacion adecuada");
 
                     } else if (series.size() == 1) {
                         beanSerieCandidata = series.get(0);
@@ -403,7 +403,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 } else {
                     // LOCALIZO LAS COMPRAS (SI NO EXISTEN LAS GENERO)
                     if (beanPeticionCompraSuscripcion.getIdestadopeticion().toString().equals(SigaConstants.ESTADO_PETICION_COMPRA_BAJA)) { // Esta en estado baja
-                        throw new Exception("messages.facturacionRapidaCompra.estadoBaja");
+                        throw new Exception("La petición está en estado 'Baja'");
 
                     } else if (beanPeticionCompraSuscripcion.getIdestadopeticion().toString().equals(SigaConstants.ESTADO_PETICION_COMPRA_PENDIENTE)) { // Esta en estado pendiente. Hay que aprobarla
                         beanPeticionCompraSuscripcion = aprobarCompras(vCompras, usuario);
@@ -696,7 +696,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 List<PysCompra> v = pysCompraExtendsMapper.selectByExample(pysCompraExample);
 
                 if ((v != null) && (v.size() > 0)) {
-                    throw new Exception("messages.pys.gestionSolicitudes.errorBaja");
+                    throw new Exception("No se encuentra el producto solicitado");
                 }
 
 				/*
@@ -949,7 +949,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             File carpetaAlmacen = new File(rutaAlmacen);
             SIGAHelper.mkdirs(rutaAlmacen);
             if (!carpetaAlmacen.canWrite()) {
-                throw new Exception("messages.facturacion.comprueba.noPermisosPathFacturas");
+                throw new Exception("No se tienen permisos para acceder a la carpeta destino");
             }
 
             // Se crea un array con los pdf del zip
@@ -973,7 +973,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 if (ficheroPdf == null) {
                     throw new Exception("Error al generar la factura. Fichero devuelto es nulo.");
                 } else if (!ficheroPdf.exists()) {
-                    throw new Exception("messages.general.error.ficheroNoExisteReintentar");
+                    throw new Exception("No existe el fichero PDF de la factura");
                 }
 
                 // Obtenemos el nombre de la persona de la factura
@@ -1050,7 +1050,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
         try {
             return this.facturacionHelper.obtenerFicheros(facturas);
         } catch (Exception e) {
-            throw new Exception("Ha ocurrido un error al descargar las facturas");
+            throw e;
         }
 
     }

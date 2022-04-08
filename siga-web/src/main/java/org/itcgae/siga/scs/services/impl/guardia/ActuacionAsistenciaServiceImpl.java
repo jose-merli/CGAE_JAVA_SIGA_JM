@@ -148,7 +148,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             if("SÍ".equals(actuacionAsistenciaItem.getValidada())){
                                 actuacionAsistenciaItem.setEstado("VALIDADA");
                             }
-                            if("1".equals(actuacionAsistenciaItem.getAnulada().toString())){
+                            if(null != actuacionAsistenciaItem.getAnulada() && "1".equals(actuacionAsistenciaItem.getAnulada())){
                             	actuacionAsistenciaItem.setEstado("ANULADA");
                             }
                             //Buscamos la última operacion hecha
@@ -523,10 +523,10 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         if("1".equals(scsActuacionasistencia.getValidada())){
                             tarjeta.setEstado("VALIDADA");
                         }
-                        if("1".equals(scsActuacionasistencia.getAnulacion().toString())){
+                        if(null != scsActuacionasistencia.getAnulacion() && "1".equals(scsActuacionasistencia.getAnulacion().toString())){
                             tarjeta.setEstado("ANULADA");
                         }
-                        tarjeta.setAnulada(scsActuacionasistencia.getAnulacion().toString());
+                        tarjeta.setAnulada(null != scsActuacionasistencia.getAnulacion() ? scsActuacionasistencia.getAnulacion().toString() : SigaConstants.DB_FALSE);
                         tarjeta.setValidada(scsActuacionasistencia.getValidada());
                         datosJustificacion.add(tarjeta);
                     }

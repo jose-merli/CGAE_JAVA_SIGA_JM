@@ -969,7 +969,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             FacturaItem filtros = new FacturaItem();
             filtros.setIdentificadorDevolucion(ficherosDevolucionesItem.getIdDisqueteDevoluciones());
-            List<FacturaItem> facturasDisquete = facFacturaExtendsMapper.getFacturas(filtros, usuario.getIdinstitucion().toString(),usuario.getIdlenguaje());
+            List<FacturaItem> facturasDisquete = facFacturaExtendsMapper.getFacturas(filtros, usuario.getIdinstitucion().toString(),usuario.getIdlenguaje(), false, true);
 
             //Devolver las factruas no devueltas
             if(facturasDisquete.size() > 0){

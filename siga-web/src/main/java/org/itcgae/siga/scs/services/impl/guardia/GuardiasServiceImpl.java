@@ -3282,6 +3282,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO insertGuardiaToCalendar(Boolean update, HttpServletRequest request, String idCalendar,
 			List<GuardiaCalendarioItem> itemList) {
 		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
@@ -3290,68 +3291,47 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-				if (usuarios != null && usuarios.size() > 0) {
-					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-					String today = formatter.format(new Date());
-					LOGGER.info(
-							"insertGuardiaToCalendar() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
-					String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(idCalendar,
-							idInstitucion.toString());
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni)
+					.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-					itemList.forEach(item -> {
-						if (!update) {
-							try {
-								String response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(
-										idConjuntoGuardia, idInstitucion.toString(), today, item);
-								String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar,
-										idConjuntoGuardia, idInstitucion.toString(), today, item);
-								if ((response == null || response2 == null) && error.getDescription() == null) {
-									error.setCode(400);
-									insertResponseDTO.setStatus(SigaConstants.KO);
-								} else if (error.getCode() == null) {
-									error.setCode(200);
-									insertResponseDTO.setStatus(SigaConstants.OK);
-								}
-							} catch (Exception e) {
-								error.setCode(500);
-								error.setDescription("general.mensaje.error.bbdd");
-								error.setMessage(e.getMessage());
-								insertResponseDTO.setError(error);
-							}
-						} else {
-							try {
-								scsGuardiasturnoExtendsMapper.updateGuardiaInCalendario(idCalendar, idConjuntoGuardia,
-										idInstitucion.toString(), today, item);
-								error.setCode(200);
-								insertResponseDTO.setStatus(SigaConstants.OK);
-							} catch (Exception e) {
-								error.setCode(500);
-								error.setDescription("general.mensaje.error.bbdd");
-								error.setMessage(e.getMessage());
-								insertResponseDTO.setError(error);
-							}
+			if (usuarios != null && usuarios.size() > 0) {
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+				String today = formatter.format(new Date());
+				LOGGER.info(
+						"insertGuardiaToCalendar() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
+				String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(idCalendar,
+						idInstitucion.toString());
+
+				itemList.forEach(item -> {
+					if (item.getNuevo() != null && item.getNuevo()) {
+						String response = null;
+						if (idConjuntoGuardia != null) {
+							response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(
+									idConjuntoGuardia, idInstitucion.toString(), today, item);
 						}
+						String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar,
+								idConjuntoGuardia, idInstitucion.toString(), today, item);
+						if ((response == null && response2 == null) && error.getDescription() == null) {
+							error.setCode(400);
+							insertResponseDTO.setStatus(SigaConstants.KO);
+						} else if (error.getCode() == null) {
+							error.setCode(200);
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+					} else {
+						scsGuardiasturnoExtendsMapper.updateGuardiaInCalendario(idCalendar, idConjuntoGuardia,
+								idInstitucion.toString(), today, item);
+						error.setCode(200);
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+				});
 
-					});
-
-					LOGGER.info("insertGuardiaToCalendar() -> Entrada para obtener los datos del calendario");
-				}
+				LOGGER.info("insertGuardiaToCalendar() -> Entrada para obtener los datos del calendario");
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"insertGuardiaToCalendar() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			error.setMessage(e.getMessage());
-			insertResponseDTO.setError(error);
 		}
 
 		insertResponseDTO.setError(error);
@@ -3474,7 +3454,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					pc.setFechamodificacion(new Date());
 					pc.setIdinstitucion(idInstitucion);
 					// int response2 = scsProgCalendariosMapper.updateByPrimaryKeySelective(pc);
-					int res = scsProgCalendariosMapper.updateProgCalendario(pc.getIdconjuntoguardia().toString(),
+					int res = scsProgCalendariosMapper.updateProgCalendario(pc.getIdconjuntoguardia(),
 							idInstitucion.toString(), calendarioItem.getFechaProgramacion(),
 							calendarioItem.getFechaDesde(), calendarioItem.getFechaHasta(), pc.getEstado().toString(),
 							pc.getFechamodificacion().toString(), pc.getUsumodificacion().toString(), null,
@@ -3511,13 +3491,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 					}
 					hco.setUsumodificacion(usuarios.get(0).getUsumodificacion());
 					hco.setFechamodificacion(new Date());
-					int response3 = scsHcoConfProgCalendariosMapper.updateByPrimaryKeySelective(hco);
-					String response4 = scsGuardiasturnoExtendsMapper.updateCalendarioProgramado3(calendarioItem,
+					scsHcoConfProgCalendariosMapper.updateByPrimaryKeySelective(hco);
+					scsGuardiasturnoExtendsMapper.updateCalendarioProgramado3(calendarioItem,
 							idInstitucion.toString());
-					if (response3 == 0 && error.getDescription() == null) {
-						error.setCode(400);
-						insertResponseDTO.setStatus(SigaConstants.KO);
-					} else if (error.getCode() == null) {
+
+					if (error.getCode() == null) {
 						error.setCode(200);
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
@@ -3567,7 +3545,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						
 						//En una programación sin lista de guardias, no debería existir ningún control al guardar la tarjeta de Datos generales, 
 						//porque todavía no se sabe qué guardias se quieren generar. Luego, se deberían poder añadir las guardias y en el Guardar de 
-						//esas guardias es donde sí debería ir el control anterior. 
+						//esas guardias es donde sí debería ir el control anterior.
+
 					}else {
 						//programación con lista de guardias
 						// la comprobación debería ser que NO existieran calendarios generados en esas fechas o futuras; es decir, SELECT COUNT(*) GUARDIAS: si devuelve 0 entonces es correcto. 
@@ -3586,7 +3565,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 					}
 					if (!errorGuardiaAsociadas) {
-						if (calendarioItem.getIdCalG() == null) {
+						if (calendarioItem.getIdCalG() == null && !UtilidadesString.esCadenaVacia(calendarioItem.getIdCalendarioProgramado())) {
 							String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(
 									calendarioItem.getIdCalendarioProgramado(), idInstitucion.toString());
 							// idConjunto:
@@ -3618,21 +3597,24 @@ public class GuardiasServiceImpl implements GuardiasService {
 								historico.setUsumodificacion(usuario.getIdusuario());
 								int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
 							});
-						}else {
-							if (!calendarioItem.getIdGuardia().isEmpty() && !calendarioItem.getIdTurno().isEmpty()) {
-								ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
-								historico.setEstado(new Short(calendarioItem.getEstado()));
-								historico.setFechamodificacion(new Date());
-								historico.setIdconjuntoguardia(null);
-								historico.setIdguardia(Integer.parseInt(calendarioItem.getIdGuardia()));
-								historico.setIdinstitucion(idInstitucion);
-								// String idCalendarioProgramado =
-								// scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
-								historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
-								historico.setIdturno(Integer.parseInt(calendarioItem.getIdTurno()));
-								historico.setUsumodificacion(usuario.getIdusuario());
-								historico.setOrden(1);
-								int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
+						}else if (calendarioItem.getGuardias() != null && !calendarioItem.getGuardias().isEmpty()) {
+							for (GuardiaCalendarioItem item: calendarioItem.getGuardias()) {
+								if (!UtilidadesString.esCadenaVacia(item.getOrden()) && !UtilidadesString.esCadenaVacia(item.getGuardia())
+										&& !UtilidadesString.esCadenaVacia(item.getTurno())) {
+									ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
+									historico.setEstado(new Short(calendarioItem.getEstado()));
+									historico.setFechamodificacion(new Date());
+									historico.setIdconjuntoguardia(null);
+									historico.setIdguardia(Integer.parseInt(item.getGuardia()));
+									historico.setIdinstitucion(idInstitucion);
+									// String idCalendarioProgramado =
+									// scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
+									historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
+									historico.setIdturno(Integer.parseInt(item.getTurno()));
+									historico.setUsumodificacion(usuario.getIdusuario());
+									historico.setOrden(Integer.parseInt(item.getOrden()));
+									int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
+								}
 							}
 						}
 
@@ -3641,6 +3623,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							insertResponseDTO.setStatus(SigaConstants.KO);
 						} else if (error.getCode() == null) {
 							error.setCode(200);
+							insertResponseDTO.setId(nextIdCalendarioProgramado);
 							insertResponseDTO.setStatus(SigaConstants.OK);
 						}
 

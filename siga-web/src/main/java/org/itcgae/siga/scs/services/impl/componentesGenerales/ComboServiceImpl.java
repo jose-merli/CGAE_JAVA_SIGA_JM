@@ -1937,7 +1937,7 @@ public class ComboServiceImpl implements ComboService {
 					scsAsistenciaKey.setIdinstitucion(idInstitucion);
 					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
 					if (scsAsistencia != null) {
-						List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, scsAsistencia.getIdtipoasistencia(), Integer.valueOf(usuarios.get(0).getIdlenguaje()));
+						List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, scsAsistencia.getIdtipoasistenciacolegio(), Integer.valueOf(usuarios.get(0).getIdlenguaje()));
 						comboDTO.setCombooItems(comboItems);
 					}
 				}else if(!UtilidadesString.esCadenaVacia(idTipoAsistencia)){
