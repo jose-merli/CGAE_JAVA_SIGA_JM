@@ -705,8 +705,19 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	}
 	
 	public String getGuardiasFromCalendarProg(String idCalendarProg, String idInstitucion, String fechaDesde, String fechaHasta) {
+		SQL sqlGenerado = new SQL();
+		sqlGenerado.SELECT("COUNT (1) GUARDIAS");
+		sqlGenerado.FROM("SCS_GUARDIASCOLEGIADO gc");
+		if (fechaDesde != null)
+			sqlGenerado.WHERE("gc.FECHAINICIO >= TO_DATE('" + fechaDesde + "', 'dd/MM/yyyy')");
+		if (fechaHasta != null)
+			sqlGenerado.WHERE("gc.FECHAFIN <= TO_DATE('" + fechaHasta + "', 'dd/MM/yyyy')");
+		sqlGenerado.WHERE("gc.idinstitucion = PG.idinstitucion");
+		sqlGenerado.WHERE("gc.idturno = t.idturno");
+		sqlGenerado.WHERE("gc.idguardia = g.idguardia");
+
 		SQL sql = new SQL();
-		 sql.SELECT("t.nombre as TURNO, g.nombre as GUARDIA, DECODE(PG.ESTADO, 2, 'No', 'Si') as GENERADO, g.IDGUARDIA as IDGUARDIA, t.IDTURNO as IDTURNO");
+		 sql.SELECT("t.nombre as TURNO, g.nombre as GUARDIA, DECODE((" + sqlGenerado + "), 0, 'No', 'Si') as GENERADO, g.IDGUARDIA as IDGUARDIA, t.IDTURNO as IDTURNO");
 	        sql.FROM("SCS_HCO_CONF_PROG_CALENDARIOS PG");
 	        sql.INNER_JOIN("scs_turno  t on PG.idturno = t.idturno and PG.idinstitucion = t.idinstitucion");
 	        sql.INNER_JOIN("scs_guardiasturno  g on PG.idguardia = g.idguardia and PG.idinstitucion = g.idinstitucion");
