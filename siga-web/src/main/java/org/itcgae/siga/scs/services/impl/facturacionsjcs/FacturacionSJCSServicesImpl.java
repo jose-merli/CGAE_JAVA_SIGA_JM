@@ -994,16 +994,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	}
 
     private int limpiafacturacion(FcsFacturacionjg facturacion, List<FcsFactEstadosfacturacion> estados) throws Exception {
-    	List<FcsFactGrupofactHito> grupofactHito;
-    	int response = 0;
-    	LOGGER.info("ejecutarFacturacion() -> Entrada recuperar criterios de facturacion");
-        FcsFactGrupofactHitoExample example = new FcsFactGrupofactHitoExample();
-        example.createCriteria().andIdinstitucionEqualTo(facturacion.getIdinstitucion())
-                                .andIdfacturacionEqualTo(facturacion.getIdfacturacion());
+        int response = 0;
 
-        grupofactHito = fcsFactGrupofactHitoMapper.selectByExample(example);
-
-        LOGGER.info("ejecutarFacturacion() -> Salida recuperar criterios de facturacion");
         LOGGER.info("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
         ejecutarBorrarFacturacion(facturacion);
 
@@ -1013,21 +1005,6 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             ficheroFisico.delete();
         }
         LOGGER.info("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
-
-        // HACEMOS INSERT DE UNA NUEVA FACTURACIÓN Y LOS CRITERIOS
-        LOGGER.info("ejecutarFacturacion() -> Entrada insertar una nueva facturación y el criterio");
-        response = fcsFacturacionJGExtendsMapper.insert(facturacion);
-        for (FcsFactGrupofactHito criterio : grupofactHito) {
-            response = fcsFactGrupofactHitoMapper.insert(criterio);
-        }
-        LOGGER.info("ejecutarFacturacion() -> Salida insertar una nueva facturación y el criterio");
-
-        // HACEMOS INSERT DE LOS ESTADOS QUE TENIA LA FACTURACION
-        LOGGER.info("ejecutarFacturacion() -> Entrada guardar datos en fcsFactEstadosfacturacion");
-        for (FcsFactEstadosfacturacion estado : estados) {
-            response = fcsFactEstadosfacturacionMapper.insert(estado);
-        }
-        LOGGER.info("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
 		
         return response;
 	}
@@ -1924,7 +1901,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             param_in[1] = String.valueOf(facturacion.getIdfacturacion());
 
             // Ejecucion del PL
-            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION (?,?,?,?)}", 2, param_in);
+            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION2(?,?,false,?,?)}", 2, param_in);
             if (!resultado[0].equalsIgnoreCase("0")) {
                 //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
                 LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
