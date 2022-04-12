@@ -1064,8 +1064,11 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		TurnosDTO turnosDTO = new TurnosDTO();
-		List<TurnosItem> turnosItems = null;
+		List<TurnosItem> turnosItems = new ArrayList<>();
+		boolean foundUltimo;
+		TurnosItem punteroTurno = null;
 		String busquedaOrden = "";
+
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -1094,6 +1097,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						busquedaOrden += comboDTO.getCombooItems().get(i).getValue() + ",";
 					}
 				}
+
 				if (busquedaOrden != null && busquedaOrden.length() > 0) {
 					busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
 				}
@@ -1102,8 +1106,38 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);
 				if (turnosItem.getIdpersona_ultimo() != null) {
-					turnosItems = scsTurnosExtendsMapper.busquedaColaOficio(turnosItem, strDate, busquedaOrden,
-							idInstitucion);
+					List<TurnosItem> turnosAuxiliar = new ArrayList<TurnosItem>();
+					List<TurnosItem> listaTurnos = scsTurnosExtendsMapper.busquedaColaOficio(turnosItem, strDate, busquedaOrden, idInstitucion);
+					foundUltimo = false;
+					int indiceOrden = 0;
+
+					for (int i = 0; i < listaTurnos.size(); i++) {
+
+						punteroTurno = listaTurnos.get(i);
+						punteroTurno.setOrden(String.valueOf(i + 1));
+
+						if (foundUltimo) {
+							turnosItems.add(punteroTurno);
+						} else {
+							turnosAuxiliar.add(punteroTurno);
+						}
+
+						if (!foundUltimo && (punteroTurno.getIdpersona().equals(turnosItem.getIdpersona_ultimo()))) {
+							foundUltimo = true;
+						}
+					}
+
+					if (turnosAuxiliar.size() > 0) {
+						turnosItems.addAll(turnosAuxiliar);
+					}
+
+					// Reordenar correctamente la lista
+					for (TurnosItem turno : turnosItems) {
+						turno.setOrden(String.valueOf(indiceOrden + 1));
+						turnosItems.set(indiceOrden, turno);
+						indiceOrden++;
+					}
+
 				} else {
 					turnosItems = scsTurnosExtendsMapper.busquedaColaOficio2(turnosItem, strDate, busquedaOrden,
 							idInstitucion);

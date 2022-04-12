@@ -3361,7 +3361,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			Long idPersonaUltimo = beanTurno.getIdpersonaUltimo();
 
-			// obteniendo ordenacion de la guardia
+			// obteniendo ordenacion del turno
 			String orden = this.getOrderBy(idOrdenacionColas.toString());
 
 			InscripcionTurnoItem ultimoAnterior;
@@ -3420,7 +3420,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					// revisando si se encontro ya al ultimo
-					if (!foundUltimo && punteroInscripciones.equals(ultimoAnterior)) {
+					if (!foundUltimo && (punteroInscripciones.getIdpersona().equals(ultimoAnterior.getIdpersona()))) {
 						foundUltimo = true;
 					}
 
