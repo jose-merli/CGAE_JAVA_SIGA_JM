@@ -2,17 +2,22 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.ScsEejgPeticionesSqlProvider;
+import org.springframework.util.StringUtils;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ScsExpedienteEconomicoSqlExtendsProvider extends ScsEejgPeticionesSqlProvider {
 
 	public String getExpedientesEconomicos(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
-		sql.SELECT("eejg.idpeticion," + 
+		sql.SELECT("eejg.idpeticion," +
 					" eejg.fechasolicitud," + 
 					" eejg.fechapeticion," + 
-					" u.descripcion as solicitadopor," + 
-					" grcatalogos.descripcion as estado," + 
+					" u.descripcion as solicitadopor," +
+					" eejg.estado as idEstado," +
 					" eejg.csv");
 		sql.SELECT("sp.apellido1 || ' ' || sp.apellido2 || ', ' || sp.nombre || ' ' || sp.nif as justiciable");
 		
@@ -20,7 +25,6 @@ public class ScsExpedienteEconomicoSqlExtendsProvider extends ScsEejgPeticionesS
 
 		sql.INNER_JOIN("SCS_PERSONAJG sp on (eejg.IDINSTITUCION = sp.IDINSTITUCION and eejg.IDPERSONA = sp.IDPERSONA)");
 		sql.INNER_JOIN("CEN_ESTADOSOLICITUD cestado on (cestado.IDESTADO = eejg.estado)");
-		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS grcatalogos on (grcatalogos.idrecurso=cestado.descripcion)");
 		sql.LEFT_OUTER_JOIN("adm_usuarios u on (eejg.idusuariopeticion=u.idusuario and eejg.idinstitucion=u.idinstitucion)");
 		
 		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
@@ -32,7 +36,6 @@ public class ScsExpedienteEconomicoSqlExtendsProvider extends ScsEejgPeticionesS
 			sql.WHERE("eejg.idtipoejg = '" + ejgItem.getTipoEJG() + "'");
 		if(idInstitucion != null && idInstitucion != "")
 			sql.WHERE("eejg.idinstitucion = '" + idInstitucion + "'");
-		sql.WHERE("grcatalogos.idlenguaje = '" + idLenguaje +"'");
 
 		if (tamMaximo != null) {
 			Integer tamMaxNumber = tamMaximo + 1;

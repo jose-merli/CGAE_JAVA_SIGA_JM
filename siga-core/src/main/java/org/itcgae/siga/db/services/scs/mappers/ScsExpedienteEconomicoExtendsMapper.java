@@ -23,6 +23,7 @@ public interface ScsExpedienteEconomicoExtendsMapper extends ScsEejgPeticionesMa
 		@Result(column = "solicitadopor", property = "solicitadoPor", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechasolicitud", property = "f_solicitud", jdbcType = JdbcType.DATE),
 		@Result(column = "fechapeticion", property = "f_recepcion", jdbcType = JdbcType.DATE),
+		@Result(column = "idEstado", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "csv", property = "csv", jdbcType = JdbcType.VARCHAR),
 	})

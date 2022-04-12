@@ -9,6 +9,7 @@ public class ExpedienteEconomicoItem {
     private String solicitadoPor;
     private Date f_solicitud;
     private Date f_recepcion;
+	private String idEstado;
     private String estado;
     private String csv;
 
@@ -69,6 +70,15 @@ public class ExpedienteEconomicoItem {
 	public void setEstado(String estado) {
 		this.estado = estado;
 	}
+
+	@JsonProperty("idEstado")
+	public String getIdEstado() {
+		return idEstado;
+	}
+	public void setIdEstado(String idEstado) {
+		this.idEstado = idEstado;
+	}
+
 	/**
 	 **/
 	public ExpedienteEconomicoItem f_recepcion(Date f_recepcion) {

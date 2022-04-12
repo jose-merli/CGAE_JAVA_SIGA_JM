@@ -51,6 +51,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -876,8 +877,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                 LOGGER.info(
                         "getExpedientesEconomicos() / getExpedientesEconomicos.getExpedientesEconomicos() -> Entrada a scsEjgExtendsMapper para obtener Expedienets Económicos");
-                expedienteEconomicoDTO.setExpEconItems(scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(
-                        ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
+
+                List<ExpedienteEconomicoItem> expedienteEconomicoItems = scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(
+                        ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString());
+
+                if (expedienteEconomicoItems != null) {
+                    expedienteEconomicoItems.forEach(e -> e.setEstado(Stream.of(SigaConstants.EEJG_ESTADO.values())
+                            .filter(e2 -> String.valueOf(e2.getId()).equals(e.getIdEstado()))
+                            .map(e2 -> e2.getMessageToTranslate())
+                            .findFirst().orElse(null)));
+                }
+
+                expedienteEconomicoDTO.setExpEconItems(expedienteEconomicoItems);
+
                 LOGGER.info(
                         "getExpedientesEconomicos() / getExpedientesEconomicos.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener Expedienets Económicos");
                 if (expedienteEconomicoDTO.getExpEconItems() != null && tamMaximo != null

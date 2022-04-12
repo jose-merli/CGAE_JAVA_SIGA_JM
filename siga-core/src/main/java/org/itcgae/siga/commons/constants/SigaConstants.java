@@ -1667,7 +1667,35 @@ public class SigaConstants {
     public static final String PRODUCTO_PENDIENTE_GENERAR_PDF= "G";
 
     public static final String TIMESTAMP_BBDD = "yyyy-MM-dd HH:mm:ss";
-	
+
+    public static enum EEJG_ESTADO {
+        INICIAL (10, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.inicial"),
+        INICIAL_ESPERANDO (15, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.inicialEsperando"),
+        ESPERA (20, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.espera"),
+        ESPERA_ESPERANDO (25, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.esperaEsperando"),
+        PENDIENTE_INFO (23, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.pendienteInfo"),
+        FINALIZADO (30, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.finalizado"),
+        ERROR_SOLICITUD (40, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.errorSolicitud"),
+        ERROR_CONSULTA_INFO (50, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.errorConsultaInfo"),
+        CADUCADO (60, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.caducado");
+
+        private long id = -1;
+        private String messageToTranslate = "";
+
+        EEJG_ESTADO(long id, String messageToTranslate) {
+            this.id = id;
+            this.messageToTranslate = messageToTranslate;
+        }
+
+        public long getId() {
+            return this.id;
+        }
+
+        public String getMessageToTranslate() {
+            return this.messageToTranslate;
+        }
+
+    }
 
 	
 }
