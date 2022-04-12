@@ -48,7 +48,7 @@ public class EEJGServiceImpl implements IEEJGServices {
 					String contenidoPDF = null;
 
 					// LLamamos al servico de EEJG para obtener el PDF a traves de la PFD
-					contenidoPDF = pfdService.obtenerDocumentoFirmado(csv);
+					contenidoPDF = pfdService.obtenerDocumentoEEJGFirmado(csv);
 
 					// generamos el informe
 					byte[] content = Base64.getDecoder().decode(contenidoPDF);

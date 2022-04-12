@@ -164,13 +164,22 @@ public class PFDServiceImpl implements IPFDService {
 
 	@Override
 	public String obtenerDocumentoFirmado(String csv) throws Exception {
+		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.MODULO_GEN);
+	}
+
+	@Override
+	public String obtenerDocumentoEEJGFirmado(String csv) throws Exception {
+		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.MODULO_SCS);
+	}
+
+	private String obtenerDocumentoFirmadoModulo(String csv, String modulo) throws Exception {
 		SolicitudDocumentoTO solicitud = SolicitudDocumentoTO.Factory.newInstance();
 		String documentoBase64 = "";
 
 		GenParametrosKey keyParam = new GenParametrosKey();
 
 		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
-		keyParam.setModulo(SigaConstants.MODULO_GEN);
+		keyParam.setModulo(modulo);
 		keyParam.setParametro(SigaConstants.PFD_IDCLIENTE);
 		GenParametros param = _genParametrosMapper.selectByPrimaryKey(keyParam);
 
