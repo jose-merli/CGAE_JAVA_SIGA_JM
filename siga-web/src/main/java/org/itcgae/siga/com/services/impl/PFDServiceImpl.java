@@ -164,23 +164,23 @@ public class PFDServiceImpl implements IPFDService {
 
 	@Override
 	public String obtenerDocumentoFirmado(String csv) throws Exception {
-		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.MODULO_GEN);
+		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.ID_INSTITUCION_0, SigaConstants.MODULO_GEN, SigaConstants.PFD_IDCLIENTE, SigaConstants.PFD_URLWS);
 	}
 
 	@Override
 	public String obtenerDocumentoEEJGFirmado(String csv) throws Exception {
-		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.MODULO_SCS);
+		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.IDINSTITUCION_2000, SigaConstants.MODULO_SCS, SigaConstants.EEJG_IDSISTEMA, SigaConstants.PFD_URLWS);
 	}
 
-	private String obtenerDocumentoFirmadoModulo(String csv, String modulo) throws Exception {
+	private String obtenerDocumentoFirmadoModulo(String csv, Short idInstitucion, String modulo, String parametroIdCliente, String paramentroUrl) throws Exception {
 		SolicitudDocumentoTO solicitud = SolicitudDocumentoTO.Factory.newInstance();
 		String documentoBase64 = "";
 
 		GenParametrosKey keyParam = new GenParametrosKey();
 
-		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+		keyParam.setIdinstitucion(idInstitucion);
 		keyParam.setModulo(modulo);
-		keyParam.setParametro(SigaConstants.PFD_IDCLIENTE);
+		keyParam.setParametro(parametroIdCliente);
 		GenParametros param = _genParametrosMapper.selectByPrimaryKey(keyParam);
 
 		String idClientePFD = param.getValor();
@@ -203,9 +203,9 @@ public class PFDServiceImpl implements IPFDService {
 		try {
 			keyParam = new GenParametrosKey();
 
-			keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
-			keyParam.setModulo(SigaConstants.MODULO_GEN);
-			keyParam.setParametro(SigaConstants.PFD_URLWS);
+			keyParam.setIdinstitucion(idInstitucion);
+			keyParam.setModulo(modulo);
+			keyParam.setParametro(paramentroUrl);
 
 			param = _genParametrosMapper.selectByPrimaryKey(keyParam);
 			String uriService = param.getValor();
