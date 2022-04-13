@@ -334,481 +334,92 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		if (ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
 			sql.WHERE("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
-		// LOGICA DE ROL
-		if (ejgItem.getRol() != null && ejgItem.getRol() != "") {
-			// Controlar que Rol es el 1 para añadir el parentesís necesario para la QUERY.
-			boolean banderaRolprimero = false;
-			// Controlar si ya esta activo el 1 Rol.
-			boolean checkRolone = false;
-			// Obtener el último Rol.
-			int rolUltimo = Integer.parseInt(ejgItem.getRol().substring(ejgItem.getRol().length() - 1));
-			// Contador del Rol Actual
-			int contadorRolActual = 0;
-			// Verificar que contengan Solicitantes.
-			if (ejgItem.getRol().contains("1")) {
-				/*
-				 * Comprobar que el Rol 1 si viene True = Entonces marcarmos TRUE la
-				 * banderaRolprimero Compronar que el Rol 1 si viene False = Entonces marcamos
-				 * False la banderaRolprimero
-				 */
-				checkRolone = (checkRolone == true) ? true : false;
-				/*
-				 * Comprobar que el Rol 1 si viene False = Entonces marcarmos TRUE porque será
-				 * el 1 Rol. Compronar que el Rol 1 si viene True = Entonces ya tenemos el 1 Rol
-				 * marcado.
-				 */
-				banderaRolprimero = (checkRolone == true) ? false : true;
+		// logica rol
+        if (ejgItem.getRol() != null && ejgItem.getRol() != "") {
+            if (ejgItem.getRol().equals("1")) {
+                if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+                    sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+                if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+                    String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
+                    String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+                    sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+                }
+                if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+                    String columna = "perjg.NOMBRE";
+                    String cadena = ejgItem.getNombre();
+                    sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+                }
+            } else if (ejgItem.getRol().equals("4")) {
+                sql.JOIN(
+                        "scs_unidadfamiliarejg unidadFamiliar on unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg");
+                sql.WHERE("unidadFamiliar.anio = ejg.anio and unidadFamiliar.numero = ejg.numero");
+                sql.JOIN(
+                        "scs_personajg perjgunidadfamiliar on perjgunidadfamiliar.idpersona = unidadFamiliar.idpersona AND perjgunidadfamiliar.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
+                if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+                    sql.WHERE("perjgunidadfamiliar.NIF = " + ejgItem.getNif());
+                if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+                    String columna = "REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')";
+                    String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+                    sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+                }
+                if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+                    String columna = "perjgunidadfamiliar.NOMBRE";
+                    String cadena = ejgItem.getNombre();
+                    sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+                }
+            } else if (ejgItem.getRol().equals("2")) {
+                sql.JOIN(
+                        "scs_contrariosejg contrario on contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg");
+                sql.WHERE("contrario.anio = ejg.anio and contrario.numero = ejg.numero");
+                sql.JOIN(
+                        "scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
+                if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+                    sql.WHERE("PERJCONTRARIO.NIF = '" + ejgItem.getNif() + "'");
+                if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+                    String columna = "REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')";
+                    String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+                    sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+                }
+                if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+                    String columna = "perjgcontrario.NOMBRE";
+                    String cadena = ejgItem.getNombre();
+                    sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+                }
+            } else if (ejgItem.getRol().equals("3")) {
+                sql.JOIN(
+                        "scs_unidadfamiliarejg solicitante on solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg");
+                sql.WHERE(
+                        "solicitante.anio = ejg.anio and solicitante.numero = ejg.numero AND solicitante.solicitante = 1");
+                sql.JOIN(
+                        "scs_personajg perjgsolicitante on perjgsolicitante.idrepresentanteejg = solicitante.idpersona AND perjgsolicitante.IDINSTITUCION = solicitante.IDINSTITUCION");
+                if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+                    sql.WHERE("PERJUNIDADFAMILIAR.NIF = '" + ejgItem.getNif() + "'");
+                if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+                    String columna = "REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')";
+                    String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+                    sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+                }
+                if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+                    String columna = "perjgunidadfamiliar.NOMBRE";
+                    String cadena = ejgItem.getNombre();
+                    sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+                }
+            }
+        } else {
+            if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+                sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+            if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+                String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
+                String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+                sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+            }
+            if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+                String columna = "perjg.NOMBRE";
+                String cadena = ejgItem.getNombre();
+                sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+            }
 
-				if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
-					// Comprobar que solo existe este Rol activado.
-					if (ejgItem.getRol().equals("1")) {
-						sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
-					} else {
-						// Verificar si el 1 Rol que tiene sino no añadir parentesis.
-						if (banderaRolprimero == true) {
-							sql.WHERE("(( perjg.NIF = '" + ejgItem.getNif() + "'");
-							checkRolone = true;
-							banderaRolprimero = false;
-						} else {
-							sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
-						}
-					}
-				}
-				if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
-					String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
-					String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
-					if (ejgItem.getRol().equals("1")) {
-						sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					} else {
-						if (banderaRolprimero == true) {
-							sql.WHERE(" ( " + UtilidadesString.filtroTextoBusquedas(columna, cadena).substring(0,
-									UtilidadesString.filtroTextoBusquedas(columna, cadena).length() - 2));
-							checkRolone = true;
-							banderaRolprimero = false;
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena).substring(0,
-									UtilidadesString.filtroTextoBusquedas(columna, cadena).length() - 2));
-						}
-					}
-				}
-				if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-					String columna = "perjg.NOMBRE";
-					String cadena = ejgItem.getNombre();
-					if (ejgItem.getRol().equals("1")) {
-						sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					} else {
-						if (banderaRolprimero == true) {
-							sql.WHERE(" ( " + UtilidadesString.filtroTextoBusquedas(columna, cadena).substring(0,
-									UtilidadesString.filtroTextoBusquedas(columna, cadena).length() - 2));
-							checkRolone = true;
-							banderaRolprimero = false;
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena).substring(0,
-									UtilidadesString.filtroTextoBusquedas(columna, cadena).length() - 2));
-						}
-					}
-				}
-			}
-			// Verificar que contengan Contrarios.
-			if (ejgItem.getRol().contains("2")) {
-				contadorRolActual = 2;
-				// Existe un Rol 1 ya seleccionado.
-				checkRolone = (checkRolone == true) ? true : false;
-				banderaRolprimero = (checkRolone == true) ? false : true;
-				if (ejgItem.getRol().equals("2")) {
-					sql.JOIN(
-							"scs_contrariosejg contrario ON contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg "
-									+ "and contrario.anio = ejg.anio  and contrario.numero = ejg.numero");
-					sql.JOIN(
-							"scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-						sql.WHERE("perjgcontrario.NIF = '" + ejgItem.getNif() + "'");
-					if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
-						String columna = "REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')";
-						String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
-						sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgcontrario.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-				} else {
-					sqlContrarios.SELECT("1");
-					sqlContrarios.FROM("scs_contrariosejg contrario  ");
-					sqlContrarios.JOIN(
-							"scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
-					sqlContrarios.WHERE(
-							"contrario.anio = ejg.anio and contrario.numero = ejg.numero and contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg");
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
-						sqlContrarios.WHERE("perjgcontrario.NIF = '" + ejgItem.getNif() + "'");
-					}
-					if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
-						String columna = "REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')";
-						String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
-						sqlContrarios.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgcontrario.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						sqlContrarios.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-
-					}
-
-					/*
-					 * Comprobar si el contrario es el 1 Rol, en caso de que no continuamos con el
-					 * procedimiento
-					 */
-					if (banderaRolprimero == true) {
-						sql.WHERE(" " + "((EXISTS(" + sqlContrarios.toString() + ")");
-						banderaRolprimero = false;
-						checkRolone = true;
-					} else {
-						// Informados Nombre, Apellido y Dni.
-						if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellidos() != null
-								&& ejgItem.getApellidos() != "") && ejgItem.getNif() != null
-								&& ejgItem.getNif() != "") {
-							if (contadorRolActual == rolUltimo) {
-								// Contiene el 1 Rol entonces insertar los parentesís.
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))))");
-								// 2 parentesís menos.
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
-							}
-						// Informados el Nombre y Apellidos
-						} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
-								&& ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")) {
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + "))))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
-							}
-							// Informados NIF
-						} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
-							// Informado Nombre o Apellido
-							if ((ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
-									|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
-								if (contadorRolActual == rolUltimo) {
-									if (ejgItem.getRol().contains("1")) {
-										sql.OR();
-										sql.WHERE("EXISTS(" + sqlContrarios.toString() + "))))");
-									} else {
-										sql.OR();
-										sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
-									}
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
-								}
-							} else {
-								if (contadorRolActual == rolUltimo) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
-								}
-							}
-						// Otros casos
-						} else {
-							if (contadorRolActual == rolUltimo) {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
-
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
-							}
-						}
-					}
-				}
-			}
-			// Verificar que contengan Representantes.
-			if (ejgItem.getRol().contains("3")) {
-				contadorRolActual = 3;
-				checkRolone = (checkRolone == true) ? true : false;
-				banderaRolprimero = (checkRolone == true) ? false : true;
-				if (ejgItem.getRol().equals("3")) {
-					sql.JOIN(
-							"scs_unidadfamiliarejg solicitante on solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg "
-									+ "and solicitante.anio = ejg.anio  and solicitante.numero = ejg.numero and  solicitante.solicitante = 1");
-					sql.JOIN(
-							"scs_personajg perjgsolicitante ON perjgsolicitante.idpersona = solicitante.idpersona and perjgsolicitante.idinstitucion = solicitante.idinstitucion ");
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-						sql.WHERE("perjgsolicitante.NIF = '" + ejgItem.getNif() + "'");
-					if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
-						String columna = "REPLACE(CONCAT(perjgsolicitante.apellido1,perjgsolicitante.apellido2), ' ', '')";
-						String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
-						sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgsolicitante.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-				} else {
-					sqlUFRep.SELECT("1");
-					sqlUFRep.FROM("scs_unidadfamiliarejg solicitante");
-					sqlUFRep.JOIN(
-							"scs_personajg perjgsolicitante on perjgsolicitante.idrepresentantejg = solicitante.idpersona AND perjgsolicitante.IDINSTITUCION = solicitante.IDINSTITUCION");
-					sqlUFRep.WHERE(
-							"solicitante.anio = ejg.anio and solicitante.numero = ejg.numero AND solicitante.solicitante = 1 "
-									+ "and solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg");
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
-						sqlUFRep.WHERE("perjgsolicitante.NIF = '" + ejgItem.getNif() + "'");
-					}
-					if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
-						String columna = "REPLACE(CONCAT(perjgsolicitante.apellido1,perjgsolicitante.apellido2), ' ', '')";
-						String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
-						sqlUFRep.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgsolicitante.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						sqlUFRep.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-					if (banderaRolprimero == true) {
-						sql.WHERE(" " + "((EXISTS(" + sqlUFRep.toString() + ")");
-						banderaRolprimero = false;
-						checkRolone = true;
-					} else {
-						// Informados Nombre, Apellido y Dni.
-						if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellidos() != null
-								&& ejgItem.getApellidos() != "") && ejgItem.getNif() != null
-								&& ejgItem.getNif() != "") {
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
-							}
-							// Informados el Nombre y Apellidos
-						} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
-								&& ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")) {
-
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + "))))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
-							}
-							// Informados NIF
-						} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
-
-							// Informado Nombre o Apellido
-							if ((ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
-									|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
-								if (contadorRolActual == rolUltimo) {
-									if (ejgItem.getRol().contains("1")) {
-										sql.OR();
-										sql.WHERE("EXISTS(" + sqlUFRep.toString() + "))))");
-									} else {
-										sql.OR();
-										sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
-									}
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
-								}
-							} else {
-								if (contadorRolActual == rolUltimo) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
-								}
-							}
-							// Otros casos
-						} else {
-							if (contadorRolActual == rolUltimo) {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
-
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
-							}
-						}
-					}
-
-				}
-			}
-			// Verificar que contengan Unidad Familiar.
-			if (ejgItem.getRol().contains("4")) {
-				contadorRolActual = 4;
-				checkRolone = (checkRolone == true) ? true : false;
-				banderaRolprimero = (checkRolone == true) ? false : true;
-				// Verificar si solo existe el Rol Unidad Familiar seleccionado.
-				if (ejgItem.getRol().equals("4")) {
-					sql.JOIN(
-							"scs_unidadfamiliarejg unidadFamiliar on unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg "
-									+ "and unidadFamiliar.anio = ejg.anio  and unidadFamiliar.numero = ejg.numero");
-					sql.JOIN(
-							"scs_personajg perjgunidadfamiliar on perjgunidadfamiliar.idpersona = unidadFamiliar.idpersona AND perjgunidadfamiliar.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
-
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-						sql.WHERE("perjgunidadfamiliar.NIF = '" + ejgItem.getNif() + "'");
-					if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
-						String columna = "REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')";
-						String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
-						sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgunidadfamiliar.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-					// Verificar que puede venir mas de un ROl.
-				} else {
-					sqlUF.SELECT("1");
-					sqlUF.FROM("scs_unidadfamiliarejg unidadFamiliar");
-					sqlUF.JOIN(
-							"scs_personajg perjgunidadfamiliar on perjgunidadfamiliar.idpersona = unidadFamiliar.idpersona AND perjgunidadfamiliar.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
-					sqlUF.WHERE(
-							"unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg"
-									+ "	and unidadFamiliar.anio = ejg.anio  and unidadFamiliar.numero = ejg.numero ");
-
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
-
-						sqlUF.WHERE("perjgunidadfamiliar.NIF = '" + ejgItem.getNif() + "'");
-
-					}
-					if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
-						String columna = "REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')";
-						String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
-
-						sqlUF.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgunidadfamiliar.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						sqlUF.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-					}
-					if (banderaRolprimero == true) {
-						sql.WHERE(" " + "((EXISTS(" + sqlUF.toString() + ")");
-						banderaRolprimero = false;
-						checkRolone = true;
-					} else {
-						// Informados Nombre, Apellido y Dni.
-						if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellidos() != null
-								&& ejgItem.getApellidos() != "") && ejgItem.getNif() != null
-								&& ejgItem.getNif() != "") {
-
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")))))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-							}
-							// Informados el Nombre y Apellidos
-						} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
-								&& ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")) {
-
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + "))))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-							}
-							// Informados NIF
-						} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
-
-							// Informado Nombre o Apellido
-							if ((ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
-									|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
-								if (contadorRolActual == rolUltimo) {
-									if (ejgItem.getRol().contains("1")) {
-										sql.OR();
-										sql.WHERE("EXISTS(" + sqlUF.toString() + "))))");
-									} else {
-										sql.OR();
-										sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
-									}
-
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-								}
-							} else {
-								if (contadorRolActual == rolUltimo) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-								}
-							}
-							// Otros casos
-						} else {
-							if (contadorRolActual == rolUltimo) {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
-
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-							}
-						}
-					}
-				}
-			}
-			// Verificar que no contiene Roles.
-		} else
-
-		{
-			if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-				sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
-			if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
-				String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
-				String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-			}
-			if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-				String columna = "perjg.NOMBRE";
-				String cadena = ejgItem.getNombre();
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-			}
-		}
+        }
 
 		if (ejgItem.getTipoLetrado() != null && ejgItem.getTipoLetrado() != "") {
 			if (ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
