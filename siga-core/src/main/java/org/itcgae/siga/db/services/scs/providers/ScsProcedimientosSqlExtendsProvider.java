@@ -115,7 +115,11 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		}
 		
 		if(!moduloItem.isHistorico()) {
-			sql.WHERE("(procedimiento.fechadesdevigor <= sysdate AND (procedimiento.FECHAHASTAVIGOR > sysdate OR procedimiento.fechahastavigor is null))");
+			if(moduloItem.isVerSoloAlta()) {
+				sql.WHERE("(procedimiento.fechadesdevigor <= sysdate AND procedimiento.fechahastavigor is null)");
+			} else {
+				sql.WHERE("(procedimiento.fechadesdevigor <= sysdate AND (procedimiento.FECHAHASTAVIGOR > sysdate OR procedimiento.fechahastavigor is null))");
+			}
 		}
 		
 		sql.GROUP_BY("procedimiento.idprocedimiento,  procedimiento.nombre, procedimiento.codigo, procedimiento.precio , procedimiento.complemento, procedimiento.vigente, procedimiento.idjurisdiccion, procedimiento.orden, procedimiento.codigoext, procedimiento.permitiraniadirletrado, procedimiento.fechadesdevigor, procedimiento.fechahastavigor, procedimiento.fechabaja, procedimiento.observaciones, juris.descripcion");

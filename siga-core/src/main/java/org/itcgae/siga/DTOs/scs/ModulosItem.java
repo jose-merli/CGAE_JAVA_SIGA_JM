@@ -2,6 +2,7 @@ package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ModulosItem {
@@ -20,15 +21,15 @@ public class ModulosItem {
 	private String orden;
 	private String codigoext;
 	private String permitiraniadirletrado;
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechadesdevigor;
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechahastavigor;
 	private String observaciones;
 	private boolean historico;
 	private String jurisdiccionDes;
-	
-	
-	
-	
+	private boolean verSoloAlta;
+
 	public String getJurisdiccionDes() {
 		return jurisdiccionDes;
 	}
@@ -195,5 +196,13 @@ public class ModulosItem {
 
 	public void setProcedimientos(String procedimientos) {
 		this.procedimientos = procedimientos;
+	}
+	
+	public boolean isVerSoloAlta() {
+		return verSoloAlta;
+	}
+
+	public void setVerSoloAlta(boolean verSoloAlta) {
+		this.verSoloAlta = verSoloAlta;
 	}
 }
