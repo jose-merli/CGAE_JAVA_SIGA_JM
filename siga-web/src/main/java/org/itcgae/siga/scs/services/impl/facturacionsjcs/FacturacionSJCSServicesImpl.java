@@ -999,11 +999,14 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         LOGGER.info("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
         ejecutarBorrarFacturacion(facturacion);
 
-        File ficheroFisico = new File(facturacion.getNombrefisico());
+        if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
+            File ficheroFisico = new File(facturacion.getNombrefisico());
 
-        if (ficheroFisico.exists()) {
-            ficheroFisico.delete();
+            if (ficheroFisico.exists()) {
+                ficheroFisico.delete();
+            }
         }
+
         LOGGER.info("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
 		
         return response;
