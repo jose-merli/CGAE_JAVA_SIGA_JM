@@ -110,7 +110,7 @@ public interface ScsIncompatibilidadguardiasExtendsMapper extends ScsIncompatibi
 	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getIdTurnoIncByIdGuardiaInc")
 
-	List<String> getIdTurnoIncByIdGuardiaInc(String idGuardiaInc);
+	List<String> getIdTurnoIncByIdGuardiaInc(String idGuardiaInc, String idInstitucion);
 	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getListaValueGuardiasInc")
 	List<String> getListaValueGuardiasInc(String idInstitucion, String idTipoGuardia, String idTurno, Integer usu, String idPartidaPresupuestaria);

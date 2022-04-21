@@ -1,6 +1,9 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
@@ -312,20 +315,20 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 					"    diasseparacionguardias,\r\n" + 
 					"    LISTAGG(idguardia_incompatible, ',') WITHIN GROUP(\r\n" + 
 					"        ORDER BY\r\n" + 
-					"            idturno, idguardia\r\n" + 
+					"            idturno, idguardia, idturno_incompatible, idguardia_incompatible\r\n" +
 					"    ) AS idguardia_incompatible,\r\n" + 
 					"    motivos,\r\n" + 
 					"    LISTAGG(guardia_incompatible, ',') WITHIN GROUP(\r\n" + 
 					"        ORDER BY\r\n" + 
-					"            idturno, idguardia\r\n" + 
+					"            idturno, idguardia, idturno_incompatible, idguardia_incompatible\r\n" +
 					"    ) AS guardia_incompatible,\r\n" + 
 					"    LISTAGG(idturno_incompatible, ',') WITHIN GROUP(\r\n" + 
 					"        ORDER BY\r\n" + 
-					"            idturno, idguardia\r\n" + 
+					"            idturno, idguardia, idturno_incompatible, idguardia_incompatible\r\n" +
 					"    ) AS idturno_incompatible,\r\n" + 
 					"    LISTAGG(turno_incompatible, ',') WITHIN GROUP(\r\n" + 
 					"        ORDER BY\r\n" + 
-					"            idturno, idguardia\r\n" + 
+					"            idturno, idguardia, idturno_incompatible, idguardia_incompatible\r\n" +
 					"    ) AS turno_incompatible\r\n" + 
 					"FROM\r\n" + 
 					"    fullquery\r\n" + 
@@ -349,23 +352,16 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		SQL sql = new SQL();
 		
 		sql.DELETE_FROM("SCS_INCOMPATIBILIDADGUARDIAS" );
-			sql.WHERE(
-				"IDINSTITUCION = " + idInstitucion +
-				" AND (IDTURNO," +
-				" IDGUARDIA," +
-				" IDTURNO_INCOMPATIBLE," +
-				" IDGUARDIA_INCOMPATIBLE ) IN (" +
-						" ( "+ idTurno + " ," 
-						+ idGuardia + ", " 
-						+ idTurnoIncompatible + " ," 
-						+ idGuardiaIncompatible + 
-						" )," +
-						" ( " + idTurnoIncompatible + ", " 
-						+ idGuardiaIncompatible + "," 
-						+ idTurno + ", "
-						+ idGuardia +
-						" )" +
-					" )");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+
+		List<String> idTurnoIncompatibleList = Arrays.asList(idTurnoIncompatible.split(","));
+		List<String> idGuardiaIncompatibleList = Arrays.asList(idGuardiaIncompatible.split(","));
+		String tuplasIncompatibles = IntStream.range(0, idTurnoIncompatibleList.size()).boxed()
+				.map(i -> "(" + idTurno + ", " + idGuardia + ", " + idTurnoIncompatibleList.get(i) + ", " + idGuardiaIncompatibleList.get(i) + "),"
+					+ "(" + idTurnoIncompatibleList.get(i) + ", " + idGuardiaIncompatibleList.get(i) + ", " + idTurno + "," + idGuardia + ")")
+				.collect(Collectors.joining(","));
+		sql.WHERE("( IDTURNO, IDGUARDIA, IDTURNO_INCOMPATIBLE, IDGUARDIA_INCOMPATIBLE ) IN ( " + tuplasIncompatibles + " )");
+
 
 		return sql.toString();
 	}
@@ -559,7 +555,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 	}
 	
 	
-	public String getIdTurnoIncByIdGuardiaInc(String idGuardiaInc) {
+	public String getIdTurnoIncByIdGuardiaInc(String idGuardiaInc, String idInstitucion) {
 		SQL sql = new SQL();
 		
 		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDTURNO");
@@ -567,7 +563,8 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		sql.FROM("SCS_GUARDIASTURNO");
 					
 		sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA IN (" + idGuardiaInc + ")");
-		
+		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = " + idInstitucion);
+
 		return sql.toString();
 	}
 	
