@@ -3520,6 +3520,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		Boolean errorGuardiaAsociadas = false;
+		boolean solapamiento = false;
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -3570,6 +3571,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 						int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(
 								nextIdCalendarioProgramado, calendarioItem, idInstitucion.toString(), today,
 								usuario.getIdusuario().toString());
+						
+						//Validacion de Solapamiento.
+						compruebaSolapamientoProgramamciones(calendarioItem,idInstitucion,solapamiento);
+						
 						if (calendarioItem.getIdCalG() != null) {
 							List<ScsConfConjuntoGuardias> confList = scsConfConjuntoGuardiasMapper
 									.selectConfById(calendarioItem.getIdCalG(), today, usuario.getIdusuario().toString());
@@ -3626,18 +3631,47 @@ public class GuardiasServiceImpl implements GuardiasService {
 				}
 			}
 		} catch (Exception e) {
-			LOGGER.error(
-					"newCalendarioProgramado() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			error.setMessage(e.getMessage());
+			if(solapamiento) {
+				LOGGER.error(
+						"newCalendarioProgramado() -> Solapamiento de Fechas."
+						);
+				error.setCode(400);
+				error.setDescription("messages.factSJCS.error.solapamientoRango");
+				error.setMessage("messages.factSJCS.error.solapamientoRango");
+			}else {
+				LOGGER.error(
+						"newCalendarioProgramado() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
+						e);
+				error.setCode(500);
+				error.setDescription("general.mensaje.error.bbdd");
+				error.setMessage(e.getMessage());
+			}
 			insertResponseDTO.setError(error);
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		}
 
 		insertResponseDTO.setError(error);
 		return insertResponseDTO;
+	}
+
+	private void compruebaSolapamientoProgramamciones(DatosCalendarioProgramadoItem calendarioItem,
+			Short idInstitucion,boolean solapamiento) throws Exception {
+		//-- PROGRAMACIONES DE MI COLEGIO PARA UN CONJUNTO DE GUARDIAS QUE CONTENGA UNA 
+		//-- GUARDIA DENTRO DE MI CONJUNTO DE GUARDIAS Y PARA ESAS FECHAS
+		long comprobacionA = scsGuardiasturnoExtendsMapper.compruebaSolapamientoProgramamcionesA(calendarioItem, idInstitucion);
+		
+		if(comprobacionA > 0) {
+			solapamiento = true;
+			throw new Exception("messages.factSJCS.error.solapamientoRango");
+		}else {
+			// PARA ESAS FECHAS DE UNA GUARDIA DENTRO DE MI CONJUNTO DE GUARDIAS
+			long comprobacionB = scsGuardiasturnoExtendsMapper.compruebaSolapamientoProgramamcionesB(calendarioItem, idInstitucion);
+			
+			if(comprobacionB > 0) {
+				solapamiento = true;
+				throw new Exception("messages.factSJCS.error.solapamientoRango");
+			}
+		}
 	}
 
 	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 0 * ? * * *}")

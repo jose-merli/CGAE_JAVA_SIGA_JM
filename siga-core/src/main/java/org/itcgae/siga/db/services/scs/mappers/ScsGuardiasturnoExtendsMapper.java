@@ -41,6 +41,7 @@ import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgComisionSqlExtendsProvider;
+import org.itcgae.siga.db.services.form.providers.PysServiciosinstitucionSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsInscripcionguardiaSqlExtendsProvider;
@@ -519,6 +520,13 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 @Results({})
 	 int generateCalendarioProgramado(String idCalculado, DatosCalendarioProgramadoItem calendarioItem, String idInstitucion, String today, String usuModif);
 	 
+	 
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "compruebaSolapamientoProgramamcionesA")
+	long compruebaSolapamientoProgramamcionesA(DatosCalendarioProgramadoItem item, Short idInstitucion);
+	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "compruebaSolapamientoProgramamcionesB")
+	long compruebaSolapamientoProgramamcionesB(DatosCalendarioProgramadoItem item, Short idInstitucion);
+	
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="insertarHistorico")
 	 @Results({ @Result(column = "IDPROGCALENDARIO", property = "IDPROGCALENDARIO", jdbcType = JdbcType.DECIMAL),
