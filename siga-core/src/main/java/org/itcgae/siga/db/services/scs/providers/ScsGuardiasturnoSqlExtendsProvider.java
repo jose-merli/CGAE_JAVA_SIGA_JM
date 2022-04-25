@@ -722,7 +722,11 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	        sql.INNER_JOIN("scs_turno  t on PG.idturno = t.idturno and PG.idinstitucion = t.idinstitucion");
 	        sql.INNER_JOIN("scs_guardiasturno  g on PG.idguardia = g.idguardia and PG.idinstitucion = g.idinstitucion");
 	        sql.WHERE("PG.idinstitucion = " + idInstitucion);
-	        sql.WHERE("PG.idProgCalendario = " + idCalendarProg);
+
+			if (idCalendarProg != null) {
+				sql.WHERE("PG.idProgCalendario = " + idCalendarProg);
+			}
+
 	        sql.WHERE("t.FECHABAJA IS NULL");
 	        sql.WHERE("g.FECHABAJA IS NULL");
 	        sql.ORDER_BY("PG.ORDEN");

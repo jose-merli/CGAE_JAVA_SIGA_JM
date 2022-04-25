@@ -95,43 +95,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Puntero;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.FcsFacturacionjg;
-import org.itcgae.siga.db.entities.FcsFacturacionjgExample;
-import org.itcgae.siga.db.entities.GenFicheroKey;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
-import org.itcgae.siga.db.entities.GenPropertiesKey;
-import org.itcgae.siga.db.entities.ScsCabeceraguardias;
-import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
-import org.itcgae.siga.db.entities.ScsCalendarioguardias;
-import org.itcgae.siga.db.entities.ScsConfConjuntoGuardias;
-import org.itcgae.siga.db.entities.ScsDocumentacionasi;
-import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
-import org.itcgae.siga.db.entities.ScsGrupoguardia;
-import org.itcgae.siga.db.entities.ScsGrupoguardiaExample;
-import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
-import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiadoExample;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
-import org.itcgae.siga.db.entities.ScsGuardiasturno;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoKey;
-import org.itcgae.siga.db.entities.ScsHcoConfProgCalendarios;
-import org.itcgae.siga.db.entities.ScsIncompatibilidadguardias;
-import org.itcgae.siga.db.entities.ScsInscripcionguardia;
-import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
-import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
-import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
-import org.itcgae.siga.db.entities.ScsPermutaCabecera;
-import org.itcgae.siga.db.entities.ScsPermutaCabeceraExample;
-import org.itcgae.siga.db.entities.ScsPermutaguardias;
-import org.itcgae.siga.db.entities.ScsPermutaguardiasExample;
-import org.itcgae.siga.db.entities.ScsProgCalendarios;
-import org.itcgae.siga.db.entities.ScsProgCalendariosExample;
-import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
@@ -4019,6 +3983,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						hcoConfProgCalendariosItemList.forEach(hcoConfProgCalendariosItem -> {
 						if (hcoConfProgCalendariosItem != null && !hcoConfProgCalendariosItem.getEstado().equals(GENERADO)) {
 							hcoConfProgCalendariosItem.setEstado(EN_PROCESO);
+                            updateEstadoHco(hcoConfProgCalendariosItem, EN_PROCESO);
 							int res2 = updateEstado(programacionItem, idInstitucion, usuModificacion1);
 
 							// El metodo crear calerndario nos creara los calendarios. Hay mas de uno ya que
@@ -4047,12 +4012,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 							generarCalendario2();
 							} catch (Exception e) {
 								programacionItem.setEstado(PROCESADO_CON_ERRORES);
+                                updateEstadoHco(hcoConfProgCalendariosItem, PROCESADO_CON_ERRORES);
 								scsGuardiasturnoExtendsMapper.updateEstado(programacionItem, idInstitucion.toString());
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 							}
 							programacionItem.setEstado(GENERADO);// FINALIZADO
+                            updateEstadoHco(hcoConfProgCalendariosItem, GENERADO);
 							updateEstado(programacionItem, idInstitucion, usuModificacion1);
 							String nombreFicheroSalida = idTurno1 + "." + idGuardia1 + "." + idCalendarioGuardias1 + "-"
 									+ fechaInicio1.replace('/', '.') + "-" + fechaFin1.replace('/', '.') + "-log";
@@ -4173,11 +4140,24 @@ public class GuardiasServiceImpl implements GuardiasService {
 		
 		int res = scsProgCalendariosMapper.updateByExampleSelective(record , example );
 		return res;
-		
-		
-		
-		
+
 	}
+
+    private void updateEstadoHco(HcoConfProgCalendariosItem item, String estado) {
+
+        ScsHcoConfProgCalendariosExample example = new ScsHcoConfProgCalendariosExample();
+        example.createCriteria().andIdprogcalendarioEqualTo(Long.valueOf(item.getIdprogcalendario()))
+                .andIdinstitucionEqualTo(Short.valueOf(item.getIdinstitucion()))
+                .andIdturnoEqualTo(Integer.valueOf(item.getIdturno()))
+                .andIdguardiaEqualTo(Integer.valueOf(item.getIdguardia()));
+
+        List<ScsHcoConfProgCalendarios> dbItems = this.scsHcoConfProgCalendariosMapper.selectByExample(example);
+        ScsHcoConfProgCalendarios dbItem = dbItems.get(0);
+        dbItem.setEstado(Short.valueOf(estado));
+
+        this.scsHcoConfProgCalendariosMapper.updateByExampleSelective(dbItem, example);
+
+    }
 
 	public int setGeneracionEnProceso(String idProgCal, String procesando) {
 		ScsProgCalendariosExample example = new ScsProgCalendariosExample();
