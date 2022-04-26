@@ -3718,6 +3718,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sqlAux.FROM("SCS_CONF_CONJUNTO_GUARDIAS CON2");
 		sqlAux.WHERE("CON2.IDINSTITUCION = CON.IDINSTITUCION ");
 		sqlAux.WHERE("CON2.IDCONJUNTOGUARDIA = "+ item.getIdCalG());
+		sqlAux.WHERE("TO_DATE('"+item.getFechaDesde()+"', 'DD/MM/RRRR') <= TRUNC(PRO.FECHACALFIN)");
+		sqlAux.WHERE("TO_DATE('"+item.getFechaHasta()+"', 'DD/MM/RRRR') >= TRUNC(PRO.FECHACALINICIO)");
 		
 		SQL sql = new SQL();
 		sql.SELECT("COUNT(1)");
@@ -3726,8 +3728,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("PRO.IDINSTITUCION = CON.IDINSTITUCION");
 		sql.WHERE("PRO.IDCONJUNTOGUARDIA = CON.IDCONJUNTOGUARDIA");
 		sql.WHERE("(CON.IDINSTITUCION, CON.IDTURNO, CON.IDGUARDIA) IN ( "+sqlAux.toString()+")");
-		sql.WHERE("TO_DATE('"+item.getFechaDesde()+"', 'DD/MM/RRRR') <= TRUNC(PRO.FECHACALFIN)");
-		sql.WHERE("TO_DATE('"+item.getFechaHasta()+"', 'DD/MM/RRRR') >= TRUNC(PRO.FECHACALINICIO)");
+		
 		return sql.toString();
 	}
 

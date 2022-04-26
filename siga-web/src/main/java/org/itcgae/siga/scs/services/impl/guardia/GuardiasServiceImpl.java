@@ -3507,6 +3507,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	@Override
+	@Transactional
 	public InsertResponseDTO newCalendarioProgramado(HttpServletRequest request,
 			DatosCalendarioProgramadoItem calendarioItem) {
 		LOGGER.info("updateCalendarioProgramado() -> Entrada al servicio para búsqueda de las guardias");
@@ -3564,13 +3565,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 						String nextIdCalendarioProgramado = getNuevoIdCalProg();
 						calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
-						int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(
-								nextIdCalendarioProgramado, calendarioItem, idInstitucion.toString(), today,
-								usuario.getIdusuario().toString());
 						
 						//Validacion de Solapamiento.
 						compruebaSolapamientoProgramamciones(calendarioItem,idInstitucion,solapamiento);
 						
+						int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(
+								nextIdCalendarioProgramado, calendarioItem, idInstitucion.toString(), today,
+								usuario.getIdusuario().toString());
+				
 						if (calendarioItem.getIdCalG() != null) {
 							List<ScsConfConjuntoGuardias> confList = scsConfConjuntoGuardiasMapper
 									.selectConfById(calendarioItem.getIdCalG(), today, usuario.getIdusuario().toString());
