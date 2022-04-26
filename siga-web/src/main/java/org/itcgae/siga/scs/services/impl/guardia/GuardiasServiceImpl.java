@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -94,43 +95,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Puntero;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.FcsFacturacionjg;
-import org.itcgae.siga.db.entities.FcsFacturacionjgExample;
-import org.itcgae.siga.db.entities.GenFicheroKey;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
-import org.itcgae.siga.db.entities.GenPropertiesKey;
-import org.itcgae.siga.db.entities.ScsCabeceraguardias;
-import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
-import org.itcgae.siga.db.entities.ScsCalendarioguardias;
-import org.itcgae.siga.db.entities.ScsConfConjuntoGuardias;
-import org.itcgae.siga.db.entities.ScsDocumentacionasi;
-import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
-import org.itcgae.siga.db.entities.ScsGrupoguardia;
-import org.itcgae.siga.db.entities.ScsGrupoguardiaExample;
-import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
-import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiadoExample;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
-import org.itcgae.siga.db.entities.ScsGuardiasturno;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoKey;
-import org.itcgae.siga.db.entities.ScsHcoConfProgCalendarios;
-import org.itcgae.siga.db.entities.ScsIncompatibilidadguardias;
-import org.itcgae.siga.db.entities.ScsInscripcionguardia;
-import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
-import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
-import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
-import org.itcgae.siga.db.entities.ScsPermutaCabecera;
-import org.itcgae.siga.db.entities.ScsPermutaCabeceraExample;
-import org.itcgae.siga.db.entities.ScsPermutaguardias;
-import org.itcgae.siga.db.entities.ScsPermutaguardiasExample;
-import org.itcgae.siga.db.entities.ScsProgCalendarios;
-import org.itcgae.siga.db.entities.ScsProgCalendariosExample;
-import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
@@ -2274,8 +2239,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 									.getIdTurnoIncompatibleFromNombreTurno(
 											incompatibilidad.getNombreTurnoIncompatible());
 						} else {
-							idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper
-									.getIdTurnoIncByIdGuardiaInc(idGuardiaIncompatible).stream().collect(Collectors.joining(","));;
+							String idInstitucionTurno = idInstitucion;
+							idTurnoIncompatible = Stream.of(idGuardiaIncompatible.split("\\s*,\\s*"))
+									.flatMap(idGuardiaItem -> scsIncompatibilidadguardiasExtendsMapper
+											.getIdTurnoIncByIdGuardiaInc(idGuardiaItem, idInstitucionTurno).stream())
+									.collect(Collectors.joining(","));
 						}
 					}
 
@@ -2289,29 +2257,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 						List<String> idTurnoIncpList = Arrays.asList(idTurnoIncompatible.split("\\s*,\\s*"));
 						List<String> idGuardiaIncpList = Arrays.asList(idGuardiaIncompatible.split("\\s*,\\s*"));
 						for (int j = 0; j < idGuardiaIncpList.size(); j++) {
-						int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno,
-								incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncpList.get(j),
-								idGuardiaIncpList.get(j).toString());
-						if (existe == 2) {
-							// existe en ambas direcciones - la actualizamos
-							ScsIncompatibilidadguardias ig = new ScsIncompatibilidadguardias();
-							ig.setIdturno(Integer.parseInt(idTurno));
-							ig.setIdguardia(Integer.parseInt(idGuardia));
-							ig.setDiasseparacionguardias(Short.parseShort(incompatibilidad.getDiasSeparacionGuardias()));
-							ig.setIdturnoIncompatible(Integer.parseInt(idTurnoIncpList.get(j)));
-							ig.setIdguardiaIncompatible(Integer.parseInt(idGuardiaIncpList.get(j).toString()));
-							ig.setMotivos(incompatibilidad.getMotivos());
-							ig.setFechamodificacion(new SimpleDateFormat("dd/MM/yyyy").parse((fechaModificacion)));
-							ig.setIdinstitucion(Short.parseShort(incompatibilidad.getIdInstitucion()));
-							scsIncompatibilidadguardiasExtendsMapper.updateByPrimaryKeySelective(ig);
-//							scsIncompatibilidadguardiasExtendsMapper.updateIfExists(idTurno,
-//									incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible,
-//									idGuardiaIncompatible, incompatibilidad.getMotivos(),
-//									incompatibilidad.getDiasSeparacionGuardias(), fechaModificacion);
-						}
-						if (existe > 2) {
-							// existe en ambas direcciones - la actualizamos
-
+							int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno,
+									incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncpList.get(j),
+									idGuardiaIncpList.get(j).toString());
+							if (existe == 2) {
+								// existe en ambas direcciones - la actualizamos
 								ScsIncompatibilidadguardias ig = new ScsIncompatibilidadguardias();
 								ig.setIdturno(Integer.parseInt(idTurno));
 								ig.setIdguardia(Integer.parseInt(idGuardia));
@@ -2322,27 +2272,45 @@ public class GuardiasServiceImpl implements GuardiasService {
 								ig.setFechamodificacion(new SimpleDateFormat("dd/MM/yyyy").parse((fechaModificacion)));
 								ig.setIdinstitucion(Short.parseShort(incompatibilidad.getIdInstitucion()));
 								scsIncompatibilidadguardiasExtendsMapper.updateByPrimaryKeySelective(ig);
-							
-						}
-						if (existe == 0) {
-							// no existe - llamamos dos veces para guardar en ambas direcciones
-							scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(
-									Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()),
-									Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncpList.get(j)),
-									Integer.parseInt(idGuardiaIncpList.get(j)), usuarios.get(0).getIdusuario(),
-									incompatibilidad.getMotivos(),
-									Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
-							scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(
-									Integer.parseInt(idTurnoIncpList.get(j)),
-									Integer.parseInt(incompatibilidad.getIdInstitucion()),
-									Integer.parseInt(idGuardiaIncpList.get(j)), Integer.parseInt(idTurno),
-									Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(),
-									incompatibilidad.getMotivos(),
-									Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
-							
+	//							scsIncompatibilidadguardiasExtendsMapper.updateIfExists(idTurno,
+	//									incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible,
+	//									idGuardiaIncompatible, incompatibilidad.getMotivos(),
+	//									incompatibilidad.getDiasSeparacionGuardias(), fechaModificacion);
+							}
+							if (existe > 2) {
+								// existe en ambas direcciones - la actualizamos
 
+									ScsIncompatibilidadguardias ig = new ScsIncompatibilidadguardias();
+									ig.setIdturno(Integer.parseInt(idTurno));
+									ig.setIdguardia(Integer.parseInt(idGuardia));
+									ig.setDiasseparacionguardias(Short.parseShort(incompatibilidad.getDiasSeparacionGuardias()));
+									ig.setIdturnoIncompatible(Integer.parseInt(idTurnoIncpList.get(j)));
+									ig.setIdguardiaIncompatible(Integer.parseInt(idGuardiaIncpList.get(j).toString()));
+									ig.setMotivos(incompatibilidad.getMotivos());
+									ig.setFechamodificacion(new SimpleDateFormat("dd/MM/yyyy").parse((fechaModificacion)));
+									ig.setIdinstitucion(Short.parseShort(incompatibilidad.getIdInstitucion()));
+									scsIncompatibilidadguardiasExtendsMapper.updateByPrimaryKeySelective(ig);
+
+							}
+							if (existe == 0) {
+								// no existe - llamamos dos veces para guardar en ambas direcciones
+								scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(
+										Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()),
+										Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncpList.get(j)),
+										Integer.parseInt(idGuardiaIncpList.get(j)), usuarios.get(0).getIdusuario(),
+										incompatibilidad.getMotivos(),
+										Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+								scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(
+										Integer.parseInt(idTurnoIncpList.get(j)),
+										Integer.parseInt(incompatibilidad.getIdInstitucion()),
+										Integer.parseInt(idGuardiaIncpList.get(j)), Integer.parseInt(idTurno),
+										Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(),
+										incompatibilidad.getMotivos(),
+										Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+
+
+							}
 						}
-					}
 					} else {
 						response = 0;
 					}
@@ -4017,6 +3985,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						hcoConfProgCalendariosItemList.forEach(hcoConfProgCalendariosItem -> {
 						if (hcoConfProgCalendariosItem != null && !hcoConfProgCalendariosItem.getEstado().equals(GENERADO)) {
 							hcoConfProgCalendariosItem.setEstado(EN_PROCESO);
+                            updateEstadoHco(hcoConfProgCalendariosItem, EN_PROCESO);
 							int res2 = updateEstado(programacionItem, idInstitucion, usuModificacion1);
 
 							// El metodo crear calerndario nos creara los calendarios. Hay mas de uno ya que
@@ -4045,12 +4014,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 							generarCalendario2();
 							} catch (Exception e) {
 								programacionItem.setEstado(PROCESADO_CON_ERRORES);
+                                updateEstadoHco(hcoConfProgCalendariosItem, PROCESADO_CON_ERRORES);
 								scsGuardiasturnoExtendsMapper.updateEstado(programacionItem, idInstitucion.toString());
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 							}
 							programacionItem.setEstado(GENERADO);// FINALIZADO
+                            updateEstadoHco(hcoConfProgCalendariosItem, GENERADO);
 							updateEstado(programacionItem, idInstitucion, usuModificacion1);
 							String nombreFicheroSalida = idTurno1 + "." + idGuardia1 + "." + idCalendarioGuardias1 + "-"
 									+ fechaInicio1.replace('/', '.') + "-" + fechaFin1.replace('/', '.') + "-log";
@@ -4171,11 +4142,24 @@ public class GuardiasServiceImpl implements GuardiasService {
 		
 		int res = scsProgCalendariosMapper.updateByExampleSelective(record , example );
 		return res;
-		
-		
-		
-		
+
 	}
+
+    private void updateEstadoHco(HcoConfProgCalendariosItem item, String estado) {
+
+        ScsHcoConfProgCalendariosExample example = new ScsHcoConfProgCalendariosExample();
+        example.createCriteria().andIdprogcalendarioEqualTo(Long.valueOf(item.getIdprogcalendario()))
+                .andIdinstitucionEqualTo(Short.valueOf(item.getIdinstitucion()))
+                .andIdturnoEqualTo(Integer.valueOf(item.getIdturno()))
+                .andIdguardiaEqualTo(Integer.valueOf(item.getIdguardia()));
+
+        List<ScsHcoConfProgCalendarios> dbItems = this.scsHcoConfProgCalendariosMapper.selectByExample(example);
+        ScsHcoConfProgCalendarios dbItem = dbItems.get(0);
+        dbItem.setEstado(Short.valueOf(estado));
+
+        this.scsHcoConfProgCalendariosMapper.updateByExampleSelective(dbItem, example);
+
+    }
 
 	public int setGeneracionEnProceso(String idProgCal, String procesando) {
 		ScsProgCalendariosExample example = new ScsProgCalendariosExample();
