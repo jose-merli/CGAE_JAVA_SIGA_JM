@@ -250,7 +250,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CODIGO", property = "label1", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem2> comboModulos(Short idInstitucion);
+	List<ComboItem2> comboModulos(Short idInstitucion,int filtro, String fecha);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboDelitos")
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
@@ -451,7 +451,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboModulosConJuzgado")
 	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> comboModulosConJuzgado(Short idInstitucion, List<String> procedimientosJuzgados);
+	List<ComboItem> comboModulosConJuzgado(Short idInstitucion, List<String> procedimientosJuzgados, int filtro, String fecha);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getProcedimientoPretension")
 	@Results({ @Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR) })
@@ -460,7 +460,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboModulosConProcedimientos")
 	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> comboModulosConProcedimientos(Short idInstitucion, List<String> idPretensiones);
+	List<ComboItem> comboModulosConProcedimientos(Short idInstitucion, List<String> idPretensiones, int filtro, String fecha);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getPretensionModulo")
 	@Results({ @Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR) })

@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -278,9 +279,8 @@ public class DesignacionesController {
 	}
 
 	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request) {
-
-		ComboDTO response = comboService.comboModulo(request);
+	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request, String fecha) {
+		ComboDTO response = comboService.comboModulo(request,fecha);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -308,10 +308,9 @@ public class DesignacionesController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@RequestMapping(value = "/comboModulosConJuzgado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboModulosConJuzgado(HttpServletRequest request, @RequestBody String idJuzgado) {
-
-		ComboDTO response = comboService.comboModulosConJuzgado(request, idJuzgado);
+	@RequestMapping(value = "/comboModulosConJuzgado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboModulosConJuzgado(HttpServletRequest request, String idJuzgado, String fecha) {
+		ComboDTO response = comboService.comboModulosConJuzgado(request, idJuzgado,fecha);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -328,11 +327,10 @@ public class DesignacionesController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@RequestMapping(value = "/comboModulosConProcedimientos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/comboModulosConProcedimientos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboModulosConProcedimientos(HttpServletRequest request,
-			@RequestBody String idPretension) {
-
-		ComboDTO response = comboService.comboModulosConProcedimientos(request, idPretension);
+			 String idPretension, String fecha) {
+		ComboDTO response = comboService.comboModulosConProcedimientos(request, idPretension,fecha);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else

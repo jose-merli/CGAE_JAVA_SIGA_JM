@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpProcedimientosExeaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
@@ -117,6 +118,9 @@ public class ComboServiceImpl implements ComboService {
 
 	@Autowired
 	private ExpProcedimientosExeaExtendsMapper expProcedimientosExeaExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosMapper;
 	
 
 	@Override
@@ -1214,7 +1218,7 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboModulo(HttpServletRequest request) {
+	public ComboDTO comboModulo(HttpServletRequest request,String fecha) {
 		LOGGER.info("modulo() -> Entrada al servicio para obtener combo modulos");
 
 		ComboDTO comboDTO = new ComboDTO();
@@ -1230,10 +1234,29 @@ public class ComboServiceImpl implements ComboService {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			GenParametrosExample exampleParametro = new GenParametrosExample();
+			exampleParametro.createCriteria().andParametroEqualTo("FILTRAR_MODULOS_PORFECHA").andIdinstitucionEqualTo(idInstitucion);
+			
+			List<GenParametros> valor = genParametrosMapper.selectByExample(exampleParametro);
+			
+			int filtro = 0; // Por fecha actual por defecto
+			
+			if(valor == null  || valor.isEmpty() ) {
+				GenParametrosExample exampleParametroAux = new GenParametrosExample();
+				exampleParametroAux.createCriteria().andParametroEqualTo("FILTRAR_MODULOS_PORFECHA").andIdinstitucionEqualTo(Short.valueOf("0"));
+				List<GenParametros> valorAux = genParametrosMapper.selectByExample(exampleParametroAux);
+				filtro = Integer.parseInt(valorAux.get(0).getValor());
+			}else {
+				filtro = Integer.parseInt(valor.get(0).getValor());
+			}
+			if(fecha== null || fecha.isEmpty()) {
+				fecha = "SYSDATE"; filtro = 0;
+			}
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems2 = scsDesignacionesExtendsMapper.comboModulos(idInstitucion);
+				comboItems2 = scsDesignacionesExtendsMapper.comboModulos(idInstitucion, filtro, fecha);
 
 				for (ComboItem2 item : comboItems2) {
 					String label = "";
@@ -1373,7 +1396,7 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado) {
+	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado,String fecha) {
 		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
 
 		ComboDTO comboDTO = new ComboDTO();
@@ -1395,6 +1418,24 @@ public class ComboServiceImpl implements ComboService {
 
 				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados(idInstitucion,
 						idJuzgado);
+				GenParametrosExample exampleParametro = new GenParametrosExample();
+				exampleParametro.createCriteria().andParametroEqualTo("FILTRAR_MODULOS_PORFECHA").andIdinstitucionEqualTo(idInstitucion);
+				
+				List<GenParametros> valor = genParametrosMapper.selectByExample(exampleParametro);
+				
+				int filtro = 0; // Por fecha actual por defecto
+				
+				if(valor == null  || valor.isEmpty() ) {
+					GenParametrosExample exampleParametroAux = new GenParametrosExample();
+					exampleParametroAux.createCriteria().andParametroEqualTo("FILTRAR_MODULOS_PORFECHA").andIdinstitucionEqualTo(Short.valueOf("0"));
+					List<GenParametros> valorAux = genParametrosMapper.selectByExample(exampleParametroAux);
+					filtro = Integer.parseInt(valorAux.get(0).getValor());
+				}else {
+					filtro = Integer.parseInt(valor.get(0).getValor());
+				}
+				if(fecha== null || fecha.isEmpty()) {
+					fecha = "SYSDATE"; filtro = 0;
+				}
 
 				if (procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
 					List<String> idPretensiones = new ArrayList<String>();
@@ -1402,7 +1443,7 @@ public class ComboServiceImpl implements ComboService {
 						idPretensiones.add(label.getValue());
 					}
 
-					comboItems = scsDesignacionesExtendsMapper.comboModulosConJuzgado(idInstitucion, idPretensiones);
+					comboItems = scsDesignacionesExtendsMapper.comboModulosConJuzgado(idInstitucion, idPretensiones,filtro, fecha);
 					for (ComboItem2 item : comboItems2) {
 						String label = "";
 						if (idInstitucion != 2005) {
@@ -1447,14 +1488,21 @@ public class ComboServiceImpl implements ComboService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados2(idInstitucion);
-
+				
+				GenParametrosExample exampleParametro = new GenParametrosExample();
+				exampleParametro.createCriteria().andParametroEqualTo("FILTRAR_MODULOS_PORFECHA").andIdinstitucionEqualTo(idInstitucion);
+				
+				List<GenParametros> valor = genParametrosMapper.selectByExample(exampleParametro);
+				
+				int filtro = 0; // Por fecha actual por defecto
+				
 				if (procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
 					List<String> idPretensiones = new ArrayList<String>();
 					for (ComboItem label : procedimientosJuzgados) {
 						idPretensiones.add(label.getValue());
 					}
 
-					comboItems = scsDesignacionesExtendsMapper.comboModulosConJuzgado(idInstitucion, idPretensiones);
+					comboItems = scsDesignacionesExtendsMapper.comboModulosConJuzgado(idInstitucion, idPretensiones,filtro, "SYSDATE");
 				}
 
 				comboDTO.setCombooItems(comboItems);
@@ -1467,7 +1515,7 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension) {
+	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension, String fecha) {
 		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
 
 		ComboDTO comboDTO = new ComboDTO();
@@ -1489,6 +1537,24 @@ public class ComboServiceImpl implements ComboService {
 				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientoPretension(idInstitucion,
 						idPretension);
 
+				GenParametrosExample exampleParametro = new GenParametrosExample();
+				exampleParametro.createCriteria().andParametroEqualTo("FILTRAR_MODULOS_PORFECHA").andIdinstitucionEqualTo(idInstitucion);
+				
+				List<GenParametros> valor = genParametrosMapper.selectByExample(exampleParametro);
+				
+				int filtro = 0; // Por fecha actual por defecto
+				
+				if(valor == null  || valor.isEmpty() ) {
+					GenParametrosExample exampleParametroAux = new GenParametrosExample();
+					exampleParametroAux.createCriteria().andParametroEqualTo("FILTRAR_MODULOS_PORFECHA").andIdinstitucionEqualTo(Short.valueOf("0"));
+					List<GenParametros> valorAux = genParametrosMapper.selectByExample(exampleParametroAux);
+					filtro = Integer.parseInt(valorAux.get(0).getValor());
+				}else {
+					filtro = Integer.parseInt(valor.get(0).getValor());
+				}
+				if(fecha== null || fecha.isEmpty()) {
+					fecha = "SYSDATE"; filtro = 0;
+				}
 				if (procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
 					List<String> idPretensiones = new ArrayList<String>();
 					for (ComboItem label : procedimientosJuzgados) {
@@ -1496,7 +1562,7 @@ public class ComboServiceImpl implements ComboService {
 					}
 
 					comboItems = scsDesignacionesExtendsMapper.comboModulosConProcedimientos(idInstitucion,
-							idPretensiones);
+							idPretensiones, filtro, fecha);
 
 				}
 
