@@ -829,15 +829,15 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		return sql.toString();
 	}
 	
-	public String setguardiaInConjuntoGuardias(String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item){
+	public String setguardiaInConjuntoGuardias(String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item,String  usuarioModificacion){
 		
-		SQL subquery = new SQL();
-		if (idConjuntoGuardia != null) {
+		//SQL subquery = new SQL();
+		/*if (idConjuntoGuardia != null) {
 			subquery.SELECT_DISTINCT("USUMODIFICACION");
 			subquery.FROM("SCS_CONF_CONJUNTO_GUARDIAS CG");
 			subquery.WHERE("CG.IDCONJUNTOGUARDIA = " + idConjuntoGuardia);
 			subquery.WHERE("CG.IDINSTITUCION = " + idInstitucion);
-		}
+		}*/
 		SQL sql2 = new SQL();
 		sql2.INSERT_INTO("SCS_CONF_CONJUNTO_GUARDIAS CG");
 		if (idConjuntoGuardia != null) {
@@ -859,7 +859,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			sql2.VALUES("FECHAMODIFICACION", "TO_DATE('" + today + "', 'DD/MM/YYYY')");
 		}
 		if (idConjuntoGuardia != null) {
-			sql2.VALUES("USUMODIFICACION", "( " + subquery.toString() + " )");
+			sql2.VALUES("USUMODIFICACION", usuarioModificacion);
 		}
 		return sql2.toString();
 		
