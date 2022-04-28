@@ -363,7 +363,7 @@ public class UtilidadesFacturacionSJCS {
         }
         
         
-        if (!resultado[2].equalsIgnoreCase("Fin correcto ")) {
+        if (resultado != null || resultado.length > 1 || !resultado[2].equalsIgnoreCase("Fin correcto ")) {
         	String sError = "Error en PL = " + (String) resultado[2]; 
             LOGGER.error(sError);
             logErroresFac.logError(sError);
