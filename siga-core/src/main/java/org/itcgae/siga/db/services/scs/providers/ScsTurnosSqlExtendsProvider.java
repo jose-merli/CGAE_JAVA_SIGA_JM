@@ -406,11 +406,11 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 				"UNION\r\n" +
 				"SELECT * FROM (SELECT tabla_nueva.* FROM tabla_nueva, tabla_nueva2\r\n" +
 				"WHERE tabla_nueva.orden<=tabla_nueva2.orden ORDER BY tabla_nueva.orden asc)\r\n" +
-				") consulta_total ");
+				") consulta_total where activo = '1' ");
 
 
 		if(turnosItem.getIdpersona_ultimo() != null) {
-			sqls5.ORDER_BY(busquedaOrden+") consulta3 WHERE activo = 1)consulta4 WHERE idpersona = \r\n" +
+			sqls5.ORDER_BY(busquedaOrden+") consulta3)consulta4 WHERE idpersona = \r\n" +
 					"( SELECT IDPERSONA_ULTIMO FROM SCS_TURNO\r\n" +
 					"        where Idinstitucion = '"+idInstitucion+"'"+
 					"		AND Idturno = '"+turnosItem.getIdturno()+"'" +
@@ -500,7 +500,7 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 				"SELECT * from(\r\n" +
 				"SELECT  tabla_nueva.* FROM tabla_nueva)\r\n" +
 				"\r\n" +
-				") consulta_total       \r\n" +
+				") consulta_total where activo = '1'\r\n" +
 				"");
 
 		return sql.toString();
