@@ -3210,7 +3210,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					}else {
 						itemList.forEach(item -> {
 							String response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(idConjuntoGuardia,
-									idInstitucion.toString(), today, item);
+									idInstitucion.toString(), today, item,usuarios.get(0).getUsumodificacion().toString());
 							if (response == null && error.getDescription() == null) {
 								error.setCode(400);
 								insertResponseDTO.setStatus(SigaConstants.KO);
@@ -3269,7 +3269,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						String response = null;
 						if (idConjuntoGuardia != null) {
 							response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(
-									idConjuntoGuardia, idInstitucion.toString(), today, item);
+									idConjuntoGuardia, idInstitucion.toString(), today, item,usuarios.get(0).getUsumodificacion().toString());
 						}
 						String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar,
 								idConjuntoGuardia, idInstitucion.toString(), today, item);
@@ -3486,6 +3486,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Error error = new Error();
 		Boolean errorGuardiaAsociadas = false;
 		boolean solapamiento = false;
+		boolean listaVacia = false;
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -3500,7 +3501,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					LOGGER.info(
 							"newCalendarioProgramado() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
 					// check si hay guardias asociadas a esta programacion
-					if (calendarioItem.getListaGuardias() == null) {
+					if (calendarioItem.getListaGuardias() == null || calendarioItem.getListaGuardias().isEmpty()) {
 						//programación sin lista de guardias
 						
 						//En una programación sin lista de guardias, no debería existir ningún control al guardar la tarjeta de Datos generales, 
@@ -3561,7 +3562,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 								}
 								historico.setUsumodificacion(usuario.getIdusuario());
 								int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
+
 							});
+							if(confList.isEmpty()) {
+								listaVacia = true;
+								throw new Exception("messages.factSJCS.error.listaVacia");
+							}
 						}else if (calendarioItem.getGuardias() != null && !calendarioItem.getGuardias().isEmpty()) {
 							for (GuardiaCalendarioItem item: calendarioItem.getGuardias()) {
 								if (!UtilidadesString.esCadenaVacia(item.getOrden()) && !UtilidadesString.esCadenaVacia(item.getGuardia())
@@ -3581,7 +3587,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 									int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
 								}
 							}
+							if(calendarioItem.getGuardias().isEmpty()) {
+								listaVacia = true;
+								throw new Exception("messages.factSJCS.error.listaVacia");
+							}
 						}
+				
 
 						if (response == 0) {
 							error.setCode(400);
@@ -3604,7 +3615,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 				error.setCode(400);
 				error.setDescription("messages.factSJCS.error.solapamientoRango");
 				error.setMessage("messages.factSJCS.error.solapamientoRango");
-			}else {
+			}else if(listaVacia) {
+				LOGGER.info(
+						"newCalendarioProgramado() -> Lista de guardias Vacia."
+						);
+				error.setCode(400);
+				error.setDescription("messages.factSJCS.error.listaVacia");
+				error.setMessage("messages.factSJCS.error.listaVacia");
+			}
+			else {
 				LOGGER.error(
 						"newCalendarioProgramado() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
 						e);

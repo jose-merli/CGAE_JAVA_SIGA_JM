@@ -1785,12 +1785,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboModulos(Short idInstitucion) {
-
+	public String comboModulos(Short idInstitucion,int filtro, String fecha) {
+		//Filtros , (0-Fecha Actual, 1 - Fecha Designacion , 2- Fecha Actuacion
 		SQL sql = new SQL();
 		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE, MODULO.CODIGO ");
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
+		if(filtro == 0) {
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= "+ fecha);
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= " + fecha + " OR MODULO.FECHAHASTAVIGOR IS NULL)");
+		}else {
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= TO_DATE('" + fecha + "','DD/MM/YYYY') OR MODULO.FECHAHASTAVIGOR IS NULL)");
+		}
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.ORDER_BY("MODULO.NOMBRE");
 
@@ -1905,7 +1912,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboModulosConJuzgado(Short idInstitucion, List<String> procedimientosJuzgados) {
+	public String comboModulosConJuzgado(Short idInstitucion, List<String> procedimientosJuzgados, int filtro, String fecha) {
 
 		String inSQL = "(";
 
@@ -1922,6 +1929,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO ");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
+		if(filtro == 0) {
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= "+ fecha);
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= " + fecha + " OR MODULO.FECHAHASTAVIGOR IS NULL)");
+		}else {
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= TO_DATE('" + fecha + "','DD/MM/YYYY') OR MODULO.FECHAHASTAVIGOR IS NULL)");
+		}
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.ORDER_BY("MODULO.NOMBRE");
 
@@ -1939,7 +1953,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboModulosConProcedimientos(Short idInstitucion, List<String> idPretensiones) {
+	public String comboModulosConProcedimientos(Short idInstitucion, List<String> idPretensiones, int filtro, String fecha) {
 
 		String inSQL = "(";
 
@@ -1956,6 +1970,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO ");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
+		if(filtro == 0) {
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= "+ fecha);
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= " + fecha + " OR MODULO.FECHAHASTAVIGOR IS NULL)");
+		}else {
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= TO_DATE('" + fecha + "','DD/MM/YYYY') OR MODULO.FECHAHASTAVIGOR IS NULL)");
+		}
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.ORDER_BY("MODULO.NOMBRE");
 

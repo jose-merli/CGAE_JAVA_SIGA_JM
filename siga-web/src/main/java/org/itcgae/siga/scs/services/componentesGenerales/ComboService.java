@@ -68,7 +68,7 @@ public interface ComboService {
 	
 	public ComboDTO comboJuzgadoPorInstitucion(String idInstitucion, HttpServletRequest request);
 	
-	public ComboDTO comboModulo(HttpServletRequest request);
+	public ComboDTO comboModulo(HttpServletRequest request, String fecha);
 	
 	public ComboDTO comboDelitos(DesignaItem designaItem, HttpServletRequest request);
 	
@@ -76,11 +76,11 @@ public interface ComboService {
 	
 	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado);
 	
-	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado);
+	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado, String fecha);
 	
 	public ComboDTO comboAllModulos(HttpServletRequest request);
 	
-	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension);
+	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension, String fecha);
 	
 	public ComboDTO comboProcedimientosConModulo(HttpServletRequest request, String idModulo);
 	
