@@ -13,6 +13,8 @@ public class DetallePagoColegiadoDTO {
     private BigDecimal importeTotalRetenciones;
     private BigDecimal importeTotalMovimientos;
     private BigDecimal totalImporteIrpf;
+    private BigDecimal totalFinal;
+    private BigDecimal totalImporteIva;
     private Long idPersonaSjcs;
     private Long idPerDestino;
     private Short idCuenta;

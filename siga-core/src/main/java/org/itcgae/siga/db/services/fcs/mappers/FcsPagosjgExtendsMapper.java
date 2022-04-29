@@ -200,6 +200,8 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
             @Result(column = "IMPORTETOTALRETENCIONES", property = "importeTotalRetenciones", jdbcType = JdbcType.DECIMAL),
             @Result(column = "IMPORTETOTALMOVIMIENTOS", property = "importeTotalMovimientos", jdbcType = JdbcType.DECIMAL),
             @Result(column = "TOTALIMPORTEIRPF", property = "totalImporteIrpf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "TOTALFINAL", property = "totalFinal", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "TOTALIMPORTEIVA", property = "totalImporteIva", jdbcType = JdbcType.DECIMAL),
             @Result(column = "IDPERSONASJCS", property = "idPersonaSjcs", jdbcType = JdbcType.DECIMAL),
             @Result(column = "IDPERDESTINO", property = "idPerDestino", jdbcType = JdbcType.DECIMAL),
             @Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.DECIMAL),
