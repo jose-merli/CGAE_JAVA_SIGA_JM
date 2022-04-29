@@ -30,6 +30,7 @@ import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
 import org.itcgae.siga.db.entities.FcsMovimientosvarios;
 import org.itcgae.siga.db.entities.FcsPagoColegiado;
 import org.itcgae.siga.db.entities.FcsPagosEstadospagos;
+import org.itcgae.siga.db.entities.FcsPagosEstadospagosExample;
 import org.itcgae.siga.db.entities.FcsPagosjg;
 import org.itcgae.siga.db.mappers.FacDisqueteabonosMapper;
 import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
@@ -122,6 +123,27 @@ public class UtilidadesPagoSJCS {
 
     private static List<Integer> listaPagosDeshacerCierre = new ArrayList<>();
 
+    @Async
+    public void asyncEjecutarPagoSJCS(FcsPagosjg pago, boolean simular, Short idInstitucion, AdmUsuarios usuario) throws Exception {
+
+        try {
+            // Insertamos el estado del pago:
+            insertEstadoPago(idInstitucion, pago.getIdpagosjg(), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_EJECUTANDO);
+
+            // Iniciamos la ejecución del pago:
+            ejecutarPagoSJCS(pago, simular, idInstitucion, usuario);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getStackTrace());
+            ponerPagoEstadoAbierto(pago, idInstitucion, usuario);
+            throw e;
+        } finally {
+            FacturacionSJCSServicesImpl.setNadieEjecutando();
+        }
+
+    }
+
+    @Transactional
     public void ejecutarPagoSJCS(FcsPagosjg pago, boolean simular, Short idInstitucion, AdmUsuarios usuario) throws Exception {
 
         ejecucionPlsPago.ejecutarPL_PagoTurnosOficio(Integer.valueOf(idInstitucion.toString()), pago.getIdpagosjg(), usuario);
@@ -282,15 +304,7 @@ public class UtilidadesPagoSJCS {
                 } // fin del segundo for de colegiados
                 
                 // Insertamos el estado del pago:
-                FcsPagosEstadospagos record = new FcsPagosEstadospagos();
-                record.setIdinstitucion(idInstitucion);
-                record.setIdpagosjg(Integer.valueOf(idPago));
-                record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
-                record.setFechaestado(new Date());
-                record.setFechamodificacion(new Date());
-                record.setUsumodificacion(usuario.getIdusuario());
-
-                fcsPagosEstadospagosMapper.insertSelective(record);
+                insertEstadoPago(idInstitucion, Integer.valueOf(idPago), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_EJECUTADO);
             }else{
                 throw new FacturacionSJCSException("Para ejecutar un pago este debe estar asociado a un colegiado.");
             }
@@ -301,6 +315,47 @@ public class UtilidadesPagoSJCS {
             LOGGER.error(e.getStackTrace());
             throw new FacturacionSJCSException("Error en la obtención de los importes", e, "messages.factSJCS.error.importes");
         }
+    }
+
+    public void insertEstadoPago(Short idInstitucion, Integer idPago, Integer idUsuario, String estado) {
+        FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+        record.setIdinstitucion(idInstitucion);
+        record.setIdpagosjg(idPago);
+        record.setIdestadopagosjg(Short.valueOf(estado));
+        record.setFechaestado(new Date());
+        record.setFechamodificacion(new Date());
+        record.setUsumodificacion(idUsuario);
+
+        fcsPagosEstadospagosMapper.insertSelective(record);
+    }
+
+    public void ponerPagoEstadoAbierto(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) {
+
+        LOGGER.info(
+                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> INICIO");
+
+        // Eliminamos los estados del pago
+        FcsPagosEstadospagosExample fcsPagosEstadospagosExample = new FcsPagosEstadospagosExample();
+        fcsPagosEstadospagosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                .andIdpagosjgEqualTo(pago.getIdpagosjg());
+        LOGGER.info(
+                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> fcsPagosEstadospagosMapper.deleteByExample() -> Eliminamos los estados del pago");
+        fcsPagosEstadospagosMapper.deleteByExample(fcsPagosEstadospagosExample);
+
+        // Ponemos el pago en estado ABIERTO
+        FcsPagosEstadospagos fcsPagosEstadospagos = new FcsPagosEstadospagos();
+        fcsPagosEstadospagos.setIdinstitucion(idInstitucion);
+        fcsPagosEstadospagos.setIdpagosjg(pago.getIdpagosjg());
+        fcsPagosEstadospagos.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_ABIERTO));
+        fcsPagosEstadospagos.setFechaestado(new Date());
+        fcsPagosEstadospagos.setFechamodificacion(new Date());
+        fcsPagosEstadospagos.setUsumodificacion(usuario.getIdusuario());
+        LOGGER.info(
+                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> fcsPagosEstadospagosMapper.insertSelective() -> Ponemos el pago en estado abierto");
+        fcsPagosEstadospagosMapper.insertSelective(fcsPagosEstadospagos);
+
+        LOGGER.info(
+                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> FIN");
     }
 
     /**

@@ -519,7 +519,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 return resource;
 
             } catch (Exception e) {
-                // Si el error viene de la obtención de la plantilla se devuelve un mensaje de exito pero si el fichero pdf
+                // Si el error viene de la obtención de la plantilla se devuelve un mensaje de éxito pero sin el fichero pdf
                 if (!UtilidadesString.esCadenaVacia(e.getMessage()) && e.getMessage().contains("ObtenerContenidoPlantilla ERROR")) {
                     return null;
                 } else {

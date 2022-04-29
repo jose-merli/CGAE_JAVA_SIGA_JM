@@ -120,6 +120,7 @@ import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.itcgae.siga.scs.services.facturacionsjcs.IPagoSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.lowagie.text.pdf.PdfReader;
@@ -1829,54 +1830,53 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     }else{
                         FacturacionSJCSServicesImpl.setAlguienEjecutando();
                         try{
-                        AdmUsuarios usuario = usuarios.get(0);
+                            AdmUsuarios usuario = usuarios.get(0);
 
-                        // Antes de ejecutar el pago comprobamos si tiene banco asociado
-                        FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
-                        fcsPagosjgKey.setIdinstitucion(idInstitucion);
-                        fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
+                            // Antes de ejecutar el pago comprobamos si tiene banco asociado
+                            FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                            fcsPagosjgKey.setIdinstitucion(idInstitucion);
+                            fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
 
-                        LOGGER.info(
-                                "UtilidadesPagoSJCS.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
-                                        + idPago);
-                        pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
-                        LOGGER.info(
-                                "UtilidadesPagoSJCS.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
-                                        + idPago);
+                            LOGGER.info(
+                                    "UtilidadesPagoSJCS.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
+                                            + idPago);
+                            pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+                            LOGGER.info(
+                                    "UtilidadesPagoSJCS.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
+                                            + idPago);
 
-                        if (UtilidadesString.esCadenaVacia(pago.getBancosCodigo())) {
-                            throw new FacturacionSJCSException("Debe de seleccionar una cuenta bancaria", "factSJCS.abonos.configuracion.literal.cuentaObligatoria");
-                        }
+                            if (UtilidadesString.esCadenaVacia(pago.getBancosCodigo())) {
+                                throw new FacturacionSJCSException("Debe de seleccionar una cuenta bancaria", "factSJCS.abonos.configuracion.literal.cuentaObligatoria");
+                            }
 
-                        String estadoPago = fcsPagosjgExtendsMapper.getEstadoPago(idPago, idInstitucion);
-                        String criterioTurno = pago.getCriteriopagoturno();
+                            String estadoPago = fcsPagosjgExtendsMapper.getEstadoPago(idPago, idInstitucion);
+                            String criterioTurno = pago.getCriteriopagoturno();
 
-                        // Validacion de los datos antes de ejecutar el pago:
-                        // 1. El estado del pago debe ser abierto:
-                        if (!estadoPago.equals(SigaConstants.ESTADO_PAGO_ABIERTO)) {
-                            ponerEnEstadoAbierto = false;
-                            LOGGER.error("El pago no se encuentra en un estado correcto para realizar esta operación");
-                            throw new FacturacionSJCSException("El pago no se encuentra en un estado correcto para realizar esta operación", "messages.factSJCS.error.estadoPagoNoCorrecto");
-                        }
-                        // 2. Criterios correctos del Turno:
-                        if (!criterioTurno.equals(SigaConstants.CRITERIOS_PAGO_FACTURACION)) {
-                            LOGGER.error("No ha sido configurado el criterio de pago.");
-                            throw new FacturacionSJCSException("No ha sido configurado el criterio de pago.", "messages.factSJCS.error.criterioPago");
-                        }
+                            // Validacion de los datos antes de ejecutar el pago:
+                            // 1. El estado del pago debe ser abierto:
+                            if (!estadoPago.equals(SigaConstants.ESTADO_PAGO_ABIERTO)) {
+                                ponerEnEstadoAbierto = false;
+                                LOGGER.error("El pago no se encuentra en un estado correcto para realizar esta operación");
+                                throw new FacturacionSJCSException("El pago no se encuentra en un estado correcto para realizar esta operación", "messages.factSJCS.error.estadoPagoNoCorrecto");
+                            }
+                            // 2. Criterios correctos del Turno:
+                            if (!criterioTurno.equals(SigaConstants.CRITERIOS_PAGO_FACTURACION)) {
+                                LOGGER.error("No ha sido configurado el criterio de pago.");
+                                throw new FacturacionSJCSException("No ha sido configurado el criterio de pago.", "messages.factSJCS.error.criterioPago");
+                            }
 
-                        //3. Si no se ha introducido importe a pagar el importe a facturar será cero
-                        if (pago.getImporterepartir().doubleValue() == 0.00) {
-                            LOGGER.error("El importe a facturar será cero, introduzca importe a pagar distinto de cero.");
-                            throw new FacturacionSJCSException("El importe a facturar será cero, introduzca importe a pagar distinto de cero.", "messages.facturacionSJCS.abono.sin.importe.pago");
-                        }
+                            //3. Si no se ha introducido importe a pagar el importe a facturar será cero
+                            if (pago.getImporterepartir().doubleValue() == 0.00) {
+                                LOGGER.error("El importe a facturar será cero, introduzca importe a pagar distinto de cero.");
+                                throw new FacturacionSJCSException("El importe a facturar será cero, introduzca importe a pagar distinto de cero.", "messages.facturacionSJCS.abono.sin.importe.pago");
+                            }
 
-                        utilidadesPagoSJCS.ejecutarPagoSJCS(pago, simular, idInstitucion, usuario);
+                            utilidadesPagoSJCS.asyncEjecutarPagoSJCS(pago, simular, idInstitucion, usuario);
                         }catch (Exception e){
                             LOGGER.error(e.getMessage());
                             LOGGER.error(e.getStackTrace());
-                            throw e;
-                        }finally {
                             FacturacionSJCSServicesImpl.setNadieEjecutando();
+                            throw e;
                         }
                     }
                 }
@@ -1887,7 +1887,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             LOGGER.error(fe.getMessage());
             LOGGER.error(fe.getStackTrace());
             if (ponerEnEstadoAbierto) {
-                ponerPagoEstadoAbierto(pago, idInstitucion, usuarios.get(0));
+                utilidadesPagoSJCS.ponerPagoEstadoAbierto(pago, idInstitucion, usuarios.get(0));
             }
             error.setDescription(fe.getDescription());
         } catch (Exception e) {
@@ -1913,36 +1913,6 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
         return insertResponseDTO;
     }
-
-    private void ponerPagoEstadoAbierto(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) {
-
-        LOGGER.info(
-                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> INICIO");
-
-        // Eliminamos los estados del pago
-        FcsPagosEstadospagosExample fcsPagosEstadospagosExample = new FcsPagosEstadospagosExample();
-        fcsPagosEstadospagosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-                .andIdpagosjgEqualTo(pago.getIdpagosjg());
-        LOGGER.info(
-                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> fcsPagosEstadospagosMapper.deleteByExample() -> Eliminamos los estados del pago");
-        fcsPagosEstadospagosMapper.deleteByExample(fcsPagosEstadospagosExample);
-
-        // Ponemos el pago en estado ABIERTO
-        FcsPagosEstadospagos fcsPagosEstadospagos = new FcsPagosEstadospagos();
-        fcsPagosEstadospagos.setIdinstitucion(idInstitucion);
-        fcsPagosEstadospagos.setIdpagosjg(pago.getIdpagosjg());
-        fcsPagosEstadospagos.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_ABIERTO));
-        fcsPagosEstadospagos.setFechaestado(new Date());
-        fcsPagosEstadospagos.setFechamodificacion(new Date());
-        fcsPagosEstadospagos.setUsumodificacion(usuario.getIdusuario());
-        LOGGER.info(
-                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> fcsPagosEstadospagosMapper.insertSelective() -> Ponemos el pago en estado abierto");
-        fcsPagosEstadospagosMapper.insertSelective(fcsPagosEstadospagos);
-
-        LOGGER.info(
-                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> FIN");
-    }
-
 
     /**
      * Funcion que devuelve los colegiados que interviene en un pago
@@ -2222,7 +2192,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             double importeMovimientos = detallePagoColegiadoDTO.getImporteTotalMovimientos().doubleValue();
             double importeIrpfTotal = detallePagoColegiadoDTO.getTotalImporteIrpf().doubleValue();
             double importeRetenciones = detallePagoColegiadoDTO.getImporteTotalRetenciones().doubleValue();
-            double totalFinal = detallePagoColegiadoDTO.getTotalImporteIrpf().doubleValue();
+            double totalFinal = detallePagoColegiadoDTO.getTotalFinal().doubleValue();
 
             String idPersonaDestino = detallePagoColegiadoDTO.getIdPerDestino().toString();
             String idCuenta = detallePagoColegiadoDTO.getIdCuenta() == null ? "" : detallePagoColegiadoDTO.getIdCuenta().toString();
