@@ -746,7 +746,7 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         sql.WHERE("PC.IDINSTITUCION = '" + idInstitucion + "'");
         sql.WHERE("PC.IDPAGOSJG = NVL(" + idPagosJg + ", PC.IDPAGOSJG)");
 
-        if (null != idPersona) {
+        if (irpf) {
             sql.WHERE("PC.IDPERDESTINO = '" + idPersona + "'");
         } else {
             sql.WHERE("PC.IDPERORIGEN = '" + idPersona + "'");
