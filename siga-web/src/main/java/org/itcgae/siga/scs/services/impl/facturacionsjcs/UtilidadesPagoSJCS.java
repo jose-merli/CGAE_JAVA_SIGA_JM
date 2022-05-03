@@ -31,6 +31,7 @@ import org.itcgae.siga.db.entities.FcsMovimientosvarios;
 import org.itcgae.siga.db.entities.FcsPagoColegiado;
 import org.itcgae.siga.db.entities.FcsPagosEstadospagos;
 import org.itcgae.siga.db.entities.FcsPagosEstadospagosExample;
+import org.itcgae.siga.db.entities.FcsPagosEstadospagosKey;
 import org.itcgae.siga.db.entities.FcsPagosjg;
 import org.itcgae.siga.db.mappers.FacDisqueteabonosMapper;
 import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
@@ -326,7 +327,16 @@ public class UtilidadesPagoSJCS {
         record.setFechamodificacion(new Date());
         record.setUsumodificacion(idUsuario);
 
-        fcsPagosEstadospagosMapper.insertSelective(record);
+        FcsPagosEstadospagosExample estadoExample = new FcsPagosEstadospagosExample();
+        estadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                .andIdpagosjgEqualTo(idPago)
+                .andIdestadopagosjgEqualTo(record.getIdestadopagosjg());
+
+        if (fcsPagosEstadospagosMapper.countByExample(estadoExample) == 0) {
+            fcsPagosEstadospagosMapper.insertSelective(record);
+        } else {
+            fcsPagosEstadospagosMapper.updateByPrimaryKeySelective(record);
+        }
     }
 
     public void ponerPagoEstadoAbierto(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) {
