@@ -9,6 +9,8 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.db.entities.FcsPagoColegiado;
+import org.itcgae.siga.db.entities.FcsPagosEstadospagos;
+import org.itcgae.siga.db.entities.FcsPagosjg;
 import org.itcgae.siga.db.mappers.FcsPagosjgMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsPagosjgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -112,6 +114,9 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
 
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getEstadoPago")
     String getEstadoPago(String idPago, Short idInstitucion);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getPagosSJCSBloqueadosEnEjecucion")
+    List<FcsPagosjg> getPagosSJCSBloqueadosEnEjecucion(Short idInstitucion, Long tiempoMaximoMinutos);
 
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getCompensacionFacturas")
     @Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),

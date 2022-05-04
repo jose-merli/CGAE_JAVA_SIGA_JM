@@ -2283,6 +2283,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             facAbono.setMotivos(motivoPago);
             facAbono.setFecha(new Date());
             facAbono.setFechamodificacion(new Date());
+            facAbono.setUsumodificacion(usuario.getIdusuario());
             facAbono.setContabilizada(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
             facAbono.setIdpersona(Long.valueOf(idPersona));
             facAbono.setIdcuenta(Short.valueOf(idCuenta));
@@ -2510,7 +2511,9 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
         String contadorFinalSugerido = "";
         try {
             String numeroAbono = getNuevoContador(contenidoAdmContador);
-            contadorFinalSugerido = contenidoAdmContador.getPrefijo() + numeroAbono + contenidoAdmContador.getSufijo();
+            String prefijo = contenidoAdmContador.getPrefijo() != null ? contenidoAdmContador.getPrefijo() : "";
+            String sufijo = contenidoAdmContador.getSufijo() != null ? contenidoAdmContador.getSufijo() : "";
+            contadorFinalSugerido = prefijo + numeroAbono + sufijo;
         } catch (Exception e) {
             throw new FacturacionSJCSException("Error al obtener nuevo contador con prefijo y sufijo", e);
         }
@@ -2540,7 +2543,11 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             if (numReg.longValue() > gcOriginal.getContador()) {
                 datosContadorNuevo.setContador(Long.valueOf(numRegNuevo));
 
-                if ((gcOriginal.getPrefijo().equals(datosContadorNuevo.getPrefijo())) && (gcOriginal.getSufijo().equals(datosContadorNuevo.getSufijo()))) {
+                //if (gcOriginal == null && gcOriginal.getPrefijo() == || gcOriginal.getPrefijo() == datosContadorNuevo.getPrefijo() && gcOriginal.getSufijo() == datosContadorNuevo.getSufijo()) {
+                if ((gcOriginal.getPrefijo() == null && gcOriginal.getPrefijo() == datosContadorNuevo.getPrefijo()
+                        || gcOriginal.getPrefijo() != null && gcOriginal.getPrefijo().equals(datosContadorNuevo.getPrefijo()))
+                    && (gcOriginal.getSufijo() == null && gcOriginal.getSufijo() == datosContadorNuevo.getSufijo()
+                        || gcOriginal.getSufijo() != null && gcOriginal.getSufijo().equals(datosContadorNuevo.getSufijo()))) {
                     // Solo en el caso de que el usuario no ha modificado el prefijo y sufijo que se
                     // le propone cuando se inserta una nueva sociedad, entonces
                     // se actualiza el campo contador en la tabla ADM_CONTADORES con el ultimo utilizado
