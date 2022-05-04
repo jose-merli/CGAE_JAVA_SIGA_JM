@@ -3716,40 +3716,19 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 	}
 
-	public String compruebaSolapamientoProgramamcionesA(DatosCalendarioProgramadoItem item, Short idInstitucion) {
-		SQL sqlAux = new SQL();
-		sqlAux.SELECT("CON2.IDINSTITUCION, CON2.IDTURNO, CON2.IDGUARDIA ");
-		sqlAux.FROM("SCS_CONF_CONJUNTO_GUARDIAS CON2");
-		sqlAux.WHERE("CON2.IDINSTITUCION = CON.IDINSTITUCION ");
-		sqlAux.WHERE("CON2.IDCONJUNTOGUARDIA = "+ item.getIdCalG());
-		sqlAux.WHERE("TO_DATE('"+item.getFechaDesde()+"', 'DD/MM/RRRR') <= TRUNC(PRO.FECHACALFIN)");
-		sqlAux.WHERE("TO_DATE('"+item.getFechaHasta()+"', 'DD/MM/RRRR') >= TRUNC(PRO.FECHACALINICIO)");
-		
+	public String compruebaSolapamientoProgramamcionesA(String idTurno, String idGuardia, String fechaINI, String fechaFIN, Short idInstitucion) {
+
 		SQL sql = new SQL();
 		sql.SELECT("COUNT(1)");
-		sql.FROM("SCS_PROG_CALENDARIOS PRO, SCS_CONF_CONJUNTO_GUARDIAS CON ");
-		sql.WHERE("CON.IDINSTITUCION = "+ idInstitucion);
-		sql.WHERE("PRO.IDINSTITUCION = CON.IDINSTITUCION");
-		sql.WHERE("PRO.IDCONJUNTOGUARDIA = CON.IDCONJUNTOGUARDIA");
-		sql.WHERE("(CON.IDINSTITUCION, CON.IDTURNO, CON.IDGUARDIA) IN ( "+sqlAux.toString()+")");
+		sql.FROM("SCS_PROG_CALENDARIOS P1");
+		sql.INNER_JOIN("SCS_HCO_CONF_PROG_CALENDARIOS P2 on P1.IDPROGCALENDARIO = P2.IDPROGCALENDARIO and P1.IDINSTITUCION = P2.IDINSTITUCION");
+		sql.WHERE("TO_DATE('"+fechaINI+"', 'DD/MM/RRRR') <= TRUNC(P1.FECHACALFIN)");
+		sql.WHERE("TO_DATE('"+fechaFIN+"', 'DD/MM/RRRR') >= TRUNC(P1.FECHACALINICIO)");
+		sql.WHERE("P2.idturno ="+ idTurno) ;
+		sql.WHERE("P2.idguardia =" + idGuardia);
+		sql.WHERE("p2.idinstitucion ="+idInstitucion);
 		
 		return sql.toString();
 	}
 
-	public String compruebaSolapamientoProgramamcionesB(DatosCalendarioProgramadoItem item, Short idInstitucion) {
-		SQL sqlAux = new SQL();
-		sqlAux.SELECT("CGG2.IDINSTITUCION, CGG2.IDTURNO, CGG2.IDGUARDIA ");
-		sqlAux.FROM("SCS_CONF_CONJUNTO_GUARDIAS CGG2 ");
-		sqlAux.WHERE("CGG2.IDINSTITUCION = " + idInstitucion);
-		sqlAux.WHERE("CGG2.IDCONJUNTOGUARDIA = " + item.getIdCalG());
-		
-		SQL sql = new SQL();
-		sql.SELECT("count(1) ");
-		sql.FROM("SCS_CALENDARIOGUARDIAS CAL ");
-		sql.WHERE("TO_DATE('"+item.getFechaDesde()+"', 'DD/MM/RRRR') <= TRUNC(CAL.FECHAFIN)");
-		sql.WHERE("TO_DATE('"+item.getFechaHasta()+"', 'DD/MM/RRRR')  >= TRUNC(CAL.FECHAINICIO)");
-		sql.WHERE("(CAL.IDINSTITUCION, CAL.IDTURNO, CAL.IDGUARDIA)  IN (" + sqlAux.toString() + ")");
-		
-		return sql.toString();
-	}
 }

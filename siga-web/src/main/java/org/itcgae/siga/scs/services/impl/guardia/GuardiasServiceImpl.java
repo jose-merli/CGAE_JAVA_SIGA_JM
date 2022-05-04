@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -114,6 +115,7 @@ import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsCabeceraguardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsCalendarioguardiasExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsConfConjuntoGuardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiacolegiadoExtendsMapper;
@@ -283,12 +285,16 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private ScsConfConjuntoGuardiasMapper scsConfConjuntoGuardiasMapper;
+	
+	@Autowired
+	private ScsConfConjuntoGuardiasExtendsMapper scsConfConjuntoGuardiasExtendsMapper;
 
 	@Autowired
 	private ScsCalendarioguardiasExtendsMapper scsCalendarioguardiasMapper;
 
 	@Autowired
 	private ScsGuardiasturnoMapper scsGuardiasTurnoMapper;
+	
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -3242,13 +3248,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO insertGuardiaToCalendar(Boolean update, HttpServletRequest request, String idCalendar,
-			List<GuardiaCalendarioItem> itemList) {
+			List<GuardiaCalendarioItem> itemList)throws Exception {
 		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
+		boolean solapamiento = false;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -3259,15 +3266,37 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 				String today = formatter.format(new Date());
+				ScsProgCalendariosExample example = new ScsProgCalendariosExample();
+				example.createCriteria().andIdprogcalendarioEqualTo(new Long(idCalendar)).andIdinstitucionEqualTo(idInstitucion);
+				
+				List<ScsProgCalendarios> calendarioItemList = scsProgCalendariosMapper.selectByExample(example);	
+				
 				LOGGER.info(
 						"insertGuardiaToCalendar() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
 				String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(idCalendar,
 						idInstitucion.toString());
+				
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaIni = dateFormat.format(calendarioItemList.get(0).getFechacalinicio());
+				String fechaFin = dateFormat.format(calendarioItemList.get(0).getFechacalfin());
+				for (int i = 0; i < itemList.size(); i++) {
+					if (itemList.get(i).getNuevo() != null && itemList.get(i).getNuevo()) {
+						long comprobacionA = scsGuardiasturnoExtendsMapper.compruebaSolapamientoProgramamcionesA(itemList.get(i).getTurno(),itemList.get(i).getGuardia(),
+								fechaIni ,fechaFin, idInstitucion);
+						if(comprobacionA > 0 ) {
+							solapamiento = true;
+							throw new Exception("messages.factSJCS.error.solapamientoRango");
+						}
+					}
+					
+				}
 
 				itemList.forEach(item -> {
 					if (item.getNuevo() != null && item.getNuevo()) {
 						String response = null;
-						if (idConjuntoGuardia != null) {
+						
+						
+						if (idConjuntoGuardia != null) {				
 							response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(
 									idConjuntoGuardia, idInstitucion.toString(), today, item,usuarios.get(0).getUsumodificacion().toString());
 						}
@@ -3475,7 +3504,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO newCalendarioProgramado(HttpServletRequest request,
 			DatosCalendarioProgramadoItem calendarioItem) {
 		LOGGER.info("updateCalendarioProgramado() -> Entrada al servicio para búsqueda de las guardias");
@@ -3487,6 +3516,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Boolean errorGuardiaAsociadas = false;
 		boolean solapamiento = false;
 		boolean listaVacia = false;
+		int response = 0;
+		
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -3495,13 +3526,25 @@ public class GuardiasServiceImpl implements GuardiasService {
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				if (usuarios != null && usuarios.size() > 0) {
+					GenParametrosExample genParametrosExample = new GenParametrosExample();
+					genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG").andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+					this.LOGGER.info("ListaGuardiaServiceImpl.getGuardiasFromLista() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+					List<GenParametros> tamMax = this.genParametrosExtendsMapper.selectByExample(genParametrosExample);
+					this.LOGGER.info("ListaGuardiaServiceImpl.getGuardiasFromLista() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+					Integer tamMaximo;
+					if (tamMax != null) {
+						tamMaximo = Integer.valueOf(((GenParametros)tamMax.get(0)).getValor());
+					} else {
+						tamMaximo = null;
+					}
 					AdmUsuarios usuario = usuarios.get(0);
 					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 					String today = formatter.format(new Date());
 					LOGGER.info(
 							"newCalendarioProgramado() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
 					// check si hay guardias asociadas a esta programacion
-					if (calendarioItem.getListaGuardias() == null || calendarioItem.getListaGuardias().isEmpty()) {
+					if (calendarioItem.getListaGuardias() == null || calendarioItem.getListaGuardias().isEmpty() && calendarioItem.getGuardias() != null && calendarioItem.getGuardias().isEmpty()) {
 						//programación sin lista de guardias
 						
 						//En una programación sin lista de guardias, no debería existir ningún control al guardar la tarjeta de Datos generales, 
@@ -3526,7 +3569,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 					}
 					if (!errorGuardiaAsociadas) {
-						if (calendarioItem.getIdCalG() == null && !UtilidadesString.esCadenaVacia(calendarioItem.getIdCalendarioProgramado())) {
+						if (calendarioItem.getIdCalG() == null
+								&& !UtilidadesString.esCadenaVacia(calendarioItem.getIdCalendarioProgramado())) {
 							String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(
 									calendarioItem.getIdCalendarioProgramado(), idInstitucion.toString());
 							// idConjunto:
@@ -3534,43 +3578,43 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 						String nextIdCalendarioProgramado = getNuevoIdCalProg();
 						calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
-						
-						//Validacion de Solapamiento.
-						compruebaSolapamientoProgramamciones(calendarioItem,idInstitucion,solapamiento);
-						
-						int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(
-								nextIdCalendarioProgramado, calendarioItem, idInstitucion.toString(), today,
-								usuario.getIdusuario().toString());
-				
-						if (calendarioItem.getIdCalG() != null) {
-							List<ScsConfConjuntoGuardias> confList = scsConfConjuntoGuardiasMapper
-									.selectConfById(calendarioItem.getIdCalG(), today, usuario.getIdusuario().toString());
-							confList.forEach(conf -> {
-								ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
-								historico.setEstado(new Short(calendarioItem.getEstado()));
-								historico.setFechamodificacion(new Date());
-								historico.setIdconjuntoguardia(new Long(calendarioItem.getIdCalG()));
-								historico.setIdguardia(conf.getIdguardia());
-								historico.setIdinstitucion(idInstitucion);
-								// String idCalendarioProgramado =
-								// scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
-								historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
-								historico.setIdturno(conf.getIdturno());
-								// OBTENER ORDEN DE SCS_CONF_CONJUNTO_GUARDIAS
-								if (conf.getOrden() != null) {
-									historico.setOrden(new Integer(conf.getOrden()));
-								}
-								historico.setUsumodificacion(usuario.getIdusuario());
-								int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
 
-							});
-							if(confList.isEmpty()) {
+						// Validacion de Solapamiento.
+						compruebaSolapamientoProgramamciones(calendarioItem, idInstitucion, solapamiento,tamMaximo);
+
+						if (calendarioItem.getIdCalG() != null) {
+							List<GuardiasItem> listaGuardiasItems = scsConfConjuntoGuardiasExtendsMapper
+									.searchGuardiasFromLista(calendarioItem.getIdCalG(), idInstitucion, tamMaximo);
+							if (!listaGuardiasItems.isEmpty()) {
+								response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(
+										nextIdCalendarioProgramado, calendarioItem, idInstitucion.toString(), today,
+										usuario.getIdusuario().toString());
+								int ordenDefault = 0;
+								for (int i = 0; i < listaGuardiasItems.size(); i++) {
+									ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
+									historico.setEstado(new Short(calendarioItem.getEstado()));
+									historico.setFechamodificacion(new Date());
+									historico.setIdconjuntoguardia(new Long(calendarioItem.getIdCalG()));
+									historico.setIdguardia(Integer.parseInt(listaGuardiasItems.get(i).getIdGuardia()));
+									historico.setIdinstitucion(idInstitucion);
+									historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
+									historico.setIdturno(Integer.parseInt(listaGuardiasItems.get(i).getIdTurno()));
+									historico.setUsumodificacion(usuario.getIdusuario());
+									historico.setOrden(Integer.parseInt(listaGuardiasItems.get(i).getOrden()));
+									ordenDefault++;
+									scsHcoConfProgCalendariosMapper.insertSelective(historico);
+								}
+							} else {
 								listaVacia = true;
 								throw new Exception("messages.factSJCS.error.listaVacia");
 							}
-						}else if (calendarioItem.getGuardias() != null && !calendarioItem.getGuardias().isEmpty()) {
-							for (GuardiaCalendarioItem item: calendarioItem.getGuardias()) {
-								if (!UtilidadesString.esCadenaVacia(item.getOrden()) && !UtilidadesString.esCadenaVacia(item.getGuardia())
+						} else if (calendarioItem.getGuardias() != null && !calendarioItem.getGuardias().isEmpty()) {
+							response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(
+									nextIdCalendarioProgramado, calendarioItem, idInstitucion.toString(), today,
+									usuario.getIdusuario().toString());
+							for (GuardiaCalendarioItem item : calendarioItem.getGuardias()) {
+								if (!UtilidadesString.esCadenaVacia(item.getOrden())
+										&& !UtilidadesString.esCadenaVacia(item.getGuardia())
 										&& !UtilidadesString.esCadenaVacia(item.getTurno())) {
 									ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
 									historico.setEstado(new Short(calendarioItem.getEstado()));
@@ -3578,21 +3622,17 @@ public class GuardiasServiceImpl implements GuardiasService {
 									historico.setIdconjuntoguardia(null);
 									historico.setIdguardia(Integer.parseInt(item.getGuardia()));
 									historico.setIdinstitucion(idInstitucion);
-									// String idCalendarioProgramado =
-									// scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
 									historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
 									historico.setIdturno(Integer.parseInt(item.getTurno()));
 									historico.setUsumodificacion(usuario.getIdusuario());
 									historico.setOrden(Integer.parseInt(item.getOrden()));
-									int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
+									scsHcoConfProgCalendariosMapper.insertSelective(historico);
 								}
 							}
-							if(calendarioItem.getGuardias().isEmpty()) {
-								listaVacia = true;
-								throw new Exception("messages.factSJCS.error.listaVacia");
-							}
+						} else {
+							listaVacia = true;
+							throw new Exception("messages.factSJCS.error.listaVacia");
 						}
-				
 
 						if (response == 0) {
 							error.setCode(400);
@@ -3640,23 +3680,37 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	private void compruebaSolapamientoProgramamciones(DatosCalendarioProgramadoItem calendarioItem,
-			Short idInstitucion,boolean solapamiento) throws Exception {
-		//-- PROGRAMACIONES DE MI COLEGIO PARA UN CONJUNTO DE GUARDIAS QUE CONTENGA UNA 
-		//-- GUARDIA DENTRO DE MI CONJUNTO DE GUARDIAS Y PARA ESAS FECHAS
-		long comprobacionA = scsGuardiasturnoExtendsMapper.compruebaSolapamientoProgramamcionesA(calendarioItem, idInstitucion);
+			Short idInstitucion,boolean solapamiento, int tamMaximo) throws Exception {
+		//--Se comprueba si hay alguna programación creada solapamiento de fechas en el turno-guardia
 		
-		if(comprobacionA > 0) {
-			solapamiento = true;
-			throw new Exception("messages.factSJCS.error.solapamientoRango");
-		}else {
-			// PARA ESAS FECHAS DE UNA GUARDIA DENTRO DE MI CONJUNTO DE GUARDIAS
-			long comprobacionB = scsGuardiasturnoExtendsMapper.compruebaSolapamientoProgramamcionesB(calendarioItem, idInstitucion);
+		if(calendarioItem.getIdCalG() != null) {
+			List<GuardiasItem> listaGuardiasItems = scsConfConjuntoGuardiasExtendsMapper
+					.searchGuardiasFromLista(calendarioItem.getIdCalG(), idInstitucion, tamMaximo);
 			
-			if(comprobacionB > 0) {
-				solapamiento = true;
-				throw new Exception("messages.factSJCS.error.solapamientoRango");
+			for (int i = 0; i < listaGuardiasItems.size(); i++) {
+				long comprobacionA = scsGuardiasturnoExtendsMapper.compruebaSolapamientoProgramamcionesA(listaGuardiasItems.get(i).getIdTurno(), listaGuardiasItems.get(i).getIdGuardia(),
+						calendarioItem.getFechaDesde(), calendarioItem.getFechaHasta(), idInstitucion);
+				if(comprobacionA > 0 ) {
+					solapamiento = true;
+					throw new Exception("messages.factSJCS.error.solapamientoRango");
+				}
+			}
+		}else {
+			List<GuardiaCalendarioItem> listaGuardiasItems = calendarioItem.getGuardias();
+			for (int i = 0; i < listaGuardiasItems.size(); i++) {
+				long comprobacionA = scsGuardiasturnoExtendsMapper.compruebaSolapamientoProgramamcionesA(listaGuardiasItems.get(i).getTurno(), listaGuardiasItems.get(i).getGuardia(),
+						calendarioItem.getFechaDesde(), calendarioItem.getFechaHasta(), idInstitucion);
+				if(comprobacionA > 0 ) {
+					solapamiento = true;
+					throw new Exception("messages.factSJCS.error.solapamientoRango");
+				}
 			}
 		}
+		
+		
+		
+		
+		
 	}
 
 	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 0 * ? * * *}")

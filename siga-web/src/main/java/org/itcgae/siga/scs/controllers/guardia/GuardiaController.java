@@ -337,17 +337,29 @@ public class GuardiaController {
 					guardiaCalendarioItemList);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			LOGGER.error(
-					"insertGuardiaToCalendar() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
-					e);
+			if(e.getMessage() == "messages.factSJCS.error.solapamientoRango") {
+				Error error = new Error();
+				response.setError(error);
+				error.setCode(400);
+				error.setDescription("messages.factSJCS.error.solapamientoRango");
+				error.setMessage(e.getMessage());
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.CONFLICT);
+			}else {
+				LOGGER.error(
+						"insertGuardiaToCalendar() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
+						e);
 
-			Error error = new Error();
-			response.setError(error);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			error.setMessage(e.getMessage());
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+				Error error = new Error();
+				response.setError(error);
+				error.setCode(500);
+				error.setDescription("general.mensaje.error.bbdd");
+				error.setMessage(e.getMessage());
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
 		}
+		
+		
 	}
 
 	@PostMapping(value = "/deleteGuardiaCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
