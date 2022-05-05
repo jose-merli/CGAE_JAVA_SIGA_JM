@@ -156,7 +156,7 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 		subQuery.FROM("FAC_HISTORICOFACTURA HIS2");
 		subQuery.WHERE("HIS2.IDINSTITUCION = FAC_FACTURA.IDINSTITUCION");
 		subQuery.WHERE("HIS2.IDFACTURA = FAC_FACTURA.IDFACTURA");
-		sql2.SELECT("NVL(" + subQuery.toString() + ", 0) + 1");
+		sql2.SELECT("NVL((" + subQuery.toString() + "), 0) + 1");
 		sql2.SELECT("SYSDATE");
 		sql2.SELECT("USUMODIFICACION");
 		sql2.SELECT(idTipoAccion.toString());
@@ -200,7 +200,7 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 		}
 
 		if (null != idAbono && idAbono > 0) {
-			sql2.SELECT("IDABONO");
+			sql2.SELECT(idAbono.toString());
 		}
 
 		if (null != comisionIdFactura && !"".equalsIgnoreCase(comisionIdFactura)) {

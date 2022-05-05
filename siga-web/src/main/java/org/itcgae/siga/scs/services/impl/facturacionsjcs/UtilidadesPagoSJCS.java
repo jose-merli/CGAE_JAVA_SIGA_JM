@@ -958,19 +958,12 @@ public class UtilidadesPagoSJCS {
                 ejecucionPlsPago.ejecutarPLDeshacerCierre(idInstitucion, fechaPago);
 
                 LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() ->fcsPagosEstadospagosMapper.updateByPrimaryKeySelective() -> Actualizamos el estado de pago a ejecutado");
-                FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+                FcsPagosEstadospagosKey record = new FcsPagosEstadospagosKey();
                 record.setIdinstitucion(idInstitucion);
                 record.setIdpagosjg(idpagoJG);
-                record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
-                record.setFechaestado(new Date());
-                record.setFechamodificacion(new Date());
-                record.setUsumodificacion(usuario.getIdusuario());
-                FcsPagosEstadospagos pagoEdit = fcsPagosEstadospagosMapper.selectByPrimaryKey(record);
-                if(pagoEdit != null ){
-                    fcsPagosEstadospagosMapper.updateByPrimaryKeySelective(record);
-                }else{
-                    fcsPagosEstadospagosMapper.insertSelective(record);
-                }
+                record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_CERRADO));
+                fcsPagosEstadospagosMapper.deleteByPrimaryKey(record);
+                insertEstadoPago(idInstitucion, idpagoJG, usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_EJECUTADO);
 
             }catch (Exception e){
                 LOGGER.error(e.getMessage());
