@@ -522,11 +522,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 
 	 
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "compruebaSolapamientoProgramamcionesA")
-	long compruebaSolapamientoProgramamcionesA(DatosCalendarioProgramadoItem item, Short idInstitucion);
-	
-	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "compruebaSolapamientoProgramamcionesB")
-	long compruebaSolapamientoProgramamcionesB(DatosCalendarioProgramadoItem item, Short idInstitucion);
-	
+	long compruebaSolapamientoProgramamcionesA(String idTurno, String idGuardia, String fechaINI, String fechaFIN, Short idInstitucion);
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="insertarHistorico")
 	 @Results({ @Result(column = "IDPROGCALENDARIO", property = "IDPROGCALENDARIO", jdbcType = JdbcType.DECIMAL),
