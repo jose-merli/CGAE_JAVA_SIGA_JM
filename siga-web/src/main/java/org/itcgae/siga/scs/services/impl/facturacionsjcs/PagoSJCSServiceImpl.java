@@ -126,6 +126,7 @@ import org.springframework.stereotype.Service;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PagoSJCSServiceImpl implements IPagoSJCSService {
@@ -2023,18 +2024,10 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                             "PagoSJCSServiceImpl.cerrarPago() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
                                     + idPago);
 
-                    FcsPagosEstadospagos record = new FcsPagosEstadospagos();
-                    record.setIdinstitucion(idInstitucion);
-                    record.setIdpagosjg(pago.getIdpagosjg());
-                    record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_CERRADO));
-                    record.setFechaestado(new Date());
-                    record.setFechamodificacion(new Date());
-                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
-
                     LOGGER.info(
                             "PagoSJCSServiceImpl.cerrarPago() -> fcsPagosEstadospagosMapper.insertSelective() -> Insertamo el estado CERRADO para el pago: " + idPago);
                     // Insertamos el estado del pago
-                    fcsPagosEstadospagosMapper.insertSelective(record);
+                    utilidadesPagoSJCS.insertEstadoPago(idInstitucion, pago.getIdpagosjg(), usuarios.get(0).getIdusuario(), SigaConstants.ESTADO_PAGO_CERRADO);
 
                     // Pasamos automaticamente a deducir los pagos
                     generarAbonos(idInstitucion, idPago, usuarios.get(0), null);
@@ -2230,6 +2223,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
      * @param irpfTotal
      * @param idPersonaSJCS
      */
+    @Transactional(rollbackFor = Exception.class)
     private void crearAbonos(String idPersona, String idCuenta, List<ColegiadosPagoDTO> colegiadosMarcados, String idPersonaSoc, String idPago, String idInstitucion, Hashtable importes, double irpfTotal, String idPersonaSJCS, AdmUsuarios usuario) throws FacturacionSJCSException {
 
         String importeTurnos = "", importeGuardias = "", importeSoj = "", importeEjg = "", importeMovimientos = "", importeRetenciones = "", importeRetencionesPersona = "";
@@ -2286,7 +2280,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             facAbono.setUsumodificacion(usuario.getIdusuario());
             facAbono.setContabilizada(SigaConstants.FACTURA_ABONO_NO_CONTABILIZADA);
             facAbono.setIdpersona(Long.valueOf(idPersona));
-            facAbono.setIdcuenta(Short.valueOf(idCuenta));
+            facAbono.setIdcuenta(UtilidadesString.esCadenaVacia(idCuenta) ? null : Short.valueOf(idCuenta));
             facAbono.setIdpagosjg(Integer.valueOf(idPago));
             facAbono.setIdperorigen(Long.valueOf(idPersonaSJCS));
 
@@ -2690,6 +2684,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                     double importeCompensado = datosPagoAbono.getImporte().doubleValue();
 
+                    datosPagoAbono.setUsumodificacion(usuario.getIdusuario());
+                    datosPagoAbono.setFechamodificacion(new Date());
                     correcto = (facPagoabonoefectivoExtendsMapper.insertSelective(datosPagoAbono) == 1);
 
                     // RGG 29/05/2009 Cambio de funciones de abono
@@ -2748,6 +2744,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     datosPagoFactura.setIdabono(Long.valueOf(abono));
                     datosPagoFactura.setIdpagoabono(datosPagoAbono.getIdpagoabono());
 
+                    datosPagoFactura.setUsumodificacion(usuario.getIdusuario());
+                    datosPagoFactura.setFechamodificacion(new Date());
                     correcto = (facPagosporcajaExtendsMapper.insertSelective(datosPagoFactura) == 1);
 
                     // Actualizo estado del abono

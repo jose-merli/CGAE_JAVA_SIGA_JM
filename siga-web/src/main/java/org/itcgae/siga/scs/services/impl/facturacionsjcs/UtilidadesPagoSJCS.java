@@ -250,6 +250,8 @@ public class UtilidadesPagoSJCS {
                 
                 for (FcsPagoColegiado colegiado : colegiados) { 
                 	idPersonaDestino = colegiado.getIdperdestino().toString();
+                	importeMovimientos = colegiadoMV.get(idPersonaDestino);
+
                 	// obtiene el porcentajeIRPF del colegiado para utilizarlo al
                     // aplicar
                     // los movimientos varios y calcular el IRPF del importe bruto.
@@ -288,7 +290,6 @@ public class UtilidadesPagoSJCS {
                     importeRetenciones = getSumaRetenciones(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(), usuario);
                     
                     //Obtenemos del mapa el importeMovimientos obtenido previamente
-                    importeMovimientos = colegiadoMV.get(idPersonaDestino);
                     // Actualizar el irpf, movimientos varios y retenciones en
                     // fcs_pago_colegiado
                     FcsPagoColegiado fcsPagoColegiado = new FcsPagoColegiado();
