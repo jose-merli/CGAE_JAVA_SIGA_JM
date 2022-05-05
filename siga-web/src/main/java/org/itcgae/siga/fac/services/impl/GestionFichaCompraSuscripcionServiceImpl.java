@@ -753,7 +753,11 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								compra.setNofacturable("0");
 							}
 							if(ficha.getIdFormaPagoSeleccionada().equals("80") || ficha.getIdFormaPagoSeleccionada().equals("20")) {
-								compra.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
+								if (ficha.getCuentaBancSelecc() != null) {
+									compra.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
+								}else {
+									compra.setIdcuenta(null);
+								}
 							}
 							else {
 								compra.setIdcuenta(null);
