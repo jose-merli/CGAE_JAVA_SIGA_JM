@@ -648,7 +648,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sqlPagoacolegiados.FROM("cen_persona cen");
         sqlPagoacolegiados.FROM("fcs_pagosjg pj");
         sqlPagoacolegiados.FROM("fcs_facturacionjg fac");
-        sqlPagoacolegiados.FROM("fcs_fact_grupofact_hito grupo");
 
         sqlPagoacolegiados.WHERE("pc.idinstitucion = " + idInstitucion);
 
@@ -656,12 +655,21 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
             sqlPagoacolegiados.WHERE("pc.idpagosjg IN ( " + cartasFacturacionPagosItem.getIdPago() + " )");
         }
 
-        if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
-            sqlPagoacolegiados.WHERE("grupo.IDGRUPOFACTURACION IN ( " + cartasFacturacionPagosItem.getIdTurno() + " )");
-        }
+        if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno()) || !UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
+            SQL sql3 = new SQL();
+            sql3.SELECT("1");
+            sql3.FROM("fcs_fact_grupofact_hito grupo");
+            sql3.WHERE("fac.idinstitucion = grupo.idinstitucion AND fac.idfacturacion = grupo.idfacturacion");
 
-        if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
-            sqlPagoacolegiados.WHERE("grupo.IDHITOGENERAL IN ( " + cartasFacturacionPagosItem.getIdConcepto() + " )");
+            if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
+                sql3.WHERE("grupo.IDGRUPOFACTURACION IN ( " + cartasFacturacionPagosItem.getIdTurno() + " )");
+            }
+
+            if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
+                sql3.WHERE("grupo.IDHITOGENERAL IN ( " + cartasFacturacionPagosItem.getIdConcepto() + " )");
+            }
+
+            sqlPagoacolegiados.WHERE("EXISTS (" + sql3.toString() + ")");
         }
 
         if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPartidaPresupuestaria())) {
@@ -675,8 +683,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sqlPagoacolegiados.WHERE("pj.idpagosjg = pc.idpagosjg");
         sqlPagoacolegiados.WHERE("pj.idinstitucion = fac.idinstitucion");
         sqlPagoacolegiados.WHERE("pj.idfacturacion = fac.idfacturacion");
-        sqlPagoacolegiados.WHERE("fac.idinstitucion = grupo.idinstitucion");
-        sqlPagoacolegiados.WHERE("fac.idfacturacion = grupo.idfacturacion");
 
         sqlPagoacolegiados.GROUP_BY("cen.apellidos1");
         sqlPagoacolegiados.GROUP_BY("cen.apellidos2");
