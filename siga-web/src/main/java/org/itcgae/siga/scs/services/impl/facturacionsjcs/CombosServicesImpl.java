@@ -99,8 +99,8 @@ public class CombosServicesImpl implements ICombosServices {
 
 				LOGGER.info(
 						"comboPagosColegio() / fcsPagosjgExtendsMapper.getComboFactColegio() -> Entrada a fcsPagosjgExtendsMapper para obtener el listado");
-				List<ComboItem> comboItems = fcsPagosjgExtendsMapper.comboPagosColegio(usuario.getIdlenguaje(),
-						idInstitucion);
+				List<ComboItem> comboItems = fcsPagosjgExtendsMapper.comboPagosColegioPorEstados(usuario.getIdlenguaje(),
+						idInstitucion, Arrays.asList(SigaConstants.ESTADO_PAGO_CERRADO, SigaConstants.ESTADO_PAGO_EJECUTADO));
 				comboEstadosFact.setCombooItems(comboItems);
 
 				LOGGER.info(
