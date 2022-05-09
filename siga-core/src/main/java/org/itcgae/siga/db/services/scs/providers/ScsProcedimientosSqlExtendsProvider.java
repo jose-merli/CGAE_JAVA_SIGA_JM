@@ -40,8 +40,6 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		
 		sql.FROM("SCS_PRETENSION procedimiento");
 		sql.WHERE("procedimiento.idinstitucion = '" + idInstitucion + "'");
-		if(!UtilidadesString.esCadenaVacia(idJurisdiccion))
-		sql.WHERE("procedimiento.idjurisdiccion = '"+idJurisdiccion+"'");
 		sql.WHERE("procedimiento.fechabaja is null");
 		sql.ORDER_BY("nombre");
 	
@@ -120,6 +118,8 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 			} else {
 				sql.WHERE("(procedimiento.fechadesdevigor <= sysdate AND (procedimiento.FECHAHASTAVIGOR > sysdate OR procedimiento.fechahastavigor is null))");
 			}
+			
+			sql.WHERE("(procedimiento.fechabaja is null)");
 		}
 		
 		sql.GROUP_BY("procedimiento.idprocedimiento,  procedimiento.nombre, procedimiento.codigo, procedimiento.precio , procedimiento.complemento, procedimiento.vigente, procedimiento.idjurisdiccion, procedimiento.orden, procedimiento.codigoext, procedimiento.permitiraniadirletrado, procedimiento.fechadesdevigor, procedimiento.fechahastavigor, procedimiento.fechabaja, procedimiento.observaciones, juris.descripcion");

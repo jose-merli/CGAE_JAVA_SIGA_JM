@@ -29,6 +29,7 @@ public class ModulosItem {
 	private boolean historico;
 	private String jurisdiccionDes;
 	private boolean verSoloAlta;
+	private boolean usado;
 
 	public String getJurisdiccionDes() {
 		return jurisdiccionDes;
@@ -204,5 +205,13 @@ public class ModulosItem {
 
 	public void setVerSoloAlta(boolean verSoloAlta) {
 		this.verSoloAlta = verSoloAlta;
+	}
+
+	public boolean isUsado() {
+		return usado;
+	}
+
+	public void setUsado(boolean usado) {
+		this.usado = usado;
 	}
 }
