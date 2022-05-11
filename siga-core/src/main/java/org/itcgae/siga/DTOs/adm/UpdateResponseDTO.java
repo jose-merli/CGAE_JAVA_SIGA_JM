@@ -1,8 +1,11 @@
 package org.itcgae.siga.DTOs.adm;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ModulosItem;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,6 +19,8 @@ public class UpdateResponseDTO   {
   private String status = new String();
   private String id = new String();
   private Error error = null;
+  private boolean moduloUsado = false;
+  private List<ModulosItem> modulosItem = new ArrayList<ModulosItem>();
 
   
   /**
@@ -110,5 +115,25 @@ public class UpdateResponseDTO   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+
+public boolean isModuloUsado() {
+	return moduloUsado;
+}
+
+
+public void setModuloUsado(boolean moduloUsado) {
+	this.moduloUsado = moduloUsado;
+}
+
+
+public List<ModulosItem> getModulosItem() {
+	return modulosItem;
+}
+
+
+public void setModulosItem(List<ModulosItem> modulosItem) {
+	this.modulosItem = modulosItem;
+}
 }
 
