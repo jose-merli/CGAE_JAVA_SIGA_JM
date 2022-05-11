@@ -978,7 +978,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         // SI ENCONTRAMOS LA FACTURACIÓN Y SE ESTÁ RECALCULANDO,
         // ALMACENAMOS LOS CRITERIOS DE FACTURACIÓN
         // Y POSTERIORMENTE BORRAMOS LA FACTURACIÓN TANTO DE LA BBDD COMO DEL SERVIDOR
-        if (facturacion != null && estados != null && estados.size()>1) {
+        if (facturacion != null && estados != null && estados.size()>0) {
 
         	LOGGER.info("ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
             response = limpiafacturacion(facturacion, estados);
@@ -1903,11 +1903,19 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             param_in[0] = String.valueOf(facturacion.getIdinstitucion());
             param_in[1] = String.valueOf(facturacion.getIdfacturacion());
 
+            LOGGER.info("PARAMETRO INSTITUCION DE ENTRADA EJECUTARBORRARFACTURACION -> " + param_in[0]);
+            LOGGER.info("PARAMETRO FACTURACION DE ENTRADA EJECUTARBORRARFACTURACION -> " + param_in[1]);
+
             // Ejecucion del PL
             resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION2(?,?,false,?,?)}", 2, param_in);
-            if (!resultado[0].equalsIgnoreCase("0")) {
-                //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
-                LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
+
+            if (resultado != null) {
+                if (!resultado[0].equalsIgnoreCase("0")) {
+                    //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
+                    LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
+                }
+            } else {
+                LOGGER.error("Error en PROC_FCS_BORRAR_FACTURACION2");
             }
 
         } catch (Exception e) {
@@ -1937,8 +1945,14 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             // Ejecucion del PL
             resultado = callPLProcedure(
                     "{call "+nomPL + " (?,?,?,?,?,?,?,?,?)}", 2, param_in);
-            if (!resultado[0].equalsIgnoreCase("0")) {
-                LOGGER.error("Error en PL = " + (String) resultado[1]);
+
+            if (resultado != null) {
+                if (!resultado[0].equalsIgnoreCase("0")) {
+                    //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
+                    LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
+                }
+            } else {
+                LOGGER.error("Error en PROC_FCS_BORRAR_FACTURACION2");
             }
 
         } catch (Exception e) {
