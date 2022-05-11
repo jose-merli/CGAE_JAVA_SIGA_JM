@@ -538,6 +538,7 @@ public class SigaConstants {
     public static final String ESTADO_PAGO_EJECUTADO = "20";
     public static final String ESTADO_PAGO_CERRADO = "30";
     public static final String ESTADO_PAGO_EJECUTANDO = "40";
+    public static final String ESTADO_PAGO_CERRANDO = "50";
 
     public static final String CRITERIOS_PAGO_FACTURACION = "F";
     public static final String CRITERIOS_PAGO_PAGOS = "P";

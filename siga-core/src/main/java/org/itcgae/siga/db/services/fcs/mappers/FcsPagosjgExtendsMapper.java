@@ -123,6 +123,9 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getPagosSJCSBloqueadosEnEjecucion")
     List<FcsPagosjg> getPagosSJCSBloqueadosEnEjecucion(Short idInstitucion, Long tiempoMaximoMinutos);
 
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getPagosSJCSBloqueadosEnCierre")
+    List<FcsPagosjg> getPagosSJCSBloqueadosEnCierre(Short idInstitucion, Long tiempoMaximoMinutos);
+
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getCompensacionFacturas")
     @Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),

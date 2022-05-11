@@ -54,7 +54,7 @@ public interface FacHistoricofacturaExtendsMapper extends FacHistoricofacturaMap
 	})
 	List<EstadosPagosItem> getFacturacionLog(String idFactura, String idInstitucion, String idLenguaje);
 
-		@InsertProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "insertarHistoricoFacParametros")
+	@InsertProvider(type = FacHistoricofacturaExtendsSqlProvider.class, method = "insertarHistoricoFacParametros")
     int insertarHistoricoFacParametros(String idInstitucion, String idFactura, Integer idTipoAccion,
                                        Integer idPagoPorCaja, Integer idDisqueteCargos, Integer idFacturaIncluidaEnDisquete,
                                        Integer idDisqueteDevoluciones, String idRecibo, Integer idRenegociacion, Integer idAbono, String comisionIdFactura);

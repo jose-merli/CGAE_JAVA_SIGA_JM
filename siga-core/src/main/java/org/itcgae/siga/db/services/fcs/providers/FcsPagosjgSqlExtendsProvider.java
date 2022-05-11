@@ -492,6 +492,25 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         return query.toString();
     }
 
+    public String getPagosSJCSBloqueadosEnCierre(Short idInstitucion, Long tiempoMaximoMinutos) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("MAX(FECHAESTADO)");
+        subQuery.FROM("FCS_PAGOS_ESTADOSPAGOS");
+        subQuery.WHERE("IDPAGOSJG = fp.IDPAGOSJG");
+        subQuery.WHERE("IDINSTITUCION = fp.IDINSTITUCION");
+
+        SQL query = new SQL();
+        query.SELECT("fp.*");
+        query.FROM("FCS_PAGOSJG fp");
+        query.INNER_JOIN("FCS_PAGOS_ESTADOSPAGOS fpe ON ( fpe.IDINSTITUCION = fp.IDINSTITUCION AND fpe.IDPAGOSJG = fp.IDPAGOSJG AND fpe.FECHAESTADO = (" + subQuery + ") )");
+        query.WHERE("fp.IDINSTITUCION = " + idInstitucion);
+        query.WHERE("fpe.IDESTADOPAGOSJG = " + SigaConstants.ESTADO_PAGO_CERRANDO);
+        query.WHERE("fpe.FECHAESTADO < SYSDATE - " + tiempoMaximoMinutos + "/1440");
+
+        return query.toString();
+    }
+
     public String getCompensacionFacturas(String idPago, Short idInstitucion) {
 
         SQL sql = new SQL();

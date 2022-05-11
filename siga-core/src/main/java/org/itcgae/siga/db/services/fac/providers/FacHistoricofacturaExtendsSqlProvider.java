@@ -176,27 +176,27 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 		sql2.SELECT("ESTADO");
 
 		if (null != idPagoPorCaja && idPagoPorCaja > 0) {
-			sql2.SELECT("IDPAGOPORCAJA");
+			sql2.SELECT(idPagoPorCaja.toString());
 		}
 
 		if (null != idDisqueteCargos && idDisqueteCargos > 0) {
-			sql2.SELECT("IDDISQUETECARGOS");
+			sql2.SELECT(idDisqueteCargos.toString());
 		}
 
 		if (null != idFacturaIncluidaEnDisquete && idFacturaIncluidaEnDisquete > 0) {
-			sql2.SELECT("IDFACTURAINCLUIDAENDISQUETE");
+			sql2.SELECT(idFacturaIncluidaEnDisquete.toString());
 		}
 
 		if (null != idDisqueteDevoluciones && idDisqueteDevoluciones > 0) {
-			sql2.SELECT("IDDISQUETEDEVOLUCIONES");
+			sql2.SELECT(idDisqueteDevoluciones.toString());
 		}
 
 		if (null != idRecibo && !"".equalsIgnoreCase(idRecibo)) {
-			sql2.SELECT("IDRECIBO");
+			sql2.SELECT(idRecibo);
 		}
 
 		if (null != idRenegociacion && idRenegociacion > 0) {
-			sql2.SELECT("IDRENEGOCIACION");
+			sql2.SELECT(idRenegociacion.toString());
 		}
 
 		if (null != idAbono && idAbono > 0) {
@@ -204,7 +204,7 @@ public class FacHistoricofacturaExtendsSqlProvider extends FacHistoricofacturaSq
 		}
 
 		if (null != comisionIdFactura && !"".equalsIgnoreCase(comisionIdFactura)) {
-			sql2.SELECT("COMISIONIDFACTURA");
+			sql2.SELECT(comisionIdFactura);
 		}
 
 		sql2.FROM("FAC_FACTURA");
