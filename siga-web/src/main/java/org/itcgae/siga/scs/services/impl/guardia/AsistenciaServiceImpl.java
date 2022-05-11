@@ -3762,9 +3762,6 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsDocumentacionasi.setIdinstitucion(idInstitucion);
 					scsDocumentacionasi.setAnio(Short.valueOf(anioNumero.split("/")[0]));
 					scsDocumentacionasi.setNumero(Long.valueOf(anioNumero.split("/")[1]));
-					if (!UtilidadesString.esCadenaVacia(documentacionAsistenciaItem.getAsociado())) {
-						scsDocumentacionasi.setIdactuacion(Long.valueOf(documentacionAsistenciaItem.getAsociado()));
-					}
 					scsDocumentacionasi.setUsumodificacion(usuarios.get(0).getIdusuario());
 					affectedRows += scsDocumentacionasiMapper.insertSelective(scsDocumentacionasi);
 
