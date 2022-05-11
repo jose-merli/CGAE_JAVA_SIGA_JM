@@ -1,7 +1,6 @@
 package org.itcgae.siga.scs.services.impl.maestros;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,17 +21,33 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ExpExpediente;
+import org.itcgae.siga.db.entities.ExpExpedienteExample;
+import org.itcgae.siga.db.entities.PcajgProcedScsproced;
+import org.itcgae.siga.db.entities.PcajgProcedScsprocedExample;
 import org.itcgae.siga.db.entities.ScsAcreditacionprocedimiento;
+import org.itcgae.siga.db.entities.ScsAcreditacionprocedimientoExample;
+import org.itcgae.siga.db.entities.ScsAcreditacionprocedimientoKey;
 import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaExample;
+import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
+import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsDesignaExample;
+import org.itcgae.siga.db.entities.ScsJuzgadoprocedimiento;
+import org.itcgae.siga.db.entities.ScsJuzgadoprocedimientoExample;
+import org.itcgae.siga.db.entities.ScsJuzgadoprocedimientoKey;
 import org.itcgae.siga.db.entities.ScsPretensionesproced;
 import org.itcgae.siga.db.entities.ScsPretensionesprocedExample;
+import org.itcgae.siga.db.entities.ScsPretensionesprocedKey;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsProcedimientosExample;
+import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
+import org.itcgae.siga.db.mappers.PcajgProcedScsprocedMapper;
 import org.itcgae.siga.db.mappers.ScsAcreditacionprocedimientoMapper;
 import org.itcgae.siga.db.mappers.ScsPretensionesprocedMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
-import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
+import org.itcgae.siga.db.mappers.ScsDesignaMapper;
+import org.itcgae.siga.db.mappers.ScsJuzgadoprocedimientoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAcreditacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPretensionesProcedExtendsMapper;
@@ -61,10 +76,25 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 	private ScsPretensionesProcedExtendsMapper scsPretensionesprocedMapper;
 	
 	@Autowired 
+	private ScsPretensionesprocedMapper scsPretensionesprocediMapper;
+	
+	@Autowired 
 	private ScsAcreditacionprocedimientoMapper scsAcreditacionProcedimientoMapper;
 
 	@Autowired 
 	private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
+	
+	@Autowired 
+	private ScsJuzgadoprocedimientoMapper scsJuzgadoprocedimientoMapper;
+	
+	@Autowired 
+	private ScsDesignaMapper scsDesignaMapper;
+	
+	@Autowired 
+	private ExpExpedienteMapper expExpedienteMapper;
+	
+	@Autowired 
+	private PcajgProcedScsprocedMapper pcajgProcedScsprocedMapper;
 	
 	@Override
 	public ComboDTO getProcedimientos(HttpServletRequest request, String idJurisdiccion) {
@@ -699,10 +729,12 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						modulo.setFechamodificacion(new Date());
 						modulo.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
-						if(modulosDTO.getBaja().equals("bajalogica")) {
+						if(modulosDTO.getBaja().equals("bajalogica") || modulosItem.isUsado()) {
 							modulo.setFechahastavigor(modulosItem.getFechahastavigor());
+							modulo.setFechabaja(new Date());
 							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
-						}else if (modulosDTO.getBaja().equals("bajafisica")){
+						}else if (modulosDTO.getBaja().equals("bajafisica")) {
+							eliminaRelacionesProcedimiento(idInstitucion, modulosItem);
 							response = scsProcedimientosExtendsMapper.deleteByPrimaryKey(modulo);
 						}else if(modulosDTO.getBaja().equals("reactivar")) {
 							modulo.setFechahastavigor(null);
@@ -750,7 +782,163 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 		return updateResponseDTO;
 	}
+	
+	private void eliminaRelacionesProcedimiento(Short idInstitucion, ModulosItem modulosItem) {
+		
+		// Eliminamos las relaciones del procedimiento con las pretensiones
+		ScsPretensionesprocedExample pretension = new ScsPretensionesprocedExample();
+		pretension.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								   .andIdprocedimientoEqualTo(modulosItem.getIdProcedimiento());
+		
+		List<ScsPretensionesproced> pretensionesEliminar = scsPretensionesprocediMapper.selectByExample(pretension);
+		
+		for (ScsPretensionesproced pretensionEliminar : pretensionesEliminar) {
+			
+			ScsPretensionesprocedKey pretensionProcedKey = new ScsPretensionesprocedKey();
+			pretensionProcedKey.setIdinstitucion(pretensionEliminar.getIdinstitucion());
+			pretensionProcedKey.setIdpretension(pretensionEliminar.getIdpretension());
+			pretensionProcedKey.setIdprocedimiento(pretensionEliminar.getIdprocedimiento());
+			
+			scsPretensionesprocediMapper.deleteByPrimaryKey(pretensionProcedKey);
+		}
+		
+		// Eliminamos las relaciones del procedimiento con las acreditaciones
+		ScsAcreditacionprocedimientoExample acreditacion = new ScsAcreditacionprocedimientoExample();
+		acreditacion.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								   .andIdprocedimientoEqualTo(modulosItem.getIdProcedimiento());
+		
+		List<ScsAcreditacionprocedimiento> acreditacionesEliminar = scsAcreditacionProcedimientoMapper.selectByExample(acreditacion);
+		
+		for (ScsAcreditacionprocedimiento acreditacionEliminar : acreditacionesEliminar) {
+			
+			ScsAcreditacionprocedimientoKey acreditacionProcedKey = new ScsAcreditacionprocedimientoKey();
+			acreditacionProcedKey.setIdinstitucion(acreditacionEliminar.getIdinstitucion());
+			acreditacionProcedKey.setIdacreditacion(acreditacionEliminar.getIdacreditacion());
+			acreditacionProcedKey.setIdprocedimiento(acreditacionEliminar.getIdprocedimiento());
+			
+			scsAcreditacionProcedimientoMapper.deleteByPrimaryKey(acreditacionProcedKey);
+		}
+		
+		// Eliminamos las relaciones del procedimiento con los juzgados
+		ScsJuzgadoprocedimientoExample juzgado = new ScsJuzgadoprocedimientoExample();
+		juzgado.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								   .andIdprocedimientoEqualTo(modulosItem.getIdProcedimiento());
+		
+		List<ScsJuzgadoprocedimiento> juzgadosEliminar = scsJuzgadoprocedimientoMapper.selectByExample(juzgado);
+		
+		for (ScsJuzgadoprocedimiento juzgadoEliminar : juzgadosEliminar) {
+			
+			ScsJuzgadoprocedimientoKey juzgadoProcedKey = new ScsJuzgadoprocedimientoKey();
+			juzgadoProcedKey.setIdinstitucion(juzgadoEliminar.getIdinstitucion());
+			juzgadoProcedKey.setIdjuzgado(juzgadoEliminar.getIdjuzgado());
+			juzgadoProcedKey.setIdprocedimiento(juzgadoEliminar.getIdprocedimiento());
+			
+			scsJuzgadoprocedimientoMapper.deleteByPrimaryKey(juzgadoProcedKey);
+		}
+	}
+	
+	@Override
+	public UpdateResponseDTO checkModules(ModulosDTO modulosDTO, HttpServletRequest request) {
+		LOGGER.info("checkModules() ->  Entrada al servicio para comprobar si los modulos han sido usados");
 
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		boolean hayAlgunModuloUsado = false;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"checkModules() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"checkModules() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					for (ModulosItem modulosItem : modulosDTO.getModulosItem()) {
+						
+						if (comprobarModuloUsado(idInstitucion, modulosItem.getIdProcedimiento())) {
+							hayAlgunModuloUsado = true;
+							modulosItem.setUsado(true);
+						}
+					}
+					
+					response = 1;
+				} catch (Exception e) {
+					LOGGER.error(e);
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+		}
+
+		updateResponseDTO.setModuloUsado(hayAlgunModuloUsado);
+		updateResponseDTO.setModulosItem(modulosDTO.getModulosItem());
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("checkModules() -> Salida del servicio para comprobar si los modulos han sido usados");
+
+		return updateResponseDTO;
+	}
+
+	private boolean comprobarModuloUsado(Short idInstitucion, String idProcedimiento) {
+		boolean usado = false;
+		
+		ScsActuaciondesignaExample scsActuaciondesignaExample = new ScsActuaciondesignaExample();
+        scsActuaciondesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								   .andIdprocedimientoEqualTo(idProcedimiento);
+		
+		List<ScsActuaciondesigna> scsActuaciondesigna = scsActuaciondesignaMapper.selectByExample(scsActuaciondesignaExample);
+		
+		ScsDesignaExample scsDesignaExample = new ScsDesignaExample();
+		scsDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								   .andIdprocedimientoEqualTo(idProcedimiento);
+		
+		List<ScsDesigna> scsDesigna = scsDesignaMapper.selectByExample(scsDesignaExample);
+		
+		ExpExpedienteExample expExpedienteExample = new ExpExpedienteExample();
+		expExpedienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								   .andProcedimientoEqualTo(idProcedimiento);
+		
+		List<ExpExpediente> expExpediente = expExpedienteMapper.selectByExample(expExpedienteExample);
+		
+		PcajgProcedScsprocedExample pcajgProcedScsprocedExample = new PcajgProcedScsprocedExample();
+		pcajgProcedScsprocedExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								   .andIdprocedimientoEqualTo(idProcedimiento);
+		
+		List<PcajgProcedScsproced> pcajgProcedScsproced = pcajgProcedScsprocedMapper.selectByExample(pcajgProcedScsprocedExample);
+		
+		if (scsActuaciondesigna.size() > 0 || 
+				scsDesigna.size() > 0 || 
+				expExpediente.size() > 0 || 
+				pcajgProcedScsproced.size() > 0) {
+			usado = true;
+		}
+		
+		return usado;
+	}
 	
 	@Override
 	public ComboDTO getAcreditaciones(String idProcedimiento, HttpServletRequest request) {

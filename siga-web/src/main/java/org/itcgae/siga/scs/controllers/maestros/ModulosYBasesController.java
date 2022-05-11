@@ -49,6 +49,15 @@ public class ModulosYBasesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/modulosybasesdecompensacion/checkModulos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> checkModules(@RequestBody ModulosDTO modulosDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = ModulosYBasesService.checkModules(modulosDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/modulosybasesdecompensacion/updatemoduloybasedecompensacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateModules(@RequestBody ModulosItem modulosItem, HttpServletRequest request) {
 		UpdateResponseDTO response = ModulosYBasesService.updateModules(modulosItem, request);

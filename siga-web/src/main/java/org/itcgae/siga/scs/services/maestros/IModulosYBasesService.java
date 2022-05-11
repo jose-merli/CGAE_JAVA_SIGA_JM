@@ -32,4 +32,6 @@ public interface IModulosYBasesService {
 
 	public ComboDTO getProcedimientos(HttpServletRequest request, String idJurisdiccion);
 
+	UpdateResponseDTO checkModules(ModulosDTO modulosDTO, HttpServletRequest request);
+
 }
