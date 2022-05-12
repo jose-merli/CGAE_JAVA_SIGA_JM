@@ -1592,6 +1592,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     private void procesarFacturacionSJCS() {
 
+        LOGGER.info("AGUERRAR - EMPIEZA EL PROCESO DE FACTURACION SJCS");
+
         CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
         exampleInstitucion.setDistinct(true);
         exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();
@@ -1599,17 +1601,20 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         List<CenInstitucion> listaInstituciones = institucionMapper.selectByExample(exampleInstitucion);
 
         for (CenInstitucion institucion : listaInstituciones) {
+            LOGGER.info("AGUERRAR - ENTRA EN LA FACTURACION BLOQUEADA");
             facturacionesBloqueadas(institucion);
-
+            LOGGER.info("AGUERRAR - SALE DE LA FACTURACION BLOQUEADA");
+            LOGGER.info("AGUERRAR - ENTRA EN LA FACTURACION PROGRAMADA");
             facturacionesProgramadas(institucion);
+            LOGGER.info("AGUERRAR - SALE DE LA FACTURACION PROGRAMADA");
         }
-
+        LOGGER.info("AGUERRAR - TERMINA EL PROCESO DE FACTURACION SJCS");
     }
 
     private void facturacionesProgramadas(CenInstitucion institucion) {
 
         LOGGER.info("ENTRA -> FacturacionSJCSServicesImpl.facturacionesProgramadas()");
-
+        LOGGER.info("AGUERRA - BUSCAMOS LA LISTA DE FACTURACIÓN PROGRAMADA");
         List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
                 .facturacionesPorEstadoProgramadas(institucion.getIdinstitucion().toString());
 
@@ -1617,21 +1622,25 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             try {
                 // Insertamos el estado En ejecucion para las facturaciones en ejecucion
+                LOGGER.info("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCIÓN PARA LAS FACTURACIONES EN EJECUCION");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
 
                 // Ejecutamos la facturación y genero los multiples ficheros pendientes
 
                 // UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
+                LOGGER.info("AGUERRA - ENTRA LA PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
                 if (item.getRegularizacion().equals("1")) {
                     ejecutarRegularizacionJG(item, institucion);
                 } else {
                     ejecutarFacturacionJG(item, institucion);
                 }
+                LOGGER.info("AGUERRA - SALE DE PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
 
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
+                LOGGER.info("AGUERRA - PETA EN EL METODO DE FACTURACION PROGRAMADA");
                 LOGGER.error(e);
                 actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
                         item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
@@ -1644,7 +1653,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
     private void facturacionesBloqueadas(CenInstitucion institucion) {
-
+        LOGGER.info("AGUERRA - ENTRA EN FACTURACION BLOQUEADA");
         LOGGER.info("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
         LOGGER.debug("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
         List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
@@ -1654,26 +1663,33 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             try {
                 // Insertamos el estado programada para las facturaciones en ejecucion
+                LOGGER.info("AGUERRA - INSERTAMOS EL ESTADO PROGRAMADA PARA LAS FACTURACIONES EN EJECUCION");
                 LOGGER.debug(" Insertamos el estado programada para las facturaciones en ejecucion");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
 
                 // Insertamos el estado En ejecucion para las facturaciones en ejecucion
+                LOGGER.info("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCION PARA LAS FACTURACIONES EN EJECUCION");
                 LOGGER.debug("Insertamos el estado En ejecucion para las facturaciones en ejecucion");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
 
                 // Ejecutamos la facturación y genero los multiples ficheros pendientes
                 // UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
+                LOGGER.info("AGUERRA - ENTRA LA PARTE DE LA REGULACION DE FACTURACIONES BLOQUEADAS");
                 if (item.getRegularizacion().equals("1")) {
                     ejecutarRegularizacionJG(item, institucion);
                 } else {
                     ejecutarFacturacionJG(item, institucion);
                 }
+                LOGGER.info("AGUERRA - SALE DE PARTE DE LA REGULACION DE FACTURACIONES BLOQUEADAS");
+
                 // Insertamos el estado En ejecucion para las facturaciones ejecutada
+                LOGGER.info("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCION PARA LAS FACTURACIONES EJECUTADAS");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
+                LOGGER.info("AGUERRA - PETA EN EL METODO DE FACTURACIONES BLOQUEADAS");
                 LOGGER.error(e.getCause());
                 LOGGER.error(e.getMessage());
                 LOGGER.error(e);
@@ -1685,6 +1701,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         }
 
         LOGGER.info("SALE -> FacturacionSJCSServicesImpl.facturacionesBloqueadas(): " + listaFacturaciones.toString());
+        LOGGER.info("AGUERRA - SALE DE FACTURACION BLOQUEADA");
     }
 
     @Transactional
@@ -2678,7 +2695,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
     private void procesarFacturacionesSJCSBloqueadas() {
-
+        LOGGER.info("AGUERRAR - EMPIEZA EL PROCESO DE FACTURACION SJCS BLOQUEADAS");
         CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
         exampleInstitucion.setDistinct(true);
         exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();
@@ -2686,14 +2703,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         List<CenInstitucion> listaInstituciones = institucionMapper.selectByExample(exampleInstitucion);
 
         for (CenInstitucion institucion : listaInstituciones) {
+            LOGGER.info("AGUERRAR - ENTRA EN LA FACTURACION BLOQUEADA EN EJECUCCION");
             facturacionesBloqueadasEnEjecucion(institucion);
+            LOGGER.info("AGUERRAR - SALE DE LA FACTURACION BLOQUEADA EN EJECUCCION");
         }
-
+        LOGGER.info("AGUERRAR - TERMINA EL PROCESO DE FACTURACION SJCS BLOQUEADAS");
     }
 
     private void facturacionesBloqueadasEnEjecucion(CenInstitucion institucion) {
         LOGGER.info("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
-
+        LOGGER.info("AGUERRAR - ENTRA EN LA FUNCION DE FACTURACIONES BLOQUEADAS");
 
         //Recuperamos el tiempo estimado como bloqueo
         GenPropertiesKey propertiesPK = new GenPropertiesKey();
@@ -2701,6 +2720,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         propertiesPK.setParametro("facturacion.programacionAutomatica.maxMinutosEnEjecucion");
         GenProperties tiempoMaximoMinutos = genPropertiesMapper.selectByPrimaryKey(propertiesPK);
 
+        LOGGER.info("AGUERRAR - BUSCA LAS FACTURACIONES POR ESTADO DE EJECUCION TIEMPO LIMITE");
         List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
                 .facturacionesPorEstadoEjecucionTiempoLimite(institucion.getIdinstitucion().toString(), Integer.parseInt(tiempoMaximoMinutos.getValor()));
 
@@ -2709,13 +2729,17 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             try {
                 // Insertamos el estado ABIERTA para las facturaciones en ejecucion
+                LOGGER.info("AGUERRAR - SE INSERTA ES ESTADO ABIERTA PARA LAS FACTURACION EN EJECUCION");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
 
                 logErroresFac.logError(TEXTO_REINTENTO);
 
                 // Localizamos donde se quedó el proceso de cierre y dehacemos lo hasta ahora modificado(conceptoErroneo puede ser Turno/Guardia/EJG/SOJ)
+                LOGGER.info("AGUERRAR - SE DESHACE LO MODIFICADO EN EL PROCESO DE CIERRE");
                 FcsTrazaErrorEjecucion conceptoErroneo = localizadaEstadoFacturacionBloqueadaEnEjecucion(item);
+                LOGGER.info("AGUERRAR - ENTRA EN LOS IF ANIDADOS PARA DESHACER LO MODIFICADO.");
+                LOGGER.info("AGUERRAR - CONCEPTO ERRONEO: " + conceptoErroneo.getIdoperacion());
                 if (conceptoErroneo != null) {
                     if ("1".equals(conceptoErroneo.getIdoperacion())) {
                         iFacturacionSJCSZombiService.deshacerRegularTurnosOfi(conceptoErroneo);
@@ -2735,8 +2759,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         iFacturacionSJCSZombiService.deshacerEJG(conceptoErroneo);
                     }
                 }
+                LOGGER.info("AGUERRAR - SALIR DE LOS IF ANIDADOS PARA DESHACER LO MODIFICADO.");
 
             } catch (Exception e) {
+
+                LOGGER.info("AGUERRAR - PETA EN EL METODO DE FACTURACIONES BLOQUEADAS EN EJECUCION");
+
             	logErroresFac.logError("excepción en facturacionesBloqueadasEnEjecucion:"+e);
                 LOGGER.error(e);
                 actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
@@ -2746,12 +2774,14 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             }
 
             try {
+                LOGGER.info("AGUERRAR - SE EJECUTA LOGERRORESFAC.WRITEALLERRORS()");
 				logErroresFac.writeAllErrors();
 			} catch (FacturacionSJCSException e) {
+                LOGGER.info("AGUERRAR - PETA LOGERRORESFAC.WRITEALLERRORS()");
 				LOGGER.error("Error al ejecutar logErroresFac.writeAllErrors:" +e);
 			}
         }
-
+        LOGGER.info("AGUERRAR - SALE DE LA FUNCION DE FACTURACIONES BLOQUEADAS");
         LOGGER.info("SALE -> FacturacionSJCSServicesImpl.facturacionesBloqueadas(): " + listaFacturaciones.toString());
     }
 
