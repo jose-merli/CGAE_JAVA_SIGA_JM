@@ -1225,9 +1225,12 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Results({})
 			String getLastProgramacion( String idInstitucion);
 
-
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getLastCalendar")
 			@Results({})
 			String getLastCalendar( String idInstitucion);
+
+			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getIdUltimaGuardiaTurno")
+			@Results({})
+			String getIdUltimaGuardiaTurno();
 
 }

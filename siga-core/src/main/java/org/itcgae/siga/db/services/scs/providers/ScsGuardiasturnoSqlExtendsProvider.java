@@ -3731,4 +3731,13 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 	}
 
+	public String getIdUltimaGuardiaTurno() {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDORDENACIONCOLAS)");
+		sql.FROM("SCS_ORDENACIONCOLAS");
+
+		return sql.toString();
+	}
+
 }
