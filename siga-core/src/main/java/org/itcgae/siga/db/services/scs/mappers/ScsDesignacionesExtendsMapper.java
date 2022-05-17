@@ -250,7 +250,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CODIGO", property = "label1", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem2> comboModulos(Short idInstitucion,int filtro, String fecha);
+	List<ComboItem2> comboModulos(Short idInstitucion, int filtro, String fecha);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboDelitos")
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),

@@ -279,8 +279,8 @@ public class DesignacionesController {
 	}
 
 	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request, String fecha) {
-		ComboDTO response = comboService.comboModulo(request,fecha);
+	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request, ActuacionDesignaItem item) {
+		ComboDTO response = comboService.comboModulo(request,item);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else

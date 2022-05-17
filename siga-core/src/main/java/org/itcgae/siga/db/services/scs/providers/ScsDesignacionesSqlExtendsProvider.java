@@ -1785,15 +1785,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboModulos(Short idInstitucion,int filtro, String fecha) {
+	public String comboModulos(Short idInstitucion, int filtro, String fecha) {
 		//Filtros , (0-Fecha Actual, 1 - Fecha Designacion , 2- Fecha Actuacion
 		SQL sql = new SQL();
 		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE, MODULO.CODIGO ");
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		if(filtro == 0) {
-			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= "+ fecha);
-			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= " + fecha + " OR MODULO.FECHAHASTAVIGOR IS NULL)");
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= SYSDATE");
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= SYSDATE OR MODULO.FECHAHASTAVIGOR IS NULL)");
 		}else {
 			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
 			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= TO_DATE('" + fecha + "','DD/MM/YYYY') OR MODULO.FECHAHASTAVIGOR IS NULL)");
