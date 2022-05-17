@@ -169,7 +169,7 @@ public class PFDServiceImpl implements IPFDService {
 
 	@Override
 	public String obtenerDocumentoEEJGFirmado(String csv) throws Exception {
-		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.IDINSTITUCION_2000, SigaConstants.MODULO_SCS, SigaConstants.EEJG_IDSISTEMA, SigaConstants.PFD_URLWS);
+		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.IDINSTITUCION_2000, SigaConstants.MODULO_SCS, SigaConstants.EEJG_IDSISTEMA, SigaConstants.EEJG_URLWS);
 	}
 
 	private String obtenerDocumentoFirmadoModulo(String csv, Short idInstitucion, String modulo, String parametroIdCliente, String paramentroUrl) throws Exception {
