@@ -329,7 +329,7 @@ public class UtilidadesFacturacionSJCS {
     public void ejecutarFacturacionJG(FcsFacturacionjg itemFac, CenInstitucion institucion) throws Exception {
         boolean prevision = false;
     	LogErroresFacturacionSJCS logErroresFac = logErroresFacHelper.getLogErroresFacturacion(itemFac.getIdinstitucion(),itemFac.getIdfacturacion().toString());
-        LOGGER.debug("Entramos ejecutarFacturacionJG");
+        LOGGER.debug("ejecutarFacturacionJG() - INICIO");
         if (itemFac.getPrevision().equals("1")) {
             prevision = true;
         }
@@ -362,7 +362,6 @@ public class UtilidadesFacturacionSJCS {
         	logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_TURNOS_OFI; " + e);
         }
         
-        
         if (resultado == null || resultado.length <= 1 || resultado[2] == null || !resultado[2].equalsIgnoreCase("Fin correcto ")) {
         	String sError = "";
         	if(resultado[2] == null) {
@@ -377,7 +376,6 @@ public class UtilidadesFacturacionSJCS {
             importeOficio = new Double(resultado[0].replaceAll(",", "."));
             importeTotal += importeOficio.doubleValue();
         }
-
 
         //////////////////////////////////
         // GUARDIAS rgg 22-03-2005
@@ -417,7 +415,6 @@ public class UtilidadesFacturacionSJCS {
             importeTotal += importeGuardia.doubleValue();
         }
 
-
         //////////////////////////////////
         // EXPEDIENTES SOJ rgg 22-03-2005
 
@@ -455,7 +452,6 @@ public class UtilidadesFacturacionSJCS {
             importeTotal += importeSOJ.doubleValue();
         }
 
-
         //////////////////////////////////
         // EXPEDIENTES EJG rgg 22-03-2005
 
@@ -492,8 +488,6 @@ public class UtilidadesFacturacionSJCS {
             importeTotal += importeEJG.doubleValue();
         }
 
-
-
         if (prevision) {
             //////////////////////////////////////
             /// CREAMOS EL INFORME
@@ -513,8 +507,6 @@ public class UtilidadesFacturacionSJCS {
             throw new Exception("Hacemos rollback por tratarse de una simulacion");
         }
 
-
-
         // Exportacion de datos a EXCEL: Se ha comentado este metodo por que no se
         // quiere utilizar
         // UtilidadesFacturacionSJCS.exportarDatosFacturacion(new
@@ -532,7 +524,8 @@ public class UtilidadesFacturacionSJCS {
 
             fcsFacturacionjgMapper.updateByPrimaryKey(itemFac);
         }
-
+        
+        LOGGER.debug("ejecutarFacturacionJG() - FIN");
     }
 
     @Transactional(rollbackFor = Exception.class)
