@@ -644,6 +644,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					if (item.getValidada() != null && !item.getValidada().trim().isEmpty()) {
 						record.setValidada(item.getValidada());
+
+						// Si se valida una actuación se establece automáticamente la fecha de justificación
+						if (record.getValidada().equals("1") && record.getFechajustificacion() == null) {
+							record.setFechajustificacion(new Date());
+						}
 					}
 
 					fecha = formatter.parse(item.getFecha());
@@ -5241,8 +5246,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (justificacion.getEstado() != null && !justificacion.getEstado().isEmpty()) {
 							recordJust.setEstado(justificacion.getEstado());
 						}
-						if (justificacion.getProcedimiento() != null && !justificacion.getProcedimiento().isEmpty()) {
-							recordJust.setIdprocedimiento(justificacion.getProcedimiento());
+						if (justificacion.getIdProcedimiento() != null && !justificacion.getIdProcedimiento().isEmpty()) {
+							recordJust.setIdprocedimiento(justificacion.getIdProcedimiento());
 						}
 
 						if (justificacion.getNumProcedimiento() != null
@@ -5257,7 +5262,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							for (ActuacionesJustificacionExpressItem actuacion : justificacion.getActuaciones()) {
 								if (actuacion.getValidada() != "1") {
 
-									ScsActuaciondesigna record = new ScsActuaciondesigna();
+
+									ScsActuaciondesignaKey actuaciondesignaKey = new ScsActuaciondesignaKey();
+									actuaciondesignaKey.setIdinstitucion(Short.parseShort(actuacion.getIdInstitucion()));
+									actuaciondesignaKey.setNumeroasunto(Long.parseLong(actuacion.getNumAsunto()));
+									actuaciondesignaKey.setNumero(Long.parseLong(actuacion.getNumDesignacion()));
+									actuaciondesignaKey.setIdturno(Integer.parseInt(actuacion.getIdTurno()));
+									actuaciondesignaKey.setAnio(Short.parseShort(actuacion.getAnio()));
+
+									ScsActuaciondesigna record = scsActuaciondesignaMapper.selectByPrimaryKey(actuaciondesignaKey);
 
 									if (actuacion.getAnioProcedimiento() != null
 											&& !actuacion.getAnioProcedimiento().isEmpty()) {
@@ -5273,8 +5286,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 											&& actuacion.getFechaJustificacion() != "false"
 											&& actuacion.getFechaJustificacion() != "true"
 											&& !actuacion.getFechaJustificacion().isEmpty()) {
+
 										fecha = formatter.parse(actuacion.getFechaJustificacion());
 										record.setFechajustificacion(fecha);
+									} else {
+										record.setFechajustificacion(null);
 									}
 
 									if (actuacion.getIdAcreditacion() != null
@@ -5302,16 +5318,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 									if (actuacion.getValidada() != null && !actuacion.getValidada().isEmpty()) {
 										record.setValidada(actuacion.getValidada());
+										if (record.getValidada().equals("1") && record.getFechajustificacion() == null) {
+											record.setFechajustificacion(new Date());
+
+										}
 									}
 
 									record.setFechamodificacion(new Date());
-									record.setIdinstitucion(Short.parseShort(actuacion.getIdInstitucion()));
-									record.setNumeroasunto(Long.parseLong(actuacion.getNumAsunto()));
-									record.setNumero(Long.parseLong(actuacion.getNumDesignacion()));
-									record.setIdturno(Integer.parseInt(actuacion.getIdTurno()));
-									record.setAnio(Short.parseShort(actuacion.getAnio()));
 
-									responseAct = scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
+
+									responseAct = scsActuaciondesignaMapper.updateByPrimaryKey(record);
 
 								}
 							}
