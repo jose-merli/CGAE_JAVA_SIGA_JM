@@ -972,6 +972,22 @@ public class GuardiasServiceImpl implements GuardiasService {
 						LOGGER.info(
 								"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Setteo de los campos que se han introducido y el resto de datos por defecto");
 
+						// Extraemos el último ID de la tabla OrdenacionColas y le sumamos 1 para generar el próximo ID
+						Integer nuevoIdOrdenacionCola = Integer.valueOf(this.scsGuardiasturnoExtendsMapper.getIdUltimaGuardiaTurno()) + 1;
+
+						// Insertamos el nuevo registro en la tabla OrdenacionColas sin configuración
+						ScsOrdenacioncolas ordenacionColas = new ScsOrdenacioncolas();
+						ordenacionColas.setIdordenacioncolas(nuevoIdOrdenacionCola);
+						ordenacionColas.setAlfabeticoapellidos(Short.valueOf("0"));
+						ordenacionColas.setFechanacimiento(Short.valueOf("0"));
+						ordenacionColas.setNumerocolegiado(Short.valueOf("0"));
+						ordenacionColas.setAntiguedadcola(Short.valueOf("0"));
+						ordenacionColas.setFechamodificacion(new Date());
+						ordenacionColas.setUsumodificacion(0);
+						ordenacionColas.setOrdenacionmanual(Short.valueOf("0"));
+
+						this.scsOrdenacionColasExtendsMapper.insert(ordenacionColas);
+
 						guardia.setFechabaja(null);
 						guardia.setEnviocentralita((short) (guardiasItem.getEnvioCentralita() ? 1 : 0));
 						guardia.setFechamodificacion(new Date());
@@ -994,8 +1010,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardia.setSeleccionfestivos("LMXJVSD");
 						guardia.setSeleccionlaborables("LMXJVSD");
 						guardia.setValidarjustificaciones("N");
-						guardia.setIdordenacioncolas(18033); // Esta puesto este id porque es el que tiene la conf por
-																// defecto.
+						guardia.setIdordenacioncolas(nuevoIdOrdenacionCola); // Se extrae el ultimo ID y se le suma 1 para obtener el nuevo ID
 					}
 					NewIdDTO idP = scsGuardiasturnoExtendsMapper.getIdGuardia();
 
