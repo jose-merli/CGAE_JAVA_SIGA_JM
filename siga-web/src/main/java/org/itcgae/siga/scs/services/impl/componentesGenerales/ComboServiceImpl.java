@@ -1270,7 +1270,14 @@ public class ComboServiceImpl implements ComboService {
 				designaKey.setIdinstitucion(idInstitucion);
 
 				ScsDesigna designa = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
-				fecha = dateFormat.format(designa.getFechaentrada());
+
+				if (designa != null) {
+					fecha = dateFormat.format(designa.getFechaentrada());
+				} else {
+					fecha = "SYSDATE";
+					filtro = 0;
+				}
+
 			} else if (filtro == 2  && !UtilidadesString.esCadenaVacia(designaItem.getNumero()) && !UtilidadesString.esCadenaVacia(designaItem.getAnio())
 					&& !UtilidadesString.esCadenaVacia(designaItem.getIdTurno()) && !UtilidadesString.esCadenaVacia(designaItem.getNumeroAsunto())) {
 				ScsActuaciondesignaKey actuacionKey = new ScsActuaciondesignaKey();
@@ -1281,7 +1288,13 @@ public class ComboServiceImpl implements ComboService {
 				actuacionKey.setIdinstitucion(idInstitucion);
 
 				ScsActuaciondesigna actuacion = scsActuaciondesignaMapper.selectByPrimaryKey(actuacionKey);
-				fecha = dateFormat.format(actuacion.getFecha());
+
+				if (actuacion != null) {
+					fecha = dateFormat.format(actuacion.getFecha());
+				} else {
+					fecha = "SYSDATE";
+					filtro = 0;
+				}
 			} else {
 				fecha = "SYSDATE";
 				filtro = 0;
