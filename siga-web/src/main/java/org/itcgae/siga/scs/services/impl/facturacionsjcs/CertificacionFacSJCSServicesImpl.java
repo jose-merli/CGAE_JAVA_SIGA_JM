@@ -1,7 +1,15 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -23,20 +31,28 @@ import org.itcgae.siga.db.services.fcs.mappers.FcsCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactCertificacionesExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsPcajgAlcActErrorCamExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICertificacionFacSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -46,6 +62,8 @@ import java.util.zip.ZipOutputStream;
 public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSService {
 
     private static final String IDFACTURACION = "IDFACTURACION";
+    
+    private static final int EXCEL_ROW_FLUSH = 1000;
 
     private static Map<Short, String> mapaInstituciones = null;
 
@@ -110,6 +128,15 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     @Autowired
     private FcsFactCertificacionesExtendsMapper fcsFactCertificacionesExtendsMapper;
+    
+    @Autowired
+    private GenPropertiesMapper genPropertiesMapper;
+    
+    @Autowired
+    private FcsPcajgAlcActErrorCamExtendsMapper fcsPcajgAlcActErrorCamExtendsMapper;
+    
+    private static final String XLSX_EXT = ".xlsx";
+    
 
     @Override
     public InsertResponseDTO tramitarCertificacion(TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request) {
@@ -135,11 +162,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                 if (null != usuarios && !usuarios.isEmpty()) {
 
                     if (tramitarCerttificacionRequestDTO.getFacturacionItemList() != null && !tramitarCerttificacionRequestDTO.getFacturacionItemList().isEmpty()) {
-
-                        for (FacturacionItem f : tramitarCerttificacionRequestDTO.getFacturacionItemList()) {
-                            listaParaConsejo(tramitarCerttificacionRequestDTO.getIdCertificacion(), idInstitucion, f.getIdFacturacion(), usuarios.get(0));
-                        }
-
+                    	listaParaConsejo(tramitarCerttificacionRequestDTO.getIdCertificacion(), idInstitucion, tramitarCerttificacionRequestDTO.getFacturacionItemList(), usuarios.get(0),tramitarCerttificacionRequestDTO.getTipoFichero());   
                     }
 
                 }
@@ -166,55 +189,250 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         return insertResponseDTO;
     }
 
-    private void listaParaConsejo(String idCertificacion, Short idInstitucion, String idFacturacion, AdmUsuarios usuario) throws Exception {
+    /* ESTADO_FACTURACION_ABIERTA(10), ESTADO_FACTURACION_EJECUTADA(20), ESTADO_FACTURACION_LISTA_CONSEJO(30),
+    ESTADO_FACTURACION_EN_EJECUCION(40), ESTADO_FACTURACION_PROGRAMADA(50),
+    ESTADO_FACTURACION_VALIDACION_NO_CORRECTA(60), ESTADO_FACTURACION_ENVIO_NO_ACEPTADO(70),
+    ESTADO_FACTURACION_ENVIO_NO_DISPONIBLE(80), ESTADO_FACTURACION_ENVIO_EN_PROCESO(90);*/
+    
+    /*        ESTADO_CERTIFICACION_ABIERTA("1"),
+        ESTADO_CERTIFICACION_VALIDANDO("2"),
+        ESTADO_CERTIFICACION_NO_VALIDADA("3"),
+        ESTADO_CERTIFICACION_VALIDADA("4"),
+        ESTADO_CERTIFICACION_ENVIANDO("5"),
+        ESTADO_CERTIFICACION_ENVIO_CON_ERRORES("6"),
+        ESTADO_CERTIFICACION_CERRADA("7");*/
+    
+    private void listaParaConsejo(String idCertificacion, Short idInstitucion, List<FacturacionItem>  listaFacturaciones , AdmUsuarios usuario, String tipoFichero) throws Exception {
 
-        String estadoActualFacturacion = fcsFactEstadosfacturacionExtendsMapper.getIdEstadoFacturacion(idInstitucion, idFacturacion);
-
-        //comprobamos que la facturacion se encuentra ejecutada o no validada o rechazada
-        int estadoActualFac = Integer.parseInt(estadoActualFacturacion);
-
-        if (estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo()
-                && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_VALIDACION_NO_CORRECTA.getCodigo()
-                && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_NO_DISPONIBLE.getCodigo()
-                && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_NO_ACEPTADO.getCodigo()
-                && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo()) {
-            throw new Exception("Ha ocurrido un error al cerrar la facturación. No se puede cerrar la facturación porque el estado actual no es correcto.");
-        }
-
-        int estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo();
+        //int estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo();
         //SI TIENE CONFIGURADO EL WEBSERVICE HACEMOS LA LLAMADA
         int tipoCAJG = getTipoCAJG(idInstitucion);
+        actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
+        
+        switch (tipoCAJG) {
+		case SigaConstants.TIPO_CAJG_XML_SANTIAGO: // Acciones a realizar si se trata de la Xunta
+        
+        	for (FacturacionItem facturacionItem : listaFacturaciones) {
+    			envioWS(idInstitucion, facturacionItem.getIdFacturacion(), SigaConstants.ECOM_OPERACION.ECOM2_XUNTA_JE.getId(), usuario);
+			}
+            break;
+		case SigaConstants.TIPO_CAJG_CATALANES:
+             for (FacturacionItem facturacionItem : listaFacturaciones) {
+            	 envioWS(idInstitucion, facturacionItem.getIdFacturacion(), SigaConstants.ECOM_OPERACION.ECOM2_CAT_VALIDA_JUSTIFICACION.getId(), usuario);
+ 			}
+             break;
+		case SigaConstants.TIPO_CAJG_CAM:
+			int errores = 0;
+			for (FacturacionItem facturacionItem : listaFacturaciones) {
+				String path = getFileInformeIncidencias(idInstitucion, facturacionItem.getIdFacturacion()).getPath();
+				errores =+ camHelper.execute(path, tipoFichero, idInstitucion, facturacionItem.getIdFacturacion(), null, usuario);
+			}
+			if(errores == 0) {
+				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDADA.getCodigo()), usuario.getIdusuario());
+				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
+				int estadoFacturacionCerrada =  SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(); // Comprobar- Estado Cerrada.
+				for (FacturacionItem facturacionItem : listaFacturaciones) {
+					actualizarEstadoFacturacion(usuario, idInstitucion, facturacionItem.getIdFacturacion(), estadoFacturacionCerrada);
+				}
+			}else {
+				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()), usuario.getIdusuario());
+			}
+			break;
+			
+		default:
+			if(!validacionA(listaFacturaciones,idCertificacion,idInstitucion, usuario) ||  !validacionB(listaFacturaciones, idInstitucion,idCertificacion)) {
+				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()), usuario.getIdusuario());
+				//
+			}else {
+				//Si la validacion es correcta actualizamos certificacion y cerramos las facturaciones.
+				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDADA.getCodigo()), usuario.getIdusuario());
+				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
+				int estadoFacturacionCerrada =  SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(); // Comprobar- Estado Cerrada.
+				for (FacturacionItem facturacionItem : listaFacturaciones) {
+					actualizarEstadoFacturacion(usuario, idInstitucion, facturacionItem.getIdFacturacion(), estadoFacturacionCerrada);
+				}
+			}
+			break;
+		}
 
-        // Acciones a realizar si se trata de la Xunta
-        if (SigaConstants.TIPO_CAJG_XML_SANTIAGO == tipoCAJG) {
-            envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_XUNTA_JE.getId(), usuario);
-            estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
-            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
-        }
+    }
+    
+    //La certificación al menos debe tener una facturación
+    // quitado -- ejecutada y no cerrada.
+    private boolean validacionA( List<FacturacionItem>  listaFacturaciones, String idCertificacion, Short IdInstitucion, AdmUsuarios usuario) {
+    	if(listaFacturaciones.isEmpty()) {
+    		generarFicheroIncidencias("validacionA", idCertificacion,null, IdInstitucion, usuario);
+    		return false;
+    	}else {
+    		return true; 
+    	}
+    }
+    /*Todas las facturaciones deben estar ejecutadas y no cerradas. Si alguna facturación se encuentra 
+	cerrada, el usuario podrá reabrirla para poder transmitirla de nuevo.*/
+    private boolean validacionB(List<FacturacionItem>  listaFacturaciones, Short idInstitucion,String idCertificacion) {
+    	for (FacturacionItem facturacionItem : listaFacturaciones) {
+    		String estadoActualFacturacion = fcsFactEstadosfacturacionExtendsMapper.getIdEstadoFacturacion(idInstitucion, facturacionItem.getIdFacturacion());
 
-        // Acciones a realizar si se trata de los Catalanes: NO SE HACE
+            //comprobamos que la facturacion se encuentra ejecutada o no validada o rechazada
+            int estadoActualFac = Integer.parseInt(estadoActualFacturacion);
 
-        //TODO CAMBIAR LA OPERACIÓN
-//        if (SigaConstants.TIPO_CAJG_CATALANES == tipoCAJG) {
-//            envioWS(idInstitucion, idFacturacion, SigaConstants.ECOM_OPERACION.ECOM2_CAT_VALIDA_JUSTIFICACION.getId(), usuario);
-//            estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_EN_PROCESO.getCodigo();
-//            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
-//        }
+            if (estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo()
+                    && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_VALIDACION_NO_CORRECTA.getCodigo()
+                    && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_NO_DISPONIBLE.getCodigo()
+                    && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_NO_ACEPTADO.getCodigo()
+                    && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo()) {
+            	generarFicheroIncidencias("validacionB",idCertificacion,facturacionItem.getIdFacturacion(), idInstitucion, null);
+               return false;
+            }
+			
+		}
+    	return true;
+    	
+    }
+    
+    private void generarFicheroIncidencias(String error,String idCertificacion,String idFacturacion, Short idInstitucion, AdmUsuarios usuario) {
+    	try {
+    		String mensajeError = "";
+    		switch (error) {
+    		case "validacionA":
+    			mensajeError = "";
+    			List<EstadoCertificacionItem> listaEstados = fcsCertificacionesExtendsMapper.getEstadosCertificacion(idCertificacion, idInstitucion, usuario.getIdlenguaje());
+    			generarExcel(mensajeError, listaEstados, null, idCertificacion,idInstitucion);
+    			break;
+    		case "validacionB":
+    			mensajeError = "";
+    			generarExcel(mensajeError, null, idFacturacion,idCertificacion , idInstitucion);
+    			break;
+    		default:
+    			break;
+    		}
+		} catch (Exception e) {
+			LOGGER.error("Error",e);
+		}
+    
+    	
+    }
+    
+    private Path getPathLogCertificacion(Short idInstitucion, String idCertificacion) throws IOException {
+    	Path pathFinal = getFileInformeCertificacion(idInstitucion, idCertificacion);
+		Files.createDirectories(pathFinal);
+		//pathFinal = pathFinal.resolve("LogCertificacion_"+idCertificacion + ".xlsx");
+		return pathFinal;
+    }
+    
+    private Path getPathLogFacturacion(Short idInstitucion, String idCertificacion, String idFacturacion) throws IOException {
+    	Path pathFinal = getFileInformeCertificacion(idInstitucion, idCertificacion).resolve("facturaciones").resolve(idFacturacion);
+		Files.createDirectories(pathFinal);
+		//pathFinal = pathFinal.resolve("LogFacturacion_"+idFacturacion+".xlsx");
+		return pathFinal;
+    }
+    
+    private String getNombreLogCertificacion() {
+    	return "LogCertificacion" + XLSX_EXT;
+    }
+    
+    private String getNombreLogFacturacion() {
+    	return "LogFacturacion" + XLSX_EXT;
+    }
+    
+    private void generarExcel(String error,List<EstadoCertificacionItem> listaEstados, String idFacturacion, String idCertificacion,Short idInstitucion )
+			throws IOException, EncryptedDocumentException, InvalidFormatException {
+    	
 
-        // Acciones a realizar si se trata de la CAM
-//        if (isCAM(idInstitucion)) {
-        /* en el caso de la CAM el fichero ya se ha generado previamente al ejecutar informe
-         *  averiguar qué implicaciones tiene en el estado en el caso de la CAM
-         */
+		
+		Path pathFinal = null;
+		if(listaEstados != null) {
+			pathFinal = getPathLogCertificacion(idInstitucion, idCertificacion).resolve(getNombreLogCertificacion());
+		}else {
+			pathFinal = getPathLogFacturacion(idInstitucion, idCertificacion,idFacturacion).resolve(getNombreLogFacturacion());
+		}
+		 try {
+			 
+				//Files.copy(input.getInputStream(),Paths.get("C:\\Users\\kvargasnunez\\Desktop\\ult.csv") ,StandardCopyOption.REPLACE_EXISTING);
+			//	Files.copy(input.getInputStream(),Paths.get(pathFinal.toString()) ,StandardCopyOption.REPLACE_EXISTING);
+			 	Workbook workBook = crearExcel(error,idCertificacion, idFacturacion, listaEstados );
+				FileOutputStream fileOut;
+				File file = new File(pathFinal.toString());
+				fileOut = new FileOutputStream(file);
+				workBook.write(fileOut);
+				fileOut.close();
+				workBook.close();	
+		} catch (Exception e) {
+		      LOGGER.error("Error",e);
+		}
+	
+	}
 
-//        }
+	private Workbook crearExcel(String error,  String idFacturacion, String idCertificacion, List<EstadoCertificacionItem> listaEstados ) {
+		
+		
 
-        // Acciones a realizar si se trata de territorio común
-        if (SigaConstants.TIPO_CAJG_XML_SANTIAGO != tipoCAJG && SigaConstants.TIPO_CAJG_CATALANES != tipoCAJG) {
-            actualizarEstadoFacturacion(usuario, idInstitucion, idFacturacion, estadoFuturo);
-            actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
-        }
+		try {
+			
+			String sheetName = "";
+			if(listaEstados != null) {
+				sheetName = "LogCertificacion";
+			}else {
+				sheetName = "LogFacturacion";
+			}
+			Workbook workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
+			Sheet sheet = workbook.createSheet(sheetName);
+			
+			
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+			Row rowAux = sheet.createRow(0);
+			rowAux.createCell(0).setCellValue("Error -");
+			rowAux.createCell(1).setCellValue(error);
+			
+			if(listaEstados != null) {
+				for (int i = 0; i < listaEstados.size(); i++) {
+	                String fecha = dateFormat.format(listaEstados.get(i).getFechaEstado());
+					Row row = sheet.createRow(i+1);
+					row.createCell(0).setCellValue(fecha);
+					row.createCell(1).setCellValue(listaEstados.get(i).getEstado());
+				}
+			}
+			sheet.setColumnWidth(0, 7000);
+			sheet.setColumnWidth(1, 4000);
 
+			return workbook;
+			
+		} catch (Exception e) {
+			throw new RuntimeException("Error al crear el archivo Excel: " + e.getMessage());
+		}
+	}
+    
+    public Path getFileInformeCertificacion(Short idInstitucion, String idCertificacion) {
+    	try {
+    		      
+       	 	GenPropertiesKey key = new GenPropertiesKey();
+            key.setFichero(SigaConstants.FICHERO_SIGA);
+            key.setParametro(SigaConstants.parametroRutaAlmacenFicheros);
+            GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
+            
+           /* GenPropertiesKey keyAux = new GenPropertiesKey();
+            keyAux.setFichero(SigaConstants.FICHERO_SIGA);
+            keyAux.setParametro(SigaConstants.parametroRutaCertificados); 
+            GenProperties rutaCertificaciones = genPropertiesMapper.selectByPrimaryKey(keyAux);
+            
+            String rutaRaiz = rutaFicherosSalida.getValor() +  rutaCertificaciones.getValor() ;*/
+            String rutaRaiz = rutaFicherosSalida.getValor();
+       	
+           return   Paths.get(rutaRaiz).resolve("informeCertificacion").resolve(idInstitucion.toString()).resolve(idCertificacion);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+        
+    }
+
+    public Path getRutaAlmacenFichero() {
+        GenPropertiesKey key = new GenPropertiesKey();
+        key.setFichero(SigaConstants.FICHERO_SIGA);
+        key.setParametro(SigaConstants.parametroRutaAlmacenFicheros);
+        GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
+        String rutaRaiz = rutaFicherosSalida.getValor();
+        return Paths.get(rutaRaiz);
     }
 
     private void actualizaEstadoCertificacion(String idCertificacion, Short idInstitucion, Short idEstado, Integer idUsuario) {
@@ -349,7 +567,9 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
             if (null != usuarios && !usuarios.isEmpty()) {
 
-                if (null != descargaInfomreCAMItem.getIdEstadoCertificacion() && SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo().equalsIgnoreCase(descargaInfomreCAMItem.getIdEstadoCertificacion())) {
+                if (null != descargaInfomreCAMItem.getIdEstadoCertificacion() && 
+                		SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo().equalsIgnoreCase(descargaInfomreCAMItem.getIdEstadoCertificacion())
+                		|| SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo().equalsIgnoreCase(descargaInfomreCAMItem.getIdEstadoCertificacion())) {
 
                     for (String idFacturacion : descargaInfomreCAMItem.getListaIdFacturaciones()) {
 
@@ -1937,6 +2157,173 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         return res;
     }
 
+    @Override
+    public Resource descargaGeneral(String idCertificacion,String idEstadoCertificacion , HttpServletRequest request) throws Exception {
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Resource res = null;
+        List<GenParametros> tamMax;
+        Integer tamMaximo;
+        List <String>listaIdFacturaciones = new ArrayList<>();
+        
+        if (null != idInstitucion) {
+
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            LOGGER.info("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuariosExtendsMapper.selectByExample() -> " + "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+            LOGGER.info("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuariosExtendsMapper.selectByExample() -> " + "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            GenParametrosExample genParametrosExample = new GenParametrosExample();
+            genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG").andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+            genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+            LOGGER.info("CertificacionFacSJCSServicesImpl.getFactCertificaciones() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+            tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+
+            LOGGER.info("CertificacionFacSJCSServicesImpl.getFactCertificaciones() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+            if (tamMax != null) {
+                tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+            } else {
+                tamMaximo = null;
+            }
+
+            
+            if (null != usuarios && !usuarios.isEmpty()) {
+
+              List<FacturacionItem> facturacionItems = fcsCertificacionesExtendsMapper.getFactCertificaciones(idCertificacion, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje());
+            
+              facturacionItems.forEach(item ->{
+            	  listaIdFacturaciones.add(item.getIdFacturacion());
+              });
+            	 int tipoCAJG = getTipoCAJG(idInstitucion);
+            	 
+            	 if(tipoCAJG == SigaConstants.TIPO_CAJG_CAM) {
+
+                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                     BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+                     ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+                     
+               
+                    		
+                     for (String idFacturacion : listaIdFacturaciones) {
+                    	 //switch no disponible por los formatos
+                    	
+                    	 if(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo().toString().equalsIgnoreCase(idEstadoCertificacion)){
+                    		 File file = getFileCAM(idInstitucion, idFacturacion);
+
+                             if (file.exists()) {
+                                 String addFName = file.getPath().replace(file.getPath(), File.separator + idFacturacion + File.separator + file.getName());
+                                 zipOutputStream.putNextEntry(new ZipEntry(addFName));
+                                 Files.copy(file.toPath(), zipOutputStream);
+                             }
+                    	 }
+                    	 
+                    	 if(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo().equalsIgnoreCase(idEstadoCertificacion)){
+                    		  File fileAux = getFileErroresCAM(idInstitucion, idFacturacion);
+
+                              if (fileAux.exists()) {
+                                  String addFName = fileAux.getPath().replace(fileAux.getPath(), File.separator + idFacturacion + File.separator + fileAux.getName());
+                                  zipOutputStream.putNextEntry(new ZipEntry(addFName));
+                                  Files.copy(fileAux.toPath(), zipOutputStream);
+                              }
+                    	 }
+                         
+                    	 if(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo().toString().equalsIgnoreCase(idEstadoCertificacion)){
+                   		  File fileAux = getFileErroresCAM(idInstitucion, idFacturacion);
+
+                             if (fileAux.exists()) {
+                                 String addFName = fileAux.getPath().replace(fileAux.getPath(), File.separator + idFacturacion + File.separator + fileAux.getName());
+                                 zipOutputStream.putNextEntry(new ZipEntry(addFName));
+                                 Files.copy(fileAux.toPath(), zipOutputStream);
+                             }
+                   	 }
+                        
+
+                     }
+
+                     zipOutputStream.closeEntry();
+
+                     if (zipOutputStream != null) {
+                         zipOutputStream.finish();
+                         zipOutputStream.flush();
+                         IOUtils.closeQuietly(zipOutputStream);
+                     }
+
+                     IOUtils.closeQuietly(bufferedOutputStream);
+                     IOUtils.closeQuietly(byteArrayOutputStream);
+
+                     res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
+                         public String getFilename() {
+                             return "Informe_CAM.zip";
+                         }
+                     };
+
+            	 }else {
+            		  ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                      BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+                      ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+                      
+                      File fileA = getFileCertificacion(idInstitucion, idCertificacion);
+                      if (fileA.exists()) {
+                          String addFName = fileA.getPath().replace(fileA.getPath(), File.separator + idCertificacion + File.separator + fileA.getName());
+                          zipOutputStream.putNextEntry(new ZipEntry(addFName));
+                          Files.copy(fileA.toPath(), zipOutputStream);
+                      }
+                
+                     		
+                      for (String idFacturacion : listaIdFacturaciones) {
+
+                          File file = getFileCertificacionFacturaciones(idInstitucion, idCertificacion,idFacturacion);
+
+                          if (file.exists()) {
+                              String addFName = file.getPath().replace(file.getPath(), File.separator + idFacturacion + File.separator + file.getName());
+                              zipOutputStream.putNextEntry(new ZipEntry(addFName));
+                              Files.copy(file.toPath(), zipOutputStream);
+                          }
+                          
+
+                      }
+
+                      zipOutputStream.closeEntry();
+
+                      if (zipOutputStream != null) {
+                          zipOutputStream.finish();
+                          zipOutputStream.flush();
+                          IOUtils.closeQuietly(zipOutputStream);
+                      }
+
+                      IOUtils.closeQuietly(bufferedOutputStream);
+                      IOUtils.closeQuietly(byteArrayOutputStream);
+
+                      res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
+                          public String getFilename() {
+                              return "Informe_Incidencias.zip";
+                          }
+                      };
+            	 }
+            
+     
+
+            } else {
+                LOGGER.warn("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+            }
+
+        } else {
+            LOGGER.warn("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> idInstitucion del token nula");
+        }
+
+        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
+
+        return res;
+    }
+    
     private String getDirectorioFichero(String modulo, String parametro, Short idinstitucion) {
         GenParametrosExample path = new GenParametrosExample();
 
@@ -1961,7 +2348,24 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
         return valor;
     }
+    
+    public File getFileCertificacion(Short idInstitucion, String idCertificacion) throws IOException {
+    	Path path = getPathLogCertificacion(idInstitucion, idCertificacion);
+    	  File file = path.toFile();
+          new File(file.getAbsolutePath()).mkdirs();
+          file = new File(file, getNombreLogCertificacion());
+          return file;
+    }
 
+    public File getFileCertificacionFacturaciones(Short idInstitucion, String idCertificacion, String idFacturacion) throws IOException {
+    	Path path = getPathLogFacturacion(idInstitucion, idCertificacion, idFacturacion);
+    	  File file = path.toFile();
+          new File(file.getAbsolutePath()).mkdirs();
+          file = new File(file, getNombreLogFacturacion());
+          return file;
+    }
+
+    
     public File getFileInformeIncidencias(Short idInstitucion, String idFacturacion) {
         Path path = facturacionHelper.getRutaAlmacenFichero().resolve("informeIncidenciasWS").resolve(idInstitucion.toString()).resolve(idFacturacion);
 
@@ -1971,6 +2375,37 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
         return file;
     }
+    
+    public File getFileErroresCAM(Short idInstitucion,String idFacturacion) {
+        //Path path = facturacionHelper.getRutaAlmacenFichero().resolve("informeIncidenciasWS").resolve(idInstitucion.toString()).resolve(idFacturacion);
+        Path path = Paths.get(camHelper.getRutaFicheroIncidencias(idInstitucion, idFacturacion));
+        File file = path.toFile();
+        new File(file.getAbsolutePath()).mkdirs();
+        file = new File(file, camHelper.getNombreErroresCAM());
+
+        return file;
+    }
+    
+    public File getFileErroresResumenCAM(Short idInstitucion,String idFacturacion) {
+        //Path path = facturacionHelper.getRutaAlmacenFichero().resolve("informeIncidenciasWS").resolve(idInstitucion.toString()).resolve(idFacturacion);
+        Path path = Paths.get(camHelper.getRutaFicheroIncidencias(idInstitucion, idFacturacion));
+        File file = path.toFile();
+        new File(file.getAbsolutePath()).mkdirs();
+        file = new File(file, camHelper.getNombreResumenCAM());
+
+        return file;
+    }
+    
+    public File getFileCAM(Short idInstitucion,String idFacturacion) {
+        //Path path = facturacionHelper.getRutaAlmacenFichero().resolve("informeIncidenciasWS").resolve(idInstitucion.toString()).resolve(idFacturacion);
+        Path path = Paths.get(camHelper.getRutaFicheroIncidencias(idInstitucion, idFacturacion));
+        File file = path.toFile();
+        new File(file.getAbsolutePath()).mkdirs();
+        file = new File(file, camHelper.getNombreFicheroCAM());
+
+        return file;
+    }
+    
 
     private boolean isXunta(Short idInstitucion) {
 
@@ -2046,4 +2481,73 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
         return stringDTO;
     }
+
+	@Override
+	public PcajgAlcActErrorCamDTO buscarErroresCAM(String idCertificacion, HttpServletRequest request) {
+		List<GenParametros> tamMax;
+		int tamMaximo;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		PcajgAlcActErrorCamDTO pcajgAlcActErrorCamDTO = new PcajgAlcActErrorCamDTO();
+		Error error = new Error();
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.buscarErroresCAM() / admUsuariosExtendsMapper.selectByExample() -> "
+							+ "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.buscarErroresCAM() / admUsuariosExtendsMapper.selectByExample() -> "
+							+ "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.buscarErroresCAM() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.buscarErroresCAM() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = 200;
+			}
+
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.buscarErroresCAM() / fcsCertificacionesExtendsMapper.getFactCertificaciones() -> Entrada a fcsCertificacionesExtendsMapper para obtener las facturaciones");
+			List<FacturacionItem> facturacionItems = fcsCertificacionesExtendsMapper.getFactCertificaciones(
+					idCertificacion, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje());
+			List<Integer> listaIdFacturaciones = new ArrayList<>();
+
+			for (FacturacionItem item : facturacionItems) {
+				listaIdFacturaciones.add(Integer.parseInt(item.getIdFacturacion()));
+			}
+			String listaIdFacturacionesAux =listaIdFacturaciones.toString().substring(1,listaIdFacturaciones.toString().length()-1);
+			List<VPcajgAlcActErrorCam> listaResult = fcsPcajgAlcActErrorCamExtendsMapper
+					.buscarErroresCAM(listaIdFacturacionesAux, idInstitucion, tamMaximo);
+			if (listaResult != null) {
+				pcajgAlcActErrorCamDTO.setListaPcajgAlcActErrorCam(listaResult);
+			} else {
+				error.setCode(400);
+				error.setDescription("empty");
+			}
+
+		} catch (Exception e) {
+			error.setCode(500);
+			error.setDescription(e.getMessage());
+		}
+		pcajgAlcActErrorCamDTO.setError(error);
+
+		return pcajgAlcActErrorCamDTO;
+	}
 }

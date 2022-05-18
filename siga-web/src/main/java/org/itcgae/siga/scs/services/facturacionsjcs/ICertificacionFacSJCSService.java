@@ -59,9 +59,14 @@ public interface ICertificacionFacSJCSService {
 
     void marcaVisiblesFacturacionesCerradas();
 
+    Resource descargaGeneral(String idCertificacion, String idEstadoCertificacion, HttpServletRequest request) throws Exception;
+    
     Resource descargarLogReintegrosXunta(List<String> idFactsList, HttpServletRequest request) throws Exception;
 
     Resource descargarInformeIncidencias(List<String> idFactsList, HttpServletRequest request) throws Exception;
 
     StringDTO perteneceInstitucionCAMoXunta(HttpServletRequest request);
+
+	PcajgAlcActErrorCamDTO buscarErroresCAM(String idCertificacion,
+			HttpServletRequest request);
 }

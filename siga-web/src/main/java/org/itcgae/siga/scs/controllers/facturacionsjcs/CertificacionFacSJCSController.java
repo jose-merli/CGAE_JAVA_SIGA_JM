@@ -75,6 +75,14 @@ public class CertificacionFacSJCSController {
         return new ResponseEntity<CertificacionesDTO>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/buscarErroresCAM")
+    ResponseEntity<PcajgAlcActErrorCamDTO> buscarErroresCAM(@RequestBody String idCertificacion, HttpServletRequest request) {
+    	PcajgAlcActErrorCamDTO response = iCertificacionFacSJCSService.buscarErroresCAM(idCertificacion, request);
+        return new ResponseEntity<PcajgAlcActErrorCamDTO>(response, HttpStatus.OK);
+    }
+
+
+
     @PostMapping(value = "/validaCatalunya", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UpdateResponseDTO> validaCatalunya(
             @RequestBody GestionEconomicaCatalunyaItem gestEcom, HttpServletRequest request) {
@@ -238,14 +246,14 @@ public class CertificacionFacSJCSController {
     }
 
     @PostMapping(value = "/descargarInformeIncidencias")
-    ResponseEntity<Resource> descargarInformeReintegrosXunta(@RequestBody DescargaReintegrosXuntaDTO descargaReintegrosXuntaDTO, HttpServletRequest request) {
+    ResponseEntity<Resource> descargarInformeReintegrosXunta(@RequestBody DescargaCertificacionesXuntaItem descargarInformeIncidencias, HttpServletRequest request) {
 
         ResponseEntity<Resource> response = null;
         Resource resource;
         Boolean error = false;
 
         try {
-            resource = iCertificacionFacSJCSService.descargarInformeIncidencias(descargaReintegrosXuntaDTO.getIdFactsList(), request);
+            resource = iCertificacionFacSJCSService.descargarInformeIncidencias(descargarInformeIncidencias.getListaIdFacturaciones(), request);
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
             headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
@@ -262,6 +270,32 @@ public class CertificacionFacSJCSController {
         return response;
     }
 
+    @PostMapping(value = "/descargaGeneral")
+    ResponseEntity<Resource> descargaGeneral(@RequestBody DescargaCertificacionesGeneralDTO descargaDTO, HttpServletRequest request) {
+
+        ResponseEntity<Resource> response = null;
+        Resource resource;
+        Boolean error = false;
+
+        try {
+            resource = iCertificacionFacSJCSService.descargaGeneral(descargaDTO.getIdCertificacion(),descargaDTO.getIdEstadoCertificacion(), request);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+            response = ResponseEntity.ok().headers(headers).contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        } catch (Exception e) {
+            error = true;
+        }
+
+        if (error) {
+            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return response;
+    }
+    
     @GetMapping("/perteneceInstitucionCAMoXunta")
     ResponseEntity<StringDTO> perteneceInstitucionCAMoXunta(HttpServletRequest request) {
         StringDTO response = new StringDTO();
