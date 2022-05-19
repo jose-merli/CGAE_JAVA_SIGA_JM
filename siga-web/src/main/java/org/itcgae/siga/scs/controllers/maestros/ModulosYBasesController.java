@@ -35,8 +35,8 @@ public class ModulosYBasesController {
 	}
 	
 	@RequestMapping(value = "/modulosybasesdecompensacion/procedimientos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getProcedimientos(@RequestParam("idJurisdiccion") String idJurisdiccion, HttpServletRequest request) {
-		ComboDTO response = ModulosYBasesService.getProcedimientos(request, idJurisdiccion);
+	ResponseEntity<ComboDTO> getProcedimientos(@RequestParam("idProcedimiento") String idProcedimiento, HttpServletRequest request) {
+		ComboDTO response = ModulosYBasesService.getProcedimientos(request, idProcedimiento);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
