@@ -5235,8 +5235,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						recordJust.setFechamodificacion(new Date());
 						recordJust.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-						if (justificacion.getIdJuzgado() != null && !justificacion.getIdJuzgado().isEmpty()) {
-							recordJust.setIdjuzgado(Long.parseLong(justificacion.getIdJuzgado()));
+						if (justificacion.getNombreJuzgado() != null && !justificacion.getNombreJuzgado().isEmpty()) {
+							recordJust.setIdjuzgado(Long.parseLong(justificacion.getNombreJuzgado()));
 						}
 
 						if (justificacion.getNig() != null && !justificacion.getNig().isEmpty()) {
@@ -5246,8 +5246,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (justificacion.getEstado() != null && !justificacion.getEstado().isEmpty()) {
 							recordJust.setEstado(justificacion.getEstado());
 						}
-						if (justificacion.getIdProcedimiento() != null && !justificacion.getIdProcedimiento().isEmpty()) {
-							recordJust.setIdprocedimiento(justificacion.getIdProcedimiento());
+						if (justificacion.getProcedimiento() != null && !justificacion.getProcedimiento().isEmpty()) {
+							ScsProcedimientosKey procedimientosKey = new ScsProcedimientosKey();
+							procedimientosKey.setIdprocedimiento(justificacion.getProcedimiento());
+							procedimientosKey.setIdinstitucion(idInstitucion);
+
+							if (scsProcedimientosMapper.selectByPrimaryKey(procedimientosKey) != null) {
+								recordJust.setIdprocedimiento(justificacion.getProcedimiento());
+							}
 						}
 
 						if (justificacion.getNumProcedimiento() != null
@@ -5302,9 +5308,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 										record.setIdjuzgado(Long.parseLong(actuacion.getIdJuzgado()));
 									}
 
-									if (actuacion.getIdProcedimiento() != null
-											&& !actuacion.getIdProcedimiento().isEmpty()) {
-										record.setIdprocedimiento(actuacion.getIdProcedimiento());
+									if (actuacion.getProcedimiento() != null
+											&& !actuacion.getProcedimiento().isEmpty()) {
+										ScsProcedimientosKey procedimientosKey = new ScsProcedimientosKey();
+										procedimientosKey.setIdprocedimiento(actuacion.getProcedimiento());
+										procedimientosKey.setIdinstitucion(idInstitucion);
+
+										if (scsProcedimientosMapper.selectByPrimaryKey(procedimientosKey) != null) {
+											record.setIdprocedimiento(actuacion.getProcedimiento());
+										}
 									}
 
 									if (actuacion.getNumProcedimiento() != null

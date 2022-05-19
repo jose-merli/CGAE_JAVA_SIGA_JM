@@ -1429,7 +1429,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.IDTURNO = EJGDES.IDTURNO ");
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA, ");
-		sql.append(" DECODE(turno.VALIDARJUSTIFICACIONES,'S',1,'N',0) AS VALIDARJUSTIFICACIONES ");
+		sql.append(" DECODE(turno.VALIDARJUSTIFICACIONES,'S',1,'N',0) AS VALIDARJUSTIFICACIONES, ");
+		sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
 
 		sql.append(" FROM SCS_DESIGNA D join scs_designasletrado   dl ON d.idinstitucion = dl.idinstitucion "
 				+ "AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
