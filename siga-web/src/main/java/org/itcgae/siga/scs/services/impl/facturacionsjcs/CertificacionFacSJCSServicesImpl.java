@@ -230,7 +230,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 			if(errores == 0) {
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDADA.getCodigo()), usuario.getIdusuario());
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
-				int estadoFacturacionCerrada =  SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(); // Comprobar- Estado Cerrada.
+				int estadoFacturacionCerrada =  SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo(); // Comprobar- Estado Cerrada.
 				for (FacturacionItem facturacionItem : listaFacturaciones) {
 					actualizarEstadoFacturacion(usuario, idInstitucion, facturacionItem.getIdFacturacion(), estadoFacturacionCerrada);
 				}
@@ -247,7 +247,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 				//Si la validacion es correcta actualizamos certificacion y cerramos las facturaciones.
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDADA.getCodigo()), usuario.getIdusuario());
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
-				int estadoFacturacionCerrada =  SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(); // Comprobar- Estado Cerrada.
+				int estadoFacturacionCerrada =  SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo(); // Comprobar- Estado Cerrada.
 				for (FacturacionItem facturacionItem : listaFacturaciones) {
 					actualizarEstadoFacturacion(usuario, idInstitucion, facturacionItem.getIdFacturacion(), estadoFacturacionCerrada);
 				}
@@ -1463,7 +1463,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         List<FcsPagosjg> pagos = fcsPagosjgMapper.selectByExample(pagosAso);
 
                         if (pagos.isEmpty()) {
-                            response += insertarEstado(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), idInstitucion, Integer.valueOf(cert.getIdFacturacion()), usuario.getIdusuario());
+                            response += insertarEstado(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(), idInstitucion, Integer.valueOf(cert.getIdFacturacion()), usuario.getIdusuario());
                         } else {
                             factNoReabierta += cert.getNombre() + "/";
                         }
@@ -2157,173 +2157,279 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         return res;
     }
 
-    @Override
-    public Resource descargaGeneral(String idCertificacion,String idEstadoCertificacion , HttpServletRequest request) throws Exception {
+	@Override
+	public Resource descargaGeneral(String idCertificacion, String idEstadoCertificacion, HttpServletRequest request)
+			throws Exception {
 
-        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
+		LOGGER.info(
+				"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
 
-        String token = request.getHeader("Authorization");
-        String dni = UserTokenUtils.getDniFromJWTToken(token);
-        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        Resource res = null;
-        List<GenParametros> tamMax;
-        Integer tamMaximo;
-        List <String>listaIdFacturaciones = new ArrayList<>();
-        
-        if (null != idInstitucion) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Resource res = null;
+		List<GenParametros> tamMax;
+		Integer tamMaximo;
+		List<String> listaIdFacturaciones = new ArrayList<>();
 
-            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-            LOGGER.info("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuariosExtendsMapper.selectByExample() -> " + "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-            LOGGER.info("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuariosExtendsMapper.selectByExample() -> " + "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		if (null != idInstitucion) {
 
-            GenParametrosExample genParametrosExample = new GenParametrosExample();
-            genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG").andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-            genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuariosExtendsMapper.selectByExample() -> "
+							+ "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuariosExtendsMapper.selectByExample() -> "
+							+ "Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-            LOGGER.info("CertificacionFacSJCSServicesImpl.getFactCertificaciones() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-            tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.getFactCertificaciones() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
-            LOGGER.info("CertificacionFacSJCSServicesImpl.getFactCertificaciones() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosMapper.selectByExample(genParametrosExample);
 
-            if (tamMax != null) {
-                tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-            } else {
-                tamMaximo = null;
-            }
+			LOGGER.info(
+					"CertificacionFacSJCSServicesImpl.getFactCertificaciones() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
-            
-            if (null != usuarios && !usuarios.isEmpty()) {
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
 
-              List<FacturacionItem> facturacionItems = fcsCertificacionesExtendsMapper.getFactCertificaciones(idCertificacion, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje());
-            
-              facturacionItems.forEach(item ->{
-            	  listaIdFacturaciones.add(item.getIdFacturacion());
-              });
-            	 int tipoCAJG = getTipoCAJG(idInstitucion);
-            	 
-            	 if(tipoCAJG == SigaConstants.TIPO_CAJG_CAM) {
+			if (null != usuarios && !usuarios.isEmpty()) {
 
-                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                     BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-                     ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-                     
-               
-                    		
-                     for (String idFacturacion : listaIdFacturaciones) {
-                    	 //switch no disponible por los formatos
-                    	
-                    	 if(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo().toString().equalsIgnoreCase(idEstadoCertificacion)){
-                    		 File file = getFileCAM(idInstitucion, idFacturacion);
+				List<FacturacionItem> facturacionItems = fcsCertificacionesExtendsMapper.getFactCertificaciones(
+						idCertificacion, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje());
 
-                             if (file.exists()) {
-                                 String addFName = file.getPath().replace(file.getPath(), File.separator + idFacturacion + File.separator + file.getName());
-                                 zipOutputStream.putNextEntry(new ZipEntry(addFName));
-                                 Files.copy(file.toPath(), zipOutputStream);
-                             }
-                    	 }
-                    	 
-                    	 if(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo().equalsIgnoreCase(idEstadoCertificacion)){
-                    		  File fileAux = getFileErroresCAM(idInstitucion, idFacturacion);
+				facturacionItems.forEach(item -> {
+					listaIdFacturaciones.add(item.getIdFacturacion());
+				});
+				int tipoCAJG = getTipoCAJG(idInstitucion);
 
-                              if (fileAux.exists()) {
-                                  String addFName = fileAux.getPath().replace(fileAux.getPath(), File.separator + idFacturacion + File.separator + fileAux.getName());
-                                  zipOutputStream.putNextEntry(new ZipEntry(addFName));
-                                  Files.copy(fileAux.toPath(), zipOutputStream);
-                              }
-                    	 }
-                         
-                    	 if(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo().toString().equalsIgnoreCase(idEstadoCertificacion)){
-                   		  File fileAux = getFileErroresCAM(idInstitucion, idFacturacion);
+				if (tipoCAJG == SigaConstants.TIPO_CAJG_CAM) {
 
-                             if (fileAux.exists()) {
-                                 String addFName = fileAux.getPath().replace(fileAux.getPath(), File.separator + idFacturacion + File.separator + fileAux.getName());
-                                 zipOutputStream.putNextEntry(new ZipEntry(addFName));
-                                 Files.copy(fileAux.toPath(), zipOutputStream);
-                             }
-                   	 }
-                        
+					if (listaIdFacturaciones.size() <= 1) {
+						String idFacturacion = listaIdFacturaciones.get(0);
 
-                     }
+						if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo().toString()
+								.equalsIgnoreCase(idEstadoCertificacion)) {
+							File file = getFileCAM(idInstitucion, idFacturacion);
 
-                     zipOutputStream.closeEntry();
+							if (file.exists()) {
+								FileInputStream fileInputStream = new FileInputStream(file);
 
-                     if (zipOutputStream != null) {
-                         zipOutputStream.finish();
-                         zipOutputStream.flush();
-                         IOUtils.closeQuietly(zipOutputStream);
-                     }
+								res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
+									public String getFilename() {
+										return file.getName();
+									}
+								};
+							}
+						}
 
-                     IOUtils.closeQuietly(bufferedOutputStream);
-                     IOUtils.closeQuietly(byteArrayOutputStream);
+						if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()
+								.equalsIgnoreCase(idEstadoCertificacion)) {
+							File file = getFileErroresCAM(idInstitucion, idFacturacion);
 
-                     res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
-                         public String getFilename() {
-                             return "Informe_CAM.zip";
-                         }
-                     };
+							if (file.exists()) {
+								FileInputStream fileInputStream = new FileInputStream(file);
 
-            	 }else {
-            		  ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                      BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-                      ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-                      
-                      File fileA = getFileCertificacion(idInstitucion, idCertificacion);
-                      if (fileA.exists()) {
-                          String addFName = fileA.getPath().replace(fileA.getPath(), File.separator + idCertificacion + File.separator + fileA.getName());
-                          zipOutputStream.putNextEntry(new ZipEntry(addFName));
-                          Files.copy(fileA.toPath(), zipOutputStream);
-                      }
-                
-                     		
-                      for (String idFacturacion : listaIdFacturaciones) {
+								res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
+									public String getFilename() {
+										return file.getName();
+									}
+								};
+							}
+						}
 
-                          File file = getFileCertificacionFacturaciones(idInstitucion, idCertificacion,idFacturacion);
+						if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo()
+								.toString().equalsIgnoreCase(idEstadoCertificacion)) {
+							File file = getFileErroresCAM(idInstitucion, idFacturacion);
 
-                          if (file.exists()) {
-                              String addFName = file.getPath().replace(file.getPath(), File.separator + idFacturacion + File.separator + file.getName());
-                              zipOutputStream.putNextEntry(new ZipEntry(addFName));
-                              Files.copy(file.toPath(), zipOutputStream);
-                          }
-                          
+							if (file.exists()) {
+								FileInputStream fileInputStream = new FileInputStream(file);
 
-                      }
+								res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
+									public String getFilename() {
+										return file.getName();
+									}
+								};
+							}
+						}
 
-                      zipOutputStream.closeEntry();
+					} else {
+						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+						BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+						ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-                      if (zipOutputStream != null) {
-                          zipOutputStream.finish();
-                          zipOutputStream.flush();
-                          IOUtils.closeQuietly(zipOutputStream);
-                      }
+						for (String idFacturacion : listaIdFacturaciones) {
+							// switch no disponible por los formatos
 
-                      IOUtils.closeQuietly(bufferedOutputStream);
-                      IOUtils.closeQuietly(byteArrayOutputStream);
+							if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo().toString()
+									.equalsIgnoreCase(idEstadoCertificacion)) {
+								File file = getFileCAM(idInstitucion, idFacturacion);
 
-                      res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
-                          public String getFilename() {
-                              return "Informe_Incidencias.zip";
-                          }
-                      };
-            	 }
-            
-     
+								if (file.exists()) {
+									String addFName = file.getPath().replace(file.getPath(),
+											File.separator + idFacturacion + File.separator + file.getName());
+									zipOutputStream.putNextEntry(new ZipEntry(addFName));
+									Files.copy(file.toPath(), zipOutputStream);
+								}
+							}
 
-            } else {
-                LOGGER.warn("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
-            }
+							if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()
+									.equalsIgnoreCase(idEstadoCertificacion)) {
+								File fileAux = getFileErroresCAM(idInstitucion, idFacturacion);
 
-        } else {
-            LOGGER.warn("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> idInstitucion del token nula");
-        }
+								if (fileAux.exists()) {
+									String addFName = fileAux.getPath().replace(fileAux.getPath(),
+											File.separator + idFacturacion + File.separator + fileAux.getName());
+									zipOutputStream.putNextEntry(new ZipEntry(addFName));
+									Files.copy(fileAux.toPath(), zipOutputStream);
+								}
+							}
 
-        LOGGER.info("CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
+							if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo()
+									.toString().equalsIgnoreCase(idEstadoCertificacion)) {
+								File fileAux = getFileErroresCAM(idInstitucion, idFacturacion);
 
-        return res;
-    }
-    
+								if (fileAux.exists()) {
+									String addFName = fileAux.getPath().replace(fileAux.getPath(),
+											File.separator + idFacturacion + File.separator + fileAux.getName());
+									zipOutputStream.putNextEntry(new ZipEntry(addFName));
+									Files.copy(fileAux.toPath(), zipOutputStream);
+								}
+							}
+
+						}
+
+						zipOutputStream.closeEntry();
+
+						if (zipOutputStream != null) {
+							zipOutputStream.finish();
+							zipOutputStream.flush();
+							IOUtils.closeQuietly(zipOutputStream);
+						}
+
+						IOUtils.closeQuietly(bufferedOutputStream);
+						IOUtils.closeQuietly(byteArrayOutputStream);
+
+						res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
+							public String getFilename() {
+								return "Informe_CAM.zip";
+							}
+						};
+					}
+
+				} else {
+
+					if (listaIdFacturaciones.size() <= 1) {
+
+						File file = getFileCertificacionFacturaciones(idInstitucion, idCertificacion,
+								listaIdFacturaciones.get(0));
+						File fileA = getFileCertificacion(idInstitucion, idCertificacion);
+
+						if (file.exists() && fileA.exists()) {
+							ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+							BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+							ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+							String addFName = file.getPath().replace(file.getPath(),
+									File.separator + listaIdFacturaciones.get(0) + File.separator + file.getName());
+							zipOutputStream.putNextEntry(new ZipEntry(addFName));
+							Files.copy(file.toPath(), zipOutputStream);
+
+							String addFNameA = fileA.getPath().replace(fileA.getPath(),
+									File.separator + idCertificacion + File.separator + fileA.getName());
+							zipOutputStream.putNextEntry(new ZipEntry(addFNameA));
+							Files.copy(fileA.toPath(), zipOutputStream);
+						} else if (file.exists() && !fileA.exists()) {
+							FileInputStream fileInputStream = new FileInputStream(file);
+							res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
+								public String getFilename() {
+									return file.getName();
+								}
+							};
+						} else if (!file.exists() && fileA.exists()) {
+							FileInputStream fileInputStream = new FileInputStream(fileA);
+							res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
+								public String getFilename() {
+									return fileA.getName();
+								}
+							};
+						}
+
+					} else {
+						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+						BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+						ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+						File fileA = getFileCertificacion(idInstitucion, idCertificacion);
+						if (fileA.exists()) {
+							String addFName = fileA.getPath().replace(fileA.getPath(),
+									File.separator + idCertificacion + File.separator + fileA.getName());
+							zipOutputStream.putNextEntry(new ZipEntry(addFName));
+							Files.copy(fileA.toPath(), zipOutputStream);
+						}
+
+						for (String idFacturacion : listaIdFacturaciones) {
+
+							File file = getFileCertificacionFacturaciones(idInstitucion, idCertificacion,
+									idFacturacion);
+
+							if (file.exists()) {
+								String addFName = file.getPath().replace(file.getPath(),
+										File.separator + idFacturacion + File.separator + file.getName());
+								zipOutputStream.putNextEntry(new ZipEntry(addFName));
+								Files.copy(file.toPath(), zipOutputStream);
+							}
+
+						}
+
+						zipOutputStream.closeEntry();
+
+						if (zipOutputStream != null) {
+							zipOutputStream.finish();
+							zipOutputStream.flush();
+							IOUtils.closeQuietly(zipOutputStream);
+						}
+
+						IOUtils.closeQuietly(bufferedOutputStream);
+						IOUtils.closeQuietly(byteArrayOutputStream);
+
+						res = new ByteArrayResource(byteArrayOutputStream.toByteArray()) {
+							public String getFilename() {
+								return "Informe_Incidencias.zip";
+							}
+						};
+
+					}
+
+				}
+
+			} else {
+				LOGGER.warn(
+						"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+
+		} else {
+			LOGGER.warn(
+					"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info(
+				"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
+
+		return res;
+	}
+
     private String getDirectorioFichero(String modulo, String parametro, Short idinstitucion) {
         GenParametrosExample path = new GenParametrosExample();
 
