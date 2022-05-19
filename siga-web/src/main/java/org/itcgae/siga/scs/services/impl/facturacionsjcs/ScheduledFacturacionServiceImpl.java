@@ -14,21 +14,21 @@ public class ScheduledFacturacionServiceImpl implements IScheduledFacturacionSer
 
     @Autowired
     private IFacturacionSJCSServices facturacionServices;
-
+  //COMENTAR SCHEDULED PARA USAR EN LOCAL
     @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
     @Override
     public void ejecutaFacturacionSJCS() {
-        LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
+        LOGGER.debug("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
         facturacionServices.ejecutaFacturacionSJCS();
-        LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
+        LOGGER.debug("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
     }
-
+  //COMENTAR SCHEDULED PARA USAR EN LOCAL
     @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacionBloqueadas}")
     @Override
     public void ejecutaFacturacionesSJCSBloqueadas() {
-        LOGGER.info("ScheduledFacturacionServiceImpl --> ENTRA ejecutaFacturacionesSJCSBloqueadas");
+        LOGGER.debug("ScheduledFacturacionServiceImpl --> ENTRA ejecutaFacturacionesSJCSBloqueadas");
         facturacionServices.ejecutaFacturacionesSJCSBloqueadas();
-        LOGGER.info("ScheduledFacturacionServiceImpl --> SALE ejecutaFacturacionesSJCSBloqueadas");
+        LOGGER.debug("ScheduledFacturacionServiceImpl --> SALE ejecutaFacturacionesSJCSBloqueadas");
     }
 
 }
