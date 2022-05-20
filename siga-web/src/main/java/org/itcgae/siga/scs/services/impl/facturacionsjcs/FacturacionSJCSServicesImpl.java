@@ -892,7 +892,6 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
     @Override
-    @Transactional
     public InsertResponseDTO ejecutarFacturacion(String idFacturacion, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1003,9 +1002,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     private int limpiafacturacion(FcsFacturacionjg facturacion, List<FcsFactEstadosfacturacion> estados) throws Exception {
         int response = 0;
+        String resPL = "";
 
         LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
-        ejecutarBorrarFacturacion(facturacion);
+        resPL = ejecutarBorrarFacturacion(facturacion);
 
         if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
             File ficheroFisico = new File(facturacion.getNombrefisico());
@@ -1016,8 +1016,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         }
 
         LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
-		
-        return response;
+		if("".equals(resPL)) {
+			response = -1;
+		}
+		return response;
 	}
 
 	@Override
@@ -1941,7 +1943,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
                 }
             } else {
-                LOGGER.error("Error en PROC_FCS_BORRAR_FACTURACION2");
+            	resultado = new String[1];
+            	resultado[0] = "";
+                LOGGER.error("Error en PL PROC_FCS_BORRAR_FACTURACION2");
             }
 
         } catch (Exception e) {
