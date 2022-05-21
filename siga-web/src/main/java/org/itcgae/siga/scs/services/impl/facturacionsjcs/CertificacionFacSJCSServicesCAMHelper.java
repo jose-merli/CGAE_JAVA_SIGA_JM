@@ -92,15 +92,10 @@ public class CertificacionFacSJCSServicesCAMHelper {
     private static final String CONTADOR_CAM = "INTERCAMBIOICM";
     private static final String DIRECTORIO_INCIDENCIAS = "informeIncidenciasWS";
 
-    private XSSFWorkbook workbook = null;
-
 	private static final int EXCEL_ROW_FLUSH = 1000;
     
     @Autowired
     private GenPropertiesMapper genPropertiesMapper;
-
-    @Autowired
-    private AdmInformeMapper admInfMap;
 
     @Autowired
     private PCAGAlcActIncidenciaMapper incMapper;
@@ -121,8 +116,8 @@ public class CertificacionFacSJCSServicesCAMHelper {
     private FcsPcajgAlcActErrorCamExtendsMapper fcsPcajgAlcActErrorCamExtendsMapper;
     
     
-    Map<String, PCAJGAlcActIncidencia> mIncidencias;
-    Set<String> sColumnasNoImprimir;
+    Map<String, PCAJGAlcActIncidencia> mIncidencias = new HashMap<String,PCAJGAlcActIncidencia >();
+    List<String> sColumnasNoImprimir = new ArrayList<String>() ;
 
     private AdmContador contadorOriginal;
     private String anyoSufijo;
@@ -135,9 +130,19 @@ public class CertificacionFacSJCSServicesCAMHelper {
 
     private void initInforme() {
         List<PCAJGAlcActIncidencia> lInc = incMapper.selectAll();
-        Predicate<PCAJGAlcActIncidencia> pIncNoImprimir = inc -> inc.getIdTipoIncidencia().equals(PCAJG_ALC_ACT_TIPO_INCIDENCIA.NO_IMPRIMIR.getId());
-        mIncidencias = lInc.stream().filter(pIncNoImprimir.negate()).collect(Collectors.toMap(x -> x.getCampo(), x -> x));
-        sColumnasNoImprimir = lInc.stream().filter(pIncNoImprimir).map(x -> x.getCampo().toUpperCase()).collect(Collectors.toSet());
+      
+        if(lInc !=null) {
+        	for (PCAJGAlcActIncidencia pcajgAlcActIncidencia : lInc) {
+				if (PCAJG_ALC_ACT_TIPO_INCIDENCIA.NO_IMPRIMIR.getId() == pcajgAlcActIncidencia.getIdTipoIncidencia()) {
+					this.sColumnasNoImprimir.add(pcajgAlcActIncidencia.getCampo());
+				} else {
+					this.mIncidencias.put(pcajgAlcActIncidencia.getCampo(), pcajgAlcActIncidencia);
+				}
+			}
+        }     
+        //Predicate<PCAJGAlcActIncidencia> pIncNoImprimir = inc -> inc.getIdTipoIncidencia().equals(PCAJG_ALC_ACT_TIPO_INCIDENCIA.NO_IMPRIMIR.getId());
+        //mIncidencias = lInc.stream().filter(pIncNoImprimir.negate()).collect(Collectors.toMap(x -> x.getCampo(), x -> x));
+        //sColumnasNoImprimir = lInc.stream().filter(pIncNoImprimir).map(x -> x.getCampo().toUpperCase()).collect(Collectors.toSet());
     }
 
     private void finalizaInforme() {
@@ -349,8 +354,9 @@ public class CertificacionFacSJCSServicesCAMHelper {
             if (listaFilas.size() > 0) {
                 int numFila = 1;
                 for (Map<String, Object> mFila : listaFilas) {
-                    hayErrores |= procesaFila(idInstitucion, idFacturacion, bw, mFila, numFila == listaFilas.size(),
+                	hayErrores |= procesaFila(idInstitucion, idFacturacion, bw, mFila, numFila == listaFilas.size(),
                             hayErrores);
+                
                 }
                 actualizarContador(idInstitucion);
             } else {
@@ -394,9 +400,39 @@ public class CertificacionFacSJCSServicesCAMHelper {
 
 
     private boolean procesaFila(Short idInstitucion, String idFacturacion, BufferedWriter bw, Map<String, Object> mFila, boolean ultima, boolean hayErrores) throws IOException {
-        for (String col : mFila.keySet()) {
+    	String anioEJG = "", numEJG = "", desAnio = "", desNumero = "", numeroActuacion = "";
+    	for (String col : mFila.keySet()) {
             try {
-                hayErrores |= procesaColumna(idInstitucion, idFacturacion, bw, col, mFila.get(col));
+                //hayErrores = procesaColumna(idInstitucion, idFacturacion, bw, col, mFila.get(col));
+            	  String valor = mFila.get(col) != null ? mFila.get(col).toString() : null;
+                  
+                  if (EJG_NUMERO.equalsIgnoreCase(col)) {
+                      numEJG = valor;
+                  } else if (EJG_ANIO.equalsIgnoreCase(col)) {
+                      anioEJG = valor;
+                  } else if (DESIGNA_CODIGO.equalsIgnoreCase(col)) {
+                      desNumero = valor;
+                  } else if (DESIGNA_ANIO.equalsIgnoreCase(col)) {
+                      desAnio = valor;
+                  } else if (NUMERO_ACTUACION.equalsIgnoreCase(col)) {
+                      numeroActuacion = valor;
+                  }
+
+                  hayErrores = valida(idInstitucion, idFacturacion, numEJG, anioEJG, desNumero, desAnio, numeroActuacion, col, valor) || hayErrores;
+
+                  if (imprimirColumna(col)) {
+                  	String aux = "";
+                  	if(valor != null) {
+                  		aux = valor.replaceAll("\\s+", "");
+                  	}
+                      if (valor != null && TOKEN_NL.equals(valor)) {
+                          bw.newLine();
+                      } else if (CAB2_NUMERO_INTERCAMBIO.equalsIgnoreCase(col)) {
+                          bw.write(utilidadesStringFormatea(++idIntercambio, longitudContador, true) + anyoSufijo);
+                      } else {
+                          bw.write(valor != null && aux.length() != 0  ? valor : "");
+                      }
+                  }
             } catch (Exception e) {
                 LOGGER.error("error al procesar la columna " + col);
             }
@@ -409,56 +445,58 @@ public class CertificacionFacSJCSServicesCAMHelper {
     }
 
 
-    private boolean procesaColumna(Short idInstitucion, String idFacturacion, BufferedWriter bw, String columna, Object oValor) throws IOException {
-        boolean hayErrores = false;
-        String valor = oValor != null ? oValor.toString() : null;
-        String anioEJG = "", numEJG = "", desAnio = "", desNumero = "", numeroActuacion = "";
-        if (EJG_NUMERO.equalsIgnoreCase(columna)) {
-            numEJG = valor;
-        } else if (EJG_ANIO.equalsIgnoreCase(columna)) {
-            anioEJG = valor;
-        } else if (DESIGNA_CODIGO.equalsIgnoreCase(columna)) {
-            desNumero = valor;
-        } else if (DESIGNA_ANIO.equalsIgnoreCase(columna)) {
-            desAnio = valor;
-        } else if (NUMERO_ACTUACION.equalsIgnoreCase(columna)) {
-            numeroActuacion = valor;
-        }
 
-        hayErrores = valida(idInstitucion, idFacturacion, numEJG, anioEJG, desNumero, desAnio, numeroActuacion, columna, valor);
-
-        if (imprimirColumna(columna)) {
-            if (valor != null && TOKEN_NL.equals(valor)) {
-                bw.newLine();
-            } else if (CAB2_NUMERO_INTERCAMBIO.equalsIgnoreCase(columna)) {
-                bw.write(utilidadesStringFormatea(++idIntercambio, longitudContador, true) + anyoSufijo);
-            } else {
-                bw.write(valor != null ? valor : "");
-            }
+    private  String utilidadesStringFormatea(Object dato, int longitud, boolean numerico) {
+        String salida = "";
+        if(dato == null) {
+        	if(numerico) {
+        		salida = relleno("0",longitud);
+        	}else {
+        		salida = relleno(" ",longitud);
+        	}
+        }else {
+        	String datoAux = dato.toString();
+        	if(datoAux.length() == 0) {
+        		if(numerico) {
+            		salida = relleno("0",longitud);
+            	}else {
+            		salida = relleno(" ",longitud);
+            	}
+        	}else if(datoAux.length() > longitud) {
+        		if(numerico) {
+            		salida = datoAux.substring(datoAux.length() - longitud, datoAux.length());
+            	}else {
+            		salida = datoAux.substring(0, longitud);
+            	}
+        	}else if(datoAux.length() < longitud) {
+        		if(numerico) {
+        			salida = relleno("0",longitud - datoAux.length())+ datoAux;
+        		}else {
+        			salida = datoAux + relleno(" ",longitud - datoAux.length());
+        		}
+        	}else {
+        		salida = datoAux;
+        	}
         }
-        return hayErrores;
+        return salida;
     }
 
-    private static String utilidadesStringFormatea(Object dato, Integer longitud, boolean numerico) {
-        String valor = dato != null ? dato.toString() : "";
-        if (numerico) {
-            valor = padLeft(valor, longitud).replace(' ', '0');
-        } else {
-            valor = padRight(valor, longitud);
-        }
-        return valor;
-    }
-
-    public static String padRight(String s, int n) {
-        return String.format("%-" + n + "s", s);
-    }
-
-    public static String padLeft(String s, int n) {
-        return String.format("%" + n + "s", s);
+    private String relleno(String caracter, int longitud) {
+    	String salida = "";
+    	for (int i = 0; i < longitud; i++) {
+			salida += caracter;
+		}
+    	return salida;
     }
 
     private boolean imprimirColumna(String colName) {
-        return !sColumnasNoImprimir.contains(colName);
+    	for( String s : this.sColumnasNoImprimir) {
+    	if(s.equalsIgnoreCase(colName)) {
+    		return false;
+    	}
+    	}
+    	return true;
+        //return !sColumnasNoImprimir.contains(colName);
     }
 
     private boolean valida(Short idInstitucion, String idFacturacion, String numEJG, String anioEJG, String desNumero, String desAnio, String numeroActuacion, String columna, String valor) throws IOException {
@@ -720,4 +758,6 @@ public class CertificacionFacSJCSServicesCAMHelper {
 		return workbook;
 
 	}
+	
+
 }
