@@ -918,6 +918,57 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		return documento;
 	}
 	
+	@Override
+	public DatosDocumentoItem generarFOTurnos(String plantilla, String rutaTmp, String nombreFicheroSalida,
+			List<Map<String, Object>> hDatosFinal) throws IOException, Exception {
+		DatosDocumentoItem documento = new DatosDocumentoItem();
+		if(hDatosFinal != null && hDatosFinal.size() > 0) {
+			// 1. obteniendo plantilla FO
+			
+			File plantillaFO = new File(plantilla);
+			LOGGER.debug("*********** rutaFicheroFO: " + plantilla);
+	
+			// 2. generando intermedio FOP a partir de plantilla y datos
+			// 2.1. obteniendo ruta para fichero intermedio FOP
+			String rutaFicheroFOP = rutaTmp 
+					+ nombreFicheroSalida + ".fo";
+			File ficheroFOP = new File(rutaFicheroFOP);
+	
+			// 2.2. obteniendo texto de plantilla FO
+			String sPlantillaFO = UtilidadesString.getFileContent(plantillaFO);
+			
+			// 2.3. generando intermedio FOP, reemplazando los datos en la plantilla
+			String content = reemplazarDatos(hDatosFinal, sPlantillaFO);
+			UtilidadesString.setFileContent(ficheroFOP, content);
+	
+			// 3. generando PDF final
+			// 3.1. obteniendo ruta para fichero PDF final
+			
+			File ficheroPDF = new File(rutaTmp+nombreFicheroSalida);
+			LOGGER.debug("*********** rutaFicheroPDF: " + nombreFicheroSalida);
+	
+			// 3.2. convirtiendo FOP a PDF
+	//					Plantilla plantilla = new Plantilla(this.usuario);
+			FoUtils.convertFO2PDF(ficheroFOP, ficheroPDF,	rutaTmp);
+	
+			// 3.3. borrando fichero intermedio FOP generado
+			ficheroFOP.delete();
+	
+			// devolviendo el fichero PDF generado
+			try {
+				documento.setDatos(Files.readAllBytes(ficheroPDF.toPath()));
+				documento.setFileName(nombreFicheroSalida);
+				documento.setPathDocumento(rutaTmp);
+			} catch (IOException e) {
+				LOGGER.error("Error al devolver el fichero generado");
+				e.printStackTrace();
+			}
+		} else {
+			documento = null;
+		}
+		return documento;
+	}
+	
 	protected String reemplazarDatos(List<Map<String, Object>> hDatosFinal, String plantillaFO) throws Exception{
 		
 		Hashtable htDatos = new Hashtable<>();
