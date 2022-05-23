@@ -1297,6 +1297,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(
 				" FROM scs_actuaciondesigna act, scs_procedimientos pro, scs_acreditacionprocedimiento acp, scs_acreditacion ac, ");
 		sql.append(" scs_tipoacreditacion tac, scs_juzgado j ");
+
+		// Filtro para evitar que se muestren las actuaciones de otro letrado
+		if (!UtilidadesString.esCadenaVacia(item.getnColegiado())) {
+			sql.append(" , scs_designasletrado designaletrado, cen_colegiado colegiado ");
+		}
+
 		sql.append(
 				" WHERE ac.idtipoacreditacion = tac.idtipoacreditacion  (+) "
 				+ "AND act.idinstitucion = j.idinstitucion (+) "
@@ -1309,6 +1315,31 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				" AND act.idprocedimiento = acp.idprocedimiento  (+)"
 				+ "AND act.idinstitucion_proc = pro.idinstitucion (+) "
 				+ "AND act.idprocedimiento = pro.idprocedimiento (+) ");
+
+		// Filtro para evitar que se muestren las actuaciones de otro letrado
+		if (!UtilidadesString.esCadenaVacia(item.getnColegiado())) {
+			SQL subquery = new SQL();
+			subquery.SELECT("MAX(LET2.FECHADESIGNA)");
+			subquery.FROM("SCS_DESIGNASLETRADO LET2");
+			subquery.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
+			subquery.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
+			subquery.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
+			subquery.WHERE("DESIGNALETRADO.IDTURNO = LET2.IDTURNO");
+			subquery.WHERE("TRUNC(LET2.FECHADESIGNA) <= act.fecha");
+
+			sql.append(
+					" AND act.idinstitucion = designaletrado.idinstitucion (+)"
+							+ "AND act.idturno = designaletrado.idturno (+) "
+							+ "AND act.anio = designaletrado.anio (+) "
+							+ "AND act.numero = designaletrado.numero (+) "
+							+ "AND act.fecha >= TRUNC(designaletrado.fechadesigna) "
+							+ "AND designaletrado.fechadesigna = ( " + subquery.toString() + " ) ");
+			sql.append(
+					" AND colegiado.idpersona = designaletrado.idpersona (+) "
+							+ "AND colegiado.idinstitucion = designaletrado.idinstitucion (+) "
+							+ "AND colegiado.ncolegiado = " + item.getnColegiado());
+		}
+
 		sql.append(" AND act.idinstitucion = " + idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = "
 				+ anio + " AND act.numero = " + numero + " ");
 		
