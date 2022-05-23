@@ -97,7 +97,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 	private PcajgProcedScsprocedMapper pcajgProcedScsprocedMapper;
 	
 	@Override
-	public ComboDTO getProcedimientos(HttpServletRequest request, String idJurisdiccion) {
+	public ComboDTO getProcedimientos(HttpServletRequest request, String idProcedimiento) {
 		LOGGER.info("getProcedimientos() -> Entrada al servicio para obtener combo jurisdicciones");
 
 		// Conseguimos información del usuario logeado
@@ -119,11 +119,13 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					"getProcedimientos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
+				
+				AdmUsuarios usuario = usuarios.get(0);
 
 				LOGGER.info(
 						"getProcedimientos() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Entrada a cenJurisdiccionesExtendsMapper para obtener los jurisdicciones");
 	
-				List<ComboItem> comboItems = scsProcedimientosExtendsMapper.getProcedimientos(idInstitucion.toString(), idJurisdiccion, dni);
+				List<ComboItem> comboItems = scsProcedimientosExtendsMapper.getProcedimientos(idInstitucion.toString(), idProcedimiento, usuario.getIdlenguaje());
 
 				LOGGER.info(
 						"getProcedimientos() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Salida a cenJurisdiccionesExtendsMapper para obtener los jurisdicciones");

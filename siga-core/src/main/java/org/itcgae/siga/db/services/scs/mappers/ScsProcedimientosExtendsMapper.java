@@ -58,7 +58,7 @@ public interface ScsProcedimientosExtendsMapper extends ScsProcedimientosMapper{
 		@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ComboItem> getProcedimientos(String idInstitucion, String idJurisdiccion, String nif);
+	List<ComboItem> getProcedimientos(String idInstitucion, String idProcedimiento, String idioma);
 	
 	
 }
