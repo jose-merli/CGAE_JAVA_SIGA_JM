@@ -23,6 +23,9 @@ public interface IGeneracionDocumentosService {
 	
 	public DatosDocumentoItem generarFO(String plantilla, String rutaTmp, String nombreFicheroSalida,
 			List<Map<String, Object>> resultDatos) throws IOException, Exception;
+
+	DatosDocumentoItem generarFOTurnos(String plantilla, String rutaTmp, String nombreFicheroSalida,
+			List<Map<String, Object>> hDatosFinal) throws IOException, Exception;
 	
 	
 }

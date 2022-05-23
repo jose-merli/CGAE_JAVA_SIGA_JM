@@ -137,6 +137,9 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     
     private static final String XLSX_EXT = ".xlsx";
     
+    @Autowired
+    private GenDiccionarioMapper genDiccionarioMapper;
+
 
     @Override
     public InsertResponseDTO tramitarCertificacion(TramitarCerttificacionRequestDTO tramitarCerttificacionRequestDTO, HttpServletRequest request) {
@@ -162,7 +165,8 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                 if (null != usuarios && !usuarios.isEmpty()) {
 
                     if (tramitarCerttificacionRequestDTO.getFacturacionItemList() != null && !tramitarCerttificacionRequestDTO.getFacturacionItemList().isEmpty()) {
-                    	listaParaConsejo(tramitarCerttificacionRequestDTO.getIdCertificacion(), idInstitucion, tramitarCerttificacionRequestDTO.getFacturacionItemList(), usuarios.get(0),tramitarCerttificacionRequestDTO.getTipoFichero());   
+                    	listaParaConsejo(tramitarCerttificacionRequestDTO.getIdCertificacion(), idInstitucion, tramitarCerttificacionRequestDTO.getFacturacionItemList(), 
+                    			usuarios.get(0),tramitarCerttificacionRequestDTO.getTipoFichero(),insertResponseDTO);   
                     }
 
                 }
@@ -173,9 +177,9 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
             LOGGER.error("CertificacionFacSJCSServicesImpl.tramitarCertificacion() -> Se ha producido un error al intentar tramitar la certificacion", e);
             error.setCode(500);
             error.setDescription("general.mensaje.error.bbdd");
+            insertResponseDTO.setError(error);
         }
 
-        insertResponseDTO.setError(error);
         insertResponseDTO.setId(tramitarCerttificacionRequestDTO.getIdCertificacion());
 
         if (error.getDescription() == null) {
@@ -202,13 +206,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         ESTADO_CERTIFICACION_ENVIO_CON_ERRORES("6"),
         ESTADO_CERTIFICACION_CERRADA("7");*/
     
-    private void listaParaConsejo(String idCertificacion, Short idInstitucion, List<FacturacionItem>  listaFacturaciones , AdmUsuarios usuario, String tipoFichero) throws Exception {
-
+    private void listaParaConsejo(String idCertificacion, Short idInstitucion, List<FacturacionItem>  listaFacturaciones , AdmUsuarios usuario, String tipoFichero,InsertResponseDTO response) throws Exception {
+    	Error error = new Error();
         //int estadoFuturo = SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo();
         //SI TIENE CONFIGURADO EL WEBSERVICE HACEMOS LA LLAMADA
         int tipoCAJG = getTipoCAJG(idInstitucion);
         actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDANDO.getCodigo()), usuario.getIdusuario());
-        
         switch (tipoCAJG) {
 		case SigaConstants.TIPO_CAJG_XML_SANTIAGO: // Acciones a realizar si se trata de la Xunta
         
@@ -216,11 +219,11 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     			envioWS(idInstitucion, facturacionItem.getIdFacturacion(), SigaConstants.ECOM_OPERACION.ECOM2_XUNTA_JE.getId(), usuario);
 			}
             break;
-		case SigaConstants.TIPO_CAJG_CATALANES:
+		/*case SigaConstants.TIPO_CAJG_CATALANES: -- COMENTADO PARA QUE VAYA A LA VALIDACION GENERAL
              for (FacturacionItem facturacionItem : listaFacturaciones) {
             	 envioWS(idInstitucion, facturacionItem.getIdFacturacion(), SigaConstants.ECOM_OPERACION.ECOM2_CAT_VALIDA_JUSTIFICACION.getId(), usuario);
  			}
-             break;
+             break;*/
 		case SigaConstants.TIPO_CAJG_CAM:
 			int errores = 0;
 			for (FacturacionItem facturacionItem : listaFacturaciones) {
@@ -236,14 +239,16 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 				}
 			}else {
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()), usuario.getIdusuario());
+				error.code(Integer.parseInt(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()));
+			
 			}
 			break;
 			
 		default:
-			if(!validacionA(listaFacturaciones,idCertificacion,idInstitucion, usuario) ||  !validacionB(listaFacturaciones, idInstitucion,idCertificacion)) {
+			if(!validacionA(listaFacturaciones,idCertificacion,idInstitucion, usuario) ||  !validacionB(listaFacturaciones, idInstitucion,idCertificacion, usuario)) {
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()), usuario.getIdusuario());
-				//
-			}else {
+				error.code(Integer.parseInt(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()));
+				}else {
 				//Si la validacion es correcta actualizamos certificacion y cerramos las facturaciones.
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_VALIDADA.getCodigo()), usuario.getIdusuario());
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
@@ -254,7 +259,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 			}
 			break;
 		}
-
+        response.error(error);
     }
     
     //La certificación al menos debe tener una facturación
@@ -269,7 +274,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     }
     /*Todas las facturaciones deben estar ejecutadas y no cerradas. Si alguna facturación se encuentra 
 	cerrada, el usuario podrá reabrirla para poder transmitirla de nuevo.*/
-    private boolean validacionB(List<FacturacionItem>  listaFacturaciones, Short idInstitucion,String idCertificacion) {
+    private boolean validacionB(List<FacturacionItem>  listaFacturaciones, Short idInstitucion,String idCertificacion,AdmUsuarios usuario) {
     	for (FacturacionItem facturacionItem : listaFacturaciones) {
     		String estadoActualFacturacion = fcsFactEstadosfacturacionExtendsMapper.getIdEstadoFacturacion(idInstitucion, facturacionItem.getIdFacturacion());
 
@@ -281,7 +286,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                     && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_NO_DISPONIBLE.getCodigo()
                     && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ENVIO_NO_ACEPTADO.getCodigo()
                     && estadoActualFac != SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo()) {
-            	generarFicheroIncidencias("validacionB",idCertificacion,facturacionItem.getIdFacturacion(), idInstitucion, null);
+            	generarFicheroIncidencias("validacionB",idCertificacion,facturacionItem.getIdFacturacion(), idInstitucion, usuario);
                return false;
             }
 			
@@ -295,12 +300,12 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
     		String mensajeError = "";
     		switch (error) {
     		case "validacionA":
-    			mensajeError = "";
+    			mensajeError = "Lista de facturaciones Vacia";//No pasará, se deja para futuros cambios en la vacidación.
     			List<EstadoCertificacionItem> listaEstados = fcsCertificacionesExtendsMapper.getEstadosCertificacion(idCertificacion, idInstitucion, usuario.getIdlenguaje());
     			generarExcel(mensajeError, listaEstados, null, idCertificacion,idInstitucion);
     			break;
     		case "validacionB":
-    			mensajeError = "";
+    			mensajeError = getTraduccion("messages.certificaciones.error.estadosFacturaciones",usuario.getIdlenguaje());
     			generarExcel(mensajeError, null, idFacturacion,idCertificacion , idInstitucion);
     			break;
     		default:
@@ -311,6 +316,14 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 		}
     
     	
+    }
+    
+    private String getTraduccion(String idrecurso, String idioma) {
+        GenDiccionarioKey keyParametros = new GenDiccionarioKey();
+        keyParametros.setIdrecurso(idrecurso);
+        keyParametros.setIdlenguaje(idioma);
+        GenDiccionario traduccion = genDiccionarioMapper.selectByPrimaryKey(keyParametros);
+        return traduccion != null ? traduccion.getDescripcion() : "";
     }
     
     private Path getPathLogCertificacion(Short idInstitucion, String idCertificacion) throws IOException {
@@ -2235,14 +2248,15 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
 						if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()
 								.equalsIgnoreCase(idEstadoCertificacion)) {
-							File file = getFileErroresCAM(idInstitucion, idFacturacion);
+							File file = getFileInformeIncidencias(idInstitucion, idFacturacion);
 
 							if (file.exists()) {
 								FileInputStream fileInputStream = new FileInputStream(file);
 
 								res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
 									public String getFilename() {
-										return file.getName();
+										String name = facturacionItems.get(0).getNombre() + "_"+ file.getName();
+										return name;
 									}
 								};
 							}
@@ -2250,17 +2264,25 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
 						if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo()
 								.toString().equalsIgnoreCase(idEstadoCertificacion)) {
+							
+							ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+							BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+							ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
 							File file = getFileErroresCAM(idInstitucion, idFacturacion);
+							
+							String addFName = file.getPath().replace(file.getPath(),
+									File.separator + listaIdFacturaciones.get(0) + File.separator + file.getName());
+							zipOutputStream.putNextEntry(new ZipEntry(addFName));
+							Files.copy(file.toPath(), zipOutputStream);
+							
+							File fileA = getFileErroresResumenCAM(idInstitucion,idFacturacion);
 
-							if (file.exists()) {
-								FileInputStream fileInputStream = new FileInputStream(file);
-
-								res = new ByteArrayResource(IOUtils.toByteArray(fileInputStream)) {
-									public String getFilename() {
-										return file.getName();
-									}
-								};
-							}
+							String addFNameA = fileA.getPath().replace(fileA.getPath(),
+									File.separator + idCertificacion + File.separator + fileA.getName());
+							zipOutputStream.putNextEntry(new ZipEntry(addFNameA));
+							Files.copy(fileA.toPath(), zipOutputStream);
+						
 						}
 
 					} else {
@@ -2268,16 +2290,17 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 						BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
 						ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-						for (String idFacturacion : listaIdFacturaciones) {
 							// switch no disponible por los formatos
-
+						for (FacturacionItem facturacionItem : facturacionItems) {
+							
+						
 							if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo().toString()
 									.equalsIgnoreCase(idEstadoCertificacion)) {
-								File file = getFileCAM(idInstitucion, idFacturacion);
+								File file = getFileCAM(idInstitucion, facturacionItem.getIdFacturacion());
 
 								if (file.exists()) {
 									String addFName = file.getPath().replace(file.getPath(),
-											File.separator + idFacturacion + File.separator + file.getName());
+											File.separator + facturacionItem.getIdFacturacion() + File.separator + file.getName());
 									zipOutputStream.putNextEntry(new ZipEntry(addFName));
 									Files.copy(file.toPath(), zipOutputStream);
 								}
@@ -2285,11 +2308,11 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
 							if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()
 									.equalsIgnoreCase(idEstadoCertificacion)) {
-								File fileAux = getFileErroresCAM(idInstitucion, idFacturacion);
+								File fileAux = getFileInformeIncidencias(idInstitucion, facturacionItem.getIdFacturacion());
 
 								if (fileAux.exists()) {
 									String addFName = fileAux.getPath().replace(fileAux.getPath(),
-											File.separator + idFacturacion + File.separator + fileAux.getName());
+											File.separator + facturacionItem.getIdFacturacion() + File.separator + facturacionItems.get(0).getNombre() + "_"+fileAux.getName());
 									zipOutputStream.putNextEntry(new ZipEntry(addFName));
 									Files.copy(fileAux.toPath(), zipOutputStream);
 								}
@@ -2297,17 +2320,23 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
 							if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_ENVIO_CON_ERRORES.getCodigo()
 									.toString().equalsIgnoreCase(idEstadoCertificacion)) {
-								File fileAux = getFileErroresCAM(idInstitucion, idFacturacion);
+								File file = getFileErroresCAM(idInstitucion, facturacionItem.getIdFacturacion());
+								
+								String addFName = file.getPath().replace(file.getPath(),
+										File.separator + listaIdFacturaciones.get(0) + File.separator + file.getName());
+								zipOutputStream.putNextEntry(new ZipEntry(addFName));
+								Files.copy(file.toPath(), zipOutputStream);
+								
+								File fileA = getFileErroresResumenCAM(idInstitucion,facturacionItem.getIdFacturacion());
 
-								if (fileAux.exists()) {
-									String addFName = fileAux.getPath().replace(fileAux.getPath(),
-											File.separator + idFacturacion + File.separator + fileAux.getName());
-									zipOutputStream.putNextEntry(new ZipEntry(addFName));
-									Files.copy(fileAux.toPath(), zipOutputStream);
-								}
+								String addFNameA = fileA.getPath().replace(fileA.getPath(),
+										File.separator + idCertificacion + File.separator + fileA.getName());
+								zipOutputStream.putNextEntry(new ZipEntry(addFNameA));
+								Files.copy(fileA.toPath(), zipOutputStream);
+								
 							}
 
-						}
+						}//fn
 
 						zipOutputStream.closeEntry();
 

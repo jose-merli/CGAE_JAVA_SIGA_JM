@@ -29,21 +29,31 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		return sql.toString();
 	}
 
-	public String getProcedimientos(String idInstitucion, String idJurisdiccion, String nif) {
+	public String getProcedimientos(String idInstitucion, String idProcedimiento, String idioma) {
 		
-		SQL sql = new SQL();
+		String sql = "";
+		SQL sql1 = new SQL();
+		SQL sql2 = new SQL();
 		
-		sql.SELECT("procedimiento.idinstitucion");
-		sql.SELECT("procedimiento.idpretension");
-		sql.SELECT("cat.descripcion as nombre");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat on (cat.idrecurso = procedimiento.DESCRIPCION and idlenguaje = (select idLenguaje from Adm_Usuarios where idInstitucion = "+ idInstitucion +" and nif = '"+ nif +"'))");;
+		sql1.SELECT("pretension.idinstitucion");
+		sql1.SELECT("pretension.idpretension");
+		sql1.SELECT("f_siga_getrecurso(pretension.descripcion, " + idioma + ") nombre");
+		sql1.FROM("SCS_PROCEDIMIENTOS procedimiento");
+		sql1.LEFT_OUTER_JOIN("SCS_PRETENSIONESPROCED prepro on (prepro.idprocedimiento = procedimiento.idprocedimiento AND PREPRO.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION)");
+		sql1.LEFT_OUTER_JOIN("SCS_PRETENSION pretension on (prepro.idpretension = pretension.idpretension AND pretension.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION)");
+		sql1.WHERE("procedimiento.idinstitucion = '" + idInstitucion + "'");
+		sql1.WHERE("procedimiento.idprocedimiento = '" + idProcedimiento + "'");
 		
-		sql.FROM("SCS_PRETENSION procedimiento");
-		sql.WHERE("procedimiento.idinstitucion = '" + idInstitucion + "'");
-		sql.WHERE("procedimiento.fechabaja is null");
-		sql.ORDER_BY("nombre");
-	
-		return sql.toString();
+		sql2.SELECT("pretension.idinstitucion");
+		sql2.SELECT("pretension.idpretension");
+		sql2.SELECT("f_siga_getrecurso(pretension.descripcion, " + idioma + ") nombre");
+		sql2.FROM("SCS_PRETENSION pretension");
+		sql2.WHERE("pretension.idinstitucion = '" + idInstitucion + "'");
+		sql2.WHERE("pretension.fechabaja is null");
+		
+		sql = "SELECT * FROM ("+ sql1.toString() + " UNION " + sql2.toString() + ") ORDER BY NOMBRE";
+		
+		return sql;
 	}
 	
 //
