@@ -418,7 +418,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
                       numeroActuacion = valor;
                   }
 
-                  hayErrores = valida(idInstitucion, idFacturacion, numEJG, anioEJG, desNumero, desAnio, numeroActuacion, col, valor) || hayErrores;
+                  hayErrores |= valida(idInstitucion, idFacturacion, numEJG, anioEJG, desNumero, desAnio, numeroActuacion, col, valor) ;
 
                   if (imprimirColumna(col)) {
                   	String aux = "";
