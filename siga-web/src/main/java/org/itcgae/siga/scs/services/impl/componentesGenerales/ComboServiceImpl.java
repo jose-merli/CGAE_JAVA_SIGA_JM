@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.services.impl.componentesGenerales;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,12 +13,14 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -115,6 +119,9 @@ public class ComboServiceImpl implements ComboService {
 
 	@Autowired
 	private ScsActuacionasistenciaExtendsMapper scsActuacionasistenciaExtendsMapper;
+
+	@Autowired
+	private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
 
 	@Autowired
 	private ExpProcedimientosExeaExtendsMapper expProcedimientosExeaExtendsMapper;
@@ -1218,12 +1225,13 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboModulo(HttpServletRequest request,String fecha) {
+	public ComboDTO comboModulo(HttpServletRequest request, ActuacionDesignaItem designaItem) {
 		LOGGER.info("modulo() -> Entrada al servicio para obtener combo modulos");
 
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		List<ComboItem2> comboItems2 = new ArrayList<ComboItem2>();
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1250,8 +1258,46 @@ public class ComboServiceImpl implements ComboService {
 			}else {
 				filtro = Integer.parseInt(valor.get(0).getValor());
 			}
-			if(fecha== null || fecha.isEmpty()) {
-				fecha = "SYSDATE"; filtro = 0;
+
+			String fecha = "SYSDATE";
+			//Filtros , (0-Fecha Actual, 1 - Fecha Designacion , 2- Fecha Actuación)
+			if (filtro == 1 && !UtilidadesString.esCadenaVacia(designaItem.getNumero()) && !UtilidadesString.esCadenaVacia(designaItem.getAnio())
+					&& !UtilidadesString.esCadenaVacia(designaItem.getIdTurno())) {
+				ScsDesignaKey designaKey = new ScsDesignaKey();
+				designaKey.setNumero(Long.parseLong(designaItem.getNumero()));
+				designaKey.setAnio(Short.parseShort(designaItem.getAnio()));
+				designaKey.setIdturno(Integer.parseInt(designaItem.getIdTurno()));
+				designaKey.setIdinstitucion(idInstitucion);
+
+				ScsDesigna designa = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
+
+				if (designa != null) {
+					fecha = dateFormat.format(designa.getFechaentrada());
+				} else {
+					fecha = "SYSDATE";
+					filtro = 0;
+				}
+
+			} else if (filtro == 2  && !UtilidadesString.esCadenaVacia(designaItem.getNumero()) && !UtilidadesString.esCadenaVacia(designaItem.getAnio())
+					&& !UtilidadesString.esCadenaVacia(designaItem.getIdTurno()) && !UtilidadesString.esCadenaVacia(designaItem.getNumeroAsunto())) {
+				ScsActuaciondesignaKey actuacionKey = new ScsActuaciondesignaKey();
+				actuacionKey.setNumero(Long.parseLong(designaItem.getNumero()));
+				actuacionKey.setAnio(Short.parseShort(designaItem.getAnio()));
+				actuacionKey.setNumeroasunto(Long.parseLong(designaItem.getNumeroAsunto()));
+				actuacionKey.setIdturno(Integer.parseInt(designaItem.getIdTurno()));
+				actuacionKey.setIdinstitucion(idInstitucion);
+
+				ScsActuaciondesigna actuacion = scsActuaciondesignaMapper.selectByPrimaryKey(actuacionKey);
+
+				if (actuacion != null) {
+					fecha = dateFormat.format(actuacion.getFecha());
+				} else {
+					fecha = "SYSDATE";
+					filtro = 0;
+				}
+			} else {
+				fecha = "SYSDATE";
+				filtro = 0;
 			}
 
 			if (null != usuarios && usuarios.size() > 0) {

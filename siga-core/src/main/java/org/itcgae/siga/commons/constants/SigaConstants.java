@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class SigaConstants {
 
     public static String parametroRutaAlmacenFicheros = "gen.ficheros.path";
-
+    public static String parametroRutaCertificados = "informes.directorioCertificacionJava";
     public enum ERROR_SERVER {
         XML_NO_VALIDO(null), CLI_NOAUTORIZADO("La IP recibida en la petición no está autorizada."),
         CLI_IP_NO_ENCONTRADA("La ip no se ha encontrado."), CLI_NOVALIDO("Esquema de petición datos no válido."),
@@ -612,8 +612,8 @@ public class SigaConstants {
     public static final String PARAMETRO_PCAJG_TIPO = "PCAJG_TIPO";
     public static final int TIPO_CAJG_XML_SANTIAGO = 6;
     public static final int TIPO_CAJG_CATALANES = 2;
-
-    	
+    public static final int TIPO_CAJG_CAM = 5;
+    
     public enum Consejos {
         C_CATALUNYA("AC0900"),
         EUSKAL_K_("AC1600"),
@@ -1486,7 +1486,7 @@ public class SigaConstants {
 	public static String EEJG_IDSISTEMA ="EEJG_IDSISTEMA";
 	public static String EEJG_URLWS ="EEJG_URLWS";
 	public static String SIGAFRONT_VERSION = "202109071016";
-	public static String SIGAWEB_VERSION = "1.0.81_3";
+	public static String SIGAWEB_VERSION = "1.0.81_4";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";

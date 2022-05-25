@@ -196,7 +196,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "NUMPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ANIOPROCEDIMIENTNO", property = "anioProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR), 
-			@Result(column = "VALIDARJUSTIFICACIONES", property = "validarjustificaciones", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "VALIDARJUSTIFICACIONES", property = "validarjustificaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "LETRADOACTUACIONES", property = "letradoActuaciones", jdbcType = JdbcType.VARCHAR)})
 //	List<JustificacionExpressItem> busquedaJustificacionExpresPendientes(JustificacionExpressItem item,
 //			String idInstitucion, String longitudCodEJG, String idPersona,  String fechaDesde, String fechaHasta);
 	List<JustificacionExpressItem> busquedaJustificacionExpresPendientes(JustificacionExpressItem item,
@@ -250,7 +251,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CODIGO", property = "label1", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem2> comboModulos(Short idInstitucion,int filtro, String fecha);
+	List<ComboItem2> comboModulos(Short idInstitucion, int filtro, String fecha);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboDelitos")
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),

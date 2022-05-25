@@ -49,11 +49,20 @@ public class JustificacionExpressItem {
 	private String idProcedimiento;
 	private String procedimiento;
 	private String validarjustificaciones;
+	private String letradoActuaciones;
 	private Map<String, String> expedientes;
 	private List<ActuacionesJustificacionExpressItem> actuaciones;	 
 	private String categoriaProcedimiento;
 	private Error error = null;
-	
+
+	public String getLetradoActuaciones() {
+		return letradoActuaciones;
+	}
+
+	public void setLetradoActuaciones(String letradoActuaciones) {
+		this.letradoActuaciones = letradoActuaciones;
+	}
+
 	/**
 	   * 
 	   **/

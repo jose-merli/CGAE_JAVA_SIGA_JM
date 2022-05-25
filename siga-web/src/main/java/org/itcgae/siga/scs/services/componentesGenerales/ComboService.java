@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.services.componentesGenerales;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 
@@ -68,7 +69,7 @@ public interface ComboService {
 	
 	public ComboDTO comboJuzgadoPorInstitucion(String idInstitucion, HttpServletRequest request);
 	
-	public ComboDTO comboModulo(HttpServletRequest request, String fecha);
+	public ComboDTO comboModulo(HttpServletRequest request, ActuacionDesignaItem item);
 	
 	public ComboDTO comboDelitos(DesignaItem designaItem, HttpServletRequest request);
 	

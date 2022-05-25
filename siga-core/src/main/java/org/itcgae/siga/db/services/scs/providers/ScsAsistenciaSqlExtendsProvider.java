@@ -483,7 +483,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		SQL_INTERESADODESIGNA.WHERE("p.idpersona = dd.idpersona and dd.anio = d.anio and dd.numero = d.numero and dd.idturno = d.idturno and dd.idinstitucion = d.idinstitucion and p.idinstitucion = d.idinstitucion AND asi.idpersonajg = p.idpersona");
 		//---
 		SQL_DESIGNAS.SELECT(
-				"TRIM('D')|| d.anio|| '/'|| TO_CHAR(d.numero) sjcs",
+				"TRIM('D')|| d.anio|| '/'|| TO_CHAR(d.codigo) sjcs",
 				"d.idinstitucion",
 				"d.anio",
 				"d.numero",
@@ -494,7 +494,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				"null idguardia",
 				"TO_CHAR(d.idturno) idturnodesigna",
 				"TO_CHAR(d.idtipodesignacolegio) idtipo",
-				"TO_CHAR(d.numero) codigo",
+				"TO_CHAR(d.codigo) codigo",
 				"("+SQL_NOMBRETURNO.toString()+") desc_turno",
 				"("+SQL_NOMBRETIPODESIGNA.toString()+") des_tipo",
 				"("+SQL_INTERESADODESIGNA.toString()+") interesado",

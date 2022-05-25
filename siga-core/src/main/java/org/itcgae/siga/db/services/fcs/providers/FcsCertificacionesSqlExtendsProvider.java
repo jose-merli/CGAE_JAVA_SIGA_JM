@@ -132,7 +132,7 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
 		sql.JOIN("FCS_ESTADOSCERTIFICACIONES EST ON H.IDESTADO = EST.IDESTADOCERTIFICACION");
 		sql.WHERE("H.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("H.IDCERTIFICACION = " + idCertificacion);
-		sql.ORDER_BY("H.FECHAESTADO DESC");
+		sql.ORDER_BY("H.FECHAESTADO DESC, H.IDESTADO DESC");
 
 		return sql.toString();
 	}

@@ -10,5 +10,5 @@ public class TramitarCerttificacionRequestDTO {
 
     private String idCertificacion;
     private List<FacturacionItem> facturacionItemList = new ArrayList<>();
-
+    private String tipoFichero;
 }

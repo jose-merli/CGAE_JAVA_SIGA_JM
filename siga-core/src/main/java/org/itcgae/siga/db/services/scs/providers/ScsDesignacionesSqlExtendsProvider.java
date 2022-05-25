@@ -1297,6 +1297,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(
 				" FROM scs_actuaciondesigna act, scs_procedimientos pro, scs_acreditacionprocedimiento acp, scs_acreditacion ac, ");
 		sql.append(" scs_tipoacreditacion tac, scs_juzgado j ");
+
+		// Filtro para evitar que se muestren las actuaciones de otro letrado
+		if (!UtilidadesString.esCadenaVacia(item.getnColegiado())) {
+			sql.append(" , scs_designasletrado designaletrado, cen_colegiado colegiado ");
+		}
+
 		sql.append(
 				" WHERE ac.idtipoacreditacion = tac.idtipoacreditacion  (+) "
 				+ "AND act.idinstitucion = j.idinstitucion (+) "
@@ -1309,6 +1315,31 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				" AND act.idprocedimiento = acp.idprocedimiento  (+)"
 				+ "AND act.idinstitucion_proc = pro.idinstitucion (+) "
 				+ "AND act.idprocedimiento = pro.idprocedimiento (+) ");
+
+		// Filtro para evitar que se muestren las actuaciones de otro letrado
+		if (!UtilidadesString.esCadenaVacia(item.getnColegiado())) {
+			SQL subquery = new SQL();
+			subquery.SELECT("MAX(LET2.FECHADESIGNA)");
+			subquery.FROM("SCS_DESIGNASLETRADO LET2");
+			subquery.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
+			subquery.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
+			subquery.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
+			subquery.WHERE("DESIGNALETRADO.IDTURNO = LET2.IDTURNO");
+			subquery.WHERE("TRUNC(LET2.FECHADESIGNA) <= act.fecha");
+
+			sql.append(
+					" AND act.idinstitucion = designaletrado.idinstitucion (+)"
+							+ "AND act.idturno = designaletrado.idturno (+) "
+							+ "AND act.anio = designaletrado.anio (+) "
+							+ "AND act.numero = designaletrado.numero (+) "
+							+ "AND act.fecha >= TRUNC(designaletrado.fechadesigna) "
+							+ "AND designaletrado.fechadesigna = ( " + subquery.toString() + " ) ");
+			sql.append(
+					" AND colegiado.idpersona = designaletrado.idpersona (+) "
+							+ "AND colegiado.idinstitucion = designaletrado.idinstitucion (+) "
+							+ "AND colegiado.ncolegiado = " + item.getnColegiado());
+		}
+
 		sql.append(" AND act.idinstitucion = " + idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = "
 				+ anio + " AND act.numero = " + numero + " ");
 		
@@ -1429,7 +1460,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.IDTURNO = EJGDES.IDTURNO ");
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA, ");
-		sql.append(" DECODE(turno.VALIDARJUSTIFICACIONES,'S',1,'N',0) AS VALIDARJUSTIFICACIONES ");
+		sql.append(" DECODE(turno.VALIDARJUSTIFICACIONES,'S',1,'N',0) AS VALIDARJUSTIFICACIONES, ");
+		sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
 
 		sql.append(" FROM SCS_DESIGNA D join scs_designasletrado   dl ON d.idinstitucion = dl.idinstitucion "
 				+ "AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
@@ -1785,15 +1817,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboModulos(Short idInstitucion,int filtro, String fecha) {
+	public String comboModulos(Short idInstitucion, int filtro, String fecha) {
 		//Filtros , (0-Fecha Actual, 1 - Fecha Designacion , 2- Fecha Actuacion
 		SQL sql = new SQL();
 		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE, MODULO.CODIGO ");
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		if(filtro == 0) {
-			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= "+ fecha);
-			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= " + fecha + " OR MODULO.FECHAHASTAVIGOR IS NULL)");
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= SYSDATE");
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= SYSDATE OR MODULO.FECHAHASTAVIGOR IS NULL)");
 		}else {
 			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
 			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= TO_DATE('" + fecha + "','DD/MM/YYYY') OR MODULO.FECHAHASTAVIGOR IS NULL)");
