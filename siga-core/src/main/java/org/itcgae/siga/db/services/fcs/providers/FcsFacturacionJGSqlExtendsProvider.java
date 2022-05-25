@@ -344,10 +344,10 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
                 + "             NVL(FAC.IMPORTESOJ,0)\r\n" + "        ELSE\r\n"
                 + "             NVL(FAC.IMPORTEEJG,0)\r\n" + "END AS IMPORTETOTAL");
         sql.SELECT("CASE CONCEPT.IDHITOGENERAL\r\n" + "        WHEN 10 THEN\r\n"
-                + "             NVL(FAC.IMPORTEOFICIO,0) - NVL(PAGO.IMPORTEOFICIO,0)\r\n" + "        WHEN 20 THEN\r\n"
-                + "             NVL(FAC.IMPORTEGUARDIA,0) - NVL(PAGO.IMPORTEGUARDIA,0)\r\n" + "        WHEN 30 THEN\r\n"
-                + "             " + "				NVL(FAC.IMPORTESOJ,0) - NVL(PAGO.IMPORTESOJ,0)\r\n"
-                + "        ELSE\r\n" + "            NVL(FAC.IMPORTEEJG,0) - NVL(PAGO.IMPORTEEJG,0)\r\n"
+                + "             NVL(PAGO.IMPORTEOFICIO,0)\r\n" + "        WHEN 20 THEN\r\n"
+                + "              NVL(PAGO.IMPORTEGUARDIA,0)\r\n" + "        WHEN 30 THEN\r\n"
+                + "             " + "				 NVL(PAGO.IMPORTESOJ,0)\r\n"
+                + "        ELSE\r\n" + "             NVL(PAGO.IMPORTEEJG,0)\r\n"
                 + "END AS IMPORTEPENDIENTE");
         sql.FROM("FCS_FACT_GRUPOFACT_HITO FACTGRUPO");
         sql.LEFT_OUTER_JOIN(
