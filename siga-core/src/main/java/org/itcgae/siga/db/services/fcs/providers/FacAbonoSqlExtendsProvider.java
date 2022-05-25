@@ -13,7 +13,7 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 	
 	private Logger LOGGER = Logger.getLogger(this.getClass());
 	
-	public String buscarAbonosSJCS(FacAbonoItem facAbonoItem,String idsGrupo, String idInstitucion,String idLenguaje) {
+	public String buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje) {
 		SQL sql = new SQL();
 		SQL sqlTotal = new SQL();
 		SQL transferencia = new SQL();
@@ -40,6 +40,17 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		sql.LEFT_OUTER_JOIN("FAC_ESTADOABONO EA ON (EA.IDESTADO = A.ESTADO)");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS GEN ON (EA.DESCRIPCION = GEN.IDRECURSO  AND GEN.IDLENGUAJE = "+ idLenguaje +")");
 		
+		if(facAbonoItem.getGrupoPago() != null || facAbonoItem.getGrupoPagoHasta() !=null || facAbonoItem.getGrupoFacturacionNombre() !=null) {
+			
+			String grupoFacturacionAux = facAbonoItem.getGrupoFacturacionNombre() != null ? facAbonoItem.getGrupoFacturacionNombre() : "-1";
+			String grupoPagoDesdeAux = facAbonoItem.getGrupoPago() != null ? facAbonoItem.getGrupoPago() : null;
+			String grupoPagoHastaAux = facAbonoItem.getGrupoPagoHasta() != null ? facAbonoItem.getGrupoPagoHasta() : null;
+			
+			
+			sql.WHERE("F.IDFACTURACION IN (PKG_SIGA_PAGOS_SJCS.Func_Pagos_Intervalo_GrupoFact(A.Idinstitucion , " + grupoPagoDesdeAux + "," + grupoPagoHastaAux + ", " + grupoFacturacionAux + "))");
+			
+		}
+		
 		if(facAbonoItem.getNumeroAbono() != null) sql.WHERE("A.NUMEROABONO LIKE '%" + facAbonoItem.getNumeroAbono() + "%'");
 		
 		if(facAbonoItem.getIdPersona() != null ) sql.WHERE("A.IDPERSONA LIKE '%" +facAbonoItem.getIdPersona() + "%'");
@@ -54,8 +65,6 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 	    }
 	        
 	    if(facAbonoItem.getNumColegiado() != null ) sql.WHERE("COL.NCOLEGIADO = " + facAbonoItem.getNumColegiado());
-	    
-	    if(facAbonoItem.getGrupoPago() != null) sql.WHERE("PA.IDFACTURACION = " + facAbonoItem.getGrupoPago());
 
         if(facAbonoItem.getImporteTotalDesde() != 0 ) {
         	sql.WHERE("A.IMPTOTAL>=to_number("+facAbonoItem.getImporteTotalDesde()+",'99999999999999999.99')");
@@ -95,9 +104,9 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
         
         if(facAbonoItem.getIdInstitucion() != null ) sql.WHERE("COL.IDINSTITUCION = " + facAbonoItem.getIdInstitucion());
         
-        if(idsGrupo != "") {
+        /*if(idsGrupo != "") {
         	sql.WHERE("F.IDFACTURACION in ("+idsGrupo+")");
-        }
+        }*/
         
 		sql.WHERE("A.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("FL.DESCRIPCIONLINEA = 'IRPF'");
@@ -245,7 +254,7 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 	
 	public String comboPago(String idInstitucion) {
 		SQL sql = new SQL();
-		sql.SELECT("IDFACTURACION, ABREVIATURA ");
+		sql.SELECT("IDPAGOSJG, ABREVIATURA ");
 		sql.FROM("fcs_pagosjg");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);		
 		sql.ORDER_BY("ABREVIATURA");

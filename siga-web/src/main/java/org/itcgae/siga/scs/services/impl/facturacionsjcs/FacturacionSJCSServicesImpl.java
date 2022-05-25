@@ -2889,12 +2889,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 		if(null != idInstitucion) {
 			
-			if(facAbonoItem.getGrupoFacturacionNombre() != null) {
+/*			if(facAbonoItem.getGrupoFacturacionNombre() != null) {
 			idsGrupo = facAbonoSJCSExtendsMapper.facturacionByGroup(facAbonoItem.getGrupoFacturacionNombre(), idInstitucion.toString());
 				
-			}
+			}*/
 	              
-         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem,idsGrupo, idInstitucion.toString(), idLenguaje);
+         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem, idInstitucion.toString(), idLenguaje);
          facAbonoDTO.setListaFacAbonoItem(listaFacAbonosItem);    
 	    
 		}
