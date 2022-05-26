@@ -1283,8 +1283,12 @@ public class FacturaAccionesHelper {
 
         resultado = commons.callPLProcedureFacturacionPyS("{call PKG_SIGA_CARGOS.DevolucionesManuales(?,?,?,?,?,?,?,?)}", 3, param_in);
 
-        if (!resultado[0].equals("0")) {
-            throw new BusinessException("facturacionPyS.facturas.error.devolucionesManuales");
+        if (resultado != null) {
+        	if (!resultado[0].equals("0")) {
+                throw new BusinessException("facturacionPyS.facturas.error.devolucionesManuales");
+            }
+        } else {
+        	throw new BusinessException("facturacionPyS.facturas.error.devolucionesManuales");
         }
 
         String [] aListaIdDisquetesDevolucion = resultado[2].split(";");

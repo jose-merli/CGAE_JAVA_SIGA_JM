@@ -58,9 +58,14 @@ public class EjecucionPlsServicios {
         
 //        LOGGER.info("SUSCRIPCION_AUTO: resultado[0] = " + resultado[0] + " y resultado[1] = " + resultado[1]);
 
-        if (!resultado[0].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[1]);
-            throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);
+        if (resultado != null) {
+        	if (!resultado[0].equalsIgnoreCase("0")) {
+                LOGGER.error("Error en PL = " + (String) resultado[1]);
+                throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);
+            }
+        } else {
+        	LOGGER.error("Error en PL");
+        	throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. El resultado del PL es null");
         }
 
         return resultado;
@@ -88,9 +93,14 @@ public class EjecucionPlsServicios {
         
 //        LOGGER.info("REVISION_AUTO: resultado[0] = " + resultado[0] + " y resultado[1] = " + resultado[1]);
 
-        if (!resultado[0].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[1]);
-            throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisón automática de servicios de una institución. Error en PL = " + (String) resultado[1]);
+        if (resultado != null) {
+        	if (!resultado[0].equalsIgnoreCase("0")) {
+                LOGGER.error("Error en PL = " + (String) resultado[1]);
+                throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisón automática de servicios de una institución. Error en PL = " + (String) resultado[1]);
+            }
+        } else {
+        	LOGGER.error("Error en PL");
+            throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisón automática de servicios de una institución. El resultado del PL es null");
         }
 
         return resultado;
@@ -121,10 +131,14 @@ public class EjecucionPlsServicios {
         resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_BAJA_SERVICIO(?,?,?,?,?,?,?,?)}", 2, paramIn);
 
 //        LOGGER.info("BAJA_SERVICIO: resultado[0] = " + resultado[0] + " y resultado[1] = " + resultado[1]);
-        
-        if (!resultado[0].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[1]);
-            throw new Exception("Ha ocurrido un error al ejecutar el proceso de baja del servicio. Error en PL = " + (String) resultado[1]);
+        if (resultado != null) {
+        	if (!resultado[0].equalsIgnoreCase("0")) {
+                LOGGER.error("Error en PL = " + (String) resultado[1]);
+                throw new Exception("Ha ocurrido un error al ejecutar el proceso de baja del servicio. Error en PL = " + (String) resultado[1]);
+            }
+        } else {
+        	LOGGER.error("Error en PL");
+            throw new Exception("Ha ocurrido un error al ejecutar el proceso de baja del servicio. El resultado del PL es null");
         }
 
         return resultado;
@@ -160,12 +174,17 @@ public class EjecucionPlsServicios {
 
 //        LOGGER.info("ELIMINAR_SUSCRIPCION: resultado[0] = " + resultado[0] + ", resultado[1] = " + resultado[1] + " y resultado[2] = "+ resultado[2]);
         
-
-        if (!resultado[0].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[1]);
-            throw new Exception("Ha ocurrido un error al ejecutar el proceso de baja del servicio. Error en PL = " + (String) resultado[1]);
-        }else if(resultado[0].equalsIgnoreCase("0")) {
-        	LOGGER.info("El PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ELIMINAR_SUSCRIPCION se ha ejecutado correctamente, numero de suscripciones borradas: " + resultado[2]);        }
+        if (resultado != null) {
+        	if (!resultado[0].equalsIgnoreCase("0")) {
+                LOGGER.error("Error en PL = " + (String) resultado[1]);
+                throw new Exception("Ha ocurrido un error al ejecutar el proceso de baja del servicio. Error en PL = " + (String) resultado[1]);
+            }else if(resultado[0].equalsIgnoreCase("0")) {
+            	LOGGER.info("El PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ELIMINAR_SUSCRIPCION se ha ejecutado correctamente, numero de suscripciones borradas: " + resultado[2]);
+            }
+        } else {
+        	LOGGER.error("Error en PL");
+            throw new Exception("Ha ocurrido un error al ejecutar el proceso de baja del servicio. El resultado del PL es null");
+        }
 
         return resultado;
     }
@@ -198,9 +217,14 @@ public class EjecucionPlsServicios {
         
 //        LOGGER.info("BAJA_SERVICIO: resultado[0] = " + resultado[0] + " y resultado[1] = " + resultado[1]);
 
-        if (!resultado[0].equalsIgnoreCase("0")) {
-            LOGGER.error("Error en PL = " + (String) resultado[1]);
-            throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisar las condiciones de los servicios para una persona. Error en PL = " + (String) resultado[1]);
+        if (resultado != null) {
+	        if (!resultado[0].equalsIgnoreCase("0")) {
+	            LOGGER.error("Error en PL = " + (String) resultado[1]);
+	            throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisar las condiciones de los servicios para una persona. Error en PL = " + (String) resultado[1]);
+	        }
+        } else {
+        	LOGGER.error("Error en PL");
+            throw new Exception("Ha ocurrido un error al ejecutar el proceso de revisar las condiciones de los servicios para una persona. El resultado del PL es null");
         }
         return resultado;
     }

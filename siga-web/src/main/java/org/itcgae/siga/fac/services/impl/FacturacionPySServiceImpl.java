@@ -2250,28 +2250,31 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
         String resultado[] = commons.callPLProcedureFacturacionPyS(
                 "{call PKG_SIGA_FACTURACION.ELIMINARFACTURACION(?,?,?,?,?,?)}", 2, param_in);
 
-        if (resultado[0] != null && !resultado[0].equals(RET_OK)) {
-            throw new Exception(resultado[1]);
+        if (resultado != null) {
+        	if (resultado[0] != null && !resultado[0].equals(RET_OK)) {
+                throw new Exception(resultado[1]);
+            } else {
+            	// Obtener la ruta del fichero
+    			String directorioFisico = "facturacion.directorioFisicoPrevisionesJava";
+    			String directorio = "facturacion.directorioPrevisionesJava";
+
+    			String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
+    					+ File.separator + usuario.getIdinstitucion();
+
+    			// Borrado del fichero
+    			File file = null;
+    			if (Objects.nonNull(facturacionToDelete)) {
+    				String nombreFichero = pathFichero + File.separator + facturacionToDelete.getNombrefichero();
+    				file = new File(nombreFichero);
+
+    				if (file.exists()) {
+    					file.delete();
+    				}
+    			}
+            }
         } else {
-        	// Obtener la ruta del fichero
-			String directorioFisico = "facturacion.directorioFisicoPrevisionesJava";
-			String directorio = "facturacion.directorioPrevisionesJava";
-
-			String pathFichero = getProperty(directorioFisico) + getProperty(directorio)
-					+ File.separator + usuario.getIdinstitucion();
-
-			// Borrado del fichero
-			File file = null;
-			if (Objects.nonNull(facturacionToDelete)) {
-				String nombreFichero = pathFichero + File.separator + facturacionToDelete.getNombrefichero();
-				file = new File(nombreFichero);
-
-				if (file.exists()) {
-					file.delete();
-				}
-			}
+        	throw new Exception("Error al llamar al PL ELIMINARFACTURACION. El resultado es null");
         }
-
 
 		LOGGER.info("eliminarFacturacion() -> Salida del servicio para eliminar facturación");
 
