@@ -340,7 +340,11 @@ public class UtilidadesFacturacionSJCS {
 
         //////////////////////////////////
         // TURNOS DE OFICIO rgg 16-03-2005
-
+        LOGGER.debug("AUDIT PARAMS PROC_FCS_FACTURAR_TURNOS_OFI");
+        LOGGER.debug("IDINSTITUCION: " + itemFac.getIdinstitucion().toString()
+        		+ " - IDFACTURACION: " + itemFac.getIdfacturacion().toString()
+        		+ " - USUMODIFICACION: " + itemFac.getUsumodificacion().toString());
+        
         Object[] param_in_facturacion = new Object[3];
         param_in_facturacion[0] = itemFac.getIdinstitucion().toString(); // IDINSTITUCION
         param_in_facturacion[1] = itemFac.getIdfacturacion().toString(); // IDFACTURACION

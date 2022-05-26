@@ -65,6 +65,7 @@ public class FacAbonoItem {
     private String nombreGeneral;
     private String apellidosGeneral;
     private String grupoPago;
+    private String grupoPagoHasta;
     private String idInstitucion;
     
     
@@ -376,6 +377,12 @@ public class FacAbonoItem {
 	}
 	public void setImporteIRPF(String importeIRPF) {
 		this.importeIRPF = importeIRPF;
+	}
+	public String getGrupoPagoHasta() {
+		return grupoPagoHasta;
+	}
+	public void setGrupoPagoHasta(String grupoPagoHasta) {
+		this.grupoPagoHasta = grupoPagoHasta;
 	}
 	
 	

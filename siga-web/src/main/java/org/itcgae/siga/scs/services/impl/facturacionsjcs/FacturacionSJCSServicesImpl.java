@@ -1660,7 +1660,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             try {
                 // Insertamos el estado En ejecucion para las facturaciones en ejecucion
-                LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCIÓN PARA LAS FACTURACIONES EN EJECUCION");
+            	LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCIÓN PARA LAS FACTURACIONES EN EJECUCION");
+                LOGGER.debug("AUDIT FACTURACIONES PROGRAMADAS");
+                LOGGER.debug("ITEM: " + item);
+                
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
 
@@ -1669,8 +1672,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 // UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
                 LOGGER.debug("AGUERRA - ENTRA LA PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
                 if (item.getRegularizacion().equals("1")) {
+                	LOGGER.debug("AUDIT ejecutarRegularizacionJG()");
                     ejecutarRegularizacionJG(item, institucion);
                 } else {
+                	LOGGER.debug("AUDIT ejecutarFacturacionJG()");
                     ejecutarFacturacionJG(item, institucion);
                 }
                 LOGGER.debug("AGUERRA - SALE DE PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
@@ -1679,6 +1684,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
                 LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACION PROGRAMADA");
+                LOGGER.error(e.getStackTrace());
                 LOGGER.error(e);
                 actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
                         item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
@@ -1728,6 +1734,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
                 LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACIONES BLOQUEADAS");
+                LOGGER.error(e.getStackTrace());
                 LOGGER.error(e.getCause());
                 LOGGER.error(e.getMessage());
                 LOGGER.error(e);
@@ -2937,12 +2944,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 		if(null != idInstitucion) {
 			
-			if(facAbonoItem.getGrupoFacturacionNombre() != null) {
+/*			if(facAbonoItem.getGrupoFacturacionNombre() != null) {
 			idsGrupo = facAbonoSJCSExtendsMapper.facturacionByGroup(facAbonoItem.getGrupoFacturacionNombre(), idInstitucion.toString());
 				
-			}
+			}*/
 	              
-         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem,idsGrupo, idInstitucion.toString(), idLenguaje);
+         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem, idInstitucion.toString(), idLenguaje);
          facAbonoDTO.setListaFacAbonoItem(listaFacAbonosItem);    
 	    
 		}
