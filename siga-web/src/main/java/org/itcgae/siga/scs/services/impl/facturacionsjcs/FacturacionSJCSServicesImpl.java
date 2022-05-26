@@ -1684,6 +1684,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
                 LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACION PROGRAMADA");
+                LOGGER.error(e.getStackTrace());
                 LOGGER.error(e);
                 actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
                         item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
