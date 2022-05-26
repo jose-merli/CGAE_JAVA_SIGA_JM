@@ -328,16 +328,22 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 "{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
 
         String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
+        if(resultado == null) {
+        	LOGGER.info("nuevoFicheroAdeudos() ERROR -> Resultado null.");
+            throw new Exception();
+        }
         if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
+        	LOGGER.info("nuevoFicheroAdeudos() -> Fichero no creados.");
             throw new BusinessException(resultado[2]);
         } else {
             if (!resultado[1].equals("0")) {
+            	LOGGER.info("nuevoFicheroAdeudos() -> Fichero no creados.");
                 throw new BusinessException("general.mensaje.error.bbdd");
             }
         }
-
         // Restaurar facturas a su estado inicial
         if (resultado[1].equals("0") && resultado[0].equals("0"))
+        	LOGGER.info("nuevoFicheroAdeudos() -> Restaurar Facturas a su estado inicial.");
             throw new BusinessException("facturacionPyS.ficheroAdeudos.error.nuevo");
     }
 
