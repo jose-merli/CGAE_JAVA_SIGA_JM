@@ -1733,6 +1733,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
                 LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACIONES BLOQUEADAS");
+                LOGGER.error(e.getStackTrace());
                 LOGGER.error(e.getCause());
                 LOGGER.error(e.getMessage());
                 LOGGER.error(e);
