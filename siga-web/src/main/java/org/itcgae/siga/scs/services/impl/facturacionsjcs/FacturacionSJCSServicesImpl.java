@@ -1960,20 +1960,25 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             LOGGER.debug("PARAMETRO INSTITUCION DE ENTRADA EJECUTARBORRARFACTURACION -> " + param_in[0]);
             LOGGER.debug("PARAMETRO FACTURACION DE ENTRADA EJECUTARBORRARFACTURACION -> " + param_in[1]);
-
-            // Ejecucion del PL
-            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION2(?,?,"+borrarFacturacion+",?,?)}", 2, param_in);
-
-            if (resultado != null) {
-                if (!resultado[0].equalsIgnoreCase("0")) {
-                    //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
-                    LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
-                }
-            } else {
-            	resultado = new String[1];
-            	resultado[0] = "";
-                LOGGER.error("Error en PL PROC_FCS_BORRAR_FACTURACION2");
+            
+            if(borrarFacturacion) {
+            	resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION(?,?,?,?)}", 2, param_in);
+            }else {
+            	resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION2(?,?,false,?,?)}", 2, param_in);
             }
+          
+            if (resultado == null || resultado.length <= 1 || resultado[1] == null || !resultado[1].equalsIgnoreCase("Fin correcto")) {
+                String sError = "";
+                if(resultado != null && resultado[1] != null) {
+                    sError = "Error en PL = " + (String) resultado[1]; 
+                }else {
+                    sError = "Error en PL PROC_FCS_BORRAR_FACTURACION / 2";
+                }
+                LOGGER.error(sError);
+                resultado = new String[1];
+            	resultado[0] = "";
+                LOGGER.error("Error en PL PROC_FCS_BORRAR_FACTURACION / 2");
+            }    
 
         } catch (Exception e) {
             throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
