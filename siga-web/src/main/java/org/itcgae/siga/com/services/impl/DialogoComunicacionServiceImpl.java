@@ -2625,7 +2625,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 			}else if(esFO){
 				try {
-					docGenerado = _generacionDocService.generarFO(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, resultDatos);
+					if(modelosComunicacionItem.getIdClaseComunicacion().equals("6")) { //Carta de Oficio
+						docGenerado = _generacionDocService.generarFOTurnos(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, resultDatos);
+					}else {
+						docGenerado = _generacionDocService.generarFO(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, resultDatos);
+					}
 				} catch (Exception e) {
 					LOGGER.error("Error al generar el fichero excel ", e);
 					throw new BusinessException("No se ha podido generar el fichero Excel", e);
