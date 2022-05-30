@@ -328,16 +328,22 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 "{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
 
         String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
+        if(resultado == null) {
+        	LOGGER.info("nuevoFicheroAdeudos() ERROR -> Resultado null.");
+            throw new Exception();
+        }
         if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
+        	LOGGER.info("nuevoFicheroAdeudos() -> Fichero no creados.");
             throw new BusinessException(resultado[2]);
         } else {
             if (!resultado[1].equals("0")) {
+            	LOGGER.info("nuevoFicheroAdeudos() -> Fichero no creados.");
                 throw new BusinessException("general.mensaje.error.bbdd");
             }
         }
-
         // Restaurar facturas a su estado inicial
         if (resultado[1].equals("0") && resultado[0].equals("0"))
+        	LOGGER.info("nuevoFicheroAdeudos() -> Restaurar Facturas a su estado inicial.");
             throw new BusinessException("facturacionPyS.ficheroAdeudos.error.nuevo");
     }
 
@@ -430,12 +436,17 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                     "{call PKG_SIGA_CARGOS.Regenerar_Presentacion(?,?,?,?,?,?,?,?,?,?,?)}", 2, param_in);
 
             String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
-            if (Arrays.asList(codigosErrorFormato).contains(resultado[0])) {
-                throw new BusinessException(resultado[1]);
-            } else {
-                if (!resultado[0].equals("0")) {
-                    throw new BusinessException("general.mensaje.error.bbdd");
+            
+            if (resultado != null) {
+            	if (Arrays.asList(codigosErrorFormato).contains(resultado[0])) {
+                    throw new BusinessException(resultado[1]);
+                } else {
+                    if (!resultado[0].equals("0")) {
+                        throw new BusinessException("general.mensaje.error.bbdd");
+                    }
                 }
+            } else {
+            	throw new BusinessException("general.mensaje.error.bbdd");
             }
         }
 
@@ -939,7 +950,11 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
                 param_in[4] = usuario;
                 resultado = commons.callPLProcedureFacturacionPyS(
                         "{call PKG_SIGA_CARGOS.DEVOLUCIONES(?,?,?,?,?,?,?,?)}", 3, param_in);
-                codretorno = resultado[0];
+                if (resultado != null) {
+                	codretorno = resultado[0];
+                } else {
+                	LOGGER.error("actualizacionTableroDevoluciones() -> Proc:PKG_SIGA_CARGOS.DEVOLUCIONES. El resultado es null");
+                }
             }
 
         } catch (Exception e){
@@ -1489,8 +1504,13 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         String[] resultado = commons.callPLProcedureFacturacionPyS(
                 "{call PKG_SIGA_ABONOS.Generarficherotransferencias(?,?,?,?,?,?,?,?,?)}", 2, param_in);
 
-        if (resultado[0] != null && resultado.length > 1 && string2Integer(resultado[0]) != 0) {
-            throw new BusinessException(resultado[1]);
+        if (resultado != null) {
+        	if (resultado[0] != null && resultado.length > 1 && string2Integer(resultado[0]) != 0) {
+                throw new BusinessException(resultado[1]);
+            }
+        } else {
+        	LOGGER.error("Error en PL Generarficherotransferencias El resultado del PL es null");
+        	throw new BusinessException("general.mensaje.error.bbdd");
         }
 
         return 1;

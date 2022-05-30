@@ -938,7 +938,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			String sPlantillaFO = UtilidadesString.getFileContent(plantillaFO);
 			
 			// 2.3. generando intermedio FOP, reemplazando los datos en la plantilla
-			String content = reemplazarDatos(hDatosFinal, sPlantillaFO);
+			String content = reemplazarDatosTurnos(hDatosFinal, sPlantillaFO);
 			UtilidadesString.setFileContent(ficheroFOP, content);
 	
 			// 3. generando PDF final
@@ -970,7 +970,31 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	}
 	
 	protected String reemplazarDatos(List<Map<String, Object>> hDatosFinal, String plantillaFO) throws Exception{
+		Hashtable htDatos = new Hashtable<>();
+		for(Map<String, Object> registro:hDatosFinal){
+			Set<String> claves = registro.keySet();
+			if (claves.size() != 0) {
+	
+				for (String clave : claves) {
+						Object o = registro.get(clave);
+						try {
+							if (o != null) {
+								htDatos.put(clave.toUpperCase(), o.toString());
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+	
+				}
+	
+			}
+			plantillaFO = this.reemplazaVariables(htDatos, plantillaFO);
+		}
 		
+		return plantillaFO;
+	}
+	
+	protected String reemplazarDatosTurnos(List<Map<String, Object>> hDatosFinal, String plantillaFO) throws Exception{
 		Hashtable htDatos = new Hashtable<>();
 		String institucion = hDatosFinal.get(0).get("IDINSTITUCION").toString();
 		String turno = hDatosFinal.get(0).get("IDTURNO").toString();

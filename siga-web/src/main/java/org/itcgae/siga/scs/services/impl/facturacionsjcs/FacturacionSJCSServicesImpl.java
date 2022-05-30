@@ -302,73 +302,100 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         return facturaciones;
     }
 
-    @Override
-    @Transactional
-    public FacturacionDeleteDTO eliminarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        String dni = UserTokenUtils.getDniFromJWTToken(token);
-        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        FacturacionDeleteDTO facturacionesDelete = new FacturacionDeleteDTO();
-        Error error = new Error();
-        int response = 0;
+	@Override
+	@Transactional
+	public FacturacionDeleteDTO eliminarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		FacturacionDeleteDTO facturacionesDelete = new FacturacionDeleteDTO();
+		Error error = new Error();
+		int response = 1;
 
-        if (null != idInstitucion) {
-            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-            LOGGER.debug(
-                    "FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-            LOGGER.debug(
-                    "FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.debug(
+					"FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.debug(
+					"FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-            if (null != usuarios && usuarios.size() > 0) {
-                AdmUsuarios usuario = usuarios.get(0);
-                usuario.setIdinstitucion(idInstitucion);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
 
-                if (checkDeleteFacturacion(facturacionItem, idInstitucion)) {
+				if (checkDeleteFacturacion(facturacionItem, idInstitucion)) {
 
-                    int idFactura = Integer.valueOf(facturacionItem.getIdFacturacion());
+					int idFactura = Integer.valueOf(facturacionItem.getIdFacturacion());
 
-                    LOGGER.debug(
-                            "FacturacionSJCSServicesImpl.eliminarFacturaciones() / eliminaTablasFacturacion() -> Entrada a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
-                    response = eliminaTablasFacturacion(idFactura, idInstitucion.toString());
+					FcsFacturacionjgKey key = new FcsFacturacionjgKey();
+					key.setIdfacturacion(idFactura);
+					key.setIdinstitucion(idInstitucion);
 
-                    if (response > 0)
-                        response = updateTablasFacturacion(idFactura, idInstitucion.toString());
+					FcsFacturacionjg facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(key);
 
-                    if (response > 0)
-                        response = eliminaFacturacionjg(idFactura, idInstitucion.toString());
+					if (facturacion != null) {
 
-                    if (response > 0) {
-                        facturacionesDelete.setStatus(SigaConstants.OK);
-                    } else {
-                        facturacionesDelete.setStatus(SigaConstants.KO);
-                    }
-                } else {
-                    LOGGER.debug(
-                            "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
-                    facturacionesDelete.setStatus(SigaConstants.KO);
-                    error.setDescription("facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
-                    error.setMessage(facturacionItem.getNombre());
-                }
-                LOGGER.debug(
-                        "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
-            } else {
-                LOGGER.warn(
-                        "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No existen usuarios en tabla admUsuarios para dni = "
-                                + dni + " e idInstitucion = " + idInstitucion);
-            }
-        } else {
-            LOGGER.warn("FacturacionSJCSServicesImpl.eliminarFacturaciones() -> idInstitucion del token nula");
-        }
+						LOGGER.debug(
+								"ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
+						try {
+							response = limpiafacturacion(facturacion, true);
+						} catch (Exception e) {
+							LOGGER.debug(
+									"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
+							facturacionesDelete.setStatus(SigaConstants.KO);
+							error.setDescription(
+									"facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
+							error.setMessage(facturacionItem.getNombre());
+						}
+						LOGGER.debug(
+								"ejecutarFacturacion() -> Salida limpieza de facturacion al recalcular facturacion");
 
-        facturacionesDelete.setError(error);
+					}
+					//
+					/*
+					 * LOGGER.debug(
+					 * "FacturacionSJCSServicesImpl.eliminarFacturaciones() / eliminaTablasFacturacion() -> Entrada a eliminafacturacion para eliminar la facturacion de las tablas relacionadas"
+					 * ); response = eliminaTablasFacturacion(idFactura, idInstitucion.toString());
+					 * 
+					 * if (response > 0) response = updateTablasFacturacion(idFactura,
+					 * idInstitucion.toString());
+					 * 
+					 * if (response > 0) response = eliminaFacturacionjg(idFactura,
+					 * idInstitucion.toString());
+					 */
 
-        LOGGER.debug(
-                "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida del servicio para eliminar las facturaciones");
+					if (response == 0) {
+						facturacionesDelete.setStatus(SigaConstants.OK);
+					} else {
+						facturacionesDelete.setStatus(SigaConstants.KO);
+					}
+				} else {
+					LOGGER.debug(
+							"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
+					facturacionesDelete.setStatus(SigaConstants.KO);
+					error.setDescription("facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
+					error.setMessage(facturacionItem.getNombre());
+				}
+				LOGGER.debug(
+						"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
+			} else {
+				LOGGER.warn(
+						"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("FacturacionSJCSServicesImpl.eliminarFacturaciones() -> idInstitucion del token nula");
+		}
 
-        return facturacionesDelete;
-    }
+		facturacionesDelete.setError(error);
+
+		LOGGER.debug(
+				"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida del servicio para eliminar las facturaciones");
+
+		return facturacionesDelete;
+	}
 
     private int eliminaTablasFacturacion(int idFactura, String idInstitucion) {
         try {
@@ -988,7 +1015,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         if (facturacion != null && estados != null && estados.size()>0) {
 
         	LOGGER.debug("ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
-            response = limpiafacturacion(facturacion, estados);
+            response = limpiafacturacion(facturacion, false);
             LOGGER.debug("ejecutarFacturacion() -> Salida limpieza de facturacion al recalcular facturacion");
 
         }
@@ -1000,12 +1027,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		return response;
 	}
 
-    private int limpiafacturacion(FcsFacturacionjg facturacion, List<FcsFactEstadosfacturacion> estados) throws Exception {
+    private int limpiafacturacion(FcsFacturacionjg facturacion,boolean borrarFacturacion) throws Exception {
         int response = 0;
         String resPL = "";
 
         LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
-        resPL = ejecutarBorrarFacturacion(facturacion);
+        resPL = ejecutarBorrarFacturacion(facturacion,borrarFacturacion);
 
         if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
             File ficheroFisico = new File(facturacion.getNombrefisico());
@@ -1633,7 +1660,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             try {
                 // Insertamos el estado En ejecucion para las facturaciones en ejecucion
-                LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCIÓN PARA LAS FACTURACIONES EN EJECUCION");
+            	LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCIÓN PARA LAS FACTURACIONES EN EJECUCION");
+                LOGGER.debug("AUDIT FACTURACIONES PROGRAMADAS");
+                LOGGER.debug("ITEM: " + item);
+                
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
 
@@ -1642,8 +1672,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 // UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
                 LOGGER.debug("AGUERRA - ENTRA LA PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
                 if (item.getRegularizacion().equals("1")) {
+                	LOGGER.debug("AUDIT ejecutarRegularizacionJG()");
                     ejecutarRegularizacionJG(item, institucion);
                 } else {
+                	LOGGER.debug("AUDIT ejecutarFacturacionJG()");
                     ejecutarFacturacionJG(item, institucion);
                 }
                 LOGGER.debug("AGUERRA - SALE DE PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
@@ -1652,6 +1684,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
                 LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACION PROGRAMADA");
+                LOGGER.error(e.getStackTrace());
                 LOGGER.error(e);
                 actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
                         item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
@@ -1701,6 +1734,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0);
             } catch (Exception e) {
                 LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACIONES BLOQUEADAS");
+                LOGGER.error(e.getStackTrace());
                 LOGGER.error(e.getCause());
                 LOGGER.error(e.getMessage());
                 LOGGER.error(e);
@@ -1922,7 +1956,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         }
     }
 
-    public String ejecutarBorrarFacturacion(FcsFacturacionjg facturacion) throws Exception {
+    public String ejecutarBorrarFacturacion(FcsFacturacionjg facturacion, boolean borrarFacturacion) throws Exception {
         Object[] param_in; // Parametros de entrada del PL
         String resultado[] = null; // Parametros de salida del PL
 
@@ -1933,20 +1967,25 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             LOGGER.debug("PARAMETRO INSTITUCION DE ENTRADA EJECUTARBORRARFACTURACION -> " + param_in[0]);
             LOGGER.debug("PARAMETRO FACTURACION DE ENTRADA EJECUTARBORRARFACTURACION -> " + param_in[1]);
-
-            // Ejecucion del PL
-            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION2(?,?,false,?,?)}", 2, param_in);
-
-            if (resultado != null) {
-                if (!resultado[0].equalsIgnoreCase("0")) {
-                    //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
-                    LOGGER.error("ejecutarPLExportarTurno -> Error en PL = " + (String) resultado[1]);
-                }
-            } else {
-            	resultado = new String[1];
-            	resultado[0] = "";
-                LOGGER.error("Error en PL PROC_FCS_BORRAR_FACTURACION2");
+            
+            if(borrarFacturacion) {
+            	resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION(?,?,?,?)}", 2, param_in);
+            }else {
+            	resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_BORRAR_FACTURACION2(?,?,false,?,?)}", 2, param_in);
             }
+          
+            if (resultado == null || resultado.length <= 1 || resultado[1] == null || !resultado[1].equalsIgnoreCase("Fin correcto")) {
+                String sError = "";
+                if(resultado != null && resultado[1] != null) {
+                    sError = "Error en PL = " + (String) resultado[1]; 
+                }else {
+                    sError = "Error en PL PROC_FCS_BORRAR_FACTURACION / 2";
+                }
+                LOGGER.error(sError);
+                resultado = new String[1];
+            	resultado[0] = "";
+                LOGGER.error("Error en PL PROC_FCS_BORRAR_FACTURACION / 2");
+            }    
 
         } catch (Exception e) {
             throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
@@ -2905,12 +2944,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 		if(null != idInstitucion) {
 			
-			if(facAbonoItem.getGrupoFacturacionNombre() != null) {
+/*			if(facAbonoItem.getGrupoFacturacionNombre() != null) {
 			idsGrupo = facAbonoSJCSExtendsMapper.facturacionByGroup(facAbonoItem.getGrupoFacturacionNombre(), idInstitucion.toString());
 				
-			}
+			}*/
 	              
-         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem,idsGrupo, idInstitucion.toString(), idLenguaje);
+         List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem, idInstitucion.toString(), idLenguaje);
          facAbonoDTO.setListaFacAbonoItem(listaFacAbonosItem);    
 	    
 		}

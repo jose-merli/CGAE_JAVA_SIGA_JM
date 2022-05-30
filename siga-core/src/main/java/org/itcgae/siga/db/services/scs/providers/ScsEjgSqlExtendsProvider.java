@@ -920,7 +920,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		 * sql.WHERE("rownum <= " + tamMaxNumber); }
 		 */
 
-		sql.ORDER_BY("TURNO ASC, GUARDIA.NOMBRE ASC");
+		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
 
 		LOGGER.info(sql.toString());
 

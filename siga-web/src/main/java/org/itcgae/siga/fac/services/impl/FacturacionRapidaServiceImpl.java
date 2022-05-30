@@ -901,7 +901,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             // Genera la facturacion
             resultado = wsCommons.callPLProcedureFacturacionPyS("{call PKG_SIGA_FACTURACION.GENERACIONFACTURACION(?,?,?,?,?,?,?,?)}", 2, param_in);
 
-            // Compruebo que ha finalizado correctamente
+        	// Compruebo que ha finalizado correctamente
             String[] codigosErrorFormato = {"-201", "-202", "-203", "-204"};
             String codretorno = resultado[0];
             if (Arrays.asList(codigosErrorFormato).contains(codretorno)) {

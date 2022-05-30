@@ -43,7 +43,7 @@ public interface FacAbonoSJCSExtendsMapper extends FacAbonoMapper{
 		@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IRPF", property = "importeIRPF", jdbcType = JdbcType.VARCHAR),
 	})
-	List<FacAbonoItem> buscarAbonosSJCS(FacAbonoItem facAbonoItem,String idsGrupo, String idInstitucion,String idLenguaje);	
+	List<FacAbonoItem> buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje);	
 	
 	@SelectProvider(type = FacAbonoSqlExtendsProvider.class, method = "comboEstadosAbono")
 	@Results({ 
@@ -62,7 +62,7 @@ public interface FacAbonoSJCSExtendsMapper extends FacAbonoMapper{
 	@SelectProvider(type = FacAbonoSqlExtendsProvider.class, method = "comboPago")
 	@Results({ 
 		@Result(column = "ABREVIATURA", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDPAGOSJG", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> comboPago(String idInstitucion);
 	

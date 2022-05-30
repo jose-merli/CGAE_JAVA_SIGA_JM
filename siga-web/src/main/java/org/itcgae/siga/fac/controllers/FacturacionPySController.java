@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
@@ -59,6 +60,7 @@ import org.itcgae.siga.fac.services.IContabilidadExportacionService;
 import org.itcgae.siga.fac.services.IFacturacionPySExportacionesService;
 import org.itcgae.siga.fac.services.IFacturacionPySFacturasService;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
+import org.itcgae.siga.fac.services.impl.FacturacionPySExportacionesServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -90,6 +92,8 @@ public class FacturacionPySController {
 	@Autowired
 	private IFacturacionPySFacturasService facturacionPySFacturasService;
 
+	 private Logger LOGGER = Logger.getLogger(this.getClass());
+	
 	@GetMapping(value = "/getCuentasBancarias")
 	ResponseEntity<CuentasBancariasDTO> getCuentasBancarias(@RequestParam(required = false) String idCuenta,
 			HttpServletRequest request) {
@@ -976,9 +980,11 @@ public class FacturacionPySController {
 			response = facturacionPySExportacionesService.nuevoFicheroAdeudos(item, request);
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		} catch (BusinessException e) {
+			LOGGER.error("nuevoFicheroAdeudos() ",e);
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
+			LOGGER.error("nuevoFicheroAdeudos() ",e);
 			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

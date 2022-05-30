@@ -258,9 +258,14 @@ public class UtilidadesFacturacionSJCS {
             param_in[6] = getCabecerasFicheros(SigaConstants.HITO_GENERAL_SOJ, tipoP, usuario);
             resultado = new String[2];
             resultado = ejecucionPlsPago.callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_EXPORTAR_SOJ (?,?,?,?,?,?,?,?,?)}", 2, param_in);
-            if (!resultado[0].equalsIgnoreCase("0")) {
-                //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
-                LOGGER.error("Error en PL = " + (String) resultado[1]);
+            
+            if (resultado != null) {
+            	if (!resultado[0].equalsIgnoreCase("0")) {
+                    //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
+                    LOGGER.error("Error en PL = " + (String) resultado[1]);
+                }
+            } else {
+            	LOGGER.error("Error en PL PROC_FCS_EXPORTAR_SOJ");
             }
 
             // EJG
@@ -268,9 +273,14 @@ public class UtilidadesFacturacionSJCS {
             param_in[6] = getCabecerasFicheros(SigaConstants.HITO_GENERAL_EJG, tipoP, usuario);
             resultado = new String[2];
             resultado = ejecucionPlsPago.callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_EXPORTAR_EJG (?,?,?,?,?,?,?,?,?)}", 2, param_in);
-            if (!resultado[0].equalsIgnoreCase("0")) {
-                //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
-                LOGGER.error("Error en PL = " + (String) resultado[1]);
+            
+            if (resultado != null) {
+            	if (!resultado[0].equalsIgnoreCase("0")) {
+                    //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
+                    LOGGER.error("Error en PL = " + (String) resultado[1]);
+                }
+            } else {
+            	LOGGER.error("Error en PL PROC_FCS_EXPORTAR_EJG");
             }
 
             // GUARDIAS
@@ -340,7 +350,11 @@ public class UtilidadesFacturacionSJCS {
 
         //////////////////////////////////
         // TURNOS DE OFICIO rgg 16-03-2005
-
+        LOGGER.debug("AUDIT PARAMS PROC_FCS_FACTURAR_TURNOS_OFI");
+        LOGGER.debug("IDINSTITUCION: " + itemFac.getIdinstitucion().toString()
+        		+ " - IDFACTURACION: " + itemFac.getIdfacturacion().toString()
+        		+ " - USUMODIFICACION: " + itemFac.getUsumodificacion().toString());
+        
         Object[] param_in_facturacion = new Object[3];
         param_in_facturacion[0] = itemFac.getIdinstitucion().toString(); // IDINSTITUCION
         param_in_facturacion[1] = itemFac.getIdfacturacion().toString(); // IDFACTURACION
@@ -359,11 +373,11 @@ public class UtilidadesFacturacionSJCS {
             LOGGER.debug("Error PL PROC_FCS_FACTURAR_TURNOS_OFI");
         	logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_TURNOS_OFI; " + e);
         }
-        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_TURNOS_OFI: "+resultado[0]);
+        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_TURNOS_OFI");
         
         if (resultado == null || resultado.length <= 1 || resultado[2] == null || !resultado[2].equalsIgnoreCase("Fin correcto ")) {
         	String sError = "";
-        	if(resultado[2] == null) {
+        	if(resultado != null && resultado[2] != null) {
         		sError = "Error en PL = " + (String) resultado[2]; 
         	}else {
         		sError = "Error en PL PROC_FCS_FACTURAR_TURNOS_OFI";
@@ -374,6 +388,7 @@ public class UtilidadesFacturacionSJCS {
         }else{
             importeOficio = new Double(resultado[0].replaceAll(",", "."));
             importeTotal += importeOficio.doubleValue();
+            LOGGER.debug("PROC_FCS_FACTURAR_TURNOS_OFI Importe facturado: " + resultado[0]);
         }
 
         //////////////////////////////////
@@ -397,11 +412,11 @@ public class UtilidadesFacturacionSJCS {
             LOGGER.debug("Error PL PROC_FCS_FACTURAR_GUARDIAS");
         	logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_GUARDIAS; " + e);
         }
-        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_GUARDIAS: "+resultado[0]);
+        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_GUARDIAS");
         
         if (resultado == null || resultado.length <= 1 || resultado[2] == null || !resultado[2].equalsIgnoreCase("El proceso:PROC_FCS_FACTURAR_GUARDIAS ha finalizado correctamente")) {
         	String sError = "";
-        	if(resultado[2] == null) {
+        	if(resultado != null && resultado[2] != null) {
         		sError = "Error en PL = " + (String) resultado[2]; 
         	}else {
         		sError = "Error en PL PROC_FCS_FACTURAR_GUARDIAS";
@@ -412,6 +427,7 @@ public class UtilidadesFacturacionSJCS {
         }else{
             importeGuardia = new Double(resultado[0].replaceAll(",", "."));
             importeTotal += importeGuardia.doubleValue();
+            LOGGER.debug("PROC_FCS_FACTURAR_GUARDIAS Importe facturado: " + resultado[0]);
         }
 
         //////////////////////////////////
@@ -435,11 +451,11 @@ public class UtilidadesFacturacionSJCS {
 	        logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_SOJ; " + e);
         }
 
-        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_SOJ: "+resultado[0]);
+        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_SOJ");
         if (resultado == null || resultado.length <= 1 || resultado[2] == null || !resultado[2].equalsIgnoreCase("Fin correcto")) {
             LOGGER.debug("Error PL PROC_FCS_FACTURAR_SOJ");
             String error = "";
-        	if(resultado[2] == null) {
+        	if(resultado != null && resultado[2] != null) {
         		error = "Error en PL = " + (String) resultado[2]; 
         	}else {
         		error = "Error en PL PROC_FCS_FACTURAR_SOJ";
@@ -450,6 +466,7 @@ public class UtilidadesFacturacionSJCS {
         }else{
             importeSOJ = new Double(resultado[0].replaceAll(",", "."));
             importeTotal += importeSOJ.doubleValue();
+            LOGGER.debug("PROC_FCS_FACTURAR_SOJ Importe facturado: " + resultado[0]);
         }
 
         //////////////////////////////////
@@ -472,11 +489,11 @@ public class UtilidadesFacturacionSJCS {
             logErroresFac.logError("Error indeterminado en la ejecución de PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_EJG; " + e);
         }
 
-        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_EJG: "+resultado[0]);
+        LOGGER.debug("Salimos PL PROC_FCS_FACTURAR_EJG");
         if (resultado == null || resultado.length <= 1 || resultado[2] == null || !resultado[2].equalsIgnoreCase("Fin correcto")) {
             LOGGER.debug("Error PL PROC_FCS_FACTURAR_EJG");
             String error = "";
-        	if(resultado[2] == null) {
+        	if(resultado != null && resultado[2] != null) {
         		error = "Error en PL = " + (String) resultado[2]; 
         	}else {
         		error = "Error en PL PROC_FCS_FACTURAR_EJG";
@@ -487,6 +504,7 @@ public class UtilidadesFacturacionSJCS {
         }else{
             importeEJG = new Double(resultado[0].replaceAll(",", "."));
             importeTotal += importeEJG.doubleValue();
+            LOGGER.debug("PROC_FCS_FACTURAR_EJG Importe facturado: " + resultado[0]);
         }
 
         if (prevision) {
@@ -555,14 +573,20 @@ public class UtilidadesFacturacionSJCS {
                     "{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_TURNOS_OFI(?,?,?,?,?,?,?)}", 3,
                     param_in_facturacion);
             LOGGER.debug("PROC_FCS_REGULAR_TURNOS_OFI regularizacion sale");
-            if (!resultado[1].equals("0")) {
-                LOGGER.error("PROC_FCS_REGULAR_TURNOS_OFI regularizacion error");
-            	String error = "Error en PL = " + (String) resultado[2];
-                LOGGER.error(error);
-                logErroresFac.logError(error);
-                throw new Exception("Ha ocurrido un error al ejecutar la regularización de Turnos de Oficio: "
-                        + (String) resultado[2]);
+            
+            if (resultado != null) {
+            	if (!resultado[1].equals("0")) {
+                    LOGGER.error("PROC_FCS_REGULAR_TURNOS_OFI regularizacion error");
+                	String error = "Error en PL = " + (String) resultado[2];
+                    LOGGER.error(error);
+                    logErroresFac.logError(error);
+                    throw new Exception("Ha ocurrido un error al ejecutar la regularización de Turnos de Oficio: "
+                            + (String) resultado[2]);
+                }
+            } else {
+            	throw new Exception("Ha ocurrido un error al ejecutar la regularización de Turnos de Oficio, el resultado del PL es null");
             }
+            
         } catch (IOException | NamingException | SQLException e) {
         	String error = "Error en PL al ejecutar la regularización de Turnos de Oficio = " + (String) resultado[2];
             LOGGER.error(error);
@@ -580,13 +604,19 @@ public class UtilidadesFacturacionSJCS {
             resultado = callPLProcedure(
                     "{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_GUARDIAS(?,?,?,?,?,?,?)}", 3,
                     param_in_facturacion);
-            if (!resultado[1].equals("0")) {
-            	String error = "Error en PL = " + (String) resultado[2];
-                LOGGER.error(error);
-                logErroresFac.logError(error);
-                throw new Exception(
-                        "Ha ocurrido un error al ejecutar la regularización de Guardias: " + (String) resultado[2]);
+            
+            if (resultado != null) {
+            	if (!resultado[1].equals("0")) {
+                	String error = "Error en PL = " + (String) resultado[2];
+                    LOGGER.error(error);
+                    logErroresFac.logError(error);
+                    throw new Exception(
+                            "Ha ocurrido un error al ejecutar la regularización de Guardias: " + (String) resultado[2]);
+                }
+            } else {
+            	throw new Exception("Ha ocurrido un error al ejecutar la regularización de Guardias, el resultado del PL es null");
             }
+            
         } catch (IOException | NamingException | SQLException e) {
         	String error = "Error en PL al ejecutar la regularización de Guardias = " + (String) resultado[2];
             LOGGER.error(error);
@@ -603,13 +633,19 @@ public class UtilidadesFacturacionSJCS {
         try {
             resultado = callPLProcedure("{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_SOJ(?,?,?,?,?,?,?)}",
                     3, param_in_facturacion);
-            if (!resultado[1].equals("0")) {
-            	String error = "Error en PL al ejecutar la regularización de SOJ= " + (String) resultado[2];
-                LOGGER.error(error);
-                logErroresFac.logError(error);
-                throw new Exception(
-                        "Ha ocurrido un error al ejecutar la regularización de SOJ: " + (String) resultado[2]);
+            
+            if (resultado != null) {
+            	if (!resultado[1].equals("0")) {
+                	String error = "Error en PL al ejecutar la regularización de SOJ= " + (String) resultado[2];
+                    LOGGER.error(error);
+                    logErroresFac.logError(error);
+                    throw new Exception(
+                            "Ha ocurrido un error al ejecutar la regularización de SOJ: " + (String) resultado[2]);
+                }
+            } else {
+            	throw new Exception("Ha ocurrido un error al ejecutar la regularización de SOJ, el resultado del PL es null");
             }
+            
         } catch (IOException | NamingException | SQLException e) {
         	String error = "Error en PL al ejecutar la regularización de SOJ= " + (String) resultado[2];
             LOGGER.error(error);
@@ -626,14 +662,20 @@ public class UtilidadesFacturacionSJCS {
         try {
             resultado = callPLProcedure("{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_EJG(?,?,?,?,?,?,?)}",
                     3, param_in_facturacion);
-            if (!resultado[1].equals("0")) {
-            	String error = "Error en PL = " + (String) resultado[2];
-                LOGGER.error(error);
-                logErroresFac.logError(error);
-                throw new Exception(
-                        "Ha ocurrido un error al ejecutar la regularización de Expedientes de Justicia Gratuita: "
-                                + (String) resultado[2]);
+            
+            if (resultado != null) {
+            	if (!resultado[1].equals("0")) {
+                	String error = "Error en PL = " + (String) resultado[2];
+                    LOGGER.error(error);
+                    logErroresFac.logError(error);
+                    throw new Exception(
+                            "Ha ocurrido un error al ejecutar la regularización de Expedientes de Justicia Gratuita: "
+                                    + (String) resultado[2]);
+                }
+            } else {
+            	throw new Exception("Ha ocurrido un error al ejecutar la regularización de EJG, el resultado del PL es null");
             }
+            
         } catch (IOException | NamingException | SQLException e) {
         	String error = "Error en PL al ejecutar la regularización de EJG= " + (String) resultado[2];
             LOGGER.error(error);
