@@ -662,7 +662,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setFechamodificacion(new Date());
 					record.setAcuerdoextrajudicial((short) 0);
 					record.setAnulacion((short) 0);
-					record.setIdprocedimiento(item.getProcedimiento());// idprocedimiento, por el front
+
+					ScsProcedimientosKey procedimientosKey = new ScsProcedimientosKey();
+					procedimientosKey.setIdprocedimiento(item.getProcedimiento());
+					procedimientosKey.setIdinstitucion(idInstitucion);
+					if (scsProcedimientosMapper.selectByPrimaryKey(procedimientosKey) != null) {
+						record.setIdprocedimiento(item.getProcedimiento());// idprocedimiento, por el front
+					}
+
 					record.setIdinstitucionProc(idInstitucion);
 
 					record.setUsucreacion(usuarios.get(0).getIdusuario());
@@ -5237,6 +5244,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						if (justificacion.getNombreJuzgado() != null && !justificacion.getNombreJuzgado().isEmpty()) {
 							recordJust.setIdjuzgado(Long.parseLong(justificacion.getNombreJuzgado()));
+							recordJust.setIdinstitucionJuzg(idInstitucion);
 						}
 
 						if (justificacion.getNig() != null && !justificacion.getNig().isEmpty()) {

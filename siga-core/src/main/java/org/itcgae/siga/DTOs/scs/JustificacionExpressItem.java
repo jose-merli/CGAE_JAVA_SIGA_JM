@@ -36,6 +36,7 @@ public class JustificacionExpressItem {
 	private String nig;
 	private String idJuzgado;
 	private String nombreJuzgado;
+	private String categoriaJuzgado;
 	private int idInstitucionJuzgado;
 	private int anioProcedimiento;
 	private String numProcedimiento;
@@ -54,6 +55,14 @@ public class JustificacionExpressItem {
 	private List<ActuacionesJustificacionExpressItem> actuaciones;	 
 	private String categoriaProcedimiento;
 	private Error error = null;
+
+	public String getCategoriaJuzgado() {
+		return categoriaJuzgado;
+	}
+
+	public void setCategoriaJuzgado(String categoriaJuzgado) {
+		this.categoriaJuzgado = categoriaJuzgado;
+	}
 
 	public String getLetradoActuaciones() {
 		return letradoActuaciones;

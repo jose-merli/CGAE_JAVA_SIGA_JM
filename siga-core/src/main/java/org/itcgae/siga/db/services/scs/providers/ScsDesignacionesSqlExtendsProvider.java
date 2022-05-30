@@ -1283,7 +1283,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" f_siga_formatonumero(to_char(acp.porcentaje), 2)) porcentaje, tac.descripcion tipo, ");
 		sql.append(
 				" pro.nombre procedimiento, pro.codigo categoria, pro.idjurisdiccion, pro.complemento, pro.permitiraniadirletrado, ");
-		sql.append(" act.numeroasunto, act.idprocedimiento, act.idjuzgado, j.nombre nombreJuzgado, ");
+		sql.append(" act.numeroasunto, act.idprocedimiento, act.idjuzgado, j.nombre nombreJuzgado, j.codigoext categoriaJuzgado, ");
 		sql.append(
 				" to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion, act.validada, act.idfacturacion, ");
 		sql.append(" act.numeroprocedimiento, act.anioprocedimiento, act.anio, act.idTurno, act.idInstitucion, ");
@@ -1407,7 +1407,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.ANIO, ");
 		sql.append(" D.NUMERO, ");
 		sql.append(" D.CODIGO, ");
-		sql.append(" D.IDJUZGADO, J.NOMBRE NOMBREJUZGADO, ");
+		sql.append(" D.IDJUZGADO, J.CODIGOEXT CATEGORIAJUZGADO, J.NOMBRE NOMBREJUZGADO, ");
 		sql.append(" D.IDINSTITUCION_JUZG, ");
 		sql.append(" D.ESTADO, ");
 		sql.append(" D.SUFIJO, ");

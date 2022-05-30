@@ -20,6 +20,7 @@ public class ActuacionesJustificacionExpressItem {
 	private String idProcedimiento;
 	private String idJuzgado;
 	private String nombreJuzgado;
+	private String categoriaJuzgado;
 	private String fechaJustificacion;
 	private String validada;
 	private String idFacturacion;
@@ -431,5 +432,13 @@ public class ActuacionesJustificacionExpressItem {
 	}
 	public void setFacturado(String facturado) {
 		this.facturado = facturado;
+	}
+
+	public String getCategoriaJuzgado() {
+		return categoriaJuzgado;
+	}
+
+	public void setCategoriaJuzgado(String categoriaJuzgado) {
+		this.categoriaJuzgado = categoriaJuzgado;
 	}
 }
