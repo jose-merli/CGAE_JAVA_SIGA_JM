@@ -71,9 +71,9 @@ public class PagoSJCSController {
     }
 
     @GetMapping("/comboConceptosPago")
-    ResponseEntity<ConceptoPagoDTO> comboConceptosPago(@RequestParam("idFacturacion") String idFacturacion, @RequestParam("idPago") String idPago,
+    ResponseEntity<ConceptoPagoDTO> comboConceptosPago(@RequestParam("idFacturacion") String idFacturacion,
                                                        HttpServletRequest request) {
-        ConceptoPagoDTO response = iPagoSJCSService.comboConceptosPago(idFacturacion, idPago, request);
+        ConceptoPagoDTO response = iPagoSJCSService.comboConceptosPago(idFacturacion, request);
         return new ResponseEntity<ConceptoPagoDTO>(response, HttpStatus.OK);
     }
 

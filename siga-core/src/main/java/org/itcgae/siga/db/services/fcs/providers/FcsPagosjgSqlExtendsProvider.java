@@ -308,10 +308,11 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         return sql.toString();
     }
 
-    public String comboConceptosPago(Short idInstitucion, String idFacturacion, String idPago, String idLenguaje) {
+    public String comboConceptosPago(Short idInstitucion, String idFacturacion, String idLenguaje) {
 
         SQL sql = new SQL();
-
+        SQL query = new SQL();
+   
         sql.SELECT("FFGH.IDINSTITUCION");
         sql.SELECT("FFGH.IDFACTURACION");
         sql.SELECT("FP.IDPAGOSJG");
@@ -325,18 +326,12 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
                 "WHEN FFGH.IDHITOGENERAL = 40 THEN NVL(FF.IMPORTEEJG, 0) " +
                 "END) IMPORTEFACTURADO");
         sql.SELECT("(CASE " +
-                "WHEN FFGH.IDHITOGENERAL = 10 THEN NVL(FF.IMPORTEOFICIO, 0) - NVL(FP.IMPORTEOFICIO, 0) " +
-                "WHEN FFGH.IDHITOGENERAL = 20 THEN NVL(FF.IMPORTEGUARDIA, 0) - NVL(FP.IMPORTEGUARDIA, 0) " +
-                "WHEN FFGH.IDHITOGENERAL = 30 THEN NVL(FF.IMPORTESOJ, 0) - NVL(FP.IMPORTESOJ, 0) " +
-                "WHEN FFGH.IDHITOGENERAL = 40 THEN NVL(FF.IMPORTEEJG, 0) - NVL(FP.IMPORTEEJG, 0) " +
+                "WHEN FFGH.IDHITOGENERAL = 10 THEN NVL(FP.IMPORTEOFICIO, 0) " +
+                "WHEN FFGH.IDHITOGENERAL = 20 THEN NVL(FP.IMPORTEGUARDIA, 0) " +
+                "WHEN FFGH.IDHITOGENERAL = 30 THEN NVL(FP.IMPORTESOJ, 0) " +
+                "WHEN FFGH.IDHITOGENERAL = 40 THEN NVL(FP.IMPORTEEJG, 0) " +
                 "END) IMPORTEPENDIENTE");
-        sql.SELECT("(CASE " +
-                "WHEN FFGH.IDHITOGENERAL = 10 THEN NVL(DECODE(FF.IMPORTEOFICIO, 0, 0, ROUND(((FF.IMPORTEOFICIO - FP.IMPORTEOFICIO) / FF.IMPORTEOFICIO) * 100, 2)), 0) " +
-                "WHEN FFGH.IDHITOGENERAL = 20 THEN NVL(DECODE(FF.IMPORTEGUARDIA, 0, 0, ROUND(((FF.IMPORTEGUARDIA - FP.IMPORTEGUARDIA) / FF.IMPORTEGUARDIA) * 100, 2)), 0) " +
-                "WHEN FFGH.IDHITOGENERAL = 30 THEN NVL(DECODE(FF.IMPORTEEJG, 0, 0, ROUND(((FF.IMPORTEEJG - FP.IMPORTEEJG) / FF.IMPORTEEJG) * 100 , 2)), 0) " +
-                "WHEN FFGH.IDHITOGENERAL = 40 THEN NVL(DECODE(FF.IMPORTESOJ, 0, 0, ROUND(((FF.IMPORTESOJ - FP.IMPORTESOJ) / FF.IMPORTESOJ) * 100 , 2)), 0) " +
-                "END) PORCENTAJEPENDIENTE");
-
+        
         sql.FROM("FCS_FACT_GRUPOFACT_HITO FFGH");
 
         sql.JOIN("FCS_HITOGENERAL FH ON FH.IDHITOGENERAL = FFGH.IDHITOGENERAL");
@@ -345,9 +340,20 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
 
         sql.WHERE("FFGH.IDINSTITUCION = '" + idInstitucion + "'");
         sql.WHERE("FFGH.IDFACTURACION = '" + idFacturacion + "'");
-        sql.WHERE("FP.IDPAGOSJG = '" + idPago + "'");
+        
+        query.SELECT(" IDINSTITUCION");
+        query.SELECT(" IDFACTURACION");
+        query.SELECT(" IDHITOGENERAL");
+        query.SELECT(" DESCRIPCION");
+        query.SELECT(" IDGRUPOFACTURACION");
+        query.SELECT(" IMPORTEFACTURADO");
+        query.SELECT(" IMPORTEFACTURADO - SUM(IMPORTEPENDIENTE) AS IMPORTEPENDIENTE");
+        query.SELECT(" ROUND(((IMPORTEFACTURADO - SUM(IMPORTEPENDIENTE)) / IMPORTEFACTURADO) * 100 , 2) AS PORCENTAJEPENDIENTE");
+        query.FROM("(" + sql + ")");
+        query.GROUP_BY("IDINSTITUCION,IDFACTURACION,IDHITOGENERAL,DESCRIPCION,IDGRUPOFACTURACION,IMPORTEFACTURADO");
+        
 
-        return sql.toString();
+        return query.toString();
     }
 
     public String hayMovimientosVariosPositivosAaplicar(Short idInstitucion, String idFacturacion) {

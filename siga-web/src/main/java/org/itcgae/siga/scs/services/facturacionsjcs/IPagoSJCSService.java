@@ -26,7 +26,7 @@ public interface IPagoSJCSService {
 
     DeleteResponseDTO deletePago(PagosjgItem pagosjgItem, HttpServletRequest request);
 
-    ConceptoPagoDTO comboConceptosPago(String idFacturacion, String idPago, HttpServletRequest request);
+    ConceptoPagoDTO comboConceptosPago(String idFacturacion, HttpServletRequest request);
 
     ConceptoPagoDTO getConceptosPago(String idPago, String idFacturacion, HttpServletRequest request);
 

@@ -544,7 +544,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("pjg.importesoj");
         sql.SELECT("pjg.importerepartir");
         sql.SELECT("pjg.importepagado");
-        sql.SELECT("(CASE pjg.importerepartir WHEN 0 THEN 0 ELSE ( pjg.importepagado * 100 ) / pjg.importerepartir END ) AS porcentaje");
+        sql.SELECT("(CASE WHEN factgrupo.IDHITOGENERAL = 10 THEN ROUND((PJG.IMPORTEOFICIO / FAC.IMPORTEOFICIO) * 100 , 2)"
+        		+ "WHEN factgrupo.IDHITOGENERAL = 20 THEN ROUND((PJG.IMPORTEGUARDIA / FAC.IMPORTEGUARDIA) * 100 , 2)"
+        		+ "WHEN factgrupo.IDHITOGENERAL = 30 THEN ROUND((PJG.IMPORTESOJ / FAC.IMPORTESOJ) * 100 , 2)"
+        		+ "WHEN factgrupo.IDHITOGENERAL = 40 THEN ROUND((PJG.IMPORTEEJG / FAC.IMPORTEEJG) * 100 , 2)"
+        		+ "END )  porcentaje");
         sql.SELECT("est.fechaestado");
         sql.SELECT("rec.descripcion desestado");
         sql.FROM("fcs_pagosjg pjg");
@@ -555,11 +559,14 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
                 "fcs_fact_grupofact_hito factgrupo ON (pjg.idfacturacion = factgrupo.idfacturacion AND pjg.idinstitucion = factgrupo.idinstitucion)");
         sql.INNER_JOIN("fcs_hitogeneral concept ON (factgrupo.idhitogeneral = concept.idhitogeneral)");
         sql.INNER_JOIN("gen_recursos_catalogos rec ON (estpagos.descripcion = rec.idrecurso)");
+        sql.INNER_JOIN("FCS_FACTURACIONJG fac ON (fac.IDFACTURACION = factgrupo.IDFACTURACION)");
         sql.WHERE("est.fechaestado = (" + sql2.toString() + ")");
-        sql.WHERE("pjg.idinstitucion = '" + idInstitucion + "'");
-        sql.WHERE("pjg.idfacturacion =  '" + idFacturacion + "'");
+        sql.WHERE("fac.idinstitucion = '" + idInstitucion + "'");
+        sql.WHERE("fac.idfacturacion =  '" + idFacturacion + "'");
         sql.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
-        sql.ORDER_BY("est.fechaestado DESC");
+        sql.WHERE("pjg.idinstitucion = '" + idInstitucion + "'");
+        sql.ORDER_BY("pjg.IDPAGOSJG DESC");
+        sql.ORDER_BY("desconcepto");
 
         return sql.toString();
     }

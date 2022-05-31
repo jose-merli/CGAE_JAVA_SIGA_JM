@@ -98,7 +98,7 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
             @Result(column = "IMPORTEFACTURADO", property = "importeFacturado", jdbcType = JdbcType.NUMERIC),
             @Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.NUMERIC),
             @Result(column = "PORCENTAJEPENDIENTE", property = "porcentajePendiente", jdbcType = JdbcType.NUMERIC)})
-    List<ConceptoPagoItem> comboConceptosPago(Short idInstitucion, String idFacturacion, String idPago, String idLenguaje);
+    List<ConceptoPagoItem> comboConceptosPago(Short idInstitucion, String idFacturacion, String idLenguaje);
 
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "hayMovimientosVariosPositivosAaplicar")
     int hayMovimientosVariosPositivosAaplicar(Short idInstitucion, String idFacturacion);
