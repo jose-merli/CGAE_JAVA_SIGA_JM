@@ -86,6 +86,8 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		sql.SELECT("idestado, descripcion");
 		
 		sql.FROM("cen_estadosbajastemp");
+		
+		sql.WHERE("descripcion NOT IN ('Anulada','Denegada')");
 
 		return sql.toString();
 	}
