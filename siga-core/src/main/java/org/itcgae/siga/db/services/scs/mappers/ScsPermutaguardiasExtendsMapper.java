@@ -2,9 +2,7 @@ package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ComboGuardiasFuturasItem;
@@ -69,4 +67,11 @@ public interface ScsPermutaguardiasExtendsMapper extends ScsPermutaguardiasMappe
 	
 	@SelectProvider(type=ScsPermutaguardiasSqlExtendsProvider.class, method="maxIdPermutaGuardia")
     String maxIdPermutaGuardia(String idinstitucion);
+
+	@DeleteProvider(type=ScsPermutaguardiasSqlExtendsProvider.class, method="deletePermutasCalendarioSolicitante")
+	public boolean deletePermutasCalendarioSolicitante(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
+
+	@DeleteProvider(type=ScsPermutaguardiasSqlExtendsProvider.class, method="deletePermutasCalendarioConfirmador")
+	public boolean deletePermutasCalendarioConfirmador(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
+
 }

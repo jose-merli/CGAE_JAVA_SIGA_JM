@@ -1301,7 +1301,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sqlGenerado.WHERE("pc.idinstitucion = gc.idinstitucion");
 		sqlGenerado.WHERE("hpc.idturno = gc.idturno");
 		sqlGenerado.WHERE("hpc.idguardia = gc.idguardia");
-		
+
 		SQL sql = new SQL();
 		sql.SELECT("PC.IDINSTITUCION AS INSTITUCION");
 		sql.SELECT("HPC.IDTURNO as idTurno");
@@ -2273,6 +2273,42 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if(today != null) {
 			sql.WHERE("FECHA_FIN < TO_DATE('" + today + "','DD/MM/YYYY')");
 		}
+		return sql.toString();
+	}
+
+	public String getTotalGuardias(String idInstitucion, String idCalendarioGuardias, String idTurno, String idGuardia) {
+
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("cal2.FECHAFIN");
+		sql2.FROM("SCS_CALENDARIOGUARDIAS cal2");
+		if(idInstitucion != null) {
+			sql2.WHERE("cal2.IDINSTITUCION = " + idInstitucion);
+		}
+		if(idTurno != null) {
+			sql2.WHERE("cal2.IDTURNO = " + idTurno);
+		}
+		if(idGuardia != null) {
+			sql2.WHERE("cal2.IDGUARDIA = " + idGuardia);
+		}
+		if(idGuardia != null) {
+			sql2.WHERE("cal2.IDCALENDARIOGUARDIAS = " + idCalendarioGuardias);
+		}
+
+		sql.SELECT("count(*) AS TOTAL");
+		sql.FROM("SCS_CALENDARIOGUARDIAS cal");
+		if(idInstitucion != null) {
+			sql.WHERE("cal.IDINSTITUCION = " + idInstitucion);
+		}
+		if(idTurno != null) {
+			sql.WHERE("cal.IDTURNO = " + idTurno);
+		}
+		if(idGuardia != null) {
+			sql.WHERE("cal.IDGUARDIA = " + idGuardia);
+		}
+
+		sql.WHERE("cal.FECHAFIN > ( " + sql2.toString() + ")");
 		return sql.toString();
 	}
 	
@@ -3736,6 +3772,63 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 
 		sql.SELECT("MAX(IDORDENACIONCOLAS)");
 		sql.FROM("SCS_ORDENACIONCOLAS");
+
+		return sql.toString();
+	}
+
+	public String updateSaltosCompensacionesCumplidos(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia, Integer usuario) {
+
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_SALTOCOMPENSACIONGRUPO");
+		sql.SET("FECHACUMPLIMIENTO = NULL");
+		sql.SET("IDINSTITUCION_CUMPLI = NULL");
+		sql.SET("IDTURNO_CUMPLI = NULL");
+		sql.SET("IDGUARDIA_CUMPLI = NULL");
+		sql.SET("IDCALENDARIOGUARDIAS_CUMPLI = NULL");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = " + usuario);
+		sql.SET("MOTIVO = REGEXP_REPLACE(MOTIVO, ':id=" + idCalendarioGuardias + ":.*:finid=" + idCalendarioGuardias + ":',' ')");
+		sql.WHERE("IDINSTITUCION_CUMPLI = " + idInstitucion);
+		sql.WHERE("IDTURNO_CUMPLI = " + idTurno);
+		sql.WHERE("IDGUARDIA_CUMPLI = " + idGuardia);
+		sql.WHERE("IDCALENDARIOGUARDIAS_CUMPLI = " + idCalendarioGuardias);
+
+		return sql.toString();
+
+	}
+
+	public String deleteSaltosCompensacionesCreadosEnCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia) {
+		SQL sql = new SQL();
+
+		sql.DELETE_FROM("SCS_SALTOCOMPENSACIONGRUPO");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDTURNO = " + idTurno);
+		sql.WHERE("IDGUARDIA = " + idGuardia);
+		sql.WHERE("IDCALENDARIOGUARDIASCREACION = " + idCalendarioGuardias);
+		sql.WHERE("(IDCALENDARIOGUARDIAS = " + idCalendarioGuardias + " OR IDCALENDARIOGUARDIAS IS NULL)");
+
+		return sql.toString();
+	}
+
+	public String deleteSaltosCompensacionesCalendariosInexistentes(Integer idInstitucion, Integer idTurno, Integer idGuardia) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("1");
+		sql2.FROM("SCS_CALENDARIOGUARDIAS cg");
+		sql2.WHERE("cg.IDINSTITUCION = " + idInstitucion);
+		sql2.WHERE("cg.IDTURNO = " + idTurno);
+		sql2.WHERE("cg.IDGUARDIA = " + idGuardia);
+		sql2.WHERE("cg.IDCALENDARIOGUARDIAS = sc.IDCALENDARIOGUARDIAS");
+
+		sql.DELETE_FROM("SCS_SALTOCOMPENSACIONGRUPO sc");
+		sql.WHERE("sc.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("sc.IDTURNO = " + idTurno);
+		sql.WHERE("sc.IDGUARDIA = " + idGuardia);
+		sql.WHERE("sc.IDCALENDARIOGUARDIAS IS NOT NULL");
+		sql.WHERE("(sc.IDCALENDARIOGUARDIAS_CUMPLI IS NULL OR IDCALENDARIOGUARDIAS_CUMPLI = sc.IDCALENDARIOGUARDIAS)");
+		sql.WHERE("NOT EXISTS ( " + sql2.toString() + ")");
 
 		return sql.toString();
 	}

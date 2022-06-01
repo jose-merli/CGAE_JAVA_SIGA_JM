@@ -4,11 +4,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.apache.ibatis.annotations.InsertProvider;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.SelectProvider;
-import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -718,7 +714,11 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getTotalLetrados")
 	 @Results({@Result(column = "TOTAL", property = "TOTAL", jdbcType = JdbcType.DECIMAL)})
 	 int getTotalLetrados(String idInstitucion, String idCalendarioGuardias, String idTurno, String idGuardia, String today);
-	 
+
+	@SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getTotalGuardias")
+	@Results({@Result(column = "TOTAL", property = "TOTAL", jdbcType = JdbcType.DECIMAL)})
+	int getTotalGuardias(String idInstitucion, String idCalendarioGuardias, String idTurno, String idGuardia);
+
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getGuardiasVnculadas")
 	 @Results({@Result(column = "IDINSTITUCION", property = "IDINSTITUCION", jdbcType = JdbcType.DECIMAL),
 		 @Result(column = "IDTURNO", property = "IDTURNO", jdbcType = JdbcType.DECIMAL),
@@ -1232,5 +1232,14 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getIdUltimaGuardiaTurno")
 			@Results({})
 			String getIdUltimaGuardiaTurno();
+
+			@UpdateProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "updateSaltosCompensacionesCumplidos")
+			public boolean updateSaltosCompensacionesCumplidos(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia, Integer usuario);
+
+			@DeleteProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "deleteSaltosCompensacionesCreadosEnCalendario")
+			public boolean deleteSaltosCompensacionesCreadosEnCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
+
+			@DeleteProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "deleteSaltosCompensacionesCalendariosInexistentes")
+			public boolean deleteSaltosCompensacionesCalendariosInexistentes(Integer idInstitucion, Integer idTurno, Integer idGuardia);
 
 }

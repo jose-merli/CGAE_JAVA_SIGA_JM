@@ -370,17 +370,21 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		sql.DELETE_FROM("SCS_HCO_CONF_PROG_CALENDARIOS" );
 			sql.WHERE(
 				"SCS_HCO_CONF_PROG_CALENDARIOS.IDPROGCALENDARIO = " + idCalendarioProgramado );
-	
+			sql.WHERE(
+				"SCS_HCO_CONF_PROG_CALENDARIOS.IDINSTITUCION = " + idInstitucion );
+			sql.WHERE(
+					"SCS_HCO_CONF_PROG_CALENDARIOS.IDTURNO = " + idTurno );
+			sql.WHERE(
+					"SCS_HCO_CONF_PROG_CALENDARIOS.IDGUARDIA = " + idGuardia );
 
 		return sql.toString();
 	}
 	
-	public String deleteCalendarioProgramado2(String idTurno, String idInstitucion, String idGuardia, String idCalendarioProgramado) {
+	public String deleteCalendarioProgramado2(String idCalendarioProgramado) {
 		SQL sql = new SQL();
 		sql.DELETE_FROM("SCS_PROG_CALENDARIOS" );
 			sql.WHERE(
 				"SCS_PROG_CALENDARIOS.IDPROGCALENDARIO = " + idCalendarioProgramado );
-	
 
 		return sql.toString();
 	}

@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.SelectProvider;
-import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
@@ -27,9 +24,6 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMapper {
 
-	
-
-	
 	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "getCabeceraGuardiasDeVariasPersonas")
 	@Results({ 
 		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
@@ -94,5 +88,12 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 	List<DatosCalendarioProgramadoItem> getCalendarioGuardiaColegiado(String institucion,String idTurno,String idGuardia,String idcalendarioguardias);
 	
 	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "tieneGuardia")
-	int tieneGuardia(String institucion,Long idPersona) ;
+	int tieneGuardia(String institucion,Long idPersona);
+
+	@DeleteProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "deleteCabecerasGuardiasCalendario")
+	public boolean deleteCabecerasGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
+
+	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "getCabeceraGuardia")
+	List<ScsCabeceraguardias> getCabeceraGuardia(String idInstitucion, String idTurno, String idGuardia, String fechaInicio);
+
 }

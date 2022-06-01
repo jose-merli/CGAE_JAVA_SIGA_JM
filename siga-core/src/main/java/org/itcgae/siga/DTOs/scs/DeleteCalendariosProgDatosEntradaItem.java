@@ -7,6 +7,8 @@ public class DeleteCalendariosProgDatosEntradaItem {
 	private String idGuardia;
 	private String idCalendarioProgramado;
 	private String idInstitucion;
+	private String fechaDesde;
+
 	public String getIdTurno() {
 		return idTurno;
 	}
@@ -19,7 +21,6 @@ public class DeleteCalendariosProgDatosEntradaItem {
 	public void setIdGuardia(String idGuardia) {
 		this.idGuardia = idGuardia;
 	}
-
 	public String getIdCalendarioProgramado() {
 		return idCalendarioProgramado;
 	}
@@ -32,7 +33,10 @@ public class DeleteCalendariosProgDatosEntradaItem {
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-	
-	
-	
+	public String getFechaDesde() {
+		return fechaDesde;
+	}
+	public void setFechaDesde(String fechaDesde) {
+		this.fechaDesde = fechaDesde;
+	}
 }

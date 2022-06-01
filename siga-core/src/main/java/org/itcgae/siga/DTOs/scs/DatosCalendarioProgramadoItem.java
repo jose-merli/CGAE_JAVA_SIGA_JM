@@ -133,19 +133,15 @@ public class DatosCalendarioProgramadoItem {
 	public void setIdCalendarioGuardia(String idCalendarioGuardia) {
 		this.idCalendarioGuardia = idCalendarioGuardia;
 	}
-
 	public String getFechaModificacion() {
 		return fechaModificacion;
 	}
-
 	public void setFechaModificacion(String fechaModificacion) {
 		this.fechaModificacion = fechaModificacion;
 	}
-
 	public List<GuardiaCalendarioItem> getGuardias() {
 		return guardias;
 	}
-
 	public void setGuardias(List<GuardiaCalendarioItem> guardias) {
 		this.guardias = guardias;
 	}

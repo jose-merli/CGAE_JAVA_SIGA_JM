@@ -649,4 +649,58 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		return sql.toString();
 	}
 
+	public String deleteSaltosCompensacionesCalendariosInexistentes(Integer idInstitucion, Integer idTurno, Integer idGuardia) {
+
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("1");
+		sql2.FROM("SCS_CALENDARIOGUARDIAS cg");
+		sql2.WHERE("cg.IDINSTITUCION = " + idInstitucion);
+		sql2.WHERE("cg.IDTURNO = " + idTurno);
+		sql2.WHERE("cg.IDGUARDIA = " + idGuardia);
+		sql2.WHERE("cg.IDCALENDARIOGUARDIAS = sc.IDCALENDARIOGUARDIASCREACION");
+
+		sql.DELETE_FROM("SCS_SALTOSCOMPENSACIONES sc");
+		sql.WHERE("sc.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("sc.IDTURNO = " + idTurno);
+		sql.WHERE("sc.IDGUARDIA = " + idGuardia);
+		sql.WHERE("sc.IDCALENDARIOGUARDIAS IS NULL");
+		sql.WHERE("sc.IDCALENDARIOGUARDIASCREACION IS NOT NULL");
+		sql.WHERE("NOT EXISTS ( " + sql2.toString() + ")");
+
+		return sql.toString();
+
+	}
+
+	public String updateSaltosCompensacionesCumplidos(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia, Integer usuario) {
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
+		sql.SET("FECHACUMPLIMIENTO = NULL");
+		sql.SET("IDCALENDARIOGUARDIAS = NULL");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = " + usuario);
+		sql.SET("MOTIVOS = REGEXP_REPLACE(MOTIVOS, ':id=" + idCalendarioGuardias + ":.*:finid=" + idCalendarioGuardias + ":',' ')");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDTURNO = " + idTurno);
+		sql.WHERE("IDGUARDIA = " + idGuardia);
+		sql.WHERE("IDCALENDARIOGUARDIAS = " + idCalendarioGuardias);
+
+		return sql.toString();
+	}
+
+	public String deleteSaltosCompensacionesCreadosEnCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia) {
+		SQL sql = new SQL();
+
+		sql.DELETE_FROM("SCS_SALTOSCOMPENSACIONES");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDCALENDARIOGUARDIASCREACION = " + idCalendarioGuardias);
+		sql.WHERE("(IDCALENDARIOGUARDIAS = " + idCalendarioGuardias + " OR IDCALENDARIOGUARDIAS IS NULL)");
+		sql.WHERE("IDTURNO = " + idTurno);
+		sql.WHERE("IDGUARDIA = " + idGuardia);
+
+		return sql.toString();
+	}
+
 }

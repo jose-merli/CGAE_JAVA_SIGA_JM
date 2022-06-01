@@ -4,6 +4,7 @@ package org.itcgae.siga.db.services.scs.mappers;
 import java.sql.Date;
 import java.util.List;
 
+import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -103,4 +104,8 @@ public interface ScsGuardiascolegiadoExtendsMapper extends ScsGuardiascolegiadoM
             @Result(column="GUARDIA_SELECCIONFESTIVOS", property="guardiaSeleccionfestivos", jdbcType=JdbcType.VARCHAR)
     })
     List<ScsGuardiascolegiado> getGuardiasColegiado(TarjetaAsistenciaResponseItem asistencia, Short idInstitucion, String idPersona);
+
+    @DeleteProvider(type = ScsGuardiascolegiadoSqlExtendsProvider.class, method = "deleteGuardiasCalendario")
+    public boolean deleteGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
+
 }
