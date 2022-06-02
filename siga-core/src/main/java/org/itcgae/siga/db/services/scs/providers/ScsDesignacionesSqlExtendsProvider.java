@@ -1361,7 +1361,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 			sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
 		}
-		sql.append(" ORDER BY act.fechajustificacion, act.numeroasunto");
+		sql.append(" ORDER BY act.fecha, act.numeroasunto, act.fechajustificacion");
 
 		return sql.toString();
 	}
