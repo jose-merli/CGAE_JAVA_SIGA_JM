@@ -1740,6 +1740,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				"cen_persona.apellidos2\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos1\r\n"
 						+ "             || ','\r\n" + "             || cen_persona.nombre ");
 		sqlDesigna_1.FROM("scs_designasletrado des JOIN cen_persona ON cen_persona.idpersona = des.idpersona");
+		sqlDesigna_1.WHERE("des.idinstitucion =" + item.getidInstitucion());
 		sqlDesigna_1.WHERE("des.anio = ejgd.aniodesigna");
 		sqlDesigna_1.WHERE("des.numero = ejgd.numerodesigna");
 		sqlDesigna_1.WHERE("des.idturno = ejgd.idturno");
@@ -1825,7 +1826,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		sqlDesigna.SELECT("NULL IDPERSONAJG");
 		sqlDesigna.SELECT(
-				"(SELECT fechaentrada FROM scs_designa des WHERE des.anio = ejgd.aniodesigna AND des.numero = ejgd.numerodesigna AND des.idturno = ejgd.idturno) fechadesignacion");
+				"(SELECT fechaentrada FROM scs_designa des WHERE des.anio = ejgd.aniodesigna AND des.numero = ejgd.numerodesigna AND des.idturno = ejgd.idturno AND des.IDINSTITUCION = " + item.getidInstitucion() + ") fechadesignacion");
 
 		sqlDesigna.FROM("scs_ejg ejg "
 				+ "LEFT OUTER JOIN scs_tiporesolucion res ON ejg.idtiporatificacionejg = res.idtiporesolucion,"
