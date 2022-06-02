@@ -1809,9 +1809,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" AND ACT.IDPROCEDIMIENTO = ACP.IDPROCEDIMIENTO ");
 			sql.append(" AND ACT.IDACREDITACION = ACP.IDACREDITACION ");
 			sql.append(" AND ACT.VALIDADA = '1'))>0 ");
-			sql.append(" ) ORDER BY FECHAENTRADA DESC, IDINSTITUCION, ANIO, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
+			sql.append(" )");
 		}
 
+		sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
 		sql.append(") query WHERE rownum<=200");
 
 		return sql.toString();
