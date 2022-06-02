@@ -544,6 +544,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
 		List<File> listaFicheros = new ArrayList<File>();
 		int erroresGeneral = 0;
 		try {
+			LOGGER.info("execute() Inicio execute() ");	
 			initInforme();	
 			cabeceraLog = "AÑO EJG;NÚMERO EJG;AÑO DESIGNACIÓN;NÚMERO DESIGNACIÓN;NÚMERO ACTUACIÓN;TIPO INCIDENCIA;INCIDENCIA";
 			
@@ -560,8 +561,9 @@ public class CertificacionFacSJCSServicesCAMHelper {
 	
 			File file = new File(parentFile, nombreFichero);				
 			boolean hayErrores = rellenaFichero(file, idInstitucion,idFacturacion,tipoFicheroCAM);	
+			LOGGER.info("execute() Generando fichero txt en: " + file.getAbsolutePath());
 			if(hayErrores) erroresGeneral = 1;
-			LOGGER.info("Generando fichero txt en: " + file.getAbsolutePath());
+			LOGGER.info("execute() hayErrores =  " + hayErrores);	
 			
 			if (tipoFicheroCAM != null && !tipoFicheroCAM.trim().equals("") && !tipoFicheroCAM.trim().equals(TIPO_FICHERO_CAM.NINGUNO.name())) {
 //				actualizar todos o el tipo seleccionado
@@ -582,17 +584,24 @@ public class CertificacionFacSJCSServicesCAMHelper {
 			
 			if (!hayErrores && (tipoFicheroCAM == null || tipoFicheroCAM.trim().equals("") || !tipoFicheroCAM.trim().equals(TIPO_FICHERO_CAM.NINGUNO.name()))) {
 				listaFicheros.add(file);
+				LOGGER.info("execute() - Certificación-Facturacion SIN ERROR");
 			} else {
+				LOGGER.debug("execute() Se borra file = " +  file.getAbsolutePath());
 				file.delete();
+				
 			}
 			
 			if (closeLogFile()) {
 				listaFicheros.add(getFileInformeIncidencias(idInstitucion, idFacturacion));
+				LOGGER.debug("execute() - Añadido informeIncidencias.");
 			}
-			
+			LOGGER.info("execute() - Creando Fichero informeResumenErroresCAM");
 			crearInformeResumenErroresCAM(parentFile,idInstitucion, idFacturacion);
+			LOGGER.info("execute() - FIN Fichero informeResumenErroresCAM");
 			//File fileErroresCAM = crearInformeErroresCAM(parentFile,idInstitucion, idFacturacion);
+			LOGGER.info("execute() - Creando Fichero crearInformeErroresCAM");
 			crearInformeErroresCAM(parentFile,idInstitucion, idFacturacion); // Habilitar para generar un fichero de errores mas extenso.
+			LOGGER.info("execute() - FIN Fichero crearInformeErroresCAM");
 			//if (fileErroresCAM != null && fileErroresCAM.exists()) {
 			//	listaFicheros.add(fileErroresCAM);
 			//}			
@@ -603,6 +612,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
 			closeLogFile();
 			
 		}
+		LOGGER.info("execute() FIN execute() ");	
 		return erroresGeneral;
 		
 	}//FIN Execute
@@ -632,6 +642,7 @@ public class CertificacionFacSJCSServicesCAMHelper {
 	
 	private void crearPestana(File parentFile, List<Map<String, Object>> result, String sheetName) {
 		try {
+			LOGGER.info("CertificacionCAM()- Se va a crear el excel informando");
 			Workbook workBook = crearExcel(result,sheetName);
 			FileOutputStream fileOut;
 			String nombreFichero = sheetName + ".xlsx";
@@ -640,8 +651,9 @@ public class CertificacionFacSJCSServicesCAMHelper {
 			workBook.write(fileOut);
 			fileOut.close();
 			workBook.close();
+			LOGGER.info(" CertificacionCAM()- Creado fichero:  " + nombreFichero);
 		} catch (Exception e) {
-			LOGGER.info("Error a la hora de crear Pestana",e);
+			LOGGER.error("crearPestana() - Error a la hora de crear Pestana",e);
 
 		}
 	
@@ -650,112 +662,116 @@ public class CertificacionFacSJCSServicesCAMHelper {
 
 	private Workbook crearExcel(List<Map<String, Object>> result, String sheetName) {
 
-		LOGGER.info("crearExcel() -> Entrada del servicio para crear el excel con los datos de CAM");
+		try {
+			LOGGER.info("crearExcel() -> Entrada del servicio para crear el excel con los datos de CAM");
 
-		// Creamos el libro de excel
-		Workbook workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
-		Sheet sheet = workbook.createSheet(sheetName);
+			// Creamos el libro de excel
+			Workbook workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
+			Sheet sheet = workbook.createSheet(sheetName);
 
-		// Le aplicamos estilos a las cabeceras
-		Font headerFont = workbook.createFont();
-		headerFont.setBold(true);
-		// headerFont.setItalic(true);
-		headerFont.setFontHeightInPoints((short) 14);
-		//headerFont.setColor(IndexedColors.BLUE.getIndex());
-		CellStyle headerCellStyle = workbook.createCellStyle();
-		headerCellStyle.setFont(headerFont);
+			// Le aplicamos estilos a las cabeceras
+			Font headerFont = workbook.createFont();
+			headerFont.setBold(true);
+			// headerFont.setItalic(true);
+			headerFont.setFontHeightInPoints((short) 14);
+			//headerFont.setColor(IndexedColors.BLUE.getIndex());
+			CellStyle headerCellStyle = workbook.createCellStyle();
+			headerCellStyle.setFont(headerFont);
 
-		Row headerRow = sheet.createRow(0);
+			Row headerRow = sheet.createRow(0);
 
-		// Recorremos el map y vamos metiendo celdas
-		List<String> columnsKey = new ArrayList<String>();
-		int rowNum = 1;
-		int index = 0;
-		Row row = null;
+			// Recorremos el map y vamos metiendo celdas
+			List<String> columnsKey = new ArrayList<String>();
+			int rowNum = 1;
+			int index = 0;
+			Row row = null;
 
-		Map<Integer, CellStyle> mapaEstilos = new HashMap<Integer, CellStyle>();
+			Map<Integer, CellStyle> mapaEstilos = new HashMap<Integer, CellStyle>();
 
-		CellStyle cellStyleNum = workbook.createCellStyle();
-		cellStyleNum.setAlignment(CellStyle.ALIGN_RIGHT);
-		
-		CellStyle cellStyleString = workbook.createCellStyle();
-		cellStyleString.setAlignment(CellStyle.ALIGN_LEFT);
-		
-		Object campo = null;
-		XSSFRichTextString textCell = null;
-		
-		if (result.size() > 0) {
-			for (String value : result.get(0).keySet()) {
-				Cell cell = headerRow.createCell(index);
-				cell.setCellValue(value);
-				cell.setCellStyle(headerCellStyle);
-				columnsKey.add(value);
-				index++;
-			}
+			CellStyle cellStyleNum = workbook.createCellStyle();
+			cellStyleNum.setAlignment(CellStyle.ALIGN_RIGHT);
+			
+			CellStyle cellStyleString = workbook.createCellStyle();
+			cellStyleString.setAlignment(CellStyle.ALIGN_LEFT);
+			
+			Object campo = null;
+			XSSFRichTextString textCell = null;
+			
+			if (result.size() > 0) {
+				for (String value : result.get(0).keySet()) {
+					Cell cell = headerRow.createCell(index);
+					cell.setCellValue(value);
+					cell.setCellStyle(headerCellStyle);
+					columnsKey.add(value);
+					index++;
+				}
 
-			for (Map<String, Object> map : result) {
-				
-				if (map != null) {
-	
-					row = sheet.createRow(rowNum++);
-					int cell = 0;
-	
+				for (Map<String, Object> map : result) {
 					
-					for (int j = 0; j < columnsKey.size(); j++) {
-						campo = map.get(columnsKey.get(j).trim());
+					if (map != null) {
+		
+						row = sheet.createRow(rowNum++);
+						int cell = 0;
+		
 						
-						if (campo == null || campo.toString().trim() == "") {
-							row.createCell(cell).setCellValue("");
-						} else {
-							Cell celda = row.createCell(cell);
-							if (campo instanceof Number) {
-								if (!mapaEstilos.containsKey(cell)) {
-									mapaEstilos.put(cell, cellStyleNum);
-								}
-								celda.setCellType(Cell.CELL_TYPE_NUMERIC);
-								celda.setCellValue(Double.parseDouble(campo.toString()));
-								
-							} else if (campo instanceof Date) {
-								if (!mapaEstilos.containsKey(cell)) {
-									mapaEstilos.put(cell, cellStyleString);
-								}
-								
-								CreationHelper creationHelper = workbook.getCreationHelper();
-								
-								celda.setCellValue((Date) campo);
-								
-								CellStyle style1 = workbook.createCellStyle();
-								style1.setDataFormat(creationHelper.createDataFormat().getFormat(
-										"dd/mm/yyyy hh:mm"));
-								celda.setCellStyle(style1);
-								
+						for (int j = 0; j < columnsKey.size(); j++) {
+							campo = map.get(columnsKey.get(j).trim());
+							
+							if (campo == null || campo.toString().trim() == "") {
+								row.createCell(cell).setCellValue("");
 							} else {
-								if (!mapaEstilos.containsKey(cell)) {
-									mapaEstilos.put(cell, cellStyleString);
+								Cell celda = row.createCell(cell);
+								if (campo instanceof Number) {
+									if (!mapaEstilos.containsKey(cell)) {
+										mapaEstilos.put(cell, cellStyleNum);
+									}
+									celda.setCellType(Cell.CELL_TYPE_NUMERIC);
+									celda.setCellValue(Double.parseDouble(campo.toString()));
+									
+								} else if (campo instanceof Date) {
+									if (!mapaEstilos.containsKey(cell)) {
+										mapaEstilos.put(cell, cellStyleString);
+									}
+									
+									CreationHelper creationHelper = workbook.getCreationHelper();
+									
+									celda.setCellValue((Date) campo);
+									
+									CellStyle style1 = workbook.createCellStyle();
+									style1.setDataFormat(creationHelper.createDataFormat().getFormat(
+											"dd/mm/yyyy hh:mm"));
+									celda.setCellStyle(style1);
+									
+								} else {
+									if (!mapaEstilos.containsKey(cell)) {
+										mapaEstilos.put(cell, cellStyleString);
+									}
+									
+									celda.setCellType(Cell.CELL_TYPE_STRING);
+									textCell = new XSSFRichTextString(campo.toString());
+									celda.setCellValue(textCell);
 								}
-								
-								celda.setCellType(Cell.CELL_TYPE_STRING);
-								textCell = new XSSFRichTextString(campo.toString());
-								celda.setCellValue(textCell);
 							}
+							cell++;
+							
 						}
-						cell++;
-						
+					}
+				}
+
+				for (int i = 0; i < index; i++) {
+					//sheet.autoSizeColumn(j);
+					if (mapaEstilos.containsKey(i)) {
+						sheet.setDefaultColumnStyle(i, mapaEstilos.get(i));
 					}
 				}
 			}
 
-			for (int i = 0; i < index; i++) {
-				//sheet.autoSizeColumn(j);
-				if (mapaEstilos.containsKey(i)) {
-					sheet.setDefaultColumnStyle(i, mapaEstilos.get(i));
-				}
-			}
+			LOGGER.info("crearExcel() -> Salida del servicio para crear el excel con los datos de CAM");
+			return workbook;
+		} catch (Exception e) {
+			LOGGER.error("crearExcel() - Certificacion", e);
+			return null;
 		}
-
-		LOGGER.info("crearExcel() -> Salida del servicio para crear el excel con los datos de CAM");
-
-		return workbook;
 
 	}
 	
