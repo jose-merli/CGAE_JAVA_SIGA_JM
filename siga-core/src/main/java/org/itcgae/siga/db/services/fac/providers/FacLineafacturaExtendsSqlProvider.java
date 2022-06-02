@@ -6,10 +6,11 @@ import org.itcgae.siga.db.mappers.FacLineafacturaSqlProvider;
 
 public class FacLineafacturaExtendsSqlProvider extends FacLineafacturaSqlProvider {
 
-    public String getLineasFactura(String idFactura, String idInstitucion) {
+    public String getLineasFactura(String idFactura, String idInstitucion, Integer tamMaximo) {
 
         SQL tipoIVA = new SQL();
         SQL query = new SQL();
+        SQL sqlFinal = new SQL();
 
         tipoIVA.SELECT("DESCRIPCION");
         tipoIVA.FROM("PYS_TIPOIVA pt");
@@ -24,9 +25,14 @@ public class FacLineafacturaExtendsSqlProvider extends FacLineafacturaSqlProvide
         query.WHERE("IDINSTITUCION =" + idInstitucion);
         query.WHERE("IDFACTURA =" + idFactura);
 
-        query.WHERE("ROWNUM < 201");
+      //query completa
+        sqlFinal.SELECT("*");
+        sqlFinal.FROM("(" + query.toString() + ")");
+        if(tamMaximo!=null) {
+        	sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
+        }
 
-        return query.toString();
+        return sqlFinal.toString();
     }
 
     public String getLineasImpresionInforme(String idInstitucion, String idFactura) {

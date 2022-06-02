@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -20,12 +21,15 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporales;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionguardiaExtendsMapper;
@@ -55,6 +59,9 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	
 	@Autowired
 	private ScsInscripcionguardiaExtendsMapper scsInscripcionguardiaExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosMapper;
 
 
 	@Override
@@ -114,16 +121,18 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 			if (usuarios != null && usuarios.size() > 0) {
 				
+				Integer tamMaximo = getTamanoMaximo(idInstitucion);
+				
 				LOGGER.info(
 						"busquedaBajasTemporales() / scsBajasTemporalesExtendsMapper.busquedaBajasTemporales() -> Entrada a scsBajasTemporalesExtendsMapper para obtener las bajas temporales");
 				
-						bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion);	
+						bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion, tamMaximo);	
 				LOGGER.info(
 						"busquedaBajasTemporales() / scsBajasTemporalesExtendsMapper.busquedaBajasTemporales() -> Salida a scsBajasTemporalesExtendsMapper para obtener las bajas temporales");
 
 				if((bajasTemporalesItems != null) && (bajasTemporalesItems.size()) >= 200) {
 					error.setCode(200);
-					error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
 					bajasTemporalesDTO.setError(error);
 				}
 				
@@ -593,6 +602,23 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			}
 		}
 		
+	}
+	
+	private Integer getTamanoMaximo(Short idinstitucion) {
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+	    genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+	    		.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idinstitucion));
+	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    List<GenParametros> tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        Integer tamMaximo = null;
+		if (tamMax != null) {
+            tamMaximo  = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+		return tamMaximo;
 	}
 	
 }

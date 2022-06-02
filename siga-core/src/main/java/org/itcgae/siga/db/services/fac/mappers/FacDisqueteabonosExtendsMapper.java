@@ -33,7 +33,7 @@ public interface FacDisqueteabonosExtendsMapper extends FacDisqueteabonosMapper 
 		@Result(column = "propOtros", property = "propOtros", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fcs", property = "fcs", jdbcType = JdbcType.BOOLEAN)
 	})
-	List<FicherosAbonosItem> getFicherosTransferencias(FicherosAbonosItem item, String idInstitucion, String idioma);
+	List<FicherosAbonosItem> getFicherosTransferencias(FicherosAbonosItem item, String idInstitucion, String idioma, Integer tamMaximo);
 
 	@SelectProvider(type = FacDisqueteabonosExtendsSqlProvider.class, method = "getFacturasIncluidas")
 	@Results({

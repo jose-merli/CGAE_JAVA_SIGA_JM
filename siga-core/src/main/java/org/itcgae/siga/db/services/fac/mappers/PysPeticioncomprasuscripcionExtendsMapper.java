@@ -169,7 +169,7 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR)
 			
 		})
-	List<ListaSuscripcionesItem> getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma);
+	List<ListaSuscripcionesItem> getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma, Integer tamMaximo);
 
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaServiciosSuscripcion")
 	@Results({
@@ -217,7 +217,7 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		@Result(column = "NUMREGISTROSERRONEOS", property = "numRegistrosErroneos", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "usuario", jdbcType = JdbcType.VARCHAR)
 	})
-	List<CargaMasivaComprasItem> listadoCargaMasivaCompras(FiltroCargaMasivaCompras cargaMasivaItem, Short idInstitucion);
+	List<CargaMasivaComprasItem> listadoCargaMasivaCompras(FiltroCargaMasivaCompras cargaMasivaItem, Short idInstitucion, Integer tamMaximo);
 	
 	 @Select({
 	        "select",

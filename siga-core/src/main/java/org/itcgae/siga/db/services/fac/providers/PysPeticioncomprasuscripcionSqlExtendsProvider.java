@@ -370,6 +370,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 	public String getListaCompras(FiltrosCompraProductosItem filtro, Short idInstitucion, String idioma, Integer tamMax) throws ParseException {
 		
 		SQL sql = new SQL();
+		SQL sqlFinal = new SQL();
 		
 		sql.SELECT_DISTINCT("pet.fecha as fechaSolicitud");
 		sql.SELECT_DISTINCT("pet.idPeticion as nSolicitud");
@@ -412,13 +413,6 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.LEFT_OUTER_JOIN("fac_estadoFactura estFact on estFact.idestado = fact.estado");
 		
 		sql.WHERE("pet.idinstitucion = "+idInstitucion.toString());
-
-		// Número de resultados parametrizado
-		if (tamMax != null && tamMax >= 0) {
-			sql.WHERE("rownum <= " + (tamMax + 1));
-		} else {
-			sql.WHERE("rownum <= 201");
-		}
 
 		
 		if(filtro.getIdEstadoSolicitud() != null && !filtro.getIdEstadoSolicitud().isEmpty()) {
@@ -538,7 +532,13 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ "group by gen.fechasolicitud, gen.nsolicitud, gen.idpersona, gen.nidentificacion, gen.ncolegiado, gen.apellidosnombre, gen.nprod, gen.idformapago, gen.desformapago, \r\n"
 						+ "gen.imptotal, gen.fechadenegada, gen.fechasolicitadaanulacion, gen.fechaefectiva, gen.fechaanulada, gen.estadofactura, gen.solicitarbaja, gen.facturas";
 				
-				LOGGER.info(query.toString());
+				//LOGGER.info(query.toString());
+				
+				sqlFinal.SELECT("*");
+		        sqlFinal.FROM("(" + query.toString() + ")");
+		        if(tamMax!=null) {
+		        	sqlFinal.WHERE("ROWNUM <= " + tamMax);
+		        }
 				
 				return query;
 		
@@ -593,10 +593,11 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		return sql.toString();
 	}
 
-	public String getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma)
+	public String getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma, Integer tamMaximo)
 			throws ParseException {
 
 		SQL sql = new SQL();
+		SQL sqlFinal = new SQL();
 
 		sql.SELECT_DISTINCT("pet.fecha AS fechasolicitud,\r\n"
 				+ "    pet.idpeticion AS nsolicitud,\r\n"
@@ -749,7 +750,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.LEFT_OUTER_JOIN("fac_estadoFactura estFact on estFact.idestado = fact.estado");
 
 		sql.WHERE("pet.idinstitucion = " + idInstitucion.toString());
-		sql.WHERE("rownum <= 200");
+		
 		sql.WHERE("factSusBis.idfactura is null");
 
 		if (filtro.getIdEstadoSolicitud() != null && !filtro.getIdEstadoSolicitud().isEmpty()) {
@@ -861,7 +862,6 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.WHERE("fact.estado IN ("+String.join(",",filtro.getIdEstadoFactura())+")");
 		}
 //		private String importe; // valor aplicado durante la compra (importe total)
-		sql.WHERE("rownum <= 200");
 		
 		sql.GROUP_BY("servins.solicitarbaja,\r\n"
 				+ "    pet.fecha,\r\n"
@@ -961,9 +961,14 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "        ELSE '1'\r\n"
 				+ "    END");
 
-		LOGGER.info(sql.toString());
+		sqlFinal.SELECT("*");
+        sqlFinal.FROM("(" + sql.toString() + ")");
+        if(tamMaximo!=null) {
+        	sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
+        }
+		//LOGGER.info(sqlFinal.toString());
 		
-		return sql.toString();
+		return sqlFinal.toString();
 	}
 
 	public String getListaServiciosSuscripcion(Short idInstitucion, String idPeticion, String idioma, Date aFechaDe) throws ParseException {
@@ -1045,8 +1050,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 	}
 	
 	
-	public String listadoCargaMasivaCompras(FiltroCargaMasivaCompras cargaMasivaItem, Short idInstitucion) {
+	public String listadoCargaMasivaCompras(FiltroCargaMasivaCompras cargaMasivaItem, Short idInstitucion, Integer tamMaximo) {
 		SQL sql = new SQL();
+		SQL sqlFinal = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.SELECT("cm.IDCARGAMASIVA");
@@ -1079,9 +1085,13 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.WHERE("TRUNC(fechacarga) <= TO_DATE('" + fechaCargaHasta + "', 'DD/MM/RRRR')");
 		}
 		
-		sql.WHERE("rownum <= 200");
+		sqlFinal.SELECT("*");
+        sqlFinal.FROM("(" + sql.toString() + ")");
+        if(tamMaximo!=null) {
+        	sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
+        }
 		
-		LOGGER.info(sql.toString());
+		//LOGGER.info(sql.toString());
 
 		return sql.toString();
 	}

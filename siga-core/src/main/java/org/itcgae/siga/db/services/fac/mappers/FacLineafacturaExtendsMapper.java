@@ -32,7 +32,7 @@ public interface FacLineafacturaExtendsMapper extends FacLineafacturaMapper {
 			@Result(column = "IMPORTEANTICIPADO", property = "importeAnticipado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idCodigoBanco", property = "idCodigoBanco", jdbcType = JdbcType.VARCHAR)
 	})
-	List<FacturaLineaItem> getLineasFactura(String idFactura, String idInstitucion);
+	List<FacturaLineaItem> getLineasFactura(String idFactura, String idInstitucion, Integer tamMaximo);
 
 	@SelectProvider(type = FacLineafacturaExtendsSqlProvider.class, method = "getLineasImpresionInforme")
 	List<LineaImpresionInformeDTO> getLineasImpresionInforme(String idInstitucion, String idFactura);

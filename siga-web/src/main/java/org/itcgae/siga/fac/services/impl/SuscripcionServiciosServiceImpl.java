@@ -19,10 +19,13 @@ import org.itcgae.siga.DTO.fac.ListaSuscripcionesItem;
 import org.itcgae.siga.DTO.fac.RevisionAutLetradoItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.PysColaSuscripcionesAuto;
 import org.itcgae.siga.db.entities.PysColaSuscripcionesAutoExample;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
@@ -31,6 +34,7 @@ import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.PysColaSuscripcionesAutoMapper;
 import org.itcgae.siga.db.mappers.PysSuscripcionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosinstitucionExtendsMapper;
 import org.itcgae.siga.fac.services.ISuscripcionServiciosService;
@@ -72,6 +76,9 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	
 	@Autowired
 	private PysColaSuscripcionesAutoMapper pysColaSuscripcionesAutoMapper;
+
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Override
 	public ListaSuscripcionesDTO getListaSuscripciones(HttpServletRequest request, FiltrosSuscripcionesItem peticion) {
@@ -105,7 +112,9 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 						LOGGER.info(
 								"getListaSuscripciones() / pysPeticioncomprasuscripcionExtendsMapper.getListaSuscripciones() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener las peticiones de suscripcion que cumplan las condiciones");
 
-						listaSuscripciones.setListaSuscripcionesItems(pysPeticioncomprasuscripcionExtendsMapper.getListaSuscripciones(peticion, idInstitucion, usuarios.get(0).getIdlenguaje()));
+						Integer tamMaximo = getTamanoMaximo(usuarios.get(0).getIdinstitucion());
+						
+						listaSuscripciones.setListaSuscripcionesItems(pysPeticioncomprasuscripcionExtendsMapper.getListaSuscripciones(peticion, idInstitucion, usuarios.get(0).getIdlenguaje(), tamMaximo));
 						
 						//Revisamos las fechas obtenidas para determinar el idestado que se devuelve
 						for(ListaSuscripcionesItem suscripcion : listaSuscripciones.getListaSuscripcionesItems()) {
@@ -480,5 +489,22 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 
 		return response;
 	
+	}
+	
+	private Integer getTamanoMaximo(Short idinstitucion) {
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+	    genParametrosExample.createCriteria().andModuloEqualTo("FAC").andParametroEqualTo("TAM_MAX_CONSULTA_FAC")
+	    		.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idinstitucion));
+	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        Integer tamMaximo = null;
+		if (tamMax != null) {
+            tamMaximo  = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+		return tamMaximo;
 	}
 }

@@ -55,6 +55,8 @@ import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenHistorico;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursos;
@@ -77,6 +79,7 @@ import org.itcgae.siga.db.mappers.PysProductossolicitadosMapper;
 import org.itcgae.siga.db.mappers.PysTipoivaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
@@ -137,6 +140,9 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 	
 	@Autowired
 	private CenCargaMasivaExtendsMapper cenCargaMasivaExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Autowired
 	private FicherosServiceImpl ficherosServiceImpl;
@@ -227,7 +233,8 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 					"listado() / ScsRemesasExtendsMapper.buscarRemesas() -> Entrada a ScsIntercambiosExtendsMapper para obtener las Cargas Maivas de Compras");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				cargaMasivaCompras = pysPeticioncomprasuscripcionExtendsMapper.listadoCargaMasivaCompras(cargaMasivaItem, idInstitucion);
+				Integer tamMaximo = getTamanoMaximo(idInstitucion);
+				cargaMasivaCompras = pysPeticioncomprasuscripcionExtendsMapper.listadoCargaMasivaCompras(cargaMasivaItem, idInstitucion, tamMaximo);
 			}
 
 			LOGGER.debug(
@@ -240,6 +247,23 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 		}
 		LOGGER.debug("getLabel() -> Salida del servicio para obtener las Cargas Maivas de Compras");
 		return cargaMasivaComprasDTO;
+	}
+	
+	private Integer getTamanoMaximo(Short idinstitucion) {
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+	    genParametrosExample.createCriteria().andModuloEqualTo("FAC").andParametroEqualTo("TAM_MAX_CONSULTA_FAC")
+	    		.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idinstitucion));
+	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        Integer tamMaximo = null;
+		if (tamMax != null) {
+            tamMaximo  = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+		return tamMaximo;
 	}
 	
 	@Override

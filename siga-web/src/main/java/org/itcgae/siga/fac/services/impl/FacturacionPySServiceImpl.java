@@ -2206,10 +2206,27 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			LOGGER.info(
 					"getFacturacionesProgramadas() / facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas() -> Entrada a facFacturacionprogramadaExtendsMapper para obtener el listado de facturaciones programadas");
 
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+    	    genParametrosExample.createCriteria().andModuloEqualTo("FAC").andParametroEqualTo("TAM_MAX_CONSULTA_FAC")
+    	    		.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, usuario.getIdinstitucion()));
+    	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+    	    LOGGER.info("getFicherosAdeudos() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+    	    List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+    	    LOGGER.info("getFicherosAdeudos() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+            Integer tamMaximo = null;
+			if (tamMax != null) {
+                tamMaximo  = Integer.valueOf(tamMax.get(0).getValor());
+            } else {
+                tamMaximo = null;
+            }
+			
 			// Logica
 			items = facFacturacionprogramadaExtendsMapper.getFacturacionesProgramadas(facturacionProgramadaItem,
-					usuario.getIdinstitucion(), usuario.getIdlenguaje(), 200);
+					usuario.getIdinstitucion(), usuario.getIdlenguaje(), tamMaximo);
 			itemsDTO.setFacturacionprogramadaItems(items);
+			if (itemsDTO.getFacturacionprogramadaItems().size() == tamMaximo) {
+				itemsDTO.setError(UtilidadesString.creaInfoResultados());
+			}
 
 		}
 
@@ -2345,8 +2362,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					|| item.getFormaCobroAbono() != null
 					|| (item.getEstadosFiltroAb() != null && item.getEstadosFiltroAb().size() > 0);
 
+			Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
+			
 			items = facFacturaExtendsMapper.getFacturas(item, usuario.getIdinstitucion().toString(),
-						usuario.getIdlenguaje(),filtrosSoloAbono,filtrosSoloFactura);
+						usuario.getIdlenguaje(),filtrosSoloAbono,filtrosSoloFactura, tamMaximo);
 
 			facturaDTO.setFacturasItems(items);
 		}
@@ -2354,6 +2373,23 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
 		return facturaDTO;
+	}
+
+	private Integer getTamanoMaximo(Short idinstitucion) {
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+	    genParametrosExample.createCriteria().andModuloEqualTo("FAC").andParametroEqualTo("TAM_MAX_CONSULTA_FAC")
+	    		.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idinstitucion));
+	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        Integer tamMaximo = null;
+		if (tamMax != null) {
+            tamMaximo  = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+		return tamMaximo;
 	}
 
 	@Override
@@ -2476,9 +2512,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getLineasFactura() -> obteniendo las lineas de la factura");
-
+			
+			Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
+			
 			List<FacturaLineaItem> items = facLineafacturaExtendsMapper.getLineasFactura(idFactura,
-					usuario.getIdinstitucion().toString());
+					usuario.getIdinstitucion().toString(), tamMaximo);
 
 			facturaLineaDTO.setFacturasLineasItems(items);
 		}
@@ -2502,9 +2540,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getLineasAbono() -> obteniendo las lineas de la factura");
-
+			
+			Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
+			
 			List<FacturaLineaItem> items = facLineaabonoExtendsMapper.getLineasAbono(idAbono,
-					usuario.getIdinstitucion().toString());
+					usuario.getIdinstitucion().toString(), tamMaximo);
 
 			facturaLineaDTO.setFacturasLineasItems(items);
 		}
@@ -2682,13 +2722,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		AdmUsuarios usuario = new AdmUsuarios();
 
 		LOGGER.info(
-				"FacturacionPySServiceImpl.getLineasFactura() -> Entrada al servicio para obtener las lineas de la factura");
+				"FacturacionPySServiceImpl.getComunicacionCobro() -> Entrada al servicio para obtener las comunicacion de cobro");
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
 
 		if (usuario != null) {
-			LOGGER.info("FacturacionPySServiceImpl.getLineasFactura() -> obteniendo las lineas de la factura");
+			LOGGER.info("FacturacionPySServiceImpl.getComunicacionCobro() -> obteniendo las comunicacion de cobro");
 
 			EnvComunicacionmorososExample example = new EnvComunicacionmorososExample();
 			example.createCriteria().andIdfacturaEqualTo(idFactura).andIdinstitucionEqualTo(usuario.getIdinstitucion());
@@ -2708,7 +2748,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		}
 
 		LOGGER.info(
-				"FacturacionPySServiceImpl.getLineasFactura() -> Salida del servicio  para obtener las lineas de la factura");
+				"FacturacionPySServiceImpl.getComunicacionCobro() -> Salida del servicio  para obtener las comunicacion de cobro");
 
 		return comunicacionCobroDTO;
 	}

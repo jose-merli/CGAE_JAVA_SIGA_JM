@@ -12,7 +12,7 @@ import java.util.Date;
 public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvariosSqlProvider {
 
 
-    public String buscarMVColegiado (MovimientosVariosFacturacionItem movimientoItem, String idInstitucion) {
+    public String buscarMVColegiado (MovimientosVariosFacturacionItem movimientoItem, String idInstitucion, Integer tamMaximo) {
     	
     	SQL sql = new SQL();
     	
@@ -261,8 +261,10 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
        
         sql.SELECT("*");
     	sql.FROM("("+subquery2);
-    	sql.WHERE("ROWNUM <= 200");
-        sql.ORDER_BY("nombre,orden,fecha_orden,idaplicacion ASC");
+    	if(tamMaximo!= null) {
+    		sql.WHERE("ROWNUM <= " + tamMaximo);
+    	}
+    	sql.ORDER_BY("nombre,orden,fecha_orden,idaplicacion ASC");
         
     	return sql.toString();
     }

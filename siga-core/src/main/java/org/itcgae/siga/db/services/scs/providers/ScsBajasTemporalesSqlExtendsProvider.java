@@ -10,7 +10,7 @@ import org.itcgae.siga.db.mappers.CenBajastemporalesSqlProvider;
 public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlProvider {
 
 
-	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion) {
+	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion, Integer tamMaximo) {
 		SQL sql = new SQL();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		sql.SELECT("DISTINCT\r\n" + 
@@ -75,7 +75,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		SQL sql2 = new SQL();
 		sql2.SELECT("*");
 		sql2.FROM("(" + sql.toString() + ")");
-		sql2.WHERE("ROWNUM <= 200");
+		sql2.WHERE("ROWNUM <= " + tamMaximo);
 		return sql2.toString();
 	}
 	

@@ -31,7 +31,7 @@ public interface FacDisquetedevolucionesExtendsMapper extends FacDisquetedevoluc
 		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR)
 	})
-	List<FicherosDevolucionesItem> getFicherosDevoluciones(FicherosDevolucionesItem item, String idInstitucion);
+	List<FicherosDevolucionesItem> getFicherosDevoluciones(FicherosDevolucionesItem item, String idInstitucion, Integer tamMaximo);
 
 	@SelectProvider(type = FacDisquetedevolucionesExtendsSqlProvider.class, method = "getFacturasIncluidas")
 	@Results({

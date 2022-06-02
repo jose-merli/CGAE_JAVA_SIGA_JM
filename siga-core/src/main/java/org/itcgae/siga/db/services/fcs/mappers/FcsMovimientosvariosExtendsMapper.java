@@ -124,7 +124,7 @@ public interface FcsMovimientosvariosExtendsMapper extends FcsMovimientosvariosM
             @Result(column = "IDCONCEPTO", property = "idConcepto", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDTIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NOMBRETIPO", property = "nombretipo", jdbcType = JdbcType.VARCHAR)})
-    List<MovimientosVariosFacturacionItem> buscarMVColegiado(MovimientosVariosFacturacionItem movimientoItem, String idInstitucion);
+    List<MovimientosVariosFacturacionItem> buscarMVColegiado(MovimientosVariosFacturacionItem movimientoItem, String idInstitucion, Integer tamMaximo);
 
 
     

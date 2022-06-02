@@ -10,11 +10,12 @@ import java.text.SimpleDateFormat;
 
 public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlProvider {
 	
-	public String getFicherosAdeudos(FicherosAdeudosItem item, String idInstitucion) {
+	public String getFicherosAdeudos(FicherosAdeudosItem item, String idInstitucion, Integer tamMaximo) {
 		SQL principal = new SQL();
 		SQL totalRemesa = new SQL();
 		SQL numRecibos = new SQL();
 		SQL sql = new SQL();
+		SQL sqlFinal = new SQL();
 		
 	    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String fecha;
@@ -100,7 +101,6 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		//query completa
 		sql.SELECT("*");
 		sql.FROM("("+principal.toString()+")");
-		sql.WHERE("ROWNUM < 201");
 		
 		//importe total desde
 		if(item.getImporteTotalDesde()!=null && !item.getImporteTotalDesde().isEmpty()) {
@@ -121,8 +121,15 @@ public class FacDisquetecargosExtendsSqlProvider extends FacDisquetecargosSqlPro
 		if(item.getNumRecibosHasta()!=null && !item.getNumRecibosHasta().isEmpty()) {
 			sql.WHERE("numRecibos <= "+item.getNumRecibosHasta());
 		}
+		
+		//query completa
+		sqlFinal.SELECT("*");
+		sqlFinal.FROM("("+sql.toString()+")");
+		if(tamMaximo!=null) {
+        	sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
+        }
 				
-		return sql.toString();
+		return sqlFinal.toString();
 	}
 
 	public String getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma) {

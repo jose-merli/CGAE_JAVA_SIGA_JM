@@ -61,7 +61,6 @@ import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
-import org.itcgae.siga.db.mappers.ScsConfConjuntoGuardiasMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
@@ -70,7 +69,6 @@ import org.itcgae.siga.db.mappers.ScsHcoConfProgCalendariosMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaCabeceraMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.mappers.ScsProgCalendariosMapper;
-import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
@@ -152,9 +150,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private ScsGuardiasturnoExtendsMapper scsGuardiasturnoExtendsMapper;
 
 	@Autowired
-	private ScsGrupoGuardiaColegiadoHistExtendsMapper scsGrupoGuardiaColegiadoHistExtendsMapper;
-
-	@Autowired
 	private ScsIncompatibilidadguardiasExtendsMapper scsIncompatibilidadguardiasExtendsMapper;
 
 	@Autowired
@@ -197,9 +192,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private GenPropertiesMapper genPropertiesMapper;
 
 	@Autowired
-	private ScsSaltoscompensacionesMapper scsSaltoscompensacionesMapper;
-
-	@Autowired
 	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesExtendsMapper;
 
 	@Autowired
@@ -240,9 +232,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
-
-	@Autowired
-	private ScsConfConjuntoGuardiasMapper scsConfConjuntoGuardiasMapper;
 
 	@Autowired
 	private ScsConfConjuntoGuardiasExtendsMapper scsConfConjuntoGuardiasExtendsMapper;

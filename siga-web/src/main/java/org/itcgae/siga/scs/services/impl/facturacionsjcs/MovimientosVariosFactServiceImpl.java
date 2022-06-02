@@ -16,6 +16,8 @@ import org.itcgae.siga.db.entities.FcsMovimientosvarios;
 import org.itcgae.siga.db.entities.FcsMovimientosvariosKey;
 import org.itcgae.siga.db.entities.FcsMvariosCertificaciones;
 import org.itcgae.siga.db.entities.FcsMvariosCertificacionesKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsActuacionasistencia;
 import org.itcgae.siga.db.entities.ScsActuacionasistenciaKey;
 import org.itcgae.siga.db.entities.ScsActuaciondesigna;
@@ -36,6 +38,7 @@ import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsMvariosCertificacionesMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsMovimientosvariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsActuacionasistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
@@ -53,6 +56,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -102,6 +106,9 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
     @Autowired
     private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
     
+    @Autowired
+    private GenParametrosExtendsMapper genParametrosExtendsMapper;
+    
     public MovimientosVariosFacturacionDTO buscarMovimientosVarios(MovimientosVariosFacturacionItem facturacionItem, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -125,11 +132,13 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
                 if (null != usuarios && usuarios.size() > 0) {
                     AdmUsuarios usuario = usuarios.get(0);
                     usuario.setIdinstitucion(idInstitucion);
+                    
+                    Integer tamMaximo = getTamanoMaximo(idInstitucion);
 
                     LOGGER.debug(
                             "MovimientosVariosFactServiceImpl.buscarMovimientosVarios() / fcsMovimientosvariosExtendsMapper.buscarMovimientosVarios() -> Entrada a fcsMovimientosvariosExtendsMapper para obtener los movimientos varios");
                     List<MovimientosVariosFacturacionItem> movimientosItems = fcsMovimientosvariosExtendsMapper
-                            .buscarMVColegiado(facturacionItem, idInstitucion.toString());
+                            .buscarMVColegiado(facturacionItem, idInstitucion.toString(), tamMaximo);
 
 
                     movimientos.setFacturacionItem(movimientosItems);
@@ -1129,5 +1138,21 @@ public class MovimientosVariosFactServiceImpl implements IMovimientosVariosFactS
         return movimientosVariosFacturacionDTO;
     }
 
-
+    private Integer getTamanoMaximo(Short idinstitucion) {
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+	    genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+	    		.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idinstitucion));
+	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+	    LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        Integer tamMaximo = null;
+		if (tamMax != null) {
+            tamMaximo  = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+		return tamMaximo;
+	}
+    
 }

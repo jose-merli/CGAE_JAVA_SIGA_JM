@@ -24,12 +24,15 @@ import org.itcgae.siga.db.entities.FcsFicheroImpreso190;
 import org.itcgae.siga.db.entities.FcsFicheroImpreso190Key;
 import org.itcgae.siga.db.entities.GenFichero;
 import org.itcgae.siga.db.entities.GenFicheroKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsBaremosGuardiaKey;
 import org.itcgae.siga.db.entities.ScsHitofacturable;
 import org.itcgae.siga.db.entities.ScsHitofacturableguardia;
 import org.itcgae.siga.db.entities.ScsHitofacturableguardiaExample;
 import org.itcgae.siga.db.entities.ScsHitofacturableguardiaKey;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBaremosGuardiaMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableguardiaExtendsMapper;
@@ -55,6 +58,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+    
+    @Autowired
+    private GenParametrosExtendsMapper genParametrosMapper;
 
 	@Override
 	@Transactional
@@ -446,8 +452,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 		if (idInstitucion != null) {
 
+			Integer tamMaximo = getTamanoMaximo(idInstitucion);
 			List<BaremosRequestItem> lBaremos = baremosGuardiaMapper.searchBaremosFichaGuardia(idGuardia,
-					idInstitucion);
+					idInstitucion, tamMaximo);
 			for(BaremosRequestItem baremo : lBaremos){
 				baremo.setGuardias(baremo.getNomTurno() + "-" + baremo.getGuardias());
 			}
@@ -476,5 +483,22 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 		return baremosRequestDTO;
 	}
+	
+    private Integer getTamanoMaximo(Short idinstitucion) {
+        GenParametrosExample genParametrosExample = new GenParametrosExample();
+        genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+                .andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idinstitucion));
+        genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+        LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        List<GenParametros> tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+        LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        Integer tamMaximo = null;
+        if (tamMax != null) {
+            tamMaximo  = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+        return tamMaximo;
+    }
 
 }

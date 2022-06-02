@@ -128,11 +128,8 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         sqlAbonos.SELECT("*");
         sqlAbonos.FROM("("+abonos.toString()+")");
 
-        if(maxRows == null || maxRows == 0 || maxRows > 201){
-            sqlAbonos.WHERE("ROWNUM < 201");
-        }
-        else {
-            sqlAbonos.WHERE("ROWNUM < " + (201 - maxRows));
+        if(maxRows != null){
+            sqlAbonos.WHERE("ROWNUM <= " + maxRows);
         }
 
         return sqlAbonos.toString();

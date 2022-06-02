@@ -50,6 +50,7 @@ import org.itcgae.siga.db.entities.FcsPagosjgKey;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
@@ -215,8 +216,10 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         if (usuario != null) {
             LOGGER.info("FacturacionPySExportacionesServiceImpl.getFicherosAdeudos() -> obteniendo datos de ficheros de adeudos");
 
+            Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
+            
             List<FicherosAdeudosItem> items = facDisquetecargosExtendsMapper.getFicherosAdeudos(item,
-                    usuario.getIdinstitucion().toString());
+                    usuario.getIdinstitucion().toString(), tamMaximo);
 
             ficherosAdeudosDTO.setFicherosAdeudosItems(items);
         }
@@ -227,7 +230,24 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         return ficherosAdeudosDTO;
     }
 
-    @Override
+    private Integer getTamanoMaximo(Short idinstitucion) {
+    	GenParametrosExample genParametrosExample = new GenParametrosExample();
+	    genParametrosExample.createCriteria().andModuloEqualTo("FAC").andParametroEqualTo("TAM_MAX_CONSULTA_FAC")
+	    		.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idinstitucion));
+	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+	    LOGGER.info("FacturacionPySExportacionesServiceImpl / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+	    LOGGER.info("FacturacionPySExportacionesServiceImpl / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        Integer tamMaximo = null;
+		if (tamMax != null) {
+            tamMaximo  = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+		return tamMaximo;
+	}
+
+	@Override
     @Transactional(rollbackFor = Exception.class)
     public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
             throws Exception {
@@ -676,8 +696,10 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             LOGGER.info(
                     "FacturacionPySExportacionesServiceImpl.getFicherosDevoluciones() -> obteniendo datos de ficheros de devoluciones");
 
+            Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
+            
             List<FicherosDevolucionesItem> items = facDisquetedevolucionesExtendsMapper.getFicherosDevoluciones(item,
-                    usuario.getIdinstitucion().toString());
+                    usuario.getIdinstitucion().toString(), tamMaximo);
 
             ficherosDevolucionesDTO.setFicherosDevolucionesItems(items);
         }
@@ -984,7 +1006,8 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             FacturaItem filtros = new FacturaItem();
             filtros.setIdentificadorDevolucion(ficherosDevolucionesItem.getIdDisqueteDevoluciones());
-            List<FacturaItem> facturasDisquete = facFacturaExtendsMapper.getFacturas(filtros, usuario.getIdinstitucion().toString(),usuario.getIdlenguaje(), false, true);
+            Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
+            List<FacturaItem> facturasDisquete = facFacturaExtendsMapper.getFacturas(filtros, usuario.getIdinstitucion().toString(),usuario.getIdlenguaje(), false, true, tamMaximo);
 
             //Devolver las factruas no devueltas
             if(facturasDisquete.size() > 0){
@@ -1187,9 +1210,11 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         if (usuario != null) {
             LOGGER.info(
                     "FacturacionPySExportacionesServiceImpl.getFicherosTransferencias() -> obteniendo datos de ficheros de transferencias");
-
+            
+            Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
+            
             List<FicherosAbonosItem> items = facDisqueteabonosExtendsMapper.getFicherosTransferencias(item,
-                    usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+                    usuario.getIdinstitucion().toString(), usuario.getIdlenguaje(), tamMaximo);
 
             ficherosAbonosDTO.setFicherosAbonosItems(items);
         }

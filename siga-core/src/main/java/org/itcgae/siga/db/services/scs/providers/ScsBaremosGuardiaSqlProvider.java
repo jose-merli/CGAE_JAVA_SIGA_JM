@@ -352,9 +352,11 @@ public class ScsBaremosGuardiaSqlProvider {
 		return sql.toString();
 	}
 
-	public String searchBaremosFichaGuardia(String idGuardia, Short idinstitucion) {
+	public String searchBaremosFichaGuardia(String idGuardia, Short idinstitucion, Integer tamMaximo) {
 
 		SQL sql = new SQL();
+		SQL sqlFinal = new SQL();
+		
 		sql.SELECT(
 				"	LISTAGG( "
 						+ "        gua.nombre, "
@@ -629,10 +631,7 @@ public class ScsBaremosGuardiaSqlProvider {
 		);
 		sql.WHERE("hit.idinstitucion = " + idinstitucion);
 
-			sql.WHERE("gua.idguardia IN( " + idGuardia +")");
-
-
-		sql.WHERE("rownum <= 200");
+		sql.WHERE("gua.idguardia IN( " + idGuardia +")");
 
 		sql.GROUP_BY("hit.idinstitucion,"
 				+ "    hit.idturno,"
@@ -649,6 +648,13 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "   gua.fechabaja,"
 				+ "tip.idhitoconfiguracion");
 		sql.ORDER_BY("hit.idhito, hit.idguardia");
-		return sql.toString();
+		
+		sqlFinal.SELECT("*");
+		sqlFinal.FROM("("+sql+")");
+    	if(tamMaximo!= null) {
+    		sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
+    	}
+		
+		return sqlFinal.toString();
 	}
 }

@@ -151,7 +151,7 @@ public class ContabilidadExportacionServiceImpl implements IContabilidadExportac
 				if (tamMax != null && !tamMax.isEmpty()) {
 					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
 				} else {
-					tamMaximo = 200;
+					tamMaximo = null;
 				}
 				LOGGER.info("Filtro: search()- Item:" + facRegistroFichConta.toString());
 				listaFacRegistroFichConta = facRegistroFichContaExtendsMapper.search(facRegistroFichConta, idInstitucion,

@@ -14,7 +14,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 	
 	private Logger LOGGER = Logger.getLogger(this.getClass());
 
-	public String getFacturas(FacturaItem item, String idInstitucion, String idLenguaje, boolean filtrosSoloAbono, boolean filtrosSoloFactura) {
+	public String getFacturas(FacturaItem item, String idInstitucion, String idLenguaje, boolean filtrosSoloAbono, boolean filtrosSoloFactura, Integer tamMaximo) {
         SQL sqlFacturas = new SQL();
         SQL sqlFinal = new SQL();
         String queryFacturas = "";
@@ -40,11 +40,12 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         sqlFacturas.ORDER_BY("fecha DESC");
         	
 
-        //query completa facturas
+        //query completa
         sqlFinal.SELECT("*");
         sqlFinal.FROM("(" + sqlFacturas.toString() + ")");
-        sqlFinal.WHERE("ROWNUM < 201");
-
+        if(tamMaximo!=null) {
+        	sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
+        }
 
         //LOGGER.info(sqlFacturas.toString());
         

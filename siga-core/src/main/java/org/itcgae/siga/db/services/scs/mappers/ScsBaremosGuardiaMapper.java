@@ -129,5 +129,5 @@ List<BaremosRequestItem> searchBaremosGuardia(BaremosGuardiaItem baremosGuardiaI
 			@Result(column = "IDHITO", property = "idHito", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDHITOCONFIGURACION", property = "idhitoconfiguracion", jdbcType = JdbcType.DECIMAL),
 	})
-	List<BaremosRequestItem> searchBaremosFichaGuardia(String idGuardia, Short idinstitucion);
+	List<BaremosRequestItem> searchBaremosFichaGuardia(String idGuardia, Short idinstitucion, Integer tamMaximo);
 }

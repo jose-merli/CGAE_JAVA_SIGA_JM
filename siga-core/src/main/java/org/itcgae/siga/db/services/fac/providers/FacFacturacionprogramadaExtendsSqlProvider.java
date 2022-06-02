@@ -186,7 +186,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         SQL sqlGlobal = new SQL();
         sqlGlobal.SELECT("*");
         sqlGlobal.FROM("(" + sql.toString() + ")");
-        sqlGlobal.WHERE("ROWNUM < " + rownum);
+        sqlGlobal.WHERE("ROWNUM <= " + rownum);
 
         if (!UtilidadesString.esCadenaVacia(facturacionProgramada.getImporteDesde()))
             sqlGlobal.WHERE("importe >= to_number('" + facturacionProgramada.getImporteDesde() + "', '99999999999999999.99')");

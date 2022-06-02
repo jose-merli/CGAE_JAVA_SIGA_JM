@@ -13,7 +13,7 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 	
 	private Logger LOGGER = Logger.getLogger(this.getClass());
 	
-	public String buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje) {
+	public String buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje, Integer tamMaximo) {
 		SQL sql = new SQL();
 		SQL sqlTotal = new SQL();
 		SQL transferencia = new SQL();
@@ -112,13 +112,14 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		sql.WHERE("FL.DESCRIPCIONLINEA = 'IRPF'");
 		sql.WHERE("A.IDPAGOSJG IS NOT NULL");
 		sql.ORDER_BY("A.NUMEROABONO DESC");
-		sql.WHERE("ROWNUM <= 200");
 		
 		sqlTotal.SELECT("*");
         sqlTotal.FROM("("+sql.toString()+")");
-        sqlTotal.WHERE("ROWNUM < 200");
+        if(tamMaximo!=null) {
+        	sqlTotal.WHERE("ROWNUM <= " + tamMaximo);
+        }
         
-        LOGGER.info(sqlTotal.toString());
+        //LOGGER.info(sqlTotal.toString());
 		return sql.toString();
 	}
 

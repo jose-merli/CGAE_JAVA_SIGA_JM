@@ -28,7 +28,7 @@ public interface FacLineaabonoExtendsMapper extends FacLineaabonoMapper {
 			@Result(column = "importeIVA", property = "importeIVA", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "importeTotal", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
 	})
-	List<FacturaLineaItem> getLineasAbono(String idFactura, String idInstitucion);
+	List<FacturaLineaItem> getLineasAbono(String idFactura, String idInstitucion, Integer tamMaximo);
 	
 	@SelectProvider(type = FacLineaabonoExtendsSqlProvider.class, method = "getNuevoID")
     Long getNuevoID(String idInstitucion, String idAbono);

@@ -43,7 +43,7 @@ public interface FacDisquetecargosExtendsMapper extends FacDisquetecargosMapper 
 		@Result(column = "FECHARECIBOSB2B", property = "fechaRecibosB2B", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAMODIFICACION", property = "fechaUltimaModificacion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<FicherosAdeudosItem> getFicherosAdeudos(FicherosAdeudosItem item, String idInstitucion);
+	List<FicherosAdeudosItem> getFicherosAdeudos(FicherosAdeudosItem item, String idInstitucion, Integer tamMaximo);
 
 	@SelectProvider(type = FacDisquetecargosExtendsSqlProvider.class, method = "getFacturasIncluidas")
 	@Results({

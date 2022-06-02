@@ -9,9 +9,10 @@ import org.itcgae.siga.db.mappers.FacLineaabonoSqlProvider;
 
 public class FacLineaabonoExtendsSqlProvider extends FacLineaabonoSqlProvider {
 
-    public String getLineasAbono(String idFactura, String idInstitucion) {
+    public String getLineasAbono(String idFactura, String idInstitucion, Integer tamMaximo) {
 
         SQL query = new SQL();
+        SQL sqlFinal = new SQL();
 
         query.SELECT("IDABONO,DESCRIPCIONLINEA,NUMEROLINEA,PRECIOUNITARIO,CANTIDAD,(PRECIOUNITARIO * CANTIDAD) importeNeto,"
                 + "((PRECIOUNITARIO * CANTIDAD) * (IVA / 100)) importeIVA,((PRECIOUNITARIO * CANTIDAD) * (1 + IVA / 100))importeTotal");
@@ -20,10 +21,13 @@ public class FacLineaabonoExtendsSqlProvider extends FacLineaabonoSqlProvider {
 
         query.WHERE("IDINSTITUCION =" + idInstitucion);
         query.WHERE("IDABONO =" + idFactura);
-
-        query.WHERE("ROWNUM < 201");
-
-        return query.toString();
+        
+        sqlFinal.SELECT("*");
+        sqlFinal.FROM("(" + query.toString() + ")");
+        if(tamMaximo!=null) {
+        	sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
+        }
+        return sqlFinal.toString();
     }
     
     public String getNuevoID(String idInstitucion, String idAbono) {

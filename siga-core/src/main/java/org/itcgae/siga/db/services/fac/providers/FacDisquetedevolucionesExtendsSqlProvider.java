@@ -9,9 +9,10 @@ import java.text.SimpleDateFormat;
 
 public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolucionesSqlProvider {
 
-	public String getFicherosDevoluciones(FicherosDevolucionesItem item, String idInstitucion) {
+	public String getFicherosDevoluciones(FicherosDevolucionesItem item, String idInstitucion, Integer tamMaximo) {
 		SQL principal = new SQL();
 		SQL sql = new SQL();
+		SQL sqlFinal = new SQL();
 
 	    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String fecha;
@@ -32,7 +33,6 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		//query completa
 		sql.SELECT("*");
 		sql.FROM("("+principal.toString()+")");
-		sql.WHERE("ROWNUM < 201");
 
 		//CUENTA BANCARIA
 		if(item.getBancosCodigo()!=null) {
@@ -70,8 +70,14 @@ public class FacDisquetedevolucionesExtendsSqlProvider extends FacDisquetedevolu
 		if(item.getNumRecibosHasta()!=null && !item.getNumRecibosHasta().isEmpty()) {
 			sql.WHERE("NUMEROFACTURAS <= "+item.getNumRecibosHasta());
 		}
-
-		return sql.toString();
+		
+		//query completa
+		sqlFinal.SELECT("*");
+		sqlFinal.FROM("("+sql.toString()+")");
+		if(tamMaximo != null) {
+			sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
+		}
+		return sqlFinal.toString();
 	}
 
 	public String getFacturasIncluidas(String idFichero, String idInstitucion, String idIdioma) {

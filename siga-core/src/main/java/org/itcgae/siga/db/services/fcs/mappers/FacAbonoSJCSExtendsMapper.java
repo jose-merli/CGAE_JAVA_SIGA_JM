@@ -43,7 +43,7 @@ public interface FacAbonoSJCSExtendsMapper extends FacAbonoMapper{
 		@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IRPF", property = "importeIRPF", jdbcType = JdbcType.VARCHAR),
 	})
-	List<FacAbonoItem> buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje);	
+	List<FacAbonoItem> buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje, Integer tamMaximo);	
 	
 	@SelectProvider(type = FacAbonoSqlExtendsProvider.class, method = "comboEstadosAbono")
 	@Results({ 
