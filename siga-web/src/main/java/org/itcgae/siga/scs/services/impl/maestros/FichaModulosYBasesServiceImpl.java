@@ -127,6 +127,9 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 	
 				List<ComboItem> comboItems = scsProcedimientosExtendsMapper.getProcedimientos(idInstitucion.toString(), idProcedimiento, usuario.getIdlenguaje());
 
+				// Eliminamos los valores nulos de la lista
+				while (comboItems.remove(null));
+				
 				LOGGER.info(
 						"getProcedimientos() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Salida a cenJurisdiccionesExtendsMapper para obtener los jurisdicciones");
 
