@@ -42,7 +42,6 @@ public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
 			sql.WHERE("poblacion.IDPROVINCIA ='" + idProvincia + "'");
 		}
 		sql.WHERE(filtroTextoBusquedas("poblacion.NOMBRE", filtro));
-		sql.WHERE("poblacion.idpoblacion = juzgado.idpoblacion");
 		
 		sql.ORDER_BY("PRIORIDAD, NOMBRE");
 
