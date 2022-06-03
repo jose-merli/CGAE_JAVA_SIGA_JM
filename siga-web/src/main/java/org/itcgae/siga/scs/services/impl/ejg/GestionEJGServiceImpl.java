@@ -4908,6 +4908,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         InputStream fileStream = null;
         HttpHeaders headers = new HttpHeaders();
 
+        LOGGER.warn("AGUERRA - COMIENZA EL SERVICIO");
+        LOGGER.warn("AGUERRA - PRIMER DOCUMENTO: " + listadocumentoEjgItem.get(0));
         try {
 
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -4928,16 +4930,26 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                             .substring(listadocumentoEjgItem.get(0).getNombreFichero().lastIndexOf("."),
                                     listadocumentoEjgItem.get(0).getNombreFichero().length())
                             .toLowerCase();
+
+                    LOGGER.warn("AGUERRA - EXTENSION: " + extension);
+
                     String path = getDirectorioFicheroEjg(idInstitucion);
+
+                    LOGGER.warn("AGUERRA - RUTA: " + path);
+
                     path += File.separator + idInstitucion + "_" + listadocumentoEjgItem.get(0).getIdFichero()
                             + extension;
+
+                    LOGGER.warn("AGUERRA - PATH DESPUES: " + path);
 
                     File file = new File(path);
                     fileStream = new FileInputStream(file);
 
                     String tipoMime = getMimeType(extension);
+                    LOGGER.warn("AGUERRA - TIPOMIME: " + tipoMime);
 
                     if(tipoMime == "") {
+                        LOGGER.warn("AGUERRA - ENTRA EN LA EXCEPCION DE LA EXTENSION NO SOPORTADA");
                     	throw new Exception("Error: el documento contiene una extensión no soportada");
                     }else {
 	                    headers.setContentType(MediaType.parseMediaType(tipoMime));
@@ -4961,6 +4973,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
             }
 
         } catch (Exception e) {
+            LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
             LOGGER.error(
                     "GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg",
                     e);
@@ -4972,6 +4985,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				ex.printStackTrace();
 			}
         }
+
+        LOGGER.warn("AGUERRA - SALE DEL SERVICIO");
 
         return res;
     }
