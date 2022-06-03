@@ -33,7 +33,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		String fechaPonenteHast;
 		String fechaResolucionDesd;
 		String fechaResolucionHast;
-		String numeroCAJG = ejgItem.getNumCAJG().trim();
 
 		SQL sql = new SQL();
 		SQL sqlUF = new SQL();
@@ -323,7 +322,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					+ "','DD/MM/RRRR')");
 		}
 		if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
-			sql.WHERE("EJG.NUMERO_CAJG = '"  + numeroCAJG + "'");
+			sql.WHERE("EJG.NUMERO_CAJG = '"  + ejgItem.getNumCAJG().trim() + "'");
 		if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
 				|| (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
 			sql.WHERE(condicionAnnioNumActas);
