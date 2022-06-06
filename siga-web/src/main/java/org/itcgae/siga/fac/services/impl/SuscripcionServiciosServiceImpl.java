@@ -1,6 +1,5 @@
 package org.itcgae.siga.fac.services.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,10 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FiltrosSuscripcionesItem;
-import org.itcgae.siga.DTO.fac.ListaCompraProductosDTO;
-import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
-import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
-import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesDTO;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesItem;
 import org.itcgae.siga.DTO.fac.RevisionAutLetradoItem;
@@ -43,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.itcgae.siga.fac.services.impl.EjecucionPlsServicios;
 
 @Service
@@ -222,6 +216,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 		}
 	}
 	
+	@Transactional(timeout=24000)
 	private void procesarSuscripcionesAut() {
 
 		PysServiciosinstitucionExample serviciosAutomaticosExample = new PysServiciosinstitucionExample();
@@ -261,7 +256,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 		LOGGER.info("SuscripcionServiciosServiceImpl --> procesarSuscripcionesAut --> Salida del bucle para comprobar las suscripciones de los servicios automaticos");
 	}
 	
-	
+	@Transactional(timeout=24000)
 	private void procesarRevisionAut() {
 		
 		AdmUsuarios usu = new AdmUsuarios();
@@ -303,6 +298,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 
 	@Scheduled(cron = "${cron.pattern.scheduled.procesoRevisionLetrado}")
 	@Override
+	@Transactional(timeout=24000)
 	public void actualizacionSuscripcionesPersona() {
 
 		

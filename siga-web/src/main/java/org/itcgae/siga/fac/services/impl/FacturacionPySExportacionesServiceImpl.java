@@ -248,7 +248,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 	}
 
 	@Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public InsertResponseDTO nuevoFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
             throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
@@ -385,7 +385,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public UpdateResponseDTO actualizarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
             throws Exception {
         UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -493,7 +493,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public DeleteResponseDTO eliminarFicheroAdeudos(FicherosAdeudosItem ficheroAdeudosItem, HttpServletRequest request)
             throws Exception {
         DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
@@ -918,7 +918,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         LOGGER.info("subirFicheroDisquete() -> Saliendo del servicio para subir el fichero de devoluciones");
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     private void procesarNuevoFicheroDevoluciones(String idDisqueteDevoluciones, String nombreFichero,
                                          String rutaOracle, Boolean conComision, AdmUsuarios usuario) throws Exception {
 
@@ -989,7 +989,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public DeleteResponseDTO eliminarFicheroDevoluciones(FicherosDevolucionesItem ficherosDevolucionesItem, HttpServletRequest request)
             throws Exception {
         DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
@@ -1226,7 +1226,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public InsertResponseDTO nuevoFicheroTransferencias(List<FacturaItem> abonoItems, HttpServletRequest request) throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         AdmUsuarios usuario = new AdmUsuarios();
@@ -1303,7 +1303,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public InsertResponseDTO nuevoFicheroTransferenciasSjcs(List<FacturaItem> abonoItems, HttpServletRequest request) throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         AdmUsuarios usuario = new AdmUsuarios();
@@ -1542,7 +1542,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public UpdateResponseDTO actualizarFicheroTranferencias(FacDisqueteabonos updateItem, HttpServletRequest request)
             throws Exception {
         UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -1592,7 +1592,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public DeleteResponseDTO eliminarFicheroTransferencias(FicherosAbonosItem ficherosAbonosItem, HttpServletRequest request)
             throws Exception {
         DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();

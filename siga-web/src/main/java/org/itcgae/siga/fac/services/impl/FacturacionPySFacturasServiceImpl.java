@@ -381,7 +381,7 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public InsertResponseDTO insertarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         Error error = new Error();

@@ -267,7 +267,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(timeout=24000)
 	public DeleteResponseDTO cargarFichero(MultipartHttpServletRequest request) throws Exception {
 		// TODO Auto-generated method stub
 		LOGGER.debug("cargarFichero() -> Entrada al servicio para subir un archivo");
@@ -630,7 +630,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 		return e;
 	}
 
-	@Transactional
+	@Transactional(timeout=24000)
 	private Long uploadFileLog(byte[] bytes, CenCargamasiva cenCargamasiva, boolean isLog) throws IOException {
 		// TODO Auto-generated method stub
 		Date dateLog = new Date();

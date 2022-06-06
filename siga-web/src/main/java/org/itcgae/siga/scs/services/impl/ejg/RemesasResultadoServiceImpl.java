@@ -295,6 +295,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
     
  
     @Override
+    @Transactional(timeout=24000)
 	public UpdateResponseDTO guardarRemesaResultado(RemesasResolucionItem remesasResolucionItem, MultipartHttpServletRequest request )  {
     	
     	UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();

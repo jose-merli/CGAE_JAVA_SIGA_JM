@@ -303,7 +303,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
 	@Override
-	@Transactional
+	@Transactional(timeout=24000)
 	public FacturacionDeleteDTO eliminarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -323,7 +323,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
+				//usuario.setIdinstitucion(idInstitucion);
 
 				if (checkDeleteFacturacion(facturacionItem, idInstitucion)) {
 
@@ -340,7 +340,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 						LOGGER.debug(
 								"ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
 						try {
-							response = limpiafacturacion(facturacion, true);
+							response = limpiafacturacion(facturacion, true, usuario);
 						} catch (Exception e) {
 							LOGGER.debug(
 									"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
@@ -947,7 +947,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 // GUARDAR DATOS DE LA FACTURACION
                 try {
 
-                    response = prepararFacturacion(idInstitucion, idFacturacion, usuario.getIdusuario());
+                    response = prepararFacturacion(idInstitucion, idFacturacion, usuario);
 
                 } catch (Exception e) {
                     LOGGER.error(
@@ -987,8 +987,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         return insertResponse;
     }
 
-    @Transactional
-    private int prepararFacturacion(Short idInstitucion, String idFacturacion, Integer idUsuario) throws Exception {
+    @Transactional(timeout=24000)
+    private int prepararFacturacion(Short idInstitucion, String idFacturacion, AdmUsuarios usuario) throws Exception {
     	FcsFacturacionjg facturacion;
     	int response = 0;
     	// BUSCAMOS LA FACTURACIÓN
@@ -1008,43 +1008,54 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         List<FcsFactEstadosfacturacion> estados = fcsFactEstadosfacturacionMapper.selectByExample(exampleEstado);
 
         LOGGER.debug("ejecutarFacturacion() -> Salida actualizar la prevision");
-
-        // SI ENCONTRAMOS LA FACTURACIÓN Y SE ESTÁ RECALCULANDO,
+        
+        // SI ENCONTRAMOS LA FACTURACIÓN Y SE ESTÁ RECALCULANDO Y NO TIENE Movimientos Varios,
         // ALMACENAMOS LOS CRITERIOS DE FACTURACIÓN
         // Y POSTERIORMENTE BORRAMOS LA FACTURACIÓN TANTO DE LA BBDD COMO DEL SERVIDOR
         if (facturacion != null && estados != null && estados.size()>0) {
 
         	LOGGER.debug("ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
-            response = limpiafacturacion(facturacion, false);
+            response = limpiafacturacion(facturacion, false, usuario);
             LOGGER.debug("ejecutarFacturacion() -> Salida limpieza de facturacion al recalcular facturacion");
 
         }
         // ACTUALIZAMOS EL ESTADO A PROGRAMADA
         LOGGER.debug("ejecutarFacturacion() -> Entrada guardar datos en fcsFactEstadosfacturacion");
         response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),
-                idInstitucion, Integer.valueOf(idFacturacion), idUsuario);
+                idInstitucion, Integer.valueOf(idFacturacion), usuario.getIdusuario());
         LOGGER.debug("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
-		return response;
+	
+        return response;
 	}
 
-    private int limpiafacturacion(FcsFacturacionjg facturacion,boolean borrarFacturacion) throws Exception {
+    private int limpiafacturacion(FcsFacturacionjg facturacion,boolean borrarFacturacion, AdmUsuarios usuario) throws Exception {
         int response = 0;
         String resPL = "";
 
-        LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
-        resPL = ejecutarBorrarFacturacion(facturacion,borrarFacturacion);
-
-        if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
-            File ficheroFisico = new File(facturacion.getNombrefisico());
-
-            if (ficheroFisico.exists()) {
-                ficheroFisico.delete();
-            }
-        }
-
-        LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
-		if("".equals(resPL)) {
-			response = -1;
+        FcsMovimientosvariosExample exampleMV =  new FcsMovimientosvariosExample();
+        exampleMV.createCriteria().andIdinstitucionEqualTo(facturacion.getIdinstitucion())
+        	.andIdfacturacionEqualTo(facturacion.getIdfacturacion());
+		List <FcsMovimientosvarios> mvList = fcsMovimientosvariosMapper.selectByExample(exampleMV );
+		if(mvList==null || mvList.size()==0) {
+	
+	        LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
+	        resPL = ejecutarBorrarFacturacion(facturacion,borrarFacturacion);
+	
+	        if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
+	            File ficheroFisico = new File(facturacion.getNombrefisico());
+	
+	            if (ficheroFisico.exists()) {
+	                ficheroFisico.delete();
+	            }
+	        }
+	
+	        LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
+			if("".equals(resPL)) {
+				response = -1;
+			}
+		}else {
+			String mensajeError = utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "factSJCS.facturacion.error.borrarFact.mov");
+			throw new Exception(mensajeError);
 		}
 		return response;
 	}
@@ -1132,7 +1143,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
     @Override
-    @Transactional
+    @Transactional(timeout=24000)
     public InsertResponseDTO simularFacturacion(String idFacturacion, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1628,6 +1639,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class,timeout=24000)
     private void procesarFacturacionSJCS() {
 
         LOGGER.debug("AGUERRAR - EMPIEZA EL PROCESO DE FACTURACION SJCS");
