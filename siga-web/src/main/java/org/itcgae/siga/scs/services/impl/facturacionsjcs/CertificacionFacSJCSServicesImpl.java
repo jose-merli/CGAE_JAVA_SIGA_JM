@@ -2175,7 +2175,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 			throws Exception {
 
 		LOGGER.info(
-				"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
+				"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros Generales");
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -2190,8 +2190,8 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuariosExtendsMapper.selectByExample() -> "
-							+ "Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuarisMapper.selectByExample() -> "
+							+ "Entrada a admUsuariosExtendsMapper para obtener información del usuario osExtendlogeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
 					"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() / admUsuariosExtendsMapper.selectByExample() -> "
@@ -2217,6 +2217,10 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 			}
 
 			if (null != usuarios && !usuarios.isEmpty()) {
+				
+				LOGGER.info(
+						"CertificacionFacSJCSServicesImpl.descargaGeneral() / Inicio descargaGeneral()");
+
 
 				List<FacturacionItem> facturacionItems = fcsCertificacionesExtendsMapper.getFactCertificaciones(
 						idCertificacion, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje());
@@ -2228,7 +2232,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
 				if (tipoCAJG == SigaConstants.TIPO_CAJG_CAM) {
 
-					if (listaIdFacturaciones.size() <= 1) {
+					if (listaIdFacturaciones.size() == 1 ) {
 						String idFacturacion = listaIdFacturaciones.get(0);
 
 						if (SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo().toString()
@@ -2454,7 +2458,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 		}
 
 		LOGGER.info(
-				"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Entrada al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
+				"CertificacionFacSJCSServicesImpl.descargarInformeIncidencias() -> Salida al servicio para descargar los ficheros de recepcion de incidencias por parte de la Xunta");
 
 		return res;
 	}
@@ -2502,8 +2506,8 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 
     
     public File getFileInformeIncidencias(Short idInstitucion, String idFacturacion) {
-        Path path = facturacionHelper.getRutaAlmacenFichero().resolve("informeIncidenciasWS").resolve(idInstitucion.toString()).resolve(idFacturacion);
-
+        //Path path = facturacionHelper.getRutaAlmacenFichero().resolve("informeIncidenciasWS").resolve(idInstitucion.toString()).resolve(idFacturacion);
+    	Path path = Paths.get(camHelper.getRutaFicheroIncidencias(idInstitucion, idFacturacion));
         File file = path.toFile();
         new File(file.getAbsolutePath()).mkdirs();
         file = new File(file, "InformeIncididencias.csv");

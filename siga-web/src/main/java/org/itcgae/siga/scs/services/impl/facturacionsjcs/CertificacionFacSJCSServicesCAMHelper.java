@@ -90,7 +90,6 @@ public class CertificacionFacSJCSServicesCAMHelper {
     private static final String XLSX_EXT = ".xlsx";
     private static final String UNDERSCORE = "_";
     private static final String CONTADOR_CAM = "INTERCAMBIOICM";
-    private static final String DIRECTORIO_INCIDENCIAS = "informeIncidenciasWS";
 
 	private static final int EXCEL_ROW_FLUSH = 1000;
     
@@ -195,10 +194,17 @@ public class CertificacionFacSJCSServicesCAMHelper {
         return Paths.get(rutaRaiz, String.valueOf(idInstitucion), idFacturacion);
     }
 
+    private Path getRutaDirectorioIncidencias() {
+    	  GenPropertiesKey key = new GenPropertiesKey();
+          key.setFichero(SigaConstants.FICHERO_SIGA);
+          key.setParametro(SigaConstants.parametroRutaDirectorioIncidenciasWS);
+          GenProperties rutaFicherosSalida = genPropertiesMapper.selectByPrimaryKey(key);
+          return Paths.get(rutaFicherosSalida.getValor());
+    }
 
     public String getRutaFicheroIncidencias(Short idInstitucion, String idFacturacion) {
-        String ruta = getRutaFicherosSiga() + SigaConstants.pathSeparator + DIRECTORIO_INCIDENCIAS + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + idFacturacion + SigaConstants.pathSeparator;
-       
+         String ruta = getRutaFicherosSiga().toString() + getRutaDirectorioIncidencias().toString() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + idFacturacion + SigaConstants.pathSeparator;
+        
         return ruta;
     }
 

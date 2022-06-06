@@ -13,6 +13,8 @@ public class SigaConstants {
 
     public static String parametroRutaAlmacenFicheros = "gen.ficheros.path";
     public static String parametroRutaCertificados = "informes.directorioCertificacionJava";
+    public static String parametroRutaDirectorioIncidenciasWS = "certificacion.directorioIncidenciasWS";
+    
     public enum ERROR_SERVER {
         XML_NO_VALIDO(null), CLI_NOAUTORIZADO("La IP recibida en la petición no está autorizada."),
         CLI_IP_NO_ENCONTRADA("La ip no se ha encontrado."), CLI_NOVALIDO("Esquema de petición datos no válido."),
