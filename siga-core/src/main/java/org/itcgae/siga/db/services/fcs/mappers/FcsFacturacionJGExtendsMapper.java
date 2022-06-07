@@ -211,7 +211,8 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR)})
+            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+    		@Result(column = "IMPORTEOFICIO", property = "importeOficio", jdbcType = JdbcType.VARCHAR)})
     List<DatosFacturacionAsuntoDTO> getFacturacionesPorActuacionDesigna(Short idInstitucion, ScsActuaciondesigna scsActuaciondesigna, String literal);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesPorEJG")
@@ -219,7 +220,8 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR)})
+            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEEJG", property = "importeEjg", jdbcType = JdbcType.VARCHAR)})
     List<DatosFacturacionAsuntoDTO> getFacturacionesPorEJG(Short idInstitucion, ScsEjg scsEjg, String literal);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesPorAsistencia")
@@ -227,7 +229,8 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR)})
+            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEGUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR)})
     List<DatosFacturacionAsuntoDTO> getFacturacionesPorAsistencia(Short idInstitucion, ScsAsistencia scsAsistencia, String literal);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesPorActuacionAsistencia")
@@ -235,7 +238,8 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR)})
+            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEGUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR)})
     List<DatosFacturacionAsuntoDTO> getFacturacionesPorActuacionAsistencia(Short idInstitucion, ScsActuacionasistencia scsActuacionasistencia, String literal);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesPorGuardia")
@@ -243,15 +247,44 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR)})
+            @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEGUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR)})
     List<DatosFacturacionAsuntoDTO> getFacturacionesPorGuardia(Short idInstitucion, ScsCabeceraguardias scsCabeceraguardias, String literal);
 
-    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorFacturacion")
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorFacturacionActuacionDesignas")
     @Results({@Result(column = "IDPAGOSJG", property = "idObjeto", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
-    List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorFacturacion(Short idInstitucion, String idFacturacion, String literal);
+    List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorFacturacionActuacionDesignas(Short idInstitucion, String idFacturacion, String literal);
+    
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorFacturacionAsistencia")
+    @Results({@Result(column = "IDPAGOSJG", property = "idObjeto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorFacturacionAsistencia(Short idInstitucion, String idFacturacion, String literal);
+    
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorFacturacionActuacionesAsistencia")
+    @Results({@Result(column = "IDPAGOSJG", property = "idObjeto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorFacturacionActuacionesAsistencia(Short idInstitucion, String idFacturacion, String literal);
+    
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorFacturacionEjgs")
+    @Results({@Result(column = "IDPAGOSJG", property = "idObjeto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorFacturacionEjgs(Short idInstitucion, String idFacturacion, String literal);
+    
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorFacturacionGuardiasColegiado")
+    @Results({@Result(column = "IDPAGOSJG", property = "idObjeto", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
+    List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorFacturacionGuardiasColegiado(Short idInstitucion, String idFacturacion, String literal);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getDatosPagoAsuntoPorMovimientoVario")
     @Results({@Result(column = "IDPAGOSJG", property = "idObjeto", jdbcType = JdbcType.VARCHAR),

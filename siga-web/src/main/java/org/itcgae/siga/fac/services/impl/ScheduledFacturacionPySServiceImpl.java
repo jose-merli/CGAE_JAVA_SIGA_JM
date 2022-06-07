@@ -15,7 +15,7 @@ public class ScheduledFacturacionPySServiceImpl implements IScheduledFacturacion
     @Autowired
     private IFacturacionProgramadaPySService facturacionPySService;
 
-    @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacionPyS}")
+    //@Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacionPyS}")
     @Override
     public void ejecutaProcesoFacturacionPyS() {
         LOGGER.info("ScheduledFacturacionPySServiceImpl --> ENTRA ejecutaProcesoFacturacionPyS()");
