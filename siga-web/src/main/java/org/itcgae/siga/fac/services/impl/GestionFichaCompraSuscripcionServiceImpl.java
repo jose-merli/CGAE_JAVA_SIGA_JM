@@ -291,7 +291,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=24000)
 	public InsertResponseDTO solicitarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha)
 			throws Exception {
 
@@ -417,7 +417,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=24000)
 	public InsertResponseDTO solicitarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha)
 			throws Exception {
 
@@ -533,7 +533,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=24000)
 	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -670,7 +670,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=24000)
 	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();

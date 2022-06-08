@@ -156,7 +156,7 @@ public class FacturaAccionesHelper {
     @Autowired
     private WSCommons commons;
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public BigDecimal compensarAbono(Long idAbono, String idFactura, BigDecimal importeFactura, AdmUsuarios usuario) {
         FacAbono abono = new FacAbono();
         FacPagoabonoefectivo pagoAbono = new FacPagoabonoefectivo();
@@ -288,7 +288,7 @@ public class FacturaAccionesHelper {
         return cantidadOriginal.subtract(cantidadPendiente);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public void pagarAbonoPorCaja(Long idAbono, String idFactura, BigDecimal importe, String observaciones, AdmUsuarios usuario) {
         int resultado;
 
@@ -432,7 +432,7 @@ public class FacturaAccionesHelper {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public int eliminarUltimoPagoPorCaja(Long idAbono, AdmUsuarios usuario) {
         int resultado;
         FacAbonoKey abonoKey = new FacAbonoKey();
@@ -498,7 +498,7 @@ public class FacturaAccionesHelper {
         return resultado;
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public int renegociarAbono(Long idAbono, Short idCuenta, AdmUsuarios usuario, String modo) {
         int resultado;
         FacAbonoKey abonoKey = new FacAbonoKey();
@@ -589,7 +589,7 @@ public class FacturaAccionesHelper {
         return resultado;
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public void renegociarFactura(String modo, String idFactura, Short idCuenta, Date fecha, String observaciones, AdmUsuarios usuario) throws Exception {
         FacFacturaKey facturaKey = new FacFacturaKey();
         facturaKey.setIdinstitucion(usuario.getIdinstitucion());
@@ -778,7 +778,7 @@ public class FacturaAccionesHelper {
         return cenCuentasbancariasExtendsMapper.selectByExample(cuentaExample);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public int pagarFacturaPorCaja(String idFactura, BigDecimal importe, String observaciones, Date fechaPago, AdmUsuarios usuario) {
         int resultado;
 
@@ -852,7 +852,7 @@ public class FacturaAccionesHelper {
         return resultado;
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public int eliminarUltimoCobroPorCaja(String idFactura, AdmUsuarios usuario) {
 
         FacFacturaKey facturaKey = new FacFacturaKey();
@@ -908,7 +908,7 @@ public class FacturaAccionesHelper {
         return 0;
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(timeout=24000,rollbackFor = Exception.class)
     public void anularFactura(String idFactura, Date fecha, String observaciones, AdmUsuarios usuario) {
         FacFacturaKey facturaKey = new FacFacturaKey();
         facturaKey.setIdinstitucion(usuario.getIdinstitucion());

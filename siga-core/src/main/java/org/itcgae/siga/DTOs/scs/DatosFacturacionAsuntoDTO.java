@@ -13,5 +13,8 @@ public class DatosFacturacionAsuntoDTO {
     private String tipo;
     private String importe;
     private String idPartidaPresupuestaria;
+    private String importeOficio;
+    private String importeGuardia;
+    private String importeEjg;
     private List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = new ArrayList<>();
 }

@@ -303,7 +303,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
 	@Override
-	@Transactional
+	@Transactional(timeout=24000)
 	public FacturacionDeleteDTO eliminarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -323,7 +323,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
+				//usuario.setIdinstitucion(idInstitucion);
 
 				if (checkDeleteFacturacion(facturacionItem, idInstitucion)) {
 
@@ -340,7 +340,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 						LOGGER.debug(
 								"ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
 						try {
-							response = limpiafacturacion(facturacion, true);
+							response = limpiafacturacion(facturacion, true, usuario);
 						} catch (Exception e) {
 							LOGGER.debug(
 									"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
@@ -947,7 +947,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 // GUARDAR DATOS DE LA FACTURACION
                 try {
 
-                    response = prepararFacturacion(idInstitucion, idFacturacion, usuario.getIdusuario());
+                    response = prepararFacturacion(idInstitucion, idFacturacion, usuario);
 
                 } catch (Exception e) {
                     LOGGER.error(
@@ -987,8 +987,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         return insertResponse;
     }
 
-    @Transactional
-    private int prepararFacturacion(Short idInstitucion, String idFacturacion, Integer idUsuario) throws Exception {
+    @Transactional(timeout=24000)
+    private int prepararFacturacion(Short idInstitucion, String idFacturacion, AdmUsuarios usuario) throws Exception {
     	FcsFacturacionjg facturacion;
     	int response = 0;
     	// BUSCAMOS LA FACTURACIÓN
@@ -1008,43 +1008,54 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         List<FcsFactEstadosfacturacion> estados = fcsFactEstadosfacturacionMapper.selectByExample(exampleEstado);
 
         LOGGER.debug("ejecutarFacturacion() -> Salida actualizar la prevision");
-
-        // SI ENCONTRAMOS LA FACTURACIÓN Y SE ESTÁ RECALCULANDO,
+        
+        // SI ENCONTRAMOS LA FACTURACIÓN Y SE ESTÁ RECALCULANDO Y NO TIENE Movimientos Varios,
         // ALMACENAMOS LOS CRITERIOS DE FACTURACIÓN
         // Y POSTERIORMENTE BORRAMOS LA FACTURACIÓN TANTO DE LA BBDD COMO DEL SERVIDOR
         if (facturacion != null && estados != null && estados.size()>0) {
 
         	LOGGER.debug("ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
-            response = limpiafacturacion(facturacion, false);
+            response = limpiafacturacion(facturacion, false, usuario);
             LOGGER.debug("ejecutarFacturacion() -> Salida limpieza de facturacion al recalcular facturacion");
 
         }
         // ACTUALIZAMOS EL ESTADO A PROGRAMADA
         LOGGER.debug("ejecutarFacturacion() -> Entrada guardar datos en fcsFactEstadosfacturacion");
         response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),
-                idInstitucion, Integer.valueOf(idFacturacion), idUsuario);
+                idInstitucion, Integer.valueOf(idFacturacion), usuario.getIdusuario());
         LOGGER.debug("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
-		return response;
+	
+        return response;
 	}
 
-    private int limpiafacturacion(FcsFacturacionjg facturacion,boolean borrarFacturacion) throws Exception {
+    private int limpiafacturacion(FcsFacturacionjg facturacion,boolean borrarFacturacion, AdmUsuarios usuario) throws Exception {
         int response = 0;
         String resPL = "";
 
-        LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
-        resPL = ejecutarBorrarFacturacion(facturacion,borrarFacturacion);
-
-        if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
-            File ficheroFisico = new File(facturacion.getNombrefisico());
-
-            if (ficheroFisico.exists()) {
-                ficheroFisico.delete();
-            }
-        }
-
-        LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
-		if("".equals(resPL)) {
-			response = -1;
+        FcsMovimientosvariosExample exampleMV =  new FcsMovimientosvariosExample();
+        exampleMV.createCriteria().andIdinstitucionEqualTo(facturacion.getIdinstitucion())
+        	.andIdfacturacionEqualTo(facturacion.getIdfacturacion());
+		List <FcsMovimientosvarios> mvList = fcsMovimientosvariosMapper.selectByExample(exampleMV );
+		if(mvList==null || mvList.size()==0) {
+	
+	        LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
+	        resPL = ejecutarBorrarFacturacion(facturacion,borrarFacturacion);
+	
+	        if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
+	            File ficheroFisico = new File(facturacion.getNombrefisico());
+	
+	            if (ficheroFisico.exists()) {
+	                ficheroFisico.delete();
+	            }
+	        }
+	
+	        LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
+			if("".equals(resPL)) {
+				response = -1;
+			}
+		}else {
+			String mensajeError = utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "factSJCS.facturacion.error.borrarFact.mov");
+			throw new Exception(mensajeError);
 		}
 		return response;
 	}
@@ -1132,7 +1143,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
     @Override
-    @Transactional
+    @Transactional(timeout=24000)
     public InsertResponseDTO simularFacturacion(String idFacturacion, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1628,6 +1639,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class,timeout=24000)
     private void procesarFacturacionSJCS() {
 
         LOGGER.debug("AGUERRAR - EMPIEZA EL PROCESO DE FACTURACION SJCS");
@@ -2220,9 +2232,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionDesigna() -> SALE: Obtenemos las facturaciones asociadas a la actuación");
 
                             for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
-                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
-                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto(), literalPago);
-                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación Actuación Designas");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacionActuacionDesignas(idInstitucion, fac.getIdObjeto(), literalPago);
+                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionDesigna() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación Actuación Designas");
                                 fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
                             }
 
@@ -2336,7 +2348,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
                             for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
                                 LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
-                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto(), literalPago);
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacionAsistencia(idInstitucion, fac.getIdObjeto(), literalPago);
                                 LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
                                 fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
                             }
@@ -2451,9 +2463,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorActuacionAsistencia() -> SALE: Obtenemos las facturaciones asociadas a la actuación asistencia");
 
                             for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
-                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
-                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto(), literalPago);
-                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación de actuación asistencia");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacionActuacionesAsistencia(idInstitucion, fac.getIdObjeto(), literalPago);
+                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorAsuntoActuacionAsistencia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación de actuación asistencia");
                                 fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
                             }
 
@@ -2568,9 +2580,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorGuardia() -> SALE: Obtenemos las facturaciones asociadas a la guardia");
 
                             for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
-                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
-                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto(), literalPago);
-                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación de Guardias Colegiados");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacionGuardiasColegiado(idInstitucion, fac.getIdObjeto(), literalPago);
+                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorGuardia() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación de Guardias Colegiados");
                                 fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
                             }
 
@@ -2685,9 +2697,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG() -> SALE: Obtenemos las facturaciones asociadas a la guardia");
 
                             for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
-                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación");
-                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion(idInstitucion, fac.getIdObjeto(), literalPago);
-                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación");
+                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación de EJGS");
+                                List<DatosPagoAsuntoDTO> datosPagoAsuntoDTOList = fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacionEjgs(idInstitucion, fac.getIdObjeto(), literalPago);
+                                LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> SALE: Obtenemos los pagos asociados a la facturación de EJGS");
                                 fac.setDatosPagoAsuntoDTOList(datosPagoAsuntoDTOList);
                             }
 

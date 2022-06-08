@@ -204,7 +204,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql;
 	}
 
-	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {
+	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo) throws Exception {
 		String sql = "";
 
 		Hashtable codigosBind = new Hashtable();
@@ -683,15 +683,18 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			}
 			// jbd // inc7744 // Cambiamos el order by porque parece que afecta a la query
 			// cuando se busca por colegiado
-			// sql+=" order by des.idturno, des.anio desc, des.numero desc";
+			//sql += " order by des.anio desc, des.NUMERO desc";
+			
 			sql += "  order by des.idturno, des.anio desc, des.codigo desc ";
+			
 			// No utilizamos la clase Paginador para la busqueda de letrados porque al
 			// filtrar por residencia la sql no devolvia bien los
 			// datos que eran de tipo varchar (devolvía n veces el mismo resultado),
 			// utilizamos el paginador PaginadorCaseSensitive
 			// y hacemos a parte el tratamiento de mayusculas y signos de acentuación
 			
-			sql = " SELECT * FROM (" + sql + ") consulta WHERE rownum <= 200 ";
+			
+			sql = " SELECT * FROM (" + sql + ") consulta WHERE rownum <= " + tamMaximo;
 		} catch (Exception e) {
 			throw e;
 		}

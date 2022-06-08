@@ -81,7 +81,7 @@ public class ScheduledPagoSJCSServiceImpl implements IScheduledPagoSJCSService {
         LOGGER.info("SALE -> ScheduledPagoSJCSServiceImpl.pagosSJCSBloqueados()");
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, timeout=24000)
     private void pagoSJCSBloqueadoEjecutando(FcsPagosjg pago) throws Exception {
         LOGGER.info("ENTRA -> ScheduledPagoSJCSServiceImpl.pagoSJCSBloqueadoEjecutando()");
 
@@ -93,7 +93,7 @@ public class ScheduledPagoSJCSServiceImpl implements IScheduledPagoSJCSService {
         LOGGER.info("SALE -> ScheduledPagoSJCSServiceImpl.pagoSJCSBloqueadoEjecutando()");
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, timeout=24000)
     private void pagoSJCSBloqueadoCerrando(FcsPagosjg pago) throws Exception {
         LOGGER.info("ENTRA -> ScheduledPagoSJCSServiceImpl.pagoSJCSBloqueadoCerrando()");
 

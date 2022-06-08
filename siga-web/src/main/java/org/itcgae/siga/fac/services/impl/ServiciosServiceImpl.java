@@ -194,7 +194,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 
 	//Servicio que da de baja logica o lo reactiva (le establece fechabaja en la columna BD a null en caso de reactivar o la actual en caso de baja) al servicio en caso de que tenga usos existentes o lo borra fisicamente (elimina el registro de la bd) en caso de que no tenga ninguna.
 	@Override
-	@Transactional(rollbackFor = Exception.class)
+	@Transactional(timeout=24000,rollbackFor = Exception.class)
 	public DeleteResponseDTO reactivarBorradoFisicoLogicoServicios(ListaServiciosDTO listadoServicios, HttpServletRequest request) throws Exception {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
@@ -359,7 +359,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = Exception.class)
+	@Transactional(timeout=24000,rollbackFor = Exception.class)
 	public InsertResponseDTO nuevoServicio(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -519,7 +519,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 	
 	@Override
-	@Transactional(rollbackFor = Exception.class)
+	@Transactional(timeout=24000,rollbackFor = Exception.class)
 	public DeleteResponseDTO editarServicio(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
@@ -980,6 +980,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 
 	@Override
+	@Transactional(timeout=24000)
 	public DeleteResponseDTO borrarSuscripcionesBajas(BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();

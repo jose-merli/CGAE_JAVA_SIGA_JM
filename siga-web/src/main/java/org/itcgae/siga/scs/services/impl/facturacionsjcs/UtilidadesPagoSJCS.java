@@ -228,7 +228,7 @@ public class UtilidadesPagoSJCS {
 
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class,timeout=24000)
     public void ejecutarPagoSJCS(FcsPagosjg pago, boolean simular, Short idInstitucion, AdmUsuarios usuario) throws Exception {
 
         ejecucionPlsPago.ejecutarPL_PagoTurnosOficio(Integer.valueOf(idInstitucion.toString()), pago.getIdpagosjg(), usuario);
@@ -250,7 +250,7 @@ public class UtilidadesPagoSJCS {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class,timeout = 900)
+    //@Transactional(rollbackFor = Exception.class,timeout = 24000)
     private void obtencionImportes(Short idInstitucion, String idPago, AdmUsuarios usuario) throws Exception {
 
         // variables para hacer el calculo del importe final a pagar
@@ -963,7 +963,7 @@ public class UtilidadesPagoSJCS {
         return bCalculo.doubleValue();
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, timeout=24000)
     public void deshacerCierre(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) throws Exception {
 
         LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> Entrada al servicio para deshacer el cierre del pago");
@@ -1141,6 +1141,7 @@ public class UtilidadesPagoSJCS {
     }
 
     @Async
+    @Transactional(rollbackFor = Exception.class,timeout=24000)
     public void asyncCerrarPagoSJCS(FcsPagosjg pago, AdmUsuarios usuario) throws Exception {
 
         try {
@@ -1188,6 +1189,7 @@ public class UtilidadesPagoSJCS {
     }
 
     @Async
+    @Transactional(rollbackFor = Exception.class,timeout=24000)
     public void asyncCerrarPagoManual(FcsPagosjg pago, List<String> idsParaEnviar, AdmUsuarios usuario) throws Exception {
         try {
             // Insertamos el estado del pago:
@@ -1308,7 +1310,7 @@ public class UtilidadesPagoSJCS {
      * @param irpfTotal
      * @param idPersonaSJCS
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, timeout=24000)
     private void crearAbonos(String idPersona, String idCuenta, List<ColegiadosPagoDTO> colegiadosMarcados, String idPersonaSoc, String idPago, String idInstitucion, Hashtable importes, double irpfTotal, String idPersonaSJCS, AdmUsuarios usuario) throws FacturacionSJCSException {
 
         String importeTurnos = "", importeGuardias = "", importeSoj = "", importeEjg = "", importeMovimientos = "", importeRetenciones = "", importeRetencionesPersona = "";

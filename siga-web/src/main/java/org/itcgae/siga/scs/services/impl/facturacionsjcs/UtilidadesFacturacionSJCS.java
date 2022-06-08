@@ -335,7 +335,7 @@ public class UtilidadesFacturacionSJCS {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class, timeout=24000)
     public void ejecutarFacturacionJG(FcsFacturacionjg itemFac, CenInstitucion institucion) throws Exception {
         boolean prevision = false;
     	LogErroresFacturacionSJCS logErroresFac = logErroresFacHelper.getLogErroresFacturacion(itemFac.getIdinstitucion(),itemFac.getIdfacturacion().toString());
@@ -547,7 +547,7 @@ public class UtilidadesFacturacionSJCS {
         LOGGER.debug("ejecutarFacturacionJG() - FIN");
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class, timeout=24000)
     public FcsFacturacionjg ejecutarRegularizacionJG(FcsFacturacionjg item, CenInstitucion institucion) throws Exception {
     	LogErroresFacturacionSJCS logErroresFac = logErroresFacHelper.getLogErroresFacturacion(item.getIdinstitucion(),item.getIdfacturacion().toString());
         // proceso de facturacion

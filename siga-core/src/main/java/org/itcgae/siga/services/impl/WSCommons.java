@@ -1109,6 +1109,7 @@ public class WSCommons {
 	 * @param response
 	 * @return
 	 */
+	@Transactional(timeout=24000)
 	public String fusionarPersonas(GetFusionadorPersonasRequestDocument peticionEntrada) {
 
 		// TODO

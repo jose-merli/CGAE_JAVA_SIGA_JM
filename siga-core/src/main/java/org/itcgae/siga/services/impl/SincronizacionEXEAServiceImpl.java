@@ -245,7 +245,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
      * @param ipCliente
      * @return
      */
-    @Transactional(rollbackFor = SigaExceptions.class)
+    @Transactional(timeout=24000,rollbackFor = SigaExceptions.class)
     @Override
     public AltaColegiadoResponseDocument aprobarAltaColegiado(AltaColegiadoRequestDocument requestDocument, String ipCliente) throws SigaExceptions {
 
@@ -1606,7 +1606,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
      * @param idInstitucion
      * @return
      */
-    @Transactional
+    @Transactional(timeout=24000)
     private Short insertarDatosBancarios(BancoType datosBancarios, Long idPersona, Short idInstitucion, DatosPersonalesType datosPersonalesType) throws Exception {
 
         LOGGER.info("SincronizacionEXEAServiceImpl.insertarDatosBancarios() - INICIO");
