@@ -6,6 +6,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
 
 public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
+	
 
 	public String comboTurnos(Short idInstitucion) {
 
@@ -777,14 +778,23 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 
 	}
 
-	public String comboTurnosBusqueda(Short idInstitucion, String pantalla) {
+	public String comboTurnosBusqueda(Short idInstitucion, String pantalla, String idTurno) {
 
 		SQL sql = new SQL();
-
+		SQL sqlSeleccionado = new SQL();
+		String sqlFinal = "";
+		
+		if(idTurno != null && !idTurno.isEmpty()) {
+			sqlSeleccionado.SELECT("IDTURNO, NOMBRE");
+			sqlSeleccionado.FROM("SCS_TURNO");
+			sqlSeleccionado.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+			sqlSeleccionado.WHERE("IDTURNO = "+ idTurno);
+		}
+		
 		sql.SELECT("IDTURNO, NOMBRE");
 		sql.FROM("SCS_TURNO");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("FECHABAJA IS NULL");
+		
 
 		if (SigaConstants.EJG.equalsIgnoreCase(pantalla)) {
 			sql.WHERE("IDTIPOTURNO <> 2 AND IDTIPOTURNO IS NOT NULL");
@@ -795,8 +805,15 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		}
 
 		sql.ORDER_BY("NOMBRE");
+		
+		if(idTurno != null && !idTurno.isEmpty()) {
+			sqlFinal = sqlSeleccionado.toString() + " UNION " + sql.toString();
+		}else {
+			sqlFinal = sql.toString();
+		}
+		
 
-		return sql.toString();
+		return sqlFinal;
 	}
 	
 	public String comboEstados(Short idInstitucion) {

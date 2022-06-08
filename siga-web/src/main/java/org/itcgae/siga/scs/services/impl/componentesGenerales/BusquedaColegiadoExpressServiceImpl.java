@@ -209,14 +209,13 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 	}
 
 	@Override
-	public ComboDTO comboTurnos(String pantalla, HttpServletRequest request) {
+	public ComboDTO comboTurnos(String pantalla, String idTurno, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = null;
-
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -231,7 +230,7 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 				LOGGER.info("busquedaColegiadosExpress.comboTurnos() -> Entrada al servicio para obtener los turnos. Viene desde "+ pantalla);
 
 				if (pantalla != null && !pantalla.isEmpty()) {
-					comboItems = scsTurnosextendsMapper.comboTurnosBusqueda(idInstitucion, pantalla);
+					comboItems = scsTurnosextendsMapper.comboTurnosBusqueda(idInstitucion, pantalla, idTurno);
 				}
 
 				LOGGER.info("busquedaColegiadosExpress.comboTurnos()-> Salida del servicio para obtener los datos del combo");
