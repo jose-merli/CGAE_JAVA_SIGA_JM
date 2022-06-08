@@ -63,6 +63,23 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					+ "'";
 		condicionNumRegRemesa = condicionNumRegRemesa + "))";
 
+		SQL letrado = new SQL();
+        letrado.SELECT("cen_persona.apellidos2 || ' ' || cen_persona.apellidos1 || ',' || cen_persona.nombre");
+        letrado.FROM("scs_ejgdesigna ejgdesigna");
+        letrado.JOIN("scs_designasletrado des ON des.idinstitucion = ejgdesigna.idinstitucion and des.idturno = ejgdesigna.idturno and des.anio = ejgdesigna.aniodesigna AND des.numero = ejgdesigna.numerodesigna");
+        letrado.JOIN("cen_persona ON cen_persona.idpersona = des.idpersona");
+        letrado.WHERE("ejgdesigna.idinstitucion = ejg.idinstitucion");
+        letrado.WHERE("ejgdesigna.ANIOEJG = ejg.anio");
+        letrado.WHERE("ejgdesigna.NUMEROEJG = ejg.numero");
+        letrado.WHERE("ejgdesigna.IDTIPOEJG = ejg.IDTIPOEJG");
+        letrado.WHERE("FECHADESIGNA = (SELECT MAX(FECHADESIGNA) "
+                    + " FROM scs_designasletrado des2 "
+                    + " WHERE des.idinstitucion = des2.idinstitucion "
+                    + " AND des.anio = des2.anio "
+                    + " AND des.numero = des2.numero "
+                    + " AND des.idturno = des2.idturno) ");
+        letrado.ORDER_BY("ejgdesigna.aniodesigna DESC, ejgdesigna.numerodesigna DESC");
+        
 		// select
 		sql.SELECT("DISTINCT ejg.anio");
 		sql.SELECT("ejg.idinstitucion");
@@ -76,8 +93,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("ejg.fechaapertura");
 		sql.SELECT("ejg.fechamodificacion");
-		sql.SELECT(
-				"(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as NOMBREletrado");
+		//sql.SELECT(
+		//		"(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as NOMBREletrado");
+		sql.SELECT("(SELECT * FROM (" + letrado.toString() + ") WHERE ROWNUM =1) as nombreletrado");
 		if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "" && !ejgItem.isUltimoEstado()) {
 			SQL sqlEstado = new SQL();
 			SQL sqlEstado2 = new SQL();
@@ -1875,7 +1893,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlPrincipal.SELECT("*");
 		sqlPrincipal.FROM("(" + sqlAsistencia.toString() + " UNION " + sqlSOJ.toString() + " UNION "
 				+ sqlDesigna.toString() + " UNION " + sqlExpediente.toString() + ")");
-		sqlPrincipal.WHERE("ROWNUM <= 200");
 		sqlPrincipal.ORDER_BY("sjcs");
 		sqlPrincipal.ORDER_BY("idinstitucion");
 		sqlPrincipal.ORDER_BY("anio DESC");
