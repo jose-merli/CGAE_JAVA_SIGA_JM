@@ -13,7 +13,7 @@ import org.itcgae.siga.db.mappers.ScsAsistenciaSqlProvider;
 
 public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 
-	public String searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax, String idLenguaje) {
+	public String searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo, String idLenguaje) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String fecha;
 
@@ -93,7 +93,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 			sql.WHERE("a.idpersonacolegiado = " + asuntosJusticiableItem.getIdPersonaColegiado());
 		}
 
-		sql.WHERE("ROWNUM <= " + tamMax);
+		sql.WHERE("ROWNUM <= " + tamMaximo);
 
 		sql.ORDER_BY("a.anio desc, a.numero DESC");
 

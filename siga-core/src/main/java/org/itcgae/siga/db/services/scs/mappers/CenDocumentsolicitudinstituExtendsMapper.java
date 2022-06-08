@@ -25,5 +25,5 @@ public interface CenDocumentsolicitudinstituExtendsMapper extends CenDocumentsol
             @Result(column = "IDTIPOCOLEGIACION", property = "tipoColegiacion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "CODIGOEXT", property = "codDocEXEA", jdbcType = JdbcType.VARCHAR)
     })
-    List<DocumentacionIncorporacionItem> getDocRequerida(Short idInstitucion, String tipoColegiacion, String tipoSolicitud, String modalidad, String idLenguaje, String idSolicitud, String codDocAnexo);
+    List<DocumentacionIncorporacionItem> getDocRequerida(Short idInstitucion, String tipoColegiacion, String tipoSolicitud, String modalidadDocumentacion, String idLenguaje, String idSolicitud, String codDocAnexo);
 }

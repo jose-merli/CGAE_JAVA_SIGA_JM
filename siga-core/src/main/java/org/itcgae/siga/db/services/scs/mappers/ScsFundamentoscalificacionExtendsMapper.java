@@ -46,6 +46,6 @@ public interface ScsFundamentoscalificacionExtendsMapper extends ScsTipofundamen
 		@Result(column = "IDFUNDAMENTOCALIF", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> comboFundamentoCalificacion(String idlenguaje, String idInstitucion, String[] list_dictamen);
+	List<ComboItem> comboFundamentoCalificacion(String idLenguaje, String idInstitucion, String[] list_dictamen);
 		
 }

@@ -17,7 +17,7 @@ public interface ScsRenunciaExtendsMapper extends ScsRenunciaMapper{
 		@Result(column = "IDRENUNCIA", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> comboRenuncia(String idlenguaje, String string);
+	List<ComboItem> comboRenuncia(String idLenguaje, String idInstitucion);
 
 
 }

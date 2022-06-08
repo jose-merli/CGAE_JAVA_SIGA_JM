@@ -73,7 +73,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "NLETRADOS", property = "nletrados", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombrepartidosjudiciales", property = "nombrepartidosjudiciales", jdbcType = JdbcType.VARCHAR),})
-	List<TurnosItem> busquedaTurnos(TurnosItem turnosItem, Short idInstitucion);
+	List<TurnosItem> busquedaTurnos(TurnosItem turnosItem, Short idInstitucion, String idLenguaje);
 
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "getObligatoriedadByTurno")
 	int getObligatoriedadByTurno(Short idInstitucion, String idTurno);
@@ -109,7 +109,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "VISIBLEMOVIL", property = "visiblemovil", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
-	List<TurnosItem> busquedaFichaTurnos(TurnosItem turnosItem, Short idInstitucion);
+	List<TurnosItem> busquedaFichaTurnos(TurnosItem turnosItem, Short idInstitucion, String idLenguaje);
 
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "getIdTurno")
 	@Results({ @Result(column = "IDTURNO", property = "newId", jdbcType = JdbcType.VARCHAR) })

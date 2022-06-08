@@ -875,7 +875,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				TurnosItem turnosItem = new TurnosItem();
 				String turnoDesc = datos.get(7).substring(0, datos.get(7).length() - 1);
 				turnosItem.setAbreviatura(turnoDesc);
-				List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+				List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 
 				designaKey.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
 
@@ -1899,7 +1899,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		} else {
 			TurnosItem turnosItem = new TurnosItem();
 			turnosItem.setAbreviatura(item.get(3));
-			List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+			List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuario.getIdlenguaje());
 			designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
 		}
 
@@ -2357,7 +2357,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				TurnosItem turnosItem = new TurnosItem();
 				String turnoDesc = datos.get(6).substring(0, datos.get(6).length() - 1);
 				turnosItem.setAbreviatura(turnoDesc);
-				List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+				List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 
 				designaKey.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
 

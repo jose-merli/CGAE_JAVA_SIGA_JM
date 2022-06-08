@@ -27,5 +27,5 @@ public interface ScsExpedienteEconomicoExtendsMapper extends ScsEejgPeticionesMa
 		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "csv", property = "csv", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ExpedienteEconomicoItem> getExpedientesEconomicos(EjgItem ejgItem, String idInstitucion, Integer tamMax, String idLenguaje);
+	List<ExpedienteEconomicoItem> getExpedientesEconomicos(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
 }

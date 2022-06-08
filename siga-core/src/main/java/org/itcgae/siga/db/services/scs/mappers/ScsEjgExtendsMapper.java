@@ -86,7 +86,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
 
 	})
-	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string, Integer tamMaximo, String idLenguaje);
+	List<EjgItem> busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "datosEJG")
 	@Results({
@@ -153,7 +153,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "observacionesDictamen", property = "dictamen", jdbcType = JdbcType.CLOB),
 			@Result(column = "identificadords", property = "identificadords", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR)})
-	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
+	List<EjgItem> datosEJG(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getDictamen")
 	@Results({ @Result(column = "fechadictamen", property = "fechaDictamen", jdbcType = JdbcType.DATE),

@@ -6662,7 +6662,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					} else {
 						TurnosItem turnosItem = new TurnosItem();
 						turnosItem.setAbreviatura(item.get(3));
-						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 						designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
 					}
 

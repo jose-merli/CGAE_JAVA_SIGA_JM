@@ -954,7 +954,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					TurnosItem turnosItem = new TurnosItem();
 					turnosItem.setAbreviatura(cargaMasivaDatosITItem.getNombreTurno());
 					turnosItem.setNombre(cargaMasivaDatosITItem.getNombreTurno());
-					List<TurnosItem> listaTur = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+					List<TurnosItem> listaTur = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuario.getIdlenguaje());
 		
 					cargaMasivaDatosITItem.setIdTurno(listaTur.get(0).getIdturno().toString());
 				}

@@ -49,7 +49,7 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 			@Result(column = "idcalendarioguardias", property = "idCalendarioGuardias", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "facturado", property = "facturado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idfacturacion", property = "idFacturacion", jdbcType = JdbcType.INTEGER),})
-	List<org.itcgae.siga.DTOs.scs.GuardiasItem> busquedaGuardiasColegiado(GuardiasItem guardiaItem, String idInstitucion, Integer tamMaximo);
+	List<org.itcgae.siga.DTOs.scs.GuardiasItem> busquedaGuardiasColegiado(GuardiasItem guardiaItem, String idInstitucion, Integer tamMax);
 	
 	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "validarSolicitudGuardia")
 	int validarSolicitudGuardia(ScsCabeceraguardias record);

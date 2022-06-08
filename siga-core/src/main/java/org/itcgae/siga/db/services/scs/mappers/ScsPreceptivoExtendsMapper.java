@@ -19,6 +19,6 @@ public interface ScsPreceptivoExtendsMapper extends ScsPreceptivoMapper {
 		@Result(column = "IDPRECEPTIVO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})	
-	List<ComboItem> comboPreceptivo(String idlenguaje, String idInstitucion);
+	List<ComboItem> comboPreceptivo(String idLenguaje, String idInstitucion);
 
 }

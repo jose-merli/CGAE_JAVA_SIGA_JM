@@ -173,7 +173,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				ti.setHistorico(true);// mando el historico ya que la consulta obtiene siempre falso y no devuelve los
 										// datos
 
-				List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(ti, idInstitucion);
+				List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(ti, idInstitucion, usuarios.get(0).getIdlenguaje());
 
 				turnoDTO.setTurnosItems(turnos);
 

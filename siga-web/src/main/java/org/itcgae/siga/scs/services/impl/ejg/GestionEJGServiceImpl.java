@@ -5126,7 +5126,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     String turnoDesc = datos.get(7).substring(0, datos.get(7).length() - 1);
                     turnosItem.setAbreviatura(turnoDesc);
                     turnosItem.setHistorico(true);
-                    List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+                    List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuarios.get(0).getIdlenguaje());
                     record.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
 
                     response = scsEjgdesignaMapper.insert(record);

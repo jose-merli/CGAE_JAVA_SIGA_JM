@@ -115,7 +115,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 
-				turnosItems = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+				turnosItems = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
@@ -163,7 +163,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 
-				turnosItems = scsTurnosExtendsMapper.busquedaFichaTurnos(turnosItem, idInstitucion);
+				turnosItems = scsTurnosExtendsMapper.busquedaFichaTurnos(turnosItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 				
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");

@@ -22,7 +22,7 @@ public interface ScsImpugnacionExtendsMapper extends ScsTiporesolautoMapper {
 		@Result(column = "IDIMPUGNACION", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> comboImpugnacion(String idlenguaje, String idInstitucion);
+	List<ComboItem> comboImpugnacion(String idLenguaje, String idInstitucion);
 	}
 
 

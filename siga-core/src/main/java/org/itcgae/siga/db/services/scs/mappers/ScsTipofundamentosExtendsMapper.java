@@ -51,6 +51,6 @@ public interface ScsTipofundamentosExtendsMapper extends ScsTipofundamentosMappe
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 
 	})
-	List<ComboItem> comboFundamentoJurid(String idlenguaje, String string, String resolucion);
+	List<ComboItem> comboFundamentoJurid(String idLenguaje, String idInstitucion, String resolucion);
 	
 }

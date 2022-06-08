@@ -87,7 +87,7 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 			@Result(column = "ejgidtipoejg", property = "idTipoEjg", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<TarjetaAsistenciaItem2> searchAsistenciasExpress(FiltroAsistenciaItem filtro, Short idInstitucion);
+	List<TarjetaAsistenciaItem2> searchAsistenciasExpress(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion);
 	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "getDelitosFromAsistencia")
 	@Results({
 		@Result(column = "iddelito", property = "idDelito", jdbcType = JdbcType.VARCHAR)
@@ -116,7 +116,7 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 			@Result(column = "REQUERIDAVALIDACION", property = "guardiaRequeridaValidacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "JUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR)
 	})
-	List<TarjetaAsistenciaResponseItem> searchAsistencias(FiltroAsistenciaItem filtro, Short idInstitucion, Integer idLenguaje, Integer tamMax);
+	List<TarjetaAsistenciaResponseItem> searchAsistencias(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion, Integer idLenguaje, Integer tamMax);
 
 	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "getNextNumeroAsistencia")
 	@Results({
