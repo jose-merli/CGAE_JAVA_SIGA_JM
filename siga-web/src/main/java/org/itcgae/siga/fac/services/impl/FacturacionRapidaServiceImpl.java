@@ -380,8 +380,14 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                     FacSeriefacturacionKey facSeriefacturacionKey = new FacSeriefacturacionKey();
                     facSeriefacturacionKey.setIdinstitucion(Short.valueOf(idInstitucion));
                     facSeriefacturacionKey.setIdseriefacturacion(Long.valueOf(idSerieSeleccionada));
-
-                    beanSerieCandidata = facSeriefacturacionExtendsMapper.selectByPrimaryKey(facSeriefacturacionKey);
+                    try {
+                    	 beanSerieCandidata = facSeriefacturacionExtendsMapper.selectByPrimaryKey(facSeriefacturacionKey);
+                    	 if(beanSerieCandidata == null) LOGGER.debug("No existe serie facturacion adecuada.");
+					} catch (Exception e) {
+						LOGGER.error(e);
+						throw new Exception("No se ha encontrado una serie de facturacion adecuada");
+					}
+                   
                 }
 
                 // Obtengo la peticion de compra
@@ -528,6 +534,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             }
 
         } catch (Exception e) {
+        	LOGGER.info("facturacionRapidaProductosCertificados() ", e);
             rollBack(tx);
             throw e;
         }
@@ -897,6 +904,8 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             param_in[3] = usuario.getIdlenguaje(); // Idioma
             param_in[4] = beanPeticionCompraSuscripcion.getIdpeticion().toString();
             param_in[5] = usuario.getIdusuario().toString();
+            
+            LOGGER.info("procesarFacturacionRapidaCompras() - PKG_SIGA_FACTURACION.GENERACIONFACTURACION INICIO");
 
             // Genera la facturacion
             resultado = wsCommons.callPLProcedureFacturacionPyS("{call PKG_SIGA_FACTURACION.GENERACIONFACTURACION(?,?,?,?,?,?,?,?)}", 2, param_in);
@@ -905,21 +914,27 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             String[] codigosErrorFormato = {"-201", "-202", "-203", "-204"};
             String codretorno = resultado[0];
             if (Arrays.asList(codigosErrorFormato).contains(codretorno)) {
+            	LOGGER.error("procesarFacturacionRapidaCompras() - PKG_SIGA_FACTURACION.GENERACIONFACTURACION CODIGOS DE FORMATO ERROR INVALIDO");
                 throw new Exception(resultado[1]);
 
             } else if (!codretorno.equals("0")) {
+            	LOGGER.error("procesarFacturacionRapidaCompras() - PKG_SIGA_FACTURACION.GENERACIONFACTURACION ERROR AL GENERAR FACTURACION RAPIDA");
                 throw new Exception("Error al generar la Facturacion rapida: " + resultado[1]);
             }
 
             // Desbloquea la facturacion programada
             if (facFacturacionprogramadaExtendsMapper.updateByPrimaryKeySelective(beanFacturacionProgramada) == 0) {
+            	LOGGER.error("procesarFacturacionRapidaCompras() - PKG_SIGA_FACTURACION.GENERACIONFACTURACION AL DESBLOQUEAR FACTURACION PROGRAMADA");
                 throw new Exception("Error al actualizar la programacion");
             }
 
         } catch (Exception e) {
+        	LOGGER.error("procesarFacturacionRapidaCompras() - PKG_SIGA_FACTURACION.GENERACIONFACTURACION",e);
             throw new Exception("Error al realizar generacion de facturacion rapida.", e);
         }
 
+        LOGGER.info("procesarFacturacionRapidaCompras() - PKG_SIGA_FACTURACION.GENERACIONFACTURACION FIN");
+        
         return beanFacturacionProgramada;
     }
 
