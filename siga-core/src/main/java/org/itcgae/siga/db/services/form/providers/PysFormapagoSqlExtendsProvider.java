@@ -22,12 +22,10 @@ public class PysFormapagoSqlExtendsProvider extends PysFormapagoSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT_DISTINCT("formaPago.IDFORMAPAGO");
-		sql.SELECT("cat.DESCRIPCION");
-		sql.FROM("PYS_FORMAPAGO formaPago");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat ON formaPago.DESCRIPCION = cat.IDRECURSO");
-		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
-		sql.ORDER_BY("cat.DESCRIPCION");
+		sql.SELECT("IDFORMAPAGO, f_siga_getrecurso(DESCRIPCION,"+idLenguaje+") as DESCRIPCION");
+		sql.FROM("PYS_FORMAPAGO ");
+		sql.WHERE("INTERNET = 'S'"); 
+		sql.ORDER_BY("DESCRIPCION");  
 
 		return sql.toString();
 	}
