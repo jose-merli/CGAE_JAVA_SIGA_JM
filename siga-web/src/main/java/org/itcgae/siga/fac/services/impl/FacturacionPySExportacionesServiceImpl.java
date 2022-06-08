@@ -362,9 +362,11 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             }
         }
         // Restaurar facturas a su estado inicial
-        if (resultado[1].equals("0") && resultado[0].equals("0"))
+        if (resultado[1].equals("0") && resultado[0].equals("0")) {
         	LOGGER.info("nuevoFicheroAdeudos() -> Restaurar Facturas a su estado inicial.");
             throw new BusinessException("facturacionPyS.ficheroAdeudos.error.nuevo");
+        }
+        	
     }
 
     private void createDirFicheroAdeudos(Short idInstitucion) {
