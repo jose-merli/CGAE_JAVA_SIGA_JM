@@ -110,6 +110,7 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -401,6 +402,11 @@ public class UtilidadesPagoSJCS {
             LOGGER.error(e.getStackTrace());
             throw new FacturacionSJCSException("Error en la obtención de los importes", e, "messages.factSJCS.error.importes");
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void insertEstadoPagoConTransaccion(Short idInstitucion, Integer idPago, Integer idUsuario, String estado) {
+        this.insertEstadoPago(idInstitucion, idPago, idUsuario, estado);
     }
 
     public void insertEstadoPago(Short idInstitucion, Integer idPago, Integer idUsuario, String estado) {
@@ -1141,12 +1147,11 @@ public class UtilidadesPagoSJCS {
     }
 
     @Async
-    @Transactional(rollbackFor = Exception.class,timeout=24000)
     public void asyncCerrarPagoSJCS(FcsPagosjg pago, AdmUsuarios usuario) throws Exception {
 
         try {
             // Insertamos el estado del pago:
-            insertEstadoPago(pago.getIdinstitucion(), pago.getIdpagosjg(), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_CERRANDO);
+            insertEstadoPagoConTransaccion(pago.getIdinstitucion(), pago.getIdpagosjg(), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_CERRANDO);
 
             // Iniciamos la ejecución del pago:
             cerrarPago(pago, usuario);
@@ -1176,6 +1181,7 @@ public class UtilidadesPagoSJCS {
      * Método que implementa la accion cerrarPago. Modifica el estado del pago a
      * cerrado.
      */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW, timeout=24000)
     public void cerrarPago(FcsPagosjg pago, AdmUsuarios usuario) throws Exception {
 
         // Pasamos automaticamente a deducir los pagos
@@ -1189,11 +1195,10 @@ public class UtilidadesPagoSJCS {
     }
 
     @Async
-    @Transactional(rollbackFor = Exception.class,timeout=24000)
     public void asyncCerrarPagoManual(FcsPagosjg pago, List<String> idsParaEnviar, AdmUsuarios usuario) throws Exception {
         try {
             // Insertamos el estado del pago:
-            insertEstadoPago(pago.getIdinstitucion(), pago.getIdpagosjg(), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_CERRANDO);
+            insertEstadoPagoConTransaccion(pago.getIdinstitucion(), pago.getIdpagosjg(), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_CERRANDO);
 
             // Iniciamos la ejecución del pago:
             cerrarPagoManual(pago, idsParaEnviar, usuario);
@@ -1224,6 +1229,7 @@ public class UtilidadesPagoSJCS {
      * @param pago
      * @param idsParaEnviar Son los idPersona
      */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW, timeout=24000)
     public void cerrarPagoManual(FcsPagosjg pago, List<String> idsParaEnviar, AdmUsuarios usuario) throws Exception {
 
         // ahora pasamos a generar abonos
@@ -1310,7 +1316,6 @@ public class UtilidadesPagoSJCS {
      * @param irpfTotal
      * @param idPersonaSJCS
      */
-    @Transactional(rollbackFor = Exception.class, timeout=24000)
     private void crearAbonos(String idPersona, String idCuenta, List<ColegiadosPagoDTO> colegiadosMarcados, String idPersonaSoc, String idPago, String idInstitucion, Hashtable importes, double irpfTotal, String idPersonaSJCS, AdmUsuarios usuario) throws FacturacionSJCSException {
 
         String importeTurnos = "", importeGuardias = "", importeSoj = "", importeEjg = "", importeMovimientos = "", importeRetenciones = "", importeRetencionesPersona = "";

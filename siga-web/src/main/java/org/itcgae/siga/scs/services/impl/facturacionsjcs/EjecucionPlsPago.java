@@ -204,6 +204,7 @@ public class EjecucionPlsPago {
                                           String pathFichero, String fichero, String idioma, AdmUsuarios usuario) throws Exception {
         Object[] param_in; // Parametros de entrada del PL
         String resultado[] = null; // Parametros de salida del PL
+        String res = null;
 
         try {
             param_in = new Object[7];
@@ -227,12 +228,16 @@ public class EjecucionPlsPago {
             	LOGGER.error("ejecutarPLExportarTurno -> Error en PL PROC_FCS_EXPORTAR_TURNOS_OFI");
             }
 
+            if (resultado != null && resultado.length != 0) {
+                res = resultado[0];
+            }
+
         } catch (Exception e) {
             throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
         }
 
         // Resultado del PL
-        return resultado[0];
+        return res;
     }
 
     public String ejecutarPLExportarGuardias(String idInstitucion, String idFacturacionDesde, String idFacturacionHasta, String idPersona,
@@ -240,6 +245,7 @@ public class EjecucionPlsPago {
 
         Object[] param_in; // Parametros de entrada del PL
         String resultado[] = null; // Parametros de salida del PL
+        String res = null;
 
         try {
             param_in = new Object[7];
@@ -263,12 +269,16 @@ public class EjecucionPlsPago {
             	LOGGER.error("ejecutarPLExportarGuardias -> Error en PL PROC_FCS_EXPORTAR_GUARDIAS");
             }
 
+            if (resultado != null && resultado.length != 0) {
+                res = resultado[0];
+            }
+
         } catch (Exception e) {
             throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
         }
 
         // Resultado del PL
-        return resultado[0];
+        return res;
     }
 
     public String ejecutarPLDeshacerCierre(Short idInstitucion, Date fechaPago) throws Exception {
