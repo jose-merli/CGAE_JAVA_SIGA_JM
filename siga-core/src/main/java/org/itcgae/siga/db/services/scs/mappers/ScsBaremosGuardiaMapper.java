@@ -107,7 +107,7 @@ public interface ScsBaremosGuardiaMapper {
 	@Result(column = "IDHITO", property = "idHito", jdbcType = JdbcType.DECIMAL),
 	@Result(column = "IDHITOCONFIGURACION", property = "idhitoconfiguracion", jdbcType = JdbcType.DECIMAL),
 })
-List<BaremosRequestItem> searchBaremosGuardia(BaremosGuardiaItem baremosGuardiaItem, Short idinstitucion);
+List<BaremosRequestItem> searchBaremosGuardia(BaremosGuardiaItem baremosGuardiaItem, Short idinstitucion,Integer tamMaximo);
 
 	@SelectProvider(type = ScsBaremosGuardiaSqlProvider.class, method = "searchBaremosFichaGuardia")
 	@Results({

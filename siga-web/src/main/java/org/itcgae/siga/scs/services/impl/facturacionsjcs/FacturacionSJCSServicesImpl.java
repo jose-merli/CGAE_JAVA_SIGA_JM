@@ -2692,9 +2692,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
                         if (null != scsEjg) {
 
-                            LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG() -> ENTRA: Obtenemos las facturaciones asociadas a la guardia");
+                            LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG() -> ENTRA: Obtenemos las facturaciones asociadas a la EJGS");
                             List<DatosFacturacionAsuntoDTO> datosFacturacionAsuntoDTOList = fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG(idInstitucion, scsEjg, literalFacturacion);
-                            LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG() -> SALE: Obtenemos las facturaciones asociadas a la guardia");
+                            LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getFacturacionesPorEJG() -> SALE: Obtenemos las facturaciones asociadas a la EJGS");
 
                             for (DatosFacturacionAsuntoDTO fac : datosFacturacionAsuntoDTOList) {
                                 LOGGER.debug("FacturacionSJCSServicesImpl.getFacturacionesPorEJG() -> fcsFacturacionJGExtendsMapper.getDatosPagoAsuntoPorFacturacion() -> ENTRA: Obtenemos los pagos asociados a la facturación de EJGS");

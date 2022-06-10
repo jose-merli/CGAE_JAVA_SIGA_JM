@@ -79,9 +79,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 //				key.setIdInstitucion(idInstitucion);
 //				key.setIdGuardia(idGuardia);
 //				key.setIdTurno(idTurno);
-
+			Integer tamMaximo = getTamanoMaximo(idInstitucion);
 			List<BaremosRequestItem> lBaremos = baremosGuardiaMapper.searchBaremosGuardia(baremosGuardiaItem,
-					idInstitucion);
+					idInstitucion,tamMaximo);
 			int keyForTabla = 0;
 			String hitoActual;
 			List<GuardiasItem> guar = new ArrayList<GuardiasItem>();
