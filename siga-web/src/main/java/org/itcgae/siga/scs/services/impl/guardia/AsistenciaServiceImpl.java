@@ -4352,9 +4352,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							caracteristicasAsistenciaItem
 									.setIdProcedimiento(caractasistencia.getIdpretension().toString());
 						}
-						caracteristicasAsistenciaItem.setNumeroProcedimiento(caractasistencia.getNumeroprocedimiento());
-						caracteristicasAsistenciaItem.setNig(caractasistencia.getNig());
-						caracteristicasAsistenciaItem.setIdJuzgado(caractasistencia.getIdjuzgado().toString());
+						if (caractasistencia.getNumeroprocedimiento() != null) {
+							caracteristicasAsistenciaItem.setNumeroProcedimiento(caractasistencia.getNumeroprocedimiento());
+						}
+						if (caractasistencia.getNig() != null) {
+							caracteristicasAsistenciaItem.setNig(caractasistencia.getNig());
+						}
+						if (caractasistencia.getIdjuzgado() != null) {
+							caracteristicasAsistenciaItem.setIdJuzgado(caractasistencia.getIdjuzgado().toString());
+						}
 						caracteristicasAsistenciaDTO.getCaracteristicasAsistenciaItems()
 								.add(caracteristicasAsistenciaItem);
 					}
