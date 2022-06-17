@@ -201,12 +201,8 @@ public class ScsBaremosGuardiaSqlProvider {
 		} else {
 			sql.FROM("scs_hitofacturableguardia hit");
 		}
-		if (!facturaciones.equals("0")) {
-			sql.FROM(" scs_hitofacturable tip," + "    scs_guardiasturno gua," + "		scs_turno tur");
-		} else {
-			sql.FROM(" scs_hitofacturable tip," + "    scs_guardiasturno gua");
-		}
-
+		
+		sql.FROM(" scs_hitofacturable tip," + "    scs_guardiasturno gua," + "		scs_turno tur");
 		sql.WHERE(" hit.idhito = tip.idhito");
 		sql.WHERE(" hit.idinstitucion = gua.idinstitucion");
 		sql.WHERE("(hit.idhito IN ( 25, 22, 20, 44, 1 )"
