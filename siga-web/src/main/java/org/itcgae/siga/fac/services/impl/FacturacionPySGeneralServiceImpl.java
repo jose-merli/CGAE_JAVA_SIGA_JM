@@ -692,7 +692,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 			// Obtenemos la clase de comunicación dependiendo de si buscamos modelos de factura o de factura rectificativa
 			ModClasecomunicacionesExample claseExample = new ModClasecomunicacionesExample();
 			if (esRectificativa) {
-				claseExample.createCriteria().andNombreEqualTo("Facturas rectificativas");
+				claseExample.createCriteria().andNombreEqualTo("Facturas Rectificativas");
 			} else {
 				claseExample.createCriteria().andNombreEqualTo("Facturas");
 			}
