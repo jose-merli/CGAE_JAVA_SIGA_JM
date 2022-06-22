@@ -1212,8 +1212,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" D.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("D.ANIO = '" + designaItem.getAno() + "'");
 		sql.WHERE("D.NUMERO = '" + designaItem.getNumero() + "'");
-		sql.WHERE("P.FECHABAJA IS NULL");
-		sql.WHERE("P.FECHA_BAJA IS NULL");
+		/*sql.WHERE("P.FECHABAJA IS NULL");
+		sql.WHERE("P.FECHA_BAJA IS NULL");*/
 
 		return sql.toString();
 
@@ -1235,7 +1235,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" DES.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("DES.ANIO = '" + designaItem.getAno() + "'");
 		sql.WHERE("DES.NUMERO = '" + designaItem.getNumero() + "'");
-		sql.WHERE("procd.FECHABAJA IS NULL");
+		//sql.WHERE("procd.FECHABAJA IS NULL");
 
 		return sql.toString();
 
@@ -3645,7 +3645,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("IDJUZGADO = '" + idJuzgado + "'");
-		sql.WHERE("FECHABAJA IS NULL");
+		//sql.WHERE("FECHABAJA IS NULL");
 
 		return sql.toString();
 

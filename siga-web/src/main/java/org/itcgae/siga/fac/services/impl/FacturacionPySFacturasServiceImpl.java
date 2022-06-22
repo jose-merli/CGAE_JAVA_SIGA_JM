@@ -134,7 +134,7 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
             FacFactura factura = facturas.get(0);
 
             if (!factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_CAJA))
-                    || !factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO)))
+                    && !factura.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO)))
                 throw new BusinessException("facturacionSJCS.abonosSJCS.error.compensacion.estado");
 
             if (factura.getImptotalporpagar().compareTo(new BigDecimal(nuevoEstado.getMovimiento())) < 0)

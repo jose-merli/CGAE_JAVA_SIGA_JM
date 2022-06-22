@@ -120,7 +120,7 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
         }
         
         //LOGGER.info(sqlTotal.toString());
-		return sql.toString();
+		return sqlTotal.toString();
 	}
 
     public String getNuevoID(String idInstitucion) {
