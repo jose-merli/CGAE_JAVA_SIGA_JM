@@ -35,5 +35,5 @@ public interface IFacturacionPySFacturasService {
 
     public InsertResponseDTO insertarEstadosPagosVarios(List<EstadosPagosItem> nuevosEstados, HttpServletRequest request) throws Exception;
 
-    public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception;
+    public DeleteResponseDTO eliminarEstadosPagos(List <EstadosPagosItem> item, HttpServletRequest request) throws Exception;
 }

@@ -468,7 +468,7 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
     }
 
     @Override
-    public DeleteResponseDTO eliminarEstadosPagos(EstadosPagosItem item, HttpServletRequest request) throws Exception {
+    public DeleteResponseDTO eliminarEstadosPagos(List <EstadosPagosItem> items, HttpServletRequest request) throws Exception {
         DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
         Error error = new Error();
         deleteResponseDTO.setError(error);
@@ -477,12 +477,13 @@ public class FacturacionPySFacturasServiceImpl implements IFacturacionPySFactura
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
 
         LOGGER.info("eliminarEstadosPagos() -> Entrada al servicio para eliminar una entrada del historico de factura");
-
-        if (usuario != null && item.getIdAccion().equalsIgnoreCase("4")) {
-            facturaAccionesHelper.eliminarUltimoCobroPorCaja(item.getIdFactura(), usuario);
-            deleteResponseDTO.setStatus(HttpStatus.OK.toString());
+        
+        for(EstadosPagosItem item : items) {
+        	if (usuario != null && item.getIdAccion().equalsIgnoreCase("4")) {
+                facturaAccionesHelper.eliminarUltimoCobroPorCaja(item.getIdFactura(), usuario);
+            }
         }
-
+        deleteResponseDTO.setStatus(HttpStatus.OK.toString());
         LOGGER.info("eliminarEstadosPagos() -> Salida del servicio para eliminar una entrada del historico de factura");
 
         return deleteResponseDTO;

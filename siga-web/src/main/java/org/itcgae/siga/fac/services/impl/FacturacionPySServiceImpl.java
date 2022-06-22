@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -2238,9 +2240,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return itemsDTO;
 	}
 
+	/**
+	 *
+	 */
 	@Override
 	@Transactional(timeout=24000,rollbackFor = Exception.class)
-	public DeleteResponseDTO eliminarFacturacion(FacFacturacionEliminarItem fac, HttpServletRequest request)
+	public DeleteResponseDTO eliminarFacturacion(List<FacFacturacionEliminarItem> facs, HttpServletRequest request)
 			throws Exception {
 		LOGGER.info("eliminarFacturacion() -> Entrada al servicio para eliminar facturación");
 
@@ -2249,7 +2254,27 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		Error error = new Error();
 		error.setCode(0);
 		deleteResponseDTO.setError(error);
+		int borradasOK = 0;
+		int borradasKO = 0;
+		for(FacFacturacionEliminarItem item : facs) {
+			if(eliminarFacturaciones(item, usuario) > 0){
+				borradasOK++;
+			}else {
+				borradasKO++;
+			}
+		}
+		error.description(borradasOK+"/"+borradasKO);
+		
+		
+		deleteResponseDTO.setError(error);
 
+		LOGGER.info("eliminarFacturacion() -> Salida del servicio para eliminar facturación");
+
+		return deleteResponseDTO;
+	}
+
+	private int eliminarFacturaciones(FacFacturacionEliminarItem fac, AdmUsuarios usuario)
+			throws IOException, NamingException, SQLException, Exception {
 		// Obtener la facturación cuyo fichero se va a eliminar
 		FacFacturacionprogramadaKey key = new FacFacturacionprogramadaKey();
 		key.setIdinstitucion(usuario.getIdinstitucion());
@@ -2269,7 +2294,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
         if (resultado != null) {
         	if (resultado[0] != null && !resultado[0].equals(RET_OK)) {
-                throw new Exception(resultado[1]);
+        		
+        		LOGGER.error("Error al llamar al PL ELIMINARFACTURACION. El resultado es "+ resultado[1]);
+                return 0;
             } else {
             	// Obtener la ruta del fichero
     			String directorioFisico = "facturacion.directorioFisicoPrevisionesJava";
@@ -2288,14 +2315,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
     					file.delete();
     				}
     			}
+    			return 1;
             }
         } else {
-        	throw new Exception("Error al llamar al PL ELIMINARFACTURACION. El resultado es null");
+        	LOGGER.error("Error al llamar al PL ELIMINARFACTURACION. El resultado es null");
+        	return 0;
         }
-
-		LOGGER.info("eliminarFacturacion() -> Salida del servicio para eliminar facturación");
-
-		return deleteResponseDTO;
 	}
 
 	@Override
