@@ -214,7 +214,7 @@ public class UtilidadesPagoSJCS {
 
         try {
             // Insertamos el estado del pago:
-            insertEstadoPago(idInstitucion, pago.getIdpagosjg(), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_EJECUTANDO);
+            insertEstadoPagoConTransaccion(idInstitucion, pago.getIdpagosjg(), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_EJECUTANDO);
 
             // Iniciamos la ejecución del pago:
             ejecutarPagoSJCS(pago, simular, idInstitucion, usuario);
@@ -229,7 +229,7 @@ public class UtilidadesPagoSJCS {
 
     }
 
-    @Transactional(rollbackFor = Exception.class,timeout=24000)
+    @Transactional(rollbackFor = Exception.class, timeout=24000, propagation = Propagation.REQUIRES_NEW)
     public void ejecutarPagoSJCS(FcsPagosjg pago, boolean simular, Short idInstitucion, AdmUsuarios usuario) throws Exception {
 
         ejecucionPlsPago.ejecutarPL_PagoTurnosOficio(Integer.valueOf(idInstitucion.toString()), pago.getIdpagosjg(), usuario);

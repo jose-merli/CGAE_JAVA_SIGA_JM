@@ -3429,11 +3429,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 							colaAuxiliar.add(new LetradoInscripcionItem(punteroInscripciones));
 						}
-					}
 
-					// revisando si se encontro ya al ultimo
-					if (!foundUltimo && (punteroInscripciones.getIdpersona().equals(ultimoAnterior.getIdpersona()))) {
-						foundUltimo = true;
+                        // revisando si se encontro ya al ultimo
+                        if (!foundUltimo && (punteroInscripciones.getIdpersona().equals(ultimoAnterior.getIdpersona()))) {
+                            foundUltimo = true;
+                        }
 					}
 
 				}
@@ -4800,6 +4800,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaLetradoNueva.setLetradodelturno("S");
 					designaLetradoNueva.setUsumodificacion(usuarios.get(0).getIdusuario());
 
+					// Validar que la fecha sea igual o posterior a la fecha de la designación anterior
+					if (designaLetradoVieja != null && designaLetradoVieja.getFechadesigna() != null && designaLetradoNueva.getFechadesigna() != null
+							&& designaLetradoVieja.getFechadesigna().toInstant().isBefore(designaLetradoNueva.getFechadesigna().toInstant())) {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
+						error.setCode(100);
+						error.setDescription("justiciaGratuita.oficio.designas.letrados.fechaDesignaIncorrecta");
+
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+					}
+
 					// Seleccion de un letrado en el caso de que no se haya introducido
 					if (letradoEntrante.getIdpersona() == null) {
 
@@ -4822,6 +4835,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					} else {
 						designaLetradoNueva.setIdpersona(letradoEntrante.getIdpersona());
+					}
+
+					// Validar que el letrado sea diferente al anterior
+					if (designaLetradoVieja != null && designaLetradoVieja.getIdpersona() != null
+							&& designaLetradoVieja.getIdpersona().equals(designaLetradoNueva.getIdpersona())) {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
+						error.setCode(100);
+						error.setDescription("justiciaGratuita.oficio.designas.letrados.letradoRepetido");
+
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
 					}
 
 					if (letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna()) || designa.getArt27().equals("Si")) {
