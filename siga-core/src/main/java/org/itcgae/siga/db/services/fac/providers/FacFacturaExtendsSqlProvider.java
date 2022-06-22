@@ -160,8 +160,9 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         
         //Select para el ultimo estado pagos
         facturas.SELECT("f.estado estado_max_historico, f.imptotalporpagar imptotalporpagar_max,"
-        		+ "null idaccionult, f.fechamodificacion fechamodificacionult, f.imptotalpagado imptotalpagado_max");
+        		+ "("+sqlUltimoAccion.toString()+")  idaccionult, f.fechamodificacion fechamodificacionult, f.imptotalpagado imptotalpagado_max");
         
+      
         //joins
         facturas.FROM("fac_factura f");
         facturas.INNER_JOIN("fac_facturacionprogramada fp ON (fp.idinstitucion = f.idinstitucion AND fp.idprogramacion = f.idprogramacion AND f.idseriefacturacion = fp.idseriefacturacion)");
