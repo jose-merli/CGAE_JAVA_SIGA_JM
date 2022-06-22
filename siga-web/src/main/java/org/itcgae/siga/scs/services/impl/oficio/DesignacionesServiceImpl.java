@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -4802,11 +4803,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					// Validar que la fecha sea igual o posterior a la fecha de la designación anterior
 					if (designaLetradoVieja != null && designaLetradoVieja.getFechadesigna() != null && designaLetradoNueva.getFechadesigna() != null
-							&& designaLetradoVieja.getFechadesigna().toInstant().isBefore(designaLetradoNueva.getFechadesigna().toInstant())) {
+							&& designaLetradoVieja.getFechadesigna().toInstant().truncatedTo(ChronoUnit.DAYS).isAfter(designaLetradoNueva.getFechadesigna().toInstant().truncatedTo(ChronoUnit.DAYS))) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
 								"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
-						error.setCode(100);
+						error.setCode(400);
 						error.setDescription("justiciaGratuita.oficio.designas.letrados.fechaDesignaIncorrecta");
 
 						updateResponseDTO.setError(error);
@@ -4843,7 +4844,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
 								"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
-						error.setCode(100);
+						error.setCode(400);
 						error.setDescription("justiciaGratuita.oficio.designas.letrados.letradoRepetido");
 
 						updateResponseDTO.setError(error);
