@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -4803,7 +4804,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					// Validar que la fecha sea igual o posterior a la fecha de la designación anterior
 					if (designaLetradoVieja != null && designaLetradoVieja.getFechadesigna() != null && designaLetradoNueva.getFechadesigna() != null
-							&& designaLetradoVieja.getFechadesigna().toInstant().truncatedTo(ChronoUnit.DAYS).isAfter(designaLetradoNueva.getFechadesigna().toInstant().truncatedTo(ChronoUnit.DAYS))) {
+							&& designaLetradoVieja.getFechadesigna().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+							.compareTo(designaLetradoNueva.getFechadesigna().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) > 0) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
 								"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
