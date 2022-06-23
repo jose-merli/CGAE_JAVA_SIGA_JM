@@ -113,7 +113,7 @@ public interface IFacturacionPySService {
 	public FacFacturacionprogramadaDTO getFacturacionesProgramadas(
 			FacFacturacionprogramadaItem facturacionProgramadaItem, HttpServletRequest request) throws Exception;
 
-	public DeleteResponseDTO eliminarFacturacion(FacFacturacionEliminarItem fac, HttpServletRequest request)
+	public DeleteResponseDTO eliminarFacturacion(List<FacFacturacionEliminarItem> fac, HttpServletRequest request)
 			throws Exception;
 
 	public UpdateResponseDTO archivarFacturaciones(List<FacFacturacionprogramadaItem> facturacionProgramadaItems,

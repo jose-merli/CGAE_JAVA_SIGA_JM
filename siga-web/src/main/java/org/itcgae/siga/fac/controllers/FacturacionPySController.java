@@ -474,12 +474,12 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/eliminarFacturacion")
-	ResponseEntity<DeleteResponseDTO> eliminarFacturacion(@RequestBody FacFacturacionEliminarItem facturacionEliminar,
+	ResponseEntity<DeleteResponseDTO> eliminarFacturacion(@RequestBody List<FacFacturacionEliminarItem> facturacionesEliminar,
 			HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
 		try {
-			response = this.facturacionService.eliminarFacturacion(facturacionEliminar, request);
+			response = this.facturacionService.eliminarFacturacion(facturacionesEliminar, request);
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
@@ -834,7 +834,7 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/eliminarEstadosPagos")
-	ResponseEntity<DeleteResponseDTO> eliminarEstadosPagos(@RequestBody EstadosPagosItem item,
+	ResponseEntity<DeleteResponseDTO> eliminarEstadosPagos(@RequestBody List<EstadosPagosItem> item,
 			HttpServletRequest request) {
 		DeleteResponseDTO response = new DeleteResponseDTO();
 
