@@ -862,7 +862,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						// Procedemos a insertar la nueva inscripción
 						ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
 						inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
-						inscripcionturno.setFechasolicitud(new Date());
+						inscripcionturno.setFechasolicitud(inscripcionesItem.getFechasolicitud());
 						
 						if (inscripcionesItem.getEstadonombre().equals("NoPermisos")
 								|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
@@ -905,7 +905,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
 
 							guardia.setObservacionessuscripcion(inscripcionesItem.getObservacionessolicitud());
-							guardia.setFechasuscripcion(new Date());
+							guardia.setFechasuscripcion(inscripcionesItem.getFechasolicitud());
 							if (inscripcionesItem.getEstadonombre().equals("NoPermisos")
 									|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
 								guardia.setFechavalidacion(null);
