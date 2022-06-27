@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.controllers.guardia;
 
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -87,8 +88,19 @@ public class GuardiasColegiadoController {
 		UpdateResponseDTO response = guardiasColegiadoService.sustituirGuardiaColeg(datos, request);
 		if (response != null) {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		} else
+		} else {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/existeAsistenciasGuardiaColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> existeAsistenciasGuardiaColegiado(@RequestBody String[] datos, HttpServletRequest request) throws Exception {
+		ResponseDataDTO response = guardiasColegiadoService.existeAsistenciasGuardiaColegiado(datos, request);
+		if (response != null) {
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@PostMapping(value = "/getCalendarioColeg", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,6 +1,9 @@
 package org.itcgae.siga.scs.services.impl.guardia;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,6 +18,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -32,17 +36,23 @@ import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenBajastemporales;
+import org.itcgae.siga.db.entities.CenBajastemporalesExample;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.ScsAsistencia;
+import org.itcgae.siga.db.entities.ScsAsistenciaExample;
 import org.itcgae.siga.db.entities.ScsCabeceraguardias;
 import org.itcgae.siga.db.entities.ScsCabeceraguardiasExample;
 import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
 import org.itcgae.siga.db.entities.ScsDictamenejg;
 import org.itcgae.siga.db.entities.ScsDictamenejgExample;
 import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
 import org.itcgae.siga.db.entities.ScsGuardiascolegiadoKey;
 import org.itcgae.siga.db.entities.ScsPermutaCabecera;
 import org.itcgae.siga.db.entities.ScsPermutaCabeceraExample;
@@ -50,10 +60,13 @@ import org.itcgae.siga.db.entities.ScsPermutaCabeceraKey;
 import org.itcgae.siga.db.entities.ScsPermutaguardias;
 import org.itcgae.siga.db.entities.ScsPermutaguardiasExample;
 import org.itcgae.siga.db.entities.ScsPermutaguardiasKey;
+import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
+import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaCabeceraMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsCabeceraguardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiascolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
@@ -62,7 +75,9 @@ import org.itcgae.siga.db.services.scs.mappers.ScsPermutaguardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSaltoscompensacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSubzonapartidoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.guardia.GuardiasColegiadoService;
+import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -107,6 +122,12 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 	@Autowired
 	private ScsGuardiascolegiadoExtendsMapper scsGuardiascolegiadoExtendsMapper;
+
+	@Autowired
+	private ScsAsistenciaExtendsMapper scsAsistenciaExtendsMapper;
+
+	@Autowired
+	private CenBajastemporalesMapper cenBajastemporalesMapper;
 
 	@Override
 	public GuardiasDTO getGuardiaColeg(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -357,9 +378,8 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 		return insertResponseDTO;
 	}
 
-	@Override
 	@Transactional
-	public UpdateResponseDTO sustituirGuardiaColeg(String[] datos, HttpServletRequest request) throws Exception {
+	public UpdateResponseDTO sustituirGuardiaColegA(String[] datos, HttpServletRequest request) throws Exception {
 		LOGGER.info("sustituirGuardiaColeg() ->  Entrada al servicio para eliminar prisiones");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -375,7 +395,6 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 		int tieneGuardia;
 
 		if (null != idInstitucion) {
-
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
@@ -751,6 +770,334 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 		LOGGER.info("sustituirGuardiaColeg() -> Salida del servicio para sustituir letrados");
 
 		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO sustituirGuardiaColeg(String[] datos, HttpServletRequest request) throws Exception {
+		LOGGER.info("sustituirGuardiaColeg() ->  Entrada al servicio para eliminar prisiones");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+				String fechaHoy = formatter.format(new Date());
+
+				String idTurno = datos[0];
+				String idGuardia = datos[1];
+				Long fechadesde = Long.parseLong(datos[2]);
+				String idPersona = datos[3];
+				String newLetrado = datos[4];
+				String fechaSustitucion = datos[5];
+				String comensustitucion = datos[6];
+				String saltoOcompensacion = datos[7];
+				String calendarioGuardias = datos[8];
+
+				//-------------------------------------------------------------------------------------------------------
+				// Obtenemos todas las guardias del letrado que solicita la sustitucion(saliente) para las que la fecha
+				// de inicio sea mayor que la actual. La informacion se saca de la tabla SCS_CABECERAGUARDIAS
+				//
+				//-------------------------------------------------------------------------------------------------------
+
+				ScsCabeceraguardiasExample cabeceraguardiasExample = new ScsCabeceraguardiasExample();
+				cabeceraguardiasExample.createCriteria()
+						.andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(Integer.parseInt(idTurno))
+						.andIdguardiaEqualTo(Integer.parseInt(idGuardia))
+						.andIdpersonaEqualTo(Long.parseLong(idPersona))
+						.andFechainicioEqualTo(new Date(fechadesde));
+
+				List<ScsCabeceraguardias> cabeceraguardias = scsCabeceraguardiasExtendsMapper.selectByExample(cabeceraguardiasExample);
+				if (cabeceraguardias != null) {
+					CenBajastemporalesExample bajastemporalesExample = new CenBajastemporalesExample();
+					bajastemporalesExample.createCriteria()
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.parseLong(idPersona))
+							.andValidadoEqualTo("1");
+
+					//List<CenBajastemporales> bajastemporales = cenBajastemporalesMapper.selectByExample(bajastemporalesExample);
+					//bajastemporales.stream().map(bt -> bt.getfecha)
+
+					for (ScsCabeceraguardias scsCabeceraguardias : cabeceraguardias) {
+						sustitucionLetradoGuardiaPuntual(scsCabeceraguardias.getIdinstitucion(), usuarios.get(0),
+								fechaHoy, scsCabeceraguardias.getFechainicio(), scsCabeceraguardias.getFechaFin(), scsCabeceraguardias.getIdturno(), scsCabeceraguardias.getIdguardia(),
+								Long.parseLong(idPersona), Long.parseLong(newLetrado), new Date(Long.parseLong(fechaSustitucion)), comensustitucion, saltoOcompensacion, Integer.parseInt(calendarioGuardias));
+					}
+				}
+			}
+		}
+
+		error.setCode(200);
+		updateResponseDTO.setError(error);
+		updateResponseDTO.setStatus(SigaConstants.OK);
+
+		LOGGER.info("sustituirGuardiaColeg() -> Salida del servicio para sustituir letrados");
+		return updateResponseDTO;
+	}
+
+	private void sustitucionLetradoGuardiaPuntual(Short idInstitucion, AdmUsuarios usuario, String fechaHoy, Date fechaInicio, Date fechaFin, Integer idTurno,
+												  Integer idGuardia, Long idPersona, Long newLetrado, Date fechaSustitucion, String comensustitucion,
+												  String saltoOcompensacion, Integer calendarioGuardias) {
+		//-----------------------------------------------------------------------------------------------------
+		//  Comprobamos si el letrado entrante cumple los criteriosde separación de guardias y de incompatibilidades
+		//------------------------------------------------------------------------------------------------------
+
+		//-----------------------------------------------------------------------------------------------------
+		// Recuperamos todas las permutas en las que el saliente sea o confirmador o solicitante. Posteriormente
+		// borraremos dichas permutas y volveremos a insertar aquellas para las que fecha de confirmacion sea
+		// distinta de null
+		//-----------------------------------------------------------------------------------------------------
+
+		ScsPermutaguardiasExample permutaComoSolicitanteExample = new ScsPermutaguardiasExample();
+		permutaComoSolicitanteExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andIdguardiaSolicitanteEqualTo(idGuardia)
+				.andIdturnoSolicitanteEqualTo(idTurno)
+				.andIdcalendarioguardiasSolicitanEqualTo(calendarioGuardias)
+				.andFechainicioSolicitanteEqualTo(fechaInicio)
+				.andIdpersonaSolicitanteEqualTo(idPersona);
+		List<ScsPermutaguardias> permutaComoSolicitante = scsPermutaguardiasMapper.selectByExample(permutaComoSolicitanteExample);
+
+		ScsPermutaguardiasExample permutaComoConfirmadorExample = new ScsPermutaguardiasExample();
+		permutaComoConfirmadorExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andIdguardiaConfirmadorEqualTo(idGuardia)
+				.andIdturnoConfirmadorEqualTo(idTurno)
+				.andIdcalendarioguardiasConfirmadEqualTo(calendarioGuardias)
+				.andFechainicioConfirmadorEqualTo(fechaInicio)
+				.andIdpersonaConfirmadorEqualTo(idPersona);
+		List<ScsPermutaguardias> permutaComoConfirmador = scsPermutaguardiasMapper.selectByExample(permutaComoConfirmadorExample);
+
+
+		//----------------------------------------------------------------------------------------------
+		// guardamos los registros de cabecera de guardias y guardias colegiado para el colegiado saliente
+		//
+		//----------------------------------------------------------------------------------------------
+
+		ScsCabeceraguardiasKey cabeceraGuardiaSalienteKey = new ScsCabeceraguardiasKey();
+		cabeceraGuardiaSalienteKey.setIdinstitucion(idInstitucion);
+		cabeceraGuardiaSalienteKey.setIdturno(idTurno);
+		cabeceraGuardiaSalienteKey.setIdguardia(idGuardia);
+		cabeceraGuardiaSalienteKey.setIdpersona(idPersona);
+		cabeceraGuardiaSalienteKey.setFechainicio(fechaInicio);
+		ScsCabeceraguardias cabeceraGuardiaSaliente = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(cabeceraGuardiaSalienteKey);
+
+		ScsGuardiascolegiadoExample guardiasColegiadoExample = new ScsGuardiascolegiadoExample();
+		guardiasColegiadoExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andIdturnoEqualTo(idTurno)
+				.andIdguardiaEqualTo(idGuardia)
+				.andIdpersonaEqualTo(idPersona)
+				.andFechainicioEqualTo(fechaInicio);
+		List<ScsGuardiascolegiado> guardiasColegiadoSaliente = scsGuardiascolegiadoExtendsMapper.selectByExample(guardiasColegiadoExample);
+
+		//-----------------------------------------------------------------------------
+		//  Borramos los registros de las permutas obtenidas para el saliente tanto aquellas en las que actua como
+		// solicitante como las que actua como confirmador
+		//-----------------------------------------------------------------------------
+
+		if (permutaComoSolicitante != null) {
+			for (ScsPermutaguardias permGuarComoSol : permutaComoSolicitante) {
+				scsPermutaguardiasMapper.deleteByPrimaryKey(permGuarComoSol);
+			}
+		}
+
+		if (permutaComoConfirmador != null) {
+			for (ScsPermutaguardias permGuarComoConf : permutaComoConfirmador) {
+				scsPermutaguardiasMapper.deleteByPrimaryKey(permGuarComoConf);
+			}
+		}
+
+		ScsPermutaCabeceraExample permutaCabeceraExample = new ScsPermutaCabeceraExample();
+		permutaCabeceraExample.createCriteria()
+			.andIdinstitucionEqualTo(idInstitucion)
+			.andIdguardiaEqualTo(idGuardia)
+			.andIdturnoEqualTo(idTurno)
+			.andIdpersonaEqualTo(idPersona)
+			.andFechaEqualTo(fechaInicio);
+
+		// Realiza los cambios previos a la sustitucion de una guardia para SCS_PERMUTA_CABECERA
+		List<ScsPermutaCabecera> permutaCabeceras = scsPermutaCabeceraMapper.selectByExample(permutaCabeceraExample);
+		if (permutaCabeceras != null) {
+			permutaCabeceras.stream().peek(pc -> pc.setIdpersona(null))
+					.forEach(scsPermutaCabeceraMapper::updateByPrimaryKey);
+		}
+
+		//----------------------------------------------------------------------------------------------------
+		// Borramos los registros de la tabla SCS_GUARDIASCOLEGIADO para el letrado saliente
+		//-----------------------------------------------------------------------------------------------------
+
+		guardiasColegiadoSaliente.forEach(scsGuardiascolegiadoExtendsMapper::deleteByPrimaryKey);
+
+		//----------------------------------------------------------------------------------------------------
+		// Borramos el registro de la tabla SCS_CABECERAGUARDIAS para el letrado saliente
+		//-----------------------------------------------------------------------------------------------------
+
+		scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabeceraGuardiaSaliente);
+
+		//---------------------------------------------------------------------------------------------------
+		// Insertamos el registro antes obtenido de la tabla SCS_CABECERAGUARDIAS cambiando el idpersona
+		// (correspondiente al saliente) por le idepersona del entrante
+		//---------------------------------------------------------------------------------------------------
+
+		cabeceraGuardiaSaliente.setIdpersona(newLetrado);
+		cabeceraGuardiaSaliente.setLetradosustituido(idPersona);
+		cabeceraGuardiaSaliente.setFechasustitucion(fechaSustitucion);
+		cabeceraGuardiaSaliente.setComensustitucion(comensustitucion);
+		cabeceraGuardiaSaliente.setFechaalta(new Date());
+		cabeceraGuardiaSaliente.setUsualta(usuario.getIdusuario());
+
+		// Antes de insertar el registro se comprueba si el letrado ya tiene una guardia en ese turno y periodo
+		ScsCabeceraguardiasExample existeGuardiaExample = new ScsCabeceraguardiasExample();
+		existeGuardiaExample.createCriteria()
+				.andIdpersonaEqualTo(idPersona)
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andIdturnoEqualTo(idTurno)
+				.andIdguardiaEqualTo(idGuardia)
+				.andFechainicioGreaterThanOrEqualTo(fechaInicio)
+				.andFechaFinLessThanOrEqualTo(cabeceraGuardiaSaliente.getFechaFin());
+
+		if (scsCabeceraguardiasExtendsMapper.countByExample(existeGuardiaExample) > 0)
+			throw new BusinessException("El letrado ya tiene una guardia asociada en ese turno y periodo");
+
+		scsCabeceraguardiasExtendsMapper.insert(cabeceraGuardiaSaliente);
+
+		//---------------------------------------------------------------------------------------------------
+		// Insertamos los registros antes obtenidos de la tabla SCS_GUARDIASCOLEGIADO cambiando el idpersona
+		// (correspondiente al saliente) por el idepersona del entrante
+		//---------------------------------------------------------------------------------------------------
+
+		if (guardiasColegiadoSaliente != null) {
+			guardiasColegiadoSaliente.stream().peek(gc -> gc.setIdpersona(newLetrado))
+					.forEach(scsGuardiascolegiadoExtendsMapper::insert);
+		}
+
+		//----------------------------------------------------------------------------------------------------
+		// Insertamos los registros de permutas obtenidos anteriormente para el saliente como confirmador y
+		// solicitante cambiando le idpersona por el del letrado entrante.Solo insertamos aquellos regstros
+		// cuya fecha de confirmación no sea null (las peticiones de permuta las desechamos, solo interesan permutas confirmadas)
+		//---------------------------------------------------------------------------------------------------
+
+		// Realiza los cambios posteriores a la sustituacion de una guardia para SCS_PERMUTA_CABECERA
+		permutaCabeceras.stream().peek(pc -> {
+			pc.setIdpersona(newLetrado);
+			pc.setUsumodificacion(usuario.getIdusuario());
+			pc.setFechamodificacion(new Date());
+		}).forEach(scsPermutaCabeceraExtendsMapper::updateByPrimaryKey);
+
+		permutaComoSolicitante.stream().filter(ps -> ps.getFechaconfirmacion() != null).peek(ps -> {
+			ps.setIdpersonaSolicitante(newLetrado);
+		}).forEach(scsPermutaguardiasExtendsMapper::insert);
+
+		permutaComoConfirmador.stream().filter(pc -> pc.getFechaconfirmacion() != null).peek(pc -> {
+			pc.setIdpersonaConfirmador(newLetrado);
+		}).forEach(scsPermutaguardiasExtendsMapper::insert);
+
+		//--------------------------------------------------------------------------------------------------
+		// Incluimos saltos (al entrante) y compensaciones  (al saliente) en funcion de los checks correspondientes
+		//--------------------------------------------------------------------------------------------------
+
+		if (saltoOcompensacion == "S/C" || saltoOcompensacion == "S") {
+			SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
+			scgi.setIdPersona(idPersona.toString());
+			scgi.setIdGuardia(idGuardia.toString());
+			scgi.setIdTurno(idTurno.toString());
+			scgi.setFecha(fechaHoy);
+			scgi.setSaltoCompensacion("S");
+			scgi.setMotivo("Sustitución");
+
+			MaxIdDto nuevoId = scsSaltoscompensacionesExtendsMapper.selectNuevoIdSaltosCompensaciones(scgi, idInstitucion.toString());
+
+			 int respSalto = scsSaltoscompensacionesExtendsMapper.guardarSaltosCompensaciones(
+					scgi, idInstitucion.toString(), Long.toString(nuevoId.getIdMax()), usuario);
+		}
+
+		if (saltoOcompensacion == "S/C" || saltoOcompensacion == "C") {
+			SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
+			scgi.setIdPersona(idPersona.toString());
+			scgi.setIdGuardia(idGuardia.toString());
+			scgi.setIdTurno(idTurno.toString());
+			scgi.setFecha(fechaHoy);
+			scgi.setSaltoCompensacion("C");
+			scgi.setMotivo("Sustitución");
+
+			MaxIdDto nuevoId = scsSaltoscompensacionesExtendsMapper.selectNuevoIdSaltosCompensaciones(scgi, idInstitucion.toString());
+
+			int	respSalto = scsSaltoscompensacionesExtendsMapper.guardarSaltosCompensaciones(
+					scgi, idInstitucion.toString(), Long.toString(nuevoId.getIdMax()), usuario);
+		}
+
+		//-------------------------------------------------------------------------------------------------
+		// Actualizamos la tabla de asistencias cambiando en dicha tabla el idpersona del saliente por el
+		//idpersona del entrante. Actualizamos aquellas asistencias para las que la fecha de realizacion sea
+		// igual al campo fechafin de cada uno de los registros de la tabla gusrdiascolegiado
+		//-------------------------------------------------------------------------------------------------
+
+		ScsAsistenciaExample asistenciasExample = new ScsAsistenciaExample();
+		asistenciasExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andIdpersonacolegiadoEqualTo(idPersona)
+				.andFechahoraBetween(startOfDay(fechaFin), endOfDay(fechaFin));
+
+		List<ScsAsistencia> asistencias = scsAsistenciaExtendsMapper.selectByExample(asistenciasExample);
+		asistencias.stream().peek(a -> a.setIdpersonacolegiado(newLetrado))
+				.forEach(scsAsistenciaExtendsMapper::updateByPrimaryKey);
+	}
+
+	@Override
+	public ResponseDataDTO existeAsistenciasGuardiaColegiado(String[] datos, HttpServletRequest request) {
+		ResponseDataDTO responseDataDTO = new ResponseDataDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		String idTurno = datos[0];
+		String idGuardia = datos[1];
+		Long fechadesde = Long.parseLong(datos[2]);
+		String idPersona = datos[3];
+
+		ScsCabeceraguardiasKey cabeceraGuardiaSalienteKey = new ScsCabeceraguardiasKey();
+		cabeceraGuardiaSalienteKey.setIdinstitucion(idInstitucion);
+		cabeceraGuardiaSalienteKey.setIdturno(Integer.parseInt(idTurno));
+		cabeceraGuardiaSalienteKey.setIdguardia(Integer.parseInt(idGuardia));
+		cabeceraGuardiaSalienteKey.setIdpersona(Long.parseLong(idPersona));
+		cabeceraGuardiaSalienteKey.setFechainicio(new Date(fechadesde));
+		ScsCabeceraguardias cabeceraGuardiaSaliente = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(cabeceraGuardiaSalienteKey);
+
+		ScsCabeceraguardiasExample existeGuardiaExample = new ScsCabeceraguardiasExample();
+		existeGuardiaExample.createCriteria()
+				.andIdpersonaEqualTo(cabeceraGuardiaSaliente.getIdpersona())
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andIdturnoEqualTo(cabeceraGuardiaSaliente.getIdturno())
+				.andIdguardiaEqualTo(cabeceraGuardiaSaliente.getIdguardia())
+				.andFechainicioGreaterThanOrEqualTo(cabeceraGuardiaSaliente.getFechainicio())
+				.andFechaFinLessThanOrEqualTo(cabeceraGuardiaSaliente.getFechaFin());
+
+		Long numGuardias = scsCabeceraguardiasExtendsMapper.countByExample(existeGuardiaExample);
+		responseDataDTO.setData(numGuardias.toString());
+		return responseDataDTO;
+	}
+
+	private Date startOfDay(Date fecha) {
+		return Date.from(fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().atTime(LocalTime.MIN)
+				.atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	private Date endOfDay(Date fecha) {
+		return Date.from(fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().atTime(LocalTime.MAX)
+				.atZone(ZoneId.systemDefault()).toInstant());
 	}
 
 	@Override

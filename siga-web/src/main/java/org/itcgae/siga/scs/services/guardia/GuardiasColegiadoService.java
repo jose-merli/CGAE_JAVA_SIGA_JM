@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ComboGuardiasFuturasDTO;
@@ -35,6 +36,9 @@ public interface GuardiasColegiadoService {
 	
 	//acciones tarjeta Sustituciones Guardias de Colegiado
 	public UpdateResponseDTO  sustituirGuardiaColeg(String[] datos, HttpServletRequest request) throws Exception;
+
+	ResponseDataDTO existeAsistenciasGuardiaColegiado(String[] datos, HttpServletRequest request);
+
 	public String getIdConjuntoGuardia(String idGuardia, HttpServletRequest request);
 	public ComboDTO getTurnoInscrito(String idPersona, HttpServletRequest request);
 	public ComboGuardiasFuturasDTO getGuardiaDestinoInscrito(GuardiasItem guardiaItem, HttpServletRequest request);
