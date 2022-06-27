@@ -1237,7 +1237,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 						// Procedemos a insertar la nueva inscripción
 						ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
 						inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
-						inscripcionturno.setFechasolicitud(new Date());
+						inscripcionturno.setFechasolicitud(inscripcionesItem.getFechasolicitud());
 
 						if (inscripcionesItem.getEstadonombre().equals("NoPermisos")
 								|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
@@ -1281,7 +1281,6 @@ public class InscripcionServiceImpl implements InscripcionService {
 							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
 
 							guardia.setObservacionessuscripcion(inscripcionesItem.getObservacionessolicitud());
-							guardia.setFechasuscripcion(new Date());
 							if (inscripcionesItem.getEstadonombre().equals("NoPermisos")
 									|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
 								guardia.setFechavalidacion(null);
@@ -1293,7 +1292,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 							guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 							guardia.setIdinstitucion(idInstitucion);
 							guardia.setIdguardia(Integer.parseInt(inscripcionesItem.getIdguardia()));
-							guardia.setFechasuscripcion(new Date());
+							guardia.setFechasuscripcion(inscripcionesItem.getFechasolicitud());
 							guardia.setFechamodificacion(new Date());
 							guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
 
