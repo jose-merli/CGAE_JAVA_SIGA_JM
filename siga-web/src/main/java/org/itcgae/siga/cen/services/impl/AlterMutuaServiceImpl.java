@@ -141,6 +141,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					
 					CenSolicitudalterExample solAlterExample = new CenSolicitudalterExample();
 					solAlterExample.createCriteria().andNumeroidentificadorEqualTo(estadosolicitudDTO.getIdentificador());
+					solAlterExample.setOrderByClause("FECHAMODIFICACION DESC");
 					
 					List<CenSolicitudalter> solAlter = _cenSolicitudalterMapper.selectByExample(solAlterExample);
 					if(solAlter.size() > 0){
@@ -153,7 +154,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						requestBody.setBolDuplicado(estadosolicitudDTO.isDuplicado());
 						request.setGetEstadoSolicitud(requestBody);
 						
-						JsonNode responseAPI = _clientAlterMutua.APICall(jsonObject, "https://api-preproduccion.altermutua.com/api/AlterApp/GetRequestStatusSIGA");
+						JsonNode responseAPI = _clientAlterMutua.APICall(jsonObject, uriService + "/AlterApp/GetRequestStatusSIGA");
 						
 						if (responseAPI != null) {
 							
@@ -776,7 +777,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					asegurado.setIdioma(Integer.parseInt(solicitud.getAsegurado().getIdioma()));
 					asegurado.setNombre(solicitud.getAsegurado().getNombre());
 					asegurado.setPublicidad(solicitud.getAsegurado().isPublicidad());
-					if(solicitud.getAsegurado().getSexo().equals("H")==true){
+					if(solicitud.getAsegurado().getSexo() != null && solicitud.getAsegurado().getSexo().equals("H")==true){
 						aseguradoJSON.put("Sexo", 1);
 						asegurado.setSexo(1);
 					}else{
@@ -811,7 +812,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						responseDTO.setIdentificador(responseAPI.get("Identificador").asInt());
 						
 						if(responseDTO.getIdentificador() > 0){
-							insertarSolicitudJSON(solicitud, responseAPI);
+							insertarSolicitudJSON(solicitud, responseAPI, responseAPI.get("Identificador").asInt());
 						}
 
 						responseDTO.setDocumento(responseAPI.get("Documento").binaryValue());
@@ -924,13 +925,14 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 		return _cenSolicitudalterMapper.insert(solAlter);
 	}
 	
-	private int insertarSolicitudJSON(SolicitudDTO solicitud, JsonNode responseAPI){
+	private int insertarSolicitudJSON(SolicitudDTO solicitud, JsonNode responseAPI, int idSolicitudAlter){
 		
 		CenSolicitudalter solAlter = new CenSolicitudalter();
 		MaxIdDto idMAx = new MaxIdDto();
 		idMAx = _cenSolicitudAlterExtendsMapper.getMaxIdRecurso();
 		
 		solAlter.setIdsolicitud(idMAx.getIdMax());
+		solAlter.setIdsolicitudalter(Long.valueOf(idSolicitudAlter));
 		solAlter.setPropuesta("1");
 		solAlter.setNombre(solicitud.getAsegurado().getNombre());
 		solAlter.setApellidos(solicitud.getAsegurado().getApellidos());
