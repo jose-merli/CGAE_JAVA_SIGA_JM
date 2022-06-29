@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.guardia;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,9 @@ import org.itcgae.siga.DTOs.scs.PermutaDTO;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.db.entities.ScsCabeceraguardias;
+import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface GuardiasColegiadoService {
 	//obtener datos para las tarjetas de la ficha
@@ -36,8 +40,11 @@ public interface GuardiasColegiadoService {
 	
 	//acciones tarjeta Sustituciones Guardias de Colegiado
 	public UpdateResponseDTO  sustituirGuardiaColeg(String[] datos, HttpServletRequest request) throws Exception;
+	public void validarGuardiaColegiado(ScsCabeceraguardias guardiaKey);
 
-	ResponseDataDTO existeAsistenciasGuardiaColegiado(String[] datos, HttpServletRequest request);
+	// Comprobaciones para la sustitución de letrado
+	public ResponseDataDTO existeFacturacionGuardiaColegiado(String[] datos, HttpServletRequest request);
+	public ResponseDataDTO existeAsistenciasGuardiaColegiado(String[] datos, HttpServletRequest request);
 
 	public String getIdConjuntoGuardia(String idGuardia, HttpServletRequest request);
 	public ComboDTO getTurnoInscrito(String idPersona, HttpServletRequest request);

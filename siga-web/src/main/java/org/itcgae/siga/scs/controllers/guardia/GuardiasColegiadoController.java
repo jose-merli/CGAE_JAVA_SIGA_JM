@@ -93,6 +93,16 @@ public class GuardiasColegiadoController {
 		}
 	}
 
+	@PostMapping(value = "/existeFacturacionGuardiaColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> existeFacturacionGuardiaColegiado(@RequestBody String[] datos, HttpServletRequest request) throws Exception {
+		ResponseDataDTO response = guardiasColegiadoService.existeFacturacionGuardiaColegiado(datos, request);
+		if (response != null) {
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@PostMapping(value = "/existeAsistenciasGuardiaColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDataDTO> existeAsistenciasGuardiaColegiado(@RequestBody String[] datos, HttpServletRequest request) throws Exception {
 		ResponseDataDTO response = guardiasColegiadoService.existeAsistenciasGuardiaColegiado(datos, request);

@@ -73,6 +73,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
+import org.itcgae.siga.scs.services.guardia.GuardiasColegiadoService;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -241,6 +242,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private ScsGuardiasturnoMapper scsGuardiasTurnoMapper;
+
+	@Autowired
+	private GuardiasColegiadoService guardiasColegiadoService;
 
 
 	@Override
@@ -8516,8 +8520,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					guardia.setFechainicio(guardiasItem.getFechadesde());
 					guardia.setFechavalidacion(guardiasItem.getFechaValidacion());
 
-					response = scsCabeceraguardiasExtendsMapper.validarSolicitudGuardia(guardia);
-
+					guardiasColegiadoService.validarGuardiaColegiado(guardia);
 				} catch (Exception e) {
 					LOGGER.error(e);
 					response = 0;
