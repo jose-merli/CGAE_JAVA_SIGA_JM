@@ -415,7 +415,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					
 					if(solicitud.getHerederos() != null){
 						if(solicitud.getHerederos().size() > 0){
-							ArrayList<JSONObject> herederosJSON = new ArrayList<JSONObject>();
+							JSONArray herederosJSON = new JSONArray();
 							WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
 							int index = 0;
 							for (PersonaDTO persona : solicitud.getHerederos()) {
@@ -448,7 +448,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 								cal.setTime(persona.getFechaNacimiento());
 								herederoJSON.put("FechaNacimiento", cal.toInstant());
 								heredero.setFechaNacimiento(cal);
-								herederosJSON.add(herederoJSON);
+								herederosJSON.put(herederoJSON);
 								herederos[index] = heredero;
 								index++;
 							}
@@ -457,7 +457,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						}
 					}else{
 						if(solicitud.getFamiliares().size() > 0){
-							ArrayList<JSONObject> familiaresJSON = new ArrayList<JSONObject>();
+							JSONArray familiaresJSON = new JSONArray();
 							WSPersona[] familiares = new WSPersona[solicitud.getFamiliares().size()];
 							int index = 0;
 							for (PersonaDTO persona : solicitud.getFamiliares()) {
@@ -490,7 +490,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 								cal.setTime(persona.getFechaNacimiento());
 								familiarJSON.put("FechaNacimiento", cal.toInstant());
 								familiar.setFechaNacimiento(cal);
-								familiaresJSON.add(familiarJSON);
+								familiaresJSON.put(familiarJSON);
 								familiares[index] = familiar;
 								index++;
 							}
@@ -682,7 +682,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					
 					if(solicitud.getHerederos() != null){
 						if(solicitud.getHerederos().size() > 0){
-							ArrayList<JSONObject> herederosJSON = new ArrayList<JSONObject>();
+							JSONArray herederosJSON = new JSONArray();
 							WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
 							int index = 0;
 							for (PersonaDTO persona : solicitud.getHerederos()) {
@@ -715,7 +715,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 								cal.setTime(persona.getFechaNacimiento());
 								herederoJSON.put("FechaNacimiento", cal.toInstant());
 								heredero.setFechaNacimiento(cal);
-								herederosJSON.add(herederoJSON);
+								herederosJSON.put(herederoJSON);
 								herederos[index] = heredero;
 								index++;
 							}
