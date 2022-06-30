@@ -385,7 +385,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						direccionJSON.put("Fax", solicitud.getAsegurado().getFax());
 						direccion.setFax(solicitud.getAsegurado().getFax());
 					}
-					direccionJSON.put("Movil", solicitud.getAsegurado().getFax());
+					direccionJSON.put("Movil", solicitud.getAsegurado().getMovil());
 					direccionJSON.put("Pais", solicitud.getAsegurado().getPais());
 					direccion.setMovil(solicitud.getAsegurado().getFax());
 					direccion.setPais(solicitud.getAsegurado().getPais());
@@ -650,7 +650,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						direccionJSON.put("Fax", solicitud.getAsegurado().getFax());
 						direccion.setFax(solicitud.getAsegurado().getFax());
 					}
-					direccionJSON.put("Movil", solicitud.getAsegurado().getFax());
+					direccionJSON.put("Movil", solicitud.getAsegurado().getMovil());
 					direccionJSON.put("Pais", solicitud.getAsegurado().getPais());
 					direccion.setMovil(solicitud.getAsegurado().getFax());
 					direccion.setPais(solicitud.getAsegurado().getPais());
