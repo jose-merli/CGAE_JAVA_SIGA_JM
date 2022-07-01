@@ -952,6 +952,8 @@ public class MenuServiceImpl implements IMenuService {
 		List<String> respuesta = new ArrayList<String>();
 		try {
 			String roles = (String) request.getHeader("CAS-roles");
+			LOGGER.info("CAS-username: " + (String) request.getHeader("CAS-username"));
+			LOGGER.info("CAS-roles: " + roles);
 			String [] rolesList = roles.split("::");
 			int primero, ultimo = 0;
 			String tipoUsuario = "";
