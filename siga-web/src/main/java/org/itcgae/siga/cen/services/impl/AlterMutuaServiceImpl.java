@@ -141,6 +141,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					
 					CenSolicitudalterExample solAlterExample = new CenSolicitudalterExample();
 					solAlterExample.createCriteria().andNumeroidentificadorEqualTo(estadosolicitudDTO.getIdentificador());
+					solAlterExample.setOrderByClause("FECHAMODIFICACION DESC");
 					
 					List<CenSolicitudalter> solAlter = _cenSolicitudalterMapper.selectByExample(solAlterExample);
 					if(solAlter.size() > 0){
@@ -153,7 +154,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						requestBody.setBolDuplicado(estadosolicitudDTO.isDuplicado());
 						request.setGetEstadoSolicitud(requestBody);
 						
-						JsonNode responseAPI = _clientAlterMutua.APICall(jsonObject, "https://api-preproduccion.altermutua.com/api/AlterApp/GetRequestStatusSIGA");
+						JsonNode responseAPI = _clientAlterMutua.APICall(jsonObject, uriService + "/AlterApp/GetRequestStatusSIGA");
 						
 						if (responseAPI != null) {
 							
@@ -384,7 +385,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						direccionJSON.put("Fax", solicitud.getAsegurado().getFax());
 						direccion.setFax(solicitud.getAsegurado().getFax());
 					}
-					direccionJSON.put("Movil", solicitud.getAsegurado().getFax());
+					direccionJSON.put("Movil", solicitud.getAsegurado().getMovil());
 					direccionJSON.put("Pais", solicitud.getAsegurado().getPais());
 					direccion.setMovil(solicitud.getAsegurado().getFax());
 					direccion.setPais(solicitud.getAsegurado().getPais());
@@ -414,7 +415,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					
 					if(solicitud.getHerederos() != null){
 						if(solicitud.getHerederos().size() > 0){
-							ArrayList<JSONObject> herederosJSON = new ArrayList<JSONObject>();
+							JSONArray herederosJSON = new JSONArray();
 							WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
 							int index = 0;
 							for (PersonaDTO persona : solicitud.getHerederos()) {
@@ -447,7 +448,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 								cal.setTime(persona.getFechaNacimiento());
 								herederoJSON.put("FechaNacimiento", cal.toInstant());
 								heredero.setFechaNacimiento(cal);
-								herederosJSON.add(herederoJSON);
+								herederosJSON.put(herederoJSON);
 								herederos[index] = heredero;
 								index++;
 							}
@@ -456,7 +457,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						}
 					}else{
 						if(solicitud.getFamiliares().size() > 0){
-							ArrayList<JSONObject> familiaresJSON = new ArrayList<JSONObject>();
+							JSONArray familiaresJSON = new JSONArray();
 							WSPersona[] familiares = new WSPersona[solicitud.getFamiliares().size()];
 							int index = 0;
 							for (PersonaDTO persona : solicitud.getFamiliares()) {
@@ -489,7 +490,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 								cal.setTime(persona.getFechaNacimiento());
 								familiarJSON.put("FechaNacimiento", cal.toInstant());
 								familiar.setFechaNacimiento(cal);
-								familiaresJSON.add(familiarJSON);
+								familiaresJSON.put(familiarJSON);
 								familiares[index] = familiar;
 								index++;
 							}
@@ -649,7 +650,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						direccionJSON.put("Fax", solicitud.getAsegurado().getFax());
 						direccion.setFax(solicitud.getAsegurado().getFax());
 					}
-					direccionJSON.put("Movil", solicitud.getAsegurado().getFax());
+					direccionJSON.put("Movil", solicitud.getAsegurado().getMovil());
 					direccionJSON.put("Pais", solicitud.getAsegurado().getPais());
 					direccion.setMovil(solicitud.getAsegurado().getFax());
 					direccion.setPais(solicitud.getAsegurado().getPais());
@@ -681,7 +682,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					
 					if(solicitud.getHerederos() != null){
 						if(solicitud.getHerederos().size() > 0){
-							ArrayList<JSONObject> herederosJSON = new ArrayList<JSONObject>();
+							JSONArray herederosJSON = new JSONArray();
 							WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
 							int index = 0;
 							for (PersonaDTO persona : solicitud.getHerederos()) {
@@ -714,7 +715,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 								cal.setTime(persona.getFechaNacimiento());
 								herederoJSON.put("FechaNacimiento", cal.toInstant());
 								heredero.setFechaNacimiento(cal);
-								herederosJSON.add(herederoJSON);
+								herederosJSON.put(herederoJSON);
 								herederos[index] = heredero;
 								index++;
 							}
@@ -776,7 +777,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					asegurado.setIdioma(Integer.parseInt(solicitud.getAsegurado().getIdioma()));
 					asegurado.setNombre(solicitud.getAsegurado().getNombre());
 					asegurado.setPublicidad(solicitud.getAsegurado().isPublicidad());
-					if(solicitud.getAsegurado().getSexo().equals("H")==true){
+					if(solicitud.getAsegurado().getSexo() != null && solicitud.getAsegurado().getSexo().equals("H")==true){
 						aseguradoJSON.put("Sexo", 1);
 						asegurado.setSexo(1);
 					}else{
@@ -811,7 +812,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						responseDTO.setIdentificador(responseAPI.get("Identificador").asInt());
 						
 						if(responseDTO.getIdentificador() > 0){
-							insertarSolicitudJSON(solicitud, responseAPI);
+							insertarSolicitudJSON(solicitud, responseAPI, responseAPI.get("Identificador").asInt());
 						}
 
 						responseDTO.setDocumento(responseAPI.get("Documento").binaryValue());
@@ -924,13 +925,14 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 		return _cenSolicitudalterMapper.insert(solAlter);
 	}
 	
-	private int insertarSolicitudJSON(SolicitudDTO solicitud, JsonNode responseAPI){
+	private int insertarSolicitudJSON(SolicitudDTO solicitud, JsonNode responseAPI, int idSolicitudAlter){
 		
 		CenSolicitudalter solAlter = new CenSolicitudalter();
 		MaxIdDto idMAx = new MaxIdDto();
 		idMAx = _cenSolicitudAlterExtendsMapper.getMaxIdRecurso();
 		
 		solAlter.setIdsolicitud(idMAx.getIdMax());
+		solAlter.setIdsolicitudalter(Long.valueOf(idSolicitudAlter));
 		solAlter.setPropuesta("1");
 		solAlter.setNombre(solicitud.getAsegurado().getNombre());
 		solAlter.setApellidos(solicitud.getAsegurado().getApellidos());
