@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -1795,11 +1796,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						String fSoK = null;
 						if (element.getUltimoCola() != null && element.getUltimoCola() != 0) {
 							if (element.getFechaSuscripcion() != null) {
-								fS = element.getFechaSuscripcion().toString();
-								LocalDate date4 = ZonedDateTime
-										.parse(fS, DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH))
-										.toLocalDate();
-								fSoK = date4.toString();
+								fSoK = element.getFechaSuscripcion().toInstant().atZone(ZoneId.systemDefault())
+										.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 							}
 
 							try {
