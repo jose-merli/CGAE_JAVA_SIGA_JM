@@ -518,9 +518,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						asegurado.setSexo(2);
 					}
 					aseguradoJSON.put("TipoComunicacion", Integer.parseInt(solicitud.getAsegurado().getMedioComunicacion()));
-					aseguradoJSON.put("TipoEjercicio", Integer.parseInt(solicitud.getAsegurado().getTipoEjercicio()));
 					asegurado.setTipoComunicacion(Integer.parseInt(solicitud.getAsegurado().getMedioComunicacion()));
-					asegurado.setTipoEjercicio(Integer.parseInt(solicitud.getAsegurado().getTipoEjercicio()));
 					
 					if(solicitud.getAsegurado().getTipoIdentificador().equals("NIF")==true || solicitud.getAsegurado().getTipoIdentificador().equals("NIE")==true){
 						aseguradoJSON.put("TipoIdentificador", 0);
@@ -786,10 +784,6 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					}
 					aseguradoJSON.put("TipoComunicacion", Integer.parseInt(solicitud.getAsegurado().getMedioComunicacion()));
 					asegurado.setTipoComunicacion(Integer.parseInt(solicitud.getAsegurado().getMedioComunicacion()));
-					if(solicitud.getAsegurado().getTipoEjercicio() != null) {
-						aseguradoJSON.put("TipoEjercicio", Integer.parseInt(solicitud.getAsegurado().getTipoEjercicio()));
-						asegurado.setTipoEjercicio(Integer.parseInt(solicitud.getAsegurado().getTipoEjercicio()));
-					}
 					
 					if(solicitud.getAsegurado().getTipoIdentificador().equals("NIF")==true || solicitud.getAsegurado().getTipoIdentificador().equals("NIE")==true){
 						aseguradoJSON.put("TipoIdentificador", 0);
