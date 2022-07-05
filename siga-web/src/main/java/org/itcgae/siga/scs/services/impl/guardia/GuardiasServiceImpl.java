@@ -1274,6 +1274,39 @@ public class GuardiasServiceImpl implements GuardiasService {
 						grupoUltimo = "and idgrupoguardia = " + guardias.get(0).getIdgrupoguardiaUltimo();
 
 
+					// Se comprueba si existe letrado último antes de realizar la búsqueda
+					if (guardias.get(0).getIdpersonaUltimo() != null && guardias.get(0).getFechasuscripcionUltimo() != null) {
+						ScsInscripcionguardiaKey inscripcionguardiaKey = new ScsInscripcionguardiaKey();
+						inscripcionguardiaKey.setIdinstitucion(guardias.get(0).getIdinstitucion());
+						inscripcionguardiaKey.setIdturno(guardias.get(0).getIdturno());
+						inscripcionguardiaKey.setIdguardia(guardias.get(0).getIdguardia());
+						inscripcionguardiaKey.setIdpersona(guardias.get(0).getIdpersonaUltimo());
+						inscripcionguardiaKey.setFechasuscripcion(guardias.get(0).getFechasuscripcionUltimo());
+
+						ScsInscripcionguardia inscripcionguardia = scsInscripcionguardiaExtendsMapper.selectByPrimaryKey(inscripcionguardiaKey);
+
+						if (inscripcionguardia == null) {
+							ultimo = "";
+							grupoUltimo = "";
+
+							// 
+						} else if (guardias.get(0).getIdgrupoguardiaUltimo() != null) {
+							ScsGrupoguardiacolegiadoExample grupoExample = new ScsGrupoguardiacolegiadoExample();
+							grupoExample.createCriteria()
+									.andIdinstitucionEqualTo(guardias.get(0).getIdinstitucion())
+									.andIdturnoEqualTo(guardias.get(0).getIdturno())
+									.andIdguardiaEqualTo(guardias.get(0).getIdguardia())
+									.andIdpersonaEqualTo(guardias.get(0).getIdpersonaUltimo())
+									.andFechasuscripcionEqualTo(guardias.get(0).getFechasuscripcionUltimo())
+									.andIdgrupoguardiaEqualTo(guardias.get(0).getIdgrupoguardiaUltimo());
+
+							if (scsGrupoguardiacolegiadoMapper.countByExample(grupoExample) == 0) {
+								ultimo = "";
+								grupoUltimo = "";
+							}
+						}
+					}
+
 					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
 							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
 							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo);
