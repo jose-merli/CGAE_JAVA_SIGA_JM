@@ -2949,10 +2949,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
         List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
         String idsGrupo = "";
-        	AdmUsuarios usuario = usuarios.get(0);
-            usuario.setIdinstitucion(idInstitucion);
-            idLenguaje=usuario.getIdlenguaje();    
-            
+    	AdmUsuarios usuario = usuarios.get(0);
+        usuario.setIdinstitucion(idInstitucion);
+        idLenguaje=usuario.getIdlenguaje();    
+        String numsPagosSJCS = ""; 
 
 		if(null != idInstitucion) {
 			
@@ -2962,8 +2962,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 			}*/
 			
 			Integer tamMaximo = getTamanoMaximo(idInstitucion);
-	              
-	        List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem, idInstitucion.toString(), idLenguaje, tamMaximo);
+			
+			if(facAbonoItem.getGrupoPago() != null || facAbonoItem.getGrupoPagoHasta() !=null || facAbonoItem.getGrupoFacturacionNombre() !=null) {
+				numsPagosSJCS = facAbonoSJCSExtendsMapper.pagosSJCS(facAbonoItem);
+			}
+	         
+	        List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem, idInstitucion.toString(), idLenguaje, tamMaximo, numsPagosSJCS);
 	        facAbonoDTO.setListaFacAbonoItem(listaFacAbonosItem);
 		}
 	
