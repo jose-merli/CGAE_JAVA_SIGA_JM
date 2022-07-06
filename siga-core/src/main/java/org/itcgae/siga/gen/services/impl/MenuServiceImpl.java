@@ -752,6 +752,10 @@ public class MenuServiceImpl implements IMenuService {
 		Boolean encontrado = false;
 		try{
 			LOGGER.debug("Validamos la institucion");
+			
+			LOGGER.info("CAS-username: " + (String) request.getHeader("CAS-username"));
+			LOGGER.info("CAS-roles: " + (String) request.getHeader("CAS-roles"));
+			
 			LOGGER.debug("Obtenemos de la request las instituciones del usuario en CAS");
 			List<String> institucionesList = getInstitucionesUsuarioRequest(request);
 			LOGGER.debug("Obtenemos de la lista de instituciones de base de datos");
