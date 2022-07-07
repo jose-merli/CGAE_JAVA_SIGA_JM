@@ -715,7 +715,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "            WHEN factsus.idfactura IS NULL THEN '0'\r\n"
 				+ "            ELSE '1'\r\n"
 				+ "        END\r\n"
-				+ "    AS facturas");
+				+ "    AS facturas,servins.automatico");
 
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet"); 
 
@@ -955,6 +955,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "        ) || ')'\r\n"
 				+ "    END,\r\n"
 				+ "    suscripcion.fechasuscripcion,\r\n"
+				+ "    servins.automatico,\r\n"
 				+ "    suscripcion.fechabaja,\r\n"
 				+ "    CASE\r\n"
 				+ "        WHEN factsus.idfactura IS NULL THEN '0'\r\n"
