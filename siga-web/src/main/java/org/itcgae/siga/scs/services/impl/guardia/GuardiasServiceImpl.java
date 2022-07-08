@@ -1829,8 +1829,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						String fSoK = null;
 						if (element.getUltimoCola() != null && element.getUltimoCola() != 0) {
 							if (element.getFechaSuscripcion() != null) {
-								fSoK = element.getFechaSuscripcion().toInstant().atZone(ZoneId.systemDefault())
-										.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+								SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+								fSoK = formatter.format(element.getFechaSuscripcion());
 							}
 
 							try {
