@@ -151,16 +151,12 @@ public class EjecucionPlsServicios {
     	
         Object[] paramIn = new Object[8];
     
-        
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        String fechaAlta = dateFormat.format(borrarSuscripcionBajaItem.getFechaeliminacionaltas());
-        
         paramIn[0] = idInstitucion; // IDINSTITUCION
         paramIn[1] = borrarSuscripcionBajaItem.getIdtiposervicios(); // IDTIPOSERVICIOS
         paramIn[2] = borrarSuscripcionBajaItem.getIdservicio(); // IDSERVICIO
         paramIn[3] = borrarSuscripcionBajaItem.getIdserviciosinstitucion(); //IDSERVICIOSINSTITUCION
-        paramIn[4] = borrarSuscripcionBajaItem.getOpcionaltasbajas(); // P_ALTA - IN - Indica los tipos de solicitudes a borrar - VARCHAR2(1) (RADIOBUTTON)  
-        paramIn[5] = fechaAlta; //P_FECHAALTA - IN - Fecha de alta en formato DD/MM/YYYY - VARCHAR2(10) (DATEPICKER)
+        paramIn[4] = "0"; // P_ALTA - IN - Indica los tipos de solicitudes a borrar - VARCHAR2(1) (RADIOBUTTON) //0 para borrar. 
+        paramIn[5] = null; //P_FECHAALTA - IN - Fecha de alta en formato DD/MM/YYYY - VARCHAR2(10) (DATEPICKER)
         paramIn[6] = borrarSuscripcionBajaItem.getIncluirbajasmanuales(); //- P_INCLUIRMANUALES - IN - Incluir servicios manuales - VARCHAR2(1)    (CHECKBOX)
         paramIn[7] = usuario.getIdusuario(); // - P_USUMODIFICACION - IN - Usuario que realiza la modificacion - NUMBER(5)
         

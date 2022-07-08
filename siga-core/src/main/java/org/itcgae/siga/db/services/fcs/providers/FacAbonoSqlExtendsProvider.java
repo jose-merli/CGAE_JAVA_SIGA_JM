@@ -13,7 +13,7 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 	
 	private Logger LOGGER = Logger.getLogger(this.getClass());
 	
-	public String buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje, Integer tamMaximo) {
+	public String buscarAbonosSJCS(FacAbonoItem facAbonoItem, String idInstitucion,String idLenguaje, Integer tamMaximo, String numsPagosSJCS) {
 		SQL sql = new SQL();
 		SQL sqlTotal = new SQL();
 		SQL transferencia = new SQL();
@@ -40,14 +40,9 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		sql.LEFT_OUTER_JOIN("FAC_ESTADOABONO EA ON (EA.IDESTADO = A.ESTADO)");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS GEN ON (EA.DESCRIPCION = GEN.IDRECURSO  AND GEN.IDLENGUAJE = "+ idLenguaje +")");
 		
-		if(facAbonoItem.getGrupoPago() != null || facAbonoItem.getGrupoPagoHasta() !=null || facAbonoItem.getGrupoFacturacionNombre() !=null) {
+		if(numsPagosSJCS != null && !numsPagosSJCS.isEmpty()) {
 			
-			String grupoFacturacionAux = facAbonoItem.getGrupoFacturacionNombre() != null ? facAbonoItem.getGrupoFacturacionNombre() : "-1";
-			String grupoPagoDesdeAux = facAbonoItem.getGrupoPago() != null ? facAbonoItem.getGrupoPago() : null;
-			String grupoPagoHastaAux = facAbonoItem.getGrupoPagoHasta() != null ? facAbonoItem.getGrupoPagoHasta() : null;
-			
-			
-			sql.WHERE("F.IDFACTURACION IN (PKG_SIGA_PAGOS_SJCS.Func_Pagos_Intervalo_GrupoFact(A.Idinstitucion , " + grupoPagoDesdeAux + "," + grupoPagoHastaAux + ", " + grupoFacturacionAux + "))");
+			sql.WHERE("F.IDFACTURACION IN ("+numsPagosSJCS+")"); // se controla en this.pagosSJCS()
 			
 		}
 		
@@ -123,6 +118,18 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		return sqlTotal.toString();
 	}
 
+	public String pagosSJCS(FacAbonoItem item){
+		String grupoFacturacionAux = item.getGrupoFacturacionNombre() != null ? item.getGrupoFacturacionNombre() : "-1";
+		String grupoPagoDesdeAux = item.getGrupoPago() != null ? item.getGrupoPago() : null;
+		String grupoPagoHastaAux = item.getGrupoPagoHasta() != null ? item.getGrupoPagoHasta() : null;
+		
+		
+		SQL sql = new SQL();
+		sql.SELECT("PKG_SIGA_PAGOS_SJCS.Func_Pagos_Intervalo_GrupoFact("+item.getIdInstitucion()+","+grupoPagoDesdeAux+" , "+grupoPagoHastaAux+", "+grupoFacturacionAux+")" );
+		sql.FROM("dual");
+		return sql.toString();
+	}
+	
     public String getNuevoID(String idInstitucion) {
 
         SQL sql = new SQL();

@@ -2273,6 +2273,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ig.setFechamodificacion(new SimpleDateFormat("dd/MM/yyyy").parse((fechaModificacion)));
 									ig.setIdinstitucion(Short.parseShort(incompatibilidad.getIdInstitucion()));
 									scsIncompatibilidadguardiasExtendsMapper.updateByPrimaryKeySelective(ig);
+									
+									// Lógica para el registro en la otra dirección.
+									ig.setIdturno(Integer.parseInt(idTurnoIncpList.get(j)));
+									ig.setIdguardia(Integer.parseInt(idGuardiaIncpList.get(j).toString()));
+									ig.setIdturnoIncompatible(Integer.parseInt(idTurno));
+									ig.setIdguardiaIncompatible(Integer.parseInt(idGuardia));
+									scsIncompatibilidadguardiasExtendsMapper.updateByPrimaryKeySelective(ig);
 									//							scsIncompatibilidadguardiasExtendsMapper.updateIfExists(idTurno,
 									//									incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible,
 									//									idGuardiaIncompatible, incompatibilidad.getMotivos(),
