@@ -491,7 +491,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 	public String selectSociedadesEliminadas(Short idInstitucion, Date fechaDesde, Date fechaHasta) {
 		// Formateo de fecha para sentencia sql
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
 		SQL sql = new SQL();
 		sql.SELECT("PER.NIFCIF AS NIF");
@@ -501,9 +501,11 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		String fechadesde = dateFormat.format(fechaDesde);
-		sql.WHERE("COL.FECHA_BAJA >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
+		sql.WHERE("COL.FECHA_BAJA >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY hh24:mi:ss')");
 		String fechahasta = dateFormat.format(fechaHasta);
-		sql.WHERE("COL.FECHA_BAJA < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
+		sql.WHERE("COL.FECHA_BAJA < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY hh24:mi:ss')");
+		
+		sql.WHERE("COL.SOCIEDADPROFESIONAL = '1'");
 
 		return sql.toString();
 
