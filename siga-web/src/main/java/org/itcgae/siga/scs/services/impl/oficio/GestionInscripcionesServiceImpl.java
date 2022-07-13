@@ -309,9 +309,12 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InscripcionesDTO inscripcionesDTO = new InscripcionesDTO();
-		List<InscripcionesItem> inscripcionesItems = null;
+		//SIGARNV-2471@DTT.JAMARTIN@11/07/2022@INICIO
+		List<InscripcionesItem> inscripcionesItems = new ArrayList<>();
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		boolean foundUltimo;
+		InscripcionesItem punteroInscripcion = null;
 		String busquedaOrden = "";
 
 		if (idInstitucion != null) {
@@ -339,6 +342,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				listaTurno = scsTurnosExtendsMapper.selectByExample(exampleturno);
 				
 				ScsTurno turno = listaTurno.get(0);
+				String idPersona_ultimo = turno.getIdpersonaUltimo().toString();
 				
 				ComboDTO comboDTO = new ComboDTO();
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -354,13 +358,47 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 					busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
 				}
 				
-				Date prueba = inscripcionesItem.getFechasolicitud();
+				Date prueba = inscripcionesItem.getFechaActual();
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);
 				
-				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaColaOficio(inscripcionesItem, strDate, busquedaOrden,
-						idInstitucion);
+				if(turno.getIdpersonaUltimo() != null) {
+					List<InscripcionesItem> inscripcionesAuxiliar = new ArrayList<InscripcionesItem>();
+					List<InscripcionesItem> listaInscripciones = scsInscripcionturnoExtendsMapper.busquedaColaOficio2(inscripcionesItem, strDate, busquedaOrden, idInstitucion);
+					foundUltimo = false;
+					int indiceOrden = 0;
 
+					for (int i = 0; i < listaInscripciones.size(); i++) {
+
+						punteroInscripcion = listaInscripciones.get(i);
+						punteroInscripcion.setOrden(String.valueOf(i + 1));
+
+						if (foundUltimo) {
+							inscripcionesItems.add(punteroInscripcion);
+						} else {
+							inscripcionesAuxiliar.add(punteroInscripcion);
+						}
+						
+						if (!foundUltimo && (punteroInscripcion.getIdpersona().equals(idPersona_ultimo))) {
+							foundUltimo = true;
+						}
+					}
+
+					if (inscripcionesAuxiliar.size() > 0) {
+						inscripcionesItems.addAll(inscripcionesAuxiliar);
+					}
+
+					// Reordenar correctamente la lista
+					for (InscripcionesItem inscripcion : inscripcionesItems) {
+						inscripcion.setOrden(String.valueOf(indiceOrden + 1));
+						inscripcionesItems.set(indiceOrden, inscripcion);
+						indiceOrden++;
+					}
+					
+				} else {
+					inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaColaOficio(inscripcionesItem, strDate, busquedaOrden, idInstitucion);
+				}
+				//SIGARNV-2471@DTT.JAMARTIN@11/07/2022@FIN 
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
 
