@@ -666,9 +666,9 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 @Results({@Result(column = "IDCALENDARIOGUARDIAS", property = "IDCALENDARIOGUARDIAS", jdbcType = JdbcType.DECIMAL)})
 	 String getIdCalendarioGuardias(String idTurno, String idGuardia, String idInstitucion);
 	 
-	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="insertarRegistroCalendarioGuardias")
+	 @InsertProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="insertarRegistroCalendarioGuardias")
 	 @Results({})
-	 String insertarRegistroCalendarioGuardias(Integer idTurnoPrincipal, Integer idGuardiaPrincipal, Integer idCalendarioPrincipal, String observaciones, String idTurno, String idGuardia, String fechaHasta, String fechaDesde, String idCalendarioProgramado, String idInstitucion, String idPersonaUltimoAnterior, String today, String fechaSuscUltimoAnterior, String idGrupoUltimoAnterior, String usuModif);
+	 int insertarRegistroCalendarioGuardias(Integer idTurnoPrincipal, Integer idGuardiaPrincipal, Integer idCalendarioPrincipal, String observaciones, String idTurno, String idGuardia, String fechaHasta, String fechaDesde, String idCalendarioProgramado, String idInstitucion, String idPersonaUltimoAnterior, String today, String fechaSuscUltimoAnterior, String idGrupoUltimoAnterior, String usuModif);
 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getGuardia")
 	 @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
@@ -1045,7 +1045,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Results({})
 			String guardarSaltosCompensacionesGrupo(SaltoCompGuardiaGrupoItem saltoItem, String idInstitucion, Integer usuario);
 			
-			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "nextIdSaltoOComp")
+			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "nextIdCalprog")
 			@Results({
 				@Result(column = "ID", property="ID", jdbcType = JdbcType.VARCHAR)})
 			String nextIdCalprog();
@@ -1225,6 +1225,10 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Results({})
 			String getLastProgramacion( String idInstitucion);
 
+			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getNextProgramacion")
+			@Results({})
+			String getNextProgramacion( String idInstitucion);
+			
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getLastCalendar")
 			@Results({})
 			String getLastCalendar( String idInstitucion);

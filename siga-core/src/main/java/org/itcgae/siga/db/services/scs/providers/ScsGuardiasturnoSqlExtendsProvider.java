@@ -1700,6 +1700,14 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		return sql.toString();
 	}
+	
+	public String getNextProgramacion( String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT_DISTINCT("MAX(IDPROGCALENDARIO) + 1");
+		sql.FROM("SCS_PROG_CALENDARIOS");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
+	}
 
 	public String getLastCalendar( String idInstitucion) {
 		SQL sql = new SQL();
@@ -3590,6 +3598,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.FROM("SCS_GUARDIASCOLEGIADO");
 		sql.WHERE("FECHAINICIO >= TO_DATE(' " + fechaDesde + "', 'dd/MM/yyyy')");
 		sql.WHERE("FECHAFIN <= TO_DATE(' " + fechaHasta + "', 'dd/MM/yyyy')");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		return sql.toString();
 	}
 
@@ -3651,6 +3660,10 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		}
 		if (usuModif != null) {
 			sql2.VALUES("USUMODIFICACION", usuModif);
+		}
+		
+		if(item.getEstado() != null) {
+			sql2.VALUES("ESTADO", item.getEstado());
 		}
 
 	//	if (item.getGenerado() != null) {
