@@ -23,10 +23,21 @@ public class CenCargaMasivaSqlExtendsProvider extends CenCargamasivaSqlProvider 
 		sql.INNER_JOIN("adm_usuarios adm on (adm.idusuario = ca.usumodificacion and adm.idinstitucion = ca.idinstitucion)");
 		sql.WHERE("ca.idinstitucion = '"+ idInstitucion  + "'");
 		sql.WHERE("ca.tipocarga = '"+ cargaMasivaItem.getTipoCarga() + "'");
-
-		if (cargaMasivaItem.getFechaCarga() != null && cargaMasivaItem.getFechaCarga() != "") {
-			sql.WHERE("ca.fechacarga>= TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/RRRR') and ca.fechacarga< (TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/YYYY')+1)");
+		
+		if (cargaMasivaItem.getFechaCargaDesde() != null && !cargaMasivaItem.getFechaCarga().isEmpty()) {
+			sql.WHERE("ca.fechacarga>= TO_DATE('" + cargaMasivaItem.getFechaCargaDesde() + "','DD/MM/YYYY')");
 		}
+
+		if(cargaMasivaItem.getFechaCargaHasta() != null && !cargaMasivaItem.getFechaCargaHasta().isEmpty()) {
+			 sql.WHERE("ca.fechacarga<= TO_DATE('" + cargaMasivaItem.getFechaCargaHasta() + "','DD/MM/YYYY')+1");
+		}
+		
+		if(cargaMasivaItem.getFechaSolicitudDesde() != null && !cargaMasivaItem.getFechaSolicitudDesde().isEmpty()) {
+			sql.WHERE("ca.fechacarga>= TO_DATE('" + cargaMasivaItem.getFechaSolicitudDesde() + "','DD/MM/YYYY')");
+		}
+		/*if (cargaMasivaItem.getFechaCarga() != null && cargaMasivaItem.getFechaCarga() != "") {
+			sql.WHERE("ca.fechacarga>= TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/RRRR') and ca.fechacarga< (TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/YYYY')+1)");
+		}*/
 
 		sql.WHERE(" rownum <= 200");
 		sql.ORDER_BY("ca.fechacarga desc");

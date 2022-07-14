@@ -11,6 +11,9 @@ public class CargaMasivaItem {
 	private String usuario;
 	private Short registrosCorrectos;
 	private String fechaCarga;
+	private String fechaCargaDesde ;
+	private String fechaCargaHasta;
+	private String fechaSolicitudDesde;
 	private String tipoCarga;
 	private Long idFichero;
 	private Long idFicheroLog;
@@ -184,6 +187,30 @@ public class CargaMasivaItem {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+	public String getFechaCargaDesde() {
+		return fechaCargaDesde;
+	}
+
+	public void setFechaCargaDesde(String fechaCargaDesde) {
+		this.fechaCargaDesde = fechaCargaDesde;
+	}
+
+	public String getFechaCargaHasta() {
+		return fechaCargaHasta;
+	}
+
+	public void setFechaCargaHasta(String fechaCargaHasta) {
+		this.fechaCargaHasta = fechaCargaHasta;
+	}
+
+	public String getFechaSolicitudDesde() {
+		return fechaSolicitudDesde;
+	}
+
+	public void setFechaSolicitudDesde(String fechaSolicitudDesde) {
+		this.fechaSolicitudDesde = fechaSolicitudDesde;
 	}
 
 
