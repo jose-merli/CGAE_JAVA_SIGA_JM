@@ -133,10 +133,10 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
             if (!soloGenerarFactura) {
 
                 try {
-
                     // Lo primero que se hace es poner la facturacion en estado EJECUTANDO CONFIRMACION
                     facAactualizar.setIdestadoconfirmacion(FacEstadosFacturacion.EJECUTANDO_CONFIRMACION.getId());
                     facProgMapper.updateByPrimaryKeySelective(facAactualizar);
+        			facturacionHelper.actualizarLogExcel(facAactualizar, FacEstadosFacturacion.EJECUTANDO_CONFIRMACION,"");
                     commit(tx);
 
                     LOGGER.info("### Procesando CONFIRMACION: " + idProgramacion);
@@ -236,13 +236,14 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
                     facAactualizar.setIdestadoconfirmacion(FacEstadosFacturacion.CONFIRM_FINALIZADA.getId());
                     facAactualizar.setLogerror("");
                     facProgMapper.updateByPrimaryKeySelective(facAactualizar);
+                    facturacionHelper.actualizarLogExcel(facAactualizar, FacEstadosFacturacion.CONFIRM_FINALIZADA,"");
 
                     commit(tx);
 
                     LOGGER.info("CONFIRMAR Y PRESENTAR OK ");
 
                 } catch (Exception e) {
-
+                	LOGGER.error("confirmarProgramacionFactura() - ", e );
                     rollBack(tx);
 
                     String sms = e.getMessage() != null ? e.getMessage() : e.toString();
@@ -254,14 +255,16 @@ public class ProTratarConfirmacion extends ProcesoFacPyS {
                     facAactualizar.setLogerror(getNombreFicheroLogConfirmacion(facFacturacionprogramada));
 
                     facProgMapper.updateByPrimaryKeySelective(facAactualizar);
+                    facturacionHelper.actualizarLogExcel(facAactualizar, FacEstadosFacturacion.ERROR_CONFIRMACION,sms);
                     commit(tx);
 
-                    LOGGER.info("CAMBIA ESTADO A FINALIZADA ERRORES.");
+                    LOGGER.info("CAMBIA ESTADO A FINALIZADA ERRORES: " + sms);
                     throw new Exception("Ha ocurrido un error al confirmar facturación " + sms);
                 }
 
                 //INSERTAMOS EN LA COLA LA OPERACION CREARCLIENTE(): (NO HAY PROBLEMA PORQUE SI EL CLIENTE YA EXISTE LO ACTUALIZA, Y HACE UN INTENTO DE TRASPASAR UNICAMENTE LAS FACTURAS QUE TENGA SIN TRASPASAR, QUE ES LO QUE NOS INTERESA).
                 facAactualizar.setIdestadotraspaso(TRASPASO_PROGRAMADA);
+                facturacionHelper.actualizarLogExcel(facAactualizar, FacEstadosFacturacion.TRASPASO_PROGRAMADA,"");
                 Short idInstitucion = facFacturacionprogramada.getIdinstitucion();
                 encolarTraspasoFacturas(idInstitucion, idSerieFacturacion, idProgramacion);
 

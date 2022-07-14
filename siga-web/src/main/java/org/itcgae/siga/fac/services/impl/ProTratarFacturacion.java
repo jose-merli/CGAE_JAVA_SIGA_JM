@@ -1,23 +1,32 @@
 package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaExtendsDTO;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmInforme;
 import org.itcgae.siga.db.entities.AdmInformeExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
+import org.itcgae.siga.db.entities.FcsEstadosfacturacion;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +36,7 @@ import java.util.List;
 public class ProTratarFacturacion extends ProcesoFacPyS {
 
     private final Logger LOGGER = Logger.getLogger(ProTratarFacturacion.class);
+    private static final int EXCEL_ROW_FLUSH = 1000;
 
     @Override
     protected void execute(String idInstitucion) {
@@ -209,6 +219,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         if (facProgMapper.updateByPrimaryKeySelective(fac) != 1) {
             throw new Exception("### Error al actualizar el estado de la GENERACION.");
         }
+        facturacionHelper.actualizarLogExcel(fac,FacEstadosFacturacion.GENERADA,null);
     }
 
     private String generarInformeGeneracion(String idInstitucion, FacFacturacionprogramada fac) throws Exception {
@@ -304,7 +315,7 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
                 throw new Exception("Error al actualizar el estado de la generacion. finalizada con errores.");
             }
 
-            logErrorFacturacion(fac, mensaje);
+            logErrorFacturacion(fac, mensaje,estadoFin);
 
             commit(transactionPrincipal);
 
@@ -314,21 +325,21 @@ public class ProTratarFacturacion extends ProcesoFacPyS {
         }
     }
 
-    private void logErrorFacturacion(FacFacturacionprogramada fac, String sMensaje) throws Exception {
+    private void logErrorFacturacion(FacFacturacionprogramada fac, String sMensaje, FacEstadosFacturacion estadoFin) throws Exception {
         String pathFichero = getProperty(FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION);
         Path pLog = Paths.get(pathFichero).resolve(fac.getIdinstitucion().toString()).resolve(fac.getLogerror());
         Files.deleteIfExists(pLog);
-        try (PrintWriter log = new PrintWriter(pLog.toFile())) {
-
-            if (!UtilidadesString.esCadenaVacia(sMensaje)) {
-                log.println(sMensaje);
-            } else {
-                log.println(TXT_ERR_NO_SE_HA_PODIDO_FACTURAR_NADA);
+        try {
+        	if (UtilidadesString.esCadenaVacia(sMensaje)) {
+             sMensaje = TXT_ERR_NO_SE_HA_PODIDO_FACTURAR_NADA;
             }
+        	facturacionHelper.actualizarLogExcel(fac,estadoFin , sMensaje);            
         } catch (Exception e) {
             throw new BusinessException("Error al crear el fichero de log:" + pLog, e);
         }
     }
+    
+
 
     private void actualizarNombreFichero(FacFacturacionprogramada fac, String namefile, TransactionStatus transactionStatus) throws Exception {
         LOGGER.info("### GENERACION finalizada correctamente con datos ");
