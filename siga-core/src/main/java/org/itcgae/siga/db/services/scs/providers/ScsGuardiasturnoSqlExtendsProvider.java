@@ -3467,9 +3467,14 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if (sFechaSusc != null) {
 		sql.SET("FECHASUSCRIPCION_ULTIMO = TO_DATE(' " + sFechaSusc + "', 'YYYY-MM-DD HH24:MI:SS')");
 		}
-		if (sIdpersona != null && sIdpersona != "null" && !sIdpersona.isEmpty() ) {
-		sql.SET("IDPERSONA_ULTIMO = " + sIdpersona);
+		if (sIdGrupoGuardiaColegiado_Ultimo == null || sIdGrupoGuardiaColegiado_Ultimo == "null" || sIdGrupoGuardiaColegiado_Ultimo.isEmpty()) {
+			if (sIdpersona != null && sIdpersona != "null" && !sIdpersona.isEmpty()) {
+				sql.SET("IDPERSONA_ULTIMO = " + sIdpersona);
+			}
+		} else {
+			sql.SET("IDPERSONA_ULTIMO = NULL");
 		}
+
 		if (usu != null) {
 		sql.SET("USUMODIFICACION = " + usu);
 		}

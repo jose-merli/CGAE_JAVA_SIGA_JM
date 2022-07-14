@@ -20,7 +20,7 @@ import org.itcgae.siga.db.mappers.ScsInscripcionguardiaSqlProvider;
 
 public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguardiaSqlProvider{
 	
-	public String getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion, String idgrupoguardia) {
+	public String getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion, String idgrupoguardia, Boolean porGrupos) {
 		SQL sql = new SQL();
 		
 		String fechaAnd = fecha != null && !fecha.equals("") ? "AND TRUNC(Ins.Fechavalidacion) <= NVL('"+fecha+"', Ins.Fechavalidacion)\r\n":"";
@@ -67,31 +67,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado,\r\n" + 
 					"				Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
 					"				Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
-					"				Gru.ORDEN AS Ordengrupo,\r\n" + 
-					"				(\r\n" + 
-					"				SELECT\r\n" + 
-					"					COUNT(1) numero\r\n" + 
-					"				FROM\r\n" + 
-					"					scs_saltoscompensaciones salto\r\n" + 
-					"				WHERE\r\n" + 
-					"					salto.idinstitucion = gua.idinstitucion\r\n" + 
-					"					AND salto.idturno = gua.IDTURNO\r\n" + 
-					"					AND salto.idguardia = gua.idguardia\r\n" + 
-					"					AND salto.saltoocompensacion = 'S'\r\n" + 
-					"					AND salto.fechacumplimiento IS NULL\r\n" + 
-					"					AND salto.idpersona = ins.IDPERSONA ) AS saltos,\r\n" + 
-					"				(\r\n" + 
-					"				SELECT\r\n" + 
-					"					COUNT(1) numero\r\n" + 
-					"				FROM\r\n" + 
-					"					scs_saltoscompensaciones salto\r\n" + 
-					"				WHERE\r\n" + 
-					"					salto.idinstitucion = gua.idinstitucion\r\n" + 
-					"					AND salto.idturno = gua.IDTURNO\r\n" + 
-					"					AND salto.idguardia = gua.idguardia\r\n" + 
-					"					AND salto.saltoocompensacion = 'C'\r\n" + 
-					"					AND salto.fechacumplimiento IS NULL\r\n" + 
-					"					AND salto.idpersona = ins.IDPERSONA ) AS compensaciones\r\n" + 
+					"				Gru.ORDEN AS Ordengrupo,\r\n" +
+					saltosOCompensaciones(porGrupos) +
 					"			FROM\r\n" + 
 					"				scs_inscripcionguardia ins\r\n" + 
 					"			INNER JOIN cen_persona per ON\r\n" + 
@@ -162,32 +139,9 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
 					"				Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
 					"				Gru.ORDEN AS Ordengrupo,\r\n" + 
-					"				Gru.IDGRUPOGUARDIA AS IDGRUPOGUARDIA,\r\n" + 
-					"				(\r\n" + 
-					"				SELECT\r\n" + 
-					"					COUNT(1) numero\r\n" + 
-					"				FROM\r\n" + 
-					"					scs_saltoscompensaciones salto\r\n" + 
-					"				WHERE\r\n" + 
-					"					salto.idinstitucion = gua.idinstitucion\r\n" + 
-					"					AND salto.idturno = gua.IDTURNO\r\n" + 
-					"					AND salto.idguardia = gua.idguardia\r\n" + 
-					"					AND salto.saltoocompensacion = 'S'\r\n" + 
-					"					AND salto.fechacumplimiento IS NULL\r\n" + 
-					"					AND salto.idpersona = ins.IDPERSONA ) AS saltos,\r\n" + 
-					"				(\r\n" + 
-					"				SELECT\r\n" + 
-					"					COUNT(1) numero\r\n" + 
-					"				FROM\r\n" + 
-					"					scs_saltoscompensaciones salto\r\n" + 
-					"				WHERE\r\n" + 
-					"					salto.idinstitucion = gua.idinstitucion\r\n" + 
-					"					AND salto.idturno = gua.IDTURNO\r\n" + 
-					"					AND salto.idguardia = gua.idguardia\r\n" + 
-					"					AND salto.saltoocompensacion = 'C'\r\n" + 
-					"					AND salto.fechacumplimiento IS NULL\r\n" + 
-					"					AND salto.idpersona = ins.IDPERSONA ) AS compensaciones\r\n" + 
-					"			FROM\r\n" + 
+					"				Gru.IDGRUPOGUARDIA AS IDGRUPOGUARDIA,\r\n" +
+					saltosOCompensaciones(porGrupos) +
+					"			FROM\r\n" +
 					"				scs_inscripcionguardia ins\r\n" + 
 					"			INNER JOIN cen_persona per ON\r\n" + 
 					"				per.IDPERSONA = ins.IDPERSONA\r\n" + 
@@ -274,31 +228,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"                          Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado,\r\n" + 
 					"                          Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
 					"                          Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
-					"                          Gru.ORDEN AS Ordengrupo,\r\n" + 
-					"                          (\r\n" + 
-					"                          SELECT\r\n" + 
-					"                                 COUNT(1) numero\r\n" + 
-					"                          FROM\r\n" + 
-					"                                 scs_saltoscompensaciones salto\r\n" + 
-					"                          WHERE\r\n" + 
-					"                                 salto.idinstitucion = gua.idinstitucion\r\n" + 
-					"                                 AND salto.idturno = gua.IDTURNO\r\n" + 
-					"                                 AND salto.idguardia = gua.idguardia\r\n" + 
-					"                                 AND salto.saltoocompensacion = 'S'\r\n" + 
-					"                                 AND salto.fechacumplimiento IS NULL\r\n" + 
-					"                                 AND salto.idpersona = ins.IDPERSONA ) AS saltos,\r\n" + 
-					"                          (\r\n" + 
-					"                          SELECT\r\n" + 
-					"                                 COUNT(1) numero\r\n" + 
-					"                          FROM\r\n" + 
-					"                                 scs_saltoscompensaciones salto\r\n" + 
-					"                          WHERE\r\n" + 
-					"                                 salto.idinstitucion = gua.idinstitucion\r\n" + 
-					"                                 AND salto.idturno = gua.IDTURNO\r\n" + 
-					"                                 AND salto.idguardia = gua.idguardia\r\n" + 
-					"                                 AND salto.saltoocompensacion = 'C'\r\n" + 
-					"                                 AND salto.fechacumplimiento IS NULL\r\n" + 
-					"                                 AND salto.idpersona = ins.IDPERSONA ) AS compensaciones\r\n" + 
+					"                          Gru.ORDEN AS Ordengrupo,\r\n" +
+					saltosOCompensaciones(porGrupos) +
 					"                    FROM\r\n" + 
 					"                          scs_inscripcionguardia ins\r\n" + 
 					"                    INNER JOIN cen_persona per ON\r\n" + 
@@ -323,13 +254,67 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"                          Ins.Fechavalidacion IS NOT NULL\r\n" + 
 					"                          AND Gua.Idinstitucion = "+idInstitucion+"\r\n" + 
 					"                          AND Gua.Idturno = "+idTurno+"\r\n" + 
-					"                          AND Gua.Idguardia = "+idGuardia+"\r\n" + 
+					"                          AND Gua.Idguardia = "+idGuardia+"\r\n" +
 					"                    ORDER BY\r\n" + 
 					"							"+ordenaciones+"\r\n" + 
 					"                          NOMBRE,\r\n" + 
 					"                          Ins.FECHASUSCRIPCION,\r\n" + 
 					"                          Ins.Idpersona) consulta where activo = 1");
 		return sql.toString();
+	}
+
+	private String saltosOCompensaciones(Boolean porGrupos) {
+		return !porGrupos ? (
+			"				(\r\n" +
+			"				SELECT\r\n" +
+			"					COUNT(1) numero\r\n" +
+			"				FROM\r\n" +
+			"					scs_saltoscompensaciones salto\r\n" +
+			"				WHERE\r\n" +
+			"					salto.idinstitucion = gua.idinstitucion\r\n" +
+			"					AND salto.idturno = gua.IDTURNO\r\n" +
+			"					AND salto.idguardia = gua.idguardia\r\n" +
+			"					AND salto.saltoocompensacion = 'S'\r\n" +
+			"					AND salto.fechacumplimiento IS NULL\r\n" +
+			"					AND salto.idpersona = ins.IDPERSONA ) AS saltos,\r\n" +
+			"				(\r\n" +
+			"				SELECT\r\n" +
+			"					COUNT(1) numero\r\n" +
+			"				FROM\r\n" +
+			"					scs_saltoscompensaciones salto\r\n" +
+			"				WHERE\r\n" +
+			"					salto.idinstitucion = gua.idinstitucion\r\n" +
+			"					AND salto.idturno = gua.IDTURNO\r\n" +
+			"					AND salto.idguardia = gua.idguardia\r\n" +
+			"					AND salto.saltoocompensacion = 'C'\r\n" +
+			"					AND salto.fechacumplimiento IS NULL\r\n" +
+			"					AND salto.idpersona = ins.IDPERSONA ) AS compensaciones\r\n"
+		) : (
+			"				(\r\n" +
+			"				SELECT\r\n" +
+			"					COUNT(1) numero\r\n" +
+			"				FROM\r\n" +
+			"					scs_saltocompensaciongrupo salto\r\n" +
+			"				WHERE\r\n" +
+			"					salto.idinstitucion = gua.idinstitucion\r\n" +
+			"					AND salto.idturno = gua.IDTURNO\r\n" +
+			"					AND salto.idguardia = gua.idguardia\r\n" +
+			"					AND salto.saltoocompensacion = 'S'\r\n" +
+			"					AND salto.fechacumplimiento IS NULL\r\n" +
+			"					AND salto.idgrupoguardia =  Gru.IDGRUPOGUARDIA ) AS saltos,\r\n" +
+			"				(\r\n" +
+			"				SELECT\r\n" +
+			"					COUNT(1) numero\r\n" +
+			"				FROM\r\n" +
+			"					scs_saltocompensaciongrupo salto\r\n" +
+			"				WHERE\r\n" +
+			"					salto.idinstitucion = gua.idinstitucion\r\n" +
+			"					AND salto.idturno = gua.IDTURNO\r\n" +
+			"					AND salto.idguardia = gua.idguardia\r\n" +
+			"					AND salto.saltoocompensacion = 'C'\r\n" +
+			"					AND salto.fechacumplimiento IS NULL\r\n" +
+			"					AND salto.idgrupoguardia =  Gru.IDGRUPOGUARDIA ) AS compensaciones\r\n"
+		);
 	}
 
 	public String searchGrupoGuardia(Short idInstitucion, String idGuardia, String idPersona) {

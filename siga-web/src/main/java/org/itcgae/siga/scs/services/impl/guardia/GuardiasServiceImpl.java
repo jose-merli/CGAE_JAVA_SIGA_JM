@@ -1209,6 +1209,16 @@ public class GuardiasServiceImpl implements GuardiasService {
 							.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()));
 
 					List<ScsGuardiasturno> guardias = scsGuardiasturnoExtendsMapper.selectByExample(example);
+
+					// Copia el valor de porGrupos para ser utilizado en la busqueda
+					List<GuardiasItem> confCola = scsGuardiasturnoExtendsMapper.resumenConfCola(guardiasItem.getIdGuardia(),
+							guardiasItem.getIdTurno(), idInstitucion.toString());
+
+					if (confCola != null && !confCola.isEmpty() && confCola.get(0).getIdOrdenacionColas() != null) {
+						guardiasItem.setPorGrupos(confCola.get(0).getIdOrdenacionColas().contains("Por grupos") ? "1" : "0");
+					}
+
+
 					String ultimo = "";
 
 					if (guardias != null && !guardias.isEmpty())
@@ -1271,7 +1281,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					String grupoUltimo = "";
 
 					if (guardias.get(0).getIdgrupoguardiaUltimo() != null)
-						grupoUltimo = "and idgrupoguardia = " + guardias.get(0).getIdgrupoguardiaUltimo();
+						grupoUltimo = "and idgrupoguardiacolegiado = " + guardias.get(0).getIdgrupoguardiaUltimo();
 
 
 					// Se comprueba si existe letrado último antes de realizar la búsqueda
@@ -1298,7 +1308,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 									.andIdguardiaEqualTo(guardias.get(0).getIdguardia())
 									.andIdpersonaEqualTo(guardias.get(0).getIdpersonaUltimo())
 									.andFechasuscripcionEqualTo(guardias.get(0).getFechasuscripcionUltimo())
-									.andIdgrupoguardiaEqualTo(guardias.get(0).getIdgrupoguardiaUltimo());
+									.andIdgrupoguardiacolegiadoEqualTo(guardias.get(0).getIdgrupoguardiaUltimo());
 
 							if (scsGrupoguardiacolegiadoMapper.countByExample(grupoExample) == 0) {
 								ultimo = "";
@@ -1307,10 +1317,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 					}
 
+					String porGrupos = guardiasItem.getPorGrupos();
 					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
 							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
-							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo);
-					String porGrupos = guardiasItem.getPorGrupos();
+							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
 					//cuando marcamos orden = manual por primera vez
 					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos == "1") {
 
@@ -1396,7 +1406,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						List<InscripcionGuardiaItem> todaColaGuardia = scsInscripcionguardiaExtendsMapper
 								.getColaGuardias(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), strDate,
-										ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo);
+										ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
 						// Obtenemos el ultimo id generado en los grupos
 						ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
 						grupoGuardiaExample.createCriteria()
@@ -1505,7 +1515,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
 								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
-								idInstitucion.toString(), grupoUltimo);
+								idInstitucion.toString(), grupoUltimo, porGrupos == "1");
 						for (int i = 0; i < colaGuardia.size(); i++) {
 							if (colaGuardia.get(i).getNombre() == "CARLA") {
 								String duda = colaGuardia.get(i).getNumeroGrupo();
