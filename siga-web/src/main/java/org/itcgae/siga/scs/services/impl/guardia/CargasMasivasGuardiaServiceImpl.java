@@ -27,6 +27,7 @@ import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.exception.BusinessException;
@@ -123,6 +124,15 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 	@Autowired
 	private ScsCalendarioguardiasMapper scsCalendarioguardiasMapper;
+	
+	@Autowired
+	private ScsCabeceraguardiasMapper scsCabeceraGuardiasMapper ;
+	
+	@Autowired
+	private ScsConfConjuntoGuardiasExtendsMapper scsConfConjuntoGuardiasExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Autowired
 	private ExcelHelper excelHelper;
@@ -692,7 +702,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 							// Se comprueba si se ha introducido una guardia especifica. Si no es asi, se
 							// realiza con todos las guardias del turno.
-							if (cargaMasivaDatosITItem.getIdGuardia().equals(null)
+							if (cargaMasivaDatosITItem.getIdGuardia() == null
 									|| cargaMasivaDatosITItem.getIdGuardia().equals("")) {
 								int i = 0;
 								while (i < listGu.size() && result != 0) {
@@ -1146,7 +1156,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 								// Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se
 								// inscriben las guardias.
-								if (insturList.size() != 0 && insturList.get(0) != null) {
+								if (insturList.size() != 0 && insturList != null) {
 									// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del
 									// turno correspondiente.
 									if (cargaMasivaDatosITItem.getFechaEfectiva()
@@ -1226,14 +1236,17 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2,
 											new SimpleDateFormat("dd/MM/yyyy")
 													.format(cargaMasivaDatosITItem.getFechaEfectiva()));
-									if (insturList.get(0) != null) {
+									if (insturList.size() != 0 && insturList != null) {
 										// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del
 										// turno correspondiente.
-										if (cargaMasivaDatosITItem.getFechaEfectiva()
-												.compareTo(insturList.get(0).getFechavalidacion()) < 0)
-											errorLinea.append(
-													"La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
+										if(insturList.get(0).getFechavalidacion() != null) {
+											if (cargaMasivaDatosITItem.getFechaEfectiva()
+													.compareTo(insturList.get(0).getFechavalidacion()) < 0)
+												errorLinea.append(
+														"La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
 
+										}
+									
 										// 6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso,
 										// no se tendrán en cuenta
 										// 6.1 Grupo y orden deben tener la longitud máxima permitida para estos campos
@@ -1873,6 +1886,19 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		return deleteResponseDTO;
 	}
 
+	private boolean compruebaSolapamientoProgramamciones(DatosCalendarioProgramadoItem calendarioItem, Short idInstitucion) throws Exception {
+		//--Se comprueba si hay alguna programación creada solapamiento de fechas en el turno-guardia	
+		long comprobacionA = scsGuardiasturnoExtendsMapper.compruebaSolapamientoProgramamcionesA(
+				calendarioItem.getIdTurno(), calendarioItem.getIdGuardia(),
+				calendarioItem.getFechaDesde(), calendarioItem.getFechaHasta(), idInstitucion);
+		if (comprobacionA > 0) {
+			return true;
+			//throw new Exception("messages.factSJCS.error.solapamientoRango");
+		}
+		return false;
+
+	}
+
 	@Override
 	public DeleteResponseDTO uploadFileC(MultipartHttpServletRequest request, String fechaDesde, String fechaHasta,
 			String observaciones) throws Exception {
@@ -1942,7 +1968,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						// Comprobar que las fechas introducidas en el fichero están dentro del periodo
 
 						try {
-							if (cenBajasTemporales.getFechadesde()
+							//Lo siguiente se comprueba con el metodo this.solapamiento(..).
+							/*if (cenBajasTemporales.getFechadesde()
 									.before(new SimpleDateFormat("dd/MM/yyyy").parse(fechaDesde))
 									|| cenBajasTemporales.getFechahasta()
 											.after(new SimpleDateFormat("dd/MM/yyyy").parse(fechaHasta))) {
@@ -1950,7 +1977,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								errores += "Error debido a que las fechas no cumplen el rango establecido";
 								LOGGER.error(
 										"uploadFileC() -> Error debido a que las fechas no cumplen el rango establecido");
-							}
+							}*/
 
 							// Cumplimentar el calendario (programación de calendario) que se creará con
 							// todas las guardias del fichero subido.
@@ -1975,7 +2002,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										.getIdTurnoByName(cargaMasivaDatosBTItem.getIdTurno(), idInstitucion.toString());
 								String idTurno = idTurnoList.get(0);
 								if (numGuards <= 0) {
+									result = 0;
 									error.setCode(204);
+									cargaMasivaDatosBTItem.setErrores("No existen guardias asociadas a esta programación");
 									error.setDescription("No existen guardias asociadas a esta programación");
 									error.setMessage("No existen guardias asociadas a esta programación");
 									deleteResponseDTO.setError(error);
@@ -1992,55 +2021,77 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									calendarioItem.setObservaciones(observaciones);
 									// generamos programacion por cada guardia
 									// ScsProgCalendariosSqlProvider.insertSelective(ScsProgCalendarios record)
-									String nextIdCalendarioProgramado = getNuevoIdCalProg();
-									calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
-									int res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(
-											nextIdCalendarioProgramado, calendarioItem, idInstitucion.toString(), today,
-											usuario.getIdusuario().toString());
+									
+									if(!compruebaSolapamientoProgramamciones(calendarioItem, idInstitucion)) {
+										//OBTENEMOS EL ULTIMO ID CALENDARIO PROGRAMADO Y LO USAMOS DONDE LO REQUIERA
+										String nextIdCalendarioProgramado = scsGuardiasturnoExtendsMapper.nextIdCalprog();
 
-									String idProgramacion = scsGuardiasturnoExtendsMapper
-											.getLastProgramacion(idInstitucion.toString());
-									// generamos un calendario por cada guardia asociada a esa programacion
-									GuardiaCalendarioItem item = new GuardiaCalendarioItem();
-									item.setIdGuardia(idGuardia);
-									item.setIdTurno(idTurno);
-									item.setOrden("1");
-									String res2 = scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(null,
-											null, null, observaciones, idTurno, idGuardia,
-											new SimpleDateFormat("dd/MM/yyyy")
-													.format(cargaMasivaDatosBTItem.getFechaFinal()),
-											new SimpleDateFormat("dd/MM/yyyy")
-													.format(cargaMasivaDatosBTItem.getFechaInicio()),
-											idProgramacion, idInstitucion.toString(), null, today, null, null,
-											usuarios.get(0).getIdusuario().toString());
+										calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
+										int res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(
+												nextIdCalendarioProgramado, calendarioItem, idInstitucion.toString(), today,
+												usuario.getIdusuario().toString());
 
-									String idCalendario = scsGuardiasturnoExtendsMapper
-											.getLastCalendar(idInstitucion.toString());
-									// insertamos historico de calendario
-									scsGuardiasturnoExtendsMapper.insertHistoricoCalendario(idCalendario, null,
-											idInstitucion.toString(), today, item,
-											usuarios.get(0).getIdusuario().toString());
+										//String idProgramacion = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
+										// generamos un calendario por cada guardia asociada a esa programacion
+										GuardiaCalendarioItem item = new GuardiaCalendarioItem();
+										item.setIdGuardia(idGuardia);
+										item.setIdTurno(idTurno);
+										item.setOrden("1");
+										item.setEstado("4");//Estado pendiente para scs_hco_conf_prog_calendarios
+										int res2 = scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(null,
+												null, null, observaciones, idTurno, idGuardia,
+												new SimpleDateFormat("dd/MM/yyyy")
+														.format(cargaMasivaDatosBTItem.getFechaFinal()),
+												new SimpleDateFormat("dd/MM/yyyy")
+														.format(cargaMasivaDatosBTItem.getFechaInicio()),
+														nextIdCalendarioProgramado, idInstitucion.toString(), null, today, null, null,
+												usuarios.get(0).getIdusuario().toString());
 
-									// Para cada línea correcta, se creará una guardia de colegiado con sus datos.
-									ScsGuardiasturnoKey key = new ScsGuardiasturnoKey();
-									key.setIdguardia(Integer.parseInt(idGuardia));
-									key.setIdinstitucion(idInstitucion);
-									key.setIdturno(Integer.parseInt(idTurno));
-									ScsGuardiasturno configGuardia = scsGuardiasturnoMapper.selectByPrimaryKey(key);
-									ScsGuardiascolegiado gc = new ScsGuardiascolegiado();
-									gc.setIdguardia(Integer.parseInt(idGuardia));
-									gc.setFechafin(cargaMasivaDatosBTItem.getFechaFinal());
-									gc.setFechainicio(cargaMasivaDatosBTItem.getFechaInicio());
-									gc.setFechamodificacion(new Date());
-									gc.setIdpersona(Long.parseLong(cargaMasivaDatosBTItem.getIdPersona()));
-									gc.setIdturno(Integer.parseInt(idTurno));
-									gc.setIdinstitucion(idInstitucion);
-									gc.setDiasguardia(new Long(configGuardia.getDiasguardia()));
-									gc.setDiasacobrar(new Long(configGuardia.getDiasguardia()));
-									gc.setUsumodificacion(usuario.getIdusuario());
-									gc.setReserva("N");
-									scsGuardiascolegiadoMapper.insert(gc);
-								}
+										//String idCalendario = scsGuardiasturnoExtendsMapper.getLastCalendar(idInstitucion.toString()); 
+										// insertamos historico de calendario
+										scsGuardiasturnoExtendsMapper.insertHistoricoCalendario(nextIdCalendarioProgramado, null,
+												idInstitucion.toString(), today, item,
+												usuarios.get(0).getIdusuario().toString());
+
+										// Para cada línea correcta, se creará una guardia de colegiado con sus datos.
+										ScsGuardiasturnoKey key = new ScsGuardiasturnoKey();
+										key.setIdguardia(Integer.parseInt(idGuardia));
+										key.setIdinstitucion(idInstitucion);
+										key.setIdturno(Integer.parseInt(idTurno));
+										ScsGuardiasturno configGuardia = scsGuardiasturnoMapper.selectByPrimaryKey(key);
+										
+										ScsCabeceraguardiasKey cabeKey = new ScsCabeceraguardiasKey();
+										cabeKey.setIdguardia(Integer.parseInt(idGuardia));
+										cabeKey.setIdguardia((int)idInstitucion);
+										cabeKey.setIdguardia(Integer.parseInt(idTurno));
+										cabeKey.setIdpersona(Long.parseLong(cargaMasivaDatosBTItem.getIdPersona()));
+										cabeKey.setFechainicio(cargaMasivaDatosBTItem.getFechaInicio());
+										ScsCabeceraguardiasKey cabeceraGuardia = scsCabeceraGuardiasMapper.selectByPrimaryKey(cabeKey);
+										
+										if(cabeceraGuardia != null && configGuardia != null) {
+											
+											ScsGuardiascolegiado gc = new ScsGuardiascolegiado();
+											gc.setIdguardia(Integer.parseInt(idGuardia));
+											gc.setFechafin(cargaMasivaDatosBTItem.getFechaFinal());
+											gc.setFechainicio(cargaMasivaDatosBTItem.getFechaInicio());
+											gc.setFechamodificacion(new Date());
+											gc.setIdpersona(Long.parseLong(cargaMasivaDatosBTItem.getIdPersona()));
+											gc.setIdturno(Integer.parseInt(idTurno));
+											gc.setIdinstitucion(idInstitucion);
+											gc.setDiasguardia(new Long(configGuardia.getDiasguardia()));
+											gc.setDiasacobrar(new Long(configGuardia.getDiasguardia()));
+											gc.setUsumodificacion(usuario.getIdusuario());
+											gc.setReserva("N");
+											scsGuardiascolegiadoMapper.insert(gc);
+										}
+
+									}else {
+										result = 0;
+										cargaMasivaDatosBTItem.setErrores("Error solapamiento de fechas");
+									}
+									
+									
+								}//-E
 							}
 						} catch (ParseException e1) {
 							// TODO Auto-generated catch block

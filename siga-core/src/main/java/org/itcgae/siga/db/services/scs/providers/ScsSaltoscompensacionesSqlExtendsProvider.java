@@ -9,7 +9,7 @@ import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 
 public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensaciones {
 
-	public String searchSaltosCompensaciones(SaltoCompGuardiaItem salto, String idInstitucion, Integer tamMax) {
+	public String searchSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion, Integer tamMax) {
 
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -55,17 +55,17 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 				+ "		SCS_TURNO.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION\r\n"
 				+ "		AND SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO ) CONSULTA");
 
-		if (!UtilidadesString.esCadenaVacia(salto.getIdSaltosTurno())) {
-			sql.WHERE("IDSALTOSTURNO =" + salto.getIdSaltosTurno());
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdSaltosTurno())) {
+			sql.WHERE("IDSALTOSTURNO =" + saltoItem.getIdSaltosTurno());
 		}
 
-		if (!salto.isHistorico()) {
+		if (!saltoItem.isHistorico()) {
 			sql.WHERE("FECHAUSO IS NULL");
 			sql.WHERE("FECHA_ANULACION IS NULL");
 		}
 
-		if (!UtilidadesString.esCadenaVacia(salto.getColegiadoGrupo())) {
-			sql.WHERE("( (COLEGIADO_GRUPO = " + salto.getColegiadoGrupo() + "\r\n" + "	AND GRUPO IS NULL)\r\n"
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getColegiadoGrupo())) {
+			sql.WHERE("( (COLEGIADO_GRUPO = " + saltoItem.getColegiadoGrupo() + "\r\n" + "	AND GRUPO IS NULL)\r\n"
 					+ "	OR (GRUPO IN (\r\n" + "	SELECT\r\n" + "		IDGRUPOGUARDIA\r\n" + "	FROM\r\n" + "		(\r\n"
 					+ "		SELECT\r\n" + "			ggc.IDGRUPOGUARDIA,\r\n"
 					+ "			DECODE(col.COMUNITARIO, '1', col.NCOMUNITARIO, col.NCOLEGIADO) AS COLEGIADO\r\n"
@@ -76,27 +76,27 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 					+ "			AND col.idinstitucion = ggc.idinstitucion\r\n"
 					+ "			AND ggc.idgrupoguardia IN (\r\n" + "			SELECT\r\n"
 					+ "				IDGRUPOGUARDIA\r\n" + "			FROM\r\n" + "				SCS_GRUPOGUARDIA ))\r\n"
-					+ "	WHERE\r\n" + "		COLEGIADO = " + salto.getColegiadoGrupo() + ") ) ) ");
+					+ "	WHERE\r\n" + "		COLEGIADO = " + saltoItem.getColegiadoGrupo() + ") ) ) ");
 		}
 
 		sql.WHERE("IDINSTITUCION =" + idInstitucion);
 
-		if (!UtilidadesString.esCadenaVacia(salto.getIdTurno())) {
-			sql.WHERE("IDTURNO IN (" + salto.getIdTurno() + " )");
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdTurno())) {
+			sql.WHERE("IDTURNO IN (" + saltoItem.getIdTurno() + " )");
 		}
 
-		if (!UtilidadesString.esCadenaVacia(salto.getIdGuardia())) {
-			sql.WHERE("IDGUARDIA IN (" + salto.getIdGuardia() + " )");
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdGuardia())) {
+			sql.WHERE("IDGUARDIA IN (" + saltoItem.getIdGuardia() + " )");
 		}
 
 		sql.WHERE("IDGUARDIA IS NOT NULL");
 
-		if (!UtilidadesString.esCadenaVacia(salto.getFechaDesde())) {
-			sql.WHERE("TRUNC(FECHA) >= TRUNC(TO_DATE('" + salto.getFechaDesde() + "', 'DD/MM/YYYY'))");
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getFechaDesde())) {
+			sql.WHERE("TRUNC(FECHA) >= TRUNC(TO_DATE('" + saltoItem.getFechaDesde() + "', 'DD/MM/YYYY'))");
 		}
 
-		if (!UtilidadesString.esCadenaVacia(salto.getFechaHasta())) {
-			sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE('" + salto.getFechaHasta() + "', 'DD/MM/YYYY'))");
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getFechaHasta())) {
+			sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE('" + saltoItem.getFechaHasta() + "', 'DD/MM/YYYY'))");
 		}
 
 		sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");

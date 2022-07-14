@@ -348,7 +348,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						&& (designaItem.getCodigo().indexOf(',') == -1)) {
 					String[] parts = designaItem.getCodigo().split("-");
 					if (parts.length == 2) {
-						sql += " and des.codigo IN (" + parts[0] + "," + parts[1] + ")";
+						//SIGARNV-2253@DTT.JAMARTIN@08/07/2022@INICIO
+//						sql += " and des.codigo IN (" + parts[0] + "," + parts[1] + ")";
+						sql += " and des.codigo BETWEEN " + parts[0] + " AND " + parts[1];
+						//SIGARNV-2253@DTT.JAMARTIN@08/07/2022@FIN 
 					}
 				} else if ((designaItem.getCodigo().indexOf('-') == -1)
 						&& (designaItem.getCodigo().indexOf(',') == -1)) {

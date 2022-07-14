@@ -1775,7 +1775,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// SIGARNV-2438@DTT.JAMARTIN@01/10/2021@FIN
             	
                 if (datos.getTipoEJGColegio() != null) {
-                    if (ejg.getIdtipoejgcolegio() != Short.parseShort(datos.getTipoEJGColegio())) {
+                    if (ejg.getIdtipoejgcolegio()==null || ejg.getIdtipoejgcolegio() != Short.parseShort(datos.getTipoEJGColegio())) {
                         if (ejg.getIdtipoejgcolegio() != null)
                             insertAuditoriaEJG("Tipo EEJG Colegio", ejg.getIdtipoejgcolegio().toString(),
                                     datos.getTipoEJGColegio().toString(), usuarios.get(0), (ScsEjg) ejg);
