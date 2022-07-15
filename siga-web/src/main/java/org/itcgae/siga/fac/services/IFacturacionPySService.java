@@ -153,4 +153,7 @@ public interface IFacturacionPySService {
 	public ResponseFileDTO generateExcelAbonos(FacAbonoItem facAbonosItem, HttpServletRequest request) throws Exception;
 
 	FaseFacturacionProgramadaDTO getFasesFacturacionProgramada(HttpServletRequest request, String idInstitucion, String idSerieFacturacion, String idProgramacion) throws Exception;
+
+	public ResponseEntity<InputStreamResource> descargarLogFacturacion(List<FacFacturacionprogramadaItem> facturacionItems,
+			HttpServletRequest request) throws Exception;
 }

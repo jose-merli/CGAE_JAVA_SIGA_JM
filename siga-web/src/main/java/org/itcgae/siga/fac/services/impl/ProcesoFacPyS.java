@@ -206,8 +206,6 @@ public abstract class ProcesoFacPyS {
     @Autowired
     protected FacSeriefacturacionExtendsMapper facSeriefacturacionExtendsMapper;
 
-    @Autowired
-    protected FacturacionHelper facturacionHelper;
 
     @Autowired
     protected EnvEnviosExtendsMapper envEnviosExtendsMapper;
@@ -247,6 +245,9 @@ public abstract class ProcesoFacPyS {
 
     @Autowired
     protected IEnviosCommonsService enviosCommonsService;
+    
+    @Autowired
+    protected FacturacionHelper facturacionHelper;
 
     public void ejecutar() {
 
@@ -379,6 +380,12 @@ public abstract class ProcesoFacPyS {
         fac.setUsumodificacion(USUARIO_AUTO);
         fac.setFechamodificacion(new Date());
         facProgMapper.updateByPrimaryKeySelective(fac);
+        try{
+        	facturacionHelper.actualizarLogExcel(fac,FacEstadosFacturacion.EJECUTANDO_GENERACION,null);
+        }catch(Exception e) {
+        	LOGGER.error("Error a la hora de actualizar LOG_FACTURACION_EXCEL"+e.getMessage());
+        }
+ 
     }
 
     protected String getLenguajeInstitucion(Short idinstitucion) {
@@ -646,6 +653,7 @@ public abstract class ProcesoFacPyS {
             //////////// INICIO TRANSACCION ////////////////
             beanP.setIdestadopdf(FacEstadosFacturacion.PDF_PROCESANDO.getId()); // cambio de estado PDF a PROCESANDO
             facProgMapper.updateByPrimaryKeySelective(beanP);
+            facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_PROCESANDO,"");
 
             commit(tx);
             //////////// FIN TRANSACCION ////////////////
@@ -659,11 +667,15 @@ public abstract class ProcesoFacPyS {
                 case 0: //NO HAY ERROR. SE HA GENERADO CORRECTAMENTE Y SE PROCESADO EL ENVIO
                     if (isGenerarEnvio) {
                         hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADA.getId()); // cambio de estado PDF a FINALIZADA
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_FINALIZADA,"");
+                        
                         hashFactura.setIdestadoenvio(FacEstadoConfirmacionFact.ENVIO_FINALIZADA.getId()); // cambio de estado ENVIO a FINALIZADO
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.ENVIO_FINALIZADA,"");
                         facProgMapper.updateByPrimaryKeySelective(hashFactura);
 
                     } else {
                         hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADA.getId()); // cambio de estado PDF a FINALIZADA
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_FINALIZADA,"");
                         facProgMapper.updateByPrimaryKeySelective(hashFactura);
                     }
 
@@ -675,12 +687,16 @@ public abstract class ProcesoFacPyS {
                     msjAviso = getRecurso("messages.facturacion.confirmacion.errorPdf");
                     if (isGenerarEnvio) {
                         hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADAERRORES.getId()); // cambio de estado PDF a FINALIZADA CON ERRRORES
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_FINALIZADAERRORES,msjAviso);
+                        
                         hashFactura.setIdestadoenvio(FacEstadoConfirmacionFact.ENVIO_FINALIZADAERRORES.getId()); // cambio de estado ENVIO a FINALIZADO CON ERRRORES
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.ENVIO_FINALIZADAERRORES,msjAviso);
                         hashFactura.setLogerror(nombreFichero);
                         facProgMapper.updateByPrimaryKeySelective(hashFactura);
                     } else {
                         hashFactura.setLogerror(nombreFichero);
                         hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADAERRORES.getId()); // cambio de estado PDF a FINALIZADA CON ERRRORES
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_FINALIZADAERRORES,msjAviso);
                         facProgMapper.updateByPrimaryKeySelective(hashFactura);
                     }
 
@@ -692,11 +708,13 @@ public abstract class ProcesoFacPyS {
                     if (isGenerarEnvio) {
                         hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADA.getId()); // cambio de estado PDF a FINALIZADA
                         hashFactura.setIdestadoenvio(FacEstadoConfirmacionFact.ENVIO_FINALIZADAERRORES.getId()); // cambio de estado ENVIO a FINALIZADO CON ERRRORES
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.ENVIO_FINALIZADAERRORES,msjAviso);
                         hashFactura.setLogerror(nombreFichero);
                         facProgMapper.updateByPrimaryKeySelective(hashFactura);
                     } else {
                         hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADA.getId()); // cambio de estado PDF a FINALIZADA
                         facProgMapper.updateByPrimaryKeySelective(hashFactura);
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_FINALIZADA,msjAviso);
                     }
 
                     LOGGER.info("ERROR ENVIAR FACTURA. CAMBIO DE ESTADOS");
@@ -706,12 +724,16 @@ public abstract class ProcesoFacPyS {
                     msjAviso = getRecurso("messages.facturacion.confirmacion.errorPdf");
                     if (isGenerarEnvio) {
                         hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADAERRORES.getId()); // cambio de estado PDF a FINALIZADA CON ERRRORES
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_FINALIZADAERRORES,msjAviso);
+                        
                         hashFactura.setIdestadoenvio(FacEstadoConfirmacionFact.ENVIO_FINALIZADAERRORES.getId()); // cambio de estado ENVIO a FINALIZADO CON ERRRORES
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.ENVIO_FINALIZADAERRORES,msjAviso);
                         hashFactura.setLogerror(nombreFichero);
                         facProgMapper.updateByPrimaryKeySelective(hashFactura);
                     } else {
                         hashFactura.setLogerror(nombreFichero);
                         hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADAERRORES.getId()); // cambio de estado PDF a FINALIZADA CON ERRRORES
+                        facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_FINALIZADAERRORES,msjAviso);
                         facProgMapper.updateByPrimaryKeySelective(hashFactura);
                     }
 
@@ -733,12 +755,16 @@ public abstract class ProcesoFacPyS {
             //////////// INICIO TRANSACCION ////////////////
             if (isGenerarEnvio) {
                 hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADAERRORES.getId()); // cambio de estado PDF a FINALIZADA CON ERRRORES
+                facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.PDF_FINALIZADAERRORES,msjAviso);
+                
                 hashFactura.setIdestadoenvio(FacEstadoConfirmacionFact.ENVIO_FINALIZADAERRORES.getId()); // cambio de estado ENVIO a FINALIZADO CON ERRRORES
                 hashFactura.setLogerror(nombreFichero);
                 facProgMapper.updateByPrimaryKeySelective(hashFactura);
+                facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.ENVIO_FINALIZADAERRORES,msjAviso);
 
             } else {
                 hashFactura.setIdestadopdf(FacEstadoConfirmacionFact.PDF_FINALIZADAERRORES.getId()); // cambio de estado PDF a FINALIZADA CON ERRRORES
+                facturacionHelper.actualizarLogExcel(beanP, FacEstadosFacturacion.ENVIO_FINALIZADAERRORES,msjAviso);
                 hashFactura.setLogerror(nombreFichero);
                 facProgMapper.updateByPrimaryKeySelective(hashFactura);
             }

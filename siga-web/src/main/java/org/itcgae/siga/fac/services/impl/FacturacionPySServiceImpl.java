@@ -13,6 +13,9 @@ import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -63,6 +66,7 @@ import org.itcgae.siga.DTO.fac.EstadosAbonosDTO;
 import org.itcgae.siga.DTO.fac.EstadosAbonosItem;
 import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
 import org.itcgae.siga.DTO.fac.EstadosPagosItem;
+import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
@@ -104,9 +108,11 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.FicherosService;
 import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.cen.services.impl.CargasMasivasGFServiceImpl;
+import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
 import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
+import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesNumeros;
@@ -273,6 +279,8 @@ import org.w3c.dom.NodeList;
 public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private static final String RET_OK = "0";
+	
+    protected static final String FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION = "facturacion.directorioFisicoLogProgramacion";
 
 	private Logger LOGGER = Logger.getLogger(FacturacionPySServiceImpl.class);
 
@@ -418,6 +426,11 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private ExcelHelper excelHelper;
 
 	private static final int EXCEL_ROW_FLUSH = 1000;
+	
+    protected static final String LOG_FAC_PREFIX = "LOG_FAC";
+    
+    @Autowired
+    private FacturacionHelper facturacionHelper;
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -2784,6 +2797,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			HttpServletRequest request) throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
+		int insertado = 0;
 		insertResponseDTO.setError(error);
 
 		// Conseguimos información del usuario logeado
@@ -2793,14 +2807,81 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		if (usuario != null) {
 			FacFacturacionprogramada facProg = creaFacturacionProgramadaDesdeItem(facItem, usuario);
-			facFacturacionprogramadaExtendsMapper.insertSelective(facProg);
-
+			insertado = facFacturacionprogramadaExtendsMapper.insertSelective(facProg);
+			if(insertado == 1) {
+				crearLog(facProg);
+			}
 			insertResponseDTO.setId(facProg.getIdprogramacion().toString());
 		}
 
 		LOGGER.info("insertarProgramacionFactura() -> Salida del servicio para crear una programación de factura");
 
 		return insertResponseDTO;
+	}
+	
+	private void crearLog(FacFacturacionprogramada facPro) {
+		try {
+			LOGGER.info("FacturacionProgramada()- Se va a crear el excel informando");
+			
+			String sheetName = facPro.getDescripcion();
+			String pathFichero = getPathFacPro(facPro);
+			Workbook workBook = crearExcel(facPro,sheetName);
+			FileOutputStream fileOut;
+			String nombreFichero =  nombreFac(facPro);
+			SIGAHelper.mkdirs(pathFichero);
+			File file = new File(pathFichero,nombreFichero);
+			fileOut = new FileOutputStream(file);
+			workBook.write(fileOut);
+			fileOut.close();
+			workBook.close();
+			LOGGER.info(" FacturacionProgramada()- Creado fichero:  " + nombreFichero);
+		} catch (Exception e) {
+			LOGGER.error("FacturacionProgramada() - Error a la hora de crear Excel",e);
+
+		}
+	}
+
+	private String getPathFacPro(FacFacturacionprogramada facPro) {
+		 String pathFichero = getProperty(FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION);
+	     Path pLog = Paths.get(pathFichero).resolve(facPro.getIdinstitucion().toString());
+		return pLog.toString();
+	}
+	
+	private Workbook crearExcel(FacFacturacionprogramada facPro, String sheetName ) {
+		
+		try {
+
+			Workbook workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
+			Sheet sheet = workbook.createSheet(sheetName);
+			
+			
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+			
+			//Fecha
+			Row rowFecha = sheet.createRow(0);
+			rowFecha.createCell(0).setCellValue("FECHA");
+			rowFecha.createCell(1).setCellValue("ACCIÓN");
+			rowFecha.createCell(2).setCellValue("ESTADO");
+			rowFecha.createCell(3).setCellValue("DESCRIPCION");
+			
+			Date date = new Date();
+			String fecha = dateFormat.format(date);
+			//Fecha
+			Row Accion = sheet.createRow(1);
+			Accion.createCell(0).setCellValue(fecha);
+			Accion.createCell(1).setCellValue("CREACIÓN");
+			Accion.createCell(2).setCellValue("GENERACIÓN PROGRAMADA");
+			Accion.createCell(3).setCellValue("CREADO");
+			
+			sheet.setColumnWidth(0, 7000);
+			sheet.setColumnWidth(1, 4000);
+			sheet.setColumnWidth(2, 4000);
+			sheet.setColumnWidth(3, 4000);
+			return workbook;
+			
+		} catch (Exception e) {
+			throw new RuntimeException("Error al crear el archivo Excel: " + e.getMessage());
+		}
 	}
 
 	@Override
@@ -3166,9 +3247,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			key.setIdseriefacturacion(string2Long(item.getIdSerieFacturacion()));
 			key.setIdprogramacion(string2Long(item.getIdProgramacion()));
 			FacFacturacionprogramada facturacion = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
-
 			File file = null;
-			if (Objects.nonNull(facturacion) && Objects.nonNull(facturacion.getLogerror())) {
+			if (Objects.nonNull(facturacion) && Objects.nonNull(facturacion.getLogerror()) ) {
 				String nombreFichero = pathFichero + File.separator + facturacion.getLogerror();
 				file = new File(nombreFichero);
 			}
@@ -3185,6 +3265,53 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("descargarFichaFacturacion() -> Salida del servicio para obtener el archivo de LOG de la facturación");
 
 		return res;
+	}
+	
+	@Override
+	public ResponseEntity<InputStreamResource> descargarLogFacturacion(List<FacFacturacionprogramadaItem> facturacionItems, HttpServletRequest request)throws Exception {
+		ResponseEntity<InputStreamResource> res = null;
+		AdmUsuarios usuario = null;
+
+		LOGGER.info("descargarFichaFacturacion() -> Entrada al servicio para recuperar el archivo de LOG de la facturación");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+		Short idInstitucion = usuario.getIdinstitucion();
+
+		String directorioFisico = "facturacion.directorioFisicoLogProgramacion";
+
+		String pathFichero = getProperty(directorioFisico) + File.separator + usuario.getIdinstitucion();
+
+		// Lista de ficheros de facturaciones programadas
+		List<File> listaFicheros = facturacionItems.stream().map(item -> {
+			FacFacturacionprogramadaKey key = new FacFacturacionprogramadaKey();
+			key.setIdinstitucion(idInstitucion);
+			key.setIdseriefacturacion(string2Long(item.getIdSerieFacturacion()));
+			key.setIdprogramacion(string2Long(item.getIdProgramacion()));
+			FacFacturacionprogramada facturacion = facFacturacionprogramadaExtendsMapper.selectByPrimaryKey(key);
+			File file = null;
+			if (Objects.nonNull(facturacion) ) {
+				String nombreFichero = pathFichero + File.separator + nombreFac(facturacion);
+				file = new File(nombreFichero);
+			}
+
+			return file;
+		}).filter(Objects::nonNull).collect(Collectors.toList());
+
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
+				MediaType.parseMediaType("application/vnd.ms-excel"),
+				MediaType.parseMediaType("application/zip"), "LOG_FACTURACION");
+
+
+		LOGGER.info("descargarFichaFacturacion() -> Salida del servicio para obtener el archivo de LOG de la facturación");
+
+		return res;
+	}
+	
+	private String nombreFac(FacFacturacionprogramada item) {
+		
+		return LOG_FAC_PREFIX +"_"+item.getIdseriefacturacion() +"_" +item.getIdprogramacion()+".xlsx";
 	}
 
 	private File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector)

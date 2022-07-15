@@ -4,6 +4,12 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.FoUtils;
@@ -22,6 +28,7 @@ import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaKey;
+import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacPlantillafacturacion;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
@@ -61,9 +68,12 @@ import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -125,6 +135,14 @@ public class FacturacionHelper {
     private FacLineafacturaExtendsMapper facLineafacturaExtendsMapper;
 
     private final String CTR = "%%";
+    
+	private static final int EXCEL_ROW_FLUSH = 1000;
+	
+    protected static final String LOG_FAC_PREFIX = "LOG_FAC";
+    
+    protected static final String FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION = "facturacion.directorioFisicoLogProgramacion";
+
+	
 
     public File generarPdfFacturaFirmada(String idFactura, String idInstitucion, AdmUsuarios usuario) throws Exception {
         return generarPdfFacturaFirmada(idFactura, idInstitucion, false, usuario);
@@ -1234,5 +1252,141 @@ public class FacturacionHelper {
         return null;
 
     }
+    
+    //Facturacion Programada.
+    public boolean actualizarLogExcel(FacFacturacionprogramada facP,
+    		FacEstadosFacturacion estado,String msg) {
+    	String estadoAux = "";
+    	
+    	try {
+    		switch (estado) {
+    		case EJECUTANDO_GENERACION:
+    			estadoAux = "GENERACIÓN";
+    			editarLog(facP,estadoAux,"EJECUTANDO GENERACIÓN",msg);
+    			break;
+    		case GENERADA:
+    			estadoAux = "GENERACIÓN";
+    			editarLog(facP,estadoAux,"GENERADA",msg);
+    			break;
+    			
+    		case ERROR_GENERACION:
+    			estadoAux = "GENERACIÓN";
+    			editarLog(facP,estadoAux,"ERROR GENERACIÓN",msg);
+    			break;
+    			
+    		case EJECUTANDO_CONFIRMACION:
+    			estadoAux = "CONFIRMACIÓN";
+	    		editarLog(facP,estadoAux,"EJECUTANDO CONFIRMACIÓN",msg);
+				break;
+    		case CONFIRM_FINALIZADA:
+    			estadoAux = "CONFIRMACIÓN";
+    			editarLog(facP,estadoAux,"CONFIRMACIÓN FINALIZADA",msg);
+				break;
+    		case ERROR_CONFIRMACION:
+    			estadoAux = "CONFIRMACIÓN";
+    			editarLog(facP,estadoAux,"ERROR CONFIRMACIÓN",msg);
+				break;
+    		case TRASPASO_PROGRAMADA:
+    			estadoAux = "TRASPASO";
+    			editarLog(facP,estadoAux,"TRASPASO PROGRAMADO",msg);
+    			break;
+    		case PDF_PROCESANDO:
+    			estadoAux = "GENERAR PDF";
+    			editarLog(facP,estadoAux,"PDF PROCESANDO",msg);
+    			break;
+    		case PDF_FINALIZADA:
+    			estadoAux = "GENERAR PDF-ENVIO";
+    			editarLog(facP,estadoAux,"PDF FINALIZADO",msg);
+				break;
+				
+    		case PDF_FINALIZADAERRORES:
+    			estadoAux = "GENERAR PDF-ENVIO";
+    			editarLog(facP,estadoAux,"PDF FINALIZADO CON ERRORES",msg);
+				break;
+    		case ENVIO_FINALIZADA:
+    			estadoAux = "GENERAR PDF-ENVIO";
+    			editarLog(facP,estadoAux,"ENVIO FINALIZADO",msg);
+				break;
+    		case ENVIO_FINALIZADAERRORES:
+    			estadoAux = "GENERAR PDF-ENVIO";
+    			editarLog(facP,estadoAux,"ENVIO FINALIZADO CON ERRORES",msg);
+				break;
+    		default:
+    			break;
+    		}
+    		return true;
+		} catch (Exception e) {
+			return false;
+		}
+		
+    }
+    
+	private void editarLog(FacFacturacionprogramada facPro,String auxEstado, String estado,String msg) {
+		try {
+			LOGGER.info("FacturacionProgramada()- Se va a editar el excel informando");
+			
+			String pathFichero = getPathFacPro(facPro);
+			String nombreFichero =  nombreFac(facPro);
+			
+			File file = new File(pathFichero,nombreFichero);
+			if(file.exists()) {
+				Workbook workBook = editarExcel(file,facPro,auxEstado,estado,msg);
+				FileOutputStream fileOut;
+				fileOut = new FileOutputStream(file);
+				workBook.write(fileOut);
+				fileOut.close();
+				workBook.close();
+				LOGGER.info(" FacturacionProgramada()- editar fichero:  " + nombreFichero);
+			}
+			
+		} catch (Exception e) {
+			LOGGER.error("FacturacionProgramada() - Error a la hora de editar Excel",e);
+
+		}
+	}
+
+private Workbook editarExcel(File file,FacFacturacionprogramada facPro, String auxEstado,String estado ,String msg) {
+		
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			Workbook workbook = WorkbookFactory.create(fis);
+			Sheet sheet = workbook.getSheetAt(0);
+			
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+			
+			int rowCount = sheet.getLastRowNum();
+			sheet.shiftRows(1,	 rowCount, 1);
+			Date date = new Date();
+			String fecha = dateFormat.format(date);
+			//Fecha
+			Row Accion = sheet.createRow(1);
+			Accion.createCell(0).setCellValue(fecha);
+			Accion.createCell(1).setCellValue(auxEstado);
+			Accion.createCell(2).setCellValue(estado);
+			Accion.createCell(3).setCellValue(msg);
+	
+			sheet.setColumnWidth(0, 6500);
+			sheet.setColumnWidth(1, 4000);
+			sheet.setColumnWidth(2, 8000);
+			sheet.setColumnWidth(3, 10000);
+			fis.close();
+			return workbook;
+			
+		} catch (Exception e) {
+			throw new RuntimeException("Error al editar el archivo Excel: " + e.getMessage());
+		}
+	}
+    
+	private String nombreFac(FacFacturacionprogramada item) {
+		
+		return LOG_FAC_PREFIX +"_"+item.getIdseriefacturacion() +"_" +item.getIdprogramacion()+".xlsx";
+	}
+
+
+	private String getPathFacPro(FacFacturacionprogramada facPro) {
+		 String pathFichero = getProperty(FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION);
+	     Path pLog = Paths.get(pathFichero).resolve(facPro.getIdinstitucion().toString());
+		return pLog.toString();
+	}
 
 }

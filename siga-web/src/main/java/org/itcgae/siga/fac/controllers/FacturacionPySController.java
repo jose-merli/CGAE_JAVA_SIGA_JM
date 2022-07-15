@@ -1177,6 +1177,11 @@ public class FacturacionPySController {
 
 	}
 	
+	@RequestMapping(value = "/descargarLogFacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> descargarLogFacturacion(@RequestBody List<FacFacturacionprogramadaItem> facturacionItems, HttpServletRequest request) throws Exception {
+		return facturacionService.descargarLogFacturacion(facturacionItems, request);
+
+	}
 	@RequestMapping(value = "/generarExcel", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	ResponseEntity<InputStreamResource> generateExcel(@RequestBody TarjetaPickListSerieDTO etiquetas, HttpServletRequest request) throws Exception {
 	

@@ -6,6 +6,6 @@ import org.itcgae.siga.db.entities.FcsRetencionesJudiciales;
 
 @Data
 public class RetencionDTO {
-    private FcsRetencionesJudiciales retencion;
+    private RetencionJudicialItem retencion;
     private Error error = null;
 }

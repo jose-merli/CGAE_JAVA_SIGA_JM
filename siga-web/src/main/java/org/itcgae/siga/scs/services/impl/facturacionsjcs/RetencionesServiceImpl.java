@@ -142,12 +142,9 @@ public class RetencionesServiceImpl implements IRetencionesService {
 
                     LOGGER.info("RetencionesServiceImpl.searchRetencion() ->  fcsRetencionesJudicialesExtendsMapper.selectByPrimaryKey() -> Inicio de consulta para buscar la retencion");
                     FcsRetencionesJudicialesKey fcsRetencionesJudicialesKey = new FcsRetencionesJudicialesKey();
-                    fcsRetencionesJudicialesKey.setIdretencion(Long.valueOf(retencionesRequestDTO.getIdRetenciones()));
-                    fcsRetencionesJudicialesKey.setIdinstitucion(idInstitucion);
-                    FcsRetencionesJudiciales fcsRetencionesJudiciales = fcsRetencionesJudicialesExtendsMapper.selectByPrimaryKey(fcsRetencionesJudicialesKey);
-                    retencionDTO.setRetencion(fcsRetencionesJudiciales);
+                    RetencionJudicialItem retencionJudicialItem = fcsRetencionesJudicialesExtendsMapper.searchRetencionConRestante(idInstitucion, retencionesRequestDTO.getIdRetenciones());
+                    retencionDTO.setRetencion(retencionJudicialItem);
                     LOGGER.info("RetencionesServiceImpl.searchRetencion() ->  fcsRetencionesJudicialesExtendsMapper.selectByPrimaryKey() -> Fin de consulta para buscar la retencion");
-
                 } else {
                     LOGGER.warn("RetencionesServiceImpl.searchRetencion() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
                             + dni + " e idInstitucion = " + idInstitucion);
