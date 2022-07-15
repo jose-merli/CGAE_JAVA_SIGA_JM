@@ -184,6 +184,25 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         return superQuery.toString();
     }
 
+    public String searchRetencionConRestante(Short idInstitucion, String idRetencion) {
+        SQL sql = new SQL();
+        SQL sql1 = new SQL();
+
+        sql1.SELECT("SUM(C.IMPORTERETENIDO)");
+        sql1.FROM("FCS_COBROS_RETENCIONJUDICIAL C");
+        sql1.WHERE("C.IDINSTITUCION = frj.IDINSTITUCION");
+        sql1.WHERE("C.IDPERSONA = frj.IDPERSONA");
+        sql1.WHERE("C.IDRETENCION = frj.IDRETENCION");
+
+        sql.SELECT("IDINSTITUCION, IDRETENCION, IDPERSONA, IDDESTINATARIO, FECHAALTA, FECHAINICIO, FECHAFIN, TIPORETENCION, IMPORTE, OBSERVACIONES, FECHAMODIFICACION, USUMODIFICACION, CONTABILIZADO, ESDETURNO, DESCDESTINATARIO");
+        sql.SELECT("(IMPORTE + NVL((" + sql1 + "), 0)) RESTANTE");
+        sql.FROM("FCS_RETENCIONES_JUDICIALES frj");
+        sql.WHERE("frj.IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("frj.IDRETENCION = " + idRetencion);
+
+        return sql.toString();
+    }
+
     public String searchRetencionesAplicadas(Short idInstitucion, RetencionesRequestDTO retencionesRequestDTO, Integer tamMaximo) {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

@@ -33,6 +33,27 @@ public interface FcsRetencionesJudicialesExtendsMapper extends FcsRetencionesJud
     })
     List<RetencionesItem> searchRetenciones(Short idInstitucion, RetencionesRequestDTO retencionesRequestDTO, String idLenguaje, Integer tamMaximo);
 
+    @SelectProvider(type = FcsRetencionesJudicialesSqlExtendsProvider.class, method = "searchRetencionConRestante")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDRETENCION", property = "idRetencion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDDESTINATARIO", property = "idDestinatario", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "TIPORETENCION", property = "tipoRetencion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "USUMODIFICACION", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CONTABILIZADO", property = "contabilizado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ESDETURNO", property = "esDeTurno", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESCDESTINATARIO", property = "descDestinatario", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "RESTANTE", property = "restante", jdbcType = JdbcType.VARCHAR)
+    })
+    RetencionJudicialItem searchRetencionConRestante(Short idInstitucion, String idRetencion);
+
     @SelectProvider(type = FcsRetencionesJudicialesSqlExtendsProvider.class, method = "searchRetencionesAplicadas")
     @Results({
             @Result(column = "TIPORETENCION", property = "tipoRetencion", jdbcType = JdbcType.VARCHAR),
