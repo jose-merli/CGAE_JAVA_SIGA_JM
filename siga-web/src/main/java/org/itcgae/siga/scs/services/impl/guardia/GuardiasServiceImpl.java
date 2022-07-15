@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1209,6 +1210,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 							.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()));
 
 					List<ScsGuardiasturno> guardias = scsGuardiasturnoExtendsMapper.selectByExample(example);
+
+					// Actualizar cola guardia para evitar que el ultimo grupo quede a caballo
+					actualizarColaGuardiaConUltimoColegiadoPorGrupo(idInstitucion, Integer.valueOf(guardiasItem.getIdTurno()), Integer.valueOf(guardiasItem.getIdGuardia()));
 
 					// Copia el valor de porGrupos para ser utilizado en la busqueda
 					List<GuardiasItem> confCola = scsGuardiasturnoExtendsMapper.resumenConfCola(guardiasItem.getIdGuardia(),
@@ -5383,7 +5387,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			List<LetradoInscripcionItem> colaLetrados = new ArrayList<LetradoInscripcionItem>();
 
 			// Actualizar cola guardia para evitar que el ultimo grupo quede a caballo
-			actualizarColaGuardiaConUltimoColegiadoPorGrupo(idInstitucion, idTurno, idGuardia);
+			actualizarColaGuardiaConUltimoColegiadoPorGrupo(idInstitucion.shortValue(), idTurno, idGuardia);
 
 			// obteniendo la guardia
 
@@ -5482,7 +5486,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 	} // getColaGuardia()
 
-	public void actualizarColaGuardiaConUltimoColegiadoPorGrupo(Integer idInstitucion, Integer idTurno,
+	public void actualizarColaGuardiaConUltimoColegiadoPorGrupo(Short idInstitucion, Integer idTurno,
 																Integer idGuardia) {
 		// actualizando el ultimo colegiado de la guardia al ultimo colegiado del grupo
 		// (que era ultimo de la guardia)
@@ -5492,20 +5496,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 			Hashtable registro = scsGuardiasturnoExtendsMapper.getUltimoColegiadoGrupo(idTurno.toString(),
 					idInstitucion.toString(), idGuardia.toString());
 			if (registro != null) {
-				Hashtable<String, String> hashGuardiasTurno = new Hashtable<String, String>();
-				hashGuardiasTurno.put("IDGUARDIA", idGuardia.toString());
-				hashGuardiasTurno.put("IDINSTITUCION", idInstitucion.toString());
-				hashGuardiasTurno.put("IDTURNO", idTurno.toString());
+				ScsGuardiasturnoKey guardiaKey = new ScsGuardiasturnoKey();
+				guardiaKey.setIdinstitucion(idInstitucion);
+				guardiaKey.setIdturno(idTurno);
+				guardiaKey.setIdguardia(idGuardia);
 
-				GuardiasTurnoItem beanGuardiasTurno = new GuardiasTurnoItem();
-				beanGuardiasTurno = scsGuardiasturnoExtendsMapper
-						.getIdPersonaUltimoAnterior(idTurno.toString(), idGuardia.toString(), idInstitucion.toString())
-						.get(0);
-				beanGuardiasTurno.setIdPersona_Ultimo(new Long((String) registro.get("IDPERSONA")));
-				beanGuardiasTurno
-						.setIdGrupoGuardiaColegiado_Ultimo(new Long((String) registro.get("IDGRUPOGUARDIACOLEGIADO")));
-				beanGuardiasTurno.setFechaSuscripcion_Ultimo((String) registro.get("FECHASUSCRIPCION"));
-				scsGuardiasturnoExtendsMapper.updateGuardiasTurno(beanGuardiasTurno);
+				ScsGuardiasturno guardia = scsGuardiasTurnoMapper.selectByPrimaryKey(guardiaKey);
+
+				if (guardia != null) {
+					guardia.setIdpersonaUltimo(registro.get("idpersona") != null ? ((BigDecimal) registro.get("idpersona")).longValue() : null);
+					guardia.setIdgrupoguardiaUltimo(registro.get("idGrupoGuardiaColegiado") != null ? ((BigDecimal) registro.get("idGrupoGuardiaColegiado")).longValue() : null);
+					guardia.setFechasuscripcionUltimo((Date) registro.get("fechaSuscripcion"));
+					scsGuardiasTurnoMapper.updateByPrimaryKey(guardia);
+				}
 			}
 		} catch (Exception e) {
 			errorGeneracionCalendario = "actualizando el ultimo colegiado de la guardia al ultimo colegiado del grupo: "
