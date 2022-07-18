@@ -17,7 +17,9 @@ public class CargaMasivaDatosGuardiatem {
 	private Date fechaFinal;
 	private String idPersona;
 	private String idTurno;
+	private String nombreTurno;
 	private String idGuardia;
+	private String nombreGuardia;
 	private String grupo;
 	private String orden;
 	private String errores;
@@ -106,6 +108,18 @@ public class CargaMasivaDatosGuardiatem {
 	}
 	public void setOrden(String orden) {
 		this.orden = orden;
+	}
+	public String getNombreTurno() {
+		return nombreTurno;
+	}
+	public void setNombreTurno(String nombreTurno) {
+		this.nombreTurno = nombreTurno;
+	}
+	public String getNombreGuardia() {
+		return nombreGuardia;
+	}
+	public void setNombreGuardia(String nombreGuardia) {
+		this.nombreGuardia = nombreGuardia;
 	}
 
 }

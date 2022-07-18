@@ -990,13 +990,14 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					List<TurnosItem> listaTur = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuario.getIdlenguaje());
 
 					cargaMasivaDatosITItem.setIdTurno(listaTur.get(0).getIdturno().toString());
+					cargaMasivaDatosITItem.setNombreTurno((String) hashtable.get(SigaConstants.TURNO));
 				} catch (Exception e) {
 					errorLinea.append("No se ha encontrado un turno con la introducida");
-					cargaMasivaDatosITItem.setNombreTurno("Error");
+					cargaMasivaDatosITItem.setNombreTurno((String) hashtable.get(SigaConstants.TURNO));
 				}
 			} else {
 				errorLinea.append("Es obligatorio introducir el turno.");
-				cargaMasivaDatosITItem.setNombreTurno("Error");
+				cargaMasivaDatosITItem.setNombreTurno((String) hashtable.get(SigaConstants.TURNO));
 			}
 
 			// Obtener guardia
@@ -1014,9 +1015,10 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					List<ScsGuardiasturno> listaGuar = scsGuardiasTurnoExtendsMapper.selectByExample(guardiaExample);
 
 					cargaMasivaDatosITItem.setIdTurno(listaGuar.get(0).getIdturno().toString());
+					cargaMasivaDatosITItem.setNombreGuardia((String) hashtable.get(SigaConstants.GUARDIA));
 				} catch (Exception e) {
 					errorLinea.append("No se ha encontrado una guardia con el nombre introducido");
-					cargaMasivaDatosITItem.setNombreGuardia("Error");
+					cargaMasivaDatosITItem.setNombreGuardia((String) hashtable.get(SigaConstants.GUARDIA));
 				}
 			}
 
@@ -1036,11 +1038,11 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				} catch (Exception e) {
 					errorLinea.append(
 							"No se ha encontrado una persona con el número de colegiado introducido en su institucion. ");
-					cargaMasivaDatosITItem.setnColegiado("Error");
+					cargaMasivaDatosITItem.setnColegiado((String) hashtable.get(SigaConstants.NCOLEGIADO));
 				}
 			} else {
 				errorLinea.append("Es obligatorio introducir número de colegiado.");
-				cargaMasivaDatosITItem.setnColegiado("Error");
+				cargaMasivaDatosITItem.setnColegiado((String) hashtable.get(SigaConstants.NCOLEGIADO));
 			}
 //			SigaConstants.IT_FECHAEFECTIVA, "Obligatorio");
 //			SigaConstants.IT_TIPO, "puede tener los valores ‘ALTA’ o ‘BAJA’. Obligatorio");
@@ -1055,12 +1057,12 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					cargaMasivaDatosITItem.setTipo((String) hashtable.get(SigaConstants.TIPO));
 				} else {
 					errorLinea.append("El valor de tipo solo puede ser \"ALTA\" o \"BAJA\".");
-					cargaMasivaDatosITItem.setTipo("Error");
+					cargaMasivaDatosITItem.setTipo((String) hashtable.get(SigaConstants.TIPO));
 				}
 
 			} else {
 				errorLinea.append("Es obligatorio introducir el tipo de petición a realizar.");
-				cargaMasivaDatosITItem.setTipo("Error");
+				cargaMasivaDatosITItem.setTipo((String) hashtable.get(SigaConstants.TIPO));
 			}
 
 			// Comprobamos fecha efectiva
@@ -1364,7 +1366,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 			if (!errorLinea.toString().isEmpty()) {
 				cargaMasivaDatosITItem
-						.setErrores("Errores en la línea " + numLinea + " : " + errorLinea.toString() + "<br/>");
+						.setErrores("Errores : " + errorLinea.toString() );
 			}
 
 			masivaDatosITVos.add(cargaMasivaDatosITItem);
@@ -1544,10 +1546,20 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			e.put(SigaConstants.NCOLEGIADO, cargaMasivaDatosITItem.getnColegiado());
 		}
 		if (cargaMasivaDatosITItem.getIdTurno() != null) {
-			e.put(SigaConstants.TURNO, cargaMasivaDatosITItem.getIdTurno());
+			if(!cargaMasivaDatosITItem.getNombreTurno().isEmpty()) {
+				e.put(SigaConstants.TURNO, cargaMasivaDatosITItem.getNombreTurno());
+			}else {
+				e.put(SigaConstants.TURNO, cargaMasivaDatosITItem.getIdTurno());
+			}
+			
 		}
 		if (cargaMasivaDatosITItem.getIdGuardia() != null) {
-			e.put(SigaConstants.GUARDIA, cargaMasivaDatosITItem.getIdGuardia());
+			if(!cargaMasivaDatosITItem.getNombreGuardia().isEmpty()) {
+				e.put(SigaConstants.GUARDIA, cargaMasivaDatosITItem.getNombreGuardia());
+			}else {
+				e.put(SigaConstants.GUARDIA, cargaMasivaDatosITItem.getIdGuardia());
+			}
+			
 		}
 		if (cargaMasivaDatosITItem.getTipo() != null) {
 			e.put(SigaConstants.TIPO, cargaMasivaDatosITItem.getTipo());
@@ -1800,8 +1812,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									});
 									// Si no existe inscripción, la asignación de grupo, no puede crearse.
 									if (listInscrip.size() == 0) {
-										errores += "Error insertando los grupos en cola de la linea " + i
-												+ " debido a que no existen inscripciones . <br/>";
+										errores += "Error debido a que no existen inscripciones .";
 										error.setDescription(errores);
 										deleteResponseDTO.setError(error);
 
@@ -1809,8 +1820,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									}
 
 								} else {
-									errores += "Error insertando los grupos en cola de la linea " + i
-											+ " debido a que no existen inscripcion de alta para la fecha actual . <br/>";
+									errores += "Error debido a que no existen inscripcion de alta para la fecha actual .";
 									error.setDescription(errores);
 									deleteResponseDTO.setError(error);
 
@@ -2187,10 +2197,20 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			e.put(SigaConstants.FECHAI, fechaInicio);
 		}
 		if (cargaMasivaDatosBTItem.getIdGuardia() != null) {
-			e.put(SigaConstants.GUARDIA, cargaMasivaDatosBTItem.getIdGuardia());
+			if(!cargaMasivaDatosBTItem.getNombreTurno().isEmpty()) {
+				e.put(SigaConstants.GUARDIA, cargaMasivaDatosBTItem.getNombreGuardia());
+			}else {
+				e.put(SigaConstants.GUARDIA, cargaMasivaDatosBTItem.getIdGuardia());
+			}
+
 		}
 		if (cargaMasivaDatosBTItem.getIdTurno() != null) {
-			e.put(SigaConstants.TURNO, cargaMasivaDatosBTItem.getIdTurno());
+			if(!cargaMasivaDatosBTItem.getNombreTurno().isEmpty()) {
+				e.put(SigaConstants.TURNO, cargaMasivaDatosBTItem.getNombreTurno());
+			}else {
+				e.put(SigaConstants.TURNO, cargaMasivaDatosBTItem.getIdTurno());
+			}
+
 		}
 		if (cargaMasivaDatosBTItem.getFechaFinal() != null) {
 			String fechaFinal = df2.format(cargaMasivaDatosBTItem.getFechaFinal());
@@ -2524,7 +2544,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 			if (!errorLinea.toString().isEmpty()) {
 				cargaMasivaDatosBTItem
-						.setErrores("Errores en la línea " + numLinea + " : " + errorLinea.toString() + "<br/>");
+						.setErrores("Errores : " + errorLinea.toString() );
 			}
 
 			masivaDatosBTVos.add(cargaMasivaDatosBTItem);
@@ -2843,7 +2863,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				}
 			} else {
 				errorLinea.append("Es obligatorio el numero del colegiado.");
-				cargaMasivaDatosGCItem.setNif("Error");
+				cargaMasivaDatosGCItem.setNif((String) hashtable.get(SigaConstants.NCOLEGIADO));
 			}
 
 			// Comprobamos GUARDIA
@@ -2854,6 +2874,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							.getIdGuardiaByName(hashtable.get(SigaConstants.GUARDIA).toString(), idInstitucion.toString());
 					String idGuardia = idGuardiaList.get(0);
 					cargaMasivaDatosGCItem.setIdGuardia(idGuardia);
+					cargaMasivaDatosGCItem.setNombreGuardia((String)hashtable.get(SigaConstants.GUARDIA));
+					
 				} catch (Exception e) {
 					errorLinea.append("La guardia introducida no tiene un formato valido.");
 					cargaMasivaDatosGCItem.setIdGuardia(null);
@@ -2872,6 +2894,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							.getIdTurnoByName(hashtable.get(SigaConstants.TURNO).toString(), idInstitucion.toString());
 					String idTurno = idTurnoList.get(0);
 					cargaMasivaDatosGCItem.setIdTurno(idTurno);
+					cargaMasivaDatosGCItem.setNombreTurno((String)hashtable.get(SigaConstants.TURNO));
 				} catch (Exception e) {
 					errorLinea.append("El turno introducido no tiene un formato valido.");
 					cargaMasivaDatosGCItem.setIdTurno(null);
@@ -2920,7 +2943,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 			if (!errorLinea.toString().isEmpty()) {
 				cargaMasivaDatosGCItem
-						.setErrores("Errores en la línea " + numLinea + " : " + errorLinea.toString() + "<br/>");
+						.setErrores("Errores : " + errorLinea.toString() );
 			}
 
 			masivaDatosBTVos.add(cargaMasivaDatosGCItem);
