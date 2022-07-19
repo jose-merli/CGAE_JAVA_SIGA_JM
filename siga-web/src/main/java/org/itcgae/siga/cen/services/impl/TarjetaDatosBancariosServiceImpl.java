@@ -63,6 +63,8 @@ import org.itcgae.siga.db.entities.CenAnexosCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenAnexosCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
@@ -83,6 +85,7 @@ import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenAnexosCuentasbancariasMapper;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenMandatosCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
@@ -151,6 +154,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 	@Autowired
 	private CenBancosExtendsMapper cenBancosExtendsMapper;
+	
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
 
 	@Override
 	public DatosBancariosDTO searchBanksData(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO,
@@ -271,6 +277,14 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							return deleteResponseDTO;
 
 						}
+						
+						CenClienteKey keyCliente = new CenClienteKey();
+						keyCliente.setIdinstitucion(idInstitucion);
+						keyCliente.setIdpersona(Long.valueOf(datosBancariosDeleteDTO.getIdPersona()));
+						CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+						cliente.setFechaactualizacion(new Date());
+						cenClienteMapper.updateByPrimaryKey(cliente);
+						
 					} catch (Exception e) {
 						deleteResponseDTO.setStatus(SigaConstants.KO);
 						error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA");
@@ -594,6 +608,13 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				// comprobacion actualización
 				if (response >= 1) {
 
+					CenClienteKey keyCliente = new CenClienteKey();
+					keyCliente.setIdinstitucion(idInstitucion);
+					keyCliente.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+					CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+					cliente.setFechaactualizacion(new Date());
+					cenClienteMapper.updateByPrimaryKey(cliente);
+					
 					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
 						LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
 						insertResponseDTO.setStatus(SigaConstants.OK);
@@ -994,9 +1015,17 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				if (response >= 1) {
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setId(idCuenta.toString());
+					
+					CenClienteKey keyCliente = new CenClienteKey();
+					keyCliente.setIdinstitucion(idInstitucion);
+					keyCliente.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+					CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+					cliente.setFechaactualizacion(new Date());
+					cenClienteMapper.updateByPrimaryKey(cliente);
+					
 					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
 						LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
-
+						
 						// AUDITORIA si se creó una cuenta bancaria correctamente
 						CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
 						CenCuentasbancariasKey cenCuentasbancariasKey = new CenCuentasbancariasKey();
@@ -1556,6 +1585,14 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				// comprobacion actualización
 				if (response >= 1) {
 					updateResponseDTO.setStatus(SigaConstants.OK);
+					
+					CenClienteKey keyCliente = new CenClienteKey();
+					keyCliente.setIdinstitucion(idInstitucion);
+					keyCliente.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+					CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+					cliente.setFechaactualizacion(new Date());
+					cenClienteMapper.updateByPrimaryKey(cliente);
+					
 					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
 						LOGGER.info("updateBanksData() -> OK. Update para cuentas bancarias realizado correctamente");
 

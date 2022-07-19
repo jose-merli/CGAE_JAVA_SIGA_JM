@@ -41,6 +41,8 @@ import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColacambioletrado;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
@@ -58,6 +60,7 @@ import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
@@ -121,6 +124,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	
 	@Autowired
 	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
+	
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
 
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina,
@@ -313,6 +319,13 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					LOGGER.warn("getCargos() / cenDireccionesExtendsMapper.updateMember() -> "
 							+ updateResponseDTO.getStatus() + ". No se pudo actualizar datos de un direcciones");
 
+				} else {
+					CenClienteKey keyCliente = new CenClienteKey();
+					keyCliente.setIdinstitucion(idInstitucion);
+					keyCliente.setIdpersona(Long.valueOf(tarjetaDireccionesUpdateDTO[i].getIdPersona()));
+					CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+					cliente.setFechaactualizacion(new Date());
+					cenClienteMapper.updateByPrimaryKey(cliente);
 				}
 			}
 
@@ -1246,6 +1259,13 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						insertResponseDTO.setId(idDireccion.toString());
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
+					
+					CenClienteKey keyCliente = new CenClienteKey();
+					keyCliente.setIdinstitucion(idInstitucion);
+					keyCliente.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+					CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+					cliente.setFechaactualizacion(new Date());
+					cenClienteMapper.updateByPrimaryKey(cliente);
 
 					// AUDITORIA
 					if (!UtilidadesString.esCadenaVacia(datosDireccionesItem.getMotivo())) {

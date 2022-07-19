@@ -26,6 +26,8 @@ import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividad;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividadExample;
@@ -34,6 +36,7 @@ import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenRegMercantil;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenNocolegiadoActividadMapper;
 import org.itcgae.siga.db.mappers.CenRegMercantilMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
@@ -71,6 +74,9 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 
 	@Autowired
 	private AdmContadorExtendsMapper admContadorMapper;
+	
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
 
 	@Override
 	public ComboDTO getActividadProfesionalPer(PersonaJuridicaActividadDTO personaJuridicaActividadDTO,
@@ -575,6 +581,13 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 
 				return updateResponseDTO;
 			}
+			
+			CenClienteKey key = new CenClienteKey();
+			key.setIdinstitucion(idInstitucion);
+			key.setIdpersona(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+			CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key);
+			cliente.setFechaactualizacion(new Date());
+			cenClienteMapper.updateByPrimaryKey(cliente);
 		}
 
 		LOGGER.info(
