@@ -88,7 +88,7 @@ public class ScsBaremosGuardiaSqlProvider {
 		sqlNum_min_simple.WHERE("hit2.idguardia = hit.idguardia");
 		sqlNum_min_simple.WHERE("hit2.diasaplicables = hit.diasaplicables");
 		sqlNum_min_simple.WHERE("hit2.agrupar = hit.agrupar");
-		sqlNum_min_simple.WHERE("hit2.idhito = CASE hit.idhito " + " WHEN 44 THEN 56" + " WHEN 1  THEN 55 END");
+		sqlNum_min_simple.WHERE("hit2.idhito = CASE hit.idhito " + " WHEN 44 THEN 56 " + " WHEN 1  THEN 55 END ");
 		sqlNum_min_simple.WHERE("rownum < 2");
 
 		// Subconsulta para obtener Numeros Importe Individual.
@@ -125,8 +125,8 @@ public class ScsBaremosGuardiaSqlProvider {
 		if (!facturaciones.equals("0")) {
 			sqlSimpleImptIndividual.WHERE("hit2.idfacturacion = hit.idfacturacion");
 		}
-		sqlNapartir.WHERE("hit2.idhito = CASE hit.idhito " + " WHEN 44 THEN 46" + " WHEN 1  THEN 45" + " END");
-		sqlNapartir.WHERE("rownum < 2");
+		sqlNapartir.WHERE(" hit2.idhito = CASE hit.idhito " + " WHEN 44 THEN 46 " + " WHEN 1  THEN 45" + " END ");
+		sqlNapartir.WHERE(" rownum < 2");
 
 		// Subconsulta para obtener el Maximo.
 		sqlMaximo.SELECT("hit2.preciohito");
@@ -143,9 +143,9 @@ public class ScsBaremosGuardiaSqlProvider {
 		if (!facturaciones.equals("0")) {
 			sqlMaximo.WHERE("hit2.idfacturacion = hit.idfacturacion");
 		}
-		sqlMaximo.WHERE("hit2.idhito = CASE hit.idhito " + " WHEN 7    THEN 8" + " WHEN 22   THEN 8"
-				+ " WHEN 5    THEN 3" + "	WHEN 20   THEN 3" + "	WHEN 9    THEN 6" + "	WHEN 24   THEN 6"
-				+ "	WHEN 44   THEN 4" + "	WHEN 1    THEN 2" + "END");
+		sqlMaximo.WHERE(" hit2.idhito = CASE hit.idhito " + " WHEN 7    THEN 8 " + " WHEN 22   THEN 8 "
+				+ " WHEN 5    THEN 3 " + "	WHEN 20   THEN 3 " + "	WHEN 9    THEN 6 " + "	WHEN 24   THEN 6 "
+				+ "	WHEN 44   THEN 4 " + "	WHEN 1    THEN 2 " + " END ");
 		sqlMaximo.WHERE("rownum < 2");
 
 		// Filtro para obtener los días.
@@ -174,10 +174,9 @@ public class ScsBaremosGuardiaSqlProvider {
 		sql.SELECT("  gua.diasguardia " + "     || ' ' " + "     || gua.tipodiasguardia n_dias");
 		sql.SELECT("tip.idhitoconfiguracion");
 		sql.SELECT("hit.idturno");
-		sql.SELECT("hit.idguardia");
+		sql.SELECT("gua.idguardia");
 		sql.SELECT("hit.IDHITO");
 		sql.SELECT("gua.fechabaja");
-		sql.SELECT("hit.IDHITO");
 		sql.SELECT("tur.nombre as NOMBRETURNO");
 		sql.SELECT("gua.fechabaja");
 		sql.SELECT("f_siga_getrecurso( tip.descripcion,1) baremo");
@@ -192,9 +191,7 @@ public class ScsBaremosGuardiaSqlProvider {
 
 		sql.SELECT("(" + sqlMaximo.toString() + ") maximo");
 
-		sql.SELECT("(" + sqlMaximo.toString() + ") maximo");
-
-		sql.SELECT(" CASE " + " WHEN nvl(hit.agrupar,0) = '1' THEN 'No' ELSE 'Si' END" + " por_dia");
+		sql.SELECT(" CASE " + " WHEN nvl(hit.agrupar,0) = '1' THEN 'No' ELSE 'Si' END " + " por_dia ");
 
 		if (!facturaciones.equals("0")) {
 			sql.FROM("FCS_HISTORICO_HITOFACT  hit");
@@ -207,17 +204,17 @@ public class ScsBaremosGuardiaSqlProvider {
 		sql.WHERE(" hit.idinstitucion = gua.idinstitucion");
 		sql.WHERE("(hit.idhito IN ( 25, 22, 20, 44, 1 )"
 				+ " or ( hit.idhito in ( 7, 9, 5 ) and not exists (" + sqlExisteHito.toString() + ""
-				+ " or ( hit.idhito in ( 12, 13 ) and hit.PRECIOHITO > 0 ) )");
+				+ " or ( hit.idhito in ( 12, 13 ) and hit.PRECIOHITO > 0 ) ) ");
 		
 		sql.WHERE("hit.idinstitucion = " + idinstitucion);
 		if (guardias != "") {
-			sql.WHERE("gua.idguardia IN( " + guardias + ")");
+			sql.WHERE("gua.idguardia IN( " + guardias + " ) ");
 		}
 		if (turnos != "") {
-			sql.WHERE("hit.idturno IN( " + turnos + ")");
+			sql.WHERE("hit.idturno IN( " + turnos + " ) ");
 		}
 		if (!facturaciones.equals("0")) {
-			sql.WHERE("hit.idfacturacion IN( " + facturaciones + ")");
+			sql.WHERE("hit.idfacturacion IN( " + facturaciones + " ) ");
 		}
 
 		if (!baremosGuardiaItem.isHistorico()) {
@@ -229,10 +226,11 @@ public class ScsBaremosGuardiaSqlProvider {
 			sql.WHERE("ROWNUM <= " + tamMaxNumber);
 		}
 
-		sql.WHERE("hit.idturno = tur.idturno");
-		sql.WHERE("hit.idinstitucion = tur.idinstitucion");
+		sql.WHERE(" hit.idturno = tur.idturno ");
+		sql.WHERE(" hit.idinstitucion = tur.idinstitucion ");
+		sql.WHERE(" hit.idguardia = gua.idguardia ");
 
-		sql.ORDER_BY("hit.idhito, hit.idguardia");
+		sql.ORDER_BY(" hit.idhito, hit.idguardia, hit.idturno");
 
 		return sql.toString();
 	}
