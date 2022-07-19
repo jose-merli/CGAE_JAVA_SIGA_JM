@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -1712,8 +1713,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 
-	@Override
-	public UpdateResponseDTO guardarColaGuardias(List<InscripcionGuardiaItem> inscripciones,
+	//@Override
+	// Antigua función de guardado
+	public UpdateResponseDTO guardarColaGuardias2(List<InscripcionGuardiaItem> inscripciones,
 												 HttpServletRequest request) {
 		LOGGER.info("guardarColaGuardias() ->  Entrada al servicio para editar guardia");
 
@@ -1977,6 +1979,197 @@ public class GuardiasServiceImpl implements GuardiasService {
 		LOGGER.info("guardarColaGuardia() -> Salida del servicio para guardar la cola de guardia");
 
 		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO guardarColaGuardias(List<InscripcionGuardiaItem> inscripciones,
+												 HttpServletRequest request) {
+		LOGGER.info(
+				"guardarColaGuardias() / guardiasServiceImpl.guardarColaGuardias() -> Entrada al servicio que guarda la cola de guardias");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 1;
+
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+		LOGGER.info(
+				"guardarColaGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+		LOGGER.info(
+				"guardarColaGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+		if (null != usuarios && usuarios.size() > 0) {
+			try {
+				// Comprobamos cual es el último grupo para cambiar el último letrado
+				OptionalInt maxGrupo = inscripciones.stream()
+						.filter(item -> !UtilidadesString.esCadenaVacia(item.getNumeroGrupo()))
+						.mapToInt(item -> Integer.parseInt(item.getNumeroGrupo())).max();
+				OptionalInt maxOrden = inscripciones.stream()
+						.filter(item -> !UtilidadesString.esCadenaVacia(item.getNumeroGrupo()) && maxGrupo.isPresent()
+								&& Integer.parseInt(item.getNumeroGrupo()) == maxGrupo.getAsInt())
+						.mapToInt(item -> Integer.parseInt(item.getOrden())).max();
+
+				for (InscripcionGuardiaItem item : inscripciones) {
+					if (UtilidadesString.esCadenaVacia(item.getOrden()) && UtilidadesString.esCadenaVacia(item.getNumeroGrupo())
+							&& UtilidadesString.esCadenaVacia(item.getIdGrupoGuardiaColegiado())) {
+						// Elimina grupo guardia colegiado
+						scsGrupoguardiacolegiadoExtendsMapper.deleteByPrimaryKey(Long.parseLong(item.getIdGrupoGuardiaColegiado()));
+					} else if (!UtilidadesString.esCadenaVacia(item.getOrden()) && !UtilidadesString.esCadenaVacia(item.getNumeroGrupo())) {
+						// Inserta grupo guardia
+						try {
+							// Se guarda el último letrado en caso de que coincida el letrado con el letrado del ultimo grupo de la guardia
+							if (item.getFechaSuscripcion() != null && maxGrupo.isPresent() && maxOrden.isPresent()
+									&& Integer.parseInt(item.getNumeroGrupo()) == maxGrupo.getAsInt()
+									&& Integer.parseInt(item.getOrden()) == maxOrden.getAsInt()) {
+								SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+								String fSoK = formatter.format(item.getFechaSuscripcion());
+
+								scsGuardiasturnoExtendsMapper.cambiarUltimoCola4(idInstitucion.toString(), item.getIdTurno(), item.getIdGuardia(), item.getIdPersona(),
+										item.getIdGrupoGuardiaColegiado(), fSoK, usuarios.get(0).getIdusuario().toString());
+							}
+
+							insertaGrupoGuardiaColegiado(idInstitucion, Integer.parseInt(item.getIdturno()), Integer.parseInt(item.getIdGuardia()),
+									Long.parseLong(item.getIdPersona()), item.getFechaSuscripcion(), Integer.parseInt(item.getNumeroGrupo()),
+									Integer.parseInt(item.getOrden()), Long.parseLong(item.getIdGrupoGuardiaColegiado()),
+									usuarios.get(0).getIdusuario());
+						} catch (Exception e) {
+							LOGGER.warn("Error al insertar el grupo guardia colegiado", e);
+						}
+					}
+				}
+
+				LOGGER.info(
+						"guardarColaGuardias() / guardiasServiceImpl.guardarColaGuardias() -> Entrando a busqueda de grupos sin letrados");
+
+				for (InscripcionGuardiaItem item : inscripciones) {
+					Integer idTurno = Integer.parseInt(item.getIdturno());
+					Integer idGuardia = Integer.parseInt(item.getIdGuardia());
+					Long idGrupoGuardia = Long.parseLong(item.getIdGrupoGuardia());
+
+					// Cuando se haya recorrido la lista de cambios hay que comprobar que los grupos se sigan usando porque igual
+					// se pueden eliminar los que ya no se usen
+
+					ScsGrupoguardiaExample grupoExample = new ScsGrupoguardiaExample();
+					grupoExample.createCriteria()
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(idTurno)
+							.andIdguardiaEqualTo(idGuardia)
+							.andIdgrupoguardiaEqualTo(idGrupoGuardia);
+
+					List<ScsGrupoguardia> grupos = scsGrupoguardiaExtendsMapper.selectByExample(grupoExample);
+					for (ScsGrupoguardia grupo : grupos) {
+						ScsGrupoguardiacolegiadoExample grupoColegiadoExample = new ScsGrupoguardiacolegiadoExample();
+						grupoColegiadoExample.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdturnoEqualTo(idTurno)
+								.andIdguardiaEqualTo(idGuardia)
+								.andIdgrupoguardiaEqualTo(grupo.getIdgrupoguardia());
+
+						long numGrupoGuardiaColegiados = scsGrupoguardiacolegiadoExtendsMapper.countByExample(grupoColegiadoExample);
+						if (numGrupoGuardiaColegiados == 0) {
+							scsGrupoguardiaExtendsMapper.deleteByPrimaryKey(grupo.getIdgrupoguardia());
+						}
+					}
+				}
+
+				LOGGER.info(
+						"guardarColaGuardias() / guardiasServiceImpl.guardarColaGuardias() <- Saliendo de busqueda de grupos sin letrados");
+			} catch (Exception e) {
+				LOGGER.error(e);
+				response = 0;
+				error.setCode(400);
+				error.setDescription("general.mensaje.error.bbdd");
+				updateResponseDTO.setStatus(SigaConstants.KO);
+			}
+
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else if (response == 1) {
+			error.setCode(200);
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
+		}
+
+		LOGGER.info(
+				"guardarColaGuardias() / guardiasServiceImpl.guardarColaGuardias() <- Saliendo del servicio que guarda la cola de guardias");
+		return updateResponseDTO;
+	}
+
+	private void insertaGrupoGuardiaColegiado(Short idInstitucion, Integer idTurno, Integer idGuardia, Long idPersona,
+											  Date fechaValidacion, Integer numeroGrupo, Integer ordenGrupo,
+											  Long idGrupoGuardiaColegiado, Integer idUsuario) {
+		Long idGrupoGuardia = null;
+
+		// Buscamos el idGrupo que corresponde con el numero del grupo
+		ScsGrupoguardiaExample grupoExample = new ScsGrupoguardiaExample();
+		grupoExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andIdturnoEqualTo(idTurno)
+				.andIdguardiaEqualTo(idGuardia)
+				.andNumerogrupoEqualTo(numeroGrupo);
+
+		List<ScsGrupoguardia> gruposGuardia = scsGrupoguardiaExtendsMapper.selectByExample(grupoExample);
+
+		if (gruposGuardia != null && !gruposGuardia.isEmpty()) {
+			idGrupoGuardia = gruposGuardia.get(0).getIdgrupoguardia();
+		} else {
+			// Si el grupo no existe lo creamos y lo usamos para meter la guardia
+			idGrupoGuardia = Long.parseLong(scsGrupoguardiaExtendsMapper.getLastId().getNewId()) + 1;
+
+			ScsGrupoguardia recordGrupoGuardia = new ScsGrupoguardia();
+			recordGrupoGuardia.setIdgrupoguardia(idGrupoGuardia);
+			recordGrupoGuardia.setIdinstitucion(idInstitucion);
+			recordGrupoGuardia.setIdturno(idTurno);
+			recordGrupoGuardia.setIdguardia(idGuardia);
+			recordGrupoGuardia.setNumerogrupo(numeroGrupo);
+			recordGrupoGuardia.setFechacreacion(new Date());
+			recordGrupoGuardia.setUsucreacion(idUsuario);
+			recordGrupoGuardia.setFechamodificacion(new Date());
+			recordGrupoGuardia.setUsumodificacion(idUsuario);
+
+			scsGrupoguardiaExtendsMapper.insert(recordGrupoGuardia);
+		}
+
+		boolean nuevoGrupoGuardiaColegiado = false;
+		if (idGrupoGuardiaColegiado == null) {
+			nuevoGrupoGuardiaColegiado = true;
+			idGrupoGuardiaColegiado = Long.parseLong(scsGrupoguardiacolegiadoExtendsMapper.getLastId().getNewId()) + 1;
+		}
+
+		ScsGrupoguardiacolegiado recordGrupoGuardiaColegiado = new ScsGrupoguardiacolegiado();
+		recordGrupoGuardiaColegiado.setIdgrupoguardiacolegiado(idGrupoGuardiaColegiado);
+		recordGrupoGuardiaColegiado.setIdpersona(idPersona);
+		recordGrupoGuardiaColegiado.setOrden(ordenGrupo);
+		recordGrupoGuardiaColegiado.setIdgrupoguardia(idGrupoGuardia);
+		recordGrupoGuardiaColegiado.setIdinstitucion(idInstitucion);
+		recordGrupoGuardiaColegiado.setIdturno(idTurno);
+		recordGrupoGuardiaColegiado.setIdguardia(idGuardia);
+		recordGrupoGuardiaColegiado.setFechacreacion(new Date());
+		recordGrupoGuardiaColegiado.setUsucreacion(idUsuario);
+		recordGrupoGuardiaColegiado.setFechasuscripcion(fechaValidacion);
+		recordGrupoGuardiaColegiado.setFechamodificacion(new Date());
+		recordGrupoGuardiaColegiado.setUsumodificacion(idUsuario);
+
+		if (nuevoGrupoGuardiaColegiado) {
+			scsGrupoguardiacolegiadoMapper.insert(recordGrupoGuardiaColegiado);
+		} else {
+			scsGrupoguardiacolegiadoMapper.updateByPrimaryKey(recordGrupoGuardiaColegiado);
+		}
+
+		// Actualizar cola guardia para evitar que el ultimo grupo quede a caballo
+		actualizarColaGuardiaConUltimoColegiadoPorGrupo(idInstitucion, idTurno, idGuardia);
 	}
 
 	@Override
