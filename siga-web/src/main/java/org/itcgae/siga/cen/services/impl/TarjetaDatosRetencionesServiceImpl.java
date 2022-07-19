@@ -23,12 +23,15 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
 import org.itcgae.siga.db.entities.ScsMaestroretenciones;
 import org.itcgae.siga.db.entities.ScsMaestroretencionesExample;
 import org.itcgae.siga.db.entities.ScsRetencionesirpf;
 import org.itcgae.siga.db.entities.ScsRetencionesirpfExample;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.mappers.ScsMaestroretencionesMapper;
 import org.itcgae.siga.db.mappers.ScsRetencionesirpfMapper;
@@ -53,6 +56,8 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
 	@Autowired
 	private ScsRetencionesirpfMapper scsRetencionesirpfMapper;
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
 
 	@Override
 	public MaestroRetencionDTO getRetentionTypes(HttpServletRequest request) {
@@ -254,6 +259,13 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 						if (responseInsercion == 1 && cerrojoInsercion) {
 							response.setStatus(SigaConstants.OK);
 							cerrojoInsercion = false;
+							
+							CenClienteKey keyCliente = new CenClienteKey();
+							keyCliente.setIdinstitucion(idInstitucion);
+							keyCliente.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+							CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+							cliente.setFechaactualizacion(new Date());
+							cenClienteMapper.updateByPrimaryKey(cliente);
 						}
 
 						if (responseInsercion == 0) {

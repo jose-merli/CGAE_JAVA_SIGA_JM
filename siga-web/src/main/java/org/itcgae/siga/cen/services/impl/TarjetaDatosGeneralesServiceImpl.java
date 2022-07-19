@@ -1149,6 +1149,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					cenCliente = cenClienteMapper.selectByPrimaryKey(key);
 					cenCliente.setAsientocontable(etiquetaUpdateDTO.getCuentaContable());
 					cenCliente.setIdlenguaje(usuario.getIdlenguaje());
+					cenCliente.setFechaactualizacion(new Date());
 
 					cenClienteMapper.updateByPrimaryKey(cenCliente);
 					cenClientePosterior = cenClienteMapper.selectByPrimaryKey(key);
