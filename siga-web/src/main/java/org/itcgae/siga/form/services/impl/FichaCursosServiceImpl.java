@@ -3183,7 +3183,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 									for (InscripcionItem inscripcion : inscriptionItemList) {
 
-										if (inscripcion.getEmitirCertificado() == null) {
+										if (inscripcion.getEmitirCertificado() != null) {
 											if (inscripcion.getEmitirCertificado().intValue() == SigaConstants.EMITIR_CERTIFICADO.intValue()) {
 												// Añadimos los certificados si existen para el curso y calificacion
 												ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
