@@ -100,18 +100,18 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
           }
           
           public String comboTipoDocumentacion(String idLenguaje, Short idInstitucion) {
-      		SQL sql = new SQL();
-      		
-      		sql.SELECT("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG");
-      		sql.SELECT("catalogoTIPODOCUMENTOEJG.DESCRIPCION");
+            SQL tipoDocumentacion = new SQL();
+            tipoDocumentacion.SELECT("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG");
+            tipoDocumentacion.SELECT("F_SIGA_GETRECURSO(TIPODOCUMENTOEJG.DESCRIPCION, " + idLenguaje + ") DESCRIPCION");
+            tipoDocumentacion.FROM("scs_TIPODOCUMENTOEJG TIPODOCUMENTOEJG");
+            tipoDocumentacion.WHERE("TIPODOCUMENTOEJG.fechabaja is null");
+            tipoDocumentacion.WHERE("TIPODOCUMENTOEJG.idinstitucion ='"+String.valueOf(idInstitucion)+"'");
+            tipoDocumentacion.WHERE("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG is not null");
 
-      		sql.FROM("scs_TIPODOCUMENTOEJG TIPODOCUMENTOEJG");
-      		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoTIPODOCUMENTOEJG on catalogoTIPODOCUMENTOEJG.idrecurso = TIPODOCUMENTOEJG.DESCRIPCION and catalogoTIPODOCUMENTOEJG.idlenguaje ="+idLenguaje);
-      		sql.WHERE("TIPODOCUMENTOEJG.fechabaja is null");
-      		sql.WHERE("TIPODOCUMENTOEJG.idinstitucion ='"+String.valueOf(idInstitucion)+"'");
-      		sql.WHERE("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG is not null");
-      		sql.WHERE("catalogoTIPODOCUMENTOEJG.DESCRIPCION is not null");
-      		sql.ORDER_BY("descripcion");
-      		return sql.toString();
-      	}
+            SQL sql = new SQL();
+            sql.SELECT("IDTIPODOCUMENTOEJG", "DESCRIPCION");
+            sql.FROM("(" + tipoDocumentacion.toString() + ")");
+            sql.ORDER_BY("DESCRIPCION");
+            return sql.toString();
+          }
 }
