@@ -61,7 +61,9 @@ public class ScheduledPagoSJCSServiceImpl implements IScheduledPagoSJCSService {
         long tiempoMaximoMinutos = Long.parseLong(tiempoMaximo.getValor());
         List<FcsPagosjg> pagosjgEjecutandoList = fcsPagosjgExtendsMapper.getPagosSJCSBloqueadosEnEjecucion(idInstitucion, tiempoMaximoMinutos);
         List<FcsPagosjg> pagosjgCerrandoList = fcsPagosjgExtendsMapper.getPagosSJCSBloqueadosEnCierre(idInstitucion, tiempoMaximoMinutos);
+        List<FcsPagosjg> pagosjgDeshaciendoCierreList = fcsPagosjgExtendsMapper.getPagosSJCSBloqueadosEnDeshacerCierre(idInstitucion, tiempoMaximoMinutos);
 
+        LOGGER.info("pagosSJCSBloqueados() -> Pagos SJCS Bloqueados en Ejecutando: " + pagosjgEjecutandoList.size());
         for (FcsPagosjg pago: pagosjgEjecutandoList) {
             try {
                 pagoSJCSBloqueadoEjecutando(pago);
@@ -70,9 +72,19 @@ public class ScheduledPagoSJCSServiceImpl implements IScheduledPagoSJCSService {
             }
         }
 
+        LOGGER.info("pagosSJCSBloqueados() -> Pagos SJCS Bloqueados en Cerrando: " + pagosjgCerrandoList.size());
         for (FcsPagosjg pago: pagosjgCerrandoList) {
             try {
                 pagoSJCSBloqueadoCerrando(pago);
+            } catch (Exception ex) {
+                LOGGER.error("Error al restaurar el pago SJCS:" +ex);
+            }
+        }
+
+        LOGGER.info("pagosSJCSBloqueados() -> Pagos SJCS Bloqueados en Deshaciendo CIerre: " + pagosjgDeshaciendoCierreList.size());
+        for (FcsPagosjg pago: pagosjgDeshaciendoCierreList) {
+            try {
+                pagoSJCSBloqueadoDeshaciendoCierre(pago);
             } catch (Exception ex) {
                 LOGGER.error("Error al restaurar el pago SJCS:" +ex);
             }
@@ -103,6 +115,18 @@ public class ScheduledPagoSJCSServiceImpl implements IScheduledPagoSJCSService {
         utilidadesPagoSJCS.deshacerCierre(pago, pago.getIdinstitucion(), usuario);
 
         LOGGER.info("SALE -> ScheduledPagoSJCSServiceImpl.pagoSJCSBloqueadoCerrando()");
+    }
+
+    @Transactional(rollbackFor = Exception.class, timeout=24000)
+    private void pagoSJCSBloqueadoDeshaciendoCierre(FcsPagosjg pago) throws Exception {
+        LOGGER.info("ENTRA -> ScheduledPagoSJCSServiceImpl.pagoSJCSBloqueadoDeshaciendoCierre()");
+
+        // Se pone el pago a estado ejecutado para que se pueda volver a cerrar
+        AdmUsuarios usuario = new AdmUsuarios();
+        usuario.setIdusuario(SigaConstants.USUMODIFICACION_0);
+        utilidadesPagoSJCS.deshacerCierre(pago, pago.getIdinstitucion(), usuario);
+
+        LOGGER.info("SALE -> ScheduledPagoSJCSServiceImpl.pagoSJCSBloqueadoDeshaciendoCierre()");
     }
 
 }

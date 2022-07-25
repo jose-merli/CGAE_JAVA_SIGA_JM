@@ -222,6 +222,7 @@ public class UtilidadesPagoSJCS {
             LOGGER.error(e.getMessage());
             LOGGER.error(e.getStackTrace());
             ponerPagoEstadoAbierto(pago, idInstitucion, usuario);
+            FacturacionSJCSServicesImpl.setNadieEjecutando();
             throw e;
         } finally {
             FacturacionSJCSServicesImpl.setNadieEjecutando();
@@ -969,6 +970,34 @@ public class UtilidadesPagoSJCS {
         return bCalculo.doubleValue();
     }
 
+    @Async
+    public void asyncDeshacerCierrePagoSJCS(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) throws Exception {
+
+        try {
+            // Insertamos el estado del pago:
+            insertEstadoPagoConTransaccion(idInstitucion, pago.getIdpagosjg(), usuario.getIdusuario(), SigaConstants.ESTADO_PAGO_DESHACIENDO_CIERRE);
+
+            // Iniciamos la ejecución del pago:
+            deshacerCierre(pago, idInstitucion, usuario);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getStackTrace());
+
+            FacturacionSJCSServicesImpl.setNadieEjecutando();
+
+            FcsPagosEstadospagosKey record = new FcsPagosEstadospagosKey();
+            record.setIdinstitucion(idInstitucion);
+            record.setIdpagosjg(pago.getIdpagosjg());
+            record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_DESHACIENDO_CIERRE));
+            fcsPagosEstadospagosMapper.deleteByPrimaryKey(record);
+
+            throw e;
+        } finally {
+            FacturacionSJCSServicesImpl.setNadieEjecutando();
+        }
+
+    }
+
     @Transactional(rollbackFor = Exception.class, timeout=24000)
     public void deshacerCierre(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) throws Exception {
 
@@ -1050,6 +1079,12 @@ public class UtilidadesPagoSJCS {
                 LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() ->fcsPagosEstadospagosMapper.updateByPrimaryKeySelective() -> Actualizamos el estado de pago a ejecutado");
 
                 FcsPagosEstadospagosKey record = new FcsPagosEstadospagosKey();
+                record.setIdinstitucion(idInstitucion);
+                record.setIdpagosjg(idpagoJG);
+                record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_DESHACIENDO_CIERRE));
+                fcsPagosEstadospagosMapper.deleteByPrimaryKey(record);
+
+                record = new FcsPagosEstadospagosKey();
                 record.setIdinstitucion(idInstitucion);
                 record.setIdpagosjg(idpagoJG);
                 record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_CERRADO));
@@ -1159,6 +1194,8 @@ public class UtilidadesPagoSJCS {
             LOGGER.error(e.getMessage());
             LOGGER.error(e.getStackTrace());
 
+            FacturacionSJCSServicesImpl.setNadieEjecutando();
+
             // Elimina el estado CERRADO en caso de que exista
             FcsPagosEstadospagosKey fcsPagosEstadospagosKey = new FcsPagosEstadospagosKey();
             fcsPagosEstadospagosKey.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_CERRADO));
@@ -1205,6 +1242,8 @@ public class UtilidadesPagoSJCS {
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.error(e.getStackTrace());
+
+            FacturacionSJCSServicesImpl.setNadieEjecutando();
 
             // Elimina el estado CERRADO en caso de que exista
             FcsPagosEstadospagosKey fcsPagosEstadospagosKey = new FcsPagosEstadospagosKey();

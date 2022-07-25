@@ -1830,7 +1830,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 								"YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setCode(400);
-						error.setDescription("facturacionSJCS.facturacionPagos.pagos.errorDeshacerCierreProceso");
+						error.setDescription("facturacionSJCS.facturacionPagos.pagos.errorEjecutarProceso");
 					} else {
 						FacturacionSJCSServicesImpl.setAlguienEjecutando();
 						try {
@@ -2024,25 +2024,32 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 						"PagoSJCSServiceImpl.cerrarPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (null != usuarios && !usuarios.isEmpty()) {
+					if (FacturacionSJCSServicesImpl.isAlguienEjecutando()) {
+						LOGGER.info(
+								"YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(400);
+						error.setDescription("facturacionSJCS.facturacionPagos.pagos.errorCerrarProceso");
+					} else {
+						FacturacionSJCSServicesImpl.setAlguienEjecutando();
+						FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+						fcsPagosjgKey.setIdinstitucion(idInstitucion);
+						fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
 
-					FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
-					fcsPagosjgKey.setIdinstitucion(idInstitucion);
-					fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
+						LOGGER.info(
+								"PagoSJCSServiceImpl.cerrarPago() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
+										+ idPago);
+						pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+						LOGGER.info(
+								"PagoSJCSServiceImpl.cerrarPago() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
+										+ idPago);
 
-					LOGGER.info(
-							"PagoSJCSServiceImpl.cerrarPago() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
-									+ idPago);
-					pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
-					LOGGER.info(
-							"PagoSJCSServiceImpl.cerrarPago() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
-									+ idPago);
-
-					LOGGER.info(
-							"PagoSJCSServiceImpl.cerrarPago() -> fcsPagosEstadospagosMapper.insertSelective() -> Insertamo el estado CERRADO para el pago: "
-									+ idPago);
-					// Insertamos el estado del pago
-					utilidadesPagoSJCS.asyncCerrarPagoSJCS(pago, usuarios.get(0));
-
+						LOGGER.info(
+								"PagoSJCSServiceImpl.cerrarPago() -> fcsPagosEstadospagosMapper.insertSelective() -> Insertamo el estado CERRADO para el pago: "
+										+ idPago);
+						// Insertamos el estado del pago
+						utilidadesPagoSJCS.asyncCerrarPagoSJCS(pago, usuarios.get(0));
+					}
 				}
 
 			}
@@ -2101,20 +2108,29 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 						"PagoSJCSServiceImpl.cerrarPagoManual() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (null != usuarios && !usuarios.isEmpty()) {
+					if (FacturacionSJCSServicesImpl.isAlguienEjecutando()) {
+						LOGGER.info(
+								"YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO DE DESBLOQUEO.");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(400);
+						error.setDescription("facturacionSJCS.facturacionPagos.pagos.errorCerrarProceso");
+					} else {
+						FacturacionSJCSServicesImpl.setAlguienEjecutando();
 
-					FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
-					fcsPagosjgKey.setIdinstitucion(idInstitucion);
-					fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
+						FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+						fcsPagosjgKey.setIdinstitucion(idInstitucion);
+						fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
 
-					LOGGER.info(
-							"PagoSJCSServiceImpl.cerrarPagoManual() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
-									+ idPago);
-					pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
-					LOGGER.info(
-							"PagoSJCSServiceImpl.cerrarPagoManual() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
-									+ idPago);
+						LOGGER.info(
+								"PagoSJCSServiceImpl.cerrarPagoManual() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
+										+ idPago);
+						pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+						LOGGER.info(
+								"PagoSJCSServiceImpl.cerrarPagoManual() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
+										+ idPago);
 
-					utilidadesPagoSJCS.asyncCerrarPagoManual(pago, idsParaEnviar, usuarios.get(0));
+						utilidadesPagoSJCS.asyncCerrarPagoManual(pago, idsParaEnviar, usuarios.get(0));
+					}
 				}
 
 			}
@@ -2180,14 +2196,14 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
 							FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
 
-							utilidadesPagoSJCS.deshacerCierre(pago, idInstitucion, usuarios.get(0));
+							utilidadesPagoSJCS.asyncDeshacerCierrePagoSJCS(pago, idInstitucion, usuarios.get(0));
 						} catch (Exception e) {
 							LOGGER.error(e.getMessage());
 							LOGGER.error(e.getCause());
 							LOGGER.error(e);
-							throw e;
-						} finally {
+
 							FacturacionSJCSServicesImpl.setNadieEjecutando();
+							throw e;
 						}
 					}
 				}
