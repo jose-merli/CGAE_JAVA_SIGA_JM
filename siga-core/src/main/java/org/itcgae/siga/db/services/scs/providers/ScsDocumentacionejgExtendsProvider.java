@@ -50,7 +50,7 @@ public class ScsDocumentacionejgExtendsProvider extends ScsDocumentacionejgSqlPr
 
 		}
 		
-		sql.ORDER_BY("labeldocumento");
+		sql.ORDER_BY("IDDOCUMENTACION");
 		
 		return sql.toString();
 	}
