@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
 import org.itcgae.siga.DTOs.scs.ScsUnidadfamiliarejgDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 
 public interface IGestionJusticiableService {
 	
@@ -56,4 +57,6 @@ public interface IGestionJusticiableService {
 	public UpdateResponseDTO updateUnidadFamiliar(UnidadFamiliarEJGItem unidadFamiliarEJGItem, HttpServletRequest request);
 
 	public ScsUnidadfamiliarejgDTO getSolicitante(EjgItem datos, HttpServletRequest request);	
+	
+	public UpdateResponseDTO asociarDesignacion(ScsDefendidosdesigna datos, HttpServletRequest request);
 }

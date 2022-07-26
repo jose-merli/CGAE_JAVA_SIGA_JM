@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.justiciables;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,6 +35,7 @@ import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoItem;
 import org.itcgae.siga.DTOs.scs.ScsUnidadfamiliarejgDTO;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -44,8 +46,14 @@ import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
+import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
+import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsDesignaExample;
+import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -55,6 +63,9 @@ import org.itcgae.siga.db.entities.ScsTelefonospersonaKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
+import org.itcgae.siga.db.mappers.ScsDefendidosDesignaMapperExtends;
+import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
@@ -153,6 +164,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private ScsDefendidosdesignaMapper scsDefendidosdesignaMapper;
+	
+	@Autowired
+	private ScsDefendidosDesignaMapperExtends scsDefendidosDesignaMapperExtends;
 
 	private boolean validacionDireccion = false;
 	private boolean validacionTipoVia = false;
@@ -465,6 +482,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("searchJusticiable() -> Salida del servicio para obtener los justiciables");
 		return justiciableDTO;
 	}
+	
+	
 
 	private JusticiableItem fillJusticiableItemOfScsPersonasjg(ScsPersonajg personajg) {
 
@@ -2009,6 +2028,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 2;
+		 long miliseconds = System.currentTimeMillis();
+	        Date date = new Date(miliseconds);
 
 		if (idInstitucion != null) {
 
@@ -2077,6 +2098,87 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		}
 		LOGGER.info(
 				"disassociateRepresentante() -> Salida del servicio para desasociar un representante del justiciable");
+		return updateResponseDTO;
+	}
+	
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO asociarDesignacion(ScsDefendidosdesigna datosdesigna, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		long miliseconds = System.currentTimeMillis();
+		Date date = new Date(miliseconds);
+		Error error = new Error();
+		int response = 0;
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"GestionEJGServiceImpl.asociarDesignacion() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para asociar un Justiciable a una designacion");
+				try {
+
+					datosdesigna.setIdinstitucion(idInstitucion);
+					List<ScsDefendidosdesigna> designas = scsDefendidosDesignaMapperExtends
+							.seleccionarDesigna(datosdesigna);
+					
+					if (designas != null && designas.size() > 0) {
+						ScsDefendidosdesigna interesadoDesigna = new ScsDefendidosdesigna();
+						// IdInstitucion Defendidos Designa
+						interesadoDesigna.setIdinstitucion(idInstitucion);
+						// IdTurno Defendidos Designa
+						if (datosdesigna.getIdturno() != null ) {
+							interesadoDesigna.setIdturno(datosdesigna.getIdturno());
+						}else {
+							interesadoDesigna.setIdturno(designas.get(0).getIdturno());
+						}
+						
+						// Anio Defendidos Designa
+						interesadoDesigna.setAnio(datosdesigna.getAnio());
+						// Numero Defendidos Designa
+						interesadoDesigna.setNumero(designas.get(0).getNumero());
+						// Idpersona Defendidos Designa
+						interesadoDesigna.setIdpersona(datosdesigna.getIdpersona());
+						// Fecha Modificación es la fecha actual
+						interesadoDesigna.setFechamodificacion(date);
+						// Usuario Modificación
+						interesadoDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+						// Calidad
+						interesadoDesigna.setCalidad("D"); // Demandante para que salga el Interesado en Designas.
+						// Insertar la asociación Justiciable y Designas.
+						response = scsDefendidosdesignaMapper.insertSelective(interesadoDesigna);
+					}
+				} catch (Exception e) {
+					error.setCode(400);
+					LOGGER.error(e);
+					error.setDescription("general.mensaje.error.bbdd");
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response != 1) {
+						error.setCode(400);
+						LOGGER.error(
+								"GestionEJGServiceImpl.asociarDesignacion() -> ERROR. No se ha asociado ningun elemento");
+					} else {
+						error.setCode(200);
+						LOGGER.info(
+								"GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
+					}
+				}
+			}
+		}
+
 		return updateResponseDTO;
 	}
 
