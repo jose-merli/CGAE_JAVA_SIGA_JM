@@ -457,17 +457,16 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             String[] resultado = commons.callPLProcedureFacturacionPyS(
                     "{call PKG_SIGA_CARGOS.Regenerar_Presentacion(?,?,?,?,?,?,?,?,?,?,?)}", 2, param_in);
 
-            String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
-            
+            LOGGER.info("actualizarFicheroAdeudos() -> Salida del servicio para actualizar un fichero de adeudos");
             if (resultado != null) {
-            	if (Arrays.asList(codigosErrorFormato).contains(resultado[0])) {
+            	 LOGGER.info("actualizarFicheroAdeudos() -> RESULTADO : " + resultado);
+            	if ((resultado[1] != null || !resultado[1].isEmpty() ) && !resultado[0].equals("0")) {
                     throw new BusinessException(resultado[1]);
                 } else {
-                    if (!resultado[0].equals("0")) {
                         throw new BusinessException("general.mensaje.error.bbdd");
-                    }
                 }
             } else {
+            	LOGGER.error("actualizarFicheroAdeudos() -> Error general");
             	throw new BusinessException("general.mensaje.error.bbdd");
             }
         }

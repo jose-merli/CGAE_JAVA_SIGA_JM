@@ -4452,6 +4452,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 scsDocumentacionejg.setFechaentrega(documentacionEjgItem.getF_presentacion());
                 scsDocumentacionejg.setRegentrada(documentacionEjgItem.getRegEntrada());
                 scsDocumentacionejg.setRegsalida(documentacionEjgItem.getRegSalida());
+                
+                //Si trae fichero
+                if(!documentacionEjgItem.getNombreFichero().isEmpty()) {
+                	scsDocumentacionejg.setNombrefichero(documentacionEjgItem.getNombreFichero());
+                }
 
                 // Posible fuente de problemas por restricciones de la base de datos
                 // Se lee el valor de presentador enviado desde el front.
