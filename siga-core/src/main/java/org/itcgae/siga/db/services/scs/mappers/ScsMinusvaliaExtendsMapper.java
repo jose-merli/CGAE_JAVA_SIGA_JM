@@ -21,7 +21,7 @@ public interface ScsMinusvaliaExtendsMapper extends ScsMinusvaliaMapper{
 		@Result(column = "IDMINUSVALIA", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ComboItem> getMinusvalias(Short idInstitucion);
+	List<ComboItem> getMinusvalias(Short idInstitucion, String lenguaje);
 
 	
 }

@@ -210,7 +210,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				LOGGER.info(
 						"getMinusvalia() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Entrada a scsMinusvaliaExtendsMapper para obtener minusvalias");
 
-				List<ComboItem> comboItems = scsMinusvaliaExtendsMapper.getMinusvalias(idInstitucion);
+				List<ComboItem> comboItems = scsMinusvaliaExtendsMapper.getMinusvalias(idInstitucion, usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"getMinusvalia() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Salida a scsMinusvaliaExtendsMapper para obtener minusvalias");
