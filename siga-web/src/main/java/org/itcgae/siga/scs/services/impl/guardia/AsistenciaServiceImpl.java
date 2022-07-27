@@ -2144,31 +2144,33 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				.andAnioEqualTo(Short.valueOf(anio)).andNumeroEqualTo(Long.valueOf(numero));
 
 		scsDelitosasistenciaMapper.deleteByExample(scsDelitosasistenciaExample);
-		tarjetaAsistenciaItem.getIdDelito().forEach(delito -> {
-			String anio2 = "";
-			String numero2 = "";
+		if (tarjetaAsistenciaItem.getIdDelito() != null) {
+			tarjetaAsistenciaItem.getIdDelito().forEach(delito -> {
+				String anio2 = "";
+				String numero2 = "";
 
-			if (!UtilidadesString.esCadenaVacia(delito)) {
+				if (!UtilidadesString.esCadenaVacia(delito)) {
 
-				if (UtilidadesString.esCadenaVacia(anioParam) && UtilidadesString.esCadenaVacia(numeroParam)) {
-					anio2 = tarjetaAsistenciaItem.getAnio();
-					numero2 = tarjetaAsistenciaItem.getNumero();
-				} else {
-					anio2 = anioParam;
-					numero2 = numeroParam;
+					if (UtilidadesString.esCadenaVacia(anioParam) && UtilidadesString.esCadenaVacia(numeroParam)) {
+						anio2 = tarjetaAsistenciaItem.getAnio();
+						numero2 = tarjetaAsistenciaItem.getNumero();
+					} else {
+						anio2 = anioParam;
+						numero2 = numeroParam;
+					}
+
+					ScsDelitosasistencia scsDelitosasistencia = new ScsDelitosasistencia();
+					int affectedRows = 0;
+					scsDelitosasistencia.setAnio(Short.valueOf(anio2));
+					scsDelitosasistencia.setNumero(Long.valueOf(numero2));
+					scsDelitosasistencia.setIdinstitucion(idInstitucion);
+					scsDelitosasistencia.setIddelito(Short.valueOf(delito));
+					scsDelitosasistencia.setFechamodificacion(new Date());
+					scsDelitosasistencia.setUsumodificacion(usuario.getIdusuario());
+					affectedRows = scsDelitosasistenciaMapper.insertSelective(scsDelitosasistencia);
 				}
-
-				ScsDelitosasistencia scsDelitosasistencia = new ScsDelitosasistencia();
-				int affectedRows = 0;
-				scsDelitosasistencia.setAnio(Short.valueOf(anio2));
-				scsDelitosasistencia.setNumero(Long.valueOf(numero2));
-				scsDelitosasistencia.setIdinstitucion(idInstitucion);
-				scsDelitosasistencia.setIddelito(Short.valueOf(delito));
-				scsDelitosasistencia.setFechamodificacion(new Date());
-				scsDelitosasistencia.setUsumodificacion(usuario.getIdusuario());
-				affectedRows = scsDelitosasistenciaMapper.insertSelective(scsDelitosasistencia);
-			}
-		});
+			});
+		}
 
 	}
 	/**
