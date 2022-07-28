@@ -8,7 +8,7 @@ public class CenSolicitudAlterSqlExtendsProvider {
 	public String getMaxIdSolicitud(){
 		SQL sql = new SQL();
 		sql.SELECT("MAX(IDSOLICITUD) +1 AS IDSOLICITUD");
-		sql.FROM("CEN_SOLICITUDINCORPORACION");
+		sql.FROM("CEN_SOLICITUDALTER");
 		return sql.toString();
 	}
 

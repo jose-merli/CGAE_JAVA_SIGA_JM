@@ -966,38 +966,40 @@ public class MenuServiceImpl implements IMenuService {
 				tipoUsuario = "";
 				String rolObtenido = "";
 				String[] attributes = rol.split(" ");
-				String institucionRol = getidInstitucionByCodExterno(attributes[0]).get(0).getIdinstitucion().toString();
-				if(institucionRol.equals(idInstitucion)) {
-					if(SigaUserDetailsService.isNumeric(attributes[1])) { //Si es númerico el segundo atributo
-						primero = 2; //el rol empieza en el tercero
-						if(attributes[attributes.length-1].equalsIgnoreCase("Residente")) { //Si el último atributo es Residente
-							ultimo = attributes.length -2; //la ultima palabra del rol es la penultima
+				if (attributes[0] != null && attributes[0].startsWith("A") && attributes[0].length() == 6) {
+					String institucionRol = getidInstitucionByCodExterno(attributes[0]).get(0).getIdinstitucion().toString();
+					if(institucionRol.equals(idInstitucion)) {
+						if(SigaUserDetailsService.isNumeric(attributes[1])) { //Si es númerico el segundo atributo
+							primero = 2; //el rol empieza en el tercero
+							if(attributes[attributes.length-1].equalsIgnoreCase("Residente")) { //Si el último atributo es Residente
+								ultimo = attributes.length -2; //la ultima palabra del rol es la penultima
+							}else {
+								ultimo = attributes.length -1; //Si no, la ultima palabra del rol es la ultima
+							}
 						}else {
-							ultimo = attributes.length -1; //Si no, la ultima palabra del rol es la ultima
+							primero = 1; //Si no es numerico, el rol empieza en el segundo atributo
+							ultimo = attributes.length -1; //Acaba en el ultimo atributo
 						}
-					}else {
-						primero = 1; //Si no es numerico, el rol empieza en el segundo atributo
-						ultimo = attributes.length -1; //Acaba en el ultimo atributo
-					}
+						
+						for(int i=primero;i<=ultimo ; i++) {
+							String constructRol = "";
+							if (i != ultimo) {
+								constructRol += attributes[i];
 
-					for(int i=primero;i<=ultimo ; i++) {
-						String constructRol = "";
-						if (i != ultimo) {
-							constructRol += attributes[i];
+								constructRol += " ";
 
-							constructRol += " ";
+							} else {
+								constructRol += attributes[i];
 
-						} else {
-							constructRol += attributes[i];
-
+							}
+							tipoUsuario += constructRol;
 						}
-						tipoUsuario += constructRol;
-					}
-
-					rolObtenido = SigaConstants.getTipoUsuario(tipoUsuario);
-
-					if(!respuesta.contains(rolObtenido)) {
-						respuesta.add(rolObtenido);
+						
+						rolObtenido = SigaConstants.getTipoUsuario(tipoUsuario);	
+						
+						if(!respuesta.contains(rolObtenido)) {
+							respuesta.add(rolObtenido);
+						}
 					}
 				}
 			}
@@ -1187,39 +1189,52 @@ public class MenuServiceImpl implements IMenuService {
 	public ComboDTO getInstitucionesUsuario(HttpServletRequest request) {
 		// Cargamos el combo de Instituciones
 		ComboDTO response = new ComboDTO();
+		
+		try {
+			List<String> institucionesList = getInstitucionesUsuarioRequest(request);
 
-		List<String> institucionesList = getInstitucionesUsuarioRequest(request);
+			CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+			exampleInstitucion.setDistinct(true);
+			exampleInstitucion.createCriteria().andCodigoextIn(institucionesList);
+			exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
 
-		CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
-		exampleInstitucion.setDistinct(true);
-		exampleInstitucion.createCriteria().andCodigoextIn(institucionesList);
-		exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
+			List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
+			List<ComboItem> combos = new ArrayList<ComboItem>();
+			//ComboItem comboBlanco = new ComboItem();
+			//comboBlanco.setValue("");
+			//comboBlanco.setLabel("");
+			//combos.add(comboBlanco);
+			if (null != instituciones && instituciones.size() > 0) {
+				for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
+					CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
+					ComboItem combo = new ComboItem();
+					combo.setValue(cenInstitucion.getIdinstitucion().toString());
+					if (null != cenInstitucion.getFechaenproduccion()) {
 
-		List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
-		List<ComboItem> combos = new ArrayList<ComboItem>();
-		//ComboItem comboBlanco = new ComboItem();
-		//comboBlanco.setValue("");
-		//comboBlanco.setLabel("");
-		//combos.add(comboBlanco);
-		if (null != instituciones && instituciones.size() > 0) {
-			for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
-				CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
-				ComboItem combo = new ComboItem();
-				combo.setValue(cenInstitucion.getIdinstitucion().toString());
-				if (null != cenInstitucion.getFechaenproduccion()) {
+						combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
+								+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
+					} else {
+						combo.setLabel(cenInstitucion.getAbreviatura());
+					}
 
-					combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
-							+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
-				} else {
-					combo.setLabel(cenInstitucion.getAbreviatura());
+					combos.add(combo);
 				}
 
-				combos.add(combo);
 			}
 
+			response.setCombooItems(combos);
+		} catch (Exception e) {
+			String roles = (String) request.getHeader("CAS-roles");
+			String dni = (String) request.getHeader("CAS-username");
+			String nombre = (String) request.getHeader("CAS-displayName");
+			
+			Error error = new Error();
+			
+			error.code(500);
+			error.setMessage("DNI: " + dni + "\n" + "Nombre: " + nombre + "\n" + "Roles: " + roles);
+			response.setError(error);
 		}
-
-		response.setCombooItems(combos);
+		
 		return response;
 
 	}
@@ -1228,35 +1243,48 @@ public class MenuServiceImpl implements IMenuService {
 	public ComboDTO getRolesUsuario(HttpServletRequest request, String idInstitucion) {
 		// Cargamos el combo de roles
 		ComboDTO response = new ComboDTO();
+		
+		try {
+			List<String> rolesList = getRolesUsuarioRequest(request, idInstitucion);
 
-		List<String> rolesList = getRolesUsuarioRequest(request, idInstitucion);
+			AdmRolExample exampleRol = new AdmRolExample();
+			exampleRol.setDistinct(true);
+			exampleRol.createCriteria().andCodigoextIn(rolesList);
+			exampleRol.setOrderByClause("DESCRIPCION ASC");
 
-		AdmRolExample exampleRol = new AdmRolExample();
-		exampleRol.setDistinct(true);
-		exampleRol.createCriteria().andCodigoextIn(rolesList);
-		exampleRol.setOrderByClause("DESCRIPCION ASC");
+			List<AdmRol> roles = admRolMapper.selectByExample(exampleRol);
+			List<ComboItem> combos = new ArrayList<ComboItem>();
+			
+			if (null != roles && roles.size() > 0) {
+				for (Iterator<AdmRol> iterator = roles.iterator(); iterator.hasNext();) {
+					AdmRol rol = (AdmRol) iterator.next();
+					ComboItem combo = new ComboItem();
+					combo.setValue(rol.getIdrol().toString());
+					combo.setLabel(rol.getDescripcion());
+					
+					combos.add(combo);
+				}
 
-		List<AdmRol> roles = admRolMapper.selectByExample(exampleRol);
-		List<ComboItem> combos = new ArrayList<ComboItem>();
-
-		if (null != roles && roles.size() > 0) {
-			for (Iterator<AdmRol> iterator = roles.iterator(); iterator.hasNext();) {
-				AdmRol rol = (AdmRol) iterator.next();
-				ComboItem combo = new ComboItem();
-				combo.setValue(rol.getIdrol().toString());
-				combo.setLabel(rol.getDescripcion());
-
-				combos.add(combo);
+			}else {
+				ComboItem comboBlanco = new ComboItem();
+				comboBlanco.setValue("");
+				comboBlanco.setLabel("");
+				combos.add(comboBlanco);
 			}
 
-		}else {
-			ComboItem comboBlanco = new ComboItem();
-			comboBlanco.setValue("");
-			comboBlanco.setLabel("");
-			combos.add(comboBlanco);
+			response.setCombooItems(combos);
+		} catch (Exception e) {
+			String roles = (String) request.getHeader("CAS-roles");
+			String dni = (String) request.getHeader("CAS-username");
+			String nombre = (String) request.getHeader("CAS-displayName");
+			
+			Error error = new Error();
+			
+			error.code(500);
+			error.setMessage("DNI: " + dni + "\n" + "Nombre: " + nombre + "\n" + "roles: " + roles);
+			response.setError(error);
 		}
-
-		response.setCombooItems(combos);
+		
 		return response;	}
 
 	@Override

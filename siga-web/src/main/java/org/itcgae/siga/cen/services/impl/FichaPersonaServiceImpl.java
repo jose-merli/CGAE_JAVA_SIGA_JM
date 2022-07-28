@@ -129,9 +129,18 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			if(String.valueOf(colegiado.getIdpersonanotario()).equals(desasociarPersona.getIdPersonaDesasociar())) {
 				desasociarPersona.setIdInstitucion(String.valueOf(idInstitucion));
 				int response =cenNocolegiadoExtendsMapper.disassociatePerson(usuario, desasociarPersona);
-				if(response == 1)
+				if(response == 1) {
+					CenClienteKey key = new CenClienteKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIdpersona(Long.valueOf(desasociarPersona.getIdPersona()));
+					
+					CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key);
+					
+					cliente.setFechaactualizacion(new Date());
+					
+					cenClienteMapper.updateByPrimaryKey(cliente);
 					updateResponse.setStatus(SigaConstants.OK);
-				else {
+				} else {
 					updateResponse.setStatus(SigaConstants.KO);
 				}
 			}else {
@@ -246,6 +255,14 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			updateResponse.setStatus("OK");
 			
 		}
+		
+		CenClienteKey key = new CenClienteKey();
+		key.setIdinstitucion(idInstitucion);
+		key.setIdpersona(Long.valueOf(asociarPersona.getIdPersona()));
+		CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key);
+		cliente.setFechaactualizacion(new Date());
+		cenClienteMapper.updateByPrimaryKey(cliente);
+		
 		return updateResponse;
 	}
 

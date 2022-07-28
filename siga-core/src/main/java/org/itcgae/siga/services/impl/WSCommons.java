@@ -944,7 +944,7 @@ public class WSCommons {
 									
 									if (integrante.getProfesion() != null) {
 										if(integrante.getProfesionalAbogado().equals("1")){
-											if (integrante.getCodigocolegio().equals(integrante.getCodigoColegioCliente())) {
+											if (integrante.getCodigocolegio() != null && integrante.getCodigocolegio().equals(integrante.getCodigoColegioCliente())) {
 												ProfesionalAbogadoPropio profesionalAbogadoPropio =  ProfesionalAbogadoPropio.Factory.newInstance();
 												profesionalAbogadoPropio.setColegio(colegio);
 												profesionalAbogadoPropio.setNumColegiado(integrante.getNumColegiado());

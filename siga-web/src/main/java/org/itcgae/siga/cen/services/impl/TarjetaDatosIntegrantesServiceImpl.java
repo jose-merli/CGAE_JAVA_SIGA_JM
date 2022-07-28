@@ -331,6 +331,13 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 						LOGGER.info(
 								"getCargos() / cenComponentesExtendsMapper.updateMember() -> Salida de cenComponentesExtendsMapper para actualizar datos de un integrante");
 
+						CenClienteKey keyCliente = new CenClienteKey();
+						keyCliente.setIdinstitucion(idInstitucion);
+						keyCliente.setIdpersona(Long.valueOf(tarjetaIntegrantesUpdateDTO.getIdPersona()));
+						CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+						cliente.setFechaactualizacion(new Date());
+						cenClienteMapper.updateByPrimaryKey(cliente);
+						
 						updateResponseDTO.setStatus(SigaConstants.OK);
 						
 						// AUDITORIA si se actualizó un componente correctamente
@@ -474,6 +481,13 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					}
 
 					if (responseCenComponentes == 1) {
+						CenClienteKey keyCliente = new CenClienteKey();
+						keyCliente.setIdinstitucion(idInstitucion);
+						keyCliente.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaPadre()));
+						CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+						cliente.setFechaactualizacion(new Date());
+						cenClienteMapper.updateByPrimaryKey(cliente);
+						
 						updateResponseDTO.setStatus(SigaConstants.OK);
 						
 						// AUDITORIA si se insertó un componente correctamente
@@ -542,6 +556,13 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 						}
 
 						if (responseCenComponentes == 1) {
+							CenClienteKey keyCliente = new CenClienteKey();
+							keyCliente.setIdinstitucion(idInstitucion);
+							keyCliente.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaPadre()));
+							CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+							cliente.setFechaactualizacion(new Date());
+							cenClienteMapper.updateByPrimaryKey(cliente);
+							
 							updateResponseDTO.setStatus(SigaConstants.OK);
 							
 							// AUDITORIA si se insertó un componente correctamente
@@ -721,6 +742,13 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					LOGGER.warn("getCargos() / cenComponentesExtendsMapper.updateMember() -> "
 							+ updateResponseDTO.getStatus() + ". No se pudo actualizar datos de un integrantes");
 
+				} else {
+					CenClienteKey key = new CenClienteKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIdpersona(Long.valueOf(tarjetaIntegrantesDeleteDTO[i].getIdPersona()));
+					CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key);
+					cliente.setFechaactualizacion(new Date());
+					cenClienteMapper.updateByPrimaryKey(cliente);
 				}
 			}
 
