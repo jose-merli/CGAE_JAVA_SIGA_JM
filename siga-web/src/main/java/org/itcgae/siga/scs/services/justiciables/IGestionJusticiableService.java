@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -59,4 +60,8 @@ public interface IGestionJusticiableService {
 	public ScsUnidadfamiliarejgDTO getSolicitante(EjgItem datos, HttpServletRequest request);	
 	
 	public UpdateResponseDTO asociarDesignacion(ScsDefendidosdesigna datos, HttpServletRequest request);
+
+	public UpdateResponseDTO asociarEJG(List<String> idpersonajg, HttpServletRequest request);
+
+	public UpdateResponseDTO asociarAsistencia(List<String> itemAsistencia, HttpServletRequest request);
 }

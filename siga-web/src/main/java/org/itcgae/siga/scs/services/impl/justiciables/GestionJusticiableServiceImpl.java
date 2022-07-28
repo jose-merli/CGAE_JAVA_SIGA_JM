@@ -46,13 +46,17 @@ import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.ScsAsistencia;
+import org.itcgae.siga.db.entities.ScsAsistenciaExample;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgExample;
 import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgExample;
@@ -63,6 +67,7 @@ import org.itcgae.siga.db.entities.ScsTelefonospersonaKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
+import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosDesignaMapperExtends;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
@@ -101,10 +106,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-	
+
 	@Autowired
 	ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
-	
+
 	@Autowired
 	ScsPersonajgMapper scsPersonajgMapper;
 
@@ -149,27 +154,30 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 	@Autowired
 	private ScsSojExtendsMapper scsSojExtendsMapper;
-	
+
 	@Autowired
 	private ScsTipoGrupoLaboralExtendsMapper scsTipoGrupoLaboralExtendsMapper;
-	
+
 	@Autowired
 	private ScsParentescoExtendsMapper scsParentescoExtendsMapper;
-	
+
 	@Autowired
 	private ScsTipoIngresoExtendsMapper scsTipoIngresoExtendsMapper;
-	
+
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
-	
+
 	@Autowired
 	private ScsDefendidosdesignaMapper scsDefendidosdesignaMapper;
-	
+
 	@Autowired
 	private ScsDefendidosDesignaMapperExtends scsDefendidosDesignaMapperExtends;
+	
+	@Autowired
+	private ScsAsistenciaMapper ScsAsistenciaMapper;
 
 	private boolean validacionDireccion = false;
 	private boolean validacionTipoVia = false;
@@ -210,7 +218,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				LOGGER.info(
 						"getMinusvalia() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Entrada a scsMinusvaliaExtendsMapper para obtener minusvalias");
 
-				List<ComboItem> comboItems = scsMinusvaliaExtendsMapper.getMinusvalias(idInstitucion, usuarios.get(0).getIdlenguaje());
+				List<ComboItem> comboItems = scsMinusvaliaExtendsMapper.getMinusvalias(idInstitucion,
+						usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"getMinusvalia() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Salida a scsMinusvaliaExtendsMapper para obtener minusvalias");
@@ -222,7 +231,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("getMinusvalia() -> Salida del servicio para obtener combo minusvalias");
 		return combo;
 	}
-	
+
 	@Override
 	public ComboDTO getGruposLaborales(HttpServletRequest request) {
 		LOGGER.info("getGruposLaborales() -> Entrada al servicio para obtener grupos laborales");
@@ -250,7 +259,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				LOGGER.info(
 						"getGruposLaborales() / scsTipoGrupoLaboralExtendsMapper.getGruposLaborales() -> Entrada a scsTipoGrupoLaboralExtendsMapper para obtener grupos laborales");
 
-				List<ComboItem> comboItems = scsTipoGrupoLaboralExtendsMapper.getGruposLaborales(idInstitucion, usuarios.get(0).getIdlenguaje());
+				List<ComboItem> comboItems = scsTipoGrupoLaboralExtendsMapper.getGruposLaborales(idInstitucion,
+						usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"getGruposLaborales() / scsTipoGrupoLaboralExtendsMapper.getGruposLaborales() -> Salida a scsTipoGrupoLaboralExtendsMapper para obtener grupos laborales");
@@ -262,7 +272,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("getGruposLaborales() -> Salida del servicio para obtener combo grupos laborales");
 		return combo;
 	}
-	
+
 	@Override
 	public ComboDTO getParentesco(HttpServletRequest request) {
 		LOGGER.info("getParentesco() -> Entrada al servicio para obtener combo parentesco");
@@ -290,7 +300,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				LOGGER.info(
 						"getParentesco() / scsParentescoExtendsMapper.getParentesco() -> Entrada a scsParentescoExtendsMapper para obtener combo parentesco");
 
-				List<ComboItem> comboItems = scsParentescoExtendsMapper.getParentesco(idInstitucion, usuarios.get(0).getIdlenguaje());
+				List<ComboItem> comboItems = scsParentescoExtendsMapper.getParentesco(idInstitucion,
+						usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"getParentesco() / scsParentescoExtendsMapper.getParentesco() -> Salida a scsParentescoExtendsMapper para obtener combo parentesco");
@@ -302,7 +313,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("getParentesco() -> Salida del servicio para obtener combo parentesco");
 		return combo;
 	}
-	
+
 	@Override
 	public ComboDTO getTiposIngresos(HttpServletRequest request) {
 		LOGGER.info("getTipoIngresos() -> Entrada al servicio para obtener combo tipoIngresos");
@@ -330,7 +341,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				LOGGER.info(
 						"getTipoIngresos() / scsParentescoExtendsMapper.getParentesco() -> Entrada a scsParentescoExtendsMapper para obtener combo tipoIngresos");
 
-				List<ComboItem> comboItems = scsTipoIngresoExtendsMapper.getTiposIngresos(usuarios.get(0).getIdlenguaje());
+				List<ComboItem> comboItems = scsTipoIngresoExtendsMapper
+						.getTiposIngresos(usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"getTipoIngresos() / scsParentescoExtendsMapper.getParentesco() -> Salida a scsParentescoExtendsMapper para obtener combo tipoIngresos");
@@ -482,8 +494,6 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("searchJusticiable() -> Salida del servicio para obtener los justiciables");
 		return justiciableDTO;
 	}
-	
-	
 
 	private JusticiableItem fillJusticiableItemOfScsPersonasjg(ScsPersonajg personajg) {
 
@@ -945,13 +955,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 						}
 					}
-					if (
-							validacionCodigoPostal || validacionDireccion || validacionEstadoCivil
+					if (validacionCodigoPostal || validacionDireccion || validacionEstadoCivil
 							|| validacionFechaNacimiento || validacionPais || validacionParentesco
 							|| validacionPoblacion || validacionProvincia || validacionRegimenConyugal || validacionSexo
 							|| validacionTipoVia
 //							false
-							) {
+					) {
 						error.setCode(600);
 
 						String camposErroneos = "";
@@ -1004,19 +1013,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 //								"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para buscar al justiciable a editar");
 //
 //						ScsPersonajg scsPersonajg = personaList.get(0);
-						
+
 						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
-						
+
 						personajgKey.setIdinstitucion(idInstitucion);
 						personajgKey.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
-						
+
 						LOGGER.info(
-						"updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para buscar al justiciable a editar");
+								"updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para buscar al justiciable a editar");
 
 						ScsPersonajg scsPersonajg = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
-						
+
 						LOGGER.info(
-						"updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para buscar al justiciable a editar");
+								"updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para buscar al justiciable a editar");
 
 						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, datosGenerales,
 								idInstitucion, justiciableItem);
@@ -1389,8 +1398,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 											.compareTo(((AsuntosJusticiableItem) item2).getFecha());
 								}
 							});
-							
-							 Collections.reverse(asuntosJusticiableItem);
+
+							Collections.reverse(asuntosJusticiableItem);
 
 							asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItem);
 						}
@@ -2028,8 +2037,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 2;
-		 long miliseconds = System.currentTimeMillis();
-	        Date date = new Date(miliseconds);
+		long miliseconds = System.currentTimeMillis();
+		Date date = new Date(miliseconds);
 
 		if (idInstitucion != null) {
 
@@ -2100,8 +2109,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				"disassociateRepresentante() -> Salida del servicio para desasociar un representante del justiciable");
 		return updateResponseDTO;
 	}
-	
-	
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO asociarDesignacion(ScsDefendidosdesigna datosdesigna, HttpServletRequest request) {
@@ -2133,18 +2141,18 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					datosdesigna.setIdinstitucion(idInstitucion);
 					List<ScsDefendidosdesigna> designas = scsDefendidosDesignaMapperExtends
 							.seleccionarDesigna(datosdesigna);
-					
+
 					if (designas != null && designas.size() > 0) {
 						ScsDefendidosdesigna interesadoDesigna = new ScsDefendidosdesigna();
 						// IdInstitucion Defendidos Designa
 						interesadoDesigna.setIdinstitucion(idInstitucion);
 						// IdTurno Defendidos Designa
-						if (datosdesigna.getIdturno() != null ) {
+						if (datosdesigna.getIdturno() != null) {
 							interesadoDesigna.setIdturno(datosdesigna.getIdturno());
-						}else {
+						} else {
 							interesadoDesigna.setIdturno(designas.get(0).getIdturno());
 						}
-						
+
 						// Anio Defendidos Designa
 						interesadoDesigna.setAnio(datosdesigna.getAnio());
 						// Numero Defendidos Designa
@@ -2176,6 +2184,148 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 								"GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
 					}
 				}
+				
+				updateResponseDTO.setError(error);
+			}
+		}
+
+		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO asociarEJG(List<String> itemEjg, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		long miliseconds = System.currentTimeMillis();
+		Date date = new Date(miliseconds);
+		int response = 0;
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"GestionEJGServiceImpl.asociarDesignacion() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para asociar un Justiciable a un EJG");
+				try {
+					// Identificar el EJG
+					ScsEjgExample paramejg = new ScsEjgExample();
+
+					paramejg.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
+							.andIdtipoejgEqualTo(Short.valueOf(itemEjg.get(2)))
+							.andAnioEqualTo(Short.valueOf(itemEjg.get(0))).andNumeroEqualTo(Long.valueOf(itemEjg.get(1)));
+
+					List<ScsEjgWithBLOBs> ejg = scsEjgMapper.selectByExampleWithBLOBs(paramejg);
+					// Actualizar con Justiciable seleccionado.
+					if (ejg != null && ejg.size() > 0) {
+						ScsEjgWithBLOBs ejgItem = new ScsEjgWithBLOBs();
+						ejgItem.setFechamodificacion(date); // Fecha Modificación
+						ejgItem.setIdinstitucion(Short.valueOf(idInstitucion));
+						ejgItem.setIdtipoejg(ejg.get(0).getIdtipoejg());
+						ejgItem.setAnio(ejg.get(0).getAnio());
+						ejgItem.setNumero(ejg.get(0).getNumero());
+						ejgItem.setIdpersonajg(Long.valueOf(itemEjg.get(3))); // Solicitante.
+						response = scsEjgMapper.updateByPrimaryKeySelective(ejgItem);
+					}
+
+				} catch (Exception e) {
+					error.setCode(400);
+					LOGGER.error(e);
+					error.setDescription("general.mensaje.error.bbdd");
+				} finally {
+					if (response != 1) {
+						error.setCode(400);
+						LOGGER.error(
+								"GestionEJGServiceImpl.asociarDesignacion() -> ERROR. No se ha asociado ningun elemento");
+					} else {
+						error.setCode(200);
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						LOGGER.info(
+								"GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
+					}
+				}
+				
+				updateResponseDTO.setError(error);
+			}
+		}
+
+		return updateResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO asociarAsistencia(List<String> itemAsistencia, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		long miliseconds = System.currentTimeMillis();
+		Date date = new Date(miliseconds);
+		int response = 0;
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"GestionEJGServiceImpl.asociarDesignacion() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para asociar un Justiciable a un EJG");
+				try {
+					// Identificar la Asistencia
+					ScsAsistenciaExample paramAsis = new ScsAsistenciaExample();
+
+					paramAsis.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
+							.andAnioEqualTo(Short.valueOf(itemAsistencia.get(0))).andNumeroEqualTo(Long.valueOf(itemAsistencia.get(1)));
+
+					List<ScsAsistencia> asistencia = scsAsistenciaExtendsMapper.selectByExample(paramAsis);
+					// Actualizar con Justiciable seleccionado.
+					if (asistencia != null && asistencia.size() > 0) {
+						ScsAsistencia asisItem = new ScsAsistencia();
+						asisItem.setIdinstitucion(Short.valueOf(idInstitucion));
+						asisItem.setAnio(asistencia.get(0).getAnio());
+						asisItem.setNumero(asistencia.get(0).getNumero());
+						asisItem.setIdpersonajg(Long.valueOf(itemAsistencia.get(2))); // Solicitante
+						asisItem.setFechamodificacion(date); // Fecha Modificación
+						response =  ScsAsistenciaMapper.updateByPrimaryKeySelective(asisItem);
+					}
+
+				} catch (Exception e) {
+					error.setCode(400);
+					LOGGER.error(e);
+					error.setDescription("general.mensaje.error.bbdd");
+				} finally {
+					if (response != 1) {
+						error.setCode(400);
+						LOGGER.error(
+								"GestionEJGServiceImpl.asociarDesignacion() -> ERROR. No se ha asociado ningun elemento");
+					} else {
+						error.setCode(200);
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						LOGGER.info(
+								"GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
+					}
+				}
+				
+				updateResponseDTO.setError(error);
 			}
 		}
 
@@ -2542,7 +2692,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				"getJusticiableByIdPersona() -> Salida del servicio para obtener el representante del justiciable por idpersona");
 		return justiciableDTO;
 	}
-	
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO updateUnidadFamiliar(UnidadFamiliarEJGItem datos, HttpServletRequest request) {
@@ -2573,83 +2723,87 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 				try {
 
-					//Seleccionamos el familiar que vamos a modificar
+					// Seleccionamos el familiar que vamos a modificar
 					ScsUnidadfamiliarejgKey uniKey = new ScsUnidadfamiliarejgKey();
-					
-					//SIGARNV-2449@DTT.JAMARTIN@01/10/2021@INICIO
-					if(datos.getUf_anio() != null) {
+
+					// SIGARNV-2449@DTT.JAMARTIN@01/10/2021@INICIO
+					if (datos.getUf_anio() != null) {
 						uniKey.setAnio(Short.parseShort(datos.getUf_anio()));
 					}
-					
+
 					uniKey.setIdinstitucion(idInstitucion);
-					
-					if(datos.getUf_idPersona() != null) {
+
+					if (datos.getUf_idPersona() != null) {
 						uniKey.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
 					}
-					if(datos.getUf_idTipoejg() != null) {
+					if (datos.getUf_idTipoejg() != null) {
 						uniKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
 					}
-					if(datos.getUf_numero()  != null) {
+					if (datos.getUf_numero() != null) {
 						uniKey.setNumero(Long.parseLong(datos.getUf_numero()));
 					}
-					//SIGARNV-2449@DTT.JAMARTIN@01/10/2021@FIN
-					
+					// SIGARNV-2449@DTT.JAMARTIN@01/10/2021@FIN
+
 					ScsUnidadfamiliarejg familiar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(uniKey);
 
-					//Se comprueban y modifican los valores asociados a solicitante y rol
-					
+					// Se comprueban y modifican los valores asociados a solicitante y rol
+
 					ScsEjgKey ejgKey = new ScsEjgKey();
-					
-					//SIGARNV-2449@DTT.JAMARTIN@01/10/2021@INICIO
-					if(datos.getUf_anio() != null) {
+
+					// SIGARNV-2449@DTT.JAMARTIN@01/10/2021@INICIO
+					if (datos.getUf_anio() != null) {
 						ejgKey.setAnio(Short.parseShort(datos.getUf_anio()));
 					}
 					ejgKey.setIdinstitucion(idInstitucion);
-					
-					if(datos.getUf_idTipoejg() != null) {
+
+					if (datos.getUf_idTipoejg() != null) {
 						ejgKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
 					}
-					if(datos.getUf_numero() != null) {
+					if (datos.getUf_numero() != null) {
 						ejgKey.setNumero(Long.parseLong(datos.getUf_numero()));
 					}
-					
+
 					ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
-					
-					if( familiar != null && familiar.getEncalidadde() != null && datos.getUf_enCalidad() != null) {
-						//En el caso que se le cambie el rol a un solicitante principal
-						if( familiar.getEncalidadde().equals("3") && !datos.getUf_enCalidad().equals("3")) {
+
+					if (familiar != null && familiar.getEncalidadde() != null && datos.getUf_enCalidad() != null) {
+						// En el caso que se le cambie el rol a un solicitante principal
+						if (familiar.getEncalidadde().equals("3") && !datos.getUf_enCalidad().equals("3")) {
 							ejg.setIdpersonajg(null);
-							if(response==1) response = scsEjgMapper.updateByPrimaryKey(ejg);
+							if (response == 1)
+								response = scsEjgMapper.updateByPrimaryKey(ejg);
 						}
 					}
-					if(datos.getUf_enCalidad() != null) {
-						//En el caso que sea solicitante o solicitante principal respectivamente.
-						if(datos.getUf_enCalidad().equals("2") || datos.getUf_enCalidad().equals("3")) {
-							if(datos.getUf_enCalidad().equals("3")) {
+					if (datos.getUf_enCalidad() != null) {
+						// En el caso que sea solicitante o solicitante principal respectivamente.
+						if (datos.getUf_enCalidad().equals("2") || datos.getUf_enCalidad().equals("3")) {
+							if (datos.getUf_enCalidad().equals("3")) {
 								ejg.setIdpersonajg(Long.parseLong(datos.getUf_idPersona()));
-								if(response==1) response = scsEjgMapper.updateByPrimaryKey(ejg);
+								if (response == 1)
+									response = scsEjgMapper.updateByPrimaryKey(ejg);
 							}
-							if( familiar != null) {
+							if (familiar != null) {
 								familiar.setSolicitante((short) 1);
 							}
 						}
-						//En el caso que se seleccione el rol de "Unidad familiar"
+						// En el caso que se seleccione el rol de "Unidad familiar"
 						else {
-							if( familiar != null) {
+							if (familiar != null) {
 								familiar.setSolicitante((short) 0);
 							}
 						}
 					}
-					
-					//Modificamos el familiar
-					if( familiar != null) {
+
+					// Modificamos el familiar
+					if (familiar != null) {
 						familiar.setEncalidadde(datos.getUf_enCalidad());
-						if(datos.getIncapacitado() != null) familiar.setIncapacitado(datos.getIncapacitado());
-						if(datos.getCircunsExcep() != null) familiar.setCircunstanciasExcepcionales(datos.getCircunsExcep());
-	
+						if (datos.getIncapacitado() != null)
+							familiar.setIncapacitado(datos.getIncapacitado());
+						if (datos.getCircunsExcep() != null)
+							familiar.setCircunstanciasExcepcionales(datos.getCircunsExcep());
+
 						familiar.setIdtipogrupolab(datos.getIdTipoGrupoLab());
 						familiar.setIdparentesco(datos.getIdParentesco());
-						
+
 						familiar.setIdtipoingreso(datos.getIdTipoIngreso());
 						familiar.setDescripcioningresosanuales(datos.getDescrIngrAnuales());
 						familiar.setImporteingresosanuales(datos.getImpIngrAnuales());
@@ -2658,51 +2812,50 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						familiar.setBienesmuebles(datos.getBienesMu());
 						familiar.setImportebienesmuebles(datos.getImpBienesMu());
 						familiar.setOtrosbienes(datos.getOtrosBienes());
-						familiar.setImporteotrosbienes(datos.getImpOtrosBienes());		
-	
+						familiar.setImporteotrosbienes(datos.getImpOtrosBienes());
+
 						familiar.setObservaciones(datos.getObservaciones());
-	
+
 						familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
 						familiar.setFechamodificacion(new Date());
-	
-						//Actualizamos la entrada
-						if(response == 1) {
-							response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);	
+
+						// Actualizamos la entrada
+						if (response == 1) {
+							response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);
 						}
 					}
-					//SIGARNV-2449@DTT.JAMARTIN@01/10/2021@FIN
+					// SIGARNV-2449@DTT.JAMARTIN@01/10/2021@FIN
 
 				} catch (Exception e) {
 					LOGGER.error(e);
 					error.setCode(500);
 					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
-					response=0;
+					response = 0;
 				}
 
-				if(response==0) {
+				if (response == 0) {
 					error.setCode(500);
 					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
-				}
-				else {
+				} else {
 					error.setCode(200);
 					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
-				
+
 				updateResponseDTO.setError(error);
 			}
 
 		}
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public ScsUnidadfamiliarejgDTO getSolicitante(EjgItem datos, HttpServletRequest request) {
 		LOGGER.info("getSolicitante() ->  Entrada al servicio para obtener el solicitante");
 
 		ScsUnidadfamiliarejgDTO solicitante = new ScsUnidadfamiliarejgDTO();
-		
+
 		Error error = new Error();
 
 		String token = request.getHeader("Authorization");
@@ -2726,15 +2879,16 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 				try {
 
-					//Buscamos aquella entrada que es la solicitante principal de nuestro ejg
+					// Buscamos aquella entrada que es la solicitante principal de nuestro ejg
 					ScsUnidadfamiliarejgExample example = new ScsUnidadfamiliarejgExample();
 
-					example.createCriteria().andAnioEqualTo(Short.parseShort(datos.getAnnio())).andIdinstitucionEqualTo(idInstitucion).
-					andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG())).andNumeroEqualTo(Long.parseLong(datos.getNumero())).
-					andSolicitanteEqualTo((short) 1);
+					example.createCriteria().andAnioEqualTo(Short.parseShort(datos.getAnnio()))
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG()))
+							.andNumeroEqualTo(Long.parseLong(datos.getNumero())).andSolicitanteEqualTo((short) 1);
 
-					//Actualizamos la entrada
-					solicitante.setunidadFamiliarItems(scsUnidadfamiliarejgMapper.selectByExample(example));					
+					// Actualizamos la entrada
+					solicitante.setunidadFamiliarItems(scsUnidadfamiliarejgMapper.selectByExample(example));
 
 				} catch (Exception e) {
 					LOGGER.error(e);
@@ -2742,10 +2896,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					error.setDescription("general.mensaje.error.bbdd");
 				}
 
-				if(error.getCode()==null) {
+				if (error.getCode() == null) {
 					error.setCode(200);
 				}
-				
+
 				solicitante.setError(error);
 			}
 
