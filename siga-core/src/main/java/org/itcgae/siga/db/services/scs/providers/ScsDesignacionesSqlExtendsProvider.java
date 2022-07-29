@@ -1200,7 +1200,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 	}
 
-	public String busquedaProcedimientoDesignas(DesignaItem designaItem, Short idInstitucion, Integer tamMax)
+	public String busquedaProcedimientoDesignas(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo)
 			throws Exception {
 		SQL sql = new SQL();
 
@@ -1222,7 +1222,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	}
 
-	public String busquedaModuloDesignas(DesignaItem designaItem, Short idInstitucion, Integer tamMax)
+	public String busquedaModuloDesignas(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo)
 			throws Exception {
 		SQL sql = new SQL();
 
