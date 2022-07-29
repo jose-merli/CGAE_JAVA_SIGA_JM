@@ -45,7 +45,7 @@ public class AsuntosJusticiableItem {
 	private String nColegiado;
 	private String estado;
 	private String dilnigproc;
-
+	private String codigo;
 	/**
 	 **/
 	public AsuntosJusticiableItem idInstitucion(String idInstitucion) {
@@ -443,5 +443,13 @@ public class AsuntosJusticiableItem {
 
 	public void setDilnigproc(String dilnigproc) {
 		this.dilnigproc = dilnigproc;
+	}
+
+	public String getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
 	}
 }

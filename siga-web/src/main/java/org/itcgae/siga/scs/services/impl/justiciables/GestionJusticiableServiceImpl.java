@@ -1382,7 +1382,18 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							default:
 								break;
 							}
-
+							if(asuntoClave.getAnio() != null && !asuntoClave.getAnio().isEmpty()) {
+								asunto.setAnio(asuntoClave.getAnio());
+							}
+							if(asuntoClave.getNumero() != null && !asuntoClave.getNumero().isEmpty()) {
+								asunto.setNumero(asuntoClave.getNumero());
+							}
+							if(asuntoClave.getTipo() != null && !asuntoClave.getTipo().isEmpty()) {
+								asunto.setTipo(asuntoClave.getTipo());
+							}
+							if(asuntoClave.getClave() != null && !asuntoClave.getClave().isEmpty()) {
+								asunto.setClave(asuntoClave.getClave());
+							}
 							if (asunto != null) {
 								asuntosJusticiableItem.add(asunto);
 							}
@@ -1630,6 +1641,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		asunto.setIdInstitucion(asuntoDesigna.getIdInstitucion());
 		asunto.setTurnoGuardia(asuntoDesigna.getTurnoGuardia());
 		asunto.setDatosInteres(asuntoDesigna.getDatosInteres());
+		asunto.setNumero(asuntoDesigna.getNumero());
+		asunto.setCodigo(asuntoDesigna.getCodigo());
+		
 
 		// Obtenemos colegiado
 
