@@ -49,6 +49,12 @@ public class FichaDatosColegialesController {
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/fichaDatosColegiales/cuentaContableSJCSSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> searchCuentaContableSJCS(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
+		StringDTO response = fichaDatosColegiales.getCuentaContableSJCS(colegiadoItem, request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesSearchActual", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ColegiadoDTO> searchColegialesDataActuak(@RequestParam("numPagina") int numPagina, @RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
 		ColegiadoDTO response = fichaDatosColegiales.datosColegialesSearchActual(numPagina, colegiadoItem, request);

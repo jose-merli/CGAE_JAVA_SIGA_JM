@@ -296,4 +296,10 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 
 	})
 	List<ColegiadosSJCSItem> busquedaColegiadosSJCS(String idInstitucion, ColegiadosSJCSItem colegiadosSJCSItem);
+	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectCuentaContableSJCS")
+	@Results({ 
+		@Result(column = "CUENTACONTABLESJCS", property = "cuentaContable", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ColegiadoItem> selectCuentaContableSJCS(Short idInstitucion, ColegiadoItem colegiadoItem);
 }

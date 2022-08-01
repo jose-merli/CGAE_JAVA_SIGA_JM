@@ -1253,4 +1253,18 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.GROUP_BY("COLEGIADO.IDPERSONA,INSTITUCION.ABREVIATURA,COLEGIADO.idinstitucion, COLEGIADO.COMUNITARIO,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO, PERSONA.NIFCIF,RECURSO.DESCRIPCION, PERSONA.APELLIDOS1  ,PERSONA.APELLIDOS2 ,PERSONA.NOMBRE,DIRECCION.TELEFONO1");
 		return sql.toString();
 	}	
+	
+	public String selectCuentaContableSJCS(Short idInstitucion, ColegiadoItem colegiadoItem) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("CUENTACONTABLESJCS");
+
+		sql.FROM("cen_colegiado");
+
+		sql.WHERE("idpersona = '" + colegiadoItem.getIdPersona() + "'");
+		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
 }

@@ -97,6 +97,8 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 	private Boolean searchCount;
 	private String count;
 	
+	private String cuentaContable;
+	
 	// Nombre del colegio que se mostrará como resultado en la tabla de busqueda
 	private String colegioResultado;
 	// Filtro de colegios de la pantalla de busqueda
@@ -1334,6 +1336,7 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 		result = prime * result + ((apellidos1 == null) ? 0 : apellidos1.hashCode());
 		result = prime * result + ((apellidos2 == null) ? 0 : apellidos2.hashCode());
 		result = prime * result + ((asientoContable == null) ? 0 : asientoContable.hashCode());
+		result = prime * result + ((cuentaContable == null) ? 0 : cuentaContable.hashCode());
 		result = prime * result + ((cambioEstado == null) ? 0 : cambioEstado.hashCode());
 		result = prime * result + ((codigoPostal == null) ? 0 : codigoPostal.hashCode());
 		result = prime * result + ((colegiado == null) ? 0 : colegiado.hashCode());
@@ -1441,6 +1444,11 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 			if (other.asientoContable != null)
 				return false;
 		} else if (!asientoContable.equals(other.asientoContable))
+			return false;
+		if (cuentaContable == null) {
+			if (other.cuentaContable != null)
+				return false;
+		} else if (!cuentaContable.equals(other.cuentaContable))
 			return false;
 		if (cambioEstado == null) {
 			if (other.cambioEstado != null)
@@ -1813,5 +1821,13 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 	public int compareTo(ColegiadoItem o) {
 		return getFechaEstado().compareTo(o.getFechaEstado());
     }
+
+	public String getCuentaContable() {
+		return cuentaContable;
+	}
+
+	public void setCuentaContable(String cuentaContable) {
+		this.cuentaContable = cuentaContable;
+	}
 }
 
