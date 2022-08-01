@@ -234,8 +234,7 @@ public class JusticiablesController {
 
 	// Asociar EJG
 	@RequestMapping(value = "/gestionJusticiableService/asociarEJG", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> asociarEJG(@RequestBody List<String> itemEjg,
-			HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> asociarEJG(@RequestBody List<String> itemEjg, HttpServletRequest request) {
 
 		UpdateResponseDTO response = gestionJusticiableService.asociarEJG(itemEjg, request);
 
@@ -246,16 +245,29 @@ public class JusticiablesController {
 	}
 
 	// Asociar Asistencia
-		@RequestMapping(value = "/gestionJusticiableService/asociarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<UpdateResponseDTO> asociarAsistencia(@RequestBody List<String> itemAsistencia,
-				HttpServletRequest request) {
+	@RequestMapping(value = "/gestionJusticiableService/asociarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> asociarAsistencia(@RequestBody List<String> itemAsistencia,
+			HttpServletRequest request) {
 
-			UpdateResponseDTO response = gestionJusticiableService.asociarAsistencia(itemAsistencia, request);
+		UpdateResponseDTO response = gestionJusticiableService.asociarAsistencia(itemAsistencia, request);
 
-			if (response.getStatus().equals("OK"))
-				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-			else
-				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		if (response.getStatus().equals("OK"))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	// Asociar SOJ
+	@RequestMapping(value = "/gestionJusticiableService/asociarSOJ", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> asociarSOJ(@RequestBody List<String> itemSOJ,
+			HttpServletRequest request) {
+
+		UpdateResponseDTO response = gestionJusticiableService.asociarSOJ(itemSOJ, request);
+
+		if (response.getStatus().equals("OK"))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }

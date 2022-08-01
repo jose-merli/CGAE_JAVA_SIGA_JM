@@ -64,4 +64,6 @@ public interface IGestionJusticiableService {
 	public UpdateResponseDTO asociarEJG(List<String> idpersonajg, HttpServletRequest request);
 
 	public UpdateResponseDTO asociarAsistencia(List<String> itemAsistencia, HttpServletRequest request);
+	
+	public UpdateResponseDTO asociarSOJ(List<String> itemSOJ, HttpServletRequest request);
 }

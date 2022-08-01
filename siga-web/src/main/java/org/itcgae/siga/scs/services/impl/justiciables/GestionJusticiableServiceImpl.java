@@ -61,6 +61,8 @@ import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
+import org.itcgae.siga.db.entities.ScsSoj;
+import org.itcgae.siga.db.entities.ScsSojExample;
 import org.itcgae.siga.db.entities.ScsTelefonospersona;
 import org.itcgae.siga.db.entities.ScsTelefonospersonaExample;
 import org.itcgae.siga.db.entities.ScsTelefonospersonaKey;
@@ -2178,7 +2180,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						// Usuario Modificación
 						interesadoDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
 						// Calidad
-						interesadoDesigna.setCalidad("D"); // Demandante para que salga el Interesado en Designas.
+						interesadoDesigna.setCalidad(String.valueOf('D')); // Demandante para que salga el Interesado en Designas.
 						// Insertar la asociación Justiciable y Designas.
 						response = scsDefendidosdesignaMapper.insertSelective(interesadoDesigna);
 					}
@@ -2194,6 +2196,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 								"GestionEJGServiceImpl.asociarDesignacion() -> ERROR. No se ha asociado ningun elemento");
 					} else {
 						error.setCode(200);
+						updateResponseDTO.setStatus(SigaConstants.OK);
 						LOGGER.info(
 								"GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
 					}
@@ -2220,24 +2223,23 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (idInstitucion != null) {
 			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para obtener información del usuario logeado");
+					"GestionEJGServiceImpl.asociarEJG() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarDesignacion() -> Salida de obtener información del usuario logeado");
+					"GestionEJGServiceImpl.asociarEJG() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.debug(
-						"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para asociar un Justiciable a un EJG");
+						"GestionEJGServiceImpl.asociarEJG() -> Entrada para asociar un Justiciable a un EJG");
 				try {
 					// Identificar el EJG
 					ScsEjgExample paramejg = new ScsEjgExample();
 
 					paramejg.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-							.andIdtipoejgEqualTo(Short.valueOf(itemEjg.get(2)))
 							.andAnioEqualTo(Short.valueOf(itemEjg.get(0))).andNumeroEqualTo(Long.valueOf(itemEjg.get(1)));
 
 					List<ScsEjgWithBLOBs> ejg = scsEjgMapper.selectByExampleWithBLOBs(paramejg);
@@ -2246,6 +2248,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						ScsEjgWithBLOBs ejgItem = new ScsEjgWithBLOBs();
 						ejgItem.setFechamodificacion(date); // Fecha Modificación
 						ejgItem.setIdinstitucion(Short.valueOf(idInstitucion));
+						// IdTurno EJG
+						if (itemEjg.get(2) != null) {
+							ejgItem.setIdtipoejg(Short.valueOf(itemEjg.get(2)));
+						} else {
+							ejgItem.setIdtipoejg(ejg.get(0).getIdtipoejg());
+						}
 						ejgItem.setIdtipoejg(ejg.get(0).getIdtipoejg());
 						ejgItem.setAnio(ejg.get(0).getAnio());
 						ejgItem.setNumero(ejg.get(0).getNumero());
@@ -2261,12 +2269,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					if (response != 1) {
 						error.setCode(400);
 						LOGGER.error(
-								"GestionEJGServiceImpl.asociarDesignacion() -> ERROR. No se ha asociado ningun elemento");
+								"GestionEJGServiceImpl.asociarEJG() -> ERROR. No se ha asociado ningun elemento");
 					} else {
 						error.setCode(200);
 						updateResponseDTO.setStatus(SigaConstants.OK);
 						LOGGER.info(
-								"GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
+								"GestionEJGServiceImpl.asociarEJG() -> Se ha asociado el elemento correctamente");
 					}
 				}
 				
@@ -2291,18 +2299,18 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (idInstitucion != null) {
 			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para obtener información del usuario logeado");
+					"GestionEJGServiceImpl.asociarAsistencia() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarDesignacion() -> Salida de obtener información del usuario logeado");
+					"GestionEJGServiceImpl.asociarAsistencia() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.debug(
-						"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para asociar un Justiciable a un EJG");
+						"GestionEJGServiceImpl.asociarAsistencia() -> Entrada para asociar un Justiciable a una asistencia");
 				try {
 					// Identificar la Asistencia
 					ScsAsistenciaExample paramAsis = new ScsAsistenciaExample();
@@ -2330,12 +2338,86 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					if (response != 1) {
 						error.setCode(400);
 						LOGGER.error(
-								"GestionEJGServiceImpl.asociarDesignacion() -> ERROR. No se ha asociado ningun elemento");
+								"GestionEJGServiceImpl.asociarAsistencia() -> ERROR. No se ha asociado ningun elemento");
 					} else {
 						error.setCode(200);
 						updateResponseDTO.setStatus(SigaConstants.OK);
 						LOGGER.info(
-								"GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
+								"GestionEJGServiceImpl.asociarAsistencia() -> Se ha asociado el elemento correctamente");
+					}
+				}
+				
+				updateResponseDTO.setError(error);
+			}
+		}
+
+		return updateResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO asociarSOJ(List<String> itemSOJ, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		long miliseconds = System.currentTimeMillis();
+		Date date = new Date(miliseconds);
+		int response = 0;
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.asociarSOJ() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"GestionEJGServiceImpl.asociarSOJ() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.asociarSOJ() -> Entrada para asociar un Justiciable a un SOJ");
+				try {
+					// Identificar el SOJ
+					ScsSojExample paramSOJ = new ScsSojExample();
+
+					paramSOJ.createCriteria().andIdtiposojEqualTo(Short.valueOf(itemSOJ.get(2))).andIdinstitucionEqualTo(idInstitucion)
+							.andAnioEqualTo(Short.valueOf(itemSOJ.get(0))).andNumsojEqualTo(String.valueOf(itemSOJ.get(1)));
+
+					List<ScsSoj> soj = scsSojExtendsMapper.selectByExample(paramSOJ);
+					// Actualizar con Justiciable seleccionado.
+					if (soj != null && soj.size() > 0) {
+						ScsSoj sojItem = new ScsSoj();
+						sojItem.setIdinstitucion(idInstitucion);
+						sojItem.setAnio(soj.get(0).getAnio());
+						sojItem.setNumero(Long.valueOf(soj.get(0).getNumero()));
+						if (itemSOJ.get(2) != null) {
+							sojItem.setIdtiposoj(Short.valueOf(itemSOJ.get(2)));
+						}else {
+							sojItem.setIdtiposoj(soj.get(0).getIdtiposoj());
+						}
+						sojItem.setIdpersonajg(Long.valueOf(itemSOJ.get(3))); // justiciable
+						sojItem.setFechamodificacion(date); // Fecha Modificación
+						response =  scsSojExtendsMapper.updateByPrimaryKeySelective(sojItem);
+					}
+
+				} catch (Exception e) {
+					error.setCode(400);
+					LOGGER.error(e);
+					error.setDescription("general.mensaje.error.bbdd");
+				} finally {
+					if (response != 1) {
+						error.setCode(400);
+						LOGGER.error(
+								"GestionEJGServiceImpl.asociarSOJ() -> ERROR. No se ha asociado ningun elemento");
+					} else {
+						error.setCode(200);
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						LOGGER.info(
+								"GestionEJGServiceImpl.asociarSOJ() -> Se ha asociado el elemento correctamente");
 					}
 				}
 				
