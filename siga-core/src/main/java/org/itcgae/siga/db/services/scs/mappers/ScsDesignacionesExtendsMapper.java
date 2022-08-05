@@ -516,7 +516,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHARESOLUCION", property = "fecharesolucion", jdbcType = JdbcType.DATE),
 			@Result(column = "CENTRODETENCION", property = "centrodetencion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAASUNTO", property = "fechaasunto", jdbcType = JdbcType.DATE),
-			@Result(column = "DILNIGPROC", property = "dilnigproc", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "DILNIGPROC", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOL", property = "nColLetrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIF", property = "nifInteresado", jdbcType = JdbcType.VARCHAR)})
 	List<RelacionesItem> busquedaRelaciones(String anio, String num, String idTurno, String idinstitucion);
 	
 

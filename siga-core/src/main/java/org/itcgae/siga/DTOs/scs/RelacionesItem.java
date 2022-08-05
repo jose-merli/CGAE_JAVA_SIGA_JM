@@ -36,6 +36,10 @@ public class RelacionesItem {
     private String idFundamentoCalif;
     private String idGuardia;
     private String idTipoDictamenEJG;
+    
+    //AUX
+    private String nColLetrado;
+    private String nifInteresado;
 
     public String getIdTipoDictamenEJG() {
         return idTipoDictamenEJG;
@@ -365,6 +369,22 @@ public class RelacionesItem {
         }
         return o.toString().replace("\n", "\n    ");
     }
+
+	public String getnColLetrado() {
+		return nColLetrado;
+	}
+
+	public void setnColLetrado(String nColLetrado) {
+		this.nColLetrado = nColLetrado;
+	}
+
+	public String getNifInteresado() {
+		return nifInteresado;
+	}
+
+	public void setNifInteresado(String nifInteresado) {
+		this.nifInteresado = nifInteresado;
+	}
 
 
 }
