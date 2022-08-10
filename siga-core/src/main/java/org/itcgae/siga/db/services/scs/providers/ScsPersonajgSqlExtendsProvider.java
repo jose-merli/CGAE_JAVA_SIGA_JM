@@ -538,11 +538,38 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 			}
 
 		}
-
 		sqlPersonajg.WHERE("(" + idPersonasIn + ")");
+		
+		SQL sqlEJG = new SQL();
+		sqlEJG.SELECT("per.idpersona");
+		sqlEJG.SELECT("per.idinstitucion");
+		sqlEJG.SELECT("per.fechamodificacion");
+		sqlEJG.SELECT("per.nif");
+		sqlEJG.SELECT("per.nombre");
+		sqlEJG.SELECT("per.apellido1");
+		sqlEJG.SELECT("per.apellido2");
+		sqlEJG.SELECT("EJG.fechaapertura as fechamodificacionasunto");
+		sqlEJG.SELECT("concat('E' || EJG.anio || '/',lpad(EJG.NumEJG,5,'0') ) as asunto");
+		sqlEJG.FROM("SCS_PERSONAJG per");
+		sqlEJG.INNER_JOIN(
+				"SCS_EJG EJG  on per.idpersona = EJG.idpersonajg and EJG.idinstitucion = per.idinstitucion");
+		sqlEJG.WHERE("EJG.idinstitucion = '" + idInstitucion + "'");
+		idPersonasIn = "";
+		for (int j = 0; j < arrayPersonas.size(); j++) {
+			if (j != (arrayPersonas.size() - 1)) {
+				idPersonasIn += "EJG.idpersonajg in(" + arrayPersonas.get(j) + ") OR ";
+
+			} else {
+				idPersonasIn += "EJG.idpersonajg in(" + arrayPersonas.get(j) + ")";
+			}
+		}
+
+		sqlEJG.WHERE("(" + idPersonasIn + ")");
+		
+		
 
 		sql.FROM("(" + sqlUnidadFamiliar + " union " + sqlContrarioEjg + " union all " + sqlContrariosDesigna
-				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all "
+				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all " + sqlEJG + " union all "
 				+ sqlContrariosAsistencia + "union all " + sqlAsistencia + " union all " + sqlPersonajg + ") consulta");
 
 		sql.GROUP_BY(
@@ -632,6 +659,17 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlSoj.FROM("SCS_SOJ SOJ");
 		sqlSoj.WHERE("SOJ.idinstitucion = '" + idInstitucion + "'");
 		sqlSoj.WHERE("SOJ.idpersonajg = '" + idPersona + "'");
+		
+		SQL sqlEJG = new SQL();
+		sqlEJG.SELECT("EJG.idinstitucion");
+		sqlEJG.SELECT("EJG.anio");
+		sqlEJG.SELECT("EJG.numero");
+		sqlEJG.SELECT("to_char(EJG.idtipoejg) clave");
+		sqlEJG.SELECT("'Solicitante' as rol");
+		sqlEJG.SELECT("'E' as tipo");
+		sqlEJG.FROM("SCS_EJG EJG");
+		sqlEJG.WHERE("EJG.idinstitucion = '" + idInstitucion + "'");
+		sqlEJG.WHERE("EJG.idpersonajg = '" + idPersona + "'");
 
 		SQL sqlContrariosAsistencia = new SQL();
 		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.idinstitucion");
@@ -656,7 +694,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlAsistencia.WHERE("ASISTENCIA.idpersonaJG = '" + idPersona + "'");
 
 		sql.FROM("(" + sqlUnidadFamiliar + " union " + sqlContrarioEjg + " union all " + sqlContrariosDesigna
-				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all "
+				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all " + sqlEJG + " union all "
 				+ sqlContrariosAsistencia + "union all " + sqlAsistencia + ") consulta");
 
 		return sql.toString();
