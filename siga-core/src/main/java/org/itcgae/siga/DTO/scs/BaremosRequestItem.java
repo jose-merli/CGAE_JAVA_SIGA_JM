@@ -11,7 +11,7 @@ public class BaremosRequestItem {
 	String nDias;
 	String baremo;
 	String dias;
-	Double disponibilidad;
+	Short disponibilidad;
 	Short numMinimoSimple;
 	Short simpleOImporteIndividual;
 	Short naPartir;

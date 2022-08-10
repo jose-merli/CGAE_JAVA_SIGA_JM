@@ -107,6 +107,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guardia.setSimpleOImporteIndividual(lBaremos.get(i).getSimpleOImporteIndividual());
 						guardia.setNaPartir(lBaremos.get(i).getNaPartir());
 						guardia.setMaximo(lBaremos.get(i).getMaximo());
+						guardia.setDisponibilidad(lBaremos.get(i).getDisponibilidad());
 						guardia.setPorDia(lBaremos.get(i).getPorDia());
 						guardia.setIdTurno(lBaremos.get(i).getIdTurno());
 						//guar.add(guardia);
@@ -133,6 +134,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						guardia.setSimpleOImporteIndividual(lBaremos.get(i).getSimpleOImporteIndividual());
 						guardia.setNaPartir(lBaremos.get(i).getNaPartir());
 						guardia.setMaximo(lBaremos.get(i).getMaximo());
+						guardia.setDisponibilidad(lBaremos.get(i).getDisponibilidad());
 						guardia.setPorDia(lBaremos.get(i).getPorDia());
 						guardia.setIdTurno(lBaremos.get(i).getIdTurno());
 						guar.add(guardia);
@@ -159,6 +161,7 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					guardia.setSimpleOImporteIndividual(lBaremos.get(i).getSimpleOImporteIndividual());
 					guardia.setNaPartir(lBaremos.get(i).getNaPartir());
 					guardia.setMaximo(lBaremos.get(i).getMaximo());
+					guardia.setDisponibilidad(lBaremos.get(i).getDisponibilidad());
 					guardia.setPorDia(lBaremos.get(i).getPorDia());
 
 					guar.add(guardia);

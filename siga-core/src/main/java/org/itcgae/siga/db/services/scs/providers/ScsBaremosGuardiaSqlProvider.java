@@ -51,11 +51,11 @@ public class ScsBaremosGuardiaSqlProvider {
 		sqlExisteHito.WHERE("hit2.IDTURNO = hit.IDTURNO");
 		sqlExisteHito.WHERE("hit2.IDGUARDIA = hit.IDGUARDIA");
 		sqlExisteHito.WHERE("nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD')");
-		sqlExisteHito.WHERE("nvl(hit2.AGRUPAR, '0') = nvl(hit.AGRUPAR, '0')");
+		sqlExisteHito.WHERE("nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null')");
 		sqlExisteHito.WHERE("hit2.IDHITO in ( 25, 22, 20)))");
 
 		// Subconsulta para obtener la disponibilidad
-		sqlDisponibilidad.SELECT(" hit.preciohito");
+		sqlDisponibilidad.SELECT(" hit2.preciohito");
 		if (!facturaciones.equals("0")) {
 			sqlDisponibilidad.FROM("fcs_historico_hitofact hit2");
 		} else {
@@ -66,8 +66,8 @@ public class ScsBaremosGuardiaSqlProvider {
 		sqlDisponibilidad.WHERE(" hit2.idinstitucion = hit.idinstitucion");
 		sqlDisponibilidad.WHERE(" hit2.idturno = hit.idturno");
 		sqlDisponibilidad.WHERE(" hit2.idguardia = hit.idguardia");
-		sqlDisponibilidad.WHERE(" hit2.diasaplicables = hit.diasaplicables");
-		sqlDisponibilidad.WHERE(" hit2.agrupar = hit.agrupar");
+		sqlDisponibilidad.WHERE(" nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD')");
+		sqlDisponibilidad.WHERE(" nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null')");
 		if (!facturaciones.equals("0")) {
 			sqlDisponibilidad.WHERE("hit2.idfacturacion = hit.idfacturacion");
 		}
@@ -86,8 +86,8 @@ public class ScsBaremosGuardiaSqlProvider {
 		sqlNum_min_simple.WHERE("hit2.idinstitucion = hit.idinstitucion");
 		sqlNum_min_simple.WHERE("hit2.idturno = hit.idturno");
 		sqlNum_min_simple.WHERE("hit2.idguardia = hit.idguardia");
-		sqlNum_min_simple.WHERE("hit2.diasaplicables = hit.diasaplicables");
-		sqlNum_min_simple.WHERE("hit2.agrupar = hit.agrupar");
+		sqlNum_min_simple.WHERE("nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD')");
+		sqlNum_min_simple.WHERE("nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null')");
 		sqlNum_min_simple.WHERE("hit2.idhito = CASE hit.idhito " + " WHEN 44 THEN 56 " + " WHEN 1  THEN 55 END ");
 		sqlNum_min_simple.WHERE("rownum < 2");
 
@@ -101,7 +101,7 @@ public class ScsBaremosGuardiaSqlProvider {
 		sqlSimpleImptIndividual.WHERE("hit2.idinstitucion = hit.idinstitucion");
 		sqlSimpleImptIndividual.WHERE("hit2.idturno = hit.idturno");
 		sqlSimpleImptIndividual.WHERE("hit2.idguardia = hit.idguardia");
-		sqlSimpleImptIndividual.WHERE("hit2.agrupar = hit.agrupar");
+		sqlSimpleImptIndividual.WHERE("nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null')");
 		if (!facturaciones.equals("0")) {
 			sqlSimpleImptIndividual.WHERE("hit2.idfacturacion = hit.idfacturacion");
 		}
@@ -120,8 +120,8 @@ public class ScsBaremosGuardiaSqlProvider {
 		sqlNapartir.WHERE("hit2.idinstitucion = hit.idinstitucion");
 		sqlNapartir.WHERE("hit2.idturno = hit.idturno");
 		sqlNapartir.WHERE("hit2.idguardia = hit.idguardia");
-		sqlNapartir.WHERE("hit2.diasaplicables = hit.diasaplicables");
-		sqlNapartir.WHERE("hit2.agrupar = hit.agrupar ");
+		sqlNapartir.WHERE("nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD')");
+		sqlNapartir.WHERE("nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null') ");
 		if (!facturaciones.equals("0")) {
 			sqlSimpleImptIndividual.WHERE("hit2.idfacturacion = hit.idfacturacion");
 		}
@@ -138,8 +138,8 @@ public class ScsBaremosGuardiaSqlProvider {
 		sqlMaximo.WHERE("hit2.idinstitucion = hit.idinstitucion");
 		sqlMaximo.WHERE("hit2.idturno = hit.idturno");
 		sqlMaximo.WHERE("hit2.idguardia = hit.idguardia");
-		sqlMaximo.WHERE("hit2.diasaplicables = hit.diasaplicables");
-		sqlMaximo.WHERE("hit2.agrupar = hit.agrupar");
+		sqlMaximo.WHERE("nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD')");
+		sqlMaximo.WHERE("nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null')");
 		if (!facturaciones.equals("0")) {
 			sqlMaximo.WHERE("hit2.idfacturacion = hit.idfacturacion");
 		}
@@ -178,7 +178,6 @@ public class ScsBaremosGuardiaSqlProvider {
 		sql.SELECT("hit.IDHITO");
 		sql.SELECT("gua.fechabaja");
 		sql.SELECT("tur.nombre as NOMBRETURNO");
-		sql.SELECT("gua.fechabaja");
 		sql.SELECT("f_siga_getrecurso( tip.descripcion,1) baremo");
 		sql.SELECT(filtroDia.toString() + " dias ");
 		sql.SELECT("(" + sqlDisponibilidad.toString() + ") disponibilidad");
@@ -287,8 +286,8 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "                hit2.idinstitucion = hit.idinstitucion " + "            AND "
 				+ "                hit2.idturno = hit.idturno " + "            AND "
 				+ "                hit2.idguardia = hit.idguardia " + "            AND "
-				+ "                hit2.diasaplicables = hit.diasaplicables " + "            AND "
-				+ "                hit2.agrupar = hit.agrupar " + "            AND " + "                hit2.idhito = "
+				+ "                nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD') " + "            AND "
+				+ "                nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null') " + "            AND " + "                hit2.idhito = "
 				+ "                    CASE hit.idhito " + "                        WHEN 7    THEN 19 "
 				+ "                        WHEN 22   THEN 19 " + "                        WHEN 5    THEN 10 "
 				+ "                        WHEN 20   THEN 10 " + "                        WHEN 44   THEN 54 "
@@ -298,15 +297,15 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "                hit2.idinstitucion = hit.idinstitucion " + "            AND "
 				+ "                hit2.idturno = hit.idturno " + "            AND "
 				+ "                hit2.idguardia = hit.idguardia " + "            AND "
-				+ "                hit2.diasaplicables = hit.diasaplicables " + "            AND "
-				+ "                hit2.agrupar = hit.agrupar " + "            AND " + "                hit2.idhito = "
+				+ "                nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD') " + "            AND "
+				+ "                nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null') " + "            AND " + "                hit2.idhito = "
 				+ "                    CASE hit.idhito " + "                        WHEN 44   THEN 56 "
 				+ "                        WHEN 1    THEN 55 " + "                    END "
 				+ "    ) num_minimo_simple, " + "    ( " + "        SELECT " + "            hit2.preciohito "
 				+ "        FROM " + "            scs_hitofacturableguardia hit2 " + "        WHERE "
 				+ "                hit2.idinstitucion = hit.idinstitucion " + "            AND "
 				+ "                hit2.idturno = hit.idturno " + "            AND "
-				+ "                hit2.idguardia = hit.idguardia " + "             AND hit2.agrupar = hit.agrupar "
+				+ "                hit2.idguardia = hit.idguardia " + "             AND nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null') "
 				+ "            AND " + "                hit2.idhito = " + "                    CASE hit.idhito "
 				+ "                        WHEN 7    THEN 7 " + "                        WHEN 9    THEN 9 "
 				+ "                        WHEN 22   THEN 22 " + "                        WHEN 5    THEN 5 "
@@ -318,8 +317,8 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "                hit2.idinstitucion = hit.idinstitucion " + "            AND "
 				+ "                hit2.idturno = hit.idturno " + "            AND "
 				+ "                hit2.idguardia = hit.idguardia " + "            AND "
-				+ "                hit2.diasaplicables = hit.diasaplicables " + "            AND "
-				+ "                hit2.agrupar = hit.agrupar " + "            AND " + "                hit2.idhito = "
+				+ "                nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD') " + "            AND "
+				+ "                nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null') " + "            AND " + "                hit2.idhito = "
 				+ "                    CASE hit.idhito " + "                        WHEN 44   THEN 46 "
 				+ "                        WHEN 1    THEN 45 " + "                    END " + "    ) NAPARTIR, "
 				+ "    ( " + "        SELECT " + "            hit2.preciohito " + "        FROM "
@@ -327,8 +326,8 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ "                hit2.idinstitucion = hit.idinstitucion " + "            AND "
 				+ "                hit2.idturno = hit.idturno " + "            AND "
 				+ "                hit2.idguardia = hit.idguardia " + "            AND "
-				+ "                hit2.diasaplicables = hit.diasaplicables " + "            AND "
-				+ "                hit2.agrupar = hit.agrupar " + "            AND " + "                hit2.idhito = "
+				+ "                nvl(hit2.DIASAPLICABLES, 'LMXJVSD') = nvl(hit.DIASAPLICABLES, 'LMXJVSD') " + "            AND "
+				+ "                nvl(hit2.AGRUPAR, 'null') = nvl(hit.AGRUPAR, 'null') " + "            AND " + "                hit2.idhito = "
 				+ "                    CASE hit.idhito " + "                        WHEN 7    THEN 8"
 				+ "                        WHEN 22   THEN 8" + "                        WHEN 5    THEN 3"
 				+ "                        WHEN 20   THEN 3" + "                        WHEN 9    THEN 6"

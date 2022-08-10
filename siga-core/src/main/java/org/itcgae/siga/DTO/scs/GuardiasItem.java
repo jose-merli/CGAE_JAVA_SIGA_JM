@@ -46,6 +46,7 @@ public class GuardiasItem {
 	private boolean historico;
 	private String baremo;
 	private String nDias;
+	private Short disponibilidad;
 	private Short numMinimoSimple;
 	private Short simpleOImporteIndividual;
 	private Short naPartir;
@@ -310,6 +311,12 @@ public class GuardiasItem {
 		this.maximo = maximo;
 	}
 
+	public Short getDisponibilidad() {
+		return disponibilidad;
+	}
+	public void setDisponibilidad(Short disponibilidad) {
+		this.disponibilidad = disponibilidad;
+	}
 	public String getPorDia() {
 		return porDia;
 	}
@@ -381,12 +388,13 @@ public class GuardiasItem {
 				Objects.equals(simpleOImporteIndividual, that.simpleOImporteIndividual) &&
 				Objects.equals(naPartir, that.naPartir) &&
 				Objects.equals(maximo, that.maximo) &&
+				Objects.equals(disponibilidad, that.disponibilidad) &&
 				Objects.equals(porDia, that.porDia);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idGuardia, idTurno, idOrdenacionColas, idPersonaUltimo, turno, nombre, descripcion, descripcionPago, descripcionFacturacion, area, materia, grupoZona, zona, obligatoriedad, duracion, validaJustificacion, partidaJudicial, jurisdiccion, grupoFacturacion, partidaPresupuestaria, tipoTurno, tipoGuardia, tipoDia, tipoDiasGuardia, tipoDiasPeriodo, letradosGuardia, letradosIns, seleccionLaborables, seleccionFestivos, diasPeriodo, diasGuardia, diasSeparacionGuardias, envioCentralita, porGrupos, fechabaja, historico, baremo, nDias, numMinimoSimple, simpleOImporteIndividual, naPartir, maximo, porDia);
+		return Objects.hash(idGuardia, idTurno, idOrdenacionColas, idPersonaUltimo, turno, nombre, descripcion, descripcionPago, descripcionFacturacion, area, materia, grupoZona, zona, obligatoriedad, duracion, validaJustificacion, partidaJudicial, jurisdiccion, grupoFacturacion, partidaPresupuestaria, tipoTurno, tipoGuardia, tipoDia, tipoDiasGuardia, tipoDiasPeriodo, letradosGuardia, letradosIns, seleccionLaborables, seleccionFestivos, diasPeriodo, diasGuardia, diasSeparacionGuardias, envioCentralita, porGrupos, fechabaja, historico, baremo, nDias, numMinimoSimple, simpleOImporteIndividual, naPartir, maximo, porDia,disponibilidad);
 	}
 
 	@Override
@@ -434,6 +442,7 @@ public class GuardiasItem {
 				", simpleOImporteIndividual=" + simpleOImporteIndividual +
 				", naPartir=" + naPartir +
 				", maximo=" + maximo +
+				", disponibilidad=" + disponibilidad +
 				", porDia='" + porDia + '\'' +
 				'}';
 	}
