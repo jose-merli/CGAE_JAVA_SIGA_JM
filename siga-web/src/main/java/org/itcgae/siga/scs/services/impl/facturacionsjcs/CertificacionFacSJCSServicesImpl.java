@@ -1476,7 +1476,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
                         List<FcsPagosjg> pagos = fcsPagosjgMapper.selectByExample(pagosAso);
 
                         if (pagos.isEmpty()) {
-                            response += insertarEstado(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(), idInstitucion, Integer.valueOf(cert.getIdFacturacion()), usuario.getIdusuario());
+                            response += insertarEstado(SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(), idInstitucion, Integer.valueOf(cert.getIdFacturacion()), usuario.getIdusuario());
                         } else {
                             factNoReabierta += cert.getNombre() + "/";
                         }
