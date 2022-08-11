@@ -1006,9 +1006,10 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				cargaMasivaDatosITItem.setNombreGuardia((String) hashtable.get(SigaConstants.GUARDIA));
 				List<String> idGuardiaList = scsGuardiasturnoExtendsMapper
 						.getIdGuardiaByName(cargaMasivaDatosITItem.getNombreGuardia(), idInstitucion.toString());
+				try {
 				String idGuardia = idGuardiaList.get(0);
 				cargaMasivaDatosITItem.setIdGuardia(idGuardia);
-				try {
+				
 					ScsGuardiasturnoExample guardiaExample = new ScsGuardiasturnoExample();
 					guardiaExample.createCriteria().andNombreEqualTo(cargaMasivaDatosITItem.getNombreGuardia())
 							.andIdinstitucionEqualTo(idInstitucion);
@@ -1162,7 +1163,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del
 									// turno correspondiente.
 									if (cargaMasivaDatosITItem.getFechaEfectiva()
-											.compareTo(insturList.get(0).getFechavalidacion()) < 0)
+											.compareTo(insturList.get(0).getFechavalidacion()) <= 0)
 										errorLinea.append(
 												"La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
 
