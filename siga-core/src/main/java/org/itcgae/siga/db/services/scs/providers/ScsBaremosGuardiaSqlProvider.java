@@ -149,7 +149,8 @@ public class ScsBaremosGuardiaSqlProvider {
 		sqlMaximo.WHERE("rownum < 2");
 
 		// Filtro para obtener los días.
-		filtroDia.append("'L: ' "
+		filtroDia.append("NVL2(gua.seleccionlaborables,NVL2(hit.diasaplicables,");
+		filtroDia.append("'L: ' " 
 				+ " || CASE WHEN regexp_count(gua.seleccionlaborables|| hit.diasaplicables,'L') = 2 THEN 'L' " + " END "
 				+ " || CASE WHEN regexp_count(gua.seleccionlaborables|| hit.diasaplicables,'M') = 2 THEN 'M' " + " END "
 				+ " || CASE WHEN regexp_count(gua.seleccionlaborables|| hit.diasaplicables,'X') = 2 THEN 'X' " + " END "
@@ -157,17 +158,17 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ " || CASE WHEN regexp_count(gua.seleccionlaborables|| hit.diasaplicables,'V') = 2 THEN 'V' " + " END "
 				+ " || CASE WHEN regexp_count(gua.seleccionlaborables|| hit.diasaplicables,'S') = 2 THEN 'S' " + " END "
 				+ " || CASE WHEN regexp_count(gua.seleccionlaborables|| hit.diasaplicables,'D') = 2 THEN 'D' "
-				+ " END ");
-
-		filtroDia.append(" || ' ' || CHR(10) || 'F: '");
-		filtroDia.append(" || CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'L') = 2 THEN 'L' "
+				+ " END");
+		filtroDia.append(",null),null) ||  ' ' || CHR(10) || ' '  || ");
+		filtroDia.append("NVL2(gua.seleccionfestivos,NVL2(hit.diasaplicables,'F: ' ");
+		filtroDia.append("|| CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'L') = 2 THEN 'L' "
 				+ " END " + " || CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'M') = 2 THEN 'M' "
 				+ " END " + " || CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'X') = 2 THEN 'X' "
 				+ " END " + " || CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'J') = 2 THEN 'J' "
 				+ " END " + " || CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'V') = 2 THEN 'V' "
 				+ " END " + " || CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'S') = 2 THEN 'S' "
 				+ " END " + " || CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'D') = 2 THEN 'D' "
-				+ " END ");
+				+ " END,null),null) ");
 
 		// Consulta para buscar BaremosGuardia
 		sql.SELECT("  gua.nombre guardias");
