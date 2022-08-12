@@ -1619,23 +1619,24 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         String today = formatter.format(new Date());
         
-		sql.SELECT("IDPERSONA");
-		sql.FROM("SCS_GRUPOGUARDIACOLEGIADO");
+		sql.SELECT("COLE.NCOLEGIADO");
+		sql.FROM("SCS_GRUPOGUARDIACOLEGIADO GR");
+		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COLE ON COLE.IDPERSONA = GR.IDPERSONA AND COLE.IDINSTITUCION = GR.IDINSTITUCION");
 		
 		if(String.valueOf(key.getIdinstitucion()) != null ) {
-			sql.WHERE("IDINSTITUCION = " +  "'"+String.valueOf(key.getIdinstitucion())+"'");
+			sql.WHERE("GR.IDINSTITUCION = " +  "'"+String.valueOf(key.getIdinstitucion())+"'");
 		}
 		
 		if(String.valueOf(key.getIdturno()) != null) {
-			sql.WHERE("IDTURNO = "+ String.valueOf(key.getIdturno()));
+			sql.WHERE("GR.IDTURNO = "+ String.valueOf(key.getIdturno()));
 		}
 		
 		if(String.valueOf(key.getIdguardia()) != null) {
-			sql.WHERE("IDGUARDIA = "+ String.valueOf(key.getIdguardia()));
+			sql.WHERE("GR.IDGUARDIA = "+ String.valueOf(key.getIdguardia()));
 		}
 		
 		if(key.getFechasuscripcion() != null) {
-			sql.WHERE("FECHASUSCRIPCION = " +"TO_DATE('"+today+"','DD/MM/YYYY')");
+			sql.WHERE("GR.FECHASUSCRIPCION = " +"TO_DATE('"+today+"','DD/MM/YYYY')");
 		}
 		
 		
