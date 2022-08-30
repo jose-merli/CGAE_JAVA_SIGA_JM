@@ -12,13 +12,13 @@ import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.EjgListaIntercambiosDTO;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.ExpInsosDTO;
@@ -32,9 +32,12 @@ import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
+import org.itcgae.siga.scs.services.ejg.IEJGIntercambiosService;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -57,6 +60,9 @@ public class EjgController {
 
 	@Autowired
 	private IGestionEJG gestionEJG;
+
+	@Autowired
+	private IEJGIntercambiosService ejgIntercambiosService;
 
 	@RequestMapping(value = "/filtros-ejg/comboTipoEJG", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTipoEJG(HttpServletRequest request) {
@@ -843,5 +849,32 @@ public class EjgController {
 	ResponseEntity<ExpInsosDTO> getDatosExpInsos(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
 		ExpInsosDTO response = gestionEJG.getDatosExpInsos(ejgItem, request);
 		return new ResponseEntity<ExpInsosDTO>(response, HttpStatus.OK);
+	}
+
+	//
+	@RequestMapping(value = "/gestion-ejg/getListadoIntercambiosAltaEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgListaIntercambiosDTO> getListadoIntercambiosAltaEJG(@RequestBody EjgItem item, HttpServletRequest request) {
+		EjgListaIntercambiosDTO response = new EjgListaIntercambiosDTO();
+		try {
+			response = ejgIntercambiosService.getListadoIntercambiosAltaEJG(item, request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<EjgListaIntercambiosDTO>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/gestion-ejg/getListadoIntercambiosDocumentacionEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgListaIntercambiosDTO> getListadoIntercambiosDocumentacionEJG(@RequestBody EjgItem item, HttpServletRequest request) {
+		EjgListaIntercambiosDTO response = new EjgListaIntercambiosDTO();
+		try {
+			response = ejgIntercambiosService.getListadoIntercambiosDocumentacionEJG(item, request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<EjgListaIntercambiosDTO>(response, HttpStatus.OK);
 	}
 }

@@ -470,4 +470,17 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		sql.WHERE("CEN_INST_IDINSTITUCION = '" + idInstitucion+"'");
 		return sql.toString();
 	}
+
+	public String getInstitucionByGrupo(Short idInstitucion, String codigoGrupo) {
+		SQL sql = new SQL();
+		sql.SELECT("CI.*");
+
+		sql.FROM("CEN_INSTITUCION CI");
+		sql.INNER_JOIN("CEN_GRUPOSINSTITUCION_INSTITU GRUINS ON CI.IDINSTITUCION =  GRUINS.IDINSTITUCION");
+		sql.INNER_JOIN("CEN_GRUPOSINSTITUCION GRU ON GRUINS.IDGRUPO = GRU.IDGRUPO");
+
+		sql.WHERE("CODIGO = " + codigoGrupo);
+		sql.WHERE("CI.IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
+	}
 }

@@ -120,4 +120,7 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getInstitucionesConsejo(String idInstitucion);
+
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getInstitucionByGrupo")
+	List<CenInstitucion> getInstitucionByGrupo(Short idInstitucion, String codigoGrupo);
 }

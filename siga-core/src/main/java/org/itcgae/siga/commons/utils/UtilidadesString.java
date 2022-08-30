@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -167,6 +168,10 @@ public class UtilidadesString {
 	public static boolean esCadenaVacia(final String cadena) {
 
 		return cadena == null || cadena.trim().isEmpty();
+	}
+
+	public static boolean anyMatchCadenaVacia(final String... cadena) {
+		return (cadena == null) ? true : Stream.of(cadena).anyMatch(UtilidadesString::esCadenaVacia);
 	}
 
 	public static boolean isNullOrBlank(final Object obj) {
