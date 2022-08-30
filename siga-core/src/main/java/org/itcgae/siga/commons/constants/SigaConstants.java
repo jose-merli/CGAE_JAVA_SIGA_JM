@@ -385,6 +385,61 @@ public class SigaConstants {
         }
     }
 
+    public static final String PERICLES_PARAM_ECOMCOLA_IDINSTITUCION = "IDINSTITUCION";
+    public static final String PERICLES_PARAM_ECOMCOLA_ANIO = "ANIO";
+    public static final String PERICLES_PARAM_ECOMCOLA_IDTIPOEJG = "IDTIPOEJG";
+    public static final String PERICLES_PARAM_ECOMCOLA_NUMERO = "NUMERO";
+    public static final String PERICLES_PARAM_ECOMCOLA_IDDOCUMENTACION = "IDDOCUMENTACION";
+    public static final String PERICLES_PARAM_ECOMCOLA_NIFNIE = "NIFNIE";
+    public static final String PERICLES_PARAM_ECOMCOLA_ULTIMODOCUMENTO = "ULTIMODOCUMENTO";
+
+    public static enum ESTADOS_EJG {
+        REMITIDA_APERTURA_A_COMISION((short)0),
+        SOLICITADA_DOCUMENTACION((short)1),
+        COMPLETADA_SOLICITITUD_Y_DOCUMENTACION((short)2),
+        TRASLADO_A_TRAMITADOR((short)3),
+        PREVISION_RECIBIR_DICTAMEN((short)4),
+        SOLICITADO_AMPLIACIÓN_DOCUMENTACION((short)5),
+        DICTAMINADO((short)6),
+        LISTO_REMITIR_COMISION((short)7),
+        GENERADO_EN_REMESA((short)8),
+        REMITIDO_COMISION((short)9),
+        RESUELTO_COMISION((short)10),
+        IMPUGNADO((short)11),
+        ARCHIVADO((short)12),
+        RESUELTA_IMPUGNACION((short)13),
+        INCIDENCIAS((short)14),
+        PETICION_DE_DATOS((short)15),
+        ENVIADO_A_EDICTO((short)16),
+        LISTO_REMITIR_COMISION_ACT_DESIGNACION((short)17),
+        PETICION_PROCURADOR((short)18),
+        DESIGNADO_PROCURADOR((short)19),
+        REMITIDA_APERTURA_A_CAJG_REPARTO_PONENTE((short)20),
+        DEVUELTO_AL_COLEGIO((short)21),
+        INCIDENCIAS_PROCURADOR((short)22),
+        SOLICITUD_EN_PROCESO_DE_ALTA((short)23),
+        IMPUGNABLE((short)24),
+        GENERADO_ENV_COMISION((short)25);
+
+        private final short codigo;
+
+        private ESTADOS_EJG (short codigo) {
+            this.codigo = codigo;
+        }
+
+        public short getCodigo() {
+            return this.codigo;
+        }
+        public static ESTADOS_EJG getEnum(Short codigo){
+            for(ESTADOS_EJG sc : values()){
+                if (sc.getCodigo()==codigo.shortValue()){
+                    return sc;
+                }
+            }
+            return null;
+        }
+    }
+
     // Estados facturacion
     public static enum ESTADO_FACTURACION {
         ESTADO_FACTURACION_ABIERTA(10), ESTADO_FACTURACION_EJECUTADA(20), ESTADO_FACTURACION_LISTA_CONSEJO(30),
@@ -1702,5 +1757,31 @@ public class SigaConstants {
 
     }
 
-	
+    public static enum GRUPOINSTITUCION {
+        COMUN_MINI ("COMUN_MINI"),
+        CATALUÑA ("CATALUÑA"),
+        ARAGON ("ARAGON"),
+        NAVARRA ("NAVARRA"),
+        CANTABRIA ("CANTABRIA"),
+        MADRID("MADRID"),
+        GALICIA ("GALICIA"),
+        PAISVASCO ("PAISVASCO"),
+        ANDALUCIA ("ANDALUCIA"),
+        VALENCIA ("VALENCIA"),
+        CANARIAS("CANARIAS"),
+        ASTURIAS("ASTURIAS"),
+
+                ;
+
+        private String codigoGrupo = null;
+
+        GRUPOINSTITUCION(String codigoGrupo) {
+            this.codigoGrupo = codigoGrupo;
+        }
+        public String getCodigoGrupo() {
+            return this.codigoGrupo;
+        }
+
+
+    }
 }
