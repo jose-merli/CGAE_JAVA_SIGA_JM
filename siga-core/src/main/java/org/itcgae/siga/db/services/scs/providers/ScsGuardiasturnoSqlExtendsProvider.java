@@ -59,7 +59,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		return sql.toString();
 	}
-	public String searchGuardias2(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje, Integer tamMax) {
+	public String searchGuardias2(org.itcgae.siga.DTOs.scs.GuardiasItem guardiaItem, String idInstitucion, String idLenguaje, Integer tamMax) {
 		SQL sql = new SQL();
 		SQL SQL_PADRE = new SQL();
 		//La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias
@@ -709,9 +709,9 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sqlGenerado.SELECT("COUNT (1) GUARDIAS");
 		sqlGenerado.FROM("SCS_GUARDIASCOLEGIADO gc");
 		if (fechaDesde != null)
-			sqlGenerado.WHERE("gc.FECHAINICIO >= TO_DATE('" + fechaDesde + "', 'dd/MM/yyyy')");
+			sqlGenerado.WHERE("gc.FECHAINICIO >= pc.FECHACALINICIO");
 		if (fechaHasta != null)
-			sqlGenerado.WHERE("gc.FECHAFIN <= TO_DATE('" + fechaHasta + "', 'dd/MM/yyyy')");
+			sqlGenerado.WHERE("gc.FECHAFIN <= pc.FECHACALFIN");
 		sqlGenerado.WHERE("gc.idinstitucion = PG.idinstitucion");
 		sqlGenerado.WHERE("gc.idturno = t.idturno");
 		sqlGenerado.WHERE("gc.idguardia = g.idguardia");
@@ -719,8 +719,9 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		SQL sql = new SQL();
 		 sql.SELECT("t.nombre as TURNO, g.nombre as GUARDIA, DECODE((" + sqlGenerado + "), 0, 'No', 'Si') as GENERADO, g.IDGUARDIA as IDGUARDIA, t.IDTURNO as IDTURNO");
 	        sql.FROM("SCS_HCO_CONF_PROG_CALENDARIOS PG");
-	        sql.INNER_JOIN("scs_turno  t on PG.idturno = t.idturno and PG.idinstitucion = t.idinstitucion");
-	        sql.INNER_JOIN("scs_guardiasturno  g on PG.idguardia = g.idguardia and PG.idinstitucion = g.idinstitucion");
+	        sql.JOIN("scs_prog_calendarios pc on PG.idinstitucion = pc.idinstitucion AND PG.idprogcalendario = pc.idprogcalendario");
+	        sql.JOIN("scs_turno  t on PG.idturno = t.idturno and PG.idinstitucion = t.idinstitucion");
+	        sql.JOIN("scs_guardiasturno  g on PG.idguardia = g.idguardia and PG.idinstitucion = g.idinstitucion");
 	        sql.WHERE("PG.idinstitucion = " + idInstitucion);
 
 			if (idCalendarProg != null) {
@@ -1294,9 +1295,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sqlGenerado.SELECT("COUNT (1) GUARDIAS");
 		sqlGenerado.FROM("SCS_GUARDIASCOLEGIADO gc");
 		if (calendarioItem.getFechaCalendarioDesde() != null)
-		sqlGenerado.WHERE("FECHAINICIO >= TO_DATE('" + calendarioItem.getFechaCalendarioDesde() + "', 'dd/MM/yyyy')");
+		sqlGenerado.WHERE("FECHAINICIO >= pc.FECHACALINICIO");
 		if (calendarioItem.getFechaCalendarioHasta() != null)
-		sqlGenerado.WHERE("FECHAFIN <= TO_DATE('" + calendarioItem.getFechaCalendarioHasta() + "', 'dd/MM/yyyy')");
+		sqlGenerado.WHERE("FECHAFIN <= pc.FECHACALFIN");
 		
 		sqlGenerado.WHERE("pc.idinstitucion = gc.idinstitucion");
 		sqlGenerado.WHERE("hpc.idturno = gc.idturno");
@@ -1438,9 +1439,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 				sqlGenerado.SELECT("COUNT (1) GUARDIAS");
 				sqlGenerado.FROM("SCS_GUARDIASCOLEGIADO gc");
 				if (calendarioItem.getFechaCalendarioDesde() != null)
-				sqlGenerado.WHERE("FECHAINICIO >= TO_DATE('" + calendarioItem.getFechaCalendarioDesde() + "', 'dd/MM/yyyy')");
+				sqlGenerado.WHERE("FECHAINICIO >= pc.FECHACALINICIO");
 				if (calendarioItem.getFechaCalendarioHasta() != null)
-				sqlGenerado.WHERE("FECHAFIN <= TO_DATE('" + calendarioItem.getFechaCalendarioHasta() + "', 'dd/MM/yyyy')");
+				sqlGenerado.WHERE("FECHAFIN <= pc.FECHACALFIN");
 				
 				sqlGenerado.WHERE("pc.idinstitucion = gc.idinstitucion");
 				sqlGenerado.WHERE("cg.idturno = gc.idturno");
