@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
@@ -851,7 +852,21 @@ public class EjgController {
 		return new ResponseEntity<ExpInsosDTO>(response, HttpStatus.OK);
 	}
 
-	//
+	// Integración con Pericles para la Zona Común
+
+	@RequestMapping(value = "/gestion-ejg/esColegioZonaComun", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> esColegioZonaComun(HttpServletRequest request) {
+		ResponseDataDTO response = new ResponseDataDTO();
+		try {
+			response = ejgIntercambiosService.esColegioZonaComun(request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/gestion-ejg/getListadoIntercambiosAltaEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EjgListaIntercambiosDTO> getListadoIntercambiosAltaEJG(@RequestBody EjgItem item, HttpServletRequest request) {
 		EjgListaIntercambiosDTO response = new EjgListaIntercambiosDTO();
@@ -876,5 +891,31 @@ public class EjgController {
 			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
 		}
 		return new ResponseEntity<EjgListaIntercambiosDTO>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/gestion-ejg/consultarEstadoPericles", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> consultarEstadoPericles(@RequestBody EjgItem item, HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		try {
+			response = ejgIntercambiosService.consultarEstadoPericles(item, request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/gestion-ejg/enviaDocumentacionAdicional", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> enviaDocumentacionAdicional(@RequestBody EjgDocumentacionItem documentacionItemItem, HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		try {
+			response = ejgIntercambiosService.enviaDocumentacionAdicional(documentacionItemItem, request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 }

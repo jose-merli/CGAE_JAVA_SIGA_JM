@@ -3182,7 +3182,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     record.setJuzgado(null);
              // SIGARNV-2429@DTT.JAMARTIN@30/09/2021@INICIO
                 if(datos.getIdPretension() != null && datos.getIdPretension() != 0) {
-                	record.setIdpretension( datos.getIdPretension());
+                	record.setIdpretension(datos.getIdPretension().longValue());
                	}
              // SIGARNV-2429@DTT.JAMARTIN@30/09/2021@FIN
                 record.setObservaciones(datos.getObservaciones());

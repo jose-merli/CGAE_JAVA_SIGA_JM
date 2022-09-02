@@ -1029,6 +1029,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.identificadords");
 		sql.SELECT(
 				"(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA and ejg.idinstitucion = CEN_COLEGIADO.idinstitucion) AS NCOLEGIADO");
+
+		// Tarjeta Documentación: Enviar Documentación Adicional
+		sql.SELECT("ejg.idexpedienteext");
+
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins

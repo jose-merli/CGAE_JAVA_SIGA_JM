@@ -143,6 +143,8 @@ public class EjgItem {
     private boolean informacionEconomica;
     private int editableComision;
 
+    private Long idExpedienteExt;
+
     /**
      *
      **/
@@ -1730,5 +1732,12 @@ public class EjgItem {
 	public void setEditableComision(int editableComision) {
 		this.editableComision = editableComision;
 	}
-	    
+
+    public Long getIdExpedienteExt() {
+        return idExpedienteExt;
+    }
+
+    public void setIdExpedienteExt(Long idExpedienteExt) {
+        this.idExpedienteExt = idExpedienteExt;
+    }
 }

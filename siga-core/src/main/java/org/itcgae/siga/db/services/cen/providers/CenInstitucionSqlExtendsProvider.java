@@ -479,8 +479,8 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		sql.INNER_JOIN("CEN_GRUPOSINSTITUCION_INSTITU GRUINS ON CI.IDINSTITUCION =  GRUINS.IDINSTITUCION");
 		sql.INNER_JOIN("CEN_GRUPOSINSTITUCION GRU ON GRUINS.IDGRUPO = GRU.IDGRUPO");
 
-		sql.WHERE("CODIGO = " + codigoGrupo);
-		sql.WHERE("CI.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE(String.format("CODIGO = '%s'", codigoGrupo));
+		sql.WHERE(String.format("CI.IDINSTITUCION = '%s'", idInstitucion));
 		return sql.toString();
 	}
 }
