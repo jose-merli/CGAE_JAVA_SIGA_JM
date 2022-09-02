@@ -6,6 +6,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 
 public interface ComboService {
 	
@@ -75,7 +76,7 @@ public interface ComboService {
 	
 	public ComboDTO comboProcedimientos(HttpServletRequest request);
 	
-	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado);
+	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado, Short idPretension);
 	
 	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado, String fecha);
 	
@@ -110,4 +111,6 @@ public interface ComboService {
 	public ComboDTO comboTurnosDesignacion(HttpServletRequest request);
 	
 	public ComboDTO comboProcedimientosEXEA(HttpServletRequest request);
+
+	public ComboDTO comboProcedimientosConJuzgadoEjg(HttpServletRequest request, EjgItem item);
 }

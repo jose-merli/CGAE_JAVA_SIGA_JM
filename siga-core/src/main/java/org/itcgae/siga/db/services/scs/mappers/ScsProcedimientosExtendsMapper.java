@@ -46,7 +46,7 @@ public interface ScsProcedimientosExtendsMapper extends ScsProcedimientosMapper{
 		@Result(column = "JURISDICCION", property = "jurisdiccion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "JURISDICCIONDES", property = "jurisdiccionDes", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ModulosItem> searchModulo(ModulosItem modulosItem, String idioma);
+	List<ModulosItem> searchModulo(ModulosItem moduloItem, String idioma);
 	
 	@SelectProvider(type = ScsProcedimientosSqlExtendsProvider.class, method = "getIdProcedimiento")
 	@Results({ @Result(column = "IDPROCEDIMIENTO", property = "newId", jdbcType = JdbcType.VARCHAR)

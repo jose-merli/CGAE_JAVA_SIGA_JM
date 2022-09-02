@@ -444,7 +444,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getProcedimientosPretension")
 	@Results({ @Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPRETENSION", property = "label", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> getProcedimientosPretension(Short idInstitucion, List<String> idProcedimeintos);
+	List<ComboItem> getProcedimientosPretension(Short idInstitucion, List<String> idProcedimientos);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboProcedimientosConJuzgado")
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
