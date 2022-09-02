@@ -301,7 +301,7 @@ public class DesignacionesController {
 	@RequestMapping(value = "/comboProcedimientosConJuzgado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboProcedimientosConJuzgado(HttpServletRequest request, @RequestBody String idJuzgado) {
 
-		ComboDTO response = comboService.comboProcedimientosConJuzgado(request, idJuzgado);
+		ComboDTO response = comboService.comboProcedimientosConJuzgado(request, idJuzgado, null);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else

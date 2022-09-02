@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
@@ -1389,7 +1390,7 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado) {
+	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado, Short idPretension) {
 		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
 
 		ComboDTO comboDTO = new ComboDTO();
@@ -1421,10 +1422,14 @@ public class ComboServiceImpl implements ComboService {
 					pretensionProcedimiento = scsDesignacionesExtendsMapper.getProcedimientosPretension(idInstitucion,
 							idPretensiones);
 
-					if (pretensionProcedimiento != null && pretensionProcedimiento.size() > 0) {
+					if ((pretensionProcedimiento != null && pretensionProcedimiento.size() > 0) || idPretension != null) {
 						idPretensiones = new ArrayList<String>();
 						for (ComboItem label : pretensionProcedimiento) {
 							idPretensiones.add(label.getLabel());
+						}
+						
+						if(idPretension != null) {
+							idPretensiones.add(idPretension.toString());
 						}
 
 						comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConJuzgado(idInstitucion,
@@ -1439,6 +1444,12 @@ public class ComboServiceImpl implements ComboService {
 		LOGGER.info("objetivo() -> Salida del servicio para obtener comboProcedimientos");
 
 		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboProcedimientosConJuzgadoEjg(HttpServletRequest request, EjgItem item) {
+		
+		return comboProcedimientosConJuzgado(request, item.getJuzgado(), item.getIdPretension());
 	}
 
 	@Override
@@ -2101,4 +2112,6 @@ public class ComboServiceImpl implements ComboService {
 		LOGGER.info("comboOrigenContacto() -> Salida del servicio para obtener los tipos de documentacion de una asistencia");
 		return comboDTO;
 	}
+
+	
 }

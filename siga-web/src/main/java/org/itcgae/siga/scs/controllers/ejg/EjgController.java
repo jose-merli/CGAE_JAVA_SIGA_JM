@@ -36,6 +36,7 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.ejg.IEJGIntercambiosService;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
@@ -60,6 +61,9 @@ public class EjgController {
 
 	@Autowired
 	private IGestionEJG gestionEJG;
+	
+	@Autowired
+	private ComboService comboService;
 
 	@Autowired
 	private IEJGIntercambiosService ejgIntercambiosService;
@@ -675,6 +679,16 @@ public class EjgController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/gestion-ejg/comboProcedimientosConJuzgado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboProcedimientosConJuzgado(HttpServletRequest request, @RequestBody EjgItem item) {
+
+		ComboDTO response = comboService.comboProcedimientosConJuzgadoEjg(request, item);
+		if (response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@RequestMapping(value = "/gestion-ejg/getDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
