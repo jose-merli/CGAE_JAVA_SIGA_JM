@@ -146,7 +146,6 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
         LOGGER.info("consultarEstadoPericles() <- Entrando al servicio de autenticación");
 
-
         if (UtilidadesString.anyMatchCadenaVacia(ejgItem.getidInstitucion(), ejgItem.getAnnio(), ejgItem.getTipoEJG(), ejgItem.getNumero())) {
             LOGGER.warn("consultarEstadoPericles() -> Error: Falta alguno de los parámetros necesarios para realizar la petición");
             throw new Exception("Falta alguno de los parámetros necesarios para realizar la petición");
@@ -168,7 +167,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
         estadoejgExample.createCriteria().andIdinstitucionEqualTo(ejg.getIdinstitucion())
                 .andAnioEqualTo(ejg.getAnio()).andIdtipoejgEqualTo(ejg.getIdtipoejg())
-                .andNumeroEqualTo(ejg.getNumero());
+                .andNumeroEqualTo(ejg.getNumero()).andFechabajaIsNotNull();
         estadoejgExample.setOrderByClause("IDESTADOPOREJG");
 
         List<ScsEstadoejg> estados = scsEstadoejgMapper.selectByExample(estadoejgExample);
@@ -178,7 +177,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
             throw new Exception("El EJG tiene un estado incorrecto");
         }
 
-        // ejgIntercambiosHelper.insertarConsultaEstadoEnCola(ejg);
+        ejgIntercambiosHelper.insertarConsultaEstadoEnCola(ejg);
 
         LOGGER.info("consultarEstadoPericles() <- Saliendo del servicio para pedir la consulta del estado de Pericles");
         return updateResponseDTO;
