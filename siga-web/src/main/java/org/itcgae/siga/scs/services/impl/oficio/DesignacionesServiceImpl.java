@@ -7346,7 +7346,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				designa.setNig(ejg.getNig());
 				designa.setObservaciones(ejg.getObservaciones());
 				// designa.set (No existe campo calidad en ScsDesigna)
-				designa.setIdpretension(ejg.getIdpretension());
+				designa.setIdpretension(ejg.getIdpretension().shortValue());
 				designa.setIdjuzgado(ejg.getJuzgado());
 
 				// Actualizamos los delitos del ejg

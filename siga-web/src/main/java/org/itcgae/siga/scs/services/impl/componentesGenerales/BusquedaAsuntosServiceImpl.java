@@ -799,7 +799,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				asis.setNumeroprocedimiento(ejg.getNumeroprocedimiento() + "/" + ejg.getAnioprocedimiento());
 				asis.setNumerodiligencia(ejg.getNumerodiligencia());
 				asis.setNig(ejg.getNig());
-				asis.setIdpretension(ejg.getIdpretension());
+				asis.setIdpretension(ejg.getIdpretension().shortValue());
 
 				asis.setDelitosimputados(ejg.getDelitos());
 				asis.setContrarios(contrariosAsisString);
@@ -897,7 +897,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				designa.setAnioprocedimiento(ejg.getAnioprocedimiento());
 				designa.setNig(ejg.getNig());
 				designa.setObservaciones(ejg.getObservaciones());
-				designa.setIdpretension(ejg.getIdpretension());
+				designa.setIdpretension(ejg.getIdpretension().shortValue());
 				designa.setIdjuzgado(ejg.getJuzgado());
 
 				// Actualizamos los delitos de la designacion eliminando los anteriores y
@@ -1606,7 +1606,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				ejg.setNumeroprocedimiento(designa.getNumprocedimiento());
 				ejg.setNig(designa.getNig());
 				ejg.setObservaciones(designa.getObservaciones());
-				ejg.setIdpretension(designa.getIdpretension());
+				ejg.setIdpretension(designa.getIdpretension().longValue());
 				ejg.setJuzgado(designa.getIdjuzgado());
 
 				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -2275,7 +2275,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				ejg.setNumeroprocedimiento(parts[0]);
 				ejg.setNumerodiligencia(asis.getNumerodiligencia());
 				ejg.setNig(asis.getNig());
-				ejg.setIdpretension(asis.getIdpretension());
+				ejg.setIdpretension(asis.getIdpretension().longValue());
 
 				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 				ejg.setFechamodificacion(new Date());

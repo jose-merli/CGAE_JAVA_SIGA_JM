@@ -367,7 +367,12 @@ public class EjgController {
 	@RequestMapping(value = "/filtros-ejg/anadirExpedienteARemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> anadirExpedienteARemesa(@RequestBody List<EjgItem> datos,
 			HttpServletRequest request) {
-		InsertResponseDTO response = busquedaEJG.anadirExpedienteARemesa(datos, request);
+		InsertResponseDTO response = new InsertResponseDTO();
+		try {
+			response = busquedaEJG.anadirExpedienteARemesa(datos, request);
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 

@@ -109,7 +109,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     private ScsTipoencalidadExtendsMapper scsTipoencalidadExtendsMapper;
 
     @Autowired
-    private ScsExpedienteEconomicoExtendsMapper scsExpedienteEconomicoExtendsMapper;
+    private ScsEejgPeticionesExtendsMapper scsExpedienteEconomicoExtendsMapper;
 
     @Autowired
     private ScsEstadoejgExtendsMapper scsEstadoejgExtendsMapper;
@@ -212,6 +212,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     @Autowired
     private BusquedaEJGComisionServiceImpl busquedaEJGComisionServiceImpl;
+
+    @Autowired
+    private EJGIntercambiosHelper ejgIntercambiosHelper;
 
     @Override
     public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -1333,6 +1336,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                         // scsEstadoejgMapper.selectByExample(example)
 
                         response = scsEstadoejgMapper.insert(record);
+
+                        if (response != 0) {
+                            ejgIntercambiosHelper.insertaEstadoEjg(record);
+                        }
                     }
 
                     LOGGER.debug(
@@ -2288,6 +2295,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     }
 
                     response = scsEstadoejgMapper.insertSelective(record);
+
+                    if (response != 0) {
+                        ejgIntercambiosHelper.insertaEstadoEjg(record);
+                    }
 
                     LOGGER.debug(
                             "GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para introducir un nuevo estado al EJG");
@@ -6572,6 +6583,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 	 else
                 		 LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> ejgItem vacío. "); 
                  }catch (Exception e) {
+                     LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Se ha producido un error. ", e);
                      LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Se ha producido un error. ", e);
                  }
              }

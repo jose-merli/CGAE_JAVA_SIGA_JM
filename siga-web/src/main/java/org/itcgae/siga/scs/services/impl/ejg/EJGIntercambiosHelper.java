@@ -11,16 +11,23 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsDocumentacionejgExample;
+import org.itcgae.siga.db.entities.ScsEejgPeticiones;
+import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgKey;
+import org.itcgae.siga.db.entities.ScsPersonajg;
+import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionejgMapper;
+import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
+import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.ecom.mappers.EcomIntercambioExtendsMapper;
@@ -46,6 +53,9 @@ public class EJGIntercambiosHelper {
     private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
 
     @Autowired
+    private ScsPersonajgMapper scsPersonajgMapper;
+
+    @Autowired
     private FacturacionSJCSHelper facturacionSJCSHelper;
 
     @Autowired
@@ -61,14 +71,20 @@ public class EJGIntercambiosHelper {
     private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
 
     @Autowired
+    private ScsContrariosejgMapper scsContrariosejgMapper;
+
+    @Autowired
+    private ScsEejgPeticionesMapper scsEejgPeticionesMapper;
+
+    @Autowired
     private EcomIntercambioExtendsMapper ecomIntercambioExtendsMapper;
 
     @Autowired
     private GenParametrosMapper genParametrosMapper;
 
     public boolean isColegioZonaComun(Short idInstitucion) {
-        List<CenInstitucion> cenInstitucion = cenInstitucionExtendsMapper.getInstitucionByGrupo(idInstitucion, SigaConstants.GRUPOINSTITUCION.COMUN_MINI.getCodigoGrupo());
-        return !cenInstitucion.isEmpty();
+        List<CenInstitucion> zonaComun = cenInstitucionExtendsMapper.getInstitucionByGrupo(idInstitucion, SigaConstants.GRUPOINSTITUCION.COMUN_MINI.getCodigoGrupo());
+        return !zonaComun.isEmpty();
     }
 
     public boolean isColegioConfiguradoEnvioPericles(Short idInstitucion) {
@@ -115,28 +131,32 @@ public class EJGIntercambiosHelper {
         PERICLES_INSERT_ESTADO, PERICLES_UPDATE_ESTADO, PERICLES_REENVIA
     }
 
+    public void insertaCambioEstadoPericles(ScsEstadoejg estado) throws Exception {
+        LOGGER.info("insertaEstadoEjg() -> Entrando al servicio que envia la documentación al CAJG si es necesario");
+        if (isColegioZonaComun(estado.getIdinstitucion())
+                && isColegioConfiguradoEnvioPericles(estado.getIdinstitucion())) {
+
+            ScsEjg ejg = getScsEjg(estado.getIdinstitucion(), estado.getAnio(), estado.getIdtipoejg(), estado.getNumero());
+            if (UtilidadesString.esCadenaVacia(ejg.getNumeroCajg())) {
+                envioPericlesExpediente(estado, EJGIntercambiosHelper.CASO.PERICLES_INSERT_ESTADO);
+            } else {
+                encolaEnvioDocumentacion(ejg);
+            }
+        } else {
+            LOGGER.info("insertaEstadoEjg() <- El colegio no pertenece a la zona común");
+        }
+        LOGGER.info("insertaEstadoEjg() <- Saliendo del servicio que envia la documentación al CAJG si es necesario");
+    }
 
     @Transactional
-    public void insertaEstadoEjg(ScsEstadoejg estado) throws Exception {
+    public void updateEstadoEjg(ScsEstadoejg estado) throws Exception {
         LOGGER.info("insertaEstadoEjg() -> ");
         if (isColegioZonaComun(estado.getIdinstitucion())
                 && isColegioConfiguradoEnvioPericles(estado.getIdinstitucion())) {
             if (estado.getIdestadoejg() != null && estado.getIdestadoejg().equals(SigaConstants.ESTADOS_EJG.LISTO_REMITIR_COMISION.getCodigo())) {
                 LOGGER.info("insertaEstadoEjg() -> ");
 
-                ScsEjgKey ejgKey = new ScsEjgKey();
-                ejgKey.setIdtipoejg(estado.getIdtipoejg());
-                ejgKey.setAnio(estado.getAnio());
-                ejgKey.setNumero(estado.getNumero());
-                ejgKey.setIdinstitucion(estado.getIdinstitucion());
-
-                ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
-                if (UtilidadesString.esCadenaVacia(ejg.getNumeroCajg())) {
-                    envioPericlesExpediente(estado, EJGIntercambiosHelper.CASO.PERICLES_INSERT_ESTADO);
-                } else {
-                    // Encola Envio Documentación (Por hacer)
-                    encolaEnvioDocumentacion(ejg);
-                }
+                envioPericlesExpediente(estado, CASO.PERICLES_UPDATE_ESTADO);
             }
         } else {
             LOGGER.info("insertaEstadoEjg() <- ");
@@ -209,27 +229,60 @@ public class EJGIntercambiosHelper {
     }
 
     private void encolaEnvioDocumentacion(ScsEjg ejg) throws Exception {
+        // Obtenemos la documentación
         ScsDocumentacionejgExample documentacionejgExample = new ScsDocumentacionejgExample();
         documentacionejgExample.createCriteria().andIdinstitucionEqualTo(ejg.getIdinstitucion())
                 .andAnioEqualTo(ejg.getAnio()).andIdtipoejgEqualTo(ejg.getIdtipoejg())
                 .andNumeroEqualTo(ejg.getNumero());
 
+        // Obtenemos los miembros de la unidad familiar
         ScsUnidadfamiliarejgExample unidadfamiliarejgExample = new ScsUnidadfamiliarejgExample();
+        unidadfamiliarejgExample.createCriteria().andIdinstitucionEqualTo(ejg.getIdinstitucion())
+                .andIdtipoejgEqualTo(ejg.getIdtipoejg()).andAnioEqualTo(ejg.getAnio())
+                .andNumeroEqualTo(ejg.getNumero());
+        unidadfamiliarejgExample.setOrderByClause("SOLICITANTE DESC");
 
         List<ScsDocumentacionejg> documentacionejgList = scsDocumentacionejgMapper.selectByExample(documentacionejgExample);
         List<ScsUnidadfamiliarejg> unidadfamiliarejgList = scsUnidadfamiliarejgMapper.selectByExample(unidadfamiliarejgExample);
 
         for (int i = 0; i < documentacionejgList.size(); i++) {
-            auxDocumentacion(documentacionejgList.get(i), i == documentacionejgList.size() - 1);
+            insercionIndividualDocumentacion(documentacionejgList.get(i), i == documentacionejgList.size() - 1);
         }
 
         for (int i = 0; i < unidadfamiliarejgList.size(); i++) {
-            boolean esUltimo = unidadfamiliarejgList.size() > 0 ? (unidadfamiliarejgList.get(i).getIdparentesco() != null ? false : true) : true;
-            auxUnidadFamiliar(unidadfamiliarejgList.get(i), esUltimo);
+            ScsUnidadfamiliarejg unidadfamiliarejg = unidadfamiliarejgList.get(i);
+
+            ScsPersonajgKey personajgKey = new ScsPersonajgKey();
+            personajgKey.setIdinstitucion(unidadfamiliarejg.getIdinstitucion());
+            personajgKey.setIdpersona(unidadfamiliarejg.getIdpersona());
+            ScsPersonajg persona = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+
+            if (persona.getIdtipoidentificacion() == (short) 10 || persona.getIdtipoidentificacion() == (short) 40) {
+                ScsEejgPeticionesExample eejgPeticionesExample = new ScsEejgPeticionesExample();
+                eejgPeticionesExample.createCriteria().andIdinstitucionEqualTo(unidadfamiliarejg.getIdinstitucion())
+                        .andAnioEqualTo(unidadfamiliarejg.getAnio()).andIdtipoejgEqualTo(unidadfamiliarejg.getIdtipoejg())
+                        .andNumeroEqualTo(unidadfamiliarejg.getNumero()).andNifEqualTo(persona.getNif())
+                        .andCsvIsNotNull().andEstadoNotEqualTo(40L);
+                eejgPeticionesExample.setOrderByClause("IDPETICION DESC");
+
+                List<ScsEejgPeticiones> eejgPeticiones = scsEejgPeticionesMapper.selectByExample(eejgPeticionesExample);
+
+                if (eejgPeticiones != null && !eejgPeticiones.isEmpty()) {
+                    boolean esUltimo = true;
+                    for (int j = 0; j < documentacionejgList.size(); j++) {
+                        if (documentacionejgList.get(j).getIdfichero() != null) {
+                            esUltimo = false;
+                            break;
+                        }
+                    }
+
+                    insercionIndividualUnidadFamiliar(unidadfamiliarejgList.get(i), persona, esUltimo);
+                }
+            }
         }
     }
 
-    private void auxDocumentacion(ScsDocumentacionejg documentacionejg, boolean esUltimo) throws Exception {
+    private void insercionIndividualDocumentacion(ScsDocumentacionejg documentacionejg, boolean esUltimo) throws Exception {
         Map<String, String> parametrosCola = new HashMap<>();
         parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, documentacionejg.getIdinstitucion().toString());
         parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, documentacionejg.getAnio().toString());
@@ -247,14 +300,14 @@ public class EJGIntercambiosHelper {
         insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envio documentación(%s) Pericles", documentacionejg.getIddocumentacion()));
     }
 
-    private void auxUnidadFamiliar(ScsUnidadfamiliarejg unidadfamiliarejg, boolean esUltimo) throws Exception {
+    private void insercionIndividualUnidadFamiliar(ScsUnidadfamiliarejg unidadfamiliarejg, ScsPersonajg persona, boolean esUltimo) throws Exception {
         Map<String, String> parametrosCola = new HashMap<>();
         parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, unidadfamiliarejg.getIdinstitucion().toString());
         parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, unidadfamiliarejg.getAnio().toString());
         parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, unidadfamiliarejg.getIdtipoejg().toString());
         parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, unidadfamiliarejg.getNumero().toString());
 
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NIFNIE, unidadfamiliarejg.getIdpersona().toString());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NIFNIE, persona.getNif());
         parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ULTIMODOCUMENTO, esUltimo ? SigaConstants.DB_TRUE : SigaConstants.DB_FALSE);
 
         EcomCola colaEnviaPericles = new EcomCola();
@@ -262,7 +315,7 @@ public class EJGIntercambiosHelper {
         colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_DOCUMENTO.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envio informe económico(%s) Pericles", unidadfamiliarejg.getIdtipoejg()));
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envio informe económico(%s) Pericles", persona.getIdtipoidentificacion()));
     }
 
     private void actualizarIntercambio(Long idEcomCola, SigaConstants.ECOM_ESTADOSCOLA estado, String respuesta, String descripcion) {

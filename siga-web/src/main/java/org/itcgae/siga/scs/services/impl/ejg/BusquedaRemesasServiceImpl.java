@@ -4,36 +4,27 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -41,10 +32,8 @@ import org.itcgae.siga.DTOs.scs.CheckAccionesRemesas;
 import org.itcgae.siga.DTOs.scs.CheckAccionesRemesasDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
-import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
-import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoItem;
 import org.itcgae.siga.DTOs.scs.RemesaAccionItem;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
@@ -52,14 +41,9 @@ import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem2;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
-import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.GestorContadores;
-import org.itcgae.siga.commons.utils.ReadProperties;
-import org.itcgae.siga.commons.utils.SIGAReferences;
-import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmContador;
-import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CajgEjgremesa;
@@ -71,7 +55,6 @@ import org.itcgae.siga.db.entities.CajgRemesaestados;
 import org.itcgae.siga.db.entities.CajgRemesaestadosExample;
 import org.itcgae.siga.db.entities.CajgRespuestaEjgremesa;
 import org.itcgae.siga.db.entities.CajgRespuestaEjgremesaExample;
-import org.itcgae.siga.db.entities.CenCargamasiva;
 import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.EcomColaExample;
 import org.itcgae.siga.db.entities.EcomColaParametros;
@@ -86,8 +69,6 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosKey;
-import org.itcgae.siga.db.entities.ScsEejgPeticiones;
-import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.mappers.CajgRemesaestadosMapper;
@@ -107,12 +88,10 @@ import org.itcgae.siga.db.services.cajg.mappers.CajgRemesaExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgRespuestaEjgremesaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEejgPeticionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRemesasExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
 import org.itcgae.siga.security.UserTokenUtils;
-import org.mockito.internal.util.SimpleMockitoLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -121,9 +100,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import net.bytebuddy.dynamic.scaffold.MethodRegistry.Handler.ForAbstractMethod;
-import net.bytebuddy.implementation.auxiliary.AuxiliaryType;
 
 @Service
 public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
@@ -179,7 +155,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	private GenRecursosMapper genRecursosMapper;
 	
 	@Autowired
-    private ScsExpedienteEconomicoExtendsMapper scsExpedienteEconomicoExtendsMapper;
+    private ScsEejgPeticionesExtendsMapper scsExpedienteEconomicoExtendsMapper;
 	
 	@Autowired
     private ScsEejgPeticionesExtendsMapper ScsEejgpeticionesExtendsMapper;
