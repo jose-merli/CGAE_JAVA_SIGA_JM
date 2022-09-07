@@ -25,8 +25,6 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpTipoexpedienteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
-import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
-import org.itcgae.siga.scs.services.ejg.IEEJGServices;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.itcgae.siga.scs.services.impl.ejg.comision.BusquedaEJGComisionServiceImpl;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
@@ -1276,7 +1274,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     }
 
     @Override
-    @Transactional
     public UpdateResponseDTO cambioEstadoMasivo(List<EjgItem> datos, HttpServletRequest request) {
         UpdateResponseDTO responsedto = new UpdateResponseDTO();
         int response = 0;
@@ -1302,44 +1299,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                 try {
                     for (int i = 0; datos.size() > i; i++) {
-                        ScsEstadoejg record = new ScsEstadoejg();
-                        response = 0;
-
-                        // creamos el objeto para el insert
-                        record.setIdinstitucion(idInstitucion);
-                        record.setIdtipoejg(Short.parseShort(datos.get(i).getTipoEJG()));
-                        record.setAnio(Short.parseShort(datos.get(i).getAnnio()));
-                        record.setNumero(Long.parseLong(datos.get(i).getNumero()));
-                        record.setIdestadoejg(Short.parseShort(datos.get(i).getEstadoNew()));
-                        record.setFechainicio(datos.get(i).getFechaEstadoNew());
-                        record.setFechamodificacion(new Date());
-                        record.setUsumodificacion(usuarios.get(0).getIdusuario());
-                        record.setAutomatico("0");
-
-                        // obtenemos el maximo de idestadoporejg
-                        ScsEstadoejgExample example = new ScsEstadoejgExample();
-                        example.setOrderByClause("IDESTADOPOREJG DESC");
-                        example.createCriteria().andAnioEqualTo(Short.parseShort(datos.get(i).getAnnio()))
-                                .andIdinstitucionEqualTo(idInstitucion)
-                                .andIdtipoejgEqualTo(Short.parseShort(datos.get(i).getTipoEJG()))
-                                .andNumeroEqualTo(Long.parseLong(datos.get(i).getNumero()));
-
-                        List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
-
-                        // damos el varlo al idestadoporejg + 1
-                        if (listEjg.size() > 0) {
-                            record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
-                        } else {
-                            record.setIdestadoporejg(Long.parseLong("0"));
-                        }
-
-                        // scsEstadoejgMapper.selectByExample(example)
-
-                        response = scsEstadoejgMapper.insert(record);
-
-                        if (response != 0) {
-                            ejgIntercambiosHelper.insertaEstadoEjg(record);
-                        }
+                        response = cambioEstadoMasivoItem(datos.get(i), usuarios.get(0), idInstitucion);
                     }
 
                     LOGGER.debug(
@@ -1366,6 +1326,49 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         LOGGER.info("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida del servicio.");
 
         return responsedto;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    private int cambioEstadoMasivoItem(EjgItem dato, AdmUsuarios usuario, Short idInstitucion) throws Exception {
+        ScsEstadoejg record = new ScsEstadoejg();
+
+        // creamos el objeto para el insert
+        record.setIdinstitucion(idInstitucion);
+        record.setIdtipoejg(Short.parseShort(dato.getTipoEJG()));
+        record.setAnio(Short.parseShort(dato.getAnnio()));
+        record.setNumero(Long.parseLong(dato.getNumero()));
+        record.setIdestadoejg(Short.parseShort(dato.getEstadoNew()));
+        record.setFechainicio(dato.getFechaEstadoNew());
+        record.setFechamodificacion(new Date());
+        record.setUsumodificacion(usuario.getIdusuario());
+        record.setAutomatico("0");
+
+        // obtenemos el maximo de idestadoporejg
+        ScsEstadoejgExample example = new ScsEstadoejgExample();
+        example.setOrderByClause("IDESTADOPOREJG DESC");
+        example.createCriteria().andAnioEqualTo(Short.parseShort(dato.getAnnio()))
+                .andIdinstitucionEqualTo(idInstitucion)
+                .andIdtipoejgEqualTo(Short.parseShort(dato.getTipoEJG()))
+                .andNumeroEqualTo(Long.parseLong(dato.getNumero()));
+
+        List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+
+        // damos el varlo al idestadoporejg + 1
+        if (listEjg.size() > 0) {
+            record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+        } else {
+            record.setIdestadoporejg(Long.parseLong("0"));
+        }
+
+        // scsEstadoejgMapper.selectByExample(example)
+
+        int response = scsEstadoejgMapper.insert(record);
+
+        if (response != 0 && record.getIdestadoejg() != null && record.getIdestadoejg().equals(SigaConstants.ESTADOS_EJG.LISTO_REMITIR_COMISION.getCodigo())) {
+            ejgIntercambiosHelper.insertaCambioEstadoPericles(record, usuario);
+        }
+
+        return response;
     }
 
     @Override
@@ -2237,7 +2240,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     }
 
     @Override
-    @Transactional
     public InsertResponseDTO nuevoEstado(EstadoEjgItem datos, HttpServletRequest request) {
         InsertResponseDTO responsedto = new InsertResponseDTO();
         int response = 0;
@@ -2259,46 +2261,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para insertar un nuevo estado al ejg");
 
                 try {
-
-                    ScsEstadoejg record = new ScsEstadoejg();
-                    response = 0;
-
-                    // creamos el objeto para el insert
-                    record.setIdinstitucion(idInstitucion);
-                    record.setAnio(Short.parseShort(datos.getAnio()));
-                    record.setNumero(Long.parseLong(datos.getNumero()));
-
-                    record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
-                    record.setFechainicio(datos.getFechaInicio());
-                    record.setObservaciones(datos.getObservaciones());
-
-                    record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
-
-                    record.setFechamodificacion(new Date());
-                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-                    // obtenemos el maximo de idestadoporejg
-                    ScsEstadoejgExample example = new ScsEstadoejgExample();
-                    example.setOrderByClause("IDESTADOPOREJG DESC");
-                    example.createCriteria().andAnioEqualTo(Short.parseShort(datos.getAnio()))
-                            .andIdinstitucionEqualTo(idInstitucion)
-                            .andIdtipoejgEqualTo(Short.parseShort(datos.getIdtipoejg()))
-                            .andNumeroEqualTo(Long.parseLong(datos.getNumero()));
-
-                    List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
-
-                    // damos el varlo al idestadoporejg + 1
-                    if (listEjg.size() > 0) {
-                        record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
-                    } else {
-                        record.setIdestadoporejg(Long.parseLong("1"));
-                    }
-
-                    response = scsEstadoejgMapper.insertSelective(record);
-
-                    if (response != 0) {
-                        ejgIntercambiosHelper.insertaEstadoEjg(record);
-                    }
+                    response = insertarNuevoEstado(datos, usuarios.get(0), idInstitucion);
 
                     LOGGER.debug(
                             "GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para introducir un nuevo estado al EJG");
@@ -2343,6 +2306,51 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         LOGGER.info("GestionEJGServiceImpl.borrarEstado() -> Salida del servicio.");
 
         return responsedto;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    private int insertarNuevoEstado(EstadoEjgItem datos, AdmUsuarios usuario, Short idInstitucion) throws Exception {
+        ScsEstadoejg record = new ScsEstadoejg();
+        int response = 0;
+
+        // creamos el objeto para el insert
+        record.setIdinstitucion(idInstitucion);
+        record.setAnio(Short.parseShort(datos.getAnio()));
+        record.setNumero(Long.parseLong(datos.getNumero()));
+
+        record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
+        record.setFechainicio(datos.getFechaInicio());
+        record.setObservaciones(datos.getObservaciones());
+
+        record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
+
+        record.setFechamodificacion(new Date());
+        record.setUsumodificacion(usuario.getIdusuario());
+
+        // obtenemos el maximo de idestadoporejg
+        ScsEstadoejgExample example = new ScsEstadoejgExample();
+        example.setOrderByClause("IDESTADOPOREJG DESC");
+        example.createCriteria().andAnioEqualTo(Short.parseShort(datos.getAnio()))
+                .andIdinstitucionEqualTo(idInstitucion)
+                .andIdtipoejgEqualTo(Short.parseShort(datos.getIdtipoejg()))
+                .andNumeroEqualTo(Long.parseLong(datos.getNumero()));
+
+        List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+
+        // damos el varlo al idestadoporejg + 1
+        if (listEjg.size() > 0) {
+            record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+        } else {
+            record.setIdestadoporejg(Long.parseLong("1"));
+        }
+
+        response = scsEstadoejgMapper.insertSelective(record);
+
+        if (response != 0 && record.getIdestadoejg() != null && record.getIdestadoejg().equals(SigaConstants.ESTADOS_EJG.LISTO_REMITIR_COMISION.getCodigo())) {
+            ejgIntercambiosHelper.insertaCambioEstadoPericles(record, usuario);
+        }
+
+        return response;
     }
 
     @Override

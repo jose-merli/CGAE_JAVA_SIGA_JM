@@ -95,7 +95,9 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	@Autowired
 	private CajgEjgremesaMapper cajgEjgremesaMapper;
 	@Autowired
-	private CajgEjgremesaExtendsMapper cajgEjgremesaExtendsMapper;	
+	private CajgEjgremesaExtendsMapper cajgEjgremesaExtendsMapper;
+	@Autowired
+	private EJGIntercambiosHelper ejgIntercambiosHelper;
 	
 
 	@Override
@@ -140,8 +142,8 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	}
 	
 	@Override
-	@Transactional
-	public InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) {
+	@Transactional(rollbackFor = Exception.class)
+	public InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) throws Exception {
 		InsertResponseDTO responsedto = new InsertResponseDTO();
 		int response = 0;
 		int responseEstado= 0;
@@ -241,6 +243,10 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 							
 						
 							responseEstado = scsEstadoEjgextendsMapper.insertSelective(estado);
+
+							if (responseEstado != 0) {
+								ejgIntercambiosHelper.insertaCambioEstadoPericles(estado);
+							}
 							
 							if(responseEstado == 1) {
 								responsedto.setStatus(SigaConstants.OK);

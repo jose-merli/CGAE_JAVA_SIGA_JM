@@ -43,5 +43,5 @@ public interface IBusquedaEJG {
 
 	ComboDTO comboRemesa(HttpServletRequest request);
 
-	InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request);
+	InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) throws Exception;
 }

@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.services.impl.ejg;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.EcomIntercambio;
@@ -88,7 +89,7 @@ public class EJGIntercambiosHelper {
     }
 
     public boolean isColegioConfiguradoEnvioPericles(Short idInstitucion) {
-        return getValorParametroWithNull(idInstitucion, PCAJG_WS_URL, MODULO_SCS) != null;
+        return true; //getValorParametroWithNull(idInstitucion, PCAJG_WS_URL, MODULO_SCS) != null;
     }
 
 
@@ -131,14 +132,14 @@ public class EJGIntercambiosHelper {
         PERICLES_INSERT_ESTADO, PERICLES_UPDATE_ESTADO, PERICLES_REENVIA
     }
 
-    public void insertaCambioEstadoPericles(ScsEstadoejg estado) throws Exception {
+    public void insertaCambioEstadoPericles(ScsEstadoejg estado, AdmUsuarios usuario) throws Exception {
         LOGGER.info("insertaEstadoEjg() -> Entrando al servicio que envia la documentación al CAJG si es necesario");
         if (isColegioZonaComun(estado.getIdinstitucion())
                 && isColegioConfiguradoEnvioPericles(estado.getIdinstitucion())) {
 
             ScsEjg ejg = getScsEjg(estado.getIdinstitucion(), estado.getAnio(), estado.getIdtipoejg(), estado.getNumero());
             if (UtilidadesString.esCadenaVacia(ejg.getNumeroCajg())) {
-                envioPericlesExpediente(estado, EJGIntercambiosHelper.CASO.PERICLES_INSERT_ESTADO);
+                envioPericlesExpediente(estado, usuario, EJGIntercambiosHelper.CASO.PERICLES_INSERT_ESTADO);
             } else {
                 encolaEnvioDocumentacion(ejg);
             }
@@ -156,7 +157,7 @@ public class EJGIntercambiosHelper {
             if (estado.getIdestadoejg() != null && estado.getIdestadoejg().equals(SigaConstants.ESTADOS_EJG.LISTO_REMITIR_COMISION.getCodigo())) {
                 LOGGER.info("insertaEstadoEjg() -> ");
 
-                envioPericlesExpediente(estado, CASO.PERICLES_UPDATE_ESTADO);
+                envioPericlesExpediente(estado, null, CASO.PERICLES_UPDATE_ESTADO);
             }
         } else {
             LOGGER.info("insertaEstadoEjg() <- ");
@@ -164,7 +165,7 @@ public class EJGIntercambiosHelper {
         LOGGER.info("insertaEstadoEjg() <- ");
     }
 
-    private void envioPericlesExpediente(ScsEstadoejg estadoEjgItem, CASO caso) throws Exception {
+    private void envioPericlesExpediente(ScsEstadoejg estadoEjgItem, AdmUsuarios usuario, CASO caso) throws Exception {
         if (caso.equals(CASO.PERICLES_UPDATE_ESTADO)) {
             LOGGER.info("envioPericlesExpediente() -> Entrando en Insertar intercabio en ECOM_COLA");
 
@@ -199,7 +200,7 @@ public class EJGIntercambiosHelper {
         LOGGER.info("envioPericlesExpediente() -> Entrando en Insertar intercabio en ECOM_COLA");
 
         ScsEstadoejg newEstadoejgRecord = new ScsEstadoejg();
-        newEstadoejgRecord.setIdestadoporejg(estadoEjgItem.getIdestadoporejg());
+        newEstadoejgRecord.setIdestadoporejg(estadoEjgItem.getIdestadoporejg() + 1);
         newEstadoejgRecord.setIdtipoejg(estadoEjgItem.getIdtipoejg());
         newEstadoejgRecord.setAnio(estadoEjgItem.getAnio());
         newEstadoejgRecord.setNumero(estadoEjgItem.getNumero());
@@ -208,6 +209,8 @@ public class EJGIntercambiosHelper {
         newEstadoejgRecord.setAutomatico(SigaConstants.DB_TRUE);
         newEstadoejgRecord.setIdestadoejg(SigaConstants.ESTADOS_EJG.GENERADO_ENV_COMISION.getCodigo());
         newEstadoejgRecord.setObservaciones("Espere a que se procese el envio para continuar");
+        newEstadoejgRecord.setFechamodificacion(new Date());
+        newEstadoejgRecord.setUsumodificacion(usuario.getIdusuario());
 
         scsEstadoejgMapper.insertSelective(newEstadoejgRecord);
 
@@ -347,6 +350,8 @@ public class EJGIntercambiosHelper {
         record.setIdecomcola(idEcomCola);
         record.setIdinstitucion(idInstitucion);
         record.setDescripcion(descripcion);
+
+        record.setFechaenvio(new Date());
 
         ecomIntercambioExtendsMapper.insert(record);
 
