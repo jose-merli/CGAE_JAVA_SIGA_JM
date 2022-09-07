@@ -245,7 +245,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 							responseEstado = scsEstadoEjgextendsMapper.insertSelective(estado);
 
 							if (responseEstado != 0) {
-								ejgIntercambiosHelper.insertaCambioEstadoPericles(estado);
+								ejgIntercambiosHelper.insertaCambioEstadoPericles(estado, usuarios.get(0));
 							}
 							
 							if(responseEstado == 1) {
