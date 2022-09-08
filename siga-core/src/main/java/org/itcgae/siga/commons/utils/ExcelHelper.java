@@ -186,6 +186,8 @@ public class ExcelHelper {
 	private HSSFWorkbook createExcel(List<String> orderList, Vector<Hashtable<String, Object>> datos) throws BusinessException {
 		HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
 		try {
+			log.debug("Inicio generación Xls "+new Date());
+			
 			log.info("Generando plantilla excel generarLibroExcelUnaHoja");
 			HSSFSheet hssfSheet = hssfWorkbook.createSheet("Hoja 1");
 			int numeroFila = 0;
@@ -387,8 +389,10 @@ public class ExcelHelper {
 					}
 					log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque obtener elementos del vector");
 				}
+				
 			}
-	
+			log.debug("Fin generación Xls "+new Date());
+			
 		} catch (Exception e) {
 			log.error("Se ha producido un error al generar el fichero excel generarLibroExcelUnaHoja", e);
 			throw new BusinessException("Se ha producido un error al generar el fichero excel generarLibroExcelUnaHoja", e);
