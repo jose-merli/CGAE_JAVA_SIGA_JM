@@ -308,7 +308,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				row.createCell(row.getLastCellNum() + 1).setCellValue(p);
 			else
 				row.createCell(row.getLastCellNum()).setCellValue(p);
-			sheet.autoSizeColumn(row.getLastCellNum() - 1);
+			//sheet.autoSizeColumn(row.getLastCellNum() - 1);
 		}
 
 		String[] gparts = guardias.split(",");
@@ -369,8 +369,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			sheet.addValidationData(dataValidation);
 		}
 
-		sheet.autoSizeColumn(0);
-		sheet.autoSizeColumn(1);
+		//sheet.autoSizeColumn(0);
+		//sheet.autoSizeColumn(1);
 
 //		InputStream is = null;
 //		try {
@@ -421,7 +421,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				row.createCell(row.getLastCellNum() + 1).setCellValue(p);
 			else
 				row.createCell(row.getLastCellNum()).setCellValue(p);
-			sheet.autoSizeColumn(row.getLastCellNum() - 1);
+			//sheet.autoSizeColumn(row.getLastCellNum() - 1);
 		}
 
 		String[] gparts = guardias.split(",");
@@ -497,8 +497,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			}
 		}
 
-		sheet.autoSizeColumn(0);
-		sheet.autoSizeColumn(1);
+		//sheet.autoSizeColumn(0);
+		//sheet.autoSizeColumn(1);
 
 //		InputStream is = null;
 //		try {
@@ -549,7 +549,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				row.createCell(row.getLastCellNum() + 1).setCellValue(p);
 			else
 				row.createCell(row.getLastCellNum()).setCellValue(p);
-			sheet.autoSizeColumn(row.getLastCellNum() - 1);
+			//sheet.autoSizeColumn(row.getLastCellNum() - 1);
 		}
 
 		String[] gparts = guardias.split(",");
@@ -604,8 +604,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			}
 		}
 
-		sheet.autoSizeColumn(0);
-		sheet.autoSizeColumn(1);
+		//sheet.autoSizeColumn(0);
+		//sheet.autoSizeColumn(1);
 
 		File returnFile = null;
 		try {

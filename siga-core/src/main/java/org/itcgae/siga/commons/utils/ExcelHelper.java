@@ -234,7 +234,7 @@ public class ExcelHelper {
 					log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque agregar el estilo");
 					// Agregar el estilo
 					hssfCell.setCellStyle(hssfCellStyleCabecera);
-					hssfSheet.autoSizeColumn((short) i);
+					//hssfSheet.autoSizeColumn((short) i);
 					numeroColumna++;
 					log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque agregar el estilo");
 				}
@@ -289,7 +289,7 @@ public class ExcelHelper {
 	
 							// Agregar el estilo
 							hssfCell.setCellStyle(hssfCellStyleCabecera);
-							hssfSheet.autoSizeColumn((short) numeroColumna); 
+							//hssfSheet.autoSizeColumn((short) numeroColumna); 
 							numeroColumna++;
 						}
 						numeroFila++;
@@ -379,7 +379,7 @@ public class ExcelHelper {
 							//log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque agregar el estilo");
 							// Agregar el estilo
 							hssfCell.setCellStyle(hssfCellStyleContenido);
-							hssfSheet.autoSizeColumn((short) numeroColumnaDatos);
+							//hssfSheet.autoSizeColumn((short) numeroColumnaDatos);
 							numeroColumnaDatos++;
 							//LOGGER.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque agregar el estilo");
 						}
