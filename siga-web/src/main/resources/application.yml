@@ -1,5 +1,7 @@
 application:
   permisos:
+    # Permisos Censo
+    /busquedaColegiados/generarExcel: [ 1AA ]
     # Permisos para el módulo de FacturacionSJCS
     /facturacionsjcs/eliminarFacturacion: [ 600 ]
     /facturacionsjcs/simularfacturacion: [601, 602, 603]
