@@ -569,9 +569,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
                 }
             }
             
-            for (int j = 0; j < index; j++) {
+            /*for (int j = 0; j < index; j++) {
                 sheet.autoSizeColumn(j);
-            }
+            }*/
         }
         
         
