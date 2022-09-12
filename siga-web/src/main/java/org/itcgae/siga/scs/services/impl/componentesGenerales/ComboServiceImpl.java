@@ -214,7 +214,7 @@ public class ComboServiceImpl implements ComboService {
 						"comboTipoEjgColegio() / scsTipoEJGColegioExtendsMapper.comboTipoEjgColegio() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo TipoEjgColegio");
 
 				List<ComboItem> comboItems = scsTipoEJGColegioExtendsMapper
-						.comboTipoEjgColegio(Short.parseShort(usuarios.get(0).getIdlenguaje()));
+						.comboTipoEjgColegio(Short.parseShort(usuarios.get(0).getIdlenguaje()),idInstitucion.toString());
 
 				LOGGER.info(
 						"comboTipoEjgColegio() / scsTipoEJGColegioExtendsMapper.comboTipoEjgColegio() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo TipoEjgColegio");
