@@ -185,6 +185,8 @@ public class ExcelHelper {
 		HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
 		try {
 			log.info("Generando plantilla excel generarLibroExcelUnaHoja");
+            log.debug("Inicio generación Xls "+new Date());
+            
 			HSSFSheet hssfSheet = hssfWorkbook.createSheet("Hoja 1");
 			int numeroFila = 0;
 			int numeroColumna = 0;
@@ -222,7 +224,7 @@ public class ExcelHelper {
 
 					// Agregar el estilo
 					hssfCell.setCellStyle(hssfCellStyleCabecera);
-					hssfSheet.autoSizeColumn((short) i);
+					//hssfSheet.autoSizeColumn((short) i);
 					numeroColumna++;
 				}
 				numeroFila++;
@@ -269,7 +271,7 @@ public class ExcelHelper {
 
 							// Agregar el estilo
 							hssfCell.setCellStyle(hssfCellStyleCabecera);
-							hssfSheet.autoSizeColumn((short) numeroColumna); 
+							//hssfSheet.autoSizeColumn((short) numeroColumna); 
 							numeroColumna++;
 						}
 						numeroFila++;
@@ -350,14 +352,15 @@ public class ExcelHelper {
 
 							// Agregar el estilo
 							hssfCell.setCellStyle(hssfCellStyleContenido);
-							hssfSheet.autoSizeColumn((short) numeroColumnaDatos);
+							//hssfSheet.autoSizeColumn((short) numeroColumnaDatos);
 							numeroColumnaDatos++;
 						}
 						numeroFila++;
 					}
 				}
 			}
-
+            log.debug("Fin generación Xls "+new Date());
+            
 		} catch (Exception e) {
 			log.error("Se ha producido un error al generar el fichero excel generarLibroExcelUnaHoja", e);
 			throw new BusinessException("Se ha producido un error al generar el fichero excel generarLibroExcelUnaHoja", e);

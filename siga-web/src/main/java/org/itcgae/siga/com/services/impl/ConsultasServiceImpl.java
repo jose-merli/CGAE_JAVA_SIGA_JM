@@ -1514,9 +1514,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 				}
 			}
 
-			for (int i = 0; i < index; i++) {
+			/*for (int i = 0; i < index; i++) {
 				sheet.autoSizeColumn(i);
-			}
+			}*/
 		}
 
 		return workbook;

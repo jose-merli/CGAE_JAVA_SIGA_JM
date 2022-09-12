@@ -703,6 +703,13 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					LOGGER.warn("getCargos() / cenComponentesExtendsMapper.updateMember() -> "
 							+ updateResponseDTO.getStatus() + ". No se pudo actualizar datos de un integrantes");
 
+				} else {
+					CenClienteKey key = new CenClienteKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIdpersona(Long.valueOf(tarjetaIntegrantesDeleteDTO[i].getIdPersona()));
+					CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key);
+					cliente.setFechaactualizacion(new Date());
+					cenClienteMapper.updateByPrimaryKey(cliente);
 				}
 			}
 

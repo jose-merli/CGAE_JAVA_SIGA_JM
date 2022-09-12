@@ -383,9 +383,9 @@ public class EnviosServiceImpl implements IEnviosService{
     		
     		try {
     		
-	    		for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
+	    		/*for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
 	                sheet.autoSizeColumn(i);
-	            }
+	            }*/
 	    		
 	            File file = _enviosMasivosService.getPathFicheroLOGEnvioMasivo(idinstitucion, idenvio);
 	            
@@ -605,9 +605,9 @@ public class EnviosServiceImpl implements IEnviosService{
     		
     		try {
     		
-	    		for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
+	    		/*for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
 	                sheet.autoSizeColumn(i);
-	            }
+	            }*/
 	    		
 	            File file = _enviosMasivosService.getPathFicheroLOGEnvioMasivo(idinstitucion, idenvio);
 	            

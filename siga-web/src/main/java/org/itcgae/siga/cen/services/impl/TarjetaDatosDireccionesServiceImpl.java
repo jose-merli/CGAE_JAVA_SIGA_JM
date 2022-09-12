@@ -843,6 +843,13 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 									cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
 							LOGGER.warn("updateDirection() / Salida de auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones() ");	
 						}
+						
+						CenClienteKey keyCliente = new CenClienteKey();
+						keyCliente.setIdinstitucion(idInstitucion);
+						keyCliente.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+						cliente.setFechaactualizacion(new Date());
+						cenClienteMapper.updateByPrimaryKey(cliente);
 					} else {
 						LOGGER.info(
 								"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
@@ -922,6 +929,13 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 									"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
 							updateResponseDTO.setStatus(SigaConstants.OK);
 						}
+						
+						CenClienteKey keyCliente = new CenClienteKey();
+						keyCliente.setIdinstitucion(idInstitucion);
+						keyCliente.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						CenCliente cliente = cenClienteMapper.selectByPrimaryKey(keyCliente);
+						cliente.setFechaactualizacion(new Date());
+						cenClienteMapper.updateByPrimaryKey(cliente);
 
 						// AUDITORIA
 						if (!UtilidadesString.esCadenaVacia(datosDireccionesItem.getMotivo())) {
