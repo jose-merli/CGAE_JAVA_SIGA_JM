@@ -1377,7 +1377,7 @@ public class ComboServiceImpl implements ComboService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = scsDesignacionesExtendsMapper.comboProcedimientos(idInstitucion);
+				comboItems = scsDesignacionesExtendsMapper.comboProcedimientos(idInstitucion, usuarios.get(0).getIdlenguaje());
 
 				comboDTO.setCombooItems(comboItems);
 
