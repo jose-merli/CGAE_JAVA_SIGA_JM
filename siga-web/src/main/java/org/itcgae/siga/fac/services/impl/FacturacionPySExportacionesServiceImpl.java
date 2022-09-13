@@ -333,8 +333,8 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
         // Parámetros de entrada
         param_in[0] = usuario.getIdinstitucion();
-        param_in[1] = idSerieFacturacion;
-        param_in[2] = idProgramacion;
+        param_in[1] = Integer.valueOf(idSerieFacturacion);
+        param_in[2] = Integer.valueOf(idProgramacion);
         param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
         param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
         param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
@@ -342,14 +342,14 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
         param_in[8] = pathFichero;
         param_in[9] = usuario.getIdusuario();
-        param_in[10] = usuario.getIdlenguaje();
+        param_in[10] = Integer.valueOf(usuario.getIdlenguaje());
 
         String[] resultado = commons.callPLProcedureFacturacionPyS(
                 "{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
 
         String[] codigosErrorFormato = {"5412", "5413", "5414", "5415", "5416", "5417", "5418", "5421", "5422"};
         if(resultado == null) {
-        	LOGGER.info("nuevoFicheroAdeudos() ERROR -> Resultado null.");
+        	LOGGER.warn("nuevoFicheroAdeudos() ERROR -> Resultado null.");
             throw new Exception();
         }
         if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
