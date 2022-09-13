@@ -8,7 +8,7 @@ public class ScsTipoEJGColegioSqlExtendsProvider extends ScsTipoejgcolegioSqlPro
 
 	private Logger LOGGER = Logger.getLogger(ScsTipoEJGColegioSqlExtendsProvider.class);
 
-	public String comboTipoEjgColegio(Short idLenguaje) {
+	public String comboTipoEjgColegio(Short idLenguaje, String idInstitucion) {
  
 		SQL sql = new SQL();
 
@@ -18,6 +18,7 @@ public class ScsTipoEJGColegioSqlExtendsProvider extends ScsTipoejgcolegioSqlPro
 		sql.INNER_JOIN(
 				"gen_recursos_catalogos cat on cat.IDRECURSO = tipoejg.descripcion and cat.idlenguaje = '"
 						+ idLenguaje + "'");
+		sql.WHERE("tipoejg.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("tipoejg.fecha_baja is null");
 		sql.ORDER_BY("cat.descripcion");
 
