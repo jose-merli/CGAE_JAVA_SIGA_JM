@@ -88,7 +88,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.numejg numejg");
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
 		sql.SELECT(
-				"(CASE WHEN TURNO.NOMBRE is  NULL THEN '' ELSE TURNO.NOMBRE || '/' || GUARDIA.NOMBRE END) AS TURNOGUARDIA");
+				"(CASE WHEN TURNO.NOMBRE is  NULL THEN '' ELSE TURNO.ABREVIATURA || ' / ' || GUARDIA.NOMBRE END) AS TURNOGUARDIA");
 		sql.SELECT("TURNO.ABREVIATURA AS TURNO");
 		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("ejg.fechaapertura");
