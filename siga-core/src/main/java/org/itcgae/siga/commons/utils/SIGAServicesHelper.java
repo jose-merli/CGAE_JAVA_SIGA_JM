@@ -52,6 +52,7 @@ public class SIGAServicesHelper {
 			theBAOS.flush();
 
 		} catch (Exception e) {
+			LOGGER.warn("Error upload Fichero() " + e.getMessage());
 			throw new BusinessException("Error upload Fichero"+e.getClass().getName());
 		}finally{
 			if(theBAOS!=null)
