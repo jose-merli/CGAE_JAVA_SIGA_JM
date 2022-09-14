@@ -247,6 +247,22 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         return query.toString();
     }
 
+    public String getUltimoNumeroAbono(String prefijo, String sufijo, Integer logitud, Short idInstitucion) {
+        if (prefijo == null) prefijo = "";
+        if (sufijo == null) sufijo = "";
+
+        SQL subquery = new SQL();
+        subquery.SELECT(String.format("TO_NUMBER(REGEXP_SUBSTR(fa.numeroabono, '^%s([[:digit:]]{%s})%s$', 1, 1, 'c', 1)) AS numeroAbono", prefijo, logitud, sufijo));
+        subquery.FROM("FAC_ABONO fa");
+        subquery.WHERE("fa.NUMEROABONO IS NOT NULL AND fa.IDINSTITUCION = " + idInstitucion);
+
+        SQL sql = new SQL();
+        sql.SELECT("NVL(MAX(numeroAbono), 0)");
+        sql.FROM("( " + subquery.toString() + " )");
+        sql.WHERE("NUMEROABONO IS NOT NULL");
+        return sql.toString();
+    }
+
     public String getAbonoAnterior(Short idInstitucion, String fecha) {
 
         SQL subQuery = new SQL();

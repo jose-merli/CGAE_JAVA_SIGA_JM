@@ -1029,31 +1029,19 @@ public class UtilidadesPagoSJCS {
 
             }
 
-            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.hayAbonoPosterior() -> Comprobamos si hay abonos posteriores a los relacionados con nuestro pago");
-            List<FacAbono> hayAbonoPosterior = facAbonoExtendsMapper.hayAbonoPosterior(idInstitucion, pago.getIdpagosjg());
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getUltimoNumeroAbono() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
+                    "con nuestro pago");
 
-            if (!hayAbonoPosterior.isEmpty()) {
-                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
-                        "con nuestro pago");
+            AdmContadorKey admContadorKey = new AdmContadorKey();
+            admContadorKey.setIdcontador(SigaConstants.CONTADOR_ABONOS_PAGOSJG);
+            admContadorKey.setIdinstitucion(idInstitucion);
 
-                SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                String fecha = formato.format(hayAbonoPosterior.get(0).getFecha());
+            AdmContador contador = admContadorExtendsMapper.selectByPrimaryKey(admContadorKey);
+            Long newContador = facAbonoExtendsMapper.getUltimoNumeroAbono(contador.getPrefijo(), contador.getSufijo(), contador.getLongitudcontador(), contador.getIdinstitucion());
+            contador.setContador(newContador);
 
-                List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, fecha);
-
-                AdmContador admContador = new AdmContador();
-                admContador.setIdcontador(SigaConstants.CONTADOR_ABONOS_PAGOSJG);
-                admContador.setIdinstitucion(idInstitucion);
-
-                if (abonoAnterior.isEmpty()) {
-                    admContador.setContador(0L);
-                } else {
-                    admContador.setContador(abonoAnterior.get(0));
-                }
-
-                LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> admContadorExtendsMapper.updateByPrimaryKeySelective() -> Actualizamos el contador");
-                admContadorExtendsMapper.updateByPrimaryKeySelective(admContador);
-            }
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> admContadorExtendsMapper.updateByPrimaryKeySelective() -> Actualizamos el contador");
+            admContadorExtendsMapper.updateByPrimaryKeySelective(contador);
         }catch (Exception e){
             LOGGER.error(e.getMessage());
             LOGGER.error(e.getCause());
@@ -1210,6 +1198,8 @@ public class UtilidadesPagoSJCS {
             fcsPagosEstadospagosKey.setIdpagosjg(pago.getIdpagosjg());
             fcsPagosEstadospagosMapper.deleteByPrimaryKey(fcsPagosEstadospagosKey);
             throw e;
+        } finally {
+            FacturacionSJCSServicesImpl.setNadieEjecutando();
         }
 
     }
@@ -1259,6 +1249,8 @@ public class UtilidadesPagoSJCS {
             fcsPagosEstadospagosKey.setIdpagosjg(pago.getIdpagosjg());
             fcsPagosEstadospagosMapper.deleteByPrimaryKey(fcsPagosEstadospagosKey);
             throw e;
+        } finally {
+            FacturacionSJCSServicesImpl.setNadieEjecutando();
         }
     }
 
