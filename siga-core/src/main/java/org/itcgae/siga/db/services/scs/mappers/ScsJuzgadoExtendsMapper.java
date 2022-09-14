@@ -82,13 +82,13 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR)
 	})
-	List<JuzgadoItem> comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion);
+	List<JuzgadoItem> comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion,String idJuzgado);
 	
 	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "getJuzgadosByIdTurno")
 	@Results({
 		@Result(column = "idjuzgado", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ComboItem> getJuzgadosByIdTurno(Short idInstitucion, String idTurno);
+	List<ComboItem> getJuzgadosByIdTurno(Short idInstitucion, String idTurnoo);
 
 }

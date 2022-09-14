@@ -263,7 +263,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboProcedimientos")
 	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> comboProcedimientos(Short idInstitucion);
+	List<ComboItem> comboProcedimientos(Short idInstitucion,String idLenguaje);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaListaContrarios")
 	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),

@@ -1872,10 +1872,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboProcedimientos(Short idInstitucion) {
+	public String comboProcedimientos(Short idInstitucion,String idLenguaje) {
 
 		SQL sql = new SQL();
-		sql.SELECT(" DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS NOMBRE");
+		sql.SELECT(" DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, "+idLenguaje+") AS NOMBRE");
 		sql.FROM("SCS_PRETENSION");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("FECHABAJA IS NULL");

@@ -952,7 +952,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				LOGGER.info(
 						"comboTipoColegioEjg() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				comboItems = scsTipoejgcolegioExtendsMapper.comboTipoEjgColegio(Short.valueOf(usuarios.get(0).getIdlenguaje()));
+				comboItems = scsTipoejgcolegioExtendsMapper.comboTipoEjgColegio(Short.valueOf(usuarios.get(0).getIdlenguaje()), idInstitucion.toString());
 
 				LOGGER.info(
 						"comboTipoColegioEjg() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");

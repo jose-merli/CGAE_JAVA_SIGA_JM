@@ -1459,6 +1459,23 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 	private StringBuffer CheckGrupoOrden2(CargaMasivaDatosGuardiatem cargaMasivaDatosITItem, StringBuffer errorLinea,
 			Short idInstitucion, Hashtable<String, Object> hashtable, Vector<Hashtable<String, Object>> datos) {
+		boolean porGrupo = false;
+		//Obtenemos Datos de la guardia para saber si está por grupos.
+		ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+		example.createCriteria().andIdguardiaEqualTo(Integer.valueOf(cargaMasivaDatosITItem.getIdGuardia()))
+				.andIdturnoEqualTo(Integer.valueOf(cargaMasivaDatosITItem.getIdTurno()))
+				.andIdinstitucionEqualTo(idInstitucion);
+
+		List<ScsGuardiasturno> guardiasList = scsGuardiasturnoExtendsMapper.selectByExample(example);
+		if (guardiasList != null && guardiasList.size() > 0) {
+			ScsGuardiasturno guardia = guardiasList.get(0);
+			if(guardia.getPorgrupos().equalsIgnoreCase("1")) 
+				porGrupo = true;
+		}else {
+			return errorLinea;
+		}
+		
+		/*
 		// Comprobamos que la guardia esta en un grupo. Se cambian los valores pero no
 		// se añade un error para que no impida su posible insercion
 		List<CargaMasivaDatosITItem> group = scsInscripcionguardiaExtendsMapper.searchGrupoGuardia(idInstitucion,
@@ -1466,7 +1483,12 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		if (group.isEmpty()) {
 			cargaMasivaDatosITItem.setOrden("Error");
 			cargaMasivaDatosITItem.setGrupo("Error");
-		} else {
+		} else { 
+		*/
+		if(!porGrupo) {
+			cargaMasivaDatosITItem.setOrden("Error");
+			cargaMasivaDatosITItem.setGrupo("Error");
+		}else {
 			int colegr = 0;
 			// Comprobamos si el colegiado ya esta en el grupo.
 			List<CargaMasivaDatosITItem> gr = scsInscripcionguardiaExtendsMapper
@@ -1758,6 +1780,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									// INSERTAMOS GRUPOGUARDIA
 									// NewIdDTO lastIdGG = scsGrupoguardiaMapper.getLastId();
 									listInscrip.forEach(inscripcion -> {
+										CargaMasivaDatosGuardiatem aux = cargaMasivaDatosGCItem;
 										ScsGrupoguardia grupo = new ScsGrupoguardia();
 										grupo.setFechacreacion(new Date());
 										grupo.setIdguardia(inscripcion.getIdguardia());
@@ -1768,7 +1791,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										// grupo.setFechasuscripcion(new Date());
 										// grupo.setIdgrupoguardiacolegiado(Long.parseLong(lastIdGGC.getNewId()) + 1);
 										// grupo.setOrden(Integer.parseInt(cargaMasivaDatosGCItem.getOrden()));
-										grupo.setNumerogrupo(Integer.parseInt(cargaMasivaDatosGCItem.getGrupo()));
+										grupo.setNumerogrupo(Integer.parseInt(aux.getGrupo()));
 										// grupo.setIdgrupoguardia(Long.parseLong(lastIdGG.getNewId()) + 1);
 										grupo.setUsucreacion(
 												Integer.parseInt(usuarios.get(0).getIdusuario().toString()));
