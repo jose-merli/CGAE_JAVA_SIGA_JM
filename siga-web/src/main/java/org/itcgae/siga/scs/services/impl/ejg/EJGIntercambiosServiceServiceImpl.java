@@ -3,21 +3,27 @@ package org.itcgae.siga.scs.services.impl.ejg;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
-import org.itcgae.siga.DTOs.scs.DocumentacionEjgItem;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EjgListaIntercambiosDTO;
 import org.itcgae.siga.DTOs.scs.EjgListaIntercambiosItem;
+import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsDocumentacionejgKey;
+import org.itcgae.siga.db.entities.ScsEejgPeticiones;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.entities.ScsPersonajg;
+import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.mappers.ScsDocumentacionejgMapper;
+import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
+import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
+import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.ecom.mappers.EcomIntercambioExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IEJGIntercambiosService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
@@ -25,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -42,10 +50,21 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
     private ScsDocumentacionejgMapper scsDocumentacionejgMapper;
 
     @Autowired
+    private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
+
+    @Autowired
+    private ScsPersonajgMapper scsPersonajgMapper;
+
+    @Autowired
+    private ScsEejgPeticionesMapper scsEejgPeticionesMapper;
+
+    @Autowired
     private EcomIntercambioExtendsMapper ecomIntercambioExtendsMapper;
 
     @Autowired
     private EJGIntercambiosHelper ejgIntercambiosHelper;
+
+    private static final Short[] EXCEPCIONES_ZONA_COMUN = new Short[] {Short.valueOf("2055"), Short.valueOf("2032")};
 
     @Override
     public ResponseDataDTO esColegioZonaComun(HttpServletRequest request) throws Exception {
@@ -68,6 +87,32 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         responseDataDTO.setData(esZonaComun.toString());
 
         LOGGER.info("esColegioZonaComun() <- Saliendo del servicio que comprueba si el colegio pertenece a la zona común y está configurado para la integración con Pericles");
+
+        return responseDataDTO;
+    }
+
+    @Override
+    public ResponseDataDTO esColegioConfiguradoEnvioCAJG(HttpServletRequest request) throws Exception {
+        LOGGER.info("esColegioConfiguradoEnvioCAJG() -> Entrando al servicio que comprueba si el colegio pertenece a la zona común y está configurado para la integración con Pericles o es Guipúzcoa o Navarra");
+
+        ResponseDataDTO responseDataDTO = new ResponseDataDTO();
+
+        // Conseguimos información del usuario logeado
+        LOGGER.info("esColegioConfiguradoEnvioCAJG() -> Entrando al servicio de autenticación");
+        AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+        LOGGER.info("esColegioConfiguradoEnvioCAJG() <- Saliendo del servicio de autenticación");
+
+        if (usuario.getIdinstitucion() == null) {
+            LOGGER.warn("esColegioConfiguradoEnvioCAJG() -> Error: no se ha introducido una idInstitucion válida");
+            throw new Exception("No se ha introducido una idInstitucion válida");
+        }
+
+        Boolean esZonaComun = ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
+                && ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion())
+                || Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion());
+        responseDataDTO.setData(esZonaComun.toString());
+
+        LOGGER.info("esColegioConfiguradoEnvioCAJG() <- Saliendo del servicio que comprueba si el colegio pertenece a la zona común y está configurado para la integración con Pericles o es Guipúzcoa o Navarra");
 
         return responseDataDTO;
     }
@@ -116,7 +161,9 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         LOGGER.info("getListadoIntercambiosDocumentacionEJG() <- Saliendo del servicio de autenticación");
 
         Short idInstitucion = Short.parseShort(item.getidInstitucion());
-        if (!ejgIntercambiosHelper.isColegioZonaComun(idInstitucion) || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(idInstitucion)) {
+        if ((!ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
+                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion()))
+                && !Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
             LOGGER.warn("getListadoIntercambiosDocumentacionEJG() -> El colegio con idInstitucion=" + idInstitucion + " no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
         }
@@ -155,7 +202,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
                 Short.parseShort(ejgItem.getAnnio()), Short.parseShort(ejgItem.getTipoEJG()), Long.parseLong(ejgItem.getNumero()));
         if (ejg == null) {
             LOGGER.warn("consultarEstadoPericles() -> Error: No se ha encontrado el EJG indicado");
-            throw new Exception(("No se ha encontrado el EJG indicado"));
+            throw new Exception("No se ha encontrado el EJG indicado");
         }
 
         if (!ejgIntercambiosHelper.isColegioZonaComun(ejg.getIdinstitucion())
@@ -167,7 +214,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
         estadoejgExample.createCriteria().andIdinstitucionEqualTo(ejg.getIdinstitucion())
                 .andAnioEqualTo(ejg.getAnio()).andIdtipoejgEqualTo(ejg.getIdtipoejg())
-                .andNumeroEqualTo(ejg.getNumero()).andFechabajaIsNotNull();
+                .andNumeroEqualTo(ejg.getNumero());
         estadoejgExample.setOrderByClause("IDESTADOPOREJG");
 
         List<ScsEstadoejg> estados = scsEstadoejgMapper.selectByExample(estadoejgExample);
@@ -208,8 +255,9 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
             throw new Exception("No se ha encontrado el EJG indicado");
         }
 
-        if (!ejgIntercambiosHelper.isColegioZonaComun(ejg.getIdinstitucion())
-                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(ejg.getIdinstitucion())) {
+        if ((!ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
+                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion()))
+                && !Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
             LOGGER.warn("enviaDocumentacionAdicional() -> Error: El colegio no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
         }
@@ -232,6 +280,105 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         ejgIntercambiosHelper.insertarDocumentacionAdicionalEnCola(documentacionejg);
 
         LOGGER.info("enviaDocumentacionAdicional() <- Saliendo del servicio para enviar documentación adicional");
+        return updateResponseDTO;
+    }
+
+    @Override
+    public UpdateResponseDTO enviaDocumentacionAdicionalRegtel(EjgItem ejgItem, HttpServletRequest request) throws Exception {
+        LOGGER.info("enviaDocumentacionAdicionalRegtel() -> Entrando al servicio para enviar documentación adicional");
+
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+        // Conseguimos información del usuario logeado
+        LOGGER.info("enviaDocumentacionAdicionalRegtel() -> Entrando al servicio de autenticación");
+        AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+        LOGGER.info("enviaDocumentacionAdicionalRegtel() -> Saliendo del servicio de autenticación");
+
+        if (UtilidadesString.anyMatchCadenaVacia(ejgItem.getAnnio(), ejgItem.getTipoEJG(), ejgItem.getNumero(), ejgItem.getIdentificadords())) {
+            LOGGER.warn("enviaDocumentacionAdicionalRegtel() -> Error: Falta alguno de los parámetros necesarios para realizar la petición");
+            throw new Exception("Falta alguno de los parámetros necesarios para realizar la petición");
+        }
+
+        ScsEjg ejg = ejgIntercambiosHelper.getScsEjg(usuario.getIdinstitucion(),
+                Short.parseShort(ejgItem.getAnnio()), Short.parseShort(ejgItem.getTipoEJG()),
+                Long.parseLong(ejgItem.getNumero()));
+        if (ejg == null) {
+            LOGGER.warn("enviaDocumentacionAdicionalRegtel() -> Error: No se ha encontrado el EJG indicado");
+            throw new Exception("No se ha encontrado el EJG indicado");
+        }
+
+        if ((!ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
+                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion()))
+                && !Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
+            LOGGER.warn("enviaDocumentacionAdicionalRegtel() -> Error: El colegio no pertenece a la zona común");
+            throw new Exception("El colegio no pertenece a la zona común");
+        }
+
+        ejgIntercambiosHelper.insertarDocumentacionRegtelAdicionalEnCola(ejg, ejgItem.getIdentificadords());
+
+        LOGGER.info("enviaDocumentacionAdicional() <- Saliendo del servicio para enviar documentación adicional");
+        return updateResponseDTO;
+    }
+
+    @Override
+    public UpdateResponseDTO enviaDocumentacionAdicionalUnidadFamiliar(ExpedienteEconomicoItem expedienteEconomicoItem, HttpServletRequest request) throws Exception {
+        LOGGER.info("enviaDocumentacionAdicionalExpedienteEconomico() -> Entrando al servicio para enviar documentación adicional de expediente económico");
+
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+        // Conseguimos información del usuario logeado
+        LOGGER.info("enviaDocumentacionAdicionalExpedienteEconomico() -> Entrando al servicio de autenticación");
+        AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+        LOGGER.info("enviaDocumentacionAdicionalExpedienteEconomico() -> Saliendo del servicio de autenticación");
+
+        if ((!ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
+                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion()))
+                && !Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
+            LOGGER.warn("enviaDocumentacionAdicionalExpedienteEconomico() -> Error: El colegio no pertenece a la zona común");
+            throw new Exception("El colegio no pertenece a la zona común");
+        }
+
+        if (UtilidadesString.anyMatchCadenaVacia(expedienteEconomicoItem.getIdPeticion())) {
+            LOGGER.warn("enviaDocumentacionAdicionalExpedienteEconomico() -> Error: Falta alguno de los parámetros necesarios para realizar la petición");
+            throw new Exception("Falta alguno de los parámetros necesarios para realizar la petición");
+        }
+
+        ScsEejgPeticiones eejgPeticiones = scsEejgPeticionesMapper.selectByPrimaryKey(new BigDecimal(expedienteEconomicoItem.getIdPeticion()));
+        if (eejgPeticiones == null) {
+            LOGGER.warn("enviaDocumentacionAdicionalExpedienteEconomico() -> Error: No se ha encontrado el expediente económico");
+            throw new Exception("No se ha encontrado el expediente económico");
+        }
+
+        if (eejgPeticiones.getCsv() == null || eejgPeticiones.getEstado().equals(40L) || UtilidadesString.esCadenaVacia(eejgPeticiones.getNif())) {
+            LOGGER.warn("enviaDocumentacionAdicionalExpedienteEconomico() -> Error: No se puede realizar el envío de documentación para el expediente seleccionado");
+            throw new Exception("No se puede realizar el envío de documentación para el expediente seleccionado");
+        }
+
+        ScsEjg ejg = ejgIntercambiosHelper.getScsEjg(usuario.getIdinstitucion(),
+                eejgPeticiones.getAnio(), eejgPeticiones.getIdtipoejg(), eejgPeticiones.getNumero());
+        if (ejg == null) {
+            LOGGER.warn("enviaDocumentacionAdicionalExpedienteEconomico() -> Error: No se ha encontrado el EJG indicado");
+            throw new Exception("No se ha encontrado el EJG indicado");
+        }
+
+        if (ejg.getIdexpedienteext() == null) {
+            LOGGER.warn("enviaDocumentacionAdicionalExpedienteEconomico() -> Error: El EJG no tiene el identificador de Pericles");
+            throw new Exception("El EJG no tiene el identificador de Pericles");
+        }
+
+        ScsPersonajgKey personajgKey = new ScsPersonajgKey();
+        personajgKey.setIdinstitucion(eejgPeticiones.getIdinstitucion());
+        personajgKey.setIdpersona(eejgPeticiones.getIdpersona());
+        ScsPersonajg persona = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+
+        if (persona.getIdtipoidentificacion() != (short) 10 && persona.getIdtipoidentificacion() != (short) 40) {
+            LOGGER.warn("enviaDocumentacionAdicionalExpedienteEconomico() -> Error: No se puede realizar el envío de documentación para el expediente seleccionado");
+            throw new Exception("No se puede realizar el envío de documentación para el expediente seleccionado");
+        }
+
+        ejgIntercambiosHelper.insertarDocumentacionExpedienteEconomicoAdicionalEnCola(eejgPeticiones);
+
+        LOGGER.info("enviaDocumentacionAdicionalExpedienteEconomico() <- Saliendo del servicio para enviar documentación adicional de expediente económico");
         return updateResponseDTO;
     }
 

@@ -66,7 +66,7 @@ public interface ComboService {
 
 	public ComboDTO comboConjuntoGuardias(HttpServletRequest request);
 	
-	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request);
+	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request, String idJuzgado);
 	
 	public ComboDTO comboJuzgadoPorInstitucion(String idInstitucion, HttpServletRequest request);
 	

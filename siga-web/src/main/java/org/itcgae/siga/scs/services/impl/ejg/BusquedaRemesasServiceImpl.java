@@ -159,6 +159,9 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	
 	@Autowired
     private ScsEejgPeticionesExtendsMapper ScsEejgpeticionesExtendsMapper;
+
+	@Autowired
+	private EJGIntercambiosHelper ejgIntercambiosHelper;
 	
 	@Autowired
     private GestorContadores gestor;
@@ -1037,12 +1040,25 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			if (remesaAccionItem.getAccion() != 8) {
 				if(validar) {
 					insertResponseDTO = validaEnviaExpedientes(idInstitucion, remesaAccionItem, parametro.getValor(), gr.getDescripcion(), request, usuarios.get(0).getUsumodificacion());
-				}else {
+
+				} else {
 					LOGGER.error("Error al validar la remesa. No cumple los requisitos");
 					error.setCode(200);
 					error.setDescription("Error al validar la remesa. No cumple los requisitos.");
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setError(error);
+				}
+
+				if (remesaAccionItem.getAccion() == 2 && ejgIntercambiosHelper.isColegioZonaComun(idInstitucion)
+						&& ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(idInstitucion)) {
+					if(insertResponseDTO.getStatus().equals(SigaConstants.OK) && insertResponseDTO.getError().getCode() == 200) {
+						LOGGER.debug("ejecutaOperacionRemesa() / insertaEstadoEjgEnviandoPericles() -> Comenzando el envío de los EJG al servicio de Pericles");
+						CajgRemesa cajgRemesaKey = new CajgRemesa();
+						cajgRemesaKey.setIdinstitucion(idInstitucion);
+						cajgRemesaKey.setIdremesa(Long.valueOf(remesaAccionItem.getIdRemesa()));
+						insertResponseDTO = insertaEstadoEjgEnviandoPericles(cajgRemesaKey, usuarios.get(0));
+						LOGGER.debug("ejecutaOperacionRemesa() / insertaEstadoEjgEnviandoPericles() -> Finalizando el envío de los EJG al servicio de Pericles");
+					}
 				}
 			}
 
@@ -1385,6 +1401,56 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			insertResponseDTO.setStatus(SigaConstants.OK);
 		}
 		
+		return insertResponseDTO;
+	}
+
+	private InsertResponseDTO insertaEstadoEjgEnviandoPericles(CajgRemesa cajgRemesa, AdmUsuarios usuario) {
+		// TODO Auto-generated method stub
+		int insertados = 0;
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+
+		try {
+			if (cajgRemesa == null || cajgRemesa.getIdinstitucion() == null || cajgRemesa.getIdremesa() == null) {
+				LOGGER.warn("Se ha recibido un cajgremesa no válido");
+				throw new IllegalArgumentException("Se debe indicar el idinstitución e idremesa");
+			}
+
+			CajgEjgremesaExample cajgEjgremesaExample = new CajgEjgremesaExample();
+
+			cajgEjgremesaExample.createCriteria().andIdinstitucionEqualTo(cajgRemesa.getIdinstitucion()).andIdremesaEqualTo(cajgRemesa.getIdremesa());
+			List<CajgEjgremesa> listaEJGsRemesa = cajgEjgremesaExtendsMapper.selectByExample(cajgEjgremesaExample);
+			if (listaEJGsRemesa != null && listaEJGsRemesa.size() > 0) {
+				for (CajgEjgremesa cajgEjgremesa : listaEJGsRemesa) {
+					ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
+					estadoejgExample.createCriteria().andIdinstitucionEqualTo(cajgEjgremesa.getIdinstitucion())
+							.andAnioEqualTo(cajgEjgremesa.getAnio()).andIdtipoejgEqualTo(cajgEjgremesa.getIdtipoejg())
+							.andNumeroEqualTo(cajgEjgremesa.getNumero());
+					estadoejgExample.setOrderByClause("IDESTADOPOREJG");
+
+					List<ScsEstadoejg> estados = scsEstadoejgExtendsMapper.selectByExample(estadoejgExample);
+					if (estados != null && !estados.isEmpty()) {
+						ejgIntercambiosHelper.insertaCambioEstadoPericles(estados.get(estados.size() - 1), usuario);
+					}
+
+				}
+			}
+		}catch(Exception e) {
+			insertados = 0;
+			error.setCode(400);
+			error.setDescription("Se ha producido un error en la inserción los de registros");
+			insertResponseDTO.setStatus(SigaConstants.KO);
+			insertResponseDTO.setError(error);
+			LOGGER.error("Se ha producido un error la inserción los de registros. " + e.getStackTrace());
+		}
+
+		if(insertados != 0) {
+			insertResponseDTO.setId(String.valueOf(cajgRemesa.getIdremesa()));
+			error.setCode(200);
+			error.setDescription("Se han insertado los registros correctamente");
+			insertResponseDTO.setStatus(SigaConstants.OK);
+		}
+
 		return insertResponseDTO;
 	}
 

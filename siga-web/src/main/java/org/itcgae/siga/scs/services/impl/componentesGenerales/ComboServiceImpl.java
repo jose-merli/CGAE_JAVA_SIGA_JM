@@ -3,6 +3,8 @@ package org.itcgae.siga.scs.services.impl.componentesGenerales;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -1186,7 +1188,7 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request) {
+	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request,String idJuzgado) {
 
 		LOGGER.info("comboJuzgadoDesignaciones() -> Entrada al servicio para búsqueda de Juzgado");
 		String token = request.getHeader("Authorization");
@@ -1196,7 +1198,7 @@ public class ComboServiceImpl implements ComboService {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (usuarios != null && usuarios.size() > 0) {
 
@@ -1204,7 +1206,7 @@ public class ComboServiceImpl implements ComboService {
 						"comboJuzgadoDesignaciones() / scsJuzgadoExtendsMapper.comboJuzgadoDesignaciones() -> Entrada a scsJuzgadoExtendsMapper para obtener combo Juzgado");
 
 				List<JuzgadoItem> juzgadosItems = scsJuzgadoExtendsMapper
-						.comboJuzgadoDesignaciones(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
+						.comboJuzgadoDesignaciones(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion,idJuzgado);
 
 				LOGGER.info(
 						"comboJuzgadoDesignaciones() / scsJuzgadoExtendsMapper.comboJuzgadoDesignaciones() -> Salida a scsJuzgadoExtendsMapper para obtener combo Juzgado");
@@ -1213,11 +1215,17 @@ public class ComboServiceImpl implements ComboService {
 				for (JuzgadoItem j : juzgadosItems) {
 					ComboItem comboItem = new ComboItem();
 					comboItem.setValue(j.getIdJuzgado());
-					comboItem.setLabel(j.getCodigoExt2() + ": " + j.getNombre() + " (" + j.getNombrePoblacion() + ")");
+					// PARENTESIS + Código de selección + PARENTESIS + ESPACIO + Nombre + 
+					// ESPACIO + PARENTESIS + Nombre de Población + PARENTESIS. 
+					//comboItem.setLabel(j.getCodigoExt2() + ": " + j.getNombre() + " (" + j.getNombrePoblacion() + ")");
+					comboItem.setLabel(" (" + j.getCodigoExt2() + ") " + j.getNombre() + " (" + j.getNombrePoblacion() + ")");
 					comboItems.add(comboItem);
+					
 				}
-
+				// Ordenar Combo Juzgado.
+				Collections.sort(comboItems);
 				comboDTO.setCombooItems(comboItems);
+				
 			}
 
 			LOGGER.info("comboJuzgadoDesignaciones() -> Salida del servicio para obtener combo Juzgado");

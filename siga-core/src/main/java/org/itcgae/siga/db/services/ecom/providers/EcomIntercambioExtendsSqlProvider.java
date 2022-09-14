@@ -3,6 +3,8 @@ package org.itcgae.siga.db.services.ecom.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.mappers.EcomIntercambioSqlProvider;
 
+import java.util.Arrays;
+
 public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvider {
 
     private static String CASE_ESTADO_RESPUESTA = "CASE " +
@@ -13,6 +15,7 @@ public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvide
 
     private static String ID_OPERACION_ALTA_EJG = "78";
     private static String ID_OPERACION_DOCUMENTACION_EJG = "79";
+    private static String ID_OPERACION_DOCUMENTACION_ADICIONAL_EJG = "88";
 
     public String getNewId() {
         SQL sql = new SQL();
@@ -42,7 +45,9 @@ public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvide
 
         sql.FROM("ECOM_INTERCAMBIO IC");
 
-        String idEcomCola = getEcomColaListadoIntercambios(ID_OPERACION_DOCUMENTACION_EJG, idInstitucion, anio, idTipoEJG, numero);
+        String idEcomCola = getEcomColaListadoIntercambios(
+                String.join(", ", Arrays.asList(ID_OPERACION_DOCUMENTACION_EJG, ID_OPERACION_DOCUMENTACION_ADICIONAL_EJG)),
+                idInstitucion, anio, idTipoEJG, numero);
         sql.WHERE(String.format("IC.IDECOMCOLA IN (%s)", idEcomCola));
         return sql.toString();
     }

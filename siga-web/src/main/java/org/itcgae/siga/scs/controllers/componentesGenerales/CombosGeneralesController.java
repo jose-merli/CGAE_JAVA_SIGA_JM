@@ -2,6 +2,8 @@ package org.itcgae.siga.scs.controllers.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
+import org.itcgae.siga.DTO.scs.BaremosRequestDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
@@ -212,11 +214,18 @@ public class CombosGeneralesController {
 		ComboDTO response = comboService.comboEstados(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
-	@GetMapping("/comboJuzgadoDesignaciones")
+	/// POST
+	@RequestMapping(value = "/comboJuzgadoDesignaciones",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> searchBaremosGuardia(@RequestBody String idJuzgado, HttpServletRequest request) {
+		ComboDTO response = comboService.comboJuzgadoDesignaciones(request,idJuzgado);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	/*@GetMapping("/comboJuzgadoDesignaciones")
 	public ResponseEntity<ComboDTO> comboJuzgadoDesignaciones(HttpServletRequest request) {
 		ComboDTO response = comboService.comboJuzgadoDesignaciones(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
+	}*/
 
 	@GetMapping("/comboTipoDocAsistencia")
 	public ResponseEntity<ComboDTO> comboTipoDocAsistencia(HttpServletRequest request) {

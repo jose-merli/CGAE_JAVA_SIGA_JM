@@ -60,6 +60,7 @@ public interface ScsEejgPeticionesExtendsMapper extends ScsEejgPeticionesMapper{
 
 	@SelectProvider(type = ScsEejgPeticionesSqlExtendsProvider.class, method = "getExpedientesEconomicos")
 	@Results({
+			@Result(column = "idpeticion", property = "idPeticion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "justiciable", property = "justiciable", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "solicitadopor", property = "solicitadoPor", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fechasolicitud", property = "f_solicitud", jdbcType = JdbcType.DATE),

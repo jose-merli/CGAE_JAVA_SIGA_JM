@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.DocumentacionEjgItem;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.mappers.ScsTipodocumentoejgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsDocumentacionejgExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTipodocumentoejgSqlExtendsProvider;
@@ -68,6 +69,8 @@ public interface ScsDocumentacionEjgExtendsMapper extends ScsTipodocumentoejgMap
 		@Result(column = "labelDocumento", property = "labelDocumento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EjgDocumentacionItem> getDocumentacion(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
-	
+
+	@SelectProvider(type = ScsDocumentacionejgExtendsProvider.class, method = "getDocumentacionParaEnviarPericles")
+	List<ScsDocumentacionejg> getDocumentacionParaEnviarPericles(Short idInstitucion, Short idTipoEjg, Short anio, Long numero, boolean reenviar);
 	
 }
