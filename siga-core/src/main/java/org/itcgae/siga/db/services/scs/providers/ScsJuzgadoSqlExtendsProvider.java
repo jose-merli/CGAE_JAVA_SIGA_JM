@@ -95,16 +95,19 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT("IDJUZGADO");
-		sql.SELECT("DECODE(CODIGOEXT2,NULL,NOMBRE, CODIGOEXT2 || '-' || NOMBRE) AS DESCRIPCION");
-		sql.FROM("SCS_JUZGADO");
+		sql.SELECT("CASE WHEN juzgado.FECHABAJA IS NOT NULL "
+				+ "THEN '(BAJA)(' || juzgado.CODIGOEXT2 || ') ' || juzgado.NOMBRE || ' (' || P.NOMBRE || ')'"
+				+ "ELSE '(' || juzgado.CODIGOEXT2 || ') ' || juzgado.NOMBRE || ' (' || P.NOMBRE || ')'"
+				+ "END AS DESCRIPCION");
+		sql.FROM("SCS_JUZGADO juzgado ");
+		sql.INNER_JOIN(" CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION ");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion + "");
 		return sql.toString();
 	}
 
-	
 	public String comboJuzgadoCdgoExt(Short idLenguaje, Short idInstitucion) {
 		SQL sql = new SQL();
-		
+
 		sql.SELECT("juzgado.CODIGOEXT");
 		sql.SELECT("juzgado.NOMBRE");
 		sql.FROM("SCS_JUZGADO juzgado");
@@ -112,13 +115,15 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
 		sql.WHERE("juzgado.CODIGOEXT is not null");
 		sql.ORDER_BY("juzgado.NOMBRE");
-	
+
 		return sql.toString();
 	}
-	
-	public String comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion) {
+
+	public String comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion, String idJuzgado) {
 
 		SQL sql = new SQL();
+		SQL sqlJuzgado = new SQL();
+		StringBuilder sqlUnion = new StringBuilder();
 
 		sql.SELECT("juzgado.CODIGOEXT2");
 		sql.SELECT("juzgado.NOMBRE");
@@ -127,16 +132,32 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 		sql.FROM("SCS_JUZGADO juzgado");
 		sql.INNER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
 		sql.WHERE("juzgado.fechabaja is null");
-		sql.WHERE("juzgado.CODIGOEXT2 is not null");
 		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
-		sql.ORDER_BY("juzgado.NOMBRE");
 
-		return sql.toString();
+		if (idJuzgado.equals('0')) {
+			sql.ORDER_BY("juzgado.NOMBRE");
+			return sql.toString();
+		} else {
+			sqlUnion.append(sql);
+			sqlUnion.append(" UNION ");
+			sqlJuzgado.SELECT("juzgado.CODIGOEXT2");
+			sqlJuzgado.SELECT("juzgado.NOMBRE");
+			sqlJuzgado.SELECT("P.NOMBRE AS NOMBREPOBLACION");
+			sqlJuzgado.SELECT("juzgado.IDJUZGADO");
+			sqlJuzgado.FROM("SCS_JUZGADO juzgado");
+			sqlJuzgado.INNER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
+			sqlJuzgado.WHERE("juzgado.idjuzgado = " + idJuzgado);
+			sqlJuzgado.WHERE("juzgado.idinstitucion = " + idInstitucion);
+			sqlUnion.append(sqlJuzgado);
+			sqlUnion.append(" ORDER BY NOMBRE");
+			return sqlUnion.toString();
+		}
+
 	}
-	
-	public String getJuzgadosByIdTurno (Short idInstitucion, String idTurno) {
+
+	public String getJuzgadosByIdTurno(Short idInstitucion, String idTurno) {
 		SQL sql = new SQL();
-		
+
 		sql.SELECT("scs_juzgado.idjuzgado");
 		sql.SELECT("decode(scs_juzgado.fechabaja, NULL, scs_juzgado.nombre\r\n"
 				+ "                                        || ' ('\r\n"
@@ -147,10 +168,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 				+ "                                                || ') (BAJA)') AS nombre");
 		sql.FROM("scs_juzgado");
 		sql.INNER_JOIN("cen_poblaciones ON  scs_juzgado.idpoblacion = cen_poblaciones.idpoblacion");
-		sql.WHERE("EXISTS (\r\n"
-				+ "        SELECT\r\n"
-				+ "            *\r\n"
-				+ "        FROM\r\n"
+		sql.WHERE("EXISTS (\r\n" + "        SELECT\r\n" + "            *\r\n" + "        FROM\r\n"
 				+ "            scs_turno\r\n"
 				+ "            inner join scs_materiajurisdiccion on scs_turno.idinstitucion = scs_materiajurisdiccion.idinstitucion AND scs_turno.idmateria = scs_materiajurisdiccion.idmateria AND scs_turno.idarea = scs_materiajurisdiccion.idarea\r\n"
 				+ "            inner join scs_procedimientos on scs_materiajurisdiccion.idjurisdiccion = scs_procedimientos.idjurisdiccion AND scs_materiajurisdiccion.idinstitucion = scs_procedimientos.idinstitucion\r\n"
@@ -158,14 +176,13 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 				+ "        WHERE\r\n"
 				+ "            scs_juzgadoprocedimiento.idinstitucion_juzg = scs_juzgado.idinstitucion \r\n"
 				+ "            AND scs_juzgadoprocedimiento.idjuzgado = scs_juzgado.idjuzgado\r\n"
-				+ "            and scs_turno.idinstitucion = "+idInstitucion+"\r\n"
-				+ "            AND scs_turno.idturno = "+idTurno+"\r\n"
+				+ "            and scs_turno.idinstitucion = " + idInstitucion + "\r\n"
+				+ "            AND scs_turno.idturno = " + idTurno + "\r\n"
 				+ "            AND scs_procedimientos.fechadesdevigor <= sysdate\r\n"
 				+ "            AND ( scs_procedimientos.fechahastavigor >= sysdate\r\n"
-				+ "                  OR scs_procedimientos.fechahastavigor IS NULL )\r\n"
-				+ "    )");
+				+ "                  OR scs_procedimientos.fechahastavigor IS NULL )\r\n" + "    )");
 		sql.ORDER_BY("scs_juzgado.fechabaja DESC, nombre");
-		
+
 		return sql.toString();
 	}
 }
