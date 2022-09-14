@@ -54,4 +54,57 @@ public class ScsDocumentacionejgExtendsProvider extends ScsDocumentacionejgSqlPr
 		
 		return sql.toString();
 	}
+
+	private static String ID_OPERACION_DOCUMENTACION_EJG = "79";
+
+	public String getDocumentacionParaEnviarPericles(Short idInstitucion, Short idTipoEjg, Short anio, Long numero, boolean reenviar) {
+		SQL sql = new SQL();
+
+		sql.SELECT("DE.*");
+		sql.FROM("SCS_DOCUMENTACIONEJG  DE");
+		sql.FROM("SCS_DOCUMENTOEJG      D");
+		sql.FROM("SCS_UNIDADFAMILIAREJG FAMILIA");
+		sql.FROM("SCS_PERSONAJG         PERSONA");
+		sql.FROM("SCS_PRESENTADOR       MAESTROPRESENTADOR");
+		sql.WHERE("DE.IDTIPODOCUMENTO = D.IDTIPODOCUMENTOEJG", "DE.IDINSTITUCION = D.IDINSTITUCION", "DE.IDDOCUMENTO = D.IDDOCUMENTOEJG");
+		sql.WHERE("FAMILIA.IDPERSONA = PERSONA.IDPERSONA(+)", "FAMILIA.IDINSTITUCION = PERSONA.IDINSTITUCION(+)", "DE.IDINSTITUCION = FAMILIA.IDINSTITUCION(+)", "DE.IDTIPOEJG = FAMILIA.IDTIPOEJG(+)", "DE.ANIO = FAMILIA.ANIO(+)", "DE.NUMERO = FAMILIA.NUMERO(+)", "DE.PRESENTADOR = FAMILIA.IDPERSONA(+)");
+		sql.WHERE("DE.IDMAESTROPRESENTADOR = MAESTROPRESENTADOR.IDPRESENTADOR(+)", "DE.IDINSTITUCION = MAESTROPRESENTADOR.IDINSTITUCION(+)");
+
+		sql.WHERE(String.format("DE.IDINSTITUCION = %s", idInstitucion));
+		sql.WHERE(String.format("DE.IDTIPOEJG = %s", idTipoEjg));
+		sql.WHERE(String.format("DE.ANIO = %s", anio));
+		sql.WHERE(String.format("DE.NUMERO = %s", numero));
+
+		if (reenviar) {
+			SQL enListaIntercambios = new SQL();
+			enListaIntercambios.SELECT("1");
+
+			sql.FROM("ECOM_COLA C");
+			sql.LEFT_OUTER_JOIN("LEFT OUTER JOIN ECOM_INTERCAMBIO IC ON (C.IDECOMCOLA = IC.IDECOMCOLA)");
+
+			enListaIntercambios.WHERE("IC.IDESTADORESPUESTA = 5");
+			enListaIntercambios.WHERE("IC.RESPUESTA IS NULL");
+			enListaIntercambios.WHERE("C.IDINSTITUCION = DE.IDINSTITUCION");
+
+			enListaIntercambios.WHERE(String.format("C.IDECOMCOLA IN (%S)", getParamEcomCola("IDINSTITUCION", "DE.IDINSTITUCION")));
+			enListaIntercambios.WHERE(String.format("C.IDECOMCOLA IN (%S)", getParamEcomCola("IDDOCUMENTACION", "DE.IDDOCUMENTACION")));
+
+			enListaIntercambios.WHERE(String.format("C.IDOPERACION = %s", ID_OPERACION_DOCUMENTACION_EJG));
+
+
+			sql.WHERE(String.format("NOT EXISTS (%s)", enListaIntercambios.toString()));
+		}
+
+		sql.ORDER_BY("PRESENTADOR");
+
+		return sql.toString();
+	}
+
+	private String getParamEcomCola(String clave, String valor) {
+		SQL sql = new SQL();
+		sql.SELECT("CP.IDECOMCOLA");
+		sql.FROM("ECOM_COLA_PARAMETROS CP");
+		sql.WHERE(String.format("CP.CLAVE = '%s' AND CP.VALOR = '%s'", clave, valor));
+		return sql.toString();
+	}
 }

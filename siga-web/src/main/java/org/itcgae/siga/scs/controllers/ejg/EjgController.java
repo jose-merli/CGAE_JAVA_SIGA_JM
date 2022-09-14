@@ -24,6 +24,7 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.ExpInsosDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
@@ -926,10 +927,10 @@ public class EjgController {
 	}
 
 	@RequestMapping(value = "/gestion-ejg/enviaDocumentacionAdicional", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> enviaDocumentacionAdicional(@RequestBody EjgDocumentacionItem documentacionItemItem, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> enviaDocumentacionAdicional(@RequestBody EjgDocumentacionItem documentacionItem, HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		try {
-			response = ejgIntercambiosService.enviaDocumentacionAdicional(documentacionItemItem, request);
+			response = ejgIntercambiosService.enviaDocumentacionAdicional(documentacionItem, request);
 		} catch (BusinessException e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
 		} catch (Exception e) {
@@ -937,4 +938,44 @@ public class EjgController {
 		}
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/gestion-ejg/enviaDocumentacionAdicionalExpEconomico", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> enviaDocumentacionAdicionalUnidadFamiliar(@RequestBody ExpedienteEconomicoItem expedienteEconomicoItem, HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		try {
+			response = ejgIntercambiosService.enviaDocumentacionAdicionalUnidadFamiliar(expedienteEconomicoItem, request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/gestion-ejg/enviaDocumentacionAdicionalRegtel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> enviaDocumentacionAdicionalRegtel(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		try {
+			response = ejgIntercambiosService.enviaDocumentacionAdicionalRegtel(ejgItem, request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/gestion-ejg/esColegioConfiguradoEnvioCAJG", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> esColegioConfiguradoEnvioCAJG(HttpServletRequest request) {
+		ResponseDataDTO response = new ResponseDataDTO();
+		try {
+			response = ejgIntercambiosService.esColegioConfiguradoEnvioCAJG(request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+	}
+
 }

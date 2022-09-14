@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.ejg;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -32,11 +33,13 @@ import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.ecom.mappers.EcomIntercambioExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
 import org.itcgae.siga.scs.services.impl.facturacionsjcs.FacturacionSJCSHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +69,7 @@ public class EJGIntercambiosHelper {
     private ScsEstadoejgMapper scsEstadoejgMapper;
 
     @Autowired
-    private ScsDocumentacionejgMapper scsDocumentacionejgMapper;
+    private ScsDocumentacionEjgExtendsMapper scsDocumentacionEjgExtendsMapper;
 
     @Autowired
     private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
@@ -83,13 +86,15 @@ public class EJGIntercambiosHelper {
     @Autowired
     private GenParametrosMapper genParametrosMapper;
 
+    private static final Short[] EXCEPCIONES_ZONA_COMUN = new Short[] {Short.valueOf("2055"), Short.valueOf("2032")};
+
     public boolean isColegioZonaComun(Short idInstitucion) {
         List<CenInstitucion> zonaComun = cenInstitucionExtendsMapper.getInstitucionByGrupo(idInstitucion, SigaConstants.GRUPOINSTITUCION.COMUN_MINI.getCodigoGrupo());
         return !zonaComun.isEmpty();
     }
 
     public boolean isColegioConfiguradoEnvioPericles(Short idInstitucion) {
-        return true; //getValorParametroWithNull(idInstitucion, PCAJG_WS_URL, MODULO_SCS) != null;
+        return getValorParametroWithNull(idInstitucion, PCAJG_WS_URL, MODULO_SCS) != null;
     }
 
 
@@ -106,6 +111,7 @@ public class EJGIntercambiosHelper {
         colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_CONSULTA_ESTADO.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), "Consulta Estado EJG");
     }
 
 
@@ -125,6 +131,44 @@ public class EJGIntercambiosHelper {
         colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIO_COMUNICACION.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación EJG - %s", documentacionejg.getIddocumentacion()));
+    }
+
+    @Transactional
+    public void insertarDocumentacionExpedienteEconomicoAdicionalEnCola(ScsEejgPeticiones eejgPeticiones) throws Exception {
+        Map<String, String> parametrosCola = new HashMap<>();
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, eejgPeticiones.getIdinstitucion().toString());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, eejgPeticiones.getAnio().toString());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, eejgPeticiones.getIdtipoejg().toString());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, eejgPeticiones.getNumero().toString());
+
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NIFNIE, eejgPeticiones.getNif());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ULTIMODOCUMENTO, SigaConstants.DB_TRUE);
+
+        EcomCola colaEnviaPericles = new EcomCola();
+        colaEnviaPericles.setIdinstitucion(eejgPeticiones.getIdinstitucion());
+        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_DOCUMENTO.getId());
+
+        facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación económica - %s", eejgPeticiones.getNif()));
+    }
+
+    @Transactional
+    public void insertarDocumentacionRegtelAdicionalEnCola(ScsEjg ejg, String identificadords) throws Exception {
+        Map<String, String> parametrosCola = new HashMap<>();
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, ejg.toString());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, ejg.getAnio().toString());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, ejg.getIdtipoejg().toString());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, ejg.getNumero().toString());
+
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDDOCUSHARE, identificadords);
+
+        EcomCola colaEnviaPericles = new EcomCola();
+        colaEnviaPericles.setIdinstitucion(ejg.getIdinstitucion());
+        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIO_COMUNICACION.getId());
+
+        facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación Regtel - %s", identificadords));
     }
 
 
@@ -134,8 +178,9 @@ public class EJGIntercambiosHelper {
 
     public void insertaCambioEstadoPericles(ScsEstadoejg estado, AdmUsuarios usuario) throws Exception {
         LOGGER.info("insertaEstadoEjg() -> Entrando al servicio que envia la documentación al CAJG si es necesario");
-        if (isColegioZonaComun(estado.getIdinstitucion())
-                && isColegioConfiguradoEnvioPericles(estado.getIdinstitucion())) {
+        if (isColegioZonaComun(usuario.getIdinstitucion())
+                && isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion())
+                || Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
 
             ScsEjg ejg = getScsEjg(estado.getIdinstitucion(), estado.getAnio(), estado.getIdtipoejg(), estado.getNumero());
             if (UtilidadesString.esCadenaVacia(ejg.getNumeroCajg())) {
@@ -232,12 +277,6 @@ public class EJGIntercambiosHelper {
     }
 
     private void encolaEnvioDocumentacion(ScsEjg ejg) throws Exception {
-        // Obtenemos la documentación
-        ScsDocumentacionejgExample documentacionejgExample = new ScsDocumentacionejgExample();
-        documentacionejgExample.createCriteria().andIdinstitucionEqualTo(ejg.getIdinstitucion())
-                .andAnioEqualTo(ejg.getAnio()).andIdtipoejgEqualTo(ejg.getIdtipoejg())
-                .andNumeroEqualTo(ejg.getNumero());
-
         // Obtenemos los miembros de la unidad familiar
         ScsUnidadfamiliarejgExample unidadfamiliarejgExample = new ScsUnidadfamiliarejgExample();
         unidadfamiliarejgExample.createCriteria().andIdinstitucionEqualTo(ejg.getIdinstitucion())
@@ -245,8 +284,12 @@ public class EJGIntercambiosHelper {
                 .andNumeroEqualTo(ejg.getNumero());
         unidadfamiliarejgExample.setOrderByClause("SOLICITANTE DESC");
 
-        List<ScsDocumentacionejg> documentacionejgList = scsDocumentacionejgMapper.selectByExample(documentacionejgExample);
         List<ScsUnidadfamiliarejg> unidadfamiliarejgList = scsUnidadfamiliarejgMapper.selectByExample(unidadfamiliarejgExample);
+
+        // Obtenemos las documentaciones
+        List<ScsDocumentacionejg> documentacionejgList = scsDocumentacionEjgExtendsMapper.getDocumentacionParaEnviarPericles(ejg.getIdinstitucion(),
+                ejg.getIdtipoejg(), ejg.getAnio(), ejg.getNumero(), false);
+
 
         for (int i = 0; i < documentacionejgList.size(); i++) {
             insercionIndividualDocumentacion(documentacionejgList.get(i), i == documentacionejgList.size() - 1);
@@ -283,6 +326,8 @@ public class EJGIntercambiosHelper {
                 }
             }
         }
+
+        throw new Exception("Prueba");
     }
 
     private void insercionIndividualDocumentacion(ScsDocumentacionejg documentacionejg, boolean esUltimo) throws Exception {

@@ -392,6 +392,8 @@ public class SigaConstants {
     public static final String PERICLES_PARAM_ECOMCOLA_IDDOCUMENTACION = "IDDOCUMENTACION";
     public static final String PERICLES_PARAM_ECOMCOLA_NIFNIE = "NIFNIE";
     public static final String PERICLES_PARAM_ECOMCOLA_ULTIMODOCUMENTO = "ULTIMODOCUMENTO";
+    public static final String PERICLES_PARAM_ECOMCOLA_IDDOCUSHARE = "IDDOCUSHARE";
+
 
     public static enum ESTADOS_EJG {
         REMITIDA_APERTURA_A_COMISION((short)0),

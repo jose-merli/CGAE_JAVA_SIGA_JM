@@ -5,6 +5,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExpedienteEconomicoItem {
+	private String idPeticion;
     private String justiciable;
     private String solicitadoPor;
     private Date f_solicitud;
@@ -107,5 +108,13 @@ public class ExpedienteEconomicoItem {
 
 	public void setCsv(String csv) {
 		this.csv = csv;
+	}
+
+	public String getIdPeticion() {
+		return idPeticion;
+	}
+
+	public void setIdPeticion(String idPeticion) {
+		this.idPeticion = idPeticion;
 	}
 }
