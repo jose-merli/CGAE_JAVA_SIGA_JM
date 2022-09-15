@@ -1526,7 +1526,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				FacFormapagoserie formaPagoSerie = new FacFormapagoserie();
 				formaPagoSerie.setIdseriefacturacion(idSerieFacturacion);
 				formaPagoSerie.setIdinstitucion(usuario.getIdinstitucion());
-				formaPagoSerie.setIdformapago(Short.parseShort(SigaConstants.TIPO_FORMAPAGO_FACTURA));
+				formaPagoSerie.setIdformapago(Short.parseShort(SigaConstants.TIPO_FORMAPAGO_DOMICILIACION_BANCARIA));
 
 				formaPagoSerie.setUsumodificacion(usuario.getIdusuario());
 				formaPagoSerie.setFechamodificacion(new Date());

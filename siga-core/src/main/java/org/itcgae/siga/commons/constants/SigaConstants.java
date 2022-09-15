@@ -631,6 +631,7 @@ public class SigaConstants {
     public static final String TIPO_FORMAPAGO_TARJETA	= "10";
     public static final String TIPO_FORMAPAGO_FACTURA	= "20";
     public static final String TIPO_FORMAPAGO_METALICO	= "30";
+    public static final String TIPO_FORMAPAGO_DOMICILIACION_BANCARIA = "80";
 
     //Estado Facturas
     public static final String ESTADO_FACTURA_PAGADA = "1";
