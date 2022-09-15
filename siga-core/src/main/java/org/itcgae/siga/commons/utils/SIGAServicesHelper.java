@@ -34,8 +34,11 @@ public class SIGAServicesHelper {
 
 	public static void uploadFichero(String pathDirectorio,String nombreFichero,byte [] bytesFichero) throws BusinessException{
 		File directorio = new File(pathDirectorio);
-		if(!directorio.exists())
+		if(!directorio.exists()) {
 			directorio.mkdirs();
+			SIGAHelper.addPerm777(directorio);
+		}
+			
 		StringBuffer pathFichero = new StringBuffer(pathDirectorio);
 		pathFichero.append(File.separator);
 		pathFichero.append(nombreFichero);
