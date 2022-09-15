@@ -42,8 +42,8 @@ public class FacAbonoSqlExtendsProvider extends FacAbonoSqlProvider{
 		
 		if(numsPagosSJCS != null && !numsPagosSJCS.isEmpty()) {
 			
-			sql.WHERE("F.IDFACTURACION IN ("+numsPagosSJCS+")"); // se controla en this.pagosSJCS()
-			
+			//sql.WHERE("F.IDFACTURACION IN ("+numsPagosSJCS+")"); // se controla en this.pagosSJCS()
+			sql.WHERE("PA.IDPAGOSJG IN ("+numsPagosSJCS+")");
 		}
 		
 		if(facAbonoItem.getNumeroAbono() != null) sql.WHERE("A.NUMEROABONO LIKE '%" + facAbonoItem.getNumeroAbono() + "%'");
