@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
@@ -247,6 +248,13 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 
 	})
 	List<RelacionesItem> getRelacionesEJG(EjgItem item);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getEjgDesignas")
+	@Results({ @Result(column = "ANIODESIGNA", property = "anioDesigna", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NUMERODESIGNA", property = "numeroDesigna", jdbcType = JdbcType.NUMERIC),
+
+	})
+	List<EjgItem>  getEjgDesignas(EjgItem item);
 
 	/**
 	 * getComunicaciones
