@@ -2178,14 +2178,18 @@ public class WSCommons {
 			// input Parameters
 			for (int i = 0; i < size; i++) {
 
-				LOGGER.warn("AGUERRA - PARAMETRO " + (i+1) + ": " + inParameters[i].toString());
-				if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
-					 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
-				 }
-
-				if (inParameters[i] instanceof String){
-					cs.setString(i+1, inParameters[i].toString());
-				 }
+				if(inParameters[i] != null) {
+					LOGGER.warn("AGUERRA - PARAMETRO " + (i+1) + ": " + inParameters[i].toString());
+					
+					if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
+						 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
+					 }
+	
+					if (inParameters[i] instanceof String){
+						cs.setString(i+1, inParameters[i].toString());
+					 }
+				
+				}
 			}
 			LOGGER.warn("AGUERRA - FIN PARAMETROS DE ENTRADA");
 
