@@ -28,7 +28,7 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sql.FROM("SCS_TURNO");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("FECHABAJA IS NULL");
-		sql.WHERE("IDTIPOTURNO = '2' OR IDTIPOTURNO IS NULL");
+		sql.WHERE("(IDTIPOTURNO = '2' OR IDTIPOTURNO IS NULL)");
 
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
