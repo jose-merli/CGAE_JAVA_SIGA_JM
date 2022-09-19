@@ -45,6 +45,7 @@ import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -133,6 +134,7 @@ import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsEjgdesignaExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -189,6 +191,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsTiporesolucionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.scs.services.oficio.ISaltosCompOficioService;
+import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -210,6 +213,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	private Logger LOGGER = Logger.getLogger(DesignacionesServiceImpl.class);
+
+	@Autowired
+	private CgaeAuthenticationProvider authenticationProvider;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -4958,8 +4964,31 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return updateResponseDTO;
 	}
 
-	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
+	@Override
+	public ResponseDataDTO compruebaLetradoInscritoEnTurno(ScsDesignasletrado designaLetrado, HttpServletRequest request) throws Exception {
+		LOGGER.info("compruebaLetradoInscritoEnTurno() -> Entrando al servicio que comprueba si el turno contiene al letrado indicado");
+		ResponseDataDTO response = new ResponseDataDTO();
 
+		// Conseguimos información del usuario logeado
+		LOGGER.info("compruebaLetradoInscritoEnTurno() -> Entrando al servicio de autenticación");
+		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+		LOGGER.info("compruebaLetradoInscritoEnTurno() <- Saliendo del servicio de autenticación");
+
+		ScsInscripcionturnoExample inscripcionturnoExample = new ScsInscripcionturnoExample();
+		inscripcionturnoExample.createCriteria()
+				.andIdinstitucionEqualTo(designaLetrado.getIdinstitucion())
+				.andIdturnoEqualTo(designaLetrado.getIdturno())
+				.andIdpersonaEqualTo(designaLetrado.getIdpersona())
+				.andFechabajaIsNull();
+
+		long result = scsInscripcionesTurnoExtendsMapper.countByExample(inscripcionturnoExample);
+		response.setData(Boolean.valueOf(result != 0).toString());
+
+		LOGGER.info("compruebaLetradoInscritoEnTurno() -> Saliendo del servicio que comprueba si el turno contiene al letrado indicado");
+		return response;
+	}
+
+	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
 		LOGGER.info(
 				"comboMotivosCambioActDesigna() -> Entrada al servicio para obtener combo de movitos de cambio de la actuación");
 		String token = request.getHeader("Authorization");

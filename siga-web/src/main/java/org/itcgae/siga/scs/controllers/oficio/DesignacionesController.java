@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
@@ -766,8 +767,17 @@ public class DesignacionesController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
-	
+
+	@RequestMapping(value = "/designas/compruebaLetradoInscritoEnTurno", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> compruebaLetradoInscritoEnTurno(@RequestBody ScsDesignasletrado designasletrado, HttpServletRequest request) {
+		ResponseDataDTO response = new ResponseDataDTO();
+		try {
+			response = designacionesService.compruebaLetradoInscritoEnTurno(designasletrado, request);
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
 	// 3.3.6.2.10. Tarjeta Relaciones
 
