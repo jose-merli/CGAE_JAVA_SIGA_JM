@@ -25,6 +25,8 @@ import org.itcgae.sspp.ws.registroSociedades.ProfesionalDocument.Profesional;
  */
 public class Validaciones {
 	
+	private static String motivoNoValido;
+
 	/**
 	 * Valida una cadena de caracteres que debe tener 9 caracteres y coincidir con el patrón de NIF.
 	 * @param param
@@ -401,6 +403,21 @@ public class Validaciones {
 		
 		return true;
 	}
+	
+	/**
+	 * Valida los datos personales de un notario.
+	 * @param datosPersona
+	 * @return
+	 */
+	public static boolean validaDatosNotario(DatosPersona datosNotario) {
+		
+		// Comprobamos si en los datos personales figura el nombre
+		if (datosNotario.getNombre() == null) {
+			return false;
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Valida los datos de identificacion de una persona.
@@ -675,6 +692,14 @@ public class Validaciones {
 		} else {
 			return false;
 		}
+	}
+	
+	public static String getMotivoNoValido() {
+		return motivoNoValido;
+	}
+
+	public static void setMotivoNoValido(String motivoNoValido) {
+		Validaciones.motivoNoValido = motivoNoValido;
 	}
 
 }

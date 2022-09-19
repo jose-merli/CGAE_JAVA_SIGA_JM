@@ -1220,6 +1220,8 @@ public class MenuServiceImpl implements IMenuService {
 					combos.add(combo);
 				}
 
+			} else {
+				throw new Exception();
 			}
 
 			response.setCombooItems(combos);

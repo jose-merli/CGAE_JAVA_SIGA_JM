@@ -189,6 +189,8 @@ public class ExcelHelper {
 			log.debug("Inicio generación Xls "+new Date());
 			
 			log.info("Generando plantilla excel generarLibroExcelUnaHoja");
+            log.debug("Inicio generación Xls "+new Date());
+            
 			HSSFSheet hssfSheet = hssfWorkbook.createSheet("Hoja 1");
 			int numeroFila = 0;
 			int numeroColumna = 0;
