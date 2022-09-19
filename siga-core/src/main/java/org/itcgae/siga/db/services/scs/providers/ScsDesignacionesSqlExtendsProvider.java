@@ -3036,7 +3036,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.FROM("SCS_ACTUADESIG_MOTCAMBIO");
 
-		//sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("FECHABAJA IS NOT NULL");
+		sql.WHERE("FECHA_BAJA IS NOT NULL");
 		sql.ORDER_BY("NOMBRE ASC");
 
 		return sql.toString();
