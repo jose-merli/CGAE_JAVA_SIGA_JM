@@ -1809,18 +1809,17 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlDesigna_5.WHERE("ROWNUM<2");
 
 		// consulta para obtener el interesado en consulta asistencia
-		sqlDesigna_6.SELECT("scs_personajg.apellido1\r\n" + "                     || CASE\r\n"
-				+ "                            WHEN scs_personajg.apellido2 IS NOT NULL THEN ' '\r\n"
-				+ "                             || scs_personajg.apellido2\r\n"
+		sqlDesigna_6.SELECT("designa.apellido1\r\n" + "                     || CASE\r\n"
+				+ "                            WHEN designa.apellido2 IS NOT NULL THEN ' '\r\n"
+				+ "                             || designa.apellido2\r\n"
 				+ "                             || ','\r\n" + "                            ELSE ','\r\n"
-				+ "                        END\r\n" + "                     || scs_personajg.nombre");
-		sqlDesigna_6.FROM("scs_ejg\r\n" + "                JOIN scs_personajg ON\r\n"
-				+ "                        scs_personajg.idpersona = scs_ejg.idpersona\r\n"
-				+ "                    AND\r\n"
-				+ "                        scs_personajg.idinstitucion = scs_ejg.idinstitucion");
-		sqlDesigna_6.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
-		sqlDesigna_6.WHERE("scs_ejg.anio = " + item.getAnnio());
-		sqlDesigna_6.WHERE("scs_ejg.numero =" + item.getNumero());
+				+ "                        END\r\n" + "                     || designa.nombre");
+		sqlDesigna_6.FROM("SCS_DEFENDIDOSDESIGNA  defen");
+		sqlDesigna_6.INNER_JOIN("SCS_PERSONAJG designa ON designa.idpersona = defen.idpersona AND defen.idinstitucion = designa.idinstitucion");
+		sqlDesigna_6.WHERE("defen.idturno = ejgd.idturno");
+		sqlDesigna_6.WHERE("defen.idtipoencalidad = '0'");
+		sqlDesigna_6.WHERE("defen.anio = ejgd.aniodesigna");
+		sqlDesigna_6.WHERE("defen.numero = ejgd.numerodesigna");
 		sqlDesigna_6.WHERE("ROWNUM<2");
 
 		// datos de interes de la consulta DESIGNA
@@ -2095,6 +2094,23 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.WHERE("e.idinstitucion=" + ejgItem.getidInstitucion() + " and e.anio=" + ejgItem.getAnnio()
 				+ " and e.idtipoejg=" + ejgItem.getTipoEJG() + " and e.numero=" + ejgItem.getNumero());
 
+		return sql.toString();
+	}
+	
+	
+	public String getEjgDesignas(EjgItem ejgItem) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("aniodesigna");
+		sql.SELECT("numerodesigna");
+		sql.FROM("scs_ejgdesigna");
+		sql.WHERE("idinstitucion = " + ejgItem.getidInstitucion());
+		sql.WHERE("anioejg = " + ejgItem.getAnnio());
+		sql.WHERE("numeroejg = " + ejgItem.getNumero());
+		sql.WHERE("IDTIPOEJG = " + ejgItem.getTipoEJG());
+		
+		
 		return sql.toString();
 	}
 }

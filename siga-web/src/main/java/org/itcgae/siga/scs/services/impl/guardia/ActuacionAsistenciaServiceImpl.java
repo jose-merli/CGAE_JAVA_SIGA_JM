@@ -615,6 +615,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy"); 
         UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
         int affectedRows = 0;
         Error error = new Error();
@@ -646,6 +647,9 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             scsActuacionasistencia.setValidada(tarjeta.getValidada());
                             if("1".equals(tarjeta.getValidada())){
                                 scsActuacionasistencia.setFechavalidacion(new Date());
+                                // Rellenar Fecha Justificación
+                                Date fechaJusticiacion = formato.parse(tarjeta.getFechaJustificacion());
+                                scsActuacionasistencia.setFechajustificacion(fechaJusticiacion);
                                 scsActuacionasistencia.setUsuvalidacion(usuarios.get(0).getIdusuario());
                             }
                         }else if(!UtilidadesString.esCadenaVacia(tarjeta.getAnulada())){

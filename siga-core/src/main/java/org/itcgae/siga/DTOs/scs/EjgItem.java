@@ -6,7 +6,9 @@ import java.util.Date;
 
 public class EjgItem {
     private String idEJG;
-    private String colegio;
+    private Short anioDesigna;
+    private Short numeroDesigna;
+	private String colegio;
     private String idInstitucion;
     private String annio;
     private String numero;
@@ -1740,4 +1742,20 @@ public class EjgItem {
     public void setIdExpedienteExt(Long idExpedienteExt) {
         this.idExpedienteExt = idExpedienteExt;
     }
+    
+    public Short getAnioDesigna() {
+		return anioDesigna;
+	}
+
+	public Short getNumeroDesigna() {
+		return numeroDesigna;
+	}
+
+	public void setAnioDesigna(Short anioDesigna) {
+		this.anioDesigna = anioDesigna;
+	}
+
+	public void setNumeroDesigna(Short numeroDesigna) {
+		this.numeroDesigna = numeroDesigna;
+	}
 }
