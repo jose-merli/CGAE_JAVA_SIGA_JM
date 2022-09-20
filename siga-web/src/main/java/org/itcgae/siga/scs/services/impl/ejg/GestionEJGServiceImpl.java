@@ -3449,6 +3449,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					String path = directorioFisicoCAJG.getValor() + directorioCAJGJava.getValor() + File.separator
 							+ idInstitucion + File.separator + directorioRemesaResoluciones.getValor() + File.separator
 							+ directorioResolucionesArchivos.getValor() + File.separator + docResolucion;
+					
+					LOGGER.info("GestionEJGServiceImpl.descargarDocumentoResolucion -> Path Descarga: " + path);
 
 					File file = new File(path);
 					FileInputStream fileStream = new FileInputStream(file);
@@ -3466,7 +3468,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				} catch (Exception e) {
 					res = new ResponseEntity<InputStreamResource>(null, null, HttpStatus.BAD_REQUEST);
-					LOGGER.error(
+					LOGGER.error("GestionEJGServiceImpl.descargarDocumentoResolucion() -> " + e.getMessage());
+					LOGGER.warn(
 							"GestionEJGServiceImpl.descargarDocumentoResolucion() -> Se ha producido un error en la descarga del documento de resolucion");
 				}
 			}
