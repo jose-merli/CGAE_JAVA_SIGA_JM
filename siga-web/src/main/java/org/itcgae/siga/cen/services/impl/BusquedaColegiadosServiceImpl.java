@@ -591,7 +591,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-		sql.SELECT_DISTINCT("f_siga_getncol_ncom(col.idinstitucion,col.idpersona) AS NcolNcom");
+		sql.SELECT("f_siga_getncol_ncom(col.idinstitucion,col.idpersona) AS NcolNcom");
         sql.SELECT("decode (col.comunitario,'1','SI','0','NO') AS Comunitario");
         sql.SELECT("per.nombre AS Nombre");
         sql.SELECT("per.apellidos1 AS Apellido1");
@@ -636,18 +636,18 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
         sql.SELECT("col.cuentacontablesjcs AS CuentaContableSJCS");
         sql.SELECT("decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitacion','50','Suspension Ejercicio','60','Baja por Deceso','Baja por Deceso') AS EstadoColegial");
         sql.SELECT("f_siga_getfechaestadocolegial(col.idpersona,col.idinstitucion,sysdate)   AS FechaEstado");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,1) AS Domicilio");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,2) AS CodigoPostal");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,11) AS Telefono1");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,12) AS Telefono2");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,13) AS Movil");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,14) AS Fax1");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,15) AS Fax2");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,16) AS CorreoElectronico");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,17) AS PaginaWeb");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,3) AS Poblacion");
-        sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,4) AS Provincia");
-        sql.SELECT("f_siga_getdireccioncliente1(col.idinstitucion,col.idpersona,3,5) AS Pais");
+        sql.SELECT("dir.domicilio AS Domicilio");
+        sql.SELECT("dir.codigopostal AS CodigoPostal");
+        sql.SELECT("dir.telefono1 AS Telefono1");
+        sql.SELECT("dir.telefono2 AS Telefono2");
+        sql.SELECT("dir.movil AS Movil");
+        sql.SELECT("dir.fax1 AS Fax1");
+        sql.SELECT("dir.fax2 AS Fax2");
+        sql.SELECT("dir.correoelectronico AS CorreoElectronico");
+        sql.SELECT("dir.paginaweb AS PaginaWeb");
+        sql.SELECT("CASE WHEN dir.poblacionextranjera IS NULL THEN pob.nombre ELSE dir.poblacionextranjera || '(' || pais.nombre || ')' END AS Poblacion");
+        sql.SELECT("CASE WHEN dir.poblacionextranjera IS NULL THEN pro.nombre ELSE NULL END AS Provincia");
+        sql.SELECT("f_siga_getrecurso(pais.nombre, 1) AS Pais");
 
 
 		/*String from = "cen_persona per, cen_colegiado col, cen_tipoidentificacion tip, cen_estadocivil est, cen_cliente cli, cen_tratamiento tra, cen_tiposseguro ts";
@@ -662,7 +662,12 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		sql.WHERE("col.idtiposseguro=ts.idtiposseguro(+)");
 */
 		sql.FROM("cen_colegiado col");
-
+		sql.LEFT_OUTER_JOIN("cen_direcciones dir ON (dir.idinstitucion = col.idinstitucion AND dir.idpersona = col.idpersona AND dir.fechabaja IS NULL AND "
+				+ "EXISTS ( SELECT 1 FROM cen_direccion_tipodireccion tipdir WHERE dir.idinstitucion = tipdir.idinstitucion AND dir.idpersona = tipdir.idpersona AND "
+				+ "dir.iddireccion = tipdir.iddireccion AND tipdir.idtipodireccion = '3'))");
+		sql.LEFT_OUTER_JOIN("cen_poblaciones pob ON pob.idpoblacion = dir.idpoblacion");
+		sql.LEFT_OUTER_JOIN("cen_provincias pro ON pro.idprovincia = dir.idprovincia");
+		sql.LEFT_OUTER_JOIN("cen_pais pais ON pais.idpais = dir.idpais");
 		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
 		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
 
@@ -948,8 +953,6 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 		LOGGER.info(
 				"selectColegiados() -> Salida del servicio para obtener la sentencia para obtener la lista de colegiados");
-		
-		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
 
 	}
