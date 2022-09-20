@@ -1050,7 +1050,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				}
 
 				if (remesaAccionItem.getAccion() == 2 && ejgIntercambiosHelper.isColegioZonaComun(idInstitucion)
-						&& ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(idInstitucion)) {
+						&& ejgIntercambiosHelper.envioPericlesDisponible(idInstitucion)) {
 					if(insertResponseDTO.getStatus().equals(SigaConstants.OK) && insertResponseDTO.getError().getCode() == 200) {
 						LOGGER.debug("ejecutaOperacionRemesa() / insertaEstadoEjgEnviandoPericles() -> Comenzando el envío de los EJG al servicio de Pericles");
 						CajgRemesa cajgRemesaKey = new CajgRemesa();

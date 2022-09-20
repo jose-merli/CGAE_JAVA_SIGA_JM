@@ -64,8 +64,6 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
     @Autowired
     private EJGIntercambiosHelper ejgIntercambiosHelper;
 
-    private static final Short[] EXCEPCIONES_ZONA_COMUN = new Short[] {Short.valueOf("2055"), Short.valueOf("2032")};
-
     @Override
     public ResponseDataDTO esColegioZonaComun(HttpServletRequest request) throws Exception {
         LOGGER.info("esColegioZonaComun() -> Entrando al servicio que comprueba si el colegio pertenece a la zona común y está configurado para la integración con Pericles");
@@ -83,7 +81,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         }
 
         Boolean esZonaComun = ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
-                && ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion());
+                && ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion());
         responseDataDTO.setData(esZonaComun.toString());
 
         LOGGER.info("esColegioZonaComun() <- Saliendo del servicio que comprueba si el colegio pertenece a la zona común y está configurado para la integración con Pericles");
@@ -107,9 +105,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
             throw new Exception("No se ha introducido una idInstitucion válida");
         }
 
-        Boolean esZonaComun = ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
-                && ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion())
-                || Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion());
+        Boolean esZonaComun = ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion());
         responseDataDTO.setData(esZonaComun.toString());
 
         LOGGER.info("esColegioConfiguradoEnvioCAJG() <- Saliendo del servicio que comprueba si el colegio pertenece a la zona común y está configurado para la integración con Pericles o es Guipúzcoa o Navarra");
@@ -129,8 +125,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         LOGGER.info("getListadoIntercambiosAltaEJG() <- Saliendo del servicio de autenticación");
 
         Short idInstitucion = Short.parseShort(item.getidInstitucion());
-        if (!ejgIntercambiosHelper.isColegioZonaComun(idInstitucion)
-                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(idInstitucion)) {
+        if (!ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion())) {
             LOGGER.warn("getListadoIntercambiosAltaEJG() -> Error: El colegio con idInstitucion=" + idInstitucion + " no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
         }
@@ -161,9 +156,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         LOGGER.info("getListadoIntercambiosDocumentacionEJG() <- Saliendo del servicio de autenticación");
 
         Short idInstitucion = Short.parseShort(item.getidInstitucion());
-        if ((!ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
-                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion()))
-                && !Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
+        if (!ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion())) {
             LOGGER.warn("getListadoIntercambiosDocumentacionEJG() -> El colegio con idInstitucion=" + idInstitucion + " no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
         }
@@ -205,8 +198,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
             throw new Exception("No se ha encontrado el EJG indicado");
         }
 
-        if (!ejgIntercambiosHelper.isColegioZonaComun(ejg.getIdinstitucion())
-                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(ejg.getIdinstitucion())) {
+        if (!ejgIntercambiosHelper.envioPericlesDisponible(ejg.getIdinstitucion())) {
             LOGGER.warn("consultarEstadoPericles() -> Error: El colegio no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
         }
@@ -255,9 +247,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
             throw new Exception("No se ha encontrado el EJG indicado");
         }
 
-        if ((!ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
-                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion()))
-                && !Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
+        if (!ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion())) {
             LOGGER.warn("enviaDocumentacionAdicional() -> Error: El colegio no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
         }
@@ -307,9 +297,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
             throw new Exception("No se ha encontrado el EJG indicado");
         }
 
-        if ((!ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
-                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion()))
-                && !Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
+        if (!ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion())) {
             LOGGER.warn("enviaDocumentacionAdicionalRegtel() -> Error: El colegio no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
         }
@@ -331,9 +319,7 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
         LOGGER.info("enviaDocumentacionAdicionalExpedienteEconomico() -> Saliendo del servicio de autenticación");
 
-        if ((!ejgIntercambiosHelper.isColegioZonaComun(usuario.getIdinstitucion())
-                || !ejgIntercambiosHelper.isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion()))
-                && !Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
+        if (!ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion())) {
             LOGGER.warn("enviaDocumentacionAdicionalExpedienteEconomico() -> Error: El colegio no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
         }

@@ -1,18 +1,16 @@
 package org.itcgae.siga.scs.services.impl.ejg;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.cen.DocushareDTO;
+import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.EcomIntercambio;
-import org.itcgae.siga.db.entities.EcomIntercambioExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
-import org.itcgae.siga.db.entities.ScsDocumentacionejgExample;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
 import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
 import org.itcgae.siga.db.entities.ScsEjg;
@@ -25,7 +23,6 @@ import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
-import org.itcgae.siga.db.mappers.ScsDocumentacionejgMapper;
 import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
@@ -35,10 +32,12 @@ import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.ecom.mappers.EcomIntercambioExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
 import org.itcgae.siga.scs.services.impl.facturacionsjcs.FacturacionSJCSHelper;
+import org.itcgae.siga.services.impl.DocushareHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,6 +77,9 @@ public class EJGIntercambiosHelper {
     private ScsContrariosejgMapper scsContrariosejgMapper;
 
     @Autowired
+    private DocushareHelper docushareHelper;
+
+    @Autowired
     private ScsEejgPeticionesMapper scsEejgPeticionesMapper;
 
     @Autowired
@@ -88,12 +90,18 @@ public class EJGIntercambiosHelper {
 
     private static final Short[] EXCEPCIONES_ZONA_COMUN = new Short[] {Short.valueOf("2055"), Short.valueOf("2032")};
 
+
+    public boolean envioPericlesDisponible(Short idInstitucion) {
+        return (isColegioZonaComun(idInstitucion) || Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(idInstitucion))
+                && isColegioConfiguradoEnvioPericles(idInstitucion);
+    }
+
     public boolean isColegioZonaComun(Short idInstitucion) {
         List<CenInstitucion> zonaComun = cenInstitucionExtendsMapper.getInstitucionByGrupo(idInstitucion, SigaConstants.GRUPOINSTITUCION.COMUN_MINI.getCodigoGrupo());
         return !zonaComun.isEmpty();
     }
 
-    public boolean isColegioConfiguradoEnvioPericles(Short idInstitucion) {
+    private boolean isColegioConfiguradoEnvioPericles(Short idInstitucion) {
         return getValorParametroWithNull(idInstitucion, PCAJG_WS_URL, MODULO_SCS) != null;
     }
 
@@ -178,10 +186,7 @@ public class EJGIntercambiosHelper {
 
     public void insertaCambioEstadoPericles(ScsEstadoejg estado, AdmUsuarios usuario) throws Exception {
         LOGGER.info("insertaEstadoEjg() -> Entrando al servicio que envia la documentación al CAJG si es necesario");
-        if (isColegioZonaComun(usuario.getIdinstitucion())
-                && isColegioConfiguradoEnvioPericles(usuario.getIdinstitucion())
-                || Arrays.asList(EXCEPCIONES_ZONA_COMUN).contains(usuario.getIdinstitucion())) {
-
+        if (isColegioZonaComun(estado.getIdinstitucion()) && envioPericlesDisponible(estado.getIdinstitucion())) {
             ScsEjg ejg = getScsEjg(estado.getIdinstitucion(), estado.getAnio(), estado.getIdtipoejg(), estado.getNumero());
             if (UtilidadesString.esCadenaVacia(ejg.getNumeroCajg())) {
                 envioPericlesExpediente(estado, usuario, EJGIntercambiosHelper.CASO.PERICLES_INSERT_ESTADO);
@@ -194,21 +199,6 @@ public class EJGIntercambiosHelper {
         LOGGER.info("insertaEstadoEjg() <- Saliendo del servicio que envia la documentación al CAJG si es necesario");
     }
 
-    @Transactional
-    public void updateEstadoEjg(ScsEstadoejg estado) throws Exception {
-        LOGGER.info("insertaEstadoEjg() -> ");
-        if (isColegioZonaComun(estado.getIdinstitucion())
-                && isColegioConfiguradoEnvioPericles(estado.getIdinstitucion())) {
-            if (estado.getIdestadoejg() != null && estado.getIdestadoejg().equals(SigaConstants.ESTADOS_EJG.LISTO_REMITIR_COMISION.getCodigo())) {
-                LOGGER.info("insertaEstadoEjg() -> ");
-
-                envioPericlesExpediente(estado, null, CASO.PERICLES_UPDATE_ESTADO);
-            }
-        } else {
-            LOGGER.info("insertaEstadoEjg() <- ");
-        }
-        LOGGER.info("insertaEstadoEjg() <- ");
-    }
 
     private void envioPericlesExpediente(ScsEstadoejg estadoEjgItem, AdmUsuarios usuario, CASO caso) throws Exception {
         if (caso.equals(CASO.PERICLES_UPDATE_ESTADO)) {
@@ -277,7 +267,64 @@ public class EJGIntercambiosHelper {
     }
 
     private void encolaEnvioDocumentacion(ScsEjg ejg) throws Exception {
-        // Obtenemos los miembros de la unidad familiar
+        LOGGER.info("encolaEnvioDocumentacion() -> Entrando al servicio que encola el envío de todas las documentaciones");
+
+        // --> Envío de Expedientes Económicos
+        List<Map<String, String>> listasParametrosExpEcon = insercionDocumentacionExpedienteEconomico(ejg);
+
+        // --> Envío de Documentación EJG
+        List<Map<String, String>> listasParametrosEjg = insercionDocumentacionEJG(ejg);
+
+        // --> Envío de Regtel
+        List<Map<String, String>> listasParametrosRegtel = new ArrayList<>();
+        try {
+            listasParametrosRegtel = insercionDocumentacionRegtel(ejg);
+        } catch (Exception e) {
+            LOGGER.error("encolaEnvioDocumentacion() -> Error al obtener los documentos de Regtel");
+        }
+
+        List<Map<String, String>> listasParametros = new ArrayList<>();
+        listasParametros.addAll(listasParametrosExpEcon);
+        listasParametros.addAll(listasParametrosEjg);
+        listasParametros.addAll(listasParametrosRegtel);
+
+        insercionEnEnviosPericles(listasParametros);
+
+        LOGGER.info("encolaEnvioDocumentacion() <- Saliendo al servicio que encola el envío de todas las documentaciones");
+    }
+
+    private List<Map<String, String>> insercionDocumentacionEJG(ScsEjg ejg) {
+        LOGGER.info("insercionDocumentacionEJG() -> Entrando al servicio que envía la documentación EJG");
+        List<Map<String, String>> listaParametros = new ArrayList<>();
+
+        // Obtenemos las documentaciones
+        List<ScsDocumentacionejg> documentacionejgList = scsDocumentacionEjgExtendsMapper.getDocumentacionParaEnviarPericles(ejg.getIdinstitucion(),
+                ejg.getIdtipoejg(), ejg.getAnio(), ejg.getNumero(), false);
+
+
+        // --> Envío de documentación
+        for (int i = 0; i < documentacionejgList.size(); i++) {
+            ScsDocumentacionejg documentacionejg = documentacionejgList.get(i);
+
+            Map<String, String> parametrosCola = new HashMap<>();
+            parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, documentacionejg.getIdinstitucion().toString());
+            parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, documentacionejg.getAnio().toString());
+            parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, documentacionejg.getIdtipoejg().toString());
+            parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, documentacionejg.getNumero().toString());
+
+            parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDDOCUMENTACION, documentacionejg.getIddocumentacion().toString());
+            listaParametros.add(parametrosCola);
+        }
+
+        LOGGER.info("insercionDocumentacionEJG() <- Saliendo del servicio que envía la documentación EJG");
+        return listaParametros;
+    }
+
+    private List<Map<String, String>> insercionDocumentacionExpedienteEconomico(ScsEjg ejg) {
+        LOGGER.info("insercionDocumentacionExpedienteEconomico() -> Entrando al servicio que envía la documentación de expedientes económicos");
+        List<Map<String, String>> listaParametros = new ArrayList<>();
+
+        // --> Envio de informes económicos
         ScsUnidadfamiliarejgExample unidadfamiliarejgExample = new ScsUnidadfamiliarejgExample();
         unidadfamiliarejgExample.createCriteria().andIdinstitucionEqualTo(ejg.getIdinstitucion())
                 .andIdtipoejgEqualTo(ejg.getIdtipoejg()).andAnioEqualTo(ejg.getAnio())
@@ -285,16 +332,6 @@ public class EJGIntercambiosHelper {
         unidadfamiliarejgExample.setOrderByClause("SOLICITANTE DESC");
 
         List<ScsUnidadfamiliarejg> unidadfamiliarejgList = scsUnidadfamiliarejgMapper.selectByExample(unidadfamiliarejgExample);
-
-        // Obtenemos las documentaciones
-        List<ScsDocumentacionejg> documentacionejgList = scsDocumentacionEjgExtendsMapper.getDocumentacionParaEnviarPericles(ejg.getIdinstitucion(),
-                ejg.getIdtipoejg(), ejg.getAnio(), ejg.getNumero(), false);
-
-
-        for (int i = 0; i < documentacionejgList.size(); i++) {
-            insercionIndividualDocumentacion(documentacionejgList.get(i), i == documentacionejgList.size() - 1);
-        }
-
         for (int i = 0; i < unidadfamiliarejgList.size(); i++) {
             ScsUnidadfamiliarejg unidadfamiliarejg = unidadfamiliarejgList.get(i);
 
@@ -314,75 +351,75 @@ public class EJGIntercambiosHelper {
                 List<ScsEejgPeticiones> eejgPeticiones = scsEejgPeticionesMapper.selectByExample(eejgPeticionesExample);
 
                 if (eejgPeticiones != null && !eejgPeticiones.isEmpty()) {
-                    boolean esUltimo = true;
-                    for (int j = 0; j < documentacionejgList.size(); j++) {
-                        if (documentacionejgList.get(j).getIdfichero() != null) {
-                            esUltimo = false;
-                            break;
-                        }
-                    }
+                    Map<String, String> parametrosCola = new HashMap<>();
+                    parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, unidadfamiliarejg.getIdinstitucion().toString());
+                    parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, unidadfamiliarejg.getAnio().toString());
+                    parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, unidadfamiliarejg.getIdtipoejg().toString());
+                    parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, unidadfamiliarejg.getNumero().toString());
 
-                    insercionIndividualUnidadFamiliar(unidadfamiliarejgList.get(i), persona, esUltimo);
+                    parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NIFNIE, persona.getNif());
+
+                    listaParametros.add(parametrosCola);
+                }
+            }
+
+        }
+
+        LOGGER.info("insercionDocumentacionExpedienteEconomico() <- Saliendo del servicio que envía la documentación de expedientes económicos");
+        return listaParametros;
+    }
+
+    private List<Map<String, String>> insercionDocumentacionRegtel(ScsEjg ejg) throws Exception {
+        LOGGER.info("insercionDocumentacionRegtel() -> Entrando al servicio que envía la documentación de Regtel");
+        List<Map<String, String>> listaParametros = new ArrayList<>();
+
+        if (!UtilidadesString.esCadenaVacia(ejg.getIdentificadords())) {
+            String paramRegtel = getValorParametroWithNull(ejg.getIdinstitucion(), "PATH_DOCUSHARE_EJG", SigaConstants.MODULO_GEN);
+            if (paramRegtel != null && paramRegtel.equalsIgnoreCase(SigaConstants.DB_TRUE)) {
+                paramRegtel = getValorParametroWithNull(ejg.getIdinstitucion(), "PCJAG_ENVIO_REGTEL_EJG", SigaConstants.MODULO_ECOM);
+                if (paramRegtel != null && paramRegtel.equalsIgnoreCase(SigaConstants.DB_TRUE)) {
+                    List<DocuShareObjectVO> datosDocuShare = docushareHelper.getContenidoCollection(ejg.getIdinstitucion(), ejg.getIdentificadords(), ejg.getIdentificadords());
+                    for (DocuShareObjectVO docushare: datosDocuShare) {
+                        Map<String, String> parametrosCola = new HashMap<>();
+                        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, ejg.toString());
+                        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, ejg.getAnio().toString());
+                        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, ejg.getIdtipoejg().toString());
+                        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, ejg.getNumero().toString());
+
+                        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDDOCUSHARE, docushare.getId());
+
+                        listaParametros.add(parametrosCola);
+                    }
                 }
             }
         }
 
-        throw new Exception("Prueba");
+        LOGGER.info("insercionDocumentacionRegtel() <- Saliendo del servicio que envía la documentación de Regtel");
+        return listaParametros;
     }
 
-    private void insercionIndividualDocumentacion(ScsDocumentacionejg documentacionejg, boolean esUltimo) throws Exception {
-        Map<String, String> parametrosCola = new HashMap<>();
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, documentacionejg.getIdinstitucion().toString());
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, documentacionejg.getAnio().toString());
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, documentacionejg.getIdtipoejg().toString());
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, documentacionejg.getNumero().toString());
+    private void insercionEnEnviosPericles(List<Map<String, String>> listaParametros) throws Exception {
+        for (int i = 0; i < listaParametros.size(); i++) {
+            Map<String, String> parametros = listaParametros.get(i);
 
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDDOCUMENTACION, documentacionejg.getIddocumentacion().toString());
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ULTIMODOCUMENTO, esUltimo ? SigaConstants.DB_TRUE : SigaConstants.DB_FALSE);
+            parametros.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ULTIMODOCUMENTO, i == listaParametros.size() - 1 ? SigaConstants.DB_TRUE : SigaConstants.DB_FALSE);
 
-        EcomCola colaEnviaPericles = new EcomCola();
-        colaEnviaPericles.setIdinstitucion(documentacionejg.getIdinstitucion());
-        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_DOCUMENTO.getId());
+            EcomCola colaEnviaPericles = new EcomCola();
+            colaEnviaPericles.setIdinstitucion(Short.parseShort(parametros.get(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION)));
+            colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_DOCUMENTO.getId());
 
-        facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envio documentación(%s) Pericles", documentacionejg.getIddocumentacion()));
-    }
+            String documento = "", identificador = "";
+            if (parametros.get(SigaConstants.PERICLES_PARAM_ECOMCOLA_NIFNIE) != null) {
+                documento = "económica";
+            } else if (parametros.get(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDDOCUMENTACION) != null) {
+                documento = "EJG";
+            } else if (parametros.get(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDDOCUSHARE) != null) {
+                documento = "Regtel";
+            }
 
-    private void insercionIndividualUnidadFamiliar(ScsUnidadfamiliarejg unidadfamiliarejg, ScsPersonajg persona, boolean esUltimo) throws Exception {
-        Map<String, String> parametrosCola = new HashMap<>();
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, unidadfamiliarejg.getIdinstitucion().toString());
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, unidadfamiliarejg.getAnio().toString());
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, unidadfamiliarejg.getIdtipoejg().toString());
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, unidadfamiliarejg.getNumero().toString());
-
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NIFNIE, persona.getNif());
-        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ULTIMODOCUMENTO, esUltimo ? SigaConstants.DB_TRUE : SigaConstants.DB_FALSE);
-
-        EcomCola colaEnviaPericles = new EcomCola();
-        colaEnviaPericles.setIdinstitucion(unidadfamiliarejg.getIdinstitucion());
-        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_DOCUMENTO.getId());
-
-        facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envio informe económico(%s) Pericles", persona.getIdtipoidentificacion()));
-    }
-
-    private void actualizarIntercambio(Long idEcomCola, SigaConstants.ECOM_ESTADOSCOLA estado, String respuesta, String descripcion) {
-        LOGGER.info("actualizarIntercambio() -> Entrando a actualizar intercambio en ECOM_INTERCAMBIO");
-        EcomIntercambio record = new EcomIntercambio();
-
-        // Actualizamos los valores del log de intercambios
-        record.setIdecomcola(idEcomCola);
-        record.setIdestadorespuesta(estado.getId());
-        record.setFecharespuesta(new Date());
-        record.setRespuesta(respuesta);
-        record.setDescripcion(descripcion);
-
-        // Buscamos el intercambio por idEcomCola
-        EcomIntercambioExample example = new EcomIntercambioExample();
-        example.createCriteria().andIdecomcolaEqualTo(idEcomCola);
-
-        ecomIntercambioExtendsMapper.updateByExampleSelective(record, example);
-        LOGGER.info("actualizarIntercambio() <- Saliendo de actualizar intercambio en ECOM_INTERCAMBIO");
+            facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametros);
+            insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación %s - %s", documento, identificador));
+        }
     }
 
     private void insertaIntercambio(Long idEcomCola, Short idInstitucion, String descripcion) {
@@ -401,25 +438,6 @@ public class EJGIntercambiosHelper {
         ecomIntercambioExtendsMapper.insert(record);
 
         LOGGER.info("insertaIntercambio() <- Saliendo de insertar intercambio en ECOM_INTERCAMBIO");
-    }
-
-    public boolean validarCamposExpedienteParaPericles() {
-        // Campos obligatorios:
-        // -- Número de expediente
-        // -- Fecha Solicitud
-        // -- Tipo resolución colegio
-        // -- Nombre de solicitante
-        // -- Nombre de vía del solicitante (Opcional)
-        // ---- Tipo de vía de la dirección del solicitante
-        // ---- Número de vía del solicitante
-        // ---- Código postal del solititante
-        // ---- Provincia del solicitante
-        // ---- Población del solititante
-        // -- Nombre del familiar (Opcional)
-        // ---- Primer apellido del familiar
-        // ---- Parentesco del familiar
-        // ---- Primer apellido del contrario
-        return false;
     }
 
     public ScsEjg getScsEjg(Short idInstitucion, Short annio, Short idTipoEjg, Long numero) {
