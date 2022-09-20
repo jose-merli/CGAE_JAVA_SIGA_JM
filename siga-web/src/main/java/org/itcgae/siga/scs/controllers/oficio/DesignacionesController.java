@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -867,12 +868,18 @@ public class DesignacionesController {
 			HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.actualizarActDesigna(actuacionDesignaItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
+	} 
 	
 	@GetMapping(value = "/comboMotivosCambioActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ComboDTO> comboMotivosCambioActDesigna(HttpServletRequest request) {
 		ComboDTO response = designacionesService.comboMotivosCambioActDesigna(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/desgignas/formatoProcedimiento", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<StringDTO> formatoProcedimiento(HttpServletRequest request) {
+		StringDTO response = designacionesService.formatoProcedimiento(request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/designas/updateJustiActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)

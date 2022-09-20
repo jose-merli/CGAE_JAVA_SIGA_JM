@@ -232,5 +232,7 @@ public interface IDesignacionesService {
 	UpdateResponseDTO eliminarRelacionAsistenciaDesigna(RelacionesItem datos, HttpServletRequest request);
 
 	ScsEjg getEJG(EjgItem item, HttpServletRequest request);
+
+	public StringDTO formatoProcedimiento(HttpServletRequest request);
 	
 }

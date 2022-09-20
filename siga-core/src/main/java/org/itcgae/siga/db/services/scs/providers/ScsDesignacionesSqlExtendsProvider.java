@@ -2598,7 +2598,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SET("fechadesigna = TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
 		sql.SET("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 		sql.SET("motivosrenuncia ='" + procuradorItem.getMotivosRenuncia() + "'");
-
+ 
 
 		return sql.toString();
 	}
@@ -3011,7 +3011,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	public String getPartidaPresupuestariaDesigna(Short idInstitucion, DesignaItem designaItem) {
 		SQL sql = new SQL();
-
+ 
 		sql.SELECT("D.IDPARTIDAPRESUPUESTARIA");
 		sql.SELECT("PAR.NOMBREPARTIDA");
 
@@ -3027,20 +3027,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	}
 
-	public String comboMotivosCambioActDesigna(Short idInstitucion) {
+	public String comboMotivosCambioActDesigna(Short idInstitucion,String idLenguaje) {
 
-		SQL sql = new SQL();
+		SQL sql = new SQL(); 
 
 		sql.SELECT("IDACTDESMOTCAMBIO");
-		sql.SELECT("NOMBRE");
+		sql.SELECT("f_siga_getrecurso(NOMBRE,'"+idLenguaje+"') as NOMBRE");
 
 		sql.FROM("SCS_ACTUADESIG_MOTCAMBIO");
 
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("FECHABAJA IS NOT NULL");
-		sql.WHERE("FECHA_BAJA IS NOT NULL");
+		sql.WHERE("FECHABAJA IS  NULL");
+		sql.WHERE("FECHA_BAJA IS  NULL"); 
 		sql.ORDER_BY("NOMBRE ASC");
-
+ 
 		return sql.toString();
 	}
 

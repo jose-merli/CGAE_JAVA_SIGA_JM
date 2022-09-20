@@ -5005,7 +5005,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				LOGGER.info(
 						"comboMotivosCambioActDesigna() / scsDesignacionesExtendsMapper.comboMotivosCambioActDesigna() -> Entrada a scsDesignacionesExtendsMapper para obtener combo de movitos de cambio de la actuación");
 
-				List<ComboItem> comboItems = scsDesignacionesExtendsMapper.comboMotivosCambioActDesigna(idInstitucion);
+				List<ComboItem> comboItems = scsDesignacionesExtendsMapper.comboMotivosCambioActDesigna(idInstitucion,usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"comboMotivosCambioActDesigna() / scsDesignacionesExtendsMapper.comboMotivosCambioActDesigna() -> Salida e scsDesignacionesExtendsMapper para obtener combo de movitos de cambio de la actuación");
@@ -7745,6 +7745,50 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("DesignacionesServiceImpl.getEJG() -> Saliendo del servicio...");
 
 		return ejg;
+	}
+
+	@Override
+	public StringDTO formatoProcedimiento(HttpServletRequest request) {
+		StringDTO formato = new StringDTO();
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String tipoFormato;
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.formatoProcedimiento() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.formatoProcedimiento -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+					.andParametroEqualTo("FORMATO_VALIDACION_NPROCEDIMIENTO_DESIGNA")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			
+			List<GenParametros> lista = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"formatoProcedimiento() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (lista != null) {
+				tipoFormato = lista.get(0).getValor();
+			} else {
+				tipoFormato = "";
+			}
+			LOGGER.info("formatoProcedimiento()- VALOR: " + tipoFormato);
+			formato.setValor(tipoFormato);
+		}else {
+			formato.setValor("");
+		}
+		return formato;
 	}
 
 }
