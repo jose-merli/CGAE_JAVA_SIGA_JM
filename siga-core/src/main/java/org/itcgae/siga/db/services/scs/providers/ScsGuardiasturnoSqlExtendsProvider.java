@@ -1793,7 +1793,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql2.ORDER_BY(
 				"numeroGrupo, ordengrupo, SCS_INSCRIPCIONGUARDIA.FECHASUSCRIPCION desc, SCS_INSCRIPCIONGUARDIA.Idpersona");
 
-		sql.SELECT("*");
+		sql.SELECT("DISTINCT *");
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ACTIVO = 1");
 
