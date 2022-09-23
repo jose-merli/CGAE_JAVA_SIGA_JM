@@ -1056,8 +1056,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
 					nombrePlantilla = plantillaDoc.getPlantilla();
 					idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
-					if(nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals("fo")) {
-						esFO = true;
+					if (nombrePlantilla.lastIndexOf(".") != -1) {
+						if(nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals("fo")) {
+							esFO = true;
+						}
 					}
 				}else if(listaPlantilla != null && listaPlantilla.size() > 1){
 					LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
