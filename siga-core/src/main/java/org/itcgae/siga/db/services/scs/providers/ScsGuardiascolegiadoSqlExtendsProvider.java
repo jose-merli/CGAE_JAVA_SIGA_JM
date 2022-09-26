@@ -43,7 +43,7 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
                         "AND GC.IDCALENDARIOGUARDIAS = CG.IDCALENDARIOGUARDIAS");
         sql.WHERE("turno.idinstitucion = " + idInstitucion);
         sql.WHERE("nvl(turno.idtipoturno, 2) = 2");
-        sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(cg.fechainicio) AND trunc(cg.fecha_fin)");
+        sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.FECHAINICIO) AND trunc(gc.FECHAFIN)");
         if(idPersona != null
         		&& !"".equals(idPersona)) {
         	sql.WHERE("CG.IDPERSONA = " + idPersona);
@@ -69,21 +69,25 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
             SQL.WHERE("GUA.IDTURNO = '" + idTurno + "'",
                     "GUA.IDINSTITUCION = '" + idInstitucion + "'",
                     "CG.IDPERSONA = '"+idPersona+"'",
-                    "TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(cg.fechainicio) AND trunc(cg.fecha_fin)");
+                    "TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.FECHAINICIO) AND trunc(gc.FECHAFIN)");
             SQL.ORDER_BY("GUA.NOMBRE");
         }else{
-            SQL.SELECT("NOMBRE");
-            SQL.SELECT("IDGUARDIA");
+            SQL.SELECT_DISTINCT("GUA.IDGUARDIA", "GUA.NOMBRE");
+            SQL.FROM("SCS_GUARDIASTURNO GUA");
 
-            SQL.FROM("SCS_GUARDIASTURNO");
-            if (idTurno != null &&  !idTurno.isEmpty()) {
-                SQL.WHERE("IDTURNO IN (" + idTurno + ")");
-            }
-            if (idInstitucion != null) {
-                SQL.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-            }
-            SQL.WHERE("FECHABAJA IS NULL");
-            SQL.ORDER_BY("nombre");
+            SQL.INNER_JOIN("SCS_CALENDARIOGUARDIAS GC ON GC.IDINSTITUCION = GUA.IDINSTITUCION " +
+                            "AND GC.IDTURNO = GUA.IDTURNO " +
+                            "AND GC.IDGUARDIA = GUA.IDGUARDIA ",
+                    "SCS_CABECERAGUARDIAS CG ON GC.IDINSTITUCION = CG.IDINSTITUCION " +
+                            "AND GC.IDTURNO = CG.IDTURNO " +
+                            "AND GC.IDGUARDIA = CG.IDGUARDIA " +
+                            "AND GC.IDCALENDARIOGUARDIAS = CG.IDCALENDARIOGUARDIAS");
+            SQL.WHERE("GUA.IDTURNO = '" + idTurno + "'",
+                    "GUA.IDINSTITUCION = '" + idInstitucion + "'",
+                    "TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.FECHAINICIO) AND trunc(gc.FECHAFIN)");
+
+            SQL.WHERE("GUA.FECHABAJA IS NULL");
+            SQL.ORDER_BY("GUA.NOMBRE");
         }
 
         return SQL.toString();
