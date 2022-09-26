@@ -9,7 +9,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosSOJItem;
-import org.itcgae.siga.db.mappers.ScsAsistenciaSqlProvider;
+import org.itcgae.siga.DTOs.scs.FichaSojItem;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsSojSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -55,4 +55,33 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 	
 	@UpdateProvider(type=ScsSojSqlExtendsProvider.class, method="eliminarRelacionSoj")
     int eliminarRelacionSoj(String idinstitucion, String anio, String numero, String tipoSoj);
+
+	@SelectProvider(type = ScsSojSqlExtendsProvider.class, method = "busquedaSoj")
+	@Results({
+			@Result(column = "IDTIPOSOJ", property = "idTipoSoj", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAAPERTURA", property = "fechaApertura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAAPERTURA", property = "fechaApertura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCIONCONSULTA", property = "descripcionConsulta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RESPUESTALETRADO", property = "respuestaLetrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOSOJCOLEGIO", property = "idTipoSojColegio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONAJG", property = "idPersonaJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FACTURADO", property = "facturado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PAGADO", property = "pagado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMSOJ", property = "numSoj", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOCONSULTA", property = "idTipoConsulta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPORESPUESTA", property = "idTipoRespuesta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ejgIdTipoEjg", property = "ejgIdTipoEjg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ejgAnio", property = "ejgAnio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ejgNumero", property = "ejgNumero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "sufijo", property = "sufijo", jdbcType = JdbcType.VARCHAR),
+	})
+	List<FichaSojItem> busquedaSoj(FichaSojItem fichaSojItem);
 }

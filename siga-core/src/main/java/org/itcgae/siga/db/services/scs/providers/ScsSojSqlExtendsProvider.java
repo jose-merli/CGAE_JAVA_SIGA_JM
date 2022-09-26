@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
-import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.DTOs.scs.FichaSojItem;
 import org.itcgae.siga.db.mappers.ScsSojSqlProvider;
 
 public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
@@ -227,5 +227,14 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
     	
     	return sql.toString();
     }
+
+    public String busquedaSoj(FichaSojItem fichaSojItem) {
+		SQL sql = new SQL();
+		sql.SELECT("ss.*");
+		sql.FROM("SCS_SOJ ss");
+		sql.WHERE(String.format("ss.IDINSTITUCION = %s AND ss.IDTIPOSOJ = %s AND ss.ANIO = %s AND ss.NUMERO = %s",
+				fichaSojItem.getIdInstitucion(), fichaSojItem.getIdTipoSoj(), fichaSojItem.getAnio(), fichaSojItem.getNumero()));
+		return sql.toString();
+	}
 
 }
