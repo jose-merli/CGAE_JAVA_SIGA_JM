@@ -121,7 +121,7 @@ public class EEJGServiceImpl implements IEEJGServices {
 			key.setAnio(Short.parseShort(item.getAnnio()));
 			key.setIdinstitucion(Short.parseShort(item.getidInstitucion()));
 			key.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
-			key.setNumero(Long.parseLong(item.getNumEjg()));
+			key.setNumero(Long.parseLong(item.getNumero()));
 
 			scsEjg = scsEjgMapper.selectByPrimaryKey(key);
 
