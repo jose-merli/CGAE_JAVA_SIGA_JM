@@ -2234,7 +2234,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboTipoMotivo(Short institucion, String idLenguaje) {
+	public String comboTipoMotivo(Short idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 
 		sql.SELECT("IDTIPOMOTIVO, F_SIGA_GETRECURSO(E.DESCRIPCION, " + idLenguaje + ") as Descripcion");

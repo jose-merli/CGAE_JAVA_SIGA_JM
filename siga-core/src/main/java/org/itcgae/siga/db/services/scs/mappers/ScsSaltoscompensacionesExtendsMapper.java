@@ -59,7 +59,7 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMERO", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR) })
-	List<LetradoGuardiaItem> searchSaltosOCompensacionesOficio(String idInstitucion, String idTurno, String guardia, String saltoocompensacion);
+	List<LetradoGuardiaItem> searchSaltosOCompensacionesOficio(String idInstitucion, String idTurno, String idGuardia, String saltoocompensacion);
 
 	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "searchLetrados")
 	@Results({ @Result(column = "NUMEROGRUPO", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),

@@ -520,7 +520,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "DILNIGPROC", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NCOL", property = "nColLetrado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIF", property = "nifInteresado", jdbcType = JdbcType.VARCHAR)})
-	List<RelacionesItem> busquedaRelaciones(String anio, String num, String idTurno, String idinstitucion);
+	List<RelacionesItem> busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion);
 	
 
 	@DeleteProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "eliminarRelacion")
