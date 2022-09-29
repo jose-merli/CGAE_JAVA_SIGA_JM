@@ -215,7 +215,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		try {
 			sql = "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
 					+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
-					+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
+					+ " des.fechaentrada fechaentrada,des.resumenasunto, des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 					+ "  des.fechaestado fechaestado,juzgado.nombre as nombrejuzgado,  turno.nombre,";
 			sql +=  " colegiado.ncolegiado, persona.idpersona, NVL(persona.nombre,'') as nombrepersona, NVL(persona.APELLIDOS1,'') as apellido1persona, NVL(persona.APELLIDOS2,'') as apellido2persona ,";
 			sql += " NVL(PER.NOMBRE,'') AS NOMBREINTERESADO," + " NVL(PER.APELLIDO1,'') as APELLIDO1, NVL(PER.APELLIDO2,'') as APELLIDO2 ";
@@ -394,11 +394,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 			}
 			
-			if (designaItem.getAsunto() != null && !designaItem.getAsunto().equalsIgnoreCase("")) {
+			if (tiene_asunto) {
 				contador++;
 				codigosBind.put(new Integer(contador), designaItem.getAsunto().trim());
 //				sql += " AND des.resumenasunto = '" + designaItem.getAsunto() + "'";
-				sql += " AND regexp_like(des.OBSERVACIONES,'" + designaItem.getAsunto() + "')";
+				sql += " AND regexp_like(des.resumenasunto,'" + designaItem.getAsunto() + "')";
 			}
 
 			if (designaItem.getIdModuloActuaciones() != null && designaItem.getIdModuloActuaciones().length > 0) {
@@ -633,9 +633,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						sql += " AND act.idjuzgado IN (" + turnoIN + " )";
 					}
 				}
-				if (tiene_asunto) {
+				/*if (tiene_asunto) {
 					sql += " AND des.RESUMENASUNTO = '" + designaItem.getAsunto().trim() + "' ";
-				}
+				}*/
 				if (tiene_acreditacion) {
 					if (designaItem.getIdAcreditacion().toString().indexOf(',') != -1) {
 						sql += " AND act.idacreditacion = " + designaItem.getIdAcreditacion()[0];

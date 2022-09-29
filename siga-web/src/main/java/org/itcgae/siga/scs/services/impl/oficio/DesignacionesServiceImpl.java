@@ -2005,6 +2005,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					scsDesigna.setAnio(a.shortValue());
 					Long b = new Long(designaItem.getNumero());
 					scsDesigna.setNumero(b.longValue());
+					if(designaItem.getResumenAsunto() != null && !designaItem.getResumenAsunto().isEmpty()) {
+						scsDesigna.setResumenasunto(designaItem.getResumenAsunto());
+					}
 
 					if (designaItem.getFechaAnulacion() == null) {
 						scsDesigna.setEstado(designaItem.getEstado());
