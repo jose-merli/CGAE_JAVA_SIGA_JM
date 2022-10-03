@@ -50,6 +50,7 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 	private boolean diaDespuesDisabled;
 	private String guardiaRequeridaValidacion;
 	private String idJuzgado;
+	private String idInstitucion;
 
 	public String getGuardiaRequeridaValidacion() {
 		return guardiaRequeridaValidacion;
@@ -675,5 +676,13 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 		} else {
 			return Integer.valueOf(this.getNumero()).compareTo(Integer.valueOf(that.getNumero()));
 		}
+	}
+
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 }

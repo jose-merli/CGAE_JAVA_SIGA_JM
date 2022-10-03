@@ -114,7 +114,8 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 			@Result(column = "fechacierre", property = "fechaCierre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fechasolicitud", property = "fechaSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "REQUERIDAVALIDACION", property = "guardiaRequeridaValidacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "JUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "JUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<TarjetaAsistenciaResponseItem> searchAsistencias(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion, Integer idLenguaje, Integer tamMax);
 

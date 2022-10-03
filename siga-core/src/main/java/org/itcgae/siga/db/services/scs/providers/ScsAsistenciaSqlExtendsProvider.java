@@ -701,7 +701,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 	public String searchAsistencias(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion, Integer idLenguaje, Integer tamMax) {
 		SQL SQL = new SQL();
 		SQL SQL_PADRE = new SQL();
-		SQL.SELECT("a.anio");
+		SQL.SELECT("a.anio, a.idInstitucion");
 		SQL.SELECT("a.numero");
 		SQL.SELECT("TO_CHAR(a.fechahora,'DD/MM/YYYY HH24:MI') fechahora");
 		SQL.SELECT("a.idguardia");
