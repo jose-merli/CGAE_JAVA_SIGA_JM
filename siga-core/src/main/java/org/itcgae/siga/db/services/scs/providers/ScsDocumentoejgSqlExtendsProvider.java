@@ -14,11 +14,11 @@ public class ScsDocumentoejgSqlExtendsProvider extends ScsDocumentoejgSqlProvide
 		sql.SELECT("documento.idinstitucion");
 		sql.SELECT("documento.idtipodocumentoejg AS IDTIPODOC");
 		sql.SELECT("documento.iddocumentoejg AS IDDOCUMENTO");
-		sql.SELECT("documento.abreviatura AS ABREVIATURADOC");
+		sql.SELECT("F_SIGA_GETRECURSO(documento.abreviatura," + idLenguaje + ") AS ABREVIATURADOC");
 		sql.SELECT("documento.codigoext AS DOCCODIGOEXT");
 		sql.SELECT("catdocumento.descripcion AS DESCRIPCION");
 		sql.SELECT("DOCUMENTO.fechabaja AS FECHABAJA");
-		sql.SELECT("CATDOCUMENTO.IDRECURSO AS CODIGODESCRIPCION");
+		sql.SELECT("F_SIGA_GETRECURSO(CATDOCUMENTO.IDRECURSO," + idLenguaje +") AS CODIGODESCRIPCION");
 
 
 		sql.FROM("SCS_DOCUMENTOEJG documento");

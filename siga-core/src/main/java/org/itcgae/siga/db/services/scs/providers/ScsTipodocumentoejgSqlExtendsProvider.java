@@ -15,10 +15,10 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
                     
                     sql.SELECT("tipodocumento.idinstitucion");
                     sql.SELECT("tipodocumento.idtipodocumentoejg AS IDTIPODOC");
-                    sql.SELECT("tipodocumento.abreviatura");
+                    sql.SELECT("F_SIGA_GETRECURSO(tipodocumento.abreviatura," + idLenguaje +") as abreviatura");
                     sql.SELECT("tipodocumento.fechabaja AS FECHABAJA");
-                    sql.SELECT("documento.abreviatura AS ABREVIATURADOC");
-                    sql.SELECT("tipodocumento.descripcion AS CODIGODESCRIPCION");
+                    sql.SELECT("F_SIGA_GETRECURSO(documento.abreviatura," + idLenguaje +") AS ABREVIATURADOC");
+                    sql.SELECT("F_SIGA_GETRECURSO(tipodocumento.descripcion," + idLenguaje +") AS CODIGODESCRIPCION");
                     sql.SELECT("CATTIPODOCUMENTO.descripcion AS DESCRIPCIONTIPO");
                     sql.SELECT("tipodocumento.codigoext");
                     sql.SELECT("CATDOCUMENTO.descripcion"); 
