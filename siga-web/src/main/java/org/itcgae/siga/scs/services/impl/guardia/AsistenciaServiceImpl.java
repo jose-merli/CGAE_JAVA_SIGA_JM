@@ -1869,6 +1869,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									asistenciaResponse.setNig(asistencia.getNig());
 									asistenciaResponse.setNumDiligencia(asistencia.getNumerodiligencia());
 									asistenciaResponse.setNumProcedimiento(asistencia.getNumeroprocedimiento());
+									asistenciaResponse.setIdInstitucion(asistencia.getIdinstitucion().toString());
 									if (asistencia.getIdpretension() != null) {
 										asistenciaResponse
 												.setIdProcedimiento(String.valueOf(asistencia.getIdpretension()));
