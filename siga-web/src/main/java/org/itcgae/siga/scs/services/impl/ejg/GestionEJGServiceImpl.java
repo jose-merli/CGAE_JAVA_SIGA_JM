@@ -3453,24 +3453,28 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					LOGGER.info("GestionEJGServiceImpl.descargarDocumentoResolucion -> Path Descarga: " + path);
 
 					File file = new File(path);
-					FileInputStream fileStream = new FileInputStream(file);
+					if(file.exists()) {
+						FileInputStream fileStream = new FileInputStream(file);
 
-					headers.setContentType(MediaType.parseMediaType("application/zip"));
+						headers.setContentType(MediaType.parseMediaType("application/zip"));
 
-					headers.set("Content-Disposition", "attachment; filename=\"" + docResolucion + "\"");
-//                                                                           headers.setContentLength(file.length());
+						headers.set("Content-Disposition", "attachment; filename=\"" + docResolucion + "\"");
+//	                                                                           headers.setContentLength(file.length());
 
-					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
-							HttpStatus.OK);
+						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+								HttpStatus.OK);
 
-					LOGGER.error(
-							"GestionEJGServiceImpl.descargarDocumentoResolucion() -> Operación realizada correctamente. Saliendo del servicio");
-
+						LOGGER.info(
+								"GestionEJGServiceImpl.descargarDocumentoResolucion() -> Operación realizada correctamente. Saliendo del servicio");
+					}else {
+						LOGGER.warn(
+								"GestionEJGServiceImpl.descargarDocumentoResolucion() -> No se encuentra el fichero actual.");
+						res = new ResponseEntity<InputStreamResource>(null, null, HttpStatus.BAD_REQUEST);
+					}
 				} catch (Exception e) {
 					res = new ResponseEntity<InputStreamResource>(null, null, HttpStatus.BAD_REQUEST);
 					LOGGER.error("GestionEJGServiceImpl.descargarDocumentoResolucion() -> " + e.getMessage());
-					LOGGER.warn(
-							"GestionEJGServiceImpl.descargarDocumentoResolucion() -> Se ha producido un error en la descarga del documento de resolucion");
+					
 				}
 			}
 		}
