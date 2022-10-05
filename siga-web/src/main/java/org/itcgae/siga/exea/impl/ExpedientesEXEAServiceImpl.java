@@ -1413,6 +1413,8 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         ficheroVo.setUsumodificacion(idUsuario);
         ficheroVo.setFechamodificacion(new Date());
         ficherosServiceImpl.insert(ficheroVo);
+        
+        LOGGER.info("uploadFile(), -> Directorio " + ficheroVo.getDirectorio() +" | Nombre: "+ ficheroVo.getNombre());
 
         SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
 
