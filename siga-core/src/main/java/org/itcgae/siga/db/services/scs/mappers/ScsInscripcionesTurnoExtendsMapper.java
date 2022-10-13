@@ -64,7 +64,7 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="FECHADENEGACION", property="fechadenegacion", jdbcType=JdbcType.TIMESTAMP),
 	        @Result(column="OBSERVACIONESDENEGACION", property="observacionesdenegacion", jdbcType=JdbcType.VARCHAR),
 	        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR) })
-	    List<InscripcionesItem> busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem,Short idInstitucion, String idlenguaje);
+	    List<InscripcionesItem> busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem, Short idInstitucion, String idLenguaje);
 	 
 	//SIGARNV-2009@DTT.JAMARTIN@06/08/2021@INICIO
 	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="buscaTurnoInscrito")

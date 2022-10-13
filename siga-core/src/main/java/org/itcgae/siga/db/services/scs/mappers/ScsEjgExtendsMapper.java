@@ -293,8 +293,11 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	List<ProcuradorItem> busquedaProcuradorEJG(String idProcurador, String idinstitucion);// String num, String idturno,
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getNewIdDocumentacionEjg")
-	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })
+	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR) })
 	MaxIdDto getNewIdDocumentacionEjg(Short idInstitucion);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getMaxNumEjg")
+	String getMaxNumEjg(Short idInstitucion, String anio, String idTipo);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgDictamen")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })

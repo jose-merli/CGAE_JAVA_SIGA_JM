@@ -1805,6 +1805,27 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				}
 				if (!ejg.getNumejg().equals(datos.getNumEjg())) {
+					// Comprobamos si existe el valor de codigo designa en el campo codigo de BBDD.
+					
+					ScsEjgExample exampleEJG = new ScsEjgExample();
+					exampleEJG.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andAnioEqualTo(Short.parseShort(datos.getAnnio()))
+						.andNumejgEqualTo(datos.getNumEjg());
+					List<ScsEjg> lista = scsEjgExtendsMapper.selectByExample(exampleEJG);
+					if(lista!= null) {
+						String codigoBBDD = lista.get(0).getNumejg();
+						if (codigoBBDD != null) {
+							
+							String maxNumEJG = scsEjgExtendsMapper.getMaxNumEjg(idInstitucion, datos.getAnnio(), datos.getTipoEJG());
+							Error error = new Error();
+							error.setCode(400);
+							error.setDescription(maxNumEJG);
+							error.setMessage("justiciaGratuita.oficio.ejg.yaexiste");
+							responsedto.setStatus(SigaConstants.KO);
+							responsedto.setError(error);
+							return responsedto;
+						}
+					}
 					insertAuditoriaEJG("Numero EJG", ejg.getNumejg().toString(), datos.getNumEjg(), usuarios.get(0),
 							(ScsEjg) ejg);
 					ejg.setNumejg(datos.getNumEjg());
@@ -3453,24 +3474,28 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					LOGGER.info("GestionEJGServiceImpl.descargarDocumentoResolucion -> Path Descarga: " + path);
 
 					File file = new File(path);
-					FileInputStream fileStream = new FileInputStream(file);
+					if(file.exists()) {
+						FileInputStream fileStream = new FileInputStream(file);
 
-					headers.setContentType(MediaType.parseMediaType("application/zip"));
+						headers.setContentType(MediaType.parseMediaType("application/zip"));
 
-					headers.set("Content-Disposition", "attachment; filename=\"" + docResolucion + "\"");
-//                                                                           headers.setContentLength(file.length());
+						headers.set("Content-Disposition", "attachment; filename=\"" + docResolucion + "\"");
+//	                                                                           headers.setContentLength(file.length());
 
-					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
-							HttpStatus.OK);
+						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+								HttpStatus.OK);
 
-					LOGGER.error(
-							"GestionEJGServiceImpl.descargarDocumentoResolucion() -> Operación realizada correctamente. Saliendo del servicio");
-
+						LOGGER.info(
+								"GestionEJGServiceImpl.descargarDocumentoResolucion() -> Operación realizada correctamente. Saliendo del servicio");
+					}else {
+						LOGGER.warn(
+								"GestionEJGServiceImpl.descargarDocumentoResolucion() -> No se encuentra el fichero actual.");
+						res = new ResponseEntity<InputStreamResource>(null, null, HttpStatus.BAD_REQUEST);
+					}
 				} catch (Exception e) {
 					res = new ResponseEntity<InputStreamResource>(null, null, HttpStatus.BAD_REQUEST);
 					LOGGER.error("GestionEJGServiceImpl.descargarDocumentoResolucion() -> " + e.getMessage());
-					LOGGER.warn(
-							"GestionEJGServiceImpl.descargarDocumentoResolucion() -> Se ha producido un error en la descarga del documento de resolucion");
+					
 				}
 			}
 		}

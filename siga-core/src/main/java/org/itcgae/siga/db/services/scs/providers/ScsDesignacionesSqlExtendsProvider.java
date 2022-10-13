@@ -31,7 +31,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	private Logger LOGGER = Logger.getLogger(ScsDesignacionesSqlExtendsProvider.class);
 	
-	public String searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax, String idLenguaje) {
+	public String searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo, String idLenguaje) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String fecha;
 		
@@ -160,7 +160,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sqlPpal = new SQL();
 		sqlPpal.SELECT("*");
 		sqlPpal.FROM("("+sql.toString()+") consulta");
-		sqlPpal.WHERE("ROWNUM <= " + tamMax);
+		sqlPpal.WHERE("ROWNUM <= " + tamMaximo);
 		
 		return sqlPpal.toString();
 	}
