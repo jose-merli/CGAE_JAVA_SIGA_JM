@@ -22,4 +22,56 @@ public class ScsTipoSOJSqlExtendsProvider extends ScsTiposojSqlProvider {
 		return sql.toString();
 	}
 	
+	public String comboTipoSOJColegio(Short idLenguaje,Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("tipocolegio.IDTIPOSOJCOLEGIO");
+		sql.SELECT("cat.descripcion");
+		sql.FROM("SCS_TIPOSOJCOLEGIO tipocolegio");
+		sql.INNER_JOIN(
+				"gen_recursos_catalogos cat on cat.IDRECURSO = tipocolegio.descripcion and cat.idlenguaje = '"
+						+ idLenguaje + "'");
+		sql.WHERE("tipocolegio.fecha_baja is null");
+		sql.WHERE("tipocolegio.idinstitucion = " + idInstitucion);
+		sql.ORDER_BY("cat.descripcion");
+
+		return sql.toString();
+	}
+	
+	public String comboTipoConsulta(Short idLenguaje,Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("tipocon.IDTIPOCONSULTA");
+		sql.SELECT("cat.descripcion");
+		sql.FROM("SCS_TIPOCONSULTA tipocon");
+		sql.INNER_JOIN(
+				"gen_recursos_catalogos cat on cat.IDRECURSO = tipocon.descripcion and cat.idlenguaje = '"
+						+ idLenguaje + "'");
+		sql.WHERE("tipocon.fecha_baja is null");
+		sql.WHERE("tipocon.idinstitucion = " + idInstitucion);
+		sql.ORDER_BY("cat.descripcion");
+
+		return sql.toString();
+	}
+	
+	public String comboTipoRespuesta(Short idLenguaje,Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("tipores.IDTIPORESPUESTA");
+		sql.SELECT("cat.descripcion");
+		sql.FROM("SCS_TIPORESPUESTA tipores");
+		sql.INNER_JOIN(
+				"gen_recursos_catalogos cat on cat.IDRECURSO = tipores.descripcion and cat.idlenguaje = '"
+						+ idLenguaje + "'");
+		sql.WHERE("tipores.fecha_baja is null");
+		sql.WHERE("tipores.idinstitucion = " + idInstitucion);
+		sql.ORDER_BY("cat.descripcion");
+
+		return sql.toString();
+	}
+	
+	
 }

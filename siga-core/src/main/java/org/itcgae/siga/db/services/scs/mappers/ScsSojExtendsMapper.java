@@ -1,15 +1,21 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.util.Date;
 import java.util.List;
+
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosSOJItem;
+import org.itcgae.siga.DTOs.scs.DocumentacionSojItem;
 import org.itcgae.siga.DTOs.scs.FichaSojItem;
+import org.itcgae.siga.db.entities.ScsSoj;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsSojSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -82,6 +88,26 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 			@Result(column = "ejgAnio", property = "ejgAnio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ejgNumero", property = "ejgNumero", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "sufijo", property = "sufijo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ncolegiado", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombreAp", property = "nombreAp", jdbcType = JdbcType.VARCHAR),
 	})
 	List<FichaSojItem> busquedaSoj(FichaSojItem fichaSojItem);
+	
+	
+	@UpdateProvider(type=ScsSojSqlExtendsProvider.class, method="asociarSOJ")
+    int asociarSOJ(ScsSoj fichaSojItem);
+	
+	@InsertProvider(type=ScsSojSqlExtendsProvider.class, method="subirDocumentoSOJ")
+    InsertResponseDTO subirDocumentoSOJ(DocumentacionSojItem documentacion,Short idInstitucion,String fechaActualizada);
+	
+	@SelectProvider(type = ScsSojSqlExtendsProvider.class, method = "busquedaDocumentosSOJ")
+	@Results({
+		    @Result(column = "IDDOCUMENTACION", property = "idDocumentacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHALIMITE", property = "fechaLimite", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAENTREGA", property = "fechaPresentacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "REGENTRADA", property = "registroEntrada", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "REGSALIDA", property = "registroSalida", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DOCUMENTACION", property = "documentacion", jdbcType = JdbcType.VARCHAR),
+	})
+	List<DocumentacionSojItem> busquedaDocumentosSOJ(FichaSojItem fichaSojItem);
 }

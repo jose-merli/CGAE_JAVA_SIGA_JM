@@ -23,4 +23,25 @@ public interface ScsTipoSOJExtendsMapper extends ScsTipodesignacolegioMapper{
 	})
 	List<ComboItem> comboTipoSOJ(Short idLenguaje);
 	
+	@SelectProvider(type = ScsTipoSOJSqlExtendsProvider.class, method = "comboTipoSOJColegio")
+	@Results({
+		@Result(column = "IDTIPOSOJCOLEGIO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboTipoSOJColegio(Short idLenguaje,Short idInstitucion);
+	
+	@SelectProvider(type = ScsTipoSOJSqlExtendsProvider.class, method = "comboTipoConsulta")
+	@Results({
+		@Result(column = "IDTIPOCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboTipoConsulta(Short idLenguaje,Short idInstitucion);
+	
+	@SelectProvider(type = ScsTipoSOJSqlExtendsProvider.class, method = "comboTipoRespuesta")
+	@Results({
+		@Result(column = "IDTIPORESPUESTA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboTipoRespuesta(Short idLenguaje,Short idInstitucion);
+	
 }

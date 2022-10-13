@@ -2575,6 +2575,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							scsPersonajg.setApellido1(justiciable.getApellido1());
 							scsPersonajg.setApellido2(justiciable.getApellido2());
 							scsPersonajg.setTipopersonajg(justiciable.getTipoPersonajg());
+							scsPersonajg.setTipopersonajg(justiciable.getTipoPersonajg());
 							scsPersonajg.setFechamodificacion(new Date());
 
 						} else {

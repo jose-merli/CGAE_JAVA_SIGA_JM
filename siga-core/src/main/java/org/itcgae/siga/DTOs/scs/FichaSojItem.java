@@ -3,217 +3,247 @@ package org.itcgae.siga.DTOs.scs;
 import java.util.Date;
 
 public class FichaSojItem {
-    private String idInstitucion;
-    private String idTipoSoj;
-    private String idTipoSojColegio;
-    private String anio;
-    private String numero;
+	private String idInstitucion;
+	private String idTipoSoj;
+	private String idTipoSojColegio;
+	private String anio;
+	private String numero;
+	private String sufijo;
+	private String numSoj;
+	private Date fechaApertura;
+	private String estado;
+	private String idPersona;
+	private String idPersonaJG;
+	private String idTurno;
+	private String idGuardia;
+	private String idTipoConsulta;
+	private String idTipoRespuesta;
+	private String descripcionConsulta;
+	private String respuestaLetrado;
+	private String ejgIdTipoEjg;
+	private String ejgAnio;
+	private String ejgNumero;
+	private String facturado;
+	private String pagado;
+	private String idFacturacion;
+	private String actualizaDatos;
+	private JusticiableItem justiciable;
+	private String ncolegiado;
+	private String nombreAp;
 
-    private String sufijo;
-    private String numSoj;
+	public String getNombreAp() {
+		return nombreAp;
+	}
 
-    private Date fechaApertura;
-    private String estado;
-    private String idPersona;
-    private String idPersonaJG;
+	public void setNombreAp(String nombreAp) {
+		this.nombreAp = nombreAp;
+	}
 
-    private String idTurno;
-    private String idGuardia;
+	public String getNcolegiado() {
+		return ncolegiado;
+	}
 
-    private String idTipoConsulta;
-    private String idTipoRespuesta;
-    private String descripcionConsulta;
-    private String respuestaLetrado;
+	public void setNcolegiado(String ncolegiado) {
+		this.ncolegiado = ncolegiado;
+	}
 
-    private String ejgIdTipoEjg;
-    private String ejgAnio;
-    private String ejgNumero;
+	public JusticiableItem getJusticiable() {
+		return justiciable;
+	}
 
-    private String facturado;
-    private String pagado;
-    private String idFacturacion;
+	public void setJusticiable(JusticiableItem justiciable) {
+		this.justiciable = justiciable;
+	}
 
-    public String getIdInstitucion() {
-        return idInstitucion;
-    }
+	public String getActualizaDatos() {
+		return actualizaDatos;
+	}
 
-    public void setIdInstitucion(String idInstitucion) {
-        this.idInstitucion = idInstitucion;
-    }
+	public void setActualizaDatos(String actualizaDatos) {
+		this.actualizaDatos = actualizaDatos;
+	}
 
-    public String getIdTipoSoj() {
-        return idTipoSoj;
-    }
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
 
-    public void setIdTipoSoj(String idTipoSoj) {
-        this.idTipoSoj = idTipoSoj;
-    }
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
 
-    public String getAnio() {
-        return anio;
-    }
+	public String getIdTipoSoj() {
+		return idTipoSoj;
+	}
 
-    public void setAnio(String anio) {
-        this.anio = anio;
-    }
+	public void setIdTipoSoj(String idTipoSoj) {
+		this.idTipoSoj = idTipoSoj;
+	}
 
-    public String getNumero() {
-        return numero;
-    }
+	public String getAnio() {
+		return anio;
+	}
 
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
 
-    public String getSufijo() {
-        return sufijo;
-    }
+	public String getNumero() {
+		return numero;
+	}
 
-    public void setSufijo(String sufijo) {
-        this.sufijo = sufijo;
-    }
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
 
-    public String getNumSoj() {
-        return numSoj;
-    }
+	public String getSufijo() {
+		return sufijo;
+	}
 
-    public void setNumSoj(String numSoj) {
-        this.numSoj = numSoj;
-    }
+	public void setSufijo(String sufijo) {
+		this.sufijo = sufijo;
+	}
 
-    public Date getFechaApertura() {
-        return fechaApertura;
-    }
+	public String getNumSoj() {
+		return numSoj;
+	}
 
-    public void setFechaApertura(Date fechaApertura) {
-        this.fechaApertura = fechaApertura;
-    }
+	public void setNumSoj(String numSoj) {
+		this.numSoj = numSoj;
+	}
 
-    public String getEstado() {
-        return estado;
-    }
+	public Date getFechaApertura() {
+		return fechaApertura;
+	}
 
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
+	public void setFechaApertura(Date fechaApertura) {
+		this.fechaApertura = fechaApertura;
+	}
 
-    public String getIdPersona() {
-        return idPersona;
-    }
+	public String getEstado() {
+		return estado;
+	}
 
-    public void setIdPersona(String idPersona) {
-        this.idPersona = idPersona;
-    }
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
 
-    public String getIdTurno() {
-        return idTurno;
-    }
+	public String getIdPersona() {
+		return idPersona;
+	}
 
-    public void setIdTurno(String idTurno) {
-        this.idTurno = idTurno;
-    }
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
 
-    public String getIdGuardia() {
-        return idGuardia;
-    }
+	public String getIdTurno() {
+		return idTurno;
+	}
 
-    public void setIdGuardia(String idGuardia) {
-        this.idGuardia = idGuardia;
-    }
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
 
-    public String getIdTipoConsulta() {
-        return idTipoConsulta;
-    }
+	public String getIdGuardia() {
+		return idGuardia;
+	}
 
-    public void setIdTipoConsulta(String idTipoConsulta) {
-        this.idTipoConsulta = idTipoConsulta;
-    }
+	public void setIdGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
+	}
 
-    public String getIdTipoRespuesta() {
-        return idTipoRespuesta;
-    }
+	public String getIdTipoConsulta() {
+		return idTipoConsulta;
+	}
 
-    public void setIdTipoRespuesta(String idTipoRespuesta) {
-        this.idTipoRespuesta = idTipoRespuesta;
-    }
+	public void setIdTipoConsulta(String idTipoConsulta) {
+		this.idTipoConsulta = idTipoConsulta;
+	}
 
-    public String getDescripcionConsulta() {
-        return descripcionConsulta;
-    }
+	public String getIdTipoRespuesta() {
+		return idTipoRespuesta;
+	}
 
-    public void setDescripcionConsulta(String descripcionConsulta) {
-        this.descripcionConsulta = descripcionConsulta;
-    }
+	public void setIdTipoRespuesta(String idTipoRespuesta) {
+		this.idTipoRespuesta = idTipoRespuesta;
+	}
 
-    public String getRespuestaLetrado() {
-        return respuestaLetrado;
-    }
+	public String getDescripcionConsulta() {
+		return descripcionConsulta;
+	}
 
-    public void setRespuestaLetrado(String respuestaLetrado) {
-        this.respuestaLetrado = respuestaLetrado;
-    }
+	public void setDescripcionConsulta(String descripcionConsulta) {
+		this.descripcionConsulta = descripcionConsulta;
+	}
 
-    public String getEjgIdTipoEjg() {
-        return ejgIdTipoEjg;
-    }
+	public String getRespuestaLetrado() {
+		return respuestaLetrado;
+	}
 
-    public void setEjgIdTipoEjg(String ejgIdTipoEjg) {
-        this.ejgIdTipoEjg = ejgIdTipoEjg;
-    }
+	public void setRespuestaLetrado(String respuestaLetrado) {
+		this.respuestaLetrado = respuestaLetrado;
+	}
 
-    public String getEjgAnio() {
-        return ejgAnio;
-    }
+	public String getEjgIdTipoEjg() {
+		return ejgIdTipoEjg;
+	}
 
-    public void setEjgAnio(String ejgAnio) {
-        this.ejgAnio = ejgAnio;
-    }
+	public void setEjgIdTipoEjg(String ejgIdTipoEjg) {
+		this.ejgIdTipoEjg = ejgIdTipoEjg;
+	}
 
-    public String getEjgNumero() {
-        return ejgNumero;
-    }
+	public String getEjgAnio() {
+		return ejgAnio;
+	}
 
-    public void setEjgNumero(String ejgNumero) {
-        this.ejgNumero = ejgNumero;
-    }
+	public void setEjgAnio(String ejgAnio) {
+		this.ejgAnio = ejgAnio;
+	}
 
-    public String getFacturado() {
-        return facturado;
-    }
+	public String getEjgNumero() {
+		return ejgNumero;
+	}
 
-    public void setFacturado(String facturado) {
-        this.facturado = facturado;
-    }
+	public void setEjgNumero(String ejgNumero) {
+		this.ejgNumero = ejgNumero;
+	}
 
-    public String getPagado() {
-        return pagado;
-    }
+	public String getFacturado() {
+		return facturado;
+	}
 
-    public void setPagado(String pagado) {
-        this.pagado = pagado;
-    }
+	public void setFacturado(String facturado) {
+		this.facturado = facturado;
+	}
 
-    public String getIdTipoSojColegio() {
-        return idTipoSojColegio;
-    }
+	public String getPagado() {
+		return pagado;
+	}
 
-    public void setIdTipoSojColegio(String idTipoSojColegio) {
-        this.idTipoSojColegio = idTipoSojColegio;
-    }
+	public void setPagado(String pagado) {
+		this.pagado = pagado;
+	}
 
-    public String getIdPersonaJG() {
-        return idPersonaJG;
-    }
+	public String getIdTipoSojColegio() {
+		return idTipoSojColegio;
+	}
 
-    public void setIdPersonaJG(String idPersonaJG) {
-        this.idPersonaJG = idPersonaJG;
-    }
+	public void setIdTipoSojColegio(String idTipoSojColegio) {
+		this.idTipoSojColegio = idTipoSojColegio;
+	}
 
-    public String getIdFacturacion() {
-        return idFacturacion;
-    }
+	public String getIdPersonaJG() {
+		return idPersonaJG;
+	}
 
-    public void setIdFacturacion(String idFacturacion) {
-        this.idFacturacion = idFacturacion;
-    }
+	public void setIdPersonaJG(String idPersonaJG) {
+		this.idPersonaJG = idPersonaJG;
+	}
+
+	public String getIdFacturacion() {
+		return idFacturacion;
+	}
+
+	public void setIdFacturacion(String idFacturacion) {
+		this.idFacturacion = idFacturacion;
+	}
 }
