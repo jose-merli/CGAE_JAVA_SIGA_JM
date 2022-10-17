@@ -178,7 +178,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		return sql.toString();
 	}
 
-	public String historicoFacturacion(String idFacturacion, String lenguaje, String idInstitucion) {
+	public String historicoFacturacion(String idFacturacion, String idLenguaje, String idInstitucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("EST.IDESTADOFACTURACION");
@@ -201,7 +201,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		sql.WHERE("EST.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("EST.IDFACTURACION = '" + idFacturacion + "'");
-		sql.WHERE("REC.IDLENGUAJE = '" + lenguaje + "'");
+		sql.WHERE("REC.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.ORDER_BY("FECHAESTADO DESC");
 
 		return sql.toString();

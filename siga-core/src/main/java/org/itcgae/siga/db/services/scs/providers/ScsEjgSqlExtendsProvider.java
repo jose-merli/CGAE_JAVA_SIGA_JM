@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.scs.providers;
 import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
@@ -1958,6 +1959,19 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_DOCUMENTACIONEJG DOC");
 
 		sql.WHERE("DOC.IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
+	
+	public String getMaxNumEjg(Short idInstitucion, String anio, String idTipo) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(NUMEJG) AS ID");
+
+		sql.FROM("SCS_EJG EJG");
+
+		sql.WHERE("EJG.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("EJG.anio = " + anio);
 
 		return sql.toString();
 	}

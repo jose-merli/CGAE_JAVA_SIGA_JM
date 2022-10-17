@@ -294,6 +294,100 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
+	public ComboDTO comboTipoSOJColegio(HttpServletRequest request) {
+
+		LOGGER.info("comboTipoSOJColegio() -> Entrada al servicio para búsqueda de comboTipoSOJColegio");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboTipoSOJColegio() / scsTipoSOJExtendsMapper.comboTipoSOJColegio() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo Tipo Soj Colegio");
+
+				List<ComboItem> comboItems = scsTipoSOJExtendsMapper
+						.comboTipoSOJColegio(Short.parseShort(usuarios.get(0).getIdlenguaje()),idInstitucion);
+
+				LOGGER.info(
+						"comboTipoSOJColegio() / scsTipoSOJExtendsMapper.comboTipoSOJColegio() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo Tipo Soj Colegio");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboTipoSOJColegio() -> Salida del servicio para obtener combo combo Tipo Soj Colegio");
+		}
+		return comboDTO;
+	}
+	@Override
+	public ComboDTO comboTipoConsulta(HttpServletRequest request) {
+
+		LOGGER.info("comboTipoConsulta() -> Entrada al servicio para búsqueda de comboTipoConsulta");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboTipoConsulta() / scsTipoSOJExtendsMapper.comboTipoConsulta() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo Tipo Consulta");
+
+				List<ComboItem> comboItems = scsTipoSOJExtendsMapper
+						.comboTipoConsulta(Short.parseShort(usuarios.get(0).getIdlenguaje()),idInstitucion);
+
+				LOGGER.info(
+						"comboTipoConsulta() / scsTipoSOJExtendsMapper.comboTipoConsulta() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo Tipo Consulta");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboTipoConsulta() -> Salida del servicio para obtener combo combo Tipo Consulta");
+		}
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboTipoRespuesta(HttpServletRequest request) {
+
+		LOGGER.info("comboTipoRespuesta() -> Entrada al servicio para búsqueda de comboTipoRespuesta");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboTipoRespuesta() / scsTipoSOJExtendsMapper.comboTipoRespuesta() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo Tipo Respuesta");
+
+				List<ComboItem> comboItems = scsTipoSOJExtendsMapper
+						.comboTipoRespuesta(Short.parseShort(usuarios.get(0).getIdlenguaje()),idInstitucion);
+
+				LOGGER.info(
+						"comboTipoRespuesta() / scsTipoSOJExtendsMapper.comboTipoRespuesta() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo Tipo Respuesta");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboTipoRespuesta() -> Salida del servicio para obtener combo combo Tipo Respuesta");
+		}
+		return comboDTO;
+	}
+	@Override
 	public ComboDTO comboComisaria(HttpServletRequest request) {
 
 		LOGGER.info("comboComisaria() -> Entrada al servicio para búsqueda de Comisaria");

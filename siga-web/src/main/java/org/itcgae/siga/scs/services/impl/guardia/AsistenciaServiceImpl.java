@@ -2575,6 +2575,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							scsPersonajg.setApellido1(justiciable.getApellido1());
 							scsPersonajg.setApellido2(justiciable.getApellido2());
 							scsPersonajg.setTipopersonajg(justiciable.getTipoPersonajg());
+							scsPersonajg.setTipopersonajg(justiciable.getTipoPersonajg());
 							scsPersonajg.setFechamodificacion(new Date());
 
 						} else {
@@ -3738,12 +3739,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				while (itr.hasNext()) {
 
 					MultipartFile file = request.getFile(itr.next());
+					LOGGER.info("DesignacionesServiceImpl.subirDocumentoDesigna() / FileName : " + file.getOriginalFilename());
 					String nombreFichero = file.getOriginalFilename().split(";")[0];
 					String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
 					DocumentacionAsistenciaItem documentacionAsistenciaItem = objectMapper.readValue(json,
 							DocumentacionAsistenciaItem.class);
 					String extension = FilenameUtils.getExtension(nombreFichero);
-
+					LOGGER.info("DesignacionesServiceImpl.subirDocumentoDesigna() / json : " + json);
 					Long idFichero = uploadFile(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
 							nombreFichero, extension, anioNumero);
 

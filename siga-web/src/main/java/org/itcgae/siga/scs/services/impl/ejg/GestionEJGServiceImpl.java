@@ -1805,6 +1805,27 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				}
 				if (!ejg.getNumejg().equals(datos.getNumEjg())) {
+					// Comprobamos si existe el valor de codigo designa en el campo codigo de BBDD.
+					
+					ScsEjgExample exampleEJG = new ScsEjgExample();
+					exampleEJG.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andAnioEqualTo(Short.parseShort(datos.getAnnio()))
+						.andNumejgEqualTo(datos.getNumEjg());
+					List<ScsEjg> lista = scsEjgExtendsMapper.selectByExample(exampleEJG);
+					if(lista!= null && lista.size()>0) {
+						String codigoBBDD = lista.get(0).getNumejg();
+						if (codigoBBDD != null) {
+							
+							String maxNumEJG = scsEjgExtendsMapper.getMaxNumEjg(idInstitucion, datos.getAnnio(), datos.getTipoEJG());
+							Error error = new Error();
+							error.setCode(400);
+							error.setDescription(maxNumEJG);
+							error.setMessage("justiciaGratuita.oficio.ejg.yaexiste");
+							responsedto.setStatus(SigaConstants.KO);
+							responsedto.setError(error);
+							return responsedto;
+						}
+					}
 					insertAuditoriaEJG("Numero EJG", ejg.getNumejg().toString(), datos.getNumEjg(), usuarios.get(0),
 							(ScsEjg) ejg);
 					ejg.setNumejg(datos.getNumEjg());

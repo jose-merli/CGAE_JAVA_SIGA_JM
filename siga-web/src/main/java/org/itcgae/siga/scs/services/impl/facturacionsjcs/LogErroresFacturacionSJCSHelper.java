@@ -86,7 +86,9 @@ public class LogErroresFacturacionSJCSHelper {
                     SIGAHelper.addPerm777(directorio);
                 }
 
-                fLogErrores.createNewFile();
+                if(!fLogErrores.exists()) {
+                	fLogErrores.createNewFile();
+                }
                 SIGAHelper.addPerm777(fLogErrores);
                 fw = new FileWriter(fLogErrores, true);
                 bw = new BufferedWriter(fw);
@@ -129,7 +131,9 @@ public class LogErroresFacturacionSJCSHelper {
                         SIGAHelper.addPerm777(directorio);
                     }
 
-                    fLogErrores.createNewFile();
+                    if(!fLogErrores.exists()) {
+                    	fLogErrores.createNewFile();
+                    }
                     SIGAHelper.addPerm777(fLogErrores);
                     fw = new FileWriter(fLogErrores, true);
                     bw = new BufferedWriter(fw);

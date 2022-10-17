@@ -1,11 +1,14 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.DocumentacionSojItem;
 import org.itcgae.siga.DTOs.scs.FichaSojItem;
+import org.itcgae.siga.db.entities.ScsSoj;
 import org.itcgae.siga.db.mappers.ScsSojSqlProvider;
 
 public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
@@ -231,10 +234,62 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
     public String busquedaSoj(FichaSojItem fichaSojItem) {
 		SQL sql = new SQL();
 		sql.SELECT("ss.*");
+		sql.SELECT("DECODE(col.comunitario,1,col.ncomunitario,col.NCOLEGIADO) as ncolegiado");
+		sql.SELECT("per.APELLIDOS1 || ' ' || per.APELLIDOS2 || ', ' || per.NOMBRE as nombreAp");
 		sql.FROM("SCS_SOJ ss");
+		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO col ON ss.IDPERSONA = col.IDPERSONA AND ss.IDINSTITUCION = col.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("CEN_PERSONA per ON per.IDPERSONA = col.IDPERSONA");
 		sql.WHERE(String.format("ss.IDINSTITUCION = %s AND ss.IDTIPOSOJ = %s AND ss.ANIO = %s AND ss.NUMERO = %s",
 				fichaSojItem.getIdInstitucion(), fichaSojItem.getIdTipoSoj(), fichaSojItem.getAnio(), fichaSojItem.getNumero()));
 		return sql.toString();
 	}
+    
+    public String busquedaDocumentosSOJ(FichaSojItem fichaSojItem) {
+  		SQL sql = new SQL();
+  		sql.SELECT("doc.IDDOCUMENTACION");
+  		sql.SELECT("doc.FECHALIMITE");
+  		sql.SELECT("doc.FECHAENTREGA");
+  		sql.SELECT("doc.REGENTRADA");
+  		sql.SELECT("doc.REGSALIDA");
+  		sql.SELECT("doc.documentacion");
+  		sql.SELECT("doc.anio");
+  		sql.SELECT("doc.numero");
+  		sql.SELECT("doc.idtiposoj");
+  		sql.FROM("SCS_SOJ ss");
+  		sql.INNER_JOIN("SCS_DOCUMENTACIONSOJ doc ON ss.IDINSTITUCION = doc.IDINSTITUCION AND ss.IDTIPOSOJ = doc.IDTIPOSOJ"
+  				+ " AND ss.ANIO = doc.ANIO AND ss.NUMERO = doc.NUMERO");
+  		sql.WHERE(String.format("ss.IDINSTITUCION = %s AND ss.IDTIPOSOJ = %s AND ss.ANIO = %s AND ss.NUMERO = %s",
+  				fichaSojItem.getIdInstitucion(), fichaSojItem.getIdTipoSoj(), fichaSojItem.getAnio(), fichaSojItem.getNumero()));
+  		return sql.toString();
+  	}
+
+    public String asociarSOJ(ScsSoj fichaSojItem) {
+  		SQL sql = new SQL();
+  		sql.UPDATE("SCS_SOJ ss");
+  		sql.SET("ss.IDPERSONAJG = " + String.valueOf(fichaSojItem.getIdpersonajg()));
+  		sql.WHERE(String.format("ss.IDINSTITUCION = %s AND ss.IDTIPOSOJ = %s AND ss.ANIO = %s AND ss.NUMERO = %s",
+  				fichaSojItem.getIdinstitucion(), fichaSojItem.getIdtiposoj(), fichaSojItem.getAnio(), fichaSojItem.getNumero()));
+  		return sql.toString();
+  	}
+    
+    
+    public String subirDocumentoSOJ(DocumentacionSojItem documentacion,Short idInstitucion,String fechaActualizada) {
+  		SQL sql = new SQL();
+  		sql.INSERT_INTO("SCS_DOCUMENTACIONSOJ(FECHALIMITE, FECHAENTREGA, REGENTRADA, REGSALIDA, DOCUMENTACION,IDINSTITUCION,IDTIPOSOJ,ANIO,NUMERO,USUMODIFICACION,FECHAMODIFICACION,IDDOCUMENTACION)");
+  		sql.INTO_VALUES(String.valueOf(documentacion.getFechaLimite().getTime()));
+  		sql.INTO_VALUES(String.valueOf(documentacion.getFechaPresentacion().getTime()));
+  		sql.INTO_VALUES("'" + documentacion.getRegistroEntrada()+ "'"  );
+  		sql.INTO_VALUES("'" +documentacion.getRegistroSalida()+ "'");
+  		sql.INTO_VALUES("'" +documentacion.getDocumentacion()+ "'");
+  		sql.INTO_VALUES(String.valueOf(idInstitucion));
+  		sql.INTO_VALUES(documentacion.getIdtiposoj());
+  		sql.INTO_VALUES(documentacion.getAnio());
+  		sql.INTO_VALUES(documentacion.getNumero());
+  		sql.INTO_VALUES(fechaActualizada);
+  		sql.INTO_VALUES(String.valueOf( new Date().getTime()));
+  		sql.INTO_VALUES(documentacion.getIdDocumentacion());
+  		return sql.toString();
+  	}
+    
 
 }

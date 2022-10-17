@@ -113,4 +113,10 @@ public interface ComboService {
 	public ComboDTO comboProcedimientosEXEA(HttpServletRequest request);
 
 	public ComboDTO comboProcedimientosConJuzgadoEjg(HttpServletRequest request, EjgItem item);
+
+	public ComboDTO comboTipoSOJColegio(HttpServletRequest request);
+
+	public ComboDTO comboTipoConsulta(HttpServletRequest request);
+
+	public ComboDTO comboTipoRespuesta(HttpServletRequest request);
 }
