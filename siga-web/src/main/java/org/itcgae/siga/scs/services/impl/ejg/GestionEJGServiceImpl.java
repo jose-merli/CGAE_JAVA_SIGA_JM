@@ -1812,7 +1812,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						.andAnioEqualTo(Short.parseShort(datos.getAnnio()))
 						.andNumejgEqualTo(datos.getNumEjg());
 					List<ScsEjg> lista = scsEjgExtendsMapper.selectByExample(exampleEJG);
-					if(lista!= null) {
+					if(lista!= null && lista.size()>0) {
 						String codigoBBDD = lista.get(0).getNumejg();
 						if (codigoBBDD != null) {
 							
