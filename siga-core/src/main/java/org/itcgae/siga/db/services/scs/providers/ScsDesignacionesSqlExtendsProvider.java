@@ -2428,7 +2428,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_DEFENDIDOSDESIGNA");
 		sql.JOIN(
 				"scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
-		sql.INNER_JOIN("cen_tipovia tv on persona.idtipovia = tv.idtipovia and tv.idinstitucion = persona.idinstitucion"
+		sql.LEFT_OUTER_JOIN("cen_tipovia tv on persona.idtipovia = tv.idtipovia and tv.idinstitucion = persona.idinstitucion"
 				, "cen_provincias prov on persona.idprovincia = prov.idprovincia and prov.idpais = persona.idpais"
 				, "cen_poblaciones pol on pol.idprovincia = prov.idprovincia and pol.idpoblacion = persona.idpoblacion");
 		sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = " + item.getAno() + "\r\n"
