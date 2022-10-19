@@ -2965,6 +2965,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 			
 			if(facAbonoItem.getGrupoPago() != null || facAbonoItem.getGrupoPagoHasta() !=null || facAbonoItem.getGrupoFacturacionNombre() !=null) {
 				numsPagosSJCS = facAbonoSJCSExtendsMapper.pagosSJCS(facAbonoItem);
+				if(numsPagosSJCS.equals("1") || numsPagosSJCS.equals("-1")) {
+					numsPagosSJCS = "";
+				}
 			}
 	         
 	        List<FacAbonoItem> listaFacAbonosItem = facAbonoSJCSExtendsMapper.buscarAbonosSJCS(facAbonoItem, idInstitucion.toString(), idLenguaje, tamMaximo, numsPagosSJCS);
