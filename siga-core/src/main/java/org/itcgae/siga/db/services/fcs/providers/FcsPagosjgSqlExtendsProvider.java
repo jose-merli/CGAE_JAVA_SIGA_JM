@@ -91,7 +91,7 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         sql.SELECT("IDESTADO");
         sql.SELECT("FECHAESTADO");
         sql.SELECT("CANTIDAD");
-        sql.SELECT("PORCENTAJE");
+        sql.SELECT("ROUND(PORCENTAJE,2) AS PORCENTAJE");
 
         SQL sql2 = new SQL();
 
@@ -116,7 +116,7 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         sql2.SELECT("EST.FECHAESTADO AS FECHAESTADO");
         sql2.SELECT("NVL(PAGO.IMPORTEPAGADO, 0) CANTIDAD");
         sql2.SELECT(
-                "(CASE PAGO.IMPORTEREPARTIR WHEN 0 THEN 0 ELSE (PAGO.IMPORTEPAGADO * 100) / PAGO.IMPORTEREPARTIR END) AS PORCENTAJE");
+                "(CASE PAGO.IMPORTEREPARTIR WHEN 0 THEN 0 ELSE (PAGO.IMPORTEPAGADO * 100) / FAC.IMPORTETOTAL END) AS PORCENTAJE");
         sql2.FROM("FCS_PAGOSJG PAGO");
         sql2.INNER_JOIN("CEN_INSTITUCION INS ON PAGO.IDINSTITUCION = INS.IDINSTITUCION");
         sql2.INNER_JOIN(
