@@ -761,7 +761,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 					return item;
 
-				}).collect(Collectors.toList());
+				}).sorted().collect(Collectors.toList());
 
 				comboDTO.setCombooItems(comboItems);
 			}

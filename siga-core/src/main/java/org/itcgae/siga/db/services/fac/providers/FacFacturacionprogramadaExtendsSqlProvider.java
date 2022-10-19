@@ -221,7 +221,7 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.WHERE("f.visible = 'S'");
 
         // Order by
-        sql.ORDER_BY("idprogramacion, idseriefacturacion");
+        sql.ORDER_BY("fechaConfirmacion asc, fechaRealGeneracion asc");
 
         return sql.toString();
     }

@@ -360,8 +360,9 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         //filtros
         abonos.WHERE("f.idinstitucion ="+idInstitucion);
-        //Quito esta condicion porque no salen facturas en la busqueda
-        //abonos.WHERE("f.idpagosjg is null");
+        
+        //Se añade para que muestre los abonos facturas - si es distinto de null son otros tipos de abonos.
+        abonos.WHERE("f.idpagosjg is null");
 
         //numero factura
         if(item.getNumeroFactura()!=null) {
