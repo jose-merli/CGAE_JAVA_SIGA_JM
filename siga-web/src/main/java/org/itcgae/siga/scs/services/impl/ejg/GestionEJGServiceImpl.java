@@ -1804,9 +1804,28 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ejg.setIdtipoejgcolegio(null);
 
 				}
+				
+				// Comprobamos si existe el valor de codigo designa en el campo codigo de BBDD.
+				StringDTO parametros = new StringDTO();
+				Integer longitudEjg;
+				parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG",
+						idInstitucion.toString());
+				// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+				// la institucion 0
+				if (parametros != null && parametros.getValor() != null) {
+					longitudEjg = Integer.parseInt(parametros.getValor());
+				} else {
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG",
+							"0");
+					longitudEjg = Integer.parseInt(parametros.getValor());
+				}
+				
+				// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+				while (datos.getNumEjg().length() < longitudEjg) {
+					datos.setNumEjg( "0" + datos.getNumEjg());
+				}
+				
 				if (!ejg.getNumejg().equals(datos.getNumEjg())) {
-					// Comprobamos si existe el valor de codigo designa en el campo codigo de BBDD.
-					
 					ScsEjgExample exampleEJG = new ScsEjgExample();
 					exampleEJG.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 						.andAnioEqualTo(Short.parseShort(datos.getAnnio()))
@@ -1956,6 +1975,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			// respuesta si se actualiza correctamente
 			if (response >= 1) {
+				responsedto.setId(datos.getNumEjg());
 				responsedto.setStatus(SigaConstants.OK);
 				LOGGER.info(
 						"GestionEJGServiceImpl.actualizaDatosGenerales() -> OK. Datos Generales actualizados para el ejg");
