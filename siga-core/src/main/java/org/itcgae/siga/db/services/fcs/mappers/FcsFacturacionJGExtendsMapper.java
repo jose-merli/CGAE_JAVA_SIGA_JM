@@ -50,7 +50,10 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
             @Result(column = "REGULARIZACION", property = "regularizacion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "PREVISION", property = "prevision", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR)})
+            @Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+    		@Result(column = "IDPARTIDAPRESUPUESTARIA",  property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+    		@Result(column = "IMPORTEEJG",  property = "importeEjg", jdbcType = JdbcType.VARCHAR)
+    		})
     List<FacturacionItem> datosFacturacion(String idFacturacion, String idInstitucion);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "historicoFacturacion")

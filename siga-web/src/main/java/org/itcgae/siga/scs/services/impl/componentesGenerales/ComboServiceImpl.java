@@ -687,7 +687,11 @@ public class ComboServiceImpl implements ComboService {
 
 				ScsPartidapresupuestariaExample example = new ScsPartidapresupuestariaExample();
 
-				example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+				if(importe.equals("0")) { //Para las facturaciones existentes obtenemos todas porque las antiguas estarán de baja
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+				}else { //Para las nuevas facturaciones y demás se obtienen las de alta
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+				}
 				example.setOrderByClause("nombrepartida");
 				List<ScsPartidapresupuestaria> partidas = scsPartidasPresupuestariasExtendsMapper
 						.selectByExample(example);

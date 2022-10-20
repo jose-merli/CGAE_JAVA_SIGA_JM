@@ -1020,8 +1020,9 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 								.filter(factura -> factura.getIdConcepto().equals(contConceptoPago))
 								.collect(Collectors.toList());
 						// Mapear los valores.
-						conceptoPago.setImportePendiente(fact.get(0).getImportePendiente());
+			            conceptoPago.setImportePendiente(fact.get(0).getImportePendiente());
 						conceptoPago.setPorcentajePendiente(fact.get(0).getPorcentajePendiente());
+						conceptoPago.setPorcentajeApagar(conceptoPago.getCantidadApagar() * 100 / (conceptoPago.getImportePendiente() + conceptoPago.getCantidadApagar()));
 					}
 				}
 				conceptoPagoDTO.setListaConceptos(listaConceptosPago);
