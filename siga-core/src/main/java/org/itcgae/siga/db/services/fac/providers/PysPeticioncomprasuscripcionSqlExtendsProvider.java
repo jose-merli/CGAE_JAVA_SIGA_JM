@@ -221,8 +221,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT(peticion.getIdInstitucion()+" as idInstitucion");
 				
 		//TRAJETA SOLICITUD
-		sql.SELECT("(\r\n" + "        SELECT\r\n" + "            MAX(pet.idpeticion)\r\n" + "        FROM\r\n"
-				+ "            pys_peticioncomprasuscripcion pet\r\n" + "where pet.idinstitucion = "+peticion.getIdInstitucion()+"    ) + 1 AS idpeticion");
+	//	sql.SELECT("(\r\n" + "        SELECT\r\n" + "            MAX(pet.idpeticion)\r\n" + "        FROM\r\n"
+	//			+ "            pys_peticioncomprasuscripcion pet\r\n" + "where pet.idinstitucion = "+peticion.getIdInstitucion()+"    ) + 1 AS idpeticion");
 		
 		sql.SELECT("usuario.descripcion as usuModificacion");
 
@@ -523,14 +523,14 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		//Para determinar los puntos suspensivos de  de la descripcion
 		
 				String query = "select \r\n"
-				+ "case when nProd = 1 then MAX(prodIns.descripcion) else MAX(prodIns.descripcion) || '...' end as concepto\r\n"
+				+ "case when nProd = 1 then MAX(prodIns.descripcion) else MAX(prodIns.descripcion) || '...' end as concepto,prodIns.idTipoProducto , prodIns.idProducto, prodIns.idProductoInstitucion\r\n"
 				+ " , gen.*\r\n"
 				+ "from (\r\n"+sql.toString()+") gen\r\n"
 						+ "INNER JOIN PYS_productosSolicitados prodSol on prodSol.idinstitucion="+idInstitucion+" and prodSol.idpeticion = gen.nsolicitud\r\n"
 						+ "INNER JOIN pys_productosinstitucion prodIns on prodIns.idinstitucion = prodSol.idinstitucion and prodIns.idproducto = prodSol.idProducto \r\n"
 						+ "and prodIns.idTipoProducto = prodSol.idTipoProducto and prodIns.idProductoInstitucion = prodSol.idProductoInstitucion\r\n"
 						+ "group by gen.fechasolicitud, gen.nsolicitud, gen.idpersona, gen.nidentificacion, gen.ncolegiado, gen.apellidosnombre, gen.nprod, gen.idformapago, gen.desformapago, \r\n"
-						+ "gen.imptotal, gen.fechadenegada, gen.fechasolicitadaanulacion, gen.fechaefectiva, gen.fechaanulada, gen.estadofactura, gen.solicitarbaja, gen.facturas";
+						+ "gen.imptotal, gen.fechadenegada, gen.fechasolicitadaanulacion, gen.fechaefectiva, gen.fechaanulada, gen.estadofactura, gen.solicitarbaja, gen.facturas,prodIns.idTipoProducto , prodIns.idProducto, prodIns.idProductoInstitucion";
 				
 				//LOGGER.info(query.toString());
 				
@@ -715,7 +715,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "            WHEN factsus.idfactura IS NULL THEN '0'\r\n"
 				+ "            ELSE '1'\r\n"
 				+ "        END\r\n"
-				+ "    AS facturas,servins.automatico");
+				+ "    AS facturas,servins.automatico, servins.idtiposervicios, servins.idservicio, servins.idserviciosinstitucion");
 
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet"); 
 
@@ -863,7 +863,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		}
 //		private String importe; // valor aplicado durante la compra (importe total)
 		
-		sql.GROUP_BY("servins.solicitarbaja,\r\n"
+		sql.GROUP_BY("servins.solicitarbaja, servins.idtiposervicios, servins.idservicio, servins.idserviciosinstitucion,"
 				+ "    pet.fecha,\r\n"
 				+ "    pet.idpeticion,\r\n"
 				+ "    pet.idpersona,\r\n"

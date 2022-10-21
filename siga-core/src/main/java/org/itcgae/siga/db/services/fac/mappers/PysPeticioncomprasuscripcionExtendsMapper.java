@@ -113,7 +113,10 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "estadoFactura", property = "estadoFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "facturas", property = "facturas", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "impTotal", property = "importe", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idTipoProducto", property = "idTipoProducto", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idProducto", property = "idProducto", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idProductoInstitucion", property = "idProductoInstitucion", jdbcType = JdbcType.VARCHAR)})
 	List<ListaCompraProductosItem> getListaCompras(FiltrosCompraProductosItem filtro, Short idInstitucion, String idioma, Integer tamMax);
 	
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "comboEstadoFactura")
@@ -166,8 +169,10 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "precioServicioDesc", property = "precioServicioDesc", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "facturas", property = "facturas", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR)
-			
+			@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idTipoServicios", property = "idTipoServicios", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idServicio", property = "idServicio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idServiciosInstitucion", property = "idServiciosInstitucion", jdbcType = JdbcType.VARCHAR)
 		})
 	List<ListaSuscripcionesItem> getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma, Integer tamMaximo);
 

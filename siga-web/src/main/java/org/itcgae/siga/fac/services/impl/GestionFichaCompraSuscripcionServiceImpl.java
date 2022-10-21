@@ -13,6 +13,7 @@ import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
@@ -159,6 +160,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	@Autowired
 	private PysLineaanticipoExtendsMapper pysLineaanticipoExtendsMapper;
 	
+   @Autowired
+    private FacturaAccionesHelper facturaAccionesHelper;
+
 	
 	@Override
 	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
@@ -218,12 +222,17 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 						fichaCompleta = pysPeticioncomprasuscripcionExtendsMapper.getNuevaFichaCompraSuscripcion(ficha, !letrado.equals("N"));
 						
+						MaxIdDto idMaxPeticion = pysPeticioncomprasuscripcionExtendsMapper.selectNuevoId(idInstitucion);
+						
+						fichaCompleta.setnSolicitud(idMaxPeticion.getIdMax().toString());
+						
 						LOGGER.info(
 								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getNuevaFichaCompraSuscripcion() -> Salida de PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la nueva compra/suscripcion");
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
 						fichaCompleta.setProductos(ficha.getProductos());
 						fichaCompleta.setServicios(ficha.getServicios());
+						fichaCompleta.setNuevo(true);
 						if(fichaCompleta.getIdFormasPagoComunes() != null)fichaCompleta.setIdFormaPagoSeleccionada(fichaCompleta.getIdFormasPagoComunes().split(",")[0]);
 					}
 					//Para obtener toda la informacion de una compra/suscripcion ya creada
@@ -344,6 +353,13 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				LOGGER.info(
 						"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
 
+				if(ficha.isNuevo()) {
+					//Actualizamos nº solicitud para las solicitudes simultaneas 
+					MaxIdDto idMaxPeticion = pysPeticioncomprasuscripcionExtendsMapper.selectNuevoId(idInstitucion);
+					ficha.setnSolicitud(idMaxPeticion.getIdMax().toString());
+					
+				}
+				
 				PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
 				
 				if(ficha.getFechaCompra()!=null) {
@@ -388,12 +404,13 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				// Al no necesitar aprobación, se crea el registro de compra
 				// inmediatamente
 				if (aprobNecesaria.getValor().equals("N")) {
-					
+					ficha.setNuevo(false);
 					this.aprobarCompra(request, ficha);
 
 				}
 
 				insertResponseDTO.setStatus("200");
+				insertResponseDTO.setId(ficha.getnSolicitud());
 			}
 
 		}
@@ -516,13 +533,13 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				if (aprobNecesaria.getValor().equals("N")) {
 					LOGGER.info(
 							"solicitarSuscripcion() / aprobarSuscripcion() -> Entrada a  aprobarSuscripcion ya que la institucion aprueba las solicitudes automaticamente");
-
-
+					ficha.setNuevo(false);
 					this.aprobarSuscripcion(request, ficha);
 
 				}
 
 				insertResponseDTO.setStatus("200");
+				insertResponseDTO.setId(ficha.getnSolicitud());
 			}
 		}
 
@@ -583,6 +600,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					//En el caso que se realice la aprobación desde la pantalla "Suscripcion de servicios"
 					//O se realice una aprobación directa
 					if(solicitud==null) {
+						//Actualizamos nº solicitud para las aprobaciones simultaneas 
+						MaxIdDto idMaxPeticion = pysPeticioncomprasuscripcionExtendsMapper.selectNuevoId(idInstitucion);
+						ficha.setnSolicitud(idMaxPeticion.getIdMax().toString());
+						
 						this.solicitarSuscripcion(request, ficha);
 						solicitud = pysPeticioncomprasuscripcionMapper
 								.selectByPrimaryKey(solicitudKey);
@@ -661,6 +682,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				
 				updateResponseDTO.setStatus("200");
+				updateResponseDTO.setId(ficha.getnSolicitud());
 			}
 
 		updateResponseDTO.setError(error);
@@ -699,6 +721,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
 							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Entrada a pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
+					
+					if(ficha.isNuevo()) {
+						//Actualizamos nº solicitud para las aprobaciones simultaneas 
+						MaxIdDto idMaxPeticion = pysPeticioncomprasuscripcionExtendsMapper.selectNuevoId(idInstitucion);
+						ficha.setnSolicitud(idMaxPeticion.getIdMax().toString());
+						
+					}
+					
 					
 					PysPeticioncomprasuscripcionKey solicitudKey = new PysPeticioncomprasuscripcionKey();
 
@@ -784,6 +814,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				
 				updateResponseDTO.setStatus("200");
+				updateResponseDTO.setId(ficha.getnSolicitud());
 			}
 
 		updateResponseDTO.setError(error);
@@ -2037,11 +2068,16 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		
 							if (response == 0)
 								throw new Exception("Error al insertar la petición de anulación de la petición en la BBDD.");
-						}
-						
-						else {
 							
-							//REVISAR ANULACIÓN DE FACTURAS (SE DEBE IMPLEMENTAR)
+						}else {
+							//Anulacion de Facturas si tiene Facturas.
+							ListaFacturasPeticionDTO  checkFacturas = this.getFacturasPeticion(request,nSolicitud);
+							if(!checkFacturas.getListaFacturasPeticionItem().isEmpty()) {
+								List<ListaFacturasPeticionItem> listaFacturas = checkFacturas.getListaFacturasPeticionItem();
+								listaFacturas.forEach((factura) -> {
+									facturaAccionesHelper.anularFactura(factura.getIdFactura(), new Date(), "Anulada", usuarios.get(0));
+								});
+							}
 							
 							PysCompraExample compraExample = new PysCompraExample();
 	

@@ -24,6 +24,11 @@ public class ListaCompraProductosItem {
 	private String solicitarBaja;//En este caso representa si todos los servicios tienen el valor "solicitarBaja" a 1 o no. 
 	//Se realiza una resta de los valores con el numero de columnas. Si no es 0, un colegiado no puede solicitar una anulación.
 	
+	//Se guardará información del primer producto para los datos necesarios del enlace en la tabla.
+	private String idTipoProducto;
+	private String idProducto;
+	private String idProductoInstitucion;
+	
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
 	}
@@ -131,5 +136,23 @@ public class ListaCompraProductosItem {
 	}
 	public void setSolicitarBaja(String solicitarBaja) {
 		this.solicitarBaja = solicitarBaja;
+	}
+	public String getIdTipoProducto() {
+		return idTipoProducto;
+	}
+	public void setIdTipoProducto(String idTipoProducto) {
+		this.idTipoProducto = idTipoProducto;
+	}
+	public String getIdProducto() {
+		return idProducto;
+	}
+	public void setIdProducto(String idProducto) {
+		this.idProducto = idProducto;
+	}
+	public String getIdProductoInstitucion() {
+		return idProductoInstitucion;
+	}
+	public void setIdProductoInstitucion(String idProductoInstitucion) {
+		this.idProductoInstitucion = idProductoInstitucion;
 	}
 }

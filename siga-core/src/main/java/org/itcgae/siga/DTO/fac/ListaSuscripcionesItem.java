@@ -28,6 +28,11 @@ public class ListaSuscripcionesItem {
 	//Se realiza una resta de los valores con el numero de columnas. Si no es 0, un colegiado no puede solicitar una anulación.
 	private String automatico;
 	
+	//Se almacena datos Aux para enlaces desde la tabla.
+	private String idTipoServicios;
+	private String idServicio;
+	private String idServiciosInstitucion;
+	
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
 	}
@@ -159,6 +164,24 @@ public class ListaSuscripcionesItem {
 	}
 	public void setAutomatico(String automatico) {
 		this.automatico = automatico;
+	}
+	public String getIdTipoServicios() {
+		return idTipoServicios;
+	}
+	public void setIdTipoServicios(String idTipoServicios) {
+		this.idTipoServicios = idTipoServicios;
+	}
+	public String getIdServicio() {
+		return idServicio;
+	}
+	public void setIdServicio(String idServicio) {
+		this.idServicio = idServicio;
+	}
+	public String getIdServiciosInstitucion() {
+		return idServiciosInstitucion;
+	}
+	public void setIdServiciosInstitucion(String idServiciosInstitucion) {
+		this.idServiciosInstitucion = idServiciosInstitucion;
 	}
 
 }

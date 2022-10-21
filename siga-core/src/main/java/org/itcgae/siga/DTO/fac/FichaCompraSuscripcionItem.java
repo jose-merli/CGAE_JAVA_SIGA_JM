@@ -39,7 +39,7 @@ public class FichaCompraSuscripcionItem {
     private List<ListaServiciosSuscripcionItem> servicios;
 	
 	private String idEstadoPeticion;
-
+	private boolean nuevo;
 
     //TARJETA FACTURACION
     private List<ListaFacturasPeticionItem> facturas;
@@ -209,6 +209,12 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setFechaCompra(Date fechaCompra) {
 		this.fechaCompra = fechaCompra;
+	}
+	public boolean isNuevo() {
+		return nuevo;
+	}
+	public void setNuevo(boolean nuevo) {
+		this.nuevo = nuevo;
 	}
 
 }

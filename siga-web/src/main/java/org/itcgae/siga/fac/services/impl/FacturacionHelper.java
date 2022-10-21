@@ -64,6 +64,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.nio.channels.FileChannel;
@@ -194,6 +195,7 @@ public class FacturacionHelper {
             SIGAHelper.addPerm777(fRutaFirmas);
 
             if (!fRutaFirmas.canWrite()) {
+            	 LOGGER.error("fRutaFirmas: " + fRutaFirmas.getAbsolutePath());
                 throw new Exception("El path donde almacenar las facturas no tiene los permisos adecuados.");
             }
 
@@ -252,6 +254,7 @@ public class FacturacionHelper {
             SIGAHelper.addPerm777(rutaPDF);
 
             if (!rutaPDF.canWrite()) {
+            	LOGGER.error("RUTA PDF -- : " + rutaPDF);
                 throw new Exception("El path donde almacenar las facturas no tiene los permisos adecuados.");
             }
 
@@ -374,10 +377,11 @@ public class FacturacionHelper {
 
             StringReader is = new StringReader(content);
             OutputStream os = new FileOutputStream(file);
+            
             int car;
-
+            
             while ((car = is.read()) != -1) {
-                os.write(car);
+            	if(car != 65279)os.write(car);
             }
 
             os.flush();

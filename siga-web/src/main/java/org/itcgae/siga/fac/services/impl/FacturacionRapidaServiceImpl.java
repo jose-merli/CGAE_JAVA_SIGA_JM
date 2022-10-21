@@ -550,9 +550,19 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             for (PysCompra beanCompra : vCompras) {
 
                 if (beanCompra.getNofacturable() != null && beanCompra.getNofacturable().equals("0")) { //Si no es NO FACTURABLE
-                    if (!confirmarProducto(beanCompra.getIdinstitucion().intValue(), beanCompra.getIdpeticion(), beanCompra.getIdtipoproducto().intValue(), beanCompra.getIdproducto(), beanCompra.getIdproductoinstitucion(), new Double(0), "0", usuario)) {
-                        throw new Exception("Error al confirmar producto");
-                    }
+                	if(beanCompra.getImporteanticipado() != null) {
+                		 if (!confirmarProducto(beanCompra.getIdinstitucion().intValue(), beanCompra.getIdpeticion(), beanCompra.getIdtipoproducto().intValue(),
+                         		beanCompra.getIdproducto(), beanCompra.getIdproductoinstitucion(), beanCompra.getImporteanticipado(), "0", usuario)) {
+                             throw new Exception("Error al confirmar producto");
+                         }
+                	}else {
+                		 if (!confirmarProducto(beanCompra.getIdinstitucion().intValue(), beanCompra.getIdpeticion(), beanCompra.getIdtipoproducto().intValue(),
+                         		beanCompra.getIdproducto(), beanCompra.getIdproductoinstitucion(), new BigDecimal(0), "0", usuario)) {
+                             throw new Exception("Error al confirmar producto");
+                         }
+                	}
+                   
+                    
                 }
 
             }
@@ -575,7 +585,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
         return beanPeticionCompraSuscripcion;
     }
 
-    private boolean confirmarProducto(Integer idInstitucion, Long idPeticion, Integer idTipoProducto, Long idProducto, Long idProductoInstitucion, Double importeAnticipado, String fechaEfectiva, AdmUsuarios usuario) throws Exception {
+    private boolean confirmarProducto(Integer idInstitucion, Long idPeticion, Integer idTipoProducto, Long idProducto, Long idProductoInstitucion, BigDecimal importeAnticipado, String fechaEfectiva, AdmUsuarios usuario) throws Exception {
 
         try {
 
@@ -654,7 +664,7 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                         compraBean.setImporteanticipado(BigDecimal.valueOf(new Double(importeAnticipadoTarjeta)));
                     } else {
                         if (productoBean.getIdformapago().intValue() == Integer.parseInt(SigaConstants.TIPO_FORMAPAGO_METALICO))
-                            compraBean.setImporteanticipado(BigDecimal.valueOf(importeAnticipado));
+                            compraBean.setImporteanticipado(importeAnticipado);
                         else
                             compraBean.setImporteanticipado(BigDecimal.valueOf(new Double(0)));
                     }
