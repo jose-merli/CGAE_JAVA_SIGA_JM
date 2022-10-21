@@ -59,6 +59,7 @@ public class EjgItem {
     private Long comisaria;
     private String delitos;
     private Short idPretension;
+    private String delitosSeleccionados;
 
 
     private String annioCAJG;
@@ -1757,5 +1758,13 @@ public class EjgItem {
 
 	public void setNumeroDesigna(Short numeroDesigna) {
 		this.numeroDesigna = numeroDesigna;
+	}
+
+	public String getDelitosSeleccionados() {
+		return delitosSeleccionados;
+	}
+
+	public void setDelitosSeleccionados(String delitosSeleccionados) {
+		this.delitosSeleccionados = delitosSeleccionados;
 	}
 }
