@@ -12,7 +12,7 @@ public class RetencionJudicialItem {
     private String idPersona;
     private String idDestinatario;
     private Date fechaAlta;
-    private Date fechaInicio;
+    private Date fechainicio;
     private Date fechaFin;
     private String tipoRetencion;
     private String importe;

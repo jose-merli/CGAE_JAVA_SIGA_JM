@@ -119,8 +119,8 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         if (!UtilidadesString.esCadenaVacia(retencionesRequestDTO.getIdDestinatarios())) {
             query.WHERE("RETENCIONES.IDDESTINATARIO IN (" + retencionesRequestDTO.getIdDestinatarios() + " )");
         }
-        if (null != retencionesRequestDTO.getFechaInicio()) {
-            String fecha = simpleDateFormat.format(retencionesRequestDTO.getFechaInicio());
+        if (null != retencionesRequestDTO.getFechainicio()) {
+            String fecha = simpleDateFormat.format(retencionesRequestDTO.getFechainicio());
             query.WHERE("TRUNC(FECHAINICIO) >= TRUNC(TO_DATE('" + fecha + "', 'YYYY/MM/DD HH24:MI:SS'))");
         }
         if (null != retencionesRequestDTO.getFechaFin()) {
@@ -259,8 +259,8 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         if (!UtilidadesString.esCadenaVacia(retencionesRequestDTO.getIdRetenciones())) {
             sql.WHERE("RET.IDRETENCION = " + retencionesRequestDTO.getIdRetenciones());
         }
-        if (null != retencionesRequestDTO.getFechaInicio()) {
-            String fecha = simpleDateFormat.format(retencionesRequestDTO.getFechaInicio());
+        if (null != retencionesRequestDTO.getFechainicio()) {
+            String fecha = simpleDateFormat.format(retencionesRequestDTO.getFechainicio());
             sql.WHERE("RET.FECHAINICIO >= TO_DATE('" + fecha + "', 'YYYY/MM/DD HH24:MI:SS')");
         }
         if (null != retencionesRequestDTO.getFechaFin()) {

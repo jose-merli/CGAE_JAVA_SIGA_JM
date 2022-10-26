@@ -258,13 +258,12 @@ public class RetencionesServiceImpl implements IRetencionesService {
 
                     retencion.setFechamodificacion(new Date());
                     retencion.setUsumodificacion(usuarios.get(0).getIdusuario());
-
+                    retencion.setIdinstitucion(idInstitucion);
                     if (retencion.getIdretencion() == null) {
                         LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.getNewId() -> Inicio consulta para obtener nuevo id de retencion");
                         Long newId = Long.valueOf(fcsRetencionesJudicialesExtendsMapper.getNewId(idInstitucion).getIdMax());
                         retencion.setIdretencion(newId);
                         insertResponseDTO.setId(newId.toString());
-                        retencion.setIdinstitucion(idInstitucion);
                         retencion.setFechaalta(new Date());
                         LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.getNewId() -> Fin consulta para obtener nuevo id de retencion");
 
