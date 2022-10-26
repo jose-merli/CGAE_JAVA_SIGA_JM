@@ -53,7 +53,6 @@ application:
     /pys/aprobarCompra: [39B]
     /pys/denegarPeticion: [39]
     /pys/solicitarSuscripcion: [39G]
-    /pys/updateProductosPeticion: [39C]
     /pys/anularCompra: [39D]
     /pys/actualizarServicioSuscripcion: [39E]
     /pys/anularSuscripcion: [39F]

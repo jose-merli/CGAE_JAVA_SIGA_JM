@@ -663,10 +663,11 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                         double importeAnticipadoTarjeta = UtilidadesNumeros.redondea(productoBean.getCantidad().doubleValue() * productoBean.getValor().doubleValue() * (1 + (productoBean.getIdtipoiva().floatValue() / 100)), 2);
                         compraBean.setImporteanticipado(BigDecimal.valueOf(new Double(importeAnticipadoTarjeta)));
                     } else {
-                        if (productoBean.getIdformapago().intValue() == Integer.parseInt(SigaConstants.TIPO_FORMAPAGO_METALICO))
-                            compraBean.setImporteanticipado(importeAnticipado);
-                        else
-                            compraBean.setImporteanticipado(BigDecimal.valueOf(new Double(0)));
+                    	try {
+                             compraBean.setImporteanticipado(importeAnticipado);
+                    	}catch(Exception e) {
+                    		compraBean.setImporteanticipado(BigDecimal.valueOf(new Double(0)));
+                    	}     
                     }
                 }
 
