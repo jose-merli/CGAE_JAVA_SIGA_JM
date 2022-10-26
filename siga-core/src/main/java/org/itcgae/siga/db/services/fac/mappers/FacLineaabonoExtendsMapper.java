@@ -22,11 +22,11 @@ public interface FacLineaabonoExtendsMapper extends FacLineaabonoMapper {
 			@Result(column = "IDABONO", property = "idFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROLINEA", property = "numeroLinea", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCIONLINEA", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "PRECIOUNITARIO", property = "precioUnitario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PRECIOUNITARIO", property = "precioUnitario", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CANTIDAD", property = "cantidad", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "importeNeto", property = "importeNeto", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "importeIVA", property = "importeIVA", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "importeTotal", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "importeNeto", property = "importeNeto", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "importeIVA", property = "importeIVA", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "importeTotal", property = "importeTotal", jdbcType = JdbcType.NUMERIC),
 	})
 	List<FacturaLineaItem> getLineasAbono(String idFactura, String idInstitucion, Integer tamMaximo);
 	

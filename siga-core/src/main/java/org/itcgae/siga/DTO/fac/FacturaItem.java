@@ -33,8 +33,8 @@ public class FacturaItem {
 	Date fechaEmisionDesde;
 	Date fechaEmisionHasta;
 
-	String importeIVA;
-	String importeNeto;
+	double importeIVA;
+	double importeNeto;
 
 	String importefacturado;
 	String importefacturadoDesde;
@@ -48,20 +48,20 @@ public class FacturaItem {
 	String nombreFormaPago;
 	
 	//importes factura
-	String importeAnticipado;
-	String importeCompensado;
-	String importeCaja;
-	String importeBanco;
-	String importePagado;
-	String importeAdeudadoPendiente;
+	double importeAnticipado;
+	double importeCompensado;
+	double importeCaja;
+	double importeBanco;
+	double importePagado;
+	double importeAdeudadoPendiente;
 	String idAccion;
 
 	//importes abono
-	String importeAnuladoAb;
-	String importeCajaAb;
-	String importeBancoAb;
-	String importePagadoAb;
-	String importeAdeudadoPendienteAb;
+	double importeAnuladoAb;
+	double importeCajaAb;
+	double importeBancoAb;
+	double importePagadoAb;
+	double importeAdeudadoPendienteAb;
 
 	//facturacion
 	String idFacturacion;
@@ -88,8 +88,8 @@ public class FacturaItem {
 
 	//EstadosPagos
 	String estadoUlt;
-	String importePorPagarUlt;
-	String importePagadoUlt;
+	double importePorPagarUlt;
+	double importePagadoUlt;
 	String idAccionUlt;
 	String fechaModificacionUlt;
 	

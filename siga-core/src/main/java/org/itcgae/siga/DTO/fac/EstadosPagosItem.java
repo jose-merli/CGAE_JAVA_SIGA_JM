@@ -13,8 +13,8 @@ public class EstadosPagosItem {
 	String idEstado;
 	String estado;
 	String iban;
-	String impTotalPagado;
-	String impTotalPorPagar;
+	double impTotalPagado;
+	double impTotalPorPagar;
 	String IDSJCS;
 	Boolean enlaceFactura;
 	String numeroFactura;
