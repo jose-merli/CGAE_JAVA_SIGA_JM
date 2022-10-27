@@ -205,13 +205,137 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		}
 		if(inscripcionesItem.getAfechade() != null) {
 			sql.WHERE("ins.fechadenegacion is null AND ins.fechavalidacion is not null AND (ins.fechavalidacion <= TO_DATE('"+afechade+"','DD/MM/RRRR') OR (" + 
-					" ins.fechasolicitudbaja is not null and ins.fechasolicitudbaja <= TO_DATE('"+afechade+"','DD/MM/RRRR')))"
-							+ "AND ( ins.fechabaja is null or ins.fechabaja >= TO_DATE('"+afechade+"','DD/MM/RRRR'))") ;
+					" ins.fechasolicitudbaja is not null and ins.fechasolicitudbaja <= TO_DATE('"+afechade+" 00:00:00','DD/MM/YYYY HH24:MI:SS')))"
+							+ "AND ( ins.fechabaja is null or ins.fechabaja >= TO_DATE('"+afechade+" 23:59:59','DD/MM/YYYY HH24:MI:SS'))") ;
 		}
 		if(inscripcionesItem.getFechadesde() != null) {
-			sql.WHERE("ins.fechasolicitud >= TO_DATE('"+fechadesde+"','DD/MM/RRRR')");
+			sql.WHERE("ins.fechasolicitud >= TO_DATE('"+fechadesde+" 00:00:00','DD/MM/YYYY HH24:MI:SS')");
 			if(inscripcionesItem.getFechahasta() != null)
-			sql.WHERE("ins.fechasolicitud <= TO_DATE('"+fechahasta+"','DD/MM/RRRR')");
+			sql.WHERE("ins.fechasolicitud <= TO_DATE('"+fechahasta+" 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+		}
+		sql.ORDER_BY("fechasolicitud DESC");
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sql.WHERE("rownum <= " + tamMaxNumber);
+		}
+			
+		return sql.toString();
+	}
+	
+	public String busquedaInscripcionesTurno(InscripcionesItem inscripcionesItem, Short idInstitucion,String fechadesde,String fechahasta, String afechade,Integer tamMax) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT(  
+				"       ( CASE\r\n" + 
+				"            WHEN ins.fechadenegacion IS NOT NULL THEN '4'\r\n" + 
+				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
+				"                 AND ins.fechabaja IS NOT NULL\r\n" + 
+				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 
+				"                 AND ins.fechavalidacion IS NOT NULL THEN '3' /*Baja*/\r\n" + 
+				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
+				"                 AND ins.fechabaja IS NULL\r\n" + 
+				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 
+				"                 AND ins.fechavalidacion IS NOT NULL THEN '2' /*Pendiente de Baja*/\r\n" + 
+				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
+				"                 AND ins.fechabaja IS NULL\r\n" + 
+				"                 AND ins.fechasolicitudbaja IS NULL\r\n" + 
+				"                 AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/\r\n" + 
+				"            ELSE '0' /*Pendiente de Alta*/\r\n" + 
+				"        END\r\n" + 
+				"    ) estado,\r\n" + 
+				"    tur.nombre nombreturno,\r\n" + 
+				"    tur.abreviatura abreviatura,\r\n" + 
+				"    tur.validarinscripciones,\r\n" + 
+				"    tur.guardias,"
+				+ 	"tur.idzona,\r\n" + 
+				"    per.apellidos1\r\n" + 
+				"    || DECODE(per.apellidos2,NULL,'',' '\r\n" + 
+				"    || per.apellidos2)\r\n" + 
+				"    || ', '\r\n" + 
+				"    || per.nombre apellidosnombre,\r\n" + 
+				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado,\r\n" + 
+				"    per.nombre,\r\n" + 
+				"    per.apellidos1,\r\n" + 
+				"    per.apellidos2,\r\n" + 
+				"    ins.idinstitucion,\r\n" + 
+				"    ins.idpersona,\r\n" + 
+				"    ins.idturno,\r\n" + 
+				"    ins.fechasolicitud," + 
+				"    ins.observacionessolicitud,\r\n" + 
+				"    ins.fechavalidacion,\r\n" + 
+				"    ins.observacionesvalidacion,\r\n" + 
+				"    ins.fechasolicitudbaja,\r\n" + 
+				"    ins.observacionesbaja,\r\n" + 
+				"    ins.fechabaja,\r\n" + 
+				"    ins.observacionesvalbaja,\r\n" + 
+				"    ins.fechadenegacion,\r\n" + 
+				"    ins.observacionesdenegacion,\r\n" + 
+				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado," +
+				"    DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" +
+				"FROM\r\n" + 
+				"    scs_inscripcionturno ins\r\n" + 
+				"    JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
+				"                                    AND col.idinstitucion = ins.idinstitucion\r\n" + 
+				"     JOIN cen_persona per ON per.idpersona = col.idpersona\r\n" + 
+				"    LEFT JOIN scs_turno tur ON tur.idturno = ins.idturno\r\n" + 
+				"                                AND tur.idinstitucion = ins.idinstitucion");
+		sql.WHERE("ins.idinstitucion ='"+idInstitucion+"'");
+		if(inscripcionesItem.getIdturno() != null) {
+			String condturnos ="(";
+			for(int i = 0; i< inscripcionesItem.getIdturno().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="ins.idturno ='"+inscripcionesItem.getIdturno().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
+			
+		}
+		if(inscripcionesItem.getNcolegiado() != null) {
+			sql.WHERE("(col.ncolegiado ='"+inscripcionesItem.getNcolegiado()+
+					"' OR col.ncomunitario = '" + inscripcionesItem.getNcolegiado()+ "')");
+		}
+		if(inscripcionesItem.getEstado() != null) {
+			String condestados = "(";
+			String[] estados = inscripcionesItem.getEstado().split(",");
+			for(int i = 0; i< estados.length; i++) {
+				if(i>0) condestados+=" or ";
+				// Pendiente de alta
+				if(estados[i].equals("0")) {
+					condestados+="(ins.fechavalidacion is null and ins.fechadenegacion is null)" ;
+				}
+				// Alta
+				else if(estados[i].equals("1")) {
+					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+							" AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)" ;
+				}
+				// Pendiente de Baja
+				else if(estados[i].equals("2")) {
+					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+							" AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL)" ;
+				}
+				// Baja
+				else if(estados[i].equals("3")) {
+					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
+							+ " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL )" ;
+				}
+				// Denegada
+				else if(estados[i].equals("4")) {
+					condestados+="(ins.fechadenegacion is not null)" ;
+				}
+			}
+			condestados+=")";
+			sql.WHERE(condestados);
+		}
+		if(inscripcionesItem.getAfechade() != null) {
+			sql.WHERE("ins.fechadenegacion is null AND ins.fechavalidacion is not null AND (ins.fechavalidacion <= TO_DATE('"+afechade+"','DD/MM/RRRR') OR (" + 
+					" ins.fechasolicitudbaja is not null and ins.fechasolicitudbaja <= TO_DATE('"+afechade+" 00:00:00','DD/MM/YYYY HH24:MI:SS')))"
+							+ "AND ( ins.fechabaja is null or ins.fechabaja >= TO_DATE('"+afechade+" 23:59:59','DD/MM/YYYY HH24:MI:SS'))") ;
+		}
+		if(inscripcionesItem.getFechadesde() != null) {
+			sql.WHERE("ins.fechasolicitud >= TO_DATE('"+fechadesde+" 00:00:00','DD/MM/YYYY HH24:MI:SS')");
+			if(inscripcionesItem.getFechahasta() != null)
+			sql.WHERE("ins.fechasolicitud <= TO_DATE('"+fechahasta+" 23:59:59','DD/MM/YYYY HH24:MI:SS')");
 		}
 		sql.ORDER_BY("fechasolicitud DESC");
 		if (tamMax != null) {

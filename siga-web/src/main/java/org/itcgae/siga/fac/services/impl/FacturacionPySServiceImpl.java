@@ -2650,8 +2650,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				if (!ultimoEstado.getEstado().equals(Short.parseShort(SigaConstants.ESTADO_FACTURA_EN_REVISION)))
 					throw new BusinessException("facturacionPyS.facturas.lineas.error.historicoNoRevision");
 
-				if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
-					updateItem.setPreciounitario(BigDecimal.valueOf(Double.parseDouble(item.getPrecioUnitario())));
+				if (modificarImporte && item.getPrecioUnitario() > 0 ) {
+					updateItem.setPreciounitario(BigDecimal.valueOf((item.getPrecioUnitario())));
 				}
 
 				if (modificarIva && !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
@@ -2669,7 +2669,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				facLineafacturaExtendsMapper.updateByPrimaryKey(updateItem);
 
-				if (!UtilidadesString.esCadenaVacia(item.getPrecioUnitario())
+				if (item.getPrecioUnitario() > 0
 						|| !UtilidadesString.esCadenaVacia(item.getIdTipoIVA())) {
 					facFacturaExtendsMapper.updateImportesFactura(item.getIdFactura(), usuario.getIdinstitucion(), usuario.getIdusuario());
 					facHistoricofacturaExtendsMapper.updateImportesHistoricoEmisionFactura(ultimoEstado.getIdfactura(), ultimoEstado.getIdhistorico(),
@@ -2722,7 +2722,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				updateItem.setDescripcionlinea(item.getDescripcion());
 			}
 
-			if (modificarImporte && !UtilidadesString.esCadenaVacia(item.getPrecioUnitario())) {
+			if (modificarImporte && item.getPrecioUnitario() > 0) {
 				BigDecimal precioUnitario = new BigDecimal(item.getPrecioUnitario());
 				updateItem.setPreciounitario(precioUnitario.setScale(2, RoundingMode.DOWN));
 			}

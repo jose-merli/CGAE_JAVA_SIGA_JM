@@ -22,14 +22,14 @@ public interface FacLineafacturaExtendsMapper extends FacLineafacturaMapper {
 			@Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROLINEA", property = "numeroLinea", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "PRECIOUNITARIO", property = "precioUnitario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PRECIOUNITARIO", property = "precioUnitario", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CANTIDAD", property = "cantidad", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "importeNeto", property = "importeNeto", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "importeNeto", property = "importeNeto", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "IDTIPOIVA", property = "idTipoIVA", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "tipoIVA", property = "tipoIVA", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "importeIVA", property = "importeIVA", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "importeTotal", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IMPORTEANTICIPADO", property = "importeAnticipado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "importeIVA", property = "importeIVA", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "importeTotal", property = "importeTotal", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IMPORTEANTICIPADO", property = "importeAnticipado", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "idCodigoBanco", property = "idCodigoBanco", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturaLineaItem> getLineasFactura(String idFactura, String idInstitucion, Integer tamMaximo);

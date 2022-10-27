@@ -8,13 +8,13 @@ public class FacturaLineaItem {
 	String idFactura;
 	String numeroLinea;
 	String descripcion;
-	String precioUnitario;
+	double precioUnitario;
 	String cantidad;
-	String importeNeto;
+	double importeNeto;
 	String tipoIVA;
 	String idTipoIVA;
-	String importeIVA;
-	String importeTotal;
-	String importeAnticipado;
+	double importeIVA;
+	double importeTotal;
+	double importeAnticipado;
 	String idCodigoBanco;
 }

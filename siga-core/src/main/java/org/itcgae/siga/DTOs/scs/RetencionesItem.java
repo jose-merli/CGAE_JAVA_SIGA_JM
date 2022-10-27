@@ -15,7 +15,7 @@ public class RetencionesItem {
     private String nombre;
     private String idDestinatario;
     private String nombreDestinatario;
-    private Date fechaInicio;
+    private Date fechainicio;
     private Date fechaFin;
     private String importe;
     private String retencionAplicada;

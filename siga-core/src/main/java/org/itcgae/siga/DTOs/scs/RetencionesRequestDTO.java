@@ -10,7 +10,7 @@ public class RetencionesRequestDTO {
     private String nColegiado;
     private String tiposRetencion;
     private String idDestinatarios;
-    private Date fechaInicio;
+    private Date fechainicio;
     private Date fechaFin;
     private String idPagos;
     private Date fechaAplicacionDesde;
