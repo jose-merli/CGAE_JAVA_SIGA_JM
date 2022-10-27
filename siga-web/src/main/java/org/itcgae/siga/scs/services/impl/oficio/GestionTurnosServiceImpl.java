@@ -1217,7 +1217,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				Date prueba = turnosItem.getFechaActual();
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);
-				turnosItems = scsTurnosExtendsMapper.busquedaColaGuardia(turnosItem, strDate, busquedaOrden,
+				turnosItems = scsTurnosExtendsMapper.busquedaColaGuardia(turnosItem,strDate, busquedaOrden,
 						idInstitucion);
 				
 				turnosItems = turnosItems.stream().map(item ->{

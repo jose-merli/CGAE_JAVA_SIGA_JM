@@ -213,7 +213,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "SALTOS", property = "saltos", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "COMPENSACIONES", property = "compensaciones", jdbcType = JdbcType.DECIMAL),
 	})
-	List<TurnosItem> busquedaColaOficio(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
+	List<TurnosItem> busquedaColaOficio(TurnosItem turnosItem,String strDate,String busquedaOrden,Short idInstitucion);
 
 	@SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaColaOficio2")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
@@ -263,7 +263,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE) })
-	List<TurnosItem> busquedaColaGuardia(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
+	List<TurnosItem> busquedaColaGuardia(TurnosItem turnosItem,String strDate,String busquedaOrden,Short idInstitucion);
 
 
 	@SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="selectInscripcionTurnoByTurno")

@@ -196,7 +196,7 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
 //		List<TurnosItem> busquedaColaOficio2(InscripcionesItem inscripcionesItem,String busquedaOrden,String strDate,Short idInstitucion);
-		List<InscripcionesItem> busquedaColaOficio2(InscripcionesItem inscripcionesItem,String busquedaOrden,String strDate,Short idInstitucion);
+		List<InscripcionesItem> busquedaColaOficio2(InscripcionesItem inscripcionesItem,String strDate,String busquedaOrden,Short idInstitucion);
 	//SIGARNV-2471@DTT.JAMARTIN@11/07/2022@FIN
 	 
 	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="checkSaltos")
