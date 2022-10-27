@@ -31,7 +31,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 	}
 
 	public String searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje,
-			String idinstitucion) {
+			String idInstitucion) {
 
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -152,6 +152,8 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 				idInstituciones = "'" + busquedaPerFisicaSearchDTO.getIdInstitucion()[0] + "'";
 			}
 			sql.WHERE(" I.IDINSTITUCION  IN  (" + idInstituciones + ")");
+		}else {
+			sql.WHERE(" I.IDINSTITUCION  =  '" + idInstitucion + "'");
 		}
 		//
 		// if(null != idInstituciones) {

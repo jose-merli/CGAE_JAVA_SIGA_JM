@@ -37,9 +37,9 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		sql.FROM("SCS_PROCURADOR procurador");
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = procurador.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = procurador.IDPOBLACION");
-		sql.JOIN("CEN_COLEGIOPROCURADOR ON CEN_COLEGIOPROCURADOR.IDCOLPROCURADOR = PROCURADOR.IDCOLPROCURADOR");
+		sql.LEFT_OUTER_JOIN("CEN_COLEGIOPROCURADOR ON CEN_COLEGIOPROCURADOR.IDCOLPROCURADOR = PROCURADOR.IDCOLPROCURADOR");
 		//if(idInstitucion != 2000) {
-		//	sql.WHERE("procurador.idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE("procurador.idinstitucion = '" + idInstitucion + "'");
 		//}
 
 
@@ -77,7 +77,10 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		
 		
 		
-		if(procuradorItem.getIdColProcurador() != null) sql.WHERE("UPPER(procurador.idColProcurador) like UPPER('%"+procuradorItem.getIdColProcurador()+"%')");
+		if(procuradorItem.getIdColProcurador() != null && procuradorItem.getIdColProcurador() != "") {
+			sql.WHERE("UPPER(procurador.idColProcurador) like UPPER('%"+procuradorItem.getIdColProcurador()+"%')");
+		}
+			
 
 		if (!procuradorItem.getHistorico()) {
 			sql.AND();

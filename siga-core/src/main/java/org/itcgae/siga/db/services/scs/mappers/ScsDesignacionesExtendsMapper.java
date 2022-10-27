@@ -468,7 +468,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getPretensionModulo")
 	@Results({ @Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> getPretensionModulo(Short idInstitucion, String idJuzgado);
+	List<ComboItem> getPretensionModulo(Short idInstitucion, String idModulo);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboProcedimientosConModulos")
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
@@ -491,7 +491,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAJUICIO", property = "fechaJuicio", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "DEFENSAJURIDICA", property = "defensaJuridica", jdbcType = JdbcType.VARCHAR), })
-	List<DesignaItem> getDatosAdicionales(Short idInstitucion, Integer tamMaximo, DesignaItem designa);
+	List<DesignaItem> getDatosAdicionales(Short idInstitucion, DesignaItem designa);
 	
 
 	
@@ -625,7 +625,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "ANTIGUEDADCOLA", property = "antiguedadcola", jdbcType = JdbcType.DATE)
 			
 			})
-	InscripcionTurnoItem getInscripcionTurnoActiva(String idinstitucion, String idturno, String idpersona, String fecha);
+	InscripcionTurnoItem getInscripcionTurnoActiva(String idInstitucion, String idTurno, String idPersona, String fecha);
 	
 
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "cambiarUltimoCola")
@@ -862,4 +862,5 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "VALIDADA", property = "validada", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)})
 	List<DesignaItem> busquedaDesignaActual(ScsDesignaKey key);
+	
 }

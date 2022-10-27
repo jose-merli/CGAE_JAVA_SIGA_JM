@@ -1,7 +1,12 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
+import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoSqlProvider;
 
 public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlProvider {
@@ -84,4 +89,29 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 
 		return sql.toString();
 	}
+	
+	public String updateFechaDesignasLetrado(ScsDesignasletrado designaUpdate,Date fechaOriginal) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		
+		SQL sql = new SQL();
+		
+		String fechaUpdate = dateFormat.format(designaUpdate.getFechadesigna());
+		String fechOriginal = dateFormat.format(fechaOriginal);
+		sql.UPDATE("SCS_DESIGNASLETRADO");
+		if (designaUpdate.getFechadesigna() != null) {
+			
+			sql.SET("FECHADESIGNA = " + "TO_DATE('" + fechaUpdate + "','DD/MM/YYYY HH24:MI:SS')");
+		}
+		
+		sql.WHERE("IDINSTITUCION = " + designaUpdate.getIdinstitucion());
+		sql.WHERE("IDTURNO = " + designaUpdate.getIdturno());
+		sql.WHERE("ANIO = " + designaUpdate.getAnio());
+		sql.WHERE("NUMERO = " + designaUpdate.getNumero());
+		sql.WHERE("TRUNC(FECHADESIGNA) = " +  "TO_DATE('" + fechOriginal + "','dd/MM/yyyy')");
+		
+
+		return sql.toString();
+	}
+	
+	
 }

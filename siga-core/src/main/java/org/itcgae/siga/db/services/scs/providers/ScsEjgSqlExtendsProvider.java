@@ -1177,7 +1177,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	 * @param idLenguaje
 	 * @return
 	 */
-	public String searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax,
+	public String searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo,
 			String idLenguaje) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String fecha;
@@ -1317,7 +1317,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sqlPpal = new SQL();
 		sqlPpal.SELECT("*");
 		sqlPpal.FROM("(" + sql.toString() + ") consulta");
-		sqlPpal.WHERE("ROWNUM <= " + tamMax);
+		sqlPpal.WHERE("ROWNUM <= " + tamMaximo);
 
 		return sqlPpal.toString();
 	}

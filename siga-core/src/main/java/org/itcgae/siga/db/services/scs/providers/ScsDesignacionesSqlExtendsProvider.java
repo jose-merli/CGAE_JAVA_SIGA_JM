@@ -704,8 +704,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sql;
 	}
-
-	public String busquedaNuevaDesigna(DesignaItem designaItem, Short idInstitucion, Integer tamMax, boolean isNoColegiado) throws Exception {
+	public String busquedaNuevaDesigna(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo, boolean isNoColegiado) throws Exception {
 		String sql = "";
 
 		Hashtable codigosBind = new Hashtable();
@@ -2791,7 +2790,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String getDatosAdicionales(Short idInstitucion, Integer tamMax, DesignaItem designa) {
+	public String getDatosAdicionales(Short idInstitucion, DesignaItem designa) {
 
 		SQL sql = new SQL();
 		sql.SELECT("FECHAOFICIOJUZGADO, DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
@@ -2804,6 +2803,18 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
+	public String getDatosAdicionalesDesigna(Short idInstitucion, Integer tamMaximo, DesignaItem designa) {
+
+		SQL sql = new SQL();
+		sql.SELECT("FECHAOFICIOJUZGADO, DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
+		sql.FROM("SCS_DESIGNA");
+		sql.WHERE("NUMERO = '" + designa.getNumero() + "'");
+		sql.WHERE("IDTURNO = '" + designa.getIdTurno() + "'");
+		sql.WHERE("ANIO = '" + designa.getAno() + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
 	public String comboAcreditacionesPorModulo(Short idInstitucion, String idModulo) {
 		SQL sql = new SQL();
 
