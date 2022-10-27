@@ -505,11 +505,11 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
         }
         
         if(inscripciones.getFechaDesde() != null) {
-        	sql.WHERE("ins.fechasuscripcion >= TO_DATE('" + inscripciones.getFechaDesde() + "','DD/MM/RRRR')");
+        	sql.WHERE("ins.fechasuscripcion >= TO_DATE('" + inscripciones.getFechaDesde() + " 00:00:00','DD/MM/YYYY HH24:MI:SS')");
         }
         
         if(inscripciones.getFechaHasta() != null) {
-        	 sql.WHERE("ins.fechasuscripcion <= TO_DATE('" + inscripciones.getFechaHasta() + "','DD/MM/RRRR')");
+        	 sql.WHERE("ins.fechasuscripcion <= TO_DATE('" + inscripciones.getFechaHasta() + " 23:59:59','DD/MM/YYYY HH24:MI:SS')");
         }
         
         if(inscripciones.getnColegiado() != null) {

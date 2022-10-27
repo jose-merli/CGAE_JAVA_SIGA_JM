@@ -138,12 +138,12 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"busquedaInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"busquedaInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				GenParametrosExample genParametrosExample = new GenParametrosExample();
@@ -169,7 +169,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				String afechade = "";
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				LOGGER.info(
-						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
+						"busquedaInscripciones() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 				if (inscripcionesItem.getFechadesde() != null) {
 					Date fechad = inscripcionesItem.getFechadesde();
 
@@ -185,7 +185,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 					afechade = dateFormat.format(afechades);
 				}
 
-				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem,
+				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaInscripcionesTurno(inscripcionesItem,
 						idInstitucion, fechadesde, fechahasta, afechade, tamMaximo);
 
 				if((inscripcionesItems != null) && tamMaximo != null && (inscripcionesItems.size()) > tamMaximo) {
@@ -196,7 +196,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 					}
 				
 				LOGGER.info(
-						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
+						"busquedaInscripciones() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
 
 				if (inscripcionesItems != null) {
 					inscripcionesDTO.setInscripcionesItems(inscripcionesItems);
@@ -204,7 +204,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 			}
 
 		}
-		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
+		LOGGER.info("busquedaInscripciones() -> Salida del servicio para obtener los costes fijos");
 		return inscripcionesDTO;
 	}
 	

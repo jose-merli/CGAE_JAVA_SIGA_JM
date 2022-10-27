@@ -45,6 +45,25 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="VALIDARINSCRIPCIONES", property="validarinscripciones", jdbcType=JdbcType.VARCHAR) })
 	    List<InscripcionesItem> busquedaInscripciones(InscripcionesItem inscripcionesItem,Short idInstitucion,String fechadesde,String fechahasta,String afechade,Integer tamMaximo);
 	 
+	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="busquedaInscripcionesTurno")
+	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+		 @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
+	        @Result(column="IDPERSONA", property="idpersona", jdbcType=JdbcType.DECIMAL, id=true),
+	        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL, id=true),
+	        @Result(column="FECHASOLICITUD", property="fechasolicitud", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="FECHAMODIFICACION", property="fechamodificacion", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="USUMODIFICACION", property="usumodificacion", jdbcType=JdbcType.DECIMAL),
+	        @Result(column="FECHAVALIDACION", property="fechavalidacion", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="OBSERVACIONESSOLICITUD", property="observacionessolicitud", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="OBSERVACIONESVALIDACION", property="observacionesvalidacion", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="OBSERVACIONESBAJA", property="observacionesbaja", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="FECHASOLICITUDBAJA", property="fechasolicitudbaja", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="FECHADENEGACION", property="fechadenegacion", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="OBSERVACIONESDENEGACION", property="observacionesdenegacion", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="VALIDARINSCRIPCIONES", property="validarinscripciones", jdbcType=JdbcType.VARCHAR) })
+	    List<InscripcionesItem> busquedaInscripcionesTurno(InscripcionesItem inscripcionesItem,Short idInstitucion,String fechadesde,String fechahasta,String afechade,Integer tamMaximo);
 	 
 	 
 	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="busquedaTarjetaInscripciones")
