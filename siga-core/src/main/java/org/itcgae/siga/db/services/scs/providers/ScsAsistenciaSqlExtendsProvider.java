@@ -285,7 +285,13 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.AND();
 		sql.WHERE("scs_asistencia.idguardia = '" + filtroAsistenciaItem.getIdGuardia() + "'");
 		sql.AND();
-		sql.WHERE("scs_asistencia.idpersonacolegiado = '" + filtroAsistenciaItem.getIdLetradoGuardia() + "'");
+		
+		if (filtroAsistenciaItem.getIdLetradoManual() != null && !"".equals(filtroAsistenciaItem.getIdLetradoManual())) {
+			sql.WHERE("scs_asistencia.idpersonacolegiado = '" + filtroAsistenciaItem.getIdLetradoManual() + "'");
+		} else {
+			sql.WHERE("scs_asistencia.idpersonacolegiado = '" + filtroAsistenciaItem.getIdLetradoGuardia() + "'");
+		}
+		
 		sql.AND();
 		sql.WHERE("trunc(scs_asistencia.fechahora) = '"+filtroAsistenciaItem.getDiaGuardia() + "'");
 		/*sql.AND();

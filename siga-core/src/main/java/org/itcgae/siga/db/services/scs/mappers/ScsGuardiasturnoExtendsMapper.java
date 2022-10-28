@@ -666,6 +666,10 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 @Results({@Result(column = "IDCALENDARIOGUARDIAS", property = "IDCALENDARIOGUARDIAS", jdbcType = JdbcType.DECIMAL)})
 	 String getIdCalendarioGuardias(String idTurno, String idGuardia, String idInstitucion);
 	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getIdCalendarioGuardiasFecha")
+	 @Results({@Result(column = "IDCALENDARIOGUARDIAS", property = "IDCALENDARIOGUARDIAS", jdbcType = JdbcType.DECIMAL)})
+	 String getIdCalendarioGuardiasFecha(String idTurno, String idGuardia, String idInstitucion, String diaGuardia);
+	 
 	 @InsertProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="insertarRegistroCalendarioGuardias")
 	 @Results({})
 	 int insertarRegistroCalendarioGuardias(Integer idTurnoPrincipal, Integer idGuardiaPrincipal, Integer idCalendarioPrincipal, String observaciones, String idTurno, String idGuardia, String fechaHasta, String fechaDesde, String idCalendarioProgramado, String idInstitucion, String idPersonaUltimoAnterior, String today, String fechaSuscUltimoAnterior, String idGrupoUltimoAnterior, String usuModif);

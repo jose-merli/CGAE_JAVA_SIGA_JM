@@ -49,6 +49,15 @@ public class TarjetaAsistenciaResponse2Item implements Comparable<TarjetaAsisten
 	private String numFacturadas;
 	private boolean diaDespuesDisabled;
 	private String guardiaRequeridaValidacion;
+	private String salto;
+
+	public String getSalto() {
+		return salto;
+	}
+
+	public void setSalto(String salto) {
+		this.salto = salto;
+	}
 
 	public String getGuardiaRequeridaValidacion() {
 		return guardiaRequeridaValidacion;

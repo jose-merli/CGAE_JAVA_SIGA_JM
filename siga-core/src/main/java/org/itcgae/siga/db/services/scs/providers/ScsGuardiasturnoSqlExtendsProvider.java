@@ -2204,6 +2204,30 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		}
 		return sql.toString();
 	}
+	
+	public String getIdCalendarioGuardiasFecha(String idTurno, String idGuardia, String idInstitucion, String diaGuardia) {
+		
+		SQL sql = new SQL();
+		sql.SELECT("IDCALENDARIOGUARDIAS");
+		sql.FROM("SCS_CALENDARIOGUARDIAS");
+		if(idInstitucion != null) {
+			sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		}
+		if(idTurno != null) {
+			sql.WHERE("IDTURNO = " + idTurno);
+		}
+		if(idGuardia != null) {
+			sql.WHERE("IDGUARDIA = " + idGuardia);
+		}
+		
+		if(diaGuardia != null) {
+			sql.WHERE("FECHAINICIO <= TO_DATE('" + diaGuardia + "','DD/MM/YYYY')");
+		}
+		if(diaGuardia != null) {
+			sql.WHERE("FECHAFIN >= TO_DATE('" + diaGuardia + "','DD/MM/YYYY')");
+		}
+		return sql.toString();
+	}
 		
 	
 	public String insertarRegistroCalendarioGuardias(String idTurnoPrincipal, String idGuardiaPrincipal, String idCalendarioPrincipal, String observaciones, String idTurno, String idGuardia, String fechaHasta, String fechaDesde, String idCalendarioProgramado, String idInstitucion, String idPersonaUltimoAnterior, String today, String fechaSuscUltimoAnterior, String idGrupoUltimoAnterior, String usuModif){

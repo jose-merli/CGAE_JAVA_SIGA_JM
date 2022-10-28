@@ -42,10 +42,10 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
                         "AND GC.IDGUARDIA = CG.IDGUARDIA " +
                         "AND GC.IDCALENDARIOGUARDIAS = CG.IDCALENDARIOGUARDIAS");
         sql.WHERE("turno.idinstitucion = " + idInstitucion);
-        sql.WHERE("nvl(turno.idtipoturno, 2) = 2");
         sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.FECHAINICIO) AND trunc(gc.FECHAFIN)");
         if(idPersona != null
         		&& !"".equals(idPersona)) {
+        	sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(cg.FECHAINICIO) AND trunc(cg.FECHA_FIN)");
         	sql.WHERE("CG.IDPERSONA = " + idPersona);
         }
         sql.ORDER_BY("nombre");
@@ -70,6 +70,7 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
                     "GUA.IDINSTITUCION = '" + idInstitucion + "'",
                     "CG.IDPERSONA = '"+idPersona+"'",
                     "TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.FECHAINICIO) AND trunc(gc.FECHAFIN)");
+            SQL.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(cg.FECHAINICIO) AND trunc(cg.FECHA_FIN)");
             SQL.ORDER_BY("GUA.NOMBRE");
         }else{
             SQL.SELECT_DISTINCT("GUA.IDGUARDIA", "GUA.NOMBRE");

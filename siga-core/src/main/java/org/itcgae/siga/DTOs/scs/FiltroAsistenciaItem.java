@@ -29,6 +29,15 @@ public class FiltroAsistenciaItem implements Comparable<FiltroAsistenciaItem> {
 	private String nombre;
 	private String nig;
 	private String idLetradoManual;
+	private String salto;
+
+	public String getSalto() {
+		return salto;
+	}
+
+	public void setSalto(String salto) {
+		this.salto = salto;
+	}
 
 	public String getIdLetradoManual() {
 		return idLetradoManual;

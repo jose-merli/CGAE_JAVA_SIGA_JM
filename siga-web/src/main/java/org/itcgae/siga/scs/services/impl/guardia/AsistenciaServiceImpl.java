@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -617,12 +618,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 				LOGGER.info(
-						"guardarAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"guardarAsistenciasExpres() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				LOGGER.info(
-						"guardarAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"guardarAsistenciasExpres() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && usuarios.size() > 0) {
 
@@ -636,17 +637,16 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					if (asistencias != null && !asistencias.isEmpty()) {
 
-						procesarSustitucionGuardia(asistencias.get(0).getFiltro(), idInstitucion, request);
-
 						asistencias.forEach((TarjetaAsistenciaResponse2Item asistencia) -> {
 
 							// Comprobamos si existe el justiciable, si no, lo insertamos en scs_personajg y
 							// devolvemos idPersona
+							LOGGER.info("guardarAsistenciasExpres() / Comprobamos si existe el justiciable");
 							String idPersona = getIdPersonaJusticiable(asistencia, idInstitucion, usuarios.get(0));
 
 							if (UtilidadesString.esCadenaVacia(asistencia.getAnioNumero())) {
 								// Si no viene informado el anionumero es que se trata de una nueva asistencia
-								LOGGER.info("guardarAsistencias() / Nueva asistencia");
+								LOGGER.info("guardarAsistenciasExpres() / Nueva asistencia");
 
 								// Obtenemos proximo numero de una nueva asistencia
 								String anioAsistencia = asistencia.getFiltro().getDiaGuardia().split("/")[2];
@@ -663,7 +663,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								int responseAsistencia = scsAsistenciaExtendsMapper.insertSelective(asistenciaBBDD);
 
 								if (responseAsistencia == 0) {
-									LOGGER.error("guardarAsistencias() / No se ha insertado la nueva asistencia");
+									LOGGER.error("guardarAsistenciasExpres() / No se ha insertado la nueva asistencia");
 									error.setCode(500);
 									error.setMessage("Error al insertar la nueva asistencia");
 									error.description("Error al insertar la nueva asistencia");
@@ -683,7 +683,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									int responseActuacion = scsActuacionasistenciaExtendsMapper
 											.insertSelective(actuacionBBDD);
 									if (responseActuacion == 0) {
-										LOGGER.error("guardarAsistencias() / No se ha insertado la nueva actuacion");
+										LOGGER.error("guardarAsistenciasExpres() / No se ha insertado la nueva actuacion");
 										error.setCode(500);
 										error.setMessage("Error al insertar la nueva actuacion");
 										error.description("Error al insertar la nueva actuacion");
@@ -691,7 +691,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								}
 
 							} else {
-								LOGGER.info("guardarAsistencias() / Asistencia existente, actualizamos");
+								LOGGER.info("guardarAsistenciasExpres() / Asistencia existente, actualizamos");
 								// Actualizamos asistencia y actuaciones
 								ScsAsistencia asistenciaBBDD = fromTarjetaAsistenciaItemToScsAsistencia2(asistencia,
 										null, null, tipoAsistenciaGeneral, idPersona, idInstitucion, usuarios.get(0));
@@ -699,7 +699,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								int responseAsistencia = scsAsistenciaExtendsMapper
 										.updateByPrimaryKeySelective(asistenciaBBDD);
 								if (responseAsistencia == 0) {
-									LOGGER.error("guardarAsistencias() / No se ha actualizado la asistencia");
+									LOGGER.error("guardarAsistenciasExpres() / No se ha actualizado la asistencia");
 									error.setCode(500);
 									error.setMessage("Error al actualizar las asistencias");
 									error.description("Error al actualizar las asistencias");
@@ -717,24 +717,24 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 									// Si es nueva la insertamos, si no updateamos
 									if (isNuevaActuacion) {
-										LOGGER.info("guardarAsistencias() / Nueva actuacion");
+										LOGGER.info("guardarAsistenciasExpres() / Nueva actuacion");
 										int responseActuacion = scsActuacionasistenciaExtendsMapper
 												.insertSelective(actuacionBBDD);
 										if (responseActuacion == 0) {
 											LOGGER.error(
-													"guardarAsistencias() / No se ha insertado al nueva Actuacion");
+													"guardarAsistenciasExpres() / No se ha insertado al nueva Actuacion");
 											error.setCode(500);
 											error.setMessage("Error al insertar la nueva actuacion");
 											error.description("Error al insertar la nueva actuacion");
 										}
 									} else {
-										LOGGER.info("guardarAsistencias() / Actuacion existente, actualizamos");
+										LOGGER.info("guardarAsistenciasExpres() / Actuacion existente, actualizamos");
 										actuacionBBDD.setIdactuacion(Long.valueOf(i + 1));
 										int responseActuacion = scsAsistenciaExtendsMapper
 												.updateAsistenciaExpress(actuacionBBDD);
 										if (responseActuacion == 0) {
 											LOGGER.error(
-													"guardarAsistencias() / No se han actualizado las actuaciones");
+													"guardarAsistenciasExpres() / No se han actualizado las actuaciones");
 											error.setCode(500);
 											error.setMessage("Error al actualizar las actuaciones");
 											error.description("Error al actualizar las actuaciones");
@@ -745,15 +745,20 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							}
 
 						});
+						
+						// Si no ha habido ningún error, procesamos las guardias
+						if (error.getCode() == null || error.getCode() != 500) {
+							procesarSustitucionGuardia(asistencias.get(0).getFiltro(), idInstitucion, request);
+						}
 					}
 
 				}
 			}
 		} catch (Exception e) {
-			LOGGER.error("guardarAsistencias() / ERROR: " + e.getMessage(), e);
+			LOGGER.error("guardarAsistenciasExpres() / ERROR: " + e.getMessage(), e);
 			error.setCode(500);
-			error.setMessage("Error al guardar las asistencias: " + e);
-			error.description("Error al guardar las asistencias: " + e);
+			error.setMessage("Error al guardar las asistencias: " + e.getMessage());
+			error.description("Error al guardar las asistencias: " + e.getMessage());
 			deleteResponseDTO.setError(error);
 		}
 		return deleteResponseDTO;
@@ -995,10 +1000,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 
 			if (asistencia.getFiltro() != null
-					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdLetradoGuardia())) {
-				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoGuardia()));
+					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdLetradoManual())) {
+				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoManual()));
 			} else {
-				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getIdLetradoGuardia()));
+				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoGuardia()));
 			}
 
 			if (!UtilidadesString.esCadenaVacia(asistencia.getObservaciones())) {
@@ -1178,31 +1183,49 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 		try {
 			if ("S".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
-				String[] datos = new String[9];
+				String diaGuardia = String.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime());
+				String[] datos = new String[11];
 				datos[0] = filtro.getIdTurno();
 				datos[1] = filtro.getIdGuardia();
-				datos[2] = String.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime()); // Fecha
-																														// desde
-																														// la
-																														// que
-																														// se
-																														// sustituye
+				datos[2] = diaGuardia; // Fecha
+										// desde
+										// la
+										// que
+										// se
+										// sustituye
 				datos[3] = filtro.getIdLetradoGuardia(); // Letrado al que vamos a sustituir
 				datos[4] = filtro.getIdLetradoManual(); // Letrado que sustituye
-				datos[5] = String.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime()); // Fecha
-																														// de
-																														// sustitucion
+				datos[5] = diaGuardia; // Fecha
+										// de
+										// sustitucion
 				datos[6] = ""; // Comentario
-				datos[7] = "N"; // Salto o compensacion
-				datos[8] = "";
+				datos[7] = filtro.getSalto(); // Salto (S) o compensacion (C) y Salto y compensacion (S/C)
+				datos[8] = scsGuardiasturnoExtendsMapper.getIdCalendarioGuardiasFecha(filtro.getIdTurno(), filtro.getIdGuardia(), idInstitucion.toString(), filtro.getDiaGuardia()); // idCalendario
+				datos[9] = diaGuardia; // Fecha
+										// hasta
+										// la
+										// que
+										// se
+										// sustituye
+				datos[10] = "True";
+				
 				// Sustituimos el que está de guardia por el de la asistencia
-				LOGGER.info("procesarSustitucionGuardia() / Pendiente de implementar, se sustituye letrado de guardia");
+				LOGGER.info("procesarSustitucionGuardia() / Se sustituye letrado de guardia");
 				UpdateResponseDTO updateResponseDTO = guardiasColegiadoServiceImpl.sustituirGuardiaColeg(datos,
 						request);
-			} else {
-
+				
+			} else if ("N".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
 				LOGGER.info(
-						"procesarSustitucionGuardia() / Pendiente de implementar, se añade el letrado de la asistencia como refuerzo en la guardia");
+						"procesarSustitucionGuardia() / Se añade el letrado de la asistencia como refuerzo en la guardia");
+				TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = new TarjetaAsistenciaResponseItem();
+				tarjetaAsistenciaResponseItem.setIdTurno(filtro.getIdTurno());
+				tarjetaAsistenciaResponseItem.setIdGuardia(filtro.getIdGuardia());
+				tarjetaAsistenciaResponseItem.setFechaAsistencia(filtro.getDiaGuardia() + " 00:00");
+				tarjetaAsistenciaResponseItem.setIdLetradoGuardia(filtro.getIdLetradoManual());
+				procesaGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion);
+			} else {
+				LOGGER.info(
+						"procesarSustitucionGuardia() / Se añade el letrado de la asistencia");
 				TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = new TarjetaAsistenciaResponseItem();
 				tarjetaAsistenciaResponseItem.setIdTurno(filtro.getIdTurno());
 				tarjetaAsistenciaResponseItem.setIdGuardia(filtro.getIdGuardia());
@@ -1213,7 +1236,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 
 		} catch (Exception e) {
-			throw new SigaExceptions(e, "Error al añadir como refuerzo o sustituir el letrado de guardia : " + e);
+			throw new SigaExceptions(e, "No se han podido procesar las guardias de colegiado, compruebe que no existen facturaciones");
 		}
 	}
 
@@ -2313,9 +2336,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setIdcalendarioguardias(scsCalendarioguardias.get(0).getIdcalendarioguardias());
 
 					scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
-					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
+					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
-					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy")
+					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
 					scsCabeceraguardias.setPosicion((short) 1);
