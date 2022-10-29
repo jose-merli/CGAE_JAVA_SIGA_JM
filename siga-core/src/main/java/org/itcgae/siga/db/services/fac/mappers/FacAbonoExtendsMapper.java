@@ -74,9 +74,10 @@ public interface FacAbonoExtendsMapper extends FacAbonoMapper {
 			@Result(column = "NCOLIDENT", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONADEUDOR", property = "idDeudor", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ACREEDOR_ID", property = "identificacionDeudor", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ACREEDOR_NOMBRE", property = "descripcionDeudor", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "ACREEDOR_NOMBRE", property = "descripcionDeudor", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
 	})
-	List<FacturaItem> getAbono(String idFactura, String idInstitucion);
+	List<FacturaItem> getAbono(String idFactura, String idInstitucion,String idLenguaje);
 
 	@SelectProvider(type = FacAbonoExtendsSqlProvider.class, method = "getNewAbonoID")
 	@Results({

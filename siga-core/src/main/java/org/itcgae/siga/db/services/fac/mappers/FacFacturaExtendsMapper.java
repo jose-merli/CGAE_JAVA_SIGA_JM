@@ -101,7 +101,7 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR)
 	})
-	List<FacturaItem> getFactura(String idFactura, String idInstitucion);
+	List<FacturaItem> getFactura(String idFactura, String idInstitucion, String idLenguaje);
 
 
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getInformeFacturacionActual")

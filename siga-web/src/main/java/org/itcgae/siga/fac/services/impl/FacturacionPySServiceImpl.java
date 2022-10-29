@@ -2446,7 +2446,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			if (tipo.equalsIgnoreCase("FACTURA")) {
 				List<FacturaItem> items = facFacturaExtendsMapper.getFactura(idFactura,
-						usuario.getIdinstitucion().toString());
+						usuario.getIdinstitucion().toString(),usuario.getIdlenguaje());
 
 				items.get(0).setCuentasBanco(cenCuentasbancariasExtendsMapper.getComboCuentas(
 						items.get(0).getIdDeudor() == null ? items.get(0).getIdCliente() : items.get(0).getIdDeudor(),
@@ -2457,7 +2457,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			if (tipo.equalsIgnoreCase("ABONO")) {
 				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idAbono,
-						usuario.getIdinstitucion().toString());
+						usuario.getIdinstitucion().toString(),usuario.getIdlenguaje());
 
 				items.get(0).setCuentasBanco(cenCuentasbancariasExtendsMapper.getComboCuentas(
 						items.get(0).getIdDeudor() == null ? items.get(0).getIdCliente() : items.get(0).getIdDeudor(),

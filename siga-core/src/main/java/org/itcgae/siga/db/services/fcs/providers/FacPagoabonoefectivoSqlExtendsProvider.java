@@ -86,13 +86,6 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         pagosCaja.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono);
         pagosCaja.WHERE("fp.IDINSTITUCION = fa.IDINSTITUCION AND fp.IDABONO = fa.IDABONO");
 
-        SQL pagosCajaMinus = new SQL();
-        pagosCajaMinus.SELECT("fp.IDPAGOABONO");
-        pagosCajaMinus.FROM("FAC_PAGOSPORCAJA fpc");
-        pagosCajaMinus.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono + "AND fp.IDPAGOABONO = fpc.IDPAGOABONO");
-        pagosCajaMinus.WHERE("fp.IDINSTITUCION = fpc.IDINSTITUCION AND fp.IDABONO = fpc.IDABONO AND fp.IDPAGOABONO = fpc.IDPAGOABONO");
-
-        pagosCaja.WHERE("NOT EXISTS (" + pagosCajaMinus.toString() + ")");
         return pagosCaja.toString();
     }
 
@@ -125,8 +118,9 @@ public class FacPagoabonoefectivoSqlExtendsProvider extends FacPagoabonoefectivo
         compensacion.FROM("FAC_ABONO fa");
         compensacion.WHERE("fp.IDINSTITUCION = " + idInstitucion + " AND fp.IDABONO = " + idAbono);
         compensacion.WHERE("fp.IDINSTITUCION = fpc.IDINSTITUCION AND fp.IDABONO = fpc.IDABONO AND fp.IDPAGOABONO = fpc.IDPAGOABONO");
-        compensacion.WHERE("fp.IDINSTITUCION = ff.IDINSTITUCION AND fpc.IDFACTURA = ff.IDFACTURA ");
+        compensacion.WHERE("fpc.IDINSTITUCION = ff.IDINSTITUCION AND fpc.IDFACTURA = ff.IDFACTURA ");
         compensacion.WHERE("fp.IDINSTITUCION = fa.IDINSTITUCION AND fp.IDABONO = fa.IDABONO");
+        compensacion.WHERE("fa.idpagosjg is not null");
 
         return compensacion.toString();
     }

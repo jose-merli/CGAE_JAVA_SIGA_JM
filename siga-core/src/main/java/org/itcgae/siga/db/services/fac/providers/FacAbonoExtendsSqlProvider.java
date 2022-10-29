@@ -135,8 +135,17 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         return sqlAbonos.toString();
     }
 
-    public String getAbono(String idFactura, String idInstitucion) {
+    public String getAbono(String idFactura, String idInstitucion,String idLenguaje) {
 
+    	SQL sqlEstadoAbono = new SQL();
+        //Descripcion estado
+    	sqlEstadoAbono.SELECT("r.descripcion");
+    	sqlEstadoAbono.FROM("fac_estadoabono   ef");
+    	sqlEstadoAbono.JOIN("gen_recursos  r ON ( ef.descripcion = r.idrecurso AND r.idlenguaje = " + idLenguaje + " )");
+    	sqlEstadoAbono.WHERE("ef.idestado = A.estado");
+        
+    	
+    	
         SQL query = new SQL();
 
         //select de abono
@@ -146,7 +155,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
                 +"(P.APELLIDOS1 || ' ' || NVL(P.APELLIDOS2, '')) APELLIDOS,NVL(COL.NCOLEGIADO,COL.NCOMUNITARIO) NCOLIDENT,"
                 +"A.IDPERSONADEUDOR,M.ACREEDOR_ID,M.ACREEDOR_NOMBRE,FF.IMPTOTALANTICIPADO,FF.IMPTOTALCOMPENSADO,FF.IMPTOTALPAGADOPORCAJA,"
                 + "FF.IMPTOTALPAGADOPORBANCO,FF.IMPTOTALPAGADO,FF.IMPTOTALPORPAGAR");
-
+        query.SELECT("(" + sqlEstadoAbono.toString() + ") estado");
         query.FROM("FAC_ABONO A");
         query.INNER_JOIN("CEN_PERSONA P ON (P.IDPERSONA = A.IDPERSONA)");
         query.LEFT_OUTER_JOIN("FAC_FACTURA FF ON (FF.IDFACTURA = A.IDFACTURA AND FF.IDINSTITUCION = A.IDINSTITUCION)");
