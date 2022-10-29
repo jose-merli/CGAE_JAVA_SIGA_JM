@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesDisponiblesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioDTO;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
@@ -66,9 +67,9 @@ public class InscripcionesController {
 	}
 	
 	@RequestMapping(value = "/inscripciones/busquedaTarjetaInscripciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InscripcionesDTO> busquedaTarjetaInscripciones(@RequestBody InscripcionesItem inscripcionesItem, HttpServletRequest request) {
-		InscripcionesDTO response = inscripcionesService.busquedaTarjetaInscripciones(inscripcionesItem, request);
-		return new ResponseEntity<InscripcionesDTO>(response, HttpStatus.OK);
+	ResponseEntity<InscripcionesDisponiblesDTO> busquedaTarjetaInscripciones(@RequestBody InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		InscripcionesDisponiblesDTO response = inscripcionesService.busquedaTarjetaInscripciones(inscripcionesItem, request);
+		return new ResponseEntity<InscripcionesDisponiblesDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/inscripciones/checkTrabajosSJCS",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

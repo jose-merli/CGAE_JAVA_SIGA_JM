@@ -996,8 +996,8 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 					"  FROM (SELECT          " 
 					+ " scs_guardiasturno.idguardia   AS idguardia, " +
 					" scs_inscripcionguardia.idinstitucion   AS idinstitucion, "
-					+ "SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + 
-					" scs_guardiasturno.nombre  AS nombre_guardia, " +
+					+ "scs_guardiasturno.nombre  AS nombre_guardia,\r\n" + 
+					" SCS_TURNO.NOMBRE AS NOMBRE_TURNO, " +
 					"          SCS_TURNO.IDZONA,\r\n" + 
 					"          SCS_ZONA.NOMBRE AS NOMBRE_ZONA,\r\n" + 
 					"          SCS_TURNO.IDSUBZONA,\r\n" + 
@@ -1050,7 +1050,8 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		String prevariables = "TURNOS_ASIGNADOS (IDTURNO, IDINSTITUCION) AS (SELECT DISTINCT SCS_INSCRIPCIONGUARDIA.IDTURNO, SCS_INSCRIPCIONGUARDIA.IDINSTITUCION\r\n"
 				+ "	FROM  SCS_INSCRIPCIONGUARDIA\r\n"
 				+ "    JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONGUARDIA.IDINSTITUCION AND SCS_TURNO.IDTURNO=SCS_INSCRIPCIONGUARDIA.IDTURNO\r\n"
-				+ "     WHERE SCS_TURNO.IDINSTITUCION = '"+idInstitucion+"' AND SCS_INSCRIPCIONGUARDIA.IDPERSONA='"+inscripcion.getIdpersona()+"' ),\r\n"
+				+ "     WHERE SCS_TURNO.IDINSTITUCION = '"+idInstitucion+"' AND SCS_INSCRIPCIONGUARDIA.IDPERSONA='"+inscripcion.getIdpersona()+"' "
+						+ " AND (SCS_INSCRIPCIONGUARDIA.FECHABAJA IS NOT NULL OR SCS_INSCRIPCIONGUARDIA.FECHADENEGACION IS NOT NULL) ),\r\n"
 				+ "    TURNOS_NO_ASIGNADOS (IDTURNO, IDINSTITUCION) AS(SELECT DISTINCT SCS_TURNO.IDTURNO, SCS_TURNO.IDINSTITUCION\r\n"
 				+ "	FROM  SCS_TURNO\r\n"
 				+ "    WHERE SCS_TURNO.IDINSTITUCION = '"+idInstitucion+"' AND IDTURNO NOT IN (\r\n"

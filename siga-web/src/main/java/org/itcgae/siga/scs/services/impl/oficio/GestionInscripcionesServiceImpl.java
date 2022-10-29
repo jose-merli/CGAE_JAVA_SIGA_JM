@@ -17,7 +17,9 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.GestionInscripcion;
 import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesDisponiblesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioItem;
@@ -837,6 +839,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int response = 0;
+		DateFormat dateFormat = new SimpleDateFormat(SigaConstants.DATEST_FORMAT_MIN_SEC);
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -931,7 +934,9 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							keyinscripcionguardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 							keyinscripcionguardia.setIdinstitucion(idInstitucion);
 							keyinscripcionguardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
-							keyinscripcionguardia.setFechasuscripcion(inscripcionesItem.getFechasolicitud());
+							String fechaSolicitud = dateFormat.format(inscripcionesItem.getFechasolicitud());
+							keyinscripcionguardia.setFechasuscripcion(dateFormat.parse(fechaSolicitud));
+							keyinscripcionguardia.setIdguardia(Integer.parseInt(inscripcionesItem.getIdguardia()));
 
 							ScsInscripcionguardia oldInscripcionguardia = scsInscripcionguardiaMapper
 									.selectByPrimaryKey(keyinscripcionguardia);
@@ -1276,15 +1281,16 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 	}
 	
 	@Override
-	public InscripcionesDTO busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem,
+	public InscripcionesDisponiblesDTO busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem,
 			HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		InscripcionesDTO inscripcionesDTO = new InscripcionesDTO();
+		InscripcionesDisponiblesDTO inscripcionesDTO = new InscripcionesDisponiblesDTO();
 		List<InscripcionesItem> inscripcionesItems = null;
 		List<InscripcionesItem> inscripciones = null;
+		List<GestionInscripcion> inscripcionesList = null;
 		String busquedaOrden = "";
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1353,7 +1359,21 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								inscripcionesItems.get(k).setTipoguardias(guardiasInscritas.get(l).getTipoguardias()); 
 							}
 						}
+						inscripcionesList = new ArrayList<>();
+						GestionInscripcion inscripcion = new GestionInscripcion();
+						inscripcion.setIdTurno(inscripcionesItems.get(k).getIdturno());
+						inscripcion.setNombreTurno(inscripcionesItems.get(k).getNombre_turno());
+						inscripcion.setNombreZona(inscripcionesItems.get(k).getNombre_zona());
+						inscripcion.setNombreSubzona(inscripcionesItems.get(k).getNombre_subzona());
+						inscripcion.setNombreArea(inscripcionesItems.get(k).getNombre_area());
+						inscripcion.setNombreMateria(inscripcionesItems.get(k).getNombre_materia());
+						inscripcion.setDescripcionObligatoriedad(inscripcionesItems.get(k).getDescripcion_tipo_guardia());
+						inscripcion.setIdGuardia(inscripcionesItems.get(k).getIdguardia());
+						//inscripcion.setGuardias(inscripcionesItems.get(k).getGuardias());
+						inscripcion.setNombreGuardia(inscripcionesItems.get(k).getNombre_guardia());
+						inscripcionesList.add(inscripcion);
 					}
+					
 				}
 				else {
 					//Sacamos las guardias de los turnos donde no esta inscrito
@@ -1371,13 +1391,15 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						}
 					}
 				}
+				
+				
 					
 				
 				LOGGER.info(
 						"busquedaTarjetaInscripciones()  -> Salida a csInscripcionturnoExtendsMapper para obtener la tarjetas de inscripciones");
 
-				if (inscripcionesItems != null) {
-					inscripcionesDTO.setInscripcionesItems(inscripcionesItems);
+				if (inscripcionesList != null) {
+					inscripcionesDTO.setAccion(inscripcionesList);
 				}
 			}
 

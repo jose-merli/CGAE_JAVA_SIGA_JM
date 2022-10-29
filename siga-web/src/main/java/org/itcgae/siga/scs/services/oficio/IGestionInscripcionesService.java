@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesDisponiblesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioDTO;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
@@ -26,7 +27,7 @@ public interface IGestionInscripcionesService {
 	
 	public InsertResponseDTO insertSolicitarAlta(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
 	
-	public InscripcionesDTO busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem, HttpServletRequest request);
+	public InscripcionesDisponiblesDTO busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateDenegar(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
 	
