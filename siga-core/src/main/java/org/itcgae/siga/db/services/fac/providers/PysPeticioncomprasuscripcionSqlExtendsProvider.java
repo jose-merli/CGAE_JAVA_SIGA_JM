@@ -539,8 +539,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		        if(tamMax!=null) {
 		        	sqlFinal.WHERE("ROWNUM <= " + tamMax);
 		        }
+		        sqlFinal.ORDER_BY("FECHASOLICITUD DESC");
 				
-				return query;
+				return sqlFinal.toString();
 		
 	}
 	

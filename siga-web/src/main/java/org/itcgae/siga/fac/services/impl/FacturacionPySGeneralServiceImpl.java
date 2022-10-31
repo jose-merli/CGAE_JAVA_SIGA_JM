@@ -747,7 +747,8 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 			FacSeriefacturacionExample example = new FacSeriefacturacionExample();
 			example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion()).andFechabajaIsNull();
-
+			example.setOrderByClause("NOMBREABREVIADO ASC");
+			
 			List<FacSeriefacturacion> seriesFac = facSeriefacturacionMapper.selectByExample(example);
 
 			if (seriesFac.size() > 0) {
@@ -761,7 +762,7 @@ public class FacturacionPySGeneralServiceImpl implements IFacturacionPySGeneralS
 
 					return item;
 
-				}).sorted().collect(Collectors.toList());
+				}).collect(Collectors.toList());
 
 				comboDTO.setCombooItems(comboItems);
 			}
