@@ -45,7 +45,7 @@ public class InscripcionesItem {
 	public String nombre_area;
 	public String idmateria;
 	public String nombre_materia;
-	public String idguardia;
+	public String idGuardia;
 	public String nombre_guardia;
 	public String descripcion_tipo_guardia;
 	public String obligatoriedad_inscripcion;
@@ -206,11 +206,11 @@ public class InscripcionesItem {
 	}
 
 	public String getIdguardia() {
-		return idguardia;
+		return idGuardia;
 	}
 
-	public void setIdguardia(String idguardia) {
-		this.idguardia = idguardia;
+	public void setIdguardia(String idGuardia) {
+		this.idGuardia = idGuardia;
 	}
 
 	public String getNombre_guardia() {
@@ -518,7 +518,7 @@ public class InscripcionesItem {
 				+ estadonombre + ", observaciones=" + observaciones + ", nombre_turno=" + nombre_turno
 				+ ", nombre_zona=" + nombre_zona + ", idsubzona=" + idsubzona + ", nombre_subzona=" + nombre_subzona
 				+ ", idarea=" + idarea + ", nombre_area=" + nombre_area + ", idmateria=" + idmateria
-				+ ", nombre_materia=" + nombre_materia + ", idguardia=" + idguardia + ", nombre_guardia="
+				+ ", nombre_materia=" + nombre_materia + ", idguardia=" + idGuardia + ", nombre_guardia="
 				+ nombre_guardia + ", descripcion_tipo_guardia=" + descripcion_tipo_guardia
 				+ ", obligatoriedad_inscripcion=" + obligatoriedad_inscripcion + ", tipoguardias=" + tipoguardias
 				+ ", orden=" + orden + ", numerocolegiado=" + numerocolegiado + ", accion=" + accion

@@ -138,7 +138,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 		sql.WHERE("juzgado.fechabaja is null");
 		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
 
-		if (idJuzgado.equals('0')) {
+		if (idJuzgado.equals("0")) {
 			sql.ORDER_BY("juzgado.NOMBRE");
 			return sql.toString();
 		} else {

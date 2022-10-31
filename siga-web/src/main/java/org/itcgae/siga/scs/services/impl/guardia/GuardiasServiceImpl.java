@@ -4747,7 +4747,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			LOGGER.info("*FIN generacion" + "");
 
 		} catch (Exception e) {
-			if (e.equals("periodoSinDias")) {
+			if (e.getMessage().equals("periodoSinDias")) {
 				// log.addLog(new String[] { " ", "Sin periodos" } );
 
 				Map<String, Object> mapLog = new HashMap();

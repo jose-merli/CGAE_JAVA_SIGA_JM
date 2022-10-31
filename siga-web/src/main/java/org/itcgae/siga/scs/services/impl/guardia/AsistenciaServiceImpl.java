@@ -1442,7 +1442,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							try {
 							procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
 							}catch(Exception e) {
-								if (e.equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
+								if (e.getMessage().equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
 									error.setCode(409);
 									error.setMessage("Error al guardar la asistencia: " + e);
 									error.description("Error al guardar la asistencia: " + e);
@@ -1546,7 +1546,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							try {
 							procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
 							}catch(Exception e) {
-								if (e.equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
+								if (e.getMessage().equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
 									error.setCode(409);
 									error.setMessage("Error al guardar la asistencia: " + e);
 									error.description("Error al guardar la asistencia: " + e);

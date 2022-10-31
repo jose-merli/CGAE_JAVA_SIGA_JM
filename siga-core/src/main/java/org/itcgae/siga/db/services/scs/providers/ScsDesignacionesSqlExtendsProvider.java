@@ -3244,7 +3244,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			Date fechaSolicitudUltimo, AdmUsuarios usuario) throws ParseException {
 
 		String sIdpersona = (idPersonaUltimo == null) ? "null" : idPersonaUltimo.toString();
-		String sFechaSolicitudUltimo = (fechaSolicitudUltimo == null || fechaSolicitudUltimo.equals("")) ? "null"
+		String sFechaSolicitudUltimo = (fechaSolicitudUltimo == null) ? "null"
 				: fechaSolicitudUltimo.toString();
 
 		Format formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
