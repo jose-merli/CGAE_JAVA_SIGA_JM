@@ -783,11 +783,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		if(asistencia.getNif() != null)
 		personajgExample.createCriteria().andNifEqualTo(asistencia.getNif().trim());
 
-		List<ScsPersonajg> listaJusticiables = scsPersonajgExtendsMapper.selectByExample(personajgExample);
+		//List<ScsPersonajg> listaJusticiables = scsPersonajgExtendsMapper.selectByExample(personajgExample);
+		
+		List<String> personaJg = scsPersonajgExtendsMapper.getIdPersonajgNif(asistencia.getNif().trim());
 
 		// Si existe obtenemos el idPersona y actualizamos datos
-		if (listaJusticiables != null && !listaJusticiables.isEmpty()) {
-			idPersona = listaJusticiables.get(0).getIdpersona().toString();
+		if (personaJg != null && !personaJg.isEmpty()) {
+			idPersona = personaJg.get(0);
 			ScsPersonajg personajgToUpdate = new ScsPersonajg();
 
 			personajgToUpdate.setIdpersona(Long.valueOf(idPersona));

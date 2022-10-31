@@ -588,6 +588,18 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("MAX(IDPERSONA) AS IDPERSONA");
 		sql.FROM("SCS_PERSONAJG");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		
+		return sql.toString();
+	}
+	
+	public String getIdPersonajgNif(String nif) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDPERSONA AS IDPERSONA");
+		sql.FROM("SCS_PERSONAJG");
+		sql.WHERE("NIF = '" + nif + "'");
+		sql.WHERE("ROWNUM = '1'");
 
 		return sql.toString();
 	}

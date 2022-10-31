@@ -48,6 +48,11 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 	})
 	NewIdDTO getIdPersonajg(Short idInstitucion);
 	
+	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "getIdPersonajgNif")
+	@Results({ @Result(column = "IDPERSONA", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	List<String> getIdPersonajgNif(String nif);
+	
 	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "searchClaveAsuntosJusticiable")
 	@Results({ 
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
