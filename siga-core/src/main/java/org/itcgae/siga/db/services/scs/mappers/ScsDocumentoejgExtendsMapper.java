@@ -31,7 +31,7 @@ public interface ScsDocumentoejgExtendsMapper extends ScsDocumentoejgMapper{
 		
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CODIGODESCRIPCION", property = "codigodescripcion", jdbcType = JdbcType.VARCHAR),
-		
+		@Result(column = "IDCODIGODESCRIPCION", property = "idCodigoDescripcion", jdbcType = JdbcType.VARCHAR),
 	})
 	List<DocumentacionEjgItem> searchDocumento(DocumentacionEjgItem documentacionEjgItem, String idLenguaje);
 	

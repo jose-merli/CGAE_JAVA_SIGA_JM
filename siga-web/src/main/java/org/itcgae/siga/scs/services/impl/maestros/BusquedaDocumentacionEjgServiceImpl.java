@@ -813,20 +813,20 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 						documento.setIddocumentoejg(Short.valueOf(documentoItem.getIdDocumento()));
 						documento.setIdtipodocumentoejg(Short.valueOf(documentoItem.getIdTipoDocumento()));
 						documento.setIdinstitucion(idInstitucion);
-						
-						documento.setAbreviatura(documentoItem.getAbreviatura());
 						documento.setCodigoext(documentoItem.getCodigoExt());
 						documento.setUsumodificacion(usuarios.get(0).getIdusuario());
 						documento.setFechamodificacion(new Date());
-					
-						GenRecursosCatalogosExample example = new GenRecursosCatalogosExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdlenguajeEqualTo(usuarios.get(0).getIdlenguaje())
-								.andIdrecursoEqualTo(documentoItem.getCodigodescripcion());
+						documento.setAbreviatura(documentoItem.getAbreviatura());
+						//Select-update DESCRIPCION
+						GenRecursosCatalogosExample exampleDescripcion = new GenRecursosCatalogosExample();
+						exampleDescripcion.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdlenguajeEqualTo(usuarios.get(0).getIdlenguaje())
+								.andIdrecursoEqualTo(documentoItem.getIdCodigoDescripcion());
 						
-						GenRecursosCatalogos gen = genRecursosCatalogosExtendsMapper.selectByExample(example).get(0);
-						gen.setDescripcion(documentoItem.getdescripcionDoc());
+						GenRecursosCatalogos genDes = genRecursosCatalogosExtendsMapper.selectByExample(exampleDescripcion).get(0);
+						genDes.setDescripcion(documentoItem.getdescripcionDoc());
 
-						genRecursosCatalogosExtendsMapper.updateByPrimaryKey(gen);
+						//Update
+						genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genDes);
 						response = scsDocumentoEjgExtendsMapper.updateByPrimaryKeySelective(documento);
 
 					}

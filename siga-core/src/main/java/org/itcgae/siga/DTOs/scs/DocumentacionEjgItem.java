@@ -25,10 +25,7 @@ public class DocumentacionEjgItem {
 	private int indiceAbreviatura;
 	private int indiceDesc;
 	private String idDocumento;
- 
-	
-	
-
+	private String idCodigoDescripcion;
 
 
 	/**
@@ -200,6 +197,14 @@ public class DocumentacionEjgItem {
 
 	public void setIndiceDesc(int indiceDesc) {
 		this.indiceDesc = indiceDesc;
+	}
+
+	public String getIdCodigoDescripcion() {
+		return idCodigoDescripcion;
+	}
+
+	public void setIdCodigoDescripcion(String idCodigoDescripcion) {
+		this.idCodigoDescripcion = idCodigoDescripcion;
 	}
 	
 
