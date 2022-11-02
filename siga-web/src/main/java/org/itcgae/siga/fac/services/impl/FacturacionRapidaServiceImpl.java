@@ -6,6 +6,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAHelper;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesNumeros;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -525,18 +526,25 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
                 return resource;
 
             } catch (Exception e) {
+            	
                 // Si el error viene de la obtención de la plantilla se devuelve un mensaje de éxito pero sin el fichero pdf
-                if (!UtilidadesString.esCadenaVacia(e.getMessage()) && e.getMessage().contains("ObtenerContenidoPlantilla ERROR")) {
-                    return null;
-                } else {
-                    throw e;
-                }
+               // if (!UtilidadesString.esCadenaVacia(e.getMessage()) && e.getMessage().contains("ObtenerContenidoPlantilla ERROR")) {
+                 //   return null;
+                //} 
+                    throw new SigaExceptions("FAC"+e.getMessage() ); // Identificamos que será error de la parte de generar PDF
+                
             }
 
         } catch (Exception e) {
         	LOGGER.info("facturacionRapidaProductosCertificados() ", e);
-            rollBack(tx);
-            throw e;
+        	if(e.getMessage().contains("Facturado ERROR") || e.getMessage().contains("FAC") ) {//Si el error es de las plantillas, no hacemos rollback para generar la factura, pero no generemos el PDF.
+        		throw e;
+        	}else {
+        		 rollBack(tx);
+                 throw e;
+        	}
+        
+           
         }
 
     }
@@ -926,11 +934,11 @@ public class FacturacionRapidaServiceImpl implements IFacturacionRapidaService {
             String codretorno = resultado[0];
             if (Arrays.asList(codigosErrorFormato).contains(codretorno)) {
             	LOGGER.error("procesarFacturacionRapidaCompras() - PKG_SIGA_FACTURACION.GENERACIONFACTURACION CODIGOS DE FORMATO ERROR INVALIDO");
-                throw new Exception(resultado[1]);
+                throw new SigaExceptions(resultado[1]);
 
             } else if (!codretorno.equals("0")) {
             	LOGGER.error("procesarFacturacionRapidaCompras() - PKG_SIGA_FACTURACION.GENERACIONFACTURACION ERROR AL GENERAR FACTURACION RAPIDA");
-                throw new Exception("Error al generar la Facturacion rapida: " + resultado[1]);
+            	throw new SigaExceptions("Error al generar la Facturacion rapida: " + resultado[1]);
             }
 
             // Desbloquea la facturacion programada

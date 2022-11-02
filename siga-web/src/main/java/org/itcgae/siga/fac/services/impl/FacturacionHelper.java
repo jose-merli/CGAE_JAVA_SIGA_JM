@@ -14,6 +14,7 @@ import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.FoUtils;
 import org.itcgae.siga.commons.utils.SIGAHelper;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesNumeros;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmLenguajes;
@@ -348,7 +349,7 @@ public class FacturacionHelper {
                 ficheroPDF.createNewFile();
                 SIGAHelper.addPerm777(ficheroPDF);
             } catch (IOException ioe) {
-                throw new Exception("Error al crear el fichero de firmas");
+                throw new SigaExceptions("Error al crear el fichero de firmas");
             }
 
             LOGGER.info("RUTA DONDE SE UBICAR EL INFORME. " + ficheroPDF);
@@ -357,7 +358,7 @@ public class FacturacionHelper {
             LOGGER.info("PDF GENERADO.");
 
         } catch (Exception e) {
-            throw new Exception("Error al generar el informe: " + e.getLocalizedMessage());
+            throw new SigaExceptions("Error al generar el informe: " + e.getLocalizedMessage());
         } finally {
 
             if (ficheroFOP != null && ficheroFOP.exists()) {
@@ -836,13 +837,13 @@ public class FacturacionHelper {
             plantillaFO = new File(rutaServidorPlantillas + barraPlantilla + nombrePlantilla);
             if (!plantillaFO.exists()) {
             	LOGGER.warn("El directorio de plantillas no existe o no esta bien configurado: " + plantillaFO.getAbsolutePath());
-                throw new Exception("El directorio de plantillas no existe o no esta bien configurado");
+                throw new SigaExceptions("El directorio de plantillas no existe o no esta bien configurado");
             } else if (!plantillaFO.canRead()) {
             	LOGGER.error("Error de lectura del fichero FOP: " + plantillaFO.getAbsolutePath());
-                throw new Exception("Error de lectura del fichero FOP: " + plantillaFO.getAbsolutePath());
+                throw new SigaExceptions("Error de lectura del fichero FOP: " + plantillaFO.getAbsolutePath());
             }
 		} catch (Exception e) {
-			throw new Exception("ObtenerContenidoPlantilla ERROR: " + e.getMessage());
+			throw new SigaExceptions("Facturado ERROR: " + e.getMessage());
 		}
         
         LOGGER.info("*************** PLANTILLA SALIDA : " + rutaServidorPlantillas + File.separator + nombrePlantilla);

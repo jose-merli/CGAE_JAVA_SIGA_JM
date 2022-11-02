@@ -4,6 +4,7 @@ import org.itcgae.siga.DTO.fac.FacturacionRapidaRequestDTO;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
 import org.itcgae.siga.DTO.fac.ListaFacturasPeticionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.fac.services.IFacturacionRapidaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.TransformerException;
+
 import java.util.List;
 
 @RestController
@@ -61,11 +64,24 @@ public class FacturacionRapidaController {
 
                 return ResponseEntity.ok().headers(headers).contentLength(resource.contentLength()).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
             } else {
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.noContent().build();//Obsoleto
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			if(  e instanceof SigaExceptions || e.getMessage().contains("Facturado ERROR")) {
+	          	HttpHeaders headers = new HttpHeaders();
+	          	
+	          	if(e.getCause() instanceof SigaExceptions)
+	            headers.add(HttpHeaders.CONTENT_DISPOSITION,e.getCause().getMessage());
+	          	else
+	            headers.add(HttpHeaders.CONTENT_DISPOSITION,e.getMessage());
+	          	
+	            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+	            return ResponseEntity.noContent().headers(headers).build();
+			}else {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			}
+            
         }
 
     }
