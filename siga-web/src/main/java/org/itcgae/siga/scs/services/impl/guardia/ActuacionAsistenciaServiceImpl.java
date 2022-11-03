@@ -250,7 +250,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             if(costesActuacion != null && !costesActuacion.isEmpty()) {
                                 datosGeneralesActuacionAsistenciaItem.setIdCoste(costesActuacion.get(0).getIdcostefijo().toString());
                             }
-                            if(!UtilidadesString.esCadenaVacia(scsActuacionasistencia.getDiadespues()) && "1".equals(scsActuacionasistencia.getDiadespues())){
+                            if(!UtilidadesString.esCadenaVacia(scsActuacionasistencia.getDiadespues()) && "S".equals(scsActuacionasistencia.getDiadespues())){
                                 datosGeneralesActuacionAsistenciaItem.setDiaDespues(true);
                             }else{
                                 datosGeneralesActuacionAsistenciaItem.setDiaDespues(false);
@@ -428,7 +428,10 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                                 scsActuacionasistencia.setIdprision(null);
                                 scsActuacionasistencia.setIdinstitucionPris(null);
                             }
-
+                            
+                            if(datosGenerales.isDiaDespues()) scsActuacionasistencia.setDiadespues("S");
+                            else scsActuacionasistencia.setDiadespues("N");
+                            
                             scsActuacionasistencia.setDescripcionbreve(datosGenerales.getDescripcion());
                             scsActuacionasistencia.setObservaciones(datosGenerales.getObservaciones());
                             affectedRows += scsActuacionasistenciaExtendsMapper.updateByPrimaryKey(scsActuacionasistencia);

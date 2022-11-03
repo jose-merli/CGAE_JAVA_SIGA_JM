@@ -2166,7 +2166,8 @@ public class ComboServiceImpl implements ComboService {
 					scsAsistenciaKey.setIdinstitucion(idInstitucion);
 					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
 					if (scsAsistencia != null) {
-						List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, scsAsistencia.getIdtipoasistencia(), Integer.valueOf(usuarios.get(0).getIdlenguaje()));
+						Short numIdAsistencia = scsAsistencia.getIdtipoasistencia();
+						List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, numIdAsistencia, Integer.valueOf(usuarios.get(0).getIdlenguaje()));
 						comboDTO.setCombooItems(comboItems);
 					}
 				}else if(!UtilidadesString.esCadenaVacia(idTipoAsistencia)){
