@@ -8625,7 +8625,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					List<ScsPermutaCabecera> tienePermutaCabecera = scsPermutaCabeceraMapper
 							.selectByExample(permutaExample);
-
+					
+					//Establecemos el estado
+					setEstadoGuardiaCol(idInstitucion, guardiaCol);
+					//Ahora comprobamos si tiene permutas
 					if (!tienePermutaCabecera.isEmpty()) {
 						ScsPermutaguardiasExample permutaGuardiaSolExample = new ScsPermutaguardiasExample();
 						permutaGuardiaSolExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -8636,36 +8639,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						if (!tienePermutaGuardiaSol.isEmpty()) {
 							if (tienePermutaGuardiaSol.get(0).getFechaconfirmacion() == null) {
-								guardiaCol.setEstadoGuardia("Permuta Solicidata.");
-							} else {
-								if (guardiaCol.getFechahasta() == null) {
-									guardiaCol.setEstadoGuardia("Pendiente de Realizar.");
-								}
-
-								if ((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("0")) {
-									guardiaCol.setEstadoGuardia("Realizada y no validada.");
-								}
-
-								if (((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("1"))
-										&& guardiaCol.getFacturado() == null) {
-									guardiaCol.setEstadoGuardia("Realizada y validada.");
-
-								}
-								if ((guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1"))
-										&& ((guardiaCol.getFechahasta() != null)
-										&& guardiaCol.getValidada().equals("1"))) {
-
-									FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
-									facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-											.andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
-
-									List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper
-											.selectByExample(facturacionExample);
-									if (!facturas.isEmpty()) {
-										guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
-									}
-
-								}
+								guardiaCol.setEstadoGuardia("Permuta Solicitada.");
 							}
 						} else {
 							ScsPermutaguardiasExample permutaGuardiaConfExample = new ScsPermutaguardiasExample();
@@ -8674,46 +8648,23 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 							List<ScsPermutaguardias> tienePermutaGuardiaConf = scsPermutaguardiasMapper
 									.selectByExample(permutaGuardiaConfExample);
-							guardiaCol.setEstadoGuardia("Sin permuta asociada.");
+							if(guardiaCol.getEstadoGuardia() == null || guardiaCol.getEstadoGuardia().isEmpty()) {
+								guardiaCol.setEstadoGuardia("Sin permuta asociada.");
+							}
 							if (!tienePermutaGuardiaConf.isEmpty()) {
 								if (tienePermutaGuardiaConf.get(0).getFechaconfirmacion() == null) {
-									guardiaCol.setEstadoGuardia("Permuta Solicidata.");
-								} else {
-									if (guardiaCol.getFechahasta() == null) {
-										guardiaCol.setEstadoGuardia("Pendiente de Realizar.");
-									}
-
-									if ((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("0")) {
-										guardiaCol.setEstadoGuardia("Realizada y no validada.");
-									}
-
-									if (((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("1"))
-											&& guardiaCol.getFacturado() == null) {
-										guardiaCol.setEstadoGuardia("Realizada y validada.");
-
-									}
-									if ((guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1"))
-											&& ((guardiaCol.getFechahasta() != null)
-											&& guardiaCol.getValidada().equals("1"))) {
-
-										FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
-										facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-												.andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
-
-										List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper
-												.selectByExample(facturacionExample);
-										if (!facturas.isEmpty()) {
-											guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
-										}
-
-									}
+									guardiaCol.setEstadoGuardia("Permuta Solicitada.");
 								}
 							} else {
-								guardiaCol.setEstadoGuardia("Sin permuta asociada.");
+								if(guardiaCol.getEstadoGuardia() == null || guardiaCol.getEstadoGuardia().isEmpty()) {
+									guardiaCol.setEstadoGuardia("Sin permuta asociada.");
+								}
 							}
 						}
 					} else {
-						guardiaCol.setEstadoGuardia("Sin permuta asociada.");
+						if(guardiaCol.getEstadoGuardia() == null || guardiaCol.getEstadoGuardia().isEmpty()) {
+							guardiaCol.setEstadoGuardia("Sin permuta asociada.");
+						}
 					}
 
 				}
@@ -8723,6 +8674,39 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 
 		return guardiasDTO;
+	}
+
+	private void setEstadoGuardiaCol(Short idInstitucion, GuardiasItem guardiaCol) {
+		if (guardiaCol.getFechahasta() == null) {
+			guardiaCol.setEstadoGuardia("Pendiente de Realizar.");
+		}
+
+		if ((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("0")) {
+			guardiaCol.setEstadoGuardia("Realizada y no validada.");
+		}
+
+		if (((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("1"))
+				&& guardiaCol.getFacturado() == null) {
+			guardiaCol.setEstadoGuardia("Realizada y validada.");
+
+		}
+		if ((guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1"))
+				&& ((guardiaCol.getFechahasta() != null)
+				&& guardiaCol.getValidada().equals("1"))) {
+
+			FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
+			facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
+
+			List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper
+					.selectByExample(facturacionExample);
+			if (!facturas.isEmpty()) {
+				guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
+			}
+
+		}
+
+		
 	}
 
 	@Override
