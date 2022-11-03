@@ -4423,7 +4423,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			for (EjgDocumentacionItem doc : listadocumentoEjgItem) {
 				if (doc.getNombreFichero() != null) {
-					zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+					zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero()+ "_" + doc.getNombreFichero()));
 					String extension = doc.getNombreFichero()
 							.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
 							.toLowerCase();
