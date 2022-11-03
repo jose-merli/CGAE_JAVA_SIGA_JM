@@ -241,7 +241,8 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
 
                             List<ScsActuacionasistcostefijo> costesActuacion = scsActuacionasistcostefijoMapper.selectByExample(scsActuacionasistcostefijoExample);
 
-
+                            
+                            
                             DatosGeneralesActuacionAsistenciaItem datosGeneralesActuacionAsistenciaItem = new DatosGeneralesActuacionAsistenciaItem();
                             datosGeneralesActuacionAsistenciaItem.setIdActuacion(scsActuacionasistencia.getIdactuacion().toString());
                             datosGeneralesActuacionAsistenciaItem.setTipoActuacion(scsActuacionasistencia.getIdtipoactuacion().toString());
@@ -263,6 +264,14 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             if(scsActuacionasistencia.getIdprision() != null){
                                 datosGeneralesActuacionAsistenciaItem.setPrision(scsActuacionasistencia.getIdprision().toString());
                             }
+                            //Check que aparece deshabilitado si la guardia no tiene baremo de  actuaciones fuera de guardia
+                            int baremosFG = scsActuacionasistenciaExtendsMapper.controlCheckDiaDespues(idInstitucion, scsAsistencia.getIdturno().toString(), scsAsistencia.getIdguardia().toString());
+                            if(baremosFG == 0) {
+                            	datosGeneralesActuacionAsistenciaItem.setControlCheckDiaDespues(false); 
+                            }else {
+                            	datosGeneralesActuacionAsistenciaItem.setControlCheckDiaDespues(true);
+                            }
+                            
                             datosGeneralesActuacionAsistenciaItem.setFechaActuacion(new SimpleDateFormat("dd/MM/yyyy").format(scsActuacionasistencia.getFecha()));
                             datosGeneralesActuacionAsistenciaItem.setNig(scsActuacionasistencia.getNig());
                             datosGeneralesActuacionAsistenciaItem.setNumAsunto(scsActuacionasistencia.getNumeroasunto());

@@ -16,6 +16,7 @@ public class DatosGeneralesActuacionAsistenciaItem {
     private String nig;
     private String prision;
     private String observaciones;
+    private boolean controlCheckDiaDespues;
 
     public String getIdActuacion() {
         return idActuacion;
@@ -154,4 +155,14 @@ public class DatosGeneralesActuacionAsistenciaItem {
                 ", observaciones='" + observaciones + '\'' +
                 '}';
     }
+
+	public boolean isControlCheckDiaDespues() {
+		return controlCheckDiaDespues;
+	}
+
+	public void setControlCheckDiaDespues(boolean controlCheckDiaDespues) {
+		this.controlCheckDiaDespues = controlCheckDiaDespues;
+	}
+
+
 }

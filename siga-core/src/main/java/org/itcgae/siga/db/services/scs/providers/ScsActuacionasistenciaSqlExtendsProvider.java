@@ -32,7 +32,7 @@ public class ScsActuacionasistenciaSqlExtendsProvider {
 
         return SQL.toString();
     }
-
+    
     public String getNewIdActuacion(Short idInstitucion, String anioNumero){
         SQL sql = new SQL();
 
@@ -43,5 +43,18 @@ public class ScsActuacionasistenciaSqlExtendsProvider {
                 "NUMERO = '"+anioNumero.split("/")[1]+"'");
 
         return sql.toString();
+    }
+    
+    public String controlCheckDiaDespues(Short idInstitucion, String idTurno, String idGuardia) {
+        
+    	SQL sql = new SQL();
+        sql.SELECT("count(*)");
+        sql.FROM("scs_hitofacturableguardia");
+        sql.WHERE("idhito IN (9,25)");
+        sql.WHERE("idInstitucion = " + idInstitucion);
+        sql.WHERE("idturno = " + idTurno);
+        sql.WHERE("idguardia = " + idGuardia);
+    	
+    	return sql.toString();
     }
 }

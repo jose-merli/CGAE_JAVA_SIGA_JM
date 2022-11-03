@@ -35,4 +35,8 @@ public interface ScsActuacionasistenciaExtendsMapper extends ScsActuacionasisten
 
     })
     NewIdDTO getNewIdActuacion(Short idInstitucion, String anioNumero);
+    
+    @SelectProvider(type = ScsActuacionasistenciaSqlExtendsProvider.class, method = "controlCheckDiaDespues")
+    int controlCheckDiaDespues(Short idInstitucion, String idTurno, String idGuardia);
+
 }
