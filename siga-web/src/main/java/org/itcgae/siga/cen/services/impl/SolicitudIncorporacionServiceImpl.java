@@ -92,6 +92,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTipoidentificacionExtendsMappe
 import org.itcgae.siga.db.services.cen.mappers.CenTiposolicitudExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
+import org.itcgae.siga.gen.services.IControlResidenciaService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -185,6 +186,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
+	
+	@Autowired
+	private IControlResidenciaService controlResidenciaService;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -715,6 +719,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		int insertColegiado;
 		int insertCliente;
 		int updateSolicitud = 0;
+		
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
 		CenSolicitudincorporacion solIncorporacion;
@@ -734,8 +739,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
+					
 					AdmUsuarios usuario = usuarios.get(0);
 					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
+					
+					// Se comprueba el colegiado para detectar si se generaría una anomalía de residencia con su aprobación
+					//detectarAnomalia(solIncorporacion.getNumeroidentificador());
+					
 					//insertamos datos personales
 					idPersona = insertarDatosPersonales(solIncorporacion, usuario);
 					insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
@@ -846,7 +856,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		LOGGER.info("aprobarSolicitud() -> Salida del servicio para aprobar una solicitud");
 		return response;
 	}
-	
+
 	@Override
 	public InsertResponseDTO denegarsolicitud(Long idSolicitud, HttpServletRequest request) {
 		LOGGER.info("denegarsolicitud() -> Entrada al servicio para denegar una solicitud.");
@@ -1844,4 +1854,20 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		return id.idMax;
 	}
 
+	/**
+	 * Comprueba si se generaría una anomalía de residencia en el colegiado
+	 * @param nif 
+	 * @return true si se ha detectado un caso que produciría una anomalía, false si no
+	 */
+	private void detectarAnomalia(String nif) throws Exception{
+		boolean anomaliaDetectada = true;
+		
+		// Comprueba si se generaría una anomalía
+		controlResidenciaService.compruebaColegiacionEnVigor(nif);
+		
+		if (anomaliaDetectada) {
+			LOGGER.error("aprobarSolicitud() --> Se ha detectado un caso que generaría una anomalía de residencia en el colegiado");
+			throw new Exception("No se permite aprobar la solicitud porque generaría una anomalía de residencia en el colegiado");
+		}
+	}
 }
