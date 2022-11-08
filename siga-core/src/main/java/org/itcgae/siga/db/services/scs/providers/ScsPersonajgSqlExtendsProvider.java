@@ -294,12 +294,12 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("concat(consulta.apellido1 || ' ', consulta.apellido2) as apellidos");
 		sql.SELECT("consulta.nombre as nombresolo");
 		sql.SELECT(
-				"LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc) AS ASUNTOS");
+				"LISTAGG(DISTINCT consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc) AS ASUNTOS");
 		sql.SELECT("count(consulta.asunto) as numeroasuntos");
 		sql.SELECT(
-				"nvl(SUBSTR(LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc), 0, INSTR(LISTAGG(consulta.asunto, ', ')"
+				"nvl(SUBSTR(LISTAGG(DISTINCT consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc), 0, INSTR(LISTAGG(DISTINCT consulta.asunto, ', ')"
 						+ "		WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc), ',')-1),"
-						+ "		LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc)) as ultimoasunto");
+						+ "		LISTAGG(DISTINCT consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc)) as ultimoasunto");
 
 		SQL sqlUnidadFamiliar = new SQL();
 		sqlUnidadFamiliar.SELECT("unidadFamiliar.idpersona");
