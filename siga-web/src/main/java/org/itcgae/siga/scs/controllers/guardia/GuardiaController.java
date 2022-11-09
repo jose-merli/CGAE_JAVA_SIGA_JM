@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -275,7 +276,7 @@ public class GuardiaController {
 
 	@PostMapping(value = "/eliminarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> deleteCalendariosProgramados(
-			@RequestBody DeleteCalendariosProgDatosEntradaItem deleteCalBody, HttpServletRequest request) {
+			@RequestBody List<DeleteCalendariosProgDatosEntradaItem> deleteCalBody, HttpServletRequest request) {
 		DeleteResponseDTO response = guardiasService.deleteCalendariosProgramados(deleteCalBody, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
@@ -371,6 +372,12 @@ public class GuardiaController {
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/descargarLogCalendarioProgramado", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> descargarLogCalendarioProgramado(@RequestBody DatosCalendarioProgramadoItem item, HttpServletRequest request) throws Exception {
+		return guardiasService.descargarLogCalendarioProgramado(item, request);
+
+	}
+	
 	@PostMapping(value = "/updateCalendarioProgramado", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> updateCalendarioProgramado(
 			@RequestBody DatosCalendarioProgramadoItem calendarioItem, HttpServletRequest request) {

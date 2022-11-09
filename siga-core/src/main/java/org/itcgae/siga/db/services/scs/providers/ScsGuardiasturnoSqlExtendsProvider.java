@@ -1291,6 +1291,19 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sqlAs.FROM("SCS_ASISTENCIA asi");
 		sqlAs.WHERE("asi.IDINSTITUCION = hpc.idinstitucion and asi.IDTURNO = hpc.idturno and asi.IDGUARDIA = hpc.idguardia and trunc(asi.FECHAHORA) between pc.FECHACALINICIO and pc.FECHACALFIN");
 
+		SQL tablaGenerados = new SQL();
+		tablaGenerados.SELECT_DISTINCT("PGA.IDGUARDIA,PGA.IDTURNO");
+		tablaGenerados.FROM("SCS_HCO_CONF_PROG_CALENDARIOS PGA");
+		tablaGenerados.INNER_JOIN("scs_prog_calendarios PCA on PGA.idinstitucion = PCA.idinstitucion AND PGA.idprogcalendario = PCA.idprogcalendario");
+		tablaGenerados.INNER_JOIN("SCS_GUARDIASCOLEGIADO GCA ON PCA.idinstitucion = GCA.IDINSTITUCION AND PGA.idturno = GCA.idturno AND PGA.idguardia = GCA.idguardia");
+		tablaGenerados.WHERE("GCA.FECHAINICIO >= PCA.FECHACALINICIO AND GCA.FECHAFIN <= PCA.FECHACALFIN AND PCA.idProgCalendario = pc.idProgCalendario AND PCA.IDINSTITUCION = pc.IDINSTITUCION");
+		
+		SQL sqlCalGenerados = new SQL();
+		sqlCalGenerados.SELECT("COUNT (*)");
+		sqlCalGenerados.FROM("("+tablaGenerados.toString()+")");
+		
+		
+	
 		SQL sqlGenerado = new SQL();
 		sqlGenerado.SELECT("COUNT (1) GUARDIAS");
 		sqlGenerado.FROM("SCS_GUARDIASCOLEGIADO gc");
@@ -1304,6 +1317,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sqlGenerado.WHERE("hpc.idguardia = gc.idguardia");
 
 		SQL sql = new SQL();
+		sql.SELECT("("+sqlCalGenerados+") as CONTADORGENERADOS");
 		sql.SELECT("PC.IDINSTITUCION AS INSTITUCION");
 		sql.SELECT("HPC.IDTURNO as idTurno");
 		sql.SELECT("HPC.IDGUARDIA as idGuardia");
@@ -1671,6 +1685,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		}
 		sql.VALUES("IDFICHEROCALENDARIO", "null");
 		
+		if (calendarioItem.getNombreLogProgramacion() != null) {
+			sql.VALUES("LOG_PROGRAMACION_NAME", "'" + calendarioItem.getNombreLogProgramacion() + "'");
+		}
 
 //		insert(",SCS_PROG_CALENDARIOS PC, SCS_CONF_CONJUNTO_GUARDIAS CG");
 //

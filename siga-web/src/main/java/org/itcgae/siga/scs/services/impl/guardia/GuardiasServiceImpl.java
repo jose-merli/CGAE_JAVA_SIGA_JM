@@ -5,10 +5,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
@@ -29,6 +32,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeMap;
@@ -42,6 +47,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -58,6 +69,7 @@ import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Puntero;
+import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
@@ -78,6 +90,7 @@ import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.scs.services.guardia.GuardiasColegiadoService;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
+import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.logging.LogFile;
@@ -88,8 +101,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.NoTransactionException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -116,7 +133,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 	public static final String TIPO_DESC_VACACION = "censo.bajastemporales.tipo.vacaciones";
 	public static final String TIPO_DESC_BAJA = "censo.bajastemporales.tipo.baja";
 	public static final String TIPO_DESC_MATERNIDAD = "censo.bajastemporales.tipo.maternidad";
-
+	
+	public static final String GUARDIAS_DIRECTORIO_FISICO_LOG_CALENDARIOS_PROGRAMADOS = "guardias.directorioFisicoLogCalendariosProgramados";
+	private static final int EXCEL_ROW_FLUSH = 1000;
+	
 	//	private Map<String, Boolean> calendariosGenerandose = new HashMap<String, Boolean>();
 //	private Boolean generacionCalEnProceso = false;
 	private Integer idInstitucion1;
@@ -248,6 +268,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private GuardiasColegiadoService guardiasColegiadoService;
+	
+	@Autowired
+	private CgaeAuthenticationProvider authenticationProvider;
+	
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
 
 
 	@Override
@@ -2863,14 +2890,30 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return fechas;
 	}
 
+	private void rollBack(TransactionStatus transactionStatus) {
+		if (transactionStatus != null && !transactionStatus.isCompleted()) {
+			transactionManager.rollback(transactionStatus);
+		}
+	}
+
+	private void commit(TransactionStatus transactionStatus) {
+		if (transactionStatus != null && !transactionStatus.isCompleted()) {
+			transactionManager.commit(transactionStatus);
+		}
+	}
+	
+	/**
+	 *
+	 */
 	@Override
-	public DeleteResponseDTO deleteCalendariosProgramados(DeleteCalendariosProgDatosEntradaItem deleteCalBody,
+	public DeleteResponseDTO deleteCalendariosProgramados(List<DeleteCalendariosProgDatosEntradaItem> listDeleteCalBody,
 														  HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		int response = 1;
+		int response = 0; // Variable para guardar el contador de NO ELIMINADOS
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		int tamListaNum = 0;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -2884,59 +2927,103 @@ public class GuardiasServiceImpl implements GuardiasService {
 			LOGGER.info(
 					"deleteCalendariosProgramados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (usuarios != null && usuarios.size() > 0 && deleteCalBody.getIdTurno() != null
-					&& !deleteCalBody.getIdTurno().isEmpty() && deleteCalBody.getIdInstitucion() != null
-					&& !deleteCalBody.getIdInstitucion().isEmpty() && deleteCalBody.getIdGuardia() != null
-					&& !deleteCalBody.getIdGuardia().isEmpty() && deleteCalBody.getIdCalendarioProgramado() != null
-					&& !deleteCalBody.getIdCalendarioProgramado().isEmpty()) {
-				LOGGER.info("deleteCalendariosProgramados() -> Entrada para borrar las incompatibilidades");
-
-				LOGGER.info("deleteCalendariosProgramados() -> Entra a validar las guardias del calendario");
-				if (validarBorradoCalendario(Integer.valueOf(deleteCalBody.getIdInstitucion()),
-						Integer.valueOf(deleteCalBody.getIdCalendarioProgramado()),
-						Integer.valueOf(deleteCalBody.getIdTurno()),
-						Integer.valueOf(deleteCalBody.getIdGuardia()))) {
-					LOGGER.info("deleteCalendariosProgramados() -> Entra a validar el total de letrados");
-					if (validarBorradoGuardias(Integer.valueOf(deleteCalBody.getIdInstitucion()),
-							Integer.valueOf(deleteCalBody.getIdCalendarioProgramado()),
-							Integer.valueOf(deleteCalBody.getIdTurno()),
-							Integer.valueOf(deleteCalBody.getIdGuardia()))) {
-
-						LOGGER.info("deleteCalendariosProgramados() -> Se ejecuta el borrado de todo lo relacionado con el calendario");
-
-						List<ScsCabeceraguardias> listaCabeceras = this.scsCabeceraguardiasExtendsMapper.getCabeceraGuardia(deleteCalBody.getIdInstitucion(), deleteCalBody.getIdTurno(), deleteCalBody.getIdGuardia(), deleteCalBody.getFechaDesde());
-
-						if (!listaCabeceras.isEmpty()) {
-							ScsCabeceraguardias cabeceraguardias = listaCabeceras.get(0);
-							this.borrarGeneracionCalendario(deleteCalBody, usuarios, cabeceraguardias.getIdcalendarioguardias());
-							this.borrarRegistrosCalendario(deleteCalBody, cabeceraguardias.getIdcalendarioguardias());
-						}
-
-						this.scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado1(deleteCalBody.getIdTurno(),
-								deleteCalBody.getIdInstitucion(), deleteCalBody.getIdGuardia(),
-								deleteCalBody.getIdCalendarioProgramado());
-						this.scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado2(deleteCalBody.getIdCalendarioProgramado());
+			if (usuarios != null && usuarios.size() > 0 ){
+				Stream<Integer> listaIdCalendariosProgramados = listDeleteCalBody.stream().map(x -> Integer.parseInt(x.getIdCalendarioProgramado())).distinct(); 
+				List<Integer> listaNum = listaIdCalendariosProgramados.collect(Collectors.toList());
+				tamListaNum = listaNum.size();
+				for (int i = 0; i < listaNum.size(); i++) {
+					try {
+						if(!this.deleteByIdProgramacionCalendarios(listaNum.get(i), listDeleteCalBody, idInstitucion, usuarios))response ++;
+					}catch(NoTransactionException e) {
+						response++;
 					}
+					
 				}
 
 				LOGGER.info("deleteCalendariosProgramados() -> Salida ya con los datos recogidos");
-			} else {
-				response = 0;
-			}
+			} 
 		}
 
 		// comprobacion actualización
-		if (response >= 1) {
-			LOGGER.info("deleteCalendariosProgramados() -> OK. Delete para incompatibilidades realizado correctamente");
-			deleteResponseDTO.setStatus(SigaConstants.OK);
-		} else {
-			LOGGER.info(
-					"deleteCalendariosProgramados() -> KO. Delete para incompatibilidades NO realizado correctamente");
-			deleteResponseDTO.setStatus(SigaConstants.KO);
-		}
+
+		deleteResponseDTO.setStatus(SigaConstants.OK);
+		
+		deleteResponseDTO.setId(String.valueOf((tamListaNum-response))+"/"+ String.valueOf(tamListaNum));
+		
 
 		LOGGER.info("deleteCalendariosProgramados() -> Salida del servicio para eliminar incompatibilidades");
 		return deleteResponseDTO;
+	}
+	
+	   public TransactionStatus getNeTransaction() {
+	        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+	        def.setTimeout(Integer.parseInt("30"));
+	        def.setName("transGuardias");
+	        return transactionManager.getTransaction(def);
+	    }
+
+	
+	public boolean deleteByIdProgramacionCalendarios(int idProgramacionCalendarios,List<DeleteCalendariosProgDatosEntradaItem> listDeleteCalBody, Short idInstitucion,List<AdmUsuarios> usuarios ) {
+		
+		TransactionStatus tx = getNeTransaction();
+		boolean respuesta = false;
+		LOGGER.info("deleteCalendariosProgramados() -> Entra a validar las guardias del calendario");
+		//SCS_HCO_CONF_PROG_CALENDARIOS
+		ScsHcoConfProgCalendariosExample calendariosProgramadosExample = new ScsHcoConfProgCalendariosExample();
+		calendariosProgramadosExample.createCriteria().andIdprogcalendarioEqualTo((long)idProgramacionCalendarios)
+			.andIdinstitucionEqualTo(idInstitucion);
+		List<ScsHcoConfProgCalendarios> listaCalendarios = scsHcoConfProgCalendariosMapper.selectByExample(calendariosProgramadosExample);
+		
+		int controlNoValidos = 0;
+
+		for (int j = 0; j < listaCalendarios.size(); j++) {
+			if(!validarBorradoCalendario(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
+					Integer.valueOf(listaCalendarios.get(j).getIdprogcalendario().toString()),
+					listaCalendarios.get(j).getIdturno(),
+					listaCalendarios.get(j).getIdguardia())) controlNoValidos++;
+			
+			if (!validarBorradoGuardias(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
+					Integer.valueOf(listaCalendarios.get(j).getIdprogcalendario().toString()),
+					listaCalendarios.get(j).getIdturno(),
+					listaCalendarios.get(j).getIdguardia())) controlNoValidos++;
+		}
+		LOGGER.info("deleteCalendariosProgramados() -> Se ejecuta el borrado de todo lo relacionado con el calendario");
+
+		if(controlNoValidos == 0) {
+			try {
+				//Si es valido, borramos todos los calendarios y despues borramos la programacion
+				for (int k = 0; k < listaCalendarios.size(); k++) {
+					//Identificamos el deleteBody para obtener la fechaInicio
+					String idCal  = listaCalendarios.get(k).getIdprogcalendario().toString();
+					Optional<DeleteCalendariosProgDatosEntradaItem> itemDeleteOption = listDeleteCalBody.stream().
+							filter(x-> x.getIdCalendarioProgramado().equals(idCal) ).findFirst();
+					
+					List<ScsCabeceraguardias> listaCabeceras = this.scsCabeceraguardiasExtendsMapper.getCabeceraGuardia(listaCalendarios.get(k).getIdinstitucion().toString(), 
+							listaCalendarios.get(k).getIdturno().toString(),listaCalendarios.get(k).getIdguardia().toString(), itemDeleteOption.get().getFechaDesde());
+
+					if (!listaCabeceras.isEmpty()) {
+						ScsCabeceraguardias cabeceraguardias = listaCabeceras.get(0);
+						this.borrarGeneracionCalendario(itemDeleteOption.get(), usuarios, cabeceraguardias.getIdcalendarioguardias());
+						this.borrarRegistrosCalendario(itemDeleteOption.get(), cabeceraguardias.getIdcalendarioguardias());
+					}
+
+					this.scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado1(listaCalendarios.get(k).getIdturno().toString(),
+							listaCalendarios.get(k).getIdinstitucion().toString(), listaCalendarios.get(k).getIdguardia().toString(),
+							listaCalendarios.get(k).getIdprogcalendario().toString());
+				}
+				this.scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado2(String.valueOf(idProgramacionCalendarios));
+				respuesta = true;
+				commit(tx);
+			} catch (Exception e) {
+				respuesta = false;
+				//TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				rollBack(tx);
+			}
+			
+		}else {
+			respuesta = false;
+		}
+		return respuesta;
 	}
 
 	@Override
@@ -3808,7 +3895,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 						String nextIdCalendarioProgramado = getNuevoIdCalProg();
 						calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
-
+						calendarioItem.setIdInstitucion(idInstitucion.toString());
+						calendarioItem.setNombreLogProgramacion("LOG_"+calendarioItem.getIdCalendarioProgramado()+".xlsx");
 						// Validacion de Solapamiento.
 						compruebaSolapamientoProgramamciones(calendarioItem, idInstitucion, solapamiento, tamMaximo);
 
@@ -3868,6 +3956,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							error.setCode(400);
 							insertResponseDTO.setStatus(SigaConstants.KO);
 						} else if (error.getCode() == null) {
+							crearLog(calendarioItem);
 							error.setCode(200);
 							insertResponseDTO.setId(nextIdCalendarioProgramado);
 							insertResponseDTO.setStatus(SigaConstants.OK);
@@ -3906,6 +3995,63 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		insertResponseDTO.setError(error);
 		return insertResponseDTO;
+	}
+
+	private void crearLog(DatosCalendarioProgramadoItem calendarioItem) {
+		try {
+			LOGGER.info("crearLog()- Se va a crear el excel informando");
+			
+			String sheetName = "LOG";
+			String pathFichero = getPathCalPro(calendarioItem);
+			Workbook workBook = crearExcel(calendarioItem);
+			FileOutputStream fileOut;
+			String nombreFichero =  calendarioItem.getNombreLogProgramacion();
+			SIGAHelper.mkdirs(pathFichero);
+			File file = new File(pathFichero,nombreFichero);
+			fileOut = new FileOutputStream(file);
+			workBook.write(fileOut);
+			fileOut.close();
+			workBook.close();
+			LOGGER.info(" crearLog()- Creado fichero:  " + nombreFichero);
+		} catch (Exception e) {
+			LOGGER.error("crearLog() - Error a la hora de crear Excel",e);
+
+		}
+		
+	}
+
+private Workbook crearExcel(DatosCalendarioProgramadoItem calendarioItem ) {
+		
+		try {
+
+			Workbook workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
+			Sheet sheet = workbook.createSheet("LOG");
+			
+			
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+			
+			//Fecha
+			Row rowFecha = sheet.createRow(0);
+			rowFecha.createCell(0).setCellValue("FECHA");
+			rowFecha.createCell(1).setCellValue("ACCIÓN");
+			rowFecha.createCell(2).setCellValue("DESCRIPCION");
+			
+			Date date = new Date();
+			String fecha = dateFormat.format(date);
+			//Fecha
+			Row Accion = sheet.createRow(1);
+			Accion.createCell(0).setCellValue(fecha);
+			Accion.createCell(1).setCellValue("CREACIÓN");
+			Accion.createCell(2).setCellValue("CALENDARIO PROGRAMADO CREADO");
+			
+			sheet.setColumnWidth(0, 7000);
+			sheet.setColumnWidth(1, 4000);
+			sheet.setColumnWidth(2, 4000);
+			return workbook;
+			
+		} catch (Exception e) {
+			throw new RuntimeException("Error al crear el archivo Excel: " + e.getMessage());
+		}
 	}
 
 	private void compruebaSolapamientoProgramamciones(DatosCalendarioProgramadoItem calendarioItem,
@@ -4051,7 +4197,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 													if (hcoConfProgCalendariosItem != null) {
 														hcoConfProgCalendariosItem.setEstado(EN_PROCESO);
 														updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
-
+														editarLog(d, "INICIO", "Guardias Calendario - " +hcoConfProgCalendariosItem.getNombre());
 														// El metodo crear calerndario nos creara los calendarios. Hay mas de uno ya
 														// que pueden tener guardias vincualdas
 														String textoAutomatico = "Calendario generado automáticamente desde la programación de calendarios";
@@ -4082,6 +4228,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 														} catch (Exception e) {
 															if (d != null) {
 																d.setEstado(PROCESADO_CON_ERRORES);
+																editarLog(d, "ERROR", e.getMessage());
 																updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 															}
 															TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -4089,6 +4236,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 														}
 														d.setEstado(GENERADO);// FINALIZADO
 														updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
+														editarLog(d, "FIN", "Guardias Calendario - " +hcoConfProgCalendariosItem.getNombre());
 														String nombreFicheroSalida = idTurno1 + "." + idGuardia1 + "."
 																+ idCalendarioGuardias1 + "-" + fechaInicio1.replace('/', '.') + "-"
 																+ fechaFin1.replace('/', '.') + "-log";
@@ -4115,6 +4263,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 														// false);
 														if (d != null) {
 															d.setEstado(PROCESADO_CON_ERRORES);
+															editarLog(d, "ERROR", "programacionIten nulo");
 															updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 														}
 														error.setCode(400);
@@ -4134,6 +4283,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 													"generarCalendarioAsync() -> Se ha producido un error al trabajar con el histórico",
 													e);
 											if (d != null) {
+												editarLog(d, "ERROR", e.getMessage());
 												d.setEstado(PROCESADO_CON_ERRORES);
 												updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 											}
@@ -4158,6 +4308,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 										e);
 
 								if (d != null) {
+									editarLog(d, "ERROR", e.getMessage());
 									d.setEstado(PROCESADO_CON_ERRORES);
 									updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 								}
@@ -4286,7 +4437,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								hcoConfProgCalendariosItem.setEstado(EN_PROCESO);
 								updateEstadoHco(hcoConfProgCalendariosItem, EN_PROCESO);
 								int res2 = updateEstado(programacionItem, idInstitucion, usuModificacion1);
-
+								editarLog(programacionItem, "INICIO", "Guardias Calendario - " +hcoConfProgCalendariosItem.getNombre());
 								// El metodo crear calerndario nos creara los calendarios. Hay mas de uno ya que
 								// pueden tener guardias vincualdas
 								String textoAutomatico = "Calendario generado automáticamente desde la programación de calendarios";
@@ -4315,11 +4466,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 									programacionItem.setEstado(PROCESADO_CON_ERRORES);
 									updateEstadoHco(hcoConfProgCalendariosItem, PROCESADO_CON_ERRORES);
 									scsGuardiasturnoExtendsMapper.updateEstado(programacionItem, idInstitucion.toString());
+									editarLog(programacionItem, "ERROR", e.getMessage());
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 								}
 								programacionItem.setEstado(GENERADO);// FINALIZADO
+								editarLog(programacionItem, "FIN", "Guardias Calendario - " + hcoConfProgCalendariosItem.getNombre());
 								updateEstadoHco(hcoConfProgCalendariosItem, GENERADO);
 								updateEstado(programacionItem, idInstitucion, usuModificacion1);
 								String nombreFicheroSalida = idTurno1 + "." + idGuardia1 + "." + idCalendarioGuardias1 + "-"
@@ -4381,6 +4534,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 //						}
 						programacionItem.setEstado(PROCESADO_CON_ERRORES);
+						editarLog(programacionItem, "Error", e.getMessage());
 						res = updateEstado(programacionItem, idInstitucion, usuModificacion1);
 						// generacionCalEnProceso = false;
 						res = setGeneracionEnProceso(programacionItem.getIdCalendarioProgramado(), "0");
@@ -4397,6 +4551,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			// false);
 			// generacionCalEnProceso = false;
 			programacionItem.setEstado(PROCESADO_CON_ERRORES);
+			editarLog(programacionItem, "Error", e.getMessage());
 			scsGuardiasturnoExtendsMapper.updateEstado(programacionItem, idInstitucion.toString());
 			int res = setGeneracionEnProceso(programacionItem.getIdCalendarioProgramado(), "0");
 			LOGGER.error(
@@ -4426,6 +4581,37 @@ public class GuardiasServiceImpl implements GuardiasService {
 //	}
 	}
 
+	
+	@Override
+	public ResponseEntity<InputStreamResource> descargarLogCalendarioProgramado(DatosCalendarioProgramadoItem item, HttpServletRequest request)throws Exception {
+		ResponseEntity<InputStreamResource> res = null;
+		AdmUsuarios usuario = null;
+
+		LOGGER.info("descargarFichaFacturacion() -> Entrada al servicio para recuperar el archivo de LOG de la facturación");
+
+		// Conseguimos información del usuario logeado
+		usuario = authenticationProvider.checkAuthentication(request);
+
+		String pathFichero = getPathCalPro(item);
+		
+		// Lista de ficheros de facturaciones programadas
+		List<File> listaFicheros = new ArrayList<File>();
+		File file = null;
+		String nombreFichero = getNombreFichero(item);
+		file = new File(pathFichero + File.separator + nombreFichero);
+		listaFicheros.add(file);
+
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicheros,
+				MediaType.parseMediaType("application/vnd.ms-excel"),
+				MediaType.parseMediaType("application/zip"), "LOG_FACTURACION");
+
+
+		LOGGER.info("descargarFichaFacturacion() -> Salida del servicio para obtener el archivo de LOG de la facturación");
+
+		return res;
+	}
+	
 	private int updateEstado(DatosCalendarioProgramadoItem programacionItem, Short idInstitucion, Integer usuModificacion) {
 
 		ScsProgCalendariosExample example = new ScsProgCalendariosExample();
@@ -4642,6 +4828,100 @@ public class GuardiasServiceImpl implements GuardiasService {
 		idCalendarioGuardias1 = idCalendarioGuardias;
 		fechaInicio1 = fechaInicio;
 		fechaFin1 = fechaFin;
+	}
+
+	    public String getProperty(final String parametro) {
+
+	        String valor = null;
+
+	        GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
+	        GenPropertiesExample.Criteria criteria = genPropertiesExample.createCriteria().andParametroEqualTo(parametro);
+	        
+	        List<GenProperties> genPropertiesList = genPropertiesMapper.selectByExample(genPropertiesExample);
+
+	        if (genPropertiesList != null && !genPropertiesList.isEmpty()) {
+	            valor = genPropertiesList.get(0).getValor();
+	        }
+
+	        return valor;
+	    }
+	   
+	
+	private String getPathCalPro(DatosCalendarioProgramadoItem item) {
+		 String pathFichero = getProperty(GUARDIAS_DIRECTORIO_FISICO_LOG_CALENDARIOS_PROGRAMADOS);
+	     Path pLog = Paths.get(pathFichero).resolve(item.getIdInstitucion());
+		return pLog.toString();
+	}
+
+	private void editarLog(DatosCalendarioProgramadoItem itemCalendarioProgramado,String accion, String descripcion) {
+		try {
+			LOGGER.info("FacturacionProgramada()- Se va a editar el excel informando");
+			
+			if(!descripcion.contains("No transaction aspect-managed TransactionStatus in scope")) { //Distinto del Error Generado para el RollBack
+				String pathFichero = getPathCalPro(itemCalendarioProgramado);
+				String nombreFichero = itemCalendarioProgramado.getNombreLogProgramacion();
+				if(nombreFichero == null || nombreFichero.isEmpty()){
+					nombreFichero = getNombreFichero(itemCalendarioProgramado);
+				}
+
+				File file = new File(pathFichero, nombreFichero);
+				if (file.exists()) {
+					Workbook workBook = editarExcel(file, itemCalendarioProgramado, accion, descripcion);
+					FileOutputStream fileOut;
+					fileOut = new FileOutputStream(file);
+					workBook.write(fileOut);
+					fileOut.close();
+					workBook.close();
+					LOGGER.info(" FacturacionProgramada()- editar fichero:  " + nombreFichero);
+				}
+
+			}
+
+			
+		} catch (Exception e) {
+			LOGGER.error("FacturacionProgramada() - Error a la hora de editar Excel", e);
+
+		}
+	}
+
+	private String getNombreFichero(DatosCalendarioProgramadoItem itemCalendarioProgramado) {
+		
+		ScsProgCalendariosExample exampleUsuarios = new ScsProgCalendariosExample();
+		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(itemCalendarioProgramado.getIdInstitucion()))
+			.andIdprogcalendarioEqualTo(Long.parseLong(itemCalendarioProgramado.getIdCalendarioProgramado()));
+
+		List<ScsProgCalendarios> calendariosProgramados = scsProgCalendariosMapper.selectByExample(exampleUsuarios);
+		return calendariosProgramados.get(0).getLogProgramacionName();
+	}
+
+	private Workbook editarExcel(File file, DatosCalendarioProgramadoItem facPro,String accion, String descripcion) {
+
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			Workbook workbook = WorkbookFactory.create(fis);
+			Sheet sheet = workbook.getSheetAt(0);
+
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+
+			int rowCount = sheet.getLastRowNum();
+			sheet.shiftRows(1, rowCount, 1);
+			Date date = new Date();
+			String fecha = dateFormat.format(date);
+			// Fecha
+			Row Accion = sheet.createRow(1);
+			Accion.createCell(0).setCellValue(fecha);
+			Accion.createCell(1).setCellValue(accion);
+			Accion.createCell(2).setCellValue(descripcion);
+
+			sheet.setColumnWidth(0, 6500);
+			sheet.setColumnWidth(1, 4000);
+			sheet.setColumnWidth(2, 10000);
+			fis.close();
+			return workbook;
+
+		} catch (Exception e) {
+			throw new RuntimeException("Error al editar el archivo Excel: " + e.getMessage());
+		}
 	}
 
 	public void generarCalendario2() throws Exception {
@@ -6963,7 +7243,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 					LOGGER.info("*Guardias vinculadas " + calendariosVinculados1.toString());
 					inicial = 1;
 				}
-
 				// Para cada dia o conjunto de dias:
 				for (int i = inicial; i < arrayPeriodosDiasGuardiaSJCS1.size(); i++) {
 					posicion = 1;
