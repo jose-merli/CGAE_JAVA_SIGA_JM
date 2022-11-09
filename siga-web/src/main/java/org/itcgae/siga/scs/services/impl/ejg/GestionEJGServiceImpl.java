@@ -585,9 +585,17 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					// Una vez tenemos el EJG, introducimos la informacion seleccionada en la
 					// tarjeta
 
-					ejg.setGuardiaturnoIdguardia(Integer.parseInt(datos.getIdGuardia()));
-					ejg.setGuardiaturnoIdturno(Integer.parseInt(datos.getIdTurno()));
-
+					if(datos.getIdGuardia() == null) {
+						ejg.setGuardiaturnoIdguardia(null);
+					}else {
+						ejg.setGuardiaturnoIdguardia(Integer.parseInt(datos.getIdGuardia()));
+					}
+					
+					if(datos.getIdTurno() == null) {
+						ejg.setGuardiaturnoIdturno(null);
+					}else {
+						ejg.setGuardiaturnoIdturno(Integer.parseInt(datos.getIdTurno()));
+					}
 					// Persona de la tarjeta de Servicio de Tramitación (Opcional)
 					if (!UtilidadesString.esCadenaVacia(datos.getIdPersona()))
 						ejg.setIdpersona(Long.parseLong(datos.getIdPersona()));

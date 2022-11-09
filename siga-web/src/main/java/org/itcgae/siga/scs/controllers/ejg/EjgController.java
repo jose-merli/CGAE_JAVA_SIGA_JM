@@ -230,7 +230,7 @@ public class EjgController {
 	@RequestMapping(value = "/gestion-ejg/insertFamiliarEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertFamiliar(@RequestBody List<String> datos, HttpServletRequest request) {
 		InsertResponseDTO response = gestionEJG.insertFamiliarEJG(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -358,7 +358,7 @@ public class EjgController {
 //			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 //		else
 //			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -390,7 +390,7 @@ public class EjgController {
 	ResponseEntity<InsertResponseDTO> solicitarEEJG(@RequestBody UnidadFamiliarEJGItem datos,
 			HttpServletRequest request) {
 		InsertResponseDTO response = gestionEJG.solicitarEEJG(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -401,7 +401,10 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> guardarServiciosTramitacion(@RequestBody EjgItem datos,
 			HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.guardarServiciosTramitacion(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if(response.getStatus().equals(SigaConstants.OK)) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	// borrarEstado
@@ -409,7 +412,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> borrarEstado(@RequestBody List<EstadoEjgItem> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.borrarEstado(datos, request);
 
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -422,7 +425,7 @@ public class EjgController {
 			throws Exception {
 		UpdateResponseDTO response = gestionEJG.editarEstado(datos, request);
 
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -434,7 +437,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> borrarFamiliar(@RequestBody List<UnidadFamiliarEJGItem> datos,
 			HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.borrarFamiliar(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -444,7 +447,7 @@ public class EjgController {
 	@RequestMapping(value = "/gestion-ejg/nuevoEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> nuevoEstado(@RequestBody EstadoEjgItem datos, HttpServletRequest request) {
 		InsertResponseDTO response = gestionEJG.nuevoEstado(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -479,7 +482,7 @@ public class EjgController {
 	@RequestMapping(value = "/gestion-ejg/borrarRelacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> borrarRelacion(@RequestBody List<String> datos, HttpServletRequest request) {
 		DeleteResponseDTO response = gestionEJG.borrarRelacion(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -490,7 +493,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> borrarRelacionAsistenciaEJG(@RequestBody RelacionesItem datos,
 			HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.borrarRelacionAsistenciaEJG(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -501,7 +504,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> borrarRelacionSojEJG(@RequestBody RelacionesItem datos,
 			HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.borrarRelacionSojEJG(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -535,7 +538,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> updateDatosJuridicos(@RequestBody EjgItem datos, HttpServletRequest request)
 			throws Exception {
 		UpdateResponseDTO response = gestionEJG.updateDatosJuridicos(datos, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -552,7 +555,7 @@ public class EjgController {
 		contrario.setIdtipoejg(Short.parseShort(item[3]));
 		contrario.setNumero(Long.parseLong(item[2]));
 		UpdateResponseDTO response = gestionEJG.deleteContrarioEJG(contrario, request);
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -707,7 +710,7 @@ public class EjgController {
 //	@RequestMapping(value = "/gestion-ejg/actualizarDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 //	ResponseEntity<InsertResponseDTO> actualizarDelitosEJG(@RequestBody EjgItem item, HttpServletRequest request) {
 //		InsertResponseDTO response = gestionEJG.actualizarDelitosEJG(item, request);
-//		if (response.getStatus().equals("OK"))
+//		if (response.getStatus().equals(SigaConstants.OK))
 //			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 //		else
 //			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -792,7 +795,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> asociarDesignacion(@RequestBody List<String> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.asociarDesignacion(datos, request);
 
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -811,7 +814,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> asociarAsistencia(@RequestBody List<String> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.asociarAsistencia(datos, request);
 
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -822,7 +825,7 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> asociarSOJ(@RequestBody List<String> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.asociarSOJ(datos, request);
 
-		if (response.getStatus().equals("OK"))
+		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);

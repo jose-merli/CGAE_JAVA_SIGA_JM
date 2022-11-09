@@ -3404,9 +3404,19 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
 
 					if (scsAsistencia != null && designaItem != null) {
-						scsAsistencia.setDesignaAnio((short) designaItem.getAno());
-						scsAsistencia.setDesignaNumero(Long.valueOf(designaItem.getCodigo()));
-						if (designaItem.getIdTurnos() != null && designaItem.getIdTurnos().length > 0) { // Si traemos
+						
+						
+						ScsDesignaExample exampleDesigna = new ScsDesignaExample();
+						exampleDesigna.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andAnioEqualTo(Short.valueOf(String.valueOf(designaItem.getAno())))
+							.andCodigoEqualTo(designaItem.getCodigo());
+							
+						List <ScsDesigna> listaDes = scsDesignacionesExtendsMapper.selectByExample(exampleDesigna );
+						
+						scsAsistencia.setDesignaAnio(listaDes.get(0).getAnio());
+						scsAsistencia.setDesignaNumero(listaDes.get(0).getNumero());
+						scsAsistencia.setDesignaTurno(listaDes.get(0).getIdturno());
+						/*if (designaItem.getIdTurnos() != null && designaItem.getIdTurnos().length > 0) { // Si traemos
 																											// el id
 																											// turno
 																											// informado
@@ -3419,7 +3429,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							if (turnos != null && !turnos.isEmpty()) {
 								scsAsistencia.setDesignaTurno(turnos.get(0).getIdturno());
 							}
-						}
+						}*/
 						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
 
 						if ("S".equals(copiarDatos)) { // Pasamos los datos de la asistencia a la designa
@@ -4865,8 +4875,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		// Actualizamos los datos generales
 		ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(scsDesignaKey);
 		scsDesigna.setNig(scsAsistencia.getNig());
-		scsDesigna.setNumprocedimiento(scsAsistencia.getNumeroprocedimiento().split("/")[0]);
-		scsDesigna.setAnioprocedimiento(Short.valueOf(scsAsistencia.getNumeroprocedimiento().split("/")[1]));
+		if(scsAsistencia.getNumeroprocedimiento() != null) {
+			scsDesigna.setNumprocedimiento(scsAsistencia.getNumeroprocedimiento().split("/")[0]);
+		}
+		if(scsAsistencia.getNumeroprocedimiento() != null) {
+			scsDesigna.setAnioprocedimiento(Short.valueOf(scsAsistencia.getNumeroprocedimiento().split("/")[1]));
+		}
 		scsDesigna.setObservaciones(scsAsistencia.getObservaciones());
 		scsDesigna.setIdpretension(scsAsistencia.getIdpretension());
 		scsDesigna.setIdjuzgado(scsAsistencia.getJuzgado());
