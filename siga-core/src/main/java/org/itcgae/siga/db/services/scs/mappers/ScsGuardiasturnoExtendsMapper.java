@@ -247,7 +247,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDCALENDARIOGUARDIAS", property = "idCalendarioGuardia", jdbcType = JdbcType.VARCHAR)})
 	
-	List<DatosCalendarioProgramadoItem> getLastCalendariosProgramadosSigaClassique(CalendariosProgDatosEntradaItem obj, String idIns);
+	List<DatosCalendarioProgramadoItem> getLastCalendariosProgramadosSigaClassique(CalendariosProgDatosEntradaItem calendarioItem, String idInstitucion);
 	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getFechasProgramacionFromIdConjuntoGuardia")
 	@Results({ 
