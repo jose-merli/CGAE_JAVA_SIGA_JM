@@ -24,6 +24,8 @@ public class DatosCalendarioProgramadoItem {
 	private Boolean asistenciasAsociadas;
 	private String idCalendarioGuardia;
 	List<GuardiaCalendarioItem> guardias;
+	private String nombreLogProgramacion;
+	private int contadorGenerados;
 	
 	public String getFechaDesde() {
 		return fechaDesde;
@@ -144,5 +146,17 @@ public class DatosCalendarioProgramadoItem {
 	}
 	public void setGuardias(List<GuardiaCalendarioItem> guardias) {
 		this.guardias = guardias;
+	}
+	public String getNombreLogProgramacion() {
+		return nombreLogProgramacion;
+	}
+	public void setNombreLogProgramacion(String nombreLogProgramacion) {
+		this.nombreLogProgramacion = nombreLogProgramacion;
+	}
+	public int getContadorGenerados() {
+		return contadorGenerados;
+	}
+	public void setContadorGenerados(int contadorGenerados) {
+		this.contadorGenerados = contadorGenerados;
 	}
 }

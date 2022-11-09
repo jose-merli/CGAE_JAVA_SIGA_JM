@@ -102,10 +102,6 @@ public interface GuardiasService {
 	public DatosCalendarioProgramadoItem getLastCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
 			HttpServletRequest request);
 
-	public DeleteResponseDTO deleteCalendariosProgramados(DeleteCalendariosProgDatosEntradaItem deleteCalBody,
-			HttpServletRequest request);
-	
-
 	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request);
 			
 	public DocumentoActDesignaDTO getDocumentosPorActDesigna(DocumentoActDesignaItem documentoActDesignaItem,
@@ -171,5 +167,11 @@ public interface GuardiasService {
 			ArrayList arrayDiasGuardia, String idPersona);
 
 	public void insertarSaltoCompensacion(ScsSaltoscompensaciones salto) throws Exception;
+
+	public ResponseEntity<InputStreamResource> descargarLogCalendarioProgramado(DatosCalendarioProgramadoItem item,
+			HttpServletRequest request) throws Exception;
+
+	public DeleteResponseDTO deleteCalendariosProgramados(List<DeleteCalendariosProgDatosEntradaItem> listDeleteCalBody,
+			HttpServletRequest request);
 
 }
