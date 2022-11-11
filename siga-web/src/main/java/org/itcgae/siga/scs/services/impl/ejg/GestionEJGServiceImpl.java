@@ -743,6 +743,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Boolean primero = false;
 
 		if (idInstitucion != null) {
 			LOGGER.debug(
@@ -785,7 +786,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
 							familiar.setFechamodificacion(new Date());
 							familiar.setFechabaja(null);
-							familiar.setSolicitante((short) 0);
+							primero = compruebaSiSolicitanteEjg(idInstitucion, item);
+							if(primero) {
+								familiar.setSolicitante((short) 1);
+							}else {
+								familiar.setSolicitante((short) 0);
+							}
 							response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);
 						} else {
 							response = 0;
@@ -800,9 +806,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
 						familiar.setFechamodificacion(new Date());
-
-						familiar.setSolicitante((short) 0);
-
+						primero = compruebaSiSolicitanteEjg(idInstitucion, item);
+						
+						if(primero) {
+							//Además Se marca como solicitante
+							familiar.setSolicitante((short) 1);
+						}else {
+							familiar.setSolicitante((short) 0);
+						}
+						//Insertamos el familiar
 						response = scsUnidadfamiliarejgMapper.insert(familiar);
 					}
 
@@ -813,13 +825,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
 					} else {
 						responsedto.setStatus(SigaConstants.OK);
-						ScsEjg ejgItem = new ScsEjg();
-
-						ejgItem.setAnio(Short.valueOf(item.get(2)));
-						ejgItem.setIdinstitucion(idInstitucion);
-						ejgItem.setNumero(Long.valueOf(item.get(4)));
-						ejgItem.setIdtipoejg(Short.valueOf(item.get(3)));
-
+						
 						// String descripcionUnidadFamiliar = getDescripcionUnidadFamiliar(null,
 						// familiar, "INSERT");
 
@@ -841,6 +847,35 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		}
 
 		return responsedto;
+	}
+
+	private Boolean compruebaSiSolicitanteEjg(Short idInstitucion, List<String> item) {
+		//Miramos si es el primero como unidad familiar para ponerlo como solicitante principal
+		ScsUnidadfamiliarejgExample exampleFamiliar = new ScsUnidadfamiliarejgExample();
+		exampleFamiliar.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+				.andAnioEqualTo(Short.parseShort(item.get(2)))
+				.andIdtipoejgEqualTo(Short.parseShort(item.get(3)))
+				.andNumeroEqualTo(Long.parseLong(item.get(4)))
+				.andFechabajaIsNull();
+		List<ScsUnidadfamiliarejg> uf = scsUnidadfamiliarejgMapper.selectByExample(exampleFamiliar);
+
+		//Si no hay resultados se inserta como solicitante principal
+		if(uf.isEmpty()) {
+			ScsEjgKey keyEjg = new ScsEjgKey();
+			keyEjg.setAnio(Short.valueOf(item.get(2)));
+			keyEjg.setIdinstitucion(idInstitucion);
+			keyEjg.setNumero(Long.valueOf(item.get(4)));
+			keyEjg.setIdtipoejg(Short.valueOf(item.get(3)));
+			
+			ScsEjgWithBLOBs ejg = scsEjgExtendsMapper.selectByPrimaryKey(keyEjg);
+			//Si es el primero se marca como solicitante principal
+			ejg.setIdpersonajg(Long.parseLong(item.get(1)));
+			scsEjgExtendsMapper.updateByPrimaryKeySelective(ejg);
+			
+			return true;
+		}else {
+			return false;
+		}
 	}
 
 	@Override
