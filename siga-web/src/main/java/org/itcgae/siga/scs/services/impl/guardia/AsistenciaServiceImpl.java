@@ -5100,7 +5100,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		scsEjg.setNumerodiligencia(scsAsistencia.getNumerodiligencia());
 		scsEjg.setNig(scsAsistencia.getNig());
-		scsEjg.setIdpretension(scsAsistencia.getIdpretension().longValue());
+		
+		if (scsAsistencia.getIdpretension() != null) {
+			scsEjg.setIdpretension(scsAsistencia.getIdpretension().longValue());
+		}
+		
 		scsEjg.setUsumodificacion(usuario);
 		scsEjg.setFechamodificacion(new Date());
 
