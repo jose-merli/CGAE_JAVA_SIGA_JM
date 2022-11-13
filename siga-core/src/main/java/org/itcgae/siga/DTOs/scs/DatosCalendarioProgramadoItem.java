@@ -26,6 +26,7 @@ public class DatosCalendarioProgramadoItem {
 	List<GuardiaCalendarioItem> guardias;
 	private String nombreLogProgramacion;
 	private int contadorGenerados;
+	private char soloGenerarVacio;
 	
 	public String getFechaDesde() {
 		return fechaDesde;
@@ -158,5 +159,11 @@ public class DatosCalendarioProgramadoItem {
 	}
 	public void setContadorGenerados(int contadorGenerados) {
 		this.contadorGenerados = contadorGenerados;
+	}
+	public char getSoloGenerarVacio() {
+		return soloGenerarVacio;
+	}
+	public void setSoloGenerarVacio(char soloGenerarVacio) {
+		this.soloGenerarVacio = soloGenerarVacio;
 	}
 }

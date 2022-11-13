@@ -3762,7 +3762,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								idInstitucion.toString(), calendarioItem.getFechaProgramacion(),
 								calendarioItem.getFechaDesde(), calendarioItem.getFechaHasta(), pc.getEstado().toString(),
 								pc.getFechamodificacion().toString(), pc.getUsumodificacion().toString(), null,
-								pc.getIdprogcalendario().toString());
+								pc.getIdprogcalendario().toString(),calendarioItem.getSoloGenerarVacio());
 						// String response3 =
 						// scsGuardiasturnoExtendsMapper.updateConfCalendarioProgramado2(calendarioItem,
 						// idInstitucion.toString());
@@ -4224,7 +4224,8 @@ private Workbook crearExcel(DatosCalendarioProgramadoItem calendarioItem ) {
 																	new Integer(hcoConfProgCalendariosItem.getIdturno()),
 																	new Integer(hcoConfProgCalendariosItem.getIdguardia()),
 																	new Integer(idCalendario), d.getFechaDesde(), d.getFechaHasta());
-															generarCalendario2();
+															boolean soloVacio = d.getSoloGenerarVacio() == 'S' ? true : false;
+															generarCalendario2(soloVacio);
 														} catch (Exception e) {
 															if (d != null) {
 																d.setEstado(PROCESADO_CON_ERRORES);
@@ -4461,7 +4462,8 @@ private Workbook crearExcel(DatosCalendarioProgramadoItem calendarioItem ) {
 											new Integer(hcoConfProgCalendariosItem.getIdturno()),
 											new Integer(hcoConfProgCalendariosItem.getIdguardia()), new Integer(idCalendario),
 											programacionItem.getFechaDesde(), programacionItem.getFechaHasta());
-									generarCalendario2();
+									boolean soloVacio = programacionItem.getSoloGenerarVacio() == 'S' ? true : false;
+									generarCalendario2(soloVacio);
 								} catch (Exception e) {
 									programacionItem.setEstado(PROCESADO_CON_ERRORES);
 									updateEstadoHco(hcoConfProgCalendariosItem, PROCESADO_CON_ERRORES);
@@ -4924,7 +4926,7 @@ private Workbook crearExcel(DatosCalendarioProgramadoItem calendarioItem ) {
 		}
 	}
 
-	public void generarCalendario2() throws Exception {
+	public void generarCalendario2(boolean soloVacio) throws Exception {
 		String porGrupos = "false";
 		boolean rotacion = false;
 
@@ -4993,52 +4995,55 @@ private Workbook crearExcel(DatosCalendarioProgramadoItem calendarioItem ) {
 
 			}
 		}
+//check false
+		if(!soloVacio) {
+			// inicializando calendario
+			inicializaParaMatriz(new Integer(idInstitucion1), new Integer(idTurno1), new Integer(idGuardia1),
+					new Integer(idCalendarioGuardias1), calendariosVinculados, null); // enviar log en lugar de null en el
+			// ultimo param
 
-		// inicializando calendario
-		inicializaParaMatriz(new Integer(idInstitucion1), new Integer(idTurno1), new Integer(idGuardia1),
-				new Integer(idCalendarioGuardias1), calendariosVinculados, null); // enviar log en lugar de null en el
-		// ultimo param
+			// obteniendo los periodos
+			try {
+				LOGGER.info(beanGuardiasTurno1);
+				calcularMatrizPeriodosDiasGuardiaAutomatico();
+				List<Integer> lDiasASeparar = getDiasASeparar(new Integer(idInstitucion1), new Integer(idTurno1),
+						new Integer(idGuardia1));
 
-		// obteniendo los periodos
-		try {
-			LOGGER.info(beanGuardiasTurno1);
-			calcularMatrizPeriodosDiasGuardiaAutomatico();
-			List<Integer> lDiasASeparar = getDiasASeparar(new Integer(idInstitucion1), new Integer(idTurno1),
-					new Integer(idGuardia1));
-
-			// obteniendo la matriz de letrados de guardia
-			listaDatosExcelGeneracionCalendarios = new ArrayList<>();
-			Map<String, Object> mapLog = new HashMap();
-			mapLog.put("*INICIO generacion", guardia.getNombre() + " (" + fechaInicio1 + " - " + fechaFin1 + ")");
-			listaDatosExcelGeneracionCalendarios.add(mapLog);
-			LOGGER.info(new String[]{"*INICIO generacion",
-					guardia.getNombre() + " (" + fechaInicio1 + " - " + fechaFin1 + ")"});
-
-			if (porGrupos.equals("1")) {
-				calcularMatrizLetradosGuardiaPorGrupos(lDiasASeparar, rotacion);
-			} else {
-				calcularMatrizLetradosGuardia(lDiasASeparar);
-			}
-
-			// log.addLog(new String[] { "FIN generacion" });
-			Map<String, Object> mapLog1 = new HashMap();
-			mapLog1.put("*FIN generacion", "");
-			listaDatosExcelGeneracionCalendarios.add(mapLog1);
-			LOGGER.info("*FIN generacion" + "");
-
-		} catch (Exception e) {
-			if (e.getMessage().equals("periodoSinDias")) {
-				// log.addLog(new String[] { " ", "Sin periodos" } );
-
+				// obteniendo la matriz de letrados de guardia
+				listaDatosExcelGeneracionCalendarios = new ArrayList<>();
 				Map<String, Object> mapLog = new HashMap();
-				mapLog.put("* ", "Sin periodos");
+				mapLog.put("*INICIO generacion", guardia.getNombre() + " (" + fechaInicio1 + " - " + fechaFin1 + ")");
 				listaDatosExcelGeneracionCalendarios.add(mapLog);
-				LOGGER.info("* " + "Sin periodos");
-			} else {
-				throw e;
-			}
+				LOGGER.info(new String[]{"*INICIO generacion",
+						guardia.getNombre() + " (" + fechaInicio1 + " - " + fechaFin1 + ")"});
 
+				if (porGrupos.equals("1")) {
+					calcularMatrizLetradosGuardiaPorGrupos(lDiasASeparar, rotacion);
+				} else {
+					calcularMatrizLetradosGuardia(lDiasASeparar);
+				}
+
+				// log.addLog(new String[] { "FIN generacion" });
+				Map<String, Object> mapLog1 = new HashMap();
+				mapLog1.put("*FIN generacion", "");
+				listaDatosExcelGeneracionCalendarios.add(mapLog1);
+				LOGGER.info("*FIN generacion" + "");
+
+			} catch (Exception e) {
+				if (e.getMessage().equals("periodoSinDias")) {
+					// log.addLog(new String[] { " ", "Sin periodos" } );
+
+					Map<String, Object> mapLog = new HashMap();
+					mapLog.put("* ", "Sin periodos");
+					listaDatosExcelGeneracionCalendarios.add(mapLog);
+					LOGGER.info("* " + "Sin periodos");
+				} else {
+					throw e;
+				}
+
+			}
 		}
+		
 
 	}
 
@@ -6643,23 +6648,48 @@ private Workbook crearExcel(DatosCalendarioProgramadoItem calendarioItem ) {
 		try {
 
 			Hashtable miHash = new Hashtable();
+			String idInstitucion = null;
+			String idGuardia = null;
+			String idTurno = null;
+			String idPersona = null;
+			
 			if (letrado.getIdinstitucion() != null) {
-				miHash.put("IDINSTITUCION", letrado.getIdinstitucion().toString());
+				idInstitucion = letrado.getIdinstitucion().toString();
 			}
 			if (letrado.getIdGuardia() != null) {
-				miHash.put("IDGUARDIA", letrado.getIdGuardia().toString());
+				idGuardia = letrado.getIdGuardia().toString();
+				
 			}
 			if (letrado.getIdTurno() != null) {
-				miHash.put("IDTURNO", letrado.getIdTurno().toString());
+				idTurno = letrado.getIdTurno().toString();
+			
 			}
+			if (letrado.getIdpersona() != null) {
+				idPersona =  letrado.getIdpersona().toString();
+			
+			}
+			if (letrado.getInscripcionGuardia() != null) {
+				idInstitucion = letrado.getInscripcionGuardia().getIdInstitucion().toString();
+				idGuardia = letrado.getInscripcionGuardia().getIdGuardia().toString();
+				idTurno = letrado.getInscripcionGuardia().getIdturno().toString();
+				idPersona = letrado.getInscripcionGuardia().getIdPersona().toString();
+			} else if (letrado.getInscripcionTurno() != null) {
+				idInstitucion = letrado.getInscripcionTurno().getIdinstitucion().toString();
+				idGuardia = null;
+				idTurno = letrado.getInscripcionTurno().getIdturno().toString();
+				idPersona = letrado.getInscripcionTurno().getIdpersona().toString();
+			}
+			
+			miHash.put("IDINSTITUCION", idInstitucion);
+			miHash.put("IDGUARDIA", idGuardia);
+			miHash.put("IDTURNO", idTurno);
+			miHash.put("IDPERSONA", idPersona);
+			
 			if (periodoDiasGuardia.get(0) != null) {
 				miHash.put("FECHAINICIO", (String) periodoDiasGuardia.get(0));
 			}
 			if (periodoDiasGuardia.get(periodoDiasGuardia.size() - 1) != null) {
 				miHash.put("FECHAFIN", (String) periodoDiasGuardia.get(periodoDiasGuardia.size() - 1));
-			}
-			if (letrado.getIdpersona() != null) {
-				miHash.put("IDPERSONA", letrado.getIdpersona().toString());
 			}
 
 			salida = validarSeparacionGuardias(miHash);
@@ -8052,10 +8082,13 @@ private Workbook crearExcel(DatosCalendarioProgramadoItem calendarioItem ) {
 		Map<String, Object> mapLog10 = new HashMap();
 		String g = "";
 		String t = "";
-		if (letrado.getInscripcionGuardia().getIdGuardia() != null)
+		if (letrado.getInscripcionGuardia() != null) {
 			g = "con guadia " + new Integer(letrado.getInscripcionGuardia().getIdGuardia());
-		if (letrado.getInscripcionTurno().getIdturno() != null)
+			t = "con turno " + new Integer(letrado.getInscripcionGuardia().getIdturno());
+		}else if(letrado.getInscripcionTurno() != null) {
+			g = "con guadia null" ;
 			t = "con turno " + new Integer(letrado.getInscripcionTurno().getIdturno());
+		}
 		mapLog10.put("*Almacenando guardia ", g + " y " + t);
 		listaDatosExcelGeneracionCalendarios.add(mapLog10);
 		LOGGER.info("*Almacenando guardia " + g + " y " + t);

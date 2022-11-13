@@ -195,6 +195,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "idCalG", property = "idCalG", jdbcType = JdbcType.INTEGER),
 			@Result(column = "numGuardias", property = "numGuardias", jdbcType = JdbcType.INTEGER),
 			@Result(column = "idCalendarioProgramado", property = "idCalendarioProgramado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "SOLOGENERARVACIO", property = "soloGenerarVacio", jdbcType = JdbcType.CHAR),
 			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR)})
 	
 	List<DatosCalendarioProgramadoItem> getAllCalendariosProgramadosSigaClassiquePendiente();
@@ -221,6 +222,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "asistenciasAsociadas", property = "asistenciasAsociadas", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CONTADORGENERADOS", property = "contadorGenerados", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "SOLOGENERARVACIO", property = "soloGenerarVacio", jdbcType = JdbcType.CHAR),
 			@Result(column = "IDCALENDARIOGUARDIAS", property = "idCalendarioGuardia", jdbcType = JdbcType.VARCHAR)})
 	
 	List<DatosCalendarioProgramadoItem> getCalendariosProgramadosSigaClassique(CalendariosProgDatosEntradaItem obj, String idIns);

@@ -1318,6 +1318,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 
 		SQL sql = new SQL();
 		sql.SELECT("("+sqlCalGenerados+") as CONTADORGENERADOS");
+		sql.SELECT("PC.SOLO_GENERAR_VACIO AS SOLOGENERARVACIO");
 		sql.SELECT("PC.IDINSTITUCION AS INSTITUCION");
 		sql.SELECT("HPC.IDTURNO as idTurno");
 		sql.SELECT("HPC.IDGUARDIA as idGuardia");
@@ -1684,6 +1685,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			sql.VALUES("USUMODIFICACION", usuModif );
 		}
 		sql.VALUES("IDFICHEROCALENDARIO", "null");
+		
+		sql.VALUES("SOLO_GENERAR_VACIO", "'"+calendarioItem.getSoloGenerarVacio()+"'");
 		
 		if (calendarioItem.getNombreLogProgramacion() != null) {
 			sql.VALUES("LOG_PROGRAMACION_NAME", "'" + calendarioItem.getNombreLogProgramacion() + "'");
@@ -3046,9 +3049,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		}
 		sql.WHERE("coleg.RESERVA='N'");
 
-		sql.WHERE ( "       (abs(TO_DATE(("+sqlMax+"),'DD/MM/YYYY') - TO_DATE('"+fechaPeriodoPrimerDia+"','DD/MM/YYYY')) <= guard.DIASSEPARACIONGUARDIAS)"
+		sql.WHERE ( "     (  (abs(TO_DATE(("+sqlMax+"),'DD/MM/YYYY') - TO_DATE('"+fechaPeriodoPrimerDia+"','DD/MM/YYYY')) <= guard.DIASSEPARACIONGUARDIAS)"
 			+"       OR "
-			+ "       (abs(TO_DATE(("+sqlMin+"),'DD/MM/YYYY') - TO_DATE('"+fechaPeriodoUltimoDia+"','DD/MM/YYYY')) <= guard.DIASSEPARACIONGUARDIAS)");
+			+ "       (abs(TO_DATE(("+sqlMin+"),'DD/MM/YYYY') - TO_DATE('"+fechaPeriodoUltimoDia+"','DD/MM/YYYY')) <= guard.DIASSEPARACIONGUARDIAS))");
 		return sql.toString();
 		
 //		String consulta = "SELECT COUNT(coleg.IDINSTITUCION) AS TOTAL";
