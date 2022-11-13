@@ -275,7 +275,11 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
 					else {
 						PysLineaanticipo movimiento = new PysLineaanticipo();
 
+						if(i==0) {
+							movimiento.setIdlinea((short) (movimientosFicha.size() - i));	
+						}else {
 						movimiento.setIdlinea((short) (movimientosFicha.size() - i - 1));
+						}
 						movimiento.setFechaefectiva(new Date());
 						movimiento.setIdanticipo((short) idAnticipo);
 						movimiento.setIdinstitucion(idInstitucion);

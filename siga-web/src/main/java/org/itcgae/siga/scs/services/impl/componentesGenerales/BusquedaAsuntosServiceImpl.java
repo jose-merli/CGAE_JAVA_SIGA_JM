@@ -1692,6 +1692,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				// 6. Se debe insertar los interesados seleccionados en la designacion en Unidad
 				// Familiar del EJG.
 				
+				try {
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Iniciando la introduccion de los interesados de la designacion a la unidad Familiar del EJG");
 
@@ -1743,6 +1744,10 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						throw (new Exception(
 								"Error al introducir familiares en la unidad familiar del EJG desde los interesados de la designacion."));
 
+				}
+				}catch(Exception ex) {
+					LOGGER.debug("No se han podido eliminar los familiares del ejg "+ejg.getAnio()+"/"+ejg.getNumejg() + " del colegio "
+							+ idInstitucion, ex);
 				}
 
 			}
