@@ -141,6 +141,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 	@Autowired
 	private ScsDocumentacionasiMapper scsDocumentacionasiMapper;
+	
+	@Autowired
+	private ScsActuacionasistcostefijoMapper scsActuacionasistcostefijoMapper;
 
 	@Autowired
 	private FicherosServiceImpl ficherosServiceImpl;
@@ -4575,6 +4578,47 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					for (ActuacionAsistenciaItem actuacion : actuaciones) {
 
+						// Eliminamos los documentos asociados a las actuaciones
+                        ScsDocumentacionasiExample scsDocumentacionasiExample = new ScsDocumentacionasiExample();
+                        scsDocumentacionasiExample.createCriteria()
+                                .andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
+                                .andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+                                .andIdinstitucionEqualTo(idInstitucion)
+                                .andIdactuacionEqualTo(Long.valueOf(actuacion.getIdActuacion()));
+                        List<ScsDocumentacionasi> documentos = scsDocumentacionasiMapper.selectByExample(scsDocumentacionasiExample);
+                        
+                        if(documentos != null && !documentos.isEmpty()){
+                        	for (ScsDocumentacionasi documento: documentos) {
+                        		ScsDocumentacionasiKey scsDocumentacionasiKey = new ScsDocumentacionasiKey();
+    							scsDocumentacionasiKey.setIddocumentacionasi(documento.getIddocumentacionasi());
+    							scsDocumentacionasiKey.setIdinstitucion(documento.getIdinstitucion());
+    							scsDocumentacionasiMapper.deleteByPrimaryKey(scsDocumentacionasiKey);
+                        	}
+                        }
+                        
+                        // Eliminamos los costes fijos asociados a las actuaciones
+                        ScsActuacionasistcostefijoExample scsActuacionasistcostefijoExample = new ScsActuacionasistcostefijoExample();
+                        scsActuacionasistcostefijoExample.createCriteria()
+                                .andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
+                                .andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+                                .andIdinstitucionEqualTo(idInstitucion)
+                                .andIdactuacionEqualTo(Long.valueOf(actuacion.getIdActuacion()));
+                        List<ScsActuacionasistcostefijo> costesFijos = scsActuacionasistcostefijoMapper.selectByExample(scsActuacionasistcostefijoExample);
+                        
+                        if(costesFijos != null && !costesFijos.isEmpty()){
+                        	for (ScsActuacionasistcostefijo costeFijo: costesFijos) {
+                        		ScsActuacionasistcostefijoKey scsActuacionasistcostefijoKey = new ScsActuacionasistcostefijoKey();
+                        		scsActuacionasistcostefijoKey.setIdinstitucion(costeFijo.getIdinstitucion());
+                        		scsActuacionasistcostefijoKey.setAnio(costeFijo.getAnio());
+                        		scsActuacionasistcostefijoKey.setNumero(costeFijo.getNumero());
+                        		scsActuacionasistcostefijoKey.setIdactuacion(costeFijo.getIdactuacion());
+                        		scsActuacionasistcostefijoKey.setIdtipoasistencia(costeFijo.getIdtipoasistencia());
+                        		scsActuacionasistcostefijoKey.setIdtipoactuacion(costeFijo.getIdtipoactuacion());
+                        		scsActuacionasistcostefijoKey.setIdcostefijo(costeFijo.getIdcostefijo());
+    							scsActuacionasistcostefijoMapper.deleteByPrimaryKey(scsActuacionasistcostefijoKey);
+                        	}
+                        }
+						
 						ScsActuacionasistenciaKey scsActuacionasistenciaKey = new ScsActuacionasistenciaKey();
 						scsActuacionasistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
 						scsActuacionasistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));

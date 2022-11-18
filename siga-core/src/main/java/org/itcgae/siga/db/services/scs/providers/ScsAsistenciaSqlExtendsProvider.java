@@ -653,7 +653,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		SQL SQL = new SQL();
 
 		SQL.SELECT("IDORIGENCONTACTO AS ID",
-				"DESCRIPCION");
+				"F_SIGA_GETRECURSO(DESCRIPCION, 1) AS DESCRIPCION");
 		SQL.FROM("SCS_ORIGENCONTACTO");
 		SQL.WHERE("IDINSTITUCION="+idInstitucion,
 				"FECHA_BAJA IS NULL");
