@@ -19,6 +19,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
@@ -34,6 +35,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISolicitudIncorporacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SigaUtils;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
@@ -65,6 +67,7 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
@@ -73,6 +76,7 @@ import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
 import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
@@ -189,6 +193,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private IControlResidenciaService controlResidenciaService;
+	
+	@Autowired
+	private GenParametrosMapper genParametroMapper;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -744,7 +751,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
 					
 					// Se comprueba el colegiado para detectar si se generaría una anomalía de residencia con su aprobación
-					//detectarAnomalia(solIncorporacion.getNumeroidentificador());
+					// Validacion de nuevo parametro para comprobar si se detecta anomalias por institucion o no.
+					Boolean hasToCheckAnomalias = this.checkValueParameter("administracion.parametro.validacionanomalias", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
+					// MOCK SMB TEMPORAL
+					hasToCheckAnomalias = true;
+					if (hasToCheckAnomalias) {
+						detectarAnomalia(solIncorporacion.getNumeroidentificador());
+					}
+					
 					
 					//insertamos datos personales
 					idPersona = insertarDatosPersonales(solIncorporacion, usuario);
@@ -844,8 +858,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					}
 					
 				}catch(Exception e){
-					
+					LOGGER.error(e.getMessage());
 					error.setMessage(e.getMessage());
+					error.setDescription(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 					response.setError(error);
 					LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> ERROR: " + e.getMessage());
@@ -1863,11 +1878,33 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		boolean anomaliaDetectada = true;
 		
 		// Comprueba si se generaría una anomalía
-		controlResidenciaService.compruebaColegiacionEnVigor(nif);
+		anomaliaDetectada = controlResidenciaService.compruebaColegiacionEnVigor(nif);
 		
 		if (anomaliaDetectada) {
 			LOGGER.error("aprobarSolicitud() --> Se ha detectado un caso que generaría una anomalía de residencia en el colegiado");
 			throw new Exception("No se permite aprobar la solicitud porque generaría una anomalía de residencia en el colegiado");
 		}
 	}
+	
+	
+	private Boolean checkValueParameter(String parameter, Short idInstitucion) {
+		
+		GenParametrosExample paramExample = new GenParametrosExample();
+		Boolean resultReturn = null;
+
+		LOGGER.info(
+				"checkValueParameter() / genParametroMapper.selectByExample() -> Entrada a GenParametrosMapper para obtener información del parametro para checkear anomalias en validacion de residencia");
+		
+		paramExample.createCriteria().andParametroEqualTo(parameter).andIdinstitucionEqualTo(idInstitucion);
+		
+		List<GenParametros> paramResults = genParametroMapper.selectByExample(paramExample);
+
+		LOGGER.info(
+		"checkValueParameter() / genParametroMapper.selectByExample() -> Salida de GenParametrosMapper para obtener información del parametro para checkear anomalias en validacion de residencia");
+
+		String paramResValue = !CollectionUtils.isEmpty(paramResults) ? paramResults.get(0).getValor() : "";
+		
+		return !paramResValue.isEmpty() && ("S".equalsIgnoreCase(paramResValue) || "1".equalsIgnoreCase(paramResValue) || Boolean.parseBoolean(paramResValue)) ? Boolean.TRUE : Boolean.FALSE;
+	}	
+	
 }

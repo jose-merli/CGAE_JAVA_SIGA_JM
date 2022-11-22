@@ -1,6 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -9,13 +10,23 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -28,12 +39,16 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
+import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.EmailUtil;
+import org.itcgae.siga.commons.utils.SigaUtils;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.AgeNotificacionesevento;
 import org.itcgae.siga.db.entities.CenColacambioletrado;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
@@ -45,16 +60,24 @@ import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
@@ -104,11 +127,24 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 	@Autowired
 	private GenDiccionarioMapper genDiccionarioMapper;
+	
     @Autowired
     private ScsGuardiascolegiadoExtendsMapper _scsGuardiascolegiadoMapper;
 	
 	@Autowired
 	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
+	
+	@Autowired
+	private GenParametrosMapper genParametroMapper;
+	
+	@Autowired
+	private CenInstitucionExtendsMapper cenInstitutcionExtendMapper;
+	
+	@Autowired
+	private IColaEnvios iColaEnvios;
+	
+	@Autowired
+	private EnvEnviosMapper _envEnviosMapper;
 
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -1819,6 +1855,64 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info("datosColegialesSearch() -> Salida del servicio para la búsqueda por filtros de Colegiados");
 		return datosColegialesDTO;
 	}
+	
+
+	@Override
+	public ColegiadoDTO datosColegialesSearchHistor(ColegiadoItem colegiadoItem,
+			HttpServletRequest request) {
+
+		LOGGER.info("datosColegialesSearchHistor() -> Entrada al servicio para la búsqueda por filtros de direcciones");
+
+		List<ColegiadoItem> colegiadoListItem = new ArrayList<ColegiadoItem>();
+		ColegiadoDTO datosColegialesDTO = new ColegiadoDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		Boolean hasToCheckAnomalias = this.checkValueParameter("administracion.parametro.validacionanomalias", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
+		// MOCK SMB TEMPORAL
+		hasToCheckAnomalias = true;
+		if (hasToCheckAnomalias) {
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"datosColegialesSearchHistor() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"datosColegialesSearchHistor() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					// if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+					LOGGER.info(
+							"datosColegialesSearchHistor() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
+					colegiadoListItem = cenColegiadoExtendsMapper.selectColegiacionHistor(idInstitucion,
+							usuario.getIdlenguaje(), colegiadoItem);
+					LOGGER.info(
+							"datosColegialesSearchHistor() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para busqueda de Colegiados");
+
+					datosColegialesDTO.setColegiadoItem(colegiadoListItem);
+				} else {
+					LOGGER.warn(
+							"datosColegialesSearchHistor() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+			} else {
+				LOGGER.warn("datosColegialesSearchHistor() -> idInstitucion del token nula");
+			}
+		} else {
+			LOGGER.info("datosColegialesSearchHistor() -> hasToCheckAnomalias = False | No autorizado a comprobar anomalias");
+		}
+		
+		
+
+		LOGGER.info("datosColegialesSearchHistor() -> Salida del servicio para la búsqueda por filtros de Colegiados");
+		return datosColegialesDTO;
+	}
+	
 	/**
 	 * PL que realiza una revision de letrado
 	 * 
@@ -2083,6 +2177,98 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
         return resultado;
     }
+	
+	private Boolean checkValueParameter(String parameter, Short idInstitucion) {
+		
+		GenParametrosExample paramExample = new GenParametrosExample();
+
+		LOGGER.info(
+				"checkValueParameter() / genParametroMapper.selectByExample() -> Entrada a GenParametrosMapper para obtener información del parametro: " + parameter + " | Institucion: " + idInstitucion);
+		
+		paramExample.createCriteria().andParametroEqualTo(parameter).andIdinstitucionEqualTo(idInstitucion);
+		
+		List<GenParametros> paramResults = genParametroMapper.selectByExample(paramExample);
+
+
+		String paramResValue = !CollectionUtils.isEmpty(paramResults) ? paramResults.get(0).getValor() : "";
+	
+		LOGGER.info(
+				"checkValueParameter() / genParametroMapper.selectByExample() -> Salida de GenParametrosMapper para obtener información del parametro: " + parameter + " | Institucion: " + idInstitucion + " | paramResValue: " + paramResValue);
+		
+		return !paramResValue.isEmpty() && ("S".equalsIgnoreCase(paramResValue) || "1".equalsIgnoreCase(paramResValue) || Boolean.parseBoolean(paramResValue)) ? Boolean.TRUE : Boolean.FALSE;
+	
+	}
+
+	@Override
+	public ColegiadoDTO sendMailsOtherCentres(String[] centresToSendMails, HttpServletRequest request) {
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (this.checkValueParameter("administracion.parametro.valida_envios_mails", idInstitucion) ) {
+			List<String> listMailsInst = new ArrayList<>();	
+		
+			for (String institucionId : centresToSendMails) {
+				CenInstitucion institucion = cenInstitutcionExtendMapper.selectByPrimaryKey(Short.parseShort(institucionId));
+				if (institucion != null && Short.parseShort("2000") != institucion.getIdinstitucion()) {
+					LOGGER.info("sendMailsOtherCentres() -> Envio de mails a centro: " + institucion.getNombre());
+	//				this.createAndSendMailToCentre(mailSender, mailCentreToSend, "Asunto Email" ,"Mensaje de prueba para envio mails centros");
+					
+					try {
+						EnvEnvios envio = null;
+						EnvEnviosKey keyEnvio = new EnvEnviosKey();
+						Long idEnvio = generarEnvioMod(institucion.getIdinstitucion());
+						
+						keyEnvio.setIdenvio(idEnvio);
+						keyEnvio.setIdinstitucion(institucion.getIdinstitucion());
+						
+						envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
+						envio.setIdplantilla(Short.parseShort("1"));
+						envio.setIdtipoenvios(Short.parseShort(SigaConstants.ID_ENVIO_MAIL));
+					
+						iColaEnvios.preparaCorreo(envio);
+						
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+
+		
+		
+		return null;
+	}
+
+//	private Long generarEnvioMod(AgeNotificacionesevento notification) {
+	private Long generarEnvioMod(Short idInstitucion) {
+
+		// Insertamos nuevo envio
+		EnvEnvios envio = new EnvEnvios();
+		envio.setIdinstitucion(idInstitucion);
+		envio.setDescripcion("TMP");
+		envio.setFecha(new Date());
+		envio.setGenerardocumento("N");
+		envio.setImprimiretiquetas("N");
+		envio.setIdplantillaenvios(1);
+		envio.setIdplantilla(Short.parseShort("1"));
+
+		Short estadoNuevo = 4;
+		envio.setIdestado(estadoNuevo);
+		envio.setIdtipoenvios(Short.parseShort(SigaConstants.ID_ENVIO_MAIL));
+		envio.setFechamodificacion(new Date());
+//		envio.setUsumodificacion(Integer.parseInt(notification.getUsumodificacion().toString()));
+		envio.setEnvio("A");
+		// envio.setFechaprogramada(fechageneracionnotificacion);
+		// envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
+		int insert = _envEnviosMapper.insert(envio);
+
+		return envio.getIdenvio();
+	}
 
 
 }
