@@ -334,6 +334,25 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		return sql.toString();
 	}
 	
+	public String comboTurnosGuardiasGrupo(String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sqlTurno = new SQL();
+		
+		sql.SELECT_DISTINCT("IDTURNO");
+		sql.FROM("SCS_GUARDIASTURNO");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql.WHERE("PORGRUPOS = 1");
+		
+		sqlTurno.SELECT("IDTURNO, NOMBRE");
+		sqlTurno.FROM("SCS_TURNO");
+		sqlTurno.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sqlTurno.WHERE("IDTURNO IN (" + sql.toString() + ")");
+		sqlTurno.WHERE("FECHABAJA IS NULL");
+		sqlTurno.ORDER_BY("NOMBRE");
+		
+		return sqlTurno.toString();
+	}
+	
 	public String comboGuardiasUpdate(String idTurno, String idInstitucion) {
 		SQL sql = new SQL();
 		
