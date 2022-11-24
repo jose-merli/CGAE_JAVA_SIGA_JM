@@ -2194,7 +2194,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		if (this.checkValueParameter("administracion.parametro.valida_envios_mails", idInstitucion) ) {
+		if (this.checkValueParameter("VALIDACION_ANOMALIAS_ENVIO_MAIL", idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT) ) {
 			List<String> listMailsInst = new ArrayList<>();	
 		
 			for (String institucionId : centresToSendMails) {

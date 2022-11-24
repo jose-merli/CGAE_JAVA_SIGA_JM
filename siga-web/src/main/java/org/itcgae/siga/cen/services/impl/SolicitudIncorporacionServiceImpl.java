@@ -749,9 +749,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					
 					// Se comprueba el colegiado para detectar si se generaría una anomalía de residencia con su aprobación
 					// Validacion de nuevo parametro para comprobar si se detecta anomalias por institucion o no.
-					Boolean hasToCheckAnomalias = this.checkValueParameter("administracion.parametro.validacionanomalias", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
-					// MOCK SMB TEMPORAL
-					hasToCheckAnomalias = true;
+					Boolean hasToCheckAnomalias = this.checkValueParameter("VALIDACION_ANOMALIAS_RESIDENCIA", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
+					
 					if (hasToCheckAnomalias) {
 						detectarAnomalia(solIncorporacion.getNumeroidentificador());
 					}
