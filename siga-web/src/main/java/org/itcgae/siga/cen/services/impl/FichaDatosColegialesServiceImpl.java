@@ -1858,9 +1858,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		Boolean hasToCheckAnomalias = this.checkValueParameter("administracion.parametro.validacionanomalias", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
-		// MOCK SMB TEMPORAL
-		hasToCheckAnomalias = true;
+		Boolean hasToCheckAnomalias = this.checkValueParameter("VALIDACION_ANOMALIAS_RESIDENCIA", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
 		if (hasToCheckAnomalias) {
 			if (null != idInstitucion) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
