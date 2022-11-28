@@ -2174,7 +2174,15 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		
 		List<GenParametros> paramResults = genParametroMapper.selectByExample(paramExample);
 
+		if (CollectionUtils.isEmpty(paramResults)) {			
+			LOGGER.info(
+					"FichaDatosColegialesService/checkValueParameter() --> No se ha obtenido ningun valor del parametro (" + parameter + ") para la institucion (" + idInstitucion + "). Se procede a la busqueda por defecto.");
 
+			paramExample = new GenParametrosExample();
+			paramExample.createCriteria().andParametroEqualTo(parameter).andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0_SHORT);
+			paramResults = genParametroMapper.selectByExample(paramExample);
+		}
+		
 		String paramResValue = !CollectionUtils.isEmpty(paramResults) ? paramResults.get(0).getValor() : "";
 	
 		LOGGER.info(

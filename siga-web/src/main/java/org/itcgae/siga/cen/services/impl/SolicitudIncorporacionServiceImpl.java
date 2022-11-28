@@ -1895,10 +1895,20 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		List<GenParametros> paramResults = genParametroMapper.selectByExample(paramExample);
 
+		if (CollectionUtils.isEmpty(paramResults)) {
+			LOGGER.info(
+					"SolicitudIncorporacionService/checkValueParameter() --> No se ha obtenido ningun valor del parametro (" + parameter + ") para la institucion (" + idInstitucion + "). Se procede a la busqueda por defecto.");
+
+			paramExample = new GenParametrosExample();
+			paramExample.createCriteria().andParametroEqualTo(parameter).andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0_SHORT);
+			paramResults = genParametroMapper.selectByExample(paramExample);
+		}
+		
 		LOGGER.info(
 		"checkValueParameter() / genParametroMapper.selectByExample() -> Salida de GenParametrosMapper para obtener información del parametro para checkear anomalias en validacion de residencia");
 
 		String paramResValue = !CollectionUtils.isEmpty(paramResults) ? paramResults.get(0).getValor() : "";
+		
 		
 		return !paramResValue.isEmpty() && ("S".equalsIgnoreCase(paramResValue) || "1".equalsIgnoreCase(paramResValue) || Boolean.parseBoolean(paramResValue)) ? Boolean.TRUE : Boolean.FALSE;
 	}	
