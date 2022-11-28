@@ -26,6 +26,7 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 	private String fechaCierre;
 	private String fechaAsistencia;
 	private String idLetradoGuardia;
+	private String idLetradoManual;
 	private String idTipoAsistenciaColegio;
 	private String idSolicitudCentralita;
 	private String fechaEstado;
@@ -51,6 +52,23 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 	private String guardiaRequeridaValidacion;
 	private String idJuzgado;
 	private String idInstitucion;
+	private String isSustituto;
+
+	public String getIdLetradoManual() {
+		return idLetradoManual;
+	}
+
+	public void setIdLetradoManual(String idLetradoManual) {
+		this.idLetradoManual = idLetradoManual;
+	}
+	
+	public String getIsSustituto() {
+		return isSustituto;
+	}
+
+	public void setIsSustituto(String isSustituto) {
+		this.isSustituto = isSustituto;
+	}
 
 	public String getGuardiaRequeridaValidacion() {
 		return guardiaRequeridaValidacion;

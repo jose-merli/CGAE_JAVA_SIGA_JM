@@ -903,8 +903,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 
 			if (asistencia.getFiltro() != null
-					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdLetradoGuardia())) {
-				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoGuardia()));
+					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdLetradoManual())) {
+				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoManual()));
 			} else {
 				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getIdLetradoGuardia()));
 			}
@@ -1445,7 +1445,16 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 							// Validamos guardias colegiado
 							try {
-							procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
+								
+								procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
+								
+								if (asistencias.get(0).getFiltro() != null && asistencias.get(0).getFiltro().getIsSustituto() != null) {
+									if (asistencias.get(0).getFiltro().getDiaGuardia().contains(":")) {
+										String diaGuardiaCorrecto = asistencias.get(0).getFiltro().getDiaGuardia().substring(0, 10);
+										asistencias.get(0).getFiltro().setDiaGuardia(diaGuardiaCorrecto);
+									}
+									procesarSustitucionGuardia(asistencias.get(0).getFiltro(), idInstitucion, request);
+								}
 							}catch(Exception e) {
 								if (e.getMessage().equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
 									error.setCode(409);
@@ -2005,12 +2014,30 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								if (justiciables != null && !justiciables.isEmpty()) {
 
 									if (!UtilidadesString.esCadenaVacia(justiciables.get(0).getApellido2())) {
-										asistenciaResponse.setAsistido(justiciables.get(0).getApellido1() + " "
-												+ justiciables.get(0).getApellido2() + " "
-												+ justiciables.get(0).getNombre());
+										String asistido = "";
+										
+										if (justiciables.get(0).getApellido1() != null) {
+											asistido += " " + justiciables.get(0).getApellido1();
+										}
+										if (justiciables.get(0).getApellido2() != null) {
+											asistido += " " + justiciables.get(0).getApellido2();
+										}
+										if (justiciables.get(0).getNombre() != null) {
+											asistido += " " + justiciables.get(0).getNombre();
+										}
+										
+										asistenciaResponse.setAsistido(asistido);
 									} else {
-										asistenciaResponse.setAsistido(justiciables.get(0).getApellido1() + " "
-												+ justiciables.get(0).getNombre());
+										String asistido = "";
+
+										if (justiciables.get(0).getApellido1() != null) {
+											asistido += " " + justiciables.get(0).getApellido1();
+										}
+										if (justiciables.get(0).getNombre() != null) {
+											asistido += " " + justiciables.get(0).getNombre();
+										}
+										
+										asistenciaResponse.setAsistido(asistido);
 									}
 
 									asistenciaResponse.setNif(justiciables.get(0).getNif());
@@ -4137,9 +4164,18 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								caractasistencia.setAsesoramiento("0");
 							}
 						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())
+								&& "S".equals(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())) {
+							caractasistencia.setDerivaractuacionesjudiciales("1");
+						}else {
+							caractasistencia.setDerivaractuacionesjudiciales("0");
+						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getMinisterioFiscal())
 								&& "S".equals(caracteristicasAsistenciaItem.getMinisterioFiscal())) {
 							caractasistencia.setInterposicionministfiscal("1");
+						} else if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getMinisterioFiscal())
+								&& "P".equals(caracteristicasAsistenciaItem.getMinisterioFiscal())) {
+							caractasistencia.setInterposicionministfiscal("2");
 						} else {
 							caractasistencia.setInterposicionministfiscal("0");
 						}
@@ -4148,6 +4184,39 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							caractasistencia.setIntervencionmedicoforense("1");
 						} else {
 							caractasistencia.setIntervencionmedicoforense("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getDerechosjusticiagratuita())
+								&& "S".equals(caracteristicasAsistenciaItem.getDerechosjusticiagratuita())) {
+							caractasistencia.setDerechosjusticiagratuita("1");
+						} else {
+							caractasistencia.setDerechosjusticiagratuita("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())
+								&& "S".equals(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())) {
+							caractasistencia.setObligadadesalojodomicilio("1");
+						} else {
+							caractasistencia.setObligadadesalojodomicilio("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())
+								&& "S".equals(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())) {
+							caractasistencia.setEntrevistaletradodemandante("1");
+						} else {
+							caractasistencia.setEntrevistaletradodemandante("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
+								&& "SC".equals(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())) {
+							caractasistencia.setLetradodesignadocontiactujudi("1");;
+						} else if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
+								&& "SP".equals(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())) {
+							caractasistencia.setLetradodesignadocontiactujudi("2");
+						} else {
+							caractasistencia.setLetradodesignadocontiactujudi("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getCivilespenales())
+								&& "S".equals(caracteristicasAsistenciaItem.getCivilespenales())) {
+							caractasistencia.setCivilespenales("1");
+						} else {
+							caractasistencia.setCivilespenales("0");
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getIdProcedimiento())) {
 							caractasistencia
@@ -4265,9 +4334,18 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else {
 							caractasistencia.setAsesoramiento(null);
 						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())
+								&& "S".equals(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())) {
+							caractasistencia.setDerivaractuacionesjudiciales("1");
+						}else {
+							caractasistencia.setDerivaractuacionesjudiciales("0");
+						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getMinisterioFiscal())
 								&& "S".equals(caracteristicasAsistenciaItem.getMinisterioFiscal())) {
 							caractasistencia.setInterposicionministfiscal("1");
+						} else if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getMinisterioFiscal())
+								&& "P".equals(caracteristicasAsistenciaItem.getMinisterioFiscal())) {
+							caractasistencia.setInterposicionministfiscal("2");
 						} else {
 							caractasistencia.setInterposicionministfiscal("0");
 						}
@@ -4276,6 +4354,39 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							caractasistencia.setIntervencionmedicoforense("1");
 						} else {
 							caractasistencia.setIntervencionmedicoforense("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getDerechosjusticiagratuita())
+								&& "S".equals(caracteristicasAsistenciaItem.getDerechosjusticiagratuita())) {
+							caractasistencia.setDerechosjusticiagratuita("1");
+						} else {
+							caractasistencia.setDerechosjusticiagratuita("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())
+								&& "S".equals(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())) {
+							caractasistencia.setObligadadesalojodomicilio("1");
+						} else {
+							caractasistencia.setObligadadesalojodomicilio("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())
+								&& "S".equals(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())) {
+							caractasistencia.setEntrevistaletradodemandante("1");
+						} else {
+							caractasistencia.setEntrevistaletradodemandante("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
+								&& "SC".equals(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())) {
+							caractasistencia.setLetradodesignadocontiactujudi("1");;
+						} else if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
+								&& "SP".equals(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())) {
+							caractasistencia.setLetradodesignadocontiactujudi("2");
+						} else {
+							caractasistencia.setLetradodesignadocontiactujudi("0");
+						}
+						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getCivilespenales())
+								&& "S".equals(caracteristicasAsistenciaItem.getCivilespenales())) {
+							caractasistencia.setCivilespenales("1");
+						} else {
+							caractasistencia.setCivilespenales("0");
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getIdProcedimiento())) {
 							caractasistencia
@@ -4380,10 +4491,56 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						caracteristicasAsistenciaItem.setOtras("1".equals(caractasistencia.getOtras()));
 						caracteristicasAsistenciaItem.setOtrasDesc(caractasistencia.getOtrasdescripcion());
 						caracteristicasAsistenciaItem.setAsesoramiento(caractasistencia.getAsesoramiento());
+						
+						if ("1".equals(caractasistencia.getDerivaractuacionesjudiciales())) {
+							caracteristicasAsistenciaItem.setDerivaractuacionesjudiciales("S");
+						} else {
+							caracteristicasAsistenciaItem.setDerivaractuacionesjudiciales("N");
+						}
+						
 						caracteristicasAsistenciaItem.setMedicoForense(
 								"1".equals(caractasistencia.getIntervencionmedicoforense()) ? "S" : "N");
-						caracteristicasAsistenciaItem.setMinisterioFiscal(
-								"1".equals(caractasistencia.getInterposicionministfiscal()) ? "S" : "N");
+						
+						if ("1".equals(caractasistencia.getInterposicionministfiscal())) {
+							caracteristicasAsistenciaItem.setMinisterioFiscal("S");
+						} else if ("2".equals(caractasistencia.getInterposicionministfiscal())) {
+							caracteristicasAsistenciaItem.setMinisterioFiscal("P");
+						} else {
+							caracteristicasAsistenciaItem.setMinisterioFiscal("N");
+						}
+						
+						if ("1".equals(caractasistencia.getDerechosjusticiagratuita())) {
+							caracteristicasAsistenciaItem.setDerechosjusticiagratuita("S");
+						} else {
+							caracteristicasAsistenciaItem.setDerechosjusticiagratuita("N");
+						}
+						
+						if ("1".equals(caractasistencia.getObligadadesalojodomicilio())) {
+							caracteristicasAsistenciaItem.setObligadadesalojodomicilio("S");
+						} else {
+							caracteristicasAsistenciaItem.setObligadadesalojodomicilio("N");
+						}
+						
+						if ("1".equals(caractasistencia.getEntrevistaletradodemandante())) {
+							caracteristicasAsistenciaItem.setEntrevistaletradodemandante("S");
+						} else {
+							caracteristicasAsistenciaItem.setEntrevistaletradodemandante("N");
+						}
+						
+						if ("1".equals(caractasistencia.getLetradodesignadocontiactujudi())) {
+							caracteristicasAsistenciaItem.setLetradodesignadocontiactujudi("SC");
+						} else if ("2".equals(caractasistencia.getLetradodesignadocontiactujudi())) {
+							caracteristicasAsistenciaItem.setLetradodesignadocontiactujudi("SP");
+						} else {
+							caracteristicasAsistenciaItem.setLetradodesignadocontiactujudi("N");
+						}
+						
+						if ("1".equals(caractasistencia.getCivilespenales())) {
+							caracteristicasAsistenciaItem.setCivilespenales("S");
+						} else {
+							caracteristicasAsistenciaItem.setCivilespenales("N");
+						}
+						
 						if (caractasistencia.getIdpersona() != null) {
 							FichaPersonaItem colegiado = cenPersonaExtendsMapper
 									.getColegiadoByIdPersona(caractasistencia.getIdpersona().toString(), idInstitucion);

@@ -865,7 +865,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 		// borraremos dichas permutas y volveremos a insertar aquellas para las que fecha de confirmacion sea
 		// distinta de null
 		//-----------------------------------------------------------------------------------------------------
-
+		
 		ScsPermutaguardiasExample permutaComoSolicitanteExample = new ScsPermutaguardiasExample();
 		permutaComoSolicitanteExample.createCriteria()
 				.andIdinstitucionEqualTo(idInstitucion)
@@ -1034,7 +1034,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 		// Incluimos saltos (al entrante) y compensaciones  (al saliente) en funcion de los checks correspondientes
 		//--------------------------------------------------------------------------------------------------
 
-		if (saltoOcompensacion.equals("S/C") || saltoOcompensacion.equals("S")) {
+		if ("S/C".equals(saltoOcompensacion) || "S".equals(saltoOcompensacion)) {
 			SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
 			scgi.setIdPersona(idPersona.toString());
 			scgi.setIdGuardia(idGuardia.toString());
@@ -1049,7 +1049,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 					scgi, idInstitucion.toString(), Long.toString(nuevoId.getIdMax()), usuario);
 		}
 
-		if (saltoOcompensacion.equals("S/C") || saltoOcompensacion.equals("C")) {
+		if ("S/C".equals(saltoOcompensacion) || "C".equals(saltoOcompensacion)) {
 			SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
 			scgi.setIdPersona(idPersona.toString());
 			scgi.setIdGuardia(idGuardia.toString());
