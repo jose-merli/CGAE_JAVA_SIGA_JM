@@ -752,7 +752,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					Boolean hasToCheckAnomalias = this.checkValueParameter("VALIDACION_ANOMALIAS_RESIDENCIA", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
 					
 					if (hasToCheckAnomalias) {
-						detectarAnomalia(solIncorporacion.getNumeroidentificador());
+						detectarAnomalia(solIncorporacion);
 					}
 					
 					
@@ -1870,11 +1870,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	 * @param nif 
 	 * @return true si se ha detectado un caso que produciría una anomalía, false si no
 	 */
-	private void detectarAnomalia(String nif) throws Exception{
+	private void detectarAnomalia(CenSolicitudincorporacion solicitudIncorporacion) throws Exception{
 		boolean anomaliaDetectada = true;
 		
 		// Comprueba si se generaría una anomalía
-		anomaliaDetectada = controlResidenciaService.compruebaColegiacionEnVigor(nif);
+		anomaliaDetectada = controlResidenciaService.compruebaColegiacionEnVigor(solicitudIncorporacion);
 		
 		if (anomaliaDetectada) {
 			LOGGER.error("aprobarSolicitud() --> Se ha detectado un caso que generaría una anomalía de residencia en el colegiado");
