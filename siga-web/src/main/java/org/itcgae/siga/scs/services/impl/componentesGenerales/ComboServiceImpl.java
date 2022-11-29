@@ -686,6 +686,10 @@ public class ComboServiceImpl implements ComboService {
 						"getComboPartidasPresupuestarias() -> Entrada para obtener la información de las distintas subZonas");
 
 				ScsPartidapresupuestariaExample example = new ScsPartidapresupuestariaExample();
+				
+				if(importe == null) {
+					importe = "1"; //Si se llama desde otra parte de la aplicación obtenemos las de alta
+				}
 
 				if(importe.equals("0")) { //Para las facturaciones existentes obtenemos todas porque las antiguas estarán de baja
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion);
