@@ -3,10 +3,13 @@ package org.itcgae.siga.db.services.scs.mappers;
 import java.util.List;
 
 import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.mappers.ScsCalendarioguardiasMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsCalendarioguardiasSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +48,12 @@ public interface ScsCalendarioguardiasExtendsMapper extends ScsCalendarioguardia
 	String getGenerado(String idProgCal, Short idInstitucion);
 	
 	@InsertProvider(type = ScsCalendarioguardiasSqlExtendsProvider.class, method = "setGeneracionEnProceso")
-	@Results(
-			)
+	@Results()
 	int setGeneracionEnProceso(String idProgCal, String procesando);
+	
+	@SelectProvider(type=ScsCalendarioguardiasSqlExtendsProvider.class, method="getTotalGuardiasColegiadoInsertados")
+	@Results({@Result(column = "TOTAL", property = "TOTAL", jdbcType = JdbcType.DECIMAL)})
+	int getTotalGuardiasColegiadoInsertados(String idInstitucion, String idTurno, String idGuardia, String fechaDesde, String FechaHasta);
+
+	
 }

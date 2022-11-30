@@ -1,11 +1,12 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.db.mappers.ScsCalendarioguardiasSqlProvider;
 
 public class ScsCalendarioguardiasSqlExtendsProvider extends ScsCalendarioguardiasSqlProvider{
 
-
+	private Logger LOGGER = Logger.getLogger(this.getClass());
 	   public String setLogName(String idInstitucion, String idCG, String observaciones, String fechaIni, String fechaFin, String logName, String idTurno, String idGuardia) {
 
 		SQL sql = new SQL();
@@ -107,6 +108,19 @@ public class ScsCalendarioguardiasSqlExtendsProvider extends ScsCalendarioguardi
 		   	sql.UPDATE("SCS_PROG_CALENDARIOS PC");
 			sql.SET("PROCESANDOGENERACION = " +  procesando);
 			sql.WHERE("IDPROGCALENDARIO = " + idProgCal);
+			return sql.toString();
+	   }
+	   
+	   public String getTotalGuardiasColegiadoInsertados(String idInstitucion, String idTurno, String idGuardia, String fechaDesde, String FechaHasta) {
+		   SQL sql = new SQL();
+		   	sql.SELECT("COUNT(*) AS TOTAL");
+			sql.FROM("SCS_GUARDIASCOLEGIADO");
+			sql.WHERE("IDINSTITUCION = " + idInstitucion);
+			sql.WHERE("IDTURNO = " + idTurno);
+			sql.WHERE("IDGUARDIA = " + idGuardia);
+			sql.WHERE("FECHAINICIO >= TO_DATE('" + fechaDesde+ "', 'dd-MM-yyyy')");
+			sql.WHERE("FECHAFIN <= TO_DATE('" + FechaHasta + "', 'dd-MM-yyyy')");
+			LOGGER.info(sql.toString());
 			return sql.toString();
 	   }
 	

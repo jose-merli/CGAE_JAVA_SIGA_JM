@@ -106,6 +106,6 @@ public interface ScsGuardiascolegiadoExtendsMapper extends ScsGuardiascolegiadoM
     List<ScsGuardiascolegiado> getGuardiasColegiado(TarjetaAsistenciaResponseItem asistencia, Short idInstitucion, String idPersona);
 
     @DeleteProvider(type = ScsGuardiascolegiadoSqlExtendsProvider.class, method = "deleteGuardiasCalendario")
-    public boolean deleteGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
+    public boolean deleteGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia, String fechaInicio, String fechaFin);
 
 }

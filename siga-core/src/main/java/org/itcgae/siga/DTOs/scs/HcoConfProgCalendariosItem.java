@@ -39,6 +39,7 @@ public class HcoConfProgCalendariosItem {
 	 private String idguardiaprincipal;
 	 private String fechasuscripcion_ultimo;
 	 private String idgrupoguardia_ultimo;
+	 private String usumodificacion;
 	 
 	 public String getIdprogcalendario() {
 		return idprogcalendario;
@@ -267,6 +268,12 @@ public class HcoConfProgCalendariosItem {
 	}
 	public void setIdgrupoguardia_ultimo(String idgrupoguardia_ultimo) {
 		this.idgrupoguardia_ultimo = idgrupoguardia_ultimo;
+	}
+	public String getUsumodificacion() {
+		return usumodificacion;
+	}
+	public void setUsumodificacion(String usumodificacion) {
+		this.usumodificacion = usumodificacion;
 	}
 	 
 	

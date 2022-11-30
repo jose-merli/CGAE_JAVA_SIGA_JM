@@ -20,13 +20,14 @@ public class DatosCalendarioProgramadoItem {
 	private String idCalG;
 	private String listaGuardias;
 	private String idCalendarioProgramado;
-	private Boolean facturado;
+	private char facturado;
 	private Boolean asistenciasAsociadas;
 	private String idCalendarioGuardia;
 	List<GuardiaCalendarioItem> guardias;
 	private String nombreLogProgramacion;
 	private int contadorGenerados;
 	private char soloGenerarVacio;
+	private String estadoProgramacion;
 	
 	public String getFechaDesde() {
 		return fechaDesde;
@@ -118,12 +119,7 @@ public class DatosCalendarioProgramadoItem {
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-	public Boolean getFacturado() {
-		return facturado;
-	}
-	public void setFacturado(Boolean facturado) {
-		this.facturado = facturado;
-	}
+
 	public Boolean getAsistenciasAsociadas() {
 		return asistenciasAsociadas;
 	}
@@ -165,5 +161,17 @@ public class DatosCalendarioProgramadoItem {
 	}
 	public void setSoloGenerarVacio(char soloGenerarVacio) {
 		this.soloGenerarVacio = soloGenerarVacio;
+	}
+	public String getEstadoProgramacion() {
+		return estadoProgramacion;
+	}
+	public void setEstadoProgramacion(String estadoProgramacion) {
+		this.estadoProgramacion = estadoProgramacion;
+	}
+	public char getFacturado() {
+		return facturado;
+	}
+	public void setFacturado(char facturado) {
+		this.facturado = facturado;
 	}
 }

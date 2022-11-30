@@ -182,20 +182,22 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         return SQL.toString();
     }
 
-    public String deleteGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia) {
+    public String deleteGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia,String fechaInicio,String fechaFin) {
 
         SQL sql = new SQL();
         SQL sql2 = new SQL();
 
-        sql2.SELECT("IDINSTITUCION, IDTURNO, IDGUARDIA, IDPERSONA, FECHAINICIO");
+        sql2.SELECT("IDINSTITUCION, IDTURNO, IDGUARDIA, IDPERSONA, FECHAINICIO, FECHA_FIN");
         sql2.FROM("SCS_CABECERAGUARDIAS");
         sql2.WHERE("IDINSTITUCION = " + idInstitucion);
         sql2.WHERE("IDCALENDARIOGUARDIAS = " + idCalendarioGuardias);
         sql2.WHERE("IDTURNO = " + idTurno);
         sql2.WHERE("IDGUARDIA = " + idGuardia);
-
+        sql2.WHERE( "FECHA_FIN <= TO_DATE('"+fechaFin+"','DD/MM/YYYY')");
+        sql2.WHERE( "FECHAINICIO >= TO_DATE('"+fechaInicio+"','DD/MM/YYYY')");
+        
         sql.DELETE_FROM("SCS_GUARDIASCOLEGIADO");
-        sql.WHERE("(IDINSTITUCION, IDTURNO, IDGUARDIA, IDPERSONA, FECHAINICIO) in (" + sql2 + ")");
+        sql.WHERE("(IDINSTITUCION, IDTURNO, IDGUARDIA, IDPERSONA, FECHAINICIO, FECHAFIN) in (" + sql2 + ")");
 
         return sql.toString();
 

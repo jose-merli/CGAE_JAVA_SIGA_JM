@@ -94,6 +94,6 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 	public boolean deleteCabecerasGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
 
 	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "getCabeceraGuardia")
-	List<ScsCabeceraguardias> getCabeceraGuardia(String idInstitucion, String idTurno, String idGuardia, String fechaInicio);
+	List<ScsCabeceraguardias> getCabeceraGuardia(String idInstitucion, String idTurno, String idGuardia, String fechaInicio, String fechaFin);
 
 }
