@@ -119,4 +119,6 @@ public interface ComboService {
 	public ComboDTO comboTipoConsulta(HttpServletRequest request);
 
 	public ComboDTO comboTipoRespuesta(HttpServletRequest request);
+
+	public ComboDTO comboTurnosGrupo(HttpServletRequest request);
 }

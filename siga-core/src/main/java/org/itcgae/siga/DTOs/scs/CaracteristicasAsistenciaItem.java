@@ -18,9 +18,64 @@ public class CaracteristicasAsistenciaItem {
     private boolean otras;
     private String otrasDesc;
     private String asesoramiento;
+    private String derivaractuacionesjudiciales;
     private String ministerioFiscal;
     private String medicoForense;
-    private String numColegiado;
+    private String derechosjusticiagratuita;
+    private String obligadadesalojodomicilio;
+    private String entrevistaletradodemandante;
+    private String letradodesignadocontiactujudi;
+    private String civilespenales;
+    
+    public String getDerivaractuacionesjudiciales() {
+		return derivaractuacionesjudiciales;
+	}
+
+	public void setDerivaractuacionesjudiciales(String derivaractuacionesjudiciales) {
+		this.derivaractuacionesjudiciales = derivaractuacionesjudiciales;
+	}
+
+	public String getDerechosjusticiagratuita() {
+		return derechosjusticiagratuita;
+	}
+
+	public void setDerechosjusticiagratuita(String derechosjusticiagratuita) {
+		this.derechosjusticiagratuita = derechosjusticiagratuita;
+	}
+
+	public String getObligadadesalojodomicilio() {
+		return obligadadesalojodomicilio;
+	}
+
+	public void setObligadadesalojodomicilio(String obligadadesalojodomicilio) {
+		this.obligadadesalojodomicilio = obligadadesalojodomicilio;
+	}
+
+	public String getEntrevistaletradodemandante() {
+		return entrevistaletradodemandante;
+	}
+
+	public void setEntrevistaletradodemandante(String entrevistaletradodemandante) {
+		this.entrevistaletradodemandante = entrevistaletradodemandante;
+	}
+
+	public String getLetradodesignadocontiactujudi() {
+		return letradodesignadocontiactujudi;
+	}
+
+	public void setLetradodesignadocontiactujudi(String letradodesignadocontiactujudi) {
+		this.letradodesignadocontiactujudi = letradodesignadocontiactujudi;
+	}
+
+	public String getCivilespenales() {
+		return civilespenales;
+	}
+
+	public void setCivilespenales(String civilespenales) {
+		this.civilespenales = civilespenales;
+	}
+
+	private String numColegiado;
     private String nombreColegiado;
     private String idProcedimiento;
     private String numeroProcedimiento;

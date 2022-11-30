@@ -686,6 +686,10 @@ public class ComboServiceImpl implements ComboService {
 						"getComboPartidasPresupuestarias() -> Entrada para obtener la información de las distintas subZonas");
 
 				ScsPartidapresupuestariaExample example = new ScsPartidapresupuestariaExample();
+				
+				if(importe == null) {
+					importe = "1"; //Si se llama desde otra parte de la aplicación obtenemos las de alta
+				}
 
 				if(importe.equals("0")) { //Para las facturaciones existentes obtenemos todas porque las antiguas estarán de baja
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion);
@@ -740,6 +744,42 @@ public class ComboServiceImpl implements ComboService {
 						"getComboActuacion() / scsTurnosExtendsMapper.comboTurnos() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
 
 				List<ComboItem> comboItems = scsTurnosExtendsMapper.comboTurnos(idInstitucion);
+
+				LOGGER.info(
+						"getComboActuacion() / scsTurnosExtendsMapper.comboTurnos() -> Salida a scsTipoactuacionExtendsMapper para obtener las actuaciones");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+		}
+		LOGGER.info("comboTurnos() -> Salida del servicio para obtener combo actuaciones");
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboTurnosGrupo(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"comboTurnos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboTurnos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"getComboActuacion() / scsTurnosExtendsMapper.comboTurnos() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
+
+				List<ComboItem> comboItems = scsGuardiasturnoExtendsMapper.comboTurnosGuardiasGrupo(idInstitucion.toString());
 
 				LOGGER.info(
 						"getComboActuacion() / scsTurnosExtendsMapper.comboTurnos() -> Salida a scsTipoactuacionExtendsMapper para obtener las actuaciones");

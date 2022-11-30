@@ -417,6 +417,13 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	})
 	List<ComboItem> comboGuardiasGrupo(String idTurno, String idInstitucion);
 	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboTurnosGuardiasGrupo")
+	@Results({
+		@Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboTurnosGuardiasGrupo(String idInstitucion);
+	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardiasUpdate")
 	@Results({
 		@Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
