@@ -9179,21 +9179,18 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	private void setEstadoGuardiaCol(Short idInstitucion, GuardiasItem guardiaCol) {
-		if (guardiaCol.getFechahasta() == null) {
+		if (guardiaCol.getFechadesde() != null && guardiaCol.getFechadesde().after(new Date())) {
 			guardiaCol.setEstadoGuardia("Pendiente de Realizar.");
 		}
 
-		if ((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("0")) {
+		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date()))) {
 			guardiaCol.setEstadoGuardia("Realizada y no validada.");
 		}
 
-		if (((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("1"))
-				&& guardiaCol.getFacturado() == null) {
+		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date())) && guardiaCol.getValidada().equals("1")) {
 			guardiaCol.setEstadoGuardia("Realizada y validada.");
-
 		}
-		if ((guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1"))
-				&& ((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("1"))) {
+		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date())) && guardiaCol.getValidada().equals("1") && guardiaCol.getFacturado().equals("1")) {
 
 			FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
 			facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -9366,15 +9363,25 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("eliminarGuardiaColegiado() -> Entrada para borrar las incompatibilidades");
 
-				ScsCabeceraguardiasKey keyGuardia = new ScsCabeceraguardiasKey();
+				FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
+				facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdfacturacionEqualTo(guardiasItem.getIdFacturacion());
 
-				keyGuardia.setIdinstitucion(idInstitucion);
-				keyGuardia.setIdturno(Integer.parseInt(guardiasItem.getIdTurno()));
-				keyGuardia.setIdguardia(Integer.parseInt(guardiasItem.getIdGuardia()));
-				keyGuardia.setIdpersona(Long.parseLong(guardiasItem.getIdPersona()));
-				keyGuardia.setFechainicio(guardiasItem.getFechadesde());
+				List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper
+						.selectByExample(facturacionExample);
+				if (facturas.isEmpty()) {
+					ScsCabeceraguardiasKey keyGuardia = new ScsCabeceraguardiasKey();
 
-				response = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(keyGuardia);
+					keyGuardia.setIdinstitucion(idInstitucion);
+					keyGuardia.setIdturno(Integer.parseInt(guardiasItem.getIdTurno()));
+					keyGuardia.setIdguardia(Integer.parseInt(guardiasItem.getIdGuardia()));
+					keyGuardia.setIdpersona(Long.parseLong(guardiasItem.getIdPersona()));
+					keyGuardia.setFechainicio(guardiasItem.getFechadesde());
+					
+					response = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(keyGuardia);
+				}else {
+					response = 0;
+				}
 
 				LOGGER.info("eliminarGuardiaColegiados() -> Salida ya con los datos recogidos");
 			} else {
