@@ -192,7 +192,7 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         sql2.WHERE("IDINSTITUCION = " + idInstitucion);
         sql2.WHERE("IDCALENDARIOGUARDIAS = " + idCalendarioGuardias);
         sql2.WHERE("IDTURNO = " + idTurno);
-        sql2.WHERE("IDGUARDIA = " + idGuardia);
+        //sql2.WHERE("IDGUARDIA = " + idGuardia);
         sql2.WHERE( "FECHA_FIN <= TO_DATE('"+fechaFin+"','DD/MM/YYYY')");
         sql2.WHERE( "FECHAINICIO >= TO_DATE('"+fechaInicio+"','DD/MM/YYYY')");
         

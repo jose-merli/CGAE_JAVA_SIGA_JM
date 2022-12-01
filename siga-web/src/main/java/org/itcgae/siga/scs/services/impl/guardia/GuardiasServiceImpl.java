@@ -41,6 +41,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -138,6 +139,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	public static final String TIPO_DESC_BAJA = "censo.bajastemporales.tipo.baja";
 	public static final String TIPO_DESC_MATERNIDAD = "censo.bajastemporales.tipo.maternidad";
 	private static int controlError = 0;
+	private static boolean controlVacioSC = false;
 
 	public static final String GUARDIAS_DIRECTORIO_FISICO_LOG_CALENDARIOS_PROGRAMADOS = "guardias.directorioFisicoLogCalendariosProgramados";
 	private static final int EXCEL_ROW_FLUSH = 1000;
@@ -5441,7 +5443,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		// letrado
 		int numeroLetradosGuardia; // Numero de letrados necesarios para cada periodo
 
-		HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales = null;
+		HashMap<Long, List< BajasTemporalesItem>> hmBajasTemporales = null;
 		ArrayList<SaltoCompGuardiaGrupoItem> alSaltos = null; // Lista de saltos
 		ArrayList<SaltoCompGuardiaGrupoItem> alCompensaciones = null; // Lista de compensaciones
 
@@ -5494,18 +5496,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		HashMap<Long, ArrayList<LetradoInscripcionItem>> hmGruposConSaltos = new HashMap<Long, ArrayList<LetradoInscripcionItem>>();
 		ArrayList<LetradoInscripcionItem> grupoConSaltos;
-		for (SaltoCompGuardiaGrupoItem bean : alSaltos) {
-			if ((grupoConSaltos = (ArrayList<LetradoInscripcionItem>) hmGruposConSaltos
-					.get(bean.getIdGrupoGuardia())) == null) {
-				grupoConSaltos = new ArrayList<LetradoInscripcionItem>();
-				grupoConSaltos.add(bean.getLetrados().get(0)); // se inserta uno de los letrados, que lleva ya el
-				// idSaltoCompensacionGrupo
-				hmGruposConSaltos.put(bean.getIdGrupoGuardia(), grupoConSaltos);
-			} else {
-				grupoConSaltos.add(bean.getLetrados().get(0)); // se inserta uno de los letrados, que lleva ya el
-				// idSaltoCompensacionGrupo
+		if(alSaltos != null && !alSaltos.isEmpty()) {
+			for (SaltoCompGuardiaGrupoItem bean : alSaltos) {
+				if ((grupoConSaltos = (ArrayList<LetradoInscripcionItem>) hmGruposConSaltos
+						.get(bean.getIdGrupoGuardia())) == null) {
+					grupoConSaltos = new ArrayList<LetradoInscripcionItem>();
+					grupoConSaltos.add(bean.getLetrados().get(0)); // se inserta uno de los letrados, que lleva ya el
+					// idSaltoCompensacionGrupo
+					hmGruposConSaltos.put(bean.getIdGrupoGuardia(), grupoConSaltos);
+				} else {
+					grupoConSaltos.add(bean.getLetrados().get(0)); // se inserta uno de los letrados, que lleva ya el
+					// idSaltoCompensacionGrupo
+				}
 			}
 		}
+		
 
 		// obteniendo numero de letrados necesarios para cada periodo
 		numeroLetradosGuardia = beanGuardiasTurno1.getNumeroLetradosGuardia().intValue();
@@ -5582,18 +5587,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 				errorGeneracionCalendario = "Error obteniendo las compensaciones pendientes";
 			}
 //				log.addLog(new String[] {"Compensaciones", alCompensaciones.toString()});
-			Map<String, Object> mapLog5 = new HashMap();
-			String alCompensacionesSt = alCompensaciones.stream()
-					.map(SaltoCompGuardiaGrupoItem::getIdSaltoCompensacionGrupo).collect(Collectors.joining(","));
-			mapLog5.put("*Compensaciones ", alCompensacionesSt.toString());
-			listaDatosExcelGeneracionCalendarios.add(mapLog5);
-			LOGGER.info("*Compensaciones " + alCompensacionesSt.toString());
-//				log.addLog(new String[] {"Saltos", hmGruposConSaltos.toString()});
-			Map<String, Object> mapLog6 = new HashMap();
-			mapLog6.put("*Saltos", hmGruposConSaltos.toString());
-			listaDatosExcelGeneracionCalendarios.add(mapLog6);
-			LOGGER.info("*Saltos" + hmGruposConSaltos.toString());
+			if(alCompensaciones != null) {
+				Map<String, Object> mapLog5 = new HashMap();
+				String alCompensacionesSt = alCompensaciones.stream()
+						.map(SaltoCompGuardiaGrupoItem::getIdSaltoCompensacionGrupo).collect(Collectors.joining(","));
+				mapLog5.put("*Compensaciones ", alCompensacionesSt.toString());
+				listaDatosExcelGeneracionCalendarios.add(mapLog5);
+				LOGGER.info("*Compensaciones " + alCompensacionesSt.toString());
+//					log.addLog(new String[] {"Saltos", hmGruposConSaltos.toString()});
+				Map<String, Object> mapLog6 = new HashMap();
+				mapLog6.put("*Saltos", hmGruposConSaltos.toString());
+				listaDatosExcelGeneracionCalendarios.add(mapLog6);
+				LOGGER.info("*Saltos" + hmGruposConSaltos.toString());
 
+			}
+	
 			// buscando grupo que no tenga restricciones (incompatibilidades, bajas
 			// temporales, saltos)
 			try {
@@ -5743,22 +5751,29 @@ public class GuardiasServiceImpl implements GuardiasService {
 //		}
 	} // calcularMatrizLetradosGuardiaPorGrupos()
 
-	public HashMap<Long, TreeMap<String, BajasTemporalesItem>> getLetradosDiasBajaTemporal(Integer idInstitucion,
+	public HashMap<Long, List< BajasTemporalesItem>> getLetradosDiasBajaTemporal(Integer idInstitucion,
 			Integer idTurno, Integer idGuardia, String fechaDesde, String fechaHasta) throws Exception {
 		BajasTemporalesItem bajasBean;
 		String idPersona;
 		Date fechaBT;
-		TreeMap<String, BajasTemporalesItem> bajasDePersona;
+		List<BajasTemporalesItem> bajasDePersona = null;
 
-		HashMap<Long, TreeMap<String, BajasTemporalesItem>> mSalida = null;
+		HashMap<Long, List< BajasTemporalesItem>> mSalida = null;
 
 		try {
 
 			List<BajasTemporalesItem> datos = scsGuardiasturnoExtendsMapper.getBajasTemporalesGuardias(
 					idInstitucion.toString(), idTurno.toString(), idGuardia.toString(), fechaDesde, fechaHasta);
 
-			mSalida = new HashMap<Long, TreeMap<String, BajasTemporalesItem>>();
-			for (int i = 0; i < datos.size(); i++) {
+			mSalida = new HashMap<Long, List< BajasTemporalesItem>>();
+			
+			List<String> lista = new ArrayList<>();
+			lista = datos.stream().map(BajasTemporalesItem::getIdpersona).distinct().collect(Collectors.toList());
+			
+			for(String idPer : lista) {
+				mSalida.put(new Long(idPer),  datos.stream().filter(bajaItem -> bajaItem.getIdpersona().equals(idPer)).collect(Collectors.toList()));	
+			}
+			/*for (int i = 0; i < datos.size(); i++) {
 				bajasBean = (BajasTemporalesItem) datos.get(i);
 				idPersona = bajasBean.getIdpersona();
 				fechaBT = bajasBean.getFechabt();
@@ -5771,7 +5786,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					bajasDePersona.put(fechaBT.toString(), bajasBean);
 					mSalida.put(new Long(idPersona), bajasDePersona);
 				}
-			}
+			}*/
 
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error al obtener los getDiasBajaTemporal: " + e.toString();
@@ -6194,7 +6209,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private ArrayList<LetradoInscripcionItem> getSiguienteGrupo(ArrayList<SaltoCompGuardiaGrupoItem> alCompensaciones,
 			List<LetradoInscripcionItem> alLetradosOrdenados, Puntero punteroLetrado, ArrayList<String> diasGuardia,
 			HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos,
-			HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales) throws Exception {
+			HashMap<Long, List<BajasTemporalesItem>> hmBajasTemporales) throws Exception {
 		// Variables
 		ArrayList<LetradoInscripcionItem> grupoLetrados;
 		SaltoCompGuardiaGrupoItem compensacion = null;
@@ -6203,35 +6218,39 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		// obteniendo grupo de entre los compensados
 		grupoValido = false;
-		Iterator<SaltoCompGuardiaGrupoItem> iterador = alCompensaciones.iterator();
-		while (iterador.hasNext() && !grupoValido) {
-			compensacion = iterador.next();
+		if(alCompensaciones != null) {
+			Iterator<SaltoCompGuardiaGrupoItem> iterador = alCompensaciones.iterator();
+			while (iterador.hasNext() && !grupoValido) {
+				compensacion = iterador.next();
 
-			// comprobando cada letrado del grupo
-			// log.addLog(new String[] {"Probando Grupo Compensado",
-			// compensacion.getLetrados().toString()});
-
-			Map<String, Object> mapLog = new HashMap();
-			mapLog.put("*Probando Grupo Compensado", compensacion.getLetrados().toString());
-			listaDatosExcelGeneracionCalendarios.add(mapLog);
-			LOGGER.info("*Probando Grupo Compensado" + compensacion.getLetrados().toString());
-			grupoValido = true;
-			for (LetradoInscripcionItem lg : compensacion.getLetrados()) {
-				if (!comprobarRestriccionesLetradoCompensado(lg, diasGuardia, null,
-						compensacion.getIdSaltoCompensacionGrupo().toString(), hmBajasTemporales))
-					grupoValido = false;
-				if (!grupoValido)
-					break; // salir de las comprobaciones por letrado si uno de ellos no es valido
-			}
-			if (!grupoValido) {
-				// log.addLog(new String[] {"Grupo Compensado no valido",
+				// comprobando cada letrado del grupo
+				// log.addLog(new String[] {"Probando Grupo Compensado",
 				// compensacion.getLetrados().toString()});
-				Map<String, Object> mapLog1 = new HashMap();
-				mapLog1.put("*Grupo Compensado no valido", compensacion.getLetrados().toString());
-				listaDatosExcelGeneracionCalendarios.add(mapLog1);
-				LOGGER.info("*Grupo Compensado no valido" + compensacion.getLetrados().toString());
+
+				Map<String, Object> mapLog = new HashMap();
+				mapLog.put("*Probando Grupo Compensado", compensacion.getLetrados().toString());
+				listaDatosExcelGeneracionCalendarios.add(mapLog);
+				LOGGER.info("*Probando Grupo Compensado" + compensacion.getLetrados().toString());
+				grupoValido = true;
+				for (LetradoInscripcionItem lg : compensacion.getLetrados()) {
+					if (!comprobarRestriccionesLetradoCompensado(lg, diasGuardia, null,
+							compensacion.getIdSaltoCompensacionGrupo().toString(), hmBajasTemporales,hmPersonasConSaltos))
+						grupoValido = false;
+					if (!grupoValido)
+						break; // salir de las comprobaciones por letrado si uno de ellos no es valido
+				}
+				if (!grupoValido) {
+					// log.addLog(new String[] {"Grupo Compensado no valido",
+					// compensacion.getLetrados().toString()});
+					Map<String, Object> mapLog1 = new HashMap();
+					mapLog1.put("*Grupo Compensado no valido", compensacion.getLetrados().toString());
+					listaDatosExcelGeneracionCalendarios.add(mapLog1);
+					LOGGER.info("*Grupo Compensado no valido" + compensacion.getLetrados().toString());
+				}
 			}
 		}
+		
+		
 
 		// si bien, cumplir la compensacion de grupo:
 		if (grupoValido) {
@@ -6297,7 +6316,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	private boolean comprobarRestriccionesLetradoCompensado(LetradoInscripcionItem letradoGuardia,
 			ArrayList<String> diasGuardia, Iterator<LetradoInscripcionItem> iteCompensaciones,
-			String idSaltoCompensacionGrupo, HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales)
+			String idSaltoCompensacionGrupo, HashMap<Long, List< BajasTemporalesItem>> hmBajasTemporales,HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos)
 			throws Exception {
 		// Controles
 
@@ -6364,25 +6383,49 @@ public class GuardiasServiceImpl implements GuardiasService {
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error comprobando si el letrado es incompatible: " + e;
 		}
-
+		List<LetradoInscripcionItem> alSaltos =  hmPersonasConSaltos.get(Long.valueOf( letradoGuardia.getInscripcionGuardia().getIdPersona()));
 		// cumpliendo compensacion
 		if (letradoGuardia.getGrupo() == null || letradoGuardia.getGrupo().toString().equals("")) {
-			// log.addLog(new String[] {"Compensacion cumplida",
-			// letradoGuardia.toString()});
-			Map<String, Object> mapLog1 = new HashMap();
-			mapLog1.put("*Compensacion cumplida", letradoGuardia.toString());
-			listaDatosExcelGeneracionCalendarios.add(mapLog1);
-			LOGGER.info("*Compensacion cumplida" + letradoGuardia.toString());
-//			String motivo = ":id="+idCalendarioGuardias1.toString()+":Cumplido en fecha ("+diasGuardia.get(0)+"):finid="+idCalendarioGuardias1.toString()+":";
-			String motivo = "(Registro Automático) Utilizando compensación en día de Guardia: " + diasGuardia.get(0)
-					+ "por generación calendario";
-			try {
-				cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "C", motivo);
-				iteCompensaciones.remove();
-			} catch (Exception e) {
-				errorGeneracionCalendario = "Error cumpliendo saltos y compensaciones: " + e;
+			if(alSaltos != null && !alSaltos.isEmpty()) {
+				// log.addLog(new String[] { "Encontrado Salto", letradoGuardia.toString() });
+				Map<String, Object> mapLog = new HashMap();
+				mapLog.put("*Salto y Compensacion encontrado", letradoGuardia.toString());
+				listaDatosExcelGeneracionCalendarios.add(mapLog);
+				// ... compensar uno
+				String motivoS = "(Registro Automático) Utilizando salto en día de Guardia: " + diasGuardia.get(0)
+						+ "por generación calendario";
+				
+				String motivoC = "(Registro Automático) Utilizando compensación en día de Guardia: "
+						+ diasGuardia.get(0) + "por generación calendario";
+				controlVacioSC = true;
+				try {
+					cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "S", motivoS);
+					cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "C", motivoC);
+					iteCompensaciones.remove();
+				} catch (Exception e) {
+					errorGeneracionCalendario = "Error cumpliendo salto: " + e;
+				}
+
+				return false; // y no seleccionar
+			}else {
+				// log.addLog(new String[] {"Compensacion cumplida",
+				// letradoGuardia.toString()});
+				Map<String, Object> mapLog1 = new HashMap();
+				mapLog1.put("*Compensacion cumplida", letradoGuardia.toString());
+				listaDatosExcelGeneracionCalendarios.add(mapLog1);
+				LOGGER.info("*Compensacion cumplida" + letradoGuardia.toString());
+//				String motivo = ":id="+idCalendarioGuardias1.toString()+":Cumplido en fecha ("+diasGuardia.get(0)+"):finid="+idCalendarioGuardias1.toString()+":";
+				String motivo = "(Registro Automático) Utilizando compensación en día de Guardia: " + diasGuardia.get(0)
+						+ "por generación calendario";
+				try {
+					cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "C", motivo);
+					iteCompensaciones.remove();
+				} catch (Exception e) {
+					errorGeneracionCalendario = "Error cumpliendo saltos y compensaciones: " + e;
+				}
+				return false;
 			}
-			return true;
+			
 		} else {
 			// nada, hay que cumplir la compensacion cuando todos los letrados esten
 			// comprobados
@@ -6485,7 +6528,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	 * Si el letrado esta de baja seteamos la baja temporarl en el objeto
 	 * LetradoGuardia, para luego insertar un salto
 	 */
-	private boolean isLetradoBajaTemporal(TreeMap<String, BajasTemporalesItem> hmBajasTemporales, ArrayList diasGuardia,
+	private boolean isLetradoBajaTemporal(List< BajasTemporalesItem> hmBajasTemporales, ArrayList diasGuardia,
 			LetradoInscripcionItem letradoGuardia) {
 		boolean isLetradoBaja = false;
 		BajasTemporalesItem bajaTemporal;
@@ -6495,12 +6538,25 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			for (int j = 0; j < diasGuardia.size(); j++) {
 				String fechaPeriodo = (String) diasGuardia.get(j);
-				if (hmBajasTemporales.containsKey(fechaPeriodo)) {
-					bajaTemporal = hmBajasTemporales.get(fechaPeriodo);
+				List<Date> listaFechas = new ArrayList<>();
+
+				listaFechas = hmBajasTemporales.stream().map(BajasTemporalesItem::getFechabt).collect(Collectors.toList());
+				//String strDate =  new SimpleDateFormat("yyyy-MM-dd").format(date);  
+				//List<BajasTemporalesItem> listaT= hmBajasTemporales.stream().filter(item -> item.getFechabt().toString().equals(fechaPeriodo)).collect(Collectors.toList());
+				 listaFechas = listaFechas.stream().filter(item ->new SimpleDateFormat("dd/MM/yyyy").format(item).toString().equals(fechaPeriodo)).collect(Collectors.toList());
+				if(!listaFechas.isEmpty()) {
+					Date dateA = listaFechas.get(0);
+					bajaTemporal =  hmBajasTemporales.stream().filter(item -> item.getFechabt().equals(dateA)).collect(Collectors.toList()).get(0);
 					letradoGuardia.setBajaTemporal(bajaTemporal);
 					isLetradoBaja = true;
 					break;
 				}
+				/*if (hmBajasTemporales.containsKey(fechaPeriodo)) {
+					bajaTemporal = hmBajasTemporales.get(fechaPeriodo);
+					letradoGuardia.setBajaTemporal(bajaTemporal);
+					isLetradoBaja = true;
+					break;
+				}*/
 			}
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error comporbando si el letrado esta de baja seteamos la baja temporal: " + e;
@@ -7000,7 +7056,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	private boolean comprobarRestriccionesLetradoCola(LetradoInscripcionItem letradoGuardia,
 			ArrayList<String> diasGuardia, HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos,
-			HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales, boolean ficheroCarga)
+			HashMap<Long, List< BajasTemporalesItem>> hmBajasTemporales, boolean ficheroCarga)
 			throws Exception {
 
 		// si esta de vacaciones, ...
@@ -7038,13 +7094,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 		// si tiene saltos, ...
 		List<LetradoInscripcionItem> alSaltos =  hmPersonasConSaltos.get(Long.valueOf( letradoGuardia.getInscripcionGuardia().getIdPersona()));
 		if (letradoGuardia.getGrupo() == null || letradoGuardia.getGrupo().toString().equals("")) {
-			if (alSaltos != null) {
+			if (alSaltos != null && !alSaltos.isEmpty()) {
 				// log.addLog(new String[] { "Encontrado Salto", letradoGuardia.toString() });
 				Map<String, Object> mapLog = new HashMap();
 				mapLog.put("*Encontrado Salto", letradoGuardia.toString());
 				listaDatosExcelGeneracionCalendarios.add(mapLog);
 				LOGGER.info("*Encontrado Salto" + letradoGuardia.toString());
-				if (!ficheroCarga) {
+				if (!controlVacioSC) {
 					// ... compensar uno
 //					String motivo = ":id=" + idCalendarioGuardias1.toString() + ":Cumplido en fecha (" + diasGuardia.get(0) + "):finid=" + idCalendarioGuardias1.toString() + ":";
 					String motivo = "(Registro Automático) Utilizando salto en día de Guardia: " + diasGuardia.get(0)
@@ -7058,6 +7114,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (alSaltos.size() == 0)
 						hmPersonasConSaltos.remove(letradoGuardia.getIdpersona());
 
+				}else {
+					controlVacioSC = false;
+					alSaltos.remove(0);
+					if (alSaltos.size() == 0)
+						hmPersonasConSaltos.remove(letradoGuardia.getIdpersona());
 				}
 				return false; // y no seleccionar
 			}
@@ -7309,7 +7370,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		ArrayList<String> diasGuardia, primerPeriodo, segundoPeriodo; // Periodo o dia de guardia para rellenar con
 		// letrado
 		int numeroLetradosGuardia = 0; // Numero de letrados necesarios para cada periodo
-		HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales = null;
+		HashMap<Long, List<BajasTemporalesItem>> hmBajasTemporales = null;
 		HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos = null; // Lista de saltos
 		List<LetradoInscripcionItem> alCompensaciones = null; // Lista de compensaciones
 		List<LetradoInscripcionItem> alLetradosOrdenados = null; // Cola de letrados en la guardia
@@ -7330,14 +7391,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 			} catch (Exception e) {
 				controlError++;
 				errorGeneracionCalendario = "Error cobteniendo bajas temporales: " + e;
-			}
-
-			// obteniendo saltos
-			try {
-				hmPersonasConSaltos = getSaltos(idInstitucion1, idTurno1, idGuardia1);
-			} catch (Exception e) {
-				controlError++;
-				errorGeneracionCalendario = "Error obteniendo saltos: " + e;
 			}
 
 			// obteniendo numero de letrados necesarios para cada periodo
@@ -7497,12 +7550,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 								listaDatosExcelGeneracionCalendarios.add(mapLog3);
 								LOGGER.info("Lista Compensaciones-" + ap1 + " " + ap2 + ", " + nombre);
 							}
+							indexCompensacion++;
 						};
 					} else {
 						mapLog3.put("*No existen compensaciones-", "");
 						listaDatosExcelGeneracionCalendarios.add(mapLog3);
 						LOGGER.info("*No existen compensaciones");
 						//controlError++;
+					}
+
+					// obteniendo saltos
+					try {
+						hmPersonasConSaltos = getSaltos(idInstitucion1, idTurno1, idGuardia1);
+					} catch (Exception e) {
+						controlError++;
+						errorGeneracionCalendario = "Error obteniendo saltos: " + e;
 					}
 
 //					log.addLog(new String[] {"Saltos", hmPersonasConSaltos.toString()});
@@ -8351,7 +8413,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private LetradoInscripcionItem getSiguienteLetrado(List<LetradoInscripcionItem> alCompensaciones,
 			List alLetradosOrdenados, Puntero punteroLetrado, ArrayList diasGuardia,
 			HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos,
-			HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales) throws Exception {
+			HashMap<Long, List< BajasTemporalesItem>> hmBajasTemporales) throws Exception {
 		LetradoInscripcionItem letradoGuardia, auxLetradoSeleccionado;
 
 		letradoGuardia = null;
@@ -8400,7 +8462,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					}
 					// vale
 					if (comprobarRestriccionesLetradoCompensado(auxLetradoSeleccionado, diasGuardia, iterador, null,
-							hmBajasTemporales)) {
+							hmBajasTemporales,hmPersonasConSaltos)) {
 						letradoGuardia = auxLetradoSeleccionado;
 						break;
 					} else {
@@ -8438,6 +8500,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				}
 			}
+			//Actualizamos saltos
 			if (letradoGuardia != null)
 				return letradoGuardia;
 			LOGGER.info("Recorriendo la cola INICIO");
@@ -8532,7 +8595,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	private boolean comprobarRestriccionesLetradoCompensado2(LetradoInscripcionItem letradoGuardia,
 			ArrayList<String> diasGuardia, Iterator<LetradoInscripcionItem> iteCompensaciones,
-			String idSaltoCompensacionGrupo, HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales)
+			String idSaltoCompensacionGrupo, HashMap<Long, List<BajasTemporalesItem>> hmBajasTemporales)
 			throws Exception {
 
 		// si esta de vacaciones, ...

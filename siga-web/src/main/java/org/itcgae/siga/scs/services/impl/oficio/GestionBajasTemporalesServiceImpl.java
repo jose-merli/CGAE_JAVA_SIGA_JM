@@ -1,12 +1,16 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -513,13 +517,41 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 							}
 							
 						}
-						
 						bjtmp.setFechabt(new Date());
 						bjtmp.setIdinstitucion(String.valueOf(idInstitucion));
 						String idPersona = scsBajasTemporalesExtendsMapper.persona(bjtmp);
 						bjtmp.setIdpersona(idPersona);
+						
+						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
+						String strDateDesde = dateFormat.format(bjtmp.getFechadesde());  
+						String strDateHasta = dateFormat.format(bjtmp.getFechahasta());
+						LocalDate dateBefore = LocalDate.parse(strDateDesde);
+						LocalDate dateAfter = LocalDate.parse(strDateHasta);
+						
+						long fechasBT = ChronoUnit.DAYS.between(dateBefore, dateAfter);
+						
+						if(fechasBT == 0) {
+							bjtmp.setFechabt(bjtmp.getFechadesde());
+							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+						}else if(fechasBT == 1) {
+							bjtmp.setFechabt(bjtmp.getFechadesde());
+							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+							bjtmp.setFechabt(bjtmp.getFechahasta());
+							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+						}else if(fechasBT > 1) {
+							bjtmp.setFechabt(bjtmp.getFechadesde());
+							Date dateAux = bjtmp.getFechadesde();
+							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+							for (int i = 0; i < fechasBT; i++) {
+								dateAux = this.diaSiguienteDate(dateAux);
+								//String strAux = dateFormat.format(bjtmp.getFechabt());  
+								bjtmp.setFechabt(dateAux);
+								response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+							}
+						}
+
 						eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
-						response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+						
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -551,6 +583,13 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 		return insertResponseDTO;
 	}
 
+	private Date diaSiguienteDate(Date dateDesde) throws ParseException {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dateDesde);
+		cal.add(Calendar.DAY_OF_YEAR, 1); 
+		return cal.getTime();
+	}
+	
 	private void eliminarTurnosGuardias(Short idInstitucion, Long idPersona, HttpServletRequest request) throws Exception {
 		ScsInscripcionturnoExample inscripcionesExample = new ScsInscripcionturnoExample();
 		inscripcionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(idPersona);		
