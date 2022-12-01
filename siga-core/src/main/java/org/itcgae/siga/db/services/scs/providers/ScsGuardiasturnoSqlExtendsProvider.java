@@ -2649,7 +2649,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("INS.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("INS.IDTURNO = " + idTurno);
 		sql.WHERE("INS.IDGUARDIA = " + idGuardia);
-		sql.WHERE("TRUNC(BAJAS.FECHABT) BETWEEN '" + fechaDesde + "' AND '" + fechaHasta +  "'");
+		//sql.WHERE("TRUNC(BAJAS.FECHABT) BETWEEN '" + fechaDesde + "' AND '" + fechaHasta +  "'");
+		sql.WHERE("TRUNC(BAJAS.FECHADESDE) >= " + "'"+fechaDesde+"'");
+		sql.WHERE("TRUNC(BAJAS.FECHAHASTA) <= " + "'"+fechaHasta+"'");
 		return sql.toString();
 	}
 	
@@ -3286,7 +3288,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			sql.WHERE("SALTOOCOMPENSACION = '" + s_saltocompensacion.charAt(0) + "'");
 		}
 		sql.WHERE("FECHACUMPLIMIENTO IS NULL");
-		sql.WHERE("FECHA_ANULACION IS NOT NULL");
+		sql.WHERE("FECHA_ANULACION IS  NULL");
 
 		if (saltoCompensacion.getIdsaltosturno() != null) {
 			sql.WHERE("IDSALTOSTURNO = " + saltoCompensacion.getIdsaltosturno());
@@ -3346,7 +3348,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			where.append(" IS NULL ");
 			where.append("   AND ");
 			where.append("FECHA_ANULACION");
-			where.append(" IS NOT NULL ");
+			where.append(" IS NULL ");
 			
 			StringBuilder sql = new StringBuilder();
 			sql.append(" select * ");

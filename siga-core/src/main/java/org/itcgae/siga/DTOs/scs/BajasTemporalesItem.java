@@ -22,6 +22,8 @@ public class BajasTemporalesItem {
 	public String eliminado;
 	public Date fechabt;
 	public boolean historico;
+	private String usumodificacion;
+	private Date fechamodificacion;
 	
 	public Date getFechasolicituddesde() {
 		return fechasolicituddesde;
@@ -130,6 +132,18 @@ public class BajasTemporalesItem {
 	}
 	public void setHistorico(boolean historico) {
 		this.historico = historico;
+	}
+	public String getUsumodificacion() {
+		return usumodificacion;
+	}
+	public void setUsumodificacion(String usumodificacion) {
+		this.usumodificacion = usumodificacion;
+	}
+	public Date getFechamodificacion() {
+		return fechamodificacion;
+	}
+	public void setFechamodificacion(Date fechamodificacion) {
+		this.fechamodificacion = fechamodificacion;
 	}
 	
 }

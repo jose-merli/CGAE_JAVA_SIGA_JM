@@ -942,7 +942,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "FECHAALTA", property = "fechaalta", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.DATE),
 			@Result(column = "VALIDADO", property = "validado", jdbcType = JdbcType.CHAR),
 			@Result(column = "FECHAESTADO", property = "fechaestado", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "ELIMINADO", property = "eliminado", jdbcType = JdbcType.DECIMAL)})
@@ -1038,6 +1038,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 				@Result(column = "GRUPO", property = "idGrupoGuardia", jdbcType = JdbcType.DECIMAL),
 				@Result(column = "NUMEROGRUPO", property = "numeroGrupo", jdbcType = JdbcType.DECIMAL),
 				@Result(column = "ORDENGRUPO", property = "orden", jdbcType = JdbcType.DECIMAL),
+				@Result(column = "NUMEROCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR)
 			})
 		 List<InscripcionGuardiaItem> getColaGuardia(String fechaInicio, String fechaFin, String idinstitucion, String idturno, String idguardia, String order);
 			

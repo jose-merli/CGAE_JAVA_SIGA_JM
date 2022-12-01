@@ -463,7 +463,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 						}
 					}
-					
+					sheet.setColumnWidth(0, 8500);
+					sheet.setColumnWidth(1, 10000);
 					LOGGER.debug("Ponemos los estilos al excel " + nombreFicheroSalida);
 					
 					for (int j = 0; j < index; j++) {

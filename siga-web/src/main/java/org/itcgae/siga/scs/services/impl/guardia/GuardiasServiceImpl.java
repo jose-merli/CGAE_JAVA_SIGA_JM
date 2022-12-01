@@ -6343,9 +6343,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 						ap1 = letradoGuardia.getInscripcionGuardia().getApellido1().toString();
 					if (letradoGuardia.getInscripcionGuardia().getNombre() != null)
 						nombre = letradoGuardia.getInscripcionGuardia().getNombre().toString();
-					mapLog.put("*Encontrado Incompatibilidad ", ap2 + " " + ap1 + ", " + nombre);
+					mapLog.put("*EncontradEo Incompatibilidad ", ap1 + " " + ap2 + ", " + nombre);
 					listaDatosExcelGeneracionCalendarios.add(mapLog);
-					LOGGER.info("*Encontrado Incompatibilidad " + ap2 + " " + ap1 + ", " + nombre);
+					LOGGER.info("*EncontradEo Incompatibilidad " + ap1 + " " + ap2 + ", " + nombre);
 				} else if (letradoGuardia.getInscripcionTurno() != null) {
 					Map<String, Object> mapLog = new HashMap();
 					if (letradoGuardia.getInscripcionTurno().getApellidos2() != null)
@@ -6354,9 +6354,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 						ap1 = letradoGuardia.getInscripcionTurno().getApellidos1().toString();
 					if (letradoGuardia.getInscripcionTurno().getNombre() != null)
 						nombre = letradoGuardia.getInscripcionTurno().getNombre().toString();
-					mapLog.put("*Encontrado Incompatibilidad ", ap2 + " " + ap1 + ", " + nombre);
+					mapLog.put("*EncontraEdo Incompatibilidad ", ap1 + " " + ap2 + ", " + nombre);
 					listaDatosExcelGeneracionCalendarios.add(mapLog);
-					LOGGER.info("*Encontrado Incompatibilidad " + ap2 + " " + ap1 + ", " + nombre);
+					LOGGER.info("*EncontraEdo Incompatibilidad " + ap1 + " " + ap2 + ", " + nombre);
 
 				}
 				return false; // no seleccionar
@@ -6382,7 +6382,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			} catch (Exception e) {
 				errorGeneracionCalendario = "Error cumpliendo saltos y compensaciones: " + e;
 			}
-			return false;
+			return true;
 		} else {
 			// nada, hay que cumplir la compensacion cuando todos los letrados esten
 			// comprobados
@@ -6707,6 +6707,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 			}
 
 			salida = validarIncompatibilidadGuardia(idInstitucion, idTurno, idGuardia, periodoDiasGuardia, idPersona);
+			
+			if(salida) {
+				Map<String, Object> mapLog1 = new HashMap();
+				mapLog1.put("*Encontrado Incompatibilidad en Guardias", letrado.toString() + ' ' + letrado.getInscripcionGuardia().getNombre());
+				listaDatosExcelGeneracionCalendarios.add(mapLog1);
+			}
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error comprobando si hay incompatibilidad: " + e;
 			throw new Exception(e + ": Excepcion en noHayIncompatibilidadGuardias.");
@@ -6771,6 +6777,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 			}
 
 			salida = validarSeparacionGuardias(miHash);
+			if(salida == false) {
+				Map<String, Object> mapLog1 = new HashMap();
+				mapLog1.put("*Encontrado Incompatibilidad en DIAS", letrado.toString() + ' ' + letrado.getInscripcionGuardia().getNombre());
+				listaDatosExcelGeneracionCalendarios.add(mapLog1);
+			}
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error comprobando si hay separación días: " + e;
 			throw new Exception(e + ": Excepcion en haySeparacionDias.");
@@ -6899,7 +6910,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				}
 			} else {
-				encontrado = true;
+				encontrado = false;
 			}
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error validando la incompatibilidad de guardias: " + e;
@@ -6993,7 +7004,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			throws Exception {
 
 		// si esta de vacaciones, ...
-		if (isLetradoBajaTemporal(hmBajasTemporales.get(letradoGuardia.getIdpersona()), diasGuardia, letradoGuardia)) {
+		if (isLetradoBajaTemporal(hmBajasTemporales.get(Long.parseLong( letradoGuardia.getInscripcionGuardia().getIdPersona())), diasGuardia, letradoGuardia)) {
 			// log.addLog(new String[] { "Encontrado Baja temporal",
 			// letradoGuardia.toString(), diasGuardia.toString() });
 			Map<String, Object> mapLog = new HashMap();
@@ -7025,9 +7036,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 
 		// si tiene saltos, ...
-		List<LetradoInscripcionItem> alSaltos;
+		List<LetradoInscripcionItem> alSaltos =  hmPersonasConSaltos.get(Long.valueOf( letradoGuardia.getInscripcionGuardia().getIdPersona()));
 		if (letradoGuardia.getGrupo() == null || letradoGuardia.getGrupo().toString().equals("")) {
-			if ((alSaltos = hmPersonasConSaltos.get(letradoGuardia.getIdpersona())) != null) {
+			if (alSaltos != null) {
 				// log.addLog(new String[] { "Encontrado Salto", letradoGuardia.toString() });
 				Map<String, Object> mapLog = new HashMap();
 				mapLog.put("*Encontrado Salto", letradoGuardia.toString());
@@ -7091,9 +7102,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 					ap1 = letradoGuardia.getInscripcionGuardia().getApellido1().toString();
 				if (letradoGuardia.getInscripcionGuardia().getNombre() != null)
 					nombre = letradoGuardia.getInscripcionGuardia().getNombre().toString();
-				mapLog.put("*Encontrado Incompatibilidad ", ap2 + " " + ap1 + ", " + nombre);
+				mapLog.put("*Encontrado Incompatibilidad ", ap1 + " " + ap2 + ", " + nombre);
 				listaDatosExcelGeneracionCalendarios.add(mapLog);
-				LOGGER.info("*Encontrado Incompatibilidad " + ap2 + " " + ap1 + ", " + nombre);
+				LOGGER.info("*Encontrado Incompatibilidad " + ap1 + " " + ap2 + ", " + nombre);
 			} else if (letradoGuardia.getInscripcionTurno() != null) {
 				Map<String, Object> mapLog = new HashMap();
 				if (letradoGuardia.getInscripcionTurno().getApellidos2() != null)
@@ -7102,9 +7113,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 					ap1 = letradoGuardia.getInscripcionTurno().getApellidos1().toString();
 				if (letradoGuardia.getInscripcionTurno().getNombre() != null)
 					nombre = letradoGuardia.getInscripcionTurno().getNombre().toString();
-				mapLog.put("*Encontrado Incompatibilidad ", ap2 + " " + ap1 + ", " + nombre);
+				mapLog.put("*Encontrado Incompatibilidad ", ap1 + " " + ap2 + ", " + nombre);
 				listaDatosExcelGeneracionCalendarios.add(mapLog);
-				LOGGER.info("*Encontrado Incompatibilidad " + ap2 + " " + ap1 + ", " + nombre);
+				LOGGER.info("*Encontrado Incompatibilidad " + ap1 + " " + ap2 + ", " + nombre);
 			}
 			if (!ficheroCarga) {
 				java.util.Date date = new java.util.Date();
@@ -7137,7 +7148,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						
 						insertarNuevoSaltoCompensacion(letradoGuardia, diasGuardia, "C", motivo);
 						Map<String, Object> mapLog3 = new HashMap();
-						mapLog3.put("*Insertado Nuevo salto compensación", ap2 + " " + ap1 + ", " + nombre);
+						mapLog3.put("*Insertado Nueva Compensación", ap1 + " " + ap2 + ", " + nombre);
 						listaDatosExcelGeneracionCalendarios.add(mapLog3);
 					} catch (Exception e) {
 						errorGeneracionCalendario = "Error insertando nueva compensación: " + e;
@@ -7149,7 +7160,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								idInstitucion1.toString(), idTurno1.toString(), idGuardia1.toString(),
 								idCalendarioGuardias1.toString(), "C", null);
 						Map<String, Object> mapLog3 = new HashMap();
-						mapLog3.put("*Creado Nuevo salto compensación", ap2 + " " + ap1 + ", " + nombre);
+						mapLog3.put("*Creado Nueva Compensación", ap1 + " " + ap2 + ", " + nombre);
 						listaDatosExcelGeneracionCalendarios.add(mapLog3);
 					} catch (Exception e) {
 						errorGeneracionCalendario = "Error creando nueva compensación: " + e;
@@ -7175,9 +7186,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 				ap1 = letradoGuardia.getInscripcionGuardia().getApellido1().toString();
 			if (letradoGuardia.getInscripcionGuardia().getNombre() != null)
 				nombre = letradoGuardia.getInscripcionGuardia().getNombre().toString();
-			mapLog.put("*Letrado ok ", ap2 + " " + ap1 + ", " + nombre);
+			mapLog.put("*Letrado ok ", ap1 + " " + ap2 + ", " + nombre);
 			listaDatosExcelGeneracionCalendarios.add(mapLog);
-			LOGGER.info("*Letrado ok " + ap2 + " " + ap1 + ", " + nombre);
+			LOGGER.info("*Letrado ok " + ap1 + " " + ap2 + ", " + nombre);
 		} else if (letradoGuardia.getInscripcionTurno() != null) {
 			Map<String, Object> mapLog = new HashMap();
 			if (letradoGuardia.getInscripcionTurno().getApellidos2() != null)
@@ -7186,9 +7197,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 				ap1 = letradoGuardia.getInscripcionTurno().getApellidos1().toString();
 			if (letradoGuardia.getInscripcionTurno().getNombre() != null)
 				nombre = letradoGuardia.getInscripcionTurno().getNombre().toString();
-			mapLog.put("*Letrado ok ", ap2 + " " + ap1 + ", " + nombre);
+			mapLog.put("*Letrado ok ", ap1 + " " + ap2 + ", " + nombre);
 			listaDatosExcelGeneracionCalendarios.add(mapLog);
-			LOGGER.info("*Letrado ok " + ap2 + " " + ap1 + ", " + nombre);
+			LOGGER.info("*Letrado ok " + ap1 + " " + ap2 + ", " + nombre);
 		}
 		return true;
 	} // comprobarRestriccionesLetradoCola()
@@ -7401,6 +7412,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							String nombre = "";
 							String ap1 = "";
 							String ap2 = "";
+							String numCol = "";
 							if (letrado.getInscripcionGuardia() != null) {
 								if (letrado.getInscripcionGuardia().getApellido2() != null)
 									ap2 = letrado.getInscripcionGuardia().getApellido2().toString();
@@ -7408,10 +7420,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ap1 = letrado.getInscripcionGuardia().getApellido1().toString();
 								if (letrado.getInscripcionGuardia().getNombre() != null)
 									nombre = letrado.getInscripcionGuardia().getNombre().toString();
+								if(letrado.getInscripcionGuardia().getnColegiado() != null)
+									numCol = letrado.getInscripcionGuardia().getnColegiado().toString();
 								Map<String, Object> mapLog3 = new HashMap();
-								mapLog3.put("*Cola-" + auxIndex, ap2 + " " + ap1 + ", " + nombre);
+								mapLog3.put("*Cola-" + auxIndex,"("+numCol+") "+ ap1 + " " + ap2 + ", " + nombre);
 								listaDatosExcelGeneracionCalendarios.add(mapLog3);
-								LOGGER.info("*Colae " + ap2 + " " + ap1 + ", " + nombre);
+								LOGGER.info("*Colae " + ap1 + " " + ap2 + ", " + nombre);
 							} else if (letrado.getInscripcionTurno() != null) {
 								if (letrado.getInscripcionTurno().getApellidos2() != null)
 									ap2 = letrado.getInscripcionTurno().getApellidos2().toString();
@@ -7419,9 +7433,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ap1 = letrado.getInscripcionTurno().getApellidos1().toString();
 								if (letrado.getInscripcionTurno().getNombre() != null)
 									nombre = letrado.getInscripcionTurno().getNombre().toString();
-								mapLog2.put("*Cola-" + auxIndex, ap2 + " " + ap1 + ", " + nombre);
+								if (letrado.getInscripcionTurno().getNumerocolegiado() != null)
+									numCol = letrado.getInscripcionTurno().getNumerocolegiado().toString();
+								mapLog2.put("*Cola-" + auxIndex,"("+numCol+") "+ ap1 + " " + ap2 + ", " + nombre);
 								listaDatosExcelGeneracionCalendarios.add(mapLog2);
-								LOGGER.info("*Colaia " + ap2 + " " + ap1 + ", " + nombre);
+								LOGGER.info("*Colaia " + ap1 + " " + ap2 + ", " + nombre);
 
 							}
 							auxIndex++;
@@ -7463,9 +7479,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ap1 = compensacion.getInscripcionGuardia().getApellido1().toString();
 								if (compensacion.getInscripcionGuardia().getNombre() != null)
 									nombre = compensacion.getInscripcionGuardia().getNombre().toString();
-								mapLog3.put("Lista Compensaciones-" + indexCompensacion, ap2 + " " + ap1 + ", " + nombre);
+								mapLog3.put("Lista Compensaciones-" + indexCompensacion, ap1 + " " + ap2 + ", " + nombre);
 								listaDatosExcelGeneracionCalendarios.add(mapLog3);
-								LOGGER.info("Lista Compensaciones-" + ap2 + " " + ap1 + ", " + nombre);
+								LOGGER.info("Lista Compensaciones-" + ap1 + " " + ap2 + ", " + nombre);
 							} else if (compensacion.getInscripcionTurno() != null) {
 								mapLog3.put("*Compensaciones ",
 										compensacion.getInscripcionTurno().getApellidos1() + " "
@@ -7477,9 +7493,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ap1 = compensacion.getInscripcionTurno().getApellidos1().toString();
 								if (compensacion.getInscripcionTurno().getNombre() != null)
 									nombre = compensacion.getInscripcionTurno().getNombre().toString();
-								mapLog3.put("Lista Compensaciones-" +indexCompensacion, ap2 + " " + ap1 + ", " + nombre);
+								mapLog3.put("Lista Compensaciones-" +indexCompensacion, ap1 + " " + ap2 + ", " + nombre);
 								listaDatosExcelGeneracionCalendarios.add(mapLog3);
-								LOGGER.info("Lista Compensaciones-" + ap2 + " " + ap1 + ", " + nombre);
+								LOGGER.info("Lista Compensaciones-" + ap1 + " " + ap2 + ", " + nombre);
 							}
 						};
 					} else {
@@ -7492,9 +7508,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 //					log.addLog(new String[] {"Saltos", hmPersonasConSaltos.toString()});
 					Map<String, Object> mapLog4 = new HashMap();
 					if (hmPersonasConSaltos != null && !hmPersonasConSaltos.isEmpty()) {
-						for (Map.Entry<Long, ArrayList<LetradoInscripcionItem>> personasConSaltos : hmPersonasConSaltos
-								.entrySet()) {
-							personasConSaltos.getValue().forEach(pSalto -> {
+						int indexAux = 0;
+						for (Map.Entry<Long, ArrayList<LetradoInscripcionItem>> personasConSaltos : hmPersonasConSaltos.entrySet()) {
+							for(LetradoInscripcionItem pSalto : personasConSaltos.getValue()) {
+							//personasConSaltos.getValue().forEach(pSalto -> {
+								
 								String nombre = "";
 								String ap1 = "";
 								String ap2 = "";
@@ -7505,22 +7523,32 @@ public class GuardiasServiceImpl implements GuardiasService {
 										ap1 = pSalto.getInscripcionGuardia().getApellido1().toString();
 									if (pSalto.getInscripcionGuardia().getNombre() != null)
 										nombre = pSalto.getInscripcionGuardia().getNombre().toString();
-									mapLog3.put("*Saltos ", ap2 + " " + ap1 + ", " + nombre);
+									mapLog3.put("*Saltos ", ap1 + " " + ap2 + ", " + nombre);
 									listaDatosExcelGeneracionCalendarios.add(mapLog3);
-									LOGGER.info("*Saltos " + ap2 + " " + ap1 + ", " + nombre);
+									LOGGER.info("*Saltos " + ap1 + " " + ap2 + ", " + nombre);
 								} else if (pSalto.getInscripcionTurno() != null) {
-
 									if (pSalto.getInscripcionTurno().getApellidos2() != null)
 										ap2 = pSalto.getInscripcionTurno().getApellidos2().toString();
 									if (pSalto.getInscripcionTurno().getApellidos1() != null)
 										ap1 = pSalto.getInscripcionTurno().getApellidos1().toString();
 									if (pSalto.getInscripcionTurno().getNombre() != null)
 										nombre = pSalto.getInscripcionTurno().getNombre().toString();
-									mapLog3.put("*Saltos ", ap2 + " " + ap1 + ", " + nombre);
+									mapLog3.put("*Saltos ", ap1 + " " + ap2 + ", " + nombre);
 									listaDatosExcelGeneracionCalendarios.add(mapLog3);
-									LOGGER.info("*Saltos " + ap2 + " " + ap1 + ", " + nombre);
+									LOGGER.info("*Saltos " + ap1 + " " + ap2 + ", " + nombre);
+								}else if(pSalto.getPersona() != null) {
+									if (pSalto.getPersona().getApellidos2() != null)
+										ap2 = pSalto.getPersona().getApellidos2().toString();
+									if (pSalto.getPersona().getApellidos1() != null)
+										ap1 =pSalto.getPersona().getApellidos1().toString();
+									if (pSalto.getPersona().getNombre() != null)
+										nombre = pSalto.getPersona().getNombre().toString();
+									mapLog3.put("*Lista Saltos - "+indexAux, ap1 + " " + ap2 + ", " + nombre);
+									listaDatosExcelGeneracionCalendarios.add(mapLog3);
+									LOGGER.info("*Lista Saltos - " + ap1 + " " + ap2 + ", " + nombre);
 								}
-							});
+								indexAux++;
+							};
 
 						}
 					} else {
@@ -7554,9 +7582,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ap1 = letradoGuardia.getInscripcionGuardia().getApellido1().toString();
 								if (letradoGuardia.getInscripcionGuardia().getNombre() != null)
 									nombre = letradoGuardia.getInscripcionGuardia().getNombre().toString();
-								mapLog5.put("*Letrado seleccionado ", ap2 + " " + ap1 + ", " + nombre);
+								mapLog5.put("*Letrado seleccionado ", ap1 + " " + ap2 + ", " + nombre);
 								listaDatosExcelGeneracionCalendarios.add(mapLog5);
-								LOGGER.info("*Letrado seleccionado " + ap2 + " " + ap1 + ", " + nombre);
+								LOGGER.info("*Letrado seleccionado " + ap1 + " " + ap2 + ", " + nombre);
 							} else if (letradoGuardia.getInscripcionTurno() != null) {
 								Map<String, Object> mapLog5 = new HashMap();
 								if (letradoGuardia.getInscripcionTurno().getApellidos2() != null)
@@ -7565,9 +7593,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ap1 = letradoGuardia.getInscripcionTurno().getApellidos1().toString();
 								if (letradoGuardia.getInscripcionTurno().getNombre() != null)
 									nombre = letradoGuardia.getInscripcionTurno().getNombre().toString();
-								mapLog5.put("*Letrado seleccionado ", ap2 + " " + ap1 + ", " + nombre);
+								mapLog5.put("*Letrado seleccionado ", ap1 + " " + ap2 + ", " + nombre);
 								listaDatosExcelGeneracionCalendarios.add(mapLog5);
-								LOGGER.info("*Letrado seleccionado " + ap2 + " " + ap1 + ", " + nombre);
+								LOGGER.info("*Letrado seleccionado " + ap1 + " " + ap2 + ", " + nombre);
 							}
 							alLetradosInsertar = new ArrayList<LetradoInscripcionItem>();
 							letradoGuardia.setPeriodoGuardias(diasGuardia);
@@ -8354,9 +8382,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ap1 = auxLetradoSeleccionado.getInscripcionGuardia().getApellido1().toString();
 						if (auxLetradoSeleccionado.getInscripcionGuardia().getNombre() != null)
 							nombre = auxLetradoSeleccionado.getInscripcionGuardia().getNombre().toString();
-						mapLog2.put("*Probando Letrado Compensado ", ap2 + " " + ap1 + ", " + nombre);
+						mapLog2.put("*Probando Letrado Compensado ", ap1 + " " + ap2 + ", " + nombre);
 						listaDatosExcelGeneracionCalendarios.add(mapLog2);
-						 LOGGER.info("*Probando Letrado Compensado " + ap2 + " " + ap1 + ", " +
+						 LOGGER.info("*Probando Letrado Compensado " + ap1 + " " + ap2 + ", " +
 						 nombre);
 					} else if (auxLetradoSeleccionado.getInscripcionTurno() != null) {
 						Map<String, Object> mapLog2 = new HashMap();
@@ -8366,9 +8394,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ap1 = auxLetradoSeleccionado.getInscripcionTurno().getApellidos1().toString();
 						if (auxLetradoSeleccionado.getInscripcionTurno().getNombre() != null)
 							nombre = auxLetradoSeleccionado.getInscripcionTurno().getNombre().toString();
-						mapLog2.put("*Probando Letrado Compensado ", ap2 + " " + ap1 + ", " + nombre);
+						mapLog2.put("*Probando Letrado Compensado ", ap1 + " " + ap2 + ", " + nombre);
 						listaDatosExcelGeneracionCalendarios.add(mapLog2);
-						LOGGER.info("*Probando Letrado Compensado " + ap2 + " " + ap1 + ", " + nombre);
+						LOGGER.info("*Probando Letrado Compensado " + ap1 + " " + ap2 + ", " + nombre);
 					}
 					// vale
 					if (comprobarRestriccionesLetradoCompensado(auxLetradoSeleccionado, diasGuardia, iterador, null,
@@ -8384,9 +8412,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 								ap1 = auxLetradoSeleccionado.getInscripcionGuardia().getApellido1().toString();
 							if (auxLetradoSeleccionado.getInscripcionGuardia().getNombre() != null)
 								nombre = auxLetradoSeleccionado.getInscripcionGuardia().getNombre().toString();
-							mapLog2.put("*Letrado Compensado no valido ", ap2 + " " + ap1 + ", " + nombre);
+							mapLog2.put("*Letrado Compensado no valido ", ap1 + " " + ap2 + ", " + nombre);
 							listaDatosExcelGeneracionCalendarios.add(mapLog2);
-							LOGGER.info("*Letrado Compensado no valido " + ap2 + " " + ap1 + ", " + nombre);
+							LOGGER.info("*Letrado Compensado no valido " + ap1 + " " + ap2 + ", " + nombre);
 
 						} else if (auxLetradoSeleccionado.getInscripcionTurno() != null) {
 							Map<String, Object> mapLog2 = new HashMap();
@@ -8396,7 +8424,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								ap1 = auxLetradoSeleccionado.getInscripcionTurno().getApellidos1().toString();
 							if (auxLetradoSeleccionado.getInscripcionTurno().getNombre() != null)
 								nombre = auxLetradoSeleccionado.getInscripcionTurno().getNombre().toString();
-							mapLog2.put("*Letrado Compensado no valido ", ap2 + " " + ap1 + ", " + nombre);
+							mapLog2.put("*Letrado Compensado no valido ", ap1 + " " + ap2 + ", " + nombre);
 							listaDatosExcelGeneracionCalendarios.add(mapLog2);
 //							LOGGER.info("*Letrado Compensado no valido " + ap2 + " " + ap1 + ", " + nombre);
 						}
@@ -8434,7 +8462,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ap1 = auxLetradoSeleccionado.getInscripcionGuardia().getApellido1().toString();
 						if (auxLetradoSeleccionado.getInscripcionGuardia().getNombre() != null)
 							nombre = auxLetradoSeleccionado.getInscripcionGuardia().getNombre().toString();
-						mapLog.put("*Probando Letrado ", ap2 + " " + ap1 + ", " + nombre);
+						mapLog.put("*Probando Letrado ", ap1 + " " + ap2 + ", " + nombre);
 						listaDatosExcelGeneracionCalendarios.add(mapLog);
 //						LOGGER.info("*Probando Letrado " + ap2 + " " + ap1 + ", " + nombre);
 					} else if (auxLetradoSeleccionado.getInscripcionTurno() != null) {
@@ -8445,7 +8473,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ap1 = auxLetradoSeleccionado.getInscripcionTurno().getApellidos1().toString();
 						if (auxLetradoSeleccionado.getInscripcionTurno().getNombre() != null)
 							nombre = auxLetradoSeleccionado.getInscripcionTurno().getNombre().toString();
-						mapLog2.put("*Probando Letrado ", ap2 + " " + ap1 + ", " + nombre);
+						mapLog2.put("*Probando Letrado ", ap1 + " " + ap2 + ", " + nombre);
 						listaDatosExcelGeneracionCalendarios.add(mapLog2);
 //						LOGGER.info("*Probando Letrado " + ap2 + " " + ap1 + ", " + nombre);
 					}
@@ -8462,7 +8490,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								ap1 = auxLetradoSeleccionado.getInscripcionGuardia().getApellido1().toString();
 							if (auxLetradoSeleccionado.getInscripcionGuardia().getNombre() != null)
 								nombre = auxLetradoSeleccionado.getInscripcionGuardia().getNombre().toString();
-							mapLog3.put("*Letrado no valido ", ap2 + " " + ap1 + ", " + nombre);
+							mapLog3.put("*Letrado no valido ", ap1 + " " + ap2 + ", " + nombre);
 							listaDatosExcelGeneracionCalendarios.add(mapLog3);
 //							LOGGER.info("*Letrado no valido " + ap2 + " " + ap1 + ", " + nombre);
 						} else if (auxLetradoSeleccionado.getInscripcionTurno() != null) {
@@ -8474,7 +8502,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								ap1 = auxLetradoSeleccionado.getInscripcionTurno().getApellidos1().toString();
 							if (auxLetradoSeleccionado.getInscripcionTurno().getNombre() != null)
 								nombre = auxLetradoSeleccionado.getInscripcionTurno().getNombre().toString();
-							mapLog2.put("*Letrado no valido  ", ap2 + " " + ap1 + ", " + nombre);
+							mapLog2.put("*Letrado no valido  ", ap1 + " " + ap2 + ", " + nombre);
 							listaDatosExcelGeneracionCalendarios.add(mapLog2);
 //							LOGGER.info("*Letrado no valido  " + ap2 + " " + ap1 + ", " + nombre);
 						}
@@ -8553,9 +8581,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 					ap1 = letradoGuardia.getInscripcionGuardia().getApellido1().toString();
 				if (letradoGuardia.getInscripcionGuardia().getNombre() != null)
 					nombre = letradoGuardia.getInscripcionGuardia().getNombre().toString();
-				mapLog.put("*Encontrado Incompatibilidad ", ap2 + " " + ap1 + ", " + nombre);
+				mapLog.put("*EncontradoA Incompatibilidad ", ap1 + " " + ap2 + ", " + nombre);
 				listaDatosExcelGeneracionCalendarios.add(mapLog);
-				LOGGER.info("*Encontrado Incompatibilidad " + ap2 + " " + ap1 + ", " + nombre);
+				LOGGER.info("*EncontradoA Incompatibilidad " + ap1 + " " + ap2 + ", " + nombre);
 			} else if (letradoGuardia.getInscripcionTurno() != null) {
 				Map<String, Object> mapLog = new HashMap();
 				if (letradoGuardia.getInscripcionTurno().getApellidos2() != null)
@@ -8564,9 +8592,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 					ap1 = letradoGuardia.getInscripcionTurno().getApellidos1().toString();
 				if (letradoGuardia.getInscripcionTurno().getNombre() != null)
 					nombre = letradoGuardia.getInscripcionTurno().getNombre().toString();
-				mapLog.put("*Encontrado Incompatibilidad ", ap2 + " " + ap1 + ", " + nombre);
+				mapLog.put("*EncontradoA Incompatibilidad ", ap1 + " " + ap2 + ", " + nombre);
 				listaDatosExcelGeneracionCalendarios.add(mapLog);
-				LOGGER.info("*Encontrado Incompatibilidad " + ap2 + " " + ap1 + ", " + nombre);
+				LOGGER.info("*EncontradoA Incompatibilidad " + ap1 + " " + ap2 + ", " + nombre);
 
 			}
 			return false; // no seleccionar
@@ -8590,7 +8618,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				errorGeneracionCalendario = "Error cumpliendo compensacion: " + e;
 			}
 			iteCompensaciones.remove();
-			return false;
+			return true;// Si la compensacion esta cumplida. --//PRUEBA
 		} else {
 			// nada, hay que cumplir la compensacion cuando todos los letrados esten
 			// comprobados
