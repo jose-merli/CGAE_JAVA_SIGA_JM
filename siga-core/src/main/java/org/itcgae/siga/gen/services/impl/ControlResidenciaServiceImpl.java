@@ -3,6 +3,7 @@ package org.itcgae.siga.gen.services.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -45,7 +46,7 @@ public class ControlResidenciaServiceImpl implements IControlResidenciaService {
 			List<ColegiadoItem> listColegiadosByPersona = cenColegiadoExtendsMapper
 					.selectColegiadosByIdPersona(Short.parseShort("2000"), idPersona.toString());
 						
-
+			Boolean tieneResidenciaActiva = Boolean.FALSE;
 			for (ColegiadoItem colegiadoItem : listColegiadosByPersona) {	
 				Date bajaColegDate = colegiadoItem.getFechaBajaDate();
 				
@@ -63,15 +64,24 @@ public class ControlResidenciaServiceImpl implements IControlResidenciaService {
 					hasErr = true;
 					break;
 				}
+				
+				// Se comprueba si la solicitud de aprobacion es ejer o rein.ejer y que la iterada sea residente.
+				// En caso de no tener ninguna residencia activa, al final saltaria alarma porque no puede aprobarse
+				// nada ejerciente sin una residencia minima.
+				if (this.esSolicitudEjerOReincorporacionEjer(solicitudIncorporacion.getIdtiposolicitud()) 
+						&& this.esResidente(colegiadoItem.getSituacionResidente()))  {
+					tieneResidenciaActiva = Boolean.TRUE;
+				}
+			}
+			
+			if (CollectionUtils.isNotEmpty(listColegiadosByPersona) && !tieneResidenciaActiva) {
+				hasErr = true;
 			}
 
 		} else if (idPersona == null && (solicitudIncorporacion.getIdtiposolicitud() != null
 				&& (SigaConstants.INCORPORACION_EJERCIENTE == solicitudIncorporacion.getIdtiposolicitud().shortValue()
 						|| SigaConstants.REINCORPORACION_EJERCIENTE == solicitudIncorporacion.getIdtiposolicitud().shortValue())
-				&& (StringUtils.isEmpty(solicitudIncorporacion.getResidente()) 
-					|| ("N".equalsIgnoreCase(solicitudIncorporacion.getResidente()) 
-					|| "0".equalsIgnoreCase(solicitudIncorporacion.getResidente()) 
-					|| "No".equalsIgnoreCase(solicitudIncorporacion.getResidente()))))) {
+				&& (!this.esResidente(solicitudIncorporacion.getResidente())))) {
 			hasErr = true;
 		}
 		
@@ -84,6 +94,12 @@ public class ControlResidenciaServiceImpl implements IControlResidenciaService {
 	
 	private Boolean esEjerciente(String estadoColegial) {
 		return !StringUtils.isEmpty(estadoColegial) && ("Ejerciente").equalsIgnoreCase(estadoColegial) ? Boolean.TRUE : Boolean.FALSE;
+	}
+	
+	private Boolean esSolicitudEjerOReincorporacionEjer(Short idTipoSolicitud) {
+		return idTipoSolicitud != null
+				&& (SigaConstants.INCORPORACION_EJERCIENTE == idTipoSolicitud.shortValue()
+				|| SigaConstants.REINCORPORACION_EJERCIENTE == idTipoSolicitud.shortValue()) ? Boolean.TRUE : Boolean.FALSE;
 	}
 
 	// Si es comunitario es "1" para el caso de que sea "INSCRITO"
