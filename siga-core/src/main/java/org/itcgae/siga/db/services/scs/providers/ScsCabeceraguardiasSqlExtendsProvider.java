@@ -63,6 +63,7 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 				+ "    guard.facturado,"
 				+ "    guard.idfacturacion,"
 				+ "    guard.numerogrupo,"
+				+ "    guard.observacionesanulacion,"
 				+ "    ("
 				+ "        SELECT"
 				+ "            t.nombre"
@@ -131,15 +132,11 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 			
 			if(guardiaItem.getFechadesde() != null) {
 				fechadesde = dateFormat.format(guardiaItem.getFechadesde());
-				sql.WHERE("( guard.fechainicio >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR')"
-						+ " AND "
-						+ "guard.fecha_fin >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR') )");
+				sql.WHERE("( guard.fechainicio >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR'))");
 			}
 			if(guardiaItem.getFechahasta() != null) {
 				fechahasta = dateFormat.format(guardiaItem.getFechahasta());
-				sql.WHERE("( guard.fechainicio <= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR')"
-						+ " AND "
-						+ "guard.fecha_fin <= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR') )");
+				sql.WHERE("( guard.fechainicio <= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR'))");
 			}
 
 			SQL_PADRE.SELECT(" *");
