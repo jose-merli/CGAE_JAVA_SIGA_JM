@@ -18,7 +18,7 @@ public interface PysAnticipoletradoExtendsMapper extends PysAnticipoletradoMappe
     @Results({
             @Result(column="ID", property="newId", jdbcType=JdbcType.VARCHAR)
     })
-    NewIdDTO selectMaxIdAnticipo(Short idInstitution, Long idPersona);
+    NewIdDTO selectMaxIdAnticipo(Short idInstitucion, Long idPersona);
 	
    
 }

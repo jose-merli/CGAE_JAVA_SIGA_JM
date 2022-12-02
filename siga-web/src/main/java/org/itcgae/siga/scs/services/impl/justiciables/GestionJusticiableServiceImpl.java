@@ -1403,7 +1403,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 						if (asuntosJusticiableItem != null && asuntosJusticiableItem.size() > 0) {
 
-							Collections.sort(asuntosJusticiableItem, new Comparator<Object>() {
+							/*Collections.sort(asuntosJusticiableItem, new Comparator<Object>() {
 								@Override
 								public int compare(Object item1, Object item2) {
 									// use instanceof to verify the references are indeed of the type in question
@@ -1412,7 +1412,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 								}
 							});
 
-							Collections.reverse(asuntosJusticiableItem);
+							Collections.reverse(asuntosJusticiableItem);*/
 
 							asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItem);
 						}
