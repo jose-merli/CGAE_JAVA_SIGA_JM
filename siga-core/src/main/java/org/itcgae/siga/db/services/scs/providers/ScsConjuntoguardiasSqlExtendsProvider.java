@@ -14,7 +14,7 @@ public class ScsConjuntoguardiasSqlExtendsProvider extends ScsConjuntoguardiasSq
             SQL.FROM("scs_conjuntoguardias cg");
             SQL.WHERE("cg.idinstitucion=" + idInstitucion);
             if (!UtilidadesString.esCadenaVacia(filtro.getIdTipo())) {
-            SQL.WHERE("cg.tipo='" + filtro.getIdTipo() + "'");
+            SQL.WHERE("(cg.tipo='" + filtro.getIdTipo() + "' OR cg.tipo IS NULL)");
         }
 
             if (!UtilidadesString.esCadenaVacia(filtro.getLugar())) {

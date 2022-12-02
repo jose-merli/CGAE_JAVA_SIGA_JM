@@ -38,6 +38,8 @@ public interface ComboService {
 	
 	public ComboDTO comboGuardiasGrupo(HttpServletRequest request, String idTurno);
 	
+	public ComboDTO comboGuardiasNoBajaNoExistentesEnListaGuardias(HttpServletRequest request, String idTurno, String idListaGuardias);
+	
 	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, String idordenacioncolas);
 
 	public ComboDTO comboGuardiasUpdate(HttpServletRequest request, String idTurno);

@@ -1446,7 +1446,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							// Validamos guardias colegiado
 							try {
 								
-								procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
+								if (tarjetaAsistenciaResponseItem.getIdLetradoGuardia() != null) {
+									procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
+								} else if (tarjetaAsistenciaResponseItem.getIdLetradoGuardia() == null &&
+											tarjetaAsistenciaResponseItem.getIdLetradoManual() != null) {
+									tarjetaAsistenciaResponseItem.setIdLetradoGuardia(tarjetaAsistenciaResponseItem.getIdLetradoManual());
+									procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
+								}
 								
 								if (asistencias.get(0).getFiltro() != null && asistencias.get(0).getFiltro().getIsSustituto() != null) {
 									if (asistencias.get(0).getFiltro().getDiaGuardia().contains(":")) {
@@ -2333,7 +2339,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
 						.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
-						.andFechainicioGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+						.andFechafinGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 
 				List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper
@@ -2514,7 +2520,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
 						.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
-						.andFechainicioGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+						.andFechafinGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 
 				List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper

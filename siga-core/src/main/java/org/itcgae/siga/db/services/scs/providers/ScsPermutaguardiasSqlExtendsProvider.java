@@ -15,7 +15,19 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
 
 
         SQL sql = new SQL();
-
+        SQL sql2 = new SQL();
+        
+        sql2.SELECT("1");
+        sql2.FROM("SCS_PERMUTAGUARDIAS sp2");
+        sql2.WHERE("sp2.idinstitucion = " + idInstitucion
+        		+ " AND (( sp2.idturno_solicitante = " + permutaItem.getIdturno()
+    			+ " AND pg.idguardia_solicitante = " + permutaItem.getIdguardia()
+    			+ " AND pg.idpersona_solicitante = " + permutaItem.getFechainicioSolicitante() 
+    			+ " AND pg.fechainicio_solicitante = " + permutaItem.getFechainicioSolicitante() + ")"
+    			+ " OR (pg.idturno_confirmador = " + permutaItem.getIdturno()
+    			+ " AND pg.idguardia_confirmador = " + permutaItem.getIdguardia()
+    			+ " AND pg.idpersona_confirmador = " + permutaItem.getFechainicioConfirmador()
+    			+ " AND pg.fechainicio_confirmador = " + permutaItem.getFechainicioSolicitante() + ")))");
 
         sql.SELECT("  pg.fechasolicitud,"
                 + "    pg.fechaconfirmacion,"
@@ -43,7 +55,6 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
                 + "    pc.idturno,"
                 + "    pc.idguardia,"
                 + "    pc.idpersona");
-
         sql.FROM("scs_permutaguardias pg");
         sql.JOIN("scs_permuta_cabecera pc ON"
                 + "        pg.idinstitucion = pc.idinstitucion"
@@ -63,10 +74,15 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
                 + "    AND"
                 + "        guardia.idguardia = pc.idguardia");
         sql.WHERE(" pc.idinstitucion = " + idInstitucion);
-        sql.WHERE(" pc.idguardia = " + permutaItem.getIdguardia());
-        sql.WHERE(" pc.idturno = " + permutaItem.getIdturno());
+        sql.WHERE("(( pc.idturno = " + permutaItem.getIdturno()
+        			+ " AND pc.idguardia = " + permutaItem.getIdguardia()
+        			+ " AND pg.fechainicio_solicitante = " + permutaItem.getFechainicioSolicitante() + ")"
+        			+ " OR (pc.idturno = " + permutaItem.getIdturno()
+        			+ " AND pc.idguardia = " + permutaItem.getIdguardia()
+        			+ " AND pg.fechainicio_confirmador = " + permutaItem.getFechainicioConfirmador() + "))"
+        			+ " AND EXISTS (" + sql2.toString());
         sql.WHERE("ROWNUM <= 200");
-
+        sql.ORDER_BY("pg.fechaconfirmacion DESC");
 
         return sql.toString();
     }
