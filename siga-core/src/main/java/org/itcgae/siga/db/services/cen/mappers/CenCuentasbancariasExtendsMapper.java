@@ -134,7 +134,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	@Results({
 		@Result(column = "IDCUENTA", property = "idMax", jdbcType = JdbcType.VARCHAR),
 	})
-	MaxIdDto selectMaxID(Long idPersona, Short idinstitucion);
+	MaxIdDto selectMaxID(Long idPersona, Short institucion);
 	
 
 }

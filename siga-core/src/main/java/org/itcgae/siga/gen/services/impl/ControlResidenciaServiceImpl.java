@@ -59,8 +59,10 @@ public class ControlResidenciaServiceImpl implements IControlResidenciaService {
 				if ( (this.esEjerciente(colegiadoItem.getEstadoColegial()) 
 						&& (this.esResidente(colegiadoItem.getSituacionResidente()) && colegiadoItem.getSituacionResidente().equalsIgnoreCase(solicitudIncorporacion.getResidente())))				
 					&& (bajaColegDate == null || (bajaColegDate.after(actualDate) || bajaColegDate.equals(actualDate)))) {
-					hasErr = true;
-					break;
+					if(Short.parseShort("20") == solicitudIncorporacion.getIdtipocolegiacion()) {
+						hasErr = true;
+						break;
+					}
 				}
 				
 				if (!minOneEjerRes && (this.esResidente(colegiadoItem.getSituacionResidente()) && this.esEjerciente(colegiadoItem.getEstadoColegial()))) {
