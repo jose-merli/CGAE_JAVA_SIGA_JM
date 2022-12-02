@@ -2712,21 +2712,26 @@ public class GuardiasServiceImpl implements GuardiasService {
 				// 2017-02-06 00:00:00.0
 				if (calendarioProgBody.getFechaCalendarioDesde() != null) {
 					String fecha = null;
-					if (!calendarioProgBody.getFechaCalendarioDesde().contains("T")) {
-						fecha = changeDateFormat(OLD_FORMAT1, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
-					} else {
-						fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
-					}
-
+					String format = NEW_FORMAT;
+					if(calendarioProgBody.getFechaCalendarioDesde().length() == 29 ) 
+						format = OLD_FORMAT;
+					else if (calendarioProgBody.getFechaCalendarioDesde().length() == 10 )
+						format = NEW_FORMAT;
+					else
+						format = OLD_FORMAT;
+					fecha = changeDateFormat(format, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
 					calendarioProgBody.setFechaCalendarioDesde(fecha);
 				}
 				if (calendarioProgBody.getFechaCalendarioHasta() != null) {
 					String fecha = null;
-					if (!calendarioProgBody.getFechaCalendarioHasta().contains("T")) {
-						fecha = changeDateFormat(OLD_FORMAT1, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
-					} else {
-						fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
-					}
+					String format = NEW_FORMAT;
+					if(calendarioProgBody.getFechaCalendarioHasta().length() == 29 ) 
+						format = OLD_FORMAT;
+					else if (calendarioProgBody.getFechaCalendarioHasta().length() == 10 )
+						format = NEW_FORMAT;
+					else
+						format = OLD_FORMAT;
+					fecha = changeDateFormat(format, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
 					calendarioProgBody.setFechaCalendarioHasta(fecha);
 				}
 				if (calendarioProgBody.getFechaProgramadaDesde() != null) {
