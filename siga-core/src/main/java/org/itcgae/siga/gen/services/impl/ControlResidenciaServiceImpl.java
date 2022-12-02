@@ -41,12 +41,11 @@ public class ControlResidenciaServiceImpl implements IControlResidenciaService {
 			Date actualDate = new Date();
 			GenRecursosExample recursosExample = new GenRecursosExample();			
 			recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.BAJA_COLEGIAL");
-//			List<GenRecursos> recursoIdiomasBajas = genRecursosMapper.selectByExample(recursosExample);
 			
 			List<ColegiadoItem> listColegiadosByPersona = cenColegiadoExtendsMapper
 					.selectColegiadosByIdPersona(Short.parseShort("2000"), idPersona.toString());
 						
-			Boolean tieneResidenciaActiva = Boolean.FALSE;
+			Boolean minOneEjerRes = Boolean.FALSE;
 			for (ColegiadoItem colegiadoItem : listColegiadosByPersona) {	
 				Date bajaColegDate = colegiadoItem.getFechaBajaDate();
 				
@@ -58,30 +57,25 @@ public class ControlResidenciaServiceImpl implements IControlResidenciaService {
 				}
 				
 				if ( (this.esEjerciente(colegiadoItem.getEstadoColegial()) 
-						&& (this.esResidente(colegiadoItem.getSituacionResidente()) && colegiadoItem.getSituacionResidente().equalsIgnoreCase(solicitudIncorporacion.getResidente())))
-					
+						&& (this.esResidente(colegiadoItem.getSituacionResidente()) && colegiadoItem.getSituacionResidente().equalsIgnoreCase(solicitudIncorporacion.getResidente())))				
 					&& (bajaColegDate == null || (bajaColegDate.after(actualDate) || bajaColegDate.equals(actualDate)))) {
 					hasErr = true;
 					break;
 				}
 				
-				// Se comprueba si la solicitud de aprobacion es ejer o rein.ejer y que la iterada sea residente.
-				// En caso de no tener ninguna residencia activa, al final saltaria alarma porque no puede aprobarse
-				// nada ejerciente sin una residencia minima.
-				if (this.esSolicitudEjerOReincorporacionEjer(solicitudIncorporacion.getIdtiposolicitud()) 
-						&& this.esResidente(colegiadoItem.getSituacionResidente()))  {
-					tieneResidenciaActiva = Boolean.TRUE;
+				if (!minOneEjerRes && (this.esResidente(colegiadoItem.getSituacionResidente()) && this.esEjerciente(colegiadoItem.getEstadoColegial()))) {
+					minOneEjerRes = Boolean.TRUE;
 				}
 			}
 			
-			if (CollectionUtils.isNotEmpty(listColegiadosByPersona) && !tieneResidenciaActiva) {
+			// Si no hay una E-R activa (minOneEjerRes = false) y la solicitud de aprobacion es E-NR --> No se podrá aprobar la solicitud
+			if (!minOneEjerRes && this.esSolicitudEjerOReincorporacionEjer(solicitudIncorporacion.getIdtiposolicitud())
+					&& !this.esResidente(solicitudIncorporacion.getResidente())) {
 				hasErr = true;
 			}
 
-		} else if (idPersona == null && (solicitudIncorporacion.getIdtiposolicitud() != null
-				&& (SigaConstants.INCORPORACION_EJERCIENTE == solicitudIncorporacion.getIdtiposolicitud().shortValue()
-						|| SigaConstants.REINCORPORACION_EJERCIENTE == solicitudIncorporacion.getIdtiposolicitud().shortValue())
-				&& (!this.esResidente(solicitudIncorporacion.getResidente())))) {
+		} else if (idPersona == null && this.esSolicitudEjerOReincorporacionEjer(solicitudIncorporacion.getIdtiposolicitud())
+				&& !this.esResidente(solicitudIncorporacion.getResidente())) {
 			hasErr = true;
 		}
 		
