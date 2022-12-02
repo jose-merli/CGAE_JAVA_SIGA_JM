@@ -33,9 +33,11 @@ import org.itcgae.siga.DTOs.scs.PermutaDTO;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
 import org.itcgae.siga.DTOs.scs.RangoFechasItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
+import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -50,6 +52,8 @@ import org.itcgae.siga.db.entities.ScsAsistenciaExample;
 import org.itcgae.siga.db.entities.ScsCabeceraguardias;
 import org.itcgae.siga.db.entities.ScsCabeceraguardiasExample;
 import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
+import org.itcgae.siga.db.entities.ScsCalendarioguardias;
+import org.itcgae.siga.db.entities.ScsCalendarioguardiasExample;
 import org.itcgae.siga.db.entities.ScsDictamenejg;
 import org.itcgae.siga.db.entities.ScsDictamenejgExample;
 import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
@@ -64,6 +68,7 @@ import org.itcgae.siga.db.entities.ScsPermutaguardiasKey;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
 import org.itcgae.siga.db.mappers.FcsFactGuardiascolegiadoMapper;
+import org.itcgae.siga.db.mappers.ScsCalendarioguardiasMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaCabeceraMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -133,6 +138,9 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 	@Autowired
 	private FcsFactGuardiascolegiadoMapper fcsFactGuardiascolegiadoMapper;
+	
+	@Autowired
+	private ScsCalendarioguardiasMapper scsCalendarioguardiasMapper;
 
 	@Override
 	public GuardiasDTO getGuardiaColeg(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -316,19 +324,67 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 		return updateResponseDTO;
 	}
+	
+	private int crearGuardiaColegiado(ScsGuardiascolegiado item){
+		ScsGuardiascolegiado scsGuardiascolegiado = new ScsGuardiascolegiado();
+		scsGuardiascolegiado.setIdinstitucion(item.getIdinstitucion());
+		scsGuardiascolegiado.setIdturno(item.getIdturno());
+		scsGuardiascolegiado.setIdguardia(item.getIdguardia());
+		//scsGuardiascolegiado.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
+		//		.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+		scsGuardiascolegiado.setFechainicio(item.getFechainicio());
+		scsGuardiascolegiado.setFechafin(item.getFechafin());
+		scsGuardiascolegiado.setIdpersona(item.getIdpersona());
+		scsGuardiascolegiado.setDiasguardia((long) 1);
+		scsGuardiascolegiado.setDiasacobrar((long) 1);
+		scsGuardiascolegiado.setObservaciones("Añadido Guardia Colegiado");
+		scsGuardiascolegiado.setReserva("N");
+		scsGuardiascolegiado.setFacturado("N");
+		scsGuardiascolegiado.setIdfacturacion(null);
+		scsGuardiascolegiado.setPagado("N");
+		scsGuardiascolegiado.setFechamodificacion(new Date());
+		scsGuardiascolegiado.setUsumodificacion(0);
+		return scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+	}
+	
+	private int crearCabeceraGuardiaColegiado(ScsCabeceraguardias itemCabecera) {
+		ScsCabeceraguardias scsCabeceraguardias = new ScsCabeceraguardias();
+		scsCabeceraguardias.setIdinstitucion(itemCabecera.getIdinstitucion());
+		scsCabeceraguardias.setIdturno(itemCabecera.getIdturno());
+		scsCabeceraguardias.setIdcalendarioguardias(itemCabecera.getIdcalendarioguardias());
+
+		scsCabeceraguardias.setIdguardia(itemCabecera.getIdguardia());
+		scsCabeceraguardias.setFechainicio(itemCabecera.getFechainicio());
+		scsCabeceraguardias.setFechaFin(itemCabecera.getFechaFin());
+		scsCabeceraguardias.setIdpersona(itemCabecera.getIdpersona());
+		scsCabeceraguardias.setPosicion((short) 1);
+		scsCabeceraguardias.setFechamodificacion(new Date());
+		scsCabeceraguardias.setSustituto("0");
+		scsCabeceraguardias.setFechaalta(new Date());
+
+		// Las metemos validadas
+		scsCabeceraguardias.setValidado("1");
+		scsCabeceraguardias.setFechavalidacion(new Date());
+		scsCabeceraguardias.setUsumodificacion(0);
+		
+		return  scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+	}
+	
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public InsertResponseDTO insertGuardiaColeg(GuardiasItem guardiasItem, HttpServletRequest request) {
 		LOGGER.info("insertGuardiaColeg() ->  Entrada al servicio para eliminar prisiones");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
-		int response = 0;
+		int response = 1;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		int controlError = 0;
+		ScsCabeceraguardias cabeceraRes = new ScsCabeceraguardias();
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -346,17 +402,45 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
+					
+					List<String> listaFechas = Arrays.asList( guardiasItem.getFechaIntro().split(","));
+					
 
-					ScsCabeceraguardias guardia = new ScsCabeceraguardias();
-					guardia.setIdinstitucion(idInstitucion);
-					guardia.setIdturno(Integer.parseInt(guardiasItem.getIdTurno()));
-					guardia.setIdguardia(Integer.parseInt(guardiasItem.getIdGuardia()));
-					guardia.setIdpersona(Long.parseLong(guardiasItem.getIdPersona()));
-					guardia.setFechainicio(guardiasItem.getFechadesde());
-
-					response = scsCabeceraguardiasExtendsMapper.insertSelective(guardia);
+					ScsCabeceraguardias cabecera = new ScsCabeceraguardias();
+					cabecera.setIdinstitucion(idInstitucion);
+					cabecera.setIdturno(Integer.parseInt(guardiasItem.getIdTurno()));
+					cabecera.setIdguardia(Integer.parseInt(guardiasItem.getIdGuardia()));
+					cabecera.setIdpersona(Long.parseLong(guardiasItem.getIdPersona()));
+					cabecera.setFechainicio(new SimpleDateFormat("dd/MM/yyyy").parse(listaFechas.get(0)));
+					cabecera.setFechaFin(new SimpleDateFormat("dd/MM/yyyy").parse(listaFechas.get(listaFechas.size() - 1 )));
+					cabecera.setIdcalendarioguardias(Integer.parseInt(guardiasItem.getIdCalendarioGuardias()));
+					cabeceraRes.setFechainicio(new SimpleDateFormat("dd/MM/yyyy").parse(listaFechas.get(0)));
+					cabeceraRes.setFechaFin(new SimpleDateFormat("dd/MM/yyyy").parse(listaFechas.get(listaFechas.size() - 1 )));
+					ScsCabeceraguardias cabeceraControl = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(cabecera);
+					if(cabeceraControl == null) {
+						int res = crearCabeceraGuardiaColegiado(cabecera);
+						if(res != 1)controlError++;
+					}
+					
+					
+					//Creamos un item con atributos basicos (no fechas)
+					ScsGuardiascolegiado itemIn = new ScsGuardiascolegiado();
+					itemIn.setIdguardia(Integer.parseInt(guardiasItem.getIdGuardia()));
+					itemIn.setIdturno(Integer.parseInt(guardiasItem.getIdTurno()));
+					itemIn.setIdinstitucion(idInstitucion);
+					itemIn.setIdpersona(Long.parseLong(guardiasItem.getIdPersona()));
+					
+					//Añadimos un insert por cada fecha disponible- en guardia colegiado.
+					for (int i = 0; i < listaFechas.size(); i++) {
+						itemIn.setFechainicio(new SimpleDateFormat("dd/MM/yyyy").parse(listaFechas.get(0)));
+						itemIn.setFechafin(new SimpleDateFormat("dd/MM/yyyy").parse(listaFechas.get(i)));
+						int rese = crearGuardiaColegiado(itemIn);
+						if(rese != 1)controlError++;
+					}
+				//	response = scsCabeceraguardiasExtendsMapper.insertSelective(guardia);
 
 				} catch (Exception e) {
+					
 					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
@@ -367,18 +451,19 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 		}
 
-		if (response == 0) {
+		if ( controlError > 0) {
 			error.setCode(400);
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
 			insertResponseDTO.setStatus(SigaConstants.OK);
+			error.setDescription(cabeceraRes.getFechainicio().getTime() +"/"+cabeceraRes.getFechaFin().getTime());
 		}
 
 		insertResponseDTO.setError(error);
 
 		LOGGER.info(
-				"updateGuardiaColeg() -> Salida del servicio para insertar guardia de colegiado en cabeceras de guardias");
+				"insertGuardiaColeg() -> Salida del servicio para insertar guardia de colegiado en cabeceras de guardias");
 
 		return insertResponseDTO;
 	}

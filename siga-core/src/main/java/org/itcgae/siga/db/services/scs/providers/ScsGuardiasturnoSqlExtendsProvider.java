@@ -278,6 +278,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		if (idInstitucion != null &&  !idInstitucion.isEmpty()) {
 			sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		}
+		sql.WHERE("FECHABAJA IS NULL");
 		sql.ORDER_BY("nombre");
 
 		return sql.toString();

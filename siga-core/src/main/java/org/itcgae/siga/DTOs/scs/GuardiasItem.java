@@ -73,7 +73,12 @@ public class GuardiasItem {
 	private String sustituto;
 	private String idListaGuardia;
 	private String orden;
-
+	
+	//Aux para GuardiasColegiado
+	private String fechaIntro;
+	private String idCalendarioProgramado;
+	
+	
 	public String getIdListaGuardia() {
 		return idListaGuardia;
 	}
@@ -870,6 +875,22 @@ public class GuardiasItem {
 				", estadoGuardia=" + estadoGuardia + ", idCalendarioGuardias=" + idCalendarioGuardias +", facturado=" + facturado +
 				", idFacturacion =" + idFacturacion + ", observacionesAnulacion =" + observacionesAnulacion +", fechasustitucion =" + fechasustitucion +
 				", comensustitucion =" + comensustitucion + ", letradosustituido =" + letradosustituido + ", sustituto =" + sustituto +"]";
+	}
+
+	public String getFechaIntro() {
+		return fechaIntro;
+	}
+
+	public void setFechaIntro(String fechaIntro) {
+		this.fechaIntro = fechaIntro;
+	}
+
+	public String getIdCalendarioProgramado() {
+		return idCalendarioProgramado;
+	}
+
+	public void setIdCalendarioProgramado(String idCalendarioProgramado) {
+		this.idCalendarioProgramado = idCalendarioProgramado;
 	}
 
 

@@ -287,7 +287,7 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		return sql.toString();
 	}
 
-	public String deleteCabecerasGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia) {
+	public String deleteCabecerasGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia, String fechaInicio, String fechaFin) {
 
 		SQL sql = new SQL();
 
@@ -296,7 +296,8 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		sql.WHERE("IDCALENDARIOGUARDIAS = " + idCalendarioGuardias);
 		sql.WHERE("IDTURNO = " + idTurno);
 		sql.WHERE("IDGUARDIA = " + idGuardia);
-
+		sql.WHERE("FECHAINICIO >= TO_DATE('" + fechaInicio + "', 'dd/mm/yyyy')");
+		sql.WHERE("FECHA_FIN <= TO_DATE('" + fechaFin + "', 'dd/mm/yyyy')");
 		return sql.toString();
 
 	}

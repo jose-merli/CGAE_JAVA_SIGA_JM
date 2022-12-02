@@ -22,4 +22,7 @@ public interface ScsGrupoguardiacolegiadoExtendsMapper extends ScsGrupoguardiaco
 	@DeleteProvider(type=ScsGrupoguardiacolegiadoSqlExtendsProvider.class, method ="deleteRegistrosGrupoGuardiaCol")
 	public boolean deleteRegistrosGrupoGuardiaCol(Integer idCalendarioGuardias);
 
+	@DeleteProvider(type=ScsGrupoguardiacolegiadoSqlExtendsProvider.class, method ="deleteGuardiConcreto")
+	public boolean deleteGuardiConcreto(Short idInstitucion, int idGuardia, int idTurno,int idCalendarioGuardias, String fechaIni, String fechaFin);
+
 }
