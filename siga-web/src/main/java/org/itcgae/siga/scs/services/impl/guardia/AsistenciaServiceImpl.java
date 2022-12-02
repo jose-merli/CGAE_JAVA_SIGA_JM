@@ -2339,7 +2339,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
 						.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
-						.andFechainicioGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+						.andFechafinGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 
 				List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper
@@ -2520,7 +2520,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
 						.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
-						.andFechainicioGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+						.andFechafinGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 
 				List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper
