@@ -1257,7 +1257,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 						// Creamos inscripcion a turno
 						
-						if(respTurno != 0) {
+						if(respTurno != 0 && inscripcionesItem.getIdguardia() != null && !inscripcionesItem.getIdguardia().isEmpty()) {
 							// ScsInscripcionguardiaExample exampleguardia = new
 							// ScsInscripcionguardiaExample();
 							// exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
