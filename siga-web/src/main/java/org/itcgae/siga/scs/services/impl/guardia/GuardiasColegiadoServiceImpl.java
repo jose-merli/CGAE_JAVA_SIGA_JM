@@ -1036,7 +1036,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 		if ("S/C".equals(saltoOcompensacion) || "S".equals(saltoOcompensacion)) {
 			SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
-			scgi.setIdPersona(idPersona.toString());
+			scgi.setIdPersona(newLetrado.toString());
 			scgi.setIdGuardia(idGuardia.toString());
 			scgi.setIdTurno(idTurno.toString());
 			scgi.setFecha(fechaHoy);
