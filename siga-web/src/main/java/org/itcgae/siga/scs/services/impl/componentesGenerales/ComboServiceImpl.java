@@ -1061,6 +1061,38 @@ public class ComboServiceImpl implements ComboService {
 		return comboDTO;
 
 	}
+	
+	@Override
+	public ComboDTO comboGuardiasNoBajaNoExistentesEnListaGuardias(HttpServletRequest request, String idTurno, String idListaGuardias) {
+		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboGuardias() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
+
+				List<ComboItem> comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasNoBajaNoExistentesEnListaGuardias(idTurno, idListaGuardias,
+						idInstitucion.toString());
+
+				LOGGER.info(
+						"comboGuardias() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Salida a scsGuardiasturnoExtendsMapper para obtener las guardias");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboGuardias() -> Salida del servicio para obtener combo guardias");
+		}
+		return comboDTO;
+
+	}
 
 	@Override
 	public ComboDTO comboProcedimientosEXEA(HttpServletRequest request) {

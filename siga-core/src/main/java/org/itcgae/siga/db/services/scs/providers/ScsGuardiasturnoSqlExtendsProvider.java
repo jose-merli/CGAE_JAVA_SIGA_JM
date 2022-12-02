@@ -318,6 +318,33 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		return sql.toString();
 	}
 	
+	public String comboGuardiasNoBajaNoExistentesEnListaGuardias(String idTurno, String idListaGuardias, String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sqlSecundaria = new SQL();
+
+		sql.SELECT("NOMBRE");
+		sql.SELECT("IDGUARDIA");
+
+		sql.FROM("SCS_GUARDIASTURNO");
+		if (idTurno != null &&  !idTurno.isEmpty()) {
+			sql.WHERE("IDTURNO IN (" + idTurno + ")");
+		}
+		if (idInstitucion != null &&  !idInstitucion.isEmpty()) {
+			sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		}
+		sql.WHERE("FECHABAJA IS NULL");
+		
+		sqlSecundaria.SELECT("IDGUARDIA");
+		sqlSecundaria.FROM("SCS_CONF_CONJUNTO_GUARDIAS");
+		sqlSecundaria.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sqlSecundaria.WHERE("IDCONJUNTOGUARDIA = '" + idListaGuardias + "'");
+		
+		sql.WHERE("IDGUARDIA NOT IN (" + sqlSecundaria + ")");
+		sql.ORDER_BY("nombre");
+
+		return sql.toString();
+	}
+	
 	public String comboGuardiasGrupo(String idTurno, String idInstitucion) {
 		SQL sql = new SQL();
 		

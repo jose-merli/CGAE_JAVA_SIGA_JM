@@ -138,6 +138,12 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
+	@GetMapping("/guardiasNoBajaNoExistentesEnListaGuardias")
+	public ResponseEntity<ComboDTO> comboGuardiasNoBajaNoExistentesEnListaGuardias(HttpServletRequest request, String idTurno, String idListaGuardias) {
+		ComboDTO response = comboService.comboGuardiasNoBajaNoExistentesEnListaGuardias(request, idTurno, idListaGuardias);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping("/guardiasNoBaja")
 	public ResponseEntity<ComboDTO> comboGuardiasNoBaja(HttpServletRequest request, String idTurno) {
 		ComboDTO response = comboService.comboGuardiasNoBaja(request, idTurno);
