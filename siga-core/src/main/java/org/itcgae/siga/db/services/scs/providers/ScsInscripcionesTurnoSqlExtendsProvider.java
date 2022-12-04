@@ -19,7 +19,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"(\r\n" + 
 				"SELECT\r\n" + 
 				"    idturno,\r\n" + 
-				"    abreviatura as nom\r\n" + 
+				"    nombre as nom\r\n" + 
 				"FROM\r\n" + 
 				"    scs_turno\r\n" + 
 				"WHERE\r\n" + 
@@ -31,7 +31,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"select consultaBaja.* from (\r\n" + 
 				"SELECT\r\n" + 
 				"    idturno,\r\n" + 
-				"    DECODE(fechabaja,NULL,NULL, '(Baja) ' || abreviatura || ' ') nom");
+				"    DECODE(fechabaja,NULL,NULL, '(Baja) ' || nombre || ' ') nom");
 		sql.FROM("SCS_TURNO");
 		sql.WHERE("idinstitucion = '"+idInstitucion+"'" + 
 				"    AND   fechabaja IS NOT NULL\r\n)" + 
