@@ -174,4 +174,6 @@ public interface GuardiasService {
 	public DeleteResponseDTO deleteCalendariosProgramados(List<DeleteCalendariosProgDatosEntradaItem> listDeleteCalBody,
 			HttpServletRequest request);
 
+	public ComboDTO getComboDiasDisponiblesGC(HttpServletRequest request, GuardiasItem guardiaDia);
+
 }

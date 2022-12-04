@@ -171,5 +171,20 @@ public class ScsGrupoguardiacolegiadoSqlExtendsProvider extends ScsGrupoguardiac
 		return sql.toString();
 
 	}
+	
+	public String deleteGuardiConcreto(Short idInstitucion, int idGuardia, int idTurno,int idCalendarioGuardias, String fechaIni, String fechaFin) {
+
+		SQL sql = new SQL();
+
+		sql.DELETE_FROM("SCS_CALENDARIOGUARDIAS");
+		sql.WHERE("IDCALENDARIOGUARDIAS = " + idCalendarioGuardias);
+		sql.WHERE("IDGUARDIA = "+ idGuardia);
+		sql.WHERE("IDTURNO = " + idTurno );
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("FECHAINICIO >= TO_DATE('" + fechaIni + "', 'dd/mm/yyyy')");
+		sql.WHERE("FECHAFIN <= TO_DATE('" + fechaFin + "', 'dd/mm/yyyy')");
+		return sql.toString();
+
+	}
 
 }

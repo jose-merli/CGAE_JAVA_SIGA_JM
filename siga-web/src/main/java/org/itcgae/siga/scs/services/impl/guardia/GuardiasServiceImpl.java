@@ -2023,6 +2023,61 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		return updateResponseDTO;
 	}
+	
+	public ComboDTO getComboDiasDisponiblesGC(HttpServletRequest request, GuardiasItem guardiaItem) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"getComboDiasDisponiblesGC() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"getComboDiasDisponiblesGC() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && usuarios.size() > 0) {
+
+					List<ComboItem> combosItems = new ArrayList<ComboItem>();
+					
+					ArrayList<ArrayList<String>> fechasDisponibles = this.obtenerPeriodosGuardiaFijo(guardiaItem, idInstitucion.toString());
+					for(ArrayList<String> listaPe : fechasDisponibles) {
+						ComboItem comboItem = new ComboItem();
+						String listString = String.join(", ", listaPe);
+						comboItem.setLabel(listString);
+						comboItem.setValue(listString);
+						combosItems.add(comboItem);
+					}
+					comboDTO.setCombooItems(combosItems);
+					
+
+					if (combosItems == null || combosItems.isEmpty()) {
+
+						error.setCode(200);
+						error.setMessage("sjcs.guardia.asistencia.nohayguardia");
+						error.description("sjcs.guardia.asistencia.nohayguardia");
+						comboDTO.setError(error);
+
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("getComboDiasDisponiblesGC() / ERROR: " + e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al obtener combo fechas disponibles GC " + e);
+			error.description("Error al obtener combo fechas disponibles GC " + e);
+			comboDTO.setError(error);
+		}
+		return comboDTO;
+	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -3096,8 +3151,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						ScsCabeceraguardias cabeceraguardias = listaCabeceras.get(0);
 						this.borrarGeneracionCalendario(itemDeleteOption.get(), usuarios,
 								cabeceraguardias.getIdcalendarioguardias());
-						this.borrarRegistrosCalendario(itemDeleteOption.get(),
-								cabeceraguardias.getIdcalendarioguardias());
+						//this.borrarRegistrosCalendario(itemDeleteOption.get(),
+						//		cabeceraguardias.getIdcalendarioguardias());
 					}
 //					//Eliminación de tablaa hcof
 					this.scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado1(
@@ -3995,21 +4050,29 @@ public class GuardiasServiceImpl implements GuardiasService {
 						// es correcto.
 						// Si hay != 0 entonces el error sería “Ya existen calendarios generados para
 						// las fechas seleccionadas o futuras”.
-						if (!calendarioItem.getFechaDesde().isEmpty() && calendarioItem.getFechaDesde() != null
-								&& !calendarioItem.getFechaHasta().isEmpty()
-								&& calendarioItem.getFechaHasta() != null) {
-							int numGuards = scsGuardiasturnoExtendsMapper.getGuardiasToProg(calendarioItem,
-									idInstitucion.toString());
-							if (numGuards != 0) {
-								errorGuardiaAsociadas = true;
-								error.setCode(204);
-								error.setDescription(
-										"Ya existen calendarios generados para las fechas seleccionadas o futuras");
-								error.setMessage(
-										"Ya existen calendarios generados para las fechas seleccionadas o futuras");
-								insertResponseDTO.setStatus("ERRORASOCIADAS");
+						if(!calendarioItem.getGuardias().isEmpty()) {
+							for(GuardiaCalendarioItem guardiaItem :calendarioItem.getGuardias() ) {
+								DatosCalendarioProgramadoItem comprobacionItem = calendarioItem;
+								comprobacionItem.setIdGuardia(guardiaItem.getGuardia());
+								comprobacionItem.setIdTurno(guardiaItem.getTurno());
+								int numGuards = scsGuardiasturnoExtendsMapper.getGuardiasToProg(calendarioItem,
+										idInstitucion.toString());
+								if (numGuards != 0) {
+									errorGuardiaAsociadas = true;
+									error.setCode(204);
+									error.setDescription(
+											"Ya existen calendarios generados para las fechas seleccionadas o futuras");
+									error.setMessage(
+											"Ya existen calendarios generados para las fechas seleccionadas o futuras");
+									insertResponseDTO.setStatus("ERRORASOCIADAS");
+									break;
+								}
 							}
+		
+							
+							
 						}
+						
 					}
 					if (!errorGuardiaAsociadas) {
 						if (calendarioItem.getIdCalG() == null
@@ -5235,6 +5298,17 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return scsGuardiasturnoExtendsMapper.getFestivosTurno(fechaInicio, fechaFinOk.toString(),
 				idInstitucion1.toString(), Integer.toString(INSTITUCION_CGAE), idTurno.toString());
 	}
+	List<String> obtenerFestivosTurnoFijo(Integer idInstitucion, Integer idTurno, String fechaInicio, Date fechaFin)
+			throws Exception {
+		LocalDate date4 = ZonedDateTime
+				.parse(fechaFin.toString(), DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH))
+				.toLocalDate();
+		String OLD_FORMAT = "yyyy-MM-dd";
+		String NEW_FORMAT = "dd/MM/yyyy";
+		String fechaFinOk = changeDateFormat(OLD_FORMAT, NEW_FORMAT, date4.toString());
+		return scsGuardiasturnoExtendsMapper.getFestivosTurno(fechaInicio, fechaFinOk.toString(),
+				idInstitucion.toString(), Integer.toString(INSTITUCION_CGAE), idTurno.toString());
+	}
 
 	Calendar StringToCalendar(String date) throws ParseException {
 		Calendar cal = Calendar.getInstance();
@@ -5330,6 +5404,72 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 	}
 
+	private ArrayList<ArrayList<String>> obtenerPeriodosGuardiaFijo(GuardiasItem guardiaItem, String idInstitucion) throws Exception {
+		// Variables
+		ArrayList arrayDiasGuardiaCGAE;
+		PeriodoEfectivoItem periodoEfectivo;
+		ArrayList<String> arrayDias;
+		Iterator iter;
+		Date fecha;
+		String sFecha;
+		SimpleDateFormat datef = new SimpleDateFormat("dd/MM/yyyy");
+		GuardiasTurnoItem guardiaConf = null;
+		ArrayList<ArrayList<String>> listaFinal = new ArrayList<ArrayList<String>>();
+
+		try {
+
+			
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+			String fechaIni = dateFormat.format(guardiaItem.getFechadesde());  
+			String fechaFin = dateFormat.format(guardiaItem.getFechahasta()); 
+			
+			
+				List<GuardiasTurnoItem> vGuardias = scsGuardiasturnoExtendsMapper.getAllDatosGuardia(idInstitucion, guardiaItem.getIdTurno(),
+						guardiaItem.getIdGuardia());
+				if (!vGuardias.isEmpty())
+					guardiaConf = vGuardias.get(0);
+				
+				// 3. CALENDARIO FESTIVOS:
+				Calendar calFechaFin = StringToCalendar(fechaFin);
+				calFechaFin.add(Calendar.MONTH, 1); // sumamos 1 mes
+
+				List<String> diasFestivos = this.obtenerFestivosTurnoFijo(Integer.parseInt(idInstitucion), Integer.parseInt(guardiaItem.getIdTurno()), fechaIni, calFechaFin.getTime());
+			
+
+			// generando la matriz de periodos
+			CalendarioAutomatico calendarioAutomatico = new CalendarioAutomatico(guardiaConf, fechaIni,
+					fechaFin, diasFestivos);
+			
+			arrayDiasGuardiaCGAE = calendarioAutomatico.obtenerMatrizDiasGuardia();
+			
+			
+
+			// recorriendo lista de periodos para anhadir en cada periodo
+			// las fechas de dias de guardia en formato corto
+			for (int i = 0; i < arrayDiasGuardiaCGAE.size(); i++) {
+				periodoEfectivo = (PeriodoEfectivoItem) arrayDiasGuardiaCGAE.get(i);
+
+				// obteniendo los dis por cada periodo
+				arrayDias = new ArrayList<String>();
+				iter = periodoEfectivo.iterator();
+				while (iter.hasNext()) {
+					fecha = (Date) iter.next();
+					sFecha = datef.format(fecha);
+					arrayDias.add(sFecha);
+				}
+
+				// insertando lista de dias (en formato corto) para el generador posterior
+				// Nota: no se insertan los arrays de periodos vacios que si guarda el CGAE
+				if (!arrayDias.isEmpty())
+					listaFinal.add(arrayDias);
+			}
+
+			return listaFinal;
+
+		} catch (Exception e) {
+			throw new Exception(e + ": Excepcion al calcular la matriz de periodos de dias de guardias.");
+		}
+	}
 	public List<Integer> getDiasASeparar(Integer idInstitucion, Integer idTurno, Integer idGuardia) throws Exception {
 		List<String> alDiasASeparar = getDiasASeparar2(idInstitucion, idTurno, idGuardia);
 		List<Integer> alDiasASepararEnUnidadesDiarias = null;
@@ -9410,14 +9550,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private void borrarRegistrosCalendario(DeleteCalendariosProgDatosEntradaItem deleteCalBody,
 			Integer idCalendarioGuardias) {
 		this.scsGrupoguardiacolegiadoExtendsMapper.deleteRegistrosGrupoGuardiaCol(idCalendarioGuardias);
-
+		this.scsGrupoguardiacolegiadoExtendsMapper.deleteGuardiConcreto(Short.valueOf(deleteCalBody.getIdInstitucion()),Integer.parseInt(deleteCalBody.getIdGuardia()),
+				Integer.parseInt(deleteCalBody.getIdTurno()),idCalendarioGuardias,
+				deleteCalBody.getFechaDesde(), deleteCalBody.getFechaHasta());
 		// Eliminamos el calendario guardia en concreto
-		ScsCalendarioguardiasKey calKey = new ScsCalendarioguardias();
+		/*ScsCalendarioguardiasKey calKey = new ScsCalendarioguardias();
 		calKey.setIdinstitucion(Short.valueOf(deleteCalBody.getIdInstitucion()));
 		calKey.setIdguardia(Integer.valueOf(deleteCalBody.getIdGuardia()));
 		calKey.setIdturno(Integer.valueOf(deleteCalBody.getIdTurno()));
 		calKey.setIdcalendarioguardias(idCalendarioGuardias);
-		scsCalendarioguardiasMapper.deleteByPrimaryKey(calKey);
+		ScsCalendarioguardias itemToDel = scsCalendarioguardiasMapper.selectByPrimaryKey(calKey);*/
+		//if(itemToDel != null)
+		//scsCalendarioguardiasMapper.deleteByPrimaryKey(itemToDel);
+		//this.scsGrupoguardiacolegiadoExtendsMapper (Short.valueOf(deleteCalBody.getIdInstitucion()
+			//	,Integer.valueOf(deleteCalBody.getIdGuardia(),Integer.valueOf(deleteCalBody.getIdTurno(),idCalendarioGuardias);
+		
 	}
 
 	/*
@@ -9513,7 +9660,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 				deleteCalBody.getFechaDesde(), deleteCalBody.getFechaHasta());
 		this.scsCabeceraguardiasExtendsMapper.deleteCabecerasGuardiasCalendario(
 				Integer.valueOf(deleteCalBody.getIdInstitucion()), Integer.valueOf(idCalendarioGuardias),
-				Integer.valueOf(deleteCalBody.getIdTurno()), Integer.valueOf(deleteCalBody.getIdGuardia()));
+				Integer.valueOf(deleteCalBody.getIdTurno()), Integer.valueOf(deleteCalBody.getIdGuardia()),
+						deleteCalBody.getFechaDesde(), deleteCalBody.getFechaHasta());
 		// Antiguo metodo error por encontrar varios elementos a eliminar, se pasa a
 		// hacer metodo para eliminar uno a uno.
 
@@ -9541,6 +9689,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 		registro.setFechamodificacion(new Date());
 
 		scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(registro);
+		
+		this.scsGrupoguardiacolegiadoExtendsMapper.deleteRegistrosGrupoGuardiaCol(idCalendarioGuardias);
+		this.scsGrupoguardiacolegiadoExtendsMapper.deleteGuardiConcreto(Short.valueOf(deleteCalBody.getIdInstitucion()),Integer.parseInt(deleteCalBody.getIdGuardia()),
+				Integer.parseInt(deleteCalBody.getIdTurno()),idCalendarioGuardias,
+				deleteCalBody.getFechaDesde(), deleteCalBody.getFechaHasta());
 
 	}
 
