@@ -521,47 +521,100 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         SQL sql = new SQL();
 
         // Select
-        sql.SELECT("'ACTUAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION, "+ idLenguaje+") AS formaPago,"
-                +"COUNT(*) AS numeroFacturas, SUM(ff.IMPTOTAL) AS total, SUM(ff.IMPTOTALPORPAGAR) AS totalPendiente");
-
-        // From
+        sql.SELECT(" 'ACTUAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION," + idLenguaje + ") AS formaPago, COUNT(*) AS numeroFacturas, SUM(ff.IMPTOTAL) AS total,"
+        		+" SUM(ff.IMPTOTALPAGADO) AS totalCobrado, SUM(ff.IMPTOTALPORPAGAR) AS totalPendiente ");
+        
+     // From
         sql.FROM("FAC_FACTURA ff");
-        sql.INNER_JOIN("PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
-
-        // Where
-        sql.WHERE("ff.IDINSTITUCION = " + idInstitucion);
-        sql.WHERE("ff.IDSERIEFACTURACION = " + idSerieFacturacion);
-        sql.WHERE("ff.IDPROGRAMACION = " + idProgramacion);
-
-        // Order by
+        sql.INNER_JOIN(" PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
+        
+     // Where
+        sql.WHERE(" ff.IDINSTITUCION = " + idInstitucion + " AND ff.IDSERIEFACTURACION = " + idSerieFacturacion + " AND ff.IDPROGRAMACION = " + idProgramacion
+        + "and not exists (select 1 from fac_factura ff2 where ff2.IDINSTITUCION = ff.IDINSTITUCION and ff2.COMISIONIDFACTURA = ff.IDFACTURA)");
+        
         sql.GROUP_BY("pf.DESCRIPCION");
-
         return sql.toString();
     }
 
     public String getInformeFacturacionOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje) {
         SQL sql = new SQL();
-
+      
+        
         // Select
-        sql.SELECT("'ORIGINAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION, "+ idLenguaje+") AS formaPago,"
-                +"COUNT(*) AS numeroFacturas, SUM(fh.IMPTOTALPAGADO) AS total, SUM(fh.IMPTOTALPORPAGAR) AS totalPendiente");
-
+        sql.SELECT("'ORIGINAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION, " + idLenguaje +") AS formaPago,"+"COUNT(*) AS numeroFacturas, SUM(ff.IMPTOTAL) AS total,"
+        			+"0 AS Cobrado, SUM(fh.IMPTOTALPORPAGAR) AS totalPendiente");
+        
         // From
         sql.FROM("FAC_FACTURA ff");
-        sql.INNER_JOIN("FAC_HISTORICOFACTURA fh ON (ff.IDINSTITUCION = fh.IDINSTITUCION AND ff.IDFACTURA = fh.IDFACTURA AND fh.IDHISTORICO = 1)");
-        sql.INNER_JOIN("PYS_FORMAPAGO pf ON (ff.IDFORMAPAGO = pf.IDFORMAPAGO)");
-
-        // Where
-        sql.WHERE("ff.IDINSTITUCION = " + idInstitucion);
-        sql.WHERE("ff.IDSERIEFACTURACION = " + idSerieFacturacion);
-        sql.WHERE("ff.IDPROGRAMACION = " + idProgramacion);
-
+        sql.INNER_JOIN("FAC_FACTURACIONPROGRAMADA PROG on (Ff.IDINSTITUCION = PROG.IDINSTITUCION AND Ff.IDSERIEFACTURACION = PROG.IDSERIEFACTURACION"
+        				+ " AND Ff.IDPROGRAMACION = PROG.IDPROGRAMACION and trunc(ff.FECHAEMISION) = trunc(prog.FECHAREALGENERACION))");
+        sql.INNER_JOIN("FAC_HISTORICOFACTURA fh ON (ff.IDINSTITUCION = fh.IDINSTITUCION AND ff.IDFACTURA = fh.IDFACTURA AND fh.IDHISTORICO = 1)"); 
+        sql.INNER_JOIN("PYS_FORMAPAGO pf ON (fh.IDFORMAPAGO = pf.IDFORMAPAGO)");
+       
+     // Where
+        sql.WHERE("ff.IDINSTITUCION = " + idInstitucion + " AND ff.IDSERIEFACTURACION = " +  idSerieFacturacion + " AND ff.IDPROGRAMACION = " + idProgramacion);
+      
         // Order by
         sql.GROUP_BY("pf.DESCRIPCION");
+                
+        
 
         return sql.toString();
     }
 
+    public String getInformeFacturacionAnticipadoCaja(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje) {
+        SQL sql = new SQL();
+      
+        
+        // Select
+        sql.SELECT("'ANTICIPADO CAJA' as momento, f_siga_getrecurso(pf.DESCRIPCION, " + idLenguaje + ") AS FORMA_PAGO, COUNT(*) AS NUM_FACTURAS, SUM(ff.IMPTOTAL) AS total,"
+        			+ "SUM(ff.IMPTOTALANTICIPADO) AS ANTICIPADO, SUM(ff.IMPTOTALPORPAGAR) AS totalPendiente");
+     // From	
+       	sql.FROM(" FAC_FACTURA Ff ");
+        sql.INNER_JOIN( " FAC_FACTURACIONPROGRAMADA PROG on Ff.IDINSTITUCION = PROG.IDINSTITUCION AND Ff.IDSERIEFACTURACION = PROG.IDSERIEFACTURACION "
+        			+ " AND Ff.IDPROGRAMACION = PROG.IDPROGRAMACION and trunc(Ff.FECHAEMISION) = trunc(prog.FECHAREALGENERACION)" );
+        sql.INNER_JOIN( " PYS_FORMAPAGO pf on ff.IDFORMAPAGO = pf.IDFORMAPAGO ");
+        
+        // Where
+        sql.WHERE(" ff.IDINSTITUCION = " + idInstitucion +  " AND ff.IDSERIEFACTURACION = " + idSerieFacturacion + " AND ff.IDPROGRAMACION = " + idProgramacion + 
+        		 "and Ff.IMPTOTALANTICIPADO > 0" );
+        	
+        // order by
+        sql.GROUP_BY(" pf.DESCRIPCION ") ;                       
+        
+
+        return sql.toString();
+    }
+
+    public String getInformeFacturacionAdeudoOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje) {
+       
+    	SQL sql = new SQL();
+          
+        
+        sql.SELECT(" 'ADEUDO ORIGINAL' as momento, F_SIGA_GETRECURSO(pf.DESCRIPCION, " + idLenguaje +  ") AS formaPago, COUNT(*) AS numeroFacturas, SUM(ff.IMPTOTAL) AS total, "
+        		+ " SUM(fh.IMPTOTALPAGADO) AS Cobrado, SUM(fh.IMPTOTALPORPAGAR) AS totalPendiente");
+        
+        
+	    sql.FROM(" FAC_FACTURA ff ");
+	    
+	    
+	    sql.INNER_JOIN(" FAC_FACTURACIONPROGRAMADA PROG on (Ff.IDINSTITUCION = PROG.IDINSTITUCION AND Ff.IDSERIEFACTURACION = PROG.IDSERIEFACTURACION AND "
+	    		+" Ff.IDPROGRAMACION = PROG.IDPROGRAMACION and trunc(ff.FECHAEMISION) = trunc(prog.FECHAREALGENERACION))");
+	    sql.INNER_JOIN(" FAC_HISTORICOFACTURA fh ON (ff.IDINSTITUCION = fh.IDINSTITUCION AND ff.IDFACTURA = fh.IDFACTURA and fh.IDTIPOACCION = 5 "
+	    		+ " and trunc(fh.FECHAMODIFICACION) = trunc(ff.FECHAEMISION)) ");
+	    sql.INNER_JOIN(" PYS_FORMAPAGO pf ON (fh.IDFORMAPAGO = pf.IDFORMAPAGO) ");
+	    
+	    sql.WHERE (" ff.IDINSTITUCION = " + idInstitucion + " AND ff.IDSERIEFACTURACION = " + idSerieFacturacion + " AND ff.IDPROGRAMACION = " + idProgramacion);
+	    
+	    
+	    sql.GROUP_BY( " pf.DESCRIPCION ");
+      
+                               
+        
+
+        return sql.toString();
+    }
+    
     public String getNewFacturaID(String idInstitucion) {
 
         SQL query = new SQL();
