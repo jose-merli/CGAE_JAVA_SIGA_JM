@@ -295,7 +295,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("consulta.nombre as nombresolo");
 		sql.SELECT(
 				"LISTAGG(DISTINCT consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc) AS ASUNTOS");
-		sql.SELECT("count(consulta.asunto) as numeroasuntos");
+		sql.SELECT("count(DISTINCT consulta.asunto) as numeroasuntos");
 		sql.SELECT(
 				"nvl(SUBSTR(LISTAGG(DISTINCT consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc), 0, INSTR(LISTAGG(DISTINCT consulta.asunto, ', ')"
 						+ "		WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc), ',')-1),"
@@ -310,7 +310,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlUnidadFamiliar.SELECT("per.apellido1");
 		sqlUnidadFamiliar.SELECT("per.apellido2");
 		sqlUnidadFamiliar.SELECT("e.fechaapertura as fechamodificacionasunto");
-		sqlUnidadFamiliar.SELECT("concat('E' || unidadFamiliar.anio || '/',lpad(e.NumEJG,5,'0') ) as asunto");
+		sqlUnidadFamiliar.SELECT("concat('E' || unidadFamiliar.anio || '/',e.NumEJG ) as asunto");
 		sqlUnidadFamiliar.FROM("SCS_PERSONAJG per");
 		sqlUnidadFamiliar.INNER_JOIN(
 				"SCS_UNIDADFAMILIAREJG unidadFamiliar on unidadFamiliar.idpersona = per.idpersona and unidadFamiliar.idinstitucion = per.idinstitucion");
@@ -341,7 +341,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrarioEjg.SELECT("per.apellido1");
 		sqlContrarioEjg.SELECT("per.apellido2");
 		sqlContrarioEjg.SELECT("e.fechaapertura as fechamodificacionasunto");
-		sqlContrarioEjg.SELECT("concat('E' || CONTRARIOEJG.anio || '/',lpad(e.NumEJG,5,'0') ) as asunto");
+		sqlContrarioEjg.SELECT("concat('E' || CONTRARIOEJG.anio || '/',e.NumEJG ) as asunto");
 		sqlContrarioEjg.FROM("SCS_PERSONAJG per");
 		sqlContrarioEjg.INNER_JOIN(
 				"SCS_CONTRARIOSEJG CONTRARIOEJG  on CONTRARIOEJG.idpersona = per.idpersona and CONTRARIOEJG.idinstitucion = per.idinstitucion");
@@ -372,7 +372,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrariosDesigna.SELECT("per.apellido1");
 		sqlContrariosDesigna.SELECT("per.apellido2");
 		sqlContrariosDesigna.SELECT("d.FECHAENTRADA  as fechamodificacionasunto");
-		sqlContrariosDesigna.SELECT("concat('D' || CONTRARIOSDESIGNA.anio || '/',lpad(d.codigo,5,'0') ) as asunto");
+		sqlContrariosDesigna.SELECT("concat('D' || CONTRARIOSDESIGNA.anio || '/',d.codigo) as asunto");
 		sqlContrariosDesigna.FROM("SCS_PERSONAJG per");
 		sqlContrariosDesigna.INNER_JOIN(
 				"SCS_CONTRARIOSDESIGNA CONTRARIOSDESIGNA on CONTRARIOSDESIGNA.idpersona = per.idpersona and CONTRARIOSDESIGNA.idinstitucion = per.idinstitucion");
@@ -403,7 +403,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlDefendidosDesigna.SELECT("per.apellido1");
 		sqlDefendidosDesigna.SELECT("per.apellido2");
 		sqlDefendidosDesigna.SELECT("d.FECHAENTRADA  as fechamodificacionasunto");
-		sqlDefendidosDesigna.SELECT("concat('D' || DEFENDIDOSDESIGNA.anio || '/',lpad(d.codigo,5,'0') ) as asunto");
+		sqlDefendidosDesigna.SELECT("concat('D' || DEFENDIDOSDESIGNA.anio || '/',d.codigo ) as asunto");
 		sqlDefendidosDesigna.FROM("SCS_PERSONAJG per");
 		sqlDefendidosDesigna.INNER_JOIN(
 				"SCS_DEFENDIDOSDESIGNA DEFENDIDOSDESIGNA on DEFENDIDOSDESIGNA.idpersona = per.idpersona and DEFENDIDOSDESIGNA.idinstitucion = per.idinstitucion");
@@ -434,7 +434,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlSoj.SELECT("per.apellido1");
 		sqlSoj.SELECT("per.apellido2");
 		sqlSoj.SELECT("SOJ.FECHAAPERTURA as fechamodificacionasunto");
-		sqlSoj.SELECT("concat('S' || SOJ.anio || '/',lpad(SOJ.numSOJ,5,'0') ) as asunto");
+		sqlSoj.SELECT("concat('S' || SOJ.anio || '/',SOJ.numSOJ ) as asunto");
 		sqlSoj.FROM("SCS_PERSONAJG per");
 		sqlSoj.INNER_JOIN("SCS_SOJ SOJ  on SOJ.idpersonajg = per.idpersona and SOJ.idinstitucion = per.idinstitucion");
 		sqlSoj.WHERE("SOJ.idinstitucion = '" + idInstitucion + "'");
@@ -549,7 +549,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlEJG.SELECT("per.apellido1");
 		sqlEJG.SELECT("per.apellido2");
 		sqlEJG.SELECT("EJG.fechaapertura as fechamodificacionasunto");
-		sqlEJG.SELECT("concat('E' || EJG.anio || '/',lpad(EJG.NumEJG,5,'0') ) as asunto");
+		sqlEJG.SELECT("concat('E' || EJG.anio || '/',EJG.NumEJG) as asunto");
 		sqlEJG.FROM("SCS_PERSONAJG per");
 		sqlEJG.INNER_JOIN(
 				"SCS_EJG EJG  on per.idpersona = EJG.idpersonajg and EJG.idinstitucion = per.idinstitucion");
