@@ -8,9 +8,7 @@ import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.Context;
@@ -19,6 +17,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
@@ -65,6 +64,7 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
@@ -73,6 +73,7 @@ import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
 import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
@@ -92,6 +93,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTipoidentificacionExtendsMappe
 import org.itcgae.siga.db.services.cen.mappers.CenTiposolicitudExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
+import org.itcgae.siga.gen.services.IControlResidenciaService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -185,6 +187,12 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
+	
+	@Autowired
+	private IControlResidenciaService controlResidenciaService;
+	
+	@Autowired
+	private GenParametrosMapper genParametroMapper;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -715,6 +723,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		int insertColegiado;
 		int insertCliente;
 		int updateSolicitud = 0;
+		
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
 		CenSolicitudincorporacion solIncorporacion;
@@ -734,8 +743,19 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
+					
 					AdmUsuarios usuario = usuarios.get(0);
 					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
+					
+					// Se comprueba el colegiado para detectar si se generaría una anomalía de residencia con su aprobación
+					// Validacion de nuevo parametro para comprobar si se detecta anomalias por institucion o no.
+					Boolean hasToCheckAnomalias = this.checkValueParameter("VALIDACION_ANOMALIAS_RESIDENCIA", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
+					
+					if (hasToCheckAnomalias) {
+						detectarAnomalia(solIncorporacion);
+					}
+					
+					
 					//insertamos datos personales
 					idPersona = insertarDatosPersonales(solIncorporacion, usuario);
 					insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
@@ -834,8 +854,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					}
 					
 				}catch(Exception e){
-					
+					LOGGER.error(e.getMessage());
 					error.setMessage(e.getMessage());
+					error.setDescription(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 					response.setError(error);
 					LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> ERROR: " + e.getMessage());
@@ -846,7 +867,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		LOGGER.info("aprobarSolicitud() -> Salida del servicio para aprobar una solicitud");
 		return response;
 	}
-	
+
 	@Override
 	public InsertResponseDTO denegarsolicitud(Long idSolicitud, HttpServletRequest request) {
 		LOGGER.info("denegarsolicitud() -> Entrada al servicio para denegar una solicitud.");
@@ -1844,4 +1865,52 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		return id.idMax;
 	}
 
+	/**
+	 * Comprueba si se generaría una anomalía de residencia en el colegiado
+	 * @param nif 
+	 * @return true si se ha detectado un caso que produciría una anomalía, false si no
+	 */
+	private void detectarAnomalia(CenSolicitudincorporacion solicitudIncorporacion) throws Exception{
+		boolean anomaliaDetectada = true;
+		
+		// Comprueba si se generaría una anomalía
+		anomaliaDetectada = controlResidenciaService.compruebaColegiacionEnVigor(solicitudIncorporacion);
+		
+		if (anomaliaDetectada) {
+			LOGGER.error("aprobarSolicitud() --> Se ha detectado un caso que generaría una anomalía de residencia en el colegiado");
+			throw new Exception("No se permite aprobar la solicitud porque generaría una anomalía de residencia en el colegiado");
+		}
+	}
+	
+	
+	private Boolean checkValueParameter(String parameter, Short idInstitucion) {
+		
+		GenParametrosExample paramExample = new GenParametrosExample();
+		Boolean resultReturn = null;
+
+		LOGGER.info(
+				"checkValueParameter() / genParametroMapper.selectByExample() -> Entrada a GenParametrosMapper para obtener información del parametro para checkear anomalias en validacion de residencia");
+		
+		paramExample.createCriteria().andParametroEqualTo(parameter).andIdinstitucionEqualTo(idInstitucion);
+		
+		List<GenParametros> paramResults = genParametroMapper.selectByExample(paramExample);
+
+		if (CollectionUtils.isEmpty(paramResults)) {
+			LOGGER.info(
+					"SolicitudIncorporacionService/checkValueParameter() --> No se ha obtenido ningun valor del parametro (" + parameter + ") para la institucion (" + idInstitucion + "). Se procede a la busqueda por defecto.");
+
+			paramExample = new GenParametrosExample();
+			paramExample.createCriteria().andParametroEqualTo(parameter).andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0_SHORT);
+			paramResults = genParametroMapper.selectByExample(paramExample);
+		}
+		
+		LOGGER.info(
+		"checkValueParameter() / genParametroMapper.selectByExample() -> Salida de GenParametrosMapper para obtener información del parametro para checkear anomalias en validacion de residencia");
+
+		String paramResValue = !CollectionUtils.isEmpty(paramResults) ? paramResults.get(0).getValor() : "";
+		
+		
+		return !paramResValue.isEmpty() && ("S".equalsIgnoreCase(paramResValue) || "1".equalsIgnoreCase(paramResValue) || Boolean.parseBoolean(paramResValue)) ? Boolean.TRUE : Boolean.FALSE;
+	}	
+	
 }

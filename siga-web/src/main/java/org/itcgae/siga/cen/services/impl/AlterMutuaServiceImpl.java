@@ -105,33 +105,37 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					GetEstadoSolicitud requestBody = GetEstadoSolicitud.Factory.newInstance();
 					CenSolicitudincorporacion solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(estadosolicitudDTO.getIdSolicitud());
 					
-					CenSolicitudalterExample solAlterExample = new CenSolicitudalterExample();
-					solAlterExample.createCriteria().andNombreEqualTo(solIncorporacion.getNombre()).andDomicilioEqualTo(solIncorporacion.getDomicilio())
-						.andCodigopostalEqualTo(solIncorporacion.getCodigopostal());
-					
-					List<CenSolicitudalter> solAlter = _cenSolicitudalterMapper.selectByExample(solAlterExample);
-					if(solAlter.size() > 0){
-						CenSolicitudalter solicitud = solAlter.get(0);
-						jsonObject.put("intIdSolicitud", Math.toIntExact(solicitud.getIdsolicitudalter()));
-						jsonObject.put("bolDuplicado", estadosolicitudDTO.isDuplicado());
-						requestBody.setIntIdSolicitud(Math.toIntExact(solicitud.getIdsolicitudalter()));
-						requestBody.setBolDuplicado(estadosolicitudDTO.isDuplicado());
-						request.setGetEstadoSolicitud(requestBody);
-						LOGGER.info("solicitud.getIdsolicitudalter() --> " + solicitud.getIdsolicitudalter());
-						LOGGER.info("estadosolicitudDTO.isDuplicado() --> " + estadosolicitudDTO.isDuplicado());
+					if (solIncorporacion != null) {
+						CenSolicitudalterExample solAlterExample = new CenSolicitudalterExample();
+						solAlterExample.createCriteria().andNombreEqualTo(solIncorporacion.getNombre()).andDomicilioEqualTo(solIncorporacion.getDomicilio())
+							.andCodigopostalEqualTo(solIncorporacion.getCodigopostal());
 						
-						JsonNode responseAPI = _clientAlterMutua.APICall(jsonObject, uriService + "/AlterApp/GetRequestStatusSIGA");
-						
-						if (responseAPI != null) {
+						List<CenSolicitudalter> solAlter = _cenSolicitudalterMapper.selectByExample(solAlterExample);
+						if(solAlter.size() > 0){
+							CenSolicitudalter solicitud = solAlter.get(0);
+							jsonObject.put("intIdSolicitud", Math.toIntExact(solicitud.getIdsolicitudalter()));
+							jsonObject.put("bolDuplicado", estadosolicitudDTO.isDuplicado());
+							requestBody.setIntIdSolicitud(Math.toIntExact(solicitud.getIdsolicitudalter()));
+							requestBody.setBolDuplicado(estadosolicitudDTO.isDuplicado());
+							request.setGetEstadoSolicitud(requestBody);
+							LOGGER.info("solicitud.getIdsolicitudalter() --> " + solicitud.getIdsolicitudalter());
+							LOGGER.info("estadosolicitudDTO.isDuplicado() --> " + estadosolicitudDTO.isDuplicado());
 							
-							responseDTO.setDocumento(responseAPI.get("Documento").binaryValue());
-							responseDTO.setError(responseAPI.get("Error").asBoolean());
-							responseDTO.setMensaje(responseAPI.get("Mensaje").asText());
+							JsonNode responseAPI = _clientAlterMutua.APICall(jsonObject, uriService + "/AlterApp/GetRequestStatusSIGA");
+							
+							if (responseAPI != null) {
+								
+								responseDTO.setDocumento(responseAPI.get("Documento").binaryValue());
+								responseDTO.setError(responseAPI.get("Error").asBoolean());
+								responseDTO.setMensaje(responseAPI.get("Mensaje").asText());
+							}
+						} else{
+							responseDTO.setError(true);
+							responseDTO.setMensaje("No existe solicitud de Alter mutua");
 						}
-						
 					}else{
 						responseDTO.setError(true);
-						responseDTO.setMensaje("No existe solicitud de Alter mutua");
+						responseDTO.setMensaje("No se ha podido encontrar la solicitud de incorporación");
 					}
 				}else{
 //				AÑADIR BÚSQUEDA EN CEN_COLEGIADO DONDE BUSQUE LOS DATOS DE LA PERSONA IGUAL QUE HACE ARRIBA EN CASO DE LA SOLICITUD DE INCORP. PARA ASÍ CONTROLAR LA 

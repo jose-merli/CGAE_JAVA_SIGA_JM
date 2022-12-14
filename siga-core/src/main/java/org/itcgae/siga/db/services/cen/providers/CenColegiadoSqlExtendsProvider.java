@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.cen.providers;
 import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -12,8 +13,10 @@ import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
 
 public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
+	private Logger LOGGER = Logger.getLogger(CenColegiadoSqlExtendsProvider.class);
+	
 	public String selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem, Integer tamMaximo) {
-
+		
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		SQL sql3 = new SQL();
@@ -384,6 +387,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
 		sql.SELECT_DISTINCT("cli2.noaparecerredabogacia as noaparecerredabogacia2");
 		sql.SELECT_DISTINCT("decode(cli2.noaparecerredabogacia, 0, 'NONono' , 1, 'SISisiSísíSÍ') as noAparecerRedAbogaciaFilter");
+		//sql.SELECT_DISTINCT("decode(m.situacionresidente, 0, 'NONono' , 1, 'SISisiSísíSÍ') as situacionresidenteFilter");
 		sql.SELECT_DISTINCT("decode(col.situacionresidente, 0, 'NONono' , 1, 'SISisiSísíSÍ') as situacionresidenteFilter");
 		sql.SELECT_DISTINCT("per.idtipoidentificacion");
 		sql.SELECT_DISTINCT("per.naturalde");
@@ -1204,6 +1208,46 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.ORDER_BY("fechaestadodate desc");
 		// sql.ORDER_BY("per.nombre");
 
+		return sql.toString();
+	}
+	
+	public String selectColegiacionHistor(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("TO_CHAR(fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("cat.descripcion as estadoColegial");
+		sql.SELECT("decode (col.situacionresidente, 1, 'Si', 0, 'No') as residenteInscrito");
+		sql.SELECT("decode (colest.situacionresidente, 1, 'Si', 0, 'No') as situacionResidente");
+		sql.SELECT("observaciones");
+		sql.SELECT("TO_CHAR(fechaestado,'DD/MM/YYYY') AS fechaestado");
+		sql.SELECT("fechaestado AS fechaestadodate");
+		sql.SELECT("colest.idestado AS idEstado");
+		sql.SELECT("col.idinstitucion as idInstitucion");
+
+		sql.FROM("cen_colegiado col");
+//		sql.INNER_JOIN(
+//				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");		
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
+						+ " and datcol.fechaestado < sysdate))");
+		
+		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"
+				+ idLenguaje + "')");
+
+		sql.WHERE("col.idpersona = '" + colegiadoItem.getIdPersona() + "'");
+
+		if (idInstitucion != Short.parseShort("2000")) {
+			sql.WHERE("colest.idinstitucion != '" + idInstitucion + "'");
+		}
+		// sql1.WHERE("dir.fechabaja is null");
+
+		sql.ORDER_BY("fechaestadodate desc");
+		// sql.ORDER_BY("per.nombre");
+		
+		LOGGER.info("selectColegiacionHistor() -> " + sql.toString());
 		return sql.toString();
 	}
 }

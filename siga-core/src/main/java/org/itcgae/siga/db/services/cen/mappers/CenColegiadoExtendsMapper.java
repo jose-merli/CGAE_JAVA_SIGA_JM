@@ -269,4 +269,19 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	})
 	List<ColegiadoItem> selectColegiacionActual(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
 	
+	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiacionHistor")
+	@Results({ 
+		@Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADO", property = "fechaEstadoStr", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADODATE", property = "fechaEstado", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ColegiadoItem> selectColegiacionHistor(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
+	
 }
