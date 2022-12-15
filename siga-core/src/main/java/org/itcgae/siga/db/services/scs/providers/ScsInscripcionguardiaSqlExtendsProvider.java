@@ -3,22 +3,19 @@ package org.itcgae.siga.db.services.scs.providers;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.ibatis.annotations.DeleteProvider;
-import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.ibatis.type.JdbcType;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionMod;
-import org.itcgae.siga.DTOs.scs.GrupoGuardiaColegiadoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
-import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
-import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaSqlProvider;
 
 public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguardiaSqlProvider{
+	
+	private Logger LOGGER = Logger.getLogger(ScsInscripcionguardiaSqlExtendsProvider.class);
 	
 	public String getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion, String idgrupoguardia, Boolean porGrupos) {
 		SQL sql = new SQL();
@@ -27,8 +24,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		String fechaOr = fecha != null && !fecha.equals("") ? "OR TRUNC(Ins.Fechabaja) > NVL('"+fecha+"', '01/01/1900')) THEN '1'\r\n":"";
 		
 		
-		if(!UtilidadesString.esCadenaVacia(ultimo))						
-			sql.SELECT("ROWNUM AS orden_cola,\r\n" + 
+		if(!UtilidadesString.esCadenaVacia(ultimo))	{					
+			sql.SELECT(" ROWNUM AS orden_cola,\r\n" + 
 					"	consulta_total.*\r\n" + 
 					"FROM (WITH tabla_nueva AS (\r\n" + // ESTA ES LA QUERY QUE SE USA CUANDO LA GUARDIA TIENE UN ÚLTIMOM ASIGNADO.
 					"	SELECT\r\n" + 
@@ -201,8 +198,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"			tabla_nueva.orden <= tabla_nueva2.orden\r\n" + 
 					"		ORDER BY\r\n" + 
 					"			tabla_nueva.orden ASC) ) consulta_total ");
-		else 
-			sql.SELECT("ROWNUM AS orden_cola, consulta.* FROM (SELECT(CASE\r\n" + 
+		} else { 
+			sql.SELECT(" ROWNUM AS orden_cola, consulta.* FROM (SELECT(CASE\r\n" + 
 					"                                 WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
 					"                                 "+fechaAnd+ 
 					"                                 AND (Ins.Fechabaja IS NULL\r\n" + 
@@ -259,8 +256,19 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"							"+ordenaciones+"\r\n" + 
 					"                          NOMBRE,\r\n" + 
 					"                          Ins.FECHASUSCRIPCION,\r\n" + 
-					"                          Ins.Idpersona) consulta where activo = 1");
-		return sql.toString();
+					"                          Ins.Idpersona) consulta where activo = 1 ");
+		}
+
+		// En caso de tener una coma al final, se elimina para la subconsulta final
+		if ((",").equalsIgnoreCase((ordenaciones.substring(ordenaciones.length() - 2, ordenaciones.length() - 1)))) {
+			ordenaciones = ordenaciones.substring(0, ordenaciones.length() - 2);
+		}
+		
+		String sqlFinal = "SELECT * FROM (".concat(sql.toString()).concat(") ORDER BY ".concat(ordenaciones));
+		
+		//LOGGER.info("+++++ [SIGA TEST] - SQL FINAL getColaGuardias() -> " + sqlFinal.toString());
+
+		return sqlFinal.toString();
 	}
 
 	private String saltosOCompensaciones(Boolean porGrupos) {
