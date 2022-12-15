@@ -1314,7 +1314,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					if (asuntosClaveJusticiableItem != null && asuntosClaveJusticiableItem.size() > 0) {
 
-						asuntosJusticiableDTO = searchAsuntosConClave(asuntosClaveJusticiableItem, true, request);
+						asuntosJusticiableDTO = searchAsuntosConClave(asuntosClaveJusticiableItem, false, request);
 					}
 
 				} catch (Exception e) {
