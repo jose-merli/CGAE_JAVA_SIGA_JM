@@ -133,7 +133,7 @@ public class CombosGeneralesController {
 	}
 
 	@GetMapping("/guardias")
-	public ResponseEntity<ComboDTO> comboGuardias(HttpServletRequest request, String idTurno) {
+	public ResponseEntity<ComboDTO> comboGuardias(@RequestParam("idTurno") String idTurno, HttpServletRequest request) {
 		ComboDTO response = comboService.comboGuardias(request, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}

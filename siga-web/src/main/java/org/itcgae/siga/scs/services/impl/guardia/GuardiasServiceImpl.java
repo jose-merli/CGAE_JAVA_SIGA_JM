@@ -1282,32 +1282,32 @@ public class GuardiasServiceImpl implements GuardiasService {
 					Map<Short, String> mapa = new TreeMap<Short, String>(Collections.reverseOrder());
 					if (cola != null && !cola.isEmpty()) {
 						if (cola.get(0).getAntiguedadcola() > 0)
-							mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA,");
+							mapilla.put(cola.get(0).getAntiguedadcola(), " ANTIGUEDADCOLA asc, ");
 						else if (cola.get(0).getAntiguedadcola() < 0) {
 							cola.get(0).setAntiguedadcola((short) -cola.get(0).getAntiguedadcola());
-							mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA desc,");
+							mapilla.put(cola.get(0).getAntiguedadcola(), " ANTIGUEDADCOLA desc, ");
 						}
 						if (cola.get(0).getAlfabeticoapellidos() > 0)
-							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS,");
+							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS asc, ");
 						else if (cola.get(0).getAlfabeticoapellidos() < 0) {
 							cola.get(0).setAlfabeticoapellidos((short) -cola.get(0).getAlfabeticoapellidos());
-							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS desc,");
+							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS desc, ");
 						}
 						if (cola.get(0).getFechanacimiento() > 0)
-							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO,");
+							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO asc, ");
 						else if (cola.get(0).getFechanacimiento() < 0) {
 							cola.get(0).setFechanacimiento((short) -cola.get(0).getFechanacimiento());
-							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO desc,");
+							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO desc, ");
 
 						}
 						if (cola.get(0).getOrdenacionmanual() > 0)
-							mapilla.put(cola.get(0).getOrdenacionmanual(), "NUMEROGRUPO, ORDENGRUPO,");
+							mapilla.put(cola.get(0).getOrdenacionmanual(), "NUMEROGRUPO, ORDENGRUPO, ");
 
 						if (cola.get(0).getNumerocolegiado() > 0)
-							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO,");
+							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO asc, ");
 						else if (cola.get(0).getNumerocolegiado() < 0) {
 							cola.get(0).setNumerocolegiado((short) -cola.get(0).getNumerocolegiado());
-							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO desc,");
+							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO desc, ");
 						}
 						mapa.putAll(mapilla);
 						if (mapa.size() > 0)
@@ -1317,7 +1317,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						if (!ordenaciones.isEmpty()) {
 							ordenaciones.substring(0, ordenaciones.length() - 1);
 						} else {
-							ordenaciones = "ANTIGUEDADCOLA, "; // por defecto
+							ordenaciones = " ANTIGUEDADCOLA, "; // por defecto
 						}
 					}
 					// Si hay ultimo se prepara su WHERE correspondiente
@@ -1368,7 +1368,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
 					// cuando marcamos orden = manual por primera vez
 					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos == "1") {
-
 						int j = 1;
 						for (int x = 0; x < colaGuardia.size(); x++) {
 							// rellenar todos los numero grupo y orden
@@ -1484,7 +1483,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado.setIdpersona(Long.valueOf(todaColaGuardia.get(i).getIdPersona()));
 								grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
 								grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
-
 								// NewIdDTO idP = scsGrupoguardiacolegiadoExtendsMapper.getLastId();
 
 								/*
@@ -1523,7 +1521,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado.setFechamodificacion(new Date());
 								grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
 								grupoColegiado.setOrden(1);
-
+								
 								scsGrupoguardiacolegiadoExample = new ScsGrupoguardiacolegiadoExample();
 								scsGrupoguardiacolegiadoExample.createCriteria()
 										.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
