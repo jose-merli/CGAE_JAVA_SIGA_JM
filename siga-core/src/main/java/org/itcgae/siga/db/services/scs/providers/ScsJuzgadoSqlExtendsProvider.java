@@ -131,7 +131,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 
 		sql.SELECT("juzgado.CODIGOEXT2");
 		sql.SELECT("juzgado.NOMBRE");
-		sqlJuzgado.SELECT("NVL(P.NOMBRE,'') AS NOMBREPOBLACION");
+		sqlJuzgado.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
 		sql.SELECT("juzgado.IDJUZGADO");
 		sql.FROM("SCS_JUZGADO juzgado");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
@@ -146,7 +146,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 			sqlUnion.append(" UNION ");
 			sqlJuzgado.SELECT("juzgado.CODIGOEXT2");
 			sqlJuzgado.SELECT("juzgado.NOMBRE");
-			sqlJuzgado.SELECT("NVL(P.NOMBRE,'') AS NOMBREPOBLACION");
+			sqlJuzgado.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
 			sqlJuzgado.SELECT("juzgado.IDJUZGADO");
 			sqlJuzgado.FROM("SCS_JUZGADO juzgado");
 			sqlJuzgado.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
