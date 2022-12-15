@@ -111,12 +111,12 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 						listaSuscripciones.setListaSuscripcionesItems(pysPeticioncomprasuscripcionExtendsMapper.getListaSuscripciones(peticion, idInstitucion, usuarios.get(0).getIdlenguaje(), tamMaximo));
 						
 						//Revisamos las fechas obtenidas para determinar el idestado que se devuelve
-						for(ListaSuscripcionesItem suscripcion : listaSuscripciones.getListaSuscripcionesItems()) {
-							if(suscripcion.getFechaAnulada() != null) suscripcion.setIdEstadoSolicitud("5");
-							else if(suscripcion.getFechaSolicitadaAnulacion() != null) suscripcion.setIdEstadoSolicitud("4");
-							else if(suscripcion.getFechaEfectiva() != null) suscripcion.setIdEstadoSolicitud("3");
-							else if(suscripcion.getFechaDenegada() != null) suscripcion.setIdEstadoSolicitud("2");
-							else suscripcion.setIdEstadoSolicitud("1");
+//						for(ListaSuscripcionesItem suscripcion : listaSuscripciones.getListaSuscripcionesItems()) {
+//							if(suscripcion.getFechaAnulada() != null) suscripcion.setIdEstadoSolicitud("5");
+//							else if(suscripcion.getFechaSolicitadaAnulacion() != null) suscripcion.setIdEstadoSolicitud("4");
+//							else if(suscripcion.getFechaEfectiva() != null) suscripcion.setIdEstadoSolicitud("3");
+//							else if(suscripcion.getFechaDenegada() != null) suscripcion.setIdEstadoSolicitud("2");
+//							else suscripcion.setIdEstadoSolicitud("1");
 							
 							//REVISAR
 //							List<ListaServiciosItem> serviciosSuscripcion = gestionFichaCompraSuscripcionServiceImpl.getListaServiciosSuscripcion(request, suscripcion.getnSolicitud()).getListaServiciosItems();
@@ -129,7 +129,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 							
 							//suscripcion.setImporte(totalSuscripcion.toString());
 						
-						}
+//						}
 						
 						LOGGER.info(
 								"getListaSuscripciones() / pysPeticioncomprasuscripcionExtendsMapper.getListaSuscripciones() -> Salida de PysPeticioncomprasuscripcionExtendsMapper para obtener las peticiones de compra que cumplan las condiciones");
