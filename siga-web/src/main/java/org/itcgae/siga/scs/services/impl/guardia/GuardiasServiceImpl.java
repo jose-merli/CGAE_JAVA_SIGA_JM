@@ -848,9 +848,23 @@ public class GuardiasServiceImpl implements GuardiasService {
 						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasGuardia()))
 							guardia.setDiasguardia(Short.valueOf(guardiasItem.getDiasGuardia()));
 						guardia.setTipodiasguardia(guardiasItem.getTipoDiasGuardia());
-						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasPeriodo()))
+						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasPeriodo())) {
 							guardia.setDiasperiodo(Short.valueOf(guardiasItem.getDiasPeriodo()));
-						guardia.setTipodiasperiodo(guardiasItem.getTipoDiasPeriodo());
+						}else{
+							guardia.setDiasperiodo((short)0);
+
+						}
+						
+						
+						if (!UtilidadesString.esCadenaVacia(guardiasItem.getTipoDiasPeriodo()) && guardiasItem.getTipoDiasPeriodo() != null) {
+							guardia.setTipodiasperiodo(guardiasItem.getTipoDiasPeriodo());
+						}else if(guardiasItem.getTipoDiasPeriodo() == null) {
+							guardiasItem.setTipoDiasPeriodo("");
+							guardia.setTipodiasperiodo(guardiasItem.getTipoDiasPeriodo());
+
+						}
+						
+						
 						guardia.setSeleccionfestivos(guardiasItem.getSeleccionFestivos());
 						guardia.setSeleccionlaborables(guardiasItem.getSeleccionLaborables());
 						guardia.setRequeridavalidacion(guardiasItem.isRequeridaValidacion() ? "S" : "N");
