@@ -161,8 +161,8 @@ public class EjecucionPlsServicios {
         paramIn[7] = usuario.getIdusuario(); // - P_USUMODIFICACION - IN - Usuario que realiza la modificacion - NUMBER(5)
         
         
-        String resultado[] = new String[3]; 
-
+        String resultado[] = null;
+        resultado = new String[3];
         //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
         //El segundo parametro el numero de parametros de salida del PL
         resultado = callPLProcedure2("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_ELIMINAR_SUSCRIPCION(?,?,?,?,?,?,?,?,?,?,?)}", 3, paramIn);
