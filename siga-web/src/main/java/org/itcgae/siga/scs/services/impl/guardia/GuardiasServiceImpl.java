@@ -9333,7 +9333,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date())) && guardiaCol.getValidada().equals("1")) {
 			guardiaCol.setEstadoGuardia("Realizada y validada.");
 		}
-		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date())) && guardiaCol.getValidada().equals("1") && guardiaCol.getFacturado().equals("1")) {
+		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) ||
+				guardiaCol.getFechadesde().equals(new Date())) &&
+				(guardiaCol.getValidada() != null && guardiaCol.getValidada().equals("1")) &&
+				(guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1"))) {
 
 			FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
 			facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
