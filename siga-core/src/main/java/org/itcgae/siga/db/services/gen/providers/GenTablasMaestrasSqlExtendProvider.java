@@ -42,6 +42,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         // si el catalogo es local => diferente para cada colegio
         if(catalogo.getLocal().equals("S")) {
         	 sql.WHERE("TAB.idinstitucion = '"+catalogo.getIdInstitucion()+"'");
+        	 sql.WHERE("REC.idinstitucion = '"+catalogo.getIdInstitucion()+"'");
         }
         
 		if (null != catalogo.getCodigoExt() && !catalogo.getCodigoExt().equals("")) {
