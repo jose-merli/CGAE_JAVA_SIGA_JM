@@ -87,6 +87,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
@@ -1313,7 +1314,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         example.createCriteria()
                                 .andIdfacturacionEqualTo(Integer.parseInt(facturacionItem.getIdFacturacion()))
                                 .andIdinstitucionEqualTo(idInstitucion).andIdgrupofacturacionEqualTo(idGrupoFacturacion)
-                                .andIdhitogeneralEqualTo(idHitoGeneral);
+                                .andIdhitogeneralEqualTo(idHitoGeneral)
+                                .andIdpartidapresupuestariaEqualTo(facturacionItem.getIdPartidaPresupuestaria());
 
                         LOGGER.debug(
                                 "FacturacionSJCSServicesImpl.saveConceptosFac() -> fcsFacturacionJGExtendsMapper.selectByExample() -> Entrada: comprobamos que los conceptos no existan previamente.");
@@ -1329,7 +1331,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             record.setIdhitogeneral(idHitoGeneral);
                             record.setFechamodificacion(new Date());
                             record.setUsumodificacion(usuario.getIdusuario());
-
+                            record.setIdpartidapresupuestaria(!StringUtils.isEmpty(facturacionItem.getIdPartidaPresupuestaria()) ? facturacionItem.getIdPartidaPresupuestaria() : "0");
+                            
                             LOGGER.debug(
                                     "FacturacionSJCSServicesImpl.saveConceptosFac() -> fcsFactGrupofactHitoMapper.insert() -> Entrada guardar conceptos en fcsFacturacionjg");
 
@@ -1423,7 +1426,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                         example.createCriteria()
                                 .andIdfacturacionEqualTo(Integer.parseInt(facturacionItem.getIdFacturacion()))
                                 .andIdinstitucionEqualTo(idInstitucion).andIdgrupofacturacionEqualTo(idGrupoFacturacion)
-                                .andIdhitogeneralEqualTo(idHitoGeneral);
+                                .andIdhitogeneralEqualTo(idHitoGeneral)
+                                .andIdpartidapresupuestariaEqualTo(facturacionItem.getIdPartidaPresupuestaria());
 
                         LOGGER.debug(
                                 "FacturacionSJCSServicesImpl.updateConceptosFac() -> fcsFacturacionJGExtendsMapper.selectByExample() -> Entrada: comprobamos que los conceptos no existan previamente.");
@@ -1445,6 +1449,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             record.setIdhitogeneral(idHitoGeneral);
                             record.setFechamodificacion(new Date());
                             record.setUsumodificacion(usuario.getIdusuario());
+                            record.setIdpartidapresupuestaria(!StringUtils.isEmpty(facturacionItem.getIdPartidaPresupuestaria()) ? facturacionItem.getIdPartidaPresupuestaria() : "0");
 
                             LOGGER.debug(
                                     "FacturacionSJCSServicesImpl.updateConceptosFac() -> fcsFactGrupofactHitoMapper.updateByExampleSelective() -> Entrada actualizar conceptos en fcsFacturacionjg");

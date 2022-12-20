@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.fcs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
@@ -12,6 +13,9 @@ import java.text.SimpleDateFormat;
 
 public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvider {
 
+	private Logger LOGGER = Logger.getLogger(FcsFacturacionJGSqlExtendsProvider.class);
+
+	
 	public String buscarFacturaciones(FacturacionItem facturacionItem, String idInstitucion, Integer tamMax) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -356,7 +360,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 				+ "             NVL(PAGO.IMPORTEOFICIO,0)\r\n" + "        WHEN 20 THEN\r\n"
 				+ "              NVL(PAGO.IMPORTEGUARDIA,0)\r\n" + "        WHEN 30 THEN\r\n" + "             "
 				+ "				 NVL(PAGO.IMPORTESOJ,0)\r\n" + "        ELSE\r\n"
-				+ "             NVL(PAGO.IMPORTEEJG,0)\r\n" + "END AS IMPORTEPENDIENTE");
+				+ "             NVL(PAGO.IMPORTEEJG,0)\r\n" + "END AS IMPORTEPENDIENTE,"
+				+ "             FACTGRUPO.IDPARTIDAPRESUPUESTARIA AS IDPARTIDAPRESUPUESTARIA");
 		sql.FROM("FCS_FACT_GRUPOFACT_HITO FACTGRUPO");
 		sql.LEFT_OUTER_JOIN(
 				"SCS_GRUPOFACTURACION GRUPO ON (FACTGRUPO.IDGRUPOFACTURACION = GRUPO.IDGRUPOFACTURACION AND FACTGRUPO.IDINSTITUCION = GRUPO.IDINSTITUCION)");
@@ -378,9 +383,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		query.SELECT("IDCONCEPTO");
 		query.SELECT("IMPORTETOTAL");
 		query.SELECT("IMPORTETOTAL - SUM(IMPORTEPENDIENTE) AS IMPORTEPENDIENTE");
+		query.SELECT("IDPARTIDAPRESUPUESTARIA");
 		query.FROM("( " + sql.toString() + " )");
-		query.GROUP_BY("IDINSTITUCION, IDFACTURACION, DESCGRUPO, DESCCONCEPTO, IDGRUPO, IDCONCEPTO, IMPORTETOTAL");
-
+		query.GROUP_BY("IDINSTITUCION, IDFACTURACION, DESCGRUPO, DESCCONCEPTO, IDGRUPO, IDCONCEPTO, IMPORTETOTAL, IDPARTIDAPRESUPUESTARIA");
+		
+		//LOGGER.info("++++ [SIGA TEST] Query conceptosFacturacion() -> " + query.toString());
 		return query.toString();
 	}
 
