@@ -838,6 +838,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								dS = Short.parseShort(guardiasItem.getDiasSeparacionGuardias());
 							}
 							guardia.setDiasseparacionguardias(dS);
+							guardia.setRotarcomponentes(guardiasItem.getRotarComponentes()=="false" ? "0" : "1");
 							guardia.setIdordenacioncolas(colas.get(0).getIdordenacioncolas());
 							guardia.setRequeridavalidacion(Boolean.toString(guardiasItem.isRequeridaValidacion()));
 							scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
