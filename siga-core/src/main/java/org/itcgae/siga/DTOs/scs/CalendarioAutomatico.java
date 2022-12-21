@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 public class CalendarioAutomatico {
 
 	//////////////////// ATRIBUTOS ////////////////////
@@ -17,7 +19,7 @@ public class CalendarioAutomatico {
 	 * posibles para esa guardia calculado por el metodo del CGAE
 	 */
 	private ArrayList arrayDiasGuardiaCGAE;
-
+	private Logger LOGGER = Logger.getLogger(this.getClass());
 	/**
 	 * Este es el Calendario con los atributos propios de SJCS necesario para llamar
 	 * al metodo del CGAE que calcula los dias posibles de una guardia
@@ -182,16 +184,16 @@ public class CalendarioAutomatico {
 
 	/** Muestra en el LOG la configuracion del Calendario */
 	private void imprimirDatosCalendario() {
-	//ClsLogging.writeFileLog("*** DATOS DEL CALENDARIO:",10);
-	//ClsLogging.writeFileLog("> FECHA INICIO:"+this.fechaInicio,10);
-	//ClsLogging.writeFileLog("> FECHA FIN:"+this.fechaFin,10);		
-	//ClsLogging.writeFileLog("> DURACION:"+this.duracion,10);
-	//ClsLogging.writeFileLog("> UNIDADES DURACION:"+this.unidadesDuracion,10);
-	//ClsLogging.writeFileLog("> PERIODO:"+this.periodo,10);
-	//ClsLogging.writeFileLog("> UNIDADES PERIODO:"+this.unidadesPeriodo,10);
-	//ClsLogging.writeFileLog("> SELECCION LABORABLES:"+this.seleccionLaborables.toString(),10);
-	//ClsLogging.writeFileLog("> SELECCION FESTIVOS:"+this.seleccionFestivos.toString(),10);
-	//ClsLogging.writeFileLog("***",10);
+	LOGGER.info("*** DATOS DEL CALENDARIO:");
+	LOGGER.info("> FECHA INICIO:"+this.fechaInicio);
+	LOGGER.info("> FECHA FIN:"+this.fechaFin);		
+	LOGGER.info("> DURACION:"+this.duracion);
+	LOGGER.info("> UNIDADES DURACION:"+this.unidadesDuracion);
+	LOGGER.info("> PERIODO:"+this.periodo);
+	LOGGER.info("> UNIDADES PERIODO:"+this.unidadesPeriodo);
+	LOGGER.info("> SELECCION LABORABLES:"+this.seleccionLaborables.toString());
+	LOGGER.info("> SELECCION FESTIVOS:"+this.seleccionFestivos.toString());
+	LOGGER.info("***");
 	} // imprimirDatosCalendario ()
 
 	public ArrayList getArrayDiasGuardiaCGAE() {

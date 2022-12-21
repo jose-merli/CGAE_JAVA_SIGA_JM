@@ -702,5 +702,16 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 		return sql.toString();
 	}
+	public String deleteSaltosCompensacionesGrupoCreadosEnCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia) {
+		SQL sql = new SQL();
 
+		sql.DELETE_FROM("SCS_SALTOCOMPENSACIONGRUPO");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDCALENDARIOGUARDIASCREACION = " + idCalendarioGuardias);
+		sql.WHERE("(IDCALENDARIOGUARDIAS = " + idCalendarioGuardias + " OR IDCALENDARIOGUARDIAS IS NULL)");
+		sql.WHERE("IDTURNO = " + idTurno);
+		sql.WHERE("IDGUARDIA = " + idGuardia);
+
+		return sql.toString();
+	}
 }

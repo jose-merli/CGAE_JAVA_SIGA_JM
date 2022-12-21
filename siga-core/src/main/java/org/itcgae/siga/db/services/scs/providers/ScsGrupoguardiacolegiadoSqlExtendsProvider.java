@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
 import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoSqlProvider;
 
 public class ScsGrupoguardiacolegiadoSqlExtendsProvider extends ScsGrupoguardiacolegiadoSqlProvider{
@@ -184,6 +185,16 @@ public class ScsGrupoguardiacolegiadoSqlExtendsProvider extends ScsGrupoguardiac
 		sql.WHERE("FECHAINICIO >= TO_DATE('" + fechaIni + "', 'dd/mm/yyyy')");
 		sql.WHERE("FECHAFIN <= TO_DATE('" + fechaFin + "', 'dd/mm/yyyy')");
 		return sql.toString();
+
+	}
+	
+	public String updateGrupoGuardiaOrden(ScsGrupoguardiacolegiado scsGrupoguardiacolegiado) {
+		String sql = "UPDATE scs_grupoguardiacolegiado"
+				+ " SET ORDEN = " + scsGrupoguardiacolegiado.getOrden()
+				+" WHERE  IDGRUPOGUARDIA  =  " + scsGrupoguardiacolegiado.getIdgrupoguardia()
+				+ " AND IDGRUPOGUARDIACOLEGIADO = " + scsGrupoguardiacolegiado.getIdgrupoguardiacolegiado();
+
+		return sql;
 
 	}
 

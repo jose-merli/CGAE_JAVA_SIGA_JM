@@ -25,6 +25,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporales;
+import org.itcgae.siga.db.entities.CenBajastemporalesExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
@@ -291,9 +292,13 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						Iterator it = entrySet.iterator();
 						while(it.hasNext()) {
 							nombres = it.next().toString().split("=");
-							if(nombres[0].equals("fechabt")) {
+							if(nombres[0].equals("fechadesde")) {
 								Date fecha = format2.parse(nombres[1]);
-								record.setFechabt(fecha);
+								record.setFechadesde(fecha);
+							}
+							if(nombres[0].equals("fechahasta")) {
+								Date fecha = format2.parse(nombres[1]);
+								record.setFechahasta(fecha);
 							}
 							if(nombres[0].equals("idpersona")) {
 								record.setIdpersona(Long.valueOf(nombres[1]));
@@ -303,7 +308,13 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						record.setIdinstitucion(idInstitucion);
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 						record.setFechamodificacion(new Date());
-						response = cenBajastemporalesMapper.updateByPrimaryKeySelective(record);
+						
+						CenBajastemporalesExample bajaExample = new CenBajastemporalesExample();
+						bajaExample.createCriteria().andIdpersonaEqualTo(record.getIdpersona()).andIdinstitucionEqualTo(record.getIdinstitucion())
+						.andFechadesdeEqualTo(record.getFechadesde()).andFechahastaEqualTo(record.getFechahasta());
+						List<CenBajastemporales> lis = cenBajastemporalesMapper.selectByExample(bajaExample);
+						response = cenBajastemporalesMapper.updateByExampleSelective(record, bajaExample);
+						LOGGER.info("Eliminados " + response + " registros ");
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -401,10 +412,10 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 							if(nombres[0].equals("validado") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
 								record.setValidado(nombres[1]);
 							}
-							if(nombres[0].equals("fechabt")) {
+							/*if(nombres[0].equals("fechabt")) {
 								Date fecha = format2.parse(nombres[1]);
 								record.setFechabt(fecha);
-							}
+							}*/
 							if(nombres[0].equals("idpersona")) {
 								record.setIdpersona(Long.valueOf(nombres[1]));
 							}

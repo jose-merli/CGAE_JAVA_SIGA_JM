@@ -55,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -2792,8 +2793,61 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		String OLD_FORMAT = "yyyy-MM-dd";
 		String NEW_FORMAT = "dd/MM/yyyy";
 		String fechaFinOk = changeDateFormat(OLD_FORMAT, NEW_FORMAT, date4.toString());
-		return scsGuardiasturnoExtendsMapper.getFestivosTurno(fechaInicio, fechaFinOk.toString(),
-				idInstitucion.toString(), null, idTurno.toString());
+		//return scsGuardiasturnoExtendsMapper.getFestivosTurno(fechaInicio, fechaFinOk.toString(),
+		//		idInstitucion.toString(), null, idTurno.toString());
+		List <RangoFechasItem> rangosFechasFestivos  = scsGuardiasturnoExtendsMapper.getFestivosAgenda(fechaInicio, fechaFinOk,idInstitucion.toString());
+		List<String> fechasFestivas = new ArrayList<String>();
+		if(rangosFechasFestivos == null || rangosFechasFestivos.isEmpty()) return fechasFestivas;
+		
+		for(RangoFechasItem itemFecha : rangosFechasFestivos) {
+			if(itemFecha.getFechaDesde().equals(itemFecha.getFechaHasta())) {
+				fechasFestivas.add(itemFecha.getFechaDesde());
+			}else {
+				long fechasBT = daysBetween(itemFecha.getFechaDesde(),itemFecha.getFechaHasta());
+				
+				if(fechasBT == 1) {
+					fechasFestivas.add(itemFecha.getFechaDesde());
+					fechasFestivas.add(itemFecha.getFechaHasta());
+				}else {
+					fechasFestivas.add(itemFecha.getFechaDesde());
+					String fechaAuxIni = itemFecha.getFechaDesde();
+					for (int i = 0; i < fechasBT; i++) {
+						String fechaNext = this.diaSiguienteDate(fechaAuxIni);
+						fechasFestivas.add(fechaNext);
+						fechaAuxIni = fechaNext;
+					}
+				}
+			}	
+		}
+		quitarRepetidos(fechasFestivas);
+		Collections.sort(fechasFestivas);//ORDENAR
+		return fechasFestivas;
+	}
+	
+	private List<String> quitarRepetidos(List<String> fechasFestivas){
+		Set<String> hashSet = new HashSet<String>(fechasFestivas);
+		fechasFestivas.clear();
+		fechasFestivas.addAll(hashSet);
+        return fechasFestivas;
+	}
+	
+	private String diaSiguienteDate(String fechaIn) throws ParseException {
+		 Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(fechaIn);  
+
+		DateFormat dateFormatFin = new SimpleDateFormat("dd/MM/yyyy");  
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date1);
+		cal.add(Calendar.DAY_OF_YEAR, 1); 
+		return dateFormatFin.format(cal.getTime());
+	}
+	
+	private long daysBetween(String fechaIni, String fechaFin) throws ParseException {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
+		String strDateDesde = dateFormat.format(	 new SimpleDateFormat("dd/MM/yyyy").parse(fechaIni));  
+		String strDateHasta = dateFormat.format( new SimpleDateFormat("dd/MM/yyyy").parse(fechaFin));
+		LocalDate dateBefore = LocalDate.parse(strDateDesde);
+		LocalDate dateAfter = LocalDate.parse(strDateHasta);
+		return ChronoUnit.DAYS.between(dateBefore, dateAfter);
 	}
 
 	private String changeDateFormat(String OLD_FORMAT, String NEW_FORMAT, String oldDateString) {

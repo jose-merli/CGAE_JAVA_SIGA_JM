@@ -139,6 +139,9 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 	@DeleteProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "deleteSaltosCompensacionesCreadosEnCalendario")
 	public boolean deleteSaltosCompensacionesCreadosEnCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
 
+	@DeleteProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "deleteSaltosCompensacionesGrupoCreadosEnCalendario")
+	public boolean deleteSaltosCompensacionesGrupoCreadosEnCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
+
 	@UpdateProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "updateSaltosCompensacionesCumplidos")
 	public boolean updateSaltosCompensacionesCumplidos(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia, Integer usuario);
 
