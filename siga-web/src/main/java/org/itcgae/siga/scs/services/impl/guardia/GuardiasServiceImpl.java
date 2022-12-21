@@ -9352,15 +9352,20 @@ public class GuardiasServiceImpl implements GuardiasService {
 				(guardiaCol.getValidada() != null && guardiaCol.getValidada().equals("1")) &&
 				(guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1"))) {
 
-			FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
-			facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-					.andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
-
-			List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper.selectByExample(facturacionExample);
-			if (!facturas.isEmpty()) {
-				guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
+			if(guardiaCol.getIdFacturacion()!=null) {
+				FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
+				facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
+	
+				List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper.selectByExample(facturacionExample);
+				if (facturas!=null && !facturas.isEmpty()) {
+					guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
+				}
 			}
 
+		}
+		if(guardiaCol.getEstadoGuardia() == null) {
+			guardiaCol.setEstadoGuardia(" ");
 		}
 
 	}
