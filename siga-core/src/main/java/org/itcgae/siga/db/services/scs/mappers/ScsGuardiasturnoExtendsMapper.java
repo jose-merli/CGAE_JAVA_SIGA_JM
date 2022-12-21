@@ -759,7 +759,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getTotalLetrados")
 	 @Results({@Result(column = "TOTAL", property = "TOTAL", jdbcType = JdbcType.DECIMAL)})
-	 int getTotalLetrados(String idInstitucion, String idCalendarioGuardias, String idTurno, String idGuardia, String today);
+	 int getTotalLetrados(String idInstitucion, String idCalendarioGuardias, String idTurno, String idGuardia, String today, String fechaIni);
 
 	@SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getTotalGuardias")
 	@Results({@Result(column = "TOTAL", property = "TOTAL", jdbcType = JdbcType.DECIMAL)})

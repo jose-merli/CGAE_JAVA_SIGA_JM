@@ -2411,7 +2411,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 	}
 	
-	public String getTotalLetrados(String idInstitucion, String idCalendarioGuardias, String idTurno, String idGuardia, String today) {
+	public String getTotalLetrados(String idInstitucion, String idCalendarioGuardias, String idTurno, String idGuardia, String today, String fechaIni) {
 //		select count(*) AS TOTAL from SCS_CABECERAGUARDIAS where IDINSTITUCION=2005 and IDTURNO=809 
 //				and IDGUARDIA=701 and IDCALENDARIOGUARDIAS=26 and trunc(FECHA_FIN) < trunc(sysdate)
 		SQL sql = new SQL();
@@ -2431,6 +2431,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		}
 		if(today != null) {
 			sql.WHERE("FECHA_FIN < TO_DATE('" + today + "','DD/MM/YYYY')");
+		}
+		if(fechaIni != null) {
+			sql.WHERE("FECHAINICIO >= TO_DATE('" + fechaIni + "','DD/MM/YYYY')");
 		}
 		return sql.toString();
 	}

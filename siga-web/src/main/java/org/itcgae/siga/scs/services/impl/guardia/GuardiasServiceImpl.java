@@ -3132,7 +3132,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				if (!validarBorradoGuardias(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
 						Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
-						listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia()))
+						listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(),dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
 					controlGuardia++;
 
 				if(!validarColegiadosFacturados(idInstitucion, Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
@@ -5152,7 +5152,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		// validando que no haya ninguna guardia realizada
 
-		if (!validarBorradoGuardias(idInstitucion1, idCalendarioGuardias1, idTurno1, idGuardia1)) {
+		if (!validarBorradoGuardias(idInstitucion1, idCalendarioGuardias1, idTurno1, idGuardia1,fechaInicio1)) {
 			errorGeneracionCalendario = "Error en la validación del borrado de guardias";
 			LOGGER.error("No se puede borrar un CALENDARIO de guardias porque existen guardias realizadas");
 //			throw new Exception(
@@ -5284,14 +5284,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 	// Comprueba antes de borrar un CALENDARIO de guardias que no exista ninguna
 	// guardia realizada.
 	public boolean validarBorradoGuardias(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno,
-			Integer idGuardia) {
+			Integer idGuardia, String fechaIni) {
 		int totalLetrados = 0;
 		boolean correcto = false;
 		try {
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 			String today = formatter.format(new Date());
 			totalLetrados = scsGuardiasturnoExtendsMapper.getTotalLetrados(idInstitucion.toString(),
-					idCalendarioGuardias.toString(), idTurno.toString(), idGuardia.toString(), today);
+					idCalendarioGuardias.toString(), idTurno.toString(), idGuardia.toString(), today, fechaIni);
 
 			if (totalLetrados == 0)
 				correcto = true;
