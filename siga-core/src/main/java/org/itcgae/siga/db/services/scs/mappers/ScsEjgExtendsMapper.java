@@ -249,6 +249,29 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	})
 	List<RelacionesItem> getRelacionesEJG(EjgItem item);
 	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getRelacionesEJGBusqueda")
+	@Results({ @Result(column = "SJCS", property = "sjcs", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDLETRADO", property = "idletrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRELETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPO", property = "idtipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DES_TURNO", property = "descturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHA", property = "fechaasunto", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDSJCS", property = "idsjcs", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONAJG", property = "idpersonajg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechadesignacion", property = "fechaDesignacion", jdbcType = JdbcType.TIMESTAMP),
+
+	})
+	List<RelacionesItem> getRelacionesEJGBusqueda(EjgItem item);
+	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getEjgDesignas")
 	@Results({ @Result(column = "ANIODESIGNA", property = "anioDesigna", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NUMERODESIGNA", property = "numeroDesigna", jdbcType = JdbcType.NUMERIC),
