@@ -1010,6 +1010,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 					LOGGER.info(
 							"borrarSuscripcionesBajas() / ejecucionPlsServicios.ejecutarPL_ServiciosAutomaticosProcesoEliminarSuscripcion() -> Entrada al servicio para borrar suscripciones o bajas del servicio");
 					
+					if(borrarSuscripcionBajaItem.getcheckboxDialogServicioAutomaticoAManual() == true) {
 							String resultado[] = ejecucionPlsServicios.ejecutarPL_ServiciosAutomaticosProcesoEliminarSuscripcion(idInstitucion, borrarSuscripcionBajaItem, usuarios.get(0));
 							 
 							 if (!resultado[0].equalsIgnoreCase("0")) {
@@ -1017,11 +1018,11 @@ public class ServiciosServiceImpl implements IServiciosService {
 						      }else if(resultado[0].equalsIgnoreCase("0")){
 						    	  deleteResponseDTO.setStatus(SigaConstants.OK);	
 						      }
-										
+					
 					LOGGER.info(
 							"borrarSuscripcionesBajas() / ejecucionPlsServicios.ejecutarPL_ServiciosAutomaticosProcesoEliminarSuscripcion() -> Salida al servicio para borrar suscripciones o bajas del servicio");
 				}
-
+				}
 			}
 		} catch (Exception e) {
 			LOGGER.error(

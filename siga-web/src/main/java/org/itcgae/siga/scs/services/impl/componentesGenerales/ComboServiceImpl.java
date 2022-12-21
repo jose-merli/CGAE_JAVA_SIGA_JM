@@ -1009,6 +1009,9 @@ public class ComboServiceImpl implements ComboService {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboGuardias() / scsGuardiasturnoExtendsMapper.comboGuardias() -> admUsuariosExtendsMapper.selectByExample(exampleUsuarios) -> ");
+
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (usuarios != null && usuarios.size() > 0) {

@@ -1404,8 +1404,10 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 				permItem.setIdguardia(permutaItem.getIdguardia());
 				permItem.setIdturno(permutaItem.getIdturno());
+				permItem.setIdpersona(permutaItem.getIdpersona());
+				permItem.setFechainicioSolicitante(permutaItem.getFechasolicitud());
 
-				List<PermutaItem> permutas = scsPermutaguardiasExtendsMapper.getPermutaColeg(permItem, idInstitucion);
+				List<PermutaItem> permutas = scsPermutaguardiasExtendsMapper.getPermutasGuardiaColeg(permItem, idInstitucion);
 
 				permutaDTO.setPermutaItems(permutas);
 

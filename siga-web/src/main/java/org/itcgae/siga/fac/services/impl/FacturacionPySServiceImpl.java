@@ -3205,7 +3205,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		// Conseguimos información del usuario logeado
 		usuario = authenticationProvider.checkAuthentication(request);
-
+		
 		if (usuario != null) {
 			LOGGER.info(
 					"getInformeFacturacion() / facFacturaExtendsMapper.getInformeFacturacion() -> Entrada a facFacturacionprogramadaExtendsMapper para recuperar el informe de facturacion");
@@ -3213,6 +3213,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			// Logica
 			items = facFacturaExtendsMapper.getInformeFacturacionOriginal(idSerieFacturacion, idProgramacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 			items.addAll(facFacturaExtendsMapper.getInformeFacturacionActual(idSerieFacturacion, idProgramacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
+			items.addAll(facFacturaExtendsMapper.getInformeFacturacionAnticipadoCaja(idSerieFacturacion, idProgramacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
+			items.addAll(facFacturaExtendsMapper.getInformeFacturacionAdeudoOriginal(idSerieFacturacion, idProgramacion, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje()));
 			informeFacturacionDTO.setInformeFacturacion(items);
 
 		}

@@ -1314,7 +1314,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					if (asuntosClaveJusticiableItem != null && asuntosClaveJusticiableItem.size() > 0) {
 
-						asuntosJusticiableDTO = searchAsuntosConClave(asuntosClaveJusticiableItem, true, request);
+						asuntosJusticiableDTO = searchAsuntosConClave(asuntosClaveJusticiableItem, false, request);
 					}
 
 				} catch (Exception e) {
@@ -1368,21 +1368,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							AsuntosJusticiableItem asunto = null;
 
 							switch (asuntoClave.getTipo()) {
-							case SigaConstants.TIPO_ASUNTO_EJG:
-								asunto = getAsuntoTipoEjg(asuntoClave, idInstitucion, fromJusticiable, usuario);
-								break;
-							case SigaConstants.TIPO_ASUNTO_DESIGNA:
-								asunto = getAsuntoTipoDesigna(asuntoClave, idInstitucion, fromJusticiable, usuario);
-								break;
-							case SigaConstants.TIPO_ASUNTO_ASISTENCIA:
-								asunto = getAsuntoTipoAsistencia(asuntoClave, idInstitucion, fromJusticiable, usuario);
-								break;
-							case SigaConstants.TIPO_ASUNTO_SOJ:
-								asunto = getAsuntoTipoSOJ(asuntoClave, idInstitucion, fromJusticiable, usuario);
-								break;
-
-							default:
-								break;
+								case SigaConstants.TIPO_ASUNTO_EJG:
+									asunto = getAsuntoTipoEjg(asuntoClave, idInstitucion, fromJusticiable, usuario);
+									break;
+								case SigaConstants.TIPO_ASUNTO_DESIGNA:
+									asunto = getAsuntoTipoDesigna(asuntoClave, idInstitucion, fromJusticiable, usuario);
+									break;
+								case SigaConstants.TIPO_ASUNTO_ASISTENCIA:
+									asunto = getAsuntoTipoAsistencia(asuntoClave, idInstitucion, fromJusticiable, usuario);
+									break;
+								case SigaConstants.TIPO_ASUNTO_SOJ:
+									asunto = getAsuntoTipoSOJ(asuntoClave, idInstitucion, fromJusticiable, usuario);
+									break;
+	
+								default:
+									break;
 							}
 							if(asuntoClave.getAnio() != null && !asuntoClave.getAnio().isEmpty()) {
 								asunto.setAnio(asuntoClave.getAnio());

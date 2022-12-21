@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -667,8 +668,8 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				
 				String[] parts;
 				if(ejgItem.getNumero() == null || ejgItem.getNumero().isEmpty()) {
-					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-							usuarios.get(0).getIdlenguaje().toString()));
+					ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString())));
 				}else if (ejgItem.getNumero().trim().contains(",")) {
 					parts = ejgItem.getNumero().trim().split(",");
 					//se crea un objeto auxiliar para obtener la consulta de cada numero de EJG
@@ -681,8 +682,8 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 						//al EJG se le aplica un numero del array
 						ejgItem.setNumero(str.trim());
 						//se carga los registros obtenidos de la consulta (se espera uno solo)
-						listAux.setEjgItems( scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-								usuarios.get(0).getIdlenguaje().toString()));
+						listAux.setEjgItems( getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+								usuarios.get(0).getIdlenguaje().toString())));
 						//se almacena en la lista de EJGItem el primer registro obtenido.
 						listAux2.add(listAux.getEjgItems().get(0));
 				
@@ -695,11 +696,11 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 
 					
 				} else if(ejgItem.getNumero().trim().contains("-")) {
-					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-							usuarios.get(0).getIdlenguaje().toString()));
+					ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString())));
 				}else {
-				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-						usuarios.get(0).getIdlenguaje().toString()));
+				ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+						usuarios.get(0).getIdlenguaje().toString())));
 				}
 				LOGGER.info(
 						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
@@ -966,5 +967,30 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
 	}
-
+	
+	public List<EjgItem> getRelaciones(List<EjgItem> listaEjg) {
+		List<RelacionesItem> relacionesItem = null;
+		List<EjgItem> ejgDesigna = null;
+		
+		for (EjgItem item: listaEjg) {
+			
+			ejgDesigna = scsEjgExtendsMapper.getEjgDesignas(item);
+			
+			if (ejgDesigna != null && ejgDesigna.size() > 0) {
+				item.setAnioDesigna(ejgDesigna.get(0).getAnioDesigna());
+				item.setNumeroDesigna(ejgDesigna.get(0).getNumeroDesigna());
+			}
+			
+			relacionesItem = scsEjgExtendsMapper.getRelacionesEJGBusqueda(item);
+			
+			if (relacionesItem != null && relacionesItem.size() > 0) {
+					item.setTurnoDes(relacionesItem.get(0).getDescturno() +
+							(item.getNombre() != null ? " / " + item.getNombre().toUpperCase() : ""));
+			} else {
+				item.setTurnoDes("");
+			}
+		
+		}
+		return listaEjg;
+	}
 }

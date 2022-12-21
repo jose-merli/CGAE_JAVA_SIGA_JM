@@ -9,6 +9,7 @@ public class BorrarSuscripcionBajaItem {
 	private int idservicio; //Tipo Servicio
 	private int idserviciosinstitucion; //Servicio
 	private String opcionaltasbajas;
+	private boolean checkboxDialogServicioAutomaticoAManual;
 	private Date fechaeliminacionaltas;
 	private String incluirbajasmanuales;
 	
@@ -20,6 +21,9 @@ public class BorrarSuscripcionBajaItem {
 	}
 	public int getIdservicio() {
 		return idservicio;
+	}
+	public boolean getcheckboxDialogServicioAutomaticoAManual() {
+		return checkboxDialogServicioAutomaticoAManual;
 	}
 	public void setIdservicio(int idservicio) {
 		this.idservicio = idservicio;

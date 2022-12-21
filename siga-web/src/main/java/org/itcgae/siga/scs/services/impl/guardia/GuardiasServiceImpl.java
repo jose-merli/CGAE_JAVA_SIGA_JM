@@ -851,9 +851,23 @@ public class GuardiasServiceImpl implements GuardiasService {
 						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasGuardia()))
 							guardia.setDiasguardia(Short.valueOf(guardiasItem.getDiasGuardia()));
 						guardia.setTipodiasguardia(guardiasItem.getTipoDiasGuardia());
-						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasPeriodo()))
+						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasPeriodo())) {
 							guardia.setDiasperiodo(Short.valueOf(guardiasItem.getDiasPeriodo()));
-						guardia.setTipodiasperiodo(guardiasItem.getTipoDiasPeriodo());
+						}else{
+							guardia.setDiasperiodo((short)0);
+
+						}
+						
+						
+						if (!UtilidadesString.esCadenaVacia(guardiasItem.getTipoDiasPeriodo()) && guardiasItem.getTipoDiasPeriodo() != null) {
+							guardia.setTipodiasperiodo(guardiasItem.getTipoDiasPeriodo());
+						}else if(guardiasItem.getTipoDiasPeriodo() == null) {
+							guardiasItem.setTipoDiasPeriodo("");
+							guardia.setTipodiasperiodo(guardiasItem.getTipoDiasPeriodo());
+
+						}
+						
+						
 						guardia.setSeleccionfestivos(guardiasItem.getSeleccionFestivos());
 						guardia.setSeleccionlaborables(guardiasItem.getSeleccionLaborables());
 						guardia.setRequeridavalidacion(guardiasItem.isRequeridaValidacion() ? "S" : "N");
@@ -1285,32 +1299,32 @@ public class GuardiasServiceImpl implements GuardiasService {
 					Map<Short, String> mapa = new TreeMap<Short, String>(Collections.reverseOrder());
 					if (cola != null && !cola.isEmpty()) {
 						if (cola.get(0).getAntiguedadcola() > 0)
-							mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA,");
+							mapilla.put(cola.get(0).getAntiguedadcola(), " ANTIGUEDADCOLA asc, ");
 						else if (cola.get(0).getAntiguedadcola() < 0) {
 							cola.get(0).setAntiguedadcola((short) -cola.get(0).getAntiguedadcola());
-							mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA desc,");
+							mapilla.put(cola.get(0).getAntiguedadcola(), " ANTIGUEDADCOLA desc, ");
 						}
 						if (cola.get(0).getAlfabeticoapellidos() > 0)
-							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS,");
+							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS asc, ");
 						else if (cola.get(0).getAlfabeticoapellidos() < 0) {
 							cola.get(0).setAlfabeticoapellidos((short) -cola.get(0).getAlfabeticoapellidos());
-							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS desc,");
+							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS desc, ");
 						}
 						if (cola.get(0).getFechanacimiento() > 0)
-							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO,");
+							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO asc, ");
 						else if (cola.get(0).getFechanacimiento() < 0) {
 							cola.get(0).setFechanacimiento((short) -cola.get(0).getFechanacimiento());
-							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO desc,");
+							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO desc, ");
 
 						}
 						if (cola.get(0).getOrdenacionmanual() > 0)
-							mapilla.put(cola.get(0).getOrdenacionmanual(), "NUMEROGRUPO, ORDENGRUPO,");
+							mapilla.put(cola.get(0).getOrdenacionmanual(), "NUMEROGRUPO, ORDENGRUPO, ");
 
 						if (cola.get(0).getNumerocolegiado() > 0)
-							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO,");
+							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO asc, ");
 						else if (cola.get(0).getNumerocolegiado() < 0) {
 							cola.get(0).setNumerocolegiado((short) -cola.get(0).getNumerocolegiado());
-							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO desc,");
+							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO desc, ");
 						}
 						mapa.putAll(mapilla);
 						if (mapa.size() > 0)
@@ -1320,7 +1334,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						if (!ordenaciones.isEmpty()) {
 							ordenaciones.substring(0, ordenaciones.length() - 1);
 						} else {
-							ordenaciones = "ANTIGUEDADCOLA, "; // por defecto
+							ordenaciones = " ANTIGUEDADCOLA, "; // por defecto
 						}
 					}
 					// Si hay ultimo se prepara su WHERE correspondiente
@@ -1371,7 +1385,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
 					// cuando marcamos orden = manual por primera vez
 					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos == "1") {
-
 						int j = 1;
 						for (int x = 0; x < colaGuardia.size(); x++) {
 							// rellenar todos los numero grupo y orden
@@ -1487,7 +1500,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado.setIdpersona(Long.valueOf(todaColaGuardia.get(i).getIdPersona()));
 								grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
 								grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
-
 								// NewIdDTO idP = scsGrupoguardiacolegiadoExtendsMapper.getLastId();
 
 								/*
@@ -1526,7 +1538,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado.setFechamodificacion(new Date());
 								grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
 								grupoColegiado.setOrden(1);
-
+								
 								scsGrupoguardiacolegiadoExample = new ScsGrupoguardiacolegiadoExample();
 								scsGrupoguardiacolegiadoExample.createCriteria()
 										.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
@@ -9646,17 +9658,25 @@ public class GuardiasServiceImpl implements GuardiasService {
 		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date())) && guardiaCol.getValidada().equals("1")) {
 			guardiaCol.setEstadoGuardia("Realizada y validada.");
 		}
-		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date())) && guardiaCol.getValidada().equals("1") && guardiaCol.getFacturado().equals("1")) {
+		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) ||
+				guardiaCol.getFechadesde().equals(new Date())) &&
+				(guardiaCol.getValidada() != null && guardiaCol.getValidada().equals("1")) &&
+				(guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1"))) {
 
-			FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
-			facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-					.andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
-
-			List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper.selectByExample(facturacionExample);
-			if (!facturas.isEmpty()) {
-				guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
+			if(guardiaCol.getIdFacturacion()!=null) {
+				FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
+				facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
+	
+				List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper.selectByExample(facturacionExample);
+				if (facturas!=null && !facturas.isEmpty()) {
+					guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
+				}
 			}
 
+		}
+		if(guardiaCol.getEstadoGuardia() == null) {
+			guardiaCol.setEstadoGuardia(" ");
 		}
 
 	}

@@ -123,6 +123,30 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "totalPendiente", property = "totalPendiente", jdbcType = JdbcType.VARCHAR)
 	})
 	List<InformeFacturacionItem> getInformeFacturacionOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje);
+	
+	
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getInformeFacturacionAnticipadoCaja")
+	@Results({
+			@Result(column = "momento", property = "momento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "formaPago", property = "formaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numeroFacturas", property = "numeroFacturas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "totalPendiente", property = "totalPendiente", jdbcType = JdbcType.VARCHAR)
+	})
+	List<InformeFacturacionItem> getInformeFacturacionAnticipadoCaja(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje);
+	
+	
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getInformeFacturacionAdeudoOriginal")
+	@Results({
+			@Result(column = "momento", property = "momento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "formaPago", property = "formaPago", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numeroFacturas", property = "numeroFacturas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "totalPendiente", property = "totalPendiente", jdbcType = JdbcType.VARCHAR)
+	})
+	List<InformeFacturacionItem> getInformeFacturacionAdeudoOriginal(String idSerieFacturacion, String idProgramacion, String idInstitucion, String idLenguaje);
+
+	
 
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getNewFacturaID")
 	@Results({

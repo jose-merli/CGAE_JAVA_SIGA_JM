@@ -655,6 +655,14 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "    AS fechasolicitadaanulacion,\r\n"
 				+ "    suscripcion.fechasuscripcion AS fechaefectiva,\r\n"
 				+ "    suscripcion.fechabaja AS fechaanulada,\r\n"
+				+ "	 CASE \r\n" + 
+				"    	WHEN suscripcion.fechabaja IS NOT NULL THEN 5\r\n" + 
+				"    	WHEN suscripcion.fechasuscripcion IS NOT NULL AND petbaja.fecha IS NOT NULL THEN 4\r\n" + 
+				"    	WHEN suscripcion.fechasuscripcion IS NOT NULL THEN 3\r\n" + 
+				"    	WHEN suscripcion.fechasuscripcion IS NULL AND petbaja.fecha IS NOT NULL THEN 2\r\n" + 
+				"    	ELSE 1\r\n" + 
+				"    END\r\n" + 
+				"    AS IdEstadoSolicitud, "
 				+ "    f_siga_getrecurso_etiqueta(\r\n"
 				+ "        estfact.descripcion,\r\n"
 				+ "        '1'\r\n"
@@ -909,6 +917,13 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "    END,\r\n"
 				+ "    suscripcion.fechasuscripcion,\r\n"
 				+ "    suscripcion.fechabaja,\r\n"
+				+ "  CASE \r\n" + 
+				"    	WHEN suscripcion.fechabaja IS NOT NULL THEN 5\r\n" + 
+				"    	WHEN suscripcion.fechasuscripcion IS NOT NULL AND petbaja.fecha IS NOT NULL THEN 4\r\n" + 
+				"    	WHEN suscripcion.fechasuscripcion IS NOT NULL THEN 3\r\n" + 
+				"    	WHEN suscripcion.fechasuscripcion IS NULL AND petbaja.fecha IS NOT NULL THEN 2\r\n" + 
+				"    	ELSE 1\r\n" + 
+				"    END\r\n, "
 				+ "    f_siga_getrecurso_etiqueta(\r\n"
 				+ "        estfact.descripcion,\r\n"
 				+ "        '1'\r\n"

@@ -131,10 +131,10 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 
 		sql.SELECT("juzgado.CODIGOEXT2");
 		sql.SELECT("juzgado.NOMBRE");
-		sql.SELECT("P.NOMBRE AS NOMBREPOBLACION");
+		sqlJuzgado.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
 		sql.SELECT("juzgado.IDJUZGADO");
 		sql.FROM("SCS_JUZGADO juzgado");
-		sql.INNER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
+		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
 		sql.WHERE("juzgado.fechabaja is null");
 		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
 
@@ -146,10 +146,10 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 			sqlUnion.append(" UNION ");
 			sqlJuzgado.SELECT("juzgado.CODIGOEXT2");
 			sqlJuzgado.SELECT("juzgado.NOMBRE");
-			sqlJuzgado.SELECT("P.NOMBRE AS NOMBREPOBLACION");
+			sqlJuzgado.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
 			sqlJuzgado.SELECT("juzgado.IDJUZGADO");
 			sqlJuzgado.FROM("SCS_JUZGADO juzgado");
-			sqlJuzgado.INNER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
+			sqlJuzgado.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
 			sqlJuzgado.WHERE("juzgado.idjuzgado = " + idJuzgado);
 			sqlJuzgado.WHERE("juzgado.idinstitucion = " + idInstitucion);
 			sqlUnion.append(sqlJuzgado);
