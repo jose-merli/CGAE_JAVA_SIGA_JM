@@ -7531,7 +7531,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				designa.setNig(ejg.getNig());
 				designa.setObservaciones(ejg.getObservaciones());
 				// designa.set (No existe campo calidad en ScsDesigna)
-				designa.setIdpretension(ejg.getIdpretension().shortValue());
+				designa.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
 				designa.setIdjuzgado(ejg.getJuzgado());
 
 				// Actualizamos los delitos del ejg
@@ -7660,6 +7660,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
 					procDesigna.setFechamodificacion(new Date());
 
+					procDesigna.setObservaciones(SigaConstants.OBS_IMPORTADO_EJG);
+					
 					response = scsDesignaProcuradorMapper.insert(procDesigna);
 					if (response == 0)
 						throw (new Exception("Error al introducir un procurador en la designa proveniente del EJG"));

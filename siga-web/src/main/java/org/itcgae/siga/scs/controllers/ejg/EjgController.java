@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -47,6 +48,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +60,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @RestController
 @RequestMapping(value = "/ejg")
 public class EjgController {
+	
+	private Logger LOGGER = Logger.getLogger(EjgController.class);
+	
 	@Autowired
 	private IBusquedaEJG busquedaEJG;
 
@@ -850,9 +855,18 @@ public class EjgController {
 		ejgItem.setAnnio(anio);
 		ejgItem.setNumero(numero);
 		ejgItem.setTipoEJG(idTipoEJG);
-
-		DocushareDTO response = gestionEJG.searchListDocEjg(ejgItem, request);
-		return new ResponseEntity<DocushareDTO>(response, HttpStatus.OK);
+		
+		// AQUI LLEGA DE VEZ EN CUANDO A "undefined" (al menos el elemento anio)
+		DocushareDTO response = new DocushareDTO();
+		if ( !StringUtils.isEmpty(anio) && !StringUtils.isEmpty(numero) && !StringUtils.isEmpty(idTipoEJG)
+				&& (("undefined").equalsIgnoreCase(anio) || ("undefined").equalsIgnoreCase(numero) || ("undefined").equalsIgnoreCase(idTipoEJG)) ) {
+			LOGGER.info("+++++ searchListEjg('/gestion-ejg/searchListDocEjg') --> UNDEFINED VALUES => anio = " + anio + " | numero = " + numero + " | idTipoEJG = " + idTipoEJG);
+			return new ResponseEntity<DocushareDTO>(response, HttpStatus.NO_CONTENT);
+		} else {
+			response = gestionEJG.searchListDocEjg(ejgItem, request);
+			return new ResponseEntity<DocushareDTO>(response, HttpStatus.OK);
+		}
+		
 	}
 
 	@RequestMapping(value = "/gestion-ejg/insertCollectionEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
