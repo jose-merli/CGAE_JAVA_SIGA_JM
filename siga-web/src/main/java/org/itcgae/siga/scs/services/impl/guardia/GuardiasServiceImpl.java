@@ -2478,6 +2478,16 @@ public class GuardiasServiceImpl implements GuardiasService {
 						scsIncompatibilidadguardiasExtendsMapper.deleteIncompatibilidades(incompatibilidad.getIdTurno(),
 								incompatibilidad.getIdInstitucion(), incompatibilidad.getIdGuardia(),
 								incompatibilidad.getIdTurnoIncompatible(), incompatibilidad.getIdGuardiaIncompatible());
+					} else if (!UtilidadesString.esCadenaVacia(incompatibilidad.getIdTurno())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdInstitucion())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdGuardia())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdGuardiaIncompatible())) {
+						
+						List<String> turnoIncByIdGuardiaInc = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncByIdGuardiaInc(incompatibilidad.getIdGuardiaIncompatible(), incompatibilidad.getIdInstitucion());
+						
+						scsIncompatibilidadguardiasExtendsMapper.deleteIncompatibilidades(incompatibilidad.getIdTurno(),
+								incompatibilidad.getIdInstitucion(), incompatibilidad.getIdGuardia(),
+								turnoIncByIdGuardiaInc.get(0), incompatibilidad.getIdGuardiaIncompatible());
 					}
 				}
 				LOGGER.info("deleteIncompatibilidades() -> Salida ya con los datos recogidos");
@@ -2570,6 +2580,18 @@ public class GuardiasServiceImpl implements GuardiasService {
 										.collect(Collectors.joining(","));
 							}
 						}
+						
+						List<String> idTurnoIncpList = Arrays.asList(idTurnoIncompatible.split("\\s*,\\s*"));
+						List<String> idGuardiaIncpList = Arrays.asList(idGuardiaIncompatible.split("\\s*,\\s*"));
+						if(idGuardiaIncpList.size() > idTurnoIncpList.size()) {
+							String idInstitucionTurno = idInstitucion;
+							idTurnoIncompatible = Stream.of(idGuardiaIncompatible.split("\\s*,\\s*"))
+									.flatMap(idGuardiaItem -> scsIncompatibilidadguardiasExtendsMapper
+											.getIdTurnoIncByIdGuardiaInc(idGuardiaItem, idInstitucionTurno)
+											.stream())
+									.collect(Collectors.joining(","));
+						}
+						idTurnoIncpList = Arrays.asList(idTurnoIncompatible.split("\\s*,\\s*"));
 
 						String pattern = "dd/MM/YY";
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
@@ -2578,8 +2600,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 								&& !incompatibilidad.getIdInstitucion().isEmpty() && idGuardia != null
 								&& !idGuardia.isEmpty() && idGuardiaIncompatible != null
 								&& !idGuardiaIncompatible.isEmpty()) {
-							List<String> idTurnoIncpList = Arrays.asList(idTurnoIncompatible.split("\\s*,\\s*"));
-							List<String> idGuardiaIncpList = Arrays.asList(idGuardiaIncompatible.split("\\s*,\\s*"));
 							for (int j = 0; j < idGuardiaIncpList.size(); j++) {
 								int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(
 										idTurno, incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncpList.get(j),
