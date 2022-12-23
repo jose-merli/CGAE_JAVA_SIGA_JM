@@ -22,7 +22,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 				"    bt.fechaalta,\r\n" + 
 				"    bt.descripcion,\r\n" + 
 				"    bt.validado,\r\n" +
-				"    bt.fechabt,\r\n" + 
+				//"    bt.fechabt,\r\n" + 
 				"    bt.fechaestado,\r\n" + 
 				"    trunc(bt.fechaestado),\r\n" + 
 				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado,\r\n" + 

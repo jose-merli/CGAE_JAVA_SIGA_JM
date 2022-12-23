@@ -687,20 +687,25 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 				try {
 
-					ScsPersonajgExample example = new ScsPersonajgExample();
-					example.createCriteria().andNifEqualTo(justiciableItem.getNif())
-							.andIdinstitucionEqualTo(idInstitucion);
+					List<ScsPersonajg> personasList = new ArrayList<>();
+					
+					if(justiciableItem.getNif() == null) {
+						justiciableItem.setNif("");
 
-					example.setOrderByClause("FECHAMODIFICACION DESC");
-
-					LOGGER.info(
-							"createJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para comprobar que no este registrado el nif del nuevo justiciable");
-
-					List<ScsPersonajg> personasList = scsPersonajgExtendsMapper.selectByExample(example);
-
-					LOGGER.info(
-							"createJusticiable() / scsTelefonospersonaMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para comprobar que no este registrado el nif del nuevo justiciable");
-
+					}else {
+						ScsPersonajgExample example = new ScsPersonajgExample();
+						example.createCriteria().andNifEqualTo(justiciableItem.getNif())
+						.andIdinstitucionEqualTo(idInstitucion);
+						example.setOrderByClause("FECHAMODIFICACION DESC");
+	
+						LOGGER.info(
+								"createJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para comprobar que no este registrado el nif del nuevo justiciable");
+	
+						personasList = scsPersonajgExtendsMapper.selectByExample(example);
+	
+						LOGGER.info(
+								"createJusticiable() / scsTelefonospersonaMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para comprobar que no este registrado el nif del nuevo justiciable");
+					}
 					if (null != personasList && personasList.size() > 0 && !justiciableItem.isValidacionRepeticion()) {
 
 						ScsPersonajg persona = personasList.get(0);
@@ -867,7 +872,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			scsPersonajg.setIdtipoidentificacionotros(justiciableItem.getIdTipoIdentificacionotros());
 			scsPersonajg.setIdtipovia(justiciableItem.getIdTipoVia());
 			scsPersonajg.setIdtipovia2(justiciableItem.getIdTipoVia2());
-			scsPersonajg.setNif(justiciableItem.getNif().toUpperCase());
+			
+			if(justiciableItem.getNif() == null) {
+				scsPersonajg.setNif("");
+			}else {
+				scsPersonajg.setNif(justiciableItem.getNif().toUpperCase());
+			}
 			scsPersonajg.setNombre(justiciableItem.getNombre());
 			scsPersonajg.setNumerodir(justiciableItem.getNumeroDir());
 			scsPersonajg.setNumerodir2(justiciableItem.getNumeroDir2());

@@ -297,7 +297,7 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		sql.WHERE("IDTURNO = " + idTurno);
 		sql.WHERE("IDGUARDIA = " + idGuardia);
 		sql.WHERE("FECHAINICIO >= TO_DATE('" + fechaInicio + "', 'dd/mm/yyyy')");
-		sql.WHERE("FECHA_FIN <= TO_DATE('" + fechaFin + "', 'dd/mm/yyyy')");
+		//sql.WHERE("FECHA_FIN <= TO_DATE('" + fechaFin + "', 'dd/mm/yyyy')");
 		return sql.toString();
 
 	}

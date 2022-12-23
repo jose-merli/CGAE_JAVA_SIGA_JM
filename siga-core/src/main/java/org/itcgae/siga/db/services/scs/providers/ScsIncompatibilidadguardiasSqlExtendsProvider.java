@@ -356,7 +356,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 
 		List<String> idTurnoIncompatibleList = Arrays.asList(idTurnoIncompatible.split(","));
 		List<String> idGuardiaIncompatibleList = Arrays.asList(idGuardiaIncompatible.split(","));
-		String tuplasIncompatibles = IntStream.range(0, idTurnoIncompatibleList.size()).boxed()
+		String tuplasIncompatibles = IntStream.range(0, idGuardiaIncompatibleList.size()).boxed()
 				.map(i -> "(" + idTurno + ", " + idGuardia + ", " + idTurnoIncompatibleList.get(i) + ", " + idGuardiaIncompatibleList.get(i) + "),"
 					+ "(" + idTurnoIncompatibleList.get(i) + ", " + idGuardiaIncompatibleList.get(i) + ", " + idTurno + "," + idGuardia + ")")
 				.collect(Collectors.joining(","));
