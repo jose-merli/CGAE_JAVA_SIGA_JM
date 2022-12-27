@@ -242,10 +242,14 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlOrder.FROM("(" + sql + " )");
 		if (tamMax != null) {
 			Integer tamMaxNumber = tamMax + 1;
-			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+			if(tamMax > 50) {
+				sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+			}else {
+				sqlOrder.WHERE("rownum <= " + tamMax);
+			}
 		}
 
-		LOGGER.info("MONTADA SQL IDPERSONAS");
+//		LOGGER.info("MONTADA SQL IDPERSONAS");
 
 		return sqlOrder.toString();
 	}
