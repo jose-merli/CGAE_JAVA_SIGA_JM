@@ -26,7 +26,7 @@ public class JusticiableBusquedaItem {
 	private String apellido2;
 	private String numeroAsuntos;
 	private String ultimoAsunto;
-	
+	private String filas;
 	
 	/**
 	 **/
@@ -330,6 +330,14 @@ public class JusticiableBusquedaItem {
 
 	public void setUltimoAsunto(String ultimoAsunto) {
 		this.ultimoAsunto = ultimoAsunto;
+	}
+
+	public String getFilas() {
+		return filas;
+	}
+
+	public void setFilas(String filas) {
+		this.filas = filas;
 	}
 
 	@Override
