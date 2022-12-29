@@ -1926,7 +1926,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboProcedimientosConJuzgado(Short idInstitucion, List<String> idPretensiones) {
+	public String comboProcedimientosConJuzgado(Short idInstitucion, List<String> idPretensiones,String idLenguaje) {
 
 		String inSQL = "(";
 
@@ -1938,14 +1938,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			}
 		}
 
+
 		SQL sql = new SQL();
-		sql.SELECT("DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS DESCRIPCION ");
-		sql.FROM("SCS_PRETENSION ");
-		sql.WHERE("IDINSTITUCION = " + idInstitucion);
-		sql.WHERE("IDPRETENSION IN " + inSQL);
-		sql.WHERE("FECHABAJA IS NULL");
-		sql.WHERE("FECHA_BAJA IS NULL");
-		sql.ORDER_BY("DESCRIPCION");
+		
+		
+		sql.SELECT_DISTINCT("IDPRETENSION"); 
+		sql.SELECT("NVL(sp.CODIGOEXT, ' ') || ' - ' || f_siga_getrecurso(sp.DESCRIPCION, " + idLenguaje + ") AS DESCRIPCION");
+	    sql.FROM("SCS_PRETENSION sp");
+	    sql.WHERE("IDINSTITUCION = " + idInstitucion);
+	    sql.WHERE("IDPRETENSION IN " + inSQL);
+	    sql.WHERE("FECHABAJA IS NULL");
+	    sql.WHERE("FECHA_BAJA IS NULL");
+		
+		
 
 		return sql.toString();
 	}

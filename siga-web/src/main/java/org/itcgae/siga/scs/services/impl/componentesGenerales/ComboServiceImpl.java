@@ -1583,12 +1583,13 @@ public class ComboServiceImpl implements ComboService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
+			String idLenguaje = usuarios.get(0).getIdlenguaje();
 			if (null != usuarios && usuarios.size() > 0) {
 
 				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados(idInstitucion,
@@ -1614,7 +1615,7 @@ public class ComboServiceImpl implements ComboService {
 						}
 
 						comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConJuzgado(idInstitucion,
-								idPretensiones);
+								idPretensiones, idLenguaje);
 					}
 				}
 
