@@ -131,7 +131,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 
 		sql.SELECT("juzgado.CODIGOEXT2");
 		sql.SELECT("juzgado.NOMBRE");
-		sqlJuzgado.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
+		sql.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
 		sql.SELECT("juzgado.IDJUZGADO");
 		sql.FROM("SCS_JUZGADO juzgado");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
