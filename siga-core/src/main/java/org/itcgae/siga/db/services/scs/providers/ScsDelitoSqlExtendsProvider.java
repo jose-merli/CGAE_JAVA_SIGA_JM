@@ -8,11 +8,9 @@ public class ScsDelitoSqlExtendsProvider extends ScsDelitoSqlProvider{
 	public String comboDelitos(String idLenguaje, Short idInstitucion) {
 		SQL sql = new SQL();
 		
-		sql.SELECT("delito.IDdelito");
-		sql.SELECT("catalogodelito.DESCRIPCION");
+		sql.SELECT("delito.IDdelito, f_siga_getrecurso(delito.DESCRIPCION, " + idLenguaje + ") AS DESCRIPCION");
 
 		sql.FROM("scs_delito delito");
-		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogodelito on catalogodelito.idrecurso = delito.DESCRIPCION and catalogodelito.idlenguaje ="+idLenguaje);
 		sql.WHERE("delito.fechabaja is null");
 		sql.WHERE("delito.idinstitucion ='"+String.valueOf(idInstitucion)+"'");
 		sql.ORDER_BY("descripcion");
