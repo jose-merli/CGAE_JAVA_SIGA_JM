@@ -987,10 +987,9 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						.selectByExample(contrariosDesignaExample);
 
 				if (!contrariosDesigna.isEmpty()) {
-					response = scsDelitosdesignaMapper.deleteByExample(delitosDesignaExample);
+					response = scsContrariosdesignaMapper.deleteByExample(contrariosDesignaExample);
 					if (response == 0)
-//						throw (new Exception("Error al eliminar los contrarios de la designacion"));
-						LOGGER.info("throw (new Exception(\"Error al eliminar los contrarios de la designacion\"));");
+						throw (new Exception("Error al eliminar los contrarios de la designacion"));
 				}
 
 				// Se crean los nuevos contrarios y se asignan

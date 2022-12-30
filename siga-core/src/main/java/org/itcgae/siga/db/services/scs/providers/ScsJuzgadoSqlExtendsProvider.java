@@ -127,15 +127,6 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 		SQL sql = new SQL();
 		StringBuilder sqlUnion = new StringBuilder();
 
-		sql.SELECT("juzgado.CODIGOEXT2");
-		sql.SELECT("juzgado.NOMBRE");
-		sql.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
-		sql.SELECT("juzgado.IDJUZGADO");
-		sql.FROM("SCS_JUZGADO juzgado");
-		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
-		sql.WHERE("juzgado.fechabaja is null");
-		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
-
 		if (idJuzgado.equals("0")) {
 			sql.SELECT("juzgado.CODIGOEXT2");
 			sql.SELECT("juzgado.NOMBRE");
