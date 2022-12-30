@@ -52,6 +52,7 @@ import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsSoj;
+import org.itcgae.siga.db.entities.ScsSojExample;
 import org.itcgae.siga.db.entities.ScsSojKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
@@ -577,40 +578,42 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Seleccionando EJG y SOJ.");
 
-				ScsSojKey sojKey = new ScsSojKey();
+				ScsSojExample sojExample = new ScsSojExample();
+				sojExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+				.andNumsojEqualTo(datos.get(2))
+				.andAnioEqualTo(Short.parseShort(datos.get(1)))
+				.andIdtiposojEqualTo(Short.parseShort(datos.get(3)));
 
-				sojKey.setIdinstitucion(idInstitucion);
-				sojKey.setNumero(Long.parseLong(datos.get(2)));
-				sojKey.setAnio(Short.parseShort(datos.get(1)));
-				sojKey.setIdtiposoj(Short.parseShort(datos.get(3)));
-
-				ScsSoj soj = scsSojMapper.selectByPrimaryKey(sojKey);
-
-				ScsEjgKey ejgKey = new ScsEjgKey();
-
-				ejgKey.setIdinstitucion(idInstitucion);
-				ejgKey.setAnio(Short.parseShort(datos.get(5)));
-				ejgKey.setIdtipoejg(Short.parseShort(datos.get(4)));
-				ejgKey.setNumero(Long.parseLong(datos.get(6)));
-
-				ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
-
-				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> EJG y SOJ seleccionados.");
-
-				// 2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
-
-				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Copiando informacion del EJG al SOJ.");
-//				soj.setIdpersona(ejg.getIdpersona());
-				soj.setIdpersonajg(ejg.getIdpersonajg());
-
-				soj.setUsumodificacion(usuarios.get(0).getIdusuario());
-				soj.setFechamodificacion(new Date());
-
-				response = scsSojMapper.updateByPrimaryKey(soj);
-				if (response == 0)
-					throw (new Exception("Error en copyEjg2Soj() al copiar los datos del EJG al SOJ."));
-
-				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Saliendo del servicio... ");
+				List<ScsSoj> listSoj = scsSojMapper.selectByExample(sojExample);
+				
+				if(listSoj != null && !listSoj.isEmpty()) {
+					ScsSoj soj = listSoj.get(0);
+					ScsEjgKey ejgKey = new ScsEjgKey();
+	
+					ejgKey.setIdinstitucion(idInstitucion);
+					ejgKey.setAnio(Short.parseShort(datos.get(5)));
+					ejgKey.setIdtipoejg(Short.parseShort(datos.get(4)));
+					ejgKey.setNumero(Long.parseLong(datos.get(6)));
+	
+					ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+	
+						LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> EJG y SOJ seleccionados.");
+		
+						// 2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
+		
+						LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Copiando informacion del EJG al SOJ.");
+						soj.setIdpersona(ejg.getIdpersona());
+						soj.setIdpersonajg(ejg.getIdpersonajg());
+		
+						soj.setUsumodificacion(usuarios.get(0).getIdusuario());
+						soj.setFechamodificacion(new Date());
+		
+						response = scsSojMapper.updateByPrimaryKeySelective(soj);
+						if (response == 0)
+							throw (new Exception("Error en copyEjg2Soj() al copiar los datos del EJG al SOJ."));
+		
+						LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Saliendo del servicio... ");
+				}
 			}
 		}
 
@@ -1809,15 +1812,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				// 1. Obtenemos los asuntos que vamos a manipular.
 
 				LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Seleccionando Designacion y SOJ.");
+				
+				ScsSojExample sojExample = new ScsSojExample();
+				sojExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+				.andNumsojEqualTo(datos.get(2))
+				.andAnioEqualTo(Short.parseShort(datos.get(1)))
+				.andIdtiposojEqualTo(Short.parseShort(datos.get(3)));
 
-				ScsSojKey sojKey = new ScsSojKey();
-
-				sojKey.setIdinstitucion(idInstitucion);
-				sojKey.setNumero(Long.parseLong(datos.get(2)));
-				sojKey.setAnio(Short.parseShort(datos.get(1)));
-				sojKey.setIdtiposoj(Short.parseShort(datos.get(3)));
-
-				ScsSoj soj = scsSojMapper.selectByPrimaryKey(sojKey);
+				List<ScsSoj> listSoj = scsSojMapper.selectByExample(sojExample);
 
 				ScsDesignaKey designaKey = new ScsDesignaKey();
 
@@ -1832,24 +1834,47 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				// 2. Se asignan el letrado  principal de la designacion al SOJ.
 
+				if(listSoj != null && !listSoj.isEmpty() && designa != null) {
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Copiando informacion de la designacion al SOJ.");
 
 				ScsDesignasletradoExample letradosDesignaExample = new ScsDesignasletradoExample();
 
-//				letradosDesignaExample.setOrderByClause("FECHADESIGNA DESC");
-//				letradosDesignaExample.createCriteria().andAnioEqualTo(designa.getAnio())
-//						.andNumeroEqualTo(designa.getNumero()).andIdinstitucionEqualTo(idInstitucion)
-//						.andIdturnoEqualTo(designa.getIdturno());
+				letradosDesignaExample.setOrderByClause("FECHADESIGNA DESC");
+				letradosDesignaExample.createCriteria().andAnioEqualTo(designa.getAnio())
+						.andNumeroEqualTo(designa.getNumero()).andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(designa.getIdturno());
 
 				// Buscamos el ultmo letrado designado en la designa.
-//				List<ScsDesignasletrado> letradosDesigna = scsDesignasletradoMapper
-//						.selectByExample(letradosDesignaExample);
+				List<ScsDesignasletrado> letradosDesigna = scsDesignasletradoMapper
+						.selectByExample(letradosDesignaExample);
 
-//				if (!letradosDesigna.isEmpty())
-//					soj.setIdpersona(letradosDesigna.get(0).getIdpersona());
-//				else
-//					soj.setIdpersona(null);
+				ScsSoj soj = listSoj.get(0);
+				if (letradosDesigna != null && !letradosDesigna.isEmpty())
+					soj.setIdpersona(letradosDesigna.get(0).getIdpersona());
+				else
+					soj.setIdpersona(null);
+				
+				// 3. Se asignan el defendido de la designacion al SOJ.
+
+				LOGGER.info(
+						"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Copiando informacion de la designacion al SOJ.");
+
+				ScsDefendidosdesignaExample defendidosDesignaExample = new ScsDefendidosdesignaExample();
+
+				defendidosDesignaExample.setOrderByClause("NUMERO");
+				defendidosDesignaExample.createCriteria().andAnioEqualTo(designa.getAnio())
+						.andNumeroEqualTo(designa.getNumero()).andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(designa.getIdturno());
+
+				// Buscamos el ultmo letrado designado en la designa.
+				List<ScsDefendidosdesigna> defendidosDesigna = scsDefendidosdesignaMapper
+						.selectByExample(defendidosDesignaExample);
+				
+				if (defendidosDesigna!= null && !defendidosDesigna.isEmpty())
+					soj.setIdpersonajg(defendidosDesigna.get(0).getIdpersona());
+				else
+					soj.setIdpersonajg(null);
 
 				soj.setUsumodificacion(usuarios.get(0).getIdusuario());
 				soj.setFechamodificacion(new Date());
@@ -1860,6 +1885,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Informacion copiada de la designacion al SOJ.");
+				}
 //				} catch (Exception e) {
 //					LOGGER.error("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Se ha producido un error ",
 //							e);
@@ -2001,47 +2027,48 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Seleccionando asistencia y SOJ.");
 
-				ScsSojKey sojKey = new ScsSojKey();
+				ScsSojExample sojExample = new ScsSojExample();
+				sojExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+				.andNumsojEqualTo(datos.get(2))
+				.andAnioEqualTo(Short.parseShort(datos.get(1)))
+				.andIdtiposojEqualTo(Short.parseShort(datos.get(3)));
 
-				sojKey.setIdinstitucion(idInstitucion);
-				sojKey.setNumero(Long.parseLong(datos.get(2)));
-				sojKey.setAnio(Short.parseShort(datos.get(1)));
-				sojKey.setIdtiposoj(Short.parseShort(datos.get(3)));
-
-				ScsSoj soj = scsSojMapper.selectByPrimaryKey(sojKey);
-
-				ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
-
-				asisKey.setIdinstitucion(idInstitucion);
-				asisKey.setAnio(Short.parseShort(datos.get(5)));
-				asisKey.setNumero(Long.parseLong(datos.get(6)));
-
-				ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
-
-				LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Soj() -> asistencia y SOJ seleccionados.");
-
-				// 2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
-
-				LOGGER.info(
-						"BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Copiando informacion de la asistencia al SOJ.");
-//				soj.setIdpersona(asis.getIdpersonacolegiado());
-				soj.setIdpersonajg(asis.getIdpersonajg());
-
-				soj.setUsumodificacion(usuarios.get(0).getIdusuario());
-				soj.setFechamodificacion(new Date());
-
-				response = scsSojMapper.updateByPrimaryKey(soj);
-				if (response == 0)
-					throw (new Exception("Error en copyAsis2Soj() al copiar los datos de la asistencia al SOJ."));
-
-				LOGGER.info(
-						"BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Informacion copiada de la asistencia al SOJ.");
-//				} catch (Exception e) {
-//					LOGGER.error("BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Se ha producido un error en el servicio copyAsis2Soj",
-//							e);
-//					response = 0;
-//				}
-
+				List<ScsSoj> listSoj = scsSojMapper.selectByExample(sojExample);
+				
+				if(listSoj != null && !listSoj.isEmpty()) {
+					ScsSoj soj = listSoj.get(0);
+					ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+	
+					asisKey.setIdinstitucion(idInstitucion);
+					asisKey.setAnio(Short.parseShort(datos.get(5)));
+					asisKey.setNumero(Long.parseLong(datos.get(6)));
+	
+					ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+	
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Soj() -> asistencia y SOJ seleccionados.");
+	
+					// 2. Se asignan el letrado y el solicitante principal de la Asistencia al SOJ.
+	
+					LOGGER.info(
+							"BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Copiando informacion de la asistencia al SOJ.");
+					soj.setIdpersona(asis.getIdpersonacolegiado());
+					soj.setIdpersonajg(asis.getIdpersonajg());
+	
+					soj.setUsumodificacion(usuarios.get(0).getIdusuario());
+					soj.setFechamodificacion(new Date());
+	
+					response = scsSojMapper.updateByPrimaryKey(soj);
+					if (response == 0)
+						throw (new Exception("Error en copyAsis2Soj() al copiar los datos de la asistencia al SOJ."));
+	
+					LOGGER.info(
+							"BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Informacion copiada de la asistencia al SOJ.");
+	//				} catch (Exception e) {
+	//					LOGGER.error("BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Se ha producido un error en el servicio copyAsis2Soj",
+	//							e);
+	//					response = 0;
+	//				}
+				}
 				LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Saliendo del servicio... ");
 			}
 		}

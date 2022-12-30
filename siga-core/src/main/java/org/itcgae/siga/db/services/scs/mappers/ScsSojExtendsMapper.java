@@ -42,7 +42,7 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 		@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR)
 		
 	})
-	List<AsuntosJusticiableItem> searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo, String idLenguaje);
+	List<AsuntosJusticiableItem> searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax, String idLenguaje);
 	
 	@SelectProvider(type = ScsSojSqlExtendsProvider.class, method = "getAsuntoTipoSoj")
 	@Results({ 
