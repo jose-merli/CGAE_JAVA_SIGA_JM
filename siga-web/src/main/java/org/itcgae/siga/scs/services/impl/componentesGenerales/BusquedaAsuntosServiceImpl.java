@@ -802,7 +802,8 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				asis.setNumeroprocedimiento(ejg.getNumeroprocedimiento() + "/" + ejg.getAnioprocedimiento());
 				asis.setNumerodiligencia(ejg.getNumerodiligencia());
 				asis.setNig(ejg.getNig());
-				asis.setIdpretension(ejg.getIdpretension().shortValue());
+//				asis.setIdpretension(ejg.getIdpretension().shortValue());
+				asis.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
 
 				asis.setDelitosimputados(ejg.getDelitos());
 				asis.setContrarios(contrariosAsisString);
@@ -900,7 +901,8 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				designa.setAnioprocedimiento(ejg.getAnioprocedimiento());
 				designa.setNig(ejg.getNig());
 				designa.setObservaciones(ejg.getObservaciones());
-				designa.setIdpretension(ejg.getIdpretension().shortValue());
+//				designa.setIdpretension(ejg.getIdpretension().shortValue());
+				designa.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
 				designa.setIdjuzgado(ejg.getJuzgado());
 
 				// Actualizamos los delitos de la designacion eliminando los anteriores y
@@ -988,7 +990,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						.selectByExample(contrariosDesignaExample);
 
 				if (!contrariosDesigna.isEmpty()) {
-					response = scsDelitosdesignaMapper.deleteByExample(delitosDesignaExample);
+					response = scsContrariosdesignaMapper.deleteByExample(contrariosDesignaExample);
 					if (response == 0)
 						throw (new Exception("Error al eliminar los contrarios de la designacion"));
 				}
@@ -1067,6 +1069,8 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					procDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
 					procDesigna.setFechamodificacion(new Date());
 
+					procDesigna.setObservaciones(SigaConstants.OBS_IMPORTADO_EJG);
+					
 					response = scsDesignaProcuradorMapper.insert(procDesigna);
 					if (response == 0)
 						throw (new Exception("Error al introducir un procurador en la designa proveniente del EJG"));

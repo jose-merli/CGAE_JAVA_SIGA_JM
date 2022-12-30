@@ -47,7 +47,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         	sqlFinal.WHERE("ROWNUM <= " + tamMaximo);
         }
 
-        //LOGGER.info(sqlFacturas.toString());
+        LOGGER.info("+++++ [SIGA TEST] - query getFacturas() --> " + sqlFacturas.toString());
         
         return sqlFinal.toString();
     }

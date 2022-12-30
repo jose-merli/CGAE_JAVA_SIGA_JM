@@ -35,13 +35,13 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.SELECT("facprog.fechaconfirmacion");
         sql.SELECT("facprog.fecharealgeneracion");
         sql.SELECT("facprog.idestadoconfirmacion");
-        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadoconfirmacion ) estadoconfirmacion");
+        sql.SELECT("( SELECT f_siga_getrecurso(f.descripcion, " + idioma + ") FROM fac_estadoconfirmfact f WHERE f.idestado = NVL(facprog.idestadoconfirmacion,5) ) estadoconfirmacion");
         sql.SELECT("facprog.idestadopdf");
-        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadopdf ) estadopdf");
+        sql.SELECT("( SELECT f_siga_getrecurso(f.descripcion, " + idioma + ") FROM fac_estadoconfirmfact f WHERE f.idestado = NVL(facprog.idestadopdf,5) ) estadopdf");
         sql.SELECT("facprog.idestadoenvio");
-        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadoenvio ) estadoenvio");
+        sql.SELECT("( SELECT f_siga_getrecurso(f.descripcion, " + idioma + ") FROM fac_estadoconfirmfact f WHERE f.idestado = NVL(facprog.idestadoenvio,5) ) estadoenvio");
         sql.SELECT("facprog.idestadotraspaso");
-        sql.SELECT("( SELECT r.descripcion FROM fac_estadoconfirmfact f, gen_recursos r WHERE f.descripcion = r.idrecurso AND r.idlenguaje = '" + idioma + "' AND f.idestado = facprog.idestadotraspaso ) estadotraspaso");
+        sql.SELECT("( SELECT f_siga_getrecurso(f.descripcion, " + idioma + ") FROM fac_estadoconfirmfact f WHERE f.idestado = NVL(facprog.idestadotraspaso,22) ) estadotraspaso");
         sql.SELECT("facprog.archivarfact");
         sql.SELECT("facprog.usumodificacion");
         sql.SELECT("facprog.nombrefichero");

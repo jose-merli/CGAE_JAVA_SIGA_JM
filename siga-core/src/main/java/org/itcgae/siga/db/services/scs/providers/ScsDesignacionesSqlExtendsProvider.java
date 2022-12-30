@@ -2440,6 +2440,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "              AND scs_DEFENDIDOSDESIGNA.idinstitucion = " + idInstitucion + "\r\n"
 				+ "              AND scs_DEFENDIDOSDESIGNA.idturno = " + item.getIdTurno() + " )\r\n");
 
+		//LOGGER.info("+++++ [SIGA TEST] - query busquedaListaInteresados() --> " + sql.toString());
+		
 		return sql.toString();
 	}
 

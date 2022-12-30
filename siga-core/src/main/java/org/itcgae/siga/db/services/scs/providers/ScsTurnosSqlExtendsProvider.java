@@ -1,12 +1,14 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
 
 public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
-	
+
+	private Logger LOGGER = Logger.getLogger(ScsTurnosSqlExtendsProvider.class);
 
 	public String comboTurnos(Short idInstitucion) {
 
@@ -179,6 +181,7 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 				+ "    F_SIGA_GETRECURSO(grupof.nombre,"+idLenguaje+") , turnos.fechabaja,\r\n" + "     turnos.idinstitucion");
 		sql.ORDER_BY("nombre");
 
+		LOGGER.info("+++++ [SIGA TEST] Query ScsTurnosSqlExtendsProvider/busquedaTurnos() -> " + sql.toString());
 		return sql.toString();
 
 	}

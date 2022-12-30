@@ -124,24 +124,34 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 	}
 
 	public String comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion, String idJuzgado) {
-
 		SQL sql = new SQL();
-		SQL sqlJuzgado = new SQL();
 		StringBuilder sqlUnion = new StringBuilder();
 
-		sql.SELECT("juzgado.CODIGOEXT2");
-		sql.SELECT("juzgado.NOMBRE");
-		sql.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
-		sql.SELECT("juzgado.IDJUZGADO");
-		sql.FROM("SCS_JUZGADO juzgado");
-		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
-		sql.WHERE("juzgado.fechabaja is null");
-		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
-
 		if (idJuzgado.equals("0")) {
+			sql.SELECT("juzgado.CODIGOEXT2");
+			sql.SELECT("juzgado.NOMBRE");
+			sql.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
+			sql.SELECT("juzgado.IDJUZGADO");
+			sql.FROM("SCS_JUZGADO juzgado");
+			sql.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
+			sql.WHERE("juzgado.fechabaja is null");
+			sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
 			sql.ORDER_BY("juzgado.NOMBRE");
 			return sql.toString();
 		} else {
+			SQL sqlFinal = new SQL();
+			SQL sqlJuzgado = new SQL();
+			StringBuilder sqlFinalSB = new StringBuilder();
+			
+			sql.SELECT("juzgado.CODIGOEXT2");
+			sql.SELECT("juzgado.NOMBRE");
+			sql.SELECT("NVL(P.NOMBRE,' ') AS NOMBREPOBLACION");
+			sql.SELECT("juzgado.IDJUZGADO");
+			sql.FROM("SCS_JUZGADO juzgado");
+			sql.LEFT_OUTER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
+			sql.WHERE("juzgado.fechabaja is null");
+			sql.WHERE("juzgado.idinstitucion = " + idInstitucion);			
+			
 			sqlUnion.append(sql);
 			sqlUnion.append(" UNION ");
 			sqlJuzgado.SELECT("juzgado.CODIGOEXT2");
@@ -153,8 +163,17 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 			sqlJuzgado.WHERE("juzgado.idjuzgado = " + idJuzgado);
 			sqlJuzgado.WHERE("juzgado.idinstitucion = " + idInstitucion);
 			sqlUnion.append(sqlJuzgado);
-			sqlUnion.append(" ORDER BY NOMBRE");
-			return sqlUnion.toString();
+			
+			
+			sqlFinal.SELECT("CODIGOEXT2");
+			sqlFinal.SELECT("NOMBRE");
+			sqlFinal.SELECT("NOMBREPOBLACION");
+			sqlFinal.SELECT("IDJUZGADO");
+			sqlFinalSB.append("(").append(sqlUnion.toString()).append(")");
+			sqlFinal.FROM(sqlFinalSB.toString());
+			sqlFinal.ORDER_BY("NOMBRE");
+			
+			return sqlFinal.toString();
 		}
 
 	}

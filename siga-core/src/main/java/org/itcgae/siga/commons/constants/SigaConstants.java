@@ -1732,6 +1732,7 @@ public class SigaConstants {
     public static final String PRODUCTO_PENDIENTE_GENERAR_PDF= "G";
 
     public static final String TIMESTAMP_BBDD = "yyyy-MM-dd HH:mm:ss";
+	public static final String OBS_IMPORTADO_EJG = "IMPORTADO DESDE EJG";
 
     public static enum EEJG_ESTADO {
         INICIAL (10, "justiciaGratuita.ejg.solicitante.solicitudExpEconomico.estado.inicial"),
