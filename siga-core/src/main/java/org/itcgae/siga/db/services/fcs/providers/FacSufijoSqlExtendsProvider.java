@@ -10,7 +10,7 @@ public class FacSufijoSqlExtendsProvider extends FacSufijoSqlProvider {
         SQL sql = new SQL();
 
         sql.SELECT("IDSUFIJO");
-        sql.SELECT("CONCEPTO");
+        sql.SELECT("SUFIJO || ' - ' || CONCEPTO AS CONCEPTO");
 
         sql.FROM("FAC_SUFIJO");
 
