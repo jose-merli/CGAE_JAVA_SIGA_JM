@@ -8,6 +8,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
+import java.sql.SQLType;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -126,6 +127,7 @@ import org.itcgae.sspp.ws.registroSociedades.SociedadBajaDocument.SociedadBaja;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.SqlTypeValue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -2222,7 +2224,7 @@ public class WSCommons {
 					 }
 				
 					if(inParameters[i] == null) {
-						cs.setString(i+1, "NULL");		
+						cs.setNull(i+1, Types.NULL);		
 					}
 				
 			}
