@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -33,7 +35,7 @@ public class LogErroresFacturacionSJCSHelper {
     private GenPropertiesMapper genPropertiesMapper;
 
     private static final String LOG_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(LOG_DATE_FORMAT);
+    private static final SimpleDateFormat formatter = new SimpleDateFormat(LOG_DATE_FORMAT);  
     private static final String TEMPLATE_LOG_ERROR = "%s - %s%n";
     private static final String EXITO = "Facturación realizada con éxito";
 
@@ -46,10 +48,10 @@ public class LogErroresFacturacionSJCSHelper {
         private List<Error> lErrores = new ArrayList<Error>();
 
         private class Error {
-            LocalDateTime date;
+            Date date;
             String error;
 
-            public Error(LocalDateTime d, String e) {
+            public Error(Date d, String e) {
                 this.date = d;
                 this.error = e;
             }
@@ -63,7 +65,7 @@ public class LogErroresFacturacionSJCSHelper {
 
         @Override
         public void logError(String error) {
-            lErrores.add(new Error(LocalDateTime.now(), error));
+            lErrores.add(new Error(new Date(), error));
         }
 
         @Override
@@ -93,7 +95,7 @@ public class LogErroresFacturacionSJCSHelper {
                 fw = new FileWriter(fLogErrores, true);
                 bw = new BufferedWriter(fw);
                 pw = new PrintWriter(bw, false);
-                pw.printf(TEMPLATE_LOG_ERROR, formatter.format(LocalDateTime.now()), msg);
+                pw.printf(TEMPLATE_LOG_ERROR, formatter.format(new Date()), msg);
 
             } catch (IOException e) {
                 LOGGER.error(e.getCause());
