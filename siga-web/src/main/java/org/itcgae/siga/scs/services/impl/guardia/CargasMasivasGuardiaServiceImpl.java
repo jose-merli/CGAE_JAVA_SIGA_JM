@@ -2222,7 +2222,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			e.put(SigaConstants.FECHAI, fechaInicio);
 		}
 		if (cargaMasivaDatosBTItem.getIdGuardia() != null) {
-			if(!cargaMasivaDatosBTItem.getNombreTurno().isEmpty()) {
+			if(cargaMasivaDatosBTItem.getNombreTurno() != null && !cargaMasivaDatosBTItem.getNombreTurno().isEmpty()) {
 				e.put(SigaConstants.GUARDIA, cargaMasivaDatosBTItem.getNombreGuardia());
 			}else {
 				e.put(SigaConstants.GUARDIA, cargaMasivaDatosBTItem.getIdGuardia());
@@ -2230,7 +2230,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 		}
 		if (cargaMasivaDatosBTItem.getIdTurno() != null) {
-			if(!cargaMasivaDatosBTItem.getNombreTurno().isEmpty()) {
+			if(cargaMasivaDatosBTItem.getNombreTurno() != null && !cargaMasivaDatosBTItem.getNombreTurno().isEmpty()) {
 				e.put(SigaConstants.TURNO, cargaMasivaDatosBTItem.getNombreTurno());
 			}else {
 				e.put(SigaConstants.TURNO, cargaMasivaDatosBTItem.getIdTurno());

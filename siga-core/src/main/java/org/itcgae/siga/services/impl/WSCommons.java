@@ -2206,7 +2206,11 @@ public class WSCommons {
 			// input Parameters
 			for (int i = 0; i < size; i++) {
 
-			
+					try {
+						LOGGER.info("AGUERRA - PARAMETRO " + (i+1) + ": " + inParameters[i].toString());
+					} catch (Exception e) {
+						LOGGER.error("Error en formato para mostrar en callPLProcedureFacturacionPyS()");
+					}
 					//LOGGER.warn("AGUERRA - PARAMETRO " + (i+1) + ": " + inParameters[i].toString());
 					
 					if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
@@ -2218,7 +2222,7 @@ public class WSCommons {
 					 }
 				
 					if(inParameters[i] == null) {
-						cs.setString(i+1, null);		
+						cs.setString(i+1, "NULL");		
 					}
 				
 			}
