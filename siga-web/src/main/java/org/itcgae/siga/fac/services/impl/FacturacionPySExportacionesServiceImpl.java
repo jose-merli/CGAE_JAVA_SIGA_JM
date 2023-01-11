@@ -333,17 +333,17 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
         // Parámetros de entrada
         param_in[0] = usuario.getIdinstitucion();
-        param_in[1] = !idSerieFacturacion.isEmpty() ? Integer.valueOf(idSerieFacturacion): null;
-        param_in[2] = !idProgramacion.isEmpty() ? Integer.valueOf(idProgramacion) : null;
-        param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
-        param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
-        param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
-        param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
-        param_in[7] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
-        param_in[8] = pathFichero;
-        param_in[9] = usuario.getIdusuario();
-        param_in[10] = Integer.valueOf(usuario.getIdlenguaje());
-
+        param_in[1] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
+        param_in[2] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
+        param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
+        param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
+        param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
+        param_in[6] = pathFichero;
+        param_in[7] = usuario.getIdusuario();
+        param_in[8] = Integer.valueOf(usuario.getIdlenguaje());
+        param_in[9] = !idSerieFacturacion.isEmpty() ? Integer.valueOf(idSerieFacturacion): null;
+        param_in[10] = !idProgramacion.isEmpty() ? Integer.valueOf(idProgramacion) : null;
+        
         String[] resultado = commons.callPLProcedureFacturacionPyS(
                 "{call Pkg_Siga_Cargos.Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
 
@@ -414,7 +414,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             actualizarRegistroFicheroAdeudos(ficheroAdeudosItem, usuario);
 
-            Object[] param_in = new Object[9]; // Parametros de entrada del PL
+            Object[] param_in = new Object[10]; // Parametros de entrada del PL
 
             // Ruta del fichero
             String pathFicheroOracle = getProperty(FICHERO_ADEUDOS_ORACLE_DIR).toUpperCase() + usuario.getIdinstitucion();
@@ -445,23 +445,24 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
 
             // Parámetros de entrada
             param_in[0] = usuario.getIdinstitucion();
-            param_in[1] = Integer.parseInt(ficheroAdeudosItem.getIdDisqueteCargos());
-            param_in[2] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
-            param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
-            param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
-            param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
-            param_in[6] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
-            param_in[7] = pathFicheroOracle;
+            param_in[1] = formatDate.format(ficheroAdeudosItem.getFechaPresentacion());
+            param_in[2] = formatDate.format(ficheroAdeudosItem.getFechaRecibosPrimeros());
+            param_in[3] = formatDate.format(ficheroAdeudosItem.getFechaRecibosRecurrentes());
+            param_in[4] = formatDate.format(ficheroAdeudosItem.getFechaRecibosCOR());
+            param_in[5] = formatDate.format(ficheroAdeudosItem.getFechaRecibosB2B());
+            param_in[6] = pathFicheroOracle;
+            param_in[7] = usuario.getIdusuario();
             param_in[8] = Integer.parseInt(usuario.getIdlenguaje());
+            param_in[9] = Integer.parseInt(ficheroAdeudosItem.getIdDisqueteCargos());
 
             String[] resultado = commons.callPLProcedureFacturacionPyS(
-                    "{call PKG_SIGA_CARGOS.Regenerar_Presentacion(?,?,?,?,?,?,?,?,?,?,?)}", 2, param_in);
+                    "{call PKG_SIGA_CARGOS.Regenerar_Presentacion(?,?,?,?,?,?,?,?,?,?,?,?,?)}", 3, param_in);
 
             LOGGER.info("actualizarFicheroAdeudos() -> Salida del servicio para actualizar un fichero de adeudos");
             if (resultado != null) {
             	 LOGGER.info("actualizarFicheroAdeudos() -> RESULTADO : " + resultado);
-            	if ((resultado[1] != null || !resultado[1].isEmpty() ) && !resultado[0].equals("0")) {
-                    throw new BusinessException(resultado[1]);
+            	if ((resultado[1] != null || !resultado[1].isEmpty() ) && !resultado[1].equals("0")) {
+                    throw new BusinessException(resultado[2]);
                 } else {
                         throw new BusinessException("general.mensaje.error.bbdd");
                 }
@@ -469,6 +470,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             	LOGGER.error("actualizarFicheroAdeudos() -> Error general");
             	throw new BusinessException("general.mensaje.error.bbdd");
             }
+
         }
 
         LOGGER.info("actualizarFicheroAdeudos() -> Salida del servicio para actualizar un fichero de adeudos");
