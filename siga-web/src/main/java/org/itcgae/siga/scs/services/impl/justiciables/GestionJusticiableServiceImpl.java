@@ -1481,7 +1481,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		}
 
 		if (colegiado != null) {
-			asunto.setLetrado(colegiado.getColegiado());
+			asunto.setLetrado(colegiado.getApellido1() + " " + colegiado.getApellido2() + ", " + colegiado.getNombre());
+			asunto.setnColegiado(colegiado.getNumeroColegiado());
 		}
 
 		// Rol
@@ -1670,7 +1671,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				"getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 		if (colegiado != null) {
-			asunto.setLetrado(colegiado.getColegiado());
+			asunto.setLetrado(colegiado.getColegiado().replace(colegiado.getNumeroColegiado(), ""));
+			asunto.setnColegiado(colegiado.getNumeroColegiado());
 		}
 
 		// Rol
@@ -1750,7 +1752,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					Short.valueOf(asuntoClave.getIdInstitucion()));
 
 			if (colegiado != null) {
-				asunto.setLetrado(colegiado.getColegiado());
+				asunto.setLetrado(colegiado.getApellido1() + " " + colegiado.getApellido2() + ", " + colegiado.getNombre());
+				asunto.setnColegiado(colegiado.getNumeroColegiado());
 			}
 
 		}
@@ -1836,7 +1839,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					Short.valueOf(asuntoClave.getIdInstitucion()));
 
 			if (colegiado != null) {
-				asunto.setLetrado(colegiado.getColegiado());
+				asunto.setLetrado(colegiado.getApellido1() + " " + colegiado.getApellido2() + ", " + colegiado.getNombre());
+				asunto.setnColegiado(colegiado.getNumeroColegiado());
 			}
 
 		}
