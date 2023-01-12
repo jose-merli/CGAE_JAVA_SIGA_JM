@@ -103,6 +103,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -352,6 +353,13 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
         	LOGGER.warn("nuevoFicheroAdeudos() ERROR -> Resultado null.");
             throw new Exception();
         }
+		try {
+			for (String e : resultado) {
+				LOGGER.info("nuevoFicheroAdeudos() -> RESULTADO : " + e);
+			}
+		} catch (Exception e) {
+			LOGGER.error("nuevoFicheroAdeudos() -> ERROR AL MOSTRAR RESULTADO");
+		}
         if (Arrays.asList(codigosErrorFormato).contains(resultado[1])) {
         	LOGGER.info("nuevoFicheroAdeudos() -> Fichero no creados.");
             throw new BusinessException(resultado[2]);
@@ -461,11 +469,16 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             LOGGER.info("actualizarFicheroAdeudos() -> Salida del servicio para actualizar un fichero de adeudos");
             if (resultado != null) {
             	 LOGGER.info("actualizarFicheroAdeudos() -> RESULTADO : " + resultado);
+            	 try {
+            		 for(String e : resultado) {
+            			 LOGGER.info("actualizarFicheroAdeudos() -> RESULTADO : "  + e);
+            		 }
+            	 }catch(Exception e) {
+            		 LOGGER.error("actualizarFicheroAdeudos() -> ERROR AL MOSTRAR RESULTADO");
+            	 }
             	if ((resultado[1] != null || !resultado[1].isEmpty() ) && !resultado[1].equals("0")) {
                     throw new BusinessException(resultado[2]);
-                } else {
-                        throw new BusinessException("general.mensaje.error.bbdd");
-                }
+                } 
             } else {
             	LOGGER.error("actualizarFicheroAdeudos() -> Error general");
             	throw new BusinessException("general.mensaje.error.bbdd");
