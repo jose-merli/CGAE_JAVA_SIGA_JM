@@ -32,11 +32,15 @@ public class SIGAServicesHelper {
 	
 	private static Logger LOGGER = Logger.getLogger(SIGAServicesHelper.class);
 
-	public static void uploadFichero(String pathDirectorio,String nombreFichero,byte [] bytesFichero) throws BusinessException{
+	public static void uploadFichero(String pathDirectorio, String nombreFichero, byte [] bytesFichero) throws BusinessException{
+		LOGGER.debug("SIGAServicesHelper.uploadFichero() - INICIO");
+		LOGGER.debug("Comprobamos si el directorio de subida existe - " + pathDirectorio);
 		File directorio = new File(pathDirectorio);
 		if(!directorio.exists()) {
+			LOGGER.debug("El directorio NO existe, lo creamos");
 			directorio.mkdirs();
 			SIGAHelper.addPerm777(directorio);
+			LOGGER.debug("Directorio creado con éxito");
 		}
 			
 		StringBuffer pathFichero = new StringBuffer(pathDirectorio);
@@ -56,8 +60,9 @@ public class SIGAServicesHelper {
 
 		} catch (Exception e) {
 			LOGGER.warn("Error upload Fichero() " + e.getMessage());
-			throw new BusinessException("Error upload Fichero"+e.getClass().getName());
+			throw new BusinessException("Error upload Fichero: " + e.getClass().getName());
 		}finally{
+			LOGGER.debug("SIGAServicesHelper.uploadFichero() - FIN");
 			if(theBAOS!=null)
 				try {
 					theBAOS.close();
