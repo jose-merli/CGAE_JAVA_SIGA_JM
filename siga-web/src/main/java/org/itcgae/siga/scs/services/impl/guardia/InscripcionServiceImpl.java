@@ -1020,6 +1020,48 @@ public class InscripcionServiceImpl implements InscripcionService {
 		LOGGER.info("inscripcionesDisponibles() -> Salida para insertar inscripciones");
 		return inscripciones;
 	}
+	
+	@Override
+    public InscripcionesDisponiblesDTO inscripcionesDisponiblesGuardia(BusquedaInscripcionItem inscripcion,
+			HttpServletRequest request) {
+		LOGGER.info("inscripcionesDisponibles() -> Entrada para insertar inscripciones");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        InscripcionesDisponiblesDTO inscripciones = new InscripcionesDisponiblesDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+				LOGGER.info(
+						"inscripcionesDisponibles() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"inscripcionesDisponibles() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				if (usuarios != null && !usuarios.isEmpty()) {
+//					List<GestionInscripcion> inscripcionesDisponibles = inscripcionGuardiaExtensdsMapper
+//							.inscripcionesDisponibles(idInstitucion, usuarios.get(0), inscripcion);
+					
+					List<GestionInscripcion> inscripcionesDisponibles = inscripcionGuardiaExtensdsMapper.busquedaTarjetaInscripcionesTurnosConGuardia(idInstitucion, usuarios.get(0), inscripcion);
+					
+					inscripciones.setAccion(inscripcionesDisponibles);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"InscripcionServiceImpl.inscripcionesDisponibles() -> Se ha producido un error en la busqueda de inscripciones disponibles.",
+					e);
+
+			error.setCode(500);
+			error.setDescription("Error en la busqueda de inscripciones.");
+			error.setMessage(e.getMessage());
+
+			inscripciones.setError(error);
+		}
+		LOGGER.info("inscripcionesDisponibles() -> Salida para insertar inscripciones");
+		return inscripciones;
+	}
 
 	@Override
 	public InscripcionesDisponiblesDTO inscripcionPorguardia(BusquedaInscripcionItem inscripcion,

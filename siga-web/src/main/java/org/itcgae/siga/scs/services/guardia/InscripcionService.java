@@ -25,6 +25,8 @@ public interface InscripcionService {
 	
 	public InscripcionesDisponiblesDTO inscripcionesDisponibles(BusquedaInscripcionItem inscripcion, HttpServletRequest request);
 	
+	public InscripcionesDisponiblesDTO inscripcionesDisponiblesGuardia(BusquedaInscripcionItem inscripcion, HttpServletRequest request);
+	
 	public InscripcionesDisponiblesDTO inscripcionPorguardia(BusquedaInscripcionItem inscripcion, HttpServletRequest request);
 
 	public ComboDTO comboLetrados(HttpServletRequest request, String idGuardia);

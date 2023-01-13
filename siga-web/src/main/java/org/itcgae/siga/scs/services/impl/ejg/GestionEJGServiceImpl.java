@@ -4412,7 +4412,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	private Long uploadFileEjg(byte[] bytes, Integer idUsuario, Short idInstitucion, String nombreFichero,
 			String extension) {
-
+		LOGGER.debug("GestionEJGServiceImpl.uploadFileEjg() - INICIO");
 		FicheroVo ficheroVo = new FicheroVo();
 
 		String directorioFichero = getDirectorioFicheroEjg(idInstitucion);
@@ -4429,7 +4429,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		ficherosServiceImpl.insert(ficheroVo);
 
 		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
-
+		LOGGER.debug("GestionEJGServiceImpl.uploadFileEjg() - FIN");
 		return ficheroVo.getIdfichero();
 	}
 
@@ -4932,75 +4932,78 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	public InsertResponseDTO subirDocumentoEjg(MultipartHttpServletRequest request) {
-
+		LOGGER.debug("GestionEJGServiceImpl.subirDocumentoEjg() - INICIO");
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int response = 1;
-
+		
+		//SIGARNV-3078@DTT.JAMARTIN@12/01/2023@INICIO
 		try {
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			LOGGER.info(
-					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (usuarios != null && !usuarios.isEmpty()) {
-
-				Iterator<String> itr = request.getFileNames();
-
-				MultipartFile file = request.getFile(itr.next());
-				String nombreFichero = file.getOriginalFilename().split(";")[0];
-				String extension = FilenameUtils.getExtension(nombreFichero);
-
-				String idDocumentacion = request.getParameter("idPersona");
-
-				// Actualizamos la documentacion modificada
-				ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
-
-				scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
-				scsDocumentacionejg.setFechamodificacion(new Date());
-				scsDocumentacionejg.setIdinstitucion(idInstitucion);
-				scsDocumentacionejg.setNombrefichero(nombreFichero);
-
-				// En el caso que se haya seleccionado "Todos" en el desplegable "Documento",
-				// se pasan varios idDocumentacion y se introduce el fichero en cada uno de
-				// ellos
-				if (idDocumentacion.contains(",")) {
-					String[] documentaciones = idDocumentacion.split(",");
-					for (String idDoc : documentaciones) {
-						// Se introduce el fichero varias veces para que si se se borra en una de las
-						// documentaciones,
-						// el resto no se vean afectadas
-						Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-								nombreFichero, extension);
-
-						scsDocumentacionejg.setIdfichero(idFile);
-						scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDoc));
-
-						response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
-					}
-				} else {
-					Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-							nombreFichero, extension);
-
-					scsDocumentacionejg.setIdfichero(idFile);
-					scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDocumentacion));
-
-					response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
-				}
-
-			}
+			response = subirAdjuntoEJG(dni, idInstitucion, request);
+//
+//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+//			LOGGER.info(
+//					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+//
+//			LOGGER.info(
+//					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//			if (usuarios != null && !usuarios.isEmpty()) {
+//
+//				Iterator<String> itr = request.getFileNames();
+//
+//				MultipartFile file = request.getFile(itr.next());
+//				String nombreFichero = file.getOriginalFilename().split(";")[0];
+//				String extension = FilenameUtils.getExtension(nombreFichero);
+//
+//				String idDocumentacion = request.getParameter("idPersona");
+//
+//				// Actualizamos la documentacion modificada
+//				ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
+//
+//				scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
+//				scsDocumentacionejg.setFechamodificacion(new Date());
+//				scsDocumentacionejg.setIdinstitucion(idInstitucion);
+//				scsDocumentacionejg.setNombrefichero(nombreFichero);
+//
+//				// En el caso que se haya seleccionado "Todos" en el desplegable "Documento",
+//				// se pasan varios idDocumentacion y se introduce el fichero en cada uno de
+//				// ellos
+//				if (idDocumentacion.contains(",")) {
+//					String[] documentaciones = idDocumentacion.split(",");
+//					for (String idDoc : documentaciones) {
+//						// Se introduce el fichero varias veces para que si se se borra en una de las
+//						// documentaciones,
+//						// el resto no se vean afectadas
+//						Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+//								nombreFichero, extension);
+//
+//						scsDocumentacionejg.setIdfichero(idFile);
+//						scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDoc));
+//
+//						response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+//					}
+//				} else {
+//					Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+//							nombreFichero, extension);
+//
+//					scsDocumentacionejg.setIdfichero(idFile);
+//					scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDocumentacion));
+//
+//					response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+//				}
+//			}
+			//SIGARNV-3078@DTT.JAMARTIN@12/01/2023@FIN 
 		} catch (Exception e) {
 			LOGGER.error(
-					"GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente a la designación",
+					"ERROR: GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente a la designación",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -5008,25 +5011,89 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			insertResponseDTO.setError(error);
 			response = 0;
 		}
+		
 		if (response == 1) {
 			insertResponseDTO.setStatus(SigaConstants.OK);
 			error.setCode(200);
 			// error.setDescription("general.mensaje.error.bbdd");
 			insertResponseDTO.setError(error);
-
+			LOGGER.debug("GestionEJGServiceImpl.subirDocumentoDesigna() -> Se ha subido correctamente el fichero al ejg");
 		}
 
 		if (response == 0) {
 			insertResponseDTO.setStatus(SigaConstants.KO);
 			LOGGER.error(
-					"GestionEJGServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente al ejg");
+					"ERROR: GestionEJGServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente al ejg");
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
 			insertResponseDTO.setError(error);
 		}
-
+		
+		LOGGER.debug("GestionEJGServiceImpl.subirDocumentoEjg() - INICIO");
 		return insertResponseDTO;
 	}
+
+	//SIGARNV-3078@DTT.JAMARTIN@12/01/2023@INICIO 
+	@Transactional
+	private int subirAdjuntoEJG(String dni, Short idInstitucion, MultipartHttpServletRequest request) throws IOException {
+		LOGGER.debug("GestionEJGServiceImpl.subirAdjuntoEJG() - INICIO");
+		
+		int response = 1;
+		
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		
+		LOGGER.info("Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info("Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+		if (usuarios != null && !usuarios.isEmpty()) {
+
+			Iterator<String> itr = request.getFileNames();
+
+			MultipartFile file = request.getFile(itr.next());
+			String nombreFichero = file.getOriginalFilename().split(";")[0];
+			String extension = FilenameUtils.getExtension(nombreFichero);
+
+			String idDocumentacion = request.getParameter("idPersona");
+
+			// Actualizamos la documentacion modificada
+			ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
+
+			scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
+			scsDocumentacionejg.setFechamodificacion(new Date());
+			scsDocumentacionejg.setIdinstitucion(idInstitucion);
+			scsDocumentacionejg.setNombrefichero(nombreFichero);
+
+			// En el caso que se haya seleccionado "Todos" en el desplegable "Documento",
+			// se pasan varios idDocumentacion y se introduce el fichero en cada uno de
+			// ellos
+			if (idDocumentacion.contains(",")) {
+				String[] documentaciones = idDocumentacion.split(",");
+				for (String idDoc : documentaciones) {
+					// Se introduce el fichero varias veces para que si se se borra en una de las
+					// documentaciones, el resto no se vean afectadas
+					Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion, nombreFichero, extension);
+
+					scsDocumentacionejg.setIdfichero(idFile);
+					scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDoc));
+
+					response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+				}
+			} else {
+				Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion, nombreFichero, extension);
+
+				scsDocumentacionejg.setIdfichero(idFile);
+				scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDocumentacion));
+
+				response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+			}
+		}
+		
+		LOGGER.debug("GestionEJGServiceImpl.subirAdjuntoEJG() - FIN");
+		return response;
+	}
+	//SIGARNV-3078@DTT.JAMARTIN@12/01/2023@FIN 
 
 	@Override
 	public ResponseEntity<InputStreamResource> descargarDocumentosEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,

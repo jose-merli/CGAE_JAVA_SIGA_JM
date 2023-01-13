@@ -127,6 +127,14 @@ public class InscripcionController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 
 	}
+	
+	@PostMapping(value = "/inscripcionesDisponiblesGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<InscripcionesDisponiblesDTO> inscripcionesDisponiblesGuardia(@RequestBody BusquedaInscripcionItem inscripcion,
+			HttpServletRequest request) {
+		InscripcionesDisponiblesDTO response = inscripcionService.inscripcionesDisponiblesGuardia(inscripcion, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+
+	}
 
 	@PostMapping(value = "/inscripcionPorguardia", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<InscripcionesDisponiblesDTO> inscripcionPorguardia(@RequestBody BusquedaInscripcionItem inscripcion,

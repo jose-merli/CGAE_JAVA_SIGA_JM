@@ -160,6 +160,32 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 			
 		})
 	    List<GestionInscripcion> busquedaTarjetaInscripcionesGuardia(Short idInstitucion, AdmUsuarios admUsuarios, BusquedaInscripcionItem inscripcion);
+	 
+	 @SelectProvider(type=ScsInscripcionguardiaSqlExtendsProvider.class, method="busquedaTarjetaInscripcionesTurnosConGuardia")
+		@Results({
+			@Result(column = "numerogrupo", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "colegiado", property = "colegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "colegiado_grupo", property = "colegiadoGrupo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "letrado", property = "letrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechasuscripcion", property = "fechasolicitud", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "idguardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_guardia", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_turno", property = "nombreTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_zona", property = "nombreZona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_subzona", property = "nombreSubzona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_area", property = "nombreArea", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_materia", property = "nombreMateria", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "obligatoriedad_inscripcion", property = "obligatoriedadInscripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idturno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idzona", property = "idZona", jdbcType = JdbcType.VARCHAR),		
+			@Result(column = "idsubzona", property = "idSubzona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idarea", property = "idArea", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idmateria", property = "idMateria", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "descripcion_tipo_guardia", property = "descripcionNombreGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR)
+			
+		})
+	    List<GestionInscripcion> busquedaTarjetaInscripcionesTurnosConGuardia(Short idInstitucion, AdmUsuarios admUsuarios, BusquedaInscripcionItem inscripcion);
 
 	@Results({
 		@Result(column = "idguardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
