@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
 import org.itcgae.siga.DTOs.scs.GuardiaCalendarioItem;
@@ -26,6 +27,8 @@ import org.itcgae.siga.db.mappers.ScsGuardiasturnoSqlProvider;
 
 public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvider {
 
+	private Logger LOGGER = Logger.getLogger(ScsGuardiasturnoSqlExtendsProvider.class);
+			
 	public String searchNombreTurnoGuardia(String idInstitucion, String nombreGuardia) {
 		SQL sql = new SQL();
 
@@ -92,7 +95,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 				+ "(SCS_INSCRIPCIONGUARDIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND "
 				+ "SCS_GUARDIASTURNO.IDTURNO = SCS_INSCRIPCIONGUARDIA.IDTURNO AND SCS_GUARDIASTURNO.IDGUARDIA = SCS_INSCRIPCIONGUARDIA.IDGUARDIA "
 				+ "AND SCS_INSCRIPCIONGUARDIA.FECHABAJA IS NULL)) AS numeroletradosinscritos");
-
+		
 		sql.SELECT("CASE \r\n"
 				+ "		WHEN  'LMXJVSD' LIKE CONCAT('%',CONCAT(SELECCIONLABORABLES,'%')) AND LENGTH(SELECCIONLABORABLES)>1 \r\n"
 				+ "			AND SUBSTR(SELECCIONLABORABLES,1,1) = 'L' AND SUBSTR(SELECCIONLABORABLES,LENGTH(SELECCIONLABORABLES),1) IN ('V','S','D') THEN \r\n"
@@ -206,7 +209,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
 		}
 
-
+		LOGGER.info("++++ [SIGA TEST] - ScsGuardiasturnoSqlExtendsProvider / searchGuardias2 -> query = " + SQL_PADRE.toString());
 		return SQL_PADRE.toString();
 	}
 	
