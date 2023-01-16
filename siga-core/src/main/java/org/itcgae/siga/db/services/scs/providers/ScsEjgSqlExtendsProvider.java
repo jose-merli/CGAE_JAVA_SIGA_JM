@@ -39,6 +39,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sqlUF = new SQL();
 		SQL sqlContrarios = new SQL();
 		SQL sqlUFRep = new SQL();
+		SQL sqlTurno = new SQL();
+		SQL sqlTurnoGuardia = new SQL();
 
 		String condicionAnnioNumActas = " ac.idinstitucion = " + idInstitucion;
 
@@ -81,6 +83,30 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                     + " AND des.idturno = des2.idturno) ");
         letrado.ORDER_BY("ejgdesigna.aniodesigna DESC, ejgdesigna.numerodesigna DESC");
         
+        //sql turno
+        sqlTurno.SELECT("TUR.ABREVIATURA");
+        sqlTurno.FROM("SCS_TURNO TUR");
+        sqlTurno.JOIN("SCS_EJGDESIGNA ejgdes ON "  
+        		+ " ejgdes.idinstitucion = TUR.IDINSTITUCION AND ejgdes.idturno = TUR.IDTURNO");
+        sqlTurno.WHERE("ejgdes.idinstitucion = ejg.idinstitucion "); 
+        sqlTurno.WHERE("ejgdes.ANIOEJG = ejg.anio ");
+        sqlTurno.WHERE("ejgdes.NUMEROEJG = ejg.numero "); 
+        sqlTurno.WHERE("ejgdes.IDTIPOEJG = ejg.IDTIPOEJG");
+		sqlTurno.WHERE("rownum < 2");
+		
+		//sqlTurnoGuardia
+		
+		sqlTurnoGuardia.SELECT("st.ABREVIATURA || ' / ' || gt.nombre");
+		sqlTurnoGuardia.FROM("SCS_ASISTENCIA sa");
+		sqlTurnoGuardia.JOIN("SCS_TURNO st ON st.idturno = sa.idturno AND st.idinstitucion = sa.idinstitucion");
+		sqlTurnoGuardia.JOIN("SCS_GUARDIASTURNO gt ON gt.idturno = sa.idturno "
+				+ " AND gt.idinstitucion = sa.idinstitucion AND gt.IDGUARDIA = sa.IDGUARDIA");
+		sqlTurnoGuardia.WHERE("ejganio = ejg.ANIO");
+		sqlTurnoGuardia.WHERE("ejgnumero = ejg.NUMERO");
+		sqlTurnoGuardia.WHERE("ejgidtipoejg = ejg.IDTIPOEJG");
+		sqlTurnoGuardia.WHERE("sa.idinstitucion = ejg.IDINSTITUCION");
+		sqlTurnoGuardia.WHERE("idestadoasistencia != '2'");
+                
 		// select
 		sql.SELECT("DISTINCT ejg.anio");
 		sql.SELECT("ejg.idinstitucion");
@@ -90,18 +116,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
 		sql.SELECT(
 				"(CASE\r\n" + 
-				"		WHEN TURNO.NOMBRE IS NOT NULL THEN TURNO.ABREVIATURA \r\n" + 
-				"		ELSE (SELECT (SELECT abreviatura FROM scs_turno st WHERE (st.idturno = sa.idturno AND st.idinstitucion = sa.idinstitucion AND ROWNUM<2))  || ' / ' || \r\n" + 
-				"					(SELECT nombre FROM SCS_GUARDIASTURNO gt WHERE (gt.idturno = sa.idturno AND gt.idinstitucion = sa.idinstitucion AND gt.IDGUARDIA = sa.IDGUARDIA AND ROWNUM<2))\r\n" + 
-				"			FROM SCS_ASISTENCIA sa\r\n" + 
-				"			WHERE ejganio = ejg.ANIO \r\n" + 
-				"			AND ejgnumero = ejg.NUMERO \r\n" + 
-				"			AND ejgidtipoejg = ejg.IDTIPOEJG \r\n" + 
-				"			AND idinstitucion = ejg.IDINSTITUCION \r\n" + 
-				"			AND idestadoasistencia != '2')\r\n" + 
+				"		WHEN (" + sqlTurno.toString() + ") IS NOT NULL THEN (" + sqlTurno.toString() + ") \r\n" + 
+				"		ELSE (" + sqlTurnoGuardia.toString() + ")" + 
 				"	END) AS TURNOGUARDIA");
-		sql.SELECT("(SELECT TUR.ABREVIATURA FROM SCS_TURNO TUR "
-				+ " WHERE TUR.IDINSTITUCION = EJG.IDINSTITUCION AND TUR.IDTURNO = EJG.GUARDIATURNO_IDTURNO) AS TURNO");
+		sql.SELECT("(CASE WHEN TURNO.ABREVIATURA IS NULL THEN '' " + 
+				"	ELSE TURNO.ABREVIATURA || ' / ' || GUARDIA.NOMBRE " + 
+				"	END) AS TURNO");
 		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("ejg.fechaapertura");
 		sql.SELECT("ejg.fechamodificacion");
@@ -144,7 +164,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("col.NCOLEGIADO AS NCOLEGIADO");
 
 		// REVISAR
-		sql.SELECT("GUARDIA.NOMBRE");
+		//sql.SELECT("GUARDIA.NOMBRE");
 
 		// from
 		sql.FROM("scs_ejg ejg");
@@ -154,13 +174,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.LEFT_OUTER_JOIN(
 				"scs_personajg perjg on perjg.idpersona = ejg.idpersonajg AND perjg.IDINSTITUCION = EJG.IDINSTITUCION");
 		
-		sql.LEFT_OUTER_JOIN("SCS_EJGDESIGNA ejgdes ON ejgdes.idinstitucion = ejg.idinstitucion"
-				+ " AND ejgdes.ANIOEJG = ejg.anio"
-				+ " AND ejgdes.NUMEROEJG = ejg.numero"
-				+ " AND ejgdes.IDTIPOEJG = ejg.IDTIPOEJG");
-		sql.LEFT_OUTER_JOIN(
-				"SCS_TURNO  TURNO ON TURNO.IDINSTITUCION = ejgdes.IDINSTITUCION AND TURNO.IDTURNO = ejgdes.IDTURNO");
-		sql.LEFT_OUTER_JOIN(
+        sql.LEFT_OUTER_JOIN(
+                "SCS_TURNO  TURNO ON TURNO.IDINSTITUCION = ejg.IDINSTITUCION AND TURNO.IDTURNO = EJG.GUARDIATURNO_IDTURNO");
+        sql.LEFT_OUTER_JOIN(
 				"SCS_GUARDIASTURNO GUARDIA  ON GUARDIA.IDINSTITUCION =EJG.IDINSTITUCION AND GUARDIA.IDTURNO =EJG.GUARDIATURNO_IDTURNO  AND GUARDIA.IDGUARDIA =EJG.GUARDIATURNO_IDGUARDIA");
 
 		if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "" && !ejgItem.isUltimoEstado()) {
