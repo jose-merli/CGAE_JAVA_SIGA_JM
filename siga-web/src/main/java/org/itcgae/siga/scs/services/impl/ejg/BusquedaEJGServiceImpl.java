@@ -668,8 +668,10 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				
 				String[] parts;
 				if(ejgItem.getNumero() == null || ejgItem.getNumero().isEmpty()) {
-					ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-							usuarios.get(0).getIdlenguaje().toString())));
+					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString()));
+					//ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+						//	usuarios.get(0).getIdlenguaje().toString())));
 				}else if (ejgItem.getNumero().trim().contains(",")) {
 					parts = ejgItem.getNumero().trim().split(",");
 					//se crea un objeto auxiliar para obtener la consulta de cada numero de EJG
@@ -682,8 +684,10 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 						//al EJG se le aplica un numero del array
 						ejgItem.setNumero(str.trim());
 						//se carga los registros obtenidos de la consulta (se espera uno solo)
-						listAux.setEjgItems( getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-								usuarios.get(0).getIdlenguaje().toString())));
+						listAux.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+								usuarios.get(0).getIdlenguaje().toString()));
+						//listAux.setEjgItems( getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+						//		usuarios.get(0).getIdlenguaje().toString())));
 						//se almacena en la lista de EJGItem el primer registro obtenido.
 						listAux2.add(listAux.getEjgItems().get(0));
 				

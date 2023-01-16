@@ -222,7 +222,15 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 	public String searchLetrados(SaltoCompGuardiaItem saltoItem, String idInstitucion) {
 		SQL sql = new SQL();
+		SQL sql2 = new SQL();
 
+		sql2.SELECT("SCS_INSCRIPCIONGUARDIA.IDPERSONA");
+		sql2.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql2.WHERE("SCS_INSCRIPCIONGUARDIA.idInstitucion = '" + idInstitucion.trim() + "'");
+		sql2.WHERE("SCS_INSCRIPCIONGUARDIA.idturno = '" + saltoItem.getIdTurno().trim() + "'");
+		sql2.WHERE("SCS_INSCRIPCIONGUARDIA.idguardia = '" + saltoItem.getIdGuardia().trim() + "'");
+		sql2.WHERE("SCS_INSCRIPCIONGUARDIA.FECHABAJA IS NULL");
+		
 		sql.SELECT("SCS_GRUPOGUARDIA.numerogrupo");
 		sql.SELECT(
 				"DECODE(CEN_COLEGIADO.COMUNITARIO, '1', CEN_COLEGIADO.NCOMUNITARIO, CEN_COLEGIADO.NCOLEGIADO) AS COLEGIADO");
@@ -244,6 +252,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idturno = '" + saltoItem.getIdTurno().trim() + "'");
 		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idguardia = '" + saltoItem.getIdGuardia().trim() + "'");
 		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idgrupoguardia = '" + saltoItem.getGrupo().trim() + "'");
+		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idpersona in ( " + sql2 + " )");
 
 		sql.ORDER_BY("CEN_PERSONA.APELLIDOS1");
 
