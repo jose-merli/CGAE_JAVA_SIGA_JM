@@ -1294,6 +1294,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AsuntosJusticiableDTO asuntosJusticiableDTO = new AsuntosJusticiableDTO();
 		List<AsuntosClaveJusticiableItem> asuntosClaveJusticiableItem = new ArrayList<AsuntosClaveJusticiableItem>();
+		List<StringDTO> personasRepresentadas = null;
 		Error error = new Error();
 
 		if (idInstitucion != null) {
@@ -1316,8 +1317,16 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					LOGGER.info(
 							"searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Entrada a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
 
-					asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable(idPersona,
-							idInstitucion);
+					// Comprobamos si es representante legal de algún asunto en cuyo caso devolveremos las personas representadas
+					personasRepresentadas = scsPersonajgExtendsMapper.getPersonaRepresentanteJG(idPersona, idInstitucion);
+					
+					if (personasRepresentadas != null && personasRepresentadas.size() > 0) {
+						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiableRepresentanteJG(idPersona, personasRepresentadas,
+								idInstitucion);
+					} else {
+						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable(idPersona,
+								idInstitucion);
+					}
 
 					LOGGER.info(
 							"searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Salida a scsPersonajgExtendsMapper para obtener las claves de los asuntos");

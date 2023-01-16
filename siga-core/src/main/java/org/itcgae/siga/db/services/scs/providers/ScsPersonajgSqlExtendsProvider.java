@@ -745,7 +745,151 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		return sql.toString();
 	}
 	
-	
+	public String searchClaveAsuntosJusticiableRepresentanteJG(String idPersona, List<StringDTO> representados, Short idInstitucion) {
+
+		// Convertimos a lista de tipo IN clause
+		StringBuilder representadosIN = new StringBuilder();
+		String separator = "";
+		for (StringDTO string : representados) {
+			representadosIN.append(separator);
+			representadosIN.append(string.getValor());
+			separator = ", ";
+		}
+		
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("idinstitucion");
+		sql.SELECT("anio");
+		sql.SELECT("numero");
+		sql.SELECT("clave");
+		sql.SELECT("rol");
+		sql.SELECT("tipo");
+		sql.SELECT("fechaapertura");
+
+		SQL sqlUnidadFamiliar = new SQL();
+		sqlUnidadFamiliar.SELECT("unidadFamiliar.idinstitucion");
+		sqlUnidadFamiliar.SELECT("unidadfamiliar.anio");
+		sqlUnidadFamiliar.SELECT("unidadfamiliar.numero");
+		sqlUnidadFamiliar.SELECT("to_char(unidadfamiliar.idtipoejg) clave");
+		sqlUnidadFamiliar.SELECT(
+				"case when unidadFamiliar.solicitante = 1 then 'Solicitante' else 'Unidad Familiar' end as rol");
+		sqlUnidadFamiliar.SELECT("'E' as tipo");
+		sqlUnidadFamiliar.SELECT("(SELECT fechaapertura FROM scs_ejg "
+				+ "WHERE idinstitucion = UNIDADFAMILIAR.idinstitucion "
+				+ "AND anio = UNIDADFAMILIAR.anio "
+				+ "AND numero = UNIDADFAMILIAR.numero "
+				+ "AND idtipoejg = UNIDADFAMILIAR.idtipoejg) AS fechaapertura");
+
+		sqlUnidadFamiliar.FROM("SCS_UNIDADFAMILIAREJG unidadFamiliar");
+		sqlUnidadFamiliar.WHERE("unidadFamiliar.idinstitucion = '" + idInstitucion + "'");
+		sqlUnidadFamiliar.WHERE("unidadFamiliar.idpersona IN (" + idPersona + ", " + representadosIN + ")");
+
+		SQL sqlContrarioEjg = new SQL();
+		sqlContrarioEjg.SELECT("CONTRARIOEJG.idinstitucion");
+		sqlContrarioEjg.SELECT("CONTRARIOEJG.anio");
+		sqlContrarioEjg.SELECT("CONTRARIOEJG.numero");
+		sqlContrarioEjg.SELECT("to_char(CONTRARIOEJG.idtipoejg) clave");
+		sqlContrarioEjg.SELECT("'Contrario' as rol");
+		sqlContrarioEjg.SELECT("'E' as tipo");
+		sqlContrarioEjg.SELECT("(SELECT fechaapertura FROM scs_ejg "
+				+ "WHERE idinstitucion = CONTRARIOEJG.idinstitucion "
+				+ "AND anio = CONTRARIOEJG.anio "
+				+ "AND numero = CONTRARIOEJG.numero "
+				+ "AND idtipoejg = CONTRARIOEJG.idtipoejg) AS fechaapertura");
+		sqlContrarioEjg.FROM("SCS_CONTRARIOSEJG CONTRARIOEJG");
+		sqlContrarioEjg.WHERE("CONTRARIOEJG.idinstitucion = '" + idInstitucion + "'");
+		sqlContrarioEjg.WHERE("CONTRARIOEJG.idpersona IN (" + idPersona + ", " + representadosIN + ")");
+
+		SQL sqlContrariosDesigna = new SQL();
+		sqlContrariosDesigna.SELECT("CONTRARIOSDESIGNA.idinstitucion");
+		sqlContrariosDesigna.SELECT("CONTRARIOSDESIGNA.anio");
+		sqlContrariosDesigna.SELECT("CONTRARIOSDESIGNA.numero");
+		sqlContrariosDesigna.SELECT("to_char(CONTRARIOSDESIGNA.idturno) clave");
+		sqlContrariosDesigna.SELECT("'Contrario' as rol");
+		sqlContrariosDesigna.SELECT("'D' as tipo");
+		sqlContrariosDesigna.SELECT("(SELECT fechaentrada FROM SCS_DESIGNA "
+				+ "WHERE idinstitucion = CONTRARIOSDESIGNA.idinstitucion "
+				+ "AND anio = CONTRARIOSDESIGNA.anio "
+				+ "AND numero = CONTRARIOSDESIGNA.numero "
+				+ "AND idturno = CONTRARIOSDESIGNA.idturno) AS fechaapertura");
+		sqlContrariosDesigna.FROM("SCS_CONTRARIOSDESIGNA CONTRARIOSDESIGNA");
+		sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
+		sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.idpersona  IN (" + idPersona + ", " + representadosIN + ")");
+
+		SQL sqlDefendidosDesigna = new SQL();
+		sqlDefendidosDesigna.SELECT("DEFENDIDOSDESIGNA.idinstitucion");
+		sqlDefendidosDesigna.SELECT("DEFENDIDOSDESIGNA.anio");
+		sqlDefendidosDesigna.SELECT("DEFENDIDOSDESIGNA.numero");
+		sqlDefendidosDesigna.SELECT("to_char(DEFENDIDOSDESIGNA.idturno) clave");
+		sqlDefendidosDesigna.SELECT("'Solicitante' as rol");
+		sqlDefendidosDesigna.SELECT("'D' as tipo");
+		sqlDefendidosDesigna.SELECT("(SELECT fechaentrada FROM SCS_DESIGNA "
+				+ "WHERE idinstitucion = DEFENDIDOSDESIGNA.idinstitucion "
+				+ "AND anio = DEFENDIDOSDESIGNA.anio "
+				+ "AND numero = DEFENDIDOSDESIGNA.numero "
+				+ "AND idturno = DEFENDIDOSDESIGNA.idturno) AS fechaapertura");
+		sqlDefendidosDesigna.FROM("SCS_DEFENDIDOSDESIGNA DEFENDIDOSDESIGNA");
+		sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
+		sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.idpersona IN (" + idPersona + ", " + representadosIN + ")");
+
+		SQL sqlSoj = new SQL();
+		sqlSoj.SELECT("SOJ.idinstitucion");
+		sqlSoj.SELECT("SOJ.anio");
+		sqlSoj.SELECT("SOJ.numero");
+		sqlSoj.SELECT("to_char(SOJ.IDTIPOSOJ) clave");
+		sqlSoj.SELECT("'Solicitante' as rol");
+		sqlSoj.SELECT("'S' as tipo");
+		sqlSoj.SELECT("fechaapertura");
+		sqlSoj.FROM("SCS_SOJ SOJ");
+		sqlSoj.WHERE("SOJ.idinstitucion = '" + idInstitucion + "'");
+		sqlSoj.WHERE("SOJ.idpersonajg IN (" + idPersona + ", " + representadosIN + ")");
+		
+		SQL sqlEJG = new SQL();
+		sqlEJG.SELECT("EJG.idinstitucion");
+		sqlEJG.SELECT("EJG.anio");
+		sqlEJG.SELECT("EJG.numero");
+		sqlEJG.SELECT("to_char(EJG.idtipoejg) clave");
+		sqlEJG.SELECT("'Solicitante' as rol");
+		sqlEJG.SELECT("'E' as tipo");
+		sqlEJG.SELECT("fechaapertura");
+		sqlEJG.FROM("SCS_EJG EJG");
+		sqlEJG.WHERE("EJG.idinstitucion = '" + idInstitucion + "'");
+		sqlEJG.WHERE("EJG.idpersonajg IN (" + idPersona + ", " + representadosIN + ")");
+
+		SQL sqlContrariosAsistencia = new SQL();
+		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.idinstitucion");
+		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.anio");
+		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.numero");
+		sqlContrariosAsistencia.SELECT("'' as clave");
+		sqlContrariosAsistencia.SELECT("'Contrario' as rol");
+		sqlContrariosAsistencia.SELECT("'A' as tipo");
+		sqlContrariosAsistencia.SELECT("(SELECT fechahora FROM SCS_ASISTENCIA "
+				+ "WHERE idinstitucion = CONTRARIOSASISTENCIA.idinstitucion "
+				+ "AND anio = CONTRARIOSASISTENCIA.anio "
+				+ "AND numero = CONTRARIOSASISTENCIA.numero) AS fechaapertura");
+		sqlContrariosAsistencia.FROM("SCS_CONTRARIOSASISTENCIA CONTRARIOSASISTENCIA");
+		sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.idinstitucion = '" + idInstitucion + "'");
+		sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.idpersona IN (" + idPersona + ", " + representadosIN + ")");
+
+		SQL sqlAsistencia = new SQL();
+		sqlAsistencia.SELECT("ASISTENCIA.idinstitucion");
+		sqlAsistencia.SELECT("ASISTENCIA.anio");
+		sqlAsistencia.SELECT("ASISTENCIA.numero");
+		sqlAsistencia.SELECT("'' as clave");
+		sqlAsistencia.SELECT("'Solicitante' as rol");
+		sqlAsistencia.SELECT("'A' as tipo");
+		sqlAsistencia.SELECT("fechahora AS fechaapertura");
+		sqlAsistencia.FROM("SCS_ASISTENCIA ASISTENCIA");
+		sqlAsistencia.WHERE("ASISTENCIA.idinstitucion = '" + idInstitucion + "'");
+		sqlAsistencia.WHERE("ASISTENCIA.idpersonaJG IN (" + idPersona + ", " + representadosIN + ")");
+
+		sql.FROM("(" + sqlUnidadFamiliar + " union " + sqlContrarioEjg + " union all " + sqlContrariosDesigna
+				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all " + sqlEJG + " union all "
+				+ sqlContrariosAsistencia + "union all " + sqlAsistencia + ") consulta");
+		sql.ORDER_BY("fechaapertura DESC");
+
+		return sql.toString();
+	}
 	
 	public String unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
@@ -846,6 +990,15 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.WHERE("PER.IDPOBLACION = POB.IDPOBLACION(+)");
 		sql.WHERE("PER.IDPROVINCIA  = PRO.IDPROVINCIA(+)");
 		sql.WHERE("IDPERSONA = " + idPersonaJG);
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
+	}
+	
+	public String getPersonaRepresentanteJG(String idPersonaJG, Short idInstitucion) {
+		SQL sql  = new SQL();
+		sql.SELECT("IDPERSONA");
+		sql.FROM("SCS_PERSONAJG");
+		sql.WHERE("IDREPRESENTANTEJG = " + idPersonaJG);
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		return sql.toString();
 	}
