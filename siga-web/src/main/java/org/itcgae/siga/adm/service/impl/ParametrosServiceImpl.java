@@ -107,7 +107,7 @@ public class ParametrosServiceImpl implements IParametrosService {
 					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
 					List<ParametroItem> parametroItemsFinal = new ArrayList<ParametroItem>();
 					for (ParametroItem parameter : parametroItems) {
-						if (parameter.getIdInstitucion().equalsIgnoreCase(String.valueOf(idInstitucion))) {
+						if (parameter.getIdInstitucion().equalsIgnoreCase(String.valueOf(idInstitucion)) || "0".equals(parameter.getIdInstitucion())) {
 							parametroItemsFinal.add(parameter);
 						}
 					}
