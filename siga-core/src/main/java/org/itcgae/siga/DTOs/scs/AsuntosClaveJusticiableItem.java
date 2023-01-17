@@ -16,6 +16,7 @@ public class AsuntosClaveJusticiableItem {
 	private String rol;
 	private String tipo;
 	private String fechaActuacion;
+	private String idTurno;
 
 	/**
 	 **/
@@ -253,6 +254,14 @@ public class AsuntosClaveJusticiableItem {
 		return "AsuntosClaveJusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", anio="
 				+ anio + ", nombre=" + nombre + ", numero=" + numero + ", fechaModificacion=" + fechaModificacion
 				+ ", clave=" + clave + ", rol=" + rol + ", tipo=" + tipo + ", fechaActuacion=" + fechaActuacion + "]";
+	}
+
+	public String getIdTurno() {
+		return idTurno;
+	}
+
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
 	}
 
 }

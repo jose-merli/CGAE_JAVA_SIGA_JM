@@ -95,6 +95,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoGrupoLaboralExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoIngresoExtendsMapper;
+import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
 import org.itcgae.siga.scs.services.justiciables.IGestionJusticiableService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,6 +181,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	
 	@Autowired
 	private ScsAsistenciaMapper ScsAsistenciaMapper;
+	
+	@Autowired
+	private GestionEJGServiceImpl gestionEJGService;
 
 	private boolean validacionDireccion = false;
 	private boolean validacionTipoVia = false;
@@ -2282,6 +2286,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						ejgItem.setNumero(ejg.get(0).getNumero());
 						ejgItem.setIdpersonajg(Long.valueOf(itemEjg.get(3))); // Solicitante.
 						response = scsEjgMapper.updateByPrimaryKeySelective(ejgItem);
+						
+						//Lo añadimos en la Unidad Familiar como solicitante.
+						List<String> newUnidadFamiliar = new ArrayList<>();
+						newUnidadFamiliar.add(idInstitucion.toString());
+						newUnidadFamiliar.add(itemEjg.get(3));
+						newUnidadFamiliar.add(itemEjg.get(0));
+						newUnidadFamiliar.add(String.valueOf(ejg.get(0).getIdtipoejg()));
+						newUnidadFamiliar.add(itemEjg.get(1));
+						gestionEJGService.insertFamiliarEJG(newUnidadFamiliar, request);
 					}
 
 				} catch (Exception e) {

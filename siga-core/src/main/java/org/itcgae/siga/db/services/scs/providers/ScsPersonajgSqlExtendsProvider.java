@@ -619,7 +619,8 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("rol");
 		sql.SELECT("tipo");
 		sql.SELECT("fechaapertura");
-
+		sql.SELECT("idTurno");
+		
 		SQL sqlUnidadFamiliar = new SQL();
 		sqlUnidadFamiliar.SELECT("unidadFamiliar.idinstitucion");
 		sqlUnidadFamiliar.SELECT("unidadfamiliar.anio");
@@ -633,7 +634,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = UNIDADFAMILIAR.anio "
 				+ "AND numero = UNIDADFAMILIAR.numero "
 				+ "AND idtipoejg = UNIDADFAMILIAR.idtipoejg) AS fechaapertura");
-
+		sqlUnidadFamiliar.SELECT("null as idTurno");
 		sqlUnidadFamiliar.FROM("SCS_UNIDADFAMILIAREJG unidadFamiliar");
 		sqlUnidadFamiliar.WHERE("unidadFamiliar.idinstitucion = '" + idInstitucion + "'");
 		sqlUnidadFamiliar.WHERE("unidadFamiliar.idpersona = '" + idPersona + "'");
@@ -650,6 +651,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = CONTRARIOEJG.anio "
 				+ "AND numero = CONTRARIOEJG.numero "
 				+ "AND idtipoejg = CONTRARIOEJG.idtipoejg) AS fechaapertura");
+		sqlContrarioEjg.SELECT("null as idTurno");
 		sqlContrarioEjg.FROM("SCS_CONTRARIOSEJG CONTRARIOEJG");
 		sqlContrarioEjg.WHERE("CONTRARIOEJG.idinstitucion = '" + idInstitucion + "'");
 		sqlContrarioEjg.WHERE("CONTRARIOEJG.idpersona = '" + idPersona + "'");
@@ -666,6 +668,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = CONTRARIOSDESIGNA.anio "
 				+ "AND numero = CONTRARIOSDESIGNA.numero "
 				+ "AND idturno = CONTRARIOSDESIGNA.idturno) AS fechaapertura");
+		sqlContrariosDesigna.SELECT("null as idTurno");
 		sqlContrariosDesigna.FROM("SCS_CONTRARIOSDESIGNA CONTRARIOSDESIGNA");
 		sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
 		sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.idpersona = '" + idPersona + "'");
@@ -682,6 +685,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = DEFENDIDOSDESIGNA.anio "
 				+ "AND numero = DEFENDIDOSDESIGNA.numero "
 				+ "AND idturno = DEFENDIDOSDESIGNA.idturno) AS fechaapertura");
+		sqlDefendidosDesigna.SELECT("null as idTurno");
 		sqlDefendidosDesigna.FROM("SCS_DEFENDIDOSDESIGNA DEFENDIDOSDESIGNA");
 		sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
 		sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.idpersona = '" + idPersona + "'");
@@ -694,6 +698,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlSoj.SELECT("'Solicitante' as rol");
 		sqlSoj.SELECT("'S' as tipo");
 		sqlSoj.SELECT("fechaapertura");
+		sqlSoj.SELECT("TO_CHAR(idturno) idTurno");
 		sqlSoj.FROM("SCS_SOJ SOJ");
 		sqlSoj.WHERE("SOJ.idinstitucion = '" + idInstitucion + "'");
 		sqlSoj.WHERE("SOJ.idpersonajg = '" + idPersona + "'");
@@ -706,6 +711,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlEJG.SELECT("'Solicitante' as rol");
 		sqlEJG.SELECT("'E' as tipo");
 		sqlEJG.SELECT("fechaapertura");
+		sqlEJG.SELECT("null as idTurno");
 		sqlEJG.FROM("SCS_EJG EJG");
 		sqlEJG.WHERE("EJG.idinstitucion = '" + idInstitucion + "'");
 		sqlEJG.WHERE("EJG.idpersonajg = '" + idPersona + "'");
@@ -721,6 +727,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "WHERE idinstitucion = CONTRARIOSASISTENCIA.idinstitucion "
 				+ "AND anio = CONTRARIOSASISTENCIA.anio "
 				+ "AND numero = CONTRARIOSASISTENCIA.numero) AS fechaapertura");
+		sqlContrariosAsistencia.SELECT("null as idTurno");
 		sqlContrariosAsistencia.FROM("SCS_CONTRARIOSASISTENCIA CONTRARIOSASISTENCIA");
 		sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.idinstitucion = '" + idInstitucion + "'");
 		sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.idpersona = '" + idPersona + "'");
@@ -733,6 +740,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlAsistencia.SELECT("'Solicitante' as rol");
 		sqlAsistencia.SELECT("'A' as tipo");
 		sqlAsistencia.SELECT("fechahora AS fechaapertura");
+		sqlAsistencia.SELECT("null as idTurno");
 		sqlAsistencia.FROM("SCS_ASISTENCIA ASISTENCIA");
 		sqlAsistencia.WHERE("ASISTENCIA.idinstitucion = '" + idInstitucion + "'");
 		sqlAsistencia.WHERE("ASISTENCIA.idpersonaJG = '" + idPersona + "'");
