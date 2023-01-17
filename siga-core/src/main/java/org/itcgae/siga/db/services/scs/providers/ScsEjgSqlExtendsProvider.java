@@ -318,7 +318,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("TO_DATE(EJG.FECHADICTAMEN,'DD/MM/RRRR') <= TO_DATE( '" + fechaDictamenHast + "','DD/MM/RRRR')");
 		}
 		if (ejgItem.getResolucion() != null)
-			sql.WHERE("EJG.IDTIPORATIFICACIONEJG = " + ejgItem.getResolucion());
+			if(ejgItem.getResolucion().equals("12")) {
+				sql.WHERE("EJG.IDTIPORATIFICACIONEJG IS NULL");
+			}else {
+				sql.WHERE("EJG.IDTIPORATIFICACIONEJG = " + ejgItem.getResolucion());
+			}
 		if (ejgItem.getFundamentoJuridico() != null && ejgItem.getFundamentoJuridico() != "")
 			sql.WHERE("EJG.IDFUNDAMENTOJURIDICO = " + ejgItem.getFundamentoJuridico());
 		if (ejgItem.getFechaResolucionDesd() != null) {
