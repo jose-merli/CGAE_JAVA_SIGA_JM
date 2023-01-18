@@ -95,6 +95,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoGrupoLaboralExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoIngresoExtendsMapper;
+import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
 import org.itcgae.siga.scs.services.justiciables.IGestionJusticiableService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,6 +181,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	
 	@Autowired
 	private ScsAsistenciaMapper ScsAsistenciaMapper;
+	
+	@Autowired
+	private GestionEJGServiceImpl gestionEJGService;
 
 	private boolean validacionDireccion = false;
 	private boolean validacionTipoVia = false;
@@ -1294,6 +1298,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AsuntosJusticiableDTO asuntosJusticiableDTO = new AsuntosJusticiableDTO();
 		List<AsuntosClaveJusticiableItem> asuntosClaveJusticiableItem = new ArrayList<AsuntosClaveJusticiableItem>();
+		List<StringDTO> personasRepresentadas = null;
 		Error error = new Error();
 
 		if (idInstitucion != null) {
@@ -1316,8 +1321,16 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					LOGGER.info(
 							"searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Entrada a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
 
-					asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable(idPersona,
-							idInstitucion);
+					// Comprobamos si es representante legal de algún asunto en cuyo caso devolveremos las personas representadas
+					personasRepresentadas = scsPersonajgExtendsMapper.getPersonaRepresentanteJG(idPersona, idInstitucion);
+					
+					if (personasRepresentadas != null && personasRepresentadas.size() > 0) {
+						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiableRepresentanteJG(idPersona, personasRepresentadas,
+								idInstitucion);
+					} else {
+						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable(idPersona,
+								idInstitucion);
+					}
 
 					LOGGER.info(
 							"searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Salida a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
@@ -2273,6 +2286,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						ejgItem.setNumero(ejg.get(0).getNumero());
 						ejgItem.setIdpersonajg(Long.valueOf(itemEjg.get(3))); // Solicitante.
 						response = scsEjgMapper.updateByPrimaryKeySelective(ejgItem);
+						
+						//Lo añadimos en la Unidad Familiar como solicitante.
+						List<String> newUnidadFamiliar = new ArrayList<>();
+						newUnidadFamiliar.add(idInstitucion.toString());
+						newUnidadFamiliar.add(itemEjg.get(3));
+						newUnidadFamiliar.add(itemEjg.get(0));
+						newUnidadFamiliar.add(String.valueOf(ejg.get(0).getIdtipoejg()));
+						newUnidadFamiliar.add(itemEjg.get(1));
+						gestionEJGService.insertFamiliarEJG(newUnidadFamiliar, request);
 					}
 
 				} catch (Exception e) {

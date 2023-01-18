@@ -61,9 +61,22 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),	
 		@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR)
 	})
 	List<AsuntosClaveJusticiableItem> searchClaveAsuntosJusticiable(String idPersona, Short idInstitucion);
+	
+	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "searchClaveAsuntosJusticiableRepresentanteJG")
+	@Results({ 
+		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),	
+		@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR)
+	})
+	List<AsuntosClaveJusticiableItem> searchClaveAsuntosJusticiableRepresentanteJG(String idPersona, List<StringDTO> representados, Short idInstitucion);
 
 	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "unidadFamiliarEJG")
 	@Results({ 
@@ -128,5 +141,11 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 			@Result(column = "PROVINCIA", property = "provinciaStr", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ScsPersonaJGBean> getPersonaJG(Long idPersonaJG, Integer idInstitucion);
-
+	
+	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "getPersonaRepresentanteJG")
+	@Results({
+			@Result(column = "IDPERSONA", property = "valor", jdbcType = JdbcType.VARCHAR)
+	})
+	List<StringDTO> getPersonaRepresentanteJG(String idPersonaJG, Short idInstitucion);
+	
 }

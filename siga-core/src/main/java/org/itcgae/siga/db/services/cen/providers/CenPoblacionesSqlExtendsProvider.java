@@ -36,13 +36,14 @@ public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
 		sql.SELECT("poblacion.PRIORIDAD");	
 		
 		sql.FROM("CEN_POBLACIONES poblacion");
-		sql.FROM("scs_juzgado juzgado");
+		//sql.FROM("scs_juzgado juzgado");
 		
 		if(!UtilidadesString.esCadenaVacia(idProvincia)) {
 			sql.WHERE("poblacion.IDPROVINCIA ='" + idProvincia + "'");
 		}
-		sql.WHERE(filtroTextoBusquedas("poblacion.NOMBRE", filtro));
-		
+		if(!filtro.equals("-1")) {
+			sql.WHERE(filtroTextoBusquedas("poblacion.NOMBRE", filtro));
+		}
 		sql.ORDER_BY("PRIORIDAD, NOMBRE");
 
 		return sql.toString();
