@@ -700,11 +700,15 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 
 					
 				} else if(ejgItem.getNumero().trim().contains("-")) {
-					ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-							usuarios.get(0).getIdlenguaje().toString())));
+					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString()));
+//					ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+//						usuarios.get(0).getIdlenguaje().toString())));
 				}else {
-				ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-						usuarios.get(0).getIdlenguaje().toString())));
+				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+						usuarios.get(0).getIdlenguaje().toString()));
+//				ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+//						usuarios.get(0).getIdlenguaje().toString())));
 				}
 				LOGGER.info(
 						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
