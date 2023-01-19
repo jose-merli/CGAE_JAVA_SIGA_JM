@@ -76,7 +76,7 @@ public class GestionFundamentoResolucionServiceImpl implements IGestionFundament
 				LOGGER.info(
 						"getResoluciones() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Entrada a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
 
-				List<ComboItem> comboItems = scsTiporesolucionExtendsMapper.getResoluciones(usuario.getIdlenguaje(),"maestros");
+				List<ComboItem> comboItems = scsTiporesolucionExtendsMapper.getResoluciones(usuario.getIdlenguaje(),"ficha");
 
 				LOGGER.info(
 						"getResoluciones() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Salida a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
