@@ -5398,7 +5398,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				} catch (Exception e) {
 					LOGGER.debug(
-							"GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							"GestionEJGServiceImpl.asociarAsistencia() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
 							e);
 					response = 0;
 				} finally {
@@ -5407,7 +5407,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.asociarDesignacion() -> KO. No se ha asociado ningun elemento");
+								"GestionEJGServiceImpl.asociarAsistencia() -> KO. No se ha asociado ningun elemento");
 
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.OK);
@@ -5464,7 +5464,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				} catch (Exception e) {
 					LOGGER.debug(
-							"GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							"GestionEJGServiceImpl.asociarSOJ() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
 							e);
 					response = 0;
 				} finally {
@@ -5473,7 +5473,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.asociarDesignacion() -> KO. No se ha asociado ningun elemento");
+								"GestionEJGServiceImpl.asociarSOJ() -> KO. No se ha asociado ningun elemento");
 
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.OK);
