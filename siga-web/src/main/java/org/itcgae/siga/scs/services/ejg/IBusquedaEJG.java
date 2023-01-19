@@ -17,7 +17,7 @@ public interface IBusquedaEJG {
 	
 	ComboDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen);
 
-	ComboDTO comboResolucion(HttpServletRequest request);
+	ComboDTO comboResolucion(HttpServletRequest request, String origen);
 
 	ComboDTO comboFundamentoImpug(HttpServletRequest request);
 

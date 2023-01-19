@@ -31,7 +31,7 @@ public interface ScsTiporesolucionExtendsMapper extends ScsTiporesolucionMapper{
 		@Result(column = "IDTIPORESOLUCION", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> getResoluciones(String idLenguaje);
+	List<ComboItem> getResoluciones(String idLenguaje, String origen);
 	
 	@SelectProvider(type = ScsTiporesolucionSqlExtendsProvider.class, method = "getResoluciones")
 	@Results({

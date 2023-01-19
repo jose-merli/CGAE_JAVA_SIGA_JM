@@ -314,7 +314,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	}
 
 	@Override
-	public ComboDTO comboResolucion(HttpServletRequest request) {
+	public ComboDTO comboResolucion(HttpServletRequest request, String origen) {
 		// TODO Auto-generated method stub
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -339,7 +339,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				LOGGER.info(
 						"comboResolucion() / scsTiporesolucionExtendsMapper.getResoluciones() -> Entrada a scsTipofundamentosExtendsMapper para obtener los combo");
 
-				comboItems = scsTiporesolucionExtendsMapper.getResoluciones(usuarios.get(0).getIdlenguaje());
+				comboItems = scsTiporesolucionExtendsMapper.getResoluciones(usuarios.get(0).getIdlenguaje(), origen);
 
 				LOGGER.info(
 						"comboResolucion() / scsTiporesolucionExtendsMapper.getResoluciones() -> Salida a scsTipofundamentosExtendsMapper para obtener los combo");
