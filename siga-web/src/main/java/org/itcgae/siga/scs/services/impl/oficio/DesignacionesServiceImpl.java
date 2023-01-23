@@ -661,8 +661,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					// idJuzgado, hecho asi por el front
-					if (item.getNombreJuzgado() != null && !item.getNombreJuzgado().trim().isEmpty()) {
-						record.setIdjuzgado(Long.parseLong(item.getNombreJuzgado()));
+					if (item.getIdJuzgado() != null && !item.getIdJuzgado().trim().isEmpty()) {
+						record.setIdjuzgado(Long.parseLong(item.getIdJuzgado()));
 						record.setIdinstitucionJuzg(idInstitucion);
 					}
 
