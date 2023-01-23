@@ -2860,7 +2860,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		int response = 0;
 		String codigoDesigna = "";
 		ScsDesigna designa = new ScsDesigna();
-
+		Boolean letradoDesigSinTurno = Boolean.FALSE;
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -3098,6 +3099,26 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 //							MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
 							designaLetrado.setLetradodelturno("0");
+							error.setDescription("El letrado asignado no tenia turno asignado");
+							
+							if (designaLetrado.getIdturno() != null) {
+								// Comprobacion del turno del letrado y la designacion (si es diferente de tipo designacion = error)
+								ScsTurnoExample turnoExample = new ScsTurnoExample();
+								turnoExample.createCriteria().andIdturnoEqualTo(Integer.valueOf(designaLetrado.getIdturno()));
+								List<ScsTurno> turnoSelected = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
+		                        // TODO [SIGARNV-2334] - Revisar con Paco => Tiene sentido que se verifique al cambiar de letrado la ultima designacion para que no se le vuelva asignar una del tipo turno diferente a 1 ???
+								if (CollectionUtils.isNotEmpty(turnoSelected) && Short.toUnsignedInt(turnoSelected.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
+									error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+									error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
+	//								error.setDescription("El letrado asignado está asociado a tipos de turno de <b>TRAMITACION</b>. Por favor, seleccione uno de tipo <b>DESIGNACION</b>");
+									insertResponseDTO.setStatus(SigaConstants.KO);
+									insertResponseDTO.setError(error);
+									return insertResponseDTO;
+								}
+							
+							} else {
+								letradoDesigSinTurno = Boolean.TRUE;
+							}
 						}
 
 						designaLetrado.setIdpersona(Long.parseLong(idPersona));
@@ -3151,8 +3172,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			insertResponseDTO.setId(codigoDesigna);
-			error.setCode(200);
-			error.setDescription("general.message.registro.insertado");
+			error.setCode(letradoDesigSinTurno ? 202 : 200);
+			error.setDescription(letradoDesigSinTurno ? "justiciaGratuita.oficio.designa.designacionletradosinturno" : "general.message.registro.insertado");
 		}
 		insertResponseDTO.setError(error);
 
@@ -4860,6 +4881,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		
 		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
 		
+//		if (designa.getIdturno() != null) {
+//			letradoEntrante.setIdturno(designa.getIdturno());
+//		}
+		
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 		if(item[8]!=null) {
@@ -4916,6 +4941,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Error error = new Error();
 		int response = 0;
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY");
+        Boolean letradoDesigSinTurno = Boolean.FALSE;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -4927,16 +4953,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //				try {
 				
 				ScsDesignasletradoExample example = new ScsDesignasletradoExample();
-
-				// Obtencion primer letrado
-//				example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(designa.getAnio())
-//				.andIdturnoEqualTo(designa.getIdturno()).andNumeroEqualTo(designa.getNumero());
-//				example.setOrderByClause("FECHADESIGNA ASC");
-//				List<ScsDesignasletrado> letradosDesignadosAsc = scsDesignasletradoMapper.selectByExample(example);
-//				ScsDesignasletrado primerLetradoDesignado = CollectionUtils.isNotEmpty(letradosDesignadosAsc) ? letradosDesignadosAsc.get(0) : null;
-//				if (primerLetradoDesignado != null) {
-//					primerLetradoDesignado.getFechadesigna();
-//				}
 				
 				example = new ScsDesignasletradoExample();
 				example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(designa.getAnio())
@@ -5006,6 +5022,34 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				} else {
 					designaLetradoNueva.setIdpersona(letradoEntrante.getIdpersona());
+					DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+					
+					// Recuperamos ultima asignacion sin renuncia del letrado para saber su turno y comparar (Deberia ser misma busqueda que en buscador colegiados para asignar)					
+					ScsDesignasletradoExample designaletrado = new ScsDesignasletradoExample();
+					
+					designaletrado.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(letradoEntrante.getIdpersona()).andFecharenunciaIsNull();
+					designaletrado.setOrderByClause("FECHADESIGNA DESC");
+					
+					// Obtener la Designa Letrado Original.
+					List<ScsDesignasletrado> designaletradoOriginal = scsDesignasLetradoExtendMapper.selectByExample(designaletrado);
+					
+                    // Comprobacion del turno del letrado y la designacion (si es diferente de tipo designacion = error)
+					if (CollectionUtils.isNotEmpty(designaletradoOriginal) && designaletradoOriginal.get(0).getIdturno() != null) {
+						ScsTurnoExample turnoExample = new ScsTurnoExample();
+                    	turnoExample.createCriteria().andIdturnoEqualTo(designaletradoOriginal.get(0).getIdturno());
+                        List<ScsTurno> turnoSelected = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
+                        // TODO [SIGARNV-2334] - Revisar con Paco => Tiene sentido que se verifique al cambiar de letrado la ultima designacion para que no se le vuelva asignar una del tipo turno diferente a 1 ???
+//                        if (CollectionUtils.isNotEmpty(turnoSelected) && Short.toUnsignedInt(turnoSelected.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
+//                            error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+//                            error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
+//                            updateResponseDTO.setStatus(SigaConstants.KO);
+//                            updateResponseDTO.setError(error);
+//                            return updateResponseDTO;
+//                        }
+					} else {
+						letradoDesigSinTurno = Boolean.TRUE;
+					}
+                    
 				}
 
 				// Validar que el letrado sea diferente al anterior.
@@ -5143,8 +5187,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						updateResponseDTO.setError(error);
 					}
 				} else {
-					error.setCode(200);
-					error.setDescription("general.message.registro.actualizado");
+		            error.setCode(letradoDesigSinTurno ? 202 : 200);
+		            error.setDescription(letradoDesigSinTurno ? "justiciaGratuita.oficio.designa.designacionletradosinturno" : "general.message.registro.actualizado");
 					updateResponseDTO.setError(error);
 				}
 
@@ -5805,6 +5849,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Date fechaAntiguaDesigna = null;
+		Boolean letradoAsignadoSinTurno = Boolean.FALSE;
 
 		if (null != idInstitucion) {
 
@@ -5887,8 +5932,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 						if (designaItem.getFechaAlta().after(fechaActDate)) {
 							error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
-							//error.setDescription("justiciaGratuita.oficio.designa.fechaposteriorprimeraactuacion");
-							error.setDescription("La fecha no puede ser posterior a la fecha de primera actuacion (" + fechaActDate.toString() + ")");
+							error.setDescription("justiciaGratuita.oficio.designa.fechaposteriorprimeractuacion");
+//							error.setDescription("La fecha no puede ser posterior a la fecha de primera actuacion (" + fechaActDate.toString() + ")");
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							updateResponseDTO.setError(error);
 							return updateResponseDTO;
@@ -5951,7 +5996,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaletrado.setFechadesigna(scsDesigna.getFechaalta());*/
 						
 						
-						
 						ScsDesignasletradoExample designaletrado = new ScsDesignasletradoExample();
 						
 						designaletrado.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo((short) designaItem.getAno())
@@ -5969,11 +6013,32 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							// Si ha tenido cambio de letrado, LA FECHA tiene que ser siempre antes del primer cambio de letrado. 
 							if (designaItem.getFechaAlta().after(fechaOriginal)) {
 								error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
-								//error.setDescription("justiciaGratuita.oficio.designa.fechaposteriordesignaletrado");
-								error.setDescription("La fecha no puede ser posterior a la fecha de designacion del letrado (" + dateSimpleFormat.format(fechaOriginal) + ")");
+								error.setDescription("justiciaGratuita.oficio.designa.fechaposteriordesignaletrado");
+//								error.setDescription("La fecha no puede ser posterior a la fecha de designacion del letrado (" + dateSimpleFormat.format(fechaOriginal) + ")");
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								updateResponseDTO.setError(error);
 								return updateResponseDTO;
+							}
+							
+							// TODO [SIGARNV-2334] - Seria necesario para controlar aqui tambien - Analogo a updateLetradoDesigna
+							if (designaletradoOriginal.get(0).getIdturno() != null) {
+								// Comprobacion del turno del letrado y la designacion (si es diferente de tipo designacion = error)
+								
+								ScsTurnoExample turnoExample = new ScsTurnoExample();
+								
+								turnoExample.createCriteria().andIdturnoEqualTo(Integer.valueOf(designaletradoOriginal.get(0).getIdturno()));
+								
+								List<ScsTurno> letradoTurnoSelected = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
+								
+								if (CollectionUtils.isNotEmpty(letradoTurnoSelected) && Short.toUnsignedInt(letradoTurnoSelected.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
+									error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+									error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									updateResponseDTO.setError(error);
+									return updateResponseDTO;
+								}
+							} else {
+								letradoAsignadoSinTurno = Boolean.TRUE;
 							}
 							
 							// Actualizar La designa Letrado con su fecha correspondiente.

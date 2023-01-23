@@ -33,7 +33,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "comboTurnosDesignacion")
 	@Results({ @Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
-	List<ComboItem> comboTurnosDesignacion(Short idInstitucion);
+	List<ComboItem> comboTurnosDesignacion(Short idInstitucion, Short idTipoTurno);
 
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "comboTurnosTipo")
 	@Results({ @Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),

@@ -207,6 +207,10 @@ public class DesignacionesController {
 		InsertResponseDTO response = designacionesService.createDesigna(designaItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else if (response.getError().getCode() == 202)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.ACCEPTED);
+		else if (response.getError().getCode() == 406)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.NOT_ACCEPTABLE);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
@@ -713,6 +717,8 @@ public class DesignacionesController {
 		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(item, request);
 		if (response.getError().getCode().intValue() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else if (response.getError().getCode().intValue() == 202)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.ACCEPTED);
 		else if (response.getError().getCode().intValue() == 406)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.NOT_ACCEPTABLE);
 		else
