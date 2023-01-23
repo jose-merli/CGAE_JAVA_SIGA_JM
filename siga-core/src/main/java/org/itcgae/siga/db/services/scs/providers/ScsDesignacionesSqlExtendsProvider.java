@@ -702,6 +702,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			throw e;
 		}
 
+		LOGGER.info("+++++ [SIGA TEST] - query busquedaDesignaciones() --> " + sql.toString());
 		return sql;
 	}
 	public String busquedaNuevaDesigna(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo, boolean isNoColegiado) throws Exception {
