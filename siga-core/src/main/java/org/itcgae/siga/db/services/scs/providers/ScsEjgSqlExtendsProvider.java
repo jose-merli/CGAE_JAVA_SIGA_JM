@@ -1854,7 +1854,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlDesigna_6.FROM("SCS_DEFENDIDOSDESIGNA  defen");
 		sqlDesigna_6.INNER_JOIN("SCS_PERSONAJG designa ON designa.idpersona = defen.idpersona AND defen.idinstitucion = designa.idinstitucion");
 		sqlDesigna_6.WHERE("defen.idturno = ejgd.idturno");
-		sqlDesigna_6.WHERE("defen.idtipoencalidad = '0'");
+		//sqlDesigna_6.WHERE("defen.idtipoencalidad = '0'"); --- ANADIDO POSIBILIDAD NULLABLE DEBIDO A QUE SIN ESTO, NO APARECEN EN EL EJG - RELACIONES - CUANDO ES DESIGNACION
+		sqlDesigna_6.WHERE("(defen.idtipoencalidad = '0' or defen.idtipoencalidad IS NULL)");
 		sqlDesigna_6.WHERE("defen.anio = ejgd.aniodesigna");
 		sqlDesigna_6.WHERE("defen.numero = ejgd.numerodesigna");
 		sqlDesigna_6.WHERE("ROWNUM<2");
@@ -1938,6 +1939,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlPrincipal.ORDER_BY("anio DESC");
 		sqlPrincipal.ORDER_BY("codigo DESC");
 
+		
+		LOGGER.info("+++++ [SIGA TEST] - query busquedaDesignaciones() --> " + sqlPrincipal.toString());
 		return sqlPrincipal.toString();
 	}
 	
@@ -2081,7 +2084,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlDesigna_6.FROM("SCS_DEFENDIDOSDESIGNA  defen");
 		sqlDesigna_6.INNER_JOIN("SCS_PERSONAJG designa ON designa.idpersona = defen.idpersona AND defen.idinstitucion = designa.idinstitucion");
 		sqlDesigna_6.WHERE("defen.idturno = ejgd.idturno");
-		sqlDesigna_6.WHERE("defen.idtipoencalidad = '0'");
+//		sqlDesigna_6.WHERE("defen.idtipoencalidad = '0'") --- ANADIDO POSIBILIDAD NULLABLE DEBIDO A QUE SIN ESTO, NO APARECEN EN EL EJG - RELACIONES - CUANDO ES DESIGNACION;
+		sqlDesigna_6.WHERE("(defen.idtipoencalidad = '0' or defen.idtipoencalidad IS NULL)");
 		sqlDesigna_6.WHERE("defen.anio = ejgd.aniodesigna");
 		sqlDesigna_6.WHERE("defen.numero = ejgd.numerodesigna");
 		sqlDesigna_6.WHERE("ROWNUM<2");
