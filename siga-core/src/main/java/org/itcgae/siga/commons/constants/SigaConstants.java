@@ -1791,6 +1791,6 @@ public class SigaConstants {
 
     }
     
-    public static Integer TIPO_TURNO_DESIGNACION = 1;
-    public static Integer TIPO_TURNO_TRAMITACION = 2;
+    public static Integer TIPO_TURNO_DESIGNACION = 2;
+    public static Integer TIPO_TURNO_TRAMITACION = 1;
 }
