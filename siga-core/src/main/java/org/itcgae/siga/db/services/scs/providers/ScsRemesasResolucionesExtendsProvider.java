@@ -72,7 +72,7 @@ public class ScsRemesasResolucionesExtendsProvider {
 		sql.WHERE("RES.IDTIPOREMESA = 1");
 		sql.WHERE("ROWNUM <= " + tamMaximo);	
 		
-		sql.ORDER_BY("RES.IDREMESARESOLUCION DESC");
+		sql.ORDER_BY("RES.FECHARESOLUCION DESC, RES.IDREMESARESOLUCION DESC");
 		
 		LOGGER.info(sql.toString());
 		return sql.toString();
