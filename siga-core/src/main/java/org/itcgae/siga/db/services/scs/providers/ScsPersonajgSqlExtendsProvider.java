@@ -790,7 +790,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		sqlUnidadFamiliar.FROM("SCS_UNIDADFAMILIAREJG unidadFamiliar");
 		sqlUnidadFamiliar.WHERE("unidadFamiliar.idinstitucion = '" + idInstitucion + "'");
-		sqlUnidadFamiliar.WHERE("unidadFamiliar.idpersona IN (" + idPersona + ", " + representadosIN + ")");
+		sqlUnidadFamiliar.WHERE("unidadFamiliar.idpersona IN (" + idPersona  + ")");
 
 		SQL sqlContrarioEjg = new SQL();
 		sqlContrarioEjg.SELECT("CONTRARIOEJG.idinstitucion");
@@ -862,7 +862,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlEJG.SELECT("fechaapertura");
 		sqlEJG.FROM("SCS_EJG EJG");
 		sqlEJG.WHERE("EJG.idinstitucion = '" + idInstitucion + "'");
-		sqlEJG.WHERE("EJG.idpersonajg IN (" + idPersona + ", " + representadosIN + ")");
+		sqlEJG.WHERE("EJG.idpersonajg IN (" + idPersona + ")");
 
 		SQL sqlContrariosAsistencia = new SQL();
 		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.idinstitucion");
