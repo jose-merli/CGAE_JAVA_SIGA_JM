@@ -30,10 +30,10 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 				+ "    (nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado");
 		sql.FROM("    scs_soj soj\r\n");
-		sql.JOIN("scs_personajg pjg ON ( pjg.idpersona = soj.idpersonajg AND pjg.idinstitucion = soj.idinstitucion)");
-		sql.JOIN("cen_persona per ON (soj.idpersona = per.idpersona)");
-		sql.JOIN("scs_turno t ON ( t.idturno = soj.idturno AND t.idinstitucion = soj.idinstitucion)");
-		sql.JOIN(
+		sql.LEFT_OUTER_JOIN("scs_personajg pjg ON ( pjg.idpersona = soj.idpersonajg AND pjg.idinstitucion = soj.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("cen_persona per ON (soj.idpersona = per.idpersona)");
+		sql.LEFT_OUTER_JOIN("scs_turno t ON ( t.idturno = soj.idturno AND t.idinstitucion = soj.idinstitucion)");
+		sql.LEFT_OUTER_JOIN(
 				"scs_guardiasturno g ON ( soj.idturno = g.idturno AND soj.idinstitucion = g.idinstitucion AND soj.idguardia = g.idguardia)");
 		sql.LEFT_OUTER_JOIN("scs_tiposoj ts ON ( ts.idtiposoj = soj.idtiposoj )");
 		sql.LEFT_OUTER_JOIN("scs_tiposojcolegio tsc on (tsc.idtiposojcolegio = soj.idtiposojcolegio and tsc.idinstitucion = soj.idinstitucion)");
