@@ -432,13 +432,13 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.SELECT("ins.observacionesvalidacion");
 		sql.SELECT("ins.fechasolicitudbaja");
 		sql.SELECT("ins.observacionesbaja");
-		sql.SELECT("ins.fechabaja");
+		//sql.SELECT("ins.fechabaja");
 		sql.SELECT("ins.observacionesvalbaja");
 		sql.SELECT("ins.fechadenegacion");
 		sql.SELECT("ins.observacionesdenegacion");
 		//sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
 		//sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechavalidacion),'dd/mm/yyyy') fechavalidacion");
-		sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechabaja),'dd/mm/yyyy') fechabaja");
+		sql.SELECT("TO_DATE(TO_CHAR(nvl(ins.fechadenegacion,ins.fechabaja),'dd/mm/yyyy'), 'dd/mm/yyyy') fechabaja");
 		sql.SELECT("DECODE(tur.guardias,0,'Obligatorias',DECODE(tur.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
 
         sql.FROM("scs_inscripcionguardia ins");
@@ -528,7 +528,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
        
         sql.ORDER_BY("tur.nombre");
 		
-			return sql.toString();
+		LOGGER.info("++++ [SIGA TEST] - ScsInscripcionguardiaSqlExtendsProvider / listadoInscripciones -> query = " + sql.toString());
+        return sql.toString();
 
 	}
 

@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -816,7 +817,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboTurnosDesignacion() / scsTurnosExtendsMapper.comboTurnos() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
 
-				List<ComboItem> comboItems = scsTurnosExtendsMapper.comboTurnosDesignacion(idInstitucion);
+				//Designacion => IDTIPOTURNO = 1
+				List<ComboItem> comboItems = scsTurnosExtendsMapper.comboTurnosDesignacion(idInstitucion, new Short("1"));
 
 				LOGGER.info(
 						"comboTurnosDesignacion() / scsTurnosExtendsMapper.comboTurnos() -> Salida a scsTipoactuacionExtendsMapper para obtener las actuaciones");

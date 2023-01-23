@@ -234,6 +234,8 @@ public class ScsRemesasExtendsProvider {
 
 		if(tamMaximo != null)
 			sql.WHERE("ROWNUM <= " + tamMaximo);
+		
+		sql.ORDER_BY("FECHA_GENERACION DESC");
 
 		LOGGER.info(sql.toString());
 

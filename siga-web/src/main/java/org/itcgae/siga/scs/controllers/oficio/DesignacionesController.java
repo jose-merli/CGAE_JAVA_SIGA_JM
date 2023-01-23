@@ -207,6 +207,10 @@ public class DesignacionesController {
 		InsertResponseDTO response = designacionesService.createDesigna(designaItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else if (response.getError().getCode() == 202)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.ACCEPTED);
+		else if (response.getError().getCode() == 406)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.NOT_ACCEPTABLE);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
@@ -220,6 +224,8 @@ public class DesignacionesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else if (response.getError().getCode() == 400)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.BAD_REQUEST);
+		else if (response.getError().getCode() == 406)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.NOT_ACCEPTABLE);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -700,71 +706,21 @@ public class DesignacionesController {
 	// 3.3.6.2.9.3. Ficha cambio del letrado designado
 
 	
-	//Servicio de guardado
+	//Servicio de guardado - El elemento ITEM llega con los siguientes elementos de front (ficha.ts)
 //	[designa.ano, designa.idTurno, designa.numero, 
 //     this.saliente.body.idPersona,  this.saliente.body.observaciones, this.saliente.body.motivoRenuncia, this.saliente.body.fechaDesigna, this.saliente.body.fechaSolRenuncia,
-//     this.entrante.body.fechaDesigna, this.entrante.body.idPersona]
+//     this.entrante.body.fechaDesigna, this.entrante.body.idPersona this.saliente.body.compensacion, this.entrante.body.salto, 
+//	   this.entrante.body.art27, this.entrante.minDateDesigna]
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(
-			@RequestBody String[] item,
-			HttpServletRequest request) throws Exception {
+	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(@RequestBody String[] item,HttpServletRequest request) throws Exception {		
 		
-		String anio = item[0].substring(1, 5);
-		
-		ScsDesigna designa = new ScsDesigna();
-		designa.setAnio(Short.parseShort(anio));
-		designa.setIdturno(Integer.parseInt(item[1]));
-		designa.setNumero(Long.parseLong(item[2]));
-		designa.setArt27(item[12]);
-		
-		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
-		letradoSaliente.setIdpersona(Long.parseLong(item[3]));
-		letradoSaliente.setObservaciones(item[4]);
-		letradoSaliente.setIdtipomotivo(Short.parseShort(item[5]));
-		if(item[6]!=null) {
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(Long.parseLong(item[6]));
-			letradoSaliente.setFechadesigna(formatter.parse(formatter.format(calendar.getTime()))); 
-		}
-		if(item[7]!=null) {
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			String date = item[7].substring(0, 10);
-			letradoSaliente.setFecharenunciasolicita(formatter.parse(date));
-		}
-		
-		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
-		
-		if(item[8]!=null) {
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-			if(item[8].length() != 10) {
-				String date = item[8].substring(0, 10);
-				letradoEntrante.setFechadesigna(formatter.parse(date));
-			}else {
-				String date = item[8].substring(0, 10);
-				letradoEntrante.setFechadesigna(format.parse(date));
-			}
-		}
-		
-		if(item[9]!=null) {
-			letradoEntrante.setIdpersona(Long.parseLong(item[9]));
-		}
-	
-		Boolean checkCompensacionSaliente = false;
-		if(item[10] != null) {
-			 checkCompensacionSaliente = Boolean.parseBoolean(item[10]);
-		}
-		
-		Boolean checkSaltoEntrante = false;
-		if(item[11] != null) {
-			 checkSaltoEntrante = Boolean.parseBoolean(item[11]);
-			
-		}
-		
-		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, checkCompensacionSaliente ,checkSaltoEntrante, request  );
+		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(item, request);
 		if (response.getError().getCode().intValue() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else if (response.getError().getCode().intValue() == 202)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.ACCEPTED);
+		else if (response.getError().getCode().intValue() == 406)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.NOT_ACCEPTABLE);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

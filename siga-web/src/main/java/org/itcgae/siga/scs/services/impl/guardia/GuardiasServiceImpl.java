@@ -9434,19 +9434,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"getInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"validarInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("getInscripciones() -> Entrada para obtener las inscripciones");
+				LOGGER.info("validarInscripciones() -> Entrada para obtener las inscripciones");
 
 				// DESCOMENTAR CUANDO SUBA CRISTINA
 				// inscripciones =
 				// scsInscripcionguardiaExtendsMapper.getValidarInscripciones(validarBody,
 				// idInstitucion.toString());
 
-				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
+				LOGGER.info("validarInscripciones() -> Salida ya con los datos recogidos");
 			}
 		}
 
@@ -9506,19 +9506,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"getInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"denegarInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("getInscripciones() -> Entrada para obtener las inscripciones");
+				LOGGER.info("denegarInscripciones() -> Entrada para obtener las inscripciones");
 
 				// DESCOMENTAR CUANDO SUBA CRISTINA
 				// inscripciones =
 				// scsInscripcionguardiaExtendsMapper.getDenegarInscripciones(denegarBody,
 				// idInstitucion.toString());
 
-				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
+				LOGGER.info("denegarInscripciones() -> Salida ya con los datos recogidos");
 			}
 		}
 

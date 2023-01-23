@@ -572,8 +572,12 @@ public class PretensionesServiceImpl implements IPretensionesService {
                               ComboItem comboItem = new ComboItem();
                               for (ScsProcedimientos scsProcedimientos : procedimientos) {
                                        comboItem = new ComboItem();
-                                       comboItem.setLabel(scsProcedimientos.getNombre());
-                                        comboItem.setValue(scsProcedimientos.getIdprocedimiento());
+                                       if(scsProcedimientos.getCodigoext() != null) {
+                                    	   comboItem.setLabel("("+scsProcedimientos.getCodigoext()+") " + scsProcedimientos.getNombre());
+                                       }else {
+                                    	   comboItem.setLabel(scsProcedimientos.getNombre());
+                                       }
+                                       comboItem.setValue(scsProcedimientos.getIdprocedimiento());
                                        combooItems.add(comboItem);
                               }
 
