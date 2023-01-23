@@ -95,7 +95,7 @@ public class EjgController {
 
 	@RequestMapping(value = "/filtros-ejg/comboResolucion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboResolucion(HttpServletRequest request) {
-		ComboDTO response = busquedaEJG.comboResolucion(request);
+		ComboDTO response = busquedaEJG.comboResolucion(request,"filtro");
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
@@ -193,6 +193,12 @@ public class EjgController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/gestion-ejg/comboResolucion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboEjgResolucion(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboResolucion(request,"ficha");
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
 	// busqueda

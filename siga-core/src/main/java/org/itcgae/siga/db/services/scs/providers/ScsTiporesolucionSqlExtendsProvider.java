@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.ScsTiporesolucionSqlProvider;
 public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlProvider{
 
 	
-	public String getResoluciones(String idLenguaje) {
+	public String getResoluciones(String idLenguaje, String origen) {
 
 		SQL sql = new SQL();
 
@@ -20,6 +20,9 @@ public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlPro
 
 		sql.WHERE("tiporesolucion.fechabaja is null");
 		sql.WHERE("tiporesolucion.fecha_baja is null");
+		if(origen.equals("ficha")) {
+			sql.WHERE("tiporesolucion.idtiporesolucion <> 12");
+		}
 
 		sql.ORDER_BY("catalogoResolucion.descripcion");
 		return sql.toString();

@@ -1672,7 +1672,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		String fechaInicioOk = changeDateFormat("dd/MM/yyyy HH:mm", NEW_FORMAT, fechaInicio);
 		//return scsGuardiasturnoExtendsMapper.getFestivosTurno(fechaInicioOk, fechaFinOk.toString(),
 		//		idInstitucion.toString(), Integer.toString(2000), idTurno.toString());
-		List <RangoFechasItem> rangosFechasFestivos  = scsGuardiasturnoExtendsMapper.getFestivosAgenda(fechaInicio, fechaFinOk,idInstitucion.toString());
+		List <RangoFechasItem> rangosFechasFestivos  = scsGuardiasturnoExtendsMapper.getFestivosAgenda(fechaInicioOk, fechaFinOk,idInstitucion.toString());
 		List<String> fechasFestivas = new ArrayList<String>();
 		if(rangosFechasFestivos == null || rangosFechasFestivos.isEmpty()) return fechasFestivas;
 		

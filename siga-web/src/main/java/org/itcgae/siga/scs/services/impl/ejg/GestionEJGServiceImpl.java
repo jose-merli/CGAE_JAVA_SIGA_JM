@@ -4502,7 +4502,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		String mime = "";
 
 		switch (extension.toLowerCase()) {
-
+		
+		case ".gif":
+			mime = "image/gif";
+			break;
 		case ".doc":
 			mime = "application/msword";
 			break;
@@ -4581,7 +4584,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			scsDocumentacionejg.setRegsalida(documentacionEjgItem.getRegSalida());
 
 			// Si trae fichero
-			if (!documentacionEjgItem.getNombreFichero().isEmpty()) {
+			if (documentacionEjgItem.getNombreFichero() != null && !documentacionEjgItem.getNombreFichero().isEmpty() ) {
 				scsDocumentacionejg.setNombrefichero(documentacionEjgItem.getNombreFichero());
 			}
 
