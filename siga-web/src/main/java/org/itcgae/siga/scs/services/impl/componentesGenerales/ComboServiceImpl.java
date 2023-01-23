@@ -817,8 +817,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboTurnosDesignacion() / scsTurnosExtendsMapper.comboTurnos() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
 
-				//Designacion => IDTIPOTURNO = 1
-				List<ComboItem> comboItems = scsTurnosExtendsMapper.comboTurnosDesignacion(idInstitucion, new Short("1"));
+				//Designacion => IDTIPOTURNO = 2
+				List<ComboItem> comboItems = scsTurnosExtendsMapper.comboTurnosDesignacion(idInstitucion, new Short("2"));
 
 				LOGGER.info(
 						"comboTurnosDesignacion() / scsTurnosExtendsMapper.comboTurnos() -> Salida a scsTipoactuacionExtendsMapper para obtener las actuaciones");
