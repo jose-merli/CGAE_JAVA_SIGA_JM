@@ -139,6 +139,7 @@ import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsEjgdesignaExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
@@ -3004,7 +3005,45 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setLetradodelturno("1");
 
 					} else {
+						// 1) Averiguamos el colegiado a partir de su numero para obtener el IdPersona
+						CenColegiadoExample cenColegExample = new CenColegiadoExample();
+						cenColegExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(numeroColegiado);						
+						List<CenColegiado> resCenColegiado = this.cenColegiadoExtendsMapper.selectByExample(cenColegExample);
+						CenColegiado cenColeg = CollectionUtils.isNotEmpty(resCenColegiado) ? resCenColegiado.get(0) : null;
+						
+						if (cenColeg != null) {
+							// 2) Averiguamos el/los turnos inscritos del colegiado elegido manualmente (buscador)
+							ScsInscripcionturnoExample insTurnoExample = new ScsInscripcionturnoExample();
+							insTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andFechadenegacionIsNull().andFechasolicitudIsNotNull()
+								.andFechavalidacionIsNotNull().andFechabajaIsNull().andIdpersonaEqualTo(cenColeg.getIdpersona());
+														
+							List<ScsInscripcionturno> resInscLetrado = this.scsInscripcionesTurnoExtendsMapper.selectByExample(insTurnoExample);
+							
+							if (CollectionUtils.isNotEmpty(resInscLetrado)) {
+								//3) Recuperamos las entidades "Turno" iteradas para comparar si estuviera inscrito a alguno de tipo tramitacion (idtipoturno = 1)
+								
+								for (ScsInscripcionturno scsTurnoInscrito : resInscLetrado) {
+									ScsTurnoExample turnoExample = new ScsTurnoExample();
+									turnoExample.createCriteria().andIdturnoEqualTo(scsTurnoInscrito.getIdturno());
+									List<ScsTurno> turnoInscritoIt = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
 
+									if (CollectionUtils.isNotEmpty(turnoInscritoIt) 
+											&& Short.toUnsignedInt(turnoInscritoIt.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
+										error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+										error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
+										insertResponseDTO.setStatus(SigaConstants.KO);
+										insertResponseDTO.setError(error);
+										return insertResponseDTO;
+									}
+								}
+							} else {
+								letradoDesigSinTurno = Boolean.TRUE;
+							}	
+						} else {
+							LOGGER.info("+++ DesignacionesServiceImple/createDesigna() -> No se ha encontrado 'CenColegiado' para el NCOLEGIADO = " + numeroColegiado );
+						}
+						
+						
 						designaLetrado.setIdinstitucion(idInstitucion);
 						designaLetrado.setIdturno(designaItem.getIdTurno());
 						designaLetrado.setAnio(year);
@@ -3101,26 +3140,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 //							MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
 							designaLetrado.setLetradodelturno("0");
-							error.setDescription("El letrado asignado no tenia turno asignado");
-							
-							if (designaLetrado.getIdturno() != null) {
-								// Comprobacion del turno del letrado y la designacion (si es diferente de tipo designacion = error)
-								ScsTurnoExample turnoExample = new ScsTurnoExample();
-								turnoExample.createCriteria().andIdturnoEqualTo(Integer.valueOf(designaLetrado.getIdturno()));
-								List<ScsTurno> turnoSelected = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
-		                        // TODO [SIGARNV-2334] - Revisar con Paco => Tiene sentido que se verifique al cambiar de letrado la ultima designacion para que no se le vuelva asignar una del tipo turno diferente a 1 ???
-								if (CollectionUtils.isNotEmpty(turnoSelected) && Short.toUnsignedInt(turnoSelected.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
-									error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
-									error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
-	//								error.setDescription("El letrado asignado está asociado a tipos de turno de <b>TRAMITACION</b>. Por favor, seleccione uno de tipo <b>DESIGNACION</b>");
-									insertResponseDTO.setStatus(SigaConstants.KO);
-									insertResponseDTO.setError(error);
-									return insertResponseDTO;
-								}
-							
-							} else {
-								letradoDesigSinTurno = Boolean.TRUE;
-							}
 						}
 
 						designaLetrado.setIdpersona(Long.parseLong(idPersona));
@@ -5032,25 +5051,45 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaletrado.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(letradoEntrante.getIdpersona()).andFecharenunciaIsNull();
 					designaletrado.setOrderByClause("FECHADESIGNA DESC");
 					
-					// Obtener la Designa Letrado Original.
-					List<ScsDesignasletrado> designaletradoOriginal = scsDesignasLetradoExtendMapper.selectByExample(designaletrado);
+
+					// 1) Averiguamos el colegiado a partir de su numero para obtener el IdPersona
+					CenColegiadoExample cenColegExample = new CenColegiadoExample();
+					cenColegExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(letradoEntrante.getIdpersona());						
+					List<CenColegiado> resCenColegiado = this.cenColegiadoExtendsMapper.selectByExample(cenColegExample);
+					CenColegiado cenColeg = CollectionUtils.isNotEmpty(resCenColegiado) ? resCenColegiado.get(0) : null;
 					
-                    // Comprobacion del turno del letrado y la designacion (si es diferente de tipo designacion = error)
-					if (CollectionUtils.isNotEmpty(designaletradoOriginal) && designaletradoOriginal.get(0).getIdturno() != null) {
-						ScsTurnoExample turnoExample = new ScsTurnoExample();
-                    	turnoExample.createCriteria().andIdturnoEqualTo(designaletradoOriginal.get(0).getIdturno());
-                        List<ScsTurno> turnoSelected = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
-                        // TODO [SIGARNV-2334] - Revisar con Paco => Tiene sentido que se verifique al cambiar de letrado la ultima designacion para que no se le vuelva asignar una del tipo turno diferente a 1 ???
-//                        if (CollectionUtils.isNotEmpty(turnoSelected) && Short.toUnsignedInt(turnoSelected.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
-//                            error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
-//                            error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
-//                            updateResponseDTO.setStatus(SigaConstants.KO);
-//                            updateResponseDTO.setError(error);
-//                            return updateResponseDTO;
-//                        }
+					if (cenColeg != null) {
+						// 2) Averiguamos el/los turnos inscritos del colegiado elegido manualmente (buscador)
+						ScsInscripcionturnoExample insTurnoExample = new ScsInscripcionturnoExample();
+						insTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andFechadenegacionIsNull().andFechasolicitudIsNotNull()
+							.andFechavalidacionIsNotNull().andFechabajaIsNull().andIdpersonaEqualTo(cenColeg.getIdpersona());
+													
+						List<ScsInscripcionturno> resInscLetrado = this.scsInscripcionesTurnoExtendsMapper.selectByExample(insTurnoExample);
+						
+						if (CollectionUtils.isNotEmpty(resInscLetrado)) {
+							//3) Recuperamos las entidades "Turno" iteradas para comparar si estuviera inscrito a alguno de tipo tramitacion (idtipoturno = 1)
+							
+							for (ScsInscripcionturno scsTurnoInscrito : resInscLetrado) {
+								ScsTurnoExample turnoExample = new ScsTurnoExample();
+								turnoExample.createCriteria().andIdturnoEqualTo(scsTurnoInscrito.getIdturno());
+								List<ScsTurno> turnoInscritoIt = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
+
+								if (CollectionUtils.isNotEmpty(turnoInscritoIt) 
+										&& Short.toUnsignedInt(turnoInscritoIt.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
+									error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+									error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									updateResponseDTO.setError(error);
+									return updateResponseDTO;
+								}
+							}
+						} else {
+							letradoDesigSinTurno = Boolean.TRUE;
+						}	
 					} else {
-						letradoDesigSinTurno = Boolean.TRUE;
+						LOGGER.info("+++ DesignacionesServiceImple/createDesigna() -> No se ha encontrado 'CenColegiado' para el NCOLEGIADO = " + letradoEntrante.getNumero() );
 					}
+					
                     
 				}
 
@@ -6022,25 +6061,42 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								return updateResponseDTO;
 							}
 							
-							// TODO [SIGARNV-2334] - Seria necesario para controlar aqui tambien - Analogo a updateLetradoDesigna
-							if (designaletradoOriginal.get(0).getIdturno() != null) {
-								// Comprobacion del turno del letrado y la designacion (si es diferente de tipo designacion = error)
+							// 1) Averiguamos el colegiado a partir de su numero para obtener el IdPersona
+							CenColegiadoExample cenColegExample = new CenColegiadoExample();
+							cenColegExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(String.valueOf(designaItem.getNumero()));						
+							List<CenColegiado> resCenColegiado = this.cenColegiadoExtendsMapper.selectByExample(cenColegExample);
+							CenColegiado cenColeg = CollectionUtils.isNotEmpty(resCenColegiado) ? resCenColegiado.get(0) : null;
+							
+							if (cenColeg != null) {
+								// 2) Averiguamos el/los turnos inscritos del colegiado elegido manualmente (buscador)
+								ScsInscripcionturnoExample insTurnoExample = new ScsInscripcionturnoExample();
+								insTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andFechadenegacionIsNull().andFechasolicitudIsNotNull()
+									.andFechavalidacionIsNotNull().andFechabajaIsNull().andIdpersonaEqualTo(cenColeg.getIdpersona());
+															
+								List<ScsInscripcionturno> resInscLetrado = this.scsInscripcionesTurnoExtendsMapper.selectByExample(insTurnoExample);
 								
-								ScsTurnoExample turnoExample = new ScsTurnoExample();
-								
-								turnoExample.createCriteria().andIdturnoEqualTo(Integer.valueOf(designaletradoOriginal.get(0).getIdturno()));
-								
-								List<ScsTurno> letradoTurnoSelected = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
-								
-								if (CollectionUtils.isNotEmpty(letradoTurnoSelected) && Short.toUnsignedInt(letradoTurnoSelected.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
-									error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
-									error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
-									updateResponseDTO.setStatus(SigaConstants.KO);
-									updateResponseDTO.setError(error);
-									return updateResponseDTO;
-								}
+								if (CollectionUtils.isNotEmpty(resInscLetrado)) {
+									//3) Recuperamos las entidades "Turno" iteradas para comparar si estuviera inscrito a alguno de tipo tramitacion (idtipoturno = 1)
+									
+									for (ScsInscripcionturno scsTurnoInscrito : resInscLetrado) {
+										ScsTurnoExample turnoExample = new ScsTurnoExample();
+										turnoExample.createCriteria().andIdturnoEqualTo(scsTurnoInscrito.getIdturno());
+										List<ScsTurno> turnoInscritoIt = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
+
+										if (CollectionUtils.isNotEmpty(turnoInscritoIt) 
+												&& Short.toUnsignedInt(turnoInscritoIt.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
+											error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+											error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnotramitacion");
+											updateResponseDTO.setStatus(SigaConstants.KO);
+											updateResponseDTO.setError(error);
+											return updateResponseDTO;
+										}
+									}
+								} else {
+									letradoAsignadoSinTurno = Boolean.TRUE;
+								}	
 							} else {
-								letradoAsignadoSinTurno = Boolean.TRUE;
+								LOGGER.info("+++ DesignacionesServiceImple/createDesigna() -> No se ha encontrado 'CenColegiado' para el NCOLEGIADO = " + designaItem.getNumero() );
 							}
 							
 							// Actualizar La designa Letrado con su fecha correspondiente.
