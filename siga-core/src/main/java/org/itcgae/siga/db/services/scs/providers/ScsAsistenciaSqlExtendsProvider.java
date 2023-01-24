@@ -32,7 +32,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 
 		sql.FROM("scs_asistencia a");
 	    sql.JOIN("scs_tipoasistencia ta ON (ta.idtipoasistencia = a.idtipoasistencia)");
-	    sql.JOIN("scs_juzgado ON scs_juzgado.idjuzgado = a.juzgado AND scs_juzgado.idinstitucion = a.idinstitucion");
+	    sql.LEFT_OUTER_JOIN("scs_juzgado ON scs_juzgado.idjuzgado = a.juzgado AND scs_juzgado.idinstitucion = a.idinstitucion");
 	    sql.LEFT_OUTER_JOIN("scs_personajg pjg ON (pjg.idpersona = a.idpersonajg AND pjg.idinstitucion = a.idinstitucion)");
 	    sql.LEFT_OUTER_JOIN("scs_turno t ON (t.idturno = a.idturno AND t.idinstitucion = a.idinstitucion)");
 	    sql.LEFT_OUTER_JOIN("scs_guardiasturno g ON (a.idturno = g.idturno AND a.idinstitucion = g.idinstitucion AND a.idguardia = g.idguardia)");

@@ -2272,19 +2272,13 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					List<ScsEjgWithBLOBs> ejg = scsEjgMapper.selectByExampleWithBLOBs(paramejg);
 					// Actualizar con Justiciable seleccionado.
 					if (ejg != null && ejg.size() > 0) {
-						ScsEjgWithBLOBs ejgItem = new ScsEjgWithBLOBs();
+						ScsEjgWithBLOBs ejgItem = ejg.get(0);
 						ejgItem.setFechamodificacion(date); // Fecha Modificación
 						ejgItem.setIdinstitucion(Short.valueOf(idInstitucion));
-						// IdTurno EJG
-						if (itemEjg.get(2) != null) {
-							ejgItem.setIdtipoejg(Short.valueOf(itemEjg.get(2)));
-						} else {
-							ejgItem.setIdtipoejg(ejg.get(0).getIdtipoejg());
+						
+						if (ejgItem.getIdpersonajg() == null) {
+							ejgItem.setIdpersonajg(Long.valueOf(itemEjg.get(3))); // Solicitante.
 						}
-						ejgItem.setIdtipoejg(ejg.get(0).getIdtipoejg());
-						ejgItem.setAnio(ejg.get(0).getAnio());
-						ejgItem.setNumero(ejg.get(0).getNumero());
-						ejgItem.setIdpersonajg(Long.valueOf(itemEjg.get(3))); // Solicitante.
 						response = scsEjgMapper.updateByPrimaryKeySelective(ejgItem);
 						
 						//Lo añadimos en la Unidad Familiar como solicitante.
