@@ -2801,7 +2801,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String getDatosAdicionales(Short idInstitucion, DesignaItem designa) {
 
 		SQL sql = new SQL();
-		sql.SELECT("FECHAOFICIOJUZGADO, DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
+		SQL sqlDelitos = new SQL();
+		
+		sqlDelitos.SELECT("LISTAGG(sd.IDDELITO, ', ') WITHIN GROUP (ORDER BY sd.IDDELITO)");
+		sqlDelitos.FROM("SCS_DELITOSDESIGNA sd"); 
+		sqlDelitos.WHERE("sd.NUMERO = '" + designa.getNumero() + "'");
+		sqlDelitos.WHERE("sd.IDTURNO = '" + designa.getIdTurno() + "'");
+		sqlDelitos.WHERE("sd.ANIO = '" + designa.getAno() + "'");
+		sqlDelitos.WHERE("sd.IDINSTITUCION = '" + idInstitucion + "'");
+		
+		sql.SELECT("FECHAOFICIOJUZGADO, (" + sqlDelitos.toString() + ") AS DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
 		sql.FROM("SCS_DESIGNA");
 		sql.WHERE("NUMERO = '" + designa.getNumero() + "'");
 		sql.WHERE("IDTURNO = '" + designa.getIdTurno() + "'");
@@ -2814,7 +2823,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String getDatosAdicionalesDesigna(Short idInstitucion, Integer tamMaximo, DesignaItem designa) {
 
 		SQL sql = new SQL();
-		sql.SELECT("FECHAOFICIOJUZGADO, DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
+		SQL sqlDelitos = new SQL();
+		
+		sqlDelitos.SELECT("LISTAGG(sd.IDDELITO, ', ') WITHIN GROUP (ORDER BY sd.IDDELITO)");
+		sqlDelitos.FROM("SCS_DELITOSDESIGNA sd"); 
+		sqlDelitos.WHERE("sd.NUMERO = '" + designa.getNumero() + "'");
+		sqlDelitos.WHERE("sd.IDTURNO = '" + designa.getIdTurno() + "'");
+		sqlDelitos.WHERE("sd.ANIO = '" + designa.getAno() + "'");
+		sqlDelitos.WHERE("sd.IDINSTITUCION = '" + idInstitucion + "'");
+		
+		sql.SELECT("FECHAOFICIOJUZGADO, (" + sqlDelitos.toString() + ") AS DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
 		sql.FROM("SCS_DESIGNA");
 		sql.WHERE("NUMERO = '" + designa.getNumero() + "'");
 		sql.WHERE("IDTURNO = '" + designa.getIdTurno() + "'");
