@@ -2020,90 +2020,92 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						return updateResponseDTO;
 					}
 
-					ScsDesigna scsDesigna = new ScsDesigna();
+					ScsDesignaKey designaKey = new ScsDesignaKey();
+					designaKey.setIdinstitucion(idInstitucion);
+					designaKey.setAnio(Short.valueOf(String.valueOf(designaItem.getAno())));
+					designaKey.setIdturno(designaItem.getIdTurno());
+					designaKey.setNumero(Long.valueOf(designaItem.getNumero()));
+					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey );//new ScsDesigna();
+					
+					if(scsDesigna!=null) {
 
-					scsDesigna.setIdturno(designaItem.getIdTurno());
-					Integer a = new Integer(idInstitucion);
-					scsDesigna.setIdinstitucion(idInstitucion);
-					a = designaItem.getAno();
-					scsDesigna.setAnio(a.shortValue());
-					Long b = new Long(designaItem.getNumero());
-					scsDesigna.setNumero(b.longValue());
-					if (designaItem.getResumenAsunto() != null && !designaItem.getResumenAsunto().isEmpty()) {
-						scsDesigna.setResumenasunto(designaItem.getResumenAsunto());
-					}
-
-					if (designaItem.getFechaAnulacion() == null) {
-						scsDesigna.setEstado(designaItem.getEstado());
-						scsDesigna.setFechaestado(designaItem.getFechaEstado());
-					} else {
-						scsDesigna.setNig(designaItem.getNig());
-						scsDesigna.setNumprocedimiento(designaItem.getNumProcedimiento());
-						scsDesigna.setEstado(designaItem.getEstado());
-						Long juzgado = new Long(designaItem.getIdJuzgado());
-						scsDesigna.setIdjuzgado(juzgado);
-						if (designaItem.getIdPretension() == 0) {
-							scsDesigna.setIdpretension(null);
+						if (designaItem.getResumenAsunto() != null && !designaItem.getResumenAsunto().isEmpty()) {
+							scsDesigna.setResumenasunto(designaItem.getResumenAsunto());
+						}
+	
+						if (designaItem.getFechaAnulacion() == null) {
+							scsDesigna.setEstado(designaItem.getEstado());
+							scsDesigna.setFechaestado(designaItem.getFechaEstado());
 						} else {
-							Short idPretension = new Short((short) designaItem.getIdPretension());
-							scsDesigna.setIdpretension(idPretension);
-						}
-						scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
-						scsDesigna.setFechaestado(designaItem.getFechaEstado());
-						scsDesigna.setFechafin(designaItem.getFechaFin());
-
-						ScsDelitosdesignaExample scsDelitosdesignaExample = new ScsDelitosdesignaExample();
-						scsDelitosdesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andNumeroEqualTo(Long.valueOf(designaItem.getNumero()))
-								.andIdturnoEqualTo(Integer.valueOf(designaItem.getIdTurno()))
-								.andAnioEqualTo(Integer.valueOf(designaItem.getAno()).shortValue());
-
-						scsDelitosdesignaMapper.deleteByExample(scsDelitosdesignaExample);
-
-						if (!UtilidadesString.esCadenaVacia(designaItem.getDelitos())) {
-
-							String[] listaDelitos = designaItem.getDelitos().split(",");
-
-							ScsDelitosdesigna scsDelitosdesigna = new ScsDelitosdesigna();
-							scsDelitosdesigna.setIdinstitucion(idInstitucion);
-							scsDelitosdesigna.setNumero(Long.valueOf(designaItem.getNumero()));
-							scsDelitosdesigna.setIdturno(Integer.valueOf(designaItem.getIdTurno()));
-							scsDelitosdesigna.setAnio(Integer.valueOf(designaItem.getAno()).shortValue());
-							scsDelitosdesigna.setFechamodificacion(new Date());
-							scsDelitosdesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-							for (String delito : listaDelitos) {
-								scsDelitosdesigna.setIddelito(Short.valueOf(delito));
-								scsDelitosdesignaMapper.insertSelective(scsDelitosdesigna);
+							scsDesigna.setNig(designaItem.getNig());
+							scsDesigna.setNumprocedimiento(designaItem.getNumProcedimiento());
+							if(designaItem.getEstado()!=null && !designaItem.getEstado().isEmpty()) {
+								scsDesigna.setEstado(designaItem.getEstado());
 							}
+							Long juzgado = new Long(designaItem.getIdJuzgado());
+							scsDesigna.setIdjuzgado(juzgado);
+							if (designaItem.getIdPretension() == 0) {
+								scsDesigna.setIdpretension(null);
+							} else {
+								Short idPretension = new Short((short) designaItem.getIdPretension());
+								scsDesigna.setIdpretension(idPretension);
+							}
+							scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
+							scsDesigna.setFechaestado(designaItem.getFechaEstado());
+							scsDesigna.setFechafin(designaItem.getFechaFin());
+	
+							ScsDelitosdesignaExample scsDelitosdesignaExample = new ScsDelitosdesignaExample();
+							scsDelitosdesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andNumeroEqualTo(Long.valueOf(designaItem.getNumero()))
+									.andIdturnoEqualTo(Integer.valueOf(designaItem.getIdTurno()))
+									.andAnioEqualTo(Integer.valueOf(designaItem.getAno()).shortValue());
+	
+							scsDelitosdesignaMapper.deleteByExample(scsDelitosdesignaExample);
+	
+							if (!UtilidadesString.esCadenaVacia(designaItem.getDelitos())) {
+	
+								String[] listaDelitos = designaItem.getDelitos().split(",");
+	
+								ScsDelitosdesigna scsDelitosdesigna = new ScsDelitosdesigna();
+								scsDelitosdesigna.setIdinstitucion(idInstitucion);
+								scsDelitosdesigna.setNumero(Long.valueOf(designaItem.getNumero()));
+								scsDelitosdesigna.setIdturno(Integer.valueOf(designaItem.getIdTurno()));
+								scsDelitosdesigna.setAnio(Integer.valueOf(designaItem.getAno()).shortValue());
+								scsDelitosdesigna.setFechamodificacion(new Date());
+								scsDelitosdesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+	
+								for (String delito : listaDelitos) {
+									scsDelitosdesigna.setIddelito(Short.valueOf(delito));
+									scsDelitosdesignaMapper.insertSelective(scsDelitosdesigna);
+								}
+							}
+	
 						}
-
+						// VALIDAMOS EL NIG
+	
+						LOGGER.info("updateDetalleDesigna() / Validamos el NIG Entrada");
+	
+	//					UtilOficio utilOficio= new UtilOficio();
+	
+						boolean nigValido = utilOficio.validaNIG(designaItem.getNig(), request);
+	
+						LOGGER.info("updateDetalleDesigna() / Validamos el NIG Salida");
+	
+						LOGGER.info("updateDatosAdicionales() / scsDesignacionesExtendsMapper -> Salida ");
+	
+						LOGGER.info(
+								"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
+						if (nigValido == true) {
+							scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+						} else {
+							error.setCode(400);
+							error.setDescription("justiciaGratuita.oficio.designa.NIGInvalido");
+							updateResponseDTO.setStatus(SigaConstants.KO);
+						}
+	
+						LOGGER.info(
+								"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
 					}
-					// VALIDAMOS EL NIG
-
-					LOGGER.info("updateDetalleDesigna() / Validamos el NIG Entrada");
-
-//					UtilOficio utilOficio= new UtilOficio();
-
-					boolean nigValido = utilOficio.validaNIG(designaItem.getNig(), request);
-
-					LOGGER.info("updateDetalleDesigna() / Validamos el NIG Salida");
-
-					LOGGER.info("updateDatosAdicionales() / scsDesignacionesExtendsMapper -> Salida ");
-
-					LOGGER.info(
-							"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
-					if (nigValido == true) {
-						scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
-					} else {
-						error.setCode(400);
-						error.setDescription("justiciaGratuita.oficio.designa.NIGInvalido");
-						updateResponseDTO.setStatus(SigaConstants.KO);
-					}
-
-					LOGGER.info(
-							"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
-
 				} catch (Exception e) {
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
