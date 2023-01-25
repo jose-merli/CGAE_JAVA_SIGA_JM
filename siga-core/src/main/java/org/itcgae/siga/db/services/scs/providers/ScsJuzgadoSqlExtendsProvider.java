@@ -83,7 +83,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 		sql.SELECT("juzgado.IDJUZGADO");
 //		sql.SELECT("juzgado.IDJUZGADO, DECODE(CODIGOEXT2,NULL,NOMBRE, NOMBRE || ' - ' || CODIGOEXT2) nombre");
 //		sql.SELECT("juzgado.NOMBRE");
-		sql.SELECT("'(' || juzgado.CODIGOEXT2 || ') ' || juzgado.NOMBRE || ' (' || P.NOMBRE || ')' AS NOMBRE");
+		sql.SELECT("'(' || NVL(juzgado.CODIGOEXT2, ' ') || ') ' || juzgado.NOMBRE || ' (' || P.NOMBRE || ')' AS NOMBRE");
 		sql.FROM("SCS_JUZGADO juzgado ");
 		sql.INNER_JOIN(" CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION ");
 		sql.WHERE("juzgado.fechabaja is null");
@@ -165,7 +165,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 			sqlUnion.append(sqlJuzgado);
 			
 			
-			sqlFinal.SELECT("CODIGOEXT2");
+			sqlFinal.SELECT("NVL(CODIGOEXT2,' ') AS CODIGOEXT2");
 			sqlFinal.SELECT("NOMBRE");
 			sqlFinal.SELECT("NOMBREPOBLACION");
 			sqlFinal.SELECT("IDJUZGADO");
