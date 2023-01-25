@@ -60,11 +60,11 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),	
 		@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR)
 	})
-	List<AsuntosClaveJusticiableItem> searchClaveAsuntosJusticiable(String idPersona, Short idInstitucion);
+	List<AsuntosClaveJusticiableItem> searchClaveAsuntosJusticiable(String idPersona, Short idInstitucion, String origen);
 	
 	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "searchClaveAsuntosJusticiableRepresentanteJG")
 	@Results({ 
@@ -73,10 +73,10 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),	
 		@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR)
 	})
-	List<AsuntosClaveJusticiableItem> searchClaveAsuntosJusticiableRepresentanteJG(String idPersona, List<StringDTO> representados, Short idInstitucion);
+	List<AsuntosClaveJusticiableItem> searchClaveAsuntosJusticiableRepresentanteJG(String idPersona, List<StringDTO> representados, Short idInstitucion, String origen);
 
 	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "unidadFamiliarEJG")
 	@Results({ 

@@ -1508,10 +1508,12 @@ public class SigaConstants {
 	public static final String SCS_CONTRARIO_ASISTENCIA = "5";
 	public static final String SCS_SOLICITANTE_DESIGNACION = "6";
 	public static final String SCS_SOLICITANTE_ASISTENCIA = "7";
+	public static final String SCS_SOLICITANTE_SOJ = "8";
 	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
 	public static final String ROL_SOLICITANTE_EJG = "SE";
 	public static final String ROL_SOLICITANTE_ASISTENCIA = "SA";
 	public static final String ROL_SOLICITANTE_DESIGNACION = "SD";
+	public static final String ROL_SOLICITANTE_SOJ = "SS";
 	public static final String ROL_UNIDAD_FAMILIAR_EJG = "UE";
 	public static final String ROL_CONTRARIO_EJG = "CE";
 	public static final String ROL_CONTRADIO_DESIGNACION = "CD";

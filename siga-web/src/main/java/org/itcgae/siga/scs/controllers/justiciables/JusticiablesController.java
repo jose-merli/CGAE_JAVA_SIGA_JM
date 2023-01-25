@@ -171,7 +171,7 @@ public class JusticiablesController {
 	ResponseEntity<AsuntosJusticiableDTO> searchAsuntosJusticiable(@RequestBody String idPersonaJusticiable,
 			HttpServletRequest request) {
 		AsuntosJusticiableDTO response = gestionJusticiableService.searchAsuntosJusticiable(idPersonaJusticiable,
-				request);
+				request, "search");
 		return new ResponseEntity<AsuntosJusticiableDTO>(response, HttpStatus.OK);
 	}
 

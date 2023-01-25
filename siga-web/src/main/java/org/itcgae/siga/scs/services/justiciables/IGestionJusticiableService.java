@@ -37,7 +37,7 @@ public interface IGestionJusticiableService {
 	
 	public JusticiableTelefonoDTO getTelefonos(JusticiableItem justiciableItem, HttpServletRequest request);
 	
-	public AsuntosJusticiableDTO searchAsuntosJusticiable(String idPersona, HttpServletRequest request);
+	public AsuntosJusticiableDTO searchAsuntosJusticiable(String idPersona, HttpServletRequest request, String origen);
 	
 	public AsuntosJusticiableDTO searchAsuntosConClave(List<AsuntosClaveJusticiableItem> asuntosClaveList, boolean fromJusticiable, HttpServletRequest request);
 

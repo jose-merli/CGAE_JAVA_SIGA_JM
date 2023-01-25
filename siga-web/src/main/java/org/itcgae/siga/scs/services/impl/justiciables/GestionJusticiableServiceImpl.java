@@ -952,7 +952,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					if (datosGenerales) {
 						AsuntosJusticiableDTO asuntosJusticiableDTO = searchAsuntosJusticiable(
-								justiciableItem.getIdPersona(), request);
+								justiciableItem.getIdPersona(), request, "update");
 						List<AsuntosJusticiableItem> asuntosList = asuntosJusticiableDTO.getAsuntosJusticiableItems();
 
 						for (AsuntosJusticiableItem asunto : asuntosList) {
@@ -1288,7 +1288,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	}
 
 	@Override
-	public AsuntosJusticiableDTO searchAsuntosJusticiable(String idPersona, HttpServletRequest request) {
+	public AsuntosJusticiableDTO searchAsuntosJusticiable(String idPersona, HttpServletRequest request, String origen) {
 
 		LOGGER.info("searchAsuntosJusticiable() -> Entrada al servicio para obtener los asuntos de un justiciable");
 
@@ -1326,10 +1326,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					
 					if (personasRepresentadas != null && personasRepresentadas.size() > 0) {
 						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiableRepresentanteJG(idPersona, personasRepresentadas,
-								idInstitucion);
+								idInstitucion, origen);
 					} else {
 						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable(idPersona,
-								idInstitucion);
+								idInstitucion, origen);
 					}
 
 					LOGGER.info(
@@ -1418,6 +1418,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							}
 							if(asuntoClave.getClave() != null && !asuntoClave.getClave().isEmpty()) {
 								asunto.setClave(asuntoClave.getClave());
+							}
+							if(asuntoClave.getRol() != null && !asuntoClave.getRol().isEmpty()) {
+								asunto.setRol(asuntoClave.getRol());
 							}
 							if (asunto != null) {
 								asuntosJusticiableItem.add(asunto);
@@ -2528,6 +2531,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			break;
 		case SigaConstants.ROL_SOLICITANTE_DESIGNACION:
 			rolJusticiable = SigaConstants.SCS_SOLICITANTE_DESIGNACION;
+			break;
+		case SigaConstants.ROL_SOLICITANTE_SOJ:
+			rolJusticiable = SigaConstants.SCS_SOLICITANTE_SOJ;
 			break;
 		case SigaConstants.ROL_UNIDAD_FAMILIAR_EJG:
 			rolJusticiable = SigaConstants.SCS_UNIDAD_FAMILIAR_EJG;

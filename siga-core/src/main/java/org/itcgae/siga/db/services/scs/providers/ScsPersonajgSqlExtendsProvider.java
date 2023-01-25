@@ -608,7 +608,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		return sql.toString();
 	}
 
-	public String searchClaveAsuntosJusticiable(String idPersona, Short idInstitucion) {
+	public String searchClaveAsuntosJusticiable(String idPersona, Short idInstitucion, String origen) {
 
 		SQL sql = new SQL();
 
@@ -616,7 +616,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("anio");
 		sql.SELECT("numero");
 		sql.SELECT("clave");
-//		sql.SELECT("rol");
+		sql.SELECT("rol");
 		sql.SELECT("tipo");
 		sql.SELECT("fechaapertura");
 		sql.SELECT("idTurno");
@@ -626,8 +626,12 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlUnidadFamiliar.SELECT("unidadfamiliar.anio");
 		sqlUnidadFamiliar.SELECT("unidadfamiliar.numero");
 		sqlUnidadFamiliar.SELECT("to_char(unidadfamiliar.idtipoejg) clave");
-//		sqlUnidadFamiliar.SELECT(
-//				"case when unidadFamiliar.solicitante = 1 then 'Solicitante' else 'Unidad Familiar' end as rol");
+		if(origen.equals("update")) {
+			sqlUnidadFamiliar.SELECT(
+				"case when unidadFamiliar.solicitante = 1 then 'Solicitante' else 'Unidad Familiar' end as rol");
+		}else {
+			sqlUnidadFamiliar.SELECT("NULL AS ROL");
+		}
 		sqlUnidadFamiliar.SELECT("'E' as tipo");
 		sqlUnidadFamiliar.SELECT("(SELECT fechaapertura FROM scs_ejg "
 				+ "WHERE idinstitucion = UNIDADFAMILIAR.idinstitucion "
@@ -644,7 +648,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrarioEjg.SELECT("CONTRARIOEJG.anio");
 		sqlContrarioEjg.SELECT("CONTRARIOEJG.numero");
 		sqlContrarioEjg.SELECT("to_char(CONTRARIOEJG.idtipoejg) clave");
-//		sqlContrarioEjg.SELECT("'Contrario' as rol");
+		if(origen.equals("update")) {
+			sqlContrarioEjg.SELECT("'Contrario' as rol");
+		}else {
+			sqlContrarioEjg.SELECT("NULL AS ROL");
+		}
 		sqlContrarioEjg.SELECT("'E' as tipo");
 		sqlContrarioEjg.SELECT("(SELECT fechaapertura FROM scs_ejg "
 				+ "WHERE idinstitucion = CONTRARIOEJG.idinstitucion "
@@ -661,7 +669,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrariosDesigna.SELECT("CONTRARIOSDESIGNA.anio");
 		sqlContrariosDesigna.SELECT("CONTRARIOSDESIGNA.numero");
 		sqlContrariosDesigna.SELECT("to_char(CONTRARIOSDESIGNA.idturno) clave");
-//		sqlContrariosDesigna.SELECT("'Contrario' as rol");
+		if(origen.equals("update")) {
+			sqlContrariosDesigna.SELECT("'Contrario' as rol");
+		}else {
+			sqlContrariosDesigna.SELECT("NULL AS ROL");
+		}
 		sqlContrariosDesigna.SELECT("'D' as tipo");
 		sqlContrariosDesigna.SELECT("(SELECT fechaentrada FROM SCS_DESIGNA "
 				+ "WHERE idinstitucion = CONTRARIOSDESIGNA.idinstitucion "
@@ -678,7 +690,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlDefendidosDesigna.SELECT("DEFENDIDOSDESIGNA.anio");
 		sqlDefendidosDesigna.SELECT("DEFENDIDOSDESIGNA.numero");
 		sqlDefendidosDesigna.SELECT("to_char(DEFENDIDOSDESIGNA.idturno) clave");
-//		sqlDefendidosDesigna.SELECT("'Solicitante' as rol");
+		if(origen.equals("update")) {
+			sqlDefendidosDesigna.SELECT("'Solicitante' as rol");
+		}else {
+			sqlDefendidosDesigna.SELECT("NULL AS ROL");
+		}
 		sqlDefendidosDesigna.SELECT("'D' as tipo");
 		sqlDefendidosDesigna.SELECT("(SELECT fechaentrada FROM SCS_DESIGNA "
 				+ "WHERE idinstitucion = DEFENDIDOSDESIGNA.idinstitucion "
@@ -695,7 +711,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlSoj.SELECT("SOJ.anio");
 		sqlSoj.SELECT("SOJ.numero");
 		sqlSoj.SELECT("to_char(SOJ.IDTIPOSOJ) clave");
-//		sqlSoj.SELECT("'Solicitante' as rol");
+		if(origen.equals("update")) {
+			sqlSoj.SELECT("'Solicitante' as rol");
+		}else {
+			sqlSoj.SELECT("NULL AS ROL");
+		}
 		sqlSoj.SELECT("'S' as tipo");
 		sqlSoj.SELECT("fechaapertura");
 		sqlSoj.SELECT("TO_CHAR(idturno) idTurno");
@@ -708,7 +728,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlEJG.SELECT("EJG.anio");
 		sqlEJG.SELECT("EJG.numero");
 		sqlEJG.SELECT("to_char(EJG.idtipoejg) clave");
-//		sqlEJG.SELECT("'Solicitante' as rol");
+		if(origen.equals("update")) {
+			sqlEJG.SELECT("'Solicitante' as rol");
+		}else {
+			sqlEJG.SELECT("NULL AS ROL");
+		}
 		sqlEJG.SELECT("'E' as tipo");
 		sqlEJG.SELECT("fechaapertura");
 		sqlEJG.SELECT("null as idTurno");
@@ -721,7 +745,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.anio");
 		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.numero");
 		sqlContrariosAsistencia.SELECT("'' as clave");
-//		sqlContrariosAsistencia.SELECT("'Contrario' as rol");
+		if(origen.equals("update")) {
+			sqlContrariosAsistencia.SELECT("'Contrario' as rol");
+		}else {
+			sqlContrariosAsistencia.SELECT("NULL AS ROL");
+		}
 		sqlContrariosAsistencia.SELECT("'A' as tipo");
 		sqlContrariosAsistencia.SELECT("(SELECT fechahora FROM SCS_ASISTENCIA "
 				+ "WHERE idinstitucion = CONTRARIOSASISTENCIA.idinstitucion "
@@ -737,7 +765,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlAsistencia.SELECT("ASISTENCIA.anio");
 		sqlAsistencia.SELECT("ASISTENCIA.numero");
 		sqlAsistencia.SELECT("'' as clave");
-//		sqlAsistencia.SELECT("'Solicitante' as rol");
+		if(origen.equals("update")) {
+			sqlAsistencia.SELECT("'Solicitante' as rol");
+		}else {
+			sqlAsistencia.SELECT("NULL AS ROL");
+		}
 		sqlAsistencia.SELECT("'A' as tipo");
 		sqlAsistencia.SELECT("fechahora AS fechaapertura");
 		sqlAsistencia.SELECT("null as idTurno");
@@ -753,7 +785,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		return sql.toString();
 	}
 	
-	public String searchClaveAsuntosJusticiableRepresentanteJG(String idPersona, List<StringDTO> representados, Short idInstitucion) {
+	public String searchClaveAsuntosJusticiableRepresentanteJG(String idPersona, List<StringDTO> representados, Short idInstitucion, String origen) {
 
 		// Convertimos a lista de tipo IN clause
 		StringBuilder representadosIN = new StringBuilder();
@@ -770,7 +802,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("anio");
 		sql.SELECT("numero");
 		sql.SELECT("clave");
-//		sql.SELECT("rol");
+		sql.SELECT("rol");
 		sql.SELECT("tipo");
 		sql.SELECT("fechaapertura");
 
@@ -779,8 +811,12 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlUnidadFamiliar.SELECT("unidadfamiliar.anio");
 		sqlUnidadFamiliar.SELECT("unidadfamiliar.numero");
 		sqlUnidadFamiliar.SELECT("to_char(unidadfamiliar.idtipoejg) clave");
-//		sqlUnidadFamiliar.SELECT(
-//				"case when unidadFamiliar.solicitante = 1 then 'Solicitante' else 'Unidad Familiar' end as rol");
+		if(origen.equals("update")) {
+			sqlUnidadFamiliar.SELECT(
+				"case when unidadFamiliar.solicitante = 1 then 'Solicitante' else 'Unidad Familiar' end as rol");
+		}else {
+			sqlUnidadFamiliar.SELECT("NULL AS ROL");
+		}
 		sqlUnidadFamiliar.SELECT("'E' as tipo");
 		sqlUnidadFamiliar.SELECT("(SELECT fechaapertura FROM scs_ejg "
 				+ "WHERE idinstitucion = UNIDADFAMILIAR.idinstitucion "
@@ -797,7 +833,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrarioEjg.SELECT("CONTRARIOEJG.anio");
 		sqlContrarioEjg.SELECT("CONTRARIOEJG.numero");
 		sqlContrarioEjg.SELECT("to_char(CONTRARIOEJG.idtipoejg) clave");
-//		sqlContrarioEjg.SELECT("'Contrario' as rol");
+		if(origen.equals("update")) {
+			sqlContrarioEjg.SELECT("'Contrario' as rol");
+		}else {
+			sqlContrarioEjg.SELECT("NULL AS ROL");
+		}
 		sqlContrarioEjg.SELECT("'E' as tipo");
 		sqlContrarioEjg.SELECT("(SELECT fechaapertura FROM scs_ejg "
 				+ "WHERE idinstitucion = CONTRARIOEJG.idinstitucion "
@@ -813,7 +853,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrariosDesigna.SELECT("CONTRARIOSDESIGNA.anio");
 		sqlContrariosDesigna.SELECT("CONTRARIOSDESIGNA.numero");
 		sqlContrariosDesigna.SELECT("to_char(CONTRARIOSDESIGNA.idturno) clave");
-//		sqlContrariosDesigna.SELECT("'Contrario' as rol");
+		if(origen.equals("update")) {
+			sqlContrariosDesigna.SELECT("'Contrario' as rol");
+		}else {
+			sqlContrariosDesigna.SELECT("NULL AS ROL");
+		}
 		sqlContrariosDesigna.SELECT("'D' as tipo");
 		sqlContrariosDesigna.SELECT("(SELECT fechaentrada FROM SCS_DESIGNA "
 				+ "WHERE idinstitucion = CONTRARIOSDESIGNA.idinstitucion "
@@ -829,7 +873,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlDefendidosDesigna.SELECT("DEFENDIDOSDESIGNA.anio");
 		sqlDefendidosDesigna.SELECT("DEFENDIDOSDESIGNA.numero");
 		sqlDefendidosDesigna.SELECT("to_char(DEFENDIDOSDESIGNA.idturno) clave");
-//		sqlDefendidosDesigna.SELECT("'Solicitante' as rol");
+		if(origen.equals("update")) {
+			sqlDefendidosDesigna.SELECT("'Solicitante' as rol");
+		}else {
+			sqlDefendidosDesigna.SELECT("NULL AS ROL");
+		}
 		sqlDefendidosDesigna.SELECT("'D' as tipo");
 		sqlDefendidosDesigna.SELECT("(SELECT fechaentrada FROM SCS_DESIGNA "
 				+ "WHERE idinstitucion = DEFENDIDOSDESIGNA.idinstitucion "
@@ -845,7 +893,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlSoj.SELECT("SOJ.anio");
 		sqlSoj.SELECT("SOJ.numero");
 		sqlSoj.SELECT("to_char(SOJ.IDTIPOSOJ) clave");
-//		sqlSoj.SELECT("'Solicitante' as rol");
+		if(origen.equals("update")) {
+			sqlSoj.SELECT("'Solicitante' as rol");
+		}else {
+			sqlSoj.SELECT("NULL AS ROL");
+		}
 		sqlSoj.SELECT("'S' as tipo");
 		sqlSoj.SELECT("fechaapertura");
 		sqlSoj.FROM("SCS_SOJ SOJ");
@@ -857,7 +909,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlEJG.SELECT("EJG.anio");
 		sqlEJG.SELECT("EJG.numero");
 		sqlEJG.SELECT("to_char(EJG.idtipoejg) clave");
-//		sqlEJG.SELECT("'Solicitante' as rol");
+		if(origen.equals("update")) {
+			sqlEJG.SELECT("'Solicitante' as rol");
+		}else {
+			sqlEJG.SELECT("NULL AS ROL");
+		}
 		sqlEJG.SELECT("'E' as tipo");
 		sqlEJG.SELECT("fechaapertura");
 		sqlEJG.FROM("SCS_EJG EJG");
@@ -869,7 +925,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.anio");
 		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.numero");
 		sqlContrariosAsistencia.SELECT("'' as clave");
-//		sqlContrariosAsistencia.SELECT("'Contrario' as rol");
+		if(origen.equals("update")) {
+			sqlContrariosAsistencia.SELECT("'Contrario' as rol");
+		}else {
+			sqlContrariosAsistencia.SELECT("NULL AS ROL");
+		}
 		sqlContrariosAsistencia.SELECT("'A' as tipo");
 		sqlContrariosAsistencia.SELECT("(SELECT fechahora FROM SCS_ASISTENCIA "
 				+ "WHERE idinstitucion = CONTRARIOSASISTENCIA.idinstitucion "
@@ -884,7 +944,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlAsistencia.SELECT("ASISTENCIA.anio");
 		sqlAsistencia.SELECT("ASISTENCIA.numero");
 		sqlAsistencia.SELECT("'' as clave");
-//		sqlAsistencia.SELECT("'Solicitante' as rol");
+		if(origen.equals("update")) {
+			sqlAsistencia.SELECT("'Solicitante' as rol");
+		}else {
+			sqlAsistencia.SELECT("NULL AS ROL");
+		}
 		sqlAsistencia.SELECT("'A' as tipo");
 		sqlAsistencia.SELECT("fechahora AS fechaapertura");
 		sqlAsistencia.FROM("SCS_ASISTENCIA ASISTENCIA");
