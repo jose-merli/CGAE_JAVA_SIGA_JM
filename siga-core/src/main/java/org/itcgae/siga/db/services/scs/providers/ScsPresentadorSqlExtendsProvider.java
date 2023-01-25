@@ -9,7 +9,7 @@ public class ScsPresentadorSqlExtendsProvider extends ScsPresentadorSqlProvider{
 		SQL sql = new SQL();
 		
 		sql.SELECT("presentador.IDpresentador");
-		sql.SELECT("catalogopresentador.DESCRIPCION");
+		sql.SELECT("NVL(catalogopresentador.DESCRIPCION,presentador.DESCRIPCION) AS DESCRIPCION ");
 
 		sql.FROM("scs_presentador presentador");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogopresentador on catalogopresentador.idrecurso = presentador.DESCRIPCION and catalogopresentador.idlenguaje ="+idLenguaje);
