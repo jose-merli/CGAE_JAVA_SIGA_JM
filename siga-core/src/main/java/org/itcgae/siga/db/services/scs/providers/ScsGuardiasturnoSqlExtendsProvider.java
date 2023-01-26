@@ -3088,8 +3088,6 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		// Para el caso de que coincida el orden establecido, añadimos un orden que siempre deberia ser diferente: la fecha de suscripcion
 		consulta.append(", Ins.FECHASUSCRIPCION, Ins.Idpersona ");
 		
-		LOGGER.info("++++ [SIGA TEST] - ScsGuardiasturnoSqlExtendsProvider / getColaGuardia -> query = " + consulta.toString());
-
 		return consulta.toString();
 	}
 	
