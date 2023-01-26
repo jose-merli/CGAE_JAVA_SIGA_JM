@@ -966,15 +966,32 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 	public String unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
 		SQL sqlEstado = new SQL();
+		SQL sqlMaxIdPeticion = new SQL();
 		SQL sqlFechaSolicitud = new SQL();
+		
+		sqlMaxIdPeticion.SELECT("max(eejg_p.IDPETICION)");
+		sqlMaxIdPeticion.FROM("scs_eejg_peticiones eejg_p ");
+		sqlMaxIdPeticion.WHERE("eejg_p.anio = uf.anio");
+		sqlMaxIdPeticion.WHERE("eejg_p.numero = uf.numero");
+		sqlMaxIdPeticion.WHERE("eejg_p.idtipoejg = uf.idtipoejg");
+		sqlMaxIdPeticion.WHERE("eejg_p.idinstitucion = uf.idinstitucion");
+		sqlMaxIdPeticion.WHERE("eejg_p.idpersona = uf.idpersona");
 		
 		sqlEstado.SELECT("eejg_p.estado");
 		sqlEstado.FROM("scs_eejg_peticiones eejg_p");
-		sqlEstado.WHERE("eejg_p.idpeticion = (select max(eejg_p.IDPETICION) from scs_eejg_peticiones eejg_p where eejg_p.idpersona = uf.idpersona)");
+		sqlEstado.WHERE("eejg_p.anio = uf.anio");
+		sqlEstado.WHERE("eejg_p.numero = uf.numero");
+		sqlEstado.WHERE("eejg_p.idtipoejg = uf.idtipoejg");
+		sqlEstado.WHERE("eejg_p.idinstitucion = uf.idinstitucion");
+		sqlEstado.WHERE("eejg_p.idpeticion = (" + sqlMaxIdPeticion.toString() + ")");
 		
 		sqlFechaSolicitud.SELECT("eejg_p.fechasolicitud");
 		sqlFechaSolicitud.FROM("scs_eejg_peticiones eejg_p");
-		sqlFechaSolicitud.WHERE("eejg_p.idpeticion = (select max(eejg_p.IDPETICION) from scs_eejg_peticiones eejg_p where eejg_p.idpersona = uf.idpersona)");
+		sqlFechaSolicitud.WHERE("eejg_p.anio = uf.anio");
+		sqlFechaSolicitud.WHERE("eejg_p.numero = uf.numero");
+		sqlFechaSolicitud.WHERE("eejg_p.idtipoejg = uf.idtipoejg");
+		sqlFechaSolicitud.WHERE("eejg_p.idinstitucion = uf.idinstitucion");
+		sqlFechaSolicitud.WHERE("eejg_p.idpeticion = (" + sqlMaxIdPeticion.toString() + ")");
 		
 		
 		sql.SELECT("uf.idinstitucion," + 
