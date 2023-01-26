@@ -336,9 +336,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				LOGGER.info("searchGuardias() -> Entrada para obtener las guardias");
 
+				//
 				List<GuardiasItem> guardias = scsGuardiasturnoExtendsMapper.searchGuardias2(guardiasItem,
 						idInstitucion.toString(), usuarios.get(0).getIdlenguaje(), tamMaximo);
-
+				//
 				guardias = guardias.stream().map(it -> {
 					it.setTipoDia(("Selección: Labor. " + it.getSeleccionLaborables() + ", Fest. "
 							+ it.getSeleccionFestivos()).replace("null", ""));
@@ -359,7 +360,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
 			}
 		}
-		return guardiaDTO;
+		return guardiaDTO; 
 	}
 
 	@Override

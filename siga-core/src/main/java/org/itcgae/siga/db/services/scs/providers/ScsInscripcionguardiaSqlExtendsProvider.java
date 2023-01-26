@@ -267,6 +267,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		String sqlFinal = "SELECT * FROM (".concat(sql.toString()).concat(") ORDER BY ".concat(ordenaciones));
 		
 		//LOGGER.info("+++++ [SIGA TEST] - SQL FINAL getColaGuardias() -> " + sqlFinal.toString());
+		LOGGER.info("++++ [SIGA TEST] - ScsGuardiasturnoSqlExtendsProvider / getColaGuardias (|ultimo="+ultimo + "|) -> query = " + sqlFinal.toString());
 
 		return sqlFinal.toString();
 	}

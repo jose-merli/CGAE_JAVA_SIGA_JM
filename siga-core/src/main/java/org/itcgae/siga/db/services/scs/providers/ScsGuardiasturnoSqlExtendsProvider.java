@@ -94,6 +94,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sql.SELECT("(SELECT COUNT(*) FROM SCS_INSCRIPCIONGUARDIA WHERE "
 				+ "(SCS_INSCRIPCIONGUARDIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND "
 				+ "SCS_GUARDIASTURNO.IDTURNO = SCS_INSCRIPCIONGUARDIA.IDTURNO AND SCS_GUARDIASTURNO.IDGUARDIA = SCS_INSCRIPCIONGUARDIA.IDGUARDIA "
+				+ "AND SCS_INSCRIPCIONGUARDIA.FECHAVALIDACION IS NOT NULL"
 				+ "AND SCS_INSCRIPCIONGUARDIA.FECHABAJA IS NULL)) AS numeroletradosinscritos");
 		
 		sql.SELECT("CASE \r\n"
@@ -3087,6 +3088,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		// Para el caso de que coincida el orden establecido, añadimos un orden que siempre deberia ser diferente: la fecha de suscripcion
 		consulta.append(", Ins.FECHASUSCRIPCION, Ins.Idpersona ");
 		
+		LOGGER.info("++++ [SIGA TEST] - ScsGuardiasturnoSqlExtendsProvider / getColaGuardia -> query = " + consulta.toString());
+
 		return consulta.toString();
 	}
 	
