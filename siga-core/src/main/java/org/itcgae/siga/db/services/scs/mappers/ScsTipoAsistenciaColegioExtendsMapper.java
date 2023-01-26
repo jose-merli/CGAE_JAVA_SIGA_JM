@@ -27,5 +27,5 @@ public interface ScsTipoAsistenciaColegioExtendsMapper extends ScsTipoasistencia
 	 @Results({ @Result(column = "idtipoasistenciacolegio", property = "idtipoasistenciacolegio", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "descripcion", property = "tipoasistencia", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "pordefecto", property = "pordefecto", jdbcType = JdbcType.VARCHAR)})
-    List<TiposAsistenciaItem> getTiposAsistenciaColegiado(Short idInstitucion, Integer idLenguaje, Short idTipoGuardia);
+    List<TiposAsistenciaItem> getTiposAsistenciaColegiado(Short idInstitucion, Integer idLenguaje, String idTipoGuardia);
 }

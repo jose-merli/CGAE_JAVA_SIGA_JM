@@ -41,12 +41,26 @@ public class ScsTipoasistenciaColegioSqlExtendsProvider extends ScsTipoasistenci
 		return sql.toString();
 	}
 	
-	public String selectTiposAsistenciaColegiado(Short idInstitucion, Integer idLenguaje, Short idTipoGuardia) {
+	public String selectTiposAsistenciaColegiado(Short idInstitucion, Integer idLenguaje, String idTipoGuardia) {
 		
 		SQL sql = new SQL();
+		SQL sqlExists = new SQL();
+		
+		
+		sqlExists.SELECT("tag.idtipoguardia");
+		sqlExists.FROM("scs_tipoasistenciaguardia tag");
+		sqlExists.WHERE("tag.idinstitucion = scs_tipoasistenciacolegio.idinstitucion");
+		sqlExists.WHERE("tag.idtipoasistenciacolegio = scs_tipoasistenciacolegio.idtipoasistenciacolegio");
+		sqlExists.WHERE("tag.idtipoguardia = " + idTipoGuardia );
+		
 		sql.SELECT("idtipoasistenciacolegio, f_siga_getrecurso(descripcion, " + idLenguaje + ") descripcion, pordefecto");
 		sql.FROM("scs_tipoasistenciacolegio");
-		sql.WHERE("scs_tipoasistenciacolegio.idinstitucion = "+idInstitucion +" AND ( EXISTS (SELECT tag.idtipoguardia FROM scs_tipoasistenciaguardia tag  WHERE ( tag.idinstitucion = scs_tipoasistenciacolegio.idinstitucion AND tag.idtipoasistenciacolegio = scs_tipoasistenciacolegio.idtipoasistenciacolegio AND tag.idtipoguardia = " + idTipoGuardia + " )) )");
+		sql.WHERE("scs_tipoasistenciacolegio.idinstitucion = " + idInstitucion );
+		sql.WHERE("FECHA_BAJA IS NULL");
+		if(idTipoGuardia != null && !idTipoGuardia.isEmpty()) {
+			sql.WHERE(" ( EXISTS (" + sqlExists.toString() + ") )");
+		}
+		
 		return sql.toString();
 	}
 	

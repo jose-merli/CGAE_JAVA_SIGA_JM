@@ -276,7 +276,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		short idTipoGuardia;
+		String idTipoGuardia = "";
 		Integer idLenguaje = 0;
 		ComboDTO comboDTO = new ComboDTO();
 		Error error = new Error();
@@ -295,40 +295,46 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						"getTiposAsistenciaColegio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && usuarios.size() > 0) {
+					
+					if(!idTurno.equals("x") && !idGuardia.equals("x")) {
 
-					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
-					String[] arrayGuardiasString = idGuardia.split(",");
-					List<String> listaGuardiasString = Arrays.asList(arrayGuardiasString);
-					List<Integer> listaGuardiasInteger = listaGuardiasString.stream().map(s -> Integer.parseInt(s))
-							.collect(Collectors.toList());
-					String[] arrayTurnosString = idTurno.split(",");
-					List<String> listaTurnosString = Arrays.asList(arrayTurnosString);
-					List<Integer> listaTurnosInteger = listaTurnosString.stream().map(s -> Integer.parseInt(s))
-							.collect(Collectors.toList());
-					example.createCriteria().andIdguardiaIn(listaGuardiasInteger).andIdturnoIn(listaTurnosInteger)
-							.andIdinstitucionEqualTo(idInstitucion);
-
-					List<ScsGuardiasturno> guardiasList = scsGuardiasturnoExtendsMapper.selectByExample(example);
-
-					if (guardiasList != null && !guardiasList.isEmpty()) {
-
-						idTipoGuardia = guardiasList.get(0).getIdtipoguardia();
-						idLenguaje = Integer.parseInt(usuarios.get(0).getIdlenguaje());
-
-						List<TiposAsistenciaItem> tiposAsistenciaItems = scsTipoAsistenciaColegioExtendsMapper
-								.getTiposAsistenciaColegiado(idInstitucion, idLenguaje, idTipoGuardia);
-
-						List<ComboItem> comboItems = (List<ComboItem>) tiposAsistenciaItems.stream().map(x -> {
-							ComboItem comboItem = new ComboItem();
-							comboItem.value(x.getIdtipoasistenciacolegio());
-							comboItem.label(x.getTipoasistencia());
-							return comboItem;
-
-						}).collect(Collectors.toList());
-
-						comboDTO.setCombooItems(comboItems);
-
+						ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+						String[] arrayGuardiasString = idGuardia.split(",");
+						List<String> listaGuardiasString = Arrays.asList(arrayGuardiasString);
+						List<Integer> listaGuardiasInteger = listaGuardiasString.stream().map(s -> Integer.parseInt(s))
+								.collect(Collectors.toList());
+						String[] arrayTurnosString = idTurno.split(",");
+						List<String> listaTurnosString = Arrays.asList(arrayTurnosString);
+						List<Integer> listaTurnosInteger = listaTurnosString.stream().map(s -> Integer.parseInt(s))
+								.collect(Collectors.toList());
+						example.createCriteria().andIdguardiaIn(listaGuardiasInteger).andIdturnoIn(listaTurnosInteger)
+								.andIdinstitucionEqualTo(idInstitucion);
+	
+						List<ScsGuardiasturno> guardiasList = scsGuardiasturnoExtendsMapper.selectByExample(example);
+	
+						if (guardiasList != null && !guardiasList.isEmpty()) {
+							idTipoGuardia = guardiasList.get(0).getIdtipoguardia().toString();
+						}
+					}else {
+						//No se ha pasado idturno o idguardia
+						idTipoGuardia = "";
 					}
+					idLenguaje = Integer.parseInt(usuarios.get(0).getIdlenguaje());
+
+					List<TiposAsistenciaItem> tiposAsistenciaItems = scsTipoAsistenciaColegioExtendsMapper
+							.getTiposAsistenciaColegiado(idInstitucion, idLenguaje, idTipoGuardia);
+
+					List<ComboItem> comboItems = (List<ComboItem>) tiposAsistenciaItems.stream().map(x -> {
+						ComboItem comboItem = new ComboItem();
+						comboItem.value(x.getIdtipoasistenciacolegio());
+						comboItem.label(x.getTipoasistencia());
+						return comboItem;
+
+					}).collect(Collectors.toList());
+
+					comboDTO.setCombooItems(comboItems);
+
+					
 				}
 			}
 		} catch (Exception e) {
@@ -2043,7 +2049,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								List<TiposAsistenciaItem> tiposAsistenciaColegio = scsTipoAsistenciaColegioExtendsMapper
 										.getTiposAsistenciaColegiado(idInstitucion,
 												Integer.valueOf(usuarios.get(0).getIdlenguaje()),
-												guardias.get(0).getIdtipoguardia());
+												guardias.get(0).getIdtipoguardia().toString());
 								String descripcionTipoAsistencia = tiposAsistenciaColegio.stream()
 										.filter(tipoAsistencia -> tipoAsistencia.getIdtipoasistenciacolegio()
 												.equals(asistenciaBBDD.getIdtipoasistenciacolegio().toString()))
