@@ -44,7 +44,7 @@ public interface ScsTipodocumentoEjgExtendsMapper extends ScsTipodocumentoejgMap
 	@SelectProvider(type = ScsTipodocumentoejgSqlExtendsProvider.class, method = "comboTipoDocumentacion")
 	@Results({ 
 		@Result(column = "IDTIPODOCUMENTOEJG", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "ABREVIATURA", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> comboTipoDocumentacion(String idLenguaje, Short idInstitucion);
 	

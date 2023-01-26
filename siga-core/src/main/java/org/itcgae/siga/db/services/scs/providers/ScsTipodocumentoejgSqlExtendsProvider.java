@@ -102,16 +102,16 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
           public String comboTipoDocumentacion(String idLenguaje, Short idInstitucion) {
             SQL tipoDocumentacion = new SQL();
             tipoDocumentacion.SELECT("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG");
-            tipoDocumentacion.SELECT("F_SIGA_GETRECURSO(TIPODOCUMENTOEJG.DESCRIPCION, " + idLenguaje + ") DESCRIPCION");
+            tipoDocumentacion.SELECT("F_SIGA_GETRECURSO(TIPODOCUMENTOEJG.ABREVIATURA, " + idLenguaje + ") ABREVIATURA");
             tipoDocumentacion.FROM("scs_TIPODOCUMENTOEJG TIPODOCUMENTOEJG");
             tipoDocumentacion.WHERE("TIPODOCUMENTOEJG.fechabaja is null");
             tipoDocumentacion.WHERE("TIPODOCUMENTOEJG.idinstitucion ='"+String.valueOf(idInstitucion)+"'");
             tipoDocumentacion.WHERE("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG is not null");
 
             SQL sql = new SQL();
-            sql.SELECT("IDTIPODOCUMENTOEJG", "DESCRIPCION");
+            sql.SELECT("IDTIPODOCUMENTOEJG", "ABREVIATURA");
             sql.FROM("(" + tipoDocumentacion.toString() + ")");
-            sql.ORDER_BY("DESCRIPCION");
+            sql.ORDER_BY("ABREVIATURA");
             return sql.toString();
           }
 }
