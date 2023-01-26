@@ -2243,13 +2243,14 @@ public class ComboServiceImpl implements ComboService {
 					scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
 					scsAsistenciaKey.setIdinstitucion(idInstitucion);
 					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
-					if (scsAsistencia != null) {
-						Short numIdAsistencia = scsAsistencia.getIdtipoasistencia();
-						List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, numIdAsistencia, Integer.valueOf(usuarios.get(0).getIdlenguaje()));
+						
+					if(scsAsistencia != null || !UtilidadesString.esCadenaVacia(idTipoAsistencia)) {
+						List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacionFicha(idInstitucion, scsAsistencia, idTipoAsistencia, Integer.valueOf(usuarios.get(0).getIdlenguaje()));
 						comboDTO.setCombooItems(comboItems);
 					}
+					
 				}else if(!UtilidadesString.esCadenaVacia(idTipoAsistencia)){
-					List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, Short.valueOf(idTipoAsistencia), Integer.valueOf(usuarios.get(0).getIdlenguaje()));
+					List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, idTipoAsistencia, Integer.valueOf(usuarios.get(0).getIdlenguaje()));
 					comboDTO.setCombooItems(comboItems);
 				}
 

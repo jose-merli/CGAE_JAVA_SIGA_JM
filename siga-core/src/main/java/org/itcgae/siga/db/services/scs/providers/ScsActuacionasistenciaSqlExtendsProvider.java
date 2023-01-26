@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.entities.ScsAsistencia;
 
 public class ScsActuacionasistenciaSqlExtendsProvider {
 
@@ -20,15 +21,36 @@ public class ScsActuacionasistenciaSqlExtendsProvider {
         return SQL.toString();
     }
 
-    public String comboTipoActuacion(Short idInstitucion, Short idTipoAsistencia, Integer idLenguaje){
+    public String comboTipoActuacion(Short idInstitucion, String idTipoAsistencia, Integer idLenguaje){
 
         SQL SQL = new SQL();
         SQL.SELECT("ta.idtipoactuacion as id",
-                "f_siga_getrecurso(ta.descripcion , '"+idLenguaje+"') as descripcion");
+                "f_siga_getrecurso(ta.descripcion, '"+idLenguaje+"') as descripcion");
         SQL.FROM("scs_tipoactuacion ta");
         SQL.WHERE("ta.idinstitucion = "+idInstitucion,
                 "ta.idtipoasistencia = "+idTipoAsistencia,
                 "ta.fechabaja is null");
+
+        return SQL.toString();
+    }
+    
+    
+    public String comboTipoActuacionFicha(Short idInstitucion, ScsAsistencia scsAsistencia, String idTipoActuacion, Integer idLenguaje) {
+    	SQL SQL = new SQL();
+    	
+        SQL.SELECT("ta.idtipoactuacion as id",
+                "f_siga_getrecurso(ta.descripcion, '"+idLenguaje+"') as descripcion");
+        SQL.FROM("scs_tipoactuacion ta");
+        SQL.WHERE("ta.idinstitucion = "+idInstitucion);
+        SQL.WHERE("ta.fechabaja is null");
+        if(scsAsistencia!=null) {
+        	SQL.WHERE("ta.idtipoasistencia = "+scsAsistencia.getIdtipoasistenciacolegio());
+        }
+        if(idTipoActuacion != null && !idTipoActuacion.isEmpty() && !idTipoActuacion.equals("-1")) {
+	        SQL.OR();
+	        SQL.WHERE("ta.idinstitucion = "+idInstitucion);
+	        SQL.WHERE("idtipoactuacion = "+ idTipoActuacion);
+        }
 
         return SQL.toString();
     }
