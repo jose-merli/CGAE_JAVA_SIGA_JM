@@ -1245,7 +1245,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	}
 
 	@Override
-	public ComboDTO getTipoVias(HttpServletRequest request) {
+	public ComboDTO getTipoVias(HttpServletRequest request, String idTipoViaJusticiable) {
 		LOGGER.info("getTipoVias() -> Entrada al servicio para obtener combo tipo vias");
 
 		// Conseguimos información del usuario logeado
@@ -1274,7 +1274,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						"getTipoVias() / cenTipoviaExtendsMapper.getJurisdicciones() -> Entrada a cenTipoviaExtendsMapper para obtener minusvalias");
 
 				List<ComboItem> comboItems = cenTipoviaExtendsMapper.getTipoVias(idInstitucion,
-						usuario.getIdlenguaje());
+						usuario.getIdlenguaje(), idTipoViaJusticiable);
 
 				LOGGER.info(
 						"getTipoVias() / cenTipoviaExtendsMapper.getJurisdicciones() -> Salida a cenTipoviaExtendsMapper para obtener minusvalias");

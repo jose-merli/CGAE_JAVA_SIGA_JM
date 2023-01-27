@@ -92,7 +92,13 @@ public class JusticiablesController {
 
 	@RequestMapping(value = "/gestionJusticiables/comboTipoVias", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getComboTipoVias(HttpServletRequest request) {
-		ComboDTO response = gestionJusticiableService.getTipoVias(request);
+		ComboDTO response = gestionJusticiableService.getTipoVias(request, null);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/comboTipoVias2", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getComboTipoVias(HttpServletRequest request, @RequestParam("idTipoViaJusticiable") String idTipoViaJusticiable) {
+		ComboDTO response = gestionJusticiableService.getTipoVias(request, idTipoViaJusticiable);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 

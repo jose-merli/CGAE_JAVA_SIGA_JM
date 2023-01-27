@@ -22,5 +22,5 @@ public interface CenTipoviaExtendsMapper extends CenTipoviaMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOVIA", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> getTipoVias(Short idInstitucion, String idLenguaje);
+	List<ComboItem> getTipoVias(Short idInstitucion, String idLenguaje, String idTipoViaJusticiable);
 }

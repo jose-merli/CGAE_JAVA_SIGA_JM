@@ -27,7 +27,7 @@ public interface IGestionJusticiableService {
 	
 	public ComboDTO getPoblacion(String idPoblacion, HttpServletRequest request);
 	
-	public ComboDTO getTipoVias(HttpServletRequest request);
+	public ComboDTO getTipoVias(HttpServletRequest request, String idTipoViaJusticiable);
 
 	public JusticiableDTO searchJusticiable (JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request);
 

@@ -6,18 +6,21 @@ import org.itcgae.siga.db.mappers.CenTipoviaSqlProvider;
 public class CenTipoviaSqlExtendsProvider extends CenTipoviaSqlProvider {
 
 	
-	public String getTipoVias(Short idInstitucion, String idLenguaje) {
+	public String getTipoVias(Short idInstitucion, String idLenguaje, String idTipoViaJusticiable) {
 		SQL sql = new SQL();
 		
 		sql.SELECT_DISTINCT("TIPOVIA.IDTIPOVIA");
-		sql.SELECT_DISTINCT("GEN.DESCRIPCION");
+		sql.SELECT_DISTINCT("f_siga_getrecurso(TIPOVIA.DESCRIPCION, " + idLenguaje + ") AS DESCRIPCION");
 		sql.FROM("CEN_TIPOVIA TIPOVIA");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GEN on GEN.IDRECURSO = TIPOVIA.DESCRIPCION");
-		
-		sql.WHERE("GEN.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("TIPOVIA.IDINSTITUCION = '" + idInstitucion + "'");
-		sql.ORDER_BY("GEN.DESCRIPCION");
+		if(idTipoViaJusticiable != null && !idTipoViaJusticiable.isEmpty() && !"undefined".equals(idTipoViaJusticiable)) {
+			sql.WHERE("TIPOVIA.FECHA_BAJA IS NULL OR TIPOVIA.IDTIPOVIA = " + idTipoViaJusticiable);
+		} else {
+			sql.WHERE("TIPOVIA.FECHA_BAJA IS NULL");
+		}
+		sql.ORDER_BY("DESCRIPCION");
 		
 		return sql.toString();
+	
 	}
 }
