@@ -3598,7 +3598,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			BajasTemporalesItem bajasBean = hmBajasTemporalesList.get(i);
 
 			Long idPersona = new Long(bajasBean.getIdpersona());
-			String fechaBT = bajasBean.getFechabt().toString();
+			Date fechaBT = bajasBean.getFechabt();
 
 			TreeMap<String, BajasTemporalesItem> bajasDePersona = (TreeMap<String, BajasTemporalesItem>) mSalida
 					.get(idPersona);
@@ -3615,16 +3615,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return mSalida;
 	}
 
-	private String getFormatedDateShort(String lang, String date) throws java.lang.Exception {
-		String dat = "";
+	private String getFormatedDateShort(String lang, Date date) throws java.lang.Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date datFormat = null;
+		String datFormat = null;
 
-		if (date != null && !date.trim().equals("")) {
+		if (date.toString() != null && !date.toString().trim().equals("")) {
 			try {
 
 				// DCG date = GstDate.getFechaLenguaje(lang, date);
-				datFormat = sdf.parse(date.trim());
+				datFormat = sdf.format(date);
 			} catch (Exception ex) {
 				Exception exc = new Exception("THIS DATE " + date + " IS BAD FORMATED");
 				// exc.setErrorCode("DATEFORMAT");
@@ -3636,9 +3635,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			} else {
 				sdf.applyPattern("dd/MM/yyyy");
 			}
-			dat = sdf.format(datFormat);
 		}
-		return dat;
+		return datFormat;
 	}
 
 	private String getApplicationFormatDate(String lang, String date) throws Exception {

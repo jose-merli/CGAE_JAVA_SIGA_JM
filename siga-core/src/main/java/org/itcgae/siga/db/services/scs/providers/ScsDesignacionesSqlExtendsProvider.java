@@ -3065,7 +3065,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" BAJAS.IDPERSONA = INS.IDPERSONA ");
 		sql.WHERE(" INS.IDINSTITUCION ='" + idInstitucion + "'");
 		sql.WHERE(" INS.IDTURNO ='" + idTurno + "'");
-		sql.WHERE(" TO_DATE(BAJAS.FECHABT, 'YYYY-MM-DD') BETWEEN  TO_DATE('" + fecha
+		sql.WHERE(" BAJAS.FECHABT BETWEEN  TO_DATE('" + fecha
 				+ "' , 'YYYY-MM-DD') AND  TO_DATE( '" + fecha + "' , 'YYYY-MM-DD')  ");
 
 		return sql.toString();

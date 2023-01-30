@@ -555,7 +555,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	List<ListaLetradosDesignaItem> getListaLetradosDesigna( ScsDesigna designa, Short idInstitucion);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getLetradosDiasBajaTemporalTurno")
-	@Results({ @Result(column = "IDPERSONA", property = "idersona", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHABT", property = "fechabt", jdbcType = JdbcType.DATE),
 			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHADESDE", property = "fechadesde", jdbcType = JdbcType.VARCHAR),
