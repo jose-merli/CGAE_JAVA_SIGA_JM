@@ -199,7 +199,7 @@ public class ScsRemesasExtendsProvider {
 		}
 
 		if (remesasBusquedaItem.getDescripcion() != null) {
-			sql.WHERE("rem.descripcion like '%" + remesasBusquedaItem.getDescripcion() + "%'"); // descripcion
+			sql.WHERE("UPPER(rem.descripcion) like '%" + remesasBusquedaItem.getDescripcion().toUpperCase() + "%'"); // descripcion
 		}
 
 		if (remesasBusquedaItem.getEstado() != null) {

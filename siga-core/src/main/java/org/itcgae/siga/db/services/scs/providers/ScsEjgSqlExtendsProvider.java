@@ -1127,6 +1127,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
 
 		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
+		LOGGER.info("++++ [SIGA-TEST] - query  ScsEjgSqlExtendsProvider/busquedaEJG() -> " + sql.toString()); 
 		return sql.toString();
 	}
 
