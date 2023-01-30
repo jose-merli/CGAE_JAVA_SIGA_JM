@@ -65,6 +65,7 @@ import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.GuardaJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
@@ -370,6 +371,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private CenClienteExtendsMapper cenClienteExtendsMapper;
+	
+	// Contadores necesarios para las comprobaciones de filtros modo lectura al guardar justificaciones exprés
+	private int numActualizados;
+	private int numNoActualizadosSinEjg;
+	private int numNoActualizadosEjgNoFavorable;
+	private int numNoActualizadosEjgSinResolucion;
+	private int numNoActualizadosEjgResolucionPteCajg;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -507,10 +515,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //									}
 
 									// obtenemos los datos del EJG
-									String anioEJG = str.substring(1, 5).toString();
-									String numEJG = str.substring(30, 36).replace("#", "").trim();
-									String idInstitucionEJG = str.substring(16, 20).toString();
-									String idtipoEJG = str.substring(28, 29).toString();
+									String[] datosEJG = str.split("##");
+									String anioEJG = datosEJG[0].split("/")[0].trim();
+									String numEJG = datosEJG[0].split("/")[1];
+									String idInstitucionEJG = datosEJG[2];
+									String idtipoEJG = datosEJG[4];
 									String dictamen = "";
 									String resolucion = "";
 
@@ -528,7 +537,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 										if (ejg.get(0).getIdtiporatificacionejg() != null) {
 
 											List<ScsTiporesolucion> resolucionExpediente = scsTiporesolucionExtendMapper
-													.getResolucionesEJG(usuarios.get(0).getIdlenguaje());
+													.getResolucionesEJG2(usuarios.get(0).getIdlenguaje());
 											// resolucion = resolucionExpediente.get(0).getDescripcion();
 
 											for (ScsTiporesolucion tipoResolucion : resolucionExpediente) {
@@ -5543,7 +5552,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	 * actualizaJustificacionExpres
 	 */
 	@Transactional
-	public UpdateResponseDTO actualizaJustificacionExpres(List<JustificacionExpressItem> listaItem,
+	public UpdateResponseDTO actualizaJustificacionExpres(GuardaJustificacionExpressItem item,
 			HttpServletRequest request) {
 		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
 
@@ -5553,6 +5562,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Error error = new Error();
 		int responseDesig = 0;
 		int responseAct = 0;
+		numActualizados = 0;
 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		Date fecha = null;
@@ -5575,8 +5585,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Realizando update...");
+					
+					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Comprobando designaciones con EJGs en modo solo lectura...");
 
-					for (JustificacionExpressItem justificacion : listaItem) {
+					/*
+					 * Comprobamos que no existan designaciones con EJGs marcados como sólo lectura por el filtro
+					 * En el caso que se detecten, se eliminaran de la lista para no ser actualizados
+					 */
+					compruebaEjgsSoloLectura(item.getFiltro(), item.getListaItem());
+					
+					for (JustificacionExpressItem justificacion : item.getListaItem()) {
 						// guardamos los cambios de la designacion
 
 						ScsDesigna recordJust = new ScsDesigna();
@@ -5616,6 +5634,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 
 						responseDesig = scsDesignaMapper.updateByPrimaryKeySelective(recordJust);
+						numActualizados++;
 
 						// guardamos las actuaciones
 						if (justificacion.getActuaciones() != null && justificacion.getActuaciones().size() > 0) {
@@ -5720,10 +5739,85 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			error.setCode(200);
 			error.setDescription("general.message.registro.actualizado");
 		}
+		
+		/*
+		 * Se tokenizan los contadores para mostrar el mensaje personalizado en la vista.
+		 * Variables de los tokens:
+		 * [0] numActualizados; Registros actualizados
+		 * [1] numNoActualizadosSinEjg; Registros sin ejg en modo lectura no actualizados
+		 * [2] numNoActualizadosEjgSinResolucion; Registros sin resolucion en modo lectura no actualizados
+		 * [3] numNoActualizadosEjgNoFavorable; Registros con EJG no favorables en modo lectura no actualizados
+		 * [4] numNoActualizadosEjgResolucionPteCajg; Registros con EJG resolución pendiente de CAJG en modo lectura no actualizados
+		 */
+		error.setMessage(numActualizados + ";"
+						+ numNoActualizadosSinEjg + ";"
+						+ numNoActualizadosEjgSinResolucion + ";"
+						+ numNoActualizadosEjgNoFavorable + ";"
+						+ numNoActualizadosEjgResolucionPteCajg);
 
 		responseDTO.setError(error);
 
 		return responseDTO;
+	}
+
+	/**
+	 * Método que comprueba si existe algún EJG en modo sólo lectura, en caso afirmativo, éste se eliminará
+	 * de la lista ocasionando que no se actualice la justificación.
+	 * @param filtro
+	 * @param listaItem
+	 */
+	private void compruebaEjgsSoloLectura(JustificacionExpressItem filtro, List<JustificacionExpressItem> listaItem) {
+		
+		// Inicialización de contadores
+		numNoActualizadosSinEjg = 0;
+		numNoActualizadosEjgSinResolucion = 0;
+		numNoActualizadosEjgNoFavorable = 0;
+		numNoActualizadosEjgResolucionPteCajg = 0;
+		
+		// 1. Comprobamos que exista algún filtro en modo sólo lectura para agilizar el proceso
+		if ("1".equals(filtro.getSinEJG())
+			|| "1".equals(filtro.getEjgSinResolucion())
+			|| "1".equals(filtro.getConEJGNoFavorables())
+			|| "1".equals(filtro.getResolucionPTECAJG())) {
+			
+			// 2. Comprobamos las justificaciones y las eliminamos si no pasan el control
+			Iterator<JustificacionExpressItem> i = listaItem.iterator();
+			
+			while (i.hasNext()) {
+				JustificacionExpressItem justificacion = i.next();
+				
+				if (!"".equals(justificacion.getEjgs()) && !justificacion.getEjgs().isEmpty()) {
+					
+					// Si el EJG se encuentra sin resolución, no actualizamos la justificacion
+					if ("1".equals(filtro.getEjgSinResolucion())
+							&& !"".equals(justificacion.getResolucionDesignacion())
+							&& !justificacion.getResolucionDesignacion().isEmpty()
+							&& "SIN_RESOLUCION".equals(justificacion.getResolucionDesignacion())) {
+						i.remove();
+						numNoActualizadosEjgSinResolucion++;
+					// Si el EJG no es favorable, no actualizamos la justificacion
+					} else if ("1".equals(filtro.getConEJGNoFavorables())
+							&& !"".equals(justificacion.getResolucionDesignacion())
+							&& !justificacion.getResolucionDesignacion().isEmpty()
+							&& "NO_FAVORABLE".equals(justificacion.getResolucionDesignacion())) {
+						i.remove();
+						numNoActualizadosEjgNoFavorable++;
+					// Si el EJG tiene resolución pendiente CAJG, no actualizamos la justificacion
+					} else if ("1".equals(filtro.getResolucionPTECAJG())
+							&& !"".equals(justificacion.getResolucionDesignacion())
+							&& !justificacion.getResolucionDesignacion().isEmpty()
+							&& "PTE_CAJG".equals(justificacion.getResolucionDesignacion())) {
+						i.remove();
+						numNoActualizadosEjgResolucionPteCajg++;
+					}
+					
+				// Si no tiene EJGs y el filtro sin EJGs está marcado como modo lectura, eliminamos la justificacion
+				} else if ("1".equals(filtro.getSinEJG())) {
+					i.remove();
+					numNoActualizadosSinEjg++;
+				}
+			}
+		}
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
+import org.itcgae.siga.DTOs.scs.GuardaJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListDTO;
@@ -117,7 +118,7 @@ public class DesignacionesController {
 	 */
 	@RequestMapping(value = "/actualizaJustificacionExpres", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> actualizaJustificacionesExpres(
-			@RequestBody List<JustificacionExpressItem> item, HttpServletRequest request) {
+			@RequestBody GuardaJustificacionExpressItem item, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.actualizaJustificacionExpres(item, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}

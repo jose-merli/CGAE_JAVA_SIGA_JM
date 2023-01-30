@@ -1388,7 +1388,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		StringBuilder sql = new StringBuilder();
 
 		sql.append(
-				"SELECT * FROM ( SELECT DECODE(ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA,1,'FAVORABLE', 2,'NO_FAVORABLE', "
+				"SELECT DISTINCT * FROM ( SELECT DECODE(ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA,1,'FAVORABLE', 2,'NO_FAVORABLE', "
 						+ "3,'PTE_CAJG', 4, 'SIN_RESOLUCION','SIN_EJG') AS TIPO_RESOLUCION_DESIGNA, ");
 		sql.append(" ALLDESIGNAS.* ");
 		sql.append(" FROM ( ");
@@ -1477,49 +1477,17 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                AND d.idinstitucion_juzg = j.idinstitucion ");
 		sql.append(" LEFT OUTER join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
 				+ "                AND p.idinstitucion = d.idinstitucion ");
-		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty() && !item.getSinEJG().equals("2"))
-					|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty() && !item.getConEJGNoFavorables().equals("2"))
-					|| (item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty() && !item.getEjgSinResolucion().equals("2"))
-					|| (item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty() && !item.getResolucionPTECAJG().equals("2"))
-					|| ((item.getAnioEJG() != null && !item.getAnioEJG().trim().isEmpty())
-					|| (item.getNumEJG() != null && !item.getNumEJG().trim().isEmpty())))
-		{
-			sql.append("LEFT OUTER join scs_ejgdesigna ejd ON  d.anio = ejd.aniodesigna\r\n"
-					+ "                AND d.numero = ejd.numerodesigna\r\n"
-					+ "                AND d.idturno = ejd.idturno\r\n"
-					+ "                LEFT OUTER join scs_ejg ejg ON ejd.idinstitucion = ejg.idinstitucion\r\n"
-					+ "                AND ejd.idtipoejg = ejg.idtipoejg\r\n"
-					+ "                AND ejd.anioejg = ejg.anio\r\n"
-					+ "                AND ejd.numeroejg = ejg.numero ");
-		}
+		sql.append("LEFT OUTER join scs_ejgdesigna ejd ON  d.anio = ejd.aniodesigna\r\n"
+				+ "                AND d.numero = ejd.numerodesigna\r\n"
+				+ "                AND d.idturno = ejd.idturno\r\n"
+				+ "                LEFT OUTER join scs_ejg ejg ON ejd.idinstitucion = ejg.idinstitucion\r\n"
+				+ "                AND ejd.idtipoejg = ejg.idtipoejg\r\n"
+				+ "                AND ejd.anioejg = ejg.anio\r\n"
+				+ "                AND ejd.numeroejg = ejg.numero ");
 		sql.append(" WHERE D.IDINSTITUCION = " + idInstitucion);
 
-		if (item.getSinEJG() != null && !item.getSinEJG().isEmpty() && !item.getSinEJG().equals("2")) {
-			if (item.getSinEJG().equals("0")) {
-				sql.append(" AND ejg.anio is not null ");
-			}
-		}
-		if ((item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty() && !item.getConEJGNoFavorables().equals("2"))) {
-			if (item.getConEJGNoFavorables().equals("0")) {
-				sql.append(" AND ejg.IDTIPODICTAMENEJG <> " + idDesfavorable);
-			} // else {
-				 //sql.append(" AND ejg.IDTIPODICTAMENEJG = " + idFavorable);
-				 }
-		
-		if ((item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty() && !item.getEjgSinResolucion().equals("2"))) {
-			if (item.getEjgSinResolucion().equals("0")) {
-				sql.append(" AND ejg.anioresolucion is not null\r\n" + " and ejg.numeroresolucion is not null ");
-			} //else {
-			//	sql.append(" AND ejg.anioresolucion IS NULL\r\n" + " AND ejg.numeroresolucion IS NULL ");
-			//}
-		}
-
-		if ((item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty() && !item.getResolucionPTECAJG().equals("2"))) {
-			if (item.getResolucionPTECAJG().equals("0")) {
-				sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NOT NULL");
-			} // else {
-				// sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NULL");
-				// }
+		if (item.getSinEJG().equals("0")) {
+			sql.append(" AND ejg.anio is not null ");
 		}
 
 		if (item.getAnioDesignacion() != null && !item.getAnioDesignacion().trim().isEmpty()) {
@@ -1571,79 +1539,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			} else {
 				sql.append(" D.CODIGO = " + item.getNumDesignacion().trim());
 			}
-		}
-
-		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty() && !item.getSinEJG().equals("2"))
-				|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty() && !item.getConEJGNoFavorables().equals("2"))
-				|| (item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty() && !item.getEjgSinResolucion().equals("2"))
-				|| (item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty() && !item.getResolucionPTECAJG().equals("2"))
-				|| ((item.getAnioEJG() != null && !item.getAnioEJG().trim().isEmpty())
-				|| (item.getNumEJG() != null && !item.getNumEJG().trim().isEmpty()))) {
-			sql.append(" AND EXISTS ( ");
-			sql.append(" SELECT 1 ");
-			sql.append(" FROM SCS_EJG EJG, ");
-			sql.append(" SCS_EJGDESIGNA EJGDES ");
-			sql.append(" WHERE EJGDES.IDINSTITUCION = EJG.IDINSTITUCION ");
-			sql.append(" AND EJGDES.IDTIPOEJG = EJG.IDTIPOEJG ");
-			sql.append(" AND EJGDES.ANIOEJG = EJG.ANIO ");
-			sql.append(" AND EJGDES.NUMEROEJG = EJG.NUMERO ");
-			sql.append(" AND D.IDINSTITUCION = EJGDES.IDINSTITUCION ");
-			sql.append(" AND D.IDTURNO = EJGDES.IDTURNO ");
-			sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
-			sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA ");
-
-			if (item.getAnioEJG() != null && !item.getAnioEJG().trim().isEmpty()) {
-				sql.append(" AND EJG.ANIO = " + item.getAnioEJG().trim());
-			}
-
-			if (item.getNumEJG() != null && !item.getNumEJG().trim().isEmpty()) {
-				// si viene - hay que buscar de uno a otro (1-5 => numDesignacion 1,2,3,4,5)
-				// si viene , hay que buscar uno u otro (1,6 => numDesignacion 1 ó 6)
-
-				sql.append(" AND");
-
-				String[] parts;
-				boolean primero = true;
-
-				// contiene ,
-				if (item.getNumEJG().trim().contains(",")) {
-					parts = item.getNumEJG().trim().split(",");
-
-					sql.append("(");
-
-					for (String str : parts) {
-						if (primero) {
-							sql.append(" EJG.NUMEJG = " + str.trim());
-							primero = false;
-						} else {
-							sql.append(" OR EJG.NUMEJG =" + str.trim());
-						}
-					}
-
-					sql.append(" )");
-
-					// contiene -
-				} else if (item.getNumEJG().trim().contains("-")) {
-					parts = item.getNumEJG().trim().split("-");
-
-					sql.append("( TO_NUMBER(EJG.NUMEJG, 999999999999) BETWEEN ");
-
-					for (String str : parts) {
-						if (primero) {
-							sql.append("TO_NUMBER(" + str.trim() + ", 999999999999)");
-							primero = false;
-						} else {
-							sql.append(" AND TO_NUMBER(" + str.trim() + ", 999999999999)");
-						}
-					}
-
-					sql.append(" )");
-				} else {
-					sql.append(" EJG.NUMEJG = " + item.getNumEJG().trim());
-				}
-			}
-
-			sql.append(")");
 		}
 
 		if (item.getActuacionesValidadas() != null && !item.getActuacionesValidadas().trim().isEmpty()) {
@@ -1729,23 +1624,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" AND dl2.idturno = d.idturno");
 			sql.append(" AND dl2.idpersona = "+ idPersona+")");
 		}
-		
-		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty() && !item.getSinEJG().equals("2"))
-				|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty() && !item.getConEJGNoFavorables().equals("2"))
-				|| (item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty() && !item.getEjgSinResolucion().equals("2"))
-				|| (item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty() && !item.getResolucionPTECAJG().equals("2"))
-				|| ((item.getAnioEJG() != null && !item.getAnioEJG().trim().isEmpty())
-				|| (item.getNumEJG() != null && !item.getNumEJG().trim().isEmpty()))) {
-			//Esto evita que se repitan los registros al tener varios ejg por cada designa
-			sql.append(" AND ejg.numero IN (select ejgdes.numeroejg from scs_ejgdesigna ejgdes"); 
-			sql.append(" WHERE d.idinstitucion = ejgdes.idinstitucion");
-			sql.append(" AND d.anio = ejgdes.aniodesigna");
-			sql.append(" AND d.numero = ejgdes.numerodesigna");
-			sql.append(" AND d.idturno = ejgdes.idturno");
-			sql.append(" AND ejg.anioresolucion IS NULL");
-			sql.append(" AND ejg.numeroresolucion IS NULL");
-			sql.append(" and rownum = 1)");
-		}
 
 		if (item.isMuestraPendiente()) {
 			sql.append(" AND D.ESTADO NOT IN ('A','F') ");
@@ -1820,6 +1698,18 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
 		sql.append(") query WHERE rownum<=200");
+		
+		if (item.getConEJGNoFavorables().equals("0")) {
+			sql.append(" AND query.tipo_resolucion_designa != 'NO_FAVORABLE' ");
+		}
+	
+		if (item.getEjgSinResolucion().equals("0")) {
+			sql.append(" AND query.tipo_resolucion_designa != 'SIN_RESOLUCION' ");
+		}
+		
+		if (item.getResolucionPTECAJG().equals("0")) {
+			sql.append(" AND query.tipo_resolucion_designa != 'PTE_CAJG' ");
+		}
 
 		return sql.toString();
 	}

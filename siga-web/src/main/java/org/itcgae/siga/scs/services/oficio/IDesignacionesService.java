@@ -25,6 +25,7 @@ import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.GuardaJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListDTO;
@@ -75,7 +76,7 @@ public interface IDesignacionesService {
 	 * @param request
 	 * @return
 	 */
-	public UpdateResponseDTO actualizaJustificacionExpres(List<JustificacionExpressItem> item,
+	public UpdateResponseDTO actualizaJustificacionExpres(GuardaJustificacionExpressItem item,
 			HttpServletRequest request);
 
 	/**

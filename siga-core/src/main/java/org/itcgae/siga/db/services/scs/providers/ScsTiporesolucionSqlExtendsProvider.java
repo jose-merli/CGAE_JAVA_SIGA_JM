@@ -27,4 +27,23 @@ public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlPro
 		sql.ORDER_BY("catalogoResolucion.descripcion");
 		return sql.toString();
 	}
+	
+	public String getResoluciones2(String idLenguaje) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("tiporesolucion.idtiporesolucion");
+		sql.SELECT("catalogoResolucion.descripcion");
+
+		sql.FROM("SCS_TIPORESOLUCION tiporesolucion");
+		sql.INNER_JOIN(
+				"GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = "
+						+ idLenguaje);
+
+		sql.WHERE("tiporesolucion.fechabaja is null");
+		sql.WHERE("tiporesolucion.fecha_baja is null");
+
+		sql.ORDER_BY("catalogoResolucion.descripcion");
+		return sql.toString();
+	}
 }
