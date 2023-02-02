@@ -1051,7 +1051,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getUltimoColegiadoGrupo")
 			@Results({ 
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHASUSCRIPCION", property = "fechaSuscripcion", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHASUSCRIPCION", property = "fechaSuscripcion", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "IDGRUPOGUARDIACOLEGIADO", property = "idGrupoGuardiaColegiado", jdbcType = JdbcType.NUMERIC)})
 		 GrupoGuardiaRowItem getUltimoColegiadoGrupo(String idTurno, String idInstitucion, String idGuardia);
 

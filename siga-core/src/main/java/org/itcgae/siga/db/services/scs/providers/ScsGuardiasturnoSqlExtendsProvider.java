@@ -678,13 +678,13 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	public String actualizarUltimoColegiado(ScsGuardiasturno guardia) {
 
 		SQL sql = new SQL();
-		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
 		String fechaFormateada = dateFormat.format(guardia.getFechasuscripcionUltimo());  
 
 		sql.UPDATE("SCS_GUARDIASTURNO");
 		sql.SET("IDGRUPOGUARDIA_ULTIMO = '" + String.valueOf(guardia.getIdgrupoguardiaUltimo())+ "'" );
 		sql.SET("IDPERSONA_ULTIMO = " + guardia.getIdpersonaUltimo());
-		sql.SET("FECHASUSCRIPCION_ULTIMO  =  TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy')");
+		sql.SET("FECHASUSCRIPCION_ULTIMO  =  TO_DATE('" + fechaFormateada + "', 'DD/MM/YYYY hh24:mi:ss')");
 		sql.WHERE("IDTURNO = " + guardia.getIdturno());
 		sql.WHERE("IDGUARDIA = '" + guardia.getIdguardia() + "'");
 		sql.WHERE("IDINSTITUCION = " + guardia.getIdinstitucion());
