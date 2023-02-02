@@ -166,9 +166,9 @@ public class AsistenciaController {
 	}
 	
 	@PostMapping(value = "/guardarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<InsertResponseDTO> guardarAsistencia(HttpServletRequest request, @RequestParam(required = false) String idAsistenciaCopy, @RequestParam(required = false) String isLetrado, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
+	public ResponseEntity<InsertResponseDTO> guardarAsistencia(HttpServletRequest request, @RequestParam(required = false) String idAsistenciaCopy, @RequestParam(required = false) String isLetrado, @RequestParam(required = false) String isTodaySelected, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
 		InsertResponseDTO response = null;
-			response = asistenciaService.guardarAsistencia(request, asistencias, idAsistenciaCopy, isLetrado);
+			response = asistenciaService.guardarAsistencia(request, asistencias, idAsistenciaCopy, isLetrado, isTodaySelected);
 		if (response.getStatus() == "ERRORASOCIADAS") {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.CONFLICT);
 		} 

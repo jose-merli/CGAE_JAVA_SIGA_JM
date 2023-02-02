@@ -1941,7 +1941,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlPrincipal.ORDER_BY("codigo DESC");
 
 		
-		LOGGER.info("+++++ [SIGA TEST] - query busquedaDesignaciones() --> " + sqlPrincipal.toString());
+		//LOGGER.info("+++++ [SIGA TEST] - query busquedaDesignaciones() --> " + sqlPrincipal.toString());
 		return sqlPrincipal.toString();
 	}
 	

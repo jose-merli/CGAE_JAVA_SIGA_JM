@@ -210,7 +210,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
 		}
 
-		LOGGER.info("++++ [SIGA TEST] - ScsGuardiasturnoSqlExtendsProvider / searchGuardias2 -> query = " + SQL_PADRE.toString());
+		//LOGGER.info("++++ [SIGA TEST] - ScsGuardiasturnoSqlExtendsProvider / searchGuardias2 -> query = " + SQL_PADRE.toString());
 		return SQL_PADRE.toString();
 	}
 	

@@ -294,7 +294,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		}
 		
 		sql.AND();
-		sql.WHERE("trunc(scs_asistencia.fechahora) = '"+filtroAsistenciaItem.getDiaGuardia() + "'");
+		sql.WHERE("trunc(scs_asistencia.fechahora) = to_date('"+filtroAsistenciaItem.getDiaGuardia() + "','dd/MM/yyyy')");
 		/*sql.AND();
 		sql.WHERE("EXISTS ("
 				+ "        SELECT"

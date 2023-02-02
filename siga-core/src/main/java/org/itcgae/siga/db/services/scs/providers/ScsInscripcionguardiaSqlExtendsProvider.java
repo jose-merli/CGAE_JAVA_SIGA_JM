@@ -528,7 +528,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
        
         sql.ORDER_BY("tur.nombre");
 		
-		LOGGER.info("++++ [SIGA TEST] - ScsInscripcionguardiaSqlExtendsProvider / listadoInscripciones -> query = " + sql.toString());
+		//LOGGER.info("++++ [SIGA TEST] - ScsInscripcionguardiaSqlExtendsProvider / listadoInscripciones -> query = " + sql.toString());
         return sql.toString();
 
 	}

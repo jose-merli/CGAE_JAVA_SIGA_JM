@@ -855,8 +855,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 */
 	private ScsAsistencia fromTarjetaAsistenciaItemToScsAsistencia(TarjetaAsistenciaResponseItem asistencia,
 			String anioAsistencia, String numeroAsistencia, String tipoAsistenciaGeneral, String idPersonaJg,
-			Short idInstitucion, AdmUsuarios usuario) {
+			Short idInstitucion, AdmUsuarios usuario, String isTodaySelected) {
 		ScsAsistencia asistenciaBBDD = new ScsAsistencia();
+		
 		try {
 			if (!UtilidadesString.esCadenaVacia(anioAsistencia)) {
 				asistenciaBBDD.setAnio(Short.valueOf(anioAsistencia));
@@ -871,7 +872,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 
 			if (asistencia.getFiltro() != null
-					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getDiaGuardia())) {
+					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getDiaGuardia())
+					&& this.esFormatoFechaReducida(asistencia.getFiltro().getDiaGuardia(), isTodaySelected)) {
 				asistenciaBBDD
 						.setFechahora(new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFiltro().getDiaGuardia()));
 			} else {
@@ -947,12 +949,30 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			asistenciaBBDD.setUsumodificacion(usuario.getIdusuario());
 		} catch (ParseException e) {
 			LOGGER.error("guardarAsistencias() / ERROR AL PARSEAR FECHAS: " + e.getMessage(), e);
+		} catch (NullPointerException e) {
+			LOGGER.error("guardarAsistencias() / ERROR NULL  : " + e.getMessage(), e);
+			throw e;
+		} catch (NumberFormatException e) {
+			LOGGER.error("guardarAsistencias() / ERROR FORMAT EXCEPTION  : " + e.getMessage(), e);
+			throw e;
 		} catch (Exception e) {
 			LOGGER.error("guardarAsistencias() / ERROR GENERICO: " + e.getMessage(), e);
 			throw e;
 		}
 
 		return asistenciaBBDD;
+	}
+
+	private Boolean esFormatoFechaReducida(String fechaHoraGuardiaToCompare, String isTodaySelected) throws ParseException {
+		if (Boolean.parseBoolean(isTodaySelected)) {
+			return Boolean.TRUE;
+		}
+		
+		if (fechaHoraGuardiaToCompare.length() > 10) {
+			return Boolean.FALSE;
+		}
+		
+		return Boolean.TRUE;
 	}
 
 	private ScsAsistencia fromTarjetaAsistenciaItemToScsAsistencia2(TarjetaAsistenciaResponse2Item asistencia,
@@ -1408,7 +1428,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	@Transactional
 	@Override
 	public InsertResponseDTO guardarAsistencia(HttpServletRequest request,
-			List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy, String isLetrado) {
+			List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy, String isLetrado, String isTodaySelected) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1438,8 +1458,26 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						if (UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getNumero())) {
 
 							// Insertamos asistencia
-							ScsAsistencia asistencia = fromTarjetaAsistenciaItemToScsAsistencia(asistencias.get(i),
-									null, null, null, null, idInstitucion, usuarios.get(0));
+							ScsAsistencia asistencia = null;
+							try {
+								asistencia = fromTarjetaAsistenciaItemToScsAsistencia(asistencias.get(i),
+										null, null, null, null, idInstitucion, usuarios.get(0), isTodaySelected);
+							} catch (NullPointerException | NumberFormatException e) {
+								LOGGER.error("guardarAsistencias() / ERROR NULL POINTER  : " + e.getMessage(), e);
+								insertResponse.setStatus(SigaConstants.KO);
+								error.setCode(500);
+								error.setDescription(
+										"Es obligatorio indicar un número de colegiado");
+								insertResponse.setError(error);
+							} catch (Exception e) {
+								LOGGER.error("guardarAsistencias() / ERROR GENERICO: " + e.getMessage(), e);
+								insertResponse.setStatus(SigaConstants.KO);
+								error.setCode(500);
+								error.setDescription(
+										"Se ha producido un error al crear/actualizar una asistencia");
+								insertResponse.setError(error);
+							}
+							
 							// Obtenemos proximo numero de una nueva asistencia
 							String anioAsistencia = tarjetaAsistenciaResponseItem.getFechaAsistencia().substring(0, 11)
 									.split("/")[2].trim();

@@ -181,7 +181,7 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 				+ "    F_SIGA_GETRECURSO(grupof.nombre,"+idLenguaje+") , turnos.fechabaja,\r\n" + "     turnos.idinstitucion");
 		sql.ORDER_BY("nombre");
 
-		LOGGER.info("+++++ [SIGA TEST] Query ScsTurnosSqlExtendsProvider/busquedaTurnos() -> " + sql.toString());
+		//LOGGER.info("+++++ [SIGA TEST] Query ScsTurnosSqlExtendsProvider/busquedaTurnos() -> " + sql.toString());
 		return sql.toString();
 
 	}
