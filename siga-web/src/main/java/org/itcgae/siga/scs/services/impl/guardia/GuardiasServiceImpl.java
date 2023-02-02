@@ -2134,7 +2134,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				for (InscripcionGuardiaItem item : inscripciones) {
 					if (UtilidadesString.esCadenaVacia(item.getOrden())
 							&& UtilidadesString.esCadenaVacia(item.getNumeroGrupo())
-							&& UtilidadesString.esCadenaVacia(item.getIdGrupoGuardiaColegiado())) {
+							&& !UtilidadesString.esCadenaVacia(item.getIdGrupoGuardiaColegiado())) {
 						// Elimina grupo guardia colegiado
 						scsGrupoguardiacolegiadoExtendsMapper
 								.deleteByPrimaryKey(Long.parseLong(item.getIdGrupoGuardiaColegiado()));
@@ -6486,8 +6486,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 							Long.parseLong(registro.getIdPersona()));
 					guardia.setIdgrupoguardiaUltimo((long)registro.getIdGrupoGuardiaColegiado());
 					guardia.setFechasuscripcionUltimo(registro.getFechaSuscripcion());
-					//scsGuardiasTurnoMapper.updateByPrimaryKeySelective(guardia);
-					scsGuardiasturnoExtendsMapper.actualizarUltimoColegiado(guardia);
+					scsGuardiasTurnoMapper.updateByPrimaryKeySelective(guardia);
+					//scsGuardiasturnoExtendsMapper.actualizarUltimoColegiado(guardia);
 				}
 			}
 		} catch (Exception e) {
