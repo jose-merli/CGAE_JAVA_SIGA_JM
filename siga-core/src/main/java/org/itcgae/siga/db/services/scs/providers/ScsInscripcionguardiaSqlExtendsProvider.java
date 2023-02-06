@@ -361,6 +361,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		subQuerysql.FROM("scs_inscripcionguardia it2");
 		subQuerysql.WHERE("it2.idinstitucion = ins.idinstitucion");
 		subQuerysql.WHERE("it2.idturno = ins.idturno");
+		subQuerysql.WHERE("it2.idguardia = ins.idguardia");
 		subQuerysql.WHERE("it2.idpersona = ins.idpersona");
 		
 		SQL subQuerysql2 = new SQL();
@@ -376,18 +377,12 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		subQuerysql3.WHERE("guar3.idinstitucion = ins.idinstitucion");
 		subQuerysql3.WHERE("guar3.idturno = ins.idturno");
 		subQuerysql3.WHERE("guar3.idguardia = guar.idguardia");
-		  if(inscripciones.getIdGuardia() != null) {
-			  subQuerysql3.WHERE("guar.idguardia in ("+ inscripciones.getIdGuardia()+")");
-	        }
 		
 		SQL subQuerysql4 = new SQL();
 		subQuerysql4.SELECT("tur.validarjustificaciones");
 		subQuerysql4.FROM("scs_turno tur2");
 		subQuerysql4.WHERE("tur2.idinstitucion = ins.idinstitucion");
 		subQuerysql4.WHERE("tur2.idturno = ins.idturno");
-		 if(inscripciones.getIdturno() != null) {
-			 subQuerysql4.WHERE("tur2.idturno in ("+ inscripciones.getIdturno()+")");
-	        }
 		
 		sql.SELECT("(CASE"
 				+ "            WHEN ins.fechadenegacion IS NOT NULL THEN '4'"

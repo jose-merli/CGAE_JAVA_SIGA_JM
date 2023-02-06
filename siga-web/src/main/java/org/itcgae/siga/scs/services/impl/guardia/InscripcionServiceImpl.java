@@ -1281,8 +1281,9 @@ public class InscripcionServiceImpl implements InscripcionService {
 						inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
 						inscripcionturno.setFechasolicitud(inscripcionesItem.getFechasolicitud());
 
-						if (inscripcionesItem.getEstadonombre().equals("NoPermisos")
-								|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
+						if (inscripcionesItem.getEstadonombre()!= null &&
+								(inscripcionesItem.getEstadonombre().equals("NoPermisos")
+								|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar"))) {
 							inscripcionturno.setFechavalidacion(null);
 						} else {
 							if (valid == "N")
@@ -1296,6 +1297,8 @@ public class InscripcionServiceImpl implements InscripcionService {
 						inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 						int respTurno = scsInscripcionturnoExtendsMapper.insert(inscripcionturno);
+						
+						response = respTurno;
 
 						// Creamos inscripcion a turno
 						
@@ -1323,8 +1326,9 @@ public class InscripcionServiceImpl implements InscripcionService {
 							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
 
 							guardia.setObservacionessuscripcion(inscripcionesItem.getObservacionessolicitud());
-							if (inscripcionesItem.getEstadonombre().equals("NoPermisos")
-									|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
+							if (inscripcionesItem.getEstadonombre()!= null
+									&& (inscripcionesItem.getEstadonombre().equals("NoPermisos")
+									|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar"))) {
 								guardia.setFechavalidacion(null);
 							} else {
 								if (valid == "N")
