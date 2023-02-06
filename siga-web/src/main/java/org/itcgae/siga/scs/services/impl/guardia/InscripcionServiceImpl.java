@@ -1366,11 +1366,11 @@ public class InscripcionServiceImpl implements InscripcionService {
 				} else if (response == 1 && existentes != 0) {
 					error.setCode(200);
 					error.setDescription(
-							"Se han modificiado la partida presupuestaria excepto algunos que tiene las mismas características");
+							"Se han modificado la inscripción excepto algunos que tiene las mismas características");
 
 				} else if (error.getCode() == null) {
 					error.setCode(200);
-					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+					error.setDescription("Se ha modificado la inscripción correctamente");
 				}
 
 				insertResponseDTO.setError(error);
