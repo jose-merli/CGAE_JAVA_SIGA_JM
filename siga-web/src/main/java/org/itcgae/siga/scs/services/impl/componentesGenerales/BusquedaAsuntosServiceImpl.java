@@ -754,7 +754,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				ScsContrariosasistenciaExample contrariosAsistenciaExample = new ScsContrariosasistenciaExample();
 
 				contrariosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andAnioEqualTo(ejg.getAnio()).andNumeroEqualTo(ejg.getNumero());
+						.andAnioEqualTo(asis.getAnio()).andNumeroEqualTo(asis.getNumero());
 
 				List<ScsContrariosasistencia> contrariosAsistencia = scsContrariosasistenciaMapper
 						.selectByExample(contrariosAsistenciaExample);
@@ -769,12 +769,15 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				String contrariosAsisString = "";
 				if (!contrariosEjg.isEmpty()) {
 					for (ScsContrariosejg contrarioEjg : contrariosEjg) {
-						contrarioAsistencia.setIdpersona(contrarioEjg.getIdpersona());
-						contrariosAsisString += contrarioEjg.getIdpersona();
-						response = scsContrariosasistenciaMapper.insert(contrarioAsistencia);
-						if (response == 0)
-							throw (new Exception(
-									"Error al introducir un contrario en la asistencia proveniente del EJG"));
+						if(contrarioEjg.getFechabaja() == null) {
+							contrarioAsistencia.setIdpersona(contrarioEjg.getIdpersona());
+							contrariosAsisString += contrarioEjg.getIdpersona();
+							response = scsContrariosasistenciaMapper.insert(contrarioAsistencia);
+							if (response == 0)
+								throw (new Exception(
+										"Error al introducir un contrario en la asistencia proveniente del EJG"));
+						
+						}
 					}
 				}
 
@@ -1302,7 +1305,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				ScsContrariosasistenciaExample contrariosAsistenciaExample = new ScsContrariosasistenciaExample();
 
 				contrariosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero());
+						.andAnioEqualTo(asis.getAnio()).andNumeroEqualTo(asis.getNumero());
 
 				List<ScsContrariosasistencia> contrariosAsistencia = scsContrariosasistenciaMapper
 						.selectByExample(contrariosAsistenciaExample);

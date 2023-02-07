@@ -213,6 +213,27 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private EJGIntercambiosHelper ejgIntercambiosHelper;
+	
+	@Autowired
+	private ScsDesignaMapper scsDesignaMapper;
+	
+	@Autowired 
+	private ScsDelitosdesignaMapper scsDelitosdesignaMapper;
+	
+	@Autowired
+	private ScsContrariosdesignaMapper scsContrariosdesignaMapper;
+	
+	@Autowired 
+	private ScsDesignaprocuradorMapper scsDesignaProcuradorMapper;
+	
+	@Autowired 
+	private ScsDefendidosdesignaMapper scsDefendidosdesignaMapper;
+	
+	@Autowired
+	private ScsDelitosasistenciaMapper scsDelitosasistenciaMapper;
+	
+	@Autowired
+	private ScsContrariosasistenciaMapper scsContrariosasistenciaMapper;
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -817,6 +838,17 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						//Insertamos el familiar
 						response = scsUnidadfamiliarejgMapper.insert(familiar);
 					}
+					
+					EjgItem ejgItem = new EjgItem();
+					ejgItem.setidInstitucion(idInstitucion.toString());
+					ejgItem.setAnnio(item.get(2));
+					ejgItem.setTipoEJG(item.get(3));
+					ejgItem.setNumero(item.get(4));
+					
+					response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "unidadFamiliar" , usuarios.get(0));
+					if (response == 0)
+							throw (new Exception(
+									"Error al copiar los datos a otros asuntos"));
 
 					if (response != 1) {
 						responsedto.setStatus(SigaConstants.KO);
@@ -2281,13 +2313,18 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (response == 0)
 						throw (new Exception("Error al actualizar los datos generales del EJG"));
 
-//                    ScsEjg ejg = new ScsEjg();
+					EjgItem ejgItem = new EjgItem();
 
-//                    ejg.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
-//                    ejg.setIdinstitucion(idInstitucion);
-//                    ejg.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
-//                    ejg.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
-//
+					ejgItem.setAnnio(datos.get(i).getUf_anio());
+					ejgItem.setidInstitucion(idInstitucion.toString());
+					ejgItem.setTipoEJG(datos.get(i).getUf_idTipoejg());
+					ejgItem.setNumero(datos.get(i).getUf_numero());
+ 
+                    response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "unidadFamiliar" , usuarios.get(0));
+    				if (response == 0)
+    						throw (new Exception(
+    								"Error al copiar los datos a otros asuntos"));
+    				
 //                    ScsPersonajgKey perKey = new ScsPersonajgKey();
 //
 //                    perKey.setIdinstitucion(idInstitucion);
@@ -3338,6 +3375,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					}
 				}
 
+				response = actualizaEjgEnAsuntos(datos, idInstitucion, "defensaJuridica" , usuarios.get(0));
+				if (response == 0)
+						throw (new Exception(
+								"Error al copiar los datos a otros asuntos"));
+				
 				LOGGER.debug(
 						"GestionEJGServiceImpl.updateDatosJuridicos() -> Salida del servicio para cambiar los datos juridicos para el ejg");
 //                                                           } catch (Exception e) {
@@ -3365,6 +3407,586 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responsedto;
 	}
 
+	private int actualizaEjgEnAsuntos(EjgItem datos, Short idInstitucion, String origen, AdmUsuarios usuario) {
+		// TODO Completar y usar como ejemplo y tratar error con try catch
+		int respuesta = 0;
+		try{
+		ScsEjgdesignaExample example = new ScsEjgdesignaExample();
+        example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+        .andAnioejgEqualTo(Short.valueOf(datos.getAnnio()))
+        .andNumeroejgEqualTo(Long.valueOf(datos.getNumero()))
+        .andIdtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+        List<ScsEjgdesigna> relDesignaList = scsEjgdesignaMapper.selectByExample(example );
+        if(relDesignaList != null && !relDesignaList.isEmpty()) {
+            for(ScsEjgdesigna relacion:relDesignaList) {
+                
+            	//OPCION 1 crear método similar a los que hay en BusquedaAsuntosServiceImpl copyEjg2....
+            	//pero parametrizando la tarjeta origen que está haciendo el guardado de datos, por ejemplo, Defensa jurídica
+            	
+            	respuesta = copyEjg2Designa(idInstitucion, origen, usuario, relacion);
+            }
+        }
+        ScsAsistenciaExample exampleAsistencia = new  ScsAsistenciaExample();
+        exampleAsistencia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+        .andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
+        .andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
+        .andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+        List<ScsAsistencia> relAsistenciaList = scsAsistenciaExtendsMapper.selectByExample(exampleAsistencia);
+        if(relAsistenciaList != null && !relAsistenciaList.isEmpty()) {
+        	for(ScsAsistencia relacion : relAsistenciaList) {
+        		respuesta = copyEjg2Asis(idInstitucion, origen, usuario, relacion);
+        	}
+        }
+        
+        if(origen.equals("unidadFamiliar")) { // Si hay cambios en la unidad familiar solicitante principal, se actualiza los SOJ.
+        	ScsSojExample sojExample = new ScsSojExample();
+    		sojExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+    		.andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
+    		.andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
+    		.andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+
+    		List<ScsSoj> relSojList = scsSojMapper.selectByExample(sojExample);
+    		
+    		 if(relSojList != null && !relSojList.isEmpty()) {
+    	        	for(ScsSoj relacion : relSojList) {
+    	        		respuesta = copyEjg2Soj(idInstitucion, origen, usuario, relacion);
+    	        	}
+    	        }
+        }
+    	
+		}catch(Exception e){
+			return respuesta= 0;
+		}
+		return respuesta;
+	}
+
+	public int copyEjg2Soj(Short idInstitucion, String origen, AdmUsuarios usuario, ScsSoj relacion) throws Exception {
+		int response = 0;
+		ScsSoj soj = relacion;
+		ScsEjgKey ejgKey = new ScsEjgKey();
+
+		ejgKey.setIdinstitucion(idInstitucion);
+		ejgKey.setAnio(relacion.getEjganio());
+		ejgKey.setIdtipoejg(relacion.getEjgidtipoejg());
+		ejgKey.setNumero(relacion.getEjgnumero());
+
+		ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+
+		LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> EJG y SOJ seleccionados.");
+
+		// 2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
+
+		LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Copiando informacion del EJG al SOJ.");
+
+		soj.setIdpersonajg(ejg.getIdpersonajg());
+		soj.setIdpersona(ejg.getIdpersona());
+
+		soj.setUsumodificacion(usuario.getIdusuario());
+		soj.setFechamodificacion(new Date());
+
+		response = scsSojMapper.updateByPrimaryKeySelective(soj);
+		if (response == 0)
+			throw (new Exception("Error en copyEjg2Soj() al copiar los datos del EJG al SOJ."));
+
+		LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Saliendo del servicio... ");
+
+		return response;
+	}
+
+	public int copyEjg2Designa(Short idInstitucion, String origen, AdmUsuarios usuario, ScsEjgdesigna relacion) throws Exception {
+		
+		int response = 1;
+
+		LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Entrada metodo copyEjg2Designa ");
+
+			ScsDesignaKey designaKey = new ScsDesignaKey();
+
+			designaKey.setIdinstitucion(idInstitucion);
+			designaKey.setAnio(relacion.getAniodesigna());
+			designaKey.setNumero(relacion.getNumerodesigna());
+			
+			designaKey.setIdturno(relacion.getIdturno());
+
+			ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
+
+			ScsEjgKey ejgKey = new ScsEjgKey();
+
+			ejgKey.setIdinstitucion(idInstitucion);
+			ejgKey.setAnio(relacion.getAnioejg());
+			ejgKey.setIdtipoejg(relacion.getIdtipoejg());
+			ejgKey.setNumero(relacion.getNumeroejg());
+
+			ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+			
+			if(ejg != null && designa != null) {
+				LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Encontrado Datos para relacionar ");
+				
+				if(origen.equals("defensaJuridica")) {
+					LOGGER.info(
+							"GestionEJGServiceImpl.copyEjg2Designa() -> Actualizando Defensa Jurifica en Relaciones");
+				
+
+					// 1. Se debe modificar los atributos asociados en la ficha predesignacion del
+					// EJG en la designa.
+
+					designa.setNumprocedimiento(ejg.getNumeroprocedimiento());
+					designa.setAnioprocedimiento(ejg.getAnioprocedimiento());
+					designa.setNig(ejg.getNig());
+					designa.setObservaciones(ejg.getObservaciones());
+//						designa.setIdpretension(ejg.getIdpretension().shortValue());
+					designa.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
+					designa.setIdjuzgado(ejg.getJuzgado());
+					designa.setResumenasunto(ejg.getObservaciones());//Campo Asuntos
+					// Actualizamos los delitos de la designacion eliminando los anteriores y
+					// asignando los designados en EJG.
+					ScsDelitosdesigna delitoDesigna = new ScsDelitosdesigna();
+
+					delitoDesigna.setIdinstitucion(idInstitucion);
+					delitoDesigna.setAnio(designa.getAnio());
+					delitoDesigna.setNumero(designa.getNumero());
+					delitoDesigna.setIdturno(designa.getIdturno());
+					delitoDesigna.setUsumodificacion(usuario.getIdusuario());
+					delitoDesigna.setFechamodificacion(new Date());
+
+					// Seleccionamos y eliminamos los delitos anteriormente seleccionados en la
+					// designacion.
+
+					ScsDelitosdesignaExample delitosDesignaExample = new ScsDelitosdesignaExample();
+
+					delitosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
+							.andIdturnoEqualTo(designa.getIdturno());
+
+					List<ScsDelitosdesigna> delitosDesigna = scsDelitosdesignaMapper.selectByExample(delitosDesignaExample);
+
+					if (!delitosDesigna.isEmpty()) {
+						response = scsDelitosdesignaMapper.deleteByExample(delitosDesignaExample);
+						if (response == 0)
+							throw (new Exception("Error al eliminar los delitos de la designacion"));
+					}
+
+					ScsDelitosejgExample delitosEjgExample = new ScsDelitosejgExample();
+
+					delitosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
+							.andNumeroEqualTo(ejg.getNumero()).andIdtipoejgEqualTo(ejg.getIdtipoejg());
+
+					List<ScsDelitosejg> delitosEjg = scsDelitosejgMapper.selectByExample(delitosEjgExample);
+
+					if (!delitosEjg.isEmpty()) {
+						for (ScsDelitosejg delitoEjg : delitosEjg) {
+							delitoDesigna.setIddelito(delitoEjg.getIddelito());
+							response = scsDelitosdesignaMapper.insert(delitoDesigna);
+							if (response == 0)
+								throw (new Exception(
+										"Error al introducir un delito en la designacion proveniente del EJG"));
+						}
+					}
+
+					designa.setUsumodificacion(usuario.getIdusuario());
+					designa.setFechamodificacion(new Date());
+
+					response = scsDesignaMapper.updateByPrimaryKeySelective(designa);
+					
+					LOGGER.info(
+							"GestionEJGServiceImpl.copyEjg2Designa() -> FIN - Actualizando Defensa Jurifica en Relaciones");
+				}else if(origen.equals("ContrariosEJG")) {
+					// 2. Se debe insertar los contrarios seleccionados en EJG.
+
+					LOGGER.info(
+							"GestionEJGServiceImpl.copyEjg2Designa() -> Actualizando ContrariosEJG en Relaciones");
+				
+
+					// Obtenemos los contrarios ejg a introducir. Se seleccionan solo los activos
+					// (con fecha de baja nula).
+
+					ScsContrariosejgExample contrariosEjgExample = new ScsContrariosejgExample();
+
+					contrariosEjgExample.createCriteria().andAnioEqualTo(ejg.getAnio()).andNumeroEqualTo(ejg.getNumero())
+							.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(ejg.getIdtipoejg())
+							.andFechabajaIsNull();
+
+					List<ScsContrariosejg> contrariosEjg = scsContrariosejgMapper.selectByExample(contrariosEjgExample);
+
+					// Seleccionamos y borramos los contrarios presentes anteriormente en la
+					// designacion
+
+					ScsContrariosdesignaExample contrariosDesignaExample = new ScsContrariosdesignaExample();
+
+					contrariosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
+							.andIdturnoEqualTo(designa.getIdturno());
+
+					List<ScsContrariosdesigna> contrariosDesigna = scsContrariosdesignaMapper
+							.selectByExample(contrariosDesignaExample);
+
+					if (!contrariosDesigna.isEmpty()) {
+						response = scsContrariosdesignaMapper.deleteByExample(contrariosDesignaExample);
+						if (response == 0)
+							throw (new Exception("Error al eliminar los contrarios de la designacion"));
+					}
+
+					// Se crean los nuevos contrarios y se asignan
+
+					ScsContrariosdesigna newContrarioDesigna = new ScsContrariosdesigna();
+					newContrarioDesigna.setAnio(designa.getAnio());
+					newContrarioDesigna.setNumero(designa.getNumero());
+					newContrarioDesigna.setIdturno(designa.getIdturno());
+					newContrarioDesigna.setIdinstitucion(designa.getIdinstitucion());
+
+					newContrarioDesigna.setFechamodificacion(new Date());
+					newContrarioDesigna.setUsumodificacion(usuario.getIdusuario());
+
+					for (ScsContrariosejg contrarioEjg : contrariosEjg) {
+						if(contrarioEjg.getFechabaja() == null ){
+							ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
+							scsPersonajgkey.setIdpersona(Long.valueOf(contrarioEjg.getIdpersona()));
+							scsPersonajgkey.setIdinstitucion(idInstitucion);
+
+							LOGGER.info(
+									"copyEjg2Designa() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para obtener justiciables de los contrarios ejg");
+
+							ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(scsPersonajgkey);
+
+							LOGGER.info(
+									"copyEjg2Designa() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para obtener justiciables de los contrarios ejg");
+
+							// Se comprueba si tiene representante y se busca.
+							if (personajg.getIdrepresentantejg() != null) {
+
+								scsPersonajgkey.setIdpersona(personajg.getIdrepresentantejg());
+
+								ScsPersonajg representante = scsPersonajgMapper.selectByPrimaryKey(scsPersonajgkey);
+
+								newContrarioDesigna.setNombrerepresentante(representante.getApellido1() + " "
+										+ representante.getApellido2() + ", " + representante.getNombre());
+							}
+
+							// Se le van asignando los distintos valores de IdPersona correspondientes
+							newContrarioDesigna.setIdpersona(Long.valueOf(contrarioEjg.getIdpersona()));
+
+							LOGGER.info(
+									"copyEjg2Designa() / ScsContrariosdesignaMapper.insert() -> Entrada a ScsContrariosdesignaMapper para insertar los contrarios ejg");
+
+							response = scsContrariosdesignaMapper.insert(newContrarioDesigna);
+							if (response == 0)
+								throw (new Exception("Error al introducir contrarios en la designa provenientes del EJG"));
+
+						}
+
+					
+					}
+
+					LOGGER.info(
+							"GestionEJGServiceImpl.copyEjg2Designa() -> FIN - Actualizando ContrariosEJG en Relaciones");
+				}else if(origen.equals("procuradorEJG")) {
+					// 3. Se debe introducir el procurador seleccionado en el EJG.
+
+					// Se comprueba que hay un procurador definido en el ejg para prevenir
+					// inserciones fallidas
+					if (ejg.getIdprocurador() != null) {
+						LOGGER.info(
+								"GestionEJGServiceImpl.copyEjg2Designa() -> Actualizando Procurador en Relaciones");
+						
+						ScsDesignaprocuradorExample exampleDesignaProcurador = new ScsDesignaprocuradorExample();
+						exampleDesignaProcurador.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(designa.getIdturno())
+						.andNumeroEqualTo(designa.getNumero())
+						.andAnioEqualTo(designa.getAnio());
+						
+						List<ScsDesignaprocurador> listaDesignaPro = scsDesignaProcuradorMapper.selectByExample(exampleDesignaProcurador);
+						
+						ScsDesignaprocurador procDesigna = new ScsDesignaprocurador();
+
+						procDesigna.setIdinstitucion(idInstitucion);
+						procDesigna.setIdturno(designa.getIdturno());
+						procDesigna.setNumero(designa.getNumero());
+						procDesigna.setNumerodesignacion(ejg.getNumerodesignaproc());
+						procDesigna.setAnio(designa.getAnio());
+
+						procDesigna.setIdinstitucionProc(ejg.getIdinstitucionProc());
+						procDesigna.setIdprocurador(ejg.getIdprocurador());
+						procDesigna.setFechadesigna(ejg.getFechaDesProc());
+
+						procDesigna.setUsumodificacion(usuario.getIdusuario());
+						procDesigna.setFechamodificacion(new Date());
+
+						procDesigna.setObservaciones(SigaConstants.OBS_IMPORTADO_EJG);
+						
+						if(listaDesignaPro != null && !listaDesignaPro.isEmpty()) {
+							response = scsDesignaProcuradorMapper.updateByExample(procDesigna, exampleDesignaProcurador);
+						}else {
+							response = scsDesignaProcuradorMapper.insert(procDesigna);
+						}
+
+						if (response == 0)
+							throw (new Exception("Error al introducir un procurador en la designa proveniente del EJG"));
+
+						LOGGER.info(
+								"GestionEJGServiceImpl.copyEjg2Designa() -> FIN - Actualizando Procurador en Relaciones");
+
+					}else {
+						//Si el ejg no tiene procurador, borramos los procuradores del ejg.
+						ScsDesignaprocuradorExample exampleDesignaProcurador = new ScsDesignaprocuradorExample();
+						exampleDesignaProcurador.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(designa.getIdturno())
+						.andNumeroEqualTo(designa.getNumero())
+						.andAnioEqualTo(designa.getAnio());
+						response = scsDesignaProcuradorMapper.deleteByExample(exampleDesignaProcurador);
+						
+					}
+				}else if(origen.equals("unidadFamiliar")) {
+					// 4. Se debe insertar los interesados seleccionados en EJG en Unidad Familiar.
+
+					// Seleccionamos y borramos los interesados presentes anteriormente en la
+					// designacion
+					LOGGER.info(
+							"GestionEJGServiceImpl.copyEjg2Designa() -> Actualizando Unidad Familiar / Interesados en Relaciones");
+
+
+					ScsDefendidosdesignaExample interesadosDesignaExample = new ScsDefendidosdesignaExample();
+
+					interesadosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
+							.andIdturnoEqualTo(designa.getIdturno());
+
+					List<ScsDefendidosdesigna> interesadosDesigna = scsDefendidosdesignaMapper
+							.selectByExample(interesadosDesignaExample);
+
+					if (!interesadosDesigna.isEmpty()) {
+						response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
+						if (response == 0)
+							throw (new Exception("Error al eliminar los interesados de la designacion"));
+					}
+
+					// Se debe insertar los interesados seleccionados en EJG en Unidad Familiar.
+
+					ScsUnidadfamiliarejgExample familiaresEJGExample = new ScsUnidadfamiliarejgExample();
+
+					familiaresEJGExample.createCriteria().andAnioEqualTo(ejg.getAnio())
+					.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(ejg.getIdtipoejg())
+					.andNumeroEqualTo(ejg.getNumero()).andFechabajaIsNull();
+
+					List<ScsUnidadfamiliarejg> familiaresEJG = scsUnidadfamiliarejgMapper
+							.selectByExample(familiaresEJGExample);
+
+					//Se crea el interesado que se introducira en la designacion
+					ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
+
+					interesado.setAnio(designa.getAnio());
+					interesado.setNumero(designa.getNumero());
+					interesado.setIdinstitucion(idInstitucion);
+					interesado.setIdturno(designa.getIdturno());
+
+					for(ScsUnidadfamiliarejg familiar : familiaresEJG) {
+
+
+						interesado.setIdpersona(familiar.getIdpersona());
+
+						//Se comprueba si el interesado introducido tiene un representante asociado
+						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
+
+						personajgKey.setIdinstitucion(idInstitucion);
+						personajgKey.setIdpersona(familiar.getIdpersona());
+
+						ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+
+						if(personajg.getIdrepresentantejg() != null) {
+							personajgKey.setIdpersona(personajg.getIdrepresentantejg());
+
+						ScsPersonajg representanteFamiliar = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+
+						interesado.setNombrerepresentante(representanteFamiliar.getNombre());
+						}
+
+						interesado.setUsumodificacion(usuario.getIdusuario());
+						interesado.setFechamodificacion(new Date());
+
+						response = scsDefendidosdesignaMapper.insert(interesado);
+						if (response == 0)
+							throw (new Exception(
+									"Error al introducir interesados en la designa proveniente de la unidad familiar del EJG"));
+
+					}
+					LOGGER.info(
+							"GestionEJGServiceImpl.copyEjg2Designa() -> FIN - Actualizando Unidad Familiar / Interesados en Relaciones");
+
+				}
+			}else {
+				LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> No encontrado Datos para Actualizar");
+				response = 0;
+			}
+
+			LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Saliendo del servicio");
+
+		return response;
+	}
+	
+	public int copyEjg2Asis(Short idInstitucion, String origen, AdmUsuarios usuario, ScsAsistencia relacion)
+			throws Exception {
+
+		int response = 0;
+
+		// Tareas:
+		// 1. Obtenemos los asuntos que vamos a manipular.
+
+		LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Seleccionando EJG y la asistencia correspondientes.");
+
+		ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+
+		asisKey.setIdinstitucion(idInstitucion);
+		asisKey.setNumero(relacion.getNumero());
+		asisKey.setAnio(relacion.getAnio());
+
+		ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+
+		ScsEjgKey ejgKey = new ScsEjgKey();
+
+		ejgKey.setIdinstitucion(idInstitucion);
+		ejgKey.setAnio(relacion.getEjganio());
+		ejgKey.setIdtipoejg(relacion.getEjgidtipoejg());
+		ejgKey.setNumero(relacion.getEjgnumero());
+
+		ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+
+		LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> EJG y Asistencia seleccionados.");
+
+		if(origen.equals("defensaJuridica")) {
+			// 2. Actualizamos los delitos de la asistencia asignando los del EJG.
+
+			LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando delitos del EJG a la asistencia.");
+
+			ScsDelitosasistencia delitoAsistencia = new ScsDelitosasistencia();
+
+			delitoAsistencia.setIdinstitucion(idInstitucion);
+			delitoAsistencia.setAnio(asis.getAnio());
+			delitoAsistencia.setNumero(asis.getNumero());
+
+			delitoAsistencia.setUsumodificacion(usuario.getIdusuario());
+			delitoAsistencia.setFechamodificacion(new Date());
+
+			ScsDelitosejgExample delitosEjgExample = new ScsDelitosejgExample();
+
+			delitosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
+					.andNumeroEqualTo(ejg.getNumero()).andIdtipoejgEqualTo(ejg.getIdtipoejg());
+
+			List<ScsDelitosejg> delitosEjg = scsDelitosejgMapper.selectByExample(delitosEjgExample);
+
+			ScsDelitosasistenciaExample delitosAsistenciaExample = new ScsDelitosasistenciaExample();
+
+			delitosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
+					.andNumeroEqualTo(ejg.getNumero());
+
+			List<ScsDelitosasistencia> delitosAsistencia = scsDelitosasistenciaMapper
+					.selectByExample(delitosAsistenciaExample);
+
+			if (!delitosAsistencia.isEmpty()) {
+				response = scsDelitosasistenciaMapper.deleteByExample(delitosAsistenciaExample);
+				if (response == 0)
+					throw (new Exception("Error al eliminar los delitos anteriores de la asistencia"));
+
+			}
+
+			if (!delitosEjg.isEmpty()) {
+				for (ScsDelitosejg delitoEjg : delitosEjg) {
+					delitoAsistencia.setIddelito(delitoEjg.getIddelito());
+					response = scsDelitosasistenciaMapper.insert(delitoAsistencia);
+					if (response == 0)
+						throw (new Exception("Error al introducir un delito en la asistencia proveniente del EJG"));
+				}
+			}
+			
+			asis.setJuzgado(ejg.getJuzgado());
+			asis.setJuzgadoidinstitucion(ejg.getJuzgadoidinstitucion());
+
+			asis.setComisaria(ejg.getComisaria());
+			asis.setComisariaidinstitucion(ejg.getComisariaidinstitucion());
+
+			asis.setNumeroprocedimiento(ejg.getNumeroprocedimiento() + "/" + ejg.getAnioprocedimiento());
+			asis.setNumerodiligencia(ejg.getNumerodiligencia());
+			asis.setNig(ejg.getNig());
+			asis.setDelitosimputados(ejg.getDelitos());
+			
+			asis.setUsumodificacion(usuario.getIdusuario());
+			asis.setFechamodificacion(new Date());
+			
+			LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Delitos copiados del EJG a la asistencia.");
+
+			response = scsAsistenciaMapper.updateByPrimaryKey(asis);
+			if (response == 0)
+				throw (new Exception("Error en copyEjg2Asis() al copiar los datos del EJG a la asistencia."));
+
+			
+		}else if(origen.equals("ContrariosEJG")) {
+			// 3. Actualizamos los contrarios de la asistencia asignando los del EJG.
+
+			LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando contrarios del EJG a la asistencia.");
+
+			ScsContrariosasistencia contrarioAsistencia = new ScsContrariosasistencia();
+
+			contrarioAsistencia.setIdinstitucion(idInstitucion);
+			contrarioAsistencia.setAnio(asis.getAnio());
+			contrarioAsistencia.setNumero(asis.getNumero());
+
+			contrarioAsistencia.setUsumodificacion(usuario.getIdusuario());
+			contrarioAsistencia.setFechamodificacion(new Date());
+
+			ScsContrariosejgExample contrariosEjgExample = new ScsContrariosejgExample();
+
+			contrariosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
+					.andNumeroEqualTo(ejg.getNumero()).andIdtipoejgEqualTo(ejg.getIdtipoejg());
+
+			List<ScsContrariosejg> contrariosEjg = scsContrariosejgMapper.selectByExample(contrariosEjgExample);
+
+			ScsContrariosasistenciaExample contrariosAsistenciaExample = new ScsContrariosasistenciaExample();
+
+			contrariosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(asis.getAnio()).andNumeroEqualTo(asis.getNumero());
+
+			List<ScsContrariosasistencia> contrariosAsistencia = scsContrariosasistenciaMapper
+					.selectByExample(contrariosAsistenciaExample);
+
+			if (!contrariosAsistencia.isEmpty()) {
+				response = scsContrariosasistenciaMapper.deleteByExample(contrariosAsistenciaExample);
+				if (response == 0)
+					throw (new Exception("Error al eliminar los contrarios anteriores de la asistencia"));
+
+			}
+
+			String contrariosAsisString = "";
+			if (!contrariosEjg.isEmpty()) {
+				for (ScsContrariosejg contrarioEjg : contrariosEjg) {
+					if(contrarioEjg.getFechabaja() == null){
+						contrarioAsistencia.setIdpersona(contrarioEjg.getIdpersona());
+						contrariosAsisString += contrarioEjg.getIdpersona();
+						response = scsContrariosasistenciaMapper.insert(contrarioAsistencia);
+						if (response == 0)
+							throw (new Exception("Error al introducir un contrario en la asistencia proveniente del EJG"));
+				
+					}
+						}
+			}
+
+			asis.setUsumodificacion(usuario.getIdusuario());
+			asis.setFechamodificacion(new Date());
+			asis.setContrarios(contrariosAsisString);
+
+			response = scsAsistenciaMapper.updateByPrimaryKey(asis);
+			if (response == 0)
+				throw (new Exception("Error en copyEjg2Asis() al copiar los datos del EJG a la asistencia."));
+
+		}
+		
+		// 4. Se asignan los datos del EJG a la asistencia.
+	
+		//asis.setIdpersonajg(ejg.getIdpersonajg());
+		//asis.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
+		//Estas en que tarjetas de ficha EJG se actualiza ?
+		
+		LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Saliendo del servicio... ");
+
+		return response;
+	}
+	
 	/**
 	 * getComunicaciones
 	 */
@@ -3662,6 +4284,18 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							"deleteContrario() / scsContrariosejgMapper.updateByPrimaryKey() -> Entrada a scsContrariosDesignaMapper para eliminar los contrarios seleccionados");
 
 					response = scsContrariosejgMapper.updateByPrimaryKey(contrario);
+					
+					EjgItem ejgItem = new EjgItem();
+					ejgItem.setidInstitucion(idInstitucion.toString());
+					ejgItem.setAnnio(item.getAnio().toString());
+					ejgItem.setNumero(String.valueOf(item.getNumero()));
+					ejgItem.setTipoEJG(item.getIdtipoejg().toString());
+					
+					response = actualizaEjgEnAsuntos(ejgItem , idInstitucion, "ContrariosEJG" , usuarios.get(0));
+					if (response == 0)
+							throw (new Exception(
+									"Error al copiar los datos a otros asuntos"));
+					
 
 					LOGGER.info(
 							"deleteContrario() / scsContrariosejgMapper.updateByPrimaryKey() -> Salida de scsContrariosDesignaMapper para eliminar los contrarios seleccionados");
@@ -3763,6 +4397,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					response = scsContrariosejgMapper.insert(contrario);
 
+					
+					EjgItem ejgItem = new EjgItem();
+					ejgItem.setidInstitucion(idInstitucion.toString());
+					ejgItem.setAnnio(item.getAnio().toString());
+					ejgItem.setNumero(String.valueOf(item.getNumero()));
+					ejgItem.setTipoEJG(item.getIdtipoejg().toString());
+					
+					response = actualizaEjgEnAsuntos(ejgItem , idInstitucion, "ContrariosEJG" , usuarios.get(0));
+					if (response == 0)
+							throw (new Exception(
+									"Error al copiar los datos a otros asuntos"));
+					
+					
 					LOGGER.info(
 							"insertContrarioEJG() / scsContrariosejgMapper.insert() -> Salida de ScsDefendidosdesignaMapper para insertar contrario ejg");
 
@@ -4213,12 +4860,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				if (response == 0)
 					throw (new Exception("Error al introducir el nuevo estado al cambiar el procurador del EJG"));
 
-//                                                           } catch (Exception e) {
-//                                                                           response = 0;
-//                                                                           error.setCode(400);
-//                                                                           error.setDescription(e.getMessage());
-//                                                                           updateResponseDTO.setStatus(SigaConstants.KO);
-//                                                           }
+				response = actualizaEjgEnAsuntos(item, idInstitucion, "procuradorEJG" , usuarios.get(0));
+				if (response == 0)
+						throw (new Exception(
+								"Error al copiar los datos a otros asuntos"));
+				
+
 			}
 
 		}

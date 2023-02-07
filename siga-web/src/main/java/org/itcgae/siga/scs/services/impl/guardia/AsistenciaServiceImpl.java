@@ -143,7 +143,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 	@Autowired
 	private ScsDocumentacionasiMapper scsDocumentacionasiMapper;
-	
+
 	@Autowired
 	private ScsActuacionasistcostefijoMapper scsActuacionasistcostefijoMapper;
 
@@ -161,16 +161,30 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 	@Autowired
 	private GuardiasColegiadoServiceImpl guardiasColegiadoServiceImpl;
-	
+
 	@Autowired
 	private GuardiasService guardiasService;
-	
+
 	@Autowired
 	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesExtendsMapper;
 
 	@Autowired
 	private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
 
+	@Autowired
+	private ScsDesignaMapper scsDesignaMapper;
+
+	@Autowired
+	private ScsAsistenciaMapper scsAsistenciaMapper;
+
+	@Autowired
+	private ScsDelitosdesignaMapper scsDelitosdesignaMapper;
+
+	@Autowired
+	private ScsPersonajgMapper scsPersonajgMapper;
+
+	@Autowired
+	private ScsContrariosejgMapper scsContrariosejgMapper;
 
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
@@ -427,7 +441,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					List<GenProperties> properties = genPropertiesMapper.selectByExample(exampleProperties);
 
 					if (properties != null && !properties.isEmpty()) {
-						//filtro.setIdTipoAsistencia(properties.get(0).getValor());
+						// filtro.setIdTipoAsistencia(properties.get(0).getValor());
 
 						List<TarjetaAsistenciaItem2> tarjetaAsistenciaItems = scsAsistenciaExtendsMapper
 								.searchAsistenciasExpress(filtro, idInstitucion);
@@ -694,7 +708,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									int responseActuacion = scsActuacionasistenciaExtendsMapper
 											.insertSelective(actuacionBBDD);
 									if (responseActuacion == 0) {
-										LOGGER.error("guardarAsistenciasExpres() / No se ha insertado la nueva actuacion");
+										LOGGER.error(
+												"guardarAsistenciasExpres() / No se ha insertado la nueva actuacion");
 										error.setCode(500);
 										error.setMessage("Error al insertar la nueva actuacion");
 										error.description("Error al insertar la nueva actuacion");
@@ -756,7 +771,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							}
 
 						});
-						
+
 						// Si no ha habido ningún error, procesamos las guardias
 						if (error.getCode() == null || error.getCode() != 500) {
 							procesarSustitucionGuardia(asistencias.get(0).getFiltro(), idInstitucion, request);
@@ -791,11 +806,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		int response = 0;
 
 		ScsPersonajgExample personajgExample = new ScsPersonajgExample();
-		if(asistencia.getNif() != null)
-		personajgExample.createCriteria().andNifEqualTo(asistencia.getNif().trim());
+		if (asistencia.getNif() != null)
+			personajgExample.createCriteria().andNifEqualTo(asistencia.getNif().trim());
 
-		//List<ScsPersonajg> listaJusticiables = scsPersonajgExtendsMapper.selectByExample(personajgExample);
-		
+		// List<ScsPersonajg> listaJusticiables =
+		// scsPersonajgExtendsMapper.selectByExample(personajgExample);
+
 		List<String> personaJg = scsPersonajgExtendsMapper.getIdPersonajgNif(asistencia.getNif().trim());
 
 		// Si existe obtenemos el idPersona y actualizamos datos
@@ -1216,7 +1232,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 		try {
 			if ("S".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
-				String diaGuardia = String.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime());
+				String diaGuardia = String
+						.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime());
 				String[] datos = new String[11];
 				datos[0] = filtro.getIdTurno();
 				datos[1] = filtro.getIdGuardia();
@@ -1233,7 +1250,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										// sustitucion
 				datos[6] = ""; // Comentario
 				datos[7] = filtro.getSalto(); // Salto (S) o compensacion (C) y Salto y compensacion (S/C)
-				datos[8] = scsGuardiasturnoExtendsMapper.getIdCalendarioGuardiasFecha(filtro.getIdTurno(), filtro.getIdGuardia(), idInstitucion.toString(), filtro.getDiaGuardia()); // idCalendario
+				datos[8] = scsGuardiasturnoExtendsMapper.getIdCalendarioGuardiasFecha(filtro.getIdTurno(),
+						filtro.getIdGuardia(), idInstitucion.toString(), filtro.getDiaGuardia()); // idCalendario
 				datos[9] = diaGuardia; // Fecha
 										// hasta
 										// la
@@ -1241,13 +1259,14 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										// se
 										// sustituye
 				datos[10] = "True";
-				
+
 				// Sustituimos el que está de guardia por el de la asistencia
 				LOGGER.info("procesarSustitucionGuardia() / Se sustituye letrado de guardia");
 				UpdateResponseDTO updateResponseDTO = guardiasColegiadoServiceImpl.sustituirGuardiaColeg(datos,
 						request);
-				
-			} else if ("N".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
+
+			} else if ("N".equals(filtro.getIsSustituto())
+					&& !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
 				LOGGER.info(
 						"procesarSustitucionGuardia() / Se añade el letrado de la asistencia como refuerzo en la guardia");
 				TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = new TarjetaAsistenciaResponseItem();
@@ -1257,8 +1276,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				tarjetaAsistenciaResponseItem.setIdLetradoGuardia(filtro.getIdLetradoManual());
 				procesaGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion);
 			} else {
-				LOGGER.info(
-						"procesarSustitucionGuardia() / Se añade el letrado de la asistencia");
+				LOGGER.info("procesarSustitucionGuardia() / Se añade el letrado de la asistencia");
 				TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = new TarjetaAsistenciaResponseItem();
 				tarjetaAsistenciaResponseItem.setIdTurno(filtro.getIdTurno());
 				tarjetaAsistenciaResponseItem.setIdGuardia(filtro.getIdGuardia());
@@ -1269,7 +1287,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 
 		} catch (Exception e) {
-			throw new SigaExceptions(e, "No se han podido procesar las guardias de colegiado, compruebe que no existen facturaciones");
+			throw new SigaExceptions(e,
+					"No se han podido procesar las guardias de colegiado, compruebe que no existen facturaciones");
 		}
 	}
 
@@ -1434,7 +1453,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InsertResponseDTO insertResponse = new InsertResponseDTO();
 		Error error = new Error();
-		 
+
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1486,37 +1505,42 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 							asistencia.setNumero(Long.valueOf(numeroAsistencia));
 							asistencia.setAnio(Short.valueOf(anioAsistencia));
-							if (tarjetaAsistenciaResponseItem.getIdJuzgado() != null && ! tarjetaAsistenciaResponseItem.getIdJuzgado().isEmpty())
-							asistencia.setJuzgado(Long.valueOf(tarjetaAsistenciaResponseItem.getIdJuzgado()));
+							if (tarjetaAsistenciaResponseItem.getIdJuzgado() != null
+									&& !tarjetaAsistenciaResponseItem.getIdJuzgado().isEmpty())
+								asistencia.setJuzgado(Long.valueOf(tarjetaAsistenciaResponseItem.getIdJuzgado()));
 
 							// Validamos guardias colegiado
 							try {
-								
+
 								if (tarjetaAsistenciaResponseItem.getIdLetradoGuardia() != null) {
 									procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
-								} else if (tarjetaAsistenciaResponseItem.getIdLetradoGuardia() == null &&
-											tarjetaAsistenciaResponseItem.getIdLetradoManual() != null) {
-									tarjetaAsistenciaResponseItem.setIdLetradoGuardia(tarjetaAsistenciaResponseItem.getIdLetradoManual());
+								} else if (tarjetaAsistenciaResponseItem.getIdLetradoGuardia() == null
+										&& tarjetaAsistenciaResponseItem.getIdLetradoManual() != null) {
+									tarjetaAsistenciaResponseItem
+											.setIdLetradoGuardia(tarjetaAsistenciaResponseItem.getIdLetradoManual());
 									procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
 								}
-								
-								if (asistencias.get(0).getFiltro() != null && asistencias.get(0).getFiltro().getIsSustituto() != null) {
+
+								if (asistencias.get(0).getFiltro() != null
+										&& asistencias.get(0).getFiltro().getIsSustituto() != null) {
 									if (asistencias.get(0).getFiltro().getDiaGuardia().contains(":")) {
-										String diaGuardiaCorrecto = asistencias.get(0).getFiltro().getDiaGuardia().substring(0, 10);
+										String diaGuardiaCorrecto = asistencias.get(0).getFiltro().getDiaGuardia()
+												.substring(0, 10);
 										asistencias.get(0).getFiltro().setDiaGuardia(diaGuardiaCorrecto);
 									}
 									procesarSustitucionGuardia(asistencias.get(0).getFiltro(), idInstitucion, request);
 								}
-							}catch(Exception e) {
-								if (e.getMessage().equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
+							} catch (Exception e) {
+								if (e.getMessage().equals(
+										"procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
 									error.setCode(409);
 									error.setMessage("Error al guardar la asistencia: " + e);
 									error.description("Error al guardar la asistencia: " + e);
 								}
 							}
 
-							
-							comprobacionIncompatibilidades(tarjetaAsistenciaResponseItem, idInstitucion, usuarios.get(0));
+							comprobacionIncompatibilidades(tarjetaAsistenciaResponseItem, idInstitucion,
+									usuarios.get(0));
 							int inserted = scsAsistenciaExtendsMapper.insertSelective(asistencia);
 
 							// Si viene de una preasistencia, la pasamos a confirmada
@@ -1607,20 +1631,21 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							} else {
 								scsAsistencia.setFechasolicitud(null);
 							}
-							
+
 							// Validamos guardias colegiado
 							try {
-							procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
-							}catch(Exception e) {
-								if (e.getMessage().equals("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
+								procesaGuardiasColegiado2(tarjetaAsistenciaResponseItem, idInstitucion, isLetrado);
+							} catch (Exception e) {
+								if (e.getMessage().equals(
+										"procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar")) {
 									error.setCode(409);
 									error.setMessage("Error al guardar la asistencia: " + e);
 									error.description("Error al guardar la asistencia: " + e);
 								}
 							}
 
-							
-							comprobacionIncompatibilidades(tarjetaAsistenciaResponseItem, idInstitucion, usuarios.get(0));
+							comprobacionIncompatibilidades(tarjetaAsistenciaResponseItem, idInstitucion,
+									usuarios.get(0));
 							affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
 
 							if (affectedRows > 0) {
@@ -1645,7 +1670,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			error.setMessage("Error al guardar la asistencia: " + e);
 			error.description("Error al guardar la asistencia: " + e);
 			insertResponse.setError(error);
-			
+
 			if (error.getCode() == 409) {
 				insertResponse.setStatus("ERRORASOCIADAS");
 			}
@@ -1653,7 +1678,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return insertResponse;
 	}
 
-	private ArrayList<ArrayList<String>> obtenerPeriodosGuardia(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem, Integer idInstitucion) throws Exception {
+	private ArrayList<ArrayList<String>> obtenerPeriodosGuardia(
+			TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem, Integer idInstitucion) throws Exception {
 		// Variables
 		ArrayList arrayDiasGuardiaCGAE;
 		PeriodoEfectivoItem periodoEfectivo;
@@ -1665,14 +1691,19 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 		ArrayList<ArrayList<String>> listaFinal = new ArrayList<ArrayList<String>>();
 		GuardiasTurnoItem beanGuardiasTurno1 = null;
-		List<GuardiasTurnoItem> vGuardias = scsGuardiasturnoExtendsMapper.getAllDatosGuardia(idInstitucion.toString(), tarjetaAsistenciaResponseItem.getIdTurno().toString(),
+		List<GuardiasTurnoItem> vGuardias = scsGuardiasturnoExtendsMapper.getAllDatosGuardia(idInstitucion.toString(),
+				tarjetaAsistenciaResponseItem.getIdTurno().toString(),
 				tarjetaAsistenciaResponseItem.getIdGuardia().toString());
-			if (!vGuardias.isEmpty())
-				 beanGuardiasTurno1 = vGuardias.get(0);
-			List<String> vDiasFestivos1 = obtenerFestivosTurno(idInstitucion, Integer.parseInt(tarjetaAsistenciaResponseItem.getIdTurno()), tarjetaAsistenciaResponseItem.getFechaAsistencia(), new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+		if (!vGuardias.isEmpty())
+			beanGuardiasTurno1 = vGuardias.get(0);
+		List<String> vDiasFestivos1 = obtenerFestivosTurno(idInstitucion,
+				Integer.parseInt(tarjetaAsistenciaResponseItem.getIdTurno()),
+				tarjetaAsistenciaResponseItem.getFechaAsistencia(),
+				new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 		try {
 			// generando la matriz de periodos
-			CalendarioAutomatico calendarioAutomatico = new CalendarioAutomatico(beanGuardiasTurno1, tarjetaAsistenciaResponseItem.getFechaAsistencia(),
+			CalendarioAutomatico calendarioAutomatico = new CalendarioAutomatico(beanGuardiasTurno1,
+					tarjetaAsistenciaResponseItem.getFechaAsistencia(),
 					tarjetaAsistenciaResponseItem.getFechaAsistencia(), vDiasFestivos1);
 			arrayDiasGuardiaCGAE = calendarioAutomatico.obtenerMatrizDiasGuardia();
 
@@ -1702,9 +1733,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			throw new Exception(e + ": Excepcion al calcular la matriz de periodos de dias de guardias.");
 		}
 	}
-	
-	
-	
+
 	List<String> obtenerFestivosTurno(Integer idInstitucion, Integer idTurno, String fechaInicio, Date fechaFin)
 			throws Exception {
 		LocalDate date4 = ZonedDateTime
@@ -1714,22 +1743,25 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		String NEW_FORMAT = "dd/MM/yyyy";
 		String fechaFinOk = changeDateFormat(OLD_FORMAT, NEW_FORMAT, date4.toString());
 		String fechaInicioOk = changeDateFormat("dd/MM/yyyy HH:mm", NEW_FORMAT, fechaInicio);
-		//return scsGuardiasturnoExtendsMapper.getFestivosTurno(fechaInicioOk, fechaFinOk.toString(),
-		//		idInstitucion.toString(), Integer.toString(2000), idTurno.toString());
-		List <RangoFechasItem> rangosFechasFestivos  = scsGuardiasturnoExtendsMapper.getFestivosAgenda(fechaInicioOk, fechaFinOk,idInstitucion.toString());
+		// return scsGuardiasturnoExtendsMapper.getFestivosTurno(fechaInicioOk,
+		// fechaFinOk.toString(),
+		// idInstitucion.toString(), Integer.toString(2000), idTurno.toString());
+		List<RangoFechasItem> rangosFechasFestivos = scsGuardiasturnoExtendsMapper.getFestivosAgenda(fechaInicioOk,
+				fechaFinOk, idInstitucion.toString());
 		List<String> fechasFestivas = new ArrayList<String>();
-		if(rangosFechasFestivos == null || rangosFechasFestivos.isEmpty()) return fechasFestivas;
-		
-		for(RangoFechasItem itemFecha : rangosFechasFestivos) {
-			if(itemFecha.getFechaDesde().equals(itemFecha.getFechaHasta())) {
+		if (rangosFechasFestivos == null || rangosFechasFestivos.isEmpty())
+			return fechasFestivas;
+
+		for (RangoFechasItem itemFecha : rangosFechasFestivos) {
+			if (itemFecha.getFechaDesde().equals(itemFecha.getFechaHasta())) {
 				fechasFestivas.add(itemFecha.getFechaDesde());
-			}else {
-				long fechasBT = daysBetween(itemFecha.getFechaDesde(),itemFecha.getFechaHasta());
-				
-				if(fechasBT == 1) {
+			} else {
+				long fechasBT = daysBetween(itemFecha.getFechaDesde(), itemFecha.getFechaHasta());
+
+				if (fechasBT == 1) {
 					fechasFestivas.add(itemFecha.getFechaDesde());
 					fechasFestivas.add(itemFecha.getFechaHasta());
-				}else {
+				} else {
 					fechasFestivas.add(itemFecha.getFechaDesde());
 					String fechaAuxIni = itemFecha.getFechaDesde();
 					for (int i = 0; i < fechasBT; i++) {
@@ -1738,38 +1770,39 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						fechaAuxIni = fechaNext;
 					}
 				}
-			}	
+			}
 		}
 		quitarRepetidos(fechasFestivas);
-		Collections.sort(fechasFestivas);//ORDENAR
+		Collections.sort(fechasFestivas);// ORDENAR
 		return fechasFestivas;
 	}
-	
-	private List<String> quitarRepetidos(List<String> fechasFestivas){
+
+	private List<String> quitarRepetidos(List<String> fechasFestivas) {
 		Set<String> hashSet = new HashSet<String>(fechasFestivas);
 		fechasFestivas.clear();
 		fechasFestivas.addAll(hashSet);
-        return fechasFestivas;
+		return fechasFestivas;
 	}
-	private String diaSiguienteDate(String fechaIn) throws ParseException {
-		 Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(fechaIn);  
 
-		DateFormat dateFormatFin = new SimpleDateFormat("dd/MM/yyyy");  
+	private String diaSiguienteDate(String fechaIn) throws ParseException {
+		Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(fechaIn);
+
+		DateFormat dateFormatFin = new SimpleDateFormat("dd/MM/yyyy");
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date1);
-		cal.add(Calendar.DAY_OF_YEAR, 1); 
+		cal.add(Calendar.DAY_OF_YEAR, 1);
 		return dateFormatFin.format(cal.getTime());
 	}
-	
+
 	private long daysBetween(String fechaIni, String fechaFin) throws ParseException {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
-		String strDateDesde = dateFormat.format(	 new SimpleDateFormat("dd/MM/yyyy").parse(fechaIni));  
-		String strDateHasta = dateFormat.format( new SimpleDateFormat("dd/MM/yyyy").parse(fechaFin));
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String strDateDesde = dateFormat.format(new SimpleDateFormat("dd/MM/yyyy").parse(fechaIni));
+		String strDateHasta = dateFormat.format(new SimpleDateFormat("dd/MM/yyyy").parse(fechaFin));
 		LocalDate dateBefore = LocalDate.parse(strDateDesde);
 		LocalDate dateAfter = LocalDate.parse(strDateHasta);
 		return ChronoUnit.DAYS.between(dateBefore, dateAfter);
 	}
-	
+
 	private String changeDateFormat(String OLD_FORMAT, String NEW_FORMAT, String oldDateString) {
 		String newDateString;
 
@@ -1785,18 +1818,22 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		newDateString = sdf.format(d);
 		return newDateString;
 	}
+
 	private void comprobacionIncompatibilidades(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem,
 			Short idInstitucion, AdmUsuarios usu) throws Exception {
 		ArrayList<ArrayList<String>> arrayPeriodosDiasGuardiaSJCS1 = new ArrayList();
 		ArrayList arrayDiasGuardia = new ArrayList();
-		// si el letrado no puede ser seleccionado por alguna incompatibilidad de la guardia, se deberá crear una compensación.
-		ArrayList<ArrayList<String>> listaDiasPeriodos = obtenerPeriodosGuardia(tarjetaAsistenciaResponseItem, (int)idInstitucion);
+		// si el letrado no puede ser seleccionado por alguna incompatibilidad de la
+		// guardia, se deberá crear una compensación.
+		ArrayList<ArrayList<String>> listaDiasPeriodos = obtenerPeriodosGuardia(tarjetaAsistenciaResponseItem,
+				(int) idInstitucion);
 		if (listaDiasPeriodos != null && !listaDiasPeriodos.isEmpty())
 			arrayPeriodosDiasGuardiaSJCS1.addAll(listaDiasPeriodos);
 		for (int i = 0; i < arrayPeriodosDiasGuardiaSJCS1.size(); i++) {
 			arrayDiasGuardia = (ArrayList<String>) arrayPeriodosDiasGuardiaSJCS1.get(i);
 		}
-		boolean incompatible = guardiasService.validarIncompatibilidadGuardia(idInstitucion.toString(), tarjetaAsistenciaResponseItem.getIdTurno(), tarjetaAsistenciaResponseItem.getIdGuardia(),
+		boolean incompatible = guardiasService.validarIncompatibilidadGuardia(idInstitucion.toString(),
+				tarjetaAsistenciaResponseItem.getIdTurno(), tarjetaAsistenciaResponseItem.getIdGuardia(),
 				arrayDiasGuardia, tarjetaAsistenciaResponseItem.getIdLetradoGuardia());
 		if (incompatible) {
 			ScsSaltoscompensaciones salto = new ScsSaltoscompensaciones();
@@ -1808,15 +1845,16 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			salto.setFecha(new Date());
 			salto.setMotivos("Añadiendo letrado con incompatibilidades en una Asistencia");
 			try {
-				LOGGER.info("El letrado no puede ser seleccionado por incompatibilidad de la guardia, se va a crear una compensación");
+				LOGGER.info(
+						"El letrado no puede ser seleccionado por incompatibilidad de la guardia, se va a crear una compensación");
 				try {
 					salto.setUsumodificacion(usu.getIdusuario());
 					salto.setFechamodificacion(new Date());
 					java.util.Date date = new java.util.Date();
 					java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
 					String fechaFormat = sdf.format(salto.getFecha());
-					Long idSaltosTurno = Long
-							.valueOf(getNuevoIdSaltosTurno(salto.getIdinstitucion().toString(), salto.getIdturno().toString()));
+					Long idSaltosTurno = Long.valueOf(
+							getNuevoIdSaltosTurno(salto.getIdinstitucion().toString(), salto.getIdturno().toString()));
 					salto.setIdsaltosturno(idSaltosTurno);
 					scsSaltoscompensacionesExtendsMapper.insertManual(salto, fechaFormat);
 				} catch (Exception e) {
@@ -1827,9 +1865,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				e.printStackTrace();
 			}
 		}
-	
+
 	}
-	
+
 	public String getNuevoIdSaltosTurno(String idInstitucion, String idTurno) throws Exception {
 		String nuevoId = "";
 		try {
@@ -1841,6 +1879,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		return nuevoId;
 	}
+
 	@Override
 	public UpdateResponseDTO updateEstadoAsistencia(HttpServletRequest request,
 			List<TarjetaAsistenciaResponseItem> asistencias) {
@@ -1876,48 +1915,47 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 //								if (("2".equals(tarjetaAsistenciaResponseItem.getEstado())
 //										&& !isFacturada(tarjetaAsistenciaResponseItem, idInstitucion))
 //										|| !"2".equals(tarjetaAsistenciaResponseItem.getEstado())) {
-								int rowsUpdated = 0;
-								ScsAsistencia scsAsistencia = new ScsAsistencia();
-								scsAsistencia.setFechaestadoasistencia(new SimpleDateFormat("dd/MM/yyyy")
-										.parse(tarjetaAsistenciaResponseItem.getFechaEstado()));
-								scsAsistencia.setIdestadoasistencia(
-										Short.valueOf(tarjetaAsistenciaResponseItem.getEstado()));
-								scsAsistencia.setAnio(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()));
-								scsAsistencia.setNumero(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()));
-								scsAsistencia.setIdinstitucion(idInstitucion);
+							int rowsUpdated = 0;
+							ScsAsistencia scsAsistencia = new ScsAsistencia();
+							scsAsistencia.setFechaestadoasistencia(new SimpleDateFormat("dd/MM/yyyy")
+									.parse(tarjetaAsistenciaResponseItem.getFechaEstado()));
+							scsAsistencia
+									.setIdestadoasistencia(Short.valueOf(tarjetaAsistenciaResponseItem.getEstado()));
+							scsAsistencia.setAnio(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()));
+							scsAsistencia.setNumero(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()));
+							scsAsistencia.setIdinstitucion(idInstitucion);
 
-								rowsUpdated = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(scsAsistencia);
+							rowsUpdated = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(scsAsistencia);
 
-								// Si es una anulacion, anulamos sus actuaciones asociadas
-								if ("2".equals(tarjetaAsistenciaResponseItem.getEstado())) {
+							// Si es una anulacion, anulamos sus actuaciones asociadas
+							if ("2".equals(tarjetaAsistenciaResponseItem.getEstado())) {
 
-									ScsActuacionasistencia scsActuacionasistencia = new ScsActuacionasistencia();
-									scsActuacionasistencia.setAnulacion((short) 1);
+								ScsActuacionasistencia scsActuacionasistencia = new ScsActuacionasistencia();
+								scsActuacionasistencia.setAnulacion((short) 1);
 
-									ScsActuacionasistenciaExample scsActuacionasistenciaExample = new ScsActuacionasistenciaExample();
-									scsActuacionasistenciaExample.createCriteria()
-											.andIdinstitucionEqualTo(idInstitucion)
-											.andAnioEqualTo(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()))
-											.andNumeroEqualTo(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()))
-											.andFacturadoEqualTo("0");
+								ScsActuacionasistenciaExample scsActuacionasistenciaExample = new ScsActuacionasistenciaExample();
+								scsActuacionasistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+										.andAnioEqualTo(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()))
+										.andNumeroEqualTo(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()))
+										.andFacturadoEqualTo("0");
 
-									rowsUpdated += scsActuacionasistenciaExtendsMapper.updateByExampleSelective(
-											scsActuacionasistencia, scsActuacionasistenciaExample);
+								rowsUpdated += scsActuacionasistenciaExtendsMapper.updateByExampleSelective(
+										scsActuacionasistencia, scsActuacionasistenciaExample);
 
-								}
+							}
 
-								if (rowsUpdated > 0) {
-									updateResponse.setStatus(SigaConstants.OK);
-									updateResponse.setId(tarjetaAsistenciaResponseItem.getAnioNumero());
-								} else {
+							if (rowsUpdated > 0) {
+								updateResponse.setStatus(SigaConstants.OK);
+								updateResponse.setId(tarjetaAsistenciaResponseItem.getAnioNumero());
+							} else {
 
-									updateResponse.setStatus(SigaConstants.KO);
-									error.setCode(500);
-									error.setMessage("No se ha actualizado ningun registro");
-									error.description("No se ha actualizado ningun registro");
-									updateResponse.setError(error);
+								updateResponse.setStatus(SigaConstants.KO);
+								error.setCode(500);
+								error.setMessage("No se ha actualizado ningun registro");
+								error.description("No se ha actualizado ningun registro");
+								updateResponse.setError(error);
 
-								}
+							}
 //							} else {
 //								updateResponse.setStatus(SigaConstants.KO);
 //								error.setCode(500);
@@ -1964,7 +2002,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		TarjetaAsistenciaResponseDTO tarjetaAsistenciaResponseDTO = new TarjetaAsistenciaResponseDTO();
 		String anio = "";
 		String numero = "";
-		if(anioNumero != null && !anioNumero.isEmpty()) {
+		if (anioNumero != null && !anioNumero.isEmpty()) {
 			anio = anioNumero.split("/")[0];
 			numero = anioNumero.split("/")[1];
 		}
@@ -2119,7 +2157,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 									if (!UtilidadesString.esCadenaVacia(justiciables.get(0).getApellido2())) {
 										String asistido = "";
-										
+
 										if (justiciables.get(0).getApellido1() != null) {
 											asistido += " " + justiciables.get(0).getApellido1();
 										}
@@ -2129,7 +2167,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										if (justiciables.get(0).getNombre() != null) {
 											asistido += " " + justiciables.get(0).getNombre();
 										}
-										
+
 										asistenciaResponse.setAsistido(asistido);
 									} else {
 										String asistido = "";
@@ -2140,7 +2178,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										if (justiciables.get(0).getNombre() != null) {
 											asistido += " " + justiciables.get(0).getNombre();
 										}
-										
+
 										asistenciaResponse.setAsistido(asistido);
 									}
 
@@ -2333,6 +2371,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 
 	}
+
 	/**
 	 * Método que procesa las guardias de colegiado y las cabeceras de guardia al
 	 * crear una asistencia
@@ -2495,11 +2534,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								"procesaGuardiasColegiado() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
 					}
 				}
-	
 
 			}
-			
-			
 
 		} catch (Exception e) {
 			LOGGER.error(
@@ -2611,78 +2647,80 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			} else {
 				if (!Boolean.parseBoolean(isLetrado)) {
 
-				ScsCalendarioguardiasExample example = new ScsCalendarioguardiasExample();
+					ScsCalendarioguardiasExample example = new ScsCalendarioguardiasExample();
 
-				example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdturnoEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()))
-						.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
-						.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
-								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
-						.andFechafinGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()))
+							.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
+							.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+									.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
+							.andFechafinGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+									.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+
+					List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper
+							.selectByExample(example);
+
+					if (scsCalendarioguardias != null && !scsCalendarioguardias.isEmpty()) {
+
+						ScsGuardiascolegiado scsGuardiascolegiado = new ScsGuardiascolegiado();
+						scsGuardiascolegiado.setIdinstitucion(idInstitucion);
+						scsGuardiascolegiado.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+						scsGuardiascolegiado
+								.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+						scsGuardiascolegiado.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
 								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+						scsGuardiascolegiado.setFechafin(new SimpleDateFormat("dd/MM/yyyy")
+								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+						scsGuardiascolegiado
+								.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+						scsGuardiascolegiado.setDiasguardia((long) 1);
+						scsGuardiascolegiado.setDiasacobrar((long) 1);
+						scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
 
-				List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper
-						.selectByExample(example);
+						scsGuardiascolegiado.setReserva("N");
+						scsGuardiascolegiado.setFacturado("N");
+						scsGuardiascolegiado.setIdfacturacion(null);
+						scsGuardiascolegiado.setPagado("N");
+						scsGuardiascolegiado.setFechamodificacion(new Date());
+						scsGuardiascolegiado.setUsumodificacion(0);
 
-				if (scsCalendarioguardias != null && !scsCalendarioguardias.isEmpty()) {
+						ScsCabeceraguardias scsCabeceraguardias = new ScsCabeceraguardias();
+						scsCabeceraguardias.setIdinstitucion(idInstitucion);
+						scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+						scsCabeceraguardias
+								.setIdcalendarioguardias(scsCalendarioguardias.get(0).getIdcalendarioguardias());
 
-					ScsGuardiascolegiado scsGuardiascolegiado = new ScsGuardiascolegiado();
-					scsGuardiascolegiado.setIdinstitucion(idInstitucion);
-					scsGuardiascolegiado.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
-					scsGuardiascolegiado.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
-					scsGuardiascolegiado.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
-							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
-					scsGuardiascolegiado.setFechafin(new SimpleDateFormat("dd/MM/yyyy")
-							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
-					scsGuardiascolegiado
-							.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
-					scsGuardiascolegiado.setDiasguardia((long) 1);
-					scsGuardiascolegiado.setDiasacobrar((long) 1);
-					scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
+						scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+						scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
+								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+						scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy")
+								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+						scsCabeceraguardias
+								.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+						scsCabeceraguardias.setPosicion((short) 1);
+						scsCabeceraguardias.setFechamodificacion(new Date());
+						scsCabeceraguardias.setSustituto("0");
+						scsCabeceraguardias.setFechaalta(new Date());
 
-					scsGuardiascolegiado.setReserva("N");
-					scsGuardiascolegiado.setFacturado("N");
-					scsGuardiascolegiado.setIdfacturacion(null);
-					scsGuardiascolegiado.setPagado("N");
-					scsGuardiascolegiado.setFechamodificacion(new Date());
-					scsGuardiascolegiado.setUsumodificacion(0);
+						// Las metemos validadas
+						scsCabeceraguardias.setValidado("1");
+						scsCabeceraguardias.setFechavalidacion(new Date());
+						scsCabeceraguardias.setUsumodificacion(0);
 
-					ScsCabeceraguardias scsCabeceraguardias = new ScsCabeceraguardias();
-					scsCabeceraguardias.setIdinstitucion(idInstitucion);
-					scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
-					scsCabeceraguardias.setIdcalendarioguardias(scsCalendarioguardias.get(0).getIdcalendarioguardias());
+						affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+						affectedRows += scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
 
-					scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
-					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
-							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
-					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy")
-							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
-					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
-					scsCabeceraguardias.setPosicion((short) 1);
-					scsCabeceraguardias.setFechamodificacion(new Date());
-					scsCabeceraguardias.setSustituto("0");
-					scsCabeceraguardias.setFechaalta(new Date());
-
-					// Las metemos validadas
-					scsCabeceraguardias.setValidado("1");
-					scsCabeceraguardias.setFechavalidacion(new Date());
-					scsCabeceraguardias.setUsumodificacion(0);
-
-					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
-					affectedRows += scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
-
-					if (affectedRows <= 0) {
-						LOGGER.error(
-								"procesaGuardiasColegiado() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
+						if (affectedRows <= 0) {
+							LOGGER.error(
+									"procesaGuardiasColegiado() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
+						}
 					}
+				} else {
+					throw new Exception(
+							"procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar");
 				}
-			}else {
-				throw new Exception("procesarGuardiasColegiado () / El usuario es colegiado y no existe una guardia para la fecha seleccionada. No puede continuar");
-			}
 
 			}
-			
-			
 
 		} catch (Exception e) {
 			LOGGER.error(
@@ -2936,6 +2974,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int affectedRows = 0;
+		int res = 0;
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -2988,7 +3027,17 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							}
 						}
 					}
-					if (affectedRows <= 0) {
+					ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+
+					asisKey.setIdinstitucion(idInstitucion);
+					asisKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					asisKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+
+					ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+
+					res = actualizaAsistenciaEnAsuntos(asis, idInstitucion, "contrariosAsistencia", usuarios.get(0));
+
+					if (affectedRows <= 0 || res == 0) {
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setCode(500);
 						error.setDescription("No se ha insertado ningún registro");
@@ -3029,6 +3078,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int affectedRows = 0;
+		int res = 0;
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -3062,9 +3112,20 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									.updateByExampleSelective(scsContrariosasistencia, scsContrariosasistenciaExample);
 
 						}
+						ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+
+						asisKey.setIdinstitucion(idInstitucion);
+						asisKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+						asisKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+
+						ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+
+						res = actualizaAsistenciaEnAsuntos(asis, idInstitucion, "contrariosAsistencia",
+								usuarios.get(0));
+
 					}
 
-					if (affectedRows <= 0) {
+					if (affectedRows <= 0 || res == 0) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						error.setCode(500);
 						error.setDescription("No se ha borrado ningún registro");
@@ -3178,6 +3239,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int affectedRows = 0;
+		int res = 0;
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -3276,10 +3338,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						}
 
 						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
-
+						res = actualizaAsistenciaEnAsuntos(scsAsistencia, idInstitucion, "defensaJuridicaAsistencia",
+								usuarios.get(0));
 					}
 
-					if (affectedRows <= 0) {
+					if (affectedRows <= 0 || res == 0) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						error.setCode(500);
 						error.setDescription("No se ha borrado ningún registro");
@@ -3538,32 +3601,30 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
 
 					if (scsAsistencia != null && designaItem != null) {
-						
-						
+
 						ScsDesignaExample exampleDesigna = new ScsDesignaExample();
 						exampleDesigna.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andAnioEqualTo(Short.valueOf(String.valueOf(designaItem.getAno())))
-							.andCodigoEqualTo(designaItem.getCodigo());
-							
-						List <ScsDesigna> listaDes = scsDesignacionesExtendsMapper.selectByExample(exampleDesigna );
-						
+								.andAnioEqualTo(Short.valueOf(String.valueOf(designaItem.getAno())))
+								.andCodigoEqualTo(designaItem.getCodigo());
+
+						List<ScsDesigna> listaDes = scsDesignacionesExtendsMapper.selectByExample(exampleDesigna);
+
 						scsAsistencia.setDesignaAnio(listaDes.get(0).getAnio());
 						scsAsistencia.setDesignaNumero(listaDes.get(0).getNumero());
 						scsAsistencia.setDesignaTurno(listaDes.get(0).getIdturno());
-						/*if (designaItem.getIdTurnos() != null && designaItem.getIdTurnos().length > 0) { // Si traemos
-																											// el id
-																											// turno
-																											// informado
-							scsAsistencia.setDesignaTurno(Integer.valueOf(designaItem.getIdTurnos()[0]));
-						} else { // Si venimos de la pantalla de busqueda de asuntos traeremos la abreviatura
-							ScsTurnoExample scsTurnoExample = new ScsTurnoExample();
-							scsTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-									.andAbreviaturaEqualTo(designaItem.getNombreTurno().split("/")[0]);
-							List<ScsTurno> turnos = scsTurnosExtendsMapper.selectByExample(scsTurnoExample);
-							if (turnos != null && !turnos.isEmpty()) {
-								scsAsistencia.setDesignaTurno(turnos.get(0).getIdturno());
-							}
-						}*/
+						/*
+						 * if (designaItem.getIdTurnos() != null && designaItem.getIdTurnos().length >
+						 * 0) { // Si traemos // el id // turno // informado
+						 * scsAsistencia.setDesignaTurno(Integer.valueOf(designaItem.getIdTurnos()[0]));
+						 * } else { // Si venimos de la pantalla de busqueda de asuntos traeremos la
+						 * abreviatura ScsTurnoExample scsTurnoExample = new ScsTurnoExample();
+						 * scsTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						 * .andAbreviaturaEqualTo(designaItem.getNombreTurno().split("/")[0]);
+						 * List<ScsTurno> turnos =
+						 * scsTurnosExtendsMapper.selectByExample(scsTurnoExample); if (turnos != null
+						 * && !turnos.isEmpty()) {
+						 * scsAsistencia.setDesignaTurno(turnos.get(0).getIdturno()); } }
+						 */
 						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
 
 						if ("S".equals(copiarDatos)) { // Pasamos los datos de la asistencia a la designa
@@ -3908,7 +3969,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				while (itr.hasNext()) {
 
 					MultipartFile file = request.getFile(itr.next());
-					LOGGER.info("DesignacionesServiceImpl.subirDocumentoDesigna() / FileName : " + file.getOriginalFilename());
+					LOGGER.info("DesignacionesServiceImpl.subirDocumentoDesigna() / FileName : "
+							+ file.getOriginalFilename());
 					String nombreFichero = file.getOriginalFilename().split(";")[0];
 					String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
 					DocumentacionAsistenciaItem documentacionAsistenciaItem = objectMapper.readValue(json,
@@ -4268,10 +4330,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								caractasistencia.setAsesoramiento("0");
 							}
 						}
-						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())
+						if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())
 								&& "S".equals(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())) {
 							caractasistencia.setDerivaractuacionesjudiciales("1");
-						}else {
+						} else {
 							caractasistencia.setDerivaractuacionesjudiciales("0");
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getMinisterioFiscal())
@@ -4295,22 +4358,27 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else {
 							caractasistencia.setDerechosjusticiagratuita("0");
 						}
-						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())
+						if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())
 								&& "S".equals(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())) {
 							caractasistencia.setObligadadesalojodomicilio("1");
 						} else {
 							caractasistencia.setObligadadesalojodomicilio("0");
 						}
-						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())
+						if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())
 								&& "S".equals(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())) {
 							caractasistencia.setEntrevistaletradodemandante("1");
 						} else {
 							caractasistencia.setEntrevistaletradodemandante("0");
 						}
-						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
+						if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
 								&& "SC".equals(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())) {
-							caractasistencia.setLetradodesignadocontiactujudi("1");;
-						} else if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
+							caractasistencia.setLetradodesignadocontiactujudi("1");
+							;
+						} else if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
 								&& "SP".equals(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())) {
 							caractasistencia.setLetradodesignadocontiactujudi("2");
 						} else {
@@ -4338,7 +4406,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else {
 							caractasistencia.setIdpersona(null);
 						}
-						
+
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getIdJuzgado())) {
 							caractasistencia.setIdjuzgado(Long.valueOf(caracteristicasAsistenciaItem.getIdJuzgado()));
 						}
@@ -4438,10 +4506,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else {
 							caractasistencia.setAsesoramiento(null);
 						}
-						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())
+						if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())
 								&& "S".equals(caracteristicasAsistenciaItem.getDerivaractuacionesjudiciales())) {
 							caractasistencia.setDerivaractuacionesjudiciales("1");
-						}else {
+						} else {
 							caractasistencia.setDerivaractuacionesjudiciales("0");
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getMinisterioFiscal())
@@ -4465,22 +4534,27 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else {
 							caractasistencia.setDerechosjusticiagratuita("0");
 						}
-						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())
+						if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())
 								&& "S".equals(caracteristicasAsistenciaItem.getObligadadesalojodomicilio())) {
 							caractasistencia.setObligadadesalojodomicilio("1");
 						} else {
 							caractasistencia.setObligadadesalojodomicilio("0");
 						}
-						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())
+						if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())
 								&& "S".equals(caracteristicasAsistenciaItem.getEntrevistaletradodemandante())) {
 							caractasistencia.setEntrevistaletradodemandante("1");
 						} else {
 							caractasistencia.setEntrevistaletradodemandante("0");
 						}
-						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
+						if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
 								&& "SC".equals(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())) {
-							caractasistencia.setLetradodesignadocontiactujudi("1");;
-						} else if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
+							caractasistencia.setLetradodesignadocontiactujudi("1");
+							;
+						} else if (!UtilidadesString
+								.esCadenaVacia(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())
 								&& "SP".equals(caracteristicasAsistenciaItem.getLetradodesignadocontiactujudi())) {
 							caractasistencia.setLetradodesignadocontiactujudi("2");
 						} else {
@@ -4595,16 +4669,16 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						caracteristicasAsistenciaItem.setOtras("1".equals(caractasistencia.getOtras()));
 						caracteristicasAsistenciaItem.setOtrasDesc(caractasistencia.getOtrasdescripcion());
 						caracteristicasAsistenciaItem.setAsesoramiento(caractasistencia.getAsesoramiento());
-						
+
 						if ("1".equals(caractasistencia.getDerivaractuacionesjudiciales())) {
 							caracteristicasAsistenciaItem.setDerivaractuacionesjudiciales("S");
 						} else {
 							caracteristicasAsistenciaItem.setDerivaractuacionesjudiciales("N");
 						}
-						
+
 						caracteristicasAsistenciaItem.setMedicoForense(
 								"1".equals(caractasistencia.getIntervencionmedicoforense()) ? "S" : "N");
-						
+
 						if ("1".equals(caractasistencia.getInterposicionministfiscal())) {
 							caracteristicasAsistenciaItem.setMinisterioFiscal("S");
 						} else if ("2".equals(caractasistencia.getInterposicionministfiscal())) {
@@ -4612,25 +4686,25 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else {
 							caracteristicasAsistenciaItem.setMinisterioFiscal("N");
 						}
-						
+
 						if ("1".equals(caractasistencia.getDerechosjusticiagratuita())) {
 							caracteristicasAsistenciaItem.setDerechosjusticiagratuita("S");
 						} else {
 							caracteristicasAsistenciaItem.setDerechosjusticiagratuita("N");
 						}
-						
+
 						if ("1".equals(caractasistencia.getObligadadesalojodomicilio())) {
 							caracteristicasAsistenciaItem.setObligadadesalojodomicilio("S");
 						} else {
 							caracteristicasAsistenciaItem.setObligadadesalojodomicilio("N");
 						}
-						
+
 						if ("1".equals(caractasistencia.getEntrevistaletradodemandante())) {
 							caracteristicasAsistenciaItem.setEntrevistaletradodemandante("S");
 						} else {
 							caracteristicasAsistenciaItem.setEntrevistaletradodemandante("N");
 						}
-						
+
 						if ("1".equals(caractasistencia.getLetradodesignadocontiactujudi())) {
 							caracteristicasAsistenciaItem.setLetradodesignadocontiactujudi("SC");
 						} else if ("2".equals(caractasistencia.getLetradodesignadocontiactujudi())) {
@@ -4638,13 +4712,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else {
 							caracteristicasAsistenciaItem.setLetradodesignadocontiactujudi("N");
 						}
-						
+
 						if ("1".equals(caractasistencia.getCivilespenales())) {
 							caracteristicasAsistenciaItem.setCivilespenales("S");
 						} else {
 							caracteristicasAsistenciaItem.setCivilespenales("N");
 						}
-						
+
 						if (caractasistencia.getIdpersona() != null) {
 							FichaPersonaItem colegiado = cenPersonaExtendsMapper
 									.getColegiadoByIdPersona(caractasistencia.getIdpersona().toString(), idInstitucion);
@@ -4657,7 +4731,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									.setIdProcedimiento(caractasistencia.getIdpretension().toString());
 						}
 						if (caractasistencia.getNumeroprocedimiento() != null) {
-							caracteristicasAsistenciaItem.setNumeroProcedimiento(caractasistencia.getNumeroprocedimiento());
+							caracteristicasAsistenciaItem
+									.setNumeroProcedimiento(caractasistencia.getNumeroprocedimiento());
 						}
 						if (caractasistencia.getNig() != null) {
 							caracteristicasAsistenciaItem.setNig(caractasistencia.getNig());
@@ -4760,7 +4835,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							scsActuacionasistenciaKey.setIdinstitucion(idInstitucion);
 							scsActuacionasistencia = scsActuacionasistenciaExtendsMapper
 									.selectByPrimaryKey(scsActuacionasistenciaKey);
-							//actuacion.setAnulada("0");
+							// actuacion.setAnulada("0");
 
 							if (scsActuacionasistencia != null && "1".equals(scsActuacionasistencia.getFacturado())) {
 								facturada = true;
@@ -4840,46 +4915,48 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					for (ActuacionAsistenciaItem actuacion : actuaciones) {
 
 						// Eliminamos los documentos asociados a las actuaciones
-                        ScsDocumentacionasiExample scsDocumentacionasiExample = new ScsDocumentacionasiExample();
-                        scsDocumentacionasiExample.createCriteria()
-                                .andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
-                                .andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
-                                .andIdinstitucionEqualTo(idInstitucion)
-                                .andIdactuacionEqualTo(Long.valueOf(actuacion.getIdActuacion()));
-                        List<ScsDocumentacionasi> documentos = scsDocumentacionasiMapper.selectByExample(scsDocumentacionasiExample);
-                        
-                        if(documentos != null && !documentos.isEmpty()){
-                        	for (ScsDocumentacionasi documento: documentos) {
-                        		ScsDocumentacionasiKey scsDocumentacionasiKey = new ScsDocumentacionasiKey();
-    							scsDocumentacionasiKey.setIddocumentacionasi(documento.getIddocumentacionasi());
-    							scsDocumentacionasiKey.setIdinstitucion(documento.getIdinstitucion());
-    							scsDocumentacionasiMapper.deleteByPrimaryKey(scsDocumentacionasiKey);
-                        	}
-                        }
-                        
-                        // Eliminamos los costes fijos asociados a las actuaciones
-                        ScsActuacionasistcostefijoExample scsActuacionasistcostefijoExample = new ScsActuacionasistcostefijoExample();
-                        scsActuacionasistcostefijoExample.createCriteria()
-                                .andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
-                                .andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
-                                .andIdinstitucionEqualTo(idInstitucion)
-                                .andIdactuacionEqualTo(Long.valueOf(actuacion.getIdActuacion()));
-                        List<ScsActuacionasistcostefijo> costesFijos = scsActuacionasistcostefijoMapper.selectByExample(scsActuacionasistcostefijoExample);
-                        
-                        if(costesFijos != null && !costesFijos.isEmpty()){
-                        	for (ScsActuacionasistcostefijo costeFijo: costesFijos) {
-                        		ScsActuacionasistcostefijoKey scsActuacionasistcostefijoKey = new ScsActuacionasistcostefijoKey();
-                        		scsActuacionasistcostefijoKey.setIdinstitucion(costeFijo.getIdinstitucion());
-                        		scsActuacionasistcostefijoKey.setAnio(costeFijo.getAnio());
-                        		scsActuacionasistcostefijoKey.setNumero(costeFijo.getNumero());
-                        		scsActuacionasistcostefijoKey.setIdactuacion(costeFijo.getIdactuacion());
-                        		scsActuacionasistcostefijoKey.setIdtipoasistencia(costeFijo.getIdtipoasistencia());
-                        		scsActuacionasistcostefijoKey.setIdtipoactuacion(costeFijo.getIdtipoactuacion());
-                        		scsActuacionasistcostefijoKey.setIdcostefijo(costeFijo.getIdcostefijo());
-    							scsActuacionasistcostefijoMapper.deleteByPrimaryKey(scsActuacionasistcostefijoKey);
-                        	}
-                        }
-						
+						ScsDocumentacionasiExample scsDocumentacionasiExample = new ScsDocumentacionasiExample();
+						scsDocumentacionasiExample.createCriteria()
+								.andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
+								.andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdactuacionEqualTo(Long.valueOf(actuacion.getIdActuacion()));
+						List<ScsDocumentacionasi> documentos = scsDocumentacionasiMapper
+								.selectByExample(scsDocumentacionasiExample);
+
+						if (documentos != null && !documentos.isEmpty()) {
+							for (ScsDocumentacionasi documento : documentos) {
+								ScsDocumentacionasiKey scsDocumentacionasiKey = new ScsDocumentacionasiKey();
+								scsDocumentacionasiKey.setIddocumentacionasi(documento.getIddocumentacionasi());
+								scsDocumentacionasiKey.setIdinstitucion(documento.getIdinstitucion());
+								scsDocumentacionasiMapper.deleteByPrimaryKey(scsDocumentacionasiKey);
+							}
+						}
+
+						// Eliminamos los costes fijos asociados a las actuaciones
+						ScsActuacionasistcostefijoExample scsActuacionasistcostefijoExample = new ScsActuacionasistcostefijoExample();
+						scsActuacionasistcostefijoExample.createCriteria()
+								.andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
+								.andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdactuacionEqualTo(Long.valueOf(actuacion.getIdActuacion()));
+						List<ScsActuacionasistcostefijo> costesFijos = scsActuacionasistcostefijoMapper
+								.selectByExample(scsActuacionasistcostefijoExample);
+
+						if (costesFijos != null && !costesFijos.isEmpty()) {
+							for (ScsActuacionasistcostefijo costeFijo : costesFijos) {
+								ScsActuacionasistcostefijoKey scsActuacionasistcostefijoKey = new ScsActuacionasistcostefijoKey();
+								scsActuacionasistcostefijoKey.setIdinstitucion(costeFijo.getIdinstitucion());
+								scsActuacionasistcostefijoKey.setAnio(costeFijo.getAnio());
+								scsActuacionasistcostefijoKey.setNumero(costeFijo.getNumero());
+								scsActuacionasistcostefijoKey.setIdactuacion(costeFijo.getIdactuacion());
+								scsActuacionasistcostefijoKey.setIdtipoasistencia(costeFijo.getIdtipoasistencia());
+								scsActuacionasistcostefijoKey.setIdtipoactuacion(costeFijo.getIdtipoactuacion());
+								scsActuacionasistcostefijoKey.setIdcostefijo(costeFijo.getIdcostefijo());
+								scsActuacionasistcostefijoMapper.deleteByPrimaryKey(scsActuacionasistcostefijoKey);
+							}
+						}
+
 						ScsActuacionasistenciaKey scsActuacionasistenciaKey = new ScsActuacionasistenciaKey();
 						scsActuacionasistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
 						scsActuacionasistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
@@ -5180,10 +5257,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		// Actualizamos los datos generales
 		ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(scsDesignaKey);
 		scsDesigna.setNig(scsAsistencia.getNig());
-		if(scsAsistencia.getNumeroprocedimiento() != null) {
+		if (scsAsistencia.getNumeroprocedimiento() != null) {
 			scsDesigna.setNumprocedimiento(scsAsistencia.getNumeroprocedimiento().split("/")[0]);
 		}
-		if(scsAsistencia.getNumeroprocedimiento() != null) {
+		if (scsAsistencia.getNumeroprocedimiento() != null) {
 			scsDesigna.setAnioprocedimiento(Short.valueOf(scsAsistencia.getNumeroprocedimiento().split("/")[1]));
 		}
 		scsDesigna.setObservaciones(scsAsistencia.getObservaciones());
@@ -5298,7 +5375,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * Metodo que copia los datos de la Asistencia al EJG
 	 *
 	 * @param scsAsistencia
-	 * @param usuario 
+	 * @param usuario
 	 * @return
 	 */
 	@Transactional
@@ -5390,8 +5467,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		// Copiamos datos restantes
 		scsEjg.setGuardiaturnoIdturno(scsAsistencia.getIdturno());
 		scsEjg.setGuardiaturnoIdguardia(scsAsistencia.getIdguardia());
-		//No se incluye el letrado como tramitador
-		//scsEjg.setIdpersona(scsAsistencia.getIdpersonacolegiado());
+		// No se incluye el letrado como tramitador
+		// scsEjg.setIdpersona(scsAsistencia.getIdpersonacolegiado());
 		scsEjg.setIdpersonajg(scsAsistencia.getIdpersonajg());
 		scsEjg.setJuzgado(scsAsistencia.getJuzgado());
 		scsEjg.setJuzgadoidinstitucion(scsAsistencia.getJuzgadoidinstitucion());
@@ -5405,19 +5482,19 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		scsEjg.setNumerodiligencia(scsAsistencia.getNumerodiligencia());
 		scsEjg.setNig(scsAsistencia.getNig());
-		
+
 		if (scsAsistencia.getIdpretension() != null) {
 			scsEjg.setIdpretension(scsAsistencia.getIdpretension().longValue());
 		}
-		
+
 		scsEjg.setUsumodificacion(usuario);
 		scsEjg.setFechamodificacion(new Date());
 
 		affectedRows += scsEjgExtendsMapper.updateByPrimaryKey(scsEjg);
-		
-		//Creamos el solicitante en la unidad familiar
-		if(scsAsistencia.getIdpersonajg() != null) {
-			
+
+		// Creamos el solicitante en la unidad familiar
+		if (scsAsistencia.getIdpersonajg() != null) {
+
 			ScsUnidadfamiliarejg record = new ScsUnidadfamiliarejg();
 			record.setAnio(scsEjg.getAnio());
 			record.setEncalidadde("SOLICITANTE");
@@ -5426,7 +5503,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			record.setIdpersona(scsAsistencia.getIdpersonajg());
 			record.setIdtipoejg(scsEjg.getIdtipoejg());
 			record.setNumero(scsEjg.getNumero());
-			record.setObservaciones("Copiado desde la asistencia: "+scsAsistencia.getAnio()+"/"+scsAsistencia.getNumero());
+			record.setObservaciones(
+					"Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
 			record.setSolicitante(new Short("1"));
 			record.setUsumodificacion(usuario);
 			affectedRows += scsUnidadfamiliarejgMapper.insert(record);
@@ -5633,7 +5711,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		newAsistencia.setIdpretension(scsAsistenciaOld.getIdpretension());
 		newAsistencia.setNig(scsAsistenciaOld.getNig());
 		newAsistencia.setNumeroprocedimiento(scsAsistenciaOld.getNumeroprocedimiento());
-		//newAsistencia.setIdpersonajg(scsAsistenciaOld.getIdpersonajg());
+		// newAsistencia.setIdpersonajg(scsAsistenciaOld.getIdpersonajg());
 		newAsistencia.setDelitosimputados(scsAsistenciaOld.getDelitosimputados());
 
 		scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(newAsistencia);
@@ -5670,4 +5748,440 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 		}
 	}
+
+	private int actualizaAsistenciaEnAsuntos(ScsAsistencia datos, Short idInstitucion, String origen,
+			AdmUsuarios usuario) {
+		// TODO Completar y usar como ejemplo y tratar error con try catch
+		int respuesta = 0;
+		try {
+
+			if (datos.getDesignaNumero() != null) {
+				ScsDesignaExample example = new ScsDesignaExample();
+				example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(datos.getDesignaAnio())
+						.andNumeroEqualTo(datos.getDesignaNumero()).andIdturnoEqualTo(datos.getDesignaTurno());
+
+				List<ScsDesigna> relDesignaList = scsDesignaMapper.selectByExample(example);
+				if (relDesignaList != null && !relDesignaList.isEmpty()) {
+					for (ScsDesigna relacion : relDesignaList) {
+
+						// OPCION 1 crear método similar a los que hay en BusquedaAsuntosServiceImpl
+						// copyEjg2....
+						// pero parametrizando la tarjeta origen que está haciendo el guardado de datos,
+						// por ejemplo, Defensa jurídica
+
+						respuesta = copyAsis2Designa(idInstitucion, origen, usuario, relacion, datos);
+					}
+				}
+			}
+
+			if (datos.getEjgnumero() != null) {
+				ScsEjgExample exampleEjg = new ScsEjgExample();
+				exampleEjg.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(datos.getEjganio())
+						.andIdtipoejgEqualTo(datos.getEjgidtipoejg()).andNumeroEqualTo(datos.getEjgnumero());
+
+				List<ScsEjg> relEjgList = scsEjgExtendsMapper.selectByExample(exampleEjg);
+				if (relEjgList != null && !relEjgList.isEmpty()) {
+					for (ScsEjg relacion : relEjgList) {
+						respuesta = copyAsis2Ejg(idInstitucion, origen, usuario, relacion, datos);
+					}
+				}
+
+			}
+
+		} catch (Exception e) {
+			return respuesta = 0;
+		}
+		return respuesta;
+	}
+
+	public int copyAsis2Designa(Short idInstitucion, String origen, AdmUsuarios usuario, ScsDesigna relacionDesigna,
+			ScsAsistencia datosAsistencia) throws Exception {
+
+		int response = 0;
+
+		// Tareas:
+		// 0. Seleccionamos los datos implicados
+
+		LOGGER.info(
+				"AsistenciaServiceImpl.copyAsis2Designa() -> Entrando a busqueda de datos para asociar datos copyAsis2Designa");
+
+		ScsDesignaKey designaKey = new ScsDesignaKey();
+
+		designaKey.setIdinstitucion(idInstitucion);
+		designaKey.setAnio(relacionDesigna.getAnio());
+		designaKey.setNumero(relacionDesigna.getNumero());
+		designaKey.setIdturno(relacionDesigna.getIdturno());
+
+		ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
+
+		ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+
+		asisKey.setIdinstitucion(idInstitucion);
+		asisKey.setAnio(datosAsistencia.getAnio());
+		asisKey.setNumero(datosAsistencia.getNumero());
+
+		ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+
+		// 1. Se debe modificar los atributos asociados en la ficha predesignacion del
+		// EJG en la designa.
+
+		if (origen.equals("defensaJuridicaAsistencia")) {
+			designa.setNumprocedimiento(asis.getNumeroprocedimiento());
+			designa.setNig(asis.getNig());
+			designa.setObservaciones(asis.getObservaciones());
+			designa.setIdpretension(asis.getIdpretension());
+			designa.setIdjuzgado(asis.getJuzgado());
+			asis.getNumerodiligencia();
+
+			// Actualizamos los delitos de la designacion eliminando los anteriores y
+			// asignando los designados en la asistencia.
+			ScsDelitosdesigna delitoDesigna = new ScsDelitosdesigna();
+
+			delitoDesigna.setIdinstitucion(idInstitucion);
+			delitoDesigna.setAnio(designa.getAnio());
+			delitoDesigna.setNumero(designa.getNumero());
+			delitoDesigna.setIdturno(designa.getIdturno());
+			delitoDesigna.setUsumodificacion(usuario.getIdusuario());
+			delitoDesigna.setFechamodificacion(new Date());
+
+			// Seleccionamos y eliminamos los delitos anteriormente seleccionados en la
+			// designacion.
+
+			ScsDelitosdesignaExample delitosDesignaExample = new ScsDelitosdesignaExample();
+
+			delitosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
+					.andIdturnoEqualTo(designa.getIdturno());
+
+			List<ScsDelitosdesigna> delitosDesigna = scsDelitosdesignaMapper.selectByExample(delitosDesignaExample);
+
+			if (!delitosDesigna.isEmpty()) {
+				response = scsDelitosdesignaMapper.deleteByExample(delitosDesignaExample);
+				if (response == 0)
+					throw (new Exception("Error al eliminar los delitos de la designacion (copyAsis2Designa)"));
+			}
+
+			ScsDelitosasistenciaExample delitosAsistenciaExample = new ScsDelitosasistenciaExample();
+
+			delitosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(asis.getAnio()).andNumeroEqualTo(asis.getNumero());
+
+			List<ScsDelitosasistencia> delitosAsistencia = scsDelitosasistenciaMapper
+					.selectByExample(delitosAsistenciaExample);
+
+			if (!delitosAsistencia.isEmpty()) {
+				for (ScsDelitosasistencia delitoAsistencia : delitosAsistencia) {
+					delitoDesigna.setIddelito(delitoAsistencia.getIddelito());
+					response = scsDelitosdesignaMapper.insert(delitoDesigna);
+					if (response == 0)
+						throw (new Exception(
+								"Error al introducir un delito en la designacion proveniente de la asistencia"));
+				}
+			}
+
+			// designa.setUsumodificacion(usuario.getIdusuario());
+			designa.setFechamodificacion(new Date());
+
+			response = scsDesignaMapper.updateByPrimaryKeySelective(designa);
+			if (response == 0)
+				throw (new Exception(
+						"Error al introducir los datos juridicos en la designacion proveniente de la asistencia"));
+
+			LOGGER.info(
+					"AsistenciaServiceImpl.copyAsis2Designa() -> Saliendo de la actualizacion de algunos datos juridicos de designa");
+
+		} else if (origen.equals("contrariosAsistencia")) {
+			// 2. Se debe insertar los contrarios seleccionados en EJG.
+
+			LOGGER.info(
+					"AsistenciaServiceImpl.copyAsis2Designa() -> Entrando a los inserts para los contrarios de designa");
+
+			// Obtenemos los contrarios de la asistencia a introducir. Se seleccionan solo
+			// los activos (con fecha de baja nula).
+
+			ScsContrariosasistenciaExample contrariosAsistenciaExample = new ScsContrariosasistenciaExample();
+
+			contrariosAsistenciaExample.createCriteria().andAnioEqualTo(asis.getAnio())
+					.andNumeroEqualTo(asis.getNumero()).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+
+			List<ScsContrariosasistencia> contrariosAsistencia = scsContrariosasistenciaMapper
+					.selectByExample(contrariosAsistenciaExample);
+
+			// Seleccionamos y borramos los contrarios presentes anteriormente en la
+			// designacion
+
+			ScsContrariosdesignaExample contrariosDesignaExample = new ScsContrariosdesignaExample();
+
+			contrariosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
+					.andIdturnoEqualTo(designa.getIdturno());
+
+			List<ScsContrariosdesigna> contrariosDesigna = scsContrariosdesignaMapper
+					.selectByExample(contrariosDesignaExample);
+
+			if (!contrariosDesigna.isEmpty()) {
+				response = scsContrariosdesignaMapper.deleteByExample(contrariosDesignaExample);
+				if (response == 0)
+					throw (new Exception("Error al eliminar los contrarios de la designacion (copyAsis2Designa)"));
+			}
+
+			// Se crean los nuevos contrarios y se asignan
+
+			ScsContrariosdesigna newContrarioDesigna = new ScsContrariosdesigna();
+			newContrarioDesigna.setAnio(designa.getAnio());
+			newContrarioDesigna.setNumero(designa.getNumero());
+			newContrarioDesigna.setIdturno(designa.getIdturno());
+			newContrarioDesigna.setIdinstitucion(designa.getIdinstitucion());
+
+			newContrarioDesigna.setFechamodificacion(new Date());
+			newContrarioDesigna.setUsumodificacion(usuario.getIdusuario());
+
+			for (ScsContrariosasistencia contrarioAsistencia : contrariosAsistencia) {
+				if (contrarioAsistencia.getFechabaja() == null) {
+					ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
+					scsPersonajgkey.setIdpersona(Long.valueOf(contrarioAsistencia.getIdpersona()));
+					scsPersonajgkey.setIdinstitucion(idInstitucion);
+
+					LOGGER.info(
+							"copyAsis2Designa() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para obtener justiciables de los contrarios de asistencia");
+
+					ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(scsPersonajgkey);
+
+					LOGGER.info(
+							"copyAsis2Designa() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para obtener justiciables de los contrarios de asistencia");
+
+					// Se comprueba si tiene representante y se busca.
+					if (personajg.getIdrepresentantejg() != null) {
+
+						scsPersonajgkey.setIdpersona(personajg.getIdrepresentantejg());
+
+						ScsPersonajg representante = scsPersonajgMapper.selectByPrimaryKey(scsPersonajgkey);
+
+						newContrarioDesigna.setNombrerepresentante(representante.getApellido1() + " "
+								+ representante.getApellido2() + ", " + representante.getNombre());
+					}
+
+					// Se le van asignando los distintos valores de IdPersona correspondientes
+					newContrarioDesigna.setIdpersona(Long.valueOf(contrarioAsistencia.getIdpersona()));
+
+					LOGGER.info(
+							"copyAsis2Designa() / ScsContrariosdesignaMapper.insert() -> Entrada a ScsContrariosdesignaMapper para insertar los contrarios de asistencia en la designacion");
+
+					response = scsContrariosdesignaMapper.insert(newContrarioDesigna);
+					if (response == 0)
+						throw (new Exception(
+								"Error al introducir contrarios en la designa provenientes de la assitencia"));
+
+				}
+
+			}
+
+		}
+		LOGGER.info("AsistenciaServiceImpl.copyAsis2Designa() -> Saliendo del servicio... ");
+
+		return response;
+	}
+
+	public int copyAsis2Ejg(Short idInstitucion, String origen, AdmUsuarios usuario, ScsEjg relacionEjg,
+			ScsAsistencia datosAsistencia) throws Exception {
+
+		int response = 0;
+
+		// Tareas:
+		// 1. Obtenemos los asuntos que vamos a manipular.
+
+		LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Seleccionando EJG y la asistencia correspondientes.");
+
+		ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+
+		asisKey.setIdinstitucion(idInstitucion);
+		asisKey.setNumero(datosAsistencia.getNumero());
+		asisKey.setAnio(datosAsistencia.getAnio());
+
+		ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+
+		ScsEjgKey ejgKey = new ScsEjgKey();
+
+		ejgKey.setIdinstitucion(idInstitucion);
+		ejgKey.setAnio(relacionEjg.getAnio());
+		ejgKey.setIdtipoejg(relacionEjg.getIdtipoejg());
+		ejgKey.setNumero(relacionEjg.getNumero());
+
+		ScsEjg ejg = scsEjgExtendsMapper.selectByPrimaryKey(ejgKey);
+
+		LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> EJG y Asistencia seleccionados.");
+
+		if (origen.equals("defensaJuridicaAsistencia")) {
+			// 2. Actualizamos los delitos del EJG asignando los de la asistencia.
+
+			LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Copiando delitos de la asistencia al EJG.");
+
+			// Creamos la base de los nuevos nuevos delitos del EJG
+			ScsDelitosejg delitoEjg = new ScsDelitosejg();
+
+			delitoEjg.setIdinstitucion(idInstitucion);
+			delitoEjg.setAnio(ejg.getAnio());
+			delitoEjg.setNumero(ejg.getNumero());
+			delitoEjg.setUsumodificacion(usuario.getIdusuario());
+			delitoEjg.setFechamodificacion(new Date());
+
+			// Seleccionamos y eliminamos los delitos anteriores del EJG
+			ScsDelitosejgExample delitosEjgExample = new ScsDelitosejgExample();
+
+			delitosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
+					.andNumeroEqualTo(ejg.getNumero()).andIdtipoejgEqualTo(ejg.getIdtipoejg());
+
+			List<ScsDelitosejg> delitosEjg = scsDelitosejgMapper.selectByExample(delitosEjgExample);
+
+			if (!delitosEjg.isEmpty()) {
+				response = scsDelitosejgMapper.deleteByExample(delitosEjgExample);
+				if (response == 0)
+					throw (new Exception("Error al eliminar delitos de un EJG (copyAsis2Ejg)."));
+			}
+
+			ScsDelitosasistenciaExample delitosAsistenciaExample = new ScsDelitosasistenciaExample();
+
+			delitosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(asis.getAnio()).andNumeroEqualTo(asis.getNumero());
+
+			List<ScsDelitosasistencia> delitosAsistencia = scsDelitosasistenciaMapper
+					.selectByExample(delitosAsistenciaExample);
+
+			String delitosEjgString = "";
+			if (!delitosAsistencia.isEmpty()) {
+				for (ScsDelitosasistencia delitoAsistencia : delitosAsistencia) {
+					if (delitosEjgString != "")
+						delitosEjgString += ",";
+					delitosEjgString += delitoAsistencia.getIddelito();
+					delitoEjg.setIddelito(delitoAsistencia.getIddelito());
+					response = scsDelitosasistenciaMapper.insert(delitoAsistencia);
+					if (response == 0)
+						throw (new Exception("Error al introducir un delito en el EJG proveniente de la asistencia."));
+				}
+			}
+
+			if (delitosEjgString.equals(""))
+				ejg.setDelitos(null);
+			else
+				ejg.setDelitos(delitosEjgString);
+
+			response = scsEjgExtendsMapper.updateByPrimaryKey(ejg);
+			if (response == 0)
+				throw (new Exception(
+						"Error al introducir los datos juridicos en el EJG provenientes de la asistencia"));
+
+			ejg.setJuzgado(asis.getJuzgado());
+			ejg.setJuzgadoidinstitucion(asis.getJuzgadoidinstitucion());
+
+			ejg.setComisaria(asis.getComisaria());
+			ejg.setComisariaidinstitucion(asis.getComisariaidinstitucion());
+
+			ejg.setNumeroprocedimiento(asis.getNumeroprocedimiento());
+			ejg.setNumerodiligencia(asis.getNumerodiligencia());
+			ejg.setNig(asis.getNig());
+			ejg.setIdpretension(asis.getIdpretension().longValue());
+
+			ejg.setUsumodificacion(usuario.getIdusuario());
+			ejg.setFechamodificacion(new Date());
+
+			response = scsEjgExtendsMapper.updateByPrimaryKey(ejg);
+			if (response == 0)
+				throw (new Exception("Error en copyAsis2Ejg() al copiar los datos de la asistencia al EJG."));
+
+			LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Delitos copiados de la asistencia al EJG.");
+
+		} else if (origen.equals("contrariosAsistencia")) {
+			// 3. Actualizamos los contrarios del EJG asignando los de la asistencia.
+
+			LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Copiando contrarios de la asistencia al EJG.");
+
+			// Obtenemos los contrarios de asistencia a introducir
+
+			ScsContrariosasistenciaExample contrariosAsistenciaExample = new ScsContrariosasistenciaExample();
+
+			contrariosAsistenciaExample.createCriteria().andAnioEqualTo(asis.getAnio())
+					.andNumeroEqualTo(asis.getNumero()).andIdinstitucionEqualTo(idInstitucion);
+
+			List<ScsContrariosasistencia> contrariosAsistencia = scsContrariosasistenciaMapper
+					.selectByExample(contrariosAsistenciaExample);
+
+			// Iniciamos los contrariosEjg que vamos a introducir
+
+			ScsContrariosejg newContrarioEjg = new ScsContrariosejg();
+			newContrarioEjg.setAnio(ejg.getAnio());
+			newContrarioEjg.setNumero(ejg.getNumero());
+			newContrarioEjg.setIdtipoejg(ejg.getIdtipoejg());
+			newContrarioEjg.setIdinstitucion(ejg.getIdinstitucion());
+
+			newContrarioEjg.setFechamodificacion(new Date());
+			newContrarioEjg.setUsumodificacion(usuario.getIdusuario());
+
+			// Seleccionamos y eliminamos los contrarios anteriores del EJG
+
+			ScsContrariosejgExample contrariosEjgExample = new ScsContrariosejgExample();
+
+			contrariosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
+					.andNumeroEqualTo(ejg.getNumero()).andIdtipoejgEqualTo(ejg.getIdtipoejg());
+
+			List<ScsContrariosejg> contrariosEjg = scsContrariosejgMapper.selectByExample(contrariosEjgExample);
+
+			if (!contrariosEjg.isEmpty()) {
+				response = scsContrariosejgMapper.deleteByExample(contrariosEjgExample);
+				if (response == 0)
+					throw (new Exception("Error al eliminar contrarios de un EJG (copyAsis2Ejg)."));
+			}
+
+			// Asignamos los valores a los nuevos contrarios de EJG
+
+			for (ScsContrariosasistencia contrarioAsistencia : contrariosAsistencia) {
+				if (contrarioAsistencia.getFechabaja() == null) {
+					ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
+					scsPersonajgkey.setIdpersona(Long.valueOf(contrarioAsistencia.getIdpersona()));
+					scsPersonajgkey.setIdinstitucion(idInstitucion);
+
+					LOGGER.info(
+							"copyAsis2Ejg() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para obtener justiciables de los contrarios de la asistencia");
+
+					ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(scsPersonajgkey);
+
+					LOGGER.info(
+							"copyAsis2Ejg() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para obtener justiciables de los contrarios de la asistencia");
+
+					// Se comprueba si tiene representante y se busca.
+					if (personajg.getIdrepresentantejg() != null) {
+
+						scsPersonajgkey.setIdpersona(personajg.getIdrepresentantejg());
+
+						ScsPersonajg representante = scsPersonajgMapper.selectByPrimaryKey(scsPersonajgkey);
+
+						newContrarioEjg.setNombrerepresentanteejg(representante.getApellido1() + " "
+								+ representante.getApellido2() + ", " + representante.getNombre());
+					}
+
+					// Se le van asignando los distintos valores de IdPersona correspondientes
+					newContrarioEjg.setIdpersona(Long.valueOf(contrarioAsistencia.getIdpersona()));
+
+					LOGGER.info(
+							"copyAsis2Ejg() / ScsContrariosejgMapper.insert() -> Entrada a ScsContrariosejgMapper para insertar los contrarios en ejg de la asistencia");
+
+					response = scsContrariosejgMapper.insert(newContrarioEjg);
+					if (response == 0)
+						throw (new Exception("Error al introducir contrarios en el EJG provenientes de la asistencia"));
+
+					LOGGER.info(
+							"copyAsis2Ejg() / ScsContrariosejgMapper.insert() -> Salida de ScsContrariosejgMapper para insertar los contrarios en ejg de la asistencia");
+
+				}
+
+			}
+
+		}
+
+		// ejg.setIdpersonajg(asis.getIdpersonajg()); -- cuando actualizar ?
+
+		LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Saliendo del servicio... ");
+
+		return response;
+	}
+
 }
