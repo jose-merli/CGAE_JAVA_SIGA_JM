@@ -4832,6 +4832,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.info(
 						"guardarProcuradorEJG() / scsEjgMapper.updateByPrimaryKey() -> Salida de scsEjgMapper para guardar procurador EJG.");
 
+				if(item.getIdProcurador()!=null) {
 				ScsEstadoejg estado = new ScsEstadoejg();
 
 				// creamos el objeto para el insert
@@ -4857,6 +4858,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				estado.setIdestadoporejg(getNewIdestadoporejg(ejg, idInstitucion));
 
 				response = scsEstadoejgMapper.insert(estado);
+				}else {
+					ScsEstadoejgExample exampleEstado = new ScsEstadoejgExample();
+					exampleEstado.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andAnioEqualTo(ejg.getAnio()).andNumeroEqualTo(ejg.getNumero())
+						.andIdtipoejgEqualTo(ejg.getIdtipoejg()).andIdestadoejgEqualTo(Short.valueOf("19"))
+						.andFechabajaIsNull();
+					
+					List<ScsEstadoejg> estadosList = scsEstadoejgMapper.selectByExample(exampleEstado);
+					for(ScsEstadoejg estado: estadosList) {
+						estado.setFechabaja(new Date());
+						response = scsEstadoejgMapper.updateByPrimaryKeySelective(estado);
+					}
+				}
 				if (response == 0)
 					throw (new Exception("Error al introducir el nuevo estado al cambiar el procurador del EJG"));
 
