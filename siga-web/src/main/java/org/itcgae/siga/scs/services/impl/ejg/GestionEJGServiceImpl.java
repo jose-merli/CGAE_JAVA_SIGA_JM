@@ -1417,7 +1417,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		record.setFechamodificacion(new Date());
 		record.setUsumodificacion(usuario.getIdusuario());
 		record.setAutomatico("0");
-
+		record.setObservaciones(dato.getObservaciones());
 		// obtenemos el maximo de idestadoporejg
 		ScsEstadoejgExample example = new ScsEstadoejgExample();
 		example.setOrderByClause("IDESTADOPOREJG DESC");
