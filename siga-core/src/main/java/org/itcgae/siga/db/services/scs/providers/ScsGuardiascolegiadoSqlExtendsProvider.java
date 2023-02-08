@@ -37,11 +37,18 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         		+ "            AND gc.idturno = turno.idturno\r\n"
         		+ "    )          AS nombre");
         sql.FROM("scs_calendarioguardias  gc");
-        sql.INNER_JOIN("SCS_TURNO turno ON gc.idinstitucion = turno.idinstitucion AND gc.idturno = turno.idturno",
-                "SCS_CABECERAGUARDIAS CG on GC.IDINSTITUCION = CG.IDINSTITUCION " +
-                        "AND GC.IDTURNO = CG.IDTURNO " +
-                        "AND GC.IDGUARDIA = CG.IDGUARDIA " +
-                        "AND GC.IDCALENDARIOGUARDIAS = CG.IDCALENDARIOGUARDIAS");
+        
+        if(idPersona != null
+        		&& !"".equals(idPersona)) {
+	        sql.INNER_JOIN("SCS_TURNO turno ON gc.idinstitucion = turno.idinstitucion AND gc.idturno = turno.idturno",
+	                "SCS_CABECERAGUARDIAS CG on GC.IDINSTITUCION = CG.IDINSTITUCION " +
+	                        "AND GC.IDTURNO = CG.IDTURNO " +
+	                        "AND GC.IDGUARDIA = CG.IDGUARDIA " +
+	                        "AND GC.IDCALENDARIOGUARDIAS = CG.IDCALENDARIOGUARDIAS");
+        } else {
+        	sql.INNER_JOIN("SCS_TURNO turno ON gc.idinstitucion = turno.idinstitucion AND gc.idturno = turno.idturno");
+        }
+        
         sql.WHERE("turno.idinstitucion = " + idInstitucion);
         sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.FECHAINICIO) AND trunc(gc.FECHAFIN)");
         if(idPersona != null
