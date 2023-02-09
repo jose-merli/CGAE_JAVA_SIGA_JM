@@ -742,6 +742,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							idPersona = String.valueOf(idPersonajg);
 							justiciable.setIdpersona(idPersonajg);
 						}
+						
+						if (justiciableItem.getDireccion() == null) {
+							justiciable.setExistedomicilio("N");
+						}
 
 						LOGGER.info(
 								"createJusticiable() / scsPersonajgExtendsMapper.insert() -> Entrada de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
@@ -1049,6 +1053,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						justiciable.setUsumodificacion(usuario.getIdusuario());
 						justiciable.setFechamodificacion(new Date());
 
+						if (justiciableItem.getDireccion() != null) {
+							justiciable.setExistedomicilio("S");
+						}
+						
+						
 						LOGGER.info(
 								"updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para modificar al justiciable");
 
