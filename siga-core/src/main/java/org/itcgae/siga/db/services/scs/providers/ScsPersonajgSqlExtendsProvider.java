@@ -596,13 +596,14 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		return sql.toString();
 	}
 	
-	public String getIdPersonajgNif(String nif) {
+	public String getIdPersonajgNif(String nif, Short idInstitucion) {
 
 		SQL sql = new SQL();
 
 		sql.SELECT("IDPERSONA AS IDPERSONA");
 		sql.FROM("SCS_PERSONAJG");
 		sql.WHERE("NIF = '" + nif + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("ROWNUM = '1'");
 
 		return sql.toString();

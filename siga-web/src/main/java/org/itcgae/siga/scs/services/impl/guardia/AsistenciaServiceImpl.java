@@ -211,8 +211,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					// Si la fecha trae hora la recortamos
 					if (guardiaDia.length() > 10) {
-
-						guardiaDia = guardiaDia.substring(0, 11);
+						guardiaDia = guardiaDia.trim();
+						guardiaDia = guardiaDia.substring(0, 10);
 
 					}
 					List<ComboItem> combosItems = scsGuardiascolegiadoExtendsMapper.getTurnosByColegiadoFecha(idPersona,
@@ -838,7 +838,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		// List<ScsPersonajg> listaJusticiables =
 		// scsPersonajgExtendsMapper.selectByExample(personajgExample);
 
-		List<String> personaJg = scsPersonajgExtendsMapper.getIdPersonajgNif(asistencia.getNif().trim());
+		List<String> personaJg = scsPersonajgExtendsMapper.getIdPersonajgNif(asistencia.getNif().trim(), idInstitucion);
 
 		// Si existe obtenemos el idPersona y actualizamos datos
 		if (personaJg != null && !personaJg.isEmpty()) {

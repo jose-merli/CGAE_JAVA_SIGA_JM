@@ -51,7 +51,7 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "getIdPersonajgNif")
 	@Results({ @Result(column = "IDPERSONA", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
-	List<String> getIdPersonajgNif(String nif);
+	List<String> getIdPersonajgNif(String nif, Short idInstitucion);
 	
 	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "searchClaveAsuntosJusticiable")
 	@Results({ 
