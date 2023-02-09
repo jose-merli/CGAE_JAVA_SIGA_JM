@@ -133,15 +133,8 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 				+ "                                      || po.nombre\r\n"
 				+ "                                      || ') (BAJA)') AS nombre");
 		sql.FROM("scs_comisaria c");
-		sql.INNER_JOIN("scs_turno            tu ON tu.idinstitucion = c.idinstitucion"
-				, "scs_zona             zo ON tu.idzona = zo.idzona AND tu.idinstitucion = zo.idinstitucion"
-				, "scs_subzona          szo ON zo.idzona = szo.idzona AND zo.idinstitucion = szo.idinstitucion"
-				, "scs_subzonapartido   spar ON szo.idinstitucion = spar.idinstitucion AND szo.idsubzona = spar.idsubzona AND szo.idzona = spar.idzona"
-				, "cen_partidojudicial  par ON spar.idpartido = par.idpartido"
-				, "cen_poblaciones      po ON par.idpartido = po.idpartido AND c.idpoblacion = po.idpoblacion");
-		sql.WHERE("tu.idinstitucion = "+idInstitucion+"");
-		sql.AND();
-		sql.WHERE("tu.idturno = "+idTurno+"");
+		sql.INNER_JOIN("cen_poblaciones po ON c.idpoblacion = po.idpoblacion");
+		sql.WHERE("c.idinstitucion = "+idInstitucion+"");
 		sql.ORDER_BY("c.fechabaja DESC, nombre");
 
 

@@ -495,6 +495,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 											.groupingBy((TarjetaAsistenciaItem2 item) -> item.getAnioNumero()));
 
 							actuacionesPorAsistencia.forEach((asistencia, actuaciones) -> {
+								ScsAsistencia datosAsistencia;
+								String[] claveAsistencia = asistencia.split("/");
+
+					            ScsAsistenciaExample exampleA = new ScsAsistenciaExample();
+					            exampleA.createCriteria().andIdinstitucionEqualTo(idInstitucion).
+						            andAnioEqualTo(Short.parseShort(claveAsistencia[0].replace("A", ""))).
+						            andNumeroEqualTo(Long.parseLong(claveAsistencia[1]));
+
+					            datosAsistencia = scsAsistenciaMapper.selectByExample(exampleA).get(0);
 
 								TarjetaAsistenciaResponse2Item responseItem = new TarjetaAsistenciaResponse2Item();
 
@@ -518,7 +527,24 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									responseItem.setApellido2(actuacion.getApellido2());
 									responseItem.setNif(actuacion.getNif());
 									responseItem.setSexo(actuacion.getSexo());
-
+									
+									// Seteamos los datos de la asistencia
+									responseItem.setFechaAsistencia(actuacion.getFechaAsistencia());
+									responseItem.setNumDiligencia(datosAsistencia.getNumerodiligencia());
+									responseItem.setNumProcedimiento(datosAsistencia.getNumeroprocedimiento());
+									
+									if (datosAsistencia.getJuzgado() != null) {
+										responseItem.setJuzgado(datosAsistencia.getJuzgado().toString());
+									} else {
+										responseItem.setJuzgado("");
+									}
+									
+									if (datosAsistencia.getComisaria() != null) {
+										responseItem.setComisaria(datosAsistencia.getComisaria().toString());
+									} else {
+										responseItem.setComisaria("");
+									}
+									
 									// Seteamos los datos de las actuaciones de la asistencia y los añadimos a la
 									// lista
 									ActuacionAsistenciaItem actuacionAsistenciaItem = new ActuacionAsistenciaItem();
@@ -1007,14 +1033,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			} else if (!UtilidadesString.esCadenaVacia(asistencia.getNumero())) {
 				asistenciaBBDD.setNumero(Long.valueOf(asistencia.getNumero()));
 			}
-
-			if (asistencia.getFiltro() != null
-					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getDiaGuardia())) {
+			
+			if (asistencia.getFechaAsistencia() != null &&
+					!UtilidadesString.esCadenaVacia(asistencia.getFechaAsistencia())) {
 				asistenciaBBDD
-						.setFechahora(new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFiltro().getDiaGuardia()));
-			} else {
+					.setFechahora(new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(asistencia.getFechaAsistencia()));
+			} else if (asistencia.getFiltro() != null
+					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getDiaGuardia())){
 				asistenciaBBDD
-						.setFechahora(new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(asistencia.getFechaAsistencia()));
+					.setFechahora(new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFiltro().getDiaGuardia()));
 			}
 
 			if (!UtilidadesString.esCadenaVacia(asistencia.getFechaCierre())) {
@@ -1079,6 +1106,22 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			if (!UtilidadesString.esCadenaVacia(asistencia.getIdSolicitudCentralita())) {
 				asistenciaBBDD.setIdsolicitudcentralita(Integer.valueOf(asistencia.getIdSolicitudCentralita()));
 				asistenciaBBDD.setIdorigenasistencia((short) 40); // 40 - Proviene de una solicitud de centralita
+			}
+			
+			if (!UtilidadesString.esCadenaVacia(asistencia.getComisaria())) {
+				asistenciaBBDD.setComisaria(Long.valueOf(asistencia.getComisaria()));
+			}
+			
+			if (!UtilidadesString.esCadenaVacia(asistencia.getJuzgado())) {
+				asistenciaBBDD.setJuzgado(Long.valueOf(asistencia.getJuzgado()));
+			}
+			
+			if (!UtilidadesString.esCadenaVacia(asistencia.getNumDiligencia())) {
+				asistenciaBBDD.setNumerodiligencia(asistencia.getNumDiligencia());
+			}
+			
+			if (!UtilidadesString.esCadenaVacia(asistencia.getNumProcedimiento())) {
+				asistenciaBBDD.setNumeroprocedimiento(asistencia.getNumProcedimiento());
 			}
 
 			asistenciaBBDD.setFechamodificacion(new Date());
