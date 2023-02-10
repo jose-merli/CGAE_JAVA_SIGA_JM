@@ -265,8 +265,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					// Si la fecha trae hora la recortamos
 					if (guardiaDia.length() > 10) {
-
-						guardiaDia = guardiaDia.substring(0, 11);
+						guardiaDia = guardiaDia.trim();
+						guardiaDia = guardiaDia.substring(0, 10);
 
 					}
 					List<ComboItem> combosItems = scsGuardiascolegiadoExtendsMapper
@@ -387,8 +387,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					// Si la fecha trae hora la recortamos
 					if (guardiaDia.length() > 10) {
-
-						guardiaDia = guardiaDia.substring(0, 11);
+						guardiaDia = guardiaDia.trim();
+						guardiaDia = guardiaDia.substring(0, 10);
 
 					}
 
