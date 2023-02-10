@@ -1258,7 +1258,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("CUENTACONTABLESJCS");
+		sql.SELECT("IDPERSONA");
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("NVL(CUENTACONTABLESJCS,' ') AS cuentaContable");
 
 		sql.FROM("cen_colegiado");
 

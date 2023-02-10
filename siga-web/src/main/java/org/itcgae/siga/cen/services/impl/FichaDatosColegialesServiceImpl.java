@@ -256,7 +256,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info("getCuentaContableSJCS() -> Entrada al servicio para la obtención de la cuenta contable SJCS");
 
 		StringDTO cuentaContableSJCS = new StringDTO();
-		List<ColegiadoItem> colegiadoListItem = new ArrayList<ColegiadoItem>();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -277,7 +276,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				LOGGER.info(
 						"getCuentaContableSJCS() / CenColegiadoExtendsMapper.selectCuentaContableSJCS() -> Entrada a CenColegiadoExtendsMapper para busqueda de la cuenta contable SJCS");
 				
-				colegiadoListItem = cenColegiadoExtendsMapper.selectCuentaContableSJCS(idInstitucion, colegiadoItem);
+				List<ColegiadoItem> colegiadoListItem = cenColegiadoExtendsMapper.selectCuentaContableSJCS(idInstitucion, colegiadoItem);
 				
 				if (colegiadoListItem.size() > 0) {
 					cuentaContableSJCS.setValor(colegiadoListItem.get(0).getCuentaContable());
