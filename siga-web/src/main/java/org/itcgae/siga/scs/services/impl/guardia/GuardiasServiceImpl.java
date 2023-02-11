@@ -2164,6 +2164,24 @@ public class GuardiasServiceImpl implements GuardiasService {
 						} catch (Exception e) {
 							LOGGER.warn("Error al insertar el grupo guardia colegiado", e);
 						}
+					}else {//No es guardia por grupos
+						if(item.getFechaSuscripcion() != null && item.getUltimoCola() != null && item.getUltimoCola().equals(1)) {
+							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							String fSoK = formatter.format(item.getFechaSuscripcion());
+
+							ScsGuardiasturnoKey key = new ScsGuardiasturnoKey();
+							key.setIdinstitucion(idInstitucion);
+							key.setIdturno(Integer.valueOf(item.getIdTurno()));
+							key.setIdguardia(Integer.valueOf(item.getIdGuardia()));
+							ScsGuardiasturno regGuardia = scsGuardiasturnoExtendsMapper.selectByPrimaryKey(key );
+							
+							regGuardia.setIdpersonaUltimo(Long.valueOf(item.getIdPersona()));
+							regGuardia.setFechasuscripcionUltimo(item.getFechaSuscripcion());
+							regGuardia.setUsumodificacion(usuarios.get(0).getIdusuario());
+							regGuardia.setFechamodificacion(new Date());
+							
+							response = scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(regGuardia);
+						}
 					}
 				}
 
@@ -2173,27 +2191,32 @@ public class GuardiasServiceImpl implements GuardiasService {
 				for (InscripcionGuardiaItem item : inscripciones) {
 					Integer idTurno = Integer.parseInt(item.getIdturno());
 					Integer idGuardia = Integer.parseInt(item.getIdGuardia());
-					Long idGrupoGuardia = Long.parseLong(item.getIdGrupoGuardia());
-
-					// Cuando se haya recorrido la lista de cambios hay que comprobar que los grupos
-					// se sigan usando porque igual
-					// se pueden eliminar los que ya no se usen
-
-					ScsGrupoguardiaExample grupoExample = new ScsGrupoguardiaExample();
-					grupoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(idTurno)
-							.andIdguardiaEqualTo(idGuardia).andIdgrupoguardiaEqualTo(idGrupoGuardia);
-
-					List<ScsGrupoguardia> grupos = scsGrupoguardiaExtendsMapper.selectByExample(grupoExample);
-					for (ScsGrupoguardia grupo : grupos) {
-						ScsGrupoguardiacolegiadoExample grupoColegiadoExample = new ScsGrupoguardiacolegiadoExample();
-						grupoColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdturnoEqualTo(idTurno).andIdguardiaEqualTo(idGuardia)
-								.andIdgrupoguardiaEqualTo(grupo.getIdgrupoguardia());
-
-						long numGrupoGuardiaColegiados = scsGrupoguardiacolegiadoExtendsMapper
-								.countByExample(grupoColegiadoExample);
-						if (numGrupoGuardiaColegiados == 0) {
-							scsGrupoguardiaExtendsMapper.deleteByPrimaryKey(grupo.getIdgrupoguardia());
+					Long idGrupoGuardia = null;
+					if(item.getIdGrupoGuardia()!=null) {
+						idGrupoGuardia = Long.parseLong(item.getIdGrupoGuardia());
+					}
+					
+					if(idGrupoGuardia != null) {
+						// Cuando se haya recorrido la lista de cambios hay que comprobar que los grupos
+						// se sigan usando porque igual
+						// se pueden eliminar los que ya no se usen
+	
+						ScsGrupoguardiaExample grupoExample = new ScsGrupoguardiaExample();
+						grupoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(idTurno)
+								.andIdguardiaEqualTo(idGuardia).andIdgrupoguardiaEqualTo(idGrupoGuardia);
+	
+						List<ScsGrupoguardia> grupos = scsGrupoguardiaExtendsMapper.selectByExample(grupoExample);
+						for (ScsGrupoguardia grupo : grupos) {
+							ScsGrupoguardiacolegiadoExample grupoColegiadoExample = new ScsGrupoguardiacolegiadoExample();
+							grupoColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdturnoEqualTo(idTurno).andIdguardiaEqualTo(idGuardia)
+									.andIdgrupoguardiaEqualTo(grupo.getIdgrupoguardia());
+	
+							long numGrupoGuardiaColegiados = scsGrupoguardiacolegiadoExtendsMapper
+									.countByExample(grupoColegiadoExample);
+							if (numGrupoGuardiaColegiados == 0) {
+								scsGrupoguardiaExtendsMapper.deleteByPrimaryKey(grupo.getIdgrupoguardia());
+							}
 						}
 					}
 				}

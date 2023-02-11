@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -35,7 +36,7 @@ public interface CargasMasivasGuardiaService {
 	public File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector, String tipo)
 			throws BusinessException;
 
-	public DeleteResponseDTO uploadFileI( String fechaSolicitud, MultipartHttpServletRequest request) throws IllegalStateException, IOException;
+	public DeleteResponseDTO uploadFileI( String fechaSolicitud, MultipartHttpServletRequest request) throws IllegalStateException, IOException, BusinessException, ParseException;
 
 	public DeleteResponseDTO uploadFileGC(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 	
