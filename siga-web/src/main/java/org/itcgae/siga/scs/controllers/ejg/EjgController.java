@@ -222,6 +222,13 @@ public class EjgController {
 		EjgDTO response = gestionEJG.datosEJG(ejgItem, request);
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 	}
+	
+	// datosEJGJustificacionExpres
+	@RequestMapping(value = "/gestion-ejg/datosEJGJustificacionExpres", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgDTO> datosEJGJustificacionExpres(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		EjgDTO response = gestionEJG.datosEJGJustificacionExpres(ejgItem, request);
+		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+	}
 
 	// getEjgDesigna
 	@RequestMapping(value = "/gestion-ejg/getEjgDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
