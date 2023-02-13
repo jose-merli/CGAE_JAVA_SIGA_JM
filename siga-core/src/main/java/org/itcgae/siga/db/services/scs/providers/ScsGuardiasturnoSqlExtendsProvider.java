@@ -3302,7 +3302,18 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 
 		return sql.toString();
 	}
-	
+	public String searchNombresGuardiaByIdturnoIdguardia(String idInstitucion, String idGuardia, String idTurno) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("CONCAT(st.nombre, CONCAT(' - ',sgt.nombre)) as nombre");
+		sql.FROM("scs_guardiasturno sgt");
+		sql.INNER_JOIN("scs_turno st on sgt.idturno = st.idturno and sgt.idinstitucion = st.idinstitucion");
+		sql.WHERE("sgt.idturno = " + idTurno);
+		sql.WHERE("sgt.idguardia = " + idGuardia);
+		sql.WHERE("sgt.idInstitucion = " + idInstitucion);
+		return sql.toString();
+		
+	}
 	public String checkIncompatibilidadesCalendario(String idPersona,String idInstitucion, String idTurno, String idGuardia, String fechaGuardia){
 		StringBuffer consulta = new StringBuffer();
 		

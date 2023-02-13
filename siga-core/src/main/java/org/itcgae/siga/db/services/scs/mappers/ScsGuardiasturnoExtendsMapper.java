@@ -62,6 +62,10 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		})
 	List<CargaMasivaDatosITItem> searchNombreTurnoGuardia(String idInstitucion, String nombreGuardia);
 	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchNombresGuardiaByIdturnoIdguardia")
+	@Results()
+	String searchNombresGuardiaByIdturnoIdguardia(String idInstitucion, String idGuardia, String idTurno);
+	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardias")
 	@Results({ @Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })

@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.services.impl.guardia;
 
+import static org.assertj.core.api.Assertions.in;
+
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -6482,11 +6484,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 				ScsGuardiasturno guardia = scsGuardiasTurnoMapper.selectByPrimaryKey(guardiaKey);
 
 				if (guardia != null) {
-					guardia.setIdpersonaUltimo(
-							Long.parseLong(registro.getIdPersona()));
-					guardia.setIdgrupoguardiaUltimo((long)registro.getIdGrupoGuardiaColegiado());
-					guardia.setFechasuscripcionUltimo(registro.getFechaSuscripcion());
-					scsGuardiasTurnoMapper.updateByPrimaryKeySelective(guardia);
+					ScsInscripcionguardiaExample insc = new ScsInscripcionguardiaExample();
+					insc.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.parseLong(registro.getIdPersona()))
+					.andIdguardiaEqualTo(idGuardia).andIdturnoEqualTo(idTurno);
+					insc.setOrderByClause("fechasuscripcion desc");
+					
+					List<ScsInscripcionguardia> inscripcionList = scsInscripcionguardiaExtendsMapper.selectByExample(insc);
+					if(inscripcionList != null && !inscripcionList.isEmpty()) {
+						ScsInscripcionguardia inscripcionUpdate = inscripcionList.get(0);
+						guardia.setIdpersonaUltimo(inscripcionUpdate.getIdpersona());
+						guardia.setIdgrupoguardiaUltimo((long)registro.getIdGrupoGuardiaColegiado());
+						guardia.setFechasuscripcionUltimo(inscripcionUpdate.getFechasuscripcion()); //fecha inscripcionguardia
+						scsGuardiasTurnoMapper.updateByPrimaryKeySelective(guardia);
+					}
+					//select inscripcionguardiasbyexample
+					
 					//scsGuardiasturnoExtendsMapper.actualizarUltimoColegiado(guardia);
 				}
 			}
@@ -7221,8 +7233,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 			salida = validarIncompatibilidadGuardia(idInstitucion, idTurno, idGuardia, periodoDiasGuardia, idPersona);
 			
 			if(salida) {
+				String nombreLog = scsGuardiasturnoExtendsMapper.searchNombresGuardiaByIdturnoIdguardia(idInstitucion, idGuardia, idTurno);
 				Map<String, Object> mapLog1 = new HashMap();
-				mapLog1.put("*Encontrado Incompatibilidad en Guardias","IDGuardia: " +idGuardia+" "+ letrado.getInscripcionGuardia().getApellido1() + ' ' + letrado.getInscripcionGuardia().getNombre());
+				mapLog1.put("*Encontrado Incompatibilidad en Guardias",nombreLog+" "
+						+ letrado.getInscripcionGuardia().getApellido1() + ' ' + letrado.getInscripcionGuardia().getNombre() 
+				+ " Fechas :"+ periodoDiasGuardia.get(0).toString() +" - " + periodoDiasGuardia.get(periodoDiasGuardia.size() - 1).toString());
 				listaDatosExcelGeneracionCalendarios.add(mapLog1);
 			}
 		} catch (Exception e) {
@@ -7290,9 +7305,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			salida = validarSeparacionGuardias(miHash);
 			if(!salida) {
+				String nombreLog = scsGuardiasturnoExtendsMapper.searchNombresGuardiaByIdturnoIdguardia(idInstitucion, idGuardia, idTurno);
+				//nombreLog = nombre del turno y guardia.
 				Map<String, Object> mapLog1 = new HashMap();
 				mapLog1.put("*Encontrado Incompatibilidad en DIAS", (String) periodoDiasGuardia.get(0) + " - " + (String) periodoDiasGuardia.get(periodoDiasGuardia.size() - 1)
-				+ "Turno:" + idTurno + " Guardia: " + idGuardia);
+				+ " En " + nombreLog);
 				listaDatosExcelGeneracionCalendarios.add(mapLog1);
 			}
 		} catch (Exception e) {
@@ -8536,8 +8553,41 @@ public class GuardiasServiceImpl implements GuardiasService {
 //		sFechaSusc = changeDateFormat(OLD_FORMAT, NEW_FORMAT, date4.toString());
 		ScsGrupoguardiaExample example = new ScsGrupoguardiaExample();
 
-		int res4 = scsGuardiasturnoExtendsMapper.cambiarUltimoCola4(sIdinstitucion, sIdTurno, sIdGuardia, sIdpersona,
-				sIdGrupoGuardiaColegiado_Ultimo, sFechaSusc, usuModificacion1.toString());
+		ScsGuardiasturnoKey guardiaKey = new ScsGuardiasturnoKey();
+		guardiaKey.setIdinstitucion(Short.parseShort(sIdinstitucion));
+		guardiaKey.setIdturno(Integer.parseInt(sIdTurno));
+		guardiaKey.setIdguardia(Integer.parseInt(sIdGuardia));
+
+		ScsGuardiasturno guardia = scsGuardiasTurnoMapper.selectByPrimaryKey(guardiaKey);
+
+		if (guardia != null) {
+			ScsInscripcionguardiaExample insc = new ScsInscripcionguardiaExample();
+			insc.createCriteria().andIdinstitucionEqualTo(Short.parseShort(sIdinstitucion))
+			.andIdpersonaEqualTo(Long.parseLong(idPersona_Ultimo))
+			.andIdguardiaEqualTo(Integer.parseInt(sIdGuardia)).andIdturnoEqualTo(Integer.parseInt(sIdTurno));
+			insc.setOrderByClause("fechasuscripcion desc");
+			
+			List<ScsInscripcionguardia> inscripcionList = scsInscripcionguardiaExtendsMapper.selectByExample(insc);
+			if(inscripcionList != null && !inscripcionList.isEmpty()) {
+				ScsInscripcionguardia inscripcionUpdate = inscripcionList.get(0);
+				guardia.setIdpersonaUltimo(inscripcionUpdate.getIdpersona());
+				if(!sIdGrupoGuardiaColegiado_Ultimo.isEmpty() && !sIdGrupoGuardiaColegiado_Ultimo.equals("null") && sIdGrupoGuardiaColegiado_Ultimo != null)
+					guardia.setIdgrupoguardiaUltimo(Long.parseLong(sIdGrupoGuardiaColegiado_Ultimo));
+				
+				guardia.setFechasuscripcionUltimo(inscripcionUpdate.getFechasuscripcion()); //fecha inscripcionguardia
+				int actualizado = scsGuardiasTurnoMapper.updateByPrimaryKeySelective(guardia);
+				if(actualizado != 1)
+					LOGGER.info("ERROR AL ACTUALIZAR ULTIMO EN LA COLA");
+			}
+			//select inscripcionguardiasbyexample
+			
+			//scsGuardiasturnoExtendsMapper.actualizarUltimoColegiado(guardia);
+		}
+		
+		
+		//int res4 = scsGuardiasturnoExtendsMapper.cambiarUltimoCola4(sIdinstitucion, sIdTurno, sIdGuardia, sIdpersona,
+		//		sIdGrupoGuardiaColegiado_Ultimo, sFechaSusc, usuModificacion1.toString());
+	
 	} // cambiarUltimoCola()
 
 	/**
