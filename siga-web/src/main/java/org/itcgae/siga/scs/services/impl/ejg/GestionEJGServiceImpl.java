@@ -272,6 +272,44 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("datosEJG() -> Salida del servicio para obtener los datos del ejg seleccionado");
 		return ejgDTO;
 	}
+	
+	@Override
+	public EjgDTO datosEJGJustificacionExpres(EjgItem ejgItem, HttpServletRequest request) {
+		LOGGER.info("datosEJG() -> Entrada al servicio para obtener el colegiado");
+		EjgDTO ejgDTO = new EjgDTO();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"datosEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+				LOGGER.info(
+						"datosEJG() / scsEjgExtendsMapper.datosEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
+				ejgDTO.setEjgItems(scsEjgExtendsMapper.datosEJGJustificacionExpres(ejgItem, idInstitucion.toString(),
+						usuarios.get(0).getIdlenguaje().toString()));
+				LOGGER.info(
+						"datosEJG() / scsEjgExtendsMapper.datosEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
+			} else {
+				LOGGER.warn(
+						"datosEJG() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("datosEJG() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("datosEJG() -> Salida del servicio para obtener los datos del ejg seleccionado");
+		return ejgDTO;
+	}
 
 	@Override
 	public ComboDTO comboPrestaciones(HttpServletRequest request) {

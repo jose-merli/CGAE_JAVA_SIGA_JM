@@ -155,7 +155,7 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 			@Result(column = "IDTURNODESIGNA", property = "idturnodesigna", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPO", property = "idtipo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "DESC_TURNO", property = "descturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DES_TURNO", property = "descturno", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DICTAMEN", property = "dictamen", jdbcType = JdbcType.VARCHAR),

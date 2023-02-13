@@ -180,4 +180,6 @@ public interface IGestionEJG {
 	EstadoEjgDTO getUltEstadoEjg(EjgItem ejgItem, HttpServletRequest request);
 
 	Boolean getEditResolEjg(EjgItem ejgItem, HttpServletRequest request);
+
+	EjgDTO datosEJGJustificacionExpres(EjgItem ejgItem, HttpServletRequest request);
 }

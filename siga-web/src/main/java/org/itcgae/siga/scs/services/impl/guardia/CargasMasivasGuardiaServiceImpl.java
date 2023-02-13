@@ -629,7 +629,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 	@Override
 	@Transactional
 	public DeleteResponseDTO uploadFileI(String fechaSolicitud, MultipartHttpServletRequest request)
-			throws IllegalStateException, IOException {
+			throws IllegalStateException, IOException, BusinessException, ParseException {
 		LOGGER.info("uploadFileI() -> Entrada al servicio para subir un archivo");
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
@@ -937,7 +937,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 	}
 
 	private List<CargaMasivaDatosITItem> parseExcelFileI(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario,
-			String fechaSolicitud) throws BusinessException {
+			String fechaSolicitud) throws BusinessException, ParseException {
 
 		Date dateLog = new Date();
 		LOGGER.info(dateLog + ":inicio.GestionCargasMasivasOficioServiceImpl.parseExcelFileIT");
@@ -1138,7 +1138,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							// indicada, no se podrá realizar.
 							ScsInscripcionguardiaKey key1 = new ScsInscripcionguardiaKey();
 
-							key1.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
+							key1.setFechasuscripcion(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
 							key1.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 							key1.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
 							key1.setIdinstitucion(idInstitucion);
@@ -1150,7 +1150,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
 								key2.setIdinstitucion(idInstitucion);
 								key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-								key2.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
+								key2.setFechasolicitud(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
 								key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 
 								List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
@@ -1221,7 +1221,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								// indicada, no se podrá realizar.
 								ScsInscripcionguardiaKey key1 = new ScsInscripcionguardiaKey();
 
-								key1.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
+								key1.setFechasuscripcion(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
 								key1.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 								key1.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
 								key1.setIdinstitucion(idInstitucion);
@@ -1233,7 +1233,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
 									key2.setIdinstitucion(idInstitucion);
 									key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-									key2.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
+									key2.setFechasolicitud(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
 									key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 
 									List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();

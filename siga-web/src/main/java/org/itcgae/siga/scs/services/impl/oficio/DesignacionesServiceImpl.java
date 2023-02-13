@@ -536,8 +536,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									// hacemos una busqueda para obtener el EJG con el dictamen y la resolucion
 									ScsEjgExample ejgExample = new ScsEjgExample();
 									ejgExample.createCriteria().andAnioEqualTo(Short.parseShort(anioEJG))
-											.andNumeroEqualTo(Long.parseLong(numEJG))
-											.andIdtipoejgEqualTo(Short.parseShort(idtipoEJG))
+											.andNumejgEqualTo(numEJG)
 											.andIdinstitucionEqualTo(Short.parseShort(idInstitucionEJG));
 									List<ScsEjg> ejg = scsEjgExtendsMapper.selectByExample(ejgExample);
 									if (!ejg.isEmpty()) {

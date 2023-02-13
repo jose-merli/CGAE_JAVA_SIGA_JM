@@ -27,6 +27,15 @@ public class SaltoCompGuardiaItem {
 	private String fechaAnulacion;
 	private List<ComboItem> comboGuardia;
 	private List<ComboItem> comboColegiados;
+	private int numeroSaltosComp = 1;
+	
+	public int getNumeroSaltosComp() {
+		return numeroSaltosComp;
+	}
+	
+	public void setNumeroSaltosComp(int numeroSaltosComp) {
+		this.numeroSaltosComp = numeroSaltosComp;
+	}
 
 	public List<ComboItem> getComboColegiados() {
 		return comboColegiados;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,6 +27,7 @@ import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.guardia.CargasMasivasGuardiaService;
 import org.itcgae.siga.scs.services.oficio.IGestionCargasMasivasOficio;
@@ -57,7 +59,7 @@ public class CargasMasivasGuardiaController {
 	}
 	
 	@RequestMapping(value = "/cargasMasivasGuardia/uploadFileI", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<DeleteResponseDTO> uploadFileI( @RequestParam("fechaSolicitud") String fechaSolicitud, MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+	public ResponseEntity<DeleteResponseDTO> uploadFileI( @RequestParam("fechaSolicitud") String fechaSolicitud, MultipartHttpServletRequest request) throws IllegalStateException, IOException, BusinessException, ParseException{
 		DeleteResponseDTO response = cargasMasivasGuardiaService.uploadFileI(fechaSolicitud, request);
 		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
