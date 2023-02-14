@@ -118,7 +118,10 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
                 + "    pc.fecha,"
                 + "    pc.idturno,"
                 + "    pc.idguardia,"
-                + "    pc.idpersona");
+                + "    pc.idpersona,"
+                //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@INICIO
+        		+ "    (PERSONA.NOMBRE || ' ' || PERSONA.APELLIDOS1 || ' ' || PERSONA.APELLIDOS2) AS NOMBRE_PERSONA");
+        		//SIGARNV-2885@DTT.JAMARTIN@07/02/2023@FIN
         
         sql.FROM("SCS_PERMUTAGUARDIAS sp");
         
@@ -139,7 +142,9 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
                 + "        guardia.idinstitucion = sp.idinstitucion"
                 + "    AND"
                 + "        guardia.idguardia = pc.idguardia");
-        
+        //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@INICIO
+        sql.JOIN("CEN_PERSONA PERSONA ON pc.IDPERSONA = PERSONA.IDPERSONA");
+        //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@FIN
         sql.WHERE("sp.idinstitucion = " + idInstitucion);
         
         sql.WHERE("((" + permutaItem.getIdturno() + " = sp.IDTURNO_SOLICITANTE "
@@ -152,6 +157,9 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         		+ ")");
         
         sql.WHERE("EXISTS (" + sql2 + ")");
+        //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@INICIO 
+        sql.WHERE("pc.IDPERSONA <> " + permutaItem.getIdpersona());
+        //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@FIN 
         sql.WHERE("ROWNUM <= 200");
         
         sql.ORDER_BY("FECHACONFIRMACION desc");
@@ -193,7 +201,9 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         sql.WHERE("gc.IDTURNO = " + guardiaItem.getIdTurno());
         sql.WHERE("gc.IDGUARDIA = " + guardiaItem.getIdGuardia());
         sql.WHERE("gc.IDCALENDARIOGUARDIAS = " + guardiaItem.getIdCalendarioGuardias());
-
+        //SIGARNV-2885@DTT.JAMARTIN@06/02/2023@INICIO
+        sql.WHERE("gc.IDPERSONA <> " + guardiaItem.getIdPersona());
+        //SIGARNV-2885@DTT.JAMARTIN@06/02/2023@FIN 
 
         return sql.toString();
     }
@@ -239,5 +249,21 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         return sql.toString();
 
     }
+    
+    //SIGARNV-2885@DTT.JAMARTIN@06/02/2023@INICIO
+    public String getFechaSolicitanteInicio(String idPersona, Short idCalendarioGuardias, Short idGuardia, Short idInstitucion) {
+    	 SQL sql = new SQL();
+    	 
+    	 sql.SELECT("FECHAINICIO_SOLICITANTE");
+    	 sql.FROM("SCS_PERMUTAGUARDIAS");
+    	 sql.WHERE("IDPERSONA_SOLICITANTE = " + idPersona); 
+    	 sql.WHERE("IDCALENDARIOGUARDIAS_SOLICITAN = " + idCalendarioGuardias); 
+    	 sql.WHERE("IDGUARDIA_SOLICITANTE = " + idGuardia); 
+    	 sql.WHERE("IDINSTITUCION = " + idInstitucion); 
+    	 sql.ORDER_BY("FECHASOLICITUD desc");
+    	 
+    	 return sql.toString();
+    }
+	//SIGARNV-2885@DTT.JAMARTIN@06/02/2023@FIN 
 
 }

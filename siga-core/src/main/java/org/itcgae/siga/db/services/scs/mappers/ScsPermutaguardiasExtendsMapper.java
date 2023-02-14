@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.*;
@@ -52,6 +53,7 @@ public interface ScsPermutaguardiasExtendsMapper extends ScsPermutaguardiasMappe
 	})
 	List<PermutaItem> getPermutaColeg(PermutaItem permutaItem, Short idInstitucion);
 	
+	//SIGARNV-2885@DTT.JAMARTIN@07/02/2023@INICIO
 	@SelectProvider(type = ScsPermutaguardiasSqlExtendsProvider.class, method = "getPermutasGuardiaColeg")
 	@Results({ 
 		@Result(column = "FECHACONFIRMACION", property = "fechaconfirmacion", jdbcType = JdbcType.VARCHAR),
@@ -80,9 +82,10 @@ public interface ScsPermutaguardiasExtendsMapper extends ScsPermutaguardiasMappe
 		@Result(column = "idturno", property = "idturno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idguardia", property = "idguardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.VARCHAR),
-
+		@Result(column = "NOMBRE_PERSONA", property = "nombreColegiado", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PermutaItem> getPermutasGuardiaColeg(PermutaItem permutaItem, Short idInstitucion);
+	//SIGARNV-2885@DTT.JAMARTIN@07/02/2023@FIN 
 	
 	@SelectProvider(type = ScsPermutaguardiasSqlExtendsProvider.class, method = "getTurnoInscrito")
 	@Results({ @Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
@@ -96,6 +99,13 @@ public interface ScsPermutaguardiasExtendsMapper extends ScsPermutaguardiasMappe
 			@Result(column = "GUARDIA", property = "label", jdbcType = JdbcType.VARCHAR),
 			})
 	List<ComboGuardiasFuturasItem> getGuardiaDestinoInscrito(GuardiasItem guardiaItem, String idinstitucion);
+	
+	//SIGARNV-2885@DTT.JAMARTIN@06/02/2023@INICIO
+	@SelectProvider(type = ScsPermutaguardiasSqlExtendsProvider.class, method = "getFechaSolicitanteInicio")
+	@Results({ @Result(column = "FECHAINICIO_SOLICITANTE", property = "value", jdbcType = JdbcType.DATE)
+			})
+	List<Date> getFechaSolicitanteInicio(String idPersona, Short idCalendarioGuardias, Short idGuardia, Short idInstitucion);
+	//SIGARNV-2885@DTT.JAMARTIN@06/02/2023@FIN 
 	
 	@SelectProvider(type=ScsPermutaguardiasSqlExtendsProvider.class, method="maxIdPermutaGuardia")
     String maxIdPermutaGuardia(String idinstitucion);
