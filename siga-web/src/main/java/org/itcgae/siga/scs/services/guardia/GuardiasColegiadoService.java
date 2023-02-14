@@ -54,5 +54,7 @@ public interface GuardiasColegiadoService {
 	public UpdateResponseDTO  validarPermuta(List<PermutaItem> permutas, HttpServletRequest request) throws Exception;
 	public InsertResponseDTO permutarGuardia(PermutaItem permutaItem, HttpServletRequest request) throws Exception;
 	
-
+	//SIGARNV-2885@DTT.JAMARTIN@06/02/2023@INICIO
+	public Date getFechaSolicitante(String idPersona, Short idCalendarioGuardias, Short idGuardia, HttpServletRequest request);
+	//SIGARNV-2885@DTT.JAMARTIN@06/02/2023@FIN 
 }

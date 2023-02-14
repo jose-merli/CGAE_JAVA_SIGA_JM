@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -130,6 +131,14 @@ public class GuardiasColegiadoController {
 		ComboDTO response= guardiasColegiadoService.getTurnoInscrito(idPersona, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	//SIGARNV-2885@DTT.JAMARTIN@06/02/2023@INICIO
+	@GetMapping(value = "/getFechaSolicitante")
+	ResponseEntity<Date> getFechaSolicitante(String idPersona, Short idCalendarioGuardias, Short idGuardia, HttpServletRequest request){
+		Date response= guardiasColegiadoService.getFechaSolicitante(idPersona, idCalendarioGuardias, idGuardia, request);
+		return new ResponseEntity<Date>(response, HttpStatus.OK);
+	}
+	//SIGARNV-2885@DTT.JAMARTIN@06/02/2023@FIN 
 	
 	@PostMapping(value = "/getGuardiaDestinoInscrito", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboGuardiasFuturasDTO> getGuardiaDestinoInscrito(@RequestBody GuardiasItem guardiaItem, HttpServletRequest request){
