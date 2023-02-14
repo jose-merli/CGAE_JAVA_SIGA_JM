@@ -53,6 +53,7 @@ import org.springframework.stereotype.Service;
 import com.aspose.words.Document;
 import com.aspose.words.DocumentBuilder;
 import com.aspose.words.MailMergeCleanupOptions;
+import com.lowagie.text.pdf.hyphenation.TernaryTree.Iterator;
 
 @Service
 public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosService {
@@ -76,26 +77,29 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		try {
 
 			Set<String> claves = dato.keySet();
+			
+			for (String clave : claves) {
+				if(!clave.equals("row")) {
+					Object o = dato.get(clave);
+					if (o instanceof List) {
+						List aux = (List) o;
+						doc = sustituyeRegionDocumento(doc, clave, aux);
+						dato.remove(o);
+					}
+				}
+				
+			}
 
 			for (String clave : claves) {
-				Object o = dato.get(clave);
-				if (o instanceof List) {
-					List aux = (List) o;
-					doc = sustituyeRegionDocumento(doc, clave, aux);
-				}
+				//if (clave.equals("row")) {
+					Object datosMap = (Object) dato.get(clave);
+					if (datosMap instanceof HashMap) {
+						HashMap htRowDatosInforme = (HashMap) datosMap;
+						doc = sustituyeDatos(doc, htRowDatosInforme);
+					}
+				//}
 			}
 
-			for (String clave : claves) {
-				Object datosMap = (Object) dato.get(clave);
-				if (datosMap instanceof HashMap) {
-					HashMap htRowDatosInforme = (HashMap) datosMap;
-					doc = sustituyeDatos(doc, htRowDatosInforme);
-				}
-			}
-
-			if (doc != null && doc.getMailMerge() != null) {
-				doc.getMailMerge().deleteFields();
-			}
 
 		} catch (Exception e) {
 			LOGGER.error(
