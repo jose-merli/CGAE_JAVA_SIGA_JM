@@ -3082,6 +3082,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 											.selectByExample(turnoExample);
 
 									if (CollectionUtils.isNotEmpty(turnoInscritoIt)
+											&& turnoInscritoIt.get(0).getIdtipoturno() != null
 											&& Short.toUnsignedInt(turnoInscritoIt.get(0)
 													.getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION
 															.intValue()) {
