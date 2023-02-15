@@ -1765,7 +1765,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String comboProcedimientos(Short idInstitucion,String idLenguaje) {
 
 		SQL sql = new SQL();
-		sql.SELECT(" DISTINCT IDPRETENSION, NVL(CODIGOEXT, ' ') || ' - ' || F_SIGA_GETRECURSO(DESCRIPCION, "+idLenguaje+") AS NOMBRE");
+		sql.SELECT(" DISTINCT IDPRETENSION, NVL('(' ||CODIGOEXT || ')', ' ') ||' - ' || F_SIGA_GETRECURSO(DESCRIPCION, "+idLenguaje+") AS NOMBRE");
 		sql.FROM("SCS_PRETENSION");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("FECHABAJA IS NULL");
