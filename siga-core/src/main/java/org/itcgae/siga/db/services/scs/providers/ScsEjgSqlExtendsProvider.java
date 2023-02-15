@@ -1643,7 +1643,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			for (int i = 1; i < item.getIdTurno().length; i++) {
 				inSQL += ", " + item.getIdTurno()[i];
 			}
-			sql.WHERE("GUARDIAS.IDTURNO IN  (" + inSQL + ")");
+			//SIGARNV-3125@DTT.JAMARTIN@15/02/2023@INICIO
+//			sql.WHERE("GUARDIAS.IDTURNO IN  (" + inSQL + ")");
+			sql.WHERE("tur.IDTURNO IN  (" + inSQL + ")");
+			//SIGARNV-3125@DTT.JAMARTIN@15/02/2023@FIN 
 		}
 
 		if (item.getIdGuardia() != null && item.getIdGuardia().length > 0) {
