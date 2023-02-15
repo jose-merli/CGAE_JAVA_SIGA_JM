@@ -201,6 +201,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignasLetradoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsImpugnacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
@@ -246,6 +247,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private ScsEstadoejgMapper scsEstadoejgMapper;
+	
+	@Autowired
+	private ScsImpugnacionExtendsMapper scsImpugnacionSqlExtendsMapper;
 
 	@Autowired
 	private ScsDelitosejgMapper scsDelitosejgMapper;
@@ -532,6 +536,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									String idtipoEJG = datosEJG[4];
 									String dictamen = "";
 									String resolucion = "";
+									String impugnacion = "";
+									String tooltip = "";
 
 									// hacemos una busqueda para obtener el EJG con el dictamen y la resolucion
 									ScsEjgExample ejgExample = new ScsEjgExample();
@@ -570,28 +576,52 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 											}
 
 										}
+										
+										// si la impugnacion no esta vacia hace una busqueda para obtener la descripcion
+										// de la impugnacion
+										if (ejg.get(0).getIdtiporesolauto() != null) {
 
-										// en esta parte se configura el mensaje para el tooltip
-										if ((dictamen == null || dictamen == "")
-												&& (resolucion == null || resolucion == "")) {
-											expedientes.put(str.substring(0, str.indexOf("##")).trim(),
-													"Designación con EJG sin Resolución");
-										} else if ((dictamen != null || dictamen != "")
-												&& (resolucion == null || resolucion == "")) {
+											List<String> impugnacionExpediente = scsImpugnacionSqlExtendsMapper
+													.getDescImpugnacion(ejg.get(0).getIdtiporesolauto());
+											
+											impugnacion = impugnacionExpediente.get(0);
 
-											expedientes.put(str.substring(0, str.indexOf("##")).trim(),
-													"Dictamen: " + dictamen);
-
-										} else if ((dictamen == null || dictamen == "")
-												&& (resolucion != null || resolucion != "")) {
-
-											expedientes.put(str.substring(0, str.indexOf("##")).trim(),
-													"Resolución: " + resolucion);
-
-										} else {
-											expedientes.put(str.substring(0, str.indexOf("##")).trim(),
-													"Dictamen: " + dictamen + " / Resolución: " + resolucion);
 										}
+										
+										// en esta parte se configura el mensaje para el tooltip
+										if ((impugnacion == null || impugnacion.isEmpty())
+												&& (resolucion == null || resolucion.isEmpty())
+												&& (dictamen == null || dictamen.isEmpty())) {
+											tooltip = "Designación con EJG sin Resolución";
+											
+										}
+										
+										if (impugnacion != null && !impugnacion.isEmpty()) {
+											tooltip = "Impugnación: " + impugnacion;
+										}
+										
+										if (resolucion != null && !resolucion.isEmpty()) {
+
+											if (tooltip != null && tooltip.isEmpty()) {
+												tooltip = "Resolución: " + resolucion;
+											} else {
+												tooltip += "\n\rResolución: " + resolucion;
+											}
+
+										} 
+										
+										if (dictamen != null && !dictamen.isEmpty()) {
+
+											if (tooltip != null && tooltip.isEmpty()) {
+												tooltip = "Dictamen: " + dictamen;
+											} else {
+												tooltip += "\n\rDictamen: " + dictamen;
+											}
+
+										}
+										
+										expedientes.put(str.substring(0, str.indexOf("##")).trim(),
+												tooltip);
 									}
 
 								}

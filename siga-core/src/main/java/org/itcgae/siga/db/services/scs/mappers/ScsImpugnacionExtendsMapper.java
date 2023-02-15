@@ -23,6 +23,12 @@ public interface ScsImpugnacionExtendsMapper extends ScsTiporesolautoMapper {
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> comboImpugnacion(String idLenguaje, String idInstitucion);
+	
+	@SelectProvider(type = ScsImpugnacionSqlExtendsProvider.class, method = "getDescImpugnacion")
+	@Results({ 
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<String> getDescImpugnacion(Short idImpugnacion);
 	}
 
 

@@ -17,5 +17,16 @@ public class ScsImpugnacionSqlExtendsProvider extends ScsTiporesolautoSqlProvide
 		
 		return sql.toString();
 	}
+	
+	public String getDescImpugnacion(Short idImpugnacion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("impugnacion.DESCRIPCION");
+
+		sql.FROM("SCS_TIPORESOLAUTO impugnacion");
+		sql.WHERE("impugnacion.IDTIPORESOLAUTO = " + idImpugnacion);
+		
+		return sql.toString();
+	}
 
 }
