@@ -7344,7 +7344,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						turnosItem.setAbreviatura(item.get(3));
 						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion,
 								usuarios.get(0).getIdlenguaje());
-						designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
+						if(turnos==null || turnos.isEmpty()) {
+							turnosItem.setAbreviatura("");
+							turnosItem.setIdturno(item.get(3));
+							turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion,
+									usuarios.get(0).getIdlenguaje());
+						}
+						if(turnos!=null && !turnos.isEmpty()) {
+							designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
+						}
 					}
 
 					// EJG a asociar
