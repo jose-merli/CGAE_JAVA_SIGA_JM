@@ -73,7 +73,7 @@ public class GuardiasItem {
 	private String sustituto;
 	private String idListaGuardia;
 	private String orden;
-	
+	private Short idInstitucion;
 	//Aux para GuardiasColegiado
 	private String fechaIntro;
 	private String idCalendarioProgramado;
@@ -891,6 +891,14 @@ public class GuardiasItem {
 
 	public void setIdCalendarioProgramado(String idCalendarioProgramado) {
 		this.idCalendarioProgramado = idCalendarioProgramado;
+	}
+
+	public Short getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(Short idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 
 
