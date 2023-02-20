@@ -2322,6 +2322,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 		Error error = new Error();
 		ActuacionDesignaDTO actuacionDedignaDTO = new ActuacionDesignaDTO();
 
@@ -2344,13 +2345,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				List<ActuacionDesignaItem> listaActuacionDesignaItem = scsDesignacionesExtendsMapper
 						.busquedaActDesigna(actuacionDesignaRequestDTO, Short.toString(idInstitucion));
-
+				
 				for (ActuacionDesignaItem actuacionModificacion : listaActuacionDesignaItem) {
 					if ("S".equals(actuacionModificacion.getValidarJustificacion())
 							&& Integer.parseInt(actuacionModificacion.getUsuCreacion()) == usuarios.get(0)
 									.getIdusuario()
 							&& Integer.parseInt(actuacionModificacion.getUsuModificacion()) == usuarios.get(0)
-									.getIdusuario()) {
+									.getIdusuario()
+							|| "N".equals(letrado)) {
 						actuacionModificacion.setPermiteModificacion(true);
 					} else {
 						actuacionModificacion.setPermiteModificacion(false);
