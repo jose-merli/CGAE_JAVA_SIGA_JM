@@ -2350,8 +2350,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if ("S".equals(actuacionModificacion.getValidarJustificacion())
 							&& Integer.parseInt(actuacionModificacion.getUsuCreacion()) == usuarios.get(0)
 									.getIdusuario()
-							&& Integer.parseInt(actuacionModificacion.getUsuModificacion()) == usuarios.get(0)
-									.getIdusuario()
 							|| "N".equals(letrado)) {
 						actuacionModificacion.setPermiteModificacion(true);
 					} else {
