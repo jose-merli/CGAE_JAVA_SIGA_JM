@@ -148,4 +148,15 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		return sql.toString();
 	}
 	
+	public String getComplementoProcedimiento(String idInstitucion, String idProcedimiento) {
+		SQL sql = new SQL();
+
+		sql.SELECT("COMPLEMENTO");
+		sql.FROM("SCS_PROCEDIMIENTOS");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+		sql.WHERE("IDPROCEDIMIENTO = '" + idProcedimiento + "'");
+
+		return sql.toString();
+	}
+	
 }

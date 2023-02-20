@@ -60,5 +60,8 @@ public interface ScsProcedimientosExtendsMapper extends ScsProcedimientosMapper{
 	})
 	List<ComboItem> getProcedimientos(String idInstitucion, String idProcedimiento, String idioma);
 	
+	@SelectProvider(type = ScsProcedimientosSqlExtendsProvider.class, method = "getComplementoProcedimiento")
+	List<String> getComplementoProcedimiento(String idInstitucion, String idProcedimiento);
+	
 	
 }

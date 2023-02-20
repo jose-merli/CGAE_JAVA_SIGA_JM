@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
 import org.itcgae.siga.DTOs.scs.AcreditacionItem;
@@ -38,6 +39,12 @@ public class ModulosYBasesController {
 	ResponseEntity<ComboDTO> getProcedimientos(@RequestParam("idProcedimiento") String idProcedimiento, HttpServletRequest request) {
 		ComboDTO response = ModulosYBasesService.getProcedimientos(request, idProcedimiento);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/modulosybasesdecompensacion/getComplementoProcedimiento",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> getComplementoProcedimiento(@RequestBody ModulosItem modulosItem, HttpServletRequest request) {
+		StringDTO response = ModulosYBasesService.getComplementoProcedimiento(modulosItem, request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/modulosybasesdecompensacion/deleteModulos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

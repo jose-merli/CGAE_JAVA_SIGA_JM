@@ -155,7 +155,7 @@ public class GuardiaController {
 	@PostMapping(value = "/busquedaGuardia/getColaGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InscripcionGuardiaDTO> getColaGuardia(@RequestBody GuardiasItem guardia,
 			HttpServletRequest request) {
-		InscripcionGuardiaDTO response = guardiasService.searchColaGuardia(guardia, request);
+		InscripcionGuardiaDTO response = guardiasService.searchColaGuardia(guardia, request, null);
 		return new ResponseEntity<InscripcionGuardiaDTO>(response, HttpStatus.OK);
 	}
 

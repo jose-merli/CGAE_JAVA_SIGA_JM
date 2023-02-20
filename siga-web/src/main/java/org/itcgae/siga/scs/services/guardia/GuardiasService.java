@@ -69,7 +69,7 @@ public interface GuardiasService {
 
 	public GuardiasItem resumenConfiguracionCola(GuardiasItem guardia, HttpServletRequest request);
 
-	public InscripcionGuardiaDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
+	public InscripcionGuardiaDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request, String from);
 
 	public UpdateResponseDTO updateUltimoCola(GuardiasItem guardiasItem, HttpServletRequest request);
 

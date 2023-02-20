@@ -1240,14 +1240,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Transactional
 	@Override
-	public InscripcionGuardiaDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request) {
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+	public InscripcionGuardiaDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request, String from) {
+		Short idInstitucion =null ;
+		String dni = "";
+		if(!"Calendarios".equals(from)) {
+			String token = request.getHeader("Authorization");
+			 dni = UserTokenUtils.getDniFromJWTToken(token);
+			 idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		}
+	
 		// idInstitucion = (short) 2005; // borrar
 		String ordenaciones = "";
 		InscripcionGuardiaDTO inscritos = new InscripcionGuardiaDTO();
+		
+		if(from != null && from.equals("Calendarios"))
+			idInstitucion = guardiasItem.getIdInstitucion();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1262,7 +1269,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					"searchColaGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try {
 
-				if (usuarios != null && usuarios.size() > 0) {
+				if (usuarios != null && usuarios.size() > 0 || ("Calendarios").equals(from)) {
 					LOGGER.info("searchGuardias() -> Entrada para obtener las colas de guardia");
 					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -4563,14 +4570,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 																+ hcoConfProgCalendariosItem.getNombre() + " : "
 																+ nombreFicheroSalida);
 
-														scsCalendarioguardiasMapper.setLogName(d.getIdInstitucion(),
+														String updateName = scsCalendarioguardiasMapper.setLogName(d.getIdInstitucion(),
 																idCalendarioGuardias1.toString(), d.getObservaciones(),
 																fechaInicio1, fechaFin1, nombreFicheroSalida,
 																hcoConfProgCalendariosItem.getIdturno(),
 																hcoConfProgCalendariosItem.getIdguardia());
 														generarExcelLog(nombreFicheroSalida);
 
-													
+														LOGGER.info("LOGNAME UPDATE : " + updateName);
 
 														LOGGER.info(
 																"generarCalendarioAsync() -> FIN generacion base HCO "
@@ -6426,7 +6433,24 @@ public class GuardiasServiceImpl implements GuardiasService {
 				ultimoAnterior = new InscripcionGuardiaItem(idInstitucion.toString(), idTurno.toString(),
 						idGuardia.toString(), idPersonaUltimo.toString(), fechaSuscripcionUltimo,
 						idGrupoGuardiaUltimo2);
+			
+			GuardiasItem guardiaBuscador = new GuardiasItem();
+			guardiaBuscador.setIdTurno(idTurno.toString());
+			guardiaBuscador.setIdGuardia(vGuardia.getIdGuardia());
+			guardiaBuscador.setIdOrdenacionColas(vGuardia.getIdOrdenacionColas().toString());
+			guardiaBuscador.setPorGrupos(vGuardia.getPorGrupos());
+			guardiaBuscador.setIdInstitucion(Short.valueOf(vGuardia.getIdInstitucion()));
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		    String fecha = sdf.format(new Date());
+		    
+		    guardiaBuscador.setLetradosIns(fecha);
+		    
+		    
+		    InscripcionGuardiaDTO respuesta = searchColaGuardia(guardiaBuscador, null, "Calendarios");
+		    List<InscripcionGuardiaItem> listaLetrados = respuesta.getInscripcionesItem();
 
+		    /*
 			// obteniendo lista de letrados (ordenada)
 			List<InscripcionGuardiaItem> listaLetrados = null;
 			if (idGuardia != null) {
@@ -6436,9 +6460,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 				listaLetrados = getColaGuardia2(idInstitucion.toString(), idTurno.toString(), null, fechaInicio,
 						fechaFin, porGrupos, orden);
 			}
+			
 			if (listaLetrados == null || listaLetrados.size() == 0)
 				return colaLetrados;
-
+			
 			if (ultimoAnterior == null) {
 				// si no existe ultimo colegiado, se empieza la cola desde el primero en la
 				// lista
@@ -6477,8 +6502,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 						foundUltimo = true;
 				}
 				colaLetrados.addAll(colaAuxiliar);
-			}
+			}*/
+			if (listaLetrados == null || listaLetrados.size() == 0)
+				return colaLetrados;
+			for (int i = 0; i < listaLetrados.size(); i++) {
+				punteroInscripciones = listaLetrados.get(i);
 
+				LetradoInscripcionItem letradoInscripcionItem = new LetradoInscripcionItem();
+				letradoInscripcionItem.setInscripcionGuardia(punteroInscripciones);
+				colaLetrados.add(letradoInscripcionItem);
+
+			}
+			
+			
 			// usando saltos si es necesario (en guardias no)
 
 			return colaLetrados;

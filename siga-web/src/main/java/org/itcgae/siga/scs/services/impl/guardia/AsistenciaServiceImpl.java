@@ -445,6 +445,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 						List<TarjetaAsistenciaItem2> tarjetaAsistenciaItems = scsAsistenciaExtendsMapper
 								.searchAsistenciasExpress(filtro, idInstitucion);
+						
 						tarjetaAsistenciaItems.forEach(asistencia -> {
 							List<String> listaIdDelitos = scsAsistenciaExtendsMapper.getDelitosFromAsistencia(
 									asistencia.getAnio(), asistencia.getNumero(), idInstitucion.toString());
@@ -838,8 +839,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		// List<ScsPersonajg> listaJusticiables =
 		// scsPersonajgExtendsMapper.selectByExample(personajgExample);
 
-		List<String> personaJg = scsPersonajgExtendsMapper.getIdPersonajgNif(asistencia.getNif().trim(), idInstitucion);
-
+		//SIGARNV-3178@DTT.JAMARTIN@20/02/2023@INICIO
+		List<String> personaJg = new ArrayList<String>();
+		if (asistencia.getNif() != null) {
+			personaJg = scsPersonajgExtendsMapper.getIdPersonajgNif(asistencia.getNif().trim(), idInstitucion);
+		}
+		//SIGARNV-3178@DTT.JAMARTIN@20/02/2023@FIN
+		
 		// Si existe obtenemos el idPersona y actualizamos datos
 		if (personaJg != null && !personaJg.isEmpty()) {
 			idPersona = personaJg.get(0);

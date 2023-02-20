@@ -686,14 +686,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									idInstitucion.toString(), usuario.getIdlenguaje());
 
 							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
-							// En SCS_INSCRIPCIONTURNO tenemos el campo FECHASOLICITUD, mientras en
-							// SCS_INSCRIPCIONGUARDIA, el campo es FECHASUSCRIPCION.
-							try {
-								guardia.setFechasuscripcion(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
-							} catch (ParseException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
+							guardia.setFechasuscripcion(new Date());
 							guardia.setFechavalidacion(cargaMasivaDatosITItem.getFechaEfectiva());
 							guardia.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 							guardia.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
@@ -767,7 +760,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							guardia.setIdinstitucion(idInstitucion);
 							guardia.setFechamodificacion(new Date());
 							guardia.setUsumodificacion(usuario.getIdusuario());
-
+							guardia.setFechasuscripcion(new Date());
+							
 							// Se comprueba si se ha introducido una guardia especifica. Si no es asi, se
 							// realiza con todos las guardias del turno.
 							if (cargaMasivaDatosITItem.getIdGuardia().equals(null)
@@ -1138,7 +1132,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							// indicada, no se podrá realizar.
 							ScsInscripcionguardiaKey key1 = new ScsInscripcionguardiaKey();
 
-							key1.setFechasuscripcion(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
+							key1.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
 							key1.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 							key1.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
 							key1.setIdinstitucion(idInstitucion);
@@ -1150,11 +1144,10 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
 								key2.setIdinstitucion(idInstitucion);
 								key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-								key2.setFechasolicitud(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
+								key2.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
 								key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 
-								List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
-								insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2,
+								List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2,
 										new SimpleDateFormat("dd/MM/yyyy")
 												.format(cargaMasivaDatosITItem.getFechaEfectiva()));
 
@@ -1189,13 +1182,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									ig.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 									ig.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
 									ig.setUsumodificacion(usuario.getIdusuario());
-									try {
-										ig.setFechasuscripcion(
-												new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
-									} catch (ParseException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
+									ig.setFechasuscripcion(new Date());
+									
 									scsInscripcionguardiaMapper.insertSelective(ig);
 
 								} else
@@ -1221,7 +1209,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								// indicada, no se podrá realizar.
 								ScsInscripcionguardiaKey key1 = new ScsInscripcionguardiaKey();
 
-								key1.setFechasuscripcion(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
+								key1.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
 								key1.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 								key1.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
 								key1.setIdinstitucion(idInstitucion);
@@ -1233,9 +1221,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
 									key2.setIdinstitucion(idInstitucion);
 									key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-									key2.setFechasolicitud(new SimpleDateFormat("dd/MM/yyyy").parse(fechaSolicitud));
 									key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-
 									List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
 									insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2,
 											new SimpleDateFormat("dd/MM/yyyy")

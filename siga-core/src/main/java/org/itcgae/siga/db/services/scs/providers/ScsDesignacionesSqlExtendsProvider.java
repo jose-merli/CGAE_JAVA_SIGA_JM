@@ -1349,11 +1349,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND act.idinstitucion = " + idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = "
 				+ anio + " AND act.numero = " + numero + " ");
 		
-		
-		if(item.isMuestraPendiente()) {
-			sql.append(" AND (act.validada = 0 OR act.validada IS NULL)");
-		}
-		
 		if (item.getJustificacionDesde() != null) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			String fecha = dateFormat.format(item.getJustificacionDesde());
@@ -1625,10 +1620,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" AND dl2.idpersona = "+ idPersona+")");
 		}
 
-		if (item.isMuestraPendiente()) {
-			sql.append(" AND D.ESTADO NOT IN ('A','F') ");
-		}
-
 		if (item.getEstado() != null) {
 			sql.append(" AND D.ESTADO ='" + item.getEstado() + "'");
 		}
@@ -1664,37 +1655,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		tiposResolucionBuilder.append(")");
 
 		sql.append(tiposResolucionBuilder);
-
-		if (item.isMuestraPendiente()) {
-			sql.append(" AND (NOT EXISTS ");
-			sql.append(" (SELECT * ");
-			sql.append(" FROM SCS_ACTUACIONDESIGNA ACT ");
-			sql.append(" WHERE ACT.IDINSTITUCION = ALLDESIGNAS.IDINSTITUCION ");
-			sql.append(" AND ACT.IDTURNO = ALLDESIGNAS.IDTURNO ");
-			sql.append(" AND ACT.ANIO = ALLDESIGNAS.ANIO ");
-			sql.append(" AND ACT.NUMERO = ALLDESIGNAS.NUMERO) OR ");
-			sql.append(" (SELECT COUNT(*) ");
-			sql.append(" FROM SCS_ACREDITACIONPROCEDIMIENTO ACP ");
-			sql.append(" WHERE EXISTS (SELECT * ");
-			sql.append(" FROM SCS_ACTUACIONDESIGNA ACT ");
-			sql.append(" WHERE ACT.IDINSTITUCION = ALLDESIGNAS.IDINSTITUCION ");
-			sql.append(" AND ACT.IDTURNO = ALLDESIGNAS.IDTURNO ");
-			sql.append(" AND ACT.ANIO = ALLDESIGNAS.ANIO ");
-			sql.append(" AND ACT.NUMERO = ALLDESIGNAS.NUMERO ");
-			sql.append(" AND ACT.IDINSTITUCION_PROC = ACP.IDINSTITUCION ");
-			sql.append(" AND ACT.IDPROCEDIMIENTO = ACP.IDPROCEDIMIENTO) ");
-			sql.append(" AND NOT EXISTS (SELECT * ");
-			sql.append(" FROM SCS_ACTUACIONDESIGNA ACT ");
-			sql.append(" WHERE ACT.IDINSTITUCION = ALLDESIGNAS.IDINSTITUCION ");
-			sql.append(" AND ACT.IDTURNO = ALLDESIGNAS.IDTURNO ");
-			sql.append(" AND ACT.ANIO = ALLDESIGNAS.ANIO ");
-			sql.append(" AND ACT.NUMERO = ALLDESIGNAS.NUMERO ");
-			sql.append(" AND ACT.IDINSTITUCION_PROC = ACP.IDINSTITUCION ");
-			sql.append(" AND ACT.IDPROCEDIMIENTO = ACP.IDPROCEDIMIENTO ");
-			sql.append(" AND ACT.IDACREDITACION = ACP.IDACREDITACION ");
-			sql.append(" AND ACT.VALIDADA = '1'))>0 ");
-			sql.append(" )");
-		}
 
 		sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
 		sql.append(") query WHERE rownum<=200");

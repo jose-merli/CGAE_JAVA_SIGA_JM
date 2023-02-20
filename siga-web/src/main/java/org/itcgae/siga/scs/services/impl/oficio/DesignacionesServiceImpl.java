@@ -497,10 +497,29 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo las actuaciones...");
 					// obtenemos las actuaciones
 
-					for (JustificacionExpressItem record : result) {
+					
+					Iterator<JustificacionExpressItem> it = result.iterator();
+					
+					while (it.hasNext()) {
+						JustificacionExpressItem record = it.next();
+						
 						record.setActuaciones(scsDesignacionesExtendsMapper.busquedaActuacionesJustificacionExpres(
 								record.getIdInstitucion(), record.getIdTurno(), record.getAnioDesignacion(),
 								record.getNumDesignacion(), item));
+						
+						if (item.isMuestraPendiente()) {
+							float porcentajeTotal = 0;
+							
+							for (ActuacionesJustificacionExpressItem actuacion: record.getActuaciones()) {
+								porcentajeTotal += Float.valueOf(actuacion.getPorcentaje().replace(",", "."));
+							}
+							
+							if ("A".equals(record.getEstado())
+									|| "F".equals(record.getEstado())
+									|| porcentajeTotal >= 100) {
+								it.remove();;
+							}
+						}
 					}
 
 					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");
