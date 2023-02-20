@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
 import org.itcgae.siga.DTOs.scs.AcreditacionItem;
@@ -33,5 +34,7 @@ public interface IModulosYBasesService {
 	public ComboDTO getProcedimientos(HttpServletRequest request, String idJurisdiccion);
 
 	public UpdateResponseDTO checkModules(ModulosDTO modulosDTO, HttpServletRequest request);
+
+	public StringDTO getComplementoProcedimiento(ModulosItem modulosItem, HttpServletRequest request);
 
 }

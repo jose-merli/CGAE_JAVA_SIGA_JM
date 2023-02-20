@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -1486,4 +1487,35 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 //		return insertResponseDTO;
 //	}
 //	
+
+	@Override
+	public StringDTO getComplementoProcedimiento(ModulosItem modulosItem, HttpServletRequest request) {
+		LOGGER.info("getComplementoProcedimiento() -> Entrada al servicio para obtener el complemento del modulo");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		StringDTO stringDTO = new StringDTO();
+		List<String> complemento = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				complemento = scsProcedimientosExtendsMapper.getComplementoProcedimiento(idInstitucion.toString(), modulosItem.getIdProcedimiento());
+
+				if (complemento != null && complemento.size() > 0) {
+					stringDTO.setValor(complemento.get(0));
+				}
+			}
+
+		}
+		LOGGER.info("getComplementoProcedimiento() -> Salida del servicio para obtener el complemento del modulo");
+		return stringDTO;
+	}
 }

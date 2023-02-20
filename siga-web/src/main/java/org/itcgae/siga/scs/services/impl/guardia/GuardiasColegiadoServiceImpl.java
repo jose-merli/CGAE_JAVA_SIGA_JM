@@ -1745,13 +1745,31 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 													if (updatePerCabConf != 0) {
 														LOGGER.info("validarPermuta() / borrando guardia antigua del solicitante");
 														guardiaSolCopy.setIdpersona(perm.getIdpersonaSolicitante());
-														int deleteGuardColSol = scsGuardiascolegiadoExtendsMapper.deleteByPrimaryKey(guardiaSolCopy);
+//														int deleteGuardColSol = scsGuardiascolegiadoExtendsMapper.deleteByPrimaryKey(guardiaSolCopy);
+														ScsGuardiascolegiadoExample scsGuardiascolegiadoSolExample = new ScsGuardiascolegiadoExample();
+														scsGuardiascolegiadoSolExample.createCriteria()
+																.andIdinstitucionEqualTo(guardiaSolCopy.getIdinstitucion())
+																.andIdturnoEqualTo(guardiaSolCopy.getIdturno())
+																.andIdguardiaEqualTo(guardiaSolCopy.getIdguardia())
+																.andIdpersonaEqualTo(guardiaSolCopy.getIdpersona())
+																.andFechainicioEqualTo(guardiaSolCopy.getFechainicio());
+														
+														int deleteGuardColSol = scsGuardiascolegiadoExtendsMapper.deleteByExample(scsGuardiascolegiadoSolExample);
 
 														// Borramos SCS_GUARDIASCOLEGIADO antigua del Conf
 														if (deleteGuardColSol != 0) {
 															LOGGER.info("validarPermuta() / borrando guardia antigua del confirmador");
 															guardiaConfCopy.setIdpersona(perm.getIdpersonaConfirmador());
-															int deleteGuardColConf = scsGuardiascolegiadoExtendsMapper.deleteByPrimaryKey(guardiaConfCopy);
+//															int deleteGuardColConf = scsGuardiascolegiadoExtendsMapper.deleteByPrimaryKey(guardiaConfCopy);
+															ScsGuardiascolegiadoExample scsGuardiascolegiadoConfExample = new ScsGuardiascolegiadoExample();
+															scsGuardiascolegiadoConfExample.createCriteria()
+																	.andIdinstitucionEqualTo(guardiaConfCopy.getIdinstitucion())
+																	.andIdturnoEqualTo(guardiaConfCopy.getIdturno())
+																	.andIdguardiaEqualTo(guardiaConfCopy.getIdguardia())
+																	.andIdpersonaEqualTo(guardiaConfCopy.getIdpersona())
+																	.andFechainicioEqualTo(guardiaConfCopy.getFechainicio());
+															
+															int deleteGuardColConf = scsGuardiascolegiadoExtendsMapper.deleteByExample(scsGuardiascolegiadoConfExample);
 
 															// Borramos SCS_CABECERAGUARDIAS antigua del Sol
 															if (deleteGuardColConf != 0) {
