@@ -55,6 +55,15 @@ public class JustificacionExpressItem {
 	private List<ActuacionesJustificacionExpressItem> actuaciones;	 
 	private String categoriaProcedimiento;
 	private Error error = null;
+	private String complemento;
+
+	public String getComplemento() {
+		return complemento;
+	}
+
+	public void setComplemento(String complemento) {
+		this.complemento = complemento;
+	}
 
 	public String getCategoriaJuzgado() {
 		return categoriaJuzgado;

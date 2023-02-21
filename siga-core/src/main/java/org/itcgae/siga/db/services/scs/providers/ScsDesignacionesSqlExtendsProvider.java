@@ -1417,6 +1417,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.IDPROCEDIMIENTO, ");
 		sql.append(" D.NUMPROCEDIMIENTO, ");
 		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
+		sql.append(" P.COMPLEMENTO,");
 		sql.append(" P.CODIGO CATEGORIA, ");
 		sql.append(" D.NIG, ");
 		sql.append(

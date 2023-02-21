@@ -1491,7 +1491,8 @@ public class ComboServiceImpl implements ComboService {
 				for (ComboItem2 item : comboItems2) {
 					String label = "";
 					if (idInstitucion != 2005) {
-						label = item.getLabel1() + ' ' + item.getLabel2();
+						label = item.getLabel1() != null ? item.getLabel1() : "" + ' ' + item.getLabel2();
+						label = label.trim();
 					}else {
 						label = item.getLabel2();
 					}
