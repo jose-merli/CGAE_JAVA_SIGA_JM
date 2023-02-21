@@ -86,11 +86,7 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
 
             SQL.INNER_JOIN("SCS_CALENDARIOGUARDIAS GC ON GC.IDINSTITUCION = GUA.IDINSTITUCION " +
                             "AND GC.IDTURNO = GUA.IDTURNO " +
-                            "AND GC.IDGUARDIA = GUA.IDGUARDIA ",
-                    "SCS_CABECERAGUARDIAS CG ON GC.IDINSTITUCION = CG.IDINSTITUCION " +
-                            "AND GC.IDTURNO = CG.IDTURNO " +
-                            "AND GC.IDGUARDIA = CG.IDGUARDIA " +
-                            "AND GC.IDCALENDARIOGUARDIAS = CG.IDCALENDARIOGUARDIAS");
+                            "AND GC.IDGUARDIA = GUA.IDGUARDIA");
             SQL.WHERE("GUA.IDTURNO = '" + idTurno + "'",
                     "GUA.IDINSTITUCION = '" + idInstitucion + "'",
                     "TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.FECHAINICIO) AND trunc(gc.FECHAFIN)");
