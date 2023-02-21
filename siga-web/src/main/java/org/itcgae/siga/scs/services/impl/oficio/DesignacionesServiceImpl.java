@@ -785,6 +785,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actDesItem, idInstitucion);
 
 					record.setNumeroasunto(maxIdDto.getIdMax());
+					record.setIdpersonacolegiado(Long.valueOf(item.getIdPersonaColegiado()));
+					
 					response = scsActuaciondesignaMapper.insertSelective(record);
 
 					LOGGER.info("DesignacionesServiceImpl.insertaJustificacionExpres() -> Insert finalizado");

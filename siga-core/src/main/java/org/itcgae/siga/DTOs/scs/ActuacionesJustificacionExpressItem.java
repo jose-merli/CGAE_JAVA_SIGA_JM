@@ -36,6 +36,19 @@ public class ActuacionesJustificacionExpressItem {
 	private String anio;
 	private String idTurno;
 	private String idInstitucion;
+	private String idPersonaColegiado;
+	/**
+	 * @return the idPersonaColegiado
+	 */
+	public String getIdPersonaColegiado() {
+		return idPersonaColegiado;
+	}
+	/**
+	 * @param idPersonaColegiado the idPersonaColegiado to set
+	 */
+	public void setIdPersonaColegiado(String idPersonaColegiado) {
+		this.idPersonaColegiado = idPersonaColegiado;
+	}
 	/**
 	 * @return the numDesignacion
 	 */
