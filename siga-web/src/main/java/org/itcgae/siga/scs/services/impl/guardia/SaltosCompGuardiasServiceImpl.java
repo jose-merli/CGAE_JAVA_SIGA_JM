@@ -89,8 +89,7 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 							.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
 							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-
+					genParametrosExample.setOrderByClause("FECHA ASC");
 					LOGGER.info(
 							"searchJusticiables() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
@@ -116,7 +115,7 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 						saltoCompDTO.setError(error);
 						saltosComp.remove(saltosComp.size() - 1);
 					}
-
+						
 					if (saltosComp != null && !saltosComp.isEmpty()) {
 
 						LOGGER.info("searchGuardias() -> Si es por grupo, se obtienen los diferentes letrados");
