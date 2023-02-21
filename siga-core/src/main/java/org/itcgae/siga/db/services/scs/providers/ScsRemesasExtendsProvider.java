@@ -360,7 +360,7 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("ejg.numero NUMEROEJG");
 		sql.SELECT("guardia.descripcion TURNO_GUARDIA_EJG");
 		sql.SELECT("F_SIGA_GETRECURSO(tipoejg.descripcion, " + idLenguaje + ") ESTADOEJG");
-		sql.SELECT("persona.nombre || ' ' || persona.apellidos1 || ' ' || persona.apellidos2 SOLICITANTE");
+		sql.SELECT("persona.nombre || ' ' || persona.apellido1 || ' ' || persona.apellido2 SOLICITANTE");
 		sql.SELECT("(" + nuevaRemesa.toString() + ") NUEVAREMESA");
 		sql.SELECT("DECODE( (" + estadoRemesa.toString() + "), 1, 'Incidencias validacion', "
 				+ "2, 'Incidencias envio', 'Correcto') ESTADOREMESA");
@@ -373,14 +373,15 @@ public class ScsRemesasExtendsProvider {
 		sql.FROM("CEN_COLEGIADO colegiado");
 		sql.FROM("CAJG_EJGREMESA ejgremesa");
 		sql.FROM("CAJG_REMESA remesa");
-		sql.FROM("CEN_PERSONA persona");
+		sql.FROM("SCS_PERSONAJG persona");
 		sql.WHERE("ejg.IDTIPOEJG = tipoejg.IDTIPOEJG");
 		sql.WHERE("ejg.IDINSTITUCION = guardia.IDINSTITUCION(+)");
 		sql.WHERE("ejg.GUARDIATURNO_IDTURNO = guardia.IDTURNO(+)");
 		sql.WHERE("ejg.GUARDIATURNO_IDGUARDIA = guardia.IDGUARDIA(+)");
 		sql.WHERE("ejg.IDINSTITUCION = colegiado.IDINSTITUCION(+)");
 		sql.WHERE("ejg.IDPERSONA = colegiado.IDPERSONA(+)");
-		sql.WHERE("ejg.IDPERSONA = persona.IDPERSONA(+)");
+		sql.WHERE("ejg.idinstitucion = persona.IDINSTITUCION (+)");
+		sql.WHERE("ejg.IDPERSONAJG = persona.IDPERSONA(+)");
 		sql.WHERE("ejg.idinstitucion=ejgremesa.idinstitucion");
 		sql.WHERE("ejg.anio=ejgremesa.anio");
 		sql.WHERE("ejg.numero=ejgremesa.numero");
