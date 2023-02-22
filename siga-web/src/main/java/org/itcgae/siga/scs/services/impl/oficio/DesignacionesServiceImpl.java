@@ -775,7 +775,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setUsucreacion(usuarios.get(0).getIdusuario());
 					record.setFechacreacion(new Date());
 
-					// cogemos el numasunot
+					// cogemos el numasunto
 					ActuacionDesignaItem actDesItem = new ActuacionDesignaItem();
 
 					actDesItem.setIdTurno(item.getIdTurno());
@@ -785,6 +785,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actDesItem, idInstitucion);
 
 					record.setNumeroasunto(maxIdDto.getIdMax());
+					record.setIdpersonacolegiado(Long.valueOf(item.getIdPersonaColegiado()));
+					
 					response = scsActuaciondesignaMapper.insertSelective(record);
 
 					LOGGER.info("DesignacionesServiceImpl.insertaJustificacionExpres() -> Insert finalizado");
@@ -2694,8 +2696,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						List<ScsTurno> listaTurnos = scsTurnoMapper.selectByExample(scsTurnoExample);
 
-						if (actuacionDesignaItem.getIdPartidaPresupuestaria().isEmpty()
-								|| actuacionDesignaItem.getIdPartidaPresupuestaria() == null) {
+						if (actuacionDesignaItem.getIdPartidaPresupuestaria() == null
+								|| actuacionDesignaItem.getIdPartidaPresupuestaria().isEmpty()) {
 							if (!listaTurnos.isEmpty() && null != listaTurnos.get(0).getIdpartidapresupuestaria()) {
 								actuacionDesignaItem.setIdPartidaPresupuestaria(
 										listaTurnos.get(0).getIdpartidapresupuestaria().toString());
