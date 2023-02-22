@@ -1962,6 +1962,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				AdmUsuarios usuario = usuarios.get(0);
 
 				List<CargaMasivaDatosGuardiatem> cargaMasivaDatosBTItems = parseExcelFileC(datos, usuario);
+				LOGGER.info(
+						"uploadFileC() / Registros : " + cargaMasivaDatosBTItems.size());
 
 				for (CargaMasivaDatosGuardiatem cargaMasivaDatosBTItem : cargaMasivaDatosBTItems) {
 					int i = 1;
@@ -2128,7 +2130,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						}
 
 					} else {
-						LOGGER.error("uploadFileC() -> " + cargaMasivaDatosBTItem.getErrores());
+						LOGGER.error("uploadFileC() -> Errores : " + cargaMasivaDatosBTItem.getErrores());
 						errores += cargaMasivaDatosBTItem.getErrores();
 						error.setDescription(errores);
 						deleteResponseDTO.setError(error);
@@ -2145,6 +2147,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 				if (cargaMasivaDatosBTItems.isEmpty()) {
 					error.setMessage("No existen registros en el fichero.");
+					LOGGER.info("uploadFileC() -> No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK);
 				} else {
 					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
