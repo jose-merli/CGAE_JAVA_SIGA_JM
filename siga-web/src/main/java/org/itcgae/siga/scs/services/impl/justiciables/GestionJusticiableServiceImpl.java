@@ -2279,9 +2279,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					ScsEjgExample paramejg = new ScsEjgExample();
 
 					paramejg.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-							.andAnioEqualTo(Short.valueOf(itemEjg.get(0))).andNumeroEqualTo(Long.valueOf(itemEjg.get(1)));
+							.andAnioEqualTo(Short.valueOf(itemEjg.get(0))).andNumejgEqualTo(itemEjg.get(1));
 
 					List<ScsEjgWithBLOBs> ejg = scsEjgMapper.selectByExampleWithBLOBs(paramejg);
+					
 					// Actualizar con Justiciable seleccionado.
 					if (ejg != null && ejg.size() > 0) {
 						ScsEjgWithBLOBs ejgItem = ejg.get(0);
@@ -2297,9 +2298,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						List<String> newUnidadFamiliar = new ArrayList<>();
 						newUnidadFamiliar.add(idInstitucion.toString());
 						newUnidadFamiliar.add(itemEjg.get(3));
-						newUnidadFamiliar.add(itemEjg.get(0));
-						newUnidadFamiliar.add(String.valueOf(ejg.get(0).getIdtipoejg()));
-						newUnidadFamiliar.add(itemEjg.get(1));
+						newUnidadFamiliar.add(ejgItem.getAnio().toString());
+						newUnidadFamiliar.add(ejgItem.getIdtipoejg().toString());
+						newUnidadFamiliar.add(ejgItem.getNumero().toString());
 						gestionEJGService.insertFamiliarEJG(newUnidadFamiliar, request);
 					}
 
