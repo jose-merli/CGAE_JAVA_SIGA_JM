@@ -4090,15 +4090,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 						hco.setUsumodificacion(usuarios.get(0).getUsumodificacion());
 						hco.setFechamodificacion(new Date());
 						scsHcoConfProgCalendariosMapper.updateByPrimaryKeySelective(hco);
-						scsGuardiasturnoExtendsMapper.updateCalendarioProgramado3(calendarioItem,
-								idInstitucion.toString());
+						//scsGuardiasturnoExtendsMapper.updateCalendarioProgramado3(calendarioItem,
+						//		idInstitucion.toString());
 
 						if (error.getCode() == null) {
 							error.setCode(200);
 							insertResponseDTO.setStatus(SigaConstants.OK);
 						}
 
-						LOGGER.info("updateCalendarioProgramado() -> Entrada para obtener los datos del calendario");
+						LOGGER.info("updateCalendarioProgramado() -> salida para obtener los datos del calendario");
 					}
 				}
 			}
@@ -9431,11 +9431,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String pathFicheroSalida = "sjcs.directorioFisicoGeneracionCalendarios.{" + idInstitucion.toString() + "}";
 		String nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(), calyprogItem.getIdTurno(),
 				calyprogItem.getIdGuardia(), calyprogItem.getIdCalendarioGuardias());
-
+		LOGGER.info("descargarExcelLog() -> NOMBRE LOG A DESCARGAR : " + nombreLog);
+		LOGGER.info("descargarExcelLog() - > INFO CAL A DESCARGAR - > Turno:" + calyprogItem.getIdTurno() +  " / Guardia: " + calyprogItem.getIdGuardia() + "/ idCalG: " + calyprogItem.getIdCalendarioGuardias());
 		try {
 			pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
 			String nombreFicheroSalida = nombreLog + ".xlsx";
 			String path = pathFicheroSalida + nombreFicheroSalida;
+			LOGGER.info("descargarExcelLog() -> NOMBRE PATH : " + path);
+			
 			File file = new File(path);
 			FileInputStream fileInputStream = new FileInputStream(file);
 			fileInputStream.close();
