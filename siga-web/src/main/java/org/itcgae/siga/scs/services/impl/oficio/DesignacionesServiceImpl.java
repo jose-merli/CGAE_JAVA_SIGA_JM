@@ -8446,13 +8446,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	private int actualizaDesignaEnAsuntos(ScsDesigna datos, Short idInstitucion, String origen, AdmUsuarios usuario) {
 		// TODO Completar y usar como ejemplo y tratar error con try catch
-		int respuesta = 0;
+		int respuesta, respuestaDes, respuestaAsi, respuestacopy;
+		respuesta = respuestaDes = respuestaAsi = respuestacopy = 0;
+		
 		try {
 			ScsEjgdesignaExample example = new ScsEjgdesignaExample();
 			example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAniodesignaEqualTo(datos.getAnio())
 					.andNumerodesignaEqualTo(datos.getNumero());
 
 			List<ScsEjgdesigna> relDesignaList = scsEjgdesignaMapper.selectByExample(example);
+			
 			if (relDesignaList != null && !relDesignaList.isEmpty()) {
 				for (ScsEjgdesigna relacion : relDesignaList) {
 
@@ -8461,18 +8464,28 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					// pero parametrizando la tarjeta origen que está haciendo el guardado de datos,
 					// por ejemplo, Defensa jurídica
 
-					respuesta = copyDesigna2Ejg(idInstitucion, origen, usuario, relacion);
+					respuestacopy += copyDesigna2Ejg(idInstitucion, origen, usuario, relacion);
 				}
+				if(respuestacopy == relDesignaList.size()) {
+					respuestaDes = 1;
+				}
+				respuestacopy = 0;
 			}
+			
 			ScsAsistenciaExample exampleAsistencia = new ScsAsistenciaExample();
 			exampleAsistencia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 					.andDesignaAnioEqualTo(datos.getAnio()).andDesignaNumeroEqualTo(datos.getNumero());
 
 			List<ScsAsistencia> relAsistenciaList = scsAsistenciaExtendsMapper.selectByExample(exampleAsistencia);
+			
 			if (relAsistenciaList != null && !relAsistenciaList.isEmpty()) {
 				for (ScsAsistencia relacion : relAsistenciaList) {
-					respuesta = copyDesigna2Asis(idInstitucion, origen, usuario, relacion);
+					respuestacopy += copyDesigna2Asis(idInstitucion, origen, usuario, relacion);
 				}
+				if(respuestacopy == relAsistenciaList.size()) {
+					respuestaAsi = 1;
+				}
+				respuestacopy = 0;
 			}
 
 			/*
@@ -8490,6 +8503,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			 * relSojList) { //respuesta = copyEjg2Soj(idInstitucion, origen, usuario,
 			 * relacion); } } }
 			 */
+			
+			if((relDesignaList == null || relDesignaList.isEmpty()) && (relAsistenciaList == null || relAsistenciaList.isEmpty())) {
+				respuesta = 1; //si no tiene relaciones es que ha ido bien
+			}else if(respuestaDes == 0 || respuestaAsi == 0) {
+				respuesta = 0;
+			}else {
+				respuesta = 1;
+			}
 
 		} catch (Exception e) {
 			return respuesta = 0;
