@@ -63,6 +63,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private GenFicheroMapper genFicheroMapper;
+	
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 
 	@Autowired
 	private FicherosServiceImpl ficherosServiceImpl;
@@ -1710,10 +1713,20 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				if (response == 0)
 					throw (new Exception("Error al insertar los datos generales del EJG"));
 
-				// Se ejecuta este método que sustituye los triggers de la base de datos
+				// Se ejecuta de forma parametrizada este método que sustituye los triggers de la base de datos
 				// al insertar una nueva fila en la tabla SCS_EJG por codigo java.
-				this.triggersEjgInsert(record, usuarios.get(0), idInstitucion);
-
+				
+				
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgInsert(record, usuarios.get(0), idInstitucion);
+				}
 //                                                           } catch (Exception e) {
 //                                                                           LOGGER.error(
 //                                                                                                          "GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ",
@@ -1969,7 +1982,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				this.triggersEjgUpdatesFApertura(datos, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesFApertura(datos, usuarios.get(0), idInstitucion);
+				}
 
 				// Actualizamos la entrada en la BBDD
 				response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
@@ -2667,7 +2689,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				this.triggersEjgUpdatesImpug(datos, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesImpug(datos, usuarios.get(0), idInstitucion);
+				}
 
 				response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(scsEjgWithBLOBs);
 
@@ -2854,7 +2885,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				this.triggersEjgUpdatesResol(datos, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesResol(datos, usuarios.get(0), idInstitucion);
+				}
 
 				response = scsEjgMapper.updateByPrimaryKey(ejg);
 				if (response == 0)
@@ -6253,7 +6293,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
+				}
 
 				response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(newEjg);
 				if (response == 0)
@@ -6318,7 +6367,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG cuando una fila es actualizada.
-				this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
+				}
 
 				response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(newEjg);
 				if (response == 0)
