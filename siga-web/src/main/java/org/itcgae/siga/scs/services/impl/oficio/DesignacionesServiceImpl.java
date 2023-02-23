@@ -5054,18 +5054,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //		if(item[11] != null) {
 //			 checkSaltoEntrante = Boolean.parseBoolean(item[12]);
 //		}
-
-		Date fechaMinDesigna = new Date();
-		if(item[13]!=null) {
-			if (item[13].length() != 10) {
-				String date = item[13].substring(0, 10);
-				fechaMinDesigna = formatter.parse(date);
-			} else {
-				String date = item[13].substring(0, 10);
-				fechaMinDesigna = format.parse(date);
-			}
-		}
-
+		
 		LOGGER.info("updateLetradoDesigna() ->  Fin Preparacion de datos proviniente del item de front");
 
 		LOGGER.info(
