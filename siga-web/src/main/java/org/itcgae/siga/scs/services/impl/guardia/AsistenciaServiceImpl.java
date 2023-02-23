@@ -5857,7 +5857,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}else {
 				respuesta = 1;
 			}
-
+			if(datos.getEjgnumero() == null && datos.getDesignaNumero() == null) {
+				//Si no tiene asuntos relacionados la respuesta es correcta
+				respuesta=1;
+			}
 		} catch (Exception e) {
 			return respuesta = 0;
 		}
