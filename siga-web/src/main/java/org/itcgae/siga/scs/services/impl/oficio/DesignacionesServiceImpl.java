@@ -5056,12 +5056,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //		}
 
 		Date fechaMinDesigna = new Date();
-		if (item[13].length() != 10) {
-			String date = item[13].substring(0, 10);
-			fechaMinDesigna = formatter.parse(date);
-		} else {
-			String date = item[13].substring(0, 10);
-			fechaMinDesigna = format.parse(date);
+		if(item[13]!=null) {
+			if (item[13].length() != 10) {
+				String date = item[13].substring(0, 10);
+				fechaMinDesigna = formatter.parse(date);
+			} else {
+				String date = item[13].substring(0, 10);
+				fechaMinDesigna = format.parse(date);
+			}
 		}
 
 		LOGGER.info("updateLetradoDesigna() ->  Fin Preparacion de datos proviniente del item de front");
@@ -5149,6 +5151,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						error.setCode(100);
 						error.setDescription("justiciaGratuita.oficio.designas.letrados.nocolaletrado");
 						updateResponseDTO.setError(error);
+						return updateResponseDTO;
 					} else {
 						letradoEntrante.setIdpersona(newLetrado.getIdpersona());
 						designaLetradoNueva.setIdpersona(newLetrado.getIdpersona());
