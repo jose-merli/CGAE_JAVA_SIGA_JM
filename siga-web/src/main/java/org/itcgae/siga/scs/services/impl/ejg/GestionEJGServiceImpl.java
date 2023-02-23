@@ -3487,50 +3487,80 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	private int actualizaEjgEnAsuntos(EjgItem datos, Short idInstitucion, String origen, AdmUsuarios usuario) {
 		// TODO Completar y usar como ejemplo y tratar error con try catch
-		int respuesta = 0;
+		int respuesta, respuestaDes, respuestaAsi, respuestaSoj , respuestacopy;
+		respuesta = respuestaDes = respuestaAsi = respuestaSoj = respuestacopy = 0;
+		
+		List<ScsSoj> relSojList = null;
 		try{
-		ScsEjgdesignaExample example = new ScsEjgdesignaExample();
-        example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-        .andAnioejgEqualTo(Short.valueOf(datos.getAnnio()))
-        .andNumeroejgEqualTo(Long.valueOf(datos.getNumero()))
-        .andIdtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
-        List<ScsEjgdesigna> relDesignaList = scsEjgdesignaMapper.selectByExample(example );
-        if(relDesignaList != null && !relDesignaList.isEmpty()) {
-            for(ScsEjgdesigna relacion:relDesignaList) {
-                
-            	//OPCION 1 crear método similar a los que hay en BusquedaAsuntosServiceImpl copyEjg2....
-            	//pero parametrizando la tarjeta origen que está haciendo el guardado de datos, por ejemplo, Defensa jurídica
-            	
-            	respuesta = copyEjg2Designa(idInstitucion, origen, usuario, relacion);
-            }
-        }
-        ScsAsistenciaExample exampleAsistencia = new  ScsAsistenciaExample();
-        exampleAsistencia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-        .andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
-        .andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
-        .andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
-        List<ScsAsistencia> relAsistenciaList = scsAsistenciaExtendsMapper.selectByExample(exampleAsistencia);
-        if(relAsistenciaList != null && !relAsistenciaList.isEmpty()) {
-        	for(ScsAsistencia relacion : relAsistenciaList) {
-        		respuesta = copyEjg2Asis(idInstitucion, origen, usuario, relacion);
-        	}
-        }
-        
-        if(origen.equals("unidadFamiliar")) { // Si hay cambios en la unidad familiar solicitante principal, se actualiza los SOJ.
-        	ScsSojExample sojExample = new ScsSojExample();
-    		sojExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-    		.andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
-    		.andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
-    		.andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
-
-    		List<ScsSoj> relSojList = scsSojMapper.selectByExample(sojExample);
-    		
-    		 if(relSojList != null && !relSojList.isEmpty()) {
-    	        	for(ScsSoj relacion : relSojList) {
-    	        		respuesta = copyEjg2Soj(idInstitucion, origen, usuario, relacion);
-    	        	}
-    	        }
-        }
+			ScsEjgdesignaExample example = new ScsEjgdesignaExample();
+	        example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andAnioejgEqualTo(Short.valueOf(datos.getAnnio()))
+						.andNumeroejgEqualTo(Long.valueOf(datos.getNumero()))
+						.andIdtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+	       
+	        List<ScsEjgdesigna> relDesignaList = scsEjgdesignaMapper.selectByExample(example );
+	        
+	        if(relDesignaList != null && !relDesignaList.isEmpty()) {
+	            for(ScsEjgdesigna relacion:relDesignaList) {
+	                
+	            	//OPCION 1 crear método similar a los que hay en BusquedaAsuntosServiceImpl copyEjg2....
+	            	//pero parametrizando la tarjeta origen que está haciendo el guardado de datos, por ejemplo, Defensa jurídica
+	            	
+	            	respuestacopy += copyEjg2Designa(idInstitucion, origen, usuario, relacion);
+	
+	            }
+	            if(respuestacopy == relDesignaList.size()) {
+	            	respuestaDes = 1;
+	            }
+	            respuestacopy = 0;
+	        }
+	        
+	        ScsAsistenciaExample exampleAsistencia = new  ScsAsistenciaExample();
+				exampleAsistencia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
+						.andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
+						.andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+	        
+	        List<ScsAsistencia> relAsistenciaList = scsAsistenciaExtendsMapper.selectByExample(exampleAsistencia);
+	        
+	        if(relAsistenciaList != null && !relAsistenciaList.isEmpty()) {
+	        	for(ScsAsistencia relacion : relAsistenciaList) {
+	        		respuestacopy += copyEjg2Asis(idInstitucion, origen, usuario, relacion);
+	
+	        	}
+	        	if(respuestacopy == relAsistenciaList.size()) {
+	            	respuestaAsi = 1;
+	            }
+	            respuestacopy = 0;
+	        }
+	        
+	        if(origen.equals("unidadFamiliar")) { // Si hay cambios en la unidad familiar solicitante principal, se actualiza los SOJ.
+	        	ScsSojExample sojExample = new ScsSojExample();
+					sojExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
+							.andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
+							.andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+	
+	    		relSojList = scsSojMapper.selectByExample(sojExample);
+	    		
+	    		 if(relSojList != null && !relSojList.isEmpty()) {
+	    	        	for(ScsSoj relacion : relSojList) {
+	    	        		respuestacopy += copyEjg2Soj(idInstitucion, origen, usuario, relacion);
+	    	        	}
+	    	        	if(respuestacopy == relSojList.size()) {
+	    	            	respuestaSoj = 1;
+	    	            }
+	    	            respuestacopy = 0;
+	    	        }
+	        }
+	        
+	        if((relDesignaList == null || relDesignaList.isEmpty()) && (relAsistenciaList == null || relAsistenciaList.isEmpty()) && (relSojList == null || relSojList.isEmpty())) {
+	        	respuesta = 1; //si no tiene relaciones es que ha ido bien
+	        }else if(respuestaDes == 0 || respuestaAsi == 0 || respuestaSoj == 0) {
+	        	respuesta = 0;
+	        }else {
+	        	respuesta = 1;
+	        }
     	
 		}catch(Exception e){
 			return respuesta= 0;
