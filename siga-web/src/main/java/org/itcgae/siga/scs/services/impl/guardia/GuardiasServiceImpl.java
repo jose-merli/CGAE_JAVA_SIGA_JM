@@ -1449,7 +1449,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					colaGuardia.clear();
 					colaGuardia.addAll(colaGuardiaHS2);
 
-					Collections.sort(colaGuardia);
+					//Collections.sort(colaGuardia);
 					colaGuardia.addAll(colaGuardiaNulos);
 					// reordenamos
 
@@ -6415,12 +6415,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		    String fecha = sdf.format(new Date());
 		    
 		    guardiaBuscador.setLetradosIns(fecha);
-		    
-		    
-		    InscripcionGuardiaDTO respuesta = searchColaGuardia(guardiaBuscador, null, "Calendarios");
-		    List<InscripcionGuardiaItem> listaLetrados = respuesta.getInscripcionesItem();
 
-		    /*
 			// obteniendo lista de letrados (ordenada)
 			List<InscripcionGuardiaItem> listaLetrados = null;
 			if (idGuardia != null) {
@@ -6472,20 +6467,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						foundUltimo = true;
 				}
 				colaLetrados.addAll(colaAuxiliar);
-			}*/
-			if (listaLetrados == null || listaLetrados.size() == 0)
-				return colaLetrados;
-			for (int i = 0; i < listaLetrados.size(); i++) {
-				punteroInscripciones = listaLetrados.get(i);
-
-				LetradoInscripcionItem letradoInscripcionItem = new LetradoInscripcionItem();
-				letradoInscripcionItem.setInscripcionGuardia(punteroInscripciones);
-				colaLetrados.add(letradoInscripcionItem);
-
 			}
-			
-			
-			// usando saltos si es necesario (en guardias no)
 
 			return colaLetrados;
 
