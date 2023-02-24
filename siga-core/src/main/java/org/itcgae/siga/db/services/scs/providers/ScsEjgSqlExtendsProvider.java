@@ -2026,7 +2026,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		// consulta para obtener la relacion de DESIGNA con los datos de las consultas
 		// anteriores.
 		sqlDesigna.SELECT("TRIM('DESIGNACIÓN') sjcs,"
-				+ "TO_CHAR('D' || ejgd.aniodesigna || '/' || ejgd.numerodesigna) idsjcs," + "ejg.FECHAAPERTURA fecha,"
+				+ "TO_CHAR('D' || ejgd.aniodesigna || '/' || ejgd.numerodesigna) idsjcs, " 
+				+ " (SELECT fechaentrada FROM scs_designa des WHERE des.anio = ejgd.aniodesigna AND des.numero = ejgd.numerodesigna AND des.idturno = ejgd.idturno AND des.IDINSTITUCION = " + item.getidInstitucion() + ") fecha, " 
 				+ "            ejg.idinstitucion idinstitucion,\r\n" + "            ejgd.aniodesigna anio,\r\n"
 				+ "            ejgd.numerodesigna numero,\r\n" + "            ejg.idpersona idletrado,"
 				+ "TO_CHAR(ejgd.idturno) idturno," + "(" + sqlDesigna_2.toString() + ") idtipo," + "("
