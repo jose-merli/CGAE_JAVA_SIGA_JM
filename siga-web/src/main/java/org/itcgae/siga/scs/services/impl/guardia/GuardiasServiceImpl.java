@@ -126,7 +126,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class GuardiasServiceImpl implements GuardiasService {
 
 	private Logger LOGGER = Logger.getLogger(GuardiasServiceImpl.class);
-	private boolean resetGrupos = false;
 	private static final String ESTADO_PROGRAMADO = "0";
 	private static final String EN_PROCESO = "1";
 	private static final String PROCESADO_CON_ERRORES = "2";
@@ -790,15 +789,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						ordExample.createCriteria().andIdordenacioncolasEqualTo(item.get(0).getIdordenacioncolas());
 
 						List<ScsOrdenacioncolas> colas = scsOrdenacionColasExtendsMapper.selectByExample(ordExample);
-
-						// Esto sirve para ver si habrá que generar grupos automaticamente despues de
-						// updatear
-						resetGrupos = false;
-						if ((item.get(0).getPorgrupos().equals("1") || colas.get(0).getOrdenacionmanual() == 0)
-								&& !Boolean.valueOf(guardiasItem.getPorGrupos())
-								&& Short.valueOf(guardiasItem.getFiltros().split(",")[4]) != 0) {
-							resetGrupos = true;
-						}
+						
 						guardia.setPorgrupos((Boolean.valueOf(guardiasItem.getPorGrupos()) ? "1" : "0"));
 						guardia.setIdordenacioncolas(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
 						// ROTAR COMPONENTES?
@@ -1464,140 +1455,119 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					inscritos.setInscripcionesItem(colaGuardia);
 
-					// Si se ha pasado de por grupos a sin grupos o que estuviese sin grupos y se
-					// añada la ord. manual
 					// hay que updatear todos los grupos
 					// y generarlos con el mismo valor de la posicion que tienen en la lista.
-					if (colaGuardia != null && colaGuardia.size() > 0 && resetGrupos) {
-						resetGrupos = false;
 
-						ScsGrupoguardia grupo = null;
-						ScsGrupoguardiacolegiado grupoColegiado = null;
+					ScsGrupoguardia grupo = null;
+					ScsGrupoguardiacolegiado grupoColegiado = null;
 
-						SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-						String strDate = formatter.format(new Date());
+					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+					String strDate = formatter.format(new Date());
+					
+					// Obtenemos el ultimo id generado en los grupos
+					ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
+					grupoGuardiaExample.createCriteria()
+							.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
+							.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
+							.andIdinstitucionEqualTo(idInstitucion);
+					List<ScsGrupoguardia> gruposGuardia = scsGrupoguardiaExtendsMapper
+							.selectByExample(grupoGuardiaExample);
 
-						List<InscripcionGuardiaItem> todaColaGuardia = scsInscripcionguardiaExtendsMapper
-								.getColaGuardias(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), strDate,
-										ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
-						// Obtenemos el ultimo id generado en los grupos
-						ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
-						grupoGuardiaExample.createCriteria()
-								.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
-								.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
-								.andIdinstitucionEqualTo(idInstitucion);
-						List<ScsGrupoguardia> gruposGuardia = scsGrupoguardiaExtendsMapper
-								.selectByExample(grupoGuardiaExample);
+					ScsGrupoguardiacolegiadoExample scsGrupoguardiacolegiadoExample = null;
 
-						ScsGrupoguardiacolegiadoExample scsGrupoguardiacolegiadoExample = null;
+					for (int i = 0; i < colaGuardia.size(); i++) {
+						grupoColegiado = new ScsGrupoguardiacolegiado();
+						// Aqui se buscan de los grupos existentes uno cuyo numero sea adecuado para el
+						// orden cola. Si encuentra uno le settea el campo FK.
+						for (ScsGrupoguardia g : gruposGuardia)
+							if ((i + 1) == g.getNumerogrupo())
+								grupoColegiado.setIdgrupoguardia(g.getIdgrupoguardia());
+						// Aqui creamos un Grupoguardiacolegiado en caso de que no tenga uno asignado.
+						if (colaGuardia.get(i).getIdGrupoGuardiaColegiado() == null) {
+							grupoColegiado.setFechamodificacion(new Date());
+							grupoColegiado.setFechacreacion(new Date());
+							grupoColegiado.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
+							grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
+							grupoColegiado.setOrden(1);
+							grupoColegiado.setFechasuscripcion(colaGuardia.get(i).getFechaSuscripcion());
+							grupoColegiado.setIdinstitucion(idInstitucion);
+							grupoColegiado.setIdpersona(Long.valueOf(colaGuardia.get(i).getIdPersona()));
+							grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
+							grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
+							// NewIdDTO idP = scsGrupoguardiacolegiadoExtendsMapper.getLastId();
 
-						for (int i = 0; i < todaColaGuardia.size(); i++) {
-							grupoColegiado = new ScsGrupoguardiacolegiado();
-							// Aqui se buscan de los grupos existentes uno cuyo numero sea adecuado para el
-							// orden cola. Si encuentra uno le settea el campo FK.
-							for (ScsGrupoguardia g : gruposGuardia)
-								if ((i + 1) == g.getNumerogrupo())
-									grupoColegiado.setIdgrupoguardia(g.getIdgrupoguardia());
-							// Aqui creamos un Grupoguardiacolegiado en caso de que no tenga uno asignado.
-							if (todaColaGuardia.get(i).getIdGrupoGuardiaColegiado() == null) {
-								grupoColegiado.setFechamodificacion(new Date());
-								grupoColegiado.setFechacreacion(new Date());
-								grupoColegiado.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
-								grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
-								grupoColegiado.setOrden(1);
-								grupoColegiado.setFechasuscripcion(todaColaGuardia.get(i).getFechaSuscripcion());
-								grupoColegiado.setIdinstitucion(idInstitucion);
-								grupoColegiado.setIdpersona(Long.valueOf(todaColaGuardia.get(i).getIdPersona()));
-								grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
-								grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
-								// NewIdDTO idP = scsGrupoguardiacolegiadoExtendsMapper.getLastId();
+							/*
+							 * if (idP == null) grupoColegiado.setIdgrupoguardiacolegiado((long) 1); else
+							 * grupoColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idP.getNewId()) +
+							 * 1);
+							 */
 
-								/*
-								 * if (idP == null) grupoColegiado.setIdgrupoguardiacolegiado((long) 1); else
-								 * grupoColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idP.getNewId()) +
-								 * 1);
-								 */
+							// Si se encontro un grupo se inserta sino se crea uno nuevo y se asigna.
+							if (grupoColegiado.getIdgrupoguardia() != null)
+								scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
+							else {
+								grupo = new ScsGrupoguardia();
 
-								// Si se encontro un grupo se inserta sino se crea uno nuevo y se asigna.
-								if (grupoColegiado.getIdgrupoguardia() != null)
-									scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
-								else {
-									grupo = new ScsGrupoguardia();
+								// grupo.setIdgrupoguardia((long) idGrupo);
+								grupo.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
+								grupo.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
+								grupo.setFechamodificacion(new Date());
+								grupo.setFechacreacion(new Date());
+								grupo.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
+								grupo.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
+								grupo.setNumerogrupo(i + 1);
+								grupo.setIdinstitucion(idInstitucion);
 
-									// grupo.setIdgrupoguardia((long) idGrupo);
-									grupo.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
-									grupo.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
-									grupo.setFechamodificacion(new Date());
-									grupo.setFechacreacion(new Date());
-									grupo.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
-									grupo.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
-									grupo.setNumerogrupo(i + 1);
-									grupo.setIdinstitucion(idInstitucion);
+								scsGrupoguardiaExtendsMapper.insertSelective(grupo);
 
-									scsGrupoguardiaExtendsMapper.insertSelective(grupo);
+								grupoColegiado.setIdgrupoguardia(grupo.getIdgrupoguardia());
 
-									grupoColegiado.setIdgrupoguardia(grupo.getIdgrupoguardia());
+								scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
 
-									scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
-
-								}
-
-							} else {
-								// En este caso el Grupoguardiacolegiado existe y solo setteamos
-								// lo necesario.
-								grupoColegiado.setFechamodificacion(new Date());
-								grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
-								grupoColegiado.setOrden(1);
-								
-								scsGrupoguardiacolegiadoExample = new ScsGrupoguardiacolegiadoExample();
-								scsGrupoguardiacolegiadoExample.createCriteria()
-										.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
-										.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
-										.andIdgrupoguardiacolegiadoEqualTo(
-												Long.valueOf(todaColaGuardia.get(i).getIdGrupoGuardiaColegiado()))
-										.andIdinstitucionEqualTo(idInstitucion);
-
-								// Si previamente se le encontro grupo se inserta directamente
-								if (grupoColegiado.getIdgrupoguardia() != null)
-									scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
-											scsGrupoguardiacolegiadoExample);
-								// Sino se crea uno, se asigna y entonces insertamos
-								else {
-									grupo = new ScsGrupoguardia();
-
-									// grupo.setIdgrupoguardia((long) idGrupo);
-									grupo.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
-									grupo.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
-									grupo.setFechamodificacion(new Date());
-									grupo.setFechacreacion(new Date());
-									grupo.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
-									grupo.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
-									grupo.setNumerogrupo(i + 1);
-									grupo.setIdinstitucion(idInstitucion);
-
-									scsGrupoguardiaExtendsMapper.insertSelective(grupo);
-
-									grupoColegiado.setIdgrupoguardia(grupo.getIdgrupoguardia());
-
-									scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
-											scsGrupoguardiacolegiadoExample);
-								}
 							}
 
-						}
-						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
-								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
-								idInstitucion.toString(), grupoUltimo, porGrupos == "1");
-						for (int i = 0; i < colaGuardia.size(); i++) {
-							if (colaGuardia.get(i).getNombre() == "CARLA") {
-								String duda = colaGuardia.get(i).getNumeroGrupo();
-							}
-							if (colaGuardia.get(i).getNumeroGrupo() == null
-									|| colaGuardia.get(i).getNumeroGrupo() == "null") {
-								colaGuardia.remove(i);
+						} else {
+							// En este caso el Grupoguardiacolegiado existe y solo setteamos
+							// lo necesario.
+							grupoColegiado.setFechamodificacion(new Date());
+							grupoColegiado.setUsumodificacion(1);
+							grupoColegiado.setOrden(1);
+							
+							scsGrupoguardiacolegiadoExample = new ScsGrupoguardiacolegiadoExample();
+							scsGrupoguardiacolegiadoExample.createCriteria()
+									.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
+									.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
+									.andIdgrupoguardiacolegiadoEqualTo(
+											Long.valueOf(colaGuardia.get(i).getIdGrupoGuardiaColegiado()))
+									.andIdinstitucionEqualTo(idInstitucion);
+
+							// Si previamente se le encontro grupo se inserta directamente
+							if (grupoColegiado.getIdgrupoguardia() != null)
+								scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
+										scsGrupoguardiacolegiadoExample);
+							// Sino se crea uno, se asigna y entonces insertamos
+							else {
+								grupo = new ScsGrupoguardia();
+
+								// grupo.setIdgrupoguardia((long) idGrupo);
+								grupo.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
+								grupo.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
+								grupo.setFechamodificacion(new Date());
+								grupo.setFechacreacion(new Date());
+								grupo.setUsucreacion(1);
+								grupo.setUsumodificacion(1);
+								grupo.setNumerogrupo(i + 1);
+								grupo.setIdinstitucion(idInstitucion);
+
+								scsGrupoguardiaExtendsMapper.insertSelective(grupo);
+
+								grupoColegiado.setIdgrupoguardia(grupo.getIdgrupoguardia());
+
+								scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
+										scsGrupoguardiacolegiadoExample);
 							}
 						}
-						inscritos.setInscripcionesItem(colaGuardia);
+
 					}
 
 				}

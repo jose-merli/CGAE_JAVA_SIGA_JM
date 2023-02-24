@@ -141,9 +141,9 @@ public class InsertaRecursos {
 	}
 
 	private static void conecta() throws Exception {		
-		String cadenaConexion = "jdbc:oracle:thin:@vmcgaeap004.cloud.es.deloitte.com:1521:CGAE";
-		String usuario = "uscgae";
-		String clave = "uscgae";
+		String cadenaConexion = "jdbc:oracle:thin:@192.168.18.18:1546/SIGADES";
+		String usuario = "uscgae_int";
+		String clave = "oradesaINT19";
 
 		con = null;
 		Class.forName(oracle.jdbc.driver.OracleDriver.class.getName());

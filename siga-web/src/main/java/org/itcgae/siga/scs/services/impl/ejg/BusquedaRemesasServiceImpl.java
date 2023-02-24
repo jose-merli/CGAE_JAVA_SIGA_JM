@@ -1656,12 +1656,16 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		    }
 	
 		    int rowIdx = 1;
-		    String identificadorEJG;
+		    String identificadorEJG = null;
 		    for (CajgRespuestaEjgremesa respuestaEJGREMESA : respuestaEjgRemesa) {
 		    	Row row = sheet.createRow(rowIdx++);
 	
-		    	identificadorEJG = listaCajgEjgremesas.get(rowIdx-2).getIdinstitucion()+"-"+listaCajgEjgremesas.get(rowIdx-2).getIdtipoejg()+"-"+
-				        listaCajgEjgremesas.get(rowIdx-2).getAnio()+"-"+listaCajgEjgremesas.get(rowIdx-2).getNumero();
+		    	for(CajgEjgremesa listaCaj: listaCajgEjgremesas) {
+		    		if(listaCaj.getIdejgremesa().equals(respuestaEJGREMESA.getIdejgremesa())) {
+		    			identificadorEJG = listaCaj.getIdinstitucion()+"-"+listaCaj.getIdtipoejg()+"-"+
+						listaCaj.getAnio()+"-"+listaCaj.getNumero();
+		    		}
+		    	}
 		    	
 		        row.createCell(0).setCellValue(identificadorEJG);
 		        row.createCell(1).setCellValue(respuestaEJGREMESA.getDescripcion());

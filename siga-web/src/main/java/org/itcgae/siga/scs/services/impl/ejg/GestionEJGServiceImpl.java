@@ -63,6 +63,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private GenFicheroMapper genFicheroMapper;
+	
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 
 	@Autowired
 	private FicherosServiceImpl ficherosServiceImpl;
@@ -1710,10 +1713,20 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				if (response == 0)
 					throw (new Exception("Error al insertar los datos generales del EJG"));
 
-				// Se ejecuta este método que sustituye los triggers de la base de datos
+				// Se ejecuta de forma parametrizada este método que sustituye los triggers de la base de datos
 				// al insertar una nueva fila en la tabla SCS_EJG por codigo java.
-				this.triggersEjgInsert(record, usuarios.get(0), idInstitucion);
-
+				
+				
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgInsert(record, usuarios.get(0), idInstitucion);
+				}
 //                                                           } catch (Exception e) {
 //                                                                           LOGGER.error(
 //                                                                                                          "GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ",
@@ -1969,7 +1982,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				this.triggersEjgUpdatesFApertura(datos, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesFApertura(datos, usuarios.get(0), idInstitucion);
+				}
 
 				// Actualizamos la entrada en la BBDD
 				response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
@@ -2667,7 +2689,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				this.triggersEjgUpdatesImpug(datos, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesImpug(datos, usuarios.get(0), idInstitucion);
+				}
 
 				response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(scsEjgWithBLOBs);
 
@@ -2854,7 +2885,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				this.triggersEjgUpdatesResol(datos, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesResol(datos, usuarios.get(0), idInstitucion);
+				}
 
 				response = scsEjgMapper.updateByPrimaryKey(ejg);
 				if (response == 0)
@@ -3447,50 +3487,80 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	private int actualizaEjgEnAsuntos(EjgItem datos, Short idInstitucion, String origen, AdmUsuarios usuario) {
 		// TODO Completar y usar como ejemplo y tratar error con try catch
-		int respuesta = 0;
+		int respuesta, respuestaDes, respuestaAsi, respuestaSoj , respuestacopy;
+		respuesta = respuestaDes = respuestaAsi = respuestaSoj = respuestacopy = 0;
+		
+		List<ScsSoj> relSojList = null;
 		try{
-		ScsEjgdesignaExample example = new ScsEjgdesignaExample();
-        example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-        .andAnioejgEqualTo(Short.valueOf(datos.getAnnio()))
-        .andNumeroejgEqualTo(Long.valueOf(datos.getNumero()))
-        .andIdtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
-        List<ScsEjgdesigna> relDesignaList = scsEjgdesignaMapper.selectByExample(example );
-        if(relDesignaList != null && !relDesignaList.isEmpty()) {
-            for(ScsEjgdesigna relacion:relDesignaList) {
-                
-            	//OPCION 1 crear método similar a los que hay en BusquedaAsuntosServiceImpl copyEjg2....
-            	//pero parametrizando la tarjeta origen que está haciendo el guardado de datos, por ejemplo, Defensa jurídica
-            	
-            	respuesta = copyEjg2Designa(idInstitucion, origen, usuario, relacion);
-            }
-        }
-        ScsAsistenciaExample exampleAsistencia = new  ScsAsistenciaExample();
-        exampleAsistencia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-        .andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
-        .andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
-        .andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
-        List<ScsAsistencia> relAsistenciaList = scsAsistenciaExtendsMapper.selectByExample(exampleAsistencia);
-        if(relAsistenciaList != null && !relAsistenciaList.isEmpty()) {
-        	for(ScsAsistencia relacion : relAsistenciaList) {
-        		respuesta = copyEjg2Asis(idInstitucion, origen, usuario, relacion);
-        	}
-        }
-        
-        if(origen.equals("unidadFamiliar")) { // Si hay cambios en la unidad familiar solicitante principal, se actualiza los SOJ.
-        	ScsSojExample sojExample = new ScsSojExample();
-    		sojExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-    		.andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
-    		.andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
-    		.andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
-
-    		List<ScsSoj> relSojList = scsSojMapper.selectByExample(sojExample);
-    		
-    		 if(relSojList != null && !relSojList.isEmpty()) {
-    	        	for(ScsSoj relacion : relSojList) {
-    	        		respuesta = copyEjg2Soj(idInstitucion, origen, usuario, relacion);
-    	        	}
-    	        }
-        }
+			ScsEjgdesignaExample example = new ScsEjgdesignaExample();
+	        example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andAnioejgEqualTo(Short.valueOf(datos.getAnnio()))
+						.andNumeroejgEqualTo(Long.valueOf(datos.getNumero()))
+						.andIdtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+	       
+	        List<ScsEjgdesigna> relDesignaList = scsEjgdesignaMapper.selectByExample(example );
+	        
+	        if(relDesignaList != null && !relDesignaList.isEmpty()) {
+	            for(ScsEjgdesigna relacion:relDesignaList) {
+	                
+	            	//OPCION 1 crear método similar a los que hay en BusquedaAsuntosServiceImpl copyEjg2....
+	            	//pero parametrizando la tarjeta origen que está haciendo el guardado de datos, por ejemplo, Defensa jurídica
+	            	
+	            	respuestacopy += copyEjg2Designa(idInstitucion, origen, usuario, relacion);
+	
+	            }
+	            if(respuestacopy == relDesignaList.size()) {
+	            	respuestaDes = 1;
+	            }
+	            respuestacopy = 0;
+	        }
+	        
+	        ScsAsistenciaExample exampleAsistencia = new  ScsAsistenciaExample();
+				exampleAsistencia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
+						.andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
+						.andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+	        
+	        List<ScsAsistencia> relAsistenciaList = scsAsistenciaExtendsMapper.selectByExample(exampleAsistencia);
+	        
+	        if(relAsistenciaList != null && !relAsistenciaList.isEmpty()) {
+	        	for(ScsAsistencia relacion : relAsistenciaList) {
+	        		respuestacopy += copyEjg2Asis(idInstitucion, origen, usuario, relacion);
+	
+	        	}
+	        	if(respuestacopy == relAsistenciaList.size()) {
+	            	respuestaAsi = 1;
+	            }
+	            respuestacopy = 0;
+	        }
+	        
+	        if(origen.equals("unidadFamiliar")) { // Si hay cambios en la unidad familiar solicitante principal, se actualiza los SOJ.
+	        	ScsSojExample sojExample = new ScsSojExample();
+					sojExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andEjgnumeroEqualTo(Long.valueOf(datos.getNumero()))
+							.andEjganioEqualTo(Short.valueOf(datos.getAnnio()))
+							.andEjgidtipoejgEqualTo(Short.valueOf(datos.getTipoEJG()));
+	
+	    		relSojList = scsSojMapper.selectByExample(sojExample);
+	    		
+	    		 if(relSojList != null && !relSojList.isEmpty()) {
+	    	        	for(ScsSoj relacion : relSojList) {
+	    	        		respuestacopy += copyEjg2Soj(idInstitucion, origen, usuario, relacion);
+	    	        	}
+	    	        	if(respuestacopy == relSojList.size()) {
+	    	            	respuestaSoj = 1;
+	    	            }
+	    	            respuestacopy = 0;
+	    	        }
+	        }
+	        
+	        if((relDesignaList == null || relDesignaList.isEmpty()) && (relAsistenciaList == null || relAsistenciaList.isEmpty()) && (relSojList == null || relSojList.isEmpty())) {
+	        	respuesta = 1; //si no tiene relaciones es que ha ido bien
+	        }else if(respuestaDes == 0 || respuestaAsi == 0 || respuestaSoj == 0) {
+	        	respuesta = 0;
+	        }else {
+	        	respuesta = 1;
+	        }
     	
 		}catch(Exception e){
 			return respuesta= 0;
@@ -6253,7 +6323,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
+				}
 
 				response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(newEjg);
 				if (response == 0)
@@ -6318,7 +6397,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG cuando una fila es actualizada.
-				this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
+				GenParametrosKey keyParam = new GenParametrosKey();
+				keyParam.setIdinstitucion(idInstitucion);
+				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setParametro("ENABLETRIGGERSEJG");
+				
+				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
+				
+				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+					this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
+				}
 
 				response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(newEjg);
 				if (response == 0)

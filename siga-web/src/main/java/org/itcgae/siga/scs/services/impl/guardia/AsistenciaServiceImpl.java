@@ -5801,7 +5801,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	private int actualizaAsistenciaEnAsuntos(ScsAsistencia datos, Short idInstitucion, String origen,
 			AdmUsuarios usuario) {
 		// TODO Completar y usar como ejemplo y tratar error con try catch
-		int respuesta = 0;
+		int respuesta, respuestaDes, respuestaEjg , respuestacopy;
+		respuesta = respuestaDes = respuestaEjg = respuestacopy = 0;
+		
+		List<ScsDesigna> relDesignaList = null;
+		List<ScsEjg> relEjgList = null;
 		try {
 
 			if (datos.getDesignaNumero() != null) {
@@ -5809,7 +5813,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(datos.getDesignaAnio())
 						.andNumeroEqualTo(datos.getDesignaNumero()).andIdturnoEqualTo(datos.getDesignaTurno());
 
-				List<ScsDesigna> relDesignaList = scsDesignaMapper.selectByExample(example);
+				relDesignaList = scsDesignaMapper.selectByExample(example);
+				
 				if (relDesignaList != null && !relDesignaList.isEmpty()) {
 					for (ScsDesigna relacion : relDesignaList) {
 
@@ -5818,8 +5823,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						// pero parametrizando la tarjeta origen que está haciendo el guardado de datos,
 						// por ejemplo, Defensa jurídica
 
-						respuesta = copyAsis2Designa(idInstitucion, origen, usuario, relacion, datos);
+						respuestacopy += copyAsis2Designa(idInstitucion, origen, usuario, relacion, datos);
 					}
+					if(respuestacopy == relDesignaList.size()) {
+						respuestaDes = 1;
+					}
+					respuestacopy = 0;
 				}
 			}
 
@@ -5828,15 +5837,30 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				exampleEjg.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(datos.getEjganio())
 						.andIdtipoejgEqualTo(datos.getEjgidtipoejg()).andNumeroEqualTo(datos.getEjgnumero());
 
-				List<ScsEjg> relEjgList = scsEjgExtendsMapper.selectByExample(exampleEjg);
+				relEjgList = scsEjgExtendsMapper.selectByExample(exampleEjg);
+				
 				if (relEjgList != null && !relEjgList.isEmpty()) {
 					for (ScsEjg relacion : relEjgList) {
-						respuesta = copyAsis2Ejg(idInstitucion, origen, usuario, relacion, datos);
+						respuestacopy += copyAsis2Ejg(idInstitucion, origen, usuario, relacion, datos);
 					}
+					if(respuestacopy == relEjgList.size()) {
+						respuestaEjg = 1;
+					}
+					respuestacopy = 0;
 				}
-
 			}
-
+			
+			if((relDesignaList == null || relDesignaList.isEmpty()) && (relEjgList == null || relEjgList.isEmpty())) {
+				respuesta = 1; //si no tiene relaciones es que ha ido bien
+			}else if(respuestaDes == 0 || respuestaEjg == 0) {
+				respuesta = 0;
+			}else {
+				respuesta = 1;
+			}
+			if(datos.getEjgnumero() == null && datos.getDesignaNumero() == null) {
+				//Si no tiene asuntos relacionados la respuesta es correcta
+				respuesta=1;
+			}
 		} catch (Exception e) {
 			return respuesta = 0;
 		}
