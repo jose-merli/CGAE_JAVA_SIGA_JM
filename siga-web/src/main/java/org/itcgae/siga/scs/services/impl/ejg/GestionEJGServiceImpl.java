@@ -3556,7 +3556,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	        
 	        if((relDesignaList == null || relDesignaList.isEmpty()) && (relAsistenciaList == null || relAsistenciaList.isEmpty()) && (relSojList == null || relSojList.isEmpty())) {
 	        	respuesta = 1; //si no tiene relaciones es que ha ido bien
-	        }else if(respuestaDes == 0 || respuestaAsi == 0 || respuestaSoj == 0) {
+	        }else if(respuestaDes == 0 && respuestaAsi == 0 && respuestaSoj == 0) {
 	        	respuesta = 0;
 	        }else {
 	        	respuesta = 1;
