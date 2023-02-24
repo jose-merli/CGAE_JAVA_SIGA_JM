@@ -154,6 +154,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				doc = null;
 			}
 
+			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS);
 			//doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS
 			//		| MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS
 			//		| MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
@@ -495,7 +496,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				
 				FileOutputStream fileOut = new FileOutputStream(file);
 				
-				LOGGER.debug("Guardamos el excel en " + file.getAbsolutePath());
+				LOGGER.info("Guardamos el excel en " + file.getAbsolutePath());
 				workbook.write(fileOut);
 				fileOut.flush();
 				fileOut.close();
