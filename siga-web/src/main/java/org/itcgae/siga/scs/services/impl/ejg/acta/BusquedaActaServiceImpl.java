@@ -1396,14 +1396,16 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 							LOGGER.info("el fundamento juridico no es nulo");
 							//Este método sustituye a un trigger y parametrizamos su ejecución
-							GenParametrosKey keyParam = new GenParametrosKey();
-							keyParam.setIdinstitucion(idInstitucion);
-							keyParam.setModulo(SigaConstants.MODULO_SCS);
-							keyParam.setParametro("ENABLETRIGGERSEJG");
+							GenParametrosExample exampleParam = new GenParametrosExample();
+							exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+								.andParametroEqualTo("ENABLETRIGGERSEJG")
+								.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+							exampleParam.setOrderByClause("IDINSTITUCION DESC");
+
+							List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
 							
-							GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
-							
-							if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+							if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+									&& parametrosTrigger.get(0).getValor().equals("1")) {
 								response = actualizarFecharesolucioncajg(ejgItem.getIdinstitucion(), usuario,
 										ejgItem);
 	
