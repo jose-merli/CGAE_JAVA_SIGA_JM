@@ -5852,7 +5852,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			
 			if((relDesignaList == null || relDesignaList.isEmpty()) && (relEjgList == null || relEjgList.isEmpty())) {
 				respuesta = 1; //si no tiene relaciones es que ha ido bien
-			}else if(respuestaDes == 0 || respuestaEjg == 0) {
+			}else if(respuestaDes == 0 && respuestaEjg == 0) {
 				respuesta = 0;
 			}else {
 				respuesta = 1;

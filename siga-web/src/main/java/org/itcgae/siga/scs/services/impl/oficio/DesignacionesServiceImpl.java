@@ -8498,7 +8498,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 			if((relDesignaList == null || relDesignaList.isEmpty()) && (relAsistenciaList == null || relAsistenciaList.isEmpty())) {
 				respuesta = 1; //si no tiene relaciones es que ha ido bien
-			}else if(respuestaDes == 0 || respuestaAsi == 0) {
+			}else if(respuestaDes == 0 && respuestaAsi == 0) {
 				respuesta = 0;
 			}else {
 				respuesta = 1;
