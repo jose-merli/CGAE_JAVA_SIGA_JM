@@ -97,6 +97,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.guardia.GuardiasColegiadoService;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
@@ -2761,7 +2762,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (idCalendarioGuardia.size() != 0) {
 						datos.get(i).setIdCalendarioGuardia(idCalendarioGuardia.get(0));
 					}
-					datos.get(i).setOrden(Integer.toString(i + 1));
+					//datos.get(i).setOrden(Integer.toString(i + 1));
 				}
 				LOGGER.info("getGuardiasFromCalendar() -> Salida ya con los datos recogidos");
 			}
@@ -3864,17 +3865,27 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				itemList.forEach(item -> {
 					if (item.getNuevo() != null && item.getNuevo()) {
-						String response = null;
 						item.setEstado(PENDIENTE);
-
-						if (idConjuntoGuardia != null) {
-							response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(idConjuntoGuardia,
-									idInstitucion.toString(), today, item,
-									usuarios.get(0).getUsumodificacion().toString());
+						int res = 0;
+						res = scsGuardiasturnoExtendsMapper.getGuardiasAsociadasCalProgByOrder(item.getGuardia(), item.getIdTurno(),
+								idCalendar, idInstitucion.toString(), item.getOrden());
+						
+						if(res != 0) {
+							throw new BusinessException("order");
 						}
 						String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar,
 								idConjuntoGuardia, idInstitucion.toString(), today, item);
-						if ((response == null && response2 == null) && error.getDescription() == null) {
+						
+						
+						//Si venia informado el campo idConjuntoGuardia se hacia el insert en SCS_CONF_CONJUNTO_GUARDIAS -- SIGARNV-2618
+						/*if (idConjuntoGuardia != null) {
+							response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(idConjuntoGuardia,
+									idInstitucion.toString(), today, item,
+									usuarios.get(0).getUsumodificacion().toString());
+						}*/
+						
+					
+						if (response2 == null && error.getDescription() == null) {
 							error.setCode(400);
 							insertResponseDTO.setStatus(SigaConstants.KO);
 						} else if (error.getCode() == null) {
@@ -9292,7 +9303,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (idCalendarioGuardia.size() != 0) {
 				datos.get(i).setIdCalendarioGuardia(idCalendarioGuardia.get(0));
 			}
-			datos.get(i).setOrden(Integer.toString(i + 1));
+			//datos.get(i).setOrden(Integer.toString(i + 1));
 		}
 
 		datos.forEach(dato -> {

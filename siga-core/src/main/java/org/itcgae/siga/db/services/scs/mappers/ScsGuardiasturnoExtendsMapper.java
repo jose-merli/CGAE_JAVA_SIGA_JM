@@ -283,6 +283,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		@Result(column = "GENERADO", property = "generado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCALENDARIOGUARDIAS", property = "idCalendarioGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORDEN", property = "orden", jdbcType = JdbcType.VARCHAR),
 		})
 	List<GuardiaCalendarioItem>getGuardiasFromCalendar(String idCalendar, String idInstitucion, String fechaDesde, String fechaHasta);
 	
@@ -1319,4 +1320,8 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@DeleteProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "deleteSaltosCompensacionesCalendariosInexistentes")
 			public boolean deleteSaltosCompensacionesCalendariosInexistentes(Integer idInstitucion, Integer idTurno, Integer idGuardia);
 
+			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getGuardiasAsociadasCalProgByOrder")
+			@Results({ @Result(column = "num", property = "num", jdbcType = JdbcType.INTEGER)})
+			Integer getGuardiasAsociadasCalProgByOrder(String idGuardia, String idTurno, String idProgCalendario, String idInstitucion, String order);
+			
 }
