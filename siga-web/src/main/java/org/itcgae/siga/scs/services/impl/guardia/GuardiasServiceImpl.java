@@ -9348,9 +9348,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
 				for (String nombreFichero : nombresFicherosList) {
-					String pathFicheroSalida = "sjcs.directorioFisicoGeneracionCalendarios.{" + idInstitucion.toString()
-							+ "}";
-					pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
+					String pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
 					String nombreFicheroSalida = nombreFichero + ".xlsx";
 					zipOutputStream.putNextEntry(new ZipEntry(nombreFicheroSalida));
 					String path = pathFicheroSalida + File.separator + nombreFicheroSalida;
@@ -9391,13 +9389,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ArrayList<String> nombresConsultasDatos = null;
 		String pathPlantilla = null;
-		String pathFicheroSalida = "sjcs.directorioFisicoGeneracionCalendarios.{" + idInstitucion.toString() + "}";
 		String nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(), calyprogItem.getIdTurno(),
 				calyprogItem.getIdGuardia(), calyprogItem.getIdCalendarioGuardias());
 		LOGGER.info("descargarExcelLog() -> NOMBRE LOG A DESCARGAR : " + nombreLog);
 		LOGGER.info("descargarExcelLog() - > INFO CAL A DESCARGAR - > Turno:" + calyprogItem.getIdTurno() +  " / Guardia: " + calyprogItem.getIdGuardia() + "/ idCalG: " + calyprogItem.getIdCalendarioGuardias());
 		try {
-			pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
+			String pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
 			String nombreFicheroSalida = nombreLog + ".xlsx";
 			String path = pathFicheroSalida + nombreFicheroSalida;
 			LOGGER.info("descargarExcelLog() -> NOMBRE PATH : " + path);
@@ -9420,13 +9417,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 		DatosDocumentoItem docGenerado = null;
 		ArrayList<String> nombresConsultasDatos = null;
 		String pathPlantilla = null;
-		String pathFicheroSalida = "sjcs.directorioFisicoGeneracionCalendarios.{" + idInstitucion1.toString() + "}";
+		//String pathFicheroSalida = "sjcs.directorioFisicoGeneracionCalendarios.{" + idInstitucion1.toString() + "}";
 		List<List<Map<String, Object>>> listaDatosExcelGeneracionCalendarios2 = new ArrayList<>();
 		List<String> nombresFicherosList = new ArrayList<>();
 
 		try {
 			listaDatosExcelGeneracionCalendarios2.add(listaDatosExcelGeneracionCalendarios);
-			pathFicheroSalida = getRutaFicheroSalida(idInstitucion1.toString());
+			String pathFicheroSalida = getRutaFicheroSalida(idInstitucion1.toString());
 			docGenerado = _generacionDocService.generarExcelGeneracionCalendario(pathFicheroSalida, nombreLog + ".xlsx",
 					listaDatosExcelGeneracionCalendarios2);
 		} catch (Exception e) {
@@ -9439,14 +9436,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private String getRutaFicheroSalida(String idInstitucion) {
 		GenPropertiesKey key = new GenPropertiesKey();
 		key.setFichero(SigaConstants.FICHERO_SIGA);
-		key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+		key.setParametro(SigaConstants.parametroRutaCalendarios);
 
 		GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
 
-		String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion
-				+ SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+		String rutaCal = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion
+				+ SigaConstants.pathSeparator ;
 
-		return rutaTmp;
+		return rutaCal;
 	}
 
 	@Override

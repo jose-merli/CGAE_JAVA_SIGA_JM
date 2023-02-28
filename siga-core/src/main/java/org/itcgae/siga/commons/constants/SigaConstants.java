@@ -905,6 +905,7 @@ public class SigaConstants {
 	public static String carpetaTmp = "temp";
 	public static String parametroRutaPlantillas = "informes.directorioFisicoPlantillaInformesJava";
 	public static String parametroRutaSalidaInformes = "informes.directorioFisicoSalidaInformesJava";
+	public static String parametroRutaCalendarios = "sjcs.directorioFisicoGeneracionCalendarios";
 	public static String rutaPlantillaSinClase = "plantillasSinClase";
 	public static String parametroSizePlantillas = "gen.ficheros.maxsize.bytes";
 	
