@@ -1049,10 +1049,11 @@ public class DesignacionesController {
 	}
 	
 	@RequestMapping(value = "/getEJG", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ScsEjg> comboTipoEJG(HttpServletRequest request, String numEjg, String anioEjg) {
+	ResponseEntity<ScsEjg> comboTipoEJG(HttpServletRequest request, String num, String anioEjg, String tipoEjg) {
 		EjgItem item = new EjgItem();
 		item.setAnnio(anioEjg);
-		item.numEjg(numEjg);
+		item.setNumero(num);
+		item.setTipoEJG(tipoEjg);
 		ScsEjg response = designacionesService.getEJG(item, request);
 		return new ResponseEntity<ScsEjg>(response, HttpStatus.OK);
 	}

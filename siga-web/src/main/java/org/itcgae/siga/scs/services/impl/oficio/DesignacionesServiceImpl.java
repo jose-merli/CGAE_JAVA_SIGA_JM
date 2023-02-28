@@ -548,11 +548,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //									}
 
 									// obtenemos los datos del EJG
+									// anio/numEjg ## docresolucion ## idinstitucion ## anio ## idtipoejg ## numero ## idtiporatificacionejg ## fecharesolucioncajg
 									String[] datosEJG = str.split("##");
 									String anioEJG = datosEJG[0].split("/")[0].trim();
 									String numEJG = datosEJG[0].split("/")[1];
 									String idInstitucionEJG = datosEJG[2];
 									String idtipoEJG = datosEJG[4];
+									String num = datosEJG[5];
 									String dictamen = "";
 									String resolucion = "";
 									String impugnacion = "";
@@ -562,7 +564,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									ScsEjgExample ejgExample = new ScsEjgExample();
 									ejgExample.createCriteria().andAnioEqualTo(Short.parseShort(anioEJG))
 											.andNumejgEqualTo(numEJG)
-											.andIdinstitucionEqualTo(Short.parseShort(idInstitucionEJG));
+											.andIdinstitucionEqualTo(Short.parseShort(idInstitucionEJG))
+											.andIdtipoejgEqualTo(Short.valueOf(idtipoEJG));
 									List<ScsEjg> ejg = scsEjgExtendsMapper.selectByExample(ejgExample);
 									if (!ejg.isEmpty()) {
 
@@ -641,6 +644,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 										
 										expedientes.put(str.substring(0, str.indexOf("##")).trim(),
 												tooltip);
+										//Info EJG
+										expedientes.put("EJG",num + "/" + idtipoEJG);
 									}
 
 								}
@@ -8380,7 +8385,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				ScsEjgExample ejgExample = new ScsEjgExample();
 
 				ejgExample.createCriteria().andAnioEqualTo(Short.valueOf(item.getAnnio()))
-						.andIdinstitucionactaEqualTo(idInstitucion).andNumejgEqualTo(item.getNumEjg());
+						.andIdinstitucionEqualTo(idInstitucion).andNumeroEqualTo(Long.valueOf(item.getNumero())).andIdtipoejgEqualTo(Short.valueOf(item.getTipoEJG()));
 				List<ScsEjg> ejgs = scsEjgMapper.selectByExample(ejgExample);
 
 				ejg = ejgs.get(0);
