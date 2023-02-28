@@ -1186,14 +1186,16 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						int response = 0;
 
 						//Este método sustituye a la ejecución de los triggers de EJG y se parametriza su ejecucion
-						GenParametrosKey keyParam = new GenParametrosKey();
-						keyParam.setIdinstitucion(idInstitucion);
-						keyParam.setModulo(SigaConstants.MODULO_SCS);
-						keyParam.setParametro("ENABLETRIGGERSEJG");
+						GenParametrosExample exampleParam = new GenParametrosExample();
+						exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+							.andParametroEqualTo("ENABLETRIGGERSEJG")
+							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+						exampleParam.setOrderByClause("IDINSTITUCION DESC");
+
+						List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
 						
-						GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
-						
-						if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+						if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+								&& parametrosTrigger.get(0).getValor().equals("1")) {
 							response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
 	
 							if (response == 0)

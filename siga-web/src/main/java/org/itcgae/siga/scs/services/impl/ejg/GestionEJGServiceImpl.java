@@ -1716,23 +1716,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta de forma parametrizada este método que sustituye los triggers de la base de datos
 				// al insertar una nueva fila en la tabla SCS_EJG por codigo java.
 				
+				GenParametrosExample exampleParam = new GenParametrosExample();
+				exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+					.andParametroEqualTo("ENABLETRIGGERSEJG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				exampleParam.setOrderByClause("IDINSTITUCION DESC");
+
+				List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
 				
-				GenParametrosKey keyParam = new GenParametrosKey();
-				keyParam.setIdinstitucion(idInstitucion);
-				keyParam.setModulo(SigaConstants.MODULO_SCS);
-				keyParam.setParametro("ENABLETRIGGERSEJG");
-				
-				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
-				
-				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+				if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+						&& parametrosTrigger.get(0).getValor().equals("1")) {
 					this.triggersEjgInsert(record, usuarios.get(0), idInstitucion);
 				}
-//                                                           } catch (Exception e) {
-//                                                                           LOGGER.error(
-//                                                                                                          "GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ",
-//                                                                                                          e);
-//                                                                           response = 0;
-//                                                           }
+
 				// respuesta si se actualiza correctamente para que se rellene el campo de
 				// numero
 				if (response >= 1) {
@@ -1982,14 +1978,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				GenParametrosKey keyParam = new GenParametrosKey();
-				keyParam.setIdinstitucion(idInstitucion);
-				keyParam.setModulo(SigaConstants.MODULO_SCS);
-				keyParam.setParametro("ENABLETRIGGERSEJG");
+				GenParametrosExample exampleParam = new GenParametrosExample();
+				exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+					.andParametroEqualTo("ENABLETRIGGERSEJG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				exampleParam.setOrderByClause("IDINSTITUCION DESC");
+
+				List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
 				
-				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
-				
-				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+				if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+						&& parametrosTrigger.get(0).getValor().equals("1")) {
 					this.triggersEjgUpdatesFApertura(datos, usuarios.get(0), idInstitucion);
 				}
 
@@ -2689,14 +2687,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				GenParametrosKey keyParam = new GenParametrosKey();
-				keyParam.setIdinstitucion(idInstitucion);
-				keyParam.setModulo(SigaConstants.MODULO_SCS);
-				keyParam.setParametro("ENABLETRIGGERSEJG");
+				GenParametrosExample exampleParam = new GenParametrosExample();
+				exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+					.andParametroEqualTo("ENABLETRIGGERSEJG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				exampleParam.setOrderByClause("IDINSTITUCION DESC");
+
+				List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
 				
-				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
-				
-				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+				if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+						&& parametrosTrigger.get(0).getValor().equals("1")) {
 					this.triggersEjgUpdatesImpug(datos, usuarios.get(0), idInstitucion);
 				}
 
@@ -2885,14 +2885,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				GenParametrosKey keyParam = new GenParametrosKey();
-				keyParam.setIdinstitucion(idInstitucion);
-				keyParam.setModulo(SigaConstants.MODULO_SCS);
-				keyParam.setParametro("ENABLETRIGGERSEJG");
+				GenParametrosExample exampleParam = new GenParametrosExample();
+				exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+					.andParametroEqualTo("ENABLETRIGGERSEJG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				exampleParam.setOrderByClause("IDINSTITUCION DESC");
+
+				List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
 				
-				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
-				
-				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+				if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+						&& parametrosTrigger.get(0).getValor().equals("1")) {
 					this.triggersEjgUpdatesResol(datos, usuarios.get(0), idInstitucion);
 				}
 
@@ -6323,14 +6325,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
 				// cuando una fila es actualizada.
-				GenParametrosKey keyParam = new GenParametrosKey();
-				keyParam.setIdinstitucion(idInstitucion);
-				keyParam.setModulo(SigaConstants.MODULO_SCS);
-				keyParam.setParametro("ENABLETRIGGERSEJG");
+				GenParametrosExample exampleParam = new GenParametrosExample();
+				exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+					.andParametroEqualTo("ENABLETRIGGERSEJG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				exampleParam.setOrderByClause("IDINSTITUCION DESC");
+
+				List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
 				
-				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
-				
-				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+				if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+						&& parametrosTrigger.get(0).getValor().equals("1")) {
 					this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
 				}
 
@@ -6397,14 +6401,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG cuando una fila es actualizada.
-				GenParametrosKey keyParam = new GenParametrosKey();
-				keyParam.setIdinstitucion(idInstitucion);
-				keyParam.setModulo(SigaConstants.MODULO_SCS);
-				keyParam.setParametro("ENABLETRIGGERSEJG");
+				GenParametrosExample exampleParam = new GenParametrosExample();
+				exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+					.andParametroEqualTo("ENABLETRIGGERSEJG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				exampleParam.setOrderByClause("IDINSTITUCION DESC");
+
+				List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
 				
-				GenParametros parametroTrigger = genParametrosMapper.selectByPrimaryKey(keyParam);
-				
-				if(parametroTrigger != null && parametroTrigger.getValor().equals("1")) {
+				if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+						&& parametrosTrigger.get(0).getValor().equals("1")) {
 					this.triggersEjgUpdatesDictamen(ejgItem, usuarios.get(0), idInstitucion);
 				}
 
