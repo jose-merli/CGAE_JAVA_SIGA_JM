@@ -74,7 +74,9 @@ import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
+import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
@@ -442,7 +444,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<ModelosEnvioItem> listaModelosEnvio = new ArrayList<ModelosEnvioItem>();
 		DestinatarioItem destinatario = null;
 		int ficherogenerado = 0;
-		String rutaPlantillaClase = "";
 		ModClasecomunicaciones modClasecomunicacion = null;
 
 		try{
@@ -469,16 +470,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(modClasecomunicacion != null){
 				campoSufijo = modClasecomunicacion.getSufijo();
 				LOGGER.debug("Campo campoSufijo = " + campoSufijo);
-				rutaPlantillaClase = modClasecomunicacion.getRutaplantilla();
-				LOGGER.debug("Campo rutaPlantillaClase = " + rutaPlantillaClase);
-			}
-			
-			if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
-				rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
-				LOGGER.debug("Campo rutaPlantillaClase = " + rutaPlantillaClase);
-			}else {
-				rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(usuario.getIdinstitucion()));
-				LOGGER.debug("Campo rutaPlantillaClase = " + rutaPlantillaClase);
 			}
 			
 			generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
@@ -542,13 +533,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								mapaClave.put(SigaConstants.ETIQUETATIPOENVIO.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, ""), modelosComunicacionItem.getIdTipoEnvio());
 							}
 						}
-						
-						
 
 						List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
 						destinatario = new DestinatarioItem();	
-
-						int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario,listaKeyFiltros.size(),ficherogenerado,i);
+						
+						String rutaPlantillaModelo = getRutaModeloByClaseModelo(modelosComunicacionItem.getIdModeloComunicacion(), modelosComunicacionItem.getIdClaseComunicacion());
+						int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaModelo, campoSufijo, listaFicheros, ejecutarConsulta, destinatario,listaKeyFiltros.size(),ficherogenerado,i);
 											
 						if (ficherogeneradoOK > 0) {
 							ficherogenerado++;
@@ -600,6 +590,34 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return generarComunicacion;
 	}
 	
+	private String getRutaModeloByClaseModelo(String idModeloComunicacion, String idClaseComunicacion) {
+		String rutaPlantillaClase  = "";
+		String rutaPlantillaModelo = "";
+		ModClasecomunicacionesExample claseExample = new ModClasecomunicacionesExample();
+		claseExample.createCriteria().andIdclasecomunicacionEqualTo(Short.valueOf(idClaseComunicacion));
+		List <ModClasecomunicaciones> listaClaseRuta = _modClasecomunicacionesMapper.selectByExample(claseExample);
+		if(!listaClaseRuta.isEmpty() && listaClaseRuta != null) {
+			rutaPlantillaClase = listaClaseRuta.get(0).getRutaplantilla();
+			
+			ModModelocomunicacionExample modeloExample = new ModModelocomunicacionExample();
+			modeloExample.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(idModeloComunicacion)).andIdclasecomunicacionEqualTo(Short.valueOf(idClaseComunicacion));
+			List<ModModelocomunicacion> listaModeloComunicacion = _modModeloComunicacionMapper.selectByExample(modeloExample);
+
+			if(!listaModeloComunicacion.isEmpty() && listaClaseRuta != null) {
+				String idInstitucionModelo = String.valueOf( listaModeloComunicacion.get(0).getIdinstitucion());
+				rutaPlantillaModelo = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucionModelo);
+				LOGGER.info("Campo rutaPlantillaClase = " + rutaPlantillaClase);
+			
+			}else {
+				rutaPlantillaModelo = SigaConstants.rutaPlantillaSinClase;
+				LOGGER.info("Campo rutaPlantillaClase = " + rutaPlantillaClase);
+			}
+		}
+		return rutaPlantillaModelo;
+	}
+
+
+
 	private int ejecutaPlantillas(HttpServletRequest request, ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
 			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, 
 			String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta, DestinatarioItem destinatario, int numeroSeleccionados, int ficherogenerado, int numeroSeleccionado) throws Exception {
@@ -1966,7 +1984,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				List<ClaseComunicacionItem> modClaseItem = _modClasecomunicacionesExtendsMapper.selectClaseComunicacionModulo(String.valueOf(idModeloComunicacionEnvio));
 				if(modClaseItem != null && modClaseItem.size() > 0) {
 					ClaseComunicacionItem claseItem = modClaseItem.get(0);
-					directorioPlantillaClase = claseItem.getRutaPlantilla();
+					directorioPlantillaClase = getRutaModeloByClaseModelo(idModeloComunicacionEnvio.toString(), claseItem.getIdClaseComunicacion());
 				}
 			}
 		}else {
@@ -1974,11 +1992,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			throw new BusinessException("No se ha encontrado el envío:" + idEnvio);
 		}
 		
-		if(directorioPlantillaClase == null || "".equals(directorioPlantillaClase)) {
-			directorioPlantillaClase = SigaConstants.rutaPlantillaSinClase;
-		}
 		
-		directorioPlantillaClase = directorioPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucion);
+		//if(directorioPlantillaClase == null || "".equals(directorioPlantillaClase)) {
+		//	directorioPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+		//}
+		
+		//directorioPlantillaClase = directorioPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucion);
 		
 		if(listaIdPlantilla != null && listaIdPlantilla.size() > 0){
 			for(String idPlantilla : listaIdPlantilla){
