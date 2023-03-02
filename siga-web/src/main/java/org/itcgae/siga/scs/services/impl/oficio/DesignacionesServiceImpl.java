@@ -2124,8 +2124,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaKey.setAnio(Short.valueOf(String.valueOf(designaItem.getAno())));
 					designaKey.setIdturno(designaItem.getIdTurno());
 					designaKey.setNumero(Long.valueOf(designaItem.getNumero()));
-					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);// new
-																											// ScsDesigna();
+					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);// new ScsDesigna();
 
 					if (scsDesigna != null) {
 

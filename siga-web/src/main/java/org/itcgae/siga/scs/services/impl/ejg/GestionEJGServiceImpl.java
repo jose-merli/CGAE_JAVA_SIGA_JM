@@ -3970,24 +3970,18 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			delitoAsistencia.setIdinstitucion(idInstitucion);
 			delitoAsistencia.setAnio(asis.getAnio());
 			delitoAsistencia.setNumero(asis.getNumero());
-
 			delitoAsistencia.setUsumodificacion(usuario.getIdusuario());
 			delitoAsistencia.setFechamodificacion(new Date());
 
-			ScsDelitosejgExample delitosEjgExample = new ScsDelitosejgExample();
-
-			delitosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
-					.andNumeroEqualTo(ejg.getNumero()).andIdtipoejgEqualTo(ejg.getIdtipoejg());
-
-			List<ScsDelitosejg> delitosEjg = scsDelitosejgMapper.selectByExample(delitosEjgExample);
-
 			ScsDelitosasistenciaExample delitosAsistenciaExample = new ScsDelitosasistenciaExample();
 
-			delitosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
-					.andNumeroEqualTo(ejg.getNumero());
+//			delitosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
+//					.andNumeroEqualTo(ejg.getNumero());
+			
+			delitosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(asis.getAnio())
+					.andNumeroEqualTo(asis.getNumero());
 
-			List<ScsDelitosasistencia> delitosAsistencia = scsDelitosasistenciaMapper
-					.selectByExample(delitosAsistenciaExample);
+			List<ScsDelitosasistencia> delitosAsistencia = scsDelitosasistenciaMapper.selectByExample(delitosAsistenciaExample);
 
 			if (!delitosAsistencia.isEmpty()) {
 				response = scsDelitosasistenciaMapper.deleteByExample(delitosAsistenciaExample);
@@ -3995,9 +3989,20 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					throw (new Exception("Error al eliminar los delitos anteriores de la asistencia"));
 
 			}
+			
+			ScsDelitosejgExample delitosEjgExample = new ScsDelitosejgExample();
 
+			delitosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(ejg.getAnio())
+					.andNumeroEqualTo(ejg.getNumero()).andIdtipoejgEqualTo(ejg.getIdtipoejg());
+
+			List<ScsDelitosejg> delitosEjg = scsDelitosejgMapper.selectByExample(delitosEjgExample);
+
+			String delitosAsisString = "";
 			if (!delitosEjg.isEmpty()) {
 				for (ScsDelitosejg delitoEjg : delitosEjg) {
+					if (delitosAsisString != "")
+						delitosAsisString += ",";
+					delitosAsisString += delitoEjg.getIddelito();
 					delitoAsistencia.setIddelito(delitoEjg.getIddelito());
 					response = scsDelitosasistenciaMapper.insert(delitoAsistencia);
 					if (response == 0)
@@ -4005,16 +4010,22 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				}
 			}
 			
+			if (delitosAsisString.equals(""))
+				asis.setDelitosimputados(null);
+			else
+				asis.setDelitosimputados(delitosAsisString);
+			
 			asis.setJuzgado(ejg.getJuzgado());
 			asis.setJuzgadoidinstitucion(ejg.getJuzgadoidinstitucion());
 
 			asis.setComisaria(ejg.getComisaria());
 			asis.setComisariaidinstitucion(ejg.getComisariaidinstitucion());
 
-			asis.setNumeroprocedimiento(ejg.getNumeroprocedimiento() + "/" + ejg.getAnioprocedimiento());
+//			asis.setNumeroprocedimiento(ejg.getNumeroprocedimiento() + "/" + ejg.getAnioprocedimiento());
+			asis.setNumeroprocedimiento(ejg.getNumeroprocedimiento());
 			asis.setNumerodiligencia(ejg.getNumerodiligencia());
 			asis.setNig(ejg.getNig());
-			asis.setDelitosimputados(ejg.getDelitos());
+//			asis.setDelitosimputados(ejg.getDelitos());
 			
 			asis.setUsumodificacion(usuario.getIdusuario());
 			asis.setFechamodificacion(new Date());

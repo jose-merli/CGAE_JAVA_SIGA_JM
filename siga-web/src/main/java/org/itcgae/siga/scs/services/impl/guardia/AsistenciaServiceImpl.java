@@ -6065,14 +6065,6 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 		LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Seleccionando EJG y la asistencia correspondientes.");
 
-		ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
-
-		asisKey.setIdinstitucion(idInstitucion);
-		asisKey.setNumero(datosAsistencia.getNumero());
-		asisKey.setAnio(datosAsistencia.getAnio());
-
-		ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
-
 		ScsEjgKey ejgKey = new ScsEjgKey();
 
 		ejgKey.setIdinstitucion(idInstitucion);
@@ -6081,6 +6073,14 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		ejgKey.setNumero(relacionEjg.getNumero());
 
 		ScsEjg ejg = scsEjgExtendsMapper.selectByPrimaryKey(ejgKey);
+		
+		ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+
+		asisKey.setIdinstitucion(idInstitucion);
+		asisKey.setNumero(datosAsistencia.getNumero());
+		asisKey.setAnio(datosAsistencia.getAnio());
+
+		ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
 
 		LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> EJG y Asistencia seleccionados.");
 
@@ -6089,7 +6089,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 			LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Copiando delitos de la asistencia al EJG.");
 
-			// Creamos la base de los nuevos nuevos delitos del EJG
+//			// Creamos la base de los nuevos nuevos delitos del EJG
 			ScsDelitosejg delitoEjg = new ScsDelitosejg();
 
 			delitoEjg.setIdinstitucion(idInstitucion);
@@ -6117,8 +6117,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			delitosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 					.andAnioEqualTo(asis.getAnio()).andNumeroEqualTo(asis.getNumero());
 
-			List<ScsDelitosasistencia> delitosAsistencia = scsDelitosasistenciaMapper
-					.selectByExample(delitosAsistenciaExample);
+			List<ScsDelitosasistencia> delitosAsistencia = scsDelitosasistenciaMapper.selectByExample(delitosAsistenciaExample);
 
 			String delitosEjgString = "";
 			if (!delitosAsistencia.isEmpty()) {
@@ -6127,7 +6126,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						delitosEjgString += ",";
 					delitosEjgString += delitoAsistencia.getIddelito();
 					delitoEjg.setIddelito(delitoAsistencia.getIddelito());
-					response = scsDelitosasistenciaMapper.insert(delitoAsistencia);
+//					response = scsDelitosasistenciaMapper.insert(delitoAsistencia);
+					delitoEjg.setIdtipoejg(ejg.getIdtipoejg());
+					response = scsDelitosejgMapper.insert(delitoEjg);
 					if (response == 0)
 						throw (new Exception("Error al introducir un delito en el EJG proveniente de la asistencia."));
 				}
@@ -6137,6 +6138,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				ejg.setDelitos(null);
 			else
 				ejg.setDelitos(delitosEjgString);
+//			ejg.setDelitos(asis.getDelitosimputados());
 
 			response = scsEjgExtendsMapper.updateByPrimaryKey(ejg);
 			if (response == 0)
@@ -6152,7 +6154,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			ejg.setNumeroprocedimiento(asis.getNumeroprocedimiento());
 			ejg.setNumerodiligencia(asis.getNumerodiligencia());
 			ejg.setNig(asis.getNig());
-			ejg.setIdpretension(asis.getIdpretension().longValue());
+			if(asis.getIdpretension() != null)
+				ejg.setIdpretension(asis.getIdpretension().longValue());
 
 			ejg.setUsumodificacion(usuario.getIdusuario());
 			ejg.setFechamodificacion(new Date());
