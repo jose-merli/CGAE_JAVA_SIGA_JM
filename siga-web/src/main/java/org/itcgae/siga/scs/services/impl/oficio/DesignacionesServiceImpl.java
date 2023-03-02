@@ -8890,7 +8890,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			asis.setJuzgado(designa.getIdjuzgado());
 			asis.setJuzgadoidinstitucion(designa.getIdinstitucionJuzg());
 
-			asis.setNumeroprocedimiento(designa.getNumprocedimiento() + "/" + designa.getAnioprocedimiento());
+//			asis.setNumeroprocedimiento(designa.getNumprocedimiento() + "/" + designa.getAnioprocedimiento());
+			asis.setNumeroprocedimiento(designa.getNumprocedimiento());
 			asis.setNig(designa.getNig());
 			asis.setIdpretension(designa.getIdpretension());
 
