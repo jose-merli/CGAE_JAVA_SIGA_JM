@@ -696,6 +696,12 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
 
             }
 
+        }catch(NullPointerException npe) {
+            LOGGER.error("updateEstadoActuacion() / ERROR: "+ npe.getMessage(), npe);
+            error.setCode(500);
+            error.setMessage("Para validar debe rellenar la fecha de justificación");
+            error.description("Para validar debe rellenar la fecha de justificación");
+            updateResponseDTO.setError(error);
         }catch(Exception e) {
             LOGGER.error("updateEstadoActuacion() / ERROR: "+ e.getMessage(), e);
             error.setCode(500);
