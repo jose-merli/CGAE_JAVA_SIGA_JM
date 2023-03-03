@@ -520,13 +520,15 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		SQL_DESIGNAS.FROM("scs_asistencia asi");
 		SQL_DESIGNAS.INNER_JOIN(
 				"scs_designa d on d.anio = asi.designa_anio and d.numero = asi.designa_numero and d.idinstitucion = asi.idinstitucion and d.idturno = asi.designa_turno",
-				"SCS_DESIGNASLETRADO dl on d.anio = dl.anio and d.numero = dl.numero and d.idturno = dl.idturno and d.idinstitucion = dl.idinstitucion",
-				"cen_persona ON cen_persona.idpersona = dl.idpersona",
-				"cen_colegiado c on cen_persona.idpersona = c.idpersona and c.idinstitucion = asi.idinstitucion");
+				"SCS_DESIGNASLETRADO dl on d.anio = dl.anio and d.numero = dl.numero and d.idturno = dl.idturno and d.idinstitucion = dl.idinstitucion");
+		SQL_DESIGNAS.LEFT_OUTER_JOIN(
+				"cen_colegiado c ON dl.idpersona = c.idpersona AND c.idinstitucion = dl.idinstitucion",
+				"cen_persona ON cen_persona.idpersona = c.idpersona");
 		SQL_DESIGNAS.WHERE(
 				"asi.anio='"+anio+"'",
 				"asi.numero = '"+num+"'",
-				"asi.idinstitucion="+idInstitucion);
+				"asi.idinstitucion="+idInstitucion,
+				"dl.fechadesigna = (" + getMaxFechaDesigna() +")");
 
 
 		//---
@@ -596,6 +598,17 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				"anio DESC",
 				"codigo DESC");
 		return SQL_PADRE.toString();
+	}
+	
+	public String getMaxFechaDesigna() {
+		SQL SQL = new SQL();
+		
+		SQL.SELECT("MAX(let2.fechadesigna)");
+		SQL.FROM("scs_designasletrado let2");
+		SQL.WHERE("dl.idinstitucion = let2.idinstitucion AND dl.idturno = let2.idturno AND dl.anio = let2.anio "
+				+ "AND dl.numero = let2.numero AND trunc(let2.fechadesigna) <= trunc(SYSDATE)");
+		
+		return SQL.toString();
 	}
 
 	public String comboTipoDocumentosAsistencia (){

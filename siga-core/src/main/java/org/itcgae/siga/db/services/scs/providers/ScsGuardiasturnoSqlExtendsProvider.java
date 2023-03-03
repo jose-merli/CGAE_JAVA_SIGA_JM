@@ -784,14 +784,13 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sqlGenerado.WHERE("gc.idturno = t.idturno");
 		sqlGenerado.WHERE("gc.idguardia = g.idguardia");
 
-
-		
 		SQL sql = new SQL();
 		 sql.SELECT("t.nombre as TURNO, g.nombre as GUARDIA, g.IDGUARDIA as IDGUARDIA, t.IDTURNO as IDTURNO");
 		 sql.SELECT("DECODE((" + sqlGenerado + "), 0, 'No',  CONCAT('Si (',CONCAT( (" + sqlGenerado + "),'g)' )         )     ) AS GENERADO");
 	     sql.SELECT("CASE PG.ESTADO WHEN 0 THEN 'Programada' WHEN 1 THEN 'En proceso' "
 	     		+ "WHEN 2 THEN 'Procesada con Errores' WHEN 3 THEN 'Finalizado' "
 	     		+ "WHEN 4 THEN 'Pendiente' WHEN 5 THEN 'Reprogramada' ELSE 'EstadoErroneo' END AS ESTADO");  
+	     sql.SELECT("PG.ORDEN");
 		 sql.FROM("SCS_HCO_CONF_PROG_CALENDARIOS PG");
 	        sql.JOIN("scs_prog_calendarios pc on PG.idinstitucion = pc.idinstitucion AND PG.idprogcalendario = pc.idprogcalendario");
 	        sql.JOIN("scs_turno  t on PG.idturno = t.idturno and PG.idinstitucion = t.idinstitucion");
@@ -1150,6 +1149,24 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if (idInstitucion != null) {
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		}
+		
+		return sql.toString();
+	}
+	
+
+	public String getGuardiasAsociadasCalProgByOrder(String idGuardia, String idTurno, String idProgCalendario, String idInstitucion, String order){
+		
+		SQL sql = new SQL();
+//		sql.SELECT("COUNT(*) numGuardias FROM SCS_CONF_CONJUNTO_GUARDIAS");
+//		sql.WHERE("SCS_CONF_CONJUNTO_GUARDIAS.IDCONJUNTOGUARDIA IN (" +  idCalG + ")");
+		
+		sql.SELECT("COUNT(*) as num ");
+		sql.FROM("SCS_HCO_CONF_PROG_CALENDARIOS");
+		sql.WHERE("IDPROGCALENDARIO = " + idProgCalendario);
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDTURNO = " + idTurno);
+		sql.WHERE("IDGUARDIA = " + idGuardia );
+		sql.WHERE("ORDEN = " + order);
 		
 		return sql.toString();
 	}

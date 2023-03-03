@@ -47,7 +47,6 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 			@Result(column = "OBSERVACIONES", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 			@Result(column = "IDOBJETIVO", property = "idObjetivo", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "IDCLASE", property = "idClase", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NOMBREOBJETIVO", property = "objetivo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREMODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),

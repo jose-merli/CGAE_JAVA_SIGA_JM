@@ -1183,14 +1183,26 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						/*if(scsEjg.getFecharesolucioncajg() == null) {
 							scsEjg.setFecharesolucioncajg(new Date());
 						}*/
+						int response = 0;
 
-						int response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
+						//Este método sustituye a la ejecución de los triggers de EJG y se parametriza su ejecucion
+						GenParametrosExample exampleParam = new GenParametrosExample();
+						exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+							.andParametroEqualTo("ENABLETRIGGERSEJG")
+							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+						exampleParam.setOrderByClause("IDINSTITUCION DESC");
 
-						if (response == 0)
-							throw (new Exception(
-									"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
-											+ " asociada a un EJG"));
-
+						List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
+						
+						if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+								&& parametrosTrigger.get(0).getValor().equals("1")) {
+							response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
+	
+							if (response == 0)
+								throw (new Exception(
+										"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
+												+ " asociada a un EJG"));
+						}
 						scsEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
 						if(ejgItem.getFundamentoJuridico() != null) {
 							scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));

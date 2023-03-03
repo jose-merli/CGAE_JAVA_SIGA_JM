@@ -2778,8 +2778,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT(" fechahora fechaasunto");
 		sql2.SELECT(" NVL(nig,'Sin número') || ' / ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
 		sql2.FROM(" scs_asistencia asi");
-		sql2.LEFT_OUTER_JOIN(" cen_persona ON cen_persona.idpersona = asi.idpersonacolegiado");
-		sql2.LEFT_OUTER_JOIN("cen_colegiado ON cen_colegiado.idpersona = cen_persona.idpersona");
+		sql2.LEFT_OUTER_JOIN(" cen_colegiado ON cen_colegiado.idpersona = asi.idpersonacolegiado AND CEN_COLEGIADO.IDINSTITUCION = asi.IDINSTITUCION"); 
+		sql2.LEFT_OUTER_JOIN(" cen_persona ON cen_persona.idpersona = cen_colegiado.idpersona");
 		sql2.LEFT_OUTER_JOIN(" scs_personajg perjg on perjg.idpersona = asi.idpersonajg and asi.idinstitucion = perjg.idinstitucion");
 		sql2.LEFT_OUTER_JOIN(" scs_comisaria com on asi.comisaria = com.idcomisaria and asi.comisariaidinstitucion = com.idinstitucion");
 		sql2.WHERE(" designa_anio = " + designaAnio);
@@ -2858,8 +2858,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                    ed.numeroejg = e.numero\r\n"
 				+ "                AND\r\n"
 				+ "                    ed.idtipoejg = e.idtipoejg");
-		sql5.LEFT_OUTER_JOIN("cen_persona on cen_persona.idpersona = e.idpersona");
-		sql5.LEFT_OUTER_JOIN("cen_colegiado ON cen_colegiado.idpersona = cen_persona.idpersona ");
+		sql5.LEFT_OUTER_JOIN("cen_colegiado ON cen_colegiado.idpersona = e.idpersona AND cen_colegiado.idinstitucion = e.idinstitucion ");
+		sql5.LEFT_OUTER_JOIN("cen_persona on cen_persona.idpersona = cen_colegiado.idpersona ");
 		sql5.LEFT_OUTER_JOIN(" scs_personajg perjg on perjg.idpersona = e.idpersonajg and e.idinstitucion = perjg.idinstitucion");
 		sql5.LEFT_OUTER_JOIN(" scs_tipodictamenejg dic on e.idtipodictamenejg = dic.idtipodictamenejg and e.idinstitucion = dic.idinstitucion");
 		sql5.LEFT_OUTER_JOIN(" scs_tiporesolucion res on e.IDTIPORATIFICACIONEJG = res.idtiporesolucion");

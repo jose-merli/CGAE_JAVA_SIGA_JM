@@ -28,7 +28,9 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.ScsActacomision;
 import org.itcgae.siga.db.entities.ScsActacomisionKey;
 import org.itcgae.siga.db.entities.ScsEjg;
@@ -43,6 +45,7 @@ import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.entities.ScsEstadoejgKey;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.ScsActacomisionMapper;
 import org.itcgae.siga.db.mappers.ScsEjgActaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
@@ -98,6 +101,9 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 	@Autowired
 	GestionEJGServiceImpl gestionEJGServiceImpl;
+
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 
 	@Override
 	public ActasDTO busquedaActas(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
@@ -1389,15 +1395,25 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 						} else {
 
 							LOGGER.info("el fundamento juridico no es nulo");
+							//Este método sustituye a un trigger y parametrizamos su ejecución
+							GenParametrosExample exampleParam = new GenParametrosExample();
+							exampleParam.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+								.andParametroEqualTo("ENABLETRIGGERSEJG")
+								.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+							exampleParam.setOrderByClause("IDINSTITUCION DESC");
 
-							response = actualizarFecharesolucioncajg(ejgItem.getIdinstitucion(), usuario,
-									ejgItem);
-
-							if (response == 0)
-								throw (new Exception(
-										"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
-												+ " asociada a un EJG"));
-
+							List<GenParametros> parametrosTrigger = genParametrosMapper.selectByExample(exampleParam);
+							
+							if(parametrosTrigger != null && !parametrosTrigger.isEmpty() 
+									&& parametrosTrigger.get(0).getValor().equals("1")) {
+								response = actualizarFecharesolucioncajg(ejgItem.getIdinstitucion(), usuario,
+										ejgItem);
+	
+								if (response == 0)
+									throw (new Exception(
+											"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
+													+ " asociada a un EJG"));
+							}
 							ejgItem.setFecharesolucioncajg(actasItem.getFecharesolucion());
 
 							response = scsEjgMapper.updateByPrimaryKey(ejgItem);

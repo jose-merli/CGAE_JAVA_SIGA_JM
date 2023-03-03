@@ -120,7 +120,7 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
                 + "    pc.idguardia,"
                 + "    pc.idpersona,"
                 //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@INICIO
-        		+ "    (PERSONA.NOMBRE || ' ' || PERSONA.APELLIDOS1 || ' ' || PERSONA.APELLIDOS2) AS NOMBRE_PERSONA");
+        		+ "    (PERSONA.APELLIDOS1 || ' ' || PERSONA.APELLIDOS2 || ', ' || PERSONA.NOMBRE) AS NOMBRE_PERSONA");
         		//SIGARNV-2885@DTT.JAMARTIN@07/02/2023@FIN
         
         sql.FROM("SCS_PERMUTAGUARDIAS sp");

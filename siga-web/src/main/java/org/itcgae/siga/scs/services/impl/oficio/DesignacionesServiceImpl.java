@@ -548,11 +548,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //									}
 
 									// obtenemos los datos del EJG
+									// anio/numEjg ## docresolucion ## idinstitucion ## anio ## idtipoejg ## numero ## idtiporatificacionejg ## fecharesolucioncajg
 									String[] datosEJG = str.split("##");
 									String anioEJG = datosEJG[0].split("/")[0].trim();
 									String numEJG = datosEJG[0].split("/")[1];
 									String idInstitucionEJG = datosEJG[2];
 									String idtipoEJG = datosEJG[4];
+									String num = datosEJG[5];
 									String dictamen = "";
 									String resolucion = "";
 									String impugnacion = "";
@@ -562,7 +564,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									ScsEjgExample ejgExample = new ScsEjgExample();
 									ejgExample.createCriteria().andAnioEqualTo(Short.parseShort(anioEJG))
 											.andNumejgEqualTo(numEJG)
-											.andIdinstitucionEqualTo(Short.parseShort(idInstitucionEJG));
+											.andIdinstitucionEqualTo(Short.parseShort(idInstitucionEJG))
+											.andIdtipoejgEqualTo(Short.valueOf(idtipoEJG));
 									List<ScsEjg> ejg = scsEjgExtendsMapper.selectByExample(ejgExample);
 									if (!ejg.isEmpty()) {
 
@@ -641,6 +644,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 										
 										expedientes.put(str.substring(0, str.indexOf("##")).trim(),
 												tooltip);
+										//Info EJG
+										expedientes.put("EJG",num + "/" + idtipoEJG);
 									}
 
 								}
@@ -2119,8 +2124,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaKey.setAnio(Short.valueOf(String.valueOf(designaItem.getAno())));
 					designaKey.setIdturno(designaItem.getIdTurno());
 					designaKey.setNumero(Long.valueOf(designaItem.getNumero()));
-					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);// new
-																											// ScsDesigna();
+					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);// new ScsDesigna();
 
 					if (scsDesigna != null) {
 
@@ -5054,16 +5058,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //		if(item[11] != null) {
 //			 checkSaltoEntrante = Boolean.parseBoolean(item[12]);
 //		}
-
-		Date fechaMinDesigna = new Date();
-		if (item[13].length() != 10) {
-			String date = item[13].substring(0, 10);
-			fechaMinDesigna = formatter.parse(date);
-		} else {
-			String date = item[13].substring(0, 10);
-			fechaMinDesigna = format.parse(date);
-		}
-
+		
 		LOGGER.info("updateLetradoDesigna() ->  Fin Preparacion de datos proviniente del item de front");
 
 		LOGGER.info(
@@ -5149,6 +5144,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						error.setCode(100);
 						error.setDescription("justiciaGratuita.oficio.designas.letrados.nocolaletrado");
 						updateResponseDTO.setError(error);
+						return updateResponseDTO;
 					} else {
 						letradoEntrante.setIdpersona(newLetrado.getIdpersona());
 						designaLetradoNueva.setIdpersona(newLetrado.getIdpersona());
@@ -8388,7 +8384,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				ScsEjgExample ejgExample = new ScsEjgExample();
 
 				ejgExample.createCriteria().andAnioEqualTo(Short.valueOf(item.getAnnio()))
-						.andIdinstitucionactaEqualTo(idInstitucion).andNumejgEqualTo(item.getNumEjg());
+						.andIdinstitucionEqualTo(idInstitucion).andNumeroEqualTo(Long.valueOf(item.getNumero())).andIdtipoejgEqualTo(Short.valueOf(item.getTipoEJG()));
 				List<ScsEjg> ejgs = scsEjgMapper.selectByExample(ejgExample);
 
 				ejg = ejgs.get(0);
@@ -8506,7 +8502,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 			if((relDesignaList == null || relDesignaList.isEmpty()) && (relAsistenciaList == null || relAsistenciaList.isEmpty())) {
 				respuesta = 1; //si no tiene relaciones es que ha ido bien
-			}else if(respuestaDes == 0 || respuestaAsi == 0) {
+			}else if(respuestaDes == 0 && respuestaAsi == 0) {
 				respuesta = 0;
 			}else {
 				respuesta = 1;
@@ -8894,7 +8890,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			asis.setJuzgado(designa.getIdjuzgado());
 			asis.setJuzgadoidinstitucion(designa.getIdinstitucionJuzg());
 
-			asis.setNumeroprocedimiento(designa.getNumprocedimiento() + "/" + designa.getAnioprocedimiento());
+//			asis.setNumeroprocedimiento(designa.getNumprocedimiento() + "/" + designa.getAnioprocedimiento());
+			asis.setNumeroprocedimiento(designa.getNumprocedimiento());
 			asis.setNig(designa.getNig());
 			asis.setIdpretension(designa.getIdpretension());
 
