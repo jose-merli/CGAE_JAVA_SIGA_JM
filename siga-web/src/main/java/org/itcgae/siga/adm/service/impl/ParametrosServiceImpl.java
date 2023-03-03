@@ -105,16 +105,8 @@ public class ParametrosServiceImpl implements IParametrosService {
 					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
 					parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
 					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
-					List<ParametroItem> parametroItemsFinal = new ArrayList<ParametroItem>();
-					for (ParametroItem parameter : parametroItems) {
-						if (parameter.getIdInstitucion().equalsIgnoreCase(String.valueOf(idInstitucion))) {
-							parametroItemsFinal.add(parameter);
-						}
-					}
-					if(parametroItemsFinal.size() == 0) {
-						parametroItemsFinal = parametroItems;
-					}
-					parametroDTO.setParametrosItems(parametroItemsFinal);
+
+					parametroDTO.setParametrosItems(parametroItems);
 //				}
 			}
 		}	
