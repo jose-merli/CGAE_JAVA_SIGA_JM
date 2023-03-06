@@ -1058,10 +1058,10 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			sql2.WHERE("IDINSTITUCION = "+ idInstitucion);
 		}
 		if (item.getTurno() != null) {
-			sql2.WHERE("IDTURNO = "+ item.getTurno());
+			sql2.WHERE("IDTURNO = "+ item.getIdTurno());
 		}
 		if (item.getGuardia()!= null) {
-			sql2.WHERE("IDGUARDIA = "+ item.getGuardia());
+			sql2.WHERE("IDGUARDIA = "+ item.getIdGuardia());
 		}
 		return sql2.toString();
 	}
