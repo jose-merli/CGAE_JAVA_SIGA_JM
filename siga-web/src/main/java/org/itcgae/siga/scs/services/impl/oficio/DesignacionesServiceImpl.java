@@ -8560,7 +8560,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			ejg.setNumeroprocedimiento(designa.getNumprocedimiento());
 			ejg.setNig(designa.getNig());
-			ejg.setObservaciones(designa.getObservaciones());
+//			ejg.setObservaciones(designa.getObservaciones());
+			ejg.setObservaciones(designa.getResumenasunto());
 			ejg.setIdpretension(designa.getIdpretension().longValue());
 			ejg.setJuzgado(designa.getIdjuzgado());
 
@@ -8894,6 +8895,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			asis.setNumeroprocedimiento(designa.getNumprocedimiento());
 			asis.setNig(designa.getNig());
 			asis.setIdpretension(designa.getIdpretension());
+			asis.setDatosdefensajuridica(designa.getResumenasunto());
 
 			ScsDelitosasistencia delitoAsistencia = new ScsDelitosasistencia();
 
