@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -680,6 +681,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
 
 					for (Map<String, Object> dest : result) {
+						Set<String> keyList = dest.keySet();
+
+						for (String key : keyList) {
+							if (dest.get(key) != null)
+								mapaClave.put(key, dest.get(key).toString()); // Añadimos informacion adicional del destinatario.
+						}
+
 						String idioma = "";
 						if (null != dest.get("IDIOMA")) {
 							for (ConsultaItem consultaIdioma : consultasItemDest) {
