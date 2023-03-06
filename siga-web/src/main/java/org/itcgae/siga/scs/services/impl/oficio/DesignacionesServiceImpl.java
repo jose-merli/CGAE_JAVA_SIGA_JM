@@ -8560,7 +8560,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			ejg.setNumeroprocedimiento(designa.getNumprocedimiento());
 			ejg.setNig(designa.getNig());
-			ejg.setObservaciones(designa.getObservaciones());
+//			ejg.setObservaciones(designa.getObservaciones());
+			ejg.setObservaciones(designa.getResumenasunto());
 			ejg.setIdpretension(designa.getIdpretension().longValue());
 			ejg.setJuzgado(designa.getIdjuzgado());
 

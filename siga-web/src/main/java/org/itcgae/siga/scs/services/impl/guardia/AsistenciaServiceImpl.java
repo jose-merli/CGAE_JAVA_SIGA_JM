@@ -3226,8 +3226,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					if (scsAsistencia != null) {
 						TarjetaDefensaJuridicaItem tarjetaDefensaJuridicaItem = new TarjetaDefensaJuridicaItem();
 						tarjetaDefensaJuridicaItem.setNig(scsAsistencia.getNig());
-						tarjetaDefensaJuridicaItem.setComentariosDelitos(scsAsistencia.getDelitosimputados());
-						tarjetaDefensaJuridicaItem.setObservaciones(scsAsistencia.getDatosdefensajuridica());
+						tarjetaDefensaJuridicaItem.setObservaciones(scsAsistencia.getDatosdefensajuridica()); //Campo Asunto
+						tarjetaDefensaJuridicaItem.setComentariosDelitos(scsAsistencia.getObservaciones()); //Campo Comentarios
 						tarjetaDefensaJuridicaItem.setNumDiligencia(scsAsistencia.getNumerodiligencia());
 						tarjetaDefensaJuridicaItem.setNumProcedimiento(scsAsistencia.getNumeroprocedimiento());
 						if (scsAsistencia.getIdpretension() != null) {
@@ -3235,7 +3235,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						}
 						if (scsAsistencia.getComisaria() != null) {
 							tarjetaDefensaJuridicaItem.setIdComisaria(scsAsistencia.getComisaria().toString());
-						} else if (scsAsistencia.getJuzgado() != null) {
+						}
+						if (scsAsistencia.getJuzgado() != null) {
 							tarjetaDefensaJuridicaItem.setIdJuzgado(scsAsistencia.getJuzgado().toString());
 						}
 
@@ -3318,9 +3319,21 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 						ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
 						scsAsistencia.setNig(tarjetaDefensaJuridicaItem.getNig());
-						scsAsistencia.setDelitosimputados(tarjetaDefensaJuridicaItem.getComentariosDelitos());
+//						scsAsistencia.setDelitosimputados(tarjetaDefensaJuridicaItem.getComentariosDelitos());
+						String delitos = "";
+						if(tarjetaDefensaJuridicaItem.getIdDelitos() != null && !tarjetaDefensaJuridicaItem.getIdDelitos().isEmpty()) {
+							for(int i = 0; i< tarjetaDefensaJuridicaItem.getIdDelitos().size(); i++) {
+								if(i == 0) {
+									delitos += tarjetaDefensaJuridicaItem.getIdDelitos().get(i);
+								} else {
+									delitos += ", " + tarjetaDefensaJuridicaItem.getIdDelitos().get(i);
+								}
+							}
+						}
+						scsAsistencia.setDelitosimputados(delitos);
 						scsAsistencia.setDatosdefensajuridica(tarjetaDefensaJuridicaItem.getObservaciones());
 						scsAsistencia.setNumerodiligencia(tarjetaDefensaJuridicaItem.getNumDiligencia());
+						scsAsistencia.setObservaciones(tarjetaDefensaJuridicaItem.getComentariosDelitos());
 						scsAsistencia.setNumeroprocedimiento(tarjetaDefensaJuridicaItem.getNumProcedimiento());
 						if (!UtilidadesString.esCadenaVacia(tarjetaDefensaJuridicaItem.getIdProcedimiento())) {
 							scsAsistencia
@@ -3339,14 +3352,18 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						if (!UtilidadesString.esCadenaVacia(tarjetaDefensaJuridicaItem.getIdComisaria())) {
 							scsAsistencia.setComisaria(Long.valueOf(tarjetaDefensaJuridicaItem.getIdComisaria()));
 							scsAsistencia.setComisariaidinstitucion(idInstitucion);
-							scsAsistencia.setJuzgado(null);
-							scsAsistencia.setJuzgadoidinstitucion(null);
+//							scsAsistencia.setJuzgado(null);
+							scsAsistencia.setJuzgado(Long.parseLong(tarjetaDefensaJuridicaItem.getIdJuzgado()));
+//							scsAsistencia.setJuzgadoidinstitucion(null);
+							scsAsistencia.setJuzgadoidinstitucion(idInstitucion);
 							// Si elegimos comisaria y la caracteristica de la asistencia estaba creada, hay
 							// que dejarlo
 							// reflejado en SCS_CARACTASISTENCIA
 							if (scsCaractasistencia != null) {
-								scsCaractasistencia.setIdjuzgado(null);
-								scsCaractasistencia.setIdinstitucionJuzgado(null);
+//								scsCaractasistencia.setIdjuzgado(null);
+								scsCaractasistencia.setIdjuzgado(Long.parseLong(tarjetaDefensaJuridicaItem.getIdJuzgado()));
+//								scsCaractasistencia.setIdinstitucionJuzgado(null);
+								scsCaractasistencia.setIdinstitucionJuzgado(idInstitucion);
 								scsCaractasistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
 								scsCaractasistencia.setFechamodificacion(new Date());
 								affectedRows += scsCaractasistenciaMapper.updateByPrimaryKey(scsCaractasistencia);
@@ -3354,8 +3371,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						} else if (!UtilidadesString.esCadenaVacia(tarjetaDefensaJuridicaItem.getIdJuzgado())) {
 							scsAsistencia.setJuzgado(Long.valueOf(tarjetaDefensaJuridicaItem.getIdJuzgado()));
 							scsAsistencia.setJuzgadoidinstitucion(idInstitucion);
-							scsAsistencia.setComisaria(null);
-							scsAsistencia.setComisariaidinstitucion(null);
+//							scsAsistencia.setComisaria(null);
+							scsAsistencia.setComisaria(Long.valueOf(tarjetaDefensaJuridicaItem.getIdComisaria()));
+//							scsAsistencia.setComisariaidinstitucion(null);
+							scsAsistencia.setComisariaidinstitucion(idInstitucion);
 							// Si se selecciona juzgado hay que dejarlo registrado en la tabla
 							// SCS_CARACTASISTENCIA
 							// Si no tiene creado registro lo creamos y si lo tiene creado lo actualizamos
@@ -6145,6 +6164,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				throw (new Exception(
 						"Error al introducir los datos juridicos en el EJG provenientes de la asistencia"));
 
+			ejg.setObservaciones(asis.getDatosdefensajuridica()); //Campo Asunto
+			ejg.setDelitos(asis.getObservaciones()); //Campo comentario
 			ejg.setJuzgado(asis.getJuzgado());
 			ejg.setJuzgadoidinstitucion(asis.getJuzgadoidinstitucion());
 

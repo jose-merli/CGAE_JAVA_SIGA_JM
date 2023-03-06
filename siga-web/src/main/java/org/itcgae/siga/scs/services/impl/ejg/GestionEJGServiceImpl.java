@@ -3642,11 +3642,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					designa.setNumprocedimiento(ejg.getNumeroprocedimiento());
 					designa.setAnioprocedimiento(ejg.getAnioprocedimiento());
 					designa.setNig(ejg.getNig());
-					designa.setObservaciones(ejg.getObservaciones());
+					designa.setResumenasunto(ejg.getDelitos());//Campo Comentario
+					designa.setObservaciones(ejg.getObservaciones());//Campo Asuntos
 //						designa.setIdpretension(ejg.getIdpretension().shortValue());
 					designa.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
 					designa.setIdjuzgado(ejg.getJuzgado());
-					designa.setResumenasunto(ejg.getObservaciones());//Campo Asuntos
 					// Actualizamos los delitos de la designacion eliminando los anteriores y
 					// asignando los designados en EJG.
 					ScsDelitosdesigna delitoDesigna = new ScsDelitosdesigna();
@@ -4026,6 +4026,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			asis.setNumerodiligencia(ejg.getNumerodiligencia());
 			asis.setNig(ejg.getNig());
 //			asis.setDelitosimputados(ejg.getDelitos());
+			asis.setDatosdefensajuridica(ejg.getObservaciones()); //Campo Asunto
+			asis.setObservaciones(ejg.getDelitos()); //Campo Comentario
 			
 			asis.setUsumodificacion(usuario.getIdusuario());
 			asis.setFechamodificacion(new Date());
