@@ -8895,6 +8895,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			asis.setNumeroprocedimiento(designa.getNumprocedimiento());
 			asis.setNig(designa.getNig());
 			asis.setIdpretension(designa.getIdpretension());
+			asis.setDatosdefensajuridica(designa.getResumenasunto());
 
 			ScsDelitosasistencia delitoAsistencia = new ScsDelitosasistencia();
 

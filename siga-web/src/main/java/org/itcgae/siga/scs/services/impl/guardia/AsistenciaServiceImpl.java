@@ -5920,7 +5920,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		if (origen.equals("defensaJuridicaAsistencia")) {
 			designa.setNumprocedimiento(asis.getNumeroprocedimiento());
 			designa.setNig(asis.getNig());
-			designa.setObservaciones(asis.getObservaciones());
+			designa.setObservaciones(asis.getDatosdefensajuridica());
 			designa.setIdpretension(asis.getIdpretension());
 			designa.setIdjuzgado(asis.getJuzgado());
 			asis.getNumerodiligencia();
