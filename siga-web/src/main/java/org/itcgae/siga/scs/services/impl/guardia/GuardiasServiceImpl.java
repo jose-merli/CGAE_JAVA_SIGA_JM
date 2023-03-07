@@ -5221,7 +5221,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		GuardiasTurnoItem guardia = scsGuardiasturnoExtendsMapper.getGuardia(idGuardia1.toString(), idTurno1.toString(),
 				idInstitucion1.toString());
 		porGrupos = guardia.getPorGrupos();
-		rotacion = Boolean.parseBoolean(guardia.getRotarComponentes());
+		rotacion = "1".equals(guardia.getRotarComponentes()) ? true : false;
 		String nombreGuardia = guardia.getNombre();
 
 		// validando que no haya ninguna guardia realizada
