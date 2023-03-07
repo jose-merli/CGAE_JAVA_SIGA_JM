@@ -206,10 +206,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo) throws Exception {
 		String sql = "";
+		
+		SQL sqlDefendidos = new SQL();
 
 		Hashtable codigosBind = new Hashtable();
 		int contador = 0;
 		// Acceso a BBDD
+		
+		sqlDefendidos.SELECT("NVL(PER.APELLIDO1, '') || ' ' || NVL(PER.APELLIDO2, '') || ', ' || NVL(PER.NOMBRE, '')");
+		sqlDefendidos.FROM("scs_defendidosdesigna ded");
+		sqlDefendidos.JOIN("scs_personajg per ON ded.idinstitucion = per.idinstitucion	AND ded.idpersona = per.idpersona");
+		sqlDefendidos.WHERE("calidad IS NOT NULL");
+		sqlDefendidos.WHERE("ded.anio = des.anio");
+		sqlDefendidos.WHERE("ded.numero = des.numero");
+		sqlDefendidos.WHERE("ded.idinstitucion = des.idinstitucion");
+		sqlDefendidos.WHERE("ded.idturno = des.idturno");
+		sqlDefendidos.WHERE("rownum < 2");
 
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
@@ -218,7 +230,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					+ " des.fechaentrada fechaentrada,des.resumenasunto, des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 					+ "  des.fechaestado fechaestado,juzgado.nombre as nombrejuzgado,  turno.nombre,";
 			sql +=  " colegiado.ncolegiado, persona.idpersona, NVL(persona.nombre,'') as nombrepersona, NVL(persona.APELLIDOS1,'') as apellido1persona, NVL(persona.APELLIDOS2,'') as apellido2persona ,";
-			sql += " NVL(PER.NOMBRE,'') AS NOMBREINTERESADO," + " NVL(PER.APELLIDO1,'') as APELLIDO1, NVL(PER.APELLIDO2,'') as APELLIDO2 ";
+			sql += " (" + sqlDefendidos.toString() +")  AS NOMBREINTERESADO";
 			
 			sql += " FROM scs_designa             des\r\n"; 
 				sql += "   LEFT OUTER JOIN scs_designasletrado     l ON l.anio = des.anio\r\n" + 
@@ -231,14 +243,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql += 	"    JOIN scs_turno               turno ON des.idturno = turno.idturno\r\n" + 
 					"                            AND des.idinstitucion = turno.idinstitucion\r\n" + 
 					"    LEFT OUTER JOIN scs_juzgado             juzgado ON des.idjuzgado = juzgado.idjuzgado\r\n" + 
-					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n" + 
-					"    LEFT OUTER JOIN (select * from scs_defendidosdesigna where calidad is not null)   ded ON ded.anio = des.anio\r\n" + 
-					"                                                 AND ded.numero = des.numero\r\n" + 
-					"                                                 AND ded.idinstitucion = des.idinstitucion\r\n" + 
-					"                                                 AND ded.idturno = des.idturno\r\n" + 
-					"    LEFT OUTER JOIN scs_personajg           per ON ded.idinstitucion = per.idinstitucion\r\n" + 
-					"                                         AND ded.idpersona = per.idpersona";
-
+					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n";
 
 			boolean tiene_juzg = designaItem.getIdJuzgadoActu() != null
 					&& designaItem.getIdJuzgadoActu().length >0;
