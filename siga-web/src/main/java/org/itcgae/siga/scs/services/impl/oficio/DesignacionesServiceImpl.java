@@ -6170,22 +6170,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						actDesigReqDTO.setNumero(String.valueOf(designaItem.getNumero()));
 						List<ActuacionDesignaItem> listaActuacionDesignaItem = scsDesignacionesExtendsMapper
 								.busquedaActDesigna(actDesigReqDTO, Short.toString(idInstitucion));
-
-						String fechaActuacion = CollectionUtils.isNotEmpty(listaActuacionDesignaItem)
-								? listaActuacionDesignaItem.get(0).getFechaActuacion()
-								: null;
-						SimpleDateFormat dateSimpleFormat = new SimpleDateFormat("yyyy-MM-dd");
-						Date fechaActDate = dateSimpleFormat.parse(fechaActuacion);
-
-						if (designaItem.getFechaAlta().after(fechaActDate)) {
-							error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
-							error.setDescription("justiciaGratuita.oficio.designa.fechaposteriorprimeractuacion");
-//							error.setDescription("La fecha no puede ser posterior a la fecha de primera actuacion (" + fechaActDate.toString() + ")");
-							updateResponseDTO.setStatus(SigaConstants.KO);
-							updateResponseDTO.setError(error);
-							return updateResponseDTO;
+						if(!listaActuacionDesignaItem.isEmpty()) {
+							String fechaActuacion = CollectionUtils.isNotEmpty(listaActuacionDesignaItem)
+									? listaActuacionDesignaItem.get(0).getFechaActuacion()
+									: null;
+							SimpleDateFormat dateSimpleFormat = new SimpleDateFormat("yyyy-MM-dd");
+							Date fechaActDate = dateSimpleFormat.parse(fechaActuacion);
+	
+							if (designaItem.getFechaAlta().after(fechaActDate)) {
+								error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+								error.setDescription("justiciaGratuita.oficio.designa.fechaposteriorprimeractuacion");
+	//							error.setDescription("La fecha no puede ser posterior a la fecha de primera actuacion (" + fechaActDate.toString() + ")");
+								updateResponseDTO.setStatus(SigaConstants.KO);
+								updateResponseDTO.setError(error);
+								return updateResponseDTO;
+							}
 						}
-
 						// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
 						// la institucion 0
 						if (parametros != null && parametros.getValor() != null) {
