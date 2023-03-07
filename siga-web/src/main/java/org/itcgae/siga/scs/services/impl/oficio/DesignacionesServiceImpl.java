@@ -5015,6 +5015,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		// Faltaria, si es necesario el elemento 12 (Art.27)
 		Boolean checkArt27 = false;
+		if(item[12] != null) {
+			if(item[12].equalsIgnoreCase("SI")) {
+				checkArt27 = true;
+			}
+		}
 //		if(item[11] != null) {
 //			 checkSaltoEntrante = Boolean.parseBoolean(item[12]);
 //		}
@@ -5130,7 +5135,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							.selectByExample(cenColegExample);
 					CenColegiado cenColeg = CollectionUtils.isNotEmpty(resCenColegiado) ? resCenColegiado.get(0) : null;
 
-					if (cenColeg != null) {
+					// Las designaciones por art 27-28 no requieren que el letrado este en el turno activo, solo que sea ejerciente.
+					if (cenColeg != null && !checkArt27) {
 						// 2) Averiguamos el/los turnos inscritos del colegiado elegido manualmente
 						// (buscador)
 						ScsInscripcionturnoExample insTurnoExample = new ScsInscripcionturnoExample();
@@ -5164,7 +5170,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 							letradoDesigSinTurno = Boolean.TRUE;
 						}
-					} else {
+					
+					//Si es designa por art 27-28 comprobamos que el letrado sea ejerciente
+					} else if(cenColeg != null && checkArt27) {
+						//Consulta a CEN_COLEGIADO por idPersona y sin idInstitucion para sacar si es ejerciente
+						cenColegExample = new CenColegiadoExample();
+						cenColegExample.createCriteria().andIdpersonaEqualTo(letradoEntrante.getIdpersona());
+						
+						resCenColegiado = this.cenColegiadoExtendsMapper.selectByExample(cenColegExample);
+						
+						if(resCenColegiado != null && !resCenColegiado.isEmpty() && resCenColegiado.get(0).getSituacionejercicio() != null) {
+							for (int i = 0; i < resCenColegiado.size(); i++) {
+								if(Integer.parseInt(resCenColegiado.get(i).getSituacionejercicio()) != 1){
+									error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+									error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnonoejerciente");
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									updateResponseDTO.setError(error);
+									return updateResponseDTO;
+								}
+							}
+						}
+					}else {
 						LOGGER.info(
 								"+++ DesignacionesServiceImple/createDesigna() -> No se ha encontrado 'CenColegiado' para el NCOLEGIADO = "
 										+ letradoEntrante.getNumero());
