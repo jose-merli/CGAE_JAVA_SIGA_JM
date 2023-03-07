@@ -939,51 +939,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion,
 							tamMaximo);
-					// designasNuevas =
-					// scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem,
-					// idInstitucion,
-					// tamMaximo, false);
-
-					// List<DesignaItem> designasNuevasNoColegiado = null;
-					// designasNuevasNoColegiado =
-					// scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem,
-					// idInstitucion, tamMaximo, true);
-
-					// for (DesignaItem designaNoColegiado : designasNuevasNoColegiado) {
-					// designasNuevas.add(designaNoColegiado);
-					// }
-
-//					Map<String, DesignaItem> desginasBusqueda = new HashMap<String, DesignaItem>();
-//					for (DesignaItem d : designas) {
-//						int[] indice = new int[4];
-//						indice[0] = d.getAno();
-//						indice[1] = d.getNumero();
-//						indice[2] = d.getIdTurno();
-//						indice[3] = idInstitucion;
-//						desginasBusqueda.put(d.getAno() + "" + d.getNumero() + "" + d.getIdTurno() + "" + idInstitucion,
-//								d);
-//					}
-//					for (DesignaItem d : designasNuevas) {
-//						int[] indice = new int[4];
-//						indice[0] = d.getAno();
-//						indice[1] = d.getNumero();
-//						indice[2] = d.getIdTurno();
-//						indice[3] = idInstitucion;
-//						if (!(desginasBusqueda.containsKey(
-//								d.getAno() + "" + d.getNumero() + "" + d.getIdTurno() + "" + idInstitucion))) {
-//							desginasBusqueda
-//									.put(d.getAno() + "" + d.getNumero() + "" + d.getIdTurno() + "" + idInstitucion, d);
-//						}
-//					}
-
-//					designas = new ArrayList<DesignaItem>(desginasBusqueda.values());
-//
-//					if (designas.size() > 200) {
-//						int z = 0;
-//						for (int x = 200; x <= designas.size() - 1; z++) {
-//							designas.remove(x);
-//						}
-//					}
 
 					if ((designas != null) && (designas.size()) >= 200) {
 						error.setCode(200);
