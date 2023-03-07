@@ -509,15 +509,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 						if (item.isMuestraPendiente()) {
 							float porcentajeTotal = 0;
+							boolean existePdte = false;
 							
 							for (ActuacionesJustificacionExpressItem actuacion: record.getActuaciones()) {
-								porcentajeTotal += Float.valueOf(actuacion.getPorcentaje().replace(",", "."));
+								if (!existePdte && "1".equals(actuacion.getValidada())) {
+									porcentajeTotal += Float.valueOf(actuacion.getPorcentaje().replace(",", "."));
+								} else {
+									existePdte = true;
+								}
 							}
 							
-							if ("A".equals(record.getEstado())
+							if (!existePdte && ("A".equals(record.getEstado())
 									|| "F".equals(record.getEstado())
-									|| porcentajeTotal >= 100) {
-								it.remove();;
+									|| porcentajeTotal >= 100)) {
+								it.remove();
 							}
 						}
 					}
