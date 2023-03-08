@@ -2098,6 +2098,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 							scsDesigna.setNig(designaItem.getNig());
 							scsDesigna.setNumprocedimiento(designaItem.getNumProcedimiento());
+							scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
 							if (designaItem.getEstado() != null && !designaItem.getEstado().isEmpty()) {
 								scsDesigna.setEstado(designaItem.getEstado());
 							}
@@ -2109,7 +2110,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								Short idPretension = new Short((short) designaItem.getIdPretension());
 								scsDesigna.setIdpretension(idPretension);
 							}
-							scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
 							scsDesigna.setFechaestado(designaItem.getFechaEstado());
 							scsDesigna.setFechafin(designaItem.getFechaFin());
 
