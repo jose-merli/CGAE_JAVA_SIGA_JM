@@ -509,15 +509,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 						if (item.isMuestraPendiente()) {
 							float porcentajeTotal = 0;
+							boolean existePdte = false;
 							
 							for (ActuacionesJustificacionExpressItem actuacion: record.getActuaciones()) {
-								porcentajeTotal += Float.valueOf(actuacion.getPorcentaje().replace(",", "."));
+								if (!existePdte && "1".equals(actuacion.getValidada())) {
+									porcentajeTotal += Float.valueOf(actuacion.getPorcentaje().replace(",", "."));
+								} else {
+									existePdte = true;
+								}
 							}
 							
-							if ("A".equals(record.getEstado())
+							if (!existePdte && ("A".equals(record.getEstado())
 									|| "F".equals(record.getEstado())
-									|| porcentajeTotal >= 100) {
-								it.remove();;
+									|| porcentajeTotal >= 100)) {
+								it.remove();
 							}
 						}
 					}
@@ -939,51 +944,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion,
 							tamMaximo);
-					// designasNuevas =
-					// scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem,
-					// idInstitucion,
-					// tamMaximo, false);
-
-					// List<DesignaItem> designasNuevasNoColegiado = null;
-					// designasNuevasNoColegiado =
-					// scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem,
-					// idInstitucion, tamMaximo, true);
-
-					// for (DesignaItem designaNoColegiado : designasNuevasNoColegiado) {
-					// designasNuevas.add(designaNoColegiado);
-					// }
-
-//					Map<String, DesignaItem> desginasBusqueda = new HashMap<String, DesignaItem>();
-//					for (DesignaItem d : designas) {
-//						int[] indice = new int[4];
-//						indice[0] = d.getAno();
-//						indice[1] = d.getNumero();
-//						indice[2] = d.getIdTurno();
-//						indice[3] = idInstitucion;
-//						desginasBusqueda.put(d.getAno() + "" + d.getNumero() + "" + d.getIdTurno() + "" + idInstitucion,
-//								d);
-//					}
-//					for (DesignaItem d : designasNuevas) {
-//						int[] indice = new int[4];
-//						indice[0] = d.getAno();
-//						indice[1] = d.getNumero();
-//						indice[2] = d.getIdTurno();
-//						indice[3] = idInstitucion;
-//						if (!(desginasBusqueda.containsKey(
-//								d.getAno() + "" + d.getNumero() + "" + d.getIdTurno() + "" + idInstitucion))) {
-//							desginasBusqueda
-//									.put(d.getAno() + "" + d.getNumero() + "" + d.getIdTurno() + "" + idInstitucion, d);
-//						}
-//					}
-
-//					designas = new ArrayList<DesignaItem>(desginasBusqueda.values());
-//
-//					if (designas.size() > 200) {
-//						int z = 0;
-//						for (int x = 200; x <= designas.size() - 1; z++) {
-//							designas.remove(x);
-//						}
-//					}
 
 					if ((designas != null) && (designas.size()) >= 200) {
 						error.setCode(200);
@@ -2138,6 +2098,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 							scsDesigna.setNig(designaItem.getNig());
 							scsDesigna.setNumprocedimiento(designaItem.getNumProcedimiento());
+							scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
 							if (designaItem.getEstado() != null && !designaItem.getEstado().isEmpty()) {
 								scsDesigna.setEstado(designaItem.getEstado());
 							}
@@ -2149,7 +2110,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								Short idPretension = new Short((short) designaItem.getIdPretension());
 								scsDesigna.setIdpretension(idPretension);
 							}
-							scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
 							scsDesigna.setFechaestado(designaItem.getFechaEstado());
 							scsDesigna.setFechafin(designaItem.getFechaFin());
 
@@ -5055,6 +5015,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		// Faltaria, si es necesario el elemento 12 (Art.27)
 		Boolean checkArt27 = false;
+		if(item[12] != null) {
+			if(item[12].equalsIgnoreCase("SI")) {
+				checkArt27 = true;
+			}
+		}
 //		if(item[11] != null) {
 //			 checkSaltoEntrante = Boolean.parseBoolean(item[12]);
 //		}
@@ -5170,7 +5135,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							.selectByExample(cenColegExample);
 					CenColegiado cenColeg = CollectionUtils.isNotEmpty(resCenColegiado) ? resCenColegiado.get(0) : null;
 
-					if (cenColeg != null) {
+					// Las designaciones por art 27-28 no requieren que el letrado este en el turno activo, solo que sea ejerciente.
+					if (cenColeg != null && !checkArt27) {
 						// 2) Averiguamos el/los turnos inscritos del colegiado elegido manualmente
 						// (buscador)
 						ScsInscripcionturnoExample insTurnoExample = new ScsInscripcionturnoExample();
@@ -5204,7 +5170,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 							letradoDesigSinTurno = Boolean.TRUE;
 						}
-					} else {
+					
+					//Si es designa por art 27-28 comprobamos que el letrado sea ejerciente
+					} else if(cenColeg != null && checkArt27) {
+						//Consulta a CEN_COLEGIADO por idPersona y sin idInstitucion para sacar si es ejerciente
+						cenColegExample = new CenColegiadoExample();
+						cenColegExample.createCriteria().andIdpersonaEqualTo(letradoEntrante.getIdpersona());
+						
+						resCenColegiado = this.cenColegiadoExtendsMapper.selectByExample(cenColegExample);
+						
+						if(resCenColegiado != null && !resCenColegiado.isEmpty() && resCenColegiado.get(0).getSituacionejercicio() != null) {
+							for (int i = 0; i < resCenColegiado.size(); i++) {
+								if(Integer.parseInt(resCenColegiado.get(i).getSituacionejercicio()) != 1){
+									error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+									error.setDescription("justiciaGratuita.oficio.designa.designacionletradoturnonoejerciente");
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									updateResponseDTO.setError(error);
+									return updateResponseDTO;
+								}
+							}
+						}
+					}else {
 						LOGGER.info(
 								"+++ DesignacionesServiceImple/createDesigna() -> No se ha encontrado 'CenColegiado' para el NCOLEGIADO = "
 										+ letradoEntrante.getNumero());
@@ -6170,22 +6156,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						actDesigReqDTO.setNumero(String.valueOf(designaItem.getNumero()));
 						List<ActuacionDesignaItem> listaActuacionDesignaItem = scsDesignacionesExtendsMapper
 								.busquedaActDesigna(actDesigReqDTO, Short.toString(idInstitucion));
-
-						String fechaActuacion = CollectionUtils.isNotEmpty(listaActuacionDesignaItem)
-								? listaActuacionDesignaItem.get(0).getFechaActuacion()
-								: null;
-						SimpleDateFormat dateSimpleFormat = new SimpleDateFormat("yyyy-MM-dd");
-						Date fechaActDate = dateSimpleFormat.parse(fechaActuacion);
-
-						if (designaItem.getFechaAlta().after(fechaActDate)) {
-							error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
-							error.setDescription("justiciaGratuita.oficio.designa.fechaposteriorprimeractuacion");
-//							error.setDescription("La fecha no puede ser posterior a la fecha de primera actuacion (" + fechaActDate.toString() + ")");
-							updateResponseDTO.setStatus(SigaConstants.KO);
-							updateResponseDTO.setError(error);
-							return updateResponseDTO;
+						if(!listaActuacionDesignaItem.isEmpty()) {
+							String fechaActuacion = CollectionUtils.isNotEmpty(listaActuacionDesignaItem)
+									? listaActuacionDesignaItem.get(0).getFechaActuacion()
+									: null;
+							SimpleDateFormat dateSimpleFormat = new SimpleDateFormat("yyyy-MM-dd");
+							Date fechaActDate = dateSimpleFormat.parse(fechaActuacion);
+	
+							if (designaItem.getFechaAlta().after(fechaActDate)) {
+								error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+								error.setDescription("justiciaGratuita.oficio.designa.fechaposteriorprimeractuacion");
+	//							error.setDescription("La fecha no puede ser posterior a la fecha de primera actuacion (" + fechaActDate.toString() + ")");
+								updateResponseDTO.setStatus(SigaConstants.KO);
+								updateResponseDTO.setError(error);
+								return updateResponseDTO;
+							}
 						}
-
 						// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
 						// la institucion 0
 						if (parametros != null && parametros.getValor() != null) {

@@ -1539,6 +1539,8 @@ public class SigaConstants {
 	public static final String GUARDIA = "GUARDIA";
 	public static final String OFICIO = "OFICIO";
 	public static final String EJG = "EJG";
+	public static final String GESTIONEJG = "GESTIONEJG";
+	public static final String EJGEXPRESS = "EJGEXPRESS";
 
 	// si es facturacion o pago
 	public static final String FACTURACION_SJCS = "F";
