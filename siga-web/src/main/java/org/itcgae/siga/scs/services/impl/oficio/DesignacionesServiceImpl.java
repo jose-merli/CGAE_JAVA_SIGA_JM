@@ -5142,8 +5142,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						ScsInscripcionturnoExample insTurnoExample = new ScsInscripcionturnoExample();
 						insTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andFechadenegacionIsNull().andFechasolicitudIsNotNull().andFechavalidacionIsNotNull()
-								.andFechabajaIsNull().andIdpersonaEqualTo(cenColeg.getIdpersona());
-
+								.andFechabajaIsNull().andIdpersonaEqualTo(cenColeg.getIdpersona())
+								.andIdturnoEqualTo(designa.getIdturno()); //Recuperamos la inscripcion en el turno de la designa actual
+						
 						List<ScsInscripcionturno> resInscLetrado = this.scsInscripcionesTurnoExtendsMapper
 								.selectByExample(insTurnoExample);
 
