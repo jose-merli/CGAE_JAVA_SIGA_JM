@@ -40,6 +40,17 @@ public class ActuacionAsistenciaController {
         }
         return new ResponseEntity<DatosGeneralesActuacionAsistenciaDTO>(response, HttpStatus.OK);
     }
+    
+    @GetMapping(value = "/recuperaHitoNueve")
+    public ResponseEntity<Boolean> searchHitoNueve(HttpServletRequest request, @RequestParam String anioNumero, @RequestParam String idInstitucion) {
+        boolean response = false;
+        try {
+            response = actuacionAsistenciaService.searchHitoNueve(request, anioNumero, idInstitucion);
+        }catch(Exception e) {
+            throw e;
+        }
+        return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+    }
 
     @PostMapping(value = "/saveDatosGenerales", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UpdateResponseDTO> saveDatosGenerales(HttpServletRequest request, @RequestBody DatosGeneralesActuacionAsistenciaItem datosGenerales, @RequestParam String anioNumero) {

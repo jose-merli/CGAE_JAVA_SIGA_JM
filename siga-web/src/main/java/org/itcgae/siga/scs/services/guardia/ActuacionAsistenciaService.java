@@ -14,5 +14,5 @@ public interface ActuacionAsistenciaService {
     public UpdateResponseDTO saveTarjetaJustificacion (HttpServletRequest request, String anioNumero, String idActuacion, TarjetaJustificacionActuacionAsistenciaItem tarjeta);
     public UpdateResponseDTO updateEstadoActuacion (HttpServletRequest request, String anioNumero, String idActuacion, TarjetaJustificacionActuacionAsistenciaItem tarjeta);
     public HistoricoActuacionAsistenciaDTO searchHistorico(HttpServletRequest request, String anioNumero, String idActuacion);
-
+    public boolean searchHitoNueve(HttpServletRequest request, String anioNumero, String idInstitucion);
 }

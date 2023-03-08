@@ -42,6 +42,9 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 	})
 	List<AsuntosJusticiableItem> searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo, String idLenguaje);
 	
+	
+	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "searchHitoNueveAsistencia")
+	int searchHitoNueveAsistencia(String anio, String numero, String idInstitucion);
 
 	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "getAsuntoTipoAsistencia")
 	@Results({ 

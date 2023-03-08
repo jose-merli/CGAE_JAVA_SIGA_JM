@@ -208,6 +208,25 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String searchHitoNueveAsistencia(String anio, String numero, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("COUNT(*)");
+		sql.FROM("SCS_ASISTENCIA sa");
+		sql.JOIN("SCS_HITOFACTURABLEGUARDIA sh ON\r\n" + 
+				"		sa.IDINSTITUCION = sh.IDINSTITUCION\r\n" + 
+				"		AND sa.IDTURNO = sh.IDTURNO\r\n" + 
+				"		AND sa.IDGUARDIA = sh.IDGUARDIA\r\n");
+		
+		sql.WHERE("sh.IDHITO = 9\r\n" + 
+				"		AND sh.IDINSTITUCION =" + idInstitucion + 
+				"		AND sa.ANIO =" + anio +
+				"		AND sa.NUMERO = " + numero);
+		sql.ORDER_BY("sa.anio DESC");
+		
+		return sql.toString();
+	}
 
 	public String searchAsistenciasExpress(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion) {
 

@@ -293,6 +293,22 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
         }
         return datosGeneralesActuacionAsistenciaDTO;
     }
+    
+    public boolean searchHitoNueve(HttpServletRequest request, String anioNumero, String idInstitucion) {
+    	boolean esHitoNueve = false;
+    	try {
+    		String[] anioYnumero = anioNumero.split("/");
+    		int resultados = scsAsistenciaExtendsMapper.searchHitoNueveAsistencia(anioYnumero[0], anioYnumero[1], idInstitucion);
+    		
+    		if(resultados > 0)
+    				esHitoNueve = true;
+    		
+    	}catch(Exception e) {
+            LOGGER.error("searchHitoNueve() / ERROR: "+ e.getMessage(), e);
+            esHitoNueve = false;
+        }
+        return esHitoNueve;
+    }
 
     /**
      * Metodo que actualiza o inserta una nueva actuacion, esto dependera de si el idActuacion de {@link DatosGeneralesActuacionAsistenciaItem} va relleno o no
