@@ -1083,7 +1083,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					nombrePlantilla = plantillaDoc.getPlantilla();
 					idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
 					if (nombrePlantilla.lastIndexOf(".") != -1) {
-						if(nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals("fo")) {
+						String auxNombre = nombrePlantilla.substring(nombrePlantilla.lastIndexOf("."));
+						if(auxNombre.toLowerCase().equals(".fo")) {
 							esFO = true;
 						}
 					}
@@ -2654,11 +2655,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 			}else if(esFO){
 				try {
-					if(modelosComunicacionItem.getIdClaseComunicacion().equals("6")) { //Carta de Oficio
-						docGenerado = _generacionDocService.generarFOTurnos(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, resultDatos);
-					}else {
-						docGenerado = _generacionDocService.generarFO(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, resultDatos);
-					}
+					//if(modelosComunicacionItem.getIdClaseComunicacion().equals("6")) { //Carta de Oficio
+						//docGenerado = _generacionDocService.generarFOTurnos(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, resultDatos);
+					//}else {
+						docGenerado = _generacionDocService.generarFO(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, hDatosFinal);
+					//}
 				} catch (Exception e) {
 					LOGGER.error("Error al generar el fichero excel ", e);
 					throw new BusinessException("No se ha podido generar el fichero Excel", e);

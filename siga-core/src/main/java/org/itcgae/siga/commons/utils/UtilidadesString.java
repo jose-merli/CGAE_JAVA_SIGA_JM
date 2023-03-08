@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -462,6 +464,69 @@ public class UtilidadesString {
 		return finalText.toString();
 	}
 
+	public static String reemplazaParametrosMap(String texto, String marca, HashMap<String, String> properties) {
+
+		StringBuffer finalText = new StringBuffer();
+		int dif = marca.length();
+		String prop;
+		int pos1 = 0;
+		int pos2 = 0;
+		int index = 0;
+		if (texto == null)
+			texto = "";
+		// while parameters in the string
+		while ((pos1 = texto.indexOf(marca, index)) != -1) {
+			// search the parameter betwen the control characters
+			// and replace by its value
+			pos2 = texto.indexOf(marca, pos1 + dif);
+			prop = texto.substring(pos1 + dif, pos2);
+
+			finalText.append(texto.substring(index, pos1));
+			String propValue = (String) properties.get(prop.toUpperCase());
+			if (propValue != null) {
+				propValue = UtilidadesString.formato_ISO_8859_1(propValue);
+				finalText.append(propValue);
+			}
+			// searching on from the last control character
+			index = pos2 + dif;
+		}
+
+		finalText.append(texto.substring(index, texto.length()));
+		return finalText.toString();
+	}
+	
+	public static String reemplazaParametrosLink(String texto, String marca, LinkedHashMap <String, String> properties) {
+
+		StringBuffer finalText = new StringBuffer();
+		int dif = marca.length();
+		String prop;
+		int pos1 = 0;
+		int pos2 = 0;
+		int index = 0;
+		if (texto == null)
+			texto = "";
+		// while parameters in the string
+		while ((pos1 = texto.indexOf(marca, index)) != -1) {
+			// search the parameter betwen the control characters
+			// and replace by its value
+			pos2 = texto.indexOf(marca, pos1 + dif);
+			prop = texto.substring(pos1 + dif, pos2);
+
+			finalText.append(texto.substring(index, pos1));
+			String propValue = (String) properties.get(prop.toUpperCase());
+			if (propValue != null) {
+				propValue = UtilidadesString.formato_ISO_8859_1(propValue);
+				finalText.append(propValue);
+			}
+			// searching on from the last control character
+			index = pos2 + dif;
+		}
+
+		finalText.append(texto.substring(index, texto.length()));
+		return finalText.toString();
+	}
+
+	
 	public static String formato_ISO_8859_1(String s) {
 		StringBuffer buf = new StringBuffer("");
 		char[] mChars = s.toCharArray();

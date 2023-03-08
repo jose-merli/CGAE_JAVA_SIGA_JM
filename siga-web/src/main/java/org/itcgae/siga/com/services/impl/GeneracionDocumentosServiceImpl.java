@@ -14,11 +14,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.batik.dom.util.HashTable;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -875,7 +877,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 	@Override
 	public DatosDocumentoItem generarFO(String plantilla, String rutaTmp, String nombreFicheroSalida,
-			List<Map<String, Object>> hDatosFinal) throws IOException, Exception {
+			HashMap<String,Object> hDatosFinal ) throws IOException, Exception {
 		DatosDocumentoItem documento = new DatosDocumentoItem();
 		if(hDatosFinal != null && hDatosFinal.size() > 0) {
 			// 1. obteniendo plantilla FO
@@ -944,8 +946,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			String sPlantillaFO = UtilidadesString.getFileContent(plantillaFO);
 			
 			// 2.3. generando intermedio FOP, reemplazando los datos en la plantilla
-			String content = reemplazarDatosTurnos(hDatosFinal, sPlantillaFO);
-			UtilidadesString.setFileContent(ficheroFOP, content);
+			//String content = reemplazarDatosTurnos(hDatosFinal, sPlantillaFO);
+			//UtilidadesString.setFileContent(ficheroFOP, content);
 	
 			// 3. generando PDF final
 			// 3.1. obteniendo ruta para fichero PDF final
@@ -975,8 +977,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		return documento;
 	}
 	
-	protected String reemplazarDatos(List<Map<String, Object>> hDatosFinal, String plantillaFO) throws Exception{
-		Hashtable htDatos = new Hashtable<>();
+	protected String reemplazarDatos(HashMap<String, Object> dato, String plantillaFO) throws Exception{
+		
+		/*Hashtable htDatos = new Hashtable<>();
 		for(Map<String, Object> registro:hDatosFinal){
 			Set<String> claves = registro.keySet();
 			if (claves.size() != 0) {
@@ -994,13 +997,44 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				}
 	
 			}
-			plantillaFO = this.reemplazaVariables(htDatos, plantillaFO);
+			//plantillaFO = this.reemplazaVariables(htDatos, plantillaFO);
+		}*/
+		
+		
+
+		Set<String> claves = dato.keySet();
+		
+		for (String clave : claves) {
+			if(!clave.equals("row")) {
+				Object o = dato.get(clave);
+				
+				if (o instanceof List) {
+					List aux = (List) o;
+					//Nombre region en mayus
+					String nombreRegion = clave.toUpperCase();
+					plantillaFO = this.reemplazaRegistros(plantillaFO, aux, null, nombreRegion);
+					dato.remove(o);
+				}
+				
+			}
+			
 		}
+
+		for (String claveA : claves) {
+			//if (clave.equals("row")) {
+				Object datosMap = (Object) dato.get(claveA);
+				if (datosMap instanceof HashMap ) {
+					HashMap  htRowDatosInforme = (HashMap ) datosMap;
+					plantillaFO = this.reemplazaVariablesMap(htRowDatosInforme, plantillaFO);
+				}
+			//}
+		}
+		
 		
 		return plantillaFO;
 	}
 	
-	protected String reemplazarDatosTurnos(List<Map<String, Object>> hDatosFinal, String plantillaFO) throws Exception{
+	/*protected String reemplazarDatosTurnos(List<Map<String, Object>> hDatosFinal, String plantillaFO) throws Exception{
 		Hashtable htDatos = new Hashtable<>();
 		String institucion = hDatosFinal.get(0).get("IDINSTITUCION").toString();
 		String turno = hDatosFinal.get(0).get("IDTURNO").toString();
@@ -1023,7 +1057,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		for(Map<String, Object> letradoTurno:hDatosFinal){
 			Hashtable row = new Hashtable();
 			Hashtable htRow = new Hashtable();
-			
+			 Hashtable<String, String>
 			htRow.put("IDPERSONA", letradoTurno.get("IDPERSONA").toString());
 			htRow.put("APELLIDOS1", letradoTurno.get("APELLIDOS1").toString());
 			if(letradoTurno.get("APELLIDOS2") != null)
@@ -1062,7 +1096,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		plantillaFO = this.reemplazaVariables(htDatos, plantillaFO);
 		
 		return plantillaFO;
-	}
+	} */
 	
 	public String reemplazaRegistrosSyC(String plantillaFO, List<LetradoGuardiaItem> lCompensaciones, Hashtable htDatos, String delim){
 		String CTR="%%"; 
@@ -1123,7 +1157,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		 return plantilla;
 	 }
 	
-	public String reemplazaRegistros(String plantillaFO, Vector registros, Hashtable htDatos, String delim){
+	public String reemplazaRegistros(String plantillaFO, List registros, Hashtable htDatos, String delim){
 		String CTR="%%"; 
 		String plantilla=plantillaFO;
 		String delimIni=CTR+"INI_"+delim+CTR;
@@ -1139,7 +1173,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			 delimFin=CTR+"FIN_TODO_"+delim+CTR;
 			 sAux="";
 		 } else {
+			//Pasamos el LinkedHashMap a HashTable.
 		 	
+			 
 		     String delimTodoIni=CTR+"INI_TODO_"+delim+CTR;
 		     String delimTodoFin=CTR+"FIN_TODO_"+delim+CTR;
 		    
@@ -1153,16 +1189,16 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				 int size=registros.size();
 				 LOGGER.debug("TAMAÑO DEL VECTOR PARA REEMPLAZAR DATOS: "+size);
 				 for(int i=0;i<size;i++){
-					 Object rObj=registros.elementAt(i);
-					 Hashtable row=null;
-					 if(rObj instanceof Row){
-						 row=(Hashtable)registros.elementAt(i);
+					 Object rObj=registros.get(i);
+					 LinkedHashMap  row=null;
+					 if(rObj instanceof LinkedHashMap){
+						 row=(LinkedHashMap )registros.get(i);
 					 }else{
-						 row=(Hashtable)rObj;
+						 row=(LinkedHashMap )rObj;
 					 }
 					 //ClsLogging.writeFileLog("MASTERREPORT: REGISTRO: "+i,10);
 			
-					 sAux+=UtilidadesString.reemplazaParametros(plantillaRegistro,CTR, row);
+					 sAux+=UtilidadesString.reemplazaParametrosLink(plantillaRegistro,CTR, row);
 			
 				 }
 			 }
@@ -1177,5 +1213,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		String CTR="%%"; 
 		return UtilidadesString.reemplazaParametros(plantillaFO,CTR, htDatos);
 	 }
+	public String reemplazaVariablesMap(HashMap htDatos, String plantillaFO) {
+		String CTR="%%"; 
+		return UtilidadesString.reemplazaParametrosMap(plantillaFO,CTR, htDatos);
+	}
 
 }
