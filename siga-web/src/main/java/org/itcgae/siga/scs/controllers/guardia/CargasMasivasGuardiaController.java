@@ -79,9 +79,11 @@ public class CargasMasivasGuardiaController {
 		DeleteResponseDTO response;
 		try {
 			response = cargasMasivasGuardiaService.uploadFileC(request, fechaDesde, fechaHasta, observaciones);
-			if (response.getStatus().equals(SigaConstants.OK))
+			if (response != null && response.getStatus().equals(SigaConstants.OK))
 				return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-			else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
+			else
+				return null;
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

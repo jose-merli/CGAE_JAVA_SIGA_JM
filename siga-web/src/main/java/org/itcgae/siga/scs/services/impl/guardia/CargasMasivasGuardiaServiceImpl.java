@@ -40,6 +40,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -1920,9 +1921,39 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 	}
 
-	@Override
+	
 	public DeleteResponseDTO uploadFileC(MultipartHttpServletRequest request, String fechaDesde, String fechaHasta,
 			String observaciones) throws Exception {
+		
+		LOGGER.info("uploadFileBT() -> Entrada al servicio para subir un archivo");
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"uploadFileC() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"uploadFileC() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				uploadFileCalendariosAsync(request, fechaDesde, fechaHasta, observaciones);
+			}
+		}
+		LOGGER.debug("uploadFileC() -> uploadFileC Async");
+		return deleteResponseDTO;
+	}
+
+	@Async
+	@Transactional(timeout=24000,rollbackFor = Exception.class)
+	private void uploadFileCalendariosAsync(MultipartHttpServletRequest request, String fechaDesde,
+			String fechaHasta, String observaciones) throws IOException, Exception {
 		LOGGER.info("uploadFileBT() -> Entrada al servicio para subir un archivo");
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
@@ -2150,6 +2181,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					LOGGER.info("uploadFileC() -> No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK);
 				} else {
+					LOGGER.info("uploadFileC() -> Se va a crear el Excel");
 					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
 
 					cenCargamasivacv.setTipocarga("C");
@@ -2175,19 +2207,14 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					}
 
 					LOGGER.info("uploadFileC() -> Salida al servicio para subir un archivo");
-					deleteResponseDTO.setStatus(SigaConstants.OK);
-					error.setDescription(errores);
 					int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
-					error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
+					LOGGER.info("Fichero cargado correctamente. Registros Correctos: " + correctos
 							+ "<br/> Registros Erroneos: " + cenCargamasivacv.getNumregistroserroneos());
-					error.setCode(SigaConstants.CODE_200);
 				}
 			}
 		}
 
-		deleteResponseDTO.setError(error);
 
-		return deleteResponseDTO;
 	}
 
 	private Hashtable<String, Object> convertItemtoHashC(CargaMasivaDatosGuardiatem cargaMasivaDatosBTItem) {
