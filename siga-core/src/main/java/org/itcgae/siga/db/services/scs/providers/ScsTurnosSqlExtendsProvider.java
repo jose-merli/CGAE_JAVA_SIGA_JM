@@ -800,11 +800,11 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		
 
-		if (SigaConstants.GESTIONEJG.equalsIgnoreCase(pantalla) || SigaConstants.EJG.equalsIgnoreCase(pantalla)) {
+		if (SigaConstants.EJG.equalsIgnoreCase(pantalla)) {
 			sql.WHERE("IDTIPOTURNO <> 2 OR IS NULL");
 		}
 
-		if (SigaConstants.GUARDIA.equalsIgnoreCase(pantalla) || SigaConstants.OFICIO.equalsIgnoreCase(pantalla) || SigaConstants.EJGEXPRESS.equalsIgnoreCase(pantalla)) {
+		if (SigaConstants.OFICIO.equalsIgnoreCase(pantalla)) {
 			sql.WHERE("IDTIPOTURNO <> 1 OR IS NULL");
 		}
 
