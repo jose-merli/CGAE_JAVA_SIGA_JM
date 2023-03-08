@@ -125,6 +125,15 @@ public class InscripcionServiceImpl implements InscripcionService {
 					
 					ScsInscripcionguardia objeto = inscripcionGuardiaExtensdsMapper.selectByPrimaryKey(key);
 					
+					ScsInscripcionturnoKey keyInscripcion = new ScsInscripcionturnoKey();
+
+					keyInscripcion.setIdturno(Integer.valueOf(inscripcion.getIdturno()));
+					keyInscripcion.setIdinstitucion(idInstitucion);
+                    keyInscripcion.setIdpersona(Long.parseLong(inscripcion.getIdpersona()));
+                    keyInscripcion.setFechasolicitud( inscripcion.getFechasolicitud());
+                    
+                    ScsInscripcionturno inscripcionTurno = scsInscripcionturnoMapper.selectByPrimaryKey(keyInscripcion);
+					
 					if(objeto!= null) {
 						/*if(inscripcion.getFechasolicitudNUEVA() != null) {
 							objeto.setFechasuscripcion(inscripcion.getFechasolicitudNUEVA());
@@ -137,8 +146,12 @@ public class InscripcionServiceImpl implements InscripcionService {
 						objeto.setFechamodificacion(new Date());
 						objeto.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
+						inscripcionTurno.setFechamodificacion(new Date());
+						inscripcionTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
 						if(inscripcion.getFechabaja() != null) {
 							objeto.setFechabaja(inscripcion.getFechabaja());
+							inscripcionTurno.setFechabaja(inscripcion.getFechabaja());
 						}
 						
 						/*if(inscripcion.getObservacionessolicitudNUEVA() != null) {
@@ -147,37 +160,41 @@ public class InscripcionServiceImpl implements InscripcionService {
 						
 						if(inscripcion.getObservacionesbaja() != null) {
 							objeto.setObservacionesbaja(inscripcion.getObservacionesbaja());
+							inscripcionTurno.setObservacionesbaja(inscripcion.getObservacionesbaja());
 						}
 						
 						if(inscripcion.getFechasolicitudbajaNUEVA() != null) {
 							objeto.setFechasolicitudbaja(inscripcion.getFechasolicitudbajaNUEVA());
+							inscripcionTurno.setFechasolicitudbaja(inscripcion.getFechasolicitudbajaNUEVA());
 						}
 						
 						if(inscripcion.getObservacionesvalbajaNUEVA() != null) {
 							objeto.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
+							inscripcionTurno.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
 						}
 						
 						if(inscripcion.getFechavalidacionNUEVA() != null) {
 							objeto.setFechavalidacion(inscripcion.getFechavalidacionNUEVA());
+							inscripcionTurno.setFechavalidacion(inscripcion.getFechavalidacionNUEVA());
 						}
 						
 						if(inscripcion.getObservacionesvalidacionNUEVA() != null) {
 							objeto.setObservacionesvalidacion(inscripcion.getObservacionesvalidacionNUEVA());
+							inscripcionTurno.setObservacionesvalidacion(inscripcion.getObservacionesvalidacionNUEVA());
 						}
 						
 						if(inscripcion.getFechadenegacionNUEVA() != null) {
 							objeto.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
+							inscripcionTurno.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
 						}
 						
 						if(inscripcion.getObservacionesdenegacionNUEVA() != null) {
 							objeto.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
-						}
-						
-						if(inscripcion.getObservacionesvalbajaNUEVA() != null) {
-							objeto.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
+							inscripcionTurno.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
 						}
 						
 						contadorKO = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(objeto);
+						contadorKO = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionTurno);
 	
 						LOGGER.info(
 								"validarInscripciones() -> Salida ya con los datos actualizados y la inscripción validada");
@@ -346,18 +363,33 @@ public class InscripcionServiceImpl implements InscripcionService {
 					
 					ScsInscripcionguardia record = inscripcionGuardiaExtensdsMapper.selectByPrimaryKey(key);
 					
+					ScsInscripcionturnoKey keyInscripcion = new ScsInscripcionturnoKey();
+
+					keyInscripcion.setIdturno(Integer.valueOf(a.getIdturno()));
+					keyInscripcion.setIdinstitucion(idInstitucion);
+                    keyInscripcion.setIdpersona(Long.parseLong(a.getIdpersona()));
+                    keyInscripcion.setFechasolicitud( a.getFechasolicitud());
+                    
+                    ScsInscripcionturno inscripcionTurno = scsInscripcionturnoMapper.selectByPrimaryKey(keyInscripcion);
+					
 					if(record!= null) {
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuario);
 						
+						inscripcionTurno.setFechamodificacion(new Date());
+						inscripcionTurno.setUsumodificacion(usuario);
+						
 						if (a.getFechadenegacionNUEVA() != null) {
 							record.setFechadenegacion(a.getFechadenegacionNUEVA());
+							inscripcionTurno.setFechadenegacion(a.getFechadenegacionNUEVA());
 							if(a.getObservacionesdenegacionNUEVA()!= null) {
 								record.setObservacionesdenegacion(a.getObservacionesdenegacionNUEVA());
+								inscripcionTurno.setObservacionesdenegacion(a.getObservacionesdenegacionNUEVA());
 							}
 						}
 						
 						inscripciones = inscripcionGuardiaExtensdsMapper.updateByPrimaryKeySelective(record);
+						inscripciones = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionTurno);
 						
 					}
 	
