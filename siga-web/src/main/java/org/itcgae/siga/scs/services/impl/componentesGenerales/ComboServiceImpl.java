@@ -1393,7 +1393,12 @@ public class ComboServiceImpl implements ComboService {
 					// PARENTESIS + Código de selección + PARENTESIS + ESPACIO + Nombre + 
 					// ESPACIO + PARENTESIS + Nombre de Población + PARENTESIS. 
 					//comboItem.setLabel(j.getCodigoExt2() + ": " + j.getNombre() + " (" + j.getNombrePoblacion() + ")");
-					comboItem.setLabel(" (" + j.getCodigoExt2() + ") " + j.getNombre() + " (" + j.getNombrePoblacion() + ")");
+					if (j.getCodigoExt2() != null) {
+						comboItem.setLabel(" (" + j.getCodigoExt2() + ") " + j.getNombre() + " (" + j.getNombrePoblacion() + ")");
+					} else {
+						comboItem.setLabel(j.getNombre() + " (" + j.getNombrePoblacion() + ")");
+					}
+					
 					comboItems.add(comboItem);
 					
 				}
@@ -1491,7 +1496,7 @@ public class ComboServiceImpl implements ComboService {
 				for (ComboItem2 item : comboItems2) {
 					String label = "";
 					if (idInstitucion != 2005) {
-						label = item.getLabel1() != null ? item.getLabel1() : "" + ' ' + item.getLabel2();
+						label = item.getLabel1() != null ? item.getLabel1() + "-" + item.getLabel2() : item.getLabel2();
 						label = label.trim();
 					}else {
 						label = item.getLabel2();
