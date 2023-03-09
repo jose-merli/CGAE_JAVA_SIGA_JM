@@ -89,7 +89,7 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 							.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
 							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-					genParametrosExample.setOrderByClause("FECHA ASC");
+					genParametrosExample.setOrderByClause("FECHA_BAJA ASC");
 					LOGGER.info(
 							"searchJusticiables() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
