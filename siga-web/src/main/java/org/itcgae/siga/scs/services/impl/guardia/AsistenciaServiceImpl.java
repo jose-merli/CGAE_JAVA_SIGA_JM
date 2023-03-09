@@ -748,7 +748,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								// Actualizamos asistencia y actuaciones
 								ScsAsistencia asistenciaBBDD = fromTarjetaAsistenciaItemToScsAsistencia2(asistencia,
 										null, null, tipoAsistenciaGeneral, idPersona, idInstitucion, usuarios.get(0));
-								scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(asistenciaBBDD);
+								scsAsistenciaExtendsMapper.updateByPrimaryKey(asistenciaBBDD);
 								int responseAsistencia = scsAsistenciaExtendsMapper
 										.updateByPrimaryKeySelective(asistenciaBBDD);
 								if (responseAsistencia == 0) {
@@ -1088,7 +1088,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoGuardia()));
 			}
 
-			if (!UtilidadesString.esCadenaVacia(asistencia.getObservaciones())) {
+			if (asistencia.getObservaciones() != null) {
 				asistenciaBBDD.setObservaciones(asistencia.getObservaciones());
 			}
 			if (!UtilidadesString.esCadenaVacia(tipoAsistenciaGeneral)) {
@@ -1122,11 +1122,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				asistenciaBBDD.setJuzgado(Long.valueOf(asistencia.getJuzgado()));
 			}
 			
-			if (!UtilidadesString.esCadenaVacia(asistencia.getNumDiligencia())) {
+			if (asistencia.getNumDiligencia() != null) {
 				asistenciaBBDD.setNumerodiligencia(asistencia.getNumDiligencia());
 			}
 			
-			if (!UtilidadesString.esCadenaVacia(asistencia.getNumProcedimiento())) {
+			if (asistencia.getNumProcedimiento() != null) {
 				asistenciaBBDD.setNumeroprocedimiento(asistencia.getNumProcedimiento());
 			}
 
@@ -1181,7 +1181,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			if (!UtilidadesString.esCadenaVacia(actuacion.getFechaActuacion())) {
 				actuacionBBDD.setFecha(new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(actuacion.getFechaActuacion()));
 			}
-			if (!UtilidadesString.esCadenaVacia(actuacion.getNumeroAsunto())) {
+			if (actuacion.getNumeroAsunto() != null) {
 				actuacionBBDD.setNumeroasunto(actuacion.getNumeroAsunto());
 			}
 
