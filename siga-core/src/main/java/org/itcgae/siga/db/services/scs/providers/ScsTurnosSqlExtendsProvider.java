@@ -52,6 +52,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		if (tipoturno.equals("2")) {
 			sql.WHERE("nvl(IDTIPOTURNO, '2') = '" + tipoturno + "'");
 		}
+		if (tipoturno.equals("undefined")) {
+			sql.WHERE("(IDTIPOTURNO <> 2 OR IDTIPOTURNO IS NULL)");
+		}
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
 	}
@@ -801,11 +804,11 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		
 
 		if (SigaConstants.EJG.equalsIgnoreCase(pantalla)) {
-			sql.WHERE("IDTIPOTURNO <> 2 OR IS NULL");
+			sql.WHERE("(IDTIPOTURNO <> 2 OR IDTIPOTURNO IS NULL)");
 		}
 
 		if (SigaConstants.OFICIO.equalsIgnoreCase(pantalla)) {
-			sql.WHERE("IDTIPOTURNO <> 1 OR IS NULL");
+			sql.WHERE("(IDTIPOTURNO <> 1 OR IDTIPOTURNO IS NULL)");
 		}
 
 		sql.ORDER_BY("NOMBRE");
