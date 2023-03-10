@@ -124,6 +124,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.aspose.words.Document;
 
+import oracle.security.crypto.core.DES;
+
 @Service
 public class DialogoComunicacionServiceImpl implements IDialogoComunicacionService{
 	
@@ -495,7 +497,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillaEnviosExtendsMapper.selectByPrimaryKey(keyPlantilla);
 					
 					// Comprobamos si la plantilla especificada contiene remitente	
-					if(plantilla.getIdpersona() == null) {
+					if(plantilla == null || plantilla.getIdpersona() == null) {
 						String mensaje = "La plantilla especificada no tiene remitente"; 
 						LOGGER.warn(mensaje);
 						throw new BusinessException(mensaje);
@@ -2481,14 +2483,26 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		Object idPoblacion = dest.get(SigaConstants.ALIASIDPOBLACION.trim());
 		Object idProvincia= dest.get(SigaConstants.ALIASIDPROVINCIA.trim());
 		Object poblacionExtranjera= dest.get(SigaConstants.ALIASPOBLACIONEXTRANJERA.trim());
+		Object nombre = dest.get(SigaConstants.ALIASNOMBRE.trim());
+		Object apellidos1 = dest.get(SigaConstants.ALIASAPELLIDOS1.trim());
+		Object apellidos2 = dest.get(SigaConstants.ALIASAPELLIDOS2.trim());
+		Object nif = dest.get(SigaConstants.ALIASNIF.trim());
 		
-		CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona.toString()));
+		if(idPersona != null)
+			destinatario.setIdPersona(idPersona.toString());
 		
-		destinatario.setIdPersona(idPersona.toString());
-		destinatario.setNombre(persona.getNombre());
-		destinatario.setApellidos1(persona.getApellidos1());
-		destinatario.setApellidos2(persona.getApellidos2());
-		destinatario.setNIFCIF(persona.getNifcif());
+		if(nombre != null)
+			destinatario.setNombre(nombre.toString());
+		
+		if(apellidos1 != null)
+			destinatario.setApellidos1(apellidos1.toString());
+		
+		if(apellidos2 != null)
+			destinatario.setApellidos2(apellidos2.toString());
+		
+		if(nif != null)
+			destinatario.setNIFCIF(nif.toString());
+		
 		if(domicilio != null){
 			destinatario.setDomicilio(domicilio.toString());
 		}
