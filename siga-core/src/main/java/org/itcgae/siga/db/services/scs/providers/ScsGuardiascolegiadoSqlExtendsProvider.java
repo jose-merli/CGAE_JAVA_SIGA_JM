@@ -50,6 +50,7 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         }
         
         sql.WHERE("turno.idinstitucion = " + idInstitucion);
+        sql.WHERE("(IDTIPOTURNO <> 1 OR IDTIPOTURNO IS NULL)");
         sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.FECHAINICIO) AND trunc(gc.FECHAFIN)");
         if(idPersona != null
         		&& !"".equals(idPersona)) {
