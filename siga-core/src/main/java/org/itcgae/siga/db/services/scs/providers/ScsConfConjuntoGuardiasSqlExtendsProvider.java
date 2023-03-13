@@ -12,7 +12,7 @@ public class ScsConfConjuntoGuardiasSqlExtendsProvider extends ScsConfConjuntoGu
         SQL.FROM("scs_conf_conjunto_guardias ccg");
         SQL.INNER_JOIN("scs_guardiasturno gt on gt.idguardia = ccg.idguardia and gt.idinstitucion = ccg.idinstitucion and gt.idturno = ccg.idturno", "scs_turno t on t.idturno = ccg.idturno and t.idinstitucion = ccg.idinstitucion");
         SQL.WHERE("ccg.idinstitucion =" + idInstitucion, "ccg.idconjuntoguardia='" + idLista + "'","gt.FECHABAJA IS NULL");
-        SQL.ORDER_BY("ccg.orden desc");
+        SQL.ORDER_BY("ccg.orden asc");
         SQL_PADRE.SELECT(" *");
         SQL_PADRE.FROM("( " + SQL.toString() + " )");
         if (tamMax != null && tamMax > 0) {
