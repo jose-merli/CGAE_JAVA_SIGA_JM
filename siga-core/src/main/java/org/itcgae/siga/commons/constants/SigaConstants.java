@@ -969,7 +969,7 @@ public class SigaConstants {
 	public static final String ALIASNOMBRE = "NOMBRE";
 	public static final String ALIASAPELLIDOS1 = "APELLIDOS1";
 	public static final String ALIASAPELLIDOS2 = "APELLIDOS2";
-	public static final String ALIASNIF = "NIF"; 
+	public static final String ALIASNIFCIF = "NIFCIF"; 
 	
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
 	public static final long ID_OBJETIVO_DESTINATARIOS = 1;

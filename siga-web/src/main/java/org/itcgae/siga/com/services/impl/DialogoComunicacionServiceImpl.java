@@ -2486,7 +2486,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		Object nombre = dest.get(SigaConstants.ALIASNOMBRE.trim());
 		Object apellidos1 = dest.get(SigaConstants.ALIASAPELLIDOS1.trim());
 		Object apellidos2 = dest.get(SigaConstants.ALIASAPELLIDOS2.trim());
-		Object nif = dest.get(SigaConstants.ALIASNIF.trim());
+		Object nifCif = dest.get(SigaConstants.ALIASNIFCIF.trim());
 		
 		if(idPersona != null)
 			destinatario.setIdPersona(idPersona.toString());
@@ -2500,8 +2500,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		if(apellidos2 != null)
 			destinatario.setApellidos2(apellidos2.toString());
 		
-		if(nif != null)
-			destinatario.setNIFCIF(nif.toString());
+		if(nifCif != null)
+			destinatario.setNIFCIF(nifCif.toString());
 		
 		if(domicilio != null){
 			destinatario.setDomicilio(domicilio.toString());
