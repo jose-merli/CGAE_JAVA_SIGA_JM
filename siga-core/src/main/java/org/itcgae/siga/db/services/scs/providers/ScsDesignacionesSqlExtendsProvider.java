@@ -1487,8 +1487,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                AND ejd.numeroejg = ejg.numero ");
 		sql.append(" WHERE D.IDINSTITUCION = " + idInstitucion);
 
-		if (item.getSinEJG().equals("0")) {
-			sql.append(" AND ejg.anio is not null ");
+		if (item.getSinEJG()!=null) {
+			if (item.getSinEJG().equals("0")) {
+				sql.append(" AND ejg.anio is not null ");
+			}
 		}
 
 		if (item.getAnioDesignacion() != null && !item.getAnioDesignacion().trim().isEmpty()) {
@@ -1665,15 +1667,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
 		sql.append(") query WHERE rownum<=200");
 		
-		if (item.getConEJGNoFavorables().equals("0")) {
+		if (item.getConEJGNoFavorables() != null && item.getConEJGNoFavorables().equals("0")) {
 			sql.append(" AND query.tipo_resolucion_designa != 'NO_FAVORABLE' ");
 		}
 	
-		if (item.getEjgSinResolucion().equals("0")) {
+		if (item.getEjgSinResolucion() != null && item.getEjgSinResolucion().equals("0")) {
 			sql.append(" AND query.tipo_resolucion_designa != 'SIN_RESOLUCION' ");
 		}
 		
-		if (item.getResolucionPTECAJG().equals("0")) {
+		if (item.getResolucionPTECAJG() != null && item.getResolucionPTECAJG().equals("0")) {
 			sql.append(" AND query.tipo_resolucion_designa != 'PTE_CAJG' ");
 		}
 
