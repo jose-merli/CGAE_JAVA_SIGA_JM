@@ -22,6 +22,40 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		return sql.toString();
 	}
 	
+	public String comboTurnosNoBajaNoExistentesEnListaGuardias(String idInstitucion, String idListaGuardias) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDTURNO, NOMBRE");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("FECHABAJA IS NULL");
+		
+		SQL sqlAuxiliar = new SQL();
+		SQL sqlSecundaria = new SQL();
+
+		sqlAuxiliar.SELECT("IDTURNO");
+
+		sqlAuxiliar.FROM("SCS_GUARDIASTURNO");
+		
+		if (idInstitucion != null &&  !idInstitucion.isEmpty()) {
+			sqlAuxiliar.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		}
+		sqlAuxiliar.WHERE("FECHABAJA IS NULL");
+		
+		sqlSecundaria.SELECT("IDGUARDIA");
+		sqlSecundaria.FROM("SCS_CONF_CONJUNTO_GUARDIAS");
+		sqlSecundaria.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sqlSecundaria.WHERE("IDCONJUNTOGUARDIA = '" + idListaGuardias + "'");
+		
+		sqlAuxiliar.WHERE("IDGUARDIA NOT IN (" + sqlSecundaria + ")");
+
+		sql.WHERE("IDTURNO IN (" + sqlAuxiliar + ")");
+		
+		sql.ORDER_BY("NOMBRE");
+		return sql.toString();
+	}
+	
 	public String comboTurnosDesignacion(Short idInstitucion, Short idTipoTurno) {
 
 		SQL sql = new SQL();
@@ -51,6 +85,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		}
 		if (tipoturno.equals("2")) {
 			sql.WHERE("nvl(IDTIPOTURNO, '2') = '" + tipoturno + "'");
+		}
+		if (tipoturno.equals("undefined")) {
+			sql.WHERE("(IDTIPOTURNO <> 2 OR IDTIPOTURNO IS NULL)");
 		}
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
@@ -801,11 +838,11 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		
 
 		if (SigaConstants.EJG.equalsIgnoreCase(pantalla)) {
-			sql.WHERE("IDTIPOTURNO <> 2 OR IS NULL");
+			sql.WHERE("(IDTIPOTURNO <> 2 OR IDTIPOTURNO IS NULL)");
 		}
 
 		if (SigaConstants.OFICIO.equalsIgnoreCase(pantalla)) {
-			sql.WHERE("IDTIPOTURNO <> 1 OR IS NULL");
+			sql.WHERE("(IDTIPOTURNO <> 1 OR IDTIPOTURNO IS NULL)");
 		}
 
 		sql.ORDER_BY("NOMBRE");

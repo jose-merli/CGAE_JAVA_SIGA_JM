@@ -12,6 +12,8 @@ public interface ComboService {
 	
 	public ComboDTO comboTurnos(HttpServletRequest request);
 	
+	public ComboDTO comboTurnosNoBajaNoExistentesEnListaGuardias(HttpServletRequest request, String idListaGuardias);
+	
 	public ComboDTO comboAreas(HttpServletRequest request);
 	
 	public ComboDTO comboMaterias(HttpServletRequest request, String idArea,String filtro);

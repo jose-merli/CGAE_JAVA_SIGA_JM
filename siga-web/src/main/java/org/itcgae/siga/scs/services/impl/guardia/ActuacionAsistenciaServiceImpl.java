@@ -11,6 +11,7 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.ScsActuacionasistcostefijoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
+import org.itcgae.siga.db.mappers.ScsTipoactuacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.scs.services.guardia.ActuacionAsistenciaService;
@@ -35,6 +36,9 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
 
     @Autowired
     private ScsActuacionasistenciaExtendsMapper scsActuacionasistenciaExtendsMapper;
+    
+    @Autowired
+    private ScsTipoactuacionMapper scsTipoactuacionMapper;
 
     @Autowired
     private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -397,6 +401,44 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         newActuacion.setFechacreacion(new Date());
                         newActuacion.setUsumodificacion(usuarios.get(0).getIdusuario());
                         newActuacion.setFechamodificacion(new Date());
+                        
+                        //Comprobamos primeor que exista el registro en SCS_TIPOACTUACION 
+                        //Si no existe registro lo insertamos para prevenir error de FK
+                        ScsTipoactuacionExample scsTipoactuacionExample = new ScsTipoactuacionExample();
+						scsTipoactuacionExample.createCriteria()
+								.andIdinstitucionEqualTo(newActuacion.getIdinstitucion())
+								.andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistencia())
+								.andIdtipoactuacionEqualTo(newActuacion.getIdtipoactuacion());
+						
+                        List<ScsTipoactuacion> tipoActList = scsTipoactuacionMapper.selectByExample(scsTipoactuacionExample);
+                        
+                        if(tipoActList != null && tipoActList.isEmpty()) {
+                        	ScsTipoactuacion scsTipoactuacionRecord = new ScsTipoactuacion();
+                        	scsTipoactuacionRecord.setIdinstitucion(newActuacion.getIdinstitucion());
+                        	scsTipoactuacionRecord.setIdtipoasistencia(scsAsistencia.getIdtipoasistencia());
+                        	scsTipoactuacionRecord.setIdtipoactuacion(newActuacion.getIdtipoactuacion());
+                        	
+                        	//Recuperamos la descripcion de Tipo Asistencia
+                        	ScsTipoactuacionExample scsTipoactuacionExample2 = new ScsTipoactuacionExample();
+                        	scsTipoactuacionExample2.createCriteria()
+                        			.andIdinstitucionEqualTo(newActuacion.getIdinstitucion())
+                        			.andIdtipoactuacionEqualTo(Short.valueOf(datosGenerales.getTipoActuacion()));
+                        			
+                        	List<ScsTipoactuacion> listActAsist = scsTipoactuacionMapper.selectByExample(scsTipoactuacionExample2);
+                        	
+                        	String descripcion = "";
+                        	if(listActAsist != null && !listActAsist.isEmpty()) {
+                        		descripcion = listActAsist.get(0).getDescripcion();
+                        	}
+                        	
+                        	scsTipoactuacionRecord.setDescripcion(descripcion);
+                        	scsTipoactuacionRecord.setFechamodificacion(new Date());
+                        	scsTipoactuacionRecord.setUsumodificacion(usuarios.get(0).getIdusuario());
+                        	scsTipoactuacionRecord.setFechabaja(null);
+                        	
+                        	affectedRows += scsTipoactuacionMapper.insertSelective(scsTipoactuacionRecord);
+                        }
+                        
                         affectedRows += scsActuacionasistenciaExtendsMapper.insertSelective(newActuacion);
 
                         //Insertamos el coste fijo si lo ha seleccionado
@@ -610,6 +652,11 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             scsActuacionasistencia.setFechajustificacion(new SimpleDateFormat("dd/MM/yyyy").parse(tarjeta.getFechaJustificacion()));
                             scsActuacionasistencia.setUsujustificacion(usuarios.get(0).getIdusuario());
                             scsActuacionasistencia.setFechausujustificacion(new Date());
+                        }
+                        else {
+                        	scsActuacionasistencia.setFechajustificacion(null);
+                        	scsActuacionasistencia.setUsujustificacion(usuarios.get(0).getIdusuario());
+                        	scsActuacionasistencia.setFechausujustificacion(null);
                         }
                         scsActuacionasistencia.setObservacionesjustificacion(tarjeta.getObservaciones());
                         affectedRows += scsActuacionasistenciaExtendsMapper.updateByPrimaryKey(scsActuacionasistencia);

@@ -55,6 +55,12 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/turnosFiltrados")
+	public ResponseEntity<ComboDTO> comboTurnosNoBajaNoExistentesEnListaGuardias(HttpServletRequest request, String idListaGuardias) {
+		ComboDTO response = comboService.comboTurnosNoBajaNoExistentesEnListaGuardias(request, idListaGuardias);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping("/turnosgrupo")
 	public ResponseEntity<ComboDTO> comboTurnosGrupo(HttpServletRequest request) {
 		ComboDTO response = comboService.comboTurnosGrupo(request);
