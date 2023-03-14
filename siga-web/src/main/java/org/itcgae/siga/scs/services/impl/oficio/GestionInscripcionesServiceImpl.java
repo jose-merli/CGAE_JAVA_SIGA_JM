@@ -344,7 +344,6 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				listaTurno = scsTurnosExtendsMapper.selectByExample(exampleturno);
 				
 				ScsTurno turno = listaTurno.get(0);
-				String idPersona_ultimo = turno.getIdpersonaUltimo().toString();
 				
 				ComboDTO comboDTO = new ComboDTO();
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -365,6 +364,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				String strDate = dateFormat.format(prueba);
 				
 				if(turno.getIdpersonaUltimo() != null) {
+					String idPersona_ultimo = turno.getIdpersonaUltimo().toString();
 					List<InscripcionesItem> inscripcionesAuxiliar = new ArrayList<InscripcionesItem>();
 					List<InscripcionesItem> listaInscripciones = scsInscripcionturnoExtendsMapper.busquedaColaOficio2(inscripcionesItem, strDate, busquedaOrden, idInstitucion);
 					foundUltimo = false;
