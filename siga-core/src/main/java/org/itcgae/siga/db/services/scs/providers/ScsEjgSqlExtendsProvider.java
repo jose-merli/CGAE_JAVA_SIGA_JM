@@ -106,6 +106,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlTurnoGuardia.WHERE("ejgidtipoejg = ejg.IDTIPOEJG");
 		sqlTurnoGuardia.WHERE("sa.idinstitucion = ejg.IDINSTITUCION");
 		sqlTurnoGuardia.WHERE("idestadoasistencia != '2'");
+		sqlTurnoGuardia.WHERE("rownum < 2");
                 
 		// select
 		sql.SELECT("DISTINCT ejg.anio");

@@ -557,7 +557,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									String[] datosEJG = str.split("##");
 									String anioEJG = datosEJG[0].split("/")[0].trim();
 									String numEJG = datosEJG[0].split("/")[1];
-									numEJG = numEJG.replaceFirst("^0+(?!$)", "");
+									if (numEJG != null && numEJG.length() >= 5) {
+										numEJG = numEJG.substring(numEJG.length()-5, numEJG.length());
+									}
 									String idInstitucionEJG = datosEJG[2];
 									String idtipoEJG = datosEJG[4];
 									String num = datosEJG[5];
@@ -3082,7 +3084,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							insTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 									.andFechadenegacionIsNull().andFechasolicitudIsNotNull()
 									.andFechavalidacionIsNotNull().andFechabajaIsNull()
-									.andIdpersonaEqualTo(cenColeg.getIdpersona());
+									.andIdpersonaEqualTo(cenColeg.getIdpersona())
+									.andIdturnoEqualTo(designa.getIdturno()); //Recuperamos la inscripcion en el turno de la designa actual
 
 							List<ScsInscripcionturno> resInscLetrado = this.scsInscripcionesTurnoExtendsMapper
 									.selectByExample(insTurnoExample);
