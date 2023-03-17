@@ -56,7 +56,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		
 		sql.FROM("scs_designa designaciones");
-		sql.JOIN("scs_tipodesignacolegio td ON (td.IDTIPODESIGNACOLEGIO = designaciones.IDTIPODESIGNACOLEGIO AND td.IDINSTITUCION = designaciones.IDINSTITUCION)");
+		sql.JOIN("scs_turno turno ON (designaciones.idturno = turno.idturno AND designaciones.idinstitucion = turno.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("scs_tipodesignacolegio td ON (td.IDTIPODESIGNACOLEGIO = designaciones.IDTIPODESIGNACOLEGIO AND td.IDINSTITUCION = designaciones.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN("scs_designasletrado designaLetrado ON" 
+				+"        (designaLetrado.anio = designaciones.anio" 
+				+"            AND designaLetrado.numero = designaciones.numero" 
+				+"            AND designaLetrado.idinstitucion = designaciones.idinstitucion" 
+				+"            AND designaLetrado.idturno = designaciones.idturno)");
+		sql.LEFT_OUTER_JOIN("cen_colegiado colegiado ON"
+				+"        (colegiado.idinstitucion = designaciones.idinstitucion"
+				+"            AND colegiado.idpersona = designaLetrado.idpersona)");
+		sql.LEFT_OUTER_JOIN("cen_persona persona ON (persona.idpersona = colegiado.idpersona)");
+		sql.LEFT_OUTER_JOIN("scs_juzgado juzgado ON" 
+				+"        (designaciones.idjuzgado = juzgado.idjuzgado"  
+				+"            AND designaciones.idinstitucion = juzgado.idinstitucion)");
+		
+		/*sql.JOIN("scs_tipodesignacolegio td ON (td.IDTIPODESIGNACOLEGIO = designaciones.IDTIPODESIGNACOLEGIO AND td.IDINSTITUCION = designaciones.IDINSTITUCION)");
 		sql.JOIN("scs_designasletrado designaLetrado ON"
 				+ "    (designaLetrado.anio = designaciones.anio"
 				+ "        AND designaLetrado.numero = designaciones.numero"
@@ -73,7 +88,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "        AND designaciones.idinstitucion = turno.idinstitucion)");
 		sql.JOIN("scs_juzgado juzgado ON"
 				+ "    (designaciones.idjuzgado = juzgado.idjuzgado"
-				+ "        AND designaciones.idinstitucion = juzgado.idinstitucion)");
+				+ "        AND designaciones.idinstitucion = juzgado.idinstitucion)");*/
 //		sql.JOIN("scs_defendidosdesigna defendidoDesigna ON"
 //				+ "    (defendidoDesigna.anio = designaciones.anio"
 //				+ "        AND defendidoDesigna.numero = designaciones.numero"
