@@ -3408,8 +3408,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setIdpretension(datos.getIdPretension().longValue());
 				}
 				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@FIN
-				record.setObservaciones(datos.getObservaciones());
-				record.setDelitos(datos.getDelitos());
+				record.setObservaciones(datos.getObservaciones()); //Campo Asunto
+				record.setDelitos(datos.getDelitos()); //Campo Comentario
 
 				response = scsEjgMapper.updateByPrimaryKey(record);
 				if (response == 0)
@@ -3642,9 +3642,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					designa.setNumprocedimiento(ejg.getNumeroprocedimiento());
 					designa.setAnioprocedimiento(ejg.getAnioprocedimiento());
 					designa.setNig(ejg.getNig());
-					designa.setResumenasunto(ejg.getDelitos());//Campo Comentario
-					designa.setObservaciones(ejg.getObservaciones());//Campo Asuntos
-//						designa.setIdpretension(ejg.getIdpretension().shortValue());
+					designa.setResumenasunto(ejg.getObservaciones()); //Campo Asunto
 					designa.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
 					designa.setIdjuzgado(ejg.getJuzgado());
 					// Actualizamos los delitos de la designacion eliminando los anteriores y

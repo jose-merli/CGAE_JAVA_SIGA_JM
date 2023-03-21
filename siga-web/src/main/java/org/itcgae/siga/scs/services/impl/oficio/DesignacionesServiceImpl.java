@@ -2074,8 +2074,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
 					if ((designaExistentes == null || designaExistentes.size() == 0)) {
+						LOGGER.error("ERROR: La designa ya existe.");
 						error.setCode(400);
-						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						updateResponseDTO.setError(error);
@@ -2160,6 +2160,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (nigValido == true) {
 							scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
 						} else {
+							LOGGER.error("ERROR: NIG no válido.");
 							error.setCode(400);
 							error.setDescription("justiciaGratuita.oficio.designa.NIGInvalido");
 							updateResponseDTO.setStatus(SigaConstants.KO);
@@ -2170,9 +2171,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LOGGER.info(
 								"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
 					}
-				} catch (Exception e) {
+				}catch (NullPointerException ne) {
+					LOGGER.error("ERROR: " + ne.getMessage());
+					error.setCode(406);
+					error.setDescription("Se ha producido un error en el tratado de datos, contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);		
+				}catch (Exception e) {
+					LOGGER.error("ERROR: " + e.getMessage());
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("Se ha producido un error en BBDD, contacte con su administrador");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 
@@ -8431,15 +8438,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return formato;
 	}
 
-	private int actualizaDesignaEnAsuntos(ScsDesigna datos, Short idInstitucion, String origen, AdmUsuarios usuario) {
+	private int actualizaDesignaEnAsuntos(ScsDesigna datos, Short idInstitucion, String origen, AdmUsuarios usuario) throws Exception {
 		// TODO Completar y usar como ejemplo y tratar error con try catch
 		int respuesta, respuestaDes, respuestaAsi, respuestacopy;
 		respuesta = respuestaDes = respuestaAsi = respuestacopy = 0;
 		
-		try {
+//		try {
 			ScsEjgdesignaExample example = new ScsEjgdesignaExample();
 			example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAniodesignaEqualTo(datos.getAnio())
-					.andNumerodesignaEqualTo(datos.getNumero());
+					.andNumerodesignaEqualTo(datos.getNumero()).andIdturnoEqualTo(datos.getIdturno());
 
 			List<ScsEjgdesigna> relDesignaList = scsEjgdesignaMapper.selectByExample(example);
 			
@@ -8499,14 +8506,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				respuesta = 1;
 			}
 
-		} catch (Exception e) {
-			return respuesta = 0;
-		}
+//		} catch (Exception e) {
+//			LOGGER.error("ERROR - DesignacionesServiceImpl.actualizaDesignaEnAsuntos:" + e.getMessage()); 
+//			e.printStackTrace();
+//			return respuesta = 0;
+//		}
 		return respuesta;
 	}
 
 	public int copyDesigna2Ejg(Short idInstitucion, String origen, AdmUsuarios usuario, ScsEjgdesigna relacion)
-			throws Exception {
+			throws NullPointerException, Exception {
 
 		int response = 0;
 
@@ -8549,10 +8558,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.copyDesigna2Ejg() -> Iniciando la introduccion de los valores de defensa juridica del EJG");
 
+			//Guardamos el comentario original del EJG en una variable para no perderlo, 
+			//ya que en la desgina no existe dicho campo y la sobreescribimos en el proceso
+			String comentario = ejg.getDelitos();
 			ejg.setNumeroprocedimiento(designa.getNumprocedimiento());
 			ejg.setNig(designa.getNig());
-//			ejg.setObservaciones(designa.getObservaciones());
-			ejg.setObservaciones(designa.getResumenasunto());
+			ejg.setObservaciones(designa.getResumenasunto()); // Campo Asunto
 			ejg.setIdpretension(designa.getIdpretension().longValue());
 			ejg.setJuzgado(designa.getIdjuzgado());
 
@@ -8592,12 +8603,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			List<ScsDelitosdesigna> delitosDesigna = scsDelitosdesignaMapper.selectByExample(delitosDesignaExample);
 
-			String delitosEjgString = "";
 			if (!delitosDesigna.isEmpty()) {
 				for (ScsDelitosdesigna delitoDesigna : delitosDesigna) {
-					if (delitosEjgString != "")
-						delitosEjgString += ",";
-					delitosEjgString += delitoDesigna.getIddelito();
 					delitoEjg.setIddelito(delitoDesigna.getIddelito());
 					response = scsDelitosejgMapper.insert(delitoEjg);
 					if (response == 0)
@@ -8605,13 +8612,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				}
 			}
 
-			if (delitosEjgString.equals(""))
-				ejg.setDelitos(null);
-			else
-				ejg.setDelitos(delitosEjgString);
-
+			//Recuperamos el comentario original del EJG
+			ejg.setDelitos(comentario);
 			
 			response = scsEjgMapper.updateByPrimaryKey(ejg);
+			
 			if (response == 0)
 				throw (new Exception("Error al introducir los valores de defensa juridica del EJG"));
 
