@@ -1195,7 +1195,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 						} else
 							errorLinea.append(
-									"Las guardias en el turno son obligatorias por lo que no se pueden realizar la fila.");
+									"Las guardias en el turno son obligatorias por lo que no se puede realizar esta inscripción para una sola guardia. Solución: realice la carga masiva del turno.");
 
 					}
 					// Si no se introduce una guardia en especifico, se comprueban todas las
@@ -1274,7 +1274,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 							} else
 								errorLinea.append(
-										"Las guardias en el turno son obligatorias por lo que no se pueden realizar la fila.");
+										"Las guardias en el turno son obligatorias por lo que no se puede realizar esta inscripción para una sola guardia. Solución: realice la carga masiva del turno.");
 						}
 					}
 
