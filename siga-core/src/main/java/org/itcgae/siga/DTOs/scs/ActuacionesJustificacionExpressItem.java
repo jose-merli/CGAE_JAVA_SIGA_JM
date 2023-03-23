@@ -37,6 +37,13 @@ public class ActuacionesJustificacionExpressItem {
 	private String idTurno;
 	private String idInstitucion;
 	private String idPersonaColegiado;
+	private String tieneDocumentacion;
+	public String getTieneDocumentacion() {
+		return tieneDocumentacion;
+	}
+	public void setTieneDocumentacion(String tieneDocumentacion) {
+		this.tieneDocumentacion = tieneDocumentacion;
+	}
 	/**
 	 * @return the idPersonaColegiado
 	 */

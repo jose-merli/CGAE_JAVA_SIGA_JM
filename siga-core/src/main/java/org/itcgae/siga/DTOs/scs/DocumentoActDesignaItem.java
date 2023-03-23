@@ -18,6 +18,21 @@ public class DocumentoActDesignaItem {
 	private String asociado;
 	private String extension;
 	private String idPersona;
+	private String idTurno;
+
+	/**
+	 * @return the idTurno
+	 */
+	public String getIdTurno() {
+		return idTurno;
+	}
+
+	/**
+	 * @param idTurno the idTurno to set
+	 */
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
 
 	/**
 	 * @return the idDocumentacionasi

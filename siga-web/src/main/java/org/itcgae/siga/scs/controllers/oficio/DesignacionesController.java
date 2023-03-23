@@ -960,6 +960,14 @@ public class DesignacionesController {
 		return response;
 	}
 	
+	@PostMapping(value = "/designas/descargarDocumentosActDesignaJustificacionExpres", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarDocumentosActDesignaJustificacionExpres(
+			@RequestBody DocumentoDesignaItem documentoDesignaItem, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = designacionesService
+				.descargarDocumentosActDesignaJustificacionExpres(documentoDesignaItem, request);
+		return response;
+	}
+	
 	@PostMapping(value = "/designas/eliminarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> eliminarDocumentosActDesigna(
 			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
@@ -993,6 +1001,14 @@ public class DesignacionesController {
 			@RequestBody List<DocumentoDesignaItem> listaDocumentoDesignaItem, HttpServletRequest request) {
 		ResponseEntity<InputStreamResource> response = designacionesService
 				.descargarDocumentosDesigna(listaDocumentoDesignaItem, request);
+		return response;
+	}
+	
+	@PostMapping(value = "/designas/descargarDocumentosDesignaJustificacionExpres", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarDocumentosDesignaJustificacionExpres(
+			@RequestBody JustificacionExpressItem justificacionExpressItem, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = designacionesService
+				.descargarDocumentosDesignaJustificacionExpres(justificacionExpressItem, request);
 		return response;
 	}
 	

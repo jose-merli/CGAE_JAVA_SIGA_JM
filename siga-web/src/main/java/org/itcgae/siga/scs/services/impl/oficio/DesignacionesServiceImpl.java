@@ -525,6 +525,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								it.remove();
 							}
 						}
+						
+						
 					}
 
 					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");
@@ -7304,6 +7306,151 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		} catch (Exception e) {
 			LOGGER.error(
 					"DesignacionesServiceImpl.descargarDocumentosActDesigna() -> Se ha producido un error al descargar un archivo asociado a la actuacion",
+					e);
+		}
+
+		return res;
+	}
+	
+	@Override
+	public ResponseEntity<InputStreamResource> descargarDocumentosDesignaJustificacionExpres(
+			JustificacionExpressItem justificacionExpressItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ResponseEntity<InputStreamResource> res = null;
+		InputStream fileStream = null;
+		HttpHeaders headers = new HttpHeaders();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.descargarDocumentosDesignaJustificacionExpres() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.descargarDocumentosDesignaJustificacionExpres() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty() && justificacionExpressItem != null) {
+				
+				// Obtenemos los documentos de la designación
+				ScsDocumentaciondesignaExample documentaciondesignaExample = new ScsDocumentaciondesignaExample();
+				documentaciondesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(Integer.valueOf(justificacionExpressItem.getIdTurno()))
+						.andAnioEqualTo(Short.valueOf(justificacionExpressItem.getAnioDesignacion()))
+						.andNumeroEqualTo(Long.valueOf(justificacionExpressItem.getNumDesignacion()));
+
+				List<ScsDocumentaciondesigna> documentos = scsDocumentaciondesignaMapper.selectByExample(documentaciondesignaExample);
+					
+				if (documentos != null && !documentos.isEmpty()) {
+					List<DocumentoDesignaItem> listaDocumentoDesignaItem = new ArrayList<DocumentoDesignaItem>();
+					
+					
+					// Mapeamos las propiedades de los documentos al objeto de descarga
+					for (ScsDocumentaciondesigna documento: documentos) {
+						DocumentoDesignaItem documentoDesignaItem = new DocumentoDesignaItem();
+						documentoDesignaItem.setNombreFichero(documento.getNombrefichero());
+						documentoDesignaItem.setIdFichero(documento.getIdfichero().toString());
+						
+						listaDocumentoDesignaItem.add(documentoDesignaItem);
+					}
+					
+					if (!listaDocumentoDesignaItem.isEmpty()) {
+						
+						// Descargamos los documentos y los comprimimos en un zip
+						fileStream = getZipFileDocumentosDesigna(listaDocumentoDesignaItem, idInstitucion);
+	
+						headers.setContentType(MediaType.parseMediaType("application/zip"));
+						headers.set("Content-Disposition", "attachment; filename=\""
+							+ "documentos" + "_D" + justificacionExpressItem.getAnioDesignacion() + "_" + justificacionExpressItem.getNumDesignacion()
+							+ ".zip\"");
+		
+						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+								HttpStatus.OK);
+					}
+				}
+				
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.descargarDocumentosDesignaJustificacionExpres() -> Se ha producido un error al descargar un archivo asociado a la actuacion",
+					e);
+		}
+
+		return res;
+	}
+	
+	@Override
+	public ResponseEntity<InputStreamResource> descargarDocumentosActDesignaJustificacionExpres(
+			DocumentoDesignaItem documentoDesignaItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ResponseEntity<InputStreamResource> res = null;
+		InputStream fileStream = null;
+		HttpHeaders headers = new HttpHeaders();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.descargarDocumentosActDesignaJustificacionExpres() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.descargarDocumentosActDesignaJustificacionExpres() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty() && documentoDesignaItem != null) {
+				
+				// Obtenemos los documentos de la actuación
+				ScsDocumentaciondesignaExample documentaciondesignaExample = new ScsDocumentaciondesignaExample();
+				documentaciondesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(Integer.valueOf(documentoDesignaItem.getIdTurno()))
+						.andAnioEqualTo(Short.valueOf(documentoDesignaItem.getAnio()))
+						.andNumeroEqualTo(Long.valueOf(documentoDesignaItem.getNumero()))
+						.andIdactuacionEqualTo(Long.valueOf(documentoDesignaItem.getIdActuacion()));
+
+				List<ScsDocumentaciondesigna> documentos = scsDocumentaciondesignaMapper.selectByExample(documentaciondesignaExample);
+					
+				if (documentos != null && !documentos.isEmpty()) {
+						List<DocumentoDesignaItem> listaDocumentoDesignaItem = new ArrayList<DocumentoDesignaItem>();
+						
+					// Mapeamos las propiedades de los documentos al objeto de descarga
+					for (ScsDocumentaciondesigna documento: documentos) {
+						DocumentoDesignaItem documentoDesignaItemFile = new DocumentoDesignaItem();
+						documentoDesignaItemFile.setNombreFichero(documento.getNombrefichero());
+						documentoDesignaItemFile.setIdFichero(documento.getIdfichero().toString());
+						
+						listaDocumentoDesignaItem.add(documentoDesignaItemFile);
+					}
+					
+					if (!listaDocumentoDesignaItem.isEmpty()) {
+						
+						// Descargamos los documentos y los comprimimos en un zip
+						fileStream = getZipFileDocumentosDesigna(listaDocumentoDesignaItem, idInstitucion);
+			
+						headers.setContentType(MediaType.parseMediaType("application/zip"));
+						headers.set("Content-Disposition", "attachment; filename=\""
+								+ "documentos" + "_A" + documentoDesignaItem.getAnio() + "_" + documentoDesignaItem.getNumero()
+								+ ".zip\"");
+			
+						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+								HttpStatus.OK);
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.descargarDocumentosActDesignaJustificacionExpres() -> Se ha producido un error al descargar un archivo asociado a la actuacion",
 					e);
 		}
 

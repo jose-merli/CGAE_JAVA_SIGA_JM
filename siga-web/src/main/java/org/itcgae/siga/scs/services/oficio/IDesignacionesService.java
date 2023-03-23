@@ -234,5 +234,11 @@ public interface IDesignacionesService {
 	ScsEjg getEJG(EjgItem item, HttpServletRequest request);
 
 	public StringDTO formatoProcedimiento(HttpServletRequest request);
+
+	ResponseEntity<InputStreamResource> descargarDocumentosDesignaJustificacionExpres(
+			JustificacionExpressItem justificacionExpressItem, HttpServletRequest request);
+
+	ResponseEntity<InputStreamResource> descargarDocumentosActDesignaJustificacionExpres(
+			DocumentoDesignaItem documentoDesignaItem, HttpServletRequest request);
 	
 }

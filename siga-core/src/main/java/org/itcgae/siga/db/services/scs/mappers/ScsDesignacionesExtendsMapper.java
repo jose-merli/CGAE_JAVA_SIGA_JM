@@ -198,6 +198,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "NUMPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ANIOPROCEDIMIENNTO", property = "anioProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COMPLEMENTO", property = "complemento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TIENEDOCUMENTACION", property = "tieneDocumentacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR), 
 			@Result(column = "VALIDARJUSTIFICACIONES", property = "validarjustificaciones", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "LETRADOACTUACIONES", property = "letradoActuaciones", jdbcType = JdbcType.VARCHAR)})
@@ -244,6 +245,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TIENEDOCUMENTACION", property = "tieneDocumentacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR), 
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR), 
 			})

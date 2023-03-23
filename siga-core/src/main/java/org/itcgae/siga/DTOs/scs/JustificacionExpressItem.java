@@ -56,6 +56,15 @@ public class JustificacionExpressItem {
 	private String categoriaProcedimiento;
 	private Error error = null;
 	private String complemento;
+	private String tieneDocumentacion;
+
+	public String getTieneDocumentacion() {
+		return tieneDocumentacion;
+	}
+
+	public void setTieneDocumentacion(String tieneDocumentacion) {
+		this.tieneDocumentacion = tieneDocumentacion;
+	}
 
 	public String getComplemento() {
 		return complemento;

@@ -1318,6 +1318,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" FROM fcs_facturacionjg fjg ");
 		sql.append(" WHERE fjg.idinstitucion = act.idinstitucion AND fjg.idfacturacion = act.idfacturacion");
 		sql.append(" ) AS descripcionfacturacion, ");
+		sql.append("(SELECT 1 FROM scs_documentaciondesigna WHERE (idactuacion = act.numeroasunto AND idinstitucion = " + idInstitucion
+				+ " AND numero = act.numero AND anio = act.anio AND idturno = act.idturno ) FETCH FIRST 1 ROWS ONLY) AS TIENEDOCUMENTACION,");
 		sql.append(
 				" act.docjustificacion, act.anulacion, acp.nig_numprocedimiento, act.nig, act.fecha, 0 permitireditarletrado ");
 		sql.append(
@@ -1439,6 +1441,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
 		sql.append(" P.COMPLEMENTO,");
 		sql.append(" P.CODIGO CATEGORIA, ");
+		sql.append(
+				"(SELECT 1 FROM scs_documentaciondesigna WHERE ( idinstitucion = " + idInstitucion
+				+ " AND numero = d.numero AND anio = d.anio AND idturno = d.idturno ) FETCH FIRST 1 ROWS ONLY) AS TIENEDOCUMENTACION,");
 		sql.append(" D.NIG, ");
 		sql.append(
 				" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
