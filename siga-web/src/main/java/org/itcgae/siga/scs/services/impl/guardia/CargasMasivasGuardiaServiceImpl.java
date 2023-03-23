@@ -1996,8 +1996,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				LOGGER.info(
 						"uploadFileC() / Registros : " + cargaMasivaDatosBTItems.size());
 
+				int i = 1;
 				for (CargaMasivaDatosGuardiatem cargaMasivaDatosBTItem : cargaMasivaDatosBTItems) {
-					int i = 1;
+					
 					int result = -1;
 
 					// Si no se ha detectado errores leyendo el excel introducido
@@ -2152,11 +2153,11 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							e1.printStackTrace();
 						}
 						if (result == 0) {
-							errores += "Error insertando calendario (a tarvés de cargas masivas) de la linea " + i
+							errores += "Error insertando calendario (a través de cargas masivas) de la linea " + i
 									+ ". <br/>";
 							error.setDescription(errores);
 							deleteResponseDTO.setError(error);
-
+							
 							registrosErroneos++;
 						}
 
@@ -2176,11 +2177,40 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					i++;
 				}
 
+				boolean sinRegistros = false;
 				if (cargaMasivaDatosBTItems.isEmpty()) {
 					error.setMessage("No existen registros en el fichero.");
 					LOGGER.info("uploadFileC() -> No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK);
-				} else {
+					
+					CargaMasivaDatosGuardiatem cargaMasivaDatosBTItemAux = new CargaMasivaDatosGuardiatem();
+					cargaMasivaDatosBTItemAux.setErrores("No existen registros en el fichero.");
+					Hashtable<String, Object> e = new Hashtable<String, Object>();
+					e = convertItemtoHashC(cargaMasivaDatosBTItemAux);
+					// Guardar log
+					datosLog.add(e);
+					
+					sinRegistros = true;
+					
+				} 
+				
+				if(sinRegistros){
+					LOGGER.info("uploadFileC() -> Se va a crear el Excel");
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
+					
+					cenCargamasivacv.setTipocarga("C");
+					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
+					cenCargamasivacv.setNombrefichero(nombreFichero);
+					cenCargamasivacv.setNumregistros(cargaMasivaDatosBTItems.size());
+					cenCargamasivacv.setNumregistroserroneos(registrosErroneos);
+					cenCargamasivacv.setFechamodificacion(new Date());
+					cenCargamasivacv.setFechacarga(new Date());
+					cenCargamasivacv.setUsumodificacion(usuario.getIdusuario());
+					
+					uploadFileLog(file.getBytes(), cenCargamasivacv, false);
+					uploadFileLog(bytesLog, cenCargamasivacv, true);
+					
+				}else {
 					LOGGER.info("uploadFileC() -> Se va a crear el Excel");
 					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
 
@@ -2585,7 +2615,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 			if (!errorLinea.toString().isEmpty()) {
 				cargaMasivaDatosBTItem
-						.setErrores("Errores : " + errorLinea.toString() );
+						.setErrores(errorLinea.toString() );
 			}
 
 			masivaDatosBTVos.add(cargaMasivaDatosBTItem);
