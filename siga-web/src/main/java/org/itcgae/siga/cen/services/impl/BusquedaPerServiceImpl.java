@@ -371,6 +371,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 					if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 						BusquedaPerFisicaSearchDTO segundaBusqueda = new BusquedaPerFisicaSearchDTO();
 						segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
+						segundaBusqueda.setIdInstitucion(busquedaPerFisicaSearchDTO.getIdInstitucion());
 						busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje,
 								null);
 
