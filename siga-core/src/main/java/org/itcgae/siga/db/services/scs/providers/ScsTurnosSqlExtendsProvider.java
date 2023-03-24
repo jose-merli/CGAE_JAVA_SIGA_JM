@@ -22,6 +22,23 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		return sql.toString();
 	}
 	
+	public String comboTurnosAsuntos(Short idInstitucion, String idTipo) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDTURNO, NOMBRE");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		if (idTipo.equals("A")) {
+			sql.WHERE("(IDTIPOTURNO IS NULL OR IDTIPOTURNO<>1)");
+		}else if(idTipo.equals("E")) {
+			sql.WHERE("(IDTIPOTURNO IS NULL OR IDTIPOTURNO<>2)");
+		}
+		sql.WHERE("FECHABAJA IS NULL");
+		sql.ORDER_BY("NOMBRE");
+		return sql.toString();
+	}
+	
 	public String comboTurnosNoBajaNoExistentesEnListaGuardias(String idInstitucion, String idListaGuardias) {
 		
 		SQL sql = new SQL();

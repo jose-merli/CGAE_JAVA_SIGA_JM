@@ -125,4 +125,6 @@ public interface ComboService {
 	public ComboDTO comboTipoRespuesta(HttpServletRequest request);
 
 	public ComboDTO comboTurnosGrupo(HttpServletRequest request);
+
+	public ComboDTO comboTurnosAsuntos(HttpServletRequest request, String idTipo);
 }
