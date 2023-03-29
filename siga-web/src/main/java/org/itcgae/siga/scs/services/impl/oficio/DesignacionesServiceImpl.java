@@ -6789,7 +6789,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			for (DocumentoDesignaItem doc : listaDocumentoDesignaItem) {
 
-				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero() + "_" + doc.getNombreFichero()));
 				String extension = doc.getNombreFichero()
 						.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
 						.toLowerCase();
@@ -7073,17 +7073,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						new TypeReference<List<DocumentoDesignaItem>>() {
 						});
 
-				DocumentoDesignaItem docuDesigItem = new DocumentoDesignaItem();
-
-				docuDesigItem.setAnio(listaDocumentos.get(0).getAnio());
-				docuDesigItem.setNumero(listaDocumentos.get(0).getNumero());
-				docuDesigItem.setIdTurno(listaDocumentos.get(0).getIdTurno());
-				docuDesigItem.setIdActuacion(listaDocumentos.get(0).getIdActuacion());
-
-				List<DocumentoDesignaItem> listaDocumentosBBDD = scsDesignacionesExtendsMapper
-						.getDocumentosPorDesigna(docuDesigItem, idInstitucion);
-
 				if (listaDocumentos != null && !listaDocumentos.isEmpty()) {
+					
+					DocumentoDesignaItem docuDesigItem = new DocumentoDesignaItem();
+
+					docuDesigItem.setAnio(listaDocumentos.get(0).getAnio());
+					docuDesigItem.setNumero(listaDocumentos.get(0).getNumero());
+					docuDesigItem.setIdTurno(listaDocumentos.get(0).getIdTurno());
+					docuDesigItem.setIdActuacion(listaDocumentos.get(0).getIdActuacion());
+
+					List<DocumentoDesignaItem> listaDocumentosBBDD = scsDesignacionesExtendsMapper
+							.getDocumentosPorDesigna(docuDesigItem, idInstitucion);
 
 					for (DocumentoDesignaItem doc : listaDocumentos) {
 						boolean igual = false;
@@ -7141,6 +7141,107 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		} catch (Exception e) {
 			LOGGER.error(
 					"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			insertResponseDTO.setError(error);
+
+		}
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	public InsertResponseDTO subirDocumentoDesignaJustificacionExpres(MultipartHttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoDesignaJustificacionExpres() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoDesignaJustificacionExpres() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				Iterator<String> itr = request.getFileNames();
+
+				while (itr.hasNext()) {
+
+					MultipartFile file = request.getFile(itr.next());
+					String nombreFichero = file.getOriginalFilename().split(";")[0];
+					String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
+					DocumentoDesignaItem documentoDesignaItem = objectMapper.readValue(json,
+							DocumentoDesignaItem.class);
+					String extension = FilenameUtils.getExtension(nombreFichero);
+
+					Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+							nombreFichero, extension);
+
+					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
+
+					ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
+
+					scsDocumentaciondesigna.setAnio(Short.valueOf(documentoDesignaItem.getAnio()));
+					scsDocumentaciondesigna.setNumero(Long.valueOf(documentoDesignaItem.getNumero()));
+					scsDocumentaciondesigna.setIdturno(Integer.valueOf(documentoDesignaItem.getIdTurno()));
+					
+					scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(nuevoId.getIdMax().toString()));
+					scsDocumentaciondesigna.setNombrefichero(nombreFichero);
+					scsDocumentaciondesigna
+							.setIdtipodocumento(Short.valueOf("1"));
+					scsDocumentaciondesigna.setIdfichero(idFile);
+					scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+					scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+					scsDocumentaciondesigna.setFechamodificacion(new Date());
+					scsDocumentaciondesigna.setFechaentrada(new Date());
+
+					if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getIdActuacion())) {
+						scsDocumentaciondesigna.setIdactuacion(Long.valueOf(documentoDesignaItem.getIdActuacion()));
+						scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf("1"));
+					}
+
+					int response = scsDocumentaciondesignaMapper.insertSelective(scsDocumentaciondesigna);
+
+					if (response == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.subirDocumentoDesignaJustificacionExpres() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						insertResponseDTO.setError(error);
+					}
+
+				}
+
+			} else {
+				LOGGER.error(
+						"DesignacionesServiceImpl.subirDocumentoDesignaJustificacionExpres() -> Se ha producido un error, el usuario no pertenece a la tabla de cen_persona o a la tabla de adm_usuarios");
+				error.setCode(500);
+				error.setDescription("general.mensaje.error.bbdd");
+				error.setMessage("Este usuario no puede subir ficheros.");
+				insertResponseDTO.setError(error);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.subirDocumentoDesignaJustificacionExpres() -> Se ha producido un error al subir un fichero perteneciente a la designación",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
