@@ -1073,4 +1073,14 @@ public class DesignacionesController {
 		ScsEjg response = designacionesService.getEJG(item, request);
 		return new ResponseEntity<ScsEjg>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/designas/queryImprimirJustificacionExpress",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<StringDTO> queryImprimirJustificacionExpress(@RequestBody JustificacionExpressItem item,HttpServletRequest request) {
+		
+		StringDTO response = designacionesService.queryImprimirJustificacionExpress(item, request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+	}
+	
+
+	
 }

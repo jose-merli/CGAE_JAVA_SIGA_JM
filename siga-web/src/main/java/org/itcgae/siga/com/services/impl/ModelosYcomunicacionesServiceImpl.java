@@ -790,6 +790,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						if (datosTarjeta.getIdTipoEnvio() != null) {
 							modeloCom.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 						}
+						modeloCom.setInformeunico(Short.parseShort(datosTarjeta.getInformeUnico()));
 
 						modModelocomunicacionMapper.updateByPrimaryKey(modeloCom);
 					} else {
@@ -819,7 +820,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						if (datosTarjeta.getIdTipoEnvio() != null) {
 							modeloCom.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 						}
-
+						modeloCom.setInformeunico(Short.parseShort(datosTarjeta.getInformeUnico()));
 						modModelocomunicacionMapper.insert(modeloCom);
 
 						// Si es nuevo por defecto a de tener todos los perfiles

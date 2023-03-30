@@ -1398,98 +1398,104 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	 * @return
 	 */
 	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion,
-			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta) {
+			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta, boolean imprimir) {
 //	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion,
 //			String longitudCodEJG, String idPersona,  String fechaDesde, String fechaHasta) {
 
 		StringBuilder sql = new StringBuilder();
 
-		sql.append(
-				"SELECT DISTINCT * FROM ( SELECT DECODE(ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA,1,'FAVORABLE', 2,'NO_FAVORABLE', "
-						+ "3,'PTE_CAJG', 4, 'SIN_RESOLUCION','SIN_EJG') AS TIPO_RESOLUCION_DESIGNA, ");
-		sql.append(" ALLDESIGNAS.* ");
-		sql.append(" FROM ( ");
+		if(!imprimir) {
+			sql.append(
+					"SELECT DISTINCT * FROM ( SELECT DECODE(ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA,1,'FAVORABLE', 2,'NO_FAVORABLE', "
+							+ "3,'PTE_CAJG', 4, 'SIN_RESOLUCION','SIN_EJG') AS TIPO_RESOLUCION_DESIGNA, ");
+			sql.append(" ALLDESIGNAS.* ");
+			sql.append(" FROM ( ");
 
-		sql.append(" SELECT TO_CHAR(D.FECHAENTRADA, 'dd/mm/yyyy') AS FECHADESIGNA, ");
-		sql.append(" TO_CHAR(D.FECHAENTRADA, 'yyyy_mm_dd') AS FECHAORDEN, ");
-		sql.append(" D.ART27 AS ART27, ");
-		sql.append(" D.ANIO || '/' || D.CODIGO AS CODIGODESIGNA,");
+			sql.append(" SELECT TO_CHAR(D.FECHAENTRADA, 'dd/mm/yyyy') AS FECHADESIGNA, ");
+			sql.append(" TO_CHAR(D.FECHAENTRADA, 'yyyy_mm_dd') AS FECHAORDEN, ");
+			sql.append(" D.ART27 AS ART27, ");
+			sql.append(" D.ANIO || '/' || D.CODIGO AS CODIGODESIGNA,");
 
-		sql.append(" F_SIGA_GETEJG_DESIGNA(" + idInstitucion + ",d.idturno,d.anio,d.numero," + longitudCodEJG
-				+ ") AS EXPEDIENTES, ");
+			sql.append(" F_SIGA_GETEJG_DESIGNA(" + idInstitucion + ",d.idturno,d.anio,d.numero," + longitudCodEJG
+					+ ") AS EXPEDIENTES, ");
 
-		sql.append(
-				" DECODE(D.ANIOPROCEDIMIENTO,NULL,D.NUMPROCEDIMIENTO,D.NUMPROCEDIMIENTO||'/'||D.ANIOPROCEDIMIENTO) AS ASUNTO, ");
+			sql.append(
+					" DECODE(D.ANIOPROCEDIMIENTO,NULL,D.NUMPROCEDIMIENTO,D.NUMPROCEDIMIENTO||'/'||D.ANIOPROCEDIMIENTO) AS ASUNTO, ");
 
-		sql.append(" f_siga_getdefendidosdesigna(" + idInstitucion + ",d.anio,d.idturno,d.numero,0) AS CLIENTE, ");
+			sql.append(" f_siga_getdefendidosdesigna(" + idInstitucion + ",d.anio,d.idturno,d.numero,0) AS CLIENTE, ");
 
-		sql.append(" D.RESUMENASUNTO AS RESUMENASUNTO, ");
-		sql.append(" DL.FECHARENUNCIA, ");
-		sql.append(" D.IDINSTITUCION, ");
-		sql.append(" D.IDTURNO, ");
-		sql.append(" D.ANIO, ");
-		sql.append(" D.NUMERO, ");
-		sql.append(" D.CODIGO, ");
-		sql.append(" D.IDJUZGADO, J.CODIGOEXT CATEGORIAJUZGADO, J.NOMBRE NOMBREJUZGADO, ");
-		sql.append(" D.IDINSTITUCION_JUZG, ");
-		sql.append(" D.ESTADO, ");
-		sql.append(" D.SUFIJO, ");
-		sql.append(" D.FECHAENTRADA, ");
-		sql.append(" DL.IDPERSONA, ");
-		sql.append(" D.IDPROCEDIMIENTO, ");
-		sql.append(" D.NUMPROCEDIMIENTO, ");
-		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
-		sql.append(" P.COMPLEMENTO,");
-		sql.append(" P.CODIGO CATEGORIA, ");
-		sql.append(
-				"(SELECT 1 FROM scs_documentaciondesigna WHERE ( idinstitucion = " + idInstitucion
-				+ " AND numero = d.numero AND anio = d.anio AND idturno = d.idturno ) FETCH FIRST 1 ROWS ONLY) AS TIENEDOCUMENTACION,");
-		sql.append(" D.NIG, ");
-		sql.append(
-				" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
-		if (fechaDesde != null) {
-			sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') >=  '" + fechaDesde + "'" );
+			sql.append(" D.RESUMENASUNTO AS RESUMENASUNTO, ");
+			sql.append(" DL.FECHARENUNCIA, ");
+			sql.append(" D.IDINSTITUCION, ");
+			sql.append(" D.IDTURNO, ");
+			sql.append(" D.ANIO, ");
+			sql.append(" D.NUMERO, ");
+			sql.append(" D.CODIGO, ");
+			sql.append(" D.IDJUZGADO, J.CODIGOEXT CATEGORIAJUZGADO, J.NOMBRE NOMBREJUZGADO, ");
+			sql.append(" D.IDINSTITUCION_JUZG, ");
+			sql.append(" D.ESTADO, ");
+			sql.append(" D.SUFIJO, ");
+			sql.append(" D.FECHAENTRADA, ");
+			sql.append(" DL.IDPERSONA, ");
+			sql.append(" D.IDPROCEDIMIENTO, ");
+			sql.append(" D.NUMPROCEDIMIENTO, ");
+			sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
+			sql.append(" P.COMPLEMENTO,");
+			sql.append(" P.CODIGO CATEGORIA, ");
+			sql.append(
+					"(SELECT 1 FROM scs_documentaciondesigna WHERE ( idinstitucion = " + idInstitucion
+					+ " AND numero = d.numero AND anio = d.anio AND idturno = d.idturno ) FETCH FIRST 1 ROWS ONLY) AS TIENEDOCUMENTACION,");
+			sql.append(" D.NIG, ");
+			sql.append(
+					" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
+			if (fechaDesde != null) {
+				sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') >=  '" + fechaDesde + "'" );
+			}
+			if (fechaHasta != null) {
+				sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') <=  '" + fechaHasta + "'" );
+			}
+			sql.append(" AND D.ANIO = SDL.ANIO AND "
+							+ "D.NUMERO = SDL.NUMERO AND D.IDTURNO = SDL.IDTURNO) AS CAMBIOLETRADO, ");
+			sql.append(" (SELECT MIN(CASE WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
+			sql.append(" AND ((EJG.IDTIPORATIFICACIONEJG IN (3,5,6,7) ");
+			sql.append(" AND EJG.IDTIPORESOLAUTO IS NOT NULL ");
+			sql.append(" AND EJG.IDTIPORESOLAUTO IN (1)) ");
+			sql.append(" OR (EJG.IDTIPORATIFICACIONEJG IN (1,2,8,9,10,11) ");
+			sql.append(" AND (EJG.IDTIPORESOLAUTO IS NULL ");
+			sql.append(" OR EJG.IDTIPORESOLAUTO NOT IN (3))))) THEN 1 ");
+
+			sql.append(" WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
+			sql.append(" AND ((EJG.IDTIPORATIFICACIONEJG IN (1,2,8,9,10,11,0) ");
+			sql.append(" AND EJG.IDTIPORESOLAUTO IS NOT NULL ");
+			sql.append(" AND EJG.IDTIPORESOLAUTO IN (3)) ");
+			sql.append(" OR (EJG.IDTIPORATIFICACIONEJG IN (3,5,6,7) ");
+			sql.append(" AND (EJG.IDTIPORESOLAUTO IS NULL ");
+			sql.append(" OR EJG.IDTIPORESOLAUTO NOT IN (1))))) THEN 2 ");
+
+			sql.append(" WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
+			sql.append(" AND EJG.IDTIPORATIFICACIONEJG IN (4)) THEN  3 ");
+
+			sql.append(" ELSE 4 END) ");
+
+			sql.append(" FROM SCS_EJG EJG, ");
+			sql.append(" SCS_EJGDESIGNA EJGDES ");
+
+			sql.append(" WHERE EJGDES.IDINSTITUCION = EJG.IDINSTITUCION ");
+			sql.append(" AND EJGDES.IDTIPOEJG = EJG.IDTIPOEJG ");
+			sql.append(" AND EJGDES.ANIOEJG = EJG.ANIO ");
+			sql.append(" AND EJGDES.NUMEROEJG = EJG.NUMERO ");
+			sql.append(" AND D.IDINSTITUCION = EJGDES.IDINSTITUCION ");
+			sql.append(" AND D.IDTURNO = EJGDES.IDTURNO ");
+			sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
+			sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA, ");
+			sql.append(" DECODE(turno.VALIDARJUSTIFICACIONES,'S',1,'N',0) AS VALIDARJUSTIFICACIONES, ");
+			sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
+
+		}else {
+			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO ");
+		
 		}
-		if (fechaHasta != null) {
-			sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') <=  '" + fechaHasta + "'" );
-		}
-		sql.append(" AND D.ANIO = SDL.ANIO AND "
-						+ "D.NUMERO = SDL.NUMERO AND D.IDTURNO = SDL.IDTURNO) AS CAMBIOLETRADO, ");
-		sql.append(" (SELECT MIN(CASE WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
-		sql.append(" AND ((EJG.IDTIPORATIFICACIONEJG IN (3,5,6,7) ");
-		sql.append(" AND EJG.IDTIPORESOLAUTO IS NOT NULL ");
-		sql.append(" AND EJG.IDTIPORESOLAUTO IN (1)) ");
-		sql.append(" OR (EJG.IDTIPORATIFICACIONEJG IN (1,2,8,9,10,11) ");
-		sql.append(" AND (EJG.IDTIPORESOLAUTO IS NULL ");
-		sql.append(" OR EJG.IDTIPORESOLAUTO NOT IN (3))))) THEN 1 ");
-
-		sql.append(" WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
-		sql.append(" AND ((EJG.IDTIPORATIFICACIONEJG IN (1,2,8,9,10,11,0) ");
-		sql.append(" AND EJG.IDTIPORESOLAUTO IS NOT NULL ");
-		sql.append(" AND EJG.IDTIPORESOLAUTO IN (3)) ");
-		sql.append(" OR (EJG.IDTIPORATIFICACIONEJG IN (3,5,6,7) ");
-		sql.append(" AND (EJG.IDTIPORESOLAUTO IS NULL ");
-		sql.append(" OR EJG.IDTIPORESOLAUTO NOT IN (1))))) THEN 2 ");
-
-		sql.append(" WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
-		sql.append(" AND EJG.IDTIPORATIFICACIONEJG IN (4)) THEN  3 ");
-
-		sql.append(" ELSE 4 END) ");
-
-		sql.append(" FROM SCS_EJG EJG, ");
-		sql.append(" SCS_EJGDESIGNA EJGDES ");
-
-		sql.append(" WHERE EJGDES.IDINSTITUCION = EJG.IDINSTITUCION ");
-		sql.append(" AND EJGDES.IDTIPOEJG = EJG.IDTIPOEJG ");
-		sql.append(" AND EJGDES.ANIOEJG = EJG.ANIO ");
-		sql.append(" AND EJGDES.NUMEROEJG = EJG.NUMERO ");
-		sql.append(" AND D.IDINSTITUCION = EJGDES.IDINSTITUCION ");
-		sql.append(" AND D.IDTURNO = EJGDES.IDTURNO ");
-		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
-		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA, ");
-		sql.append(" DECODE(turno.VALIDARJUSTIFICACIONES,'S',1,'N',0) AS VALIDARJUSTIFICACIONES, ");
-		sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
-
+		
 		sql.append(" FROM SCS_DESIGNA D join scs_designasletrado   dl ON d.idinstitucion = dl.idinstitucion "
 				+ "AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
 		sql.append(" JOIN scs_turno   turno        ON d.idinstitucion = turno.idinstitucion "
@@ -1682,10 +1688,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		tiposResolucionBuilder.append(")");
 
-		sql.append(tiposResolucionBuilder);
+		if(!imprimir) {
+			sql.append(tiposResolucionBuilder);
 
-		sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
-		sql.append(") query WHERE rownum<=200");
+			sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
+			sql.append(") query WHERE rownum<=200");
+		}else {
+			sql.append(" ORDER BY IDINSTITUCION, ANIO DESC");
+			sql.append(") query WHERE rownum<=200");
+		}
+	
 		
 		if (item.getConEJGNoFavorables() != null && item.getConEJGNoFavorables().equals("0")) {
 			sql.append(" AND query.tipo_resolucion_designa != 'NO_FAVORABLE' ");

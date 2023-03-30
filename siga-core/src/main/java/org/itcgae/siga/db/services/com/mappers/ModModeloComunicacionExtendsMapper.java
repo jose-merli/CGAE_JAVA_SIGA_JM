@@ -35,6 +35,7 @@ public interface ModModeloComunicacionExtendsMapper extends ModModelocomunicacio
 			@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INFORMEUNICO", property = "informeUnico", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR) })
 	List<ModelosComunicacionItem> selectModelosComunicacion(String idInstitucion,
 			DatosModelosComunicacionesSearch filtros, String idLenguaje, boolean historico);
@@ -54,6 +55,7 @@ public interface ModModeloComunicacionExtendsMapper extends ModModelocomunicacio
 			@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INFORMEUNICO", property = "informeUnico", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR) })
 	ModelosComunicacionItem selectModelo(String idModelo, String idLenguaje);
 
@@ -65,7 +67,8 @@ public interface ModModeloComunicacionExtendsMapper extends ModModelocomunicacio
 			@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PRESELECCIONAR", property = "preseleccionar", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INFORMEUNICO", property = "informeUnico", jdbcType = JdbcType.VARCHAR)
 
 	})
 	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idInstitucionLogueada, String idInstitucion, String idClaseComunicacion,

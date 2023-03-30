@@ -2473,10 +2473,22 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		// Se intentan sustituir los parametros de las funciones de cen_colegiado
 		sentencia = sustituirParametrosColegiado(sentencia);
+		
+		//Quitamos ";" del final si tiene
+		sentencia = quitarUltimoCaracterPuntoComa(sentencia);
 
 		return sentencia;
 	}
 
+	private String quitarUltimoCaracterPuntoComa(String str) {
+		LOGGER.info(str);
+		str = str.replaceAll("\\s+$", "");
+		if(str.charAt(str.length()- 1) == ';') {
+			str = str.substring(0,str.length() -1);
+		}
+		return str;
+	}
+	
 	public String sustituirParametrosColegiado(String select) {
 		select = select.replaceAll("@FECHA@", "SYSDATE");
 		if (select.indexOf(SigaConstants.NOMBRETABLA_CEN_CLIENTE) != -1) {
@@ -3599,4 +3611,44 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		return comboDTO;
 	}
+
+	@Override
+	public String procesarEjecutarConsultaImprimir(AdmUsuarios usuario, String sentencia, String sentenciaImprimir, List<List<String>> listaKeyFiltros) {
+		if(sentencia.contains("%%IN%%")) {
+			sentencia = sentencia.replace("%%IN%%", "IN");
+		}
+		
+		if(sentencia.contains("%%BUSQUEDA%%") && sentenciaImprimir != null) {
+			sentencia = sentencia.replace("%%BUSQUEDA%%", "(" + sentenciaImprimir + ")");
+		}else if(sentencia.contains("%%BUSQUEDA%%") && sentenciaImprimir == null && listaKeyFiltros != null && listaKeyFiltros.size() > 0 ) {
+			sentencia = sentencia.replace("%%BUSQUEDA%%", convertirListaAnidadaEnCadena(listaKeyFiltros));
+		}
+		LOGGER.info(sentencia);
+		return sentencia;
+	}
+	
+	private String convertirListaAnidadaEnCadena(List<List<String>> listaKeyFiltros) {
+        StringBuilder resultado = new StringBuilder("(");
+
+        for (int i = 0; i < listaKeyFiltros.size(); i++) {
+            List<String> subLista = listaKeyFiltros.get(i);
+            resultado.append("(");
+
+            for (int j = 0; j < subLista.size(); j++) {
+                resultado.append(subLista.get(j));
+                if (j < subLista.size() - 1) {
+                    resultado.append(",");
+                }
+            }
+
+            resultado.append(")");
+            if (i < listaKeyFiltros.size() - 1) {
+                resultado.append(", ");
+            }
+        }
+
+        resultado.append(")");
+        return resultado.toString();
+    }
+	
 }

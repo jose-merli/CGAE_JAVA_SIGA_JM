@@ -240,5 +240,7 @@ public interface IDesignacionesService {
 
 	ResponseEntity<InputStreamResource> descargarDocumentosActDesignaJustificacionExpres(
 			DocumentoDesignaItem documentoDesignaItem, HttpServletRequest request);
+
+	public StringDTO queryImprimirJustificacionExpress(JustificacionExpressItem item, HttpServletRequest request);
 	
 }

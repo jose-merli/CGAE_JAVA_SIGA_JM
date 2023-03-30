@@ -2,6 +2,7 @@ package org.itcgae.siga.com.services;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,5 +81,8 @@ public interface IConsultasService {
 	public ConfigColumnasQueryBuilderDTO obtenerConfigColumnasQueryBuilder(HttpServletRequest request);
 	
 	public ComboDTO obtenerCombosQueryBuilder(HttpServletRequest request, ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem);
+
+	public String procesarEjecutarConsultaImprimir(AdmUsuarios usuario, String sentencia, String sentenciaImprimir,
+			List<List<String>> listaKeyFiltros) throws ParseException;;
 	
 }

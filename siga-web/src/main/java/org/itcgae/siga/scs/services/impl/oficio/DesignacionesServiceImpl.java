@@ -208,6 +208,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipodictamenejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTiporesolucionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.scs.services.oficio.ISaltosCompOficioService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
@@ -488,7 +489,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					// busqueda de designaciones segun los filtros (max 200)
 					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
 							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable,
-							fechaDesde, fechaHasta);
+							fechaDesde, fechaHasta, false);
 //					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
 //							idInstitucion.toString(), longitudCodEJG, idPersona, 
 //							fechaDesde, fechaHasta);
@@ -9181,6 +9182,113 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Saliendo del servicio... ");
 
 		return response;
+	}
+
+	@Override
+	public StringDTO queryImprimirJustificacionExpress(JustificacionExpressItem item, HttpServletRequest request) {
+		StringDTO result = new StringDTO();
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		StringDTO parametros = new StringDTO();
+		String idPersona = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.queryImprimirJustificacionExpress() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.queryImprimirJustificacionExpress -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.queryImprimirJustificacionExpress -> Entrada a servicio para la busqueda de justifiacion express");
+
+				try {
+					LOGGER.info(
+							"DesignacionesServiceImpl.queryImprimirJustificacionExpress -> obteniendo longitud_codeejg...");
+					// cargamos los parámetros necesarios
+					String longitudCodEJG;
+
+					// LONGITUD_CODEJG
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG",
+							idInstitucion.toString());
+
+					// si el ncolegiado, viene relleno, debemos obtener la idpersona
+					if (item.getnColegiado() != null && !item.getnColegiado().trim().isEmpty()) {
+						LOGGER.info(
+								"DesignacionesServiceImpl.queryImprimirJustificacionExpress -> obteniendo la idpersona...");
+
+						// obtenemos la idpersona
+						ColegiadosSJCSItem colegiadosSJCSItem = new ColegiadosSJCSItem();
+						colegiadosSJCSItem.setnColegiado(item.getnColegiado());
+
+						List<ColegiadosSJCSItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
+								.busquedaColegiadosSJCS(idInstitucion.toString(), colegiadosSJCSItem);
+
+						if (colegiadosSJCSItems.size() > 0) {
+							idPersona = colegiadosSJCSItems.get(0).getIdPersona();
+						}
+					}
+
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudCodEJG = parametros.getValor();
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG", "0");
+						longitudCodEJG = parametros.getValor();
+					}
+
+					// obtenemos los estados para los expedientes
+
+					List<ScsTipodictamenejg> estadosExpedientes = scsTipodictamenejgExtendsMapper
+							.estadosDictamen(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
+
+					String idFavorable = null;
+					String idDesfavorable = null;
+
+					for (ScsTipodictamenejg tipoDictamen : estadosExpedientes) {
+						if ("FAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
+							idFavorable = tipoDictamen.getIdtipodictamenejg().toString();
+						} else if ("DESFAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
+							idDesfavorable = tipoDictamen.getIdtipodictamenejg().toString();
+						}
+					}
+					String fechaDesde = null;
+					String fechaHasta = null;
+					if (item.getDesignacionDesde() != null) {
+						fechaDesde = Converter.dateToString(item.getDesignacionDesde());
+					}
+					if (item.getDesignacionHasta() != null) {
+						fechaHasta = Converter.dateToString(item.getDesignacionHasta());
+					}
+					LOGGER.info(
+							"DesignacionesServiceImpl.queryImprimirJustificacionExpress -> obteniendo query justificaciones...");
+					// busqueda de designaciones segun los filtros (max 200)
+
+					String sql = new ScsDesignacionesSqlExtendsProvider().busquedaJustificacionExpres(item,
+							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable,
+							fechaDesde, fechaHasta, true);
+					
+					result.setValor(sql);
+					
+					LOGGER.info("DesignacionesServiceImpl.queryImprimirJustificacionExpress -> Salida del servicio");
+				} catch (Exception e) {
+					LOGGER.error(
+							"DesignacionesServiceImpl.queryImprimirJustificacionExpress -> ERROR: al consultar datos de la bd. ",
+							e);
+				}
+			}
+		}
+		return result;
 	}
 
 }

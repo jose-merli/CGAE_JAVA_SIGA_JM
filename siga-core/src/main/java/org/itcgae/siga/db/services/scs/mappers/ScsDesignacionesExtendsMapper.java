@@ -205,7 +205,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 //	List<JustificacionExpressItem> busquedaJustificacionExpresPendientes(JustificacionExpressItem item,
 //			String idInstitucion, String longitudCodEJG, String idPersona,  String fechaDesde, String fechaHasta);
 	List<JustificacionExpressItem> busquedaJustificacionExpresPendientes(JustificacionExpressItem item,
-			String idInstitucion, String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta);
+			String idInstitucion, String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta, boolean imprimir);
 
 	/**
 	 * 
