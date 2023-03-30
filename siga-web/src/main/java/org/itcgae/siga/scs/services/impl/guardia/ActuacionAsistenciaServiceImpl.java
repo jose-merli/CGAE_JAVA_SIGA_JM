@@ -391,7 +391,9 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             newActuacion.setIdinstitucionPris(idInstitucion);
                         }
 
-                        if(isTurnoAutovalidable(idInstitucion,scsAsistencia.getIdturno())){
+                        //La validacion automatica solo se realiza en el caso de que sea perfil letrado
+                        String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+                        if(letrado.equals("S") && isTurnoAutovalidable(idInstitucion,scsAsistencia.getIdturno())){
                             newActuacion.setValidada("1");
                             newActuacion.setFechajustificacion(new Date());
                         }else {

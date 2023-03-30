@@ -4479,9 +4479,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 								Short.valueOf(d.getIdInstitucion()));
 						boolean soloVacio = d.getSoloGenerarVacio() == 'S' ? true : false;
 						LOGGER.info("generarCalendarioAsync() -> Empieza generacion idCalendario"
-								+ d.getIdCalendarioProgramado());
-						if (generado.equals("Si")
-								|| (idProgCalGenerandose2 != null && idProgCalGenerandose2.size() != 0)) {
+								+ d.getIdCalendarioProgramado() + "Generado: "+generado + " Estado: " + d.getEstado());
+//						if (generado.equals("Si")
+//								|| (idProgCalGenerandose2 != null && idProgCalGenerandose2.size() != 0)) {
+						if ((idProgCalGenerandose2 != null && idProgCalGenerandose2.size() != 0)) {
 							// generacionCalEnProceso = false;
 							int res = setGeneracionEnProceso(d.getIdCalendarioProgramado(), "0");
 							idProgCalGenerandose2 = scsCalendarioguardiasMapper.getGeneracionEnProceso();
@@ -5218,6 +5219,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String porGrupos = "false";
 		boolean rotacion = false;
 
+		LOGGER.info("generarCalendarioAsync.generarCalendario2: idGuardia: "
+				+ idGuardia1.toString() + " idTurno: " + idTurno1.toString() + " idInstitucion: " + idInstitucion1.toString());
+		
 		GuardiasTurnoItem guardia = scsGuardiasturnoExtendsMapper.getGuardia(idGuardia1.toString(), idTurno1.toString(),
 				idInstitucion1.toString());
 		porGrupos = guardia.getPorGrupos();
@@ -5266,6 +5270,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						new Integer(calendarioGuardiasBean.getIdguardiaprincipal()),
 						new Integer(calendarioGuardiasBean.getIdcalendarioguardiasprincipal()));
 
+				LOGGER.info("generarCalendarioAsync.generarCalendario2: idCalendario: " + idCalendario);
 				if (idCalendario > 0) {
 					calendarioGuardiasBean.setIdcalendarioguardias(Integer.toString(idCalendario));
 
@@ -5837,6 +5842,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 	 */
 	public void calcularMatrizLetradosGuardiaPorGrupos(List<Integer> lDiasASeparar, boolean rotacion) throws Exception {
 
+		LOGGER.info("INICIO generarCalendarioAsync.calcularMatrizLetradosGuardiaPorGrupos:");
+		
 		// Variables
 		ArrayList<String> diasGuardia, primerPeriodo, segundoPeriodo; // Periodo o dia de guardia para rellenar con
 		// letrado
@@ -6214,6 +6221,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 //			arrayPeriodosLetradosSJCS1 = null;
 //			throw new Exception(e + "");
 //		}
+		
+		LOGGER.info("FIN generarCalendarioAsync.calcularMatrizLetradosGuardiaPorGrupos:");
+		
 	} // calcularMatrizLetradosGuardiaPorGrupos()
 
 	public HashMap<Long, List< BajasTemporalesItem>> getLetradosDiasBajaTemporal(Integer idInstitucion,
@@ -6255,6 +6265,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error al obtener los getDiasBajaTemporal: " + e.toString();
+			LOGGER.info(errorGeneracionCalendario);
 			throw new Exception(e + ": Error al obtener los getDiasBajaTemporal: " + e.toString());
 
 		}
@@ -6270,6 +6281,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error al crear la copia de la cola de guardias de grupos de un calendario: "
 					+ e;
+			LOGGER.info(errorGeneracionCalendario);
 			throw new Exception("Error al crear la copia de la cola de guardias de grupos de un calendario: " + e);
 		}
 	}
@@ -6315,6 +6327,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error obteniendo los saltos o las compensaciones pendientes dada una guardia: "
 					+ e;
+			LOGGER.info(errorGeneracionCalendario);
 		}
 		return resultado;
 	}
@@ -6353,6 +6366,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error obteniendo los letrados grupos: " + e;
+			LOGGER.info(errorGeneracionCalendario);
 			throw new Exception(e + ": Error al ejecutar getLetradosGrupo()");
 
 		}
@@ -6382,6 +6396,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error obteniendo los letrados grupos de BD: " + e;
+			LOGGER.info(errorGeneracionCalendario);
 			throw new Exception(e + ": Error al ejecutar getLetradosGrupo()");
 		}
 	}
@@ -6543,6 +6558,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error obteniendo la cola de guardia: " + e;
+			LOGGER.info(errorGeneracionCalendario);
 			throw new Exception(e + ": Error al ejecutar getColaGuardia()");
 		}
 	} // getColaGuardia()
@@ -6586,6 +6602,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		} catch (Exception e) {
 			errorGeneracionCalendario = "actualizando el ultimo colegiado de la guardia al ultimo colegiado del grupo: "
 					+ e;
+			LOGGER.info(errorGeneracionCalendario);
 			e.printStackTrace();
 		}
 	}
@@ -6628,6 +6645,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		} catch (Exception e) {
 			errorGeneracionCalendario = "Error obteniendo las inscripciones ordenadas para formar la cola de una guardia dada\r\n"
 					+ "	 * una fecha: " + e;
+			LOGGER.info(errorGeneracionCalendario);
 			throw new Exception(e + ": Error al ejecutar getColaGuardia()");
 		}
 	} // getColaGuardia()
@@ -6770,6 +6788,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						idCalendarioGuardias1.toString());
 			} catch (Exception e) {
 				errorGeneracionCalendario = "Error cumpliendo compensaciones: " + e;
+				LOGGER.info(errorGeneracionCalendario);
 			}
 			grupoLetrados = compensacion.getLetrados();
 
@@ -7923,6 +7942,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 	 * calculado mediante el metodo "calcularMatrizPeriodosDiasGuardia()"
 	 */
 	public void calcularMatrizLetradosGuardia(List lDiasASeparar) throws Exception {
+		
+		LOGGER.info("INICIO generarCalendarioAsync.calcularMatrizLetradosGuardia:");
+		
 		// Variables generales
 		ArrayList<String> diasGuardia, primerPeriodo, segundoPeriodo; // Periodo o dia de guardia para rellenar con
 		// letrado
@@ -8331,6 +8353,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 			arrayPeriodosLetradosSJCS1 = null;
 			throw new Exception(e + "");
 		}
+		
+		LOGGER.info("FIN generarCalendarioAsync.calcularMatrizLetradosGuardia:");
+		
 	} // calcularMatrizLetradosGuardia()
 
 	/**

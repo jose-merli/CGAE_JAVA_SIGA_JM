@@ -242,5 +242,8 @@ public interface IDesignacionesService {
 			DocumentoDesignaItem documentoDesignaItem, HttpServletRequest request);
 
 	public StringDTO queryImprimirJustificacionExpress(JustificacionExpressItem item, HttpServletRequest request);
+
+	InsertResponseDTO subirDocumentoDesignaJustificacionExpres(MultipartHttpServletRequest request);
+
 	
 }

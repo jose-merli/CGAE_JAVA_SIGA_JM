@@ -989,6 +989,12 @@ public class DesignacionesController {
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/designas/subirDocumentoDesignaJustificacionExpres", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<InsertResponseDTO> subirDocumentoDesignaJustificacionExpres(MultipartHttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.subirDocumentoDesignaJustificacionExpres(request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
 	@PostMapping(value = "/designas/eliminarDocumentosDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> eliminarDocumentosDesigna(
 			@RequestBody List<DocumentoDesignaItem> listaDocumentoDesignaItem, HttpServletRequest request) {
