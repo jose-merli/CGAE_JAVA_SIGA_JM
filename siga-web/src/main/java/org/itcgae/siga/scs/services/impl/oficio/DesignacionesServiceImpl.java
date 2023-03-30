@@ -3142,31 +3142,32 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setManual((short) 1);
 						designaLetrado.setLetradodelturno("1");
 
-						String idPersona = null;
+						String idPersona = designaItem.getIdPersona();
 
-						if (idInstitucion == designaItem.getIdInstitucion() || designaItem.getIdInstitucion() == 0) {
-							idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumCol(idInstitucion.toString(),
-									numeroColegiado);
-
-							if (idPersona == null || idPersona == "") {
-								idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumComunitario(
-										designa.getIdinstitucion().toString(), numeroColegiado);
-							}
-//
-//							if(idPersona == null || idPersona == "") {
-//								idPersona = scsDesignacionesExtendsMapper
-//										.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
-//								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
-//
-//							}
-						} /*
-							 * else { idPersona = scsDesignacionesExtendsMapper
-							 * .obtenerIdPersonaByNumColNColegiado(designaItem.getNif()); if(idPersona ==
-							 * null || idPersona.isEmpty()) { idPersona = scsDesignacionesExtendsMapper
-							 * .obtenerNumNoColegiado(String.valueOf(designaItem.getIdInstitucion()),
-							 * idPersona); } }
-							 */
-
+						if(idPersona == null || idPersona.isEmpty()) {
+							if (idInstitucion == designaItem.getIdInstitucion() || designaItem.getIdInstitucion() == 0) {
+								idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumCol(idInstitucion.toString(),
+										numeroColegiado);
+	
+								if (idPersona == null || idPersona == "") {
+									idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumComunitario(
+											designa.getIdinstitucion().toString(), numeroColegiado);
+								}
+	//
+	//							if(idPersona == null || idPersona == "") {
+	//								idPersona = scsDesignacionesExtendsMapper
+	//										.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
+	//								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
+	//
+	//							}
+							} /*
+								 * else { idPersona = scsDesignacionesExtendsMapper
+								 * .obtenerIdPersonaByNumColNColegiado(designaItem.getNif()); if(idPersona ==
+								 * null || idPersona.isEmpty()) { idPersona = scsDesignacionesExtendsMapper
+								 * .obtenerNumNoColegiado(String.valueOf(designaItem.getIdInstitucion()),
+								 * idPersona); } }
+								 */
+						}
 						InsertResponseDTO responseNColegiado = new InsertResponseDTO();
 						if (idPersona == null || idPersona == "") {
 							idPersona = scsDesignacionesExtendsMapper

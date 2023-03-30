@@ -142,6 +142,9 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 //					if(datos.getIdTurno() != null) {
 //						datos.setIdTurno(datos.getIdTurno().substring(0,datos.getIdTurno().length-1));
 //					}
+					if(datos.getIdInstitucion()==null || datos.getIdInstitucion().isEmpty()) {
+						datos.setIdInstitucion(idInstitucion.toString());
+					}
 
 					List<ColegiadosSJCSItem> colegiadosSJCSItemList = scsEjgExtendsMapper.busquedaColegiadoEJG(datos,
 							usuarios.get(0).getIdlenguaje(), tamMaximo);

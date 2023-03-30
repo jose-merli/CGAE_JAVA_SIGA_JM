@@ -157,6 +157,10 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 //					+ "%')");
 		}
 		
+		if (colegiadoItem.getIdPersona() != null && colegiadoItem.getIdPersona() != "") {
+			sql.WHERE("per.idpersona = " + colegiadoItem.getIdPersona());
+		}		
+		
 		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
 			sql.WHERE("(decode(col.comunitario,1,col.ncomunitario,col.ncolegiado) = '" + colegiadoItem.getNumColegiado() + "')");
 		}
