@@ -218,7 +218,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 							estado.setAnio(Short.parseShort(dato.getAnnio()));
 							estado.setNumero(Long.parseLong(dato.getNumero()));
 							estado.setIdestadoejg(Short.parseShort("8"));	//id de estado correspondiente a Generado Remesa.
-							estado.setObservaciones("Nº Remesa: " + remesaSelected.getIdremesa());
+							estado.setObservaciones("Nº Remesa: " + remesaSelected.getNumero());
 							estado.setFechainicio(new Date());
 							estado.setFechamodificacion(new Date());
 							estado.setUsumodificacion(usuarios.get(0).getIdusuario());
