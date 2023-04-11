@@ -1846,9 +1846,11 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             paisElement.appendChild(doc.createTextNode(cdgoExtPais));
             solicitanteElement.appendChild(paisElement);
         }
-        Element fechaNacimientoElement = doc.createElement("fechaNacimiento");
-        fechaNacimientoElement.appendChild(doc.createTextNode(SigaConstants.DATE_FORMAT.format(solicitudincorporacion.getFechanacimiento())));
-        solicitanteElement.appendChild(fechaNacimientoElement);
+        if (solicitudincorporacion.getFechanacimiento() != null) {
+        	Element fechaNacimientoElement = doc.createElement("fechaNacimiento");
+            fechaNacimientoElement.appendChild(doc.createTextNode(SigaConstants.DATE_FORMAT.format(solicitudincorporacion.getFechanacimiento())));
+            solicitanteElement.appendChild(fechaNacimientoElement);
+        }
         //NODO SOLICITANTE - FIN
 
         //NODO DETALLES - INICIO
