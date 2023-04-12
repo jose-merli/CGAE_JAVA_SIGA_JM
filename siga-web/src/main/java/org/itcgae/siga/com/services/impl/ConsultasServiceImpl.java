@@ -2528,7 +2528,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 				LOGGER.error("ejecutarConsultaConClaves() -> Consulta no permitida: " + sentencia);
 			} else {
-				result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+				//Para ejecutar la sentencia se pasa a miniscula.
+				result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia.toLowerCase());
 			}
 
 			if (contienePuntosAlias && result != null && result.size() > 0) {

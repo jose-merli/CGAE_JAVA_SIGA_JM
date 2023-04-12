@@ -2085,7 +2085,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
 						}else {
 							try {
-								result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+								result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia.toLowerCase());
 							}catch(Exception e) {
 								LOGGER.error("Error al ejecutar la consulta: " + sentencia);
 								throw e;

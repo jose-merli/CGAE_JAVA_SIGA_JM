@@ -481,7 +481,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				
 				LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
 			}else {
-				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia.toLowerCase());
 				resultadosConsultas.addAll(result);
 			}
 		}
