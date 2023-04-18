@@ -3859,7 +3859,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		SQL sql = new SQL();
 		sql.SELECT("IDGUARDIA");
 		sql.FROM("SCS_GUARDIASTURNO");
-		sql.WHERE("NOMBRE = '"+ name + "'");
+		sql.WHERE("RTRIM(NOMBRE) = '"+ name + "'");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 //		sql.WHERE("FECHABAJA IS NULL");
 		return sql.toString();

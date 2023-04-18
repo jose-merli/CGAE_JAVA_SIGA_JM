@@ -162,7 +162,7 @@ public class CalendarioEfectivo {
 				this.fechaFin, this.duracion, this.fechaFin);
 
 		// recorriendo los periodos
-		while (punteroFecha.before(inicioSiguiente))
+		while (punteroFecha.before(inicioSiguiente) || punteroFecha.equals(inicioSiguiente))
 		{
 			periodoActual = new PeriodoEfectivoItem();
 			tiempoPendiente = this.duracion;
@@ -172,19 +172,18 @@ public class CalendarioEfectivo {
 					inicioSiguiente, this.duracion, this.fechaFin);
 
 			// recorriendo los dias
-			while (tiempoPendiente > 0 && punteroFecha.before(inicioSiguiente)) {
+			while (tiempoPendiente > 0 && (punteroFecha.before(inicioSiguiente) || punteroFecha.equals(inicioSiguiente))) {
 				if (cumple(punteroFecha)) {
 					// anyadiendo fecha efectiva al periodo actual
 					periodoActual.add((Date) punteroFecha.clone());
 
 					// si termina unidad de tiempo, restando duracion pendiente
-					if (manyanaTerminaLaUnidadDeTiempo(this.unidadesDuracion,
-							punteroFecha))
+					if (manyanaTerminaLaUnidadDeTiempo(this.unidadesDuracion, punteroFecha))
 						tiempoPendiente--;
 				}
 				// si termina unidad de tiempo y las unidades no son dias, restando duracion pendiente
-				else if (manyanaTerminaLaUnidadDeTiempo(this.unidadesDuracion,
-						punteroFecha) && this.unidadesDuracion != Calendar.DAY_OF_YEAR)
+				else if (manyanaTerminaLaUnidadDeTiempo(this.unidadesDuracion, punteroFecha) 
+						&& this.unidadesDuracion != Calendar.DAY_OF_YEAR)
 					tiempoPendiente--;
 
 				// avanzando puntero hasta la siguiente fecha
@@ -257,24 +256,24 @@ public class CalendarioEfectivo {
 	 */
 	private boolean haTerminadoLaUnidadDeTiempo(int unidades, Calendar cal) {
 		switch (unidades) {
-		case Calendar.WEEK_OF_YEAR:
-			if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
+			case Calendar.WEEK_OF_YEAR:
+				if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
+					return true;
+				else
+					return false;
+			case CalendarioEfectivo.QUINCENA:
+				if (cal.get(Calendar.DAY_OF_MONTH) == 1
+						|| cal.get(Calendar.DAY_OF_MONTH) == 16)
+					return true;
+				else
+					return false;
+			case Calendar.MONTH:
+				if (cal.get(Calendar.DAY_OF_MONTH) == 1)
+					return true;
+				else
+					return false;
+			default:
 				return true;
-			else
-				return false;
-		case CalendarioEfectivo.QUINCENA:
-			if (cal.get(Calendar.DAY_OF_MONTH) == 1
-					|| cal.get(Calendar.DAY_OF_MONTH) == 16)
-				return true;
-			else
-				return false;
-		case Calendar.MONTH:
-			if (cal.get(Calendar.DAY_OF_MONTH) == 1)
-				return true;
-			else
-				return false;
-		default:
-			return true;
 		}
 	} // haTerminadoLaUnidadDeTiempo ()
 
