@@ -8,6 +8,21 @@ public class ActuacionDesignaRequestDTO {
 	private String numeroAsunto;
 	private String idPersonaColegiado;
 	private boolean historico;
+	private boolean esLetrado;
+
+	/**
+	 * @return the esLetrado
+	 */
+	public boolean isEsLetrado() {
+		return esLetrado;
+	}
+
+	/**
+	 * @param esLetrado the esLetrado to set
+	 */
+	public void setEsLetrado(boolean esLetrado) {
+		this.esLetrado = esLetrado;
+	}
 
 	/**
 	 * @return the anio
