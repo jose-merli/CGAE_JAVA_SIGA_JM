@@ -1127,7 +1127,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					if (cargaMasivaDatosITItem.getIdGuardia() != null && cargaMasivaDatosITItem.getIdGuardia() != "") {
 
 						// 2. Si las guardias para el turno son obligatorias, no se podrá realizar.
-						if (listGu.get(0).getObligatoriedad().equals("0")) {
+						if (!listGu.get(0).getObligatoriedad().equals("0")) {
 
 							// 3. Si la inscripción en la guardia ya existe de alta para la fecha efectiva
 							// indicada, no se podrá realizar.
@@ -1149,18 +1149,17 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 
 								List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2,
-										new SimpleDateFormat("dd/MM/yyyy")
-												.format(cargaMasivaDatosITItem.getFechaEfectiva()));
+//										new SimpleDateFormat("dd/MM/yyyy")
+//												.format(cargaMasivaDatosITItem.getFechaEfectiva()));
+												fechaSolicitud);
 
 								// Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se
 								// inscriben las guardias.
 								if (insturList.size() != 0 && insturList != null) {
 									// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del
 									// turno correspondiente.
-									if (cargaMasivaDatosITItem.getFechaEfectiva()
-											.compareTo(insturList.get(0).getFechavalidacion()) <= 0)
-										errorLinea.append(
-												"La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
+									if (cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion()) <= 0)
+										errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
 
 									// 6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso,
 									// no se tendrán en cuenta
@@ -2252,7 +2251,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				
 				if(sinRegistros){
 					LOGGER.info("uploadFileC() -> Se va a crear el Excel");
-					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGC, datosLog);
 					
 					cenCargamasivacv.setTipocarga("C");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -2268,7 +2267,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					
 				}else {
 					LOGGER.info("uploadFileC() -> Se va a crear el Excel");
-					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGC, datosLog);
 
 					cenCargamasivacv.setTipocarga("C");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
