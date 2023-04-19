@@ -165,6 +165,7 @@ import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
+import org.itcgae.siga.db.mappers.AdmUsuarioEfectivoExtendsMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -239,6 +240,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private AdmUsuarioEfectivoExtendsMapper admUsuarioEfectivoExtendsMapper;
 
 	@Autowired
 	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
@@ -6031,6 +6035,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					AdmUsuariosExample exampleUsuario = null;
 					List<AdmUsuarios> listaUsuarios = null;
+					int[] isLetradoUsuarios;
+					int isLetradoUsuario = 1;
 
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuCreacion())) {
 						exampleUsuario = new AdmUsuariosExample();
@@ -6038,12 +6044,28 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								.andIdusuarioEqualTo(Integer.valueOf(actuacionDesignaItem.getUsuCreacion()));
 						listaUsuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuario);
 						if (listaUsuarios != null && !listaUsuarios.isEmpty()) {
-							actuacionDesignaItem.setUsuCreacion(listaUsuarios.get(0).getDescripcion());
+							isLetradoUsuarios = admUsuarioEfectivoExtendsMapper.isLetrado(listaUsuarios.get(0));
+							
+							for (int i = 0; i < isLetradoUsuarios.length; i++) {
+								if (isLetradoUsuarios[i] == 0) {
+									isLetradoUsuario = 0;
+								}
+							}
+							
+							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
+								actuacionDesignaItem.setUsuCreacion("PERSONAL");
+							} else {
+								actuacionDesignaItem.setUsuCreacion(listaUsuarios.get(0).getDescripcion());
+							}
 						} else {
-							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+							if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
+								actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+							}
 						}
 					} else {
-						actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
+							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						}
 					}
 
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuJustificacion())) {
@@ -6052,12 +6074,28 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								.andIdusuarioEqualTo(Integer.valueOf(actuacionDesignaItem.getUsuJustificacion()));
 						listaUsuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuario);
 						if (listaUsuarios != null && !listaUsuarios.isEmpty()) {
-							actuacionDesignaItem.setUsuJustificacion(listaUsuarios.get(0).getDescripcion());
+							isLetradoUsuarios = admUsuarioEfectivoExtendsMapper.isLetrado(listaUsuarios.get(0));
+							
+							for (int i = 0; i < isLetradoUsuarios.length; i++) {
+								if (isLetradoUsuarios[i] == 0) {
+									isLetradoUsuario = 0;
+								}
+							}
+							
+							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
+								actuacionDesignaItem.setUsuCreacion("PERSONAL");
+							} else {
+								actuacionDesignaItem.setUsuCreacion(listaUsuarios.get(0).getDescripcion());
+							}
 						} else {
-							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+							if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
+								actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+							}
 						}
 					} else {
-						actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
+							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						}
 					}
 
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuValidacion())) {
@@ -6066,12 +6104,28 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								.andIdusuarioEqualTo(Integer.valueOf(actuacionDesignaItem.getUsuValidacion()));
 						listaUsuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuario);
 						if (listaUsuarios != null && !listaUsuarios.isEmpty()) {
-							actuacionDesignaItem.setUsuValidacion(listaUsuarios.get(0).getDescripcion());
+							isLetradoUsuarios = admUsuarioEfectivoExtendsMapper.isLetrado(listaUsuarios.get(0));
+							
+							for (int i = 0; i < isLetradoUsuarios.length; i++) {
+								if (isLetradoUsuarios[i] == 0) {
+									isLetradoUsuario = 0;
+								}
+							}
+							
+							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
+								actuacionDesignaItem.setUsuCreacion("PERSONAL");
+							} else {
+								actuacionDesignaItem.setUsuCreacion(listaUsuarios.get(0).getDescripcion());
+							}
 						} else {
-							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+							if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
+								actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+							}
 						}
 					} else {
-						actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
+							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						}
 					}
 
 				}
