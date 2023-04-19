@@ -7,18 +7,27 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.batik.dom.util.HashTable;
 import org.apache.commons.codec.binary.Base64;
@@ -51,6 +60,10 @@ import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import com.aspose.words.Document;
 import com.aspose.words.DocumentBuilder;
@@ -80,18 +93,23 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 			Set<String> claves = dato.keySet();
 			
-			for (String clave : claves) {
-				if(!clave.equals("row")) {
+			Set<String> clavesRegion = dato.keySet();
+			clavesRegion.removeIf(s -> s.contains("row"));
+			
+			int controlLast = 0;
+			for (String clave : clavesRegion) {
+				controlLast++;
 					Object o = dato.get(clave);
 					if (o instanceof List) {
 						List aux = (List) o;
-						doc = sustituyeRegionDocumento(doc, clave, aux);
+							if(controlLast == clavesRegion.size())
+								doc = sustituyeRegionDocumento(doc, clave, aux, true);	
+							else
+								doc = sustituyeRegionDocumento(doc, clave, aux, false);				
 						dato.remove(o);
-					}
-				}
-				
+					} 	
 			}
-
+			
 			for (String clave : claves) {
 				//if (clave.equals("row")) {
 					Object datosMap = (Object) dato.get(clave);
@@ -112,13 +130,19 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		return doc;
 	}
 
-	private Document sustituyeRegionDocumento(Document doc, String region, List dato) throws Exception {
+	private Document sustituyeRegionDocumento(Document doc, String region, List dato, boolean ultimo) throws Exception {
 		DataMailMergeDataSource dataMerge = new DataMailMergeDataSource(region, dato);
 
 		try {
-			if (doc != null && doc.getMailMerge() != null) {
+			if (doc != null && doc.getMailMerge() != null && !ultimo) {
 				doc.getMailMerge().executeWithRegions(dataMerge);
 			}
+			else if (doc != null && doc.getMailMerge() != null && ultimo) {
+				doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS);
+				doc.getMailMerge().executeWithRegions(dataMerge);
+			}
+			
+			
 		} catch (Exception e) {
 			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeRegionDocumento :: Error al sustituir región", e);
 			throw e;
@@ -129,7 +153,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	private Document sustituyeDatos(Document doc, HashMap<String, Object> dato) {
 
 		try {
-
+			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS);
 			Set<String> claves = dato.keySet();
 
 			DocumentBuilder builder = new DocumentBuilder(doc);
@@ -156,7 +180,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				doc = null;
 			}
 
-			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS);
+			
 			//doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS
 			//		| MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS
 			//		| MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
@@ -894,6 +918,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			// 2.2. obteniendo texto de plantilla FO
 			String sPlantillaFO = UtilidadesString.getFileContent(plantillaFO);
 			
+			sPlantillaFO = removeErrorInitXML(sPlantillaFO);
+			sPlantillaFO  = corregirFO(sPlantillaFO);
+			
 			// 2.3. generando intermedio FOP, reemplazando los datos en la plantilla
 			String content = reemplazarDatos(hDatosFinal, sPlantillaFO);
 			UtilidadesString.setFileContent(ficheroFOP, content);
@@ -924,6 +951,10 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			documento = null;
 		}
 		return documento;
+	}
+	
+	private static String removeErrorInitXML(String xml) {
+		return xml.replaceFirst("^([\\W]+)<\\?", "<?");
 	}
 	
 	@Override
@@ -975,6 +1006,55 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			documento = null;
 		}
 		return documento;
+	}
+	
+	private static String corregirFO(String foContent) throws Exception {
+	        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	        dbf.setNamespaceAware(true);
+	        javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
+	        InputSource is = new InputSource(new StringReader(foContent));
+	        org.w3c.dom.Document doc = db.parse(is);
+
+	        // Encuentra todos los elementos 'fo:simple-page-master' y almacena sus 'master-name' en un conjunto
+	        Set<String> masterNames = new HashSet<>();
+	        String firstMasterName = null;
+	        NodeList spmNodeList = doc.getElementsByTagNameNS("http://www.w3.org/1999/XSL/Format", "simple-page-master");
+	        for (int i = 0; i < spmNodeList.getLength(); i++) {
+	            Node node = spmNodeList.item(i);
+	            if (node instanceof Element) {
+	                Element elem = (Element) node;
+	                if (elem.hasAttribute("master-name")) {
+	                    String masterName = elem.getAttribute("master-name");
+	                    masterNames.add(masterName);
+	                    if (firstMasterName == null) {
+	                        firstMasterName = masterName;
+	                    }
+	                }
+	            }
+	        }
+
+	        // Verifica y corrige el atributo 'master-reference' en elementos 'fo:repeatable-page-master-reference'
+	        NodeList nodeList = doc.getElementsByTagNameNS("http://www.w3.org/1999/XSL/Format", "repeatable-page-master-reference");
+	        for (int i = 0; i < nodeList.getLength(); i++) {
+	            Node node = nodeList.item(i);
+	            if (node instanceof Element) {
+	                Element elem = (Element) node;
+	                if (elem.hasAttribute("master-name") && !masterNames.contains(elem.getAttribute("master-reference"))) {
+	                    // Reemplazar con el primer 'master-name' válido encontrado
+	                    if (firstMasterName != null) {
+	                        elem.setAttribute("master-reference", firstMasterName);
+	                    }
+	                }
+	            }
+	        }
+
+	        TransformerFactory tf = TransformerFactory.newInstance();
+	        Transformer t = tf.newTransformer();
+	        StringWriter writer = new StringWriter();
+	        t.transform(new DOMSource(doc), new StreamResult(writer));
+
+	        return writer.toString();
+	    
 	}
 	
 	protected String reemplazarDatos(HashMap<String, Object> dato, String plantillaFO) throws Exception{
