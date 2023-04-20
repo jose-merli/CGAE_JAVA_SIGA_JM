@@ -3106,50 +3106,63 @@ public class GuardiasServiceImpl implements GuardiasService {
 		int tamListaNum = 0;
 		Error err = new  Error();
 		List<String> erroresRespuesta = new ArrayList<String>();
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"deleteCalendariosProgramados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"deleteCalendariosProgramados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
-			if (usuarios != null && usuarios.size() > 0) {
-				Stream<Integer> listaIdCalendariosProgramados = listDeleteCalBody.stream()
-						.map(x -> Integer.parseInt(x.getIdCalendarioProgramado())).distinct();
-				List<Integer> listaNum = listaIdCalendariosProgramados.collect(Collectors.toList());
-				tamListaNum = listaNum.size();
-				for (int i = 0; i < listaNum.size(); i++) {
-					try {
-						String respuestaAlEliminar = this.deleteByIdProgramacionCalendarios(listaNum.get(i), listDeleteCalBody, idInstitucion,
-								usuarios);
-						if ( respuestaAlEliminar == "") // si es vacio la respuesta, fue todo bien
+		
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	
+				LOGGER.info(
+						"deleteCalendariosProgramados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	
+				LOGGER.info(
+						"deleteCalendariosProgramados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				
+				if (usuarios != null && usuarios.size() > 0) {
+					Stream<Integer> listaIdCalendariosProgramados = listDeleteCalBody.stream()
+							.map(x -> Integer.parseInt(x.getIdCalendarioProgramado())).distinct();
+					List<Integer> listaNum = listaIdCalendariosProgramados.collect(Collectors.toList());
+					tamListaNum = listaNum.size();
+					for (int i = 0; i < listaNum.size(); i++) {
+						try {
+							String respuestaAlEliminar = this.deleteByIdProgramacionCalendarios(listaNum.get(i), listDeleteCalBody, idInstitucion,
+									usuarios);
+							if ( respuestaAlEliminar == "") // si es vacio la respuesta, fue todo bien
+								response++;
+							else
+								erroresRespuesta.add(respuestaAlEliminar);
+						} catch (NoTransactionException e) {
 							response++;
-						else
-							erroresRespuesta.add(respuestaAlEliminar);
-					} catch (NoTransactionException e) {
-						response++;
+						}
+	
 					}
-
+	
+					LOGGER.info("deleteCalendariosProgramados() -> Salida ya con los datos recogidos");
 				}
-
-				LOGGER.info("deleteCalendariosProgramados() -> Salida ya con los datos recogidos");
 			}
-		}
-
-		// comprobacion actualización
-		if(erroresRespuesta.size() > 0) {
-			err.setDescription(String.join(", ", erroresRespuesta));
+	
+			// comprobacion actualización
+			if(erroresRespuesta.size() > 0) {
+				err.setDescription(String.join(", ", erroresRespuesta));
+				deleteResponseDTO.setError(err);
+			}
+		
+			deleteResponseDTO.setStatus(SigaConstants.OK);
+		
+			deleteResponseDTO.setId(String.valueOf((response)) + "/" + String.valueOf(tamListaNum));
+			
+			deleteResponseDTO.setError(err);
+		} catch (Exception e) {
+			LOGGER.error(
+					"deleteCalendariosProgramados() -> Se ha producido un error al eliminar un calendario programado",
+					e);
+			err.setCode(500);
+			err.setDescription("general.mensaje.error.bbdd");
+			err.setMessage(e.getMessage());
 			deleteResponseDTO.setError(err);
 		}
-	
-		deleteResponseDTO.setStatus(SigaConstants.OK);
-	
-		deleteResponseDTO.setId(String.valueOf((response)) + "/" + String.valueOf(tamListaNum));
 
 		LOGGER.info("deleteCalendariosProgramados() -> Salida del servicio para eliminar incompatibilidades");
 		return deleteResponseDTO;
@@ -3257,6 +3270,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 					String idCal = listaCalendarios.get(k).getIdprogcalendario().toString();
 					Optional<DeleteCalendariosProgDatosEntradaItem> itemDeleteOption = listDeleteCalBody.stream()
 							.filter(x -> x.getIdCalendarioProgramado().equals(idCal)).findFirst();
+					
+					DeleteCalendariosProgDatosEntradaItem itemDeleteOptionCalendario = new DeleteCalendariosProgDatosEntradaItem();
+					itemDeleteOptionCalendario.setFechaDesde(itemDeleteOption.get().getFechaDesde());
+					itemDeleteOptionCalendario.setFechaHasta(itemDeleteOption.get().getFechaHasta());
+					itemDeleteOptionCalendario.setIdCalendarioProgramado(itemDeleteOption.get().getIdCalendarioProgramado());
+					itemDeleteOptionCalendario.setIdInstitucion(listaCalendarios.get(k).getIdinstitucion().toString());
+					itemDeleteOptionCalendario.setIdTurno(listaCalendarios.get(k).getIdturno().toString());
+					itemDeleteOptionCalendario.setIdGuardia(listaCalendarios.get(k).getIdguardia().toString());
 
 					List<ScsCabeceraguardias> listaCabeceras = this.scsCabeceraguardiasExtendsMapper.getCabeceraGuardia(
 							listaCalendarios.get(k).getIdinstitucion().toString(),
@@ -3267,12 +3288,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (!listaCabeceras.isEmpty()) {
 						LOGGER.info("Tiene cabeceras");
 						ScsCabeceraguardias cabeceraguardias = listaCabeceras.get(0);
-						this.borrarGeneracionCalendario(itemDeleteOption.get(), usuarios,
+						this.borrarGeneracionCalendario(itemDeleteOptionCalendario, usuarios,
 								cabeceraguardias.getIdcalendarioguardias());
 						//this.borrarRegistrosCalendario(itemDeleteOption.get(),
 						//		cabeceraguardias.getIdcalendarioguardias());
 					}else if(!idGuardias.isEmpty() && listaCabeceras.isEmpty()) {
-						this.borrarGeneracionCalendario(itemDeleteOption.get(), usuarios,
+						this.borrarGeneracionCalendario(itemDeleteOptionCalendario, usuarios,
 								Integer.parseInt(idGuardias));
 					}
 					
@@ -3294,8 +3315,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				commitCalendarios(tx);
 			} catch (Exception e) {
-				LOGGER.error(e.getMessage());
-				respuesta = "error";
+				LOGGER.error(Arrays.toString(e.getStackTrace()).replaceAll(", ", "\n"));
+				respuesta = "Error al eliminar calendarios programados";
 				// TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 				rollBackCalendarios(tx);
 			}
