@@ -90,12 +90,15 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	public Document sustituyeDocumento(Document doc, HashMap<String, Object> dato) throws Exception {
 
 		try {
+			Set<String> claves = new HashSet<>();
+			Set<String> clavesRegion = new HashSet<>();
+			for (String clave : dato.keySet()) {
+				if(clave.equals("row"))
+					claves.add(clave);
+				else
+					clavesRegion.add(clave);
+			}
 
-			Set<String> claves = dato.keySet();
-			
-			Set<String> clavesRegion = dato.keySet();
-			clavesRegion.removeIf(s -> s.contains("row"));
-			
 			int controlLast = 0;
 			for (String clave : clavesRegion) {
 				controlLast++;
@@ -106,18 +109,16 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 								doc = sustituyeRegionDocumento(doc, clave, aux, true);	
 							else
 								doc = sustituyeRegionDocumento(doc, clave, aux, false);				
-						dato.remove(o);
+						//dato.remove(o);
 					} 	
 			}
 			
 			for (String clave : claves) {
-				//if (clave.equals("row")) {
 					Object datosMap = (Object) dato.get(clave);
 					if (datosMap instanceof HashMap) {
 						HashMap htRowDatosInforme = (HashMap) datosMap;
 						doc = sustituyeDatos(doc, htRowDatosInforme);
 					}
-				//}
 			}
 
 
