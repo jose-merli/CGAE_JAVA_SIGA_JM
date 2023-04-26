@@ -820,7 +820,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						if (datosTarjeta.getIdTipoEnvio() != null) {
 							modeloCom.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 						}
-						modeloCom.setInformeunico(Short.parseShort(datosTarjeta.getInformeUnico()));
+						
+						Short informeUnico = datosTarjeta.getInformeUnico() != null ? Short.parseShort(datosTarjeta.getInformeUnico()) : 0;
+						modeloCom.setInformeunico(informeUnico);
 						modModelocomunicacionMapper.insert(modeloCom);
 
 						// Si es nuevo por defecto a de tener todos los perfiles
