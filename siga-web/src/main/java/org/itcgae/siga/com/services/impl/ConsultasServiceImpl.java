@@ -1716,6 +1716,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 		operadoresList.add("IS NULL");
 		operadoresList.add("LIKE");
 		operadoresList.add("OPERADOR");
+		
+		consulta = consulta.trim();
 
 		String selectExperta = consulta.toUpperCase().replaceAll("\r\n", " ");
 		String selectOriginal = consulta.replaceAll("\r\n", " ");
