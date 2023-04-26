@@ -1325,7 +1325,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								LOGGER.error(e);
 								throw new BusinessException("Error al ejecutar la consulta "
 										+ consultaMulti.getDescripcion() + " " + e.getMessage(), e);
-							} catch (Exception e) {
+							} catch (BusinessException e) {
+								LOGGER.error(e);
+								throw new BusinessException(
+										e.getMessage(), e);
+							}catch (Exception e) {
 								LOGGER.error(e);
 								throw new BusinessException(
 										"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
