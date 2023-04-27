@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1313,6 +1314,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								if(resultMulti != null && resultMulti.size() > 0){
 									for(int k = 0;k<resultMulti.size();k++){
 										// Por cada registro generamos un documento
+										Map<String, Object> itemResulMulti  = resultMulti.get(k);
+										for( Map.Entry<String, Object> entry : itemResulMulti.entrySet()) {
+											if(entry.getValue() != null)
+											mapaClave.put(entry.getKey(), entry.getValue().toString());
+											else
+												mapaClave.put(entry.getKey(), "");
+											
+										}
 										numFicheros++;
 										generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 												listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
