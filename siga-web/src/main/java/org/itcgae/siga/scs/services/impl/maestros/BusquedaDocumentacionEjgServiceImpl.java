@@ -381,7 +381,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 					LOGGER.info(
 							"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para updatear el nuevo fundamento");
-
+					genRecursosCatalogos.setIdrecurso(tipoDoc.getDescripcion());
 					genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);
 					updateRestoIdiomas(genRecursosCatalogos);
 
