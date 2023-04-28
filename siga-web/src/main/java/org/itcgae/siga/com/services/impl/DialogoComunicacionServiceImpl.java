@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -701,7 +702,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 
 				if (result != null && result.size() > 0) {
-					LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
+					LOGGER.info("Se han obtenido " + result.size() + " destinatarios");
 
 					for (Map<String, Object> dest : result) {
 						Set<String> keyList = dest.keySet();
@@ -1313,6 +1314,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								if(resultMulti != null && resultMulti.size() > 0){
 									for(int k = 0;k<resultMulti.size();k++){
 										// Por cada registro generamos un documento
+										Map<String, Object> itemResulMulti  = resultMulti.get(k);
+										for( Map.Entry<String, Object> entry : itemResulMulti.entrySet()) {
+											if(entry.getValue() != null)
+											mapaClave.put(entry.getKey(), entry.getValue().toString());
+											else
+												mapaClave.put(entry.getKey(), "");
+											
+										}
 										numFicheros++;
 										generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 												listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
@@ -2089,7 +2098,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
 						}else {
 							try {
-								result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia.toLowerCase());
+								result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
 							}catch(Exception e) {
 								LOGGER.error("Error al ejecutar la consulta: " + sentencia);
 								throw e;
@@ -2559,6 +2568,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		if(poblacionExtranjera != null){
 			destinatario.setPoblacionExtranjera(poblacionExtranjera.toString());
 		}
+		
+		LOGGER.info("LOG Destinatario: " + dest.toString());
 		return destinatario;
 	}
 	
