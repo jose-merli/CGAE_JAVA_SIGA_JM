@@ -702,7 +702,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 
 				if (result != null && result.size() > 0) {
-					LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
+					LOGGER.info("Se han obtenido " + result.size() + " destinatarios");
 
 					for (Map<String, Object> dest : result) {
 						Set<String> keyList = dest.keySet();
@@ -2568,6 +2568,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		if(poblacionExtranjera != null){
 			destinatario.setPoblacionExtranjera(poblacionExtranjera.toString());
 		}
+		
+		LOGGER.info("LOG Destinatario: " + dest.toString());
 		return destinatario;
 	}
 	
