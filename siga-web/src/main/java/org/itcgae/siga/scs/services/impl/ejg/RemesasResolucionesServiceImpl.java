@@ -266,14 +266,17 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
               
                   if (remesasResolucionItem.getNombreFichero() != null) {
                 		
-                    String nombreFichero =  remesasResolucionItem.getNombreFichero();
+                    String nombreFichero =  remesasResolucionItem.getNombreFichero().substring(0, remesasResolucionItem.getNombreFichero().lastIndexOf("."));
+	                String extension = ".zip";
+	                
+	                String nextEntry = nombreFichero + extension;                
                     String path = getDirectorioFicheroRemesa(idInstitucion,remesasResolucionItem.getIdRemesaResolucion());
-                    path += File.separator + nombreFichero;      
-                    LOGGER.info("Buscando Fichero = " +nombreFichero);
+                    path += File.separator + nombreFichero + extension;      
+                    LOGGER.info("Buscando Fichero = " +nombreFichero + extension);
                     LOGGER.info("Ruta Completa de Fichero = " + path);
                     File file = new File(path);
                     if(file.exists() && !file.isDirectory()) {
-                  	  zipOutputStream.putNextEntry(new ZipEntry(nombreFichero));
+                  	  zipOutputStream.putNextEntry(new ZipEntry(nextEntry));
   	                  FileInputStream fileInputStream = new FileInputStream(file);
   	                  IOUtils.copy(fileInputStream, zipOutputStream);
   	                  fileInputStream.close();   
@@ -282,10 +285,10 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
                     if(remesasResolucionItem.getLog() == 1) {
                   	  path = getDirectorioFicheroRemesa(idInstitucion,remesasResolucionItem.getIdRemesaResolucion());
                   	  path += File.separator + "log" + File.separator +nombreFichero + "_errores.txt";
-                  	nombreFichero = nombreFichero + "_errores.txt";
+                  	  nextEntry = nombreFichero + "_errores.txt";
                   	  File fileLog = new File(path);
                         if(fileLog.exists() && !fileLog.isDirectory()) {
-                      	  zipOutputStream.putNextEntry(new ZipEntry(nombreFichero));
+                      	  zipOutputStream.putNextEntry(new ZipEntry(nextEntry));
       	                  FileInputStream fileInputStream = new FileInputStream(fileLog);
       	                  IOUtils.copy(fileInputStream, zipOutputStream);
       	                  fileInputStream.close();   
