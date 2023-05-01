@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +17,9 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
+import org.itcgae.siga.DTOs.com.GenerarComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModeloDialogoItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
@@ -28,7 +31,14 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.FileInfoDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosExample;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +55,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class DialogoComunicacionController {
 	
 	private static final Logger LOGGER = Logger.getLogger(DialogoComunicacionController.class);	
+	
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
 	IDialogoComunicacionService _dialogoComunicacionService;
@@ -129,7 +144,7 @@ public class DialogoComunicacionController {
 	}
 	
 	@RequestMapping(value = "/nombredoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) throws InterruptedException, ExecutionException {
 		
 		//File file = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
 		FileInfoDTO fileInfoDTO = new FileInfoDTO();
@@ -149,15 +164,32 @@ public class DialogoComunicacionController {
 			}
 			
 		} catch (TimeoutException e) {
+			String mensaje = "504 - TimeOut";
+			try {
+				// Conseguimos información del usuario logeado
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				
+				AdmUsuarios usuario = usuarios.get(0);
+			
+				GenRecursosExample genRecursosExample = new GenRecursosExample();
+				genRecursosExample.createCriteria().andIdrecursoEqualTo("historico.literal.registroNuevo")
+						.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+				List<GenRecursos> genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
+
+				mensaje = genRecursos.get(0).getDescripcion();
+			}catch (Exception ex) {
+				LOGGER.info(ex.getCause());
+			}
+	
 			completableFuture.cancel(true);
-			fileInfoDTO.setMessageError("504 Gateway Timeout");
+			fileInfoDTO.setMessageError(mensaje);
 			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);	
-		}catch (InterruptedException e) {
-			fileInfoDTO.setMessageError("500 Internal Server Error");
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
-		}catch(ExecutionException e) {
-			fileInfoDTO.setMessageError("500 Internal Server Error");
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);	
 		}
 		
 		
