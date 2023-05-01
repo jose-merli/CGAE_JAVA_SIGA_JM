@@ -10221,19 +10221,20 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		ScsCalendarioguardias calendario = scsCalendarioguardiasMapper.selectByPrimaryKey(key);
 	
-		
-		ScsGuardiasturno registro = new ScsGuardiasturno();
-		registro.setIdguardia(Integer.valueOf(deleteCalBody.getIdGuardia()));
-		registro.setIdinstitucion(Short.valueOf(deleteCalBody.getIdInstitucion()));
-		registro.setIdturno(Integer.valueOf(deleteCalBody.getIdTurno()));
-		registro.setIdpersonaUltimo(calendario.getIdpersonaUltimoanterior());
-		registro.setIdgrupoguardiaUltimo(calendario.getIdgrupoguardiaUltimoanterior());
-		registro.setFechasuscripcionUltimo(calendario.getFechasuscUltimoanterior());
-		registro.setUsumodificacion(usuarios.get(0).getIdusuario());
-		registro.setFechamodificacion(new Date());
+		if (calendario != null) {
+			ScsGuardiasturno registro = new ScsGuardiasturno();
+			registro.setIdguardia(Integer.valueOf(deleteCalBody.getIdGuardia()));
+			registro.setIdinstitucion(Short.valueOf(deleteCalBody.getIdInstitucion()));
+			registro.setIdturno(Integer.valueOf(deleteCalBody.getIdTurno()));
+			registro.setIdpersonaUltimo(calendario.getIdpersonaUltimoanterior());
+			registro.setIdgrupoguardiaUltimo(calendario.getIdgrupoguardiaUltimoanterior());
+			registro.setFechasuscripcionUltimo(calendario.getFechasuscUltimoanterior());
+			registro.setUsumodificacion(usuarios.get(0).getIdusuario());
+			registro.setFechamodificacion(new Date());
 
-		scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(registro);
-		LOGGER.info("EliminaCalendario() Actualizar ultimo en la cola OK");
+			scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(registro);
+			LOGGER.info("EliminaCalendario() Actualizar ultimo en la cola OK");
+		}
 		
 		this.scsGrupoguardiacolegiadoExtendsMapper.deleteRegistrosGrupoGuardiaCol(idCalendarioGuardias);
 		LOGGER.info("EliminaCalendario() deleteRegistrosGrupoGuardiaCol OK");

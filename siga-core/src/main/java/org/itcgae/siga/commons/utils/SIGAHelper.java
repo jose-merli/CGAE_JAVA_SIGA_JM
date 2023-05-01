@@ -1,10 +1,7 @@
 package org.itcgae.siga.commons.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
@@ -32,18 +29,24 @@ public class SIGAHelper {
 			perms.add(PosixFilePermission.OTHERS_READ);
 			perms.add(PosixFilePermission.OTHERS_WRITE);
 			perms.add(PosixFilePermission.OTHERS_EXECUTE);
+			
 			try {
-				
 				File parentFile = file.getParentFile();
 				if (parentFile != null && parentFile.exists()) {
 					LOGGER.debug("Cambiando los permisos del padre: " + parentFile.getAbsolutePath());
 					addPerm777(parentFile);
 				}
-				Files.setPosixFilePermissions(file.toPath(), perms);
+				boolean isPosix = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+				if (isPosix) {
+					Files.setPosixFilePermissions(file.toPath(), perms);
+				} else {
+					file.setReadable(true);
+					file.setWritable(true);
+					file.setExecutable(false);
+				}
 			} catch (Exception e) {
-				LOGGER.warn("Error al cambiar los permisos del fichero " + file.getAbsolutePath());
+				LOGGER.warn("Error al cambiar los permisos del fichero " + file.getAbsolutePath() + " - ERROR: " + e.toString() + " - " + e.getMessage());
 			}
-			
 		}
 	}
 
