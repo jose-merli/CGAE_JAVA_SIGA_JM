@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -127,23 +129,38 @@ public class DialogoComunicacionController {
 	}
 	
 	@RequestMapping(value = "/nombredoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) throws InterruptedException, ExecutionException {
+	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
 		
 		//File file = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
 		FileInfoDTO fileInfoDTO = new FileInfoDTO();
 		
 		CompletableFuture<File> completableFuture = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
-		File file = completableFuture.get();
 		
-		if(file != null) {
-			fileInfoDTO.setFilePath(file.getAbsolutePath());
-			fileInfoDTO.setName(file.getName());
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
-		}else {
+		try {
+			File file;
+			file = completableFuture.get(5, TimeUnit.MINUTES);
+			
+			if(file != null) {
+				fileInfoDTO.setFilePath(file.getAbsolutePath());
+				fileInfoDTO.setName(file.getName());
+				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
+			}else {
+				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);	
+			}
+			
+		} catch (TimeoutException e) {
+			completableFuture.cancel(true);
+			fileInfoDTO.setMessageError("504 Gateway Timeout");
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);	
+		}catch (InterruptedException e) {
+			fileInfoDTO.setMessageError("500 Internal Server Error");
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
+		}catch(ExecutionException e) {
+			fileInfoDTO.setMessageError("500 Internal Server Error");
 			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);	
 		}
 		
-	
+		
 	}
 	
 	@RequestMapping(value = "/generarEnvios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
