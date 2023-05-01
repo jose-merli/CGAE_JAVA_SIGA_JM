@@ -45,7 +45,7 @@ public class SIGAHelper {
 					file.setExecutable(false);
 				}
 			} catch (Exception e) {
-				LOGGER.warn("Error al cambiar los permisos del fichero " + file.getAbsolutePath() + " - ERROR: " + e.toString() + " - " + e.getMessage());
+				LOGGER.warn("No se pudieron cambiar los permisos del directorio: " + file.getAbsolutePath() + " CAUSA: " + e.getMessage());
 			}
 		}
 	}
