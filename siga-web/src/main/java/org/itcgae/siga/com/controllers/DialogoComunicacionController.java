@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
@@ -124,18 +127,23 @@ public class DialogoComunicacionController {
 	}
 	
 	@RequestMapping(value = "/nombredoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) throws InterruptedException, ExecutionException {
 		
-		File file = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
+		//File file = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
 		FileInfoDTO fileInfoDTO = new FileInfoDTO();
+		
+		CompletableFuture<File> completableFuture = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
+		File file = completableFuture.get();
 		
 		if(file != null) {
 			fileInfoDTO.setFilePath(file.getAbsolutePath());
 			fileInfoDTO.setName(file.getName());
 			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
 		}else {
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);	
 		}
+		
+	
 	}
 	
 	@RequestMapping(value = "/generarEnvios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

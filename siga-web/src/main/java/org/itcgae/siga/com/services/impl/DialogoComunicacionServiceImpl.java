@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -120,6 +121,11 @@ import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,6 +134,7 @@ import com.aspose.words.Document;
 import oracle.security.crypto.core.DES;
 
 @Service
+@EnableAsync
 public class DialogoComunicacionServiceImpl implements IDialogoComunicacionService{
 	
 	private Logger LOGGER = Logger.getLogger(DialogoComunicacionServiceImpl.class);
@@ -368,9 +375,19 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return response;
 	}
 
+	@Bean("AsyncConfiguradoDocumentos")
+	public TaskExecutor getAsyncDocumentos() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(2); //default: 1
+	    executor.setMaxPoolSize(Integer.MAX_VALUE); //default: Integer.MAX_VALUE
+	    executor.setQueueCapacity(Integer.MAX_VALUE); // default: Integer.MAX_VALUE
+	    executor.setKeepAliveSeconds(300); // default: 60 seconds
+	    executor.initialize();
+		return executor;
+	}
 	
-	@Override
-	public File obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+	@Async("AsyncConfiguradoDocumentos")
+	public CompletableFuture<File> obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
 		File file = null;
@@ -409,7 +426,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			throw new BusinessException("Error interno de la aplicación", e);
 		}
 		LOGGER.info("descargarComunicacion() -> Salida al servicio para descargar la documentación de la comunicación");
-		return file;
+		return CompletableFuture.completedFuture(file);
 		
 	}
 
