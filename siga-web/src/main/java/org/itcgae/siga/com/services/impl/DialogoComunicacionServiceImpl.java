@@ -989,7 +989,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												numFicheros++;
 												generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 														listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-														hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+														hDatosGenerales, resultMulti.get(k), mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
 														nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO, null);
 											}														
 										}
@@ -1331,18 +1331,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								if(resultMulti != null && resultMulti.size() > 0){
 									for(int k = 0;k<resultMulti.size();k++){
 										// Por cada registro generamos un documento
-										Map<String, Object> itemResulMulti  = resultMulti.get(k);
-										for( Map.Entry<String, Object> entry : itemResulMulti.entrySet()) {
-											if(entry.getValue() != null)
-											mapaClave.put(entry.getKey(), entry.getValue().toString());
-											else
-												mapaClave.put(entry.getKey(), "");
-											
-										}
 										numFicheros++;
 										generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 												listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-												hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+												hDatosGenerales, resultMulti.get(k), mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
 												nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO,null);
 									}														
 								}
