@@ -1035,10 +1035,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}
 	}
 	}else {
+			LOGGER.error("No hay consulta de destinatario para el modelo de comunicacion: " + modelosComunicacionItem.getIdModeloComunicacion());
 		
-					LOGGER.error("No hay consulta de destinatario para el modelo de comunicacion: " + modelosComunicacionItem.getIdModeloComunicacion());
-					ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario,listaKeyFiltros);
-					existenConsultas = Boolean.TRUE;
+			if(esEnvio) // Si es envio, generamos error ya que es necesario el destinatario,
+				throw new BusinessException("La consulta de destinatarios no ha devuelto resultados");
+			
+			
+			ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario,listaKeyFiltros);
+			existenConsultas = Boolean.TRUE;
 	}
 	LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
 				
