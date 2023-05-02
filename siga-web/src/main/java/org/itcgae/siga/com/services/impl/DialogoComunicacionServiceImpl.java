@@ -378,7 +378,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	@Bean("AsyncConfiguradoDocumentos")
 	public TaskExecutor getAsyncDocumentos() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(2); //default: 1
+		executor.setCorePoolSize(1); //default: 1
 	    executor.setMaxPoolSize(Integer.MAX_VALUE); //default: Integer.MAX_VALUE
 	    executor.setQueueCapacity(Integer.MAX_VALUE); // default: Integer.MAX_VALUE
 	    executor.setKeepAliveSeconds(300); // default: 60 seconds

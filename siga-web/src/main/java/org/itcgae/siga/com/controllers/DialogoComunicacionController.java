@@ -143,26 +143,26 @@ public class DialogoComunicacionController {
 				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 	}
 	
-	@RequestMapping(value = "/nombredoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) throws InterruptedException, ExecutionException {
-		
-		//File file = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
+	@RequestMapping(value = "/nombredoc", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo,
+			HttpServletResponse resp) throws InterruptedException, ExecutionException {
+
 		FileInfoDTO fileInfoDTO = new FileInfoDTO();
-		
+
 		CompletableFuture<File> completableFuture = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
-		
+
 		try {
 			File file;
 			file = completableFuture.get(5, TimeUnit.MINUTES);
-			
-			if(file != null) {
+
+			if (file != null) {
 				fileInfoDTO.setFilePath(file.getAbsolutePath());
 				fileInfoDTO.setName(file.getName());
 				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
-			}else {
-				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);	
+			} else {
+				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			
+
 		} catch (TimeoutException e) {
 			String mensaje = "504 - TimeOut";
 			try {
@@ -172,27 +172,28 @@ public class DialogoComunicacionController {
 				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				
+
 				AdmUsuarios usuario = usuarios.get(0);
-			
+
 				GenRecursosExample genRecursosExample = new GenRecursosExample();
-				genRecursosExample.createCriteria().andIdrecursoEqualTo("historico.literal.registroNuevo")
+				genRecursosExample.createCriteria()
+						.andIdrecursoEqualTo("informesycomunicaciones.descarga.mensaje.errorTimeOut")
 						.andIdlenguajeEqualTo(usuario.getIdlenguaje());
 				List<GenRecursos> genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
 
 				mensaje = genRecursos.get(0).getDescripcion();
-			}catch (Exception ex) {
-				LOGGER.info(ex.getCause());
+			} catch (Exception ex) {
+				LOGGER.error(ex.getCause());
 			}
-	
+
 			completableFuture.cancel(true);
 			fileInfoDTO.setMessageError(mensaje);
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);	
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
 		}
-		
-		
+
 	}
 	
 	@RequestMapping(value = "/generarEnvios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
