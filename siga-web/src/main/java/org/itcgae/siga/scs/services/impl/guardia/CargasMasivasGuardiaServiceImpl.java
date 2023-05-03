@@ -1131,31 +1131,30 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 							// 3. Si la inscripción en la guardia ya existe de alta para la fecha efectiva
 							// indicada, no se podrá realizar.
-							ScsInscripcionguardiaKey key1 = new ScsInscripcionguardiaKey();
+							ScsInscripcionguardiaExample exampleInscripcionGuardias = new ScsInscripcionguardiaExample();
+							exampleInscripcionGuardias.createCriteria().andFechasuscripcionLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva())
+								.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+								.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdguardiaEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()))
+								.andFechabajaIsNull();
 
-							key1.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
-							key1.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-							key1.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-							key1.setIdinstitucion(idInstitucion);
-							key1.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
-							if (scsInscripcionguardiaMapper.selectByPrimaryKey(key1) == null) {
+							if (scsInscripcionguardiaMapper.selectByExample(exampleInscripcionGuardias).isEmpty()) {
 
 								// 4. Si no existe una inscripción en el turno para dicha inscripción en la
-								// guardia, no se podrá realizar
-								ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
-								key2.setIdinstitucion(idInstitucion);
-								key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-								key2.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
-								key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-
-								List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2,
-//										new SimpleDateFormat("dd/MM/yyyy")
-//												.format(cargaMasivaDatosITItem.getFechaEfectiva()));
-												fechaSolicitud);
+								// guardia, no se podrá realizar							
+								ScsInscripcionturnoExample scsInscripcionturnoExample = new ScsInscripcionturnoExample();
+								scsInscripcionturnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+									.andFechasolicitudLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva())
+									.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+									.andFechabajaIsNull();
+								
+								List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByExample(scsInscripcionturnoExample);
 
 								// Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se
 								// inscriben las guardias.
-								if (insturList.size() != 0 && insturList != null) {
+								if (insturList != null && insturList.size() != 0) {
 									// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del
 									// turno correspondiente.
 									if (cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion()) <= 0)
@@ -1326,10 +1325,19 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								}
 							} else {
 
-								key1.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
-
+//								key1.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
+//								key1.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
+								
+								ScsInscripcionguardiaExample scsInscripcionguardiaExample = new ScsInscripcionguardiaExample();
+								scsInscripcionguardiaExample.createCriteria().andIdinstitucionEqualTo(key1.getIdinstitucion())
+									.andIdpersonaEqualTo(key1.getIdpersona())
+									.andIdturnoEqualTo(key1.getIdturno())
+									.andIdguardiaEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()))
+									.andFechasuscripcionLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva());
+								
 								ScsInscripcionguardia ins = null;
-								ins = scsInscripcionguardiaMapper.selectByPrimaryKey(key1);
+//								ins = scsInscripcionguardiaMapper.selectByPrimaryKey(key1);
+								ins = scsInscripcionguardiaMapper.selectByExample(scsInscripcionguardiaExample).get(0);
 								// 3. Si la inscripción en la guardia no existe o ya está de baja, no se podrá
 								// realizar.
 								// Se comprueba si la inscripción en la guardia no existe
