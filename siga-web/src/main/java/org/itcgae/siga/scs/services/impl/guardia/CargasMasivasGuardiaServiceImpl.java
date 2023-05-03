@@ -1217,15 +1217,25 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 									// 4. Si no existe una inscripción en el turno para dicha inscripción en la
 									// guardia, no se podrá realizar
-									ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
-									key2.setIdinstitucion(idInstitucion);
-									key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-									key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-									List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
-									insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2,
-											new SimpleDateFormat("dd/MM/yyyy")
-													.format(cargaMasivaDatosITItem.getFechaEfectiva()));
-									if (insturList.size() != 0 && insturList != null) {
+//									ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
+//									key2.setIdinstitucion(idInstitucion);
+//									key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
+//									key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
+//									List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
+//									insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2,
+//											new SimpleDateFormat("dd/MM/yyyy")
+//													.format(cargaMasivaDatosITItem.getFechaEfectiva()));
+									
+									ScsInscripcionturnoExample scsInscripcionturnoExample = new ScsInscripcionturnoExample();
+									scsInscripcionturnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+										.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+										.andFechasolicitudLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva())
+										.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+										.andFechabajaIsNull();
+									
+									List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByExample(scsInscripcionturnoExample);
+									
+									if (insturList != null && insturList.size() != 0) {
 										// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del
 										// turno correspondiente.
 										if(insturList.get(0).getFechavalidacion() != null) {
