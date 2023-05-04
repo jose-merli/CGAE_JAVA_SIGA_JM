@@ -44,6 +44,7 @@ public class ScsFundamentoscalificacionSqlExtendsProvider extends ScsTipofundame
 
 		sql.SELECT("fundamento.idfundamentocalif");
 		sql.SELECT("catalogoFundamento.descripcion");
+		sql.SELECT("fundamento.fechabaja");
 
 		sql.FROM("SCS_TIPOFUNDAMENTOCALIF fundamento");
 

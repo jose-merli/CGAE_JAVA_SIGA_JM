@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboFundamentosCalifDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 
@@ -15,7 +16,7 @@ public interface IBusquedaEJG {
 
 	ComboDTO comboTipoColegioEjg(HttpServletRequest request);
 	
-	ComboDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen);
+	ComboFundamentosCalifDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen);
 
 	ComboDTO comboResolucion(HttpServletRequest request, String origen);
 
