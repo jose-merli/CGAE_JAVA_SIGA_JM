@@ -356,7 +356,7 @@ public class EnviosServiceImpl implements IEnviosService{
                         
                         insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, "OK");
                     } catch (BusinessException e) {
-                        LOGGER.warn(e);
+                        LOGGER.error(e);
                         idEstadoEnvio = SigaConstants.ENVIO_PROCESADO_CON_ERRORES;
                         insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, e.getMessage());
                     } catch(Exception e) {

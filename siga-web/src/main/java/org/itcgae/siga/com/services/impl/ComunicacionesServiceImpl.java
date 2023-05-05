@@ -133,9 +133,6 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	private ScsJuzgadoMapper scsJuzgadoMapper;
 	
 	@Autowired
-	private ColaEnviosImpl envios;
-	
-	@Autowired
 	private IEnviosMasivosService _enviosMasivosService;
 	
 
@@ -148,9 +145,6 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		List<EnviosMasivosItem> enviosItemList = new ArrayList<EnviosMasivosItem>();
 		
 		boolean control = false;
-		if(control) {
-			envios.execute();
-		}
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
