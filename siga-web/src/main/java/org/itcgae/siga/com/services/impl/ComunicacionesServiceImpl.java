@@ -143,8 +143,6 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 
 		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
 		List<EnviosMasivosItem> enviosItemList = new ArrayList<EnviosMasivosItem>();
-		
-		boolean control = false;
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
