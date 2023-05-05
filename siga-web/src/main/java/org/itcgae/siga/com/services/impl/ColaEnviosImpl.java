@@ -450,7 +450,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 			for (EnvDocumentos documento : documentos) {
 				DatosDocumentoItem doc = new DatosDocumentoItem();
 				doc.setFileName(documento.getDescripcion());
-				String path = _enviosMasivosService.getPathFicheroEnvioMasivo(envio.getIdinstitucion(), envio.getIdenvio());
+				String path = _enviosMasivosService.getPathFicheroEnvioMasivo(envio.getIdinstitucion(), envio.getIdenvio(),null);
 				File file = new File(path, documento.getPathdocumento());
 				doc.setDocumentoFile(file);
 				doc.setPathDocumento(documento.getPathdocumento());

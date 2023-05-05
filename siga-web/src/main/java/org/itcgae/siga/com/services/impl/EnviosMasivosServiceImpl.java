@@ -1134,10 +1134,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	private void copiaDocumentosEnvioDuplicado(Short idInstitucion, Long idEnvioOld, Long idEnvioNuevo,
 			String nombreDocumento) {
 		LOGGER.debug("Duplicando envío. Documento para duplicar: " + nombreDocumento);
-		String pathAntiguo = getPathFicheroEnvioMasivo(idInstitucion, idEnvioOld);
+		String pathAntiguo = getPathFicheroEnvioMasivo(idInstitucion, idEnvioOld,null);
 		LOGGER.debug("Path antiguo: " + pathAntiguo);
 
-		String pathNuevo = getPathFicheroEnvioMasivo(idInstitucion, idEnvioNuevo);
+		String pathNuevo = getPathFicheroEnvioMasivo(idInstitucion, idEnvioNuevo,null);
 		LOGGER.debug("Path nuevo: " + pathNuevo);
 
 		try {
@@ -1476,7 +1476,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			if (null != usuarios && usuarios.size() > 0) {
 
-				String pathFichero = getPathFicheroEnvioMasivo(idInstitucion, idEnvio);
+				String pathFichero = getPathFicheroEnvioMasivo(idInstitucion, idEnvio,null);
 
 				// 1. Coger archivo del request
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
@@ -1544,7 +1544,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	
 	@Override
 	public File getPathFicheroLOGEnvioMasivo(Short idInstitucion, Long idEnvio) {
-		String path = getPathFicheroEnvioMasivo(idInstitucion, idEnvio);
+		String path = getPathFicheroEnvioMasivo(idInstitucion, idEnvio,null);
 		File file = getFileLog(path, ENVIOS_MASIVOS_LOG_EXTENSION.xlsx);
         return file;
 	}
@@ -1560,7 +1560,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Override
 	public File[] getFicherosLOGEnvioMasivo(Short idInstitucion, Long idEnvio) {
-		String path = getPathFicheroEnvioMasivo(idInstitucion, idEnvio);
+		String path = getPathFicheroEnvioMasivo(idInstitucion, idEnvio,null);
 		File[] files = new File[ENVIOS_MASIVOS_LOG_EXTENSION.values().length];
 		
 		for (int i = 0;  i <  ENVIOS_MASIVOS_LOG_EXTENSION.values().length; i++) {
@@ -1573,7 +1573,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 	
 	@Override
-	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio) {
+	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio,EnvEnvios envioInfoAux ) {
 		String pathFichero = null;
 
 		GenParametrosKey genParametrosKey = new GenParametrosKey();
@@ -1596,20 +1596,37 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		envEnviosKey.setIdenvio(idEnvio);
 		EnvEnvios envEnvios = _envEnviosMapper.selectByPrimaryKey(envEnviosKey);
 
-		if (envEnvios == null) {
+		if (envEnvios != null) {
+			//String error = "No se ha encontrado el envío con idEnvio = " + idEnvio + " para la institución "
+			//		+ idInstitucion;
+			//LOGGER.error(error);
+			//throw new BusinessException(error);
+			Calendar cal = Calendar.getInstance();
+			// seteamos la fecha de creación del envío
+			cal.setTime(envEnvios.getFecha());
+
+			pathFichero = genParametros.getValor().trim() + SigaConstants.pathSeparator + String.valueOf(idInstitucion)
+					+ SigaConstants.pathSeparator + cal.get(Calendar.YEAR) + SigaConstants.pathSeparator
+					+ (cal.get(Calendar.MONTH) + 1) + SigaConstants.pathSeparator + idEnvio;
+			
+			
+		}else if(envioInfoAux != null){
+			Calendar cal = Calendar.getInstance();
+			// seteamos la fecha de creación del envío
+			cal.setTime(envioInfoAux.getFecha());
+
+			pathFichero = genParametros.getValor().trim() + SigaConstants.pathSeparator + String.valueOf(idInstitucion)
+					+ SigaConstants.pathSeparator + cal.get(Calendar.YEAR) + SigaConstants.pathSeparator
+					+ (cal.get(Calendar.MONTH) + 1) + SigaConstants.pathSeparator + idEnvio;
+			
+		}else {
 			String error = "No se ha encontrado el envío con idEnvio = " + idEnvio + " para la institución "
 					+ idInstitucion;
 			LOGGER.error(error);
 			throw new BusinessException(error);
 		}
 
-		Calendar cal = Calendar.getInstance();
-		// seteamos la fecha de creación del envío
-		cal.setTime(envEnvios.getFecha());
-
-		pathFichero = genParametros.getValor().trim() + SigaConstants.pathSeparator + String.valueOf(idInstitucion)
-				+ SigaConstants.pathSeparator + cal.get(Calendar.YEAR) + SigaConstants.pathSeparator
-				+ (cal.get(Calendar.MONTH) + 1) + SigaConstants.pathSeparator + idEnvio;
+	
 
 		return pathFichero;
 	}
@@ -1680,7 +1697,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					boolean noBorrado = false;
 					for (int i = 0; i < documentoDTO.length; i++) {
 						String filePath = getPathFicheroEnvioMasivo(idInstitucion,
-								Long.valueOf(documentoDTO[i].getIdEnvio()));
+								Long.valueOf(documentoDTO[i].getIdEnvio()),null);
 						File fichero = new File(filePath, documentoDTO[i].getRutaDocumento());
 						if (fichero.exists()) {
 							fichero.delete();
@@ -2445,5 +2462,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		LOGGER.info("obtenerDestinatarios() -> Salida del servicio para obtener destinatarios de envios");
 		return enviosMasivos;
 	}
+
 
 }

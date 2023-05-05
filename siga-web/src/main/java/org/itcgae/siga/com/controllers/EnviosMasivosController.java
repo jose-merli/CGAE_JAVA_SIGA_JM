@@ -249,7 +249,7 @@ public class EnviosMasivosController {
 		}
 		
 		if (resource == null) {
-			String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(documentoDTO.getIdInstitucion(), Long.valueOf(documentoDTO.getIdEnvio()));
+			String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(documentoDTO.getIdInstitucion(), Long.valueOf(documentoDTO.getIdEnvio()),null);
 			file = new File(filePath, documentoDTO.getRutaDocumento());
 			try{
 				if (file != null && !file.exists()) {

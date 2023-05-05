@@ -18,6 +18,8 @@ public class ConsultaEnvioItem {
 	private String nombreFichero;
 	private Short idInstitucionConsulta;
 	
+	private DestinatarioItem destinatario;
+	
 	public String getPathFichero() {
 		return pathFichero;
 	}
@@ -95,5 +97,11 @@ public class ConsultaEnvioItem {
 	}
 	public void setIdInstitucionConsulta(Short idInstitucionConsulta) {
 		this.idInstitucionConsulta = idInstitucionConsulta;
+	}
+	public DestinatarioItem getDestinatario() {
+		return destinatario;
+	}
+	public void setDestinatario(DestinatarioItem destinatario) {
+		this.destinatario = destinatario;
 	}
 }

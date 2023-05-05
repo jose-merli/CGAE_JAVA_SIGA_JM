@@ -30,6 +30,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IComunicacionesService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
+import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.GEN_PARAMETROS;
@@ -131,6 +132,12 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	@Autowired
 	private ScsJuzgadoMapper scsJuzgadoMapper;
 	
+	@Autowired
+	private ColaEnviosImpl envios;
+	
+	@Autowired
+	private IEnviosMasivosService _enviosMasivosService;
+	
 
 	/**Realiza la busqueda de comunicaciones **/
 	@Override
@@ -139,6 +146,11 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 
 		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
 		List<EnviosMasivosItem> enviosItemList = new ArrayList<EnviosMasivosItem>();
+		
+		boolean control = false;
+		if(control) {
+			envios.execute();
+		}
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -319,7 +331,8 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					String filePath = documentoDTO.getRutaDocumento();
+					String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(idInstitucion, Long.parseLong(documentoDTO.getIdEnvio()),null);
+					
 					String nombreFichero = documentoDTO.getNombreDocumento();
 					String idEnvio = documentoDTO.getIdEnvio();
 					
@@ -359,7 +372,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 				}catch(Exception e){
 					error.setCode(500);
 					error.setDescription(e.getMessage());
-					error.setMessage("Error al borrar el documento");
+					error.setMessage(e.getMessage());
 					respuesta.setError(error);
 					LOGGER.error("borrarDocumento() -> Error al borrar el documento " + e.getMessage());
 				}
