@@ -44,6 +44,7 @@ public class ScsFundamentoscalificacionSqlExtendsProvider extends ScsTipofundame
 
 		sql.SELECT("fundamento.idfundamentocalif");
 		sql.SELECT("catalogoFundamento.descripcion");
+		sql.SELECT("fundamento.fechabaja");
 
 		sql.FROM("SCS_TIPOFUNDAMENTOCALIF fundamento");
 
@@ -76,9 +77,7 @@ public class ScsFundamentoscalificacionSqlExtendsProvider extends ScsTipofundame
 		SQL sql = new SQL();
 
 		sql.SELECT("MAX(IDFUNDAMENTOCALIF) as IDFUNDAMENTOCALIF");
-		sql.FROM("SCS_TIPOFUNDAMENTOCALIF");
-		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
-		
+		sql.FROM("SCS_TIPOFUNDAMENTOCALIF fundamento");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoFundamento on catalogoFundamento.idrecurso = fundamento.DESCRIPCION and catalogoFundamento.idlenguaje ="+idLenguaje);
 		sql.WHERE("fundamento.fecha_baja is null and fundamento.idinstitucion  = '"+ idInstitucion +"'");
 		sql.WHERE("catalogoFundamento.descripcion is not null");

@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboFundamentosCalifDTO;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
@@ -88,9 +89,9 @@ public class EjgController {
 	}
 
 	@RequestMapping(value = "/filtros-ejg/comboFundamentoCalif", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen) {
-		ComboDTO response = busquedaEJG.comboFundamentoCalificacion(request, list_dictamen);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboFundamentosCalifDTO> comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen) {
+		ComboFundamentosCalifDTO response = busquedaEJG.comboFundamentoCalificacion(request, list_dictamen);
+		return new ResponseEntity<ComboFundamentosCalifDTO>(response, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/filtros-ejg/comboResolucion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
