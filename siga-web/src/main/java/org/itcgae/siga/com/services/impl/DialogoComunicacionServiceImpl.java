@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.DatosDireccionLetradoOficio;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
+import org.itcgae.siga.DTOs.com.CamposPlantillaEnvio;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.ConsultaEnvioItem;
@@ -500,6 +501,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		int ficherogenerado = 0;
 		ModClasecomunicaciones modClasecomunicacion = null;
 		String cuerpoEnvio = null;
+		CamposPlantillaEnvio camposEnvio = new CamposPlantillaEnvio();
 
 		try{
 			
@@ -554,7 +556,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						LOGGER.warn(mensaje);
 						throw new BusinessException(mensaje);
 					}
-					cuerpoEnvio = plantilla.getCuerpo();
+					if(plantilla.getCuerpo() != null)
+						camposEnvio.setCuerpo(plantilla.getCuerpo());
+					if(plantilla.getAsunto() != null)
+						camposEnvio.setAsunto(plantilla.getAsunto());
+			
 				}
 				
 				// Obtenemos la plantilla de envio seleccionada en el modelo
@@ -582,7 +588,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						destinatarios =new ArrayList<DestinatarioItem>();
 						
 						String rutaPlantillaModelo = getRutaModeloByClaseModelo(modelosComunicacionItem.getIdModeloComunicacion(), modelosComunicacionItem.getIdClaseComunicacion());
-						int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, null, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaModelo, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros.size(),ficherogenerado,1,listaKeyFiltros,cuerpoEnvio);
+						int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, null, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaModelo, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros.size(),ficherogenerado,1,listaKeyFiltros, camposEnvio);
 											
 						if (ficherogeneradoOK > 0) {
 							ficherogenerado++;
@@ -613,7 +619,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							destinatarios = new ArrayList<DestinatarioItem>();
 							
 							String rutaPlantillaModelo = getRutaModeloByClaseModelo(modelosComunicacionItem.getIdModeloComunicacion(), modelosComunicacionItem.getIdClaseComunicacion());
-							int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaModelo, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros.size(),ficherogenerado,i,null,cuerpoEnvio);
+							int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaModelo, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros.size(),ficherogenerado,i,null, camposEnvio);
 												
 							if (ficherogeneradoOK > 0) {
 								ficherogenerado++;
@@ -697,7 +703,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 	private int ejecutaPlantillas(HttpServletRequest request, ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
 			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, 
-			String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta,List< DestinatarioItem> destinatarios, int numeroSeleccionados, int ficherogenerado, int numeroSeleccionado, List<List<String>> listaKeyFiltros, String cuerpoEnvio) throws Exception {
+			String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta,List< DestinatarioItem> destinatarios, int numeroSeleccionados, int ficherogenerado, int numeroSeleccionado, List<List<String>> listaKeyFiltros, CamposPlantillaEnvio camposEnvio) throws Exception {
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1025,7 +1031,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 														listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 														hDatosGenerales, resultMulti.get(k), mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-														nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO, null, desti,destinatarios, cuerpoEnvio);
+														nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO, null, desti,destinatarios, camposEnvio);
 											}														
 										}
 											
@@ -1045,7 +1051,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 										listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 										hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-										nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO, listaKeyFiltros,desti,destinatarios, cuerpoEnvio);
+										nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO, listaKeyFiltros,desti,destinatarios, camposEnvio);
 							}
 						
 							
@@ -1076,7 +1082,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				throw new BusinessException("La consulta de destinatarios no ha devuelto resultados");
 			
 			
-			ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros, cuerpoEnvio);
+			ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros, camposEnvio);
 			existenConsultas = Boolean.TRUE;
 	}
 	LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
@@ -1092,7 +1098,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	}
 	
 	private void ejecutaPlantillas(HttpServletRequest request, ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
-			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta, List<DestinatarioItem> destinatarios, List<List<String>> listaKeyFiltros, String cuerpoEnvio) throws Exception {
+			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta, List<DestinatarioItem> destinatarios, List<List<String>> listaKeyFiltros, CamposPlantillaEnvio camposEnvio) throws Exception {
 
 	
 		String token = request.getHeader("Authorization");
@@ -1375,7 +1381,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 												listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 												hDatosGenerales, resultMulti.get(k), mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-												nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO,null, desti, destinatarios, cuerpoEnvio);
+												nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO,null, desti, destinatarios, camposEnvio);
 									}														
 								}
 									
@@ -1399,7 +1405,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 								listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 								hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-								nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas,esFO,listaKeyFiltros, desti, destinatarios, cuerpoEnvio);
+								nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas,esFO,listaKeyFiltros, desti, destinatarios, camposEnvio);
 					}
 				
 	//				if (ejecutarConsulta) {
@@ -1971,6 +1977,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									_envEnvioprogramadoMapper.insert(envioProgramado);
 
 									// Insertamos el nuevo asunto y cuerpo del envio
+									String strAsunto = null;
+									String strCuerpo = null;
+									
+									if(dest.getCamposEnvio()!= null) {
+										if(dest.getCamposEnvio().getAsunto() != null)
+											strAsunto = dest.getCamposEnvio().getAsunto();
+										if(dest.getCamposEnvio().getCuerpo() != null)
+											strCuerpo = dest.getCamposEnvio().getCuerpo();
+									}
+									
 									EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
 									envCamposEnvio.setFechamodificacion(new Date());
 									envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
@@ -1978,7 +1994,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									envCamposEnvio.setIdenvio(envio.getIdenvio());
 									envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
 									envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-//									envCamposEnvio.setValor(datosTarjeta.getAsunto());							
+									envCamposEnvio.setValor(strAsunto);							
 
 									_envCamposenviosMapper.insert(envCamposEnvio);
 
@@ -1989,12 +2005,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									envCamposEnvio.setIdenvio(envio.getIdenvio());
 									envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
 									envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-									
-									if(dest.getCuerpo() != null && dest.getCuerpo().length() > 0) {
-										envCamposEnvio.setValor(dest.getCuerpo() );	
+									envCamposEnvio.setValor(strCuerpo);	
 
-									}
-								
 									_envCamposenviosMapper.insert(envCamposEnvio);
 
 									// INSERTAMOS DESTINATARIO
@@ -2725,7 +2737,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	}
 	
 	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, 
-			Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas, boolean esFO, List<List<String>> listaKeyFiltros, DestinatarioItem destinatario , List<DestinatarioItem> destinatarios, String envioCuerpo) {
+			Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas, boolean esFO, List<List<String>> listaKeyFiltros, DestinatarioItem destinatario , List<DestinatarioItem> destinatarios, CamposPlantillaEnvio camposEnvio) {
 		
 		LOGGER.debug("Obtenemos la ruta temporal del fichero de salida");
 		String rutaTmp = getRutaFicheroSalidaTemp(dialogo.getIdInstitucion());
@@ -2894,15 +2906,25 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}
 			
 			if(esEnvio) {
-				
-				envioCuerpo = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, hDatosFinal);
-				envioCuerpo = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
+				String envioCuerpo = null;
+				String envioAsunto = null;
+				if(camposEnvio.getAsunto() != null) {
+					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), camposEnvio.getAsunto(), destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, hDatosFinal);
+					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioAsunto, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
+				}
+				if(camposEnvio.getCuerpo() != null) {
+					envioCuerpo = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), camposEnvio.getCuerpo(), destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, hDatosFinal);
+					envioCuerpo = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
+				}
 				
 
 				//Cogemos todas las consultas y le metemos el nombre del fichero
 				if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
 					DestinatarioItem dest = new DestinatarioItem(destinatario);
-					dest.setCuerpo(envioCuerpo);
+					CamposPlantillaEnvio envCampos = new CamposPlantillaEnvio();
+					envCampos.setAsunto(envioAsunto);
+					envCampos.setCuerpo(envioCuerpo);
+					dest.setCamposEnvio(envCampos);
 					destinatarios.add(dest);
 					for(ConsultaEnvioItem consultaEnvio : listaConsultasEnvio){
 						if(consultaEnvio.getDestinatario() == null) {

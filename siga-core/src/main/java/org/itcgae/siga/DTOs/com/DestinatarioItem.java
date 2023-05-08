@@ -22,8 +22,7 @@ public class DestinatarioItem {
 	private String idPoblacion;
 	private String idProvincia;
 	private String poblacionExtranjera;
-	private String cuerpo;
-	
+	private CamposPlantillaEnvio camposEnvio;
 	
 	public DestinatarioItem(DestinatarioItem ori) {
 		this.idPersona = ori.idPersona;
@@ -44,7 +43,7 @@ public class DestinatarioItem {
 		this.idPoblacion =  ori.idPoblacion;
 		this.idProvincia =  ori.idProvincia;
 		this.poblacionExtranjera =  ori.poblacionExtranjera;
-		this.cuerpo = ori.cuerpo;
+		this.camposEnvio = ori.camposEnvio;
 	}
 	
 	public DestinatarioItem() {
@@ -161,12 +160,12 @@ public class DestinatarioItem {
 	}
 
 
-	public String getCuerpo() {
-		return cuerpo;
+	public CamposPlantillaEnvio getCamposEnvio() {
+		return camposEnvio;
 	}
 
-	public void setCuerpo(String cuerpo) {
-		this.cuerpo = cuerpo;
+	public void setCamposEnvio(CamposPlantillaEnvio camposEnvio) {
+		this.camposEnvio = camposEnvio;
 	}
 
 	@Override
@@ -176,9 +175,9 @@ public class DestinatarioItem {
 		result = prime * result + ((NIFCIF == null) ? 0 : NIFCIF.hashCode());
 		result = prime * result + ((apellidos1 == null) ? 0 : apellidos1.hashCode());
 		result = prime * result + ((apellidos2 == null) ? 0 : apellidos2.hashCode());
+		result = prime * result + ((camposEnvio == null) ? 0 : camposEnvio.hashCode());
 		result = prime * result + ((codigoPostal == null) ? 0 : codigoPostal.hashCode());
 		result = prime * result + ((correoElectronico == null) ? 0 : correoElectronico.hashCode());
-		result = prime * result + ((cuerpo == null) ? 0 : cuerpo.hashCode());
 		result = prime * result + ((direccion == null) ? 0 : direccion.hashCode());
 		result = prime * result + ((domicilio == null) ? 0 : domicilio.hashCode());
 		result = prime * result + ((idPais == null) ? 0 : idPais.hashCode());
@@ -219,6 +218,11 @@ public class DestinatarioItem {
 				return false;
 		} else if (!apellidos2.equals(other.apellidos2))
 			return false;
+		if (camposEnvio == null) {
+			if (other.camposEnvio != null)
+				return false;
+		} else if (!camposEnvio.equals(other.camposEnvio))
+			return false;
 		if (codigoPostal == null) {
 			if (other.codigoPostal != null)
 				return false;
@@ -228,11 +232,6 @@ public class DestinatarioItem {
 			if (other.correoElectronico != null)
 				return false;
 		} else if (!correoElectronico.equals(other.correoElectronico))
-			return false;
-		if (cuerpo == null) {
-			if (other.cuerpo != null)
-				return false;
-		} else if (!cuerpo.equals(other.cuerpo))
 			return false;
 		if (direccion == null) {
 			if (other.direccion != null)
@@ -301,7 +300,6 @@ public class DestinatarioItem {
 			return false;
 		return true;
 	}
-	
 	
 	
 }
