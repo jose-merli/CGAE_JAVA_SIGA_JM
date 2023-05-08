@@ -1343,14 +1343,34 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designa.setNombrerepresentante(representante.getApellido1() + " " + representante.getApellido2()
 								+ ", " + representante.getNombre());
 					}
+					
+					//Primero consultamos si existe el interesado en BBDD
+					ScsDefendidosdesignaExample scsDefendidosdesignaExample = new ScsDefendidosdesignaExample();
+					scsDefendidosdesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(item.getIdturno())
+						.andIdpersonaEqualTo(Long.valueOf(item.getIdpersona())).andAnioEqualTo(item.getAnio()).andNumeroEqualTo(item.getNumero());
+					
+					List<ScsDefendidosdesigna> listInt = scsDefendidosdesignaMapper.selectByExample(scsDefendidosdesignaExample);
+					
+					//Si ya existe el interesado lanzamos un pudate
+					if(!listInt.isEmpty()) {
+						LOGGER.info(
+								"insertInteresado() / ScsDefendidosdesignaMapper.update() -> Entrada a ScsDefendidosdesignaMapper para actualizar el interesado");
 
-					LOGGER.info(
-							"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Entrada a ScsDefendidosdesignaMapper para insertar el interesado");
+						response = scsDefendidosdesignaMapper.updateByPrimaryKey(designa);
 
-					response = scsDefendidosdesignaMapper.insert(designa);
-
-					LOGGER.info(
-							"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Salida de ScsDefendidosdesignaMapper para insertar el interesado");
+						LOGGER.info(
+								"insertInteresado() / ScsDefendidosdesignaMapper.update() -> Salida de ScsDefendidosdesignaMapper para actualizar el interesado");
+					}
+					//Si no existe el interesado lo insertamos
+					else {
+						LOGGER.info(
+								"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Entrada a ScsDefendidosdesignaMapper para insertar el interesado");
+	
+						response = scsDefendidosdesignaMapper.insert(designa);
+	
+						LOGGER.info(
+								"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Salida de ScsDefendidosdesignaMapper para insertar el interesado");
+					}
 
 				} catch (Exception e) {
 					response = 0;
