@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboFundamentosCalifDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemFundamentosCalif;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -272,14 +274,14 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 
 
 	@Override
-	public ComboDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen) {
+	public ComboFundamentosCalifDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen) {
 		// TODO Auto-generated method stub
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = null;
+		ComboFundamentosCalifDTO comboDTO = new ComboFundamentosCalifDTO();
+		List<ComboItemFundamentosCalif> comboItems = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();

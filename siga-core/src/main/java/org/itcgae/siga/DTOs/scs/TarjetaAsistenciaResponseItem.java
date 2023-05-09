@@ -11,6 +11,7 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 	private String asistido;
 	private String idDelito;
 	private String observaciones;
+	private String incidencias;
 	private String ejgNumero;
 	private String ejgAnio;
 	private String ejgAnioNumero;
@@ -54,6 +55,15 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 	private String idInstitucion;
 	private String isSustituto;
 
+
+	public String getIncidencias() {
+		return incidencias;
+	}
+
+	public void setIncidencias(String incidencias) {
+		this.incidencias = incidencias;
+	}
+	
 	public String getIdLetradoManual() {
 		return idLetradoManual;
 	}

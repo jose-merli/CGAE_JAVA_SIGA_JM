@@ -148,7 +148,6 @@ public class DialogoComunicacionController {
 			HttpServletResponse resp) throws InterruptedException, ExecutionException {
 
 		FileInfoDTO fileInfoDTO = new FileInfoDTO();
-
 		CompletableFuture<File> completableFuture = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
 
 		try {
@@ -192,6 +191,10 @@ public class DialogoComunicacionController {
 			completableFuture.cancel(true);
 			fileInfoDTO.setMessageError(mensaje);
 			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
+		}catch(Exception e) {
+			if(e.getCause() != null )		
+				fileInfoDTO.setMessageError(e.getCause().getMessage());
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}

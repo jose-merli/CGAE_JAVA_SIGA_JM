@@ -723,15 +723,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		LOGGER.info("aprobarSolicitud() -> Entrada al servicio para aprobar una solicitud");
 		
-		Long idDireccion;
-		Long idPersona;
-		Short idBancario = 0;
-		int insertColegiado;
-		int insertCliente;
-		int updateSolicitud = 0;
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
-		CenSolicitudincorporacion solIncorporacion;
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -748,104 +741,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					AdmUsuarios usuario = usuarios.get(0);
-					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
-					//insertamos datos personales
-					idPersona = insertarDatosPersonales(solIncorporacion, usuario);
-					insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
-					idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersona);
-//					idDireccion2 = insertarDatosDireccion2(solIncorporacion, usuario, idPersona);
-					insertColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersona);
-					if (!UtilidadesString.esCadenaVacia(solIncorporacion.getIban())) {
-						idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersona);
-					}else {
-						// Lanzamos el proceso de revision de suscripciones del letrado 
-						String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado(""+usuario.getIdinstitucion().toString(),
-																								  ""+idPersona.toString(),
-																								  "",
-																								  ""+ usuario.getIdusuario().toString());
-						if ((resultado == null) || (!resultado[0].equals("0"))){
-							LOGGER.error("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"+resultado[1]);
-						}
-					}
 					
-					solIncorporacion.setIdestado((short)50);
-					solIncorporacion.setFechamodificacion(new Date());
-					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
-					solIncorporacion.setFechaalta(new Date());
-					solIncorporacion.setFechaestadosolicitud(new Date());
-					solIncorporacion.setIdpersona(idPersona);
-					//solIncorporacion.setFechaestado(new Date());
-					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
-				
-					if(idPersona != null && idDireccion != null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
-						response.setId(Long.toString(solIncorporacion.getIdsolicitud())+","+idPersona);
-						response.setStatus(SigaConstants.OK);
-						response.setError(null);
-						LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
-										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
-						// Llamamos al PL para mantener los colegiados
-						//Insertamos en cen_colacambioletrado						
-						int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION,usuario.getIdinstitucion().intValue(),
-								idPersona, idDireccion, usuario.getIdusuario());
-						if(res <=0) {
-							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
-									usuario.getIdinstitucion() + ", idpersona: " +
-									idPersona + ", usumodificacion: " +
-									usuario.getIdusuario());
-						}else {
-							LOGGER.info(
-									"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
-							
-							// AUDITORIA si se dió de alta correctamente
-							auditoriaCenHistoricoService.insertaCenHistorico(idPersona, SigaConstants.CEN_TIPOCAMBIO.ALTA_COLEGIACION,
-									"Alta de colegiacion", request, solIncorporacion.getObservaciones());
-						}
-						/*
-						Object[] paramMandatos = new Object[5];
-						paramMandatos[0] = idPersona.toString();
-						paramMandatos[1] = usuario.getIdinstitucion().toString();
-						paramMandatos[2] = new Long(10).toString();
-						paramMandatos[3] = idDireccion.toString();
-						paramMandatos[4] = usuario.getIdusuario().toString();
-						String resultado[] = new String[2];
-						resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
-						*/
-						
-					}else{
-						LOGGER.error("aprobarSolicitud() --> Borramos los registros al no poder aprobar la solicitud");
-						if(insertColegiado == 0) {
-							CenColegiadoKey keys = new CenColegiadoKey();
-							keys.setIdinstitucion(usuario.getIdinstitucion());
-							keys.setIdpersona(idPersona);
-							_cenColegiadoMapper.deleteByPrimaryKey(keys);
-						}
-						if(idPersona != null) 
-							_cenPersonaMapper.deleteByPrimaryKey(idPersona);
-						
-						if(idDireccion != null){
-							CenDireccionesKey keys = new CenDireccionesKey();
-							keys.setIddireccion(idDireccion);
-							keys.setIdinstitucion(usuario.getIdinstitucion());
-							keys.setIdpersona(idPersona);
-							_cenDireccionesMapper.deleteByPrimaryKey(keys);
-						}
-//						if(idDireccion2 != null){
-//							CenDireccionesKey keys = new CenDireccionesKey();
-//							keys.setIddireccion(idDireccion2);
-//							keys.setIdinstitucion(usuario.getIdinstitucion());
-//							keys.setIdpersona(idPersona);
-//							_cenDireccionesMapper.deleteByPrimaryKey(keys);
-//						}
-						if(idBancario == 1){
-							CenCuentasbancariasKey keys = new CenCuentasbancariasKey();
-							keys.setIdcuenta(idBancario);
-							keys.setIdinstitucion(usuario.getIdinstitucion());
-							keys.setIdpersona(idPersona);
-							_cenCuentasbancariasMapper.deleteByPrimaryKey(keys);
-						}
-						LOGGER.error("aprobarSolicitud() --> Registros borrados, fallo al aprobar la solicitud.");
-					}
+					// Se llama a un método inferior para no perder el rollback de la transacción en caso de error
+					aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request);
 					
 				}catch(Exception e){
 					
@@ -853,12 +751,122 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					response.setStatus(SigaConstants.KO);
 					response.setError(error);
 					LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> ERROR: " + e.getMessage());
+	                LOGGER.warn(Arrays.toString(e.getStackTrace()).replaceAll(", ", "\n"));
 				}
 				
 			}
 		}
 		LOGGER.info("aprobarSolicitud() -> Salida del servicio para aprobar una solicitud");
 		return response;
+	}
+	
+	@Transactional(timeout=2400)
+	private void aprobarSolicitudTransaccion(List<AdmUsuarios> usuarios, Long idSolicitud, InsertResponseDTO response, HttpServletRequest request) throws Exception {
+		Long idDireccion;
+		Long idPersona;
+		Short idBancario = 0;
+		int insertColegiado;
+		int insertCliente;
+		int updateSolicitud = 0;
+		CenSolicitudincorporacion solIncorporacion;
+		AdmUsuarios usuario = usuarios.get(0);
+		solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
+		//insertamos datos personales
+		idPersona = insertarDatosPersonales(solIncorporacion, usuario);
+		insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
+		idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersona);
+//		idDireccion2 = insertarDatosDireccion2(solIncorporacion, usuario, idPersona);
+		insertColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersona);
+		if (!UtilidadesString.esCadenaVacia(solIncorporacion.getIban())) {
+			idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersona);
+		}else {
+			// Lanzamos el proceso de revision de suscripciones del letrado 
+			String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado(""+usuario.getIdinstitucion().toString(),
+																					  ""+idPersona.toString(),
+																					  "",
+																					  ""+ usuario.getIdusuario().toString());
+			if ((resultado == null) || (!resultado[0].equals("0"))){
+				LOGGER.error("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"+resultado[1]);
+			}
+		}
+		
+		solIncorporacion.setIdestado((short)50);
+		solIncorporacion.setFechamodificacion(new Date());
+		solIncorporacion.setUsumodificacion(usuario.getIdusuario());
+		solIncorporacion.setFechaalta(new Date());
+		solIncorporacion.setFechaestadosolicitud(new Date());
+		solIncorporacion.setIdpersona(idPersona);
+		//solIncorporacion.setFechaestado(new Date());
+		updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
+	
+		if(idPersona != null && idDireccion != null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
+			response.setId(Long.toString(solIncorporacion.getIdsolicitud())+","+idPersona);
+			response.setStatus(SigaConstants.OK);
+			response.setError(null);
+			LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
+							+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
+			// Llamamos al PL para mantener los colegiados
+			//Insertamos en cen_colacambioletrado						
+			int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION,usuario.getIdinstitucion().intValue(),
+					idPersona, idDireccion, usuario.getIdusuario());
+			if(res <=0) {
+				LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+						usuario.getIdinstitucion() + ", idpersona: " +
+						idPersona + ", usumodificacion: " +
+						usuario.getIdusuario());
+			}else {
+				LOGGER.info(
+						"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+				
+				// AUDITORIA si se dió de alta correctamente
+				auditoriaCenHistoricoService.insertaCenHistorico(idPersona, SigaConstants.CEN_TIPOCAMBIO.ALTA_COLEGIACION,
+						"Alta de colegiacion", request, solIncorporacion.getObservaciones());
+			}
+			/*
+			Object[] paramMandatos = new Object[5];
+			paramMandatos[0] = idPersona.toString();
+			paramMandatos[1] = usuario.getIdinstitucion().toString();
+			paramMandatos[2] = new Long(10).toString();
+			paramMandatos[3] = idDireccion.toString();
+			paramMandatos[4] = usuario.getIdusuario().toString();
+			String resultado[] = new String[2];
+			resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+			*/
+			
+		}else{
+			LOGGER.error("aprobarSolicitud() --> Borramos los registros al no poder aprobar la solicitud");
+			if(insertColegiado == 0) {
+				CenColegiadoKey keys = new CenColegiadoKey();
+				keys.setIdinstitucion(usuario.getIdinstitucion());
+				keys.setIdpersona(idPersona);
+				_cenColegiadoMapper.deleteByPrimaryKey(keys);
+			}
+			if(idPersona != null) 
+				_cenPersonaMapper.deleteByPrimaryKey(idPersona);
+			
+			if(idDireccion != null){
+				CenDireccionesKey keys = new CenDireccionesKey();
+				keys.setIddireccion(idDireccion);
+				keys.setIdinstitucion(usuario.getIdinstitucion());
+				keys.setIdpersona(idPersona);
+				_cenDireccionesMapper.deleteByPrimaryKey(keys);
+			}
+//			if(idDireccion2 != null){
+//				CenDireccionesKey keys = new CenDireccionesKey();
+//				keys.setIddireccion(idDireccion2);
+//				keys.setIdinstitucion(usuario.getIdinstitucion());
+//				keys.setIdpersona(idPersona);
+//				_cenDireccionesMapper.deleteByPrimaryKey(keys);
+//			}
+			if(idBancario == 1){
+				CenCuentasbancariasKey keys = new CenCuentasbancariasKey();
+				keys.setIdcuenta(idBancario);
+				keys.setIdinstitucion(usuario.getIdinstitucion());
+				keys.setIdpersona(idPersona);
+				_cenCuentasbancariasMapper.deleteByPrimaryKey(keys);
+			}
+			LOGGER.error("aprobarSolicitud() --> Registros borrados, fallo al aprobar la solicitud.");
+		}
 	}
 	
 	@Override
@@ -1130,10 +1138,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			key.setIdpersona(idPersona);
 			CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(key );
 			
-			noColegiado.setFechaBaja(new Date());
-			noColegiado.setFechamodificacion(new Date());
-			noColegiado.setUsumodificacion(usuario.getIdusuario());
-			cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+			if (noColegiado != null) {
+				noColegiado.setFechaBaja(new Date());
+				noColegiado.setFechamodificacion(new Date());
+				noColegiado.setUsumodificacion(usuario.getIdusuario());
+				cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+			}
+			
 			CenCliente clienteupdate = clienteExistente;
 			clienteupdate.setLetrado("0");
 			if(solicitud.getIdtratamiento() != null) {
@@ -1615,7 +1626,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		ejemploColegiado.createCriteria().andIdpersonaEqualTo(idPersona).andIdinstitucionEqualTo(solicitud.getIdinstitucion());
 		
 		List <CenColegiado> listaColegiados = _cenColegiadoMapper.selectByExample(ejemploColegiado);
-		if(listaColegiados.isEmpty()) {
+		if(listaColegiados == null || listaColegiados.isEmpty()) {
 			int resultado = _cenColegiadoMapper.insert(colegiado);
 			
 			if (resultado == 1) {
