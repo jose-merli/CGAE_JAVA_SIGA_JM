@@ -10,7 +10,9 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDictamenDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemDictamen;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.FundamentosCalificacionDTO;
@@ -55,15 +57,15 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 
 	
 	@Override
-	public ComboDTO comboDictamen(HttpServletRequest request) {
+	public ComboDictamenDTO comboDictamen(HttpServletRequest request) {
 		LOGGER.info("comboDictamen() -> Entrada al servicio para obtener los dictamenes");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = null;
+		ComboDictamenDTO comboDTO = new ComboDictamenDTO();
+		List<ComboItemDictamen> comboItems = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();

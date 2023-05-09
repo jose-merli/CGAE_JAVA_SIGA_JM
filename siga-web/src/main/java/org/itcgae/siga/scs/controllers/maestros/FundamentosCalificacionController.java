@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.controllers.maestros;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboDictamenDTO;
 import org.itcgae.siga.DTOs.scs.FundamentosCalificacionDTO;
 import org.itcgae.siga.DTOs.scs.FundamentosCalificacionItem;
 import org.itcgae.siga.scs.services.maestros.IBusquedaFundamentosCalificacionService;
@@ -28,9 +29,9 @@ public class FundamentosCalificacionController {
 	
 	
 	@GetMapping(value = "/busquedaFundamentosCalificacion/comboDictamen" ,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboDictamen(HttpServletRequest request) {
-		ComboDTO response = busquedaFundamentosCalificacionService.comboDictamen(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboDictamenDTO> comboDictamen(HttpServletRequest request) {
+		ComboDictamenDTO response = busquedaFundamentosCalificacionService.comboDictamen(request);
+		return new ResponseEntity<ComboDictamenDTO>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/busquedaFundamentosCalificacion/searchFundamentos", produces =  MediaType.APPLICATION_JSON_VALUE)
