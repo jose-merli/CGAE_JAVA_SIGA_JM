@@ -2102,6 +2102,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										asistenciaResponse
 												.setIdProcedimiento(String.valueOf(asistencia.getIdpretension()));
 									}
+									if (asistencia.getIncidencias() != null) {
+										asistenciaResponse
+												.setIncidencias(String.valueOf(asistencia.getIncidencias()));
+									}
+									if(asistencia.getObservaciones() != null) {
+										asistenciaResponse.setObservaciones(String.valueOf(asistencia.getObservaciones()));
+									}
 									if (asistencia.getComisaria() != null) {
 										asistenciaResponse.setComisaria(String.valueOf(asistencia.getComisaria()));
 									}
