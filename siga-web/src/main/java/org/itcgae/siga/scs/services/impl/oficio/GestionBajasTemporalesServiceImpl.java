@@ -376,13 +376,13 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 				try {
 					String nombres[];
-					new SimpleDateFormat("yyyy-MM-dd");
-					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					for(Object bti: bajasTemporalesItem) {
 						//BajasTemporalesItem bjtmp = new BajasTemporalesItem();
 						CenBajastemporales record = new CenBajastemporales();
 						java.util.LinkedHashMap bj = (java.util.LinkedHashMap)bti;
 						Set entrySet = bj.entrySet();
+						
 						// Obtain an Iterator for the entries Set
 						Iterator it = entrySet.iterator();
 						while(it.hasNext()) {
@@ -393,29 +393,29 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 							//if(nombres[0].equals("nombre")) {
 							//	bjtmp.setNombre(nombres[1]);
 							//}
-							if(nombres[0].equals("tipo") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+							if(nombres[0].equals("tipo") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								record.setTipo(nombres[1]);
 							}
-							if(nombres[0].equals("descripcion") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+							if(nombres[0].equals("descripcion") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								record.setDescripcion(nombres[1]);
 							}
-							if(nombres[0].equals("fechadesde") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+							if(nombres[0].equals("fechadesde") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								Date fecha = format2.parse(nombres[1]);
 								record.setFechadesde(fecha);
 							}
-							if(nombres[0].equals("fechahasta") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+							if(nombres[0].equals("fechahasta") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								record.setFechahasta(format2.parse(nombres[1]));
 							}
-							if(nombres[0].equals("fechaalta") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+							if(nombres[0].equals("fechaalta") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								record.setFechaalta(format2.parse(nombres[1]));
 							}
-							if(nombres[0].equals("validado") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+							if(nombres[0].equals("validado") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								record.setValidado(nombres[1]);
 							}
-							/*if(nombres[0].equals("fechabt")) {
-								Date fecha = format2.parse(nombres[1]);
-								record.setFechabt(fecha);
-							}*/
+//							if(nombres[0].equals("fechabt")) {
+//								Date fecha = format2.parse(nombres[1]);
+//								record.setFechabt(fecha);
+//							}
 							if(nombres[0].equals("idpersona")) {
 								record.setIdpersona(Long.valueOf(nombres[1]));
 							}
@@ -426,7 +426,14 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 						record.setFechamodificacion(new Date());
 						
-						response = cenBajastemporalesMapper.updateByPrimaryKeySelective(record);
+//						response = cenBajastemporalesMapper.updateByPrimaryKeySelective(record);
+						
+						CenBajastemporalesExample cenBajastemporalesExample = new CenBajastemporalesExample();
+						cenBajastemporalesExample.createCriteria().andIdinstitucionEqualTo(record.getIdinstitucion())
+							.andIdpersonaEqualTo(record.getIdpersona()).andFechadesdeEqualTo(record.getFechadesde())
+							.andFechahastaEqualTo(record.getFechahasta());
+						
+						response = cenBajastemporalesMapper.updateByExampleSelective(record, cenBajastemporalesExample);
 							
 						//response = scsBajasTemporalesExtendsMapper.saveBajaTemporal(bjtmp,usuarios.get(0).getIdusuario());
 					}
