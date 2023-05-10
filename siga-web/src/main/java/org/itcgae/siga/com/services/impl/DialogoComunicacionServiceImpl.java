@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -148,10 +152,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import com.aspose.words.Document;
 import com.google.common.io.Files;
@@ -409,19 +415,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return response;
 	}
 
-	@Bean("AsyncConfiguradoDocumentos")
-	public TaskExecutor getAsyncDocumentos() {
-		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(1); //default: 1
-	    executor.setMaxPoolSize(Integer.MAX_VALUE); //default: Integer.MAX_VALUE
-	    executor.setQueueCapacity(Integer.MAX_VALUE); // default: Integer.MAX_VALUE
-	    executor.setKeepAliveSeconds(300); // default: 60 seconds
-	    executor.initialize();
-		return executor;
-	}
-	
-	@Async("AsyncConfiguradoDocumentos")
-	public CompletableFuture<File> obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+	@Async
+	@Transactional(timeout=600000)
+	public  ListenableFuture<File>  obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
 		File file = null;
@@ -460,10 +456,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			throw new BusinessException("Error interno de la aplicación", e);
 		}
 		LOGGER.info("descargarComunicacion() -> Salida al servicio para descargar la documentación de la comunicación");
-		return CompletableFuture.completedFuture(file);
+		return  AsyncResult.forValue(file);
 		
 	}
-
 
 	private File getFicheroDescarga(String idInstitucion, List<DatosDocumentoItem> listaFicheros) throws IOException {
 		File file = null;
@@ -856,46 +851,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 							LOGGER.info("Rendimiento fin ejecucion consultas condicionales" );
 							if (continua) {
-						
-						
-							//Obtenemos el nombre de la plantilla por cada destinatario
-							if(plantilla.getIdPlantillas() != null){
-								
-								LOGGER.debug("Generación del documento para la plantilla " + plantilla.getIdPlantillas());
-								
-								ModPlantilladocumentoExample example = new ModPlantilladocumentoExample();
-								List<Long> idValues = new ArrayList<Long>();
-								String [] idPlantillas = plantilla.getIdPlantillas().split(",");
-								
-								if(idPlantillas != null && idPlantillas.length > 0){																			
-									for(String idPlantilla :idPlantillas){
-										idValues.add(Long.parseLong(idPlantilla));
-									}
-								}
-								
-								if(plantilla.getFormatoSalida() != null && Short.parseShort(plantilla.getFormatoSalida()) == SigaConstants.FORMATO_SALIDA.XLS.getCodigo()) {
-									esExcel = true;
-									LOGGER.debug("El formato de salida es Excel");
-								}
-									example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(idioma);
-								
-								List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
-								
-								if(listaPlantilla != null && listaPlantilla.size() == 1){
-									ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
-									nombrePlantilla = plantillaDoc.getPlantilla();
-									idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
-								}else if(listaPlantilla != null && listaPlantilla.size() > 1){
-									LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
-									throw new BusinessException("Exiten multiples plantillas asociada al informe en el idioma del usuario");
-								}else{
-									LOGGER.error("No hay plantilla asociada para el informe en el idioma del destinatario");
-									throw new BusinessException("No hay plantilla asociada para el informe en el idioma del destinatario");
-								}
-							}
-							
-
-							
+					
 							//Obtenemos el nombre de la plantilla por cada destinatario
 							if(plantilla.getIdPlantillas() != null){
 								
@@ -1492,7 +1448,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
 					sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
 				}
-			}			
+			}	
+			
+			if(consulta.getIdObjetivo() != null) {
+				//añadirmos maximo por depende del idObjetivo
+
+			}
+			
 			
 		}else{
 			LOGGER.error("No se ha encontrado la consulta");
@@ -1500,6 +1462,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}		
 		
 		return sentencia;
+	}
+	
+	private String addMaxQuery(String consulta, int maximo) {
+		
+		String consultaModificada = "SELECT * FROM (" + consulta + ") WHERE ROWNUM < " + ( maximo + 1) ;
+ 		
+		return consultaModificada;
 	}
 
 	@Override
@@ -2847,7 +2816,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 		
 			LOGGER.info("Rendimiento inicio generacion del documento con datos" );
-			LOGGER.debug("Generamos el documento");																
+			LOGGER.info("Generamos el documento");																
 			DatosDocumentoItem docGenerado = null;
 			
 			if(esExcel) {
@@ -3354,4 +3323,8 @@ public HashMap<String, Object> obtenerDestinatario(DatosDireccionLetradoOficio d
 		
 		return nombre;
 	}
+
+
+
+
 }

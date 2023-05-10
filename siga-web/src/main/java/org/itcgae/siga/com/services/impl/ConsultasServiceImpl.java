@@ -2548,6 +2548,10 @@ public class ConsultasServiceImpl implements IConsultasService {
 				return resultCopia;
 			}
 		} catch (Exception e) {
+			if(e.getCause()!= null && e.getCause().toString().contains("Interrupted attempting lock")) {
+				LOGGER.warn("CONSULTA INTERRUMPIDA POR TIMEOUT CONFIGURADO - GENERACION DE INFORMES");
+				throw new BusinessSQLException("CONSULTA INTERRUMPIDA POR TIMEOUT CONFIGURADO - GENERACION DE INFORMES");
+			}
 			LOGGER.error("Error al ejecutar la consulta", e);
 			if ((e instanceof DataAccessException) && e.getCause() != null) {
 				throw new BusinessSQLException(e.getMessage(), e);
