@@ -1960,7 +1960,11 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					"uploadFileC() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				uploadFileCalendariosAsync(request, fechaDesde, fechaHasta, observaciones);
+				try {
+					uploadFileCalendariosAsync(request, fechaDesde, fechaHasta, observaciones);
+				} catch(Exception e) {
+					LOGGER.error(Arrays.toString(e.getStackTrace()).replaceAll(", ", "\n"));
+				}
 			}
 		}
 		LOGGER.debug("uploadFileC() -> uploadFileC Async");
