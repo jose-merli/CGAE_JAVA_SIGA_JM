@@ -1355,7 +1355,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									errorLinea.append("El colegiado ya esta inscrito en la guardia "
 											+ cargaMasivaDatosITItem.getNombreGuardia() + " del turno.");
 								// Se comprueba si ya esta de baja
-								else if (ins.getFechabaja() == null)
+								else if (ins.getFechabaja() != null)
 									errorLinea.append("El colegiado ya dió de baja la inscripcion en la guardia "
 											+ cargaMasivaDatosITItem.getNombreGuardia() + " del turno.");
 
@@ -1960,7 +1960,11 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					"uploadFileC() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				uploadFileCalendariosAsync(request, fechaDesde, fechaHasta, observaciones);
+				try {
+					uploadFileCalendariosAsync(request, fechaDesde, fechaHasta, observaciones);
+				} catch(Exception e) {
+					LOGGER.error(Arrays.toString(e.getStackTrace()).replaceAll(", ", "\n"));
+				}
 			}
 		}
 		LOGGER.debug("uploadFileC() -> uploadFileC Async");
