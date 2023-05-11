@@ -166,7 +166,7 @@ public class DialogoComunicacionController {
 				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+		} catch (InterruptedException | TimeoutException e) {
 
 			
 				String mensaje = "504 - TimeOut";
@@ -199,6 +199,10 @@ public class DialogoComunicacionController {
 				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
 			
 			
+		}catch(ExecutionException e) {
+			if(e.getCause() != null )		
+				fileInfoDTO.setMessageError(e.getCause().getMessage());
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		catch(Exception e) {
 			if(e.getCause() != null )		
