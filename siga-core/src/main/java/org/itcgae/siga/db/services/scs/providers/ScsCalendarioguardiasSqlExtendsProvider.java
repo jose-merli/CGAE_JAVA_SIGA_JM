@@ -123,6 +123,14 @@ public class ScsCalendarioguardiasSqlExtendsProvider extends ScsCalendarioguardi
 			LOGGER.info(sql.toString());
 			return sql.toString();
 	   }
-	
+	   
+	   public String getNextIdCalendarioGuardias() {
+		   SQL sql = new SQL();
+		   
+			sql.SELECT("MAX(IDCALENDARIOGUARDIAS) + 1");
+			sql.FROM("SCS_CALENDARIOGUARDIAS");
+			
+			return sql.toString();
+	   }
 }
 
