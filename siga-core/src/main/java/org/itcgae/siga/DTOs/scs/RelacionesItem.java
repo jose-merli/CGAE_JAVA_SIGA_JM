@@ -9,8 +9,8 @@ public class RelacionesItem {
     private String anio;
     private String numero;
     private String idletrado;
-    private String letrado;
-    private String interesado;
+    private String colegiado; 
+    private String justiciable; 
     private String idturno;
     private String idturnodesigna;
     private String idtipo;
@@ -36,10 +36,6 @@ public class RelacionesItem {
     private String idFundamentoCalif;
     private String idGuardia;
     private String idTipoDictamenEJG;
-    
-    //AUX
-    private String nColLetrado;
-    private String nifInteresado;
 
     public String getIdTipoDictamenEJG() {
         return idTipoDictamenEJG;
@@ -129,12 +125,12 @@ public class RelacionesItem {
         this.idletrado = idletrado;
     }
 
-    public String getLetrado() {
-        return letrado;
+    public String getColegiado() {
+        return colegiado;
     }
 
-    public void setLetrado(String letrado) {
-        this.letrado = letrado;
+    public void setColegiado(String colegiado) {
+        this.colegiado = colegiado;
     }
 
     public String getIdturno() {
@@ -201,12 +197,12 @@ public class RelacionesItem {
         this.datosinteres = datosinteres;
     }
 
-    public String getInteresado() {
-        return interesado;
+    public String getJusticiable() {
+        return justiciable;
     }
 
-    public void setInteresado(String interesado) {
-        this.interesado = interesado;
+    public void setJusticiable(String justiciable) {
+        this.justiciable = justiciable;
     }
 
     public String getImpugnacion() {
@@ -299,8 +295,8 @@ public class RelacionesItem {
                 Objects.equals(anio, that.anio) &&
                 Objects.equals(numero, that.numero) &&
                 Objects.equals(idletrado, that.idletrado) &&
-                Objects.equals(letrado, that.letrado) &&
-                Objects.equals(interesado, that.interesado) &&
+                Objects.equals(colegiado, that.colegiado) &&
+                Objects.equals(justiciable, that.justiciable) &&
                 Objects.equals(idturno, that.idturno) &&
                 Objects.equals(idturnodesigna, that.idturnodesigna) &&
                 Objects.equals(idtipo, that.idtipo) &&
@@ -324,7 +320,7 @@ public class RelacionesItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(sjcs, idinstitucion, anio, numero, idletrado, letrado, interesado, idturno, idturnodesigna, idtipo, codigo, descturno, destipo, fechaDesignacion, datosinteres, idsjcs, impugnacion, fechaimpugnacion, dictamen, fechadictamen, resolucion, fecharesolucion, centrodetencion, fechaasunto, dilnigproc, idpersonajg);
+        return Objects.hash(sjcs, idinstitucion, anio, numero, idletrado, colegiado, justiciable, idturno, idturnodesigna, idtipo, codigo, descturno, destipo, fechaDesignacion, datosinteres, idsjcs, impugnacion, fechaimpugnacion, dictamen, fechadictamen, resolucion, fecharesolucion, centrodetencion, fechaasunto, dilnigproc, idpersonajg);
     }
 
     @Override
@@ -335,8 +331,8 @@ public class RelacionesItem {
                 ", anio='" + anio + '\'' +
                 ", numero='" + numero + '\'' +
                 ", idletrado='" + idletrado + '\'' +
-                ", letrado='" + letrado + '\'' +
-                ", interesado='" + interesado + '\'' +
+                ", colegiado='" + colegiado + '\'' +
+                ", justiciable='" + justiciable + '\'' +
                 ", idturno='" + idturno + '\'' +
                 ", idturnodesigna='" + idturnodesigna + '\'' +
                 ", idtipo='" + idtipo + '\'' +
@@ -369,22 +365,4 @@ public class RelacionesItem {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
-	public String getnColLetrado() {
-		return nColLetrado;
-	}
-
-	public void setnColLetrado(String nColLetrado) {
-		this.nColLetrado = nColLetrado;
-	}
-
-	public String getNifInteresado() {
-		return nifInteresado;
-	}
-
-	public void setNifInteresado(String nifInteresado) {
-		this.nifInteresado = nifInteresado;
-	}
-
-
 }

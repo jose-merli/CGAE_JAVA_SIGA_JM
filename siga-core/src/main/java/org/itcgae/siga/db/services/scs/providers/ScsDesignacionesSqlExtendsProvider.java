@@ -2765,12 +2765,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT(" anio");
 		sql2.SELECT(" numero");
 		sql2.SELECT(" idpersonacolegiado idletrado");
-		sql2.SELECT(" cen_persona.apellidos2\r\n"
+		sql2.SELECT(" cen_colegiado.ncolegiado"
+				+ "				||' - '"
+				+ "				||cen_persona.apellidos2\r\n"
 				+ "             || ' '\r\n"
 				+ "             || cen_persona.apellidos1\r\n"
 				+ "             || ','\r\n"
-				+ "             || cen_persona.nombre letrado");
-		sql2.SELECT("cen_colegiado.ncolegiado ncol");
+				+ "             || cen_persona.nombre colegiado");
 		sql2.SELECT(" TO_CHAR(idturno) idturno");
 		sql2.SELECT(" TO_CHAR(designa_turno) idturnodesigna");
 		sql2.SELECT(" TO_CHAR(idtipoasistencia) idtipo");
@@ -2800,13 +2801,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                            scs_tipoasistencia.idtipoasistencia = asi.idtipoasistencia");
 		sql2.SELECT("(" + sql4.toString() + ")" + "des_tipo");
 		
-		sql2.SELECT(" perjg.apellido1\r\n"
+		sql2.SELECT(" perjg.nif"
+				+ "			||' - '"
+				+ " 		||perjg.apellido1\r\n"
 				+ "               ||  \r\n"
 				+ "                CASE WHEN perjg.apellido2 is not null then \r\n"
 				+ "                     ' ' || perjg.apellido2 || ', '\r\n"
 				+ "                   ELSE\r\n"
 				+ "                   ', '\r\n"
-				+ "                END || perjg.nombre interesado, perjg.nif nif");
+				+ "                END || perjg.nombre justiciable");
 		sql2.SELECT( "null impugnacion");
         sql2.SELECT(" null fechaimpugnacion");
 		sql2.SELECT(" null dictamen");
@@ -2840,12 +2843,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql5.SELECT(" e.anio");
 		sql5.SELECT(" e.numero");
 		sql5.SELECT(" e.idpersona idletrado");
-		sql5.SELECT(" cen_persona.apellidos2\r\n"
+		sql5.SELECT(" cen_colegiado.ncolegiado"
+				+ "				||' - '"
+				+ "				||cen_persona.apellidos2\r\n"
 				+ "             || ' '\r\n"
 				+ "             || cen_persona.apellidos1\r\n"
 				+ "             || ','\r\n"
-				+ "             || cen_persona.nombre letrado");
-		sql5.SELECT(" cen_colegiado.ncolegiado ncol");
+				+ "             || cen_persona.nombre colegiado");
 		sql5.SELECT(" TO_CHAR(e.guardiaturno_idturno) idturno");
 		sql5.SELECT(" TO_CHAR(ed.idturno) idturnodesigna");
 		sql5.SELECT(" TO_CHAR(e.idtipoejg) idtipo");
@@ -2873,13 +2877,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql7.WHERE(" scs_tipoejg.idtipoejg = e.idtipoejg");
 		sql5.SELECT(" (" + sql7.toString() + ")" + "des_tipo");
 		
-		sql5.SELECT(" perjg.apellido1\r\n"
+		sql5.SELECT(" perjg.nif"
+				+ "			||' - '"
+				+ " 		||perjg.apellido1\r\n"
 				+ "               ||  \r\n"
 				+ "                CASE WHEN perjg.apellido2 is not null then \r\n"
 				+ "                     ' ' || perjg.apellido2 || ', '\r\n"
 				+ "                   ELSE\r\n"
 				+ "                   ', '\r\n"
-				+ "                END || perjg.nombre interesado, perjg.nif nif");
+				+ "                END || perjg.nombre justiciable");
 		sql5.SELECT(" imp.descripcion impugnacion");
 		sql5.SELECT(" fechaauto fechaimpugnacion");
 		sql5.SELECT(" f_siga_getrecurso(dic.descripcion,1) dictamen");

@@ -504,14 +504,14 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDLETRADO", property = "idletrado", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "COLEGIADO", property = "colegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTURNODESIGNA", property = "idturnodesigna", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPO", property = "idtipo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESC_TURNO", property = "descturno", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "JUSTICIABLE", property = "justiciable", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPUGNACION", property = "impugnacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAIMPUGNACION", property = "fechaimpugnacion", jdbcType = JdbcType.DATE),
 			@Result(column = "DICTAMEN", property = "dictamen", jdbcType = JdbcType.VARCHAR),
@@ -520,9 +520,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHARESOLUCION", property = "fecharesolucion", jdbcType = JdbcType.DATE),
 			@Result(column = "CENTRODETENCION", property = "centrodetencion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAASUNTO", property = "fechaasunto", jdbcType = JdbcType.DATE),
-			@Result(column = "DILNIGPROC", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NCOL", property = "nColLetrado", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NIF", property = "nifInteresado", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "DILNIGPROC", property = "dilnigproc", jdbcType = JdbcType.VARCHAR)})
 	List<RelacionesItem> busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion);
 	
 
