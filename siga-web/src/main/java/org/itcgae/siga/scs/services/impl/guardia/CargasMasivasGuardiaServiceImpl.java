@@ -2040,7 +2040,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						cenBajasTemporales.setFechabt(new Date());
 						cenBajasTemporales.setDescripcion(cargaMasivaDatosBTItem.getMotivo());
 						cenBajasTemporales.setFechaalta(new Date());
-						cenBajasTemporales.setEliminado(0);
+						cenBajasTemporales.setEliminado((short) 0);
 						cenBajasTemporales.setValidado("1");
 
 						// Comprobar que las fechas introducidas en el fichero están dentro del periodo
