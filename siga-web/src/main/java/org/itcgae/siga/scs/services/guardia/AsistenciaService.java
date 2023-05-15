@@ -96,4 +96,6 @@ public interface AsistenciaService {
 	public StringDTO isUnicaAsistenciaPorGuardia(HttpServletRequest request,  List<TarjetaAsistenciaResponseItem> asistencias);
 
 	public UpdateResponseDTO desvalidarGuardiaAsistencia(HttpServletRequest request,  List<TarjetaAsistenciaResponseItem> asistencias);
+
+	public InsertResponseDTO actualizarContrario(String[] item, HttpServletRequest request);
 }

@@ -245,5 +245,7 @@ public interface IDesignacionesService {
 
 	InsertResponseDTO subirDocumentoDesignaJustificacionExpres(MultipartHttpServletRequest request);
 
-	
+	public InsertResponseDTO updateInteresado(String[] item, HttpServletRequest request);
+
+	public InsertResponseDTO updateContrario(String[] item, HttpServletRequest request);
 }

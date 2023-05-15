@@ -3114,6 +3114,90 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		return insertResponseDTO;
 	}
+	
+	public InsertResponseDTO actualizarContrario(String[] item, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		int res = 0;
+		
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"asociarContrario() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"asociarContrario() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					
+					//item = [idAsistencia, justiciable.idpersona, fichaJusticiable.idpersonaOld]
+					String anioNumero = item[0];
+					long idPersona = Long.parseLong(item[1]);
+					long idPersonaOld = Long.parseLong(item[2]);
+					
+					if (!UtilidadesString.esCadenaVacia(anioNumero)) {
+						
+						ScsContrariosasistencia contrarioAsistencia = new ScsContrariosasistencia();
+						contrarioAsistencia.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+						contrarioAsistencia.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+						contrarioAsistencia.setIdpersona(idPersona);
+						contrarioAsistencia.setIdinstitucion(idInstitucion);
+						contrarioAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+						contrarioAsistencia.setFechamodificacion(new Date());
+						
+						ScsContrariosasistenciaExample scsContrariosasistenciaExample = new ScsContrariosasistenciaExample();
+						scsContrariosasistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
+							.andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+							.andIdpersonaEqualTo(idPersonaOld);
+						
+
+//						affectedRows = scsContrariosasistenciaMapper.insertSelective(contrarioAsistencia);
+						affectedRows = scsContrariosasistenciaMapper.updateByExampleSelective(contrarioAsistencia, scsContrariosasistenciaExample);
+					}
+					
+					ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+
+					asisKey.setIdinstitucion(idInstitucion);
+					asisKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					asisKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+
+					ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+
+					res = actualizaAsistenciaEnAsuntos(asis, idInstitucion, "contrariosAsistencia", usuarios.get(0));
+
+					if (affectedRows <= 0 || res == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se ha insertado ningún registro");
+						insertResponseDTO.setError(error);
+						insertResponseDTO.setId(anioNumero);
+					} else {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+						insertResponseDTO.setId(anioNumero);
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("asociarContrario() / ERROR: " + e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al asociar el contrario: " + e);
+			error.description("Error al asociar el contrario: " + e);
+			insertResponseDTO.setError(error);
+		}
+		
+		return insertResponseDTO;
+	}
 
 	/**
 	 * Metodo encargado de insertar en la tabla SCS_CONTRARIOSASISTENCIA para

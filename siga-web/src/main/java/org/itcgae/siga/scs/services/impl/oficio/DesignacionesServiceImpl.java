@@ -1256,6 +1256,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					LOGGER.info(
 							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Salida de ScsDefendidosdesignaMapper para eliminar los interesados seleccionados");
+					
+					ScsDesignaKey designaKey = new ScsDesignaKey();
+					designaKey.setIdinstitucion(idInstitucion);
+					designaKey.setAnio(item.getAnio());
+					designaKey.setIdturno(item.getIdturno());
+					designaKey.setNumero(item.getNumero());
+					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
+					
+					if (scsDesigna != null) {
+						actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "interesadosDesigna", usuarios.get(0));
+					}
 
 				} catch (Exception e) {
 					response = 0;
@@ -1371,6 +1382,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LOGGER.info(
 								"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Salida de ScsDefendidosdesignaMapper para insertar el interesado");
 					}
+					
+					ScsDesignaKey designaKey = new ScsDesignaKey();
+					designaKey.setIdinstitucion(idInstitucion);
+					designaKey.setAnio(item.getAnio());
+					designaKey.setIdturno(item.getIdturno());
+					designaKey.setNumero(item.getNumero());
+					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
+					
+					if (scsDesigna != null) {
+						actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "interesadosDesigna", usuarios.get(0));
+					}
 
 				} catch (Exception e) {
 					response = 0;
@@ -1393,7 +1415,104 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("insertInteresado() -> Salida del servicio para eliminar contrarios");
+		LOGGER.info("insertInteresado() -> Salida del servicio para insert interesados");
+
+		return insertResponseDTO;
+	}
+	
+	/**
+	 * Cuando editamos un interesado y marcamos guardar como nuevo justiciable, 
+	 * actualizamos la referencia del justiciable antiguo al nuevo que acabamos de crear
+	 * en la tabla SCS_DEFENDIDOSDESIGNA
+	 */
+	public InsertResponseDTO updateInteresado(String[] item, HttpServletRequest request) {
+		LOGGER.info("updateInteresado() ->  Entrada al servicio para actualizar un interesado");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateInteresado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateInteresado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					//Interesado nuevo
+					String anio = item[2].substring(1, 5);
+					ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
+					interesado.setIdinstitucion(Short.parseShort(item[0]));
+					interesado.setIdpersona(Long.parseLong(item[1]));
+					interesado.setAnio(Short.parseShort(anio));
+					interesado.setIdturno(Integer.parseInt(item[3]));
+					interesado.setNumero(Long.parseLong(item[4]));
+					interesado.setUsumodificacion(usuarios.get(0).getIdusuario());
+					interesado.setFechamodificacion(new Date());
+					
+					//Interesado antiguo
+					long idPersonaOld = Long.parseLong(item[6]);
+					
+					ScsDefendidosdesignaExample scsDefendidosdesignaExample = new ScsDefendidosdesignaExample();
+					scsDefendidosdesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdpersonaEqualTo(idPersonaOld)
+						.andAnioEqualTo(interesado.getAnio())
+						.andNumeroEqualTo(interesado.getNumero())
+						.andIdturnoEqualTo(interesado.getIdturno());
+					
+					LOGGER.info(
+							"updateInteresado() / ScsDefendidosdesignaMapper.updateByExampleSelective() -> Entrada a ScsDefendidosdesignaMapper para actualizar el interesado");
+
+					response = scsDefendidosdesignaMapper.updateByExampleSelective(interesado, scsDefendidosdesignaExample);
+					
+					LOGGER.info(
+							"updateInteresado() / ScsDefendidosdesignaMapper.updateByExampleSelective() -> Salida de ScsDefendidosdesignaMapper para actualizar el interesado");
+					
+					ScsDesignaKey designaKey = new ScsDesignaKey();
+					designaKey.setIdinstitucion(idInstitucion);
+					designaKey.setAnio(interesado.getAnio());
+					designaKey.setIdturno(interesado.getIdturno());
+					designaKey.setNumero(interesado.getNumero());
+					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
+					
+					if (scsDesigna != null) {
+						actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "interesadosDesigna", usuarios.get(0));
+					}
+					
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					insertResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("updateInteresado() -> Salida del servicio para actualizar interesados");
 
 		return insertResponseDTO;
 	}
@@ -1959,7 +2078,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public InsertResponseDTO insertContrario(ScsContrariosdesigna item, HttpServletRequest request) {
-		LOGGER.info("insertContrario() ->  Entrada al servicio para eliminar contrarios");
+		LOGGER.info("insertContrario() ->  Entrada al servicio para insertar contrarios");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -2059,7 +2178,103 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("insertContrario() -> Salida del servicio para eliminar contrarios");
+		LOGGER.info("insertContrario() -> Salida del servicio para insertar contrarios");
+
+		return insertResponseDTO;
+	}
+	
+	/**
+	 * Cuando editamos un contrario y marcamos guardar como nuevo justiciable, 
+	 * actualizamos la referencia del justiciable antiguo al nuevo que acabamos de crear
+	 * en la tabla SCS_CONTRARIOSDESIGNA
+	 */
+	public InsertResponseDTO updateContrario(String[] item, HttpServletRequest request) {
+		LOGGER.info("updateContrario() ->  Entrada al servicio para actualizar contrarios");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"insertContrario() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"insertContrario() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					//Contrario nuevo
+					String anio = item[2].substring(1, 5);
+					ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+					contrario.setIdinstitucion(Short.parseShort(item[0]));
+					contrario.setIdpersona(Long.parseLong(item[1]));
+					contrario.setAnio(Short.parseShort(anio));
+					contrario.setIdturno(Integer.parseInt(item[3]));
+					contrario.setNumero(Long.parseLong(item[4]));
+					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
+					contrario.setFechamodificacion(new Date());
+					
+					//Contrario antiguo
+					long idPersonaOld = Long.parseLong(item[6]);
+					
+					ScsContrariosdesignaExample scsContrariosdesignaExample = new ScsContrariosdesignaExample();
+					scsContrariosdesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdpersonaEqualTo(idPersonaOld)
+						.andAnioEqualTo(contrario.getAnio())
+						.andNumeroEqualTo(contrario.getNumero())
+						.andIdturnoEqualTo(contrario.getIdturno());
+					
+					LOGGER.info(
+							"updateContrario() / scsContrariosDesignaMapper.updateByExampleSelective() -> Entrada de scsContrariosDesignaMapper para actualizar el contrario");
+
+					response = scsContrariosDesignaMapper.updateByExampleSelective(contrario, scsContrariosdesignaExample);
+					
+					LOGGER.info(
+							"updateContrario() / scsContrariosDesignaMapper.updateByExampleSelective() -> Salida de scsContrariosDesignaMapper para actualizar el contrario");
+					
+					ScsDesignaKey designaKey = new ScsDesignaKey();
+					designaKey.setIdinstitucion(idInstitucion);
+					designaKey.setAnio(contrario.getAnio());
+					designaKey.setIdturno(contrario.getIdturno());
+					designaKey.setNumero(contrario.getNumero());
+					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
+
+					if (scsDesigna != null) {
+						actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "contrariosDesigna", usuarios.get(0));
+					}
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					insertResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("updateContrario() -> Salida del servicio para insertar contrarios");
 
 		return insertResponseDTO;
 	}

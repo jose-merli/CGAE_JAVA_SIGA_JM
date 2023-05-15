@@ -470,14 +470,19 @@ public class DesignacionesController {
 	// designa.idTurno, designa.numero]
 	@RequestMapping(value = "/designas/insertInteresado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertInteresado(@RequestBody String[] item, HttpServletRequest request) {
-		String anio = item[2].substring(1, 5);
-		ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
-		interesado.setIdinstitucion(Short.parseShort(item[0]));
-		interesado.setIdpersona(Long.parseLong(item[1]));
-		interesado.setAnio(Short.parseShort(anio));
-		interesado.setIdturno(Integer.parseInt(item[3]));
-		interesado.setNumero(Long.parseLong(item[4]));
-		InsertResponseDTO response = designacionesService.insertInteresado(interesado, request);
+		InsertResponseDTO response;
+		if (item.length > 5 && Boolean.parseBoolean(item[5])) {
+			response = designacionesService.updateInteresado(item, request);
+		} else {
+			String anio = item[2].substring(1, 5);
+			ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
+			interesado.setIdinstitucion(Short.parseShort(item[0]));
+			interesado.setIdpersona(Long.parseLong(item[1]));
+			interesado.setAnio(Short.parseShort(anio));
+			interesado.setIdturno(Integer.parseInt(item[3]));
+			interesado.setNumero(Long.parseLong(item[4]));
+			response = designacionesService.insertInteresado(interesado, request);
+		}
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
@@ -552,14 +557,19 @@ public class DesignacionesController {
 	// designa.idTurno, designa.numero]
 	@RequestMapping(value = "/designas/insertContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertContrario(@RequestBody String[] item, HttpServletRequest request) {
-		String anio = item[2].substring(1, 5);
-		ScsContrariosdesigna contrario = new ScsContrariosdesigna();
-		contrario.setIdinstitucion(Short.parseShort(item[0]));
-		contrario.setIdpersona(Long.parseLong(item[1]));
-		contrario.setAnio(Short.parseShort(anio));
-		contrario.setIdturno(Integer.parseInt(item[3]));
-		contrario.setNumero(Long.parseLong(item[4]));
-		InsertResponseDTO response = designacionesService.insertContrario(contrario, request);
+		InsertResponseDTO response;
+		if (item.length > 5 && Boolean.parseBoolean(item[5])) {
+			response = designacionesService.updateContrario(item, request);
+		} else {
+			String anio = item[2].substring(1, 5);
+			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+			contrario.setIdinstitucion(Short.parseShort(item[0]));
+			contrario.setIdpersona(Long.parseLong(item[1]));
+			contrario.setAnio(Short.parseShort(anio));
+			contrario.setIdturno(Integer.parseInt(item[3]));
+			contrario.setNumero(Long.parseLong(item[4]));
+			response = designacionesService.insertContrario(contrario, request);
+		}
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else

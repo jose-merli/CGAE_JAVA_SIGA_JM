@@ -603,17 +603,22 @@ public class EjgController {
 	// [ justiciable.idpersona, ejg.annio, ejg.tipoEJG, ejg.numero]
 	@RequestMapping(value = "/gestion-ejg/insertContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertContrarioEJG(@RequestBody String[] item, HttpServletRequest request) {
-		ScsContrariosejg contrario = new ScsContrariosejg();
-		contrario.setIdpersona(Long.parseLong(item[0]));
-		contrario.setAnio(Short.parseShort(item[1]));
-		contrario.setNumero(Long.parseLong(item[3]));
-		contrario.setIdtipoejg(Short.parseShort(item[2]));
-		InsertResponseDTO response = gestionEJG.insertContrarioEJG(contrario, request);
+		InsertResponseDTO response;
+		//Si venimos desde editar creando uno nuevo actualizamos la referencia en SCS_CONTRARIOSEJG
+		if (item.length > 4 && Boolean.parseBoolean(item[4])) {
+			response = gestionEJG.updateContrarioEJG(item, request);
+		} else {
+			ScsContrariosejg contrario = new ScsContrariosejg();
+			contrario.setIdpersona(Long.parseLong(item[0]));
+			contrario.setAnio(Short.parseShort(item[1]));
+			contrario.setNumero(Long.parseLong(item[3]));
+			contrario.setIdtipoejg(Short.parseShort(item[2]));
+			response = gestionEJG.insertContrarioEJG(contrario, request);
+		}
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-
 	}
 
 	// [ sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero,
