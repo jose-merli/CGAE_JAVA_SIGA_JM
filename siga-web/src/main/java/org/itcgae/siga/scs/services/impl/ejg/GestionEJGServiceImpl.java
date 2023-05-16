@@ -806,6 +806,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Boolean primero = false;
+		boolean editadoNuevo = false;
 
 		if (idInstitucion != null) {
 			LOGGER.debug(
@@ -880,6 +881,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						//Insertamos el familiar
 						//Comprobamos si venimos desde editar creando uno nuevo para editar la relacion antigua en SCS_UNIDADFAMILIAREJG
 						if (item.size() > 5 && Boolean.parseBoolean(item.get(5))) {
+							editadoNuevo = true;
 							familiar.setIdinstitucion(idInstitucion);
 							familiar.setIdpersona(Long.parseLong(item.get(1)));
 							familiar.setAnio(Short.parseShort(item.get(2)));
@@ -911,32 +913,38 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						}
 					}
 					
-					EjgItem ejgItem = new EjgItem();
-					ejgItem.setidInstitucion(idInstitucion.toString());
-					ejgItem.setAnnio(item.get(2));
-					ejgItem.setTipoEJG(item.get(3));
-					ejgItem.setNumero(item.get(4));
+					//Si venimos de ditar un justiciable creando uno nuevo no copiamos sus asuntos
+					if(!editadoNuevo) {
+						EjgItem ejgItem = new EjgItem();
+						ejgItem.setidInstitucion(idInstitucion.toString());
+						ejgItem.setAnnio(item.get(2));
+						ejgItem.setTipoEJG(item.get(3));
+						ejgItem.setNumero(item.get(4));
+						
+						response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "unidadFamiliar" , usuarios.get(0));
 					
-					response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "unidadFamiliar" , usuarios.get(0));
-					if (response == 0)
-							throw (new Exception(
-									"Error al copiar los datos a otros asuntos"));
-
-					if (response != 1) {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún familiar en el ejg");
-						throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
+						if (response == 0)
+								throw (new Exception(
+										"Error al copiar los datos a otros asuntos"));
+	
+						if (response != 1) {
+							responsedto.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún familiar en el ejg");
+							throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
+						} else {
+							responsedto.setStatus(SigaConstants.OK);
+							
+							// String descripcionUnidadFamiliar = getDescripcionUnidadFamiliar(null,
+							// familiar, "INSERT");
+	
+							// auditoriaCenHistoricoService.insertaCenHistorico(null,
+							// SigaConstants.CEN_TIPOCAMBIO.EJG_ANADIR_FAMILIAR_NUEVO,
+							// descripcionUnidadFamiliar, request, null);
+							// insertAuditoriaEJG("familiar", null, "NUEVO", usuarios.get(0), ejgItem);
+						}
 					} else {
 						responsedto.setStatus(SigaConstants.OK);
-						
-						// String descripcionUnidadFamiliar = getDescripcionUnidadFamiliar(null,
-						// familiar, "INSERT");
-
-						// auditoriaCenHistoricoService.insertaCenHistorico(null,
-						// SigaConstants.CEN_TIPOCAMBIO.EJG_ANADIR_FAMILIAR_NUEVO,
-						// descripcionUnidadFamiliar, request, null);
-						// insertAuditoriaEJG("familiar", null, "NUEVO", usuarios.get(0), ejgItem);
 					}
 
 					LOGGER.debug(
@@ -4650,13 +4658,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					//Actualizamos la referencia la contrario antiguo con el nuevo
 					response = scsContrariosejgMapper.updateByExampleSelective(contrario, scsContrariosejgExample);
 
-					EjgItem ejgItem = new EjgItem();
-					ejgItem.setidInstitucion(idInstitucion.toString());
-					ejgItem.setAnnio(contrario.getAnio().toString());
-					ejgItem.setNumero(String.valueOf(contrario.getNumero()));
-					ejgItem.setTipoEJG(contrario.getIdtipoejg().toString());
-
-					response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "ContrariosEJG", usuarios.get(0));
+//					EjgItem ejgItem = new EjgItem();
+//					ejgItem.setidInstitucion(idInstitucion.toString());
+//					ejgItem.setAnnio(contrario.getAnio().toString());
+//					ejgItem.setNumero(String.valueOf(contrario.getNumero()));
+//					ejgItem.setTipoEJG(contrario.getIdtipoejg().toString());
+//
+//					response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "ContrariosEJG", usuarios.get(0));
 					
 					if (response == 0)
 						throw (new Exception("Error al copiar los datos a otros asuntos"));

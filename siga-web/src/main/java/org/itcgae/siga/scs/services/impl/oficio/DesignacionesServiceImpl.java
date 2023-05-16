@@ -1481,16 +1481,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"updateInteresado() / ScsDefendidosdesignaMapper.updateByExampleSelective() -> Salida de ScsDefendidosdesignaMapper para actualizar el interesado");
 					
-					ScsDesignaKey designaKey = new ScsDesignaKey();
-					designaKey.setIdinstitucion(idInstitucion);
-					designaKey.setAnio(interesado.getAnio());
-					designaKey.setIdturno(interesado.getIdturno());
-					designaKey.setNumero(interesado.getNumero());
-					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
-					
-					if (scsDesigna != null) {
-						actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "interesadosDesigna", usuarios.get(0));
-					}
+//					ScsDesignaKey designaKey = new ScsDesignaKey();
+//					designaKey.setIdinstitucion(idInstitucion);
+//					designaKey.setAnio(interesado.getAnio());
+//					designaKey.setIdturno(interesado.getIdturno());
+//					designaKey.setNumero(interesado.getNumero());
+//					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
+//					
+//					if (scsDesigna != null) {
+//						actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "interesadosDesigna", usuarios.get(0));
+//					}
 					
 				} catch (Exception e) {
 					response = 0;
@@ -2244,16 +2244,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"updateContrario() / scsContrariosDesignaMapper.updateByExampleSelective() -> Salida de scsContrariosDesignaMapper para actualizar el contrario");
 					
-					ScsDesignaKey designaKey = new ScsDesignaKey();
-					designaKey.setIdinstitucion(idInstitucion);
-					designaKey.setAnio(contrario.getAnio());
-					designaKey.setIdturno(contrario.getIdturno());
-					designaKey.setNumero(contrario.getNumero());
-					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
-
-					if (scsDesigna != null) {
-						actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "contrariosDesigna", usuarios.get(0));
-					}
+//					ScsDesignaKey designaKey = new ScsDesignaKey();
+//					designaKey.setIdinstitucion(idInstitucion);
+//					designaKey.setAnio(contrario.getAnio());
+//					designaKey.setIdturno(contrario.getIdturno());
+//					designaKey.setNumero(contrario.getNumero());
+//					ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
+//
+//					if (scsDesigna != null) {
+//						actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "contrariosDesigna", usuarios.get(0));
+//					}
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);

@@ -3166,17 +3166,17 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						affectedRows = scsContrariosasistenciaMapper.updateByExampleSelective(contrarioAsistencia, scsContrariosasistenciaExample);
 					}
 					
-					ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+//					ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+//
+//					asisKey.setIdinstitucion(idInstitucion);
+//					asisKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+//					asisKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+//
+//					ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+//
+//					res = actualizaAsistenciaEnAsuntos(asis, idInstitucion, "contrariosAsistencia", usuarios.get(0));
 
-					asisKey.setIdinstitucion(idInstitucion);
-					asisKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
-					asisKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
-
-					ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
-
-					res = actualizaAsistenciaEnAsuntos(asis, idInstitucion, "contrariosAsistencia", usuarios.get(0));
-
-					if (affectedRows <= 0 || res == 0) {
+					if (affectedRows <= 0 /*|| res == 0*/) {
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setCode(500);
 						error.setDescription("No se ha insertado ningún registro");
