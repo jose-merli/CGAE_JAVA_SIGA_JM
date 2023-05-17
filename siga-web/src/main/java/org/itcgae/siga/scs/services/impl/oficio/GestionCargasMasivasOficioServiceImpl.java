@@ -1492,7 +1492,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 						cenBajasTemporales.setFechabt(new Date());
 						cenBajasTemporales.setDescripcion(cargaMasivaDatosBTItem.getMotivo());
 						cenBajasTemporales.setFechaalta(new Date());
-						cenBajasTemporales.setEliminado(0);
+						cenBajasTemporales.setEliminado((short) 0);
 						cenBajasTemporales.setValidado("2");
 						
 //						CenBajastemporalesMapper cenBajasTemporalesMapper;

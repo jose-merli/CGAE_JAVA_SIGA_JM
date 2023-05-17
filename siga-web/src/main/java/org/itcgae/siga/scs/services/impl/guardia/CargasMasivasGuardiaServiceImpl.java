@@ -114,6 +114,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 	@Autowired
 	private ScsGuardiasturnoMapper scsGuardiasturnoMapper;
+	
+	@Autowired
+	private ScsCalendarioguardiasExtendsMapper scsCalendarioguardiasExtendsMapper;
 
 	@Autowired
 	private ScsGrupoguardiacolegiadoMapper scsGrupoguardiacolegiadoMapper;
@@ -1355,7 +1358,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									errorLinea.append("El colegiado ya esta inscrito en la guardia "
 											+ cargaMasivaDatosITItem.getNombreGuardia() + " del turno.");
 								// Se comprueba si ya esta de baja
-								else if (ins.getFechabaja() == null)
+								else if (ins.getFechabaja() != null)
 									errorLinea.append("El colegiado ya dió de baja la inscripcion en la guardia "
 											+ cargaMasivaDatosITItem.getNombreGuardia() + " del turno.");
 
@@ -1960,7 +1963,11 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					"uploadFileC() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				uploadFileCalendariosAsync(request, fechaDesde, fechaHasta, observaciones);
+				try {
+					uploadFileCalendariosAsync(request, fechaDesde, fechaHasta, observaciones);
+				} catch(Exception e) {
+					LOGGER.error(Arrays.toString(e.getStackTrace()).replaceAll(", ", "\n"));
+				}
 			}
 		}
 		LOGGER.debug("uploadFileC() -> uploadFileC Async");
@@ -2033,7 +2040,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						cenBajasTemporales.setFechabt(new Date());
 						cenBajasTemporales.setDescripcion(cargaMasivaDatosBTItem.getMotivo());
 						cenBajasTemporales.setFechaalta(new Date());
-						cenBajasTemporales.setEliminado(0);
+						cenBajasTemporales.setEliminado((short) 0);
 						cenBajasTemporales.setValidado("1");
 
 						// Comprobar que las fechas introducidas en el fichero están dentro del periodo
@@ -2123,6 +2130,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										item.setEstado("4");//Estado pendiente para scs_hco_conf_prog_calendarios
 										
 										//Inserta en SCS_CALENDARIOGUARDIAS
+										String nextIdCalendarioGuardias = scsCalendarioguardiasExtendsMapper.getNextIdCalendarioGuardias();
 										LOGGER.info("uploadFileCalendariosAsync() -> Insertando en SCS_CALENDARIOGUARDIAS");
 										int res2 = scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(null,
 												null, null, observaciones, idTurno, idGuardia,
@@ -2130,7 +2138,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 														.format(cargaMasivaDatosBTItem.getFechaFinal()),
 												new SimpleDateFormat("dd/MM/yyyy")
 														.format(cargaMasivaDatosBTItem.getFechaInicio()),
-														nextIdCalendarioProgramado, idInstitucion.toString(), null, today, null, null,
+														nextIdCalendarioGuardias, idInstitucion.toString(), null, today, null, null,
 												usuarios.get(0).getIdusuario().toString());
 
 										//String idCalendario = scsGuardiasturnoExtendsMapper.getLastCalendar(idInstitucion.toString()); 
@@ -2182,7 +2190,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 											cabeceraGuardia.setIdguardia(Integer.parseInt(idGuardia));
 											cabeceraGuardia.setIdpersona(Long.parseLong(cargaMasivaDatosBTItem.getIdPersona()));
 											cabeceraGuardia.setFechainicio(cargaMasivaDatosBTItem.getFechaInicio());
-											cabeceraGuardia.setIdcalendarioguardias(Integer.parseInt(nextIdCalendarioProgramado));
+											cabeceraGuardia.setIdcalendarioguardias(Integer.parseInt(nextIdCalendarioGuardias));
 											cabeceraGuardia.setFechaFin(cargaMasivaDatosBTItem.getFechaFinal());
 											cabeceraGuardia.setFechamodificacion(new Date());
 											cabeceraGuardia.setSustituto("0");

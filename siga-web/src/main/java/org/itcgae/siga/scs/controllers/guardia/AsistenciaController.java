@@ -274,6 +274,17 @@ public class AsistenciaController {
 		}
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	@PostMapping(value = "/actualizarContrario", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<InsertResponseDTO> actualizar(@RequestBody String[] item, HttpServletRequest request) {
+		InsertResponseDTO response = null;
+		try {
+			response = asistenciaService.actualizarContrario(item, request);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
 
 	@PostMapping(value = "/desasociarContrario", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UpdateResponseDTO> desasociarContrario(HttpServletRequest request, @RequestBody List<ListaContrarioJusticiableItem> contrarios, @RequestParam String anioNumero) {

@@ -182,4 +182,6 @@ public interface IGestionEJG {
 	Boolean getEditResolEjg(EjgItem ejgItem, HttpServletRequest request);
 
 	EjgDTO datosEJGJustificacionExpres(EjgItem ejgItem, HttpServletRequest request);
+
+	InsertResponseDTO updateContrarioEJG(String[] item, HttpServletRequest request);
 }

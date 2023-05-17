@@ -14,7 +14,7 @@ public class BusquedaPerFisicaSearchDTO {
 	private String segundoApellido;
 	private String numeroColegiado;
 	private boolean addDestinatarioIndv;
-	
+	private boolean fromDesignaciones;
 	
 
  
@@ -40,6 +40,16 @@ public class BusquedaPerFisicaSearchDTO {
 	
 	 
 	
+	public boolean isFromDesignaciones() {
+		return fromDesignaciones;
+	}
+
+
+	public void setFromDesignaciones(boolean fromDesignaciones) {
+		this.fromDesignaciones = fromDesignaciones;
+	}
+
+
 	/**
 	 *
 	 */

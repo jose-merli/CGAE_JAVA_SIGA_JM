@@ -113,7 +113,12 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.LEFT_OUTER_JOIN(
 				"CEN_NOCOLEGIADO_ACTIVIDAD ACT ON (PER.IDPERSONA = ACT.IDPERSONA AND CLI.IDINSTITUCION = ACT.IDINSTITUCION)");
 		sql.WHERE("PER.IDTIPOIDENTIFICACION IN ('10','30','40','50')");
-	
+		
+		
+		if (busquedaPerFisicaSearchDTO.isFromDesignaciones()) {
+			sql.WHERE("ESTADOCOLEGIAL.IDESTADO IN ('10','20')");	
+		}
+		
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 			sql.WHERE("PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "'");
 		}
@@ -154,6 +159,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			sql.WHERE(" I.IDINSTITUCION  IN  (" + idInstituciones + ")");
 		}else if(idInstitucion!=null){
 			sql.WHERE(" I.IDINSTITUCION  =  '" + idInstitucion + "'");
+			
 		}
 		//
 		// if(null != idInstituciones) {

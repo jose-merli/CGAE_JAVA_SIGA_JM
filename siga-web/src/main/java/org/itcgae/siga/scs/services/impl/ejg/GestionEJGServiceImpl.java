@@ -806,6 +806,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Boolean primero = false;
+		boolean editadoNuevo = false;
 
 		if (idInstitucion != null) {
 			LOGGER.debug(
@@ -876,36 +877,74 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						}else {
 							familiar.setSolicitante((short) 0);
 						}
+						
 						//Insertamos el familiar
-						response = scsUnidadfamiliarejgMapper.insert(familiar);
+						//Comprobamos si venimos desde editar creando uno nuevo para editar la relacion antigua en SCS_UNIDADFAMILIAREJG
+						if (item.size() > 5 && Boolean.parseBoolean(item.get(5))) {
+							editadoNuevo = true;
+							familiar.setIdinstitucion(idInstitucion);
+							familiar.setIdpersona(Long.parseLong(item.get(1)));
+							familiar.setAnio(Short.parseShort(item.get(2)));
+							familiar.setIdtipoejg(Short.parseShort(item.get(3)));
+							familiar.setNumero(Long.parseLong(item.get(4)));
+							familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+							familiar.setFechamodificacion(new Date());
+							familiar.setFechabaja(null);
+							primero = compruebaSiSolicitanteEjg(idInstitucion, item);
+
+							if (primero) {
+								familiar.setSolicitante((short) 1);
+							} else {
+								familiar.setSolicitante((short) 0);
+							}
+
+							exampleFamiliar = new ScsUnidadfamiliarejgExample();
+							exampleFamiliar.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdpersonaEqualTo(Long.parseLong(item.get(6)))
+									.andAnioEqualTo(Short.parseShort(item.get(2)))
+									.andIdtipoejgEqualTo(Short.parseShort(item.get(3)))
+									.andNumeroEqualTo(Long.parseLong(item.get(4)));
+
+							response = scsUnidadfamiliarejgMapper.updateByExampleSelective(familiar, exampleFamiliar);
+						}
+						// Si no venimos de editar creamos la nueva relacion
+						else {
+							response = scsUnidadfamiliarejgMapper.insert(familiar);
+						}
 					}
 					
-					EjgItem ejgItem = new EjgItem();
-					ejgItem.setidInstitucion(idInstitucion.toString());
-					ejgItem.setAnnio(item.get(2));
-					ejgItem.setTipoEJG(item.get(3));
-					ejgItem.setNumero(item.get(4));
+					//Si venimos de ditar un justiciable creando uno nuevo no copiamos sus asuntos
+					if(!editadoNuevo) {
+						EjgItem ejgItem = new EjgItem();
+						ejgItem.setidInstitucion(idInstitucion.toString());
+						ejgItem.setAnnio(item.get(2));
+						ejgItem.setTipoEJG(item.get(3));
+						ejgItem.setNumero(item.get(4));
+						
+						response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "unidadFamiliar" , usuarios.get(0));
 					
-					response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "unidadFamiliar" , usuarios.get(0));
-					if (response == 0)
-							throw (new Exception(
-									"Error al copiar los datos a otros asuntos"));
-
-					if (response != 1) {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún familiar en el ejg");
-						throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
+						if (response == 0)
+								throw (new Exception(
+										"Error al copiar los datos a otros asuntos"));
+	
+						if (response != 1) {
+							responsedto.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún familiar en el ejg");
+							throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
+						} else {
+							responsedto.setStatus(SigaConstants.OK);
+							
+							// String descripcionUnidadFamiliar = getDescripcionUnidadFamiliar(null,
+							// familiar, "INSERT");
+	
+							// auditoriaCenHistoricoService.insertaCenHistorico(null,
+							// SigaConstants.CEN_TIPOCAMBIO.EJG_ANADIR_FAMILIAR_NUEVO,
+							// descripcionUnidadFamiliar, request, null);
+							// insertAuditoriaEJG("familiar", null, "NUEVO", usuarios.get(0), ejgItem);
+						}
 					} else {
 						responsedto.setStatus(SigaConstants.OK);
-						
-						// String descripcionUnidadFamiliar = getDescripcionUnidadFamiliar(null,
-						// familiar, "INSERT");
-
-						// auditoriaCenHistoricoService.insertaCenHistorico(null,
-						// SigaConstants.CEN_TIPOCAMBIO.EJG_ANADIR_FAMILIAR_NUEVO,
-						// descripcionUnidadFamiliar, request, null);
-						// insertAuditoriaEJG("familiar", null, "NUEVO", usuarios.get(0), ejgItem);
 					}
 
 					LOGGER.debug(
@@ -2351,8 +2390,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							// SigaConstants.CEN_TIPOCAMBIO.EJG_BORRAR_FAMILIAR, getDescripcionEjg(ejg, ejg,
 							// "UPDATE"), request, null);
 
-							insertAuditoriaEJG("Solicitante principal borrado", ejg.getIdpersonajg().toString(), null,
-									usuarios.get(0), ejg);
+//							insertAuditoriaEJG("Solicitante principal borrado", ejg.getIdpersonajg().toString(), null,
+//									usuarios.get(0), ejg);
 
 							ejg.setIdpersonajg(null);
 
@@ -2390,19 +2429,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 //
 //                    ScsPersonajg per = scsPersonajgMapper.selectByPrimaryKey(perKey);
 
-					if (record.getFechabaja() != null) {
+//					if (record.getFechabaja() != null) {
 						// auditoriaCenHistoricoService.insertaCenHistorico(null,
 						// SigaConstants.CEN_TIPOCAMBIO.EJG_BORRAR_FAMILIAR,
 						// getDescripcionUnidadFamiliar(record2, record, "UPDATE"), request, null);
 						// insertAuditoriaEJG("Familiar borrado", per.getNif(), null, usuarios.get(0),
 						// ejg);
-					} else {
+//					} else {
 						// auditoriaCenHistoricoService.insertaCenHistorico(null,
 						// SigaConstants.CEN_TIPOCAMBIO.EJG_ACTIVAR_FAMILIAR_BORRADO,
 						// getDescripcionUnidadFamiliar(record2, record, "UPDATE"), request, null);
 						// insertAuditoriaEJG("Familiar activado", null, per.getNif(), usuarios.get(0),
 						// ejg);
-					}
+//					}
 
 				}
 				LOGGER.debug(
@@ -4559,6 +4598,104 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("insertContrario() -> Salida del servicio para insertar contrarios");
 
 		return insertResponseDTO;
+	}
+	
+	/**
+	 * Cuando editamos un contrario y marcamos guardar como nuevo justiciable, 
+	 * actualizamos la referencia del justiciable antiguo al nuevo que acabamos de crear
+	 * en la tabla SCS_CONTRARIOSEJG
+	 */
+	public InsertResponseDTO updateContrarioEJG(String[] item, HttpServletRequest request) {
+		LOGGER.info("updateContrarioEJG() ->  Entrada al servicio para actualizar contrarios");
+
+		InsertResponseDTO updateResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateContrarioEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateContrarioEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					// Contrario nuevo
+					ScsContrariosejg contrario = new ScsContrariosejg();
+					contrario.setIdpersona(Long.parseLong(item[0]));
+					contrario.setAnio(Short.parseShort(item[1]));
+					contrario.setNumero(Long.parseLong(item[3]));
+					contrario.setIdtipoejg(Short.parseShort(item[2]));
+					contrario.setIdinstitucion(idInstitucion);
+					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
+					contrario.setFechamodificacion(new Date());
+
+					// Contrario antiguo
+					long idPersonaOld = Long.parseLong(item[5]);
+
+					ScsContrariosejgExample scsContrariosejgExample = new ScsContrariosejgExample();
+					scsContrariosejgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(idPersonaOld)
+							.andAnioEqualTo(contrario.getAnio())
+							.andNumeroEqualTo(contrario.getNumero())
+							.andIdtipoejgEqualTo(contrario.getIdtipoejg());
+
+					LOGGER.info(
+							"updateContrarioEJG() / scsContrariosejgMapper.updateByExampleSelective() -> Entrada a scsContrariosejgMapper para actualizar contrario ejg");
+					
+					//Actualizamos la referencia la contrario antiguo con el nuevo
+					response = scsContrariosejgMapper.updateByExampleSelective(contrario, scsContrariosejgExample);
+
+//					EjgItem ejgItem = new EjgItem();
+//					ejgItem.setidInstitucion(idInstitucion.toString());
+//					ejgItem.setAnnio(contrario.getAnio().toString());
+//					ejgItem.setNumero(String.valueOf(contrario.getNumero()));
+//					ejgItem.setTipoEJG(contrario.getIdtipoejg().toString());
+//
+//					response = actualizaEjgEnAsuntos(ejgItem, idInstitucion, "ContrariosEJG", usuarios.get(0));
+					
+					if (response == 0)
+						throw (new Exception("Error al copiar los datos a otros asuntos"));
+
+					LOGGER.info(
+							"updateContrarioEJG() / scsContrariosejgMapper.updateByExampleSelective() -> Salida de scsContrariosejgMapper para actualizar contrario ejg");
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("insertContrario() -> Salida del servicio para insertar contrarios");
+
+		return updateResponseDTO;
 	}
 
 	@Override

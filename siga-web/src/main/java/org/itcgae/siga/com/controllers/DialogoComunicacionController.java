@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -45,10 +46,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.concurrent.ListenableFuture;
 
 @RestController
 @RequestMapping(value = "/dialogoComunicacion")
@@ -147,12 +150,13 @@ public class DialogoComunicacionController {
 	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo,
 			HttpServletResponse resp) throws InterruptedException, ExecutionException {
 
+		LOGGER.error("Entrada en nombredoc()- INI");
+		ListenableFuture<File> fileFuture = null;
 		FileInfoDTO fileInfoDTO = new FileInfoDTO();
-		CompletableFuture<File> completableFuture = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
+		try {		
+		fileFuture = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
 
-		try {
-			File file;
-			file = completableFuture.get(5, TimeUnit.MINUTES);
+		File file = fileFuture.get(10, TimeUnit.MINUTES);
 
 			if (file != null) {
 				fileInfoDTO.setFilePath(file.getAbsolutePath());
@@ -162,36 +166,45 @@ public class DialogoComunicacionController {
 				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-		} catch (TimeoutException e) {
-			String mensaje = "504 - TimeOut";
-			try {
-				// Conseguimos información del usuario logeado
-				String token = request.getHeader("Authorization");
-				String dni = UserTokenUtils.getDniFromJWTToken(token);
-				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		} catch (InterruptedException | TimeoutException e) {
 
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+				String mensaje = "504 - TimeOut";
+				try {
+					fileFuture.cancel(true);
+					// Conseguimos información del usuario logeado
+					String token = request.getHeader("Authorization");
+					String dni = UserTokenUtils.getDniFromJWTToken(token);
+					Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-				AdmUsuarios usuario = usuarios.get(0);
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni)
+							.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-				GenRecursosExample genRecursosExample = new GenRecursosExample();
-				genRecursosExample.createCriteria()
-						.andIdrecursoEqualTo("informesycomunicaciones.descarga.mensaje.errorTimeOut")
-						.andIdlenguajeEqualTo(usuario.getIdlenguaje());
-				List<GenRecursos> genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
+					AdmUsuarios usuario = usuarios.get(0);
 
-				mensaje = genRecursos.get(0).getDescripcion();
-			} catch (Exception ex) {
-				LOGGER.error(ex.getCause());
-			}
+					GenRecursosExample genRecursosExample = new GenRecursosExample();
+					genRecursosExample.createCriteria()
+							.andIdrecursoEqualTo("informesycomunicaciones.descarga.mensaje.errorTimeOut")
+							.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+					List<GenRecursos> genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
 
-			completableFuture.cancel(true);
-			fileInfoDTO.setMessageError(mensaje);
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
-		}catch(Exception e) {
+					mensaje = genRecursos.get(0).getDescripcion();
+					LOGGER.error(mensaje);
+				} catch (Exception ex) {
+					LOGGER.error(ex.getCause());
+				}
+				fileInfoDTO.setMessageError(mensaje);
+				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
+			
+			
+		}catch(ExecutionException e) {
+			if(e.getCause() != null )		
+				fileInfoDTO.setMessageError(e.getCause().getMessage());
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		catch(Exception e) {
 			if(e.getCause() != null )		
 				fileInfoDTO.setMessageError(e.getCause().getMessage());
 			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
