@@ -1750,7 +1750,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 				sentencia_aux = critCampoSalida;
 				sentenciaOriginalAux = selectOriginal;
 				String operadorEncontrado = "";
-				while ((continuar) && (sentencia_aux.length() > 0)) {
+				while ((continuar) && (sentencia_aux.length() > 1)) {
 					operadorEncontrado = "";
 					// int pos_ini2 =sentencia_aux.lastIndexOf(v_tipoDatos.get(i).toString());
 					int pos_ini = sentencia_aux.indexOf(tipoDatos.get(i).toString());

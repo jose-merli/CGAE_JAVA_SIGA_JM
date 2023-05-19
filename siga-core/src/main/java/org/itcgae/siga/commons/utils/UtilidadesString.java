@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -482,7 +483,15 @@ public class UtilidadesString {
 			prop = texto.substring(pos1 + dif, pos2);
 
 			finalText.append(texto.substring(index, pos1));
-			String propValue = (String) properties.get(prop.toUpperCase());
+			String propValue = null;
+			Object propValueObj = properties.get(prop.toUpperCase());
+			if(propValueObj instanceof BigDecimal) {
+				BigDecimal bigDecimalValue = (BigDecimal)propValueObj;
+				propValue = bigDecimalValue.toPlainString();
+			}else {
+				propValue = (String) properties.get(prop.toUpperCase());
+			}
+		
 			if (propValue != null) {
 				propValue = UtilidadesString.formato_ISO_8859_1(propValue);
 				finalText.append(propValue);
