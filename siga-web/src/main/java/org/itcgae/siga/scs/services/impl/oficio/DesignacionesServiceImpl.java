@@ -6286,7 +6286,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									isLetradoUsuario = 0;
 								}
 							}
-							
 							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
 								actuacionDesignaItem.setUsuCreacion("PERSONAL");
 							} else {
@@ -6319,17 +6318,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							
 							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
 								actuacionDesignaItem.setUsuCreacion("PERSONAL");
+								if (actuacionDesignaItem.getUsuJustificacion() != null) {
+								actuacionDesignaItem.setUsuJustificacion("PERSONAL");
+								}
 							} else {
-								actuacionDesignaItem.setUsuCreacion(listaUsuarios.get(0).getDescripcion());
+								actuacionDesignaItem.setUsuJustificacion(listaUsuarios.get(0).getDescripcion());
 							}
 						} else {
 							if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-								actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+								actuacionDesignaItem.setUsuJustificacion(usuarios.get(0).getDescripcion());
 							}
 						}
 					} else {
 						if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+							actuacionDesignaItem.setUsuValidacion(usuarios.get(0).getDescripcion());
 						}
 					}
 
@@ -6349,17 +6351,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							
 							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
 								actuacionDesignaItem.setUsuCreacion("PERSONAL");
+								if (actuacionDesignaItem.getUsuValidacion() != null) {
+								actuacionDesignaItem.setUsuValidacion("PERSONAL");
+								}
 							} else {
-								actuacionDesignaItem.setUsuCreacion(listaUsuarios.get(0).getDescripcion());
+								actuacionDesignaItem.setUsuValidacion(listaUsuarios.get(0).getDescripcion());
 							}
 						} else {
 							if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-								actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+								actuacionDesignaItem.setUsuValidacion(usuarios.get(0).getDescripcion());
 							}
 						}
 					} else {
 						if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+							actuacionDesignaItem.setUsuValidacion(usuarios.get(0).getDescripcion());
 						}
 					}
 
