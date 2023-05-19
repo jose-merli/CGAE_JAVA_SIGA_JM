@@ -603,8 +603,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						"getJuzgados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && usuarios.size() > 0) {
-					List<ComboItem> combosItems = scsJuzgadoExtendsMapper.getJuzgadosByIdTurno(idInstitucion, idTurno);
-					comboDTO.setCombooItems(combosItems);
+					if((idInstitucion != null ) && (idTurno != null && !"".equals(idTurno))) {
+						List<ComboItem> combosItems = scsJuzgadoExtendsMapper.getJuzgadosByIdTurno(idInstitucion, idTurno);
+						comboDTO.setCombooItems(combosItems);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -2567,9 +2569,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setIdcalendarioguardias(scsCalendarioguardias.get(0).getIdcalendarioguardias());
 
 					scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
-					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy HH:mm")
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
-					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy HH:mm")
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
 					scsCabeceraguardias.setPosicion((short) 1);
