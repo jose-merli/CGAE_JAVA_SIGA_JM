@@ -2328,17 +2328,31 @@ public class ConsultasServiceImpl implements IConsultasService {
 							if (!operador.equals(SigaConstants.IS_NULL) && listaCampos.get(j).getValor() != null
 									&& !listaCampos.get(j).getValor().equals("") ) {
 								if (listaCampos.get(j).getTipoDato().equals(SigaConstants.TIPOFECHA)) {
+									
 									iParametroBind++;
-									criteriosDinamicos = "TO_DATE (:@" + iParametroBind + "@:"
-											+ ", 'YYYY/MM/DD HH24:MI:SS')";
-
 									String fecha = listaCampos.get(j).getValor();
-									// This could be MM/dd/yyyy, you original value is ambiguous
-									SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-									Date dateValue = input.parse(fecha);
+									if(fecha.length() > 11) {
+										criteriosDinamicos = "TO_DATE (:@" + iParametroBind + "@:"
+												+ ", 'YYYY/MM/DD HH24:MI:SS')";
 
-									SimpleDateFormat output = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-									String nuevoValor = output.format(dateValue);
+									}else {
+										criteriosDinamicos = "TO_DATE (:@" + iParametroBind + "@:"
+												+ ", 'DD/MM/YYYY')";
+									}
+									
+									
+									// This could be MM/dd/yyyy, you original value is ambiguous
+									String nuevoValor = "";
+									if(fecha.length() > 11) {
+										SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+										Date dateValue = input.parse(fecha);
+										SimpleDateFormat output = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+										 nuevoValor = output.format(dateValue);
+									}else {		
+										nuevoValor = fecha;
+									}
+									
+									
 									// listaCampos.get(j).setValor("'" + nuevoValor + "'");
 
 									// String aux = listaCampos.get(j).getValor();

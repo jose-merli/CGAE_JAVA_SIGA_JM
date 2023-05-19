@@ -247,6 +247,9 @@ public class EnvEnviosExtendsSqlProvider {
         if (filtros.getIdTipoEnvios() != null && !filtros.getIdTipoEnvios().trim().equals("")) {
             sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() + "'");
         }
+        if(filtros.getIdEnvio() != null && !filtros.getIdEnvio().trim().equals("")) {
+        	sql.WHERE("ENVIO.IDENVIO LIKE '%" + filtros.getIdEnvio() + "%'");
+        }
         if (filtros.getNombre() != null && !filtros.getNombre().trim().equals("")) {
             sql.WHERE(filtroTextoBusquedas("DEST.NOMBRE", filtros.getNombre()));
         }
