@@ -1913,6 +1913,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SELECT("DISTINCT *");
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ACTIVO = 1");
+		sql.ORDER_BY("Grupo");
 
 		return sql.toString();
 	}
