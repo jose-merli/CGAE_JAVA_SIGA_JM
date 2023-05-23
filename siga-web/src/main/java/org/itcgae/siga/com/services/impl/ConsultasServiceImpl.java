@@ -841,6 +841,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		modeloCom.setPreseleccionar("SI");
 		modeloCom.setUsumodificacion(usuario.getIdusuario());
 		modeloCom.setVisible((short) 1);
+		modeloCom.setInformeunico((short)0);
 
 		return modeloCom;
 	}
