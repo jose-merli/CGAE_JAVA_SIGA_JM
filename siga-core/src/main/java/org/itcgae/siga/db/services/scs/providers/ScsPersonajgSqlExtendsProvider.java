@@ -38,11 +38,15 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		if (justiciableBusquedaItem.getApellidos() != null && justiciableBusquedaItem.getApellidos() != "") {
 			
+			String[] splitApellidos = justiciableBusquedaItem.getApellidos().trim().split("\\s+");
+			if(splitApellidos.length>1) {
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas("apellido1", splitApellidos[0]));
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas("apellido2", splitApellidos[1]));
+			}
+			else {
+				sql.WHERE("( "+UtilidadesString.filtroTextoBusquedas("apellido1", splitApellidos[0])+" OR "+UtilidadesString.filtroTextoBusquedas("apellido2", splitApellidos[0])+" )");
+			}
 			
-			String columna = "REPLACE(CONCAT(apellido1,apellido2), ' ', '')";
-			String cadena = justiciableBusquedaItem.getApellidos().replaceAll("\\s+","");
-			
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}
 
 		if (justiciableBusquedaItem.getNif() != null && justiciableBusquedaItem.getNif() != "") {
