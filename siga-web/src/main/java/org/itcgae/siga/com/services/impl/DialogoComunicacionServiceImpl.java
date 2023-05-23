@@ -578,7 +578,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 				
 				if((listaKeyFiltros != null && listaKeyFiltros.size() > 0) || ejecutarConsulta){
-					if(modelosComunicacionItem.getInformeUnico().equals("1")) {
+					if(modelosComunicacionItem.getInformeUnico() != null && modelosComunicacionItem.getInformeUnico().equals("1")) {
 						List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
 						destinatarios =new ArrayList<DestinatarioItem>();
 						
@@ -1434,7 +1434,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			try {
 				sentencia = _consultasService.procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
 
-				if(modelosComunicacionItem != null && modelosComunicacionItem.getInformeUnico().equals("1")) {
+				if(modelosComunicacionItem != null && modelosComunicacionItem.getInformeUnico() != null && modelosComunicacionItem.getInformeUnico().equals("1")) {
 					sentencia = _consultasService.procesarEjecutarConsultaImprimir(usuario, sentencia, dialogo.getSentenciaImprimir(), listaKeyFiltros);
 				}
 				
