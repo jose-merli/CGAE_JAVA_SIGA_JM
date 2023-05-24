@@ -1916,6 +1916,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								ModModelocomunicacion modelo = _modModeloComunicacionMapper
 										.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
 								String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
+								
+								if(dest.getCamposEnvio()!= null && dest.getCamposEnvio().getIdentificador() != null && !dest.getCamposEnvio().getIdentificador().isEmpty() ) {
+									descripcion = dest.getCamposEnvio().getIdentificador();
+								}
+								
 								envio.setDescripcion(descripcion);
 
 								_envEnviosMapper.updateByPrimaryKey(envio);
@@ -2877,6 +2882,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(esEnvio) {
 				String envioCuerpo = null;
 				String envioAsunto = null;
+				String valorIdentificador = null;
 				if(camposEnvio.getAsunto() != null) {
 					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), camposEnvio.getAsunto(), destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, hDatosFinal);
 					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioAsunto, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
@@ -2886,11 +2892,17 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					envioCuerpo = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
 				}
 				
+				if (mapaClave.containsKey("identificador")) {
+				     valorIdentificador = mapaClave.get("identificador");
+				}
+				
 
 				//Cogemos todas las consultas y le metemos el nombre del fichero
 				if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
-					DestinatarioItem dest = new DestinatarioItem(destinatario);
 					CamposPlantillaEnvio envCampos = new CamposPlantillaEnvio();
+				
+					DestinatarioItem dest = new DestinatarioItem(destinatario);
+					envCampos.setIdentificador(valorIdentificador);
 					envCampos.setAsunto(envioAsunto);
 					envCampos.setCuerpo(envioCuerpo);
 					dest.setCamposEnvio(envCampos);
