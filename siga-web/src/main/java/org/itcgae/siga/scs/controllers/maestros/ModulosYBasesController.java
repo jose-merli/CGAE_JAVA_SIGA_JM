@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
 import org.itcgae.siga.DTOs.scs.AcreditacionItem;
 import org.itcgae.siga.DTOs.scs.ModulosDTO;
 import org.itcgae.siga.DTOs.scs.ModulosItem;
+import org.itcgae.siga.DTOs.scs.ModulosJuzgadoItem;
 import org.itcgae.siga.scs.services.maestros.IModulosYBasesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,12 @@ public class ModulosYBasesController {
 		ModulosDTO response = ModulosYBasesService.searchModules(modulosItem, request);
 		return new ResponseEntity<ModulosDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/modulosybasesdecompensacion/searchModulosJuzgados",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ModulosDTO> searchModules(@RequestBody ModulosJuzgadoItem modulosJuzgadoItem, HttpServletRequest request) {
+		ModulosDTO response = ModulosYBasesService.searchModulesJuzgados(modulosJuzgadoItem, request);
+		return new ResponseEntity<ModulosDTO>(response, HttpStatus.OK);
+}
 	
 	@RequestMapping(value = "/modulosybasesdecompensacion/procedimientos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getProcedimientos(@RequestParam("idProcedimiento") String idProcedimiento, HttpServletRequest request) {
