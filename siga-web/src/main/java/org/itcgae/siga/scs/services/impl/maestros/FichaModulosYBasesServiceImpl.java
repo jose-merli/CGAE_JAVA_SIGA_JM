@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
 import org.itcgae.siga.DTOs.scs.AcreditacionItem;
 import org.itcgae.siga.DTOs.scs.ModulosDTO;
 import org.itcgae.siga.DTOs.scs.ModulosItem;
+import org.itcgae.siga.DTOs.scs.ModulosJuzgadoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -172,7 +173,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 				modulosItem.setidInstitucion(idInstitucion.toString());
 				
 				modulosItem.setNombre(UtilidadesString.tratamientoApostrofes(modulosItem.getNombre()));
-				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosItem, usuarios.get(0).getIdlenguaje());
+				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosItem, usuarios.get(0).getIdlenguaje(), null);
 
 				LOGGER.info(
 						"searchModules() / scsProcedimientosMapper.selectByExample() -> Salida a scsProcedimientosMapper para obtener los modulos");
@@ -188,6 +189,52 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 		return modulosDTO;
 	}
 	
+	@Override
+	public ModulosDTO searchModulesJuzgados(ModulosJuzgadoItem modulosJuzgadoItem, HttpServletRequest request) {
+		LOGGER.info("searchSubzonas() -> Entrada al servicio para obtener modulos");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ModulosDTO modulosJuzgadoDTO = new ModulosDTO();
+		List<ModulosItem> modulosItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchModules() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchModules() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"searchModules() / scsProcedimientosMapper.selectByExample() -> Entrada a scsProcedimientosMapper para obtener los modulos");
+				modulosJuzgadoItem.getModulo().setidInstitucion(idInstitucion.toString());
+				
+				modulosJuzgadoItem.getModulo().setNombre(UtilidadesString.tratamientoApostrofes(modulosJuzgadoItem.getModulo().getNombre()));
+				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosJuzgadoItem.getModulo(), usuarios.get(0).getIdlenguaje(), modulosJuzgadoItem.getIdJuzgado());
+
+				LOGGER.info(
+						"searchModules() / scsProcedimientosMapper.selectByExample() -> Salida a scsProcedimientosMapper para obtener los modulos");
+
+
+				if (modulosItems != null) {
+					modulosJuzgadoDTO.setModulosItem(modulosItems);
+				}
+			}
+
+		}
+		LOGGER.info("searchSubzonas() -> Salida del servicio para obtener modulos");
+		return modulosJuzgadoDTO;
+	}
+
 	
 	@Override
 	public UpdateResponseDTO updateModules(ModulosItem modulosItem, HttpServletRequest request) {

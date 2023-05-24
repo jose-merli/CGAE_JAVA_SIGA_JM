@@ -46,7 +46,23 @@ public interface ScsProcedimientosExtendsMapper extends ScsProcedimientosMapper{
 		@Result(column = "JURISDICCION", property = "jurisdiccion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "JURISDICCIONDES", property = "jurisdiccionDes", jdbcType = JdbcType.VARCHAR),
 	})
+	List<ModulosItem> searchModulo(ModulosItem moduloItem, String idioma, String idJuzgado);
+	
+	/*
+	@SelectProvider(type = ScsProcedimientosSqlExtendsProvider.class, method = "searchModulo")
+	@Results({
+		@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAHASTAVIGOR", property = "fechahastavigor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADESDEVIGOR", property = "fechadesdevigor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "JURISDICCION", property = "jurisdiccion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "JURISDICCIONDES", property = "jurisdiccionDes", jdbcType = JdbcType.VARCHAR),
+	})
 	List<ModulosItem> searchModulo(ModulosItem moduloItem, String idioma);
+	*/
 	
 	@SelectProvider(type = ScsProcedimientosSqlExtendsProvider.class, method = "getIdProcedimiento")
 	@Results({ @Result(column = "IDPROCEDIMIENTO", property = "newId", jdbcType = JdbcType.VARCHAR)
