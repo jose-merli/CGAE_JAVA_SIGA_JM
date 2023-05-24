@@ -754,7 +754,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							e);
 				}
 
-				if (result != null && result.size() > 0) {
+				if (result != null && result.size() > 0 && result.get(0) != null) {
 					LOGGER.info("Se han obtenido " + result.size() + " destinatarios");
 
 					for (Map<String, Object> dest : result) {
@@ -997,6 +997,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												+ consultaMulti.getDescripcion() + " " + e.getMessage(), e);
 									} catch (Exception e) {
 										LOGGER.error(e);
+										if(e instanceof BusinessException) 
+											throw new BusinessException(e.getMessage(), e);
+									
 										throw new BusinessException(
 												"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
 									}
