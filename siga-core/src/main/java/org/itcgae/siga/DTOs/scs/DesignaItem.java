@@ -98,6 +98,8 @@ public class DesignaItem {
 	private String idPersona;  
 	private Error error = null;
 	private String institucioncolegiado;
+	
+	private String salto;
 
 	 public DesignaItem error(Error error) {
 		 this.error = error;
@@ -978,6 +980,14 @@ public class DesignaItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
+	public String getSalto() {
+		return salto;
+	}
+
+	public void setSalto(String salto) {
+		this.salto = salto;
+	}
+
 	@Override
 	public String toString() {
 		return "DesignaItem [ano=" + ano + ", anoProcedimiento=" + anoProcedimiento + ", art27=" + art27 + ", codigo="
