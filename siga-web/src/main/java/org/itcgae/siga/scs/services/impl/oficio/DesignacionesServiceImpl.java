@@ -3510,7 +3510,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							"createDesigna() / scsDesignasletradoMapper.insert() -> Salida de scsDesignasletradoMapper para insertar designaLetrado");
 
 					//Añadir salto
-					if("1".equals(designaItem.getSalto()) && !letradoDesigSinTurno) {
+					if("1".equals(designaItem.getSalto()) ) {
 						
 						SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
 						MaxIdDto nuevoId;
