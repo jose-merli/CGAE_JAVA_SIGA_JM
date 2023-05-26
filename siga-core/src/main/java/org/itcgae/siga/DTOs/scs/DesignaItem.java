@@ -35,7 +35,7 @@ public class DesignaItem {
 	private int idInstitucion_juzg;
 	private int idInstitucion_procur;
 	private String[] idJuzgados;
-	private int idJuzgado;
+	private String idJuzgado;
 	private String nombreJuzgado;
 	private String[] idJuzgadoActu;
 	private String nombreJuzgadoActu;
@@ -395,10 +395,10 @@ public class DesignaItem {
 	public void setIdJuzgados(String[] idJuzgados) {
 		this.idJuzgados = idJuzgados;
 	}
-	public int getIdJuzgado() {
+	public String getIdJuzgado() {
 		return idJuzgado;
 	}
-	public void setIdJuzgado(int idJuzgado) {
+	public void setIdJuzgado(String idJuzgado) {
 		this.idJuzgado = idJuzgado;
 	}
 	/**
