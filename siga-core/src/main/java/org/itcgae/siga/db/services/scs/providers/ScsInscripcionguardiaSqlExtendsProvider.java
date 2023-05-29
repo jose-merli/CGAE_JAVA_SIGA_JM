@@ -386,9 +386,11 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		
 		sql.SELECT("(CASE"
 				+ "            WHEN ins.fechadenegacion IS NOT NULL THEN '4'"
+				+ "            WHEN ins.fechabaja IS NOT NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
+				+ "                 AND ins.fechavalidacion IS NULL THEN '4' /*Denegacion*/"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NOT NULL"
-				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
 				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '3'"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NULL"
@@ -398,7 +400,11 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "                 AND ins.fechabaja IS NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NULL"
 				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1'"
-				+ "            ELSE '0'"
+				+ "            WHEN ins.fechadenegacion IS NULL"
+				+ "                 AND ins.fechabaja IS NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NULL"
+				+ "                 AND ins.fechavalidacion IS NULL THEN '0' /*Pendiente de Alta*/"
+				+ "            ELSE ''"
 				+ "        END"
 				+ "    ) estado");
 		

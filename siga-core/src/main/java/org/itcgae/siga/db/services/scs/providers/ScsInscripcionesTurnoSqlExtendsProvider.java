@@ -229,9 +229,11 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		sql.SELECT(  
 				"       ( CASE\r\n" + 
 				"            WHEN ins.fechadenegacion IS NOT NULL THEN '4'\r\n" + 
+				"            WHEN ins.fechabaja IS NOT NULL\r\n" + 
+				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 
+				"                 AND ins.fechavalidacion IS NULL THEN '4' /*Denegacion*/\r\n" + 
 				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
 				"                 AND ins.fechabaja IS NOT NULL\r\n" + 
-				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 
 				"                 AND ins.fechavalidacion IS NOT NULL THEN '3' /*Baja*/\r\n" + 
 				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
 				"                 AND ins.fechabaja IS NULL\r\n" + 
@@ -241,7 +243,11 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"                 AND ins.fechabaja IS NULL\r\n" + 
 				"                 AND ins.fechasolicitudbaja IS NULL\r\n" + 
 				"                 AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/\r\n" + 
-				"            ELSE '0' /*Pendiente de Alta*/\r\n" + 
+				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
+				"                 AND ins.fechabaja IS NULL\r\n" + 
+				"                 AND ins.fechasolicitudbaja IS NULL\r\n" + 
+				"                 AND ins.fechavalidacion IS NULL THEN '0' /*Pendiente de Alta*/\r\n" + 
+				"            ELSE ''\r\n" + 
 				"        END\r\n" + 
 				"    ) estado,\r\n" + 
 				"    tur.nombre nombreturno,\r\n" + 
