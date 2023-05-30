@@ -391,15 +391,15 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "                 AND ins.fechavalidacion IS NULL THEN '4' /*Denegacion*/"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NOT NULL"
-				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '3'"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '3' /*Baja*/"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
-				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '2'"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '2' /*Pendiente de Baja*/"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NULL"
-				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1'"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NULL"
@@ -473,8 +473,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		                if(i>0) condestados+=" or ";
 		                // Pendiente de alta
 		                if(estados[i].equals("0")) {
-		                    condestados+=" (ins.fechavalidacion is null and ins.fechadenegacion is null and ins.fechasuscripcion is not null)" ;
-		                }
+		                	condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+									" AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL)";		                }
 		                // Alta
 		                else if(estados[i].equals("1")) {
 		                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
@@ -492,8 +492,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		                }
 		                // Denegada
 		                else if(estados[i].equals("4")) {
-		                    condestados+=" (ins.fechadenegacion is not null)" ;
-		                }
+							condestados+="((ins.fechadenegacion is not null) or"
+									+ "(ins.fechabaja IS NOT NULL"
+									+ " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NULL )"
+									+" )" ;		                }
 		            }
 		            condestados+=")";
 		            sql.WHERE(condestados);

@@ -308,7 +308,8 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				if(i>0) condestados+=" or ";
 				// Pendiente de alta
 				if(estados[i].equals("0")) {
-					condestados+="(ins.fechavalidacion is null and ins.fechadenegacion is null)" ;
+					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+							" AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL)" ;
 				}
 				// Alta
 				else if(estados[i].equals("1")) {
@@ -327,7 +328,10 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				}
 				// Denegada
 				else if(estados[i].equals("4")) {
-					condestados+="(ins.fechadenegacion is not null)" ;
+					condestados+="((ins.fechadenegacion is not null) or"
+							+ "(ins.fechabaja IS NOT NULL"
+							+ " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NULL )"
+							+" )" ;
 				}
 			}
 			condestados+=")";
