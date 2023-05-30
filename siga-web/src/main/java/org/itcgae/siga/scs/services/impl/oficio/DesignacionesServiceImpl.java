@@ -791,6 +791,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setAcuerdoextrajudicial((short) 0);
 					record.setAnulacion((short) 0);
 
+					record.setUsujustificacion(usuarios.get(0).getIdusuario());
+					
 					ScsProcedimientosKey procedimientosKey = new ScsProcedimientosKey();
 					procedimientosKey.setIdprocedimiento(item.getProcedimiento());
 					procedimientosKey.setIdinstitucion(idInstitucion);
