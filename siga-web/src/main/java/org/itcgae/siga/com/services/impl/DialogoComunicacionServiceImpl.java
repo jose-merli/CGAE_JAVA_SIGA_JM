@@ -2948,8 +2948,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
                 	Pattern patternAux = Pattern.compile(Pattern.quote(etiqueta));
                     Matcher  matcherAux = patternAux.matcher(cuerpoEnvio);
                     
-                     if(matcherAux.find()) {
-                    	 cuerpoEnvio = cuerpoEnvio.replaceAll(etiqueta, entryVal.getValue().toString());
+                     if(matcherAux.find() ) {
+                    	 if(entryVal.getValue() == null)
+                    		 cuerpoEnvio = cuerpoEnvio.replaceAll(etiqueta, "");
+                    	 else
+                    		 cuerpoEnvio = cuerpoEnvio.replaceAll(etiqueta, entryVal.getValue().toString());
                      }
         			
         		}
