@@ -2134,11 +2134,12 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										LOGGER.info("uploadFileCalendariosAsync() -> Insertando en SCS_CALENDARIOGUARDIAS");
 										int res2 = scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(null,
 												null, null, observaciones, idTurno, idGuardia,
-												new SimpleDateFormat("dd/MM/yyyy")
+												new SimpleDateFormat("yyyy/MM/dd")
 														.format(cargaMasivaDatosBTItem.getFechaFinal()),
-												new SimpleDateFormat("dd/MM/yyyy")
+												new SimpleDateFormat("yyyy/MM/dd")
 														.format(cargaMasivaDatosBTItem.getFechaInicio()),
-														nextIdCalendarioGuardias, idInstitucion.toString(), null, today, null, null,
+														nextIdCalendarioGuardias, idInstitucion.toString(), null, new SimpleDateFormat("yyyy/MM/dd")
+														.format(new Date()), null, null,
 												usuarios.get(0).getIdusuario().toString());
 
 										//String idCalendario = scsGuardiasturnoExtendsMapper.getLastCalendar(idInstitucion.toString()); 

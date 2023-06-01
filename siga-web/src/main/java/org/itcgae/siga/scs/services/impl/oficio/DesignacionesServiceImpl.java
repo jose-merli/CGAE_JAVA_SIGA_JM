@@ -206,10 +206,12 @@ import org.itcgae.siga.db.services.scs.mappers.ScsImpugnacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsSaltoscompensacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipodictamenejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTiporesolucionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
+import org.itcgae.siga.scs.services.guardia.SaltosCompGuardiasService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.scs.services.oficio.ISaltosCompOficioService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
@@ -246,6 +248,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
+	
+	@Autowired
+	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesExtendsMapper;
 
 	@Autowired
 	private ScsSojMapper scsSojMapper;
@@ -390,6 +395,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private CenClienteExtendsMapper cenClienteExtendsMapper;
+	
+	@Autowired
+	private SaltosCompGuardiasService saltosCompGuardiasService;
 	
 	// Contadores necesarios para las comprobaciones de filtros modo lectura al guardar justificaciones exprés
 	private int numActualizados;
@@ -783,6 +791,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setAcuerdoextrajudicial((short) 0);
 					record.setAnulacion((short) 0);
 
+					record.setUsujustificacion(usuarios.get(0).getIdusuario());
+					
 					ScsProcedimientosKey procedimientosKey = new ScsProcedimientosKey();
 					procedimientosKey.setIdprocedimiento(item.getProcedimiento());
 					procedimientosKey.setIdinstitucion(idInstitucion);
@@ -3501,6 +3511,32 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"createDesigna() / scsDesignasletradoMapper.insert() -> Salida de scsDesignasletradoMapper para insertar designaLetrado");
 
+					//Añadir salto
+					if("1".equals(designaItem.getSalto()) ) {
+						
+						SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
+						MaxIdDto nuevoId;
+						
+						scgi.setIdPersona(designaLetrado.getIdpersona().toString());
+						scgi.setIdTurno(designaLetrado.getIdturno().toString());
+						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+						fecha = sdf.format(new Date());
+						scgi.setFecha(fecha);
+						scgi.setSaltoCompensacion("S");
+						scgi.setMotivo("Creado en la designacion D"+designa.getAnio().toString()+"/"+designa.getCodigo());
+
+						nuevoId = scsSaltoscompensacionesExtendsMapper
+								.selectNuevoIdSaltosCompensaciones(scgi, idInstitucion.toString());
+
+						int	respSalto = scsSaltoscompensacionesExtendsMapper.guardarSaltosCompensaciones(
+								scgi, idInstitucion.toString(), Long.toString(nuevoId.getIdMax()), usuario);
+						if (respSalto != 0) {
+							error.setCode(200);
+						} else {
+							throw (new Exception("Error al asociar un salto o una compensacion a unos de los letrados"));
+						}						
+						
+					}
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);

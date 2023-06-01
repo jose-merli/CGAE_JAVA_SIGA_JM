@@ -117,6 +117,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -769,7 +770,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						guardia.setDescripcion(guardiasItem.getDescripcion());
 						guardia.setNombre(guardiasItem.getNombre());
-						guardia.setIdtipoguardia(Short.valueOf(guardiasItem.getIdTipoGuardia()));
+						if (guardiasItem.getIdTipoGuardia() != null && !StringUtils.isEmpty(guardiasItem.getIdTipoGuardia())) {
+							guardia.setIdtipoguardia(Short.valueOf(guardiasItem.getIdTipoGuardia()));
+						} else {
+							guardia.setIdtipoguardia(null);
+						}
 						if (guardiasItem.getEnvioCentralita() != null)
 							guardia.setEnviocentralita(
 									Short.valueOf((short) (guardiasItem.getEnvioCentralita() ? 1 : 0)));
@@ -1099,7 +1104,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.info("resumenGuardia() -> Salida ya con los datos recogidos");
 			}
 		}
-		return guardias.get(0);
+		return !guardias.isEmpty() ? guardias.get(0) : null;
 	}
 
 	@Override

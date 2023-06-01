@@ -199,6 +199,9 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
         if (!UtilidadesString.esCadenaVacia(salto.getIdTurno())) {
         	sql.WHERE(" IDTURNO IN (" + salto.getIdTurno() + ")");
         }
+        if (!UtilidadesString.esCadenaVacia(salto.getIdGuardia())) {
+        	sql.WHERE(" IDGUARDIA IN (" + salto.getIdGuardia() + ")");
+        }
     
 
         if (!UtilidadesString.esCadenaVacia(salto.getFechaDesde())) {
