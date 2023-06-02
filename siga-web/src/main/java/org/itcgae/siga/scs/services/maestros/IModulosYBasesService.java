@@ -10,10 +10,13 @@ import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
 import org.itcgae.siga.DTOs.scs.AcreditacionItem;
 import org.itcgae.siga.DTOs.scs.ModulosDTO;
 import org.itcgae.siga.DTOs.scs.ModulosItem;
+import org.itcgae.siga.DTOs.scs.ModulosJuzgadoItem;
 
 public interface IModulosYBasesService {
 	
 	public ModulosDTO searchModules(ModulosItem modulosItem, HttpServletRequest request);
+	
+	public ModulosDTO searchModulesJuzgados(ModulosJuzgadoItem modulosJuzgadoItem, HttpServletRequest request);
 
 	public UpdateResponseDTO deleteModules(ModulosDTO modulosDTO, HttpServletRequest request);
 

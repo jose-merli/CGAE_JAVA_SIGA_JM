@@ -7,5 +7,6 @@ public class CamposPlantillaEnvio {
 	
 	private String cuerpo;
 	private String asunto;
+	private String identificador;
 
 }

@@ -383,19 +383,25 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		
 		sql.SELECT("(CASE"
 				+ "            WHEN ins.fechadenegacion IS NOT NULL THEN '4'"
+				+ "            WHEN ins.fechabaja IS NOT NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
+				+ "                 AND ins.fechavalidacion IS NULL THEN '4' /*Denegacion*/"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NOT NULL"
-				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
-				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '3'"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '3' /*Baja*/"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
-				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '2'"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '2' /*Pendiente de Baja*/"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NULL"
-				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1'"
-				+ "            ELSE '0'"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/"
+				+ "            WHEN ins.fechadenegacion IS NULL"
+				+ "                 AND ins.fechabaja IS NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NULL"
+				+ "                 AND ins.fechavalidacion IS NULL THEN '0' /*Pendiente de Alta*/"
+				+ "            ELSE ''"
 				+ "        END"
 				+ "    ) estado");
 		
@@ -456,6 +462,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
         /*if(inscripciones.getaFechaDe() != null) {
         	sql.WHERE("ins.estado in (1,2)");
         }else {*/
+
     	if(inscripciones.getIdEstado() != null) {
     
             String condestados = "(";
@@ -489,6 +496,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
             condestados+=")";
             sql.WHERE(condestados);
         }
+
 	      // }
         
         //sql.WHERE("ins.fechasuscripcion = (" + subQuerysql + ")");

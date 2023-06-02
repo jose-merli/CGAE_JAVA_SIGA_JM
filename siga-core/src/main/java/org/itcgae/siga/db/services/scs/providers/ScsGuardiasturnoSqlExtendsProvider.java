@@ -203,7 +203,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		sql.ORDER_BY("SCS_TURNO.NOMBRE DESC, SCS_GUARDIASTURNO.NOMBRE DESC");
 
-		SQL_PADRE.SELECT(" *");
+		SQL_PADRE.SELECT_DISTINCT(" *");
 		SQL_PADRE.FROM("( " + sql.toString() + " )");
 		if(tamMax != null && tamMax > 0) {
 			tamMax += 1;

@@ -754,7 +754,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							e);
 				}
 
-				if (result != null && result.size() > 0) {
+				if (result != null && result.size() > 0 && result.get(0) != null) {
 					LOGGER.info("Se han obtenido " + result.size() + " destinatarios");
 
 					for (Map<String, Object> dest : result) {
@@ -997,6 +997,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												+ consultaMulti.getDescripcion() + " " + e.getMessage(), e);
 									} catch (Exception e) {
 										LOGGER.error(e);
+										if(e instanceof BusinessException) 
+											throw new BusinessException(e.getMessage(), e);
+									
 										throw new BusinessException(
 												"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
 									}
@@ -1916,6 +1919,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								ModModelocomunicacion modelo = _modModeloComunicacionMapper
 										.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
 								String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
+								
+								if(dest.getCamposEnvio()!= null && dest.getCamposEnvio().getIdentificador() != null && !dest.getCamposEnvio().getIdentificador().isEmpty() ) {
+									descripcion = dest.getCamposEnvio().getIdentificador();
+								}
+								
 								envio.setDescripcion(descripcion);
 
 								_envEnviosMapper.updateByPrimaryKey(envio);
@@ -2877,6 +2885,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(esEnvio) {
 				String envioCuerpo = null;
 				String envioAsunto = null;
+				String valorIdentificador = null;
 				if(camposEnvio.getAsunto() != null) {
 					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), camposEnvio.getAsunto(), destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, hDatosFinal);
 					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioAsunto, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
@@ -2886,11 +2895,17 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					envioCuerpo = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
 				}
 				
+				if (mapaClave.containsKey("identificador")) {
+				     valorIdentificador = mapaClave.get("identificador");
+				}
+				
 
 				//Cogemos todas las consultas y le metemos el nombre del fichero
 				if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
-					DestinatarioItem dest = new DestinatarioItem(destinatario);
 					CamposPlantillaEnvio envCampos = new CamposPlantillaEnvio();
+				
+					DestinatarioItem dest = new DestinatarioItem(destinatario);
+					envCampos.setIdentificador(valorIdentificador);
 					envCampos.setAsunto(envioAsunto);
 					envCampos.setCuerpo(envioCuerpo);
 					dest.setCamposEnvio(envCampos);
@@ -2933,8 +2948,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
                 	Pattern patternAux = Pattern.compile(Pattern.quote(etiqueta));
                     Matcher  matcherAux = patternAux.matcher(cuerpoEnvio);
                     
-                     if(matcherAux.find()) {
-                    	 cuerpoEnvio = cuerpoEnvio.replaceAll(etiqueta, entryVal.getValue().toString());
+                     if(matcherAux.find() ) {
+                    	 if(entryVal.getValue() == null)
+                    		 cuerpoEnvio = cuerpoEnvio.replaceAll(etiqueta, "");
+                    	 else
+                    		 cuerpoEnvio = cuerpoEnvio.replaceAll(etiqueta, entryVal.getValue().toString());
                      }
         			
         		}
