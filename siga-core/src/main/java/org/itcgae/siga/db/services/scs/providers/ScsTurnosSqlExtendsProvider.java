@@ -672,7 +672,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sql4.INNER_JOIN("scs_guardiasturno gua ON gua.idturno = ins.idturno and gua.idguardia = ins.idguardia and gua.IDINSTITUCION = ins.IDINSTITUCION");
 		sql4.LEFT_OUTER_JOIN("scs_grupoguardiacolegiado gru ON gru.IDINSTITUCION = ins.IDINSTITUCION and gru.IDTURNO = ins.IDTURNO and gru.IDGUARDIA = ins.IDGUARDIA and gru.IDPERSONA = per.IDPERSONA and gru.FECHASUSCRIPCION = ins.FECHASUSCRIPCION");
 		sql4.LEFT_OUTER_JOIN("scs_grupoguardia grg ON grg.IDGRUPOGUARDIA = gru.IDGRUPOGUARDIA");
-		sql4.WHERE("Ins.Fechavalidacion IS NOT NULL AND Ins.fechabaja IS NULL "+
+		
+		//ARR:
+		sql4.WHERE("Ins.Fechavalidacion IS NOT NULL AND (Ins.fechabaja IS NULL || Ins.fechabaja > sysdate ) "+
 				"AND Gua.Idinstitucion = '"+idInstitucion+"'" +
 				"AND Gua.Idturno = '"+turnosItem.getIdturno()+"'"+
 				"AND Gua.idguardia = '"+turnosItem.getIdcomboguardias()+"'");
@@ -749,7 +751,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sqls5.INNER_JOIN("scs_guardiasturno gua ON gua.idturno = ins.idturno and gua.idguardia = ins.idguardia and gua.IDINSTITUCION = ins.IDINSTITUCION");
 		sqls5.LEFT_OUTER_JOIN("scs_grupoguardiacolegiado gru ON gru.IDINSTITUCION = ins.IDINSTITUCION and gru.IDTURNO = ins.IDTURNO and gru.IDGUARDIA = ins.IDGUARDIA and gru.IDPERSONA = per.IDPERSONA and gru.FECHASUSCRIPCION = ins.FECHASUSCRIPCION");
 		sqls5.LEFT_OUTER_JOIN("scs_grupoguardia grg ON grg.IDGRUPOGUARDIA = gru.IDGRUPOGUARDIA");
-		sqls5.WHERE("Ins.Fechavalidacion IS NOT NULL AND Ins.fechabaja IS NULL "+
+		
+		//ARR
+		sqls5.WHERE("Ins.Fechavalidacion IS NOT NULL AND (Ins.fechabaja IS NULL || Ins.fechabaja > sysdate ) "+
 				"AND Gua.Idinstitucion = '"+idInstitucion+"'" +
 				"AND Gua.Idturno = '"+turnosItem.getIdturno()+"'"+
 				"AND Gua.idguardia = '"+turnosItem.getIdcomboguardias()+"'");
