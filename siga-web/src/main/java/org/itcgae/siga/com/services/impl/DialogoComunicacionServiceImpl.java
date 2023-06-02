@@ -2870,6 +2870,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					docGenerado = _generacionDocService.grabaDocumento(doc, rutaTmp, nombreFicheroSalida, firmado);
 
 				} catch (Exception e) {
+					
+					if(e instanceof BusinessException) {
+						throw new BusinessException(e.getMessage(), e);
+					}
 					LOGGER.error(e);
 					throw new BusinessException("Error al generar el fichero", e);
 				}
