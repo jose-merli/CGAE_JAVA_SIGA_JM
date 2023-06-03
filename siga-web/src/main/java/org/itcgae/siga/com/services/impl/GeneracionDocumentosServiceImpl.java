@@ -228,6 +228,10 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 		} catch (Exception e) {
 			String mensaje = "Error al guardar el documento: " + pathfinal + nombrefichero;
+			if(e.getMessage() != null && e.getMessage().contains("PDF")) {
+				 mensaje = 	e.getMessage();
+			}
+ 
 			LOGGER.error(mensaje);
 			throw new BusinessException(mensaje, e);
 		}
