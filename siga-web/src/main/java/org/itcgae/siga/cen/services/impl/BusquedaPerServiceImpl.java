@@ -27,6 +27,8 @@ import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
@@ -463,13 +465,28 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 
 							// Buscamos si se encuentra en nuestra bbdd
 						} else {
+							
+							String tipo = isNifNie(busquedaPerFisicaSearchDTO.getNif());
 							CenPersonaExample cenPersonaExample = new CenPersonaExample();
-							cenPersonaExample.createCriteria().andIdtipoidentificacionEqualTo(Short.valueOf("20"))
-									.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
-
+							if(tipo != null) {
+								if(tipo.equals("NIF")) {
+									cenPersonaExample.createCriteria().andIdtipoidentificacionEqualTo(Short.valueOf("10"))
+											.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+								}else if(tipo.equals("NIE")) {
+									cenPersonaExample.createCriteria().andIdtipoidentificacionEqualTo(Short.valueOf("40"))
+											.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+								}
+							}else {
+								cenPersonaExample.createCriteria().andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());	
+							}
+							
 							List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 
 							if (null != listPersona && listPersona.size() > 0) {
+								rellenaPersonaFisica(listPersona, busquedaPerFisicaItems, idInstitucion);
+								
+								busquedaPerFisicaDTO.setBusquedaFisicaItems(busquedaPerFisicaItems);
+							} else {
 								Error error = new Error();
 								error.setMessage("general.mensaje.busquedaGeneral.noexiste.personaFisica");
 								busquedaPerFisicaDTO.setError(error);
@@ -587,6 +604,63 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 		return busquedaPerFisicaDTO;
 	}
 
+	private void rellenaPersonaFisica(List<CenPersona> listPersona,
+			List<BusquedaPerFisicaItem> busquedaPerFisicaItems, Short idInstitucion) {
+
+		for(CenPersona persona : listPersona) {
+		
+			BusquedaPerFisicaItem busquedaPerFisica = new BusquedaPerFisicaItem();
+			if (null != persona.getApellidos1()) {
+				busquedaPerFisica.setPrimerApellido(persona.getApellidos1());
+			} else {
+				busquedaPerFisica.setPrimerApellido("");
+			}
+			if (null != persona.getApellidos2()) {
+				busquedaPerFisica.setSegundoApellido(persona.getApellidos2());
+			} else {
+				busquedaPerFisica.setSegundoApellido("");
+			}
+	
+			busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido()
+					.concat(" ")
+					.concat(busquedaPerFisica.getSegundoApellido()));
+			if (null != persona.getNifcif()) {
+				busquedaPerFisica.setNif(persona.getNifcif());
+			}
+			busquedaPerFisica.setNombre(persona.getNombre());
+			
+			CenColegiadoExample exampleCol = new CenColegiadoExample();
+			exampleCol.createCriteria().andIdpersonaEqualTo(persona.getIdpersona())
+						.andIdinstitucionEqualTo(idInstitucion);
+			List<CenColegiado> colegiado = cenColegiadoExtendsMapper.selectByExample(exampleCol);
+	
+			if (null != colegiado && colegiado.size() > 0) {
+				if (null != colegiado.get(0).getSituacionresidente()) {
+					if (colegiado.get(0).getSituacionresidente().toString().equals("1")) {
+						busquedaPerFisica.setResidente("SI");
+					} else {
+						busquedaPerFisica.setResidente("NO");
+					}
+	
+				}
+				busquedaPerFisica
+						.setNumeroColegiado(colegiado.get(0).getNcolegiado());
+				busquedaPerFisica.setSituacion(colegiado.get(0).getSituacionejercicio().toString());
+				if (null != idInstitucion) {
+					
+					CenInstitucion institucion = cenInstitucionExtendsMapper.selectByPrimaryKey(idInstitucion);
+					if (null != institucion) {
+						busquedaPerFisica.setColegio(institucion.getNombre());
+						busquedaPerFisica.setNumeroInstitucion(institucion.getIdinstitucion().toString());
+					}
+				}
+			}
+			
+			busquedaPerFisicaItems.add(busquedaPerFisica);
+		}
+		
+	}
+
 	private com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[] buscarColegiadoSinDocumentacion(
 			BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO) {
 
@@ -651,10 +725,14 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				String tipo = isNifNie(documento);
 				// Rellenamos la peticion
 				IdentificacionType identificacion = IdentificacionType.Factory.newInstance();
-				if (tipo.equals("NIF")) {
-					identificacion.setNIF(documento);
-				} else if (tipo.equals("NIE")) {
-					identificacion.setNIE(documento);
+				if(tipo != null) {
+						if (tipo.equals("NIF")) {
+						identificacion.setNIF(documento);
+					} else if (tipo.equals("NIE")) {
+						identificacion.setNIE(documento);
+					}
+				}else {
+					identificacion.setPasaporte(documento);
 				}
 				colegiadoRequest.setIdentificacion(identificacion);
 
