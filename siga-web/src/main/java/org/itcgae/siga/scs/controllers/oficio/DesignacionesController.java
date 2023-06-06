@@ -212,6 +212,8 @@ public class DesignacionesController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.ACCEPTED);
 		else if (response.getError().getCode() == 406)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.NOT_ACCEPTABLE);
+		else if (response.getError().getCode() == 404)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.NOT_FOUND);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

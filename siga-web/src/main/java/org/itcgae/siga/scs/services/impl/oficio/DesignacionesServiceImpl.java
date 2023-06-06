@@ -3300,7 +3300,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (letradoAlgoritmoSeleccion == null) {
 							response = 0;
 							error.setCode(404);
-							error.setDescription("general.mensaje.error.bbdd");
+							error.setDescription("justiciaGratuita.oficio.designa.seleccionManualLetrado");
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							insertResponseDTO.setError(error);
 							LOGGER.info("No se ha encontrado letrado en la cola");
