@@ -610,14 +610,57 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 							//Denegacion de peticion de baja
 							if(inscripcionesItem.getEstado().equals("2")){
-							inscripcionturno.setObservacionesdenegacion(inscripcionesItem.getObservaciones());
-							inscripcionturno.setFechasolicitudbaja(null);
-							inscripcionturno.setFechabaja(null);
+								inscripcionturno.setObservacionesdenegacion(inscripcionesItem.getObservaciones());
+								inscripcionturno.setFechasolicitudbaja(null);
+								inscripcionturno.setFechabaja(null);
+								
+								if (inscripcionesItem.getTipoguardias().equals("Obligatorias")
+										|| inscripcionesItem.getTipoguardias().equals("Todas o ninguna")) {
+									
+									List<ScsInscripcionguardia> inscripcionguardia = null;
+									ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
+									exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+											.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+											.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+	
+									inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
+									for (int i = 0; i < inscripcionguardia.size(); i++) {
+									ScsInscripcionguardia guardia = inscripcionguardia.get(i);
+									guardia.setObservacionesdenegacion(inscripcionesItem.getObservaciones());
+									guardia.setFechasolicitudbaja(null);
+									guardia.setFechabaja(null);
+									guardia.setFechamodificacion(new Date());
+									guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
+									
+									response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardia);
+									}
+								}
 							}
 							//Denegacion de peticion de alta
 							if(inscripcionesItem.getEstado().equals("0")){
-							inscripcionturno.setObservacionesdenegacion(inscripcionesItem.getObservaciones());
-							inscripcionturno.setFechadenegacion(inscripcionesItem.getFechaActual());
+								inscripcionturno.setObservacionesdenegacion(inscripcionesItem.getObservaciones());
+								inscripcionturno.setFechadenegacion(inscripcionesItem.getFechaActual());
+								
+								if (inscripcionesItem.getTipoguardias().equals("Obligatorias")
+										|| inscripcionesItem.getTipoguardias().equals("Todas o ninguna")) {
+									
+									List<ScsInscripcionguardia> inscripcionguardia = null;
+									ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
+									exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+											.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+											.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+	
+									inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
+									for (int i = 0; i < inscripcionguardia.size(); i++) {
+										ScsInscripcionguardia guardia = inscripcionguardia.get(i);
+										guardia.setObservacionesdenegacion(inscripcionesItem.getObservaciones());
+										guardia.setFechadenegacion(inscripcionesItem.getFechaActual());
+										guardia.setFechamodificacion(new Date());
+										guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
+										
+										response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardia);
+									}
+								}
 							}
 							
 
@@ -730,6 +773,14 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 										break;
 									}
 									
+									List<ScsInscripcionguardia> inscripcionguardia = null;
+									ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
+									exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+											.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+											.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+	
+									inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
+									
 									//Final comprobación
 									if(inscripcionesItem.getEstadonombre().equals("Alta")
 											|| inscripcionesItem.getFechaActual().before(inscripcionturno.getFechasolicitudbaja())) {
@@ -742,6 +793,20 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 										inscripcionturno.setFechamodificacion(new Date());
 										inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 										
+										for (int i = 0; i < inscripcionguardia.size(); i++) {
+											ScsInscripcionguardia guardia = inscripcionguardia.get(i);
+											
+											guardia.setFechavalidacion(inscripcionesItem.getFechaActual());
+											
+											if(inscripcionesItem.getEstadonombre().equals("Pendiente de Baja")) {
+												guardia.setObservacionesvalbaja(inscripcionesItem.getObservaciones());
+											}
+											
+											guardia.setFechamodificacion(new Date());
+											guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
+											
+											response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardia);
+										}
 										response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
 									}else {
 										response = 0;
@@ -774,13 +839,34 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									//		|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechabaja()) 
 									//		|| response != 0) {
 									//if(response !=0) {
-										inscripcionturno.setFechabaja(inscripcionesItem.getFechaActual());
-										inscripcionturno.setObservacionesbaja(inscripcionesItem.getObservaciones());
-
-										inscripcionturno.setFechamodificacion(new Date());
-										inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
+									
+									List<ScsInscripcionguardia> inscripcionguardia = null;
+									ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
+									exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+											.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+											.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+	
+									inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
+									
+									for (int i = 0; i < inscripcionguardia.size(); i++) {
+										ScsInscripcionguardia guardia = inscripcionguardia.get(i);
 										
-										response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
+										guardia.setFechabaja(inscripcionesItem.getFechaActual());
+										guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
+										
+										guardia.setFechamodificacion(new Date());
+										guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
+										
+										response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardia);
+									}
+								
+									inscripcionturno.setFechabaja(inscripcionesItem.getFechaActual());
+									inscripcionturno.setObservacionesbaja(inscripcionesItem.getObservaciones());
+
+									inscripcionturno.setFechamodificacion(new Date());
+									inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
+									
+									response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
 
 									//}//else {
 									//	response = 0;
