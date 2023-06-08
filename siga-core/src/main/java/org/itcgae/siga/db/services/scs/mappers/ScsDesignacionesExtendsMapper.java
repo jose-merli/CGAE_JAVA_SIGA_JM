@@ -525,6 +525,12 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "NIF", property = "nifInteresado", jdbcType = JdbcType.VARCHAR)})
 	List<RelacionesItem> busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion);
 	
+	
+	//Busca la resolución del ejg asociado a la asistencia que le indicamos
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaResolucionEjgAsistencia")
+	@Results({})//si no es así corchetes vacíos o result value (???) buscar un string en los exten... esperemos no tener que llegar a esto
+	String busquedaResolucionEjgAsistencia(String anio, String num, short idInstitucion, int idLenguaje);
+	
 
 	@DeleteProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "eliminarRelacion")
 	int eliminarRelacion(String anioEjg, String numEjg, String idTurno, String idinstitucion, String anioDes, String numDes, String idTipoEjg);

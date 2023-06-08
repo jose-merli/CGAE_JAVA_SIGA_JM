@@ -2746,6 +2746,23 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String busquedaResolucionEjgAsistencia(String anio, String num, short idInstitucion, int idLenguaje) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("NVL(f_siga_getrecurso(res.descripcion,"+idLenguaje+"),'Sin resolución') resolucion");
+		sql.FROM("scs_ejg e");
+		sql.INNER_JOIN("scs_asistencia a on a.idinstitucion = e.idinstitucion AND a.ejganio = e.anio AND a.ejgnumero = e.numero AND a.ejgidtipoejg = e.idtipoejg");
+		sql.LEFT_OUTER_JOIN("cen_persona on cen_persona.idpersona = e.idpersona",
+				"cen_colegiado c on cen_persona.idpersona=c.idpersona and c.idinstitucion=e.idinstitucion",
+				"scs_personajg perjg on perjg.idpersona = e.idpersonajg and e.idinstitucion = perjg.idinstitucion",
+				"scs_tipodictamenejg dic on e.idtipodictamenejg = dic.idtipodictamenejg and e.idinstitucion = dic.idinstitucion",
+				"scs_tiporesolucion res on e.IDTIPORATIFICACIONEJG = res.idtiporesolucion",
+				"scs_tiporesolauto imp ON e.idtiporesolauto = imp.idtiporesolauto");
+		sql.WHERE("a.anio = '"+anio+"' AND  a.numero = '"+num+"' AND  a.idinstitucion ="+idInstitucion);
+		
+		return sql.toString();
+	}
 
 	public String busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion) {
 		//Consulta padre que engloba al resto para usar un where general, etc.
