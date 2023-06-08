@@ -2283,7 +2283,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
+						response = scsEstadoejgMapper.deleteByPrimaryKey(record);
 
 						if (response != 1) {
 							responsedto.setStatus(SigaConstants.KO);
