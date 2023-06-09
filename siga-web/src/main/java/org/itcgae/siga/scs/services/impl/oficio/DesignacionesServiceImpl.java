@@ -747,6 +747,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							&& !item.getFechaJustificacion().equals("false")) {
 						fecha = formatter.parse(item.getFechaJustificacion());
 						record.setFechajustificacion(fecha);
+						
+						record.setUsujustificacion(usuarios.get(0).getIdusuario());
+						record.setFechausujustificacion(new Date());
 					}
 
 					// Idacreditacion, hecho asi por el front
@@ -770,12 +773,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						record.setNumeroprocedimiento(item.getNumProcedimiento());
 					}
 					if (item.getValidada() != null && !item.getValidada().trim().isEmpty()) {
-						record.setValidada(item.getValidada());
-
-						// Si se valida una actuación se establece automáticamente la fecha de
-						// justificación
-						if (record.getValidada().equals("1") && record.getFechajustificacion() == null) {
-							record.setFechajustificacion(new Date());
+						String validada = item.getValidada();
+						record.setValidada(validada);
+												
+						if (validada.equals("1")) {
+							record.setUsuvalidacion(usuarios.get(0).getIdusuario());
+							record.setFechavalidacion(new Date());
+							
+							// Si se valida una actuación se establece automáticamente la fecha de
+							// justificación
+							if(record.getFechajustificacion() == null) {
+								record.setFechajustificacion(new Date());
+								
+								record.setUsujustificacion(usuarios.get(0).getIdusuario());
+								record.setFechausujustificacion(new Date());
+							}
 						}
 					}
 
@@ -791,7 +803,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setAcuerdoextrajudicial((short) 0);
 					record.setAnulacion((short) 0);
 
-					record.setUsujustificacion(usuarios.get(0).getIdusuario());
+					
 					
 					ScsProcedimientosKey procedimientosKey = new ScsProcedimientosKey();
 					procedimientosKey.setIdprocedimiento(item.getProcedimiento());
@@ -6042,7 +6054,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						// guardamos las actuaciones
 						if (justificacion.getActuaciones() != null && justificacion.getActuaciones().size() > 0) {
 							for (ActuacionesJustificacionExpressItem actuacion : justificacion.getActuaciones()) {
-								if (actuacion.getValidada() != "1") {
+								boolean modified = false;
+								String print = actuacion.getNumAsunto() + "  "+ actuacion.getValidada();
+								if (actuacion.getNumAsunto().equals("26")) {
+									int para = 1;
+								}
 
 									ScsActuaciondesignaKey actuaciondesignaKey = new ScsActuaciondesignaKey();
 									actuaciondesignaKey
@@ -6053,72 +6069,102 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									actuaciondesignaKey.setAnio(Short.parseShort(actuacion.getAnio()));
 
 									ScsActuaciondesigna record = scsActuaciondesignaMapper
-											.selectByPrimaryKey(actuaciondesignaKey);
+											.selectByPrimaryKey(actuaciondesignaKey); //comparar record(DB) con actuacion(front)
 
-									if (actuacion.getAnioProcedimiento() != null
-											&& !actuacion.getAnioProcedimiento().isEmpty()) {
-										record.setAnioprocedimiento(Short.parseShort(actuacion.getAnioProcedimiento()));
-									}
-
-									if (actuacion.getFecha() != null && !actuacion.getFecha().isEmpty()) {
-										fecha = formatter.parse(actuacion.getFecha());
-										record.setFecha(fecha);
-									}
-
-									if (actuacion.getFechaJustificacion() != null
-											&& actuacion.getFechaJustificacion() != "false"
-											&& actuacion.getFechaJustificacion() != "true"
-											&& !actuacion.getFechaJustificacion().isEmpty()) {
-
-										fecha = formatter.parse(actuacion.getFechaJustificacion());
-										record.setFechajustificacion(fecha);
-									} else {
-										record.setFechajustificacion(null);
-									}
-
-									if (actuacion.getIdAcreditacion() != null
-											&& !actuacion.getIdAcreditacion().isEmpty()) {
-										record.setIdacreditacion(Short.parseShort(actuacion.getIdAcreditacion()));
-									}
-
-									if (actuacion.getIdJuzgado() != null && !actuacion.getIdJuzgado().isEmpty()) {
+									if (actuacion.getIdJuzgado() != null && !actuacion.getIdJuzgado().isEmpty() && !actuacion.getIdJuzgado().equals(record.getIdjuzgado().toString()) ) {
 										record.setIdjuzgado(Long.parseLong(actuacion.getIdJuzgado()));
+										modified = true;
 									}
-
+									
+									if (actuacion.getNig() != null && !actuacion.getNig().isEmpty() && !actuacion.getNig().equals(record.getNig())) {
+										record.setNig(actuacion.getNig());
+										modified = true;
+									}
+									
+									if (actuacion.getNumProcedimiento() != null
+											&& !actuacion.getNumProcedimiento().isEmpty() && !actuacion.getNumProcedimiento().equals(record.getNumeroprocedimiento())) {
+										record.setNumeroprocedimiento(actuacion.getNumProcedimiento());
+										modified = true;
+									}
+									
+									if (actuacion.getAnioProcedimiento() != null
+											&& !actuacion.getAnioProcedimiento().isEmpty() && !record.getAnioprocedimiento().toString().equals(actuacion.getAnioProcedimiento())) {
+										record.setAnioprocedimiento(Short.parseShort(actuacion.getAnioProcedimiento()));
+										modified = true;
+									}
+									
+									//Modulo
 									if (actuacion.getProcedimiento() != null
-											&& !actuacion.getProcedimiento().isEmpty()) {
+											&& !actuacion.getProcedimiento().isEmpty() && !actuacion.getProcedimiento().equals(record.getIdprocedimiento())) {
 										ScsProcedimientosKey procedimientosKey = new ScsProcedimientosKey();
 										procedimientosKey.setIdprocedimiento(actuacion.getProcedimiento());
 										procedimientosKey.setIdinstitucion(idInstitucion);
 
 										if (scsProcedimientosMapper.selectByPrimaryKey(procedimientosKey) != null) {
 											record.setIdprocedimiento(actuacion.getProcedimiento());
+											modified = true;
+										}
+									}								
+									
+									//Fecha Actuacion
+									if (actuacion.getFecha() != null && !actuacion.getFecha().isEmpty() && !formatter.parse(actuacion.getFecha()).equals(record.getFecha())) {
+										fecha = formatter.parse(actuacion.getFecha());
+										record.setFecha(fecha);
+										modified = true;
+									}
+
+									if (actuacion.getFechaJustificacion() != null 
+											&& !actuacion.getFechaJustificacion().isEmpty() && actuacion.getFechaJustificacion() != "false"
+													&& actuacion.getFechaJustificacion() != "true" && !formatter.parse(actuacion.getFechaJustificacion()).equals(record.getFechajustificacion())) {
+
+										fecha = formatter.parse(actuacion.getFechaJustificacion());
+										record.setFechajustificacion(fecha);
+										
+										record.setUsujustificacion(usuarios.get(0).getIdusuario());
+										record.setFechausujustificacion(new Date());
+										modified = true;
+									} else if((actuacion.getFechaJustificacion() == null 
+											|| actuacion.getFechaJustificacion().isEmpty()) && record.getFechajustificacion()!=null){
+										record.setFechajustificacion(null);
+										record.setUsujustificacion(null);
+										record.setFechausujustificacion(null);
+										modified = true;
+									}	
+
+									
+									if (actuacion.getIdAcreditacion() != null
+											&& !actuacion.getIdAcreditacion().isEmpty() && !actuacion.getIdAcreditacion().equals(record.getIdacreditacion().toString()) ) {
+										record.setIdacreditacion(Short.parseShort(actuacion.getIdAcreditacion()));
+										modified = true;
+									}
+									
+									if (actuacion.getValidada() != null && !actuacion.getValidada().isEmpty() && !actuacion.getValidada().equals(record.getValidada()) ) {
+										String validada = actuacion.getValidada();
+										
+										record.setValidada(validada);
+										modified = true;
+										if (validada.equals("1")) {
+											record.setUsuvalidacion(usuarios.get(0).getIdusuario());
+											record.setFechavalidacion(new Date());
+											
+											if(record.getFechajustificacion() == null) {
+												record.setFechajustificacion(new Date());
+												
+												record.setUsujustificacion(usuarios.get(0).getIdusuario());
+												record.setFechausujustificacion(new Date());
+											}
+										}else if (validada.equals("0")){
+											record.setUsuvalidacion(null);
+											record.setFechavalidacion(null);
 										}
 									}
-
-									if (actuacion.getNumProcedimiento() != null
-											&& !actuacion.getNumProcedimiento().isEmpty()) {
-										record.setNumeroprocedimiento(actuacion.getNumProcedimiento());
+									
+									
+									if(modified) {
+										record.setFechamodificacion(new Date());
+										record.setUsumodificacion(usuarios.get(0).getIdusuario());
+										responseAct = scsActuaciondesignaMapper.updateByPrimaryKey(record);
 									}
-
-									if (actuacion.getNig() != null && !actuacion.getNig().isEmpty()) {
-										record.setNig(actuacion.getNig());
-									}
-
-									if (actuacion.getValidada() != null && !actuacion.getValidada().isEmpty()) {
-										record.setValidada(actuacion.getValidada());
-										if (record.getValidada().equals("1")
-												&& record.getFechajustificacion() == null) {
-											record.setFechajustificacion(new Date());
-
-										}
-									}
-
-									record.setFechamodificacion(new Date());
-
-									responseAct = scsActuaciondesignaMapper.updateByPrimaryKey(record);
-
-								}
 							}
 						}
 					}
@@ -6322,13 +6368,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					List<AdmUsuarios> listaUsuarios = null;
 					int[] isLetradoUsuarios;
 					int isLetradoUsuario = 1;
-
+					
+					//CREACION
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuCreacion())) {
 						exampleUsuario = new AdmUsuariosExample();
 						exampleUsuario.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andIdusuarioEqualTo(Integer.valueOf(actuacionDesignaItem.getUsuCreacion()));
+						//Obtiene la info del usuario que Creó la actuación, si el usuario de la web es admin vera los nombres y si no, se enmascaran con PERSONAL
 						listaUsuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuario);
 						if (listaUsuarios != null && !listaUsuarios.isEmpty()) {
+							//si es letrado se muestra PERSONAL, si no, si es admin se muestra el usuario
 							isLetradoUsuarios = admUsuarioEfectivoExtendsMapper.isLetrado(listaUsuarios.get(0));
 							
 							for (int i = 0; i < isLetradoUsuarios.length; i++) {
@@ -6336,22 +6385,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									isLetradoUsuario = 0;
 								}
 							}
+							//si el usuario logueado es letrado && el usuarioCreacion no es letrado 
 							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
 								actuacionDesignaItem.setUsuCreacion("PERSONAL");
 							} else {
 								actuacionDesignaItem.setUsuCreacion(listaUsuarios.get(0).getDescripcion());
 							}
-						} else {
-							if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-								actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
-							}
 						}
-					} else {
-						if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
-						}
-					}
+					} 
 
+					//JUSTIFICACION
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuJustificacion())) {
 						exampleUsuario = new AdmUsuariosExample();
 						exampleUsuario.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -6367,24 +6410,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							}
 							
 							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
-								actuacionDesignaItem.setUsuCreacion("PERSONAL");
-								if (actuacionDesignaItem.getUsuJustificacion() != null) {
 								actuacionDesignaItem.setUsuJustificacion("PERSONAL");
-								}
 							} else {
 								actuacionDesignaItem.setUsuJustificacion(listaUsuarios.get(0).getDescripcion());
 							}
-						} else {
-							if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-								actuacionDesignaItem.setUsuJustificacion(usuarios.get(0).getDescripcion());
-							}
-						}
-					} else {
-						if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-							actuacionDesignaItem.setUsuValidacion(usuarios.get(0).getDescripcion());
-						}
+						} 
 					}
 
+					//VALIDACION
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuValidacion())) {
 						exampleUsuario = new AdmUsuariosExample();
 						exampleUsuario.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -6400,23 +6433,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							}
 							
 							if (actuacionDesignaRequestDTO.isEsLetrado() == true && isLetradoUsuario == 0) {
-								actuacionDesignaItem.setUsuCreacion("PERSONAL");
-								if (actuacionDesignaItem.getUsuValidacion() != null) {
 								actuacionDesignaItem.setUsuValidacion("PERSONAL");
-								}
 							} else {
 								actuacionDesignaItem.setUsuValidacion(listaUsuarios.get(0).getDescripcion());
 							}
-						} else {
-							if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-								actuacionDesignaItem.setUsuValidacion(usuarios.get(0).getDescripcion());
-							}
 						}
-					} else {
-						if (!"PERSONAL".equals(actuacionDesignaItem.getUsuCreacion())) {
-							actuacionDesignaItem.setUsuValidacion(usuarios.get(0).getDescripcion());
-						}
-					}
+					} 
 
 				}
 
@@ -6424,7 +6446,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		} catch (Exception e) {
 			LOGGER.error(
-					"DesignacionesServiceImpl.getHistorioAccionesActDesigna() -> Se ha producido un error altratar de obtener el histórico de la acciones realizadas sobre una actuación",
+					"DesignacionesServiceImpl.getHistorioAccionesActDesigna() -> Se ha producido un error al tratar de obtener el histórico de la acciones realizadas sobre una actuación",
 					e);
 		}
 

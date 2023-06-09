@@ -1384,6 +1384,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 			sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
 		}
+		
 		sql.append(" ORDER BY act.fecha, act.numeroasunto, act.fechajustificacion");
 
 		return sql.toString();
@@ -2367,13 +2368,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 
-		if (validar && !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
-			sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
-		}
+		
 
 		if (validar) {
 			sql.SET("FECHAVALIDACION = SYSDATE");
 			sql.SET("USUVALIDACION = '" + usuario.getIdusuario() + "'");
+			
+			if (UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
+				sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
+				sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
+				sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
+			}
+		}else {
+			sql.SET("FECHAVALIDACION = NULL");
+			sql.SET("USUVALIDACION = NULL");
 		}
 
 		sql.WHERE("NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
@@ -2999,17 +3007,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 			sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
+			
+			if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
+				sql.SET("OBSERVACIONESJUSTIFICACION = '" + actuacionDesignaItem.getObservacionesJusti() + "'");
+			} else {
+				sql.SET("OBSERVACIONESJUSTIFICACION = NULL");
+			}
 		} else {
 			sql.SET("FECHAJUSTIFICACION = NULL");
 			sql.SET("USUJUSTIFICACION = NULL");
 			sql.SET("FECHAUSUJUSTIFICACION = NULL");
-		}
-
-		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
-			sql.SET("OBSERVACIONESJUSTIFICACION = '" + actuacionDesignaItem.getObservacionesJusti() + "'");
-		} else {
 			sql.SET("OBSERVACIONESJUSTIFICACION = NULL");
 		}
+
 
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
