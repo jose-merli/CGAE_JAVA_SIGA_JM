@@ -522,11 +522,22 @@ public class UtilidadesString {
 			prop = texto.substring(pos1 + dif, pos2);
 
 			finalText.append(texto.substring(index, pos1));
-			String propValue = (String) properties.get(prop.toUpperCase());
+			Object propValueObj = properties.get(prop.toUpperCase());
+			String propValue = null;
+			if(propValueObj instanceof BigDecimal) {
+				BigDecimal bigDecimalValue = (BigDecimal)propValueObj;
+				propValue = bigDecimalValue.toPlainString();
+			}else {
+				propValue = (String) properties.get(prop.toUpperCase());
+			}
+
 			if (propValue != null) {
 				propValue = UtilidadesString.formato_ISO_8859_1(propValue);
 				finalText.append(propValue);
 			}
+			
+			
+		
 			// searching on from the last control character
 			index = pos2 + dif;
 		}
