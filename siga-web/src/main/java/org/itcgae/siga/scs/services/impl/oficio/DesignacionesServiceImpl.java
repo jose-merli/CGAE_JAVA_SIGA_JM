@@ -3300,7 +3300,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (letradoAlgoritmoSeleccion == null) {
 							response = 0;
 							error.setCode(404);
-							error.setDescription("general.mensaje.error.bbdd");
+							error.setDescription("justiciaGratuita.oficio.designa.seleccionManualLetrado");
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							insertResponseDTO.setError(error);
 							LOGGER.info("No se ha encontrado letrado en la cola");
@@ -5769,6 +5769,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		RelacionesDTO relacionesDTO = new RelacionesDTO();
 		List<RelacionesItem> relacionesItem = null;
+		String resolucionEJG = "";
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -5793,6 +5794,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String idTurno = relaciones.get(1);
 				String idinstitucion = relaciones.get(2);
 				relacionesItem = scsDesignacionesExtendsMapper.busquedaRelaciones(anio, num, idTurno, idinstitucion);
+				int idLenguaje = Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue();
+				
+				//Poner la resolución del ejg asignado a la asistencia
+				for(RelacionesItem relacion: relacionesItem) {//recorremos toooodas las relaciones
+					
+					if(relacion.getSjcs().startsWith("A")) {
+						resolucionEJG = scsDesignacionesExtendsMapper.busquedaResolucionEjgAsistencia(relacion.getAnio(), relacion.getNumero(), idInstitucion, idLenguaje);
+						if(resolucionEJG!=null) {
+							relacion.setResolucion(resolucionEJG);
+						}
+					}
+					
+				}
 
 				LOGGER.info(
 						"busquedaRelaciones() / scsDesignacionesExtendsMapper.busquedaRelaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las relaciones");

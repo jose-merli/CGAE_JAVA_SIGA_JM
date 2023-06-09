@@ -934,8 +934,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		return directorioFichero.toString();
 	}
 
-	private List<CargaMasivaDatosITItem> parseExcelFileI(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario,
-			String fechaSolicitud) throws BusinessException, ParseException {
+	private List<CargaMasivaDatosITItem> parseExcelFileI(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario, String fechaSolicitud) throws BusinessException, ParseException {
 
 		Date dateLog = new Date();
 		LOGGER.info(dateLog + ":inicio.GestionCargasMasivasOficioServiceImpl.parseExcelFileIT");
@@ -961,8 +960,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		List<Short> idInstituciones = new ArrayList<Short>();
 		idInstituciones.add(idInstitucion);
 
-		// Comprueba si la institucion que esta logeada es la 2000 si es diferente la
-		// añade a la lista de instituciones
+		// Comprueba si la institucion que esta logeada es la 2000 si es diferente la añade a la lista de instituciones
 		if (idInstitucion != SigaConstants.IDINSTITUCION_2000) {
 			idInstituciones.add(SigaConstants.IDINSTITUCION_2000);
 		}
@@ -979,8 +977,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 //			SigaConstants.IT_NCOLEGIADO, "Campo numérico. Obligatorio");
 
 			// Turno
-			if (hashtable.get(SigaConstants.TURNO) != null
-					&& !hashtable.get(SigaConstants.TURNO).toString().equals("")) {
+			if (hashtable.get(SigaConstants.TURNO) != null && !hashtable.get(SigaConstants.TURNO).toString().equals("")) {
+				
 				cargaMasivaDatosITItem.setNombreTurno((String) hashtable.get(SigaConstants.TURNO));
 				try {
 					TurnosItem turnosItem = new TurnosItem();
@@ -1000,18 +998,16 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			}
 
 			// Obtener guardia
-			if (hashtable.get(SigaConstants.GUARDIA) != null
-					&& !hashtable.get(SigaConstants.GUARDIA).toString().equals("")) {
+			if (hashtable.get(SigaConstants.GUARDIA) != null && !hashtable.get(SigaConstants.GUARDIA).toString().equals("")) {
+				
 				cargaMasivaDatosITItem.setNombreGuardia((String) hashtable.get(SigaConstants.GUARDIA));
-				List<String> idGuardiaList = scsGuardiasturnoExtendsMapper
-						.getIdGuardiaByName(cargaMasivaDatosITItem.getNombreGuardia(), idInstitucion.toString());
+				List<String> idGuardiaList = scsGuardiasturnoExtendsMapper.getIdGuardiaByName(cargaMasivaDatosITItem.getNombreGuardia(), idInstitucion.toString());
 				try {
-				String idGuardia = idGuardiaList.get(0);
-				cargaMasivaDatosITItem.setIdGuardia(idGuardia);
+					String idGuardia = idGuardiaList.get(0);
+					cargaMasivaDatosITItem.setIdGuardia(idGuardia);
 				
 					ScsGuardiasturnoExample guardiaExample = new ScsGuardiasturnoExample();
-					guardiaExample.createCriteria().andNombreEqualTo(cargaMasivaDatosITItem.getNombreGuardia())
-							.andIdinstitucionEqualTo(idInstitucion);
+					guardiaExample.createCriteria().andNombreEqualTo(cargaMasivaDatosITItem.getNombreGuardia()).andIdinstitucionEqualTo(idInstitucion);
 					List<ScsGuardiasturno> listaGuar = scsGuardiasTurnoExtendsMapper.selectByExample(guardiaExample);
 
 					cargaMasivaDatosITItem.setIdTurno(listaGuar.get(0).getIdturno().toString());
@@ -1023,21 +1019,16 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			}
 
 			// Obtener ncolegiado y extraemos id persona
-			if (hashtable.get(SigaConstants.NCOLEGIADO) != null
-					&& !hashtable.get(SigaConstants.NCOLEGIADO).toString().equals("")) {
+			if (hashtable.get(SigaConstants.NCOLEGIADO) != null && !hashtable.get(SigaConstants.NCOLEGIADO).toString().equals("")) {
 				cargaMasivaDatosITItem.setnColegiado((String) hashtable.get(SigaConstants.NCOLEGIADO));
 
 				try {
 					CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
-					cenColegiadoExample.createCriteria().andNcolegiadoEqualTo(cargaMasivaDatosITItem.getnColegiado())
-							.andIdinstitucionEqualTo(idInstitucion);
+					cenColegiadoExample.createCriteria().andNcolegiadoEqualTo(cargaMasivaDatosITItem.getnColegiado()).andIdinstitucionEqualTo(idInstitucion);
 					List<CenColegiado> cenColegiado = cenColegiadoMapper.selectByExample(cenColegiadoExample);
-
 					cargaMasivaDatosITItem.setIdPersona(cenColegiado.get(0).getIdpersona().toString());
-
 				} catch (Exception e) {
-					errorLinea.append(
-							"No se ha encontrado una persona con el número de colegiado introducido en su institucion. ");
+					errorLinea.append("No se ha encontrado una persona con el número de colegiado introducido en su institucion. ");
 					cargaMasivaDatosITItem.setnColegiado((String) hashtable.get(SigaConstants.NCOLEGIADO));
 				}
 			} else {
@@ -1052,8 +1043,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			// Comprobamos tipo
 			if (hashtable.get(SigaConstants.TIPO) != null && !hashtable.get(SigaConstants.TIPO).toString().equals("")) {
 
-				if (hashtable.get(SigaConstants.TIPO).toString().equals("ALTA")
-						|| hashtable.get(SigaConstants.TIPO).toString().equals("BAJA")) {
+				if (hashtable.get(SigaConstants.TIPO).toString().equals("ALTA") || hashtable.get(SigaConstants.TIPO).toString().equals("BAJA")) {
 					cargaMasivaDatosITItem.setTipo((String) hashtable.get(SigaConstants.TIPO));
 				} else {
 					errorLinea.append("El valor de tipo solo puede ser \"ALTA\" o \"BAJA\".");
@@ -1066,16 +1056,14 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			}
 
 			// Comprobamos fecha efectiva
-			if (hashtable.get(SigaConstants.FECHAEFECTIVA) != null
-					&& !hashtable.get(SigaConstants.FECHAEFECTIVA).toString().equals("")) {
+			if (hashtable.get(SigaConstants.FECHAEFECTIVA) != null && !hashtable.get(SigaConstants.FECHAEFECTIVA).toString().equals("")) {
 				try {
-					cargaMasivaDatosITItem.setFechaEfectiva(new SimpleDateFormat("dd-MM-yyyy")
-							.parse((String) hashtable.get(SigaConstants.FECHAEFECTIVA)));
+					Date fechaFectiva = new SimpleDateFormat("dd-MM-yyyy HH:mm").parse(hashtable.get(SigaConstants.FECHAEFECTIVA) + " 23:59");
+					cargaMasivaDatosITItem.setFechaEfectiva(fechaFectiva);
 				} catch (Exception e) {
 					errorLinea.append("La fecha introducida no tiene un formato valido.");
 					cargaMasivaDatosITItem.setFechaEfectiva(null);
 				}
-
 			} else {
 				errorLinea.append("Es obligatorio introducir la fecha efectiva. ");
 				cargaMasivaDatosITItem.setFechaEfectiva(null);
@@ -1114,38 +1102,43 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 //				}
 //			}
 
-			// Comprobamos según su tipo (ALTA o BAJA) y unicamente si no tiene otros
-			// errrores
+			// Comprobamos según su tipo (ALTA o BAJA) y unicamente si no tiene otros errrores
 			if (errorLinea.toString().isEmpty() && hashtable.get(SigaConstants.TIPO).toString().equals("ALTA")) {
 				TurnosItem t = new TurnosItem();
 				t.setIdturno(cargaMasivaDatosITItem.getIdTurno());
-				List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(),
-						usuario.getIdlenguaje());
+				List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(), usuario.getIdlenguaje());
 
 				if (!listGu.isEmpty()) {
 
-					// 1. Si no se ha indicado la guardia, se realizará la inscripción en todas las
-					// guardias del turno (habrá que realizar las comprobaciones para todas las
-					// guardias).
+					// 1. Si no se ha indicado la guardia, se realizará la inscripción en todas las guardias del turno (habrá que realizar las comprobaciones para todas las guardias).
 					if (cargaMasivaDatosITItem.getIdGuardia() != null && cargaMasivaDatosITItem.getIdGuardia() != "") {
 
 						// 2. Si las guardias para el turno son obligatorias, no se podrá realizar.
 						if (!listGu.get(0).getObligatoriedad().equals("0")) {
 
-							// 3. Si la inscripción en la guardia ya existe de alta para la fecha efectiva
-							// indicada, no se podrá realizar.
+							// 3. Si la inscripción en la guardia ya existe de alta para la fecha efectiva indicada, no se podrá realizar.
+							/*
 							ScsInscripcionguardiaExample exampleInscripcionGuardias = new ScsInscripcionguardiaExample();
-							exampleInscripcionGuardias.createCriteria().andFechasuscripcionLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva())
+							exampleInscripcionGuardias.createCriteria()
+								.andFechasuscripcionLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva())
 								.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
 								.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
 								.andIdinstitucionEqualTo(idInstitucion)
 								.andIdguardiaEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()))
-								.andFechabajaIsNull();
+								.andFechadenegacionIsNull()
+								.andFechabajaIsNull()
+								.andFechasolicitudbajaIsNull()
+								.andFechavalidacionIsNotNull();
+							*/
+							
+							ScsInscripcionguardia inscripcionguardia = scsInscripcionguardiaExtendsMapper.getLastInscripciones(cargaMasivaDatosITItem.getIdGuardia(), 
+									cargaMasivaDatosITItem.getIdTurno(), cargaMasivaDatosITItem.getIdPersona(), idInstitucion.toString());
+							
+							//scsInscripcionguardiaMapper.selectByExample(exampleInscripcionGuardias).isEmpty()
 
-							if (scsInscripcionguardiaMapper.selectByExample(exampleInscripcionGuardias).isEmpty()) {
+							if (inscripcionguardia != null && inscripcionguardia.getFechavalidacion() == null) {
 
-								// 4. Si no existe una inscripción en el turno para dicha inscripción en la
-								// guardia, no se podrá realizar							
+								// 4. Si no existe una inscripción en el turno para dicha inscripción en la guardia, no se podrá realizar							
 								ScsInscripcionturnoExample scsInscripcionturnoExample = new ScsInscripcionturnoExample();
 								scsInscripcionturnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 									.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
@@ -1155,27 +1148,23 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								
 								List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByExample(scsInscripcionturnoExample);
 
-								// Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se
-								// inscriben las guardias.
+								// Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se inscriben las guardias.
 								if (insturList != null && insturList.size() != 0) {
-									// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del
-									// turno correspondiente.
-									if (cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion()) <= 0)
+									
+									//ARR:
+									
+									// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del turno correspondiente.
+									if (cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion()) <= 0) {
 										errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
+									}
 
-									// 6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso,
-									// no se tendrán en cuenta
-									// 6.1 Grupo y orden deben tener la longitud máxima permitida para estos campos
-									// en base de datos.
-									// 6.2 Orden no se puede repetir dentro del mismo grupo, tanto los existentes
-									// como los del fichero.
+									// 6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso, no se tendrán en cuenta
+									// 6.1 Grupo y orden deben tener la longitud máxima permitida para estos campos en base de datos.
+									// 6.2 Orden no se puede repetir dentro del mismo grupo, tanto los existentes como los del fichero.
 									// 6.3 Un letrado no se encuentra dos veces en el mismo grupo
-									StringBuffer errorLineaOrdenGrupo = CheckGrupoOrden(cargaMasivaDatosITItem,
-											errorLinea, idInstitucion, hashtable, datos);
+									StringBuffer errorLineaOrdenGrupo = CheckGrupoOrden(cargaMasivaDatosITItem, errorLinea, idInstitucion, hashtable, datos);
 
-									// 7. Si la línea es correcta, se creará una inscripción de guardia ya validada
-									// para el turno, guardia y colegiado indicados, usando el método utilizado en
-									// la creación con validación de inscripciones de guardia.
+									// 7. Si la línea es correcta, se creará una inscripción de guardia ya validada para el turno, guardia y colegiado indicados, usando el método utilizado en la creación con validación de inscripciones de guardia.
 									ScsInscripcionguardia ig = new ScsInscripcionguardia();
 									ig.setFechamodificacion(new Date());
 									ig.setFechavalidacion(new Date());
@@ -1188,27 +1177,23 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									
 									scsInscripcionguardiaMapper.insertSelective(ig);
 
-								} else
+								} else {
 									errorLinea.append("El colegiado no esta inscrito en el turno indicado.");
-							} else
-								errorLinea.append(
-										"Ya existe una inscripcion a dicha guardia con las mismas caracteristicas.");
-
-						} else
-							errorLinea.append(
-									"Las guardias en el turno son obligatorias por lo que no se puede realizar esta inscripción para una sola guardia. Solución: realice la carga masiva del turno.");
-
-					}
-					// Si no se introduce una guardia en especifico, se comprueban todas las
-					// guardias de dicho turno
-					else {
+								}
+							} else {
+								errorLinea.append("Ya existe una inscripcion a dicha guardia con las mismas caracteristicas.");
+							}
+						} else {
+							errorLinea.append("Las guardias en el turno son obligatorias por lo que no se puede realizar esta inscripción para una sola guardia. Solución: realice la carga masiva del turno.");
+						}
+					} else {
+						// Si no se introduce una guardia en especifico, se comprueban todas las guardias de dicho turno
 						for (GuardiasItem gu : listGu) {
 
 							// 2. Si las guardias para el turno son obligatorias, no se podrá realizar.
 							if (!gu.getObligatoriedad().equals("0")) {
 
-								// 3. Si la inscripción en la guardia ya existe de alta para la fecha efectiva
-								// indicada, no se podrá realizar.
+								// 3. Si la inscripción en la guardia ya existe de alta para la fecha efectiva indicada, no se podrá realizar.
 								ScsInscripcionguardiaKey key1 = new ScsInscripcionguardiaKey();
 
 								key1.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
@@ -1239,14 +1224,11 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByExample(scsInscripcionturnoExample);
 									
 									if (insturList != null && insturList.size() != 0) {
-										// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del
-										// turno correspondiente.
+										// 5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del turno correspondiente.
 										if(insturList.get(0).getFechavalidacion() != null) {
-											if (cargaMasivaDatosITItem.getFechaEfectiva()
-													.compareTo(insturList.get(0).getFechavalidacion()) < 0)
-												errorLinea.append(
-														"La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
-
+											if (cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion()) < 0) {
+												errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
+											}
 										}
 									
 										// 6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso,
@@ -1277,33 +1259,30 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 //												scsInscripcionguardiaMapper.insertSelective(ig);
 //											
 //											}
-									} else
+									} else {
 										errorLinea.append("El colegiado no esta inscrito en el turno indicado.");
-								} else
-									errorLinea.append(
-											"Ya existe una inscripcion a dicha guardia con las mismas caracteristicas.");
-
-							} else
-								errorLinea.append(
-										"Las guardias en el turno son obligatorias por lo que no se puede realizar esta inscripción para una sola guardia. Solución: realice la carga masiva del turno.");
+									}
+								} else {
+									errorLinea.append("Ya existe una inscripcion a dicha guardia con las mismas caracteristicas.");
+								}
+							} else {
+								errorLinea.append("Las guardias en el turno son obligatorias por lo que no se puede realizar esta inscripción para una sola guardia. Solución: realice la carga masiva del turno.");
+							}
 						}
 					}
-
-				} else
+				} else {
 					errorLinea.append("No se ha encontrado guardias asociadas al turno indicado.");
+				}
 			} else if (errorLinea.toString().isEmpty() && hashtable.get(SigaConstants.TIPO).toString().equals("BAJA")) {
 
 				TurnosItem t = new TurnosItem();
 				t.setIdturno(cargaMasivaDatosITItem.getIdTurno());
-				List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(),
-						usuario.getIdlenguaje());
+				List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(), usuario.getIdlenguaje());
 
-				// Comprobamos el tipo de guardias asociadas al turno. En caso de ser
-				// obligatorias (0) o Todas o ninguna (1), no se realizarian las inscripciones.
+				// Comprobamos el tipo de guardias asociadas al turno. En caso de ser obligatorias (0) o Todas o ninguna (1), no se realizarian las inscripciones.
 				// 2- A elegir; 1-Todas o ninguna;
 				if (!listGu.isEmpty()) {
-					// 2. Si las guardias para el turno son obligatorias o todas o ninguna, no se
-					// podrá realizar
+					// 2. Si las guardias para el turno son obligatorias o todas o ninguna, no se podrá realizar
 					if (!listGu.get(0).getObligatoriedad().equals("0")) {
 						if (!listGu.get(0).getObligatoriedad().equals("1")) {
 
@@ -1316,8 +1295,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							// Comprobamos si se introdujo una guardia o no.
 							if (cargaMasivaDatosITItem.getIdGuardia().equals(null)) {
 								// 1. Si no se ha indicado la guardia, se actualizará la inscripción en todas
-								// las guardias del turno (habrá que realizar las comprobaciones para todas las
-								// guardias).
+								// las guardias del turno (habrá que realizar las comprobaciones para todas las guardias).
 								for (GuardiasItem gu : listGu) {
 
 									key1.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
@@ -1325,16 +1303,14 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									ScsInscripcionguardia ins = null;
 									ins = scsInscripcionguardiaMapper.selectByPrimaryKey(key1);
 
-									// 3. Si la inscripción en la guardia no existe o ya está de baja, no se podrá
-									// realizar.
+									// 3. Si la inscripción en la guardia no existe o ya está de baja, no se podrá realizar.
 									// Se comprueba si la inscripción en la guardia no existe
-									if (ins == null)
-										errorLinea.append("El colegiado no esta inscrito en la guardia "
-												+ gu.getNombre() + " del turno.");
-									// Se comprueba si ya esta de baja
-									else if (ins.getFechabaja() != null)
-										errorLinea.append("El colegiado ya dió de baja la inscripcion en la guardia "
-												+ gu.getNombre() + " del turno.");
+									if (ins == null) {										
+										errorLinea.append("El colegiado no esta inscrito en la guardia " + gu.getNombre() + " del turno.");
+									} else if (ins.getFechabaja() != null) {
+										// Se comprueba si ya esta de baja
+										errorLinea.append("El colegiado ya dió de baja la inscripcion en la guardia " + gu.getNombre() + " del turno.");
+									}
 								}
 							} else {
 
@@ -1351,31 +1327,28 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								ScsInscripcionguardia ins = null;
 //								ins = scsInscripcionguardiaMapper.selectByPrimaryKey(key1);
 								ins = scsInscripcionguardiaMapper.selectByExample(scsInscripcionguardiaExample).get(0);
-								// 3. Si la inscripción en la guardia no existe o ya está de baja, no se podrá
-								// realizar.
+								// 3. Si la inscripción en la guardia no existe o ya está de baja, no se podrá realizar.
 								// Se comprueba si la inscripción en la guardia no existe
-								if (ins == null)
-									errorLinea.append("El colegiado ya esta inscrito en la guardia "
-											+ cargaMasivaDatosITItem.getNombreGuardia() + " del turno.");
-								// Se comprueba si ya esta de baja
-								else if (ins.getFechabaja() != null)
-									errorLinea.append("El colegiado ya dió de baja la inscripcion en la guardia "
-											+ cargaMasivaDatosITItem.getNombreGuardia() + " del turno.");
-
+								if (ins == null) {
+									errorLinea.append("El colegiado ya esta inscrito en la guardia " + cargaMasivaDatosITItem.getNombreGuardia() + " del turno.");
+								} else if (ins.getFechabaja() != null) {
+									// Se comprueba si ya esta de baja
+									errorLinea.append("El colegiado ya dió de baja la inscripcion en la guardia " + cargaMasivaDatosITItem.getNombreGuardia() + " del turno.");
+								}
 							}
-						} else
-							errorLinea.append(
-									"Las guardias en el turno son \"Todas o ninguna\" por lo que no se pueden realizar la fila.");
-					} else
-						errorLinea.append(
-								"Las guardias en el turno son \"Obligatorias\" por lo que no se pueden realizar la fila.");
-				} else
+						} else {
+							errorLinea.append("Las guardias en el turno son \"Todas o ninguna\" por lo que no se pueden realizar la fila.");
+						}
+					} else {
+						errorLinea.append("Las guardias en el turno son \"Obligatorias\" por lo que no se pueden realizar la fila.");
+					}
+				} else {
 					errorLinea.append("No se ha encontrado guardias asociadas al turno indicado.");
+				}
 			}
 
 			if (!errorLinea.toString().isEmpty()) {
-				cargaMasivaDatosITItem
-						.setErrores("Errores : " + errorLinea.toString() );
+				cargaMasivaDatosITItem.setErrores("Errores : " + errorLinea.toString() );
 			}
 
 			masivaDatosITVos.add(cargaMasivaDatosITItem);

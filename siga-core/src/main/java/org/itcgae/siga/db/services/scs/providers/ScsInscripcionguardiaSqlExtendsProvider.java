@@ -349,40 +349,37 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		return sql.toString();
 	}
 	
-
-	
-
 	public String listadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion) {
 		
 		SQL sql = new SQL();
 		
-		SQL subQuerysql = new SQL();
-		subQuerysql.SELECT("MAX(it2.fechasuscripcion)");
-		subQuerysql.FROM("scs_inscripcionguardia it2");
-		subQuerysql.WHERE("it2.idinstitucion = ins.idinstitucion");
-		subQuerysql.WHERE("it2.idturno = ins.idturno");
-		subQuerysql.WHERE("it2.idguardia = ins.idguardia");
-		subQuerysql.WHERE("it2.idpersona = ins.idpersona");
+		//SQL subQuerysql = new SQL();
+		//subQuerysql.SELECT("MAX(it2.fechasuscripcion)");
+		//subQuerysql.FROM("scs_inscripcionguardia it2");
+		//subQuerysql.WHERE("it2.idinstitucion = ins.idinstitucion");
+		//subQuerysql.WHERE("it2.idturno = ins.idturno");
+		//subQuerysql.WHERE("it2.idguardia = ins.idguardia");
+		//subQuerysql.WHERE("it2.idpersona = ins.idpersona");
 		
-		SQL subQuerysql2 = new SQL();
-		subQuerysql2.SELECT("guar.nombre");
-		subQuerysql2.FROM("scs_guardiasturno guar2");
-		subQuerysql2.WHERE("guar2.idinstitucion = ins.idinstitucion");
-		subQuerysql2.WHERE("guar2.idturno = ins.idturno");
-		subQuerysql2.WHERE("guar2.idguardia = guar.idguardia");
+		//SQL subQuerysql2 = new SQL();
+		//subQuerysql2.SELECT("guar.nombre");
+		//subQuerysql2.FROM("scs_guardiasturno guar2");
+		//subQuerysql2.WHERE("guar2.idinstitucion = ins.idinstitucion");
+		//subQuerysql2.WHERE("guar2.idturno = ins.idturno");
+		//subQuerysql2.WHERE("guar2.idguardia = guar.idguardia");
 		
-		SQL subQuerysql3 = new SQL();
-		subQuerysql3.SELECT("guar.descripcion");
-		subQuerysql3.FROM("scs_guardiasturno guar3");
-		subQuerysql3.WHERE("guar3.idinstitucion = ins.idinstitucion");
-		subQuerysql3.WHERE("guar3.idturno = ins.idturno");
-		subQuerysql3.WHERE("guar3.idguardia = guar.idguardia");
+		//SQL subQuerysql3 = new SQL();
+		//subQuerysql3.SELECT("guar.descripcion");
+		//subQuerysql3.FROM("scs_guardiasturno guar3");
+		//subQuerysql3.WHERE("guar3.idinstitucion = ins.idinstitucion");
+		//subQuerysql3.WHERE("guar3.idturno = ins.idturno");
+		//subQuerysql3.WHERE("guar3.idguardia = guar.idguardia");
 		
-		SQL subQuerysql4 = new SQL();
-		subQuerysql4.SELECT("tur.validarjustificaciones");
-		subQuerysql4.FROM("scs_turno tur2");
-		subQuerysql4.WHERE("tur2.idinstitucion = ins.idinstitucion");
-		subQuerysql4.WHERE("tur2.idturno = ins.idturno");
+		//SQL subQuerysql4 = new SQL();
+		//subQuerysql4.SELECT("tur.validarjustificaciones");
+		//subQuerysql4.FROM("scs_turno tur2");
+		//subQuerysql4.WHERE("tur2.idinstitucion = ins.idinstitucion");
+		//subQuerysql4.WHERE("tur2.idturno = ins.idturno");
 		
 		sql.SELECT("(CASE"
 				+ "            WHEN ins.fechadenegacion IS NOT NULL THEN '4'"
@@ -465,51 +462,50 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
         /*if(inscripciones.getaFechaDe() != null) {
         	sql.WHERE("ins.estado in (1,2)");
         }else {*/
-	        	if(inscripciones.getIdEstado() != null) {
-	        
-		            String condestados = "(";
-		            String[] estados = inscripciones.getIdEstado().split(",");
-		            for(int i = 0; i< estados.length; i++) {
-		                if(i>0) condestados+=" or ";
-		                // Pendiente de alta
-		                if(estados[i].equals("0")) {
-		                	condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
-									" AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL)";		                }
-		                // Alta
-		                else if(estados[i].equals("1")) {
-		                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
-		                            " AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)" ;
-		                }
-		                // Pendiente de Baja
-		                else if(estados[i].equals("2")) {
-		                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
-		                            " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL)" ;
-		                }
-		                // Baja
-		                else if(estados[i].equals("3")) {
-		                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
-		                            + " AND ins.fechavalidacion IS NOT NULL )" ;
-		                }
-		                // Denegada
-		                else if(estados[i].equals("4")) {
-							condestados+="((ins.fechadenegacion is not null) or"
-									+ "(ins.fechabaja IS NOT NULL"
-									+ " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NULL )"
-									+" )" ;		                
-						}
-		            }
-		            condestados+=")";
-		            sql.WHERE(condestados);
-		        }
+
+    	if(inscripciones.getIdEstado() != null) {
+    
+            String condestados = "(";
+            String[] estados = inscripciones.getIdEstado().split(",");
+            for(int i = 0; i< estados.length; i++) {
+                if(i>0) condestados+=" or ";
+                // Pendiente de alta
+                if(estados[i].equals("0")) {
+                    condestados+=" (ins.fechavalidacion is null and ins.fechadenegacion is null and ins.fechasuscripcion is not null)" ;
+                }
+                // Alta
+                else if(estados[i].equals("1")) {
+                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+                            " AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)" ;
+                }
+                // Pendiente de Baja
+                else if(estados[i].equals("2")) {
+                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+                            " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL)" ;
+                }
+                // Baja
+                else if(estados[i].equals("3")) {
+                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
+                            + " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL )" ;
+                }
+                // Denegada
+                else if(estados[i].equals("4")) {
+                    condestados+=" (ins.fechadenegacion is not null)" ;
+                }
+            }
+            condestados+=")";
+            sql.WHERE(condestados);
+        }
+
 	      // }
         
-        sql.WHERE("ins.fechasuscripcion = (" + subQuerysql + ")");
+        //sql.WHERE("ins.fechasuscripcion = (" + subQuerysql + ")");
         
 //        sql.WHERE("guar.nombre = (" + subQuerysql2 + ")");
 //        
 //        sql.WHERE("guar.descripcion = (" + subQuerysql3 + ")");
         
-        sql.WHERE("tur.validarjustificaciones = (" + subQuerysql4 + ")");
+        //sql.WHERE("tur.validarjustificaciones = (" + subQuerysql4 + ")");
 
         
         if(inscripciones.getaFechaDe() != null) {
@@ -535,6 +531,28 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		//LOGGER.info("++++ [SIGA TEST] - ScsInscripcionguardiaSqlExtendsProvider / listadoInscripciones -> query = " + sql.toString());
         return sql.toString();
 
+	}
+	
+	public String getLastInscripciones(String idGuardia, String idTurno, String idPersona, String idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDINSTITUCION, IDPERSONA, IDTURNO, IDGUARDIA, FECHASUSCRIPCION, FECHABAJA, OBSERVACIONESSUSCRIPCION, OBSERVACIONESBAJA, FECHASOLICITUDBAJA, FECHAVALIDACION, OBSERVACIONESVALIDACION, FECHADENEGACION, OBSERVACIONESDENEGACION, OBSERVACIONESVALBAJA");
+
+		sql.FROM("scs_inscripcionguardia");
+
+       	sql.WHERE("IDINSTITUCION = " + idInstitucion);
+       	sql.WHERE("IDTURNO = " + idTurno);
+       	sql.WHERE("IDGUARDIA = " + idGuardia);
+       	sql.WHERE("IDPERSONA = " + idPersona);
+		sql.WHERE("FECHADENEGACION IS NULL");
+		sql.WHERE("FECHASOLICITUDBAJA IS NULL");
+		sql.WHERE("FECHABAJA IS NULL");
+		sql.WHERE("ROWNUM = 1");
+		
+		sql.ORDER_BY("FECHASUSCRIPCION DESC");
+		
+		return sql.toString();
 	}
 
 	public String searchGrupo(String grupo, Short idInstitucion) {
@@ -900,8 +918,7 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		return sql.toString();
 	}
 	
-	public String buscarInscripcion(Short idInstitucion, BusquedaInscripcionItem inscripcion,
-			AdmUsuarios admUsuarios){
+	public String buscarInscripcion(Short idInstitucion, BusquedaInscripcionItem inscripcion, AdmUsuarios admUsuarios){
 		SQL sql = new SQL();
 		sql.SELECT("IDPERSONA", "IDINSTITUCION", "IDTURNO", "IDGUARDIA", "FECHASUSCRIPCION", "FECHAMODIFICACION", "USUMODIFICACION", "FECHABAJA", "OBSERVACIONESSUSCRIPCION", "OBSERVACIONESBAJA", "FECHASOLICITUDBAJA", "FECHAVALIDACION", "OBSERVACIONESVALIDACION", "FECHADENEGACION", "OBSERVACIONESDENEGACION", "OBSERVACIONESVALBAJA");
 		sql.FROM("scs_inscripcionguardia");
@@ -909,7 +926,7 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		sql.WHERE("IDPERSONA ="+ inscripcion.getIdpersona());
 		sql.WHERE("IDTURNO ="+ inscripcion.getIdturno());
 		sql.WHERE("IDGUARDIA ="+ inscripcion.getIdguardia());
-		//sql.WHERE("IDGUARDIA ="+ inscripcion.getIdGuardia());
+		sql.ORDER_BY("FECHASUSCRIPCION DESC");
 		return sql.toString();
 	}
 	

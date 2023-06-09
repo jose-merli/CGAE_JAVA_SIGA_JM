@@ -104,7 +104,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "tipodeguardia", property = "idTipoGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "tipoguardia", property = "tipoGuardia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "obligatoriedad", property = "obligatoriedad", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "duracion", property = "duracion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROLETRADOSGUARDIA", property = "letradosGuardia", jdbcType = JdbcType.VARCHAR),

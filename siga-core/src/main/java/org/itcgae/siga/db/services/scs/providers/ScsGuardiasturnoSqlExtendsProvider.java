@@ -75,9 +75,8 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sql.SELECT("SCS_GUARDIASTURNO.IDTURNO AS idturno");
 		sql.SELECT("SCS_GUARDIASTURNO.IDGUARDIA AS idguardia");
 		sql.SELECT("SCS_GUARDIASTURNO.NOMBRE AS nombre");
-		if (guardiaItem.getIdTipoGuardia() != null && guardiaItem.getIdTipoGuardia() != "")
-		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION AS tipodeguardia");
-
+		sql.SELECT("F_SIGA_GETRECURSO(SCS_TIPOSGUARDIAS.DESCRIPCION,1) AS tipoguardia");
+		
 		sql.SELECT("CASE \n" +
 				"            WHEN SCS_TURNO.GUARDIAS = 0 THEN 'Obligatorias'\n" +
 				"            WHEN SCS_TURNO.GUARDIAS = 1 THEN 'Todas o ninguna'\n" +
@@ -115,16 +114,9 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		sql.FROM("SCS_GUARDIASTURNO");
 
-		sql.JOIN(
-				"SCS_TURNO ON SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO AND SCS_GUARDIASTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION");
-		if (guardiaItem.getIdTipoGuardia() != null && guardiaItem.getIdTipoGuardia() != "")
-		sql.JOIN("SCS_TIPOSGUARDIAS ON SCS_TIPOSGUARDIAS.IDTIPOGUARDIA = SCS_GUARDIASTURNO.IDTIPOGUARDIA");
-		if (guardiaItem.getIdTipoGuardia() != null && guardiaItem.getIdTipoGuardia() != "") {
-			
-		}
-		
-
 		// JOINS
+		sql.JOIN("SCS_TURNO ON SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO AND SCS_GUARDIASTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION");
+		sql.JOIN("SCS_TIPOSGUARDIAS ON SCS_TIPOSGUARDIAS.IDTIPOGUARDIA = SCS_GUARDIASTURNO.IDTIPOGUARDIA");
 
 		// FILTRO AREA
 		if (guardiaItem.getArea() != null && guardiaItem.getArea() != "") {

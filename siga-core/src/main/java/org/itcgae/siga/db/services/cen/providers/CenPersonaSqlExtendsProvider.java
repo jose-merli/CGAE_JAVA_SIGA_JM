@@ -156,7 +156,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			} else if (busquedaPerFisicaSearchDTO.getIdInstitucion().length == 1) {
 				idInstituciones = "'" + busquedaPerFisicaSearchDTO.getIdInstitucion()[0] + "'";
 			}
-			sql.WHERE(" I.IDINSTITUCION  IN  (" + idInstituciones + ")");
+			sql.WHERE(" I.IDINSTITUCION  IN  (" + idInstituciones + ",'2000'" + ")");
 		}else if(idInstitucion!=null){
 			sql.WHERE(" I.IDINSTITUCION  =  '" + idInstitucion + "'");
 			

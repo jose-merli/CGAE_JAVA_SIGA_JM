@@ -2,7 +2,6 @@ package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
@@ -15,18 +14,15 @@ import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionMod;
 import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
 import org.itcgae.siga.DTOs.scs.GestionInscripcion;
-import org.itcgae.siga.DTOs.scs.GrupoGuardiaColegiadoItem;
 import org.itcgae.siga.DTOs.scs.GuardiasTurnosItem;
 import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
-import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TrabajosSJCSInsGuardiaItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
-import org.itcgae.siga.db.mappers.ScsInscripcionguardiaSqlProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsInscripcionguardiaSqlExtendsProvider;
 
@@ -233,27 +229,38 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	})
 	List<BusquedaInscripcionItem> getListadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion);
 	
-	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getSaltoCompensacionesActivo")
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "getLastInscripciones")
 	@Results({ 
+		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "FECHASUSCRIPCION", property = "fechasuscripcion", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESSUSCRIPCION", property = "observacionessuscripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESBAJA", property = "observacionesbaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESVALIDACION", property = "observacionesvalidacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADENEGACION", property = "fechadenegacion", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR)
 	})
+    ScsInscripcionguardia getLastInscripciones(String idGuardia, String idTurno, String idPersona, String idInstitucion);
+	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getSaltoCompensacionesActivo")
+	@Results({})
 	List<SaltoCompGuardiaItem> getBuscarSaltoCompensancion(String idInstitucion, String idturno, String idguardia, String idpersona,String saltocompensacion);
-
-
 
 	@DeleteProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "eliminarSaltoCompensacion")
 	int getEliminarSaltoCompensancion(String idinstitucion, String idturno, String idguardia, String idpersona, String saltooCompensacion);
 
-
-
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "busquedaTrabajosGuardias")
-	@Results({ 
-	})
+	@Results({})
 	List<TrabajosSJCSInsGuardiaItem> busquedaTrabajosGuardias(String idpersona,String idturno,String idguardia ,Short idInstitucion,String fechaActual);
 	
-	
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "busquedaTrabajosPendientes")
-	@Results({ 
-	})
+	@Results({})
 	List<TrabajosSJCSInsGuardiaItem> busquedaTrabajosPendientes(String idpersona,String idturno ,Short idInstitucion,String fechaActual);
 
 

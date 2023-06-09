@@ -87,6 +87,8 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdGuardia())) {
 			sql.WHERE("IDGUARDIA IN (" + saltoItem.getIdGuardia() + " )");
+		} else {
+			sql.WHERE("IDGUARDIA IS NOT NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(saltoItem.getFechaDesde())) {
@@ -201,6 +203,8 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
         }
         if (!UtilidadesString.esCadenaVacia(salto.getIdGuardia())) {
         	sql.WHERE(" IDGUARDIA IN (" + salto.getIdGuardia() + ")");
+        } else {
+        	sql.WHERE("IDGUARDIA IS NULL");
         }
     
 
