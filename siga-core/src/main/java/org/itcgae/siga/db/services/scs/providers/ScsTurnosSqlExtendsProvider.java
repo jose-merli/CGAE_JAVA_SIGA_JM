@@ -654,8 +654,6 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		}
 		sqlListadoInscripciones.ORDER_BY ("numeroGrupo");
 		sqlListadoInscripciones.ORDER_BY ("ordengrupo");
-		sqlListadoInscripciones.ORDER_BY ("Ins.FECHASUSCRIPCION");
-		sqlListadoInscripciones.ORDER_BY ("Ins.Idpersona");
 		
 		sqlListadoInscripcionesConRownum.SELECT ("ROWNUM AS orden");
 		sqlListadoInscripcionesConRownum.SELECT ("linscripciones.*");
