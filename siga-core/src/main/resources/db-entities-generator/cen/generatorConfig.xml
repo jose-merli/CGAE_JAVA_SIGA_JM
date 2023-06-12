@@ -5,10 +5,10 @@
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//10.75.29.133:1521/cgae" 
+			connectionURL="jdbc:oracle:thin:@//192.168.18.18:1546/SIGADES" 
 			driverClass="oracle.jdbc.OracleDriver"
-			userId="uscgae"
-			password="uscgae" />
+			userId="USCGAE_INT"
+			password="oradesaINT19" />
 			
 			
 		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
@@ -38,6 +38,9 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>  -->
 			<table schema="USCGAE_DESA" tableName="ADM_INFORME" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table> 
+			<table schema="USCGAE_INT" tableName="CEN_BAJASTEMPORALES" >
 				<property name="ignoreQualifiersAtRuntime" value="true"/>
 			</table> 
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_LENGUAJES" > -->
