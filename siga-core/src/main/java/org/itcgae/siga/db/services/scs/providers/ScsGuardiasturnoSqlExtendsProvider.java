@@ -1480,7 +1480,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		
 		//sql.WHERE("NOT EXISTS (" + sql2 + ")");
 		
-		sql.ORDER_BY("PC.FECHACALINICIO desc, PC.FECHACALFIN desc, PC.FECHAPROGRAMACION desc");
+		sql.ORDER_BY("PC.FECHAPROGRAMACION desc, PC.FECHACALINICIO desc, PC.FECHACALFIN desc");
 
 		
 		return sql.toString();
