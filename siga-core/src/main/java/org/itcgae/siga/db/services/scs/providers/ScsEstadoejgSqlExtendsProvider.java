@@ -40,14 +40,11 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 	public String comboEstadoEjg(Short idLenguaje) {
                     SQL sql = new SQL();
 
-        sql.SELECT("estado.IDESTADOEJG");
-        sql.SELECT("cat.descripcion");
-        sql.FROM("SCS_MAESTROESTADOSEJG estado");
-        sql.INNER_JOIN(
-                "gen_recursos_catalogos cat on cat.IDRECURSO = estado.descripcion and cat.idlenguaje = '"
-                        + idLenguaje + "'");
-        sql.WHERE("estado.fecha_baja is null");
-        sql.ORDER_BY("cat.descripcion");
+        sql.SELECT("IDESTADOEJG, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS DESCRIPCION, CODIGOEXT, BLOQUEADO, ORDEN, VISIBLECOMISION, EDITABLECOMISION");
+        sql.FROM("SCS_MAESTROESTADOSEJG");
+        sql.WHERE("IDESTADOEJG NOT IN (25,26,13,0,9,10,12,15,16,20)");
+        sql.ORDER_BY("ORDEN");
+
         return sql.toString();
     }
     

@@ -578,7 +578,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 									response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
 								}
 							}
-							eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
+							//eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
 						}
 					}
 				} catch (Exception e) {
