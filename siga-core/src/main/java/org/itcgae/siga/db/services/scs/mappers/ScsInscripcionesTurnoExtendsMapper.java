@@ -25,6 +25,12 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	})
 	List<ComboItem> comboTurnos(Short idInstitucion);
 	
+	@SelectProvider(type = ScsInscripcionesTurnoSqlExtendsProvider.class, method = "validarExisteTurnoDeAlta")
+	@Results({
+		@Result(column="IDPERSONA", property="idpersona", jdbcType=JdbcType.DECIMAL, id=true)
+	})
+	List<InscripcionesItem> validarExisteTurnoDeAlta(InscripcionesItem inscripcionItem);
+	
 	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="busquedaInscripciones")
 	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
 		 @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),

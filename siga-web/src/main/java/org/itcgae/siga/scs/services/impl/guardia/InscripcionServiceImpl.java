@@ -163,13 +163,19 @@ public class InscripcionServiceImpl implements InscripcionService {
 							
 							ScsInscripcionturnoKey keyInscripcion = new ScsInscripcionturnoKey();
 
-							keyInscripcion.setIdturno(Integer.valueOf(inscripcion.getIdturno()));
-							keyInscripcion.setIdinstitucion(idInstitucion);
-					        keyInscripcion.setIdpersona(Long.parseLong(inscripcion.getIdpersona()));
+							
 					        keyInscripcion.setFechasolicitud(inscripcion.getFechasolicitud());
 					        
-					        ScsInscripcionturno inscripcionTurno = scsInscripcionturnoMapper.selectByPrimaryKey(keyInscripcion);
-							
+					        InscripcionesItem inscripcionesItem = new InscripcionesItem();
+					        inscripcionesItem.setIdturno(inscripcion.getIdturno());
+					        inscripcionesItem.setIdinstitucion(String.valueOf(idInstitucion));
+					        inscripcionesItem.setIdpersona(inscripcion.getIdpersona());
+							List<InscripcionesItem> inscripcionTurno = scsInscripcionturnoExtendsMapper.validarExisteTurnoDeAlta(inscripcionesItem);
+							// Para validar un alta, es necesario que haya un turno dado de alta (existe fechaValidacion y no tiene fechaBaja)
+							if(inscripcionTurno.isEmpty() && inscripcion.getEstado().equals("0")) {
+								upd.setStatus(SigaConstants.KO);
+								throw (new Exception("Error al Validar la inscripcion, no hay turnos de alta"));
+							}
 							if(objeto != null) {
 								/*if(inscripcion.getFechasolicitudNUEVA() != null) {
 									objeto.setFechasuscripcion(inscripcion.getFechasolicitudNUEVA());
@@ -181,13 +187,10 @@ public class InscripcionServiceImpl implements InscripcionService {
 								
 								objeto.setFechamodificacion(new Date());
 								objeto.setUsumodificacion(usuarios.get(0).getIdusuario());
-								
-								inscripcionTurno.setFechamodificacion(new Date());
-								inscripcionTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
+
 								
 								if(inscripcion.getFechabaja() != null) {
 									objeto.setFechabaja(inscripcion.getFechabaja());
-									inscripcionTurno.setFechabaja(inscripcion.getFechabaja());
 								}
 								
 								/*if(inscripcion.getObservacionessolicitudNUEVA() != null) {
@@ -196,41 +199,33 @@ public class InscripcionServiceImpl implements InscripcionService {
 								
 								if(inscripcion.getObservacionesbaja() != null) {
 									objeto.setObservacionesbaja(inscripcion.getObservacionesbaja());
-									inscripcionTurno.setObservacionesbaja(inscripcion.getObservacionesbaja());
 								}
 								
 								if(inscripcion.getFechasolicitudbajaNUEVA() != null) {
 									objeto.setFechasolicitudbaja(inscripcion.getFechasolicitudbajaNUEVA());
-									inscripcionTurno.setFechasolicitudbaja(inscripcion.getFechasolicitudbajaNUEVA());
 								}
 								
 								if(inscripcion.getObservacionesvalbajaNUEVA() != null) {
 									objeto.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
-									inscripcionTurno.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
 								}
 								
 								if(inscripcion.getFechavalidacionNUEVA() != null) {
 									objeto.setFechavalidacion(inscripcion.getFechavalidacionNUEVA());
-									inscripcionTurno.setFechavalidacion(inscripcion.getFechavalidacionNUEVA());
 								}
 								
 								if(inscripcion.getObservacionesvalidacionNUEVA() != null) {
 									objeto.setObservacionesvalidacion(inscripcion.getObservacionesvalidacionNUEVA());
-									inscripcionTurno.setObservacionesvalidacion(inscripcion.getObservacionesvalidacionNUEVA());
 								}
 								
 								if(inscripcion.getFechadenegacionNUEVA() != null) {
 									objeto.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
-									inscripcionTurno.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
 								}
 								
 								if(inscripcion.getObservacionesdenegacionNUEVA() != null) {
 									objeto.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
-									inscripcionTurno.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
 								}
 								
 								contadorKO = inscripcionGuardiaExtendsMapper.updateByPrimaryKeySelective(objeto);
-								contadorKO = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionTurno);
 								
 								// Añadimos el turno a la lista de turnos procesados
 								listaTurnosProcesados.add(idTurno);
@@ -313,68 +308,28 @@ public class InscripcionServiceImpl implements InscripcionService {
 		
 		int contadorKO = 0;
 		
-		ScsInscripcionturnoKey keyInscripcion = new ScsInscripcionturnoKey();
-
-		keyInscripcion.setIdturno(Integer.valueOf(inscripcion.getIdturno()));
-		keyInscripcion.setIdinstitucion(idInstitucion);
-        keyInscripcion.setIdpersona(Long.parseLong(inscripcion.getIdpersona()));
-        keyInscripcion.setFechasolicitud(inscripcion.getFechasolicitud());
-        
-        ScsInscripcionturno inscripcionTurno = scsInscripcionturnoMapper.selectByPrimaryKey(keyInscripcion);
+		 InscripcionesItem inscripcionesItem = new InscripcionesItem();
+        inscripcionesItem.setIdturno(inscripcion.getIdturno());
+        inscripcionesItem.setIdinstitucion(String.valueOf(idInstitucion));
+        inscripcionesItem.setIdpersona(inscripcion.getIdpersona());
+		List<InscripcionesItem> inscripcionTurno = scsInscripcionturnoExtendsMapper.validarExisteTurnoDeAlta(inscripcionesItem);
+		// Para validar un alta, es necesario que haya un turno dado de alta (existe fechaValidacion y no tiene fechaBaja)
+		if(inscripcionTurno.isEmpty() && inscripcion.getEstado().equals("0")) {
+			return contadorKO;
+		}
+	
+		List<ScsInscripcionguardia> inscripcionesGuardia = null;
+		
+		ScsInscripcionguardiaExample exampleInscripcionGuardias = new ScsInscripcionguardiaExample();
+		exampleInscripcionGuardias.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+				.andIdturnoEqualTo(Integer.parseInt(idTurno))
+				.andIdpersonaEqualTo(Long.parseLong(inscripcion.getIdpersona()));
+		inscripcionesGuardia = scsInscripcionguardiaMapper.selectByExample(exampleInscripcionGuardias);
+		
+		for (ScsInscripcionguardia inscripcionGuardia : inscripcionesGuardia) {
+			contadorKO = procesaGuardiasTurnoValidacion(inscripcion, inscripcionGuardia, idInstitucion, usuarios);
+		}
 			
-		inscripcionTurno.setFechamodificacion(new Date());
-		inscripcionTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
-		
-		if(inscripcion.getFechabaja() != null) {
-			inscripcionTurno.setFechabaja(inscripcion.getFechabaja());
-		}
-		
-		if(inscripcion.getObservacionesbaja() != null) {
-			inscripcionTurno.setObservacionesbaja(inscripcion.getObservacionesbaja());
-		}
-		
-		if(inscripcion.getFechasolicitudbajaNUEVA() != null) {
-			inscripcionTurno.setFechasolicitudbaja(inscripcion.getFechasolicitudbajaNUEVA());
-		}
-		
-		if(inscripcion.getObservacionesvalbajaNUEVA() != null) {
-			inscripcionTurno.setObservacionesvalbaja(inscripcion.getObservacionesvalbajaNUEVA());
-		}
-		
-		if(inscripcion.getFechavalidacionNUEVA() != null) {
-			inscripcionTurno.setFechavalidacion(inscripcion.getFechavalidacionNUEVA());
-		}
-		
-		if(inscripcion.getObservacionesvalidacionNUEVA() != null) {
-			inscripcionTurno.setObservacionesvalidacion(inscripcion.getObservacionesvalidacionNUEVA());
-		}
-		
-		if(inscripcion.getFechadenegacionNUEVA() != null) {
-			inscripcionTurno.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
-		}
-		
-		if(inscripcion.getObservacionesdenegacionNUEVA() != null) {
-			inscripcionTurno.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
-		}
-		
-		contadorKO = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionTurno);
-		
-		if (contadorKO != 0) {
-			
-			List<ScsInscripcionguardia> inscripcionesGuardia = null;
-			
-			ScsInscripcionguardiaExample exampleInscripcionGuardias = new ScsInscripcionguardiaExample();
-			exampleInscripcionGuardias.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-					.andIdturnoEqualTo(Integer.parseInt(idTurno))
-					.andIdpersonaEqualTo(Long.parseLong(inscripcion.getIdpersona()));
-			inscripcionesGuardia = scsInscripcionguardiaMapper.selectByExample(exampleInscripcionGuardias);
-			
-			for (ScsInscripcionguardia inscripcionGuardia : inscripcionesGuardia) {
-				contadorKO = procesaGuardiasTurnoValidacion(inscripcion, inscripcionGuardia, idInstitucion, usuarios);
-			}
-			
-		}
-		
 		LOGGER.info("procesaTurnoValidacion() -> Salida para procesar la validación de inscripciones del turno y sus guardias");
 		
 		return contadorKO;
@@ -699,34 +654,19 @@ public class InscripcionServiceImpl implements InscripcionService {
 							key.setIdturno(Integer.valueOf(inscripcion.getIdturno()));
 							
 							ScsInscripcionguardia record = inscripcionGuardiaExtendsMapper.selectByPrimaryKey(key);
-							
-							ScsInscripcionturnoKey keyInscripcion = new ScsInscripcionturnoKey();
-
-							keyInscripcion.setIdturno(Integer.valueOf(inscripcion.getIdturno()));
-							keyInscripcion.setIdinstitucion(idInstitucion);
-		                    keyInscripcion.setIdpersona(Long.parseLong(inscripcion.getIdpersona()));
-		                    keyInscripcion.setFechasolicitud(inscripcion.getFechasolicitud());
-		                    
-		                    ScsInscripcionturno inscripcionTurno = scsInscripcionturnoMapper.selectByPrimaryKey(keyInscripcion);
-							
+		                    							
 							if(record!= null) {
 								record.setFechamodificacion(new Date());
 								record.setUsumodificacion(usuario);
 								
-								inscripcionTurno.setFechamodificacion(new Date());
-								inscripcionTurno.setUsumodificacion(usuario);
-								
 								if (inscripcion.getFechadenegacionNUEVA() != null) {
 									record.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
-									inscripcionTurno.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
 									if(inscripcion.getObservacionesdenegacionNUEVA()!= null) {
 										record.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
-										inscripcionTurno.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
 									}
 								}
 								
 								contadorKO = inscripcionGuardiaExtendsMapper.updateByPrimaryKeySelective(record);
-								contadorKO = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionTurno);
 								
 								// Añadimos el turno a la lista de turnos procesados
 								listaTurnosProcesados.add(idTurno);

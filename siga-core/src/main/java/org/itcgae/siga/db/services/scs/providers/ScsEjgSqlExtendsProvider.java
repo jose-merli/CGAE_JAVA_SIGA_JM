@@ -130,6 +130,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sqlEstado.SELECT("f_siga_getrecurso(MAESTROESTADO.DESCRIPCION, " + idLenguaje + ")");
 			sqlEstado.FROM("SCS_MAESTROESTADOSEJG MAESTROESTADO, SCS_ESTADOEJG ESTADO2");
 			sqlEstado.WHERE("ESTADO2.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");
+			sqlEstado.WHERE("MAESTROESTADO.IDESTADOEJG NOT IN (25,26,13,0,9,10,12,15,16,20)");
 			sqlEstado.WHERE("ESTADO2.IDINSTITUCION = ESTADO.IDINSTITUCION");
 			sqlEstado.WHERE("ESTADO2.IDTIPOEJG = ESTADO.IDTIPOEJG");
 			sqlEstado.WHERE("ESTADO2.ANIO = ESTADO.ANIO");
@@ -143,7 +144,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			SQL sqlEstado = new SQL();
 			sqlEstado.SELECT("f_siga_getrecurso(MAESTROESTADO.DESCRIPCION, " + idLenguaje + ")");
 			sqlEstado.FROM("SCS_MAESTROESTADOSEJG MAESTROESTADO");
-			sqlEstado.WHERE("ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG AND ROWNUM = 1");
+			sqlEstado.WHERE("ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG AND MAESTROESTADO.IDESTADOEJG NOT IN (25,26,13,0,9,10,12,15,16,20) AND ROWNUM = 1");
 			
 			sql.SELECT("(" + sqlEstado.toString() + ") AS ESTADOEJG");
 		}
@@ -1095,7 +1096,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
 
 		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
-		LOGGER.info("++++ [SIGA-TEST] - query  ScsEjgSqlExtendsProvider/busquedaEJG() -> " + sql.toString()); 
+//		LOGGER.info("++++ [SIGA-TEST] - query  ScsEjgSqlExtendsProvider/busquedaEJG() -> " + sql.toString()); 
 		return sql.toString();
 	}
 	
@@ -1244,7 +1245,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
 
 		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
-		LOGGER.info("++++ [SIGA-TEST] - query  ScsEjgSqlExtendsProvider/busquedaEJG() -> " + sql.toString()); 
+//		LOGGER.info("++++ [SIGA-TEST] - query  ScsEjgSqlExtendsProvider/busquedaEJG() -> " + sql.toString()); 
 		return sql.toString();
 	}
 

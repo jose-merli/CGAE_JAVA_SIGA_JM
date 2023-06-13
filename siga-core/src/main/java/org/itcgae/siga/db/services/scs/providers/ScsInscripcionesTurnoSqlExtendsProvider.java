@@ -40,6 +40,20 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		return sql.toString() +"consultaBaja";
 	}
 	
+	public String validarExisteTurnoDeAlta(InscripcionesItem inscripcionItem) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("idPersona");
+		sql.FROM("SCS_INSCRIPCIONTURNO");
+		sql.WHERE("idinstitucion = '"+inscripcionItem.getIdinstitucion()+"' AND " + 
+				"idPersona = '"+inscripcionItem.getIdpersona()+"' AND " + 
+				"idturno = '"+inscripcionItem.getIdturno()+"' AND " + 
+				"fechaValidacion IS NOT NULL AND fechaBaja IS NULL");
+		
+		return sql.toString();
+	}
+	
 	public String busquedaTrabajosGuardias(InscripcionesItem inscripcionesItem,Short idInstitucion,String fechaActual) {
 
 		SQL sql = new SQL();
