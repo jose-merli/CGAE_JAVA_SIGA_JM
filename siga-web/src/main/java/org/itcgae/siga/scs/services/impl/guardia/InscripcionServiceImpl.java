@@ -1626,10 +1626,8 @@ public class InscripcionServiceImpl implements InscripcionService {
 						//turnoKey.setIdinstitucion(idInstitucion);
 						//ScsTurno turnoItem = scsTurnoMapper.selectByPrimaryKey(turnoKey);
 						//String valid = turnoItem.getValidarinscripciones();
-						
-						int idTurno = 0;
 
-						// Buscamos las inscripciones ya existentes
+						// Buscamos las inscripciones ya existentes en el turno
 						ScsInscripcionturnoExample scsInscripcionturnoExample = new ScsInscripcionturnoExample();
 						scsInscripcionturnoExample.createCriteria().andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
 								.andIdinstitucionEqualTo(idInstitucion)
@@ -1644,50 +1642,28 @@ public class InscripcionServiceImpl implements InscripcionService {
 							inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
 							inscripcionturno.setFechasolicitud(inscripcionesItem.getFechasolicitud());
 							inscripcionturno.setFechavalidacion(null);
-							
-							/*
-							if (inscripcionesItem.getEstadonombre()!= null && (inscripcionesItem.getEstadonombre().equals("NoPermisos") || inscripcionesItem.getEstadonombre().equals("PendienteDeValidar"))) {
-							} else {
-								if (valid == "N") {
-									inscripcionturno.setFechavalidacion(new Date());
-								}
-							}
-							*/
-
 							inscripcionturno.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 							inscripcionturno.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 							inscripcionturno.setIdinstitucion(idInstitucion);
 							inscripcionturno.setFechamodificacion(new Date());
 							inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-							idTurno = scsInscripcionturnoExtendsMapper.insert(inscripcionturno);
+							scsInscripcionturnoExtendsMapper.insert(inscripcionturno);
 							
 							creados++;
 							
-						} else {
-							
-							idTurno = listInscripcionturno.get(0).getIdturno().intValue();
 						}
 						
 						if(inscripcionesItem.getIdguardia() != null && !inscripcionesItem.getIdguardia().isEmpty()) {
 							
 							//Buscamos si existe la inscripción en la guardia
-							ScsInscripcionguardia inscripcionguardia = inscripcionGuardiaExtendsMapper.getLastInscripciones(inscripcionesItem.getIdguardia(), Integer.toString(idTurno), inscripcionesItem.getIdpersona(), idInstitucion.toString());
+							ScsInscripcionguardia inscripcionguardia = inscripcionGuardiaExtendsMapper.getLastInscripciones(inscripcionesItem.getIdguardia(), inscripcionesItem.getIdturno(), inscripcionesItem.getIdpersona(), idInstitucion.toString());
 							if(inscripcionguardia == null) {
 								
 								ScsInscripcionguardia guardia = new ScsInscripcionguardia();
 								guardia.setObservacionessuscripcion(inscripcionesItem.getObservacionessolicitud());
 								guardia.setFechavalidacion(null);
-								/*
-								if (inscripcionesItem.getEstadonombre()!= null && (inscripcionesItem.getEstadonombre().equals("NoPermisos") || inscripcionesItem.getEstadonombre().equals("PendienteDeValidar"))) {
-									guardia.setFechavalidacion(null);
-								} else {
-									if (valid == "N") {
-										guardia.setFechavalidacion(new Date());
-									}
-								}
-								*/
-								guardia.setIdturno(idTurno);
+								guardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 								guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 								guardia.setIdinstitucion(idInstitucion);
 								guardia.setIdguardia(Integer.parseInt(inscripcionesItem.getIdguardia()));

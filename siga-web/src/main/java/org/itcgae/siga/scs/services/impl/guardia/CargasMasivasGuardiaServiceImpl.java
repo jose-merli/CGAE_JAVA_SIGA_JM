@@ -1,5 +1,34 @@
 package org.itcgae.siga.scs.services.impl.guardia;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.DVConstraint;
@@ -17,22 +46,72 @@ import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.*;
+import org.itcgae.siga.DTOs.scs.BusquedaInscripcionMod;
+import org.itcgae.siga.DTOs.scs.CalendarioAutomatico;
+import org.itcgae.siga.DTOs.scs.CalendarioEfectivo;
+import org.itcgae.siga.DTOs.scs.CargaMasivaDatosGuardiatem;
+import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
+import org.itcgae.siga.DTOs.scs.GuardiaCalendarioItem;
+import org.itcgae.siga.DTOs.scs.PeriodoEfectivoItem;
+import org.itcgae.siga.DTOs.scs.RangoFechasItem;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
-import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.*;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenBajastemporales;
+import org.itcgae.siga.db.entities.CenCargamasiva;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
+import org.itcgae.siga.db.entities.CenHistorico;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosCatalogosKey;
+import org.itcgae.siga.db.entities.GenRecursosExample;
+import org.itcgae.siga.db.entities.ScsCabeceraguardias;
+import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
+import org.itcgae.siga.db.entities.ScsGrupoguardia;
+import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiadoKey;
+import org.itcgae.siga.db.entities.ScsGuardiasturno;
+import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
+import org.itcgae.siga.db.entities.ScsGuardiasturnoKey;
+import org.itcgae.siga.db.entities.ScsInscripcionguardia;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
+import org.itcgae.siga.db.entities.ScsInscripcionturno;
+import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
+import org.itcgae.siga.db.mappers.CenHistoricoMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
+import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
+import org.itcgae.siga.db.mappers.ScsCalendarioguardiasMapper;
+import org.itcgae.siga.db.mappers.ScsGrupoguardiaMapper;
+import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoMapper;
+import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
+import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
+import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
+import org.itcgae.siga.db.mappers.ScsInscripcionturnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.*;
+import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsCalendarioguardiasExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsConfConjuntoGuardiasExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiacolegiadoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionguardiaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.guardia.CargasMasivasGuardiaService;
-import org.itcgae.siga.scs.services.impl.maestros.FichaPartidasJudicialesServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -45,19 +124,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import net.bytebuddy.asm.Advice.This;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
 
 @Service
 public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaService {
@@ -1117,34 +1183,18 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						if (!listGu.get(0).getObligatoriedad().equals("0")) {
 
 							// 3. Si la inscripción en la guardia ya existe de alta para la fecha efectiva indicada, no se podrá realizar.
-							/*
-							ScsInscripcionguardiaExample exampleInscripcionGuardias = new ScsInscripcionguardiaExample();
-							exampleInscripcionGuardias.createCriteria()
-								.andFechasuscripcionLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva())
-								.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
-								.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
-								.andIdinstitucionEqualTo(idInstitucion)
-								.andIdguardiaEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()))
-								.andFechadenegacionIsNull()
-								.andFechabajaIsNull()
-								.andFechasolicitudbajaIsNull()
-								.andFechavalidacionIsNotNull();
-							*/
-							
 							ScsInscripcionguardia inscripcionguardia = scsInscripcionguardiaExtendsMapper.getLastInscripciones(cargaMasivaDatosITItem.getIdGuardia(), 
 									cargaMasivaDatosITItem.getIdTurno(), cargaMasivaDatosITItem.getIdPersona(), idInstitucion.toString());
-							
-							//scsInscripcionguardiaMapper.selectByExample(exampleInscripcionGuardias).isEmpty()
 
-							if (inscripcionguardia != null && inscripcionguardia.getFechavalidacion() == null) {
+							if (inscripcionguardia == null) {
 
 								// 4. Si no existe una inscripción en el turno para dicha inscripción en la guardia, no se podrá realizar							
 								ScsInscripcionturnoExample scsInscripcionturnoExample = new ScsInscripcionturnoExample();
-								scsInscripcionturnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-									.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
-									.andFechasolicitudLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva())
-									.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
-									.andFechabajaIsNull();
+								scsInscripcionturnoExample.createCriteria().andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+								.andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+								.andFechabajaIsNull().andFechadenegacionIsNull().andFechasolicitudbajaIsNull().andFechavalidacionIsNotNull();
+								
+								//.andFechasolicitudLessThanOrEqualTo(cargaMasivaDatosITItem.getFechaEfectiva())
 								
 								List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByExample(scsInscripcionturnoExample);
 
@@ -1180,6 +1230,25 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								} else {
 									errorLinea.append("El colegiado no esta inscrito en el turno indicado.");
 								}
+							} else if(inscripcionguardia != null && inscripcionguardia.getFechavalidacion() == null) {
+							
+								// 4. Si no existe una inscripción en el turno para dicha inscripción en la guardia, no se podrá realizar							
+								ScsInscripcionturnoExample scsInscripcionturnoExample = new ScsInscripcionturnoExample();
+								scsInscripcionturnoExample.createCriteria().andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+								.andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+								.andFechabajaIsNull().andFechadenegacionIsNull().andFechasolicitudbajaIsNull().andFechavalidacionIsNotNull();
+								
+								List<ScsInscripcionturno> insturList = scsInscripcionturnoMapper.selectByExample(scsInscripcionturnoExample);
+
+								// Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se inscriben las guardias.
+								if (insturList != null && insturList.size() != 0) {
+								
+									inscripcionguardia.setFechavalidacion(new Date());
+									scsInscripcionguardiaMapper.updateByPrimaryKeySelective(inscripcionguardia);
+								}else {
+									errorLinea.append("Ya existe una inscripcion a dicha guardia con las mismas caracteristicas no se puede validar porque el turno no esta validado.");	
+								}
+								
 							} else {
 								errorLinea.append("Ya existe una inscripcion a dicha guardia con las mismas caracteristicas.");
 							}
@@ -2204,7 +2273,6 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								}//-E
 							}
 						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 						if (result == 0) {
@@ -2959,7 +3027,6 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		try {
 			d = sdf.parse(oldDateString);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		sdf.applyPattern(NEW_FORMAT);
