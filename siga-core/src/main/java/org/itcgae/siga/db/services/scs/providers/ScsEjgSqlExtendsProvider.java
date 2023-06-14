@@ -1748,6 +1748,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql2.SELECT("e.*");
 		sql2.SELECT("(dest.nombre || ' ' || dest.apellidos1 || ' ' || dest.apellidos2) AS destinatario");
 		sql2.SELECT("(" + sqlTipoEnvio.toString() + ") as tipoenvio");
+		sql2.SELECT("CLASE.NOMBRE AS NOMBRECLASE");
 		sql2.SELECT("(" + sqlEstadosEnvio.toString() + ") as estadoenvio");
 		sql2.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
 		sql2.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
@@ -1763,7 +1764,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql2.LEFT_OUTER_JOIN(
 				"env_camposenvios camposenvioscuerpo ON (e.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = e.idinstitucion"
 						+ " AND camposenvioscuerpo.idcampo = 2)");
-
+		sql2.LEFT_OUTER_JOIN("MOD_MODELOCOMUNICACION MODELO ON MODELO.IDMODELOCOMUNICACION = e.IDMODELOCOMUNICACION");
+		sql2.LEFT_OUTER_JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
+	   
 		sql2.WHERE("e.fechabaja IS NULL");
 		sql2.WHERE("c.idinstitucion = '" + idInstitucion + "'");
 		sql2.WHERE("c.ejganio = " + anio);

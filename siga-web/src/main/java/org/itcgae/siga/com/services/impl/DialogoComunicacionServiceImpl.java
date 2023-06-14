@@ -67,8 +67,11 @@ import org.itcgae.siga.DTOs.com.TipoEnvioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.DatosCartaAcreditacionItem;
+import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DestinatariosItem;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
@@ -108,6 +111,7 @@ import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
+import org.itcgae.siga.db.entities.ScsComunicaciones;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
@@ -125,6 +129,7 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
+import org.itcgae.siga.db.mappers.ScsComunicacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
@@ -142,6 +147,7 @@ import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExte
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaEnvioConsultaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModRelPlantillaSufijoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ScsComunicacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDefendidosdesignasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
@@ -280,6 +286,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
     @Autowired    
     CenClienteExtendsMapper _cenClienteExtendsMapper;
+    
+    @Autowired
+    private ScsComunicacionesExtendsMapper scsComunicacionesExtendsMapper;
 	
 	static int numeroFicheros = 1; 
 	
@@ -1927,6 +1936,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								envio.setDescripcion(descripcion);
 
 								_envEnviosMapper.updateByPrimaryKey(envio);
+								
+								//Insertamos en SCS_Comunicaciones
+								insertComunicaciones(envio.getIdenvio(),dest.getCamposEnvio());
 
 								if (insert > 0) {
 
@@ -2074,6 +2086,34 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}
 	}
 	
+	private void insertComunicaciones(Long idenvio, CamposPlantillaEnvio camposEnvio) {
+		// TODO Auto-generated method stub
+		EjgItem ejg = camposEnvio.getEjg();
+		DesignaItem des = camposEnvio.getDesigna();
+		ScsComunicaciones comunicacionInsert = new ScsComunicaciones();
+		NewIdDTO idNew = scsComunicacionesExtendsMapper.selectMaxIdLinea();
+		
+		comunicacionInsert.setIdcomunicacion(Long.parseLong(idNew.getNewId()));
+		comunicacionInsert.setIdenviosalida(idenvio);
+		if(des != null) {
+			comunicacionInsert.setDesignaanio( (short)des.getAno() ); 
+			comunicacionInsert.setDesignanumero((long)des.getNumero()); 
+			comunicacionInsert.setDesignaidturno(des.getIdTurno());
+		}else {
+			comunicacionInsert.setEjganio(Short.parseShort(ejg.getAnnio()));
+			comunicacionInsert.setEjgnumero(Long.parseLong(ejg.getNumero()));
+			comunicacionInsert.setEjgidtipo(Short.parseShort(ejg.getTipoEJG()));	
+		}
+		comunicacionInsert.setIdinstitucion(Short.parseShort(camposEnvio.getIdInstitucion()));
+		
+		//comunicacionInsert
+		int insertB = scsComunicacionesExtendsMapper.insert(comunicacionInsert);
+		LOGGER.info("insertComunicaciones() --> Filas Insertadas: " + insertB);
+		
+	}
+
+
+
 	private void moverFichero(String rutaVieja, String nuevaRuta, String nombreFichero) {
 		File archivoActual = new File(rutaVieja,nombreFichero);
 		File archivoNuevo = new File(nuevaRuta,nombreFichero);
@@ -2890,6 +2930,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				String envioCuerpo = null;
 				String envioAsunto = null;
 				String valorIdentificador = null;
+				EjgItem ejg = null;
+				DesignaItem des = null;
 				if(camposEnvio.getAsunto() != null) {
 					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), camposEnvio.getAsunto(), destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, hDatosFinal);
 					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioAsunto, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
@@ -2901,6 +2943,17 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				if (mapaClave.containsKey("identificador")) {
 				     valorIdentificador = mapaClave.get("identificador");
+				     if(valorIdentificador.startsWith("E")) {
+				    	 ejg = new EjgItem();
+				    	 ejg.setAnnio(mapaClave.get("anio"));
+				    	 ejg.setNumero(mapaClave.get("num"));
+				    	 ejg.setTipoEJG(mapaClave.get("idtipoejg"));
+				     }else if(valorIdentificador.startsWith("D")) {
+				    	 des = new DesignaItem();
+				    	 des.setAno(Integer.parseInt(mapaClave.get("anio")));
+				    	 des.setNumero(Integer.parseInt(mapaClave.get("num")));
+				    	 des.setIdTurno(Integer.parseInt(mapaClave.get("idturno")));
+				     }
 				}
 				
 
@@ -2909,7 +2962,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					CamposPlantillaEnvio envCampos = new CamposPlantillaEnvio();
 				
 					DestinatarioItem dest = new DestinatarioItem(destinatario);
+					
+					if(des != null) envCampos.setDesigna(des);
+						else envCampos.setEjg(ejg);
+					
 					envCampos.setIdentificador(valorIdentificador);
+					envCampos.setIdInstitucion(mapaClave.containsKey("idInstitucion") ? mapaClave.get("idInstitucion") : null);
 					envCampos.setAsunto(envioAsunto);
 					envCampos.setCuerpo(envioCuerpo);
 					dest.setCamposEnvio(envCampos);
