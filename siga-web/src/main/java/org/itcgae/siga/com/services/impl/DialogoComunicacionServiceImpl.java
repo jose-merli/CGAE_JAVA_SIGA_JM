@@ -2090,25 +2090,28 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		// TODO Auto-generated method stub
 		EjgItem ejg = camposEnvio.getEjg();
 		DesignaItem des = camposEnvio.getDesigna();
-		ScsComunicaciones comunicacionInsert = new ScsComunicaciones();
-		NewIdDTO idNew = scsComunicacionesExtendsMapper.selectMaxIdLinea();
-		
-		comunicacionInsert.setIdcomunicacion(Long.parseLong(idNew.getNewId()));
-		comunicacionInsert.setIdenviosalida(idenvio);
-		if(des != null) {
-			comunicacionInsert.setDesignaanio( (short)des.getAno() ); 
-			comunicacionInsert.setDesignanumero((long)des.getNumero()); 
-			comunicacionInsert.setDesignaidturno(des.getIdTurno());
-		}else {
-			comunicacionInsert.setEjganio(Short.parseShort(ejg.getAnnio()));
-			comunicacionInsert.setEjgnumero(Long.parseLong(ejg.getNumero()));
-			comunicacionInsert.setEjgidtipo(Short.parseShort(ejg.getTipoEJG()));	
+		if(ejg != null || des != null ) {
+			ScsComunicaciones comunicacionInsert = new ScsComunicaciones();
+			NewIdDTO idNew = scsComunicacionesExtendsMapper.selectMaxIdLinea();
+			
+			comunicacionInsert.setIdcomunicacion(Long.parseLong(idNew.getNewId()));
+			comunicacionInsert.setIdenviosalida(idenvio);
+			if(des != null) {
+				comunicacionInsert.setDesignaanio( (short)des.getAno() ); 
+				comunicacionInsert.setDesignanumero((long)des.getNumero()); 
+				comunicacionInsert.setDesignaidturno(des.getIdTurno());
+			}else {
+				comunicacionInsert.setEjganio(Short.parseShort(ejg.getAnnio()));
+				comunicacionInsert.setEjgnumero(Long.parseLong(ejg.getNumero()));
+				comunicacionInsert.setEjgidtipo(Short.parseShort(ejg.getTipoEJG()));	
+			}
+			comunicacionInsert.setIdinstitucion(Short.parseShort(camposEnvio.getIdInstitucion()));
+			
+			//comunicacionInsert
+			int insertB = scsComunicacionesExtendsMapper.insert(comunicacionInsert);
+			LOGGER.info("insertComunicaciones() --> Filas Insertadas: " + insertB);
 		}
-		comunicacionInsert.setIdinstitucion(Short.parseShort(camposEnvio.getIdInstitucion()));
-		
-		//comunicacionInsert
-		int insertB = scsComunicacionesExtendsMapper.insert(comunicacionInsert);
-		LOGGER.info("insertComunicaciones() --> Filas Insertadas: " + insertB);
+	
 		
 	}
 
