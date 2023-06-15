@@ -1601,9 +1601,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
 								idInstitucion.toString(), grupoUltimo, porGrupos == "1");
 						for (int i = 0; i < colaGuardia.size(); i++) {
-							if (colaGuardia.get(i).getNombre() == "CARLA") {
-								String duda = colaGuardia.get(i).getNumeroGrupo();
-							}
 							if (colaGuardia.get(i).getNumeroGrupo() == null
 									|| colaGuardia.get(i).getNumeroGrupo() == "null") {
 								colaGuardia.remove(i);

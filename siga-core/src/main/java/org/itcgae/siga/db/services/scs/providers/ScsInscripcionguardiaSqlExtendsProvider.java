@@ -29,7 +29,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sqlListadoInscripciones.SELECT("ins.idguardia");
 		sqlListadoInscripciones.SELECT("per.idpersona");
 		sqlListadoInscripciones.SELECT("Ins.fechasuscripcion AS Fechasuscripcion");
-		sqlListadoInscripciones.SELECT("TRUNC(Ins.fechavalidacion) AS fechavalidacion");
+		sqlListadoInscripciones.SELECT("TO_CHAR(trunc(ins.fechavalidacion), 'DD/MM/YYYY') AS fechavalidacion");
 		sqlListadoInscripciones.SELECT("TRUNC(Ins.fechabaja) AS fechabaja");
 		sqlListadoInscripciones.SELECT("Per.Nifcif");
 		sqlListadoInscripciones.SELECT("Per.Nombre AS nombre");
