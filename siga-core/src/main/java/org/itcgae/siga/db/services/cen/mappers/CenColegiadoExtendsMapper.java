@@ -269,17 +269,22 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> selectColegiacionActual(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
-
-//	sql.SELECT("COLEGIADO.IDPERSONA,INSTITUCION.ABREVIATURA,COLEGIADO.idinstitucion");
-//	sql.SELECT("DECODE(COLEGIADO.COMUNITARIO,0,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO) AS NCOLEGIADO");
-//	sql.SELECT("PERSONA.NIFCIF");
-//	sql.SELECT("RECURSO.DESCRIPCION");
-//	sql.SELECT("(PERSONA.APELLIDOS1  || ' ' || PERSONA.APELLIDOS2 || ' ' || PERSONA.NOMBRE) AS NOMBRE");
-//	sql.SELECT("DECODE(COUNT(INSCRIPCIONTURNO.IDTURNO),0,'NO','SI') AS INSCRITOTURNO");
-//	sql.SELECT("DECODE(COUNT(INSCRIPCIONGUARDIA.IDTURNO),0,'NO','SI') AS INSCRITOGUARDIA");
-//	sql.SELECT("DIRECCION.TELEFONO1 AS TELEFONO");
-//	sql.SELECT("Select count(*)      From Scs_Cabeceraguardias Cab Where Cab.Idinstitucion = COLEGIADO.idinstitucion and cab.idpersona = COLEGIADO.idpersona and Cab.Fecha_Fin >= Sysdate) as guardiasPendientes");
-
+	
+	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiacionHistor")
+	@Results({ 
+		@Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADO", property = "fechaEstadoStr", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADODATE", property = "fechaEstado", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ColegiadoItem> selectColegiacionHistor(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
+	
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "busquedaColegiadosSJCS")
 	@Results({ 
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
