@@ -1,0 +1,99 @@
+application:
+  permisos:
+    # Permisos Censo
+    /busquedaColegiados/generarExcel: [ 1AA ]
+    # Permisos para el módulo de FacturacionSJCS
+    /facturacionsjcs/eliminarFacturacion: [ 600 ]
+    /facturacionsjcs/simularfacturacion: [601, 602, 603]
+    /facturacionsjcs/ejecutarfacturacion: [ 601 ]
+    /facturacionsjcs/reabrirfacturacion: [ 601 ]
+    /facturacionsjcs/saveFacturacion: [ 601 ]
+    /facturacionsjcs/updateFacturacion: [ 601 ]
+    /facturacionsjcs/deleteConceptosFac: [ 60B ]
+    /facturacionsjcs/saveConceptosFac: [ 60B ]
+    /facturacionsjcs/updateConceptosFac: [ 60B ]
+    /pagosjcs/simularPagoSJCS: [ 604 ]
+    /pagosjcs/ejecutarPagoSJCS: [ 604 ]
+    /pagosjcs/cerrarPago: [ 604 ]
+    /pagosjcs/cerrarPagoManual: [ 604 ]
+    /pagosjcs/deshacerCierre: [ 604 ]
+    /pagosjcs/savePago: [ 604 ]
+    /pagosjcs/deletePago: [ 604 ]
+    /pagosjcs/deleteConceptoPago: [ 61A ]
+    /pagosjcs/saveConceptoPago: [ 61A ]
+    /pagosjcs/saveConfigFichAbonos: [ 622 ]
+    /retenciones/deleteRetenciones: [ 630 ]
+    /retenciones/saveOrUpdateRetencion: [ 63B ]
+    /facturacionsjcs/impreso190generar: [613]
+    /facturacionsjcs/impreso190descargar: [613]
+    /facturacionsjcs/deleteImpreso190: [613]
+    /movimientosVarios/deleteMovimientosVarios: [608]
+    /movimientosVarios/saveClienteMovimientosVarios: [608]
+    /movimientosVarios/updateClienteMovimientosVarios: [608]
+    /movimientosVarios/saveDatosGenMovimientosVarios: [608]
+    /movimientosVarios/updateDatosGenMovimientosVarios: [608]
+    /movimientosVarios/saveCriteriosMovimientosVarios: [608]
+    /movimientosVarios/updateCriteriosMovimientosVarios: [608]
+    /certificaciones/eliminarCertificaciones: [624]
+    /certificaciones/createOrUpdateCertificacion: [626]
+    /certificaciones/reabrirCertificacion: [626]
+    /certificaciones/tramitarCertificacion: [626]
+    /certificaciones/subirFicheroCAM: [626]
+    /certificaciones/descargarCertificacionesXunta: [626]
+    /certificaciones/descargaInformeCAM: [626]
+    /certificaciones/delFactCertificacion: [627]
+    /certificaciones/reabrirfacturacion: [627]
+    /certificaciones/saveFactCertificacion: [627]
+    /certificaciones/descargarLogReintegrosXunta: [628]
+    /certificaciones/descargarInformeIncidencias: [628]
+    /certificaciones/accionXuntaEnvios: [628]
+
+    # Permisos para el módulo de ProductosYServicios
+    /pys/solicitarCompra: [39A]
+    /pys/aprobarCompra: [39B]
+    /pys/denegarPeticion: [39]
+    /pys/solicitarSuscripcion: [39G]
+    /pys/anularCompra: [39D]
+    /pys/actualizarServicioSuscripcion: [39E]
+    /pys/anularSuscripcion: [39F]
+    /pys/aprobarSuscripcion: [39H]
+    /pys/facturarCompra: [39I]
+
+    /cargaMasivaCompras/cargarFichero: [39A]
+    /pys/savePagoCompraSuscripcion: [39]
+
+    # Permisos para el módulo de PNJ
+    /comunicaciones/saveNuevaComm: [30G]
+
+    /pys/liquidacionMonederos: [52A]
+    /pys/updateMovimientosMonedero: [52B]
+    /pys/updateServiciosMonedero: [52C]
+
+    # Permisos Maestros --> Tipos Productos y Maestros --> Tipos Servicios
+    /pys/crearEditarProducto: [402]
+    /pys/activarDesactivarProducto: [403]
+    /pys/crearEditarServicio: [404]
+    /pys/activarDesactivarServicio: [405]
+
+    # Permisos Productos
+    /pys/nuevoProducto: [406]
+    /pys/editarProducto: [406]
+    /pys/reactivarBorradoFisicoLogicoProductos: [407]
+    /pys/formasPagoProducto: [408]
+
+    # Permisos Servicios
+    /pys/nuevoServicio: [409]
+    /pys/reactivarBorradoFisicoLogicoServicios: [410]
+    /pys/formasPagoServicio: [411]
+    /pys/crearEditarPrecios: [413]
+    /pys/eliminarPrecios: [414]
+    /pys/borrarSuscripcionesBajas: [415]
+
+    # Fin permisos para el módulo de ProductosYServicios
+
+    #Inicio permisos para el modulo Facturacion PyS
+    facturacionPyS/guardarRegistroFichConta: [417]
+    facturacionPyS/desactivarReactivarRegistroFichConta: [418]
+
+    #Fin permisos para el modulo Facturacion PyS
+

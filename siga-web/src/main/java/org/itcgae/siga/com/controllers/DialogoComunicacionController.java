@@ -4,14 +4,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
+import org.itcgae.siga.DTOs.com.GenerarComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModeloDialogoItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
@@ -23,23 +32,37 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.FileInfoDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosExample;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.concurrent.ListenableFuture;
 
 @RestController
 @RequestMapping(value = "/dialogoComunicacion")
 public class DialogoComunicacionController {
 	
 	private static final Logger LOGGER = Logger.getLogger(DialogoComunicacionController.class);	
+	
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
 	IDialogoComunicacionService _dialogoComunicacionService;
@@ -123,19 +146,70 @@ public class DialogoComunicacionController {
 				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 	}
 	
-	@RequestMapping(value = "/nombredoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
-		
-		File file = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
+	@RequestMapping(value = "/nombredoc", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo,
+			HttpServletResponse resp) throws InterruptedException, ExecutionException {
+
+		LOGGER.error("Entrada en nombredoc()- INI");
+		ListenableFuture<File> fileFuture = null;
 		FileInfoDTO fileInfoDTO = new FileInfoDTO();
-		
-		if(file != null) {
-			fileInfoDTO.setFilePath(file.getAbsolutePath());
-			fileInfoDTO.setName(file.getName());
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
-		}else {
+		try {		
+		fileFuture = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
+
+		File file = fileFuture.get(10, TimeUnit.MINUTES);
+
+			if (file != null) {
+				fileInfoDTO.setFilePath(file.getAbsolutePath());
+				fileInfoDTO.setName(file.getName());
+				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
+		} catch (InterruptedException | TimeoutException e) {
+
+			
+				String mensaje = "504 - TimeOut";
+				try {
+					fileFuture.cancel(true);
+					// Conseguimos información del usuario logeado
+					String token = request.getHeader("Authorization");
+					String dni = UserTokenUtils.getDniFromJWTToken(token);
+					Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni)
+							.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+					AdmUsuarios usuario = usuarios.get(0);
+
+					GenRecursosExample genRecursosExample = new GenRecursosExample();
+					genRecursosExample.createCriteria()
+							.andIdrecursoEqualTo("informesycomunicaciones.descarga.mensaje.errorTimeOut")
+							.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+					List<GenRecursos> genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
+
+					mensaje = genRecursos.get(0).getDescripcion();
+					LOGGER.error(mensaje);
+				} catch (Exception ex) {
+					LOGGER.error(ex.getCause());
+				}
+				fileInfoDTO.setMessageError(mensaje);
+				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
+			
+			
+		}catch(ExecutionException e) {
+			if(e.getCause() != null )		
+				fileInfoDTO.setMessageError(e.getCause().getMessage());
 			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		catch(Exception e) {
+			if(e.getCause() != null )		
+				fileInfoDTO.setMessageError(e.getCause().getMessage());
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 	
 	@RequestMapping(value = "/generarEnvios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

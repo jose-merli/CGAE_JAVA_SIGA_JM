@@ -158,4 +158,5 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		applyWhere(sql, example, true);
 		return sql.toString();
 	}
+
 }

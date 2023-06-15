@@ -1,22 +1,46 @@
 package org.itcgae.siga.com.services.impl;
 
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import javax.management.IntrospectionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.DatosDireccionLetradoOficio;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
+import org.itcgae.siga.DTOs.com.CamposPlantillaEnvio;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.ConsultaEnvioItem;
@@ -43,14 +67,20 @@ import org.itcgae.siga.DTOs.com.TipoEnvioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.DatosCartaAcreditacionItem;
+import org.itcgae.siga.DTOs.scs.DestinatariosItem;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
+import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
+import org.itcgae.siga.commons.constants.SigaConstants.GEN_PARAMETROS;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ConConsulta;
@@ -59,23 +89,30 @@ import org.itcgae.siga.db.entities.EnvCamposenvios;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
+import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosExample;
+import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
+import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
+import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
+import org.itcgae.siga.db.entities.ScsDefendidosdesignaExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
-import org.itcgae.siga.db.mappers.ConEjecucionMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
@@ -83,13 +120,16 @@ import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
-import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvConsultasEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -102,17 +142,30 @@ import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExte
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaEnvioConsultaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModRelPlantillaSufijoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDefendidosdesignasExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import com.aspose.words.Document;
+import com.google.common.io.Files;
+
+import oracle.security.crypto.core.DES;
 
 @Service
+@EnableAsync
 public class DialogoComunicacionServiceImpl implements IDialogoComunicacionService{
 	
 	private Logger LOGGER = Logger.getLogger(DialogoComunicacionServiceImpl.class);
@@ -143,9 +196,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private ModPlantillaDocumentoConsultaExtendsMapper _modPlantillaDocumentoConsultaExtendsMapper;
-	
-	@Autowired
-	private ModModeloPlantillaenvioMapper _modModeloPlantillaenvioMapper;
 	
 	@Autowired
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
@@ -211,8 +261,25 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private ModClasecomunicacionesExtendsMapper _modClasecomunicacionesExtendsMapper;
 	
 	@Autowired
-	private ConEjecucionMapper _conEjecucionMapper;
+	private CenDireccionesExtendsMapper cenDireccionesMapper;
 	
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoMapper;
+	
+	@Autowired
+	private ScsDesignacionesExtendsMapper designacionesMapper;
+	
+	@Autowired
+	private ScsDefendidosdesignasExtendsMapper defendidosMapper;
+	
+	@Autowired
+	private GenParametrosMapper _genParametrosMapper;
+	
+	@Autowired
+	private IEnviosMasivosService _enviosMasivosService;
+	
+    @Autowired    
+    CenClienteExtendsMapper _cenClienteExtendsMapper;
 	
 	static int numeroFicheros = 1; 
 	
@@ -348,9 +415,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return response;
 	}
 
-	
-	@Override
-	public File obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+	@Async
+	@Transactional(timeout=600000)
+	public  ListenableFuture<File>  obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
 		File file = null;
@@ -364,8 +431,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			
 			List<DatosDocumentoItem> listaFicheros = null;
 			GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
-			Error error = new Error();
-	
+			
 			if (null != idInstitucion) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -390,10 +456,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			throw new BusinessException("Error interno de la aplicación", e);
 		}
 		LOGGER.info("descargarComunicacion() -> Salida al servicio para descargar la documentación de la comunicación");
-		return file;
+		return  AsyncResult.forValue(file);
 		
 	}
-
 
 	private File getFicheroDescarga(String idInstitucion, List<DatosDocumentoItem> listaFicheros) throws IOException {
 		File file = null;
@@ -427,10 +492,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
 		List<DatosEnvioDTO> listaConsultasYDestinatario = new ArrayList<DatosEnvioDTO>();
 		List<ModelosEnvioItem> listaModelosEnvio = new ArrayList<ModelosEnvioItem>();
-		DestinatarioItem destinatario = null;
+		List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
 		int ficherogenerado = 0;
-		String rutaPlantillaClase = "";
 		ModClasecomunicaciones modClasecomunicacion = null;
+		String cuerpoEnvio = null;
+		CamposPlantillaEnvio camposEnvio = new CamposPlantillaEnvio();
 
 		try{
 			
@@ -456,16 +522,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(modClasecomunicacion != null){
 				campoSufijo = modClasecomunicacion.getSufijo();
 				LOGGER.debug("Campo campoSufijo = " + campoSufijo);
-				rutaPlantillaClase = modClasecomunicacion.getRutaplantilla();
-				LOGGER.debug("Campo rutaPlantillaClase = " + rutaPlantillaClase);
-			}
-			
-			if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
-				rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
-				LOGGER.debug("Campo rutaPlantillaClase = " + rutaPlantillaClase);
-			}else {
-				rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(usuario.getIdinstitucion()));
-				LOGGER.debug("Campo rutaPlantillaClase = " + rutaPlantillaClase);
 			}
 			
 			generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
@@ -490,11 +546,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillaEnviosExtendsMapper.selectByPrimaryKey(keyPlantilla);
 					
 					// Comprobamos si la plantilla especificada contiene remitente	
-					if(plantilla.getIdpersona() == null) {
+					if(plantilla == null || plantilla.getIdpersona() == null) {
 						String mensaje = "La plantilla especificada no tiene remitente"; 
 						LOGGER.warn(mensaje);
 						throw new BusinessException(mensaje);
 					}
+					if(plantilla.getCuerpo() != null)
+						camposEnvio.setCuerpo(plantilla.getCuerpo());
+					if(plantilla.getAsunto() != null)
+						camposEnvio.setAsunto(plantilla.getAsunto());
+			
 				}
 				
 				// Obtenemos la plantilla de envio seleccionada en el modelo
@@ -509,7 +570,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					
 				boolean ejecutarConsulta = false;
 				
-				if(dialogo.getIdClaseComunicacion().equals(SigaConstants.ID_CLASE_CONSULTA_GENERICA)  && (listaKeyFiltros == null || listaKeyFiltros.size() == 0)) {
+				if((dialogo.getIdClaseComunicacion().equals(SigaConstants.ID_CLASE_CONSULTA_GENERICA)  && (listaKeyFiltros == null || listaKeyFiltros.size() == 0) )|| dialogo.getSentenciaImprimir() != null) {
 					listaKeyFiltros = new ArrayList<List<String>>();
 					List<String> listaVacia = new ArrayList<String>();
 					listaKeyFiltros.add(listaVacia);
@@ -517,39 +578,59 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 				
 				if((listaKeyFiltros != null && listaKeyFiltros.size() > 0) || ejecutarConsulta){
-					for(int i=0; i< listaKeyFiltros.size(); i ++){	
-						List<String> listaStringKey = listaKeyFiltros.get(i);	
-						HashMap<String, String> mapaClave = new HashMap<String, String>();
-						if(!ejecutarConsulta) {
-							for(int j = 0; j < listaKey.size(); j++){
-								KeyItem key = listaKey.get(j);
-								mapaClave.put(key.getNombre(), listaStringKey.get(j));
-							}
-							if (dialogo.isComunicar() && modelosComunicacionItem.getIdTipoEnvio() != null) {
-								mapaClave.put(SigaConstants.ETIQUETATIPOENVIO.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, ""), modelosComunicacionItem.getIdTipoEnvio());
-							}
-						}
-						
-						
-
+					if(modelosComunicacionItem.getInformeUnico() != null && modelosComunicacionItem.getInformeUnico().equals("1")) {
 						List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
-						destinatario = new DestinatarioItem();	
-
-						int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario,listaKeyFiltros.size(),ficherogenerado,i);
+						destinatarios =new ArrayList<DestinatarioItem>();
+						
+						String rutaPlantillaModelo = getRutaModeloByClaseModelo(modelosComunicacionItem.getIdModeloComunicacion(), modelosComunicacionItem.getIdClaseComunicacion());
+						int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, null, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaModelo, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros.size(),ficherogenerado,1,listaKeyFiltros, camposEnvio);
 											
 						if (ficherogeneradoOK > 0) {
 							ficherogenerado++;
 							
 						}
-							
 						// Por cada key seleccionada
 						if(esEnvio){
 							DatosEnvioDTO dato = new DatosEnvioDTO();
 							dato.setConsultas(listaConsultasEnvio);
-							dato.setDestinatario(destinatario);
+							dato.setDestinatarios(destinatarios);
 							listaConsultasYDestinatario.add(dato);
 						}
+					}else {
+						for(int i=0; i< listaKeyFiltros.size(); i ++){	
+							List<String> listaStringKey = listaKeyFiltros.get(i);	
+							HashMap<String, String> mapaClave = new HashMap<String, String>();
+							if(!ejecutarConsulta) {
+								for(int j = 0; j < listaKey.size(); j++){
+									KeyItem key = listaKey.get(j);
+									mapaClave.put(key.getNombre(), listaStringKey.get(j));
+								}
+								if (dialogo.isComunicar() && modelosComunicacionItem.getIdTipoEnvio() != null) {
+									mapaClave.put(SigaConstants.ETIQUETATIPOENVIO.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, ""), modelosComunicacionItem.getIdTipoEnvio());
+								}
+							}
+
+							List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
+							destinatarios = new ArrayList<DestinatarioItem>();
+							
+							String rutaPlantillaModelo = getRutaModeloByClaseModelo(modelosComunicacionItem.getIdModeloComunicacion(), modelosComunicacionItem.getIdClaseComunicacion());
+							int ficherogeneradoOK = ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaModelo, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros.size(),ficherogenerado,i,null, camposEnvio);
+												
+							if (ficherogeneradoOK > 0) {
+								ficherogenerado++;
+								
+							}
+								
+							// Por cada key seleccionada
+							if(esEnvio){
+								DatosEnvioDTO dato = new DatosEnvioDTO();
+								dato.setConsultas(listaConsultasEnvio);
+								dato.setDestinatarios(destinatarios);
+								listaConsultasYDestinatario.add(dato);
+							}
+						}
 					}
+					
 				}	
 				
 				// Por cada modelo
@@ -587,9 +668,37 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return generarComunicacion;
 	}
 	
+	private String getRutaModeloByClaseModelo(String idModeloComunicacion, String idClaseComunicacion) {
+		String rutaPlantillaClase  = "";
+		String rutaPlantillaModelo = "";
+		ModClasecomunicacionesExample claseExample = new ModClasecomunicacionesExample();
+		claseExample.createCriteria().andIdclasecomunicacionEqualTo(Short.valueOf(idClaseComunicacion));
+		List <ModClasecomunicaciones> listaClaseRuta = _modClasecomunicacionesMapper.selectByExample(claseExample);
+		if(!listaClaseRuta.isEmpty() && listaClaseRuta != null) {
+			rutaPlantillaClase = listaClaseRuta.get(0).getRutaplantilla();
+			
+			ModModelocomunicacionExample modeloExample = new ModModelocomunicacionExample();
+			modeloExample.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(idModeloComunicacion)).andIdclasecomunicacionEqualTo(Short.valueOf(idClaseComunicacion));
+			List<ModModelocomunicacion> listaModeloComunicacion = _modModeloComunicacionMapper.selectByExample(modeloExample);
+
+			if(!listaModeloComunicacion.isEmpty() && listaClaseRuta != null) {
+				String idInstitucionModelo = String.valueOf( listaModeloComunicacion.get(0).getIdinstitucion());
+				rutaPlantillaModelo = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucionModelo);
+				LOGGER.info("Campo rutaPlantillaClase = " + rutaPlantillaClase);
+			
+			}else {
+				rutaPlantillaModelo = SigaConstants.rutaPlantillaSinClase;
+				LOGGER.info("Campo rutaPlantillaClase = " + rutaPlantillaClase);
+			}
+		}
+		return rutaPlantillaModelo;
+	}
+
+
+
 	private int ejecutaPlantillas(HttpServletRequest request, ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
 			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, 
-			String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta, DestinatarioItem destinatario, int numeroSeleccionados, int ficherogenerado, int numeroSeleccionado) throws Exception {
+			String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta,List< DestinatarioItem> destinatarios, int numeroSeleccionados, int ficherogenerado, int numeroSeleccionado, List<List<String>> listaKeyFiltros, CamposPlantillaEnvio camposEnvio) throws Exception {
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -610,7 +719,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<PlantillaModeloDocumentoDTO> plantillas = new ArrayList<PlantillaModeloDocumentoDTO>();
 		HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();		
 		HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();	
-		
+		DestinatarioItem desti = null;
 		
 		
 		List<ConsultaItem> consultasItemDest = _modPlantillaDocumentoConsultaExtendsMapper
@@ -624,7 +733,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
 			for (ConsultaItem consulta : consultasItemDest) {
 				String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
-						mapaClave, esEnvio);
+						mapaClave, esEnvio, null,null);
 
 				List<Map<String, Object>> result;
 				try {
@@ -645,10 +754,17 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							e);
 				}
 
-				if (result != null && result.size() > 0) {
-					LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
+				if (result != null && result.size() > 0 && result.get(0) != null) {
+					LOGGER.info("Se han obtenido " + result.size() + " destinatarios");
 
 					for (Map<String, Object> dest : result) {
+						Set<String> keyList = dest.keySet();
+
+						for (String key : keyList) {
+							if (dest.get(key) != null)
+								mapaClave.put(key, dest.get(key).toString()); // Añadimos informacion adicional del destinatario.
+						}
+
 						String idioma = "";
 						if (null != dest.get("IDIOMA")) {
 							for (ConsultaItem consultaIdioma : consultasItemDest) {
@@ -687,6 +803,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							String nombrePlantilla = "";
 							Long idPlantillaGenerar = null;
 							boolean esExcel = false;
+							boolean esFO = false;
 							
 							LOGGER.info("Rendimiento inicio ejecucion consultas " );
 							
@@ -700,7 +817,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								
 								for(ConsultaItem consultaCondicional:consultasItemCondicional){
 									
-									consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo, consultaCondicional, mapaClave, esEnvio);
+									consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo, consultaCondicional, mapaClave, esEnvio, null,null);
 									
 									idConsultaEjecutarCondicional = Long.parseLong(consultaCondicional.getIdConsulta());
 									
@@ -734,46 +851,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 							LOGGER.info("Rendimiento fin ejecucion consultas condicionales" );
 							if (continua) {
-						
-						
-							//Obtenemos el nombre de la plantilla por cada destinatario
-							if(plantilla.getIdPlantillas() != null){
-								
-								LOGGER.debug("Generación del documento para la plantilla " + plantilla.getIdPlantillas());
-								
-								ModPlantilladocumentoExample example = new ModPlantilladocumentoExample();
-								List<Long> idValues = new ArrayList<Long>();
-								String [] idPlantillas = plantilla.getIdPlantillas().split(",");
-								
-								if(idPlantillas != null && idPlantillas.length > 0){																			
-									for(String idPlantilla :idPlantillas){
-										idValues.add(Long.parseLong(idPlantilla));
-									}
-								}
-								
-								if(plantilla.getFormatoSalida() != null && Short.parseShort(plantilla.getFormatoSalida()) == SigaConstants.FORMATO_SALIDA.XLS.getCodigo()) {
-									esExcel = true;
-									LOGGER.debug("El formato de salida es Excel");
-								}
-									example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(idioma);
-								
-								List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
-								
-								if(listaPlantilla != null && listaPlantilla.size() == 1){
-									ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
-									nombrePlantilla = plantillaDoc.getPlantilla();
-									idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
-								}else if(listaPlantilla != null && listaPlantilla.size() > 1){
-									LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
-									throw new BusinessException("Exiten multiples plantillas asociada al informe en el idioma del usuario");
-								}else{
-									LOGGER.error("No hay plantilla asociada para el informe en el idioma del destinatario");
-									throw new BusinessException("No hay plantilla asociada para el informe en el idioma del destinatario");
-								}
-							}
-							
-
-							
+					
 							//Obtenemos el nombre de la plantilla por cada destinatario
 							if(plantilla.getIdPlantillas() != null){
 								
@@ -802,6 +880,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
 									nombrePlantilla = plantillaDoc.getPlantilla();
 									idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
+									if(nombrePlantilla.lastIndexOf(".") > -1 
+											&& nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals(".fo")) {
+										esFO = true;
+									}
 								}else if(listaPlantilla != null && listaPlantilla.size() > 1){
 									LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
 									throw new BusinessException("Exiten multiples plantillas asociada al informe en el idioma del usuario");
@@ -844,7 +926,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										&& listaConsultasPlantillaEnvio.size() > 0) {
 									for (ConsultaItem consultaPlantilla : listaConsultasPlantillaEnvio) {
 										String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario,
-												dialogo, consultaPlantilla, mapaClave, esEnvio);
+												dialogo, consultaPlantilla, mapaClave, esEnvio, null,null);
 										listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
 												Long.parseLong(consultaPlantilla.getIdConsulta()),
 												consultaPlantillaEnvio, usuario.getIdinstitucion(),
@@ -856,7 +938,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									}
 								}
 								
-								obtenerDatosDestinatario(destinatario,dest);
+								 desti= obtenerDatosDestinatario(dest);
 
 
 							} else {
@@ -880,7 +962,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento" );
 								for (ConsultaItem consultaMulti : consultasItemMulti) {
 									String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti,
-											mapaClave, esEnvio);
+											mapaClave, esEnvio, null,null);
 
 									if (esEnvio) {
 										// Guardamos la consulta multidocumento
@@ -904,8 +986,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												numFicheros++;
 												generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 														listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-														hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-														nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+														hDatosGenerales, resultMulti.get(k), mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+														nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO, null, desti,destinatarios, camposEnvio);
 											}														
 										}
 											
@@ -915,6 +997,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												+ consultaMulti.getDescripcion() + " " + e.getMessage(), e);
 									} catch (Exception e) {
 										LOGGER.error(e);
+										if(e instanceof BusinessException) 
+											throw new BusinessException(e.getMessage(), e);
+									
 										throw new BusinessException(
 												"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
 									}
@@ -925,7 +1010,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 										listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 										hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-										nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+										nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO, listaKeyFiltros,desti,destinatarios, camposEnvio);
 							}
 						
 							
@@ -950,10 +1035,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}
 	}
 	}else {
+			LOGGER.error("No hay consulta de destinatario para el modelo de comunicacion: " + modelosComunicacionItem.getIdModeloComunicacion());
 		
-					LOGGER.error("No hay consulta de destinatario para el modelo de comunicacion: " + modelosComunicacionItem.getIdModeloComunicacion());
-					ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario);
-					existenConsultas = Boolean.TRUE;
+			if(esEnvio) // Si es envio, generamos error ya que es necesario el destinatario,
+				throw new BusinessException("La consulta de destinatarios no ha devuelto resultados");
+			
+			
+			ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatarios,listaKeyFiltros, camposEnvio);
+			existenConsultas = Boolean.TRUE;
 	}
 	LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
 				
@@ -968,14 +1057,15 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	}
 	
 	private void ejecutaPlantillas(HttpServletRequest request, ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
-			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta, DestinatarioItem destinatario) throws Exception {
+			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta, List<DestinatarioItem> destinatarios, List<List<String>> listaKeyFiltros, CamposPlantillaEnvio camposEnvio) throws Exception {
 
 	
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
-
+		DestinatarioItem desti = null;
+		
 		
 		ModelosComunicacionSearch respuesta = new ModelosComunicacionSearch();
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1008,7 +1098,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			String nombrePlantilla = "";
 			Long idPlantillaGenerar = null;
 			boolean esExcel = false;
+			boolean esFO = false;
 			List<ModPlantilladocumento> listaPlantilla = null;
+			//List<ModPlantilladocumento> listaPlantilla = new ArrayList<ModPlantilladocumento>();
 			//Obtenemos el nombre de la plantilla
 			if(plantilla.getIdPlantillas() != null){
 				
@@ -1029,18 +1121,26 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.debug("El formato de salida es Excel");
 				}
 				
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - INICIO");
 				example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(usuario.getIdlenguaje());
 				listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - FIN");
 				
-				
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existe una plantilla asociada al informe  - INICIO");
-				if(listaPlantilla == null || listaPlantilla.size() < 1){
+				if(listaPlantilla != null && listaPlantilla.size() == 1){
+					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
+					nombrePlantilla = plantillaDoc.getPlantilla();
+					idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
+					if (nombrePlantilla.lastIndexOf(".") != -1) {
+						String auxNombre = nombrePlantilla.substring(nombrePlantilla.lastIndexOf("."));
+						if(auxNombre.toLowerCase().equals(".fo")) {
+							esFO = true;
+						}
+					}
+				}else if(listaPlantilla != null && listaPlantilla.size() > 1){
+					LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
+					throw new BusinessException("Exiten multiples plantillas asociada al informe en el idioma del usuario");
+				}else{
 					LOGGER.error("No hay plantilla asociada para el informe en el idioma del usuario");
 					throw new BusinessException("No hay plantilla asociada para el informe en el idioma del usuario");
 				}
-				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existe una plantilla asociada al informe  - FIN");
 			}
 			
 			for (ModPlantilladocumento plantillaDoc: listaPlantilla) {
@@ -1058,7 +1158,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					
 					for(ConsultaItem consulta:consultasItemCondicional){
 						
-						consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio);
+						consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio, null,null);
 						
 						idConsultaEjecutarCondicional = Long.parseLong(consulta.getIdConsulta());
 						
@@ -1104,7 +1204,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
 						for (ConsultaItem consulta : consultasItemDest) {
 							String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
-									mapaClave, esEnvio);
+									mapaClave, esEnvio, null, null);
 	
 							List<Map<String, Object>> result;
 							try {
@@ -1163,7 +1263,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												&& listaConsultasPlantillaEnvio.size() > 0) {
 											for (ConsultaItem consultaPlantilla : listaConsultasPlantillaEnvio) {
 												String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario,
-														dialogo, consultaPlantilla, mapaClave, esEnvio);
+														dialogo, consultaPlantilla, mapaClave, esEnvio, null, null);
 												listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
 														Long.parseLong(consultaPlantilla.getIdConsulta()),
 														consultaPlantillaEnvio, usuario.getIdinstitucion(),
@@ -1175,7 +1275,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											}
 										}
 										
-										obtenerDatosDestinatario(destinatario,dest);
+										desti =	obtenerDatosDestinatario(dest);
 	
 	
 									} else {
@@ -1197,33 +1297,33 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					}else {
 						LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
 					}
-					LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
-					
-					
-					
-					LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
-					List<ConsultaItem> consultasItemMulti = _modPlantillaDocumentoConsultaExtendsMapper
-							.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
-									Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
-									plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
-					boolean consultasDestinatarioEjecutadas = Boolean.FALSE;
-					if (!(null != modelosComunicacionItem.getIdClaseComunicacion() &&  modelosComunicacionItem.getIdClaseComunicacion().equals("5"))) {
-						 consultasDestinatarioEjecutadas = consultasItemDest.size() > 0;
-					}
-					
-					if (consultasItemMulti != null && consultasItemMulti.size() > 0) {
-						LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento" );
-						for (ConsultaItem consultaMulti : consultasItemMulti) {
-							String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti,
-									mapaClave, esEnvio);
-	
-							if (esEnvio) {
-								// Guardamos la consulta multidocumento
-								listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
-										Long.parseLong(consultaMulti.getIdConsulta()), consultaEjecutarMulti,
-										usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(),
-										Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar,
-										Long.parseLong(plantilla.getIdInforme()),
+				LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
+				
+				
+				
+				LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
+				List<ConsultaItem> consultasItemMulti = _modPlantillaDocumentoConsultaExtendsMapper
+						.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
+								Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+								plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
+				boolean consultasDestinatarioEjecutadas = Boolean.FALSE;
+				if (!(null != modelosComunicacionItem.getIdClaseComunicacion() &&  modelosComunicacionItem.getIdClaseComunicacion().equals("5"))) {
+					 consultasDestinatarioEjecutadas = consultasItemDest.size() > 0;
+				}
+				
+				if (consultasItemMulti != null && consultasItemMulti.size() > 0) {
+					LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento" );
+					for (ConsultaItem consultaMulti : consultasItemMulti) {
+						String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti,
+								mapaClave, esEnvio, null,null);
+
+						if (esEnvio) {
+							// Guardamos la consulta multidocumento
+							listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
+									Long.parseLong(consultaMulti.getIdConsulta()), consultaEjecutarMulti,
+									usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(),
+									Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar,
+									Long.parseLong(plantilla.getIdInforme()),
 										Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
 										Short.parseShort(String.valueOf(consultaMulti.getIdInstitucion())));
 							}
@@ -1239,8 +1339,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										numFicheros++;
 										generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 												listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
-												hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-												nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+												hDatosGenerales, resultMulti.get(k), mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+												nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO,null, desti, destinatarios, camposEnvio);
 									}														
 								}
 									
@@ -1248,7 +1348,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								LOGGER.error(e);
 								throw new BusinessException("Error al ejecutar la consulta "
 										+ consultaMulti.getDescripcion() + " " + e.getMessage(), e);
-							} catch (Exception e) {
+							} catch (BusinessException e) {
+								LOGGER.error(e);
+								throw new BusinessException(
+										e.getMessage(), e);
+							}catch (Exception e) {
 								LOGGER.error(e);
 								throw new BusinessException(
 										"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
@@ -1260,7 +1364,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 								listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 								hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-								nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+								nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas,esFO,listaKeyFiltros, desti, destinatarios, camposEnvio);
 					}
 				
 	//				if (ejecutarConsulta) {
@@ -1298,8 +1402,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						if(hashMapRow != null && hashMapRow.get(campo) != null){
 							identificacion = hashMapRow.get(campo);
 						}else{
-							if(mapaClave != null && mapaClave.get(campo) != null) {
-								identificacion = mapaClave.get(campo);
+							if(mapaClave != null && (mapaClave.get(campo) != null || mapaClave.get(campo.toLowerCase()) != null)) {
+								if(mapaClave.get(campo) != null)
+									identificacion = mapaClave.get(campo);
+								else
+									identificacion = mapaClave.get(campo.toLowerCase());
 							}else {
 								identificacion = SigaConstants.CAMPO_IDENTIFICACION;
 							}
@@ -1318,7 +1425,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 
-	private String reemplazarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ConsultaItem consulta, HashMap<String, String> mapaClave, boolean esEnvio) {
+	private String reemplazarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ConsultaItem consulta, HashMap<String, String> mapaClave, boolean esEnvio, ModelosComunicacionItem modelosComunicacionItem,List<List<String>> listaKeyFiltros) {
 		
 		String sentencia = null;
 		//Buscamos la consulta con sus parametros dinamicos
@@ -1330,6 +1437,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			try {
 				sentencia = _consultasService.procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
 
+				if(modelosComunicacionItem != null && modelosComunicacionItem.getInformeUnico() != null && modelosComunicacionItem.getInformeUnico().equals("1")) {
+					sentencia = _consultasService.procesarEjecutarConsultaImprimir(usuario, sentencia, dialogo.getSentenciaImprimir(), listaKeyFiltros);
+				}
+				
 			} catch (ParseException e) {
 				LOGGER.error("Error al ejecutar la consulta con id " + consulta.getIdConsulta(), e);
 				throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
@@ -1340,7 +1451,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
 					sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
 				}
-			}			
+			}	
+			
+			if(consulta.getIdObjetivo() != null) {
+				//añadirmos maximo por depende del idObjetivo
+
+			}
+			
 			
 		}else{
 			LOGGER.error("No se ha encontrado la consulta");
@@ -1348,6 +1465,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}		
 		
 		return sentencia;
+	}
+	
+	private String addMaxQuery(String consulta, int maximo) {
+		
+		String consultaModificada = "SELECT * FROM (" + consulta + ") WHERE ROWNUM < " + ( maximo + 1) ;
+ 		
+		return consultaModificada;
 	}
 
 	@Override
@@ -1751,96 +1875,119 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	}
 	
 
-	private void insertarConsultasEnvio(AdmUsuarios usuario, Short idInstitucion, GenerarComunicacionItem generarComunicacion){
+	private void insertarConsultasEnvio(AdmUsuarios usuario, Short idInstitucion,
+			GenerarComunicacionItem generarComunicacion) {
 		// Hay que generar un envio por cada modelo y cada destinatario
 
 		try {
-			if(generarComunicacion != null && generarComunicacion.getListaModelosEnvio() != null && generarComunicacion.getListaModelosEnvio().size() > 0){
+			if (generarComunicacion != null && generarComunicacion.getListaModelosEnvio() != null
+					&& generarComunicacion.getListaModelosEnvio().size() > 0) {
 				// Por cada modelo y por cada destinatario se genera un envio
-				for(ModelosEnvioItem modeloEnvio : generarComunicacion.getListaModelosEnvio()){
-			  		if(modeloEnvio != null && modeloEnvio.getListaDatosEnvio() != null){
-						for(DatosEnvioDTO listaConsultasEnvio : modeloEnvio.getListaDatosEnvio()){
-							
-							// Insertamos nuevo envio
-							EnvEnvios envio = new EnvEnvios();
-							envio.setIdinstitucion(idInstitucion);
-							envio.setDescripcion("TMP");
-							envio.setFecha(new Date());
-							envio.setGenerardocumento("N");
-							envio.setImprimiretiquetas("N");
-							envio.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
-							
-							Short estadoNuevo = 4;
-							envio.setIdestado(estadoNuevo);
-							envio.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
-							envio.setFechamodificacion(new Date());
-							envio.setUsumodificacion(usuario.getIdusuario());
-							envio.setEnvio("A");
-							envio.setFechaprogramada(generarComunicacion.getFechaProgramada());
-							envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
-							int insert = _envEnviosMapper.insert(envio);
+				for (ModelosEnvioItem modeloEnvio : generarComunicacion.getListaModelosEnvio()) {
+					if (modeloEnvio != null && modeloEnvio.getListaDatosEnvio() != null) {
 
-							// Actualizamos el envio para ponerle la descripcion
-							CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
-							ModModelocomunicacion modelo =  _modModeloComunicacionMapper.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
-							String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
-							envio.setDescripcion(descripcion);	
+						for (DatosEnvioDTO listaConsultasEnvio : modeloEnvio.getListaDatosEnvio()) {
 
-							_envEnviosMapper.updateByPrimaryKey(envio);					
-							
-							if(insert >0){						
+							List<DestinatarioItem> listDestinatarios =  listaConsultasEnvio.getDestinatarios().stream().distinct().collect(Collectors.toList());
+									
+
+							for (DestinatarioItem dest : listDestinatarios) {
+
+								// Insertamos nuevo envio
+								EnvEnvios envio = new EnvEnvios();
+								envio.setIdinstitucion(idInstitucion);
+								envio.setDescripcion("TMP");
+								envio.setFecha(new Date());
+								envio.setGenerardocumento("N");
+								envio.setImprimiretiquetas("N");
+								envio.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
+
+								Short estadoNuevo = 4;
+								envio.setIdestado(estadoNuevo);
+								envio.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
+								envio.setFechamodificacion(new Date());
+								envio.setUsumodificacion(usuario.getIdusuario());
 								
-								EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
-								historico.setIdenvio(envio.getIdenvio());
-								historico.setIdinstitucion(usuario.getIdinstitucion());
-								historico.setFechamodificacion(new Date());
-								historico.setFechaestado(new Date());
-								historico.setUsumodificacion(usuario.getIdusuario());
-								Short idEstado = 4;
-								historico.setIdestado(idEstado);
-								_envHistoricoestadoenvioMapper.insert(historico);
-								 
-								//Insertamos el envio programado
-								EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
-								envioProgramado.setIdenvio(envio.getIdenvio());
-								envioProgramado.setIdinstitucion(idInstitucion);
-								envioProgramado.setEstado("0");
-								envioProgramado.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
-								envioProgramado.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
-								envioProgramado.setNombre(descripcion);
-								envioProgramado.setFechaprogramada(generarComunicacion.getFechaProgramada());
-								envioProgramado.setFechamodificacion(new Date());
-								envioProgramado.setUsumodificacion(usuario.getIdusuario());								
-								_envEnvioprogramadoMapper.insert(envioProgramado);
+								envio.setEnvio("A");
 								
+								envio.setFechaprogramada(generarComunicacion.getFechaProgramada());
+								envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
+								int insert = _envEnviosMapper.insert(envio);
+
+								// Actualizamos el envio para ponerle la descripcion
+								CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
+								ModModelocomunicacion modelo = _modModeloComunicacionMapper
+										.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
+								String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
 								
-								//Insertamos el nuevo asunto y cuerpo del envio
-								EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
-								envCamposEnvio.setFechamodificacion(new Date());
-								envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
-								envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
-								envCamposEnvio.setIdenvio(envio.getIdenvio());
-								envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
-								envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-//								envCamposEnvio.setValor(datosTarjeta.getAsunto());							
+								if(dest.getCamposEnvio()!= null && dest.getCamposEnvio().getIdentificador() != null && !dest.getCamposEnvio().getIdentificador().isEmpty() ) {
+									descripcion = dest.getCamposEnvio().getIdentificador();
+								}
 								
-								_envCamposenviosMapper.insert(envCamposEnvio);
-								
-								envCamposEnvio = new EnvCamposenvios();
-								envCamposEnvio.setFechamodificacion(new Date());
-								envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
-								envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
-								envCamposEnvio.setIdenvio(envio.getIdenvio());
-								envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
-								envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-//								envCamposEnvio.setValor(datosTarjeta.getCuerpo());	
-								
-								_envCamposenviosMapper.insert(envCamposEnvio);
-								
-								if (null != listaConsultasEnvio.getDestinatario().getIdPersona()) {
-									//INSERTAMOS  DESTINATARIO
+								envio.setDescripcion(descripcion);
+
+								_envEnviosMapper.updateByPrimaryKey(envio);
+
+								if (insert > 0) {
+
+									EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
+									historico.setIdenvio(envio.getIdenvio());
+									historico.setIdinstitucion(usuario.getIdinstitucion());
+									historico.setFechamodificacion(new Date());
+									historico.setFechaestado(new Date());
+									historico.setUsumodificacion(usuario.getIdusuario());
+									Short idEstado = 4;
+									historico.setIdestado(idEstado);
+									_envHistoricoestadoenvioMapper.insert(historico);
+
+									// Insertamos el envio programado
+									EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
+									envioProgramado.setIdenvio(envio.getIdenvio());
+									envioProgramado.setIdinstitucion(idInstitucion);
+									envioProgramado.setEstado("0");
+									envioProgramado.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
+									envioProgramado.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
+									envioProgramado.setNombre(descripcion);
+									envioProgramado.setFechaprogramada(generarComunicacion.getFechaProgramada());
+									envioProgramado.setFechamodificacion(new Date());
+									envioProgramado.setUsumodificacion(usuario.getIdusuario());
+									_envEnvioprogramadoMapper.insert(envioProgramado);
+
+									// Insertamos el nuevo asunto y cuerpo del envio
+									String strAsunto = null;
+									String strCuerpo = null;
+									
+									if(dest.getCamposEnvio()!= null) {
+										if(dest.getCamposEnvio().getAsunto() != null)
+											strAsunto = dest.getCamposEnvio().getAsunto();
+										if(dest.getCamposEnvio().getCuerpo() != null)
+											strCuerpo = dest.getCamposEnvio().getCuerpo();
+									}
+									
+									EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
+									envCamposEnvio.setFechamodificacion(new Date());
+									envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+									envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
+									envCamposEnvio.setIdenvio(envio.getIdenvio());
+									envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+									envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+									envCamposEnvio.setValor(strAsunto);							
+
+									_envCamposenviosMapper.insert(envCamposEnvio);
+
+									envCamposEnvio = new EnvCamposenvios();
+									envCamposEnvio.setFechamodificacion(new Date());
+									envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+									envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
+									envCamposEnvio.setIdenvio(envio.getIdenvio());
+									envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+									envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+									envCamposEnvio.setValor(strCuerpo);	
+
+									_envCamposenviosMapper.insert(envCamposEnvio);
+
+									// INSERTAMOS DESTINATARIO
 									EnvDestinatarios destinatario = new EnvDestinatarios();
-									DestinatarioItem dest = listaConsultasEnvio.getDestinatario();
 									destinatario.setIdinstitucion(idInstitucion);
 									destinatario.setIdenvio(envio.getIdenvio());
 									destinatario.setIdpersona(Long.valueOf(dest.getIdPersona()));
@@ -1862,54 +2009,88 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									_envDestinatariosMapper.insert(destinatario);
 
 								}
+
+								List<String> nombresFicheros = new ArrayList<String>();
+
+								for (ConsultaEnvioItem consultaEnvio : listaConsultasEnvio.getConsultas()) {
+
+									if (consultaEnvio.getDestinatario().equals(dest)) {
+										// Insertamos las consultas del envio
+										EnvConsultasenvio consultaEnvioEntity = new EnvConsultasenvio();
+										consultaEnvioEntity.setConsulta(consultaEnvio.getConsulta());
+										consultaEnvioEntity.setFechamodificacion(new Date());
+										consultaEnvioEntity.setIdconsulta(consultaEnvio.getIdConsulta());
+										consultaEnvioEntity.setIdenvio(envio.getIdenvio());
+										consultaEnvioEntity.setIdinstitucion(consultaEnvio.getIdInstitucion());
+										consultaEnvioEntity.setIdobjetivo(consultaEnvio.getIdObjetivo());
+										if (null != consultaEnvio.getUsuModificacion()) {
+											consultaEnvioEntity.setUsumodificacion(
+													Integer.valueOf((consultaEnvio.getUsuModificacion().toString())));
+										}
+										consultaEnvioEntity.setIdplantilladocumento(consultaEnvio.getIdPlantillaDoc());
+										consultaEnvioEntity.setIdinforme(consultaEnvio.getIdInforme());
+										consultaEnvioEntity
+												.setIdmodelocomunicacion(consultaEnvio.getIdModeloComunicacion());
+										consultaEnvioEntity.setSufijo(consultaEnvio.getSufijo());
+										consultaEnvioEntity
+												.setIdinstitucionconsulta(consultaEnvio.getIdInstitucionConsulta());
+										_envConsultasenvioMapper.insert(consultaEnvioEntity);
+
+										// Insertamos los documentos asociados al envio
+
+										// Si ya se ha insertado lo omitimos
+										if (consultaEnvio.getNombreFichero() != null
+												&& !nombresFicheros.contains(consultaEnvio.getNombreFichero())) {
+											
+											String pathNuevo = _enviosMasivosService.getPathFicheroEnvioMasivo(envio.getIdinstitucion(), envio.getIdenvio(),envio);
+											moverFichero(consultaEnvio.getPathFichero(),pathNuevo,consultaEnvio.getNombreFichero());
+											
+											EnvDocumentos documento = new EnvDocumentos();
+											documento.setIdenvio(envio.getIdenvio());
+											documento.setIdinstitucion(usuario.getIdinstitucion());
+											documento.setFechamodificacion(new Date());
+											documento.setUsumodificacion(usuario.getIdusuario());
+											documento.setDescripcion(consultaEnvio.getNombreFichero());
+											documento.setPathdocumento(consultaEnvio.getNombreFichero());
+											_envDocumentosMapper.insert(documento);
+											nombresFicheros.add(consultaEnvio.getNombreFichero());
+										}
+										
+										
+										
+									} // Fin con dest
+								} // for(ConsultaEnvioItem consultaEnvio:
+
 							}
-							
-							List<String> nombresFicheros = new ArrayList<String>();
-							
-							for(ConsultaEnvioItem consultaEnvio: listaConsultasEnvio.getConsultas()){
-								// Insertamos las consultas del envio
-								EnvConsultasenvio consultaEnvioEntity = new EnvConsultasenvio();
-								consultaEnvioEntity.setConsulta(consultaEnvio.getConsulta());
-								consultaEnvioEntity.setFechamodificacion(new Date());
-								consultaEnvioEntity.setIdconsulta(consultaEnvio.getIdConsulta());
-								consultaEnvioEntity.setIdenvio(envio.getIdenvio());
-								consultaEnvioEntity.setIdinstitucion(consultaEnvio.getIdInstitucion());
-								consultaEnvioEntity.setIdobjetivo(consultaEnvio.getIdObjetivo());
-								if (null != consultaEnvio.getUsuModificacion()) {
-									consultaEnvioEntity.setUsumodificacion(Integer.valueOf((consultaEnvio.getUsuModificacion().toString())));
-								}
-								consultaEnvioEntity.setIdplantilladocumento(consultaEnvio.getIdPlantillaDoc());
-								consultaEnvioEntity.setIdinforme(consultaEnvio.getIdInforme());
-								consultaEnvioEntity.setIdmodelocomunicacion(consultaEnvio.getIdModeloComunicacion());
-								consultaEnvioEntity.setSufijo(consultaEnvio.getSufijo());
-								consultaEnvioEntity.setIdinstitucionconsulta(consultaEnvio.getIdInstitucionConsulta());
-								_envConsultasenvioMapper.insert(consultaEnvioEntity);
-								
-								
-								//Insertamos los documentos asociados al envio
-								
-								// Si ya se ha insertado lo omitimos
-								if(consultaEnvio.getNombreFichero() != null && !nombresFicheros.contains(consultaEnvio.getNombreFichero())) {
-									EnvDocumentos documento = new EnvDocumentos();
-									documento.setIdenvio(envio.getIdenvio());
-									documento.setIdinstitucion(usuario.getIdinstitucion());
-									documento.setFechamodificacion(new Date());
-									documento.setUsumodificacion(usuario.getIdusuario());
-									documento.setDescripcion(consultaEnvio.getNombreFichero());
-									documento.setPathdocumento(consultaEnvio.getPathFichero());
-									_envDocumentosMapper.insert(documento);
-									nombresFicheros.add(consultaEnvio.getNombreFichero());
-								}							
-							}
-						}
-					}							
-				}						
-			}	
-		}catch(Exception e) {
+
+						} // FIN DatosEnvioDTO listaConsultasEnvio :
+
+					}
+				}
+			}
+		} catch (Exception e) {
 			LOGGER.error("Error al generar el envío", e);
 			throw e;
 		}
-	}	
+	}
+	
+	private void moverFichero(String rutaVieja, String nuevaRuta, String nombreFichero) {
+		File archivoActual = new File(rutaVieja,nombreFichero);
+		File archivoNuevo = new File(nuevaRuta,nombreFichero);
+		
+		if(!archivoNuevo.getParentFile().exists())
+			archivoNuevo.getParentFile().mkdirs();
+		
+		
+		try {
+			archivoActual.renameTo(archivoNuevo);
+			LOGGER.info("moverFichero() --> Desde: " + archivoActual.getAbsolutePath() + " - hasta : " + archivoNuevo.getAbsolutePath());
+			
+		}catch(Exception e) {
+			LOGGER.error(e.getStackTrace());
+		}
+
+	}
 	
 	@Override
 	public List<DatosDocumentoItem> generarDocumentosEnvio(String idInstitucion, String idEnvio) throws Exception{	
@@ -1933,10 +2114,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			EnvEnvios envio = envios.get(0);
 			Long idModeloComunicacionEnvio = envio.getIdmodelocomunicacion();
 			if(idModeloComunicacionEnvio != null) {
+				idModeloComunicacion = idModeloComunicacionEnvio;
 				List<ClaseComunicacionItem> modClaseItem = _modClasecomunicacionesExtendsMapper.selectClaseComunicacionModulo(String.valueOf(idModeloComunicacionEnvio));
 				if(modClaseItem != null && modClaseItem.size() > 0) {
 					ClaseComunicacionItem claseItem = modClaseItem.get(0);
-					directorioPlantillaClase = claseItem.getRutaPlantilla();
+					directorioPlantillaClase = getRutaModeloByClaseModelo(idModeloComunicacionEnvio.toString(), claseItem.getIdClaseComunicacion());
 				}
 			}
 		}else {
@@ -1944,11 +2126,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			throw new BusinessException("No se ha encontrado el envío:" + idEnvio);
 		}
 		
-		if(directorioPlantillaClase == null || "".equals(directorioPlantillaClase)) {
-			directorioPlantillaClase = SigaConstants.rutaPlantillaSinClase;
-		}
 		
-		directorioPlantillaClase = directorioPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucion);
+		//if(directorioPlantillaClase == null || "".equals(directorioPlantillaClase)) {
+		//	directorioPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+		//}
+		
+		//directorioPlantillaClase = directorioPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucion);
 		
 		if(listaIdPlantilla != null && listaIdPlantilla.size() > 0){
 			for(String idPlantilla : listaIdPlantilla){
@@ -2024,6 +2207,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					
 					String campoSufijo = null;
 					
+					//Destinatarios obtenidos por query, pero se pasa a obtenerlos desde BD
 					example = new EnvConsultasenvioExample();
 					example.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdplantilladocumentoEqualTo(Long.parseLong(idPlantilla)).andIdobjetivoEqualTo(SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
 					List<EnvConsultasenvio> listaConsultasDest = _envConsultasenvioMapper.selectByExampleWithBLOBs(example);
@@ -2034,6 +2218,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						String sentencia = consultaDest.getConsulta();
 						
 						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+						
+						EnvDestinatariosExample exampleDests = new EnvDestinatariosExample();
+						exampleDests.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdinstitucionEqualTo(Short.parseShort(idInstitucion));
+						
+						List<EnvDestinatarios> destIndv = _envDestinatariosMapper.selectByExample(exampleDests);
+
+						
 						
 						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
 								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
@@ -2050,7 +2241,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							}
 							if(result != null && result.size() > 0){
 								for(Map<String,Object> dest : result){
-									hDatosGenerales.putAll(dest);
+									if(dest.get("IDPERSONA").toString().equals(destIndv.get(0).getIdpersona().toString()))
+										hDatosGenerales.putAll(dest);
 								}							
 							}
 						}
@@ -2116,7 +2308,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									}	
 									
 									
-									File filePlantilla = new File(rutaTmp + nombrePlantilla);
+									File filePlantilla = new File(rutaPlantilla + nombrePlantilla);
 									
 									// Por cada resultado ejecutamos las consultas de datos
 									LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
@@ -2222,6 +2414,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						LOGGER.debug("No hay consulta multidocumento para el envio " + idEnvio + " y plantilla: " + idPlantilla);
 						
 						List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectPlantillaGenerar(idModeloComunicacion, Long.parseLong(idPlantilla));
+						
+						if(plantillas == null || plantillas.size() == 0) {
+							throw new BusinessException("No hay plantillas para el envio " + idEnvio + " y plantilla: " + idPlantilla );
+							
+						}
+					
 						PlantillaModeloDocumentoDTO plantilla = plantillas.get(0);
 						
 						if(plantilla.getFormatoSalida() != null && Short.parseShort(plantilla.getFormatoSalida()) == SigaConstants.FORMATO_SALIDA.XLS.getCodigo()) {
@@ -2347,6 +2545,33 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return listaFicheros;
 	}
 	
+	private String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio) {
+		String pathFichero = null;
+
+		GenParametrosKey genParametrosKey = new GenParametrosKey();
+		genParametrosKey.setIdinstitucion(SigaConstants.IDINSTITUCION_0_SHORT);
+		genParametrosKey.setModulo(SigaConstants.MODULO_ENV);
+		genParametrosKey.setParametro(GEN_PARAMETROS.PATH_DOCUMENTOSADJUNTOS.name());
+
+		GenParametros genParametros = _genParametrosMapper.selectByPrimaryKey(genParametrosKey);
+
+		if (genParametros == null || genParametros.getValor() == null || genParametros.getValor().trim().equals("")) {
+			String error = "La ruta de ficheros de plantilla no está configurada correctamente";
+			LOGGER.error(error);
+			throw new BusinessException(error);
+		}
+
+		Calendar cal = Calendar.getInstance();
+		// seteamos la fecha de creación del envío
+		//cal.setTime(envEnvios.getFecha());
+
+		pathFichero = genParametros.getValor().trim() + SigaConstants.pathSeparator + String.valueOf(idInstitucion)
+				+ SigaConstants.pathSeparator + cal.get(Calendar.YEAR) + SigaConstants.pathSeparator
+				+ (cal.get(Calendar.MONTH) + 1) + SigaConstants.pathSeparator + idEnvio;
+
+		return pathFichero;
+	}
+	
 	private List<ConsultaEnvioItem> guardarDatosConsultas(List<ConsultaEnvioItem> listaConsultasEnvio, Long idConsulta, String consulta, Short idInstitucion, Long idObjetivo, Short idUsuario, Long idPlantilla, Long idInforme, Long idModelo, Short idInstitucionConsulta) {
 		
 		if(listaConsultasEnvio == null) {
@@ -2411,8 +2636,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return rutaPlantilla;
 	}
 	
-	private DestinatarioItem obtenerDatosDestinatario(DestinatarioItem destinatario, Map<String,Object> dest) {
+	private DestinatarioItem obtenerDatosDestinatario(Map<String,Object> dest) {
 		
+		DestinatarioItem destinatario = new DestinatarioItem();
 		
 		Object idPersona = dest.get(SigaConstants.ALIASIDPERSONA.trim());
 		Object correo = dest.get(SigaConstants.ALIASCORREO.trim());
@@ -2423,14 +2649,26 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		Object idPoblacion = dest.get(SigaConstants.ALIASIDPOBLACION.trim());
 		Object idProvincia= dest.get(SigaConstants.ALIASIDPROVINCIA.trim());
 		Object poblacionExtranjera= dest.get(SigaConstants.ALIASPOBLACIONEXTRANJERA.trim());
+		Object nombre = dest.get(SigaConstants.ALIASNOMBRE.trim());
+		Object apellidos1 = dest.get(SigaConstants.ALIASAPELLIDOS1.trim());
+		Object apellidos2 = dest.get(SigaConstants.ALIASAPELLIDOS2.trim());
+		Object nifCif = dest.get(SigaConstants.ALIASNIFCIF.trim());
 		
-		CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona.toString()));
+		if(idPersona != null)
+			destinatario.setIdPersona(idPersona.toString());
 		
-		destinatario.setIdPersona(idPersona.toString());
-		destinatario.setNombre(persona.getNombre());
-		destinatario.setApellidos1(persona.getApellidos1());
-		destinatario.setApellidos2(persona.getApellidos2());
-		destinatario.setNIFCIF(persona.getNifcif());
+		if(nombre != null)
+			destinatario.setNombre(nombre.toString());
+		
+		if(apellidos1 != null)
+			destinatario.setApellidos1(apellidos1.toString());
+		
+		if(apellidos2 != null)
+			destinatario.setApellidos2(apellidos2.toString());
+		
+		if(nifCif != null)
+			destinatario.setNIFCIF(nifCif.toString());
+		
 		if(domicilio != null){
 			destinatario.setDomicilio(domicilio.toString());
 		}
@@ -2458,6 +2696,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		if(poblacionExtranjera != null){
 			destinatario.setPoblacionExtranjera(poblacionExtranjera.toString());
 		}
+		LOGGER.info("LOG Destinatario: " + dest.toString());
 		return destinatario;
 	}
 	
@@ -2474,7 +2713,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 	}
 	
-	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas) {
+	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, 
+			Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas, boolean esFO, List<List<String>> listaKeyFiltros, DestinatarioItem destinatario , List<DestinatarioItem> destinatarios, CamposPlantillaEnvio camposEnvio) {
 		
 		LOGGER.debug("Obtenemos la ruta temporal del fichero de salida");
 		String rutaTmp = getRutaFicheroSalidaTemp(dialogo.getIdInstitucion());
@@ -2512,7 +2752,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}
 
 		consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
-		
+		List<Map<String, Object>> resultDatos = null;
 		for(ConsultaItem consultaDatosDatos:consultasItemDatos){
 			consultasItemFinal.add(consultaDatosDatos);
 		}		
@@ -2520,14 +2760,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		for(ConsultaItem consultaDatos:consultasItemFinal){																			
 			
-			String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio);
+			String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio, modelosComunicacionItem, listaKeyFiltros);
 			String nombreConsulta = consultaDatos.getDescripcion();
 			if(esEnvio){
 				//Guardamos la consulta datos															
 				listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consultaDatos.getIdConsulta()),consultaEjecutarDatos,usuario.getIdinstitucion(), SigaConstants.OBJETIVO.DATOS.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), Short.parseShort(String.valueOf(consultaDatos.getIdInstitucion())));
 			}
 			
-			List<Map<String, Object>> resultDatos;
+			resultDatos = null;
 			try {
 								
 				resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consultaDatos.getIdConsulta()),Short.valueOf(consultaDatos.getIdInstitucion()),consultaDatos.getDescripcion());		
@@ -2583,9 +2823,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 
 		
-		if(!esEnvio){
 			LOGGER.info("Rendimiento inicio generacion del documento con datos" );
-			LOGGER.debug("Generamos el documento");																
+			LOGGER.info("Generamos el documento");																
 			DatosDocumentoItem docGenerado = null;
 			
 			if(esExcel) {
@@ -2595,12 +2834,27 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.error("Error al generar el fichero excel ", e);
 					throw new BusinessException("No se ha podido generar el fichero Excel", e);
 				}
-			}else {
+			}else if(esFO){
+				try {
+					//if(modelosComunicacionItem.getIdClaseComunicacion().equals("6")) { //Carta de Oficio
+						//docGenerado = _generacionDocService.generarFOTurnos(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, resultDatos);
+					//}else {
+						docGenerado = _generacionDocService.generarFO(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, hDatosFinal);
+					//}
+				} catch (Exception e) {
+					LOGGER.error("Error al generar el fichero excel ", e);
+					throw new BusinessException("No se ha podido generar el fichero Excel", e);
+				}
+			}else{
 				existePlantilla(filePlantilla);
 				
 				try {
 					doc = new Document(rutaPlantilla + nombrePlantilla);
 				
+					if(modelosComunicacionItem.getIdClaseComunicacion().equals("9")) { //Carta de Acreditación de Oficio
+						hDatosFinal = completarDatosAcreditación(hDatosFinal,mapaClave);
+						
+					}
 					
 					doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);																			
 					
@@ -2616,6 +2870,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					docGenerado = _generacionDocService.grabaDocumento(doc, rutaTmp, nombreFicheroSalida, firmado);
 
 				} catch (Exception e) {
+					
+					if(e instanceof BusinessException) {
+						throw new BusinessException(e.getMessage(), e);
+					}
 					LOGGER.error(e);
 					throw new BusinessException("Error al generar el fichero", e);
 				}
@@ -2628,16 +2886,467 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				listaDocumentos.add(doc);
 			}
 			
-			LOGGER.info("Rendimiento fin generacion del documento con datos" );
-		}else{
-			//Cogemos todas las consultas y le metemos el nombre del fichero
-			if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
-				for(ConsultaEnvioItem consultaEnvio : listaConsultasEnvio){
-					consultaEnvio.setSufijo(campoSufijoReplaced);
-					consultaEnvio.setPathFichero(rutaTmp);
-					consultaEnvio.setNombreFichero(nombreFicheroSalida);
+			if(esEnvio) {
+				String envioCuerpo = null;
+				String envioAsunto = null;
+				String valorIdentificador = null;
+				if(camposEnvio.getAsunto() != null) {
+					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), camposEnvio.getAsunto(), destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, hDatosFinal);
+					envioAsunto = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioAsunto, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
 				}
-			}																		
-		}																															
+				if(camposEnvio.getCuerpo() != null) {
+					envioCuerpo = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), camposEnvio.getCuerpo(), destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, hDatosFinal);
+					envioCuerpo = sustituirEtiquetas(dialogo.getIdInstitucion().toString(), envioCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, hDatosFinal);
+				}
+				
+				if (mapaClave.containsKey("identificador")) {
+				     valorIdentificador = mapaClave.get("identificador");
+				}
+				
+
+				//Cogemos todas las consultas y le metemos el nombre del fichero
+				if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
+					CamposPlantillaEnvio envCampos = new CamposPlantillaEnvio();
+				
+					DestinatarioItem dest = new DestinatarioItem(destinatario);
+					envCampos.setIdentificador(valorIdentificador);
+					envCampos.setAsunto(envioAsunto);
+					envCampos.setCuerpo(envioCuerpo);
+					dest.setCamposEnvio(envCampos);
+					destinatarios.add(dest);
+					for(ConsultaEnvioItem consultaEnvio : listaConsultasEnvio){
+						if(consultaEnvio.getDestinatario() == null) {
+							consultaEnvio.setSufijo(campoSufijoReplaced);
+							consultaEnvio.setPathFichero(rutaTmp);
+							consultaEnvio.setNombreFichero(nombreFicheroSalida);
+							LOGGER.info(destinatario.getNombre());
+							consultaEnvio.setDestinatario(dest);
+						}
+
+					}
+				}	
+		//		rutaPlantilla = getPathFicheroEnvioMasivo(dialogo.getIdInstitucion());
+			}
+			
+			LOGGER.info("Rendimiento fin generacion del documento con datos" );
+																																	
 	}
+
+	private String sustituirEtiquetas(String idInstitucion, String cuerpoEnvio, DestinatarioItem destinatario, String marcaInicioFin, HashMap<String, Object> hDatosFinal ){
+        String etiqueta = SigaConstants.ETIQUETA_DEST_NOMBRE;
+
+        Pattern pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+        Matcher matcher = pattern.matcher(cuerpoEnvio);
+        
+        for(Map.Entry<String, Object> entry : hDatosFinal.entrySet()) {
+        	String key = entry.getKey();
+        	Object value = entry.getValue();
+        	
+        	if(value instanceof HashMap) {
+        		HashMap<String,Object> keyyVal = (HashMap<String,Object>) value;
+        		for(Map.Entry<String, Object> entryVal : keyyVal.entrySet()) {
+        			if(entryVal == null)
+        				continue;
+        			
+        		  	etiqueta = marcaInicioFin + entryVal.getKey() + marcaInicioFin;
+                	Pattern patternAux = Pattern.compile(Pattern.quote(etiqueta));
+                    Matcher  matcherAux = patternAux.matcher(cuerpoEnvio);
+                    
+                     if(matcherAux.find() ) {
+                    	 if(entryVal.getValue() == null)
+                    		 cuerpoEnvio = cuerpoEnvio.replaceAll(etiqueta, "");
+                    	 else
+                    		 cuerpoEnvio = cuerpoEnvio.replaceAll(etiqueta, entryVal.getValue().toString());
+                     }
+        			
+        		}
+        	}
+
+      
+        	
+        }
+     
+        
+        //Obtenemos el tratamiento del destinatario
+        etiqueta = SigaConstants.ETIQUETA_DEST_TRATAMIENTO;
+        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+        matcher = pattern.matcher(cuerpoEnvio);
+        cuerpoEnvio = matcher.replaceAll(getTratamientoDestinatario(idInstitucion, destinatario));
+        
+        
+        etiqueta = SigaConstants.ETIQUETA_FECHAACTUAL;
+        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+        Date date = Calendar.getInstance().getTime();  
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+        String strDate = dateFormat.format(date);
+        matcher = pattern.matcher(cuerpoEnvio);        
+        cuerpoEnvio = matcher.replaceAll(strDate);
+        
+        
+        return cuerpoEnvio;
+    }
+	
+	  private String getTratamientoDestinatario(String idInstitucion, DestinatarioItem destinatario) {
+	        String tratamiento = "";
+	        int idIdioma = 1;
+	        
+	        if(destinatario.getTratamiento() == null){
+	            List<StringDTO> result = _cenClienteExtendsMapper.getTratamiento(idInstitucion, destinatario.getIdPersona(), idIdioma);            
+	            if(result != null && result.size() > 0 && result.get(0) != null) {
+	                tratamiento = result.get(0).getValor();
+	                destinatario.setTratamiento(tratamiento);
+	            }
+	        }        
+	        
+	        return destinatario.getTratamiento();
+	    }
+
+	  
+	private HashMap<String, Object> completarDatosAcreditación(HashMap<String, Object> hDatosFinal, HashMap<String, String> mapaClave) throws Exception {
+		HashMap<String, Object> total = new HashMap<String, Object>();
+		String longitudNumEjg = "5";
+		String idInstitucion = mapaClave.get("idInstitucion");
+		String idTurno = mapaClave.get("idTurno");
+		String numero = mapaClave.get("num");
+		String anio = mapaClave.get("anio");
+		//String numeroAsunto = mapaClave.get("numeroAsunto");
+		
+		if (hDatosFinal.size() > 0) {
+			HashMap<String, Object> registroGeneral =  (HashMap<String, Object>) hDatosFinal.get("row");
+			//Parseamos los ejg
+			String expedientes= (String)registroGeneral.get("DESIGNA_LISTA_EXPEDIENTES");
+			if(expedientes != null && !"".equalsIgnoreCase(expedientes)){
+				if (expedientes != null && expedientes.indexOf("##") > -1) {
+					String[] ejgs = expedientes.split(",");
+					String salida = "";
+					Boolean favorable;
+					String idTipoRatificacion="";
+					String fechaResolucionCAJG ="";
+					for (String ejg:ejgs) {
+						favorable = Boolean.FALSE;
+						String[] ejgDoc = ejg.split("##");	
+						//Obtenemos los datos del ejg para comprobar si tiene resolución favorable y sólo sacar aquellos que así lo son.
+						 idTipoRatificacion = ejgDoc[6];
+						 fechaResolucionCAJG = ejgDoc[7];
+						if((fechaResolucionCAJG != null && !"".equalsIgnoreCase(fechaResolucionCAJG) && idTipoRatificacion!=null && !"".equalsIgnoreCase(idTipoRatificacion) 
+								&& (idTipoRatificacion.equalsIgnoreCase("1") || idTipoRatificacion.equalsIgnoreCase("2")|| idTipoRatificacion.equalsIgnoreCase("8")
+										|| idTipoRatificacion.equalsIgnoreCase("10")|| idTipoRatificacion.equalsIgnoreCase("9")|| idTipoRatificacion.equalsIgnoreCase("11"))) 
+										|| (" ".equalsIgnoreCase(fechaResolucionCAJG) && " ".equalsIgnoreCase(idTipoRatificacion))){
+							//Comprobamos el tipo de resolución
+							
+								favorable=Boolean.TRUE;
+							
+						}
+						if(favorable)
+							salida+=", " + ejgDoc[0].trim();				
+					}
+					expedientes=salida;
+					if (expedientes.length() > 2){
+						expedientes = expedientes.substring(1);
+					}
+					registroGeneral.put("DESIGNA_LISTA_EXPEDIENTES", expedientes);
+				}
+			}
+			total.putAll(registroGeneral);
+			
+			BigDecimal idPersonaAux  = (BigDecimal) registroGeneral.get("DESIGNA_LETRADO");
+			String idPersona = idPersonaAux.toString();
+			String nombre_designa_letrado = obtenerNombreApellidos(idPersona);
+			
+			idPersonaAux  = (BigDecimal) registroGeneral.get("ACTUACION_ID_LETRADO");
+			String idPersonaActuacion  = idPersonaAux.toString();
+			String nombre_dest = obtenerNombreApellidos(idPersonaActuacion);
+			
+			
+			List<DatosDireccionLetradoOficio> designaLetrado = cenDireccionesMapper.getDireccionLetradoSalidaOficio(idPersona, idInstitucion);
+			DatosDireccionLetradoOficio registro2=  designaLetrado.get(0);
+			total.put("DOMICILIO_DESPACHO_LETRADO", registro2.getDomicilio_letrado());
+			total.put("CP_DESPACHO_LETRADO", registro2.getCp_letrado());
+			total.put("IDPOBLACION_DESPACHO_LETRADO", registro2.getIdpoblacion_letrado());
+			total.put("POBLACION_DESPACHO_LETRADO", registro2.getPoblacion_letrado());
+			total.put("IDPROVINCIA_DESPACHO_LETRADO", registro2.getIdprovincia_letrado());
+			total.put("PROVINCIA_DESPACHO_LETRADO", registro2.getProvincia_letrado());
+			total.put("TELEFONO1_DESPACHO_LETRADO", registro2.getTelefono1_letrado());
+			total.put("TELEFONO2_DESPACHO_LETRADO", registro2.getTelefono2_letrado());
+			total.put("FAX1_DESPACHO_LETRADO", registro2.getFax1_letrado());
+			total.put("FAX2_DESPACHO_LETRADO", registro2.getFax2_letrado());
+			total.put("EMAIL_DESPACHO_LETRADO", registro2.getEmail_letrado());
+			total.put("MOVIL_DESPACHO_LETRADO", registro2.getMovil_letrado());
+			
+			List<DatosDireccionLetradoOficio>  designaLetradoGuardia = cenDireccionesMapper.getDireccionPersonalSalidaOficio(idPersona, idInstitucion);
+			DatosDireccionLetradoOficio  registro3=  designaLetradoGuardia.get(0);
+			total.put("DOMICILIO_GUARDIA_LETRADO", registro3.getDomicilio_letrado());
+			total.put("CP_GUARDIA_LETRADO", registro3.getCp_letrado());
+			total.put("IDPOBLACION_GUARDIA_LETRADO", registro3.getIdpoblacion_letrado());
+			total.put("POBLACION_GUARDIA_LETRADO", registro3.getPoblacion_letrado());
+			total.put("IDPROVINCIA_GUARDIA_LETRADO", registro3.getIdprovincia_letrado());
+			total.put("PROVINCIA_GUARDIA_LETRADO", registro3.getProvincia_letrado());
+			total.put("TELEFONO1_GUARDIA_LETRADO", registro3.getTelefono1_letrado());
+			total.put("TELEFONO2_GUARDIA_LETRADO", registro3.getTelefono2_letrado());
+			total.put("FAX1_GUARDIA_LETRADO", registro3.getFax1_letrado());
+			total.put("FAX2_GUARDIA_LETRADO", registro3.getFax2_letrado());
+			total.put("EMAIL_GUARDIA_LETRADO", registro3.getEmail_letrado());
+			total.put("MOVIL_GUARDIA_LETRADO", registro3.getMovil_letrado());
+			
+			HashMap<String, Object> letrado =  obtenerLetrado(registro2, registro3);
+			letrado.put("NOMBRE_LETRADO", nombre_designa_letrado);
+			
+			// Obtenemos el numero de colegiado
+			CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+			colegiadoKey.setIdinstitucion(Short.valueOf(idInstitucion));
+			colegiadoKey.setIdpersona(Long.valueOf(idPersona));
+			CenColegiado cenColegiado = cenColegiadoMapper.selectByPrimaryKey(colegiadoKey);
+			
+			if (cenColegiado!=null) {
+				if(cenColegiado.getComunitario()!= null && cenColegiado.getComunitario().equals("1")) {
+					letrado.put("NCOLEGIADO_LETRADO", cenColegiado.getNcomunitario());
+				}else if(cenColegiado.getNcolegiado()!= null)
+					letrado.put("NCOLEGIADO_LETRADO", cenColegiado.getNcolegiado());
+			}			    
+			total.putAll(letrado);
+			
+			
+			//Destinatario
+			List<DatosDireccionLetradoOficio> destinatario = cenDireccionesMapper.getDireccionLetradoSalidaOficio(idPersonaActuacion, idInstitucion);
+			DatosDireccionLetradoOficio registroDestinatario=  destinatario.get(0);
+			
+			List<DatosDireccionLetradoOficio>  destinatarioGuardia = cenDireccionesMapper.getDireccionPersonalSalidaOficio(idPersonaActuacion, idInstitucion);
+			DatosDireccionLetradoOficio  registroDestinatarioGuardia=  destinatarioGuardia.get(0);
+			
+			HashMap<String, Object> infoDestinatario = obtenerDestinatario(registroDestinatario, registroDestinatarioGuardia);
+			infoDestinatario.put("NOMBRE_DEST", nombre_dest);
+			total.putAll(infoDestinatario);
+			
+			
+			List<DatosCartaAcreditacionItem> regionDefendido = designacionesMapper.getDefendidosDesigna(idInstitucion,numero,idTurno, anio,"","", longitudNumEjg);
+			hDatosFinal = new HashMap<String,Object>();
+			hDatosFinal.put("row", total);
+			if (regionDefendido != null && !regionDefendido.isEmpty()) {
+				HashMap<String,Object> mRegionDefendido = new HashMap<String,Object>();
+				mRegionDefendido.put("IDINSTITUCION",regionDefendido.get(0).getIdinstitucion());
+				mRegionDefendido.put("IDTURNO",regionDefendido.get(0).getIdturno());
+				mRegionDefendido.put("ANIO",regionDefendido.get(0).getAnio());
+				mRegionDefendido.put("NUMERO",regionDefendido.get(0).getNumero());
+				mRegionDefendido.put("IDPERSONAINTERESADO",regionDefendido.get(0).getIdpersonainteresado());
+				mRegionDefendido.put("NOMBRE_DEFENDIDO",regionDefendido.get(0).getNombre_defendido());
+				mRegionDefendido.put("DOMICILIO_DEFENDIDO",regionDefendido.get(0).getDomicilio_defendido());
+				mRegionDefendido.put("CP_DEFENDIDO",regionDefendido.get(0).getCp_defendido());
+				mRegionDefendido.put("POBLACION_DEFENDIDO",regionDefendido.get(0).getPoblacion_defendido());
+				mRegionDefendido.put("PROVINCIA_DEFENDIDO",regionDefendido.get(0).getProvincia_defendido());
+				mRegionDefendido.put("NOMBRE_PAIS",regionDefendido.get(0).getNombre_pais());
+				mRegionDefendido.put("OBS_DEFENDIDO",regionDefendido.get(0).getObs_defendido());
+				mRegionDefendido.put("TELEFONO1_DEFENDIDO",regionDefendido.get(0).getTelefono1_defendido());
+				mRegionDefendido.put("LISTA_TELEFONOS_INTERESADO",regionDefendido.get(0).getLista_telefonos_interesado());
+				mRegionDefendido.put("NIF_DEFENDIDO",regionDefendido.get(0).getNif_defendido());
+				mRegionDefendido.put("SEXO_DEFENDIDO",regionDefendido.get(0).getSexo_defendido());
+				mRegionDefendido.put("SEXO_DEFENDIDO_DESCRIPCION",regionDefendido.get(0).getSexo_defendido_descripcion());
+				mRegionDefendido.put("O_A_DEFENDIDO",regionDefendido.get(0).getO_a_defendido());
+				mRegionDefendido.put("EL_LA_DEFENDIDO",regionDefendido.get(0).getEl_la_defendido());
+				mRegionDefendido.put("IDLENGUAJE_DEFENDIDO",regionDefendido.get(0).getIdlenguaje_defendido());
+				mRegionDefendido.put("ANIO_EJG",regionDefendido.get(0).getAnio_ejg());
+				mRegionDefendido.put("NUMERO_EJG",regionDefendido.get(0).getNumero_ejg());
+				mRegionDefendido.put("FECHARESOLUCIONCAJG",regionDefendido.get(0).getFecharesolucioncajg());
+				mRegionDefendido.put("COUNT_EJG",regionDefendido.get(0).getCount_ejg());
+				mRegionDefendido.put("CALIDAD_DEFENDIDO",regionDefendido.get(0).getCalidad_defendido());
+				mRegionDefendido.put("IDTIPOENCALIDAD",regionDefendido.get(0).getIdtipoencalidad());
+				mRegionDefendido.put("IDREPRESENTANTEJG",regionDefendido.get(0).getIdrepresentantejg());
+				hDatosFinal.put("defendido", mRegionDefendido); //region del defendido
+			}
+			
+			
+			List<DatosCartaAcreditacionItem> listaInteresadosFavorablesEJG = getDatosEjgResolucionFavorable(idInstitucion, anio, numero, idTurno);
+			HashMap<String,Object> listadoEjgFavorableHashMap = new HashMap<String,Object>();
+			//Si existen interesados los ponemos en forma de lista
+			if(listaInteresadosFavorablesEJG != null && listaInteresadosFavorablesEJG.size()>0){
+				String listaInteresadosFavorablesEJGString="";
+				//Si sólo hay uno lo mostramos en la lista.
+				if(listaInteresadosFavorablesEJG.size() == 1){
+					listaInteresadosFavorablesEJGString = listaInteresadosFavorablesEJG.get(0).getNombre() + " "+
+							listaInteresadosFavorablesEJG.get(0).getApellido1() + " " + listaInteresadosFavorablesEJG.get(0).getApellido2();
+					
+					
+				}else{
+					//Si hay más de uno construimos la lista
+					int tam = listaInteresadosFavorablesEJG.size();
+					
+					for(int i=0;i<listaInteresadosFavorablesEJG.size();i++){
+						if((tam-1)-i ==0){
+							//Es el úlimo elemento no se pone coma
+							listaInteresadosFavorablesEJGString = listaInteresadosFavorablesEJG.get(i).getNombre() + " "+
+									listaInteresadosFavorablesEJG.get(i).getApellido1() + " " + listaInteresadosFavorablesEJG.get(i).getApellido2();
+						}else{
+							//No es el último elemento se pone coma
+							listaInteresadosFavorablesEJGString = listaInteresadosFavorablesEJG.get(i).getNombre() + " "+
+									listaInteresadosFavorablesEJG.get(i).getApellido1() + " " + listaInteresadosFavorablesEJG.get(i).getApellido2() + ", ";
+						}
+					}
+				}
+				listadoEjgFavorableHashMap.put("DESIGNA_LISTA_INTERESADOS", listaInteresadosFavorablesEJGString);
+				total.putAll(listadoEjgFavorableHashMap);
+			}else{
+				listadoEjgFavorableHashMap.put("DESIGNA_LISTA_INTERESADOS", "");
+				total.putAll(listadoEjgFavorableHashMap);
+			}
+		
+		}
+		return hDatosFinal;
+		
+	}
+	
+	
+
+private List<DatosCartaAcreditacionItem> getDatosEjgResolucionFavorable(String idInstitucion, String anio, String numero,
+			String idTurno) {
+		try {
+			List<DatosCartaAcreditacionItem> v = null;
+			
+			ScsDefendidosdesignaExample example = new ScsDefendidosdesignaExample();
+			example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).
+				andIdturnoEqualTo(Integer.valueOf(idTurno)).andAnioEqualTo(Short.valueOf(anio)).
+				andNumeroEqualTo(Long.valueOf(numero));
+			List<ScsDefendidosdesigna> defendidos = defendidosMapper.selectByExample(example);
+			
+			if(defendidos != null && !defendidos.isEmpty()) {
+				
+				v = designacionesMapper.getDatosEjgResolucionFavorable(idInstitucion,idTurno,anio,numero);
+							 
+			}		
+			
+			if(v != null && v.size()>0){
+				return v;
+			}else{
+				return null;
+			}
+			
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+	return new ArrayList<DatosCartaAcreditacionItem>();
+	}
+
+
+
+public HashMap<String, Object> obtenerLetrado(DatosDireccionLetradoOficio despacho, DatosDireccionLetradoOficio Guardia){
+		
+		HashMap<String, Object> letrado = new HashMap<String, Object>();
+	
+		if (despacho.getDomicilio_letrado()!=null) {
+			letrado.put("DOMICILIO_LETRADO", despacho.getDomicilio_letrado());
+		}
+		if (despacho.getCp_letrado()!=null) {
+			letrado.put("CP_LETRADO", despacho.getCp_letrado());
+		}
+		if (despacho.getIdpoblacion_letrado()!=null) {
+			letrado.put("ID_POBLACION_LETRADO", despacho.getIdpoblacion_letrado());
+		}
+		if (despacho.getPoblacion_letrado()!=null) {
+			letrado.put("POBLACION_LETRADO", despacho.getPoblacion_letrado());
+		}
+		if (despacho.getIdprovincia_letrado()!=null) {
+			letrado.put("ID_PROVINCIA_LETRADO", despacho.getIdprovincia_letrado());
+		}
+		if (despacho.getProvincia_letrado()!=null) {
+			letrado.put("PROVINCIA_LETRADO", despacho.getProvincia_letrado());
+		}
+		if (despacho.getTelefono1_letrado()!=null) {
+			letrado.put("TELEFONODESPACHO_LET", despacho.getTelefono1_letrado());
+		}
+		if (despacho.getFax1_letrado()!=null) {
+			letrado.put("FAX_LETRADO", despacho.getFax1_letrado());
+		}
+		if (despacho.getEmail_letrado()!=null) {
+			letrado.put("EMAIL_LETRADO", despacho.getEmail_letrado());
+		}
+		if (despacho.getMovil_letrado()!=null) {
+			letrado.put("MOVILDESPACHO_LET", despacho.getMovil_letrado());
+		}
+		if (Guardia.getTelefono1_letrado()!=null) {
+			letrado.put("TELEFONO1_LETRADO", Guardia.getTelefono1_letrado());
+		}
+		if (Guardia.getTelefono2_letrado()!=null) {
+			letrado.put("TELEFONO2_LETRADO", Guardia.getTelefono2_letrado());
+		}
+		if (Guardia.getMovil_letrado()!=null) {
+			letrado.put("MOVIL_LETRADO", Guardia.getMovil_letrado());
+		}
+		return letrado;
+
+	}
+
+public HashMap<String, Object> obtenerDestinatario(DatosDireccionLetradoOficio despacho, DatosDireccionLetradoOficio Guardia){
+	
+	HashMap<String, Object> destinatario = new HashMap<String, Object>();
+
+	if (despacho.getDomicilio_letrado()!=null) {
+		destinatario.put("DOMICILIO_DEST", despacho.getDomicilio_letrado());
+	}
+	if (despacho.getCp_letrado()!=null) {
+		destinatario.put("CP_DEST", despacho.getCp_letrado());
+	}
+	if (despacho.getIdpoblacion_letrado()!=null) {
+		destinatario.put("ID_POBLACION_DEST", despacho.getIdpoblacion_letrado());
+	}
+	if (despacho.getPoblacion_letrado()!=null) {
+		destinatario.put("POBLACION_DEST", despacho.getPoblacion_letrado());
+	}
+	if (despacho.getIdprovincia_letrado()!=null) {
+		destinatario.put("ID_PROVINCIA_DEST", despacho.getIdprovincia_letrado());
+	}
+	if (despacho.getProvincia_letrado()!=null) {
+		destinatario.put("PROVINCIA_DEST", despacho.getProvincia_letrado());
+	}
+	if (despacho.getTelefono1_letrado()!=null) {
+		destinatario.put("TELEFONO_DEST", despacho.getTelefono1_letrado());
+	}
+	if (despacho.getFax1_letrado()!=null) {
+		destinatario.put("FAX_DEST", despacho.getFax1_letrado());
+	}
+	if (despacho.getEmail_letrado()!=null) {
+		destinatario.put("EMAIL_DEST", despacho.getEmail_letrado());
+	}
+	if (despacho.getMovil_letrado()!=null) {
+		destinatario.put("MOVIL_DEST", despacho.getMovil_letrado());
+	}
+	if (Guardia.getTelefono1_letrado()!=null) {
+		destinatario.put("TELEFONO1_DEST", Guardia.getTelefono1_letrado());
+	}
+	if (Guardia.getTelefono2_letrado()!=null) {
+		destinatario.put("TELEFONO2_DEST", Guardia.getTelefono2_letrado());
+	}
+	
+	return destinatario;
+
+}
+
+	private String obtenerNombreApellidos(String idPersona) throws Exception {
+		String nombre = "";		
+		
+		try {
+			// Obtiene la persona
+			CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona));
+						
+			if (persona!=null) {
+
+				nombre = persona.getNombre();
+				if (persona.getApellidos1()!=null && !persona.getApellidos1().equals("#NA")){
+					nombre += " " + persona.getApellidos1();
+				}
+				
+				if (persona.getApellidos2()!=null && !persona.getApellidos2().equals("#NA")){
+					nombre += " " + persona.getApellidos2();
+				}
+			}
+			
+		} catch(Exception e) {
+			throw new Exception ("Error al obtener el nombre y apellidos",e);
+		}
+		
+		return nombre;
+	}
+
+
+
+
 }

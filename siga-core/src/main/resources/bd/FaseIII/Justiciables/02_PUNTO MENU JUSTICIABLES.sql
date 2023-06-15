@@ -1,0 +1,27 @@
+spool PUNTO MENU JUSTICIABLES.log
+prompt PUNTO MENU JUSTICIABLES.log
+select to_char(sysdate, 'hh24:mi:ss') as "Inicio" from dual;
+prompt .
+
+Insert into GEN_PROCESOS 
+(IDPROCESO,IDMODULO,TRAZA,TARGET,FECHAMODIFICACION,USUMODIFICACION,DESCRIPCION,TRANSACCION,IDPARENT,NIVEL) values 
+('89','JGR','1','Y',SYSDATE,'0','Justiciables','JGR_Justiciables','014','10');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.justiciables','Justiciables','0','1',SYSDATE,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.justiciables','Justiciables','0','2',SYSDATE,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.justiciables','Justiciables#EU','0','3',SYSDATE,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.justiciables','Justiciables#GL','0','4',SYSDATE,'0','19');
+
+Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.justiciables','Justiciables','0','1',SYSDATE,'0','19');
+Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.justiciables','Justiciables','0','2',SYSDATE,'0','19');
+Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.justiciables','Justiciables#EU','0','3',SYSDATE,'0','19');
+Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.justiciables','Justiciables#GL','0','4',SYSDATE,'0','19');
+
+Insert into GEN_MENU 
+(IDMENU,ORDEN,TAGWIDTH,IDPARENT,FECHAMODIFICACION,USUMODIFICACION,URI_IMAGEN,IDRECURSO,GEN_MENU_IDMENU,IDPROCESO,IDLENGUAJE,PATH,FECHA_BAJA,IDCLASS) values
+('89','35001','160','100',SYSDATE,'0',null,'menu.justiciaGratuita.justiciables',null,'89','1','justiciables',null,null);
+
+commit;
+prompt .
+select to_char(sysdate, 'hh24:mi:ss') as "Fin" from dual;
+spool off

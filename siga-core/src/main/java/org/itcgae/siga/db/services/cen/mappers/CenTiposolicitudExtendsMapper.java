@@ -21,6 +21,6 @@ public interface CenTiposolicitudExtendsMapper {
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectTipoSolicitud(String idLenguage);
+	List<ComboItem> selectTipoSolicitud(String idLenguage, String isEXEA);
 
 }

@@ -29,19 +29,21 @@ import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.exception.BusinessException;
+import org.springframework.stereotype.Service;
 
 /**
  * @author MJM 
  * @date 06/04/2015
  *
  */
+@Service
 public class ExcelHelper {
 	
 	private static Logger log = Logger.getLogger(ExcelHelper.class);
 	public static final String C_INFO = "INFO"; 
 	
 	
-	private static Vector<Hashtable<String, Object>> parseWorkbook(HSSFWorkbook wb) throws BusinessException {
+	private Vector<Hashtable<String, Object>> parseWorkbook(HSSFWorkbook wb) throws BusinessException {
 		Vector<Hashtable<String, Object>> datos = new Vector<Hashtable<String, Object>>();
 		
 		try {
@@ -119,12 +121,12 @@ public class ExcelHelper {
 		return datos;
 	}
 
-	public static File createExcelFile(List<String> cabecera, Vector<Hashtable<String, Object>> datos) throws BusinessException {
+	public File createExcelFile(List<String> cabecera, Vector<Hashtable<String, Object>> datos) throws BusinessException {
 		return createExcelFile(cabecera, datos,"fichero");
 		
 	}
 	
-	public static File createExcelFile(List<String> cabecera, Vector<Hashtable<String, Object>> datos,String nombreFichero) throws BusinessException {
+	public File createExcelFile(List<String> cabecera, Vector<Hashtable<String, Object>> datos,String nombreFichero) throws BusinessException {
 		HSSFWorkbook generarLibroExcelUnaHoja = createExcel(cabecera, datos);
 		File returnFile = null;
 		try {
@@ -146,7 +148,7 @@ public class ExcelHelper {
 	}
 	
 
-	public static byte[] createExcelBytes(List<String> cabecera, Vector<Hashtable<String, Object>> datos) throws BusinessException {
+	public byte[] createExcelBytes(List<String> cabecera, Vector<Hashtable<String, Object>> datos) throws BusinessException {
 		HSSFWorkbook generarLibroExcelUnaHoja = createExcel(cabecera, datos);
 		ByteArrayOutputStream archivo = new ByteArrayOutputStream();
 		try {
@@ -161,7 +163,7 @@ public class ExcelHelper {
 		return archivo.toByteArray();
 	}
 	
-	public static Vector<Hashtable<String, Object>> parseExcelFile(byte[] fich) throws BusinessException {
+	public Vector<Hashtable<String, Object>> parseExcelFile(byte[] fich) throws BusinessException {
 		Vector<Hashtable<String, Object>> datos = new Vector<Hashtable<String, Object>>();
 		try {
 			ByteArrayInputStream input = new ByteArrayInputStream(fich);
@@ -181,9 +183,11 @@ public class ExcelHelper {
 	 * @return
 	 * @throws BusinessException
 	 */
-	private static HSSFWorkbook createExcel(List<String> orderList, Vector<Hashtable<String, Object>> datos) throws BusinessException {
+	private HSSFWorkbook createExcel(List<String> orderList, Vector<Hashtable<String, Object>> datos) throws BusinessException {
 		HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
 		try {
+			log.debug("Inicio generación Xls "+new Date());
+			
 			log.info("Generando plantilla excel generarLibroExcelUnaHoja");
             log.debug("Inicio generación Xls "+new Date());
             
@@ -191,6 +195,7 @@ public class ExcelHelper {
 			int numeroFila = 0;
 			int numeroColumna = 0;
 			if (orderList != null && orderList.size() > 0) {
+				log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque estilo de la cabecera");
 				// Estilo de la cabecera
 				HSSFCellStyle hssfCellStyleCabecera = hssfWorkbook.createCellStyle();
 				hssfCellStyleCabecera.setAlignment(HSSFCellStyle.ALIGN_JUSTIFY);
@@ -203,39 +208,50 @@ public class ExcelHelper {
 				hssfCellStyleCabecera.setRightBorderColor((short) 8);
 				hssfCellStyleCabecera.setBorderTop(HSSFCellStyle.BORDER_THIN);
 				hssfCellStyleCabecera.setTopBorderColor((short) 8);
-
+				
+				log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque estilo de la cabecera");
+	
+				log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque crear fuente de la cabecera");
 				// Crear la fuente de la cabecera
 				HSSFFont hssfFont = hssfWorkbook.createFont();
 				hssfFont.setFontName(HSSFFont.FONT_ARIAL);
 				hssfFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 				hssfFont.setColor(HSSFColor.BLACK.index);
-
+				log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque crear fuente de la cabecera");
+	
+				log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque aplicar fuente al estilo de la cabecera");
 				// Aplicarle la fuente al estilo de la cabecera
 				hssfCellStyleCabecera.setFont(hssfFont);
 				HSSFRow hssfRow = hssfSheet.createRow(numeroFila);
-				HSSFCell hssfCell = null; 
+				HSSFCell hssfCell = null;
+				log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque aplicar fuente al estilo de la cabecera");
 				
+				log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque agregar los nombres de las cabeceras al excel");
 				// Agregar los nombres de las cabeceras a el excel (tenemos una lista con las columnas de la cabecera)
 				for (int i = 0; i < orderList.size(); i++) {
 					hssfCell = hssfRow.createCell(numeroColumna);
 					hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
 					HSSFRichTextString textCell = new HSSFRichTextString(orderList.get(i));
 					hssfCell.setCellValue(textCell);
-
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque agregar los nombres de las cabeceras al excel");
+	
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque agregar el estilo");
 					// Agregar el estilo
 					hssfCell.setCellStyle(hssfCellStyleCabecera);
 					//hssfSheet.autoSizeColumn((short) i);
 					numeroColumna++;
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque agregar el estilo");
 				}
 				numeroFila++;
 			}
-
+	
 			if (datos != null) {
 				if (datos.size() > 0) {
-
 					// Si creamos la cabecera del fichero con las keys del
 					// vector de datos
 					if (orderList == null || orderList.size() == 0) {
+						
+						log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque estilo de la cabecera");
 						// Estilo de la cabecera
 						HSSFCellStyle hssfCellStyleCabecera = hssfWorkbook.createCellStyle();
 						hssfCellStyleCabecera.setAlignment(HSSFCellStyle.ALIGN_JUSTIFY);
@@ -248,27 +264,33 @@ public class ExcelHelper {
 						hssfCellStyleCabecera.setRightBorderColor((short) 8);
 						hssfCellStyleCabecera.setBorderTop(HSSFCellStyle.BORDER_THIN);
 						hssfCellStyleCabecera.setTopBorderColor((short) 8);
-
+						log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque estilo de la cabecera");
+	
+						log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque crear fuente de la cabecera");
 						// Crear la fuente de la cabecera
 						HSSFFont hssfFont = hssfWorkbook.createFont();
 						hssfFont.setFontName(HSSFFont.FONT_ARIAL);
 						hssfFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 						hssfFont.setColor(HSSFColor.BLACK.index);
-
+						log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque crear fuente de la cabecera");
+	
+						log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque aplicar fuente al estilo de la cabecera");
 						// Aplicarle la fuente al estilo de la cabecera
 						hssfCellStyleCabecera.setFont(hssfFont);
 						HSSFRow hssfRow = hssfSheet.createRow(numeroFila); 
 						HSSFCell hssfCell = null; // Creamos la celda
-
+						log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque aplicar fuente al estilo de la cabecera");
+	
+	
 						Hashtable<String, Object> datosCabH = datos.get(0);
 						Enumeration<String> ecab = datosCabH.keys();
-
+	
 						while (ecab.hasMoreElements()) {
 							hssfCell = hssfRow.createCell(numeroColumna);
 							hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
 							HSSFRichTextString textCell = new HSSFRichTextString(ecab.nextElement());
 							hssfCell.setCellValue(textCell);
-
+	
 							// Agregar el estilo
 							hssfCell.setCellStyle(hssfCellStyleCabecera);
 							//hssfSheet.autoSizeColumn((short) numeroColumna); 
@@ -276,7 +298,8 @@ public class ExcelHelper {
 						}
 						numeroFila++;
 					}
-
+	
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque aplicar estilo del contenido");
 					// Estilo del contenido
 					HSSFCellStyle hssfCellStyleContenido = hssfWorkbook.createCellStyle();
 					hssfCellStyleContenido.setFillBackgroundColor(new HSSFColor.GREY_25_PERCENT().getIndex());
@@ -289,17 +312,23 @@ public class ExcelHelper {
 					hssfCellStyleContenido.setRightBorderColor((short) 8);
 					hssfCellStyleContenido.setBorderTop(HSSFCellStyle.BORDER_THIN);
 					hssfCellStyleContenido.setTopBorderColor((short) 8);
-
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque aplicar estilo del contenido");
+	
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque crear fuente contenido");
 					// Crear la fuente del contenido
 					HSSFFont hssfFontCont = hssfWorkbook.createFont();
 					hssfFontCont.setFontName(HSSFFont.FONT_ARIAL);
 					hssfFontCont.setColor(HSSFColor.BLACK.index);
 					hssfCellStyleContenido.setFont(hssfFontCont);
 					int numeroColumnaDatos = 0;
-
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque crear fuente contenido");
+	
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque obtener elementos del vector");
+					log.info("Tamaño datos: " + datos.size());
 					// Obtenemos los elementos del vector. Cada elemento del vector es una fila y cada valor del Hastable una columna
 					for (int f = 0; f < datos.size(); f++) {
 						HSSFRow hssfRow = hssfSheet.createRow(numeroFila);
+						log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque creacion columnas y celdas");
 						// Creamos las columnas
 						numeroColumnaDatos = 0;
 						Hashtable<String, Object> datosCol = datos.get(f);
@@ -311,9 +340,9 @@ public class ExcelHelper {
 						for (int i = 0; i < orderList.size(); i++) {
 							String key = orderList.get(i);
 							Object valor = datosCol.get(key);
-
+	
 							HSSFCell hssfCell = hssfRow.createCell(numeroColumnaDatos);
-
+	
 							if(key == SigaConstants.FORMA_PAGO) {
 								firstRow = 1;
 								firstCol = 1;
@@ -349,25 +378,29 @@ public class ExcelHelper {
 							} else {
 								hssfCell.setCellType(HSSFCell.CELL_TYPE_BLANK);
 							}
-
+							//log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque creacion columnas y celdas");
+	
+							//log.info("GeneracionFicheroContabilidad --> createExcel(): Entrada bloque agregar el estilo");
 							// Agregar el estilo
 							hssfCell.setCellStyle(hssfCellStyleContenido);
 							//hssfSheet.autoSizeColumn((short) numeroColumnaDatos);
 							numeroColumnaDatos++;
+							//LOGGER.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque agregar el estilo");
 						}
 						numeroFila++;
 					}
+					log.info("GeneracionFicheroContabilidad --> createExcel(): Salida bloque obtener elementos del vector");
 				}
+				
 			}
-            log.debug("Fin generación Xls "+new Date());
-            
+			log.debug("Fin generación Xls "+new Date());
+			
 		} catch (Exception e) {
 			log.error("Se ha producido un error al generar el fichero excel generarLibroExcelUnaHoja", e);
 			throw new BusinessException("Se ha producido un error al generar el fichero excel generarLibroExcelUnaHoja", e);
 		}
 		return hssfWorkbook;
 	}
-	
 	
 	
 }

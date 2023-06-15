@@ -1,8 +1,11 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,7 +21,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -28,17 +35,31 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
+import org.itcgae.siga.DTO.fac.FiltroServicioItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderDTO;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasItem;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasRuleDTO;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasRuleItem;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.Criterio;
 import org.itcgae.siga.DTOs.com.KeyItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
+import org.itcgae.siga.DTOs.com.QueryBuilderDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -51,8 +72,11 @@ import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenGruposcriterios;
+import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.ConCriterioconsulta;
 import org.itcgae.siga.db.entities.ConEjecucion;
 import org.itcgae.siga.db.entities.ConEjecucionExample;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -65,7 +89,10 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
+import org.itcgae.siga.db.entities.PysPreciosservicios;
+import org.itcgae.siga.db.entities.PysServiciosinstitucion;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.ConCriterioconsultaMapper;
 import org.itcgae.siga.db.mappers.ConEjecucionMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
@@ -74,6 +101,8 @@ import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
+import org.itcgae.siga.db.mappers.PysPreciosserviciosMapper;
+import org.itcgae.siga.db.mappers.PysServiciosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
@@ -86,13 +115,20 @@ import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.CenGruposcriteriosExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacGrupcritincluidosenserieExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.jaxen.function.ext.UpperFunction;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 @Service
 public class ConsultasServiceImpl implements IConsultasService {
@@ -160,9 +196,24 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 	@Autowired
 	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
+	
+	@Autowired
+	private ConCriterioconsultaMapper conCriterioConsultaMapper;
 
 	@Autowired
 	private ConEjecucionMapper _conEjecucionMapper;
+	
+	@Autowired
+	private PysServiciosinstitucionMapper _pysServiciosInstitucionMapper;
+	
+	@Autowired
+	private PysPreciosserviciosMapper _pysPreciosServiciosMapper;
+
+	@Autowired
+	private FacGrupcritincluidosenserieExtendsMapper _facGrupcritincluidosenserieExtendsMapper;
+
+	@Autowired
+	private CenGruposcriteriosExtendsMapper _cenGruposcriteriosExtendsMapper;
 
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -790,6 +841,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		modeloCom.setPreseleccionar("SI");
 		modeloCom.setUsumodificacion(usuario.getIdusuario());
 		modeloCom.setVisible((short) 1);
+		modeloCom.setInformeunico((short)0);
 
 		return modeloCom;
 	}
@@ -937,6 +989,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					boolean camposIncorrectos = false;
 					boolean objetivoIncorrecto = false;
 					boolean noContieneInstitucion = false;
+					boolean errorActualizarGruposCriterios = false;
 
 
 					ConConsultaKey key = new ConConsultaKey();
@@ -969,6 +1022,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 						respuesta.setCode(400);
 						respuesta.setMessage("No cumple con las restricciones del objetivo");
 					} else {
+						// Actualizar entrada en CEN_GRUPOSCRITERIOS en caso de que la consulta se encuentre asociada a una serie de facturación
+						actualizarConsultaEnCenGruposCriterios(Short.parseShort(consultaDTO.getIdInstitucion()), key.getIdconsulta(), consultaDTO.getSentencia());
+
 						consulta.setSentencia(consultaDTO.getSentencia());
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
@@ -987,6 +1043,41 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		LOGGER.info("guardarConsulta() -> Salida del servicio para guardar la sentencia de la consulta");
 		return respuesta;
+	}
+
+	// FUNCIÓN UTILIZADA PARA ACTUALIZAR LAS SENTECIAS DE LA TABLE CEN_GRUPOSCRITERIOS UTILIZADA EN LA FICHA DE SERIRES DE FACTURACIÓN (SENTENCIAS SIN ETIQUETAS)
+	private boolean actualizarConsultaEnCenGruposCriterios(Short idInstitucion, Long idConsulta, String consulta) {
+		try {
+			CenGruposcriteriosExample exampleGruposCriterios = new CenGruposcriteriosExample();
+			exampleGruposCriterios.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdconsultaEqualTo(idConsulta);
+
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document doc = builder.parse(new ByteArrayInputStream(
+					("<root>" + consulta + "</root>").getBytes(StandardCharsets.UTF_8)));
+
+
+			List<String> partesSentencia = new ArrayList<>();
+			NodeList nodes = doc.getDocumentElement().getChildNodes();
+			for (int i = 0; i < nodes.getLength(); i++) {
+				String nodeContent = nodes.item(i).getTextContent();
+				if (nodeContent != null)
+					partesSentencia.add(nodeContent.trim());
+			}
+
+			CenGruposcriterios recordGruposCriterios = new CenGruposcriterios();
+			if (partesSentencia.isEmpty()) {
+				recordGruposCriterios.setSentencia(consulta);
+			} else {
+				recordGruposCriterios.setSentencia(String.join(" \n", partesSentencia));
+			}
+
+			_cenGruposcriteriosExtendsMapper.updateByExampleSelective(recordGruposCriterios, exampleGruposCriterios);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+
 	}
 
 	private boolean comprobarInstitucion(String sentencia) {
@@ -1626,6 +1717,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 		operadoresList.add("IS NULL");
 		operadoresList.add("LIKE");
 		operadoresList.add("OPERADOR");
+		
+		consulta = consulta.trim();
 
 		String selectExperta = consulta.toUpperCase().replaceAll("\r\n", " ");
 		String selectOriginal = consulta.replaceAll("\r\n", " ");
@@ -1658,7 +1751,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 				sentencia_aux = critCampoSalida;
 				sentenciaOriginalAux = selectOriginal;
 				String operadorEncontrado = "";
-				while ((continuar) && (sentencia_aux.length() > 0)) {
+				while ((continuar) && (sentencia_aux.length() > 1)) {
 					operadorEncontrado = "";
 					// int pos_ini2 =sentencia_aux.lastIndexOf(v_tipoDatos.get(i).toString());
 					int pos_ini = sentencia_aux.indexOf(tipoDatos.get(i).toString());
@@ -2236,17 +2329,31 @@ public class ConsultasServiceImpl implements IConsultasService {
 							if (!operador.equals(SigaConstants.IS_NULL) && listaCampos.get(j).getValor() != null
 									&& !listaCampos.get(j).getValor().equals("") ) {
 								if (listaCampos.get(j).getTipoDato().equals(SigaConstants.TIPOFECHA)) {
+									
 									iParametroBind++;
-									criteriosDinamicos = "TO_DATE (:@" + iParametroBind + "@:"
-											+ ", 'YYYY/MM/DD HH24:MI:SS')";
-
 									String fecha = listaCampos.get(j).getValor();
-									// This could be MM/dd/yyyy, you original value is ambiguous
-									SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-									Date dateValue = input.parse(fecha);
+									if(fecha.length() > 11) {
+										criteriosDinamicos = "TO_DATE (:@" + iParametroBind + "@:"
+												+ ", 'YYYY/MM/DD HH24:MI:SS')";
 
-									SimpleDateFormat output = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-									String nuevoValor = output.format(dateValue);
+									}else {
+										criteriosDinamicos = "TO_DATE (:@" + iParametroBind + "@:"
+												+ ", 'DD/MM/YYYY')";
+									}
+									
+									
+									// This could be MM/dd/yyyy, you original value is ambiguous
+									String nuevoValor = "";
+									if(fecha.length() > 11) {
+										SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+										Date dateValue = input.parse(fecha);
+										SimpleDateFormat output = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+										 nuevoValor = output.format(dateValue);
+									}else {		
+										nuevoValor = fecha;
+									}
+									
+									
 									// listaCampos.get(j).setValor("'" + nuevoValor + "'");
 
 									// String aux = listaCampos.get(j).getValor();
@@ -2383,10 +2490,22 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		// Se intentan sustituir los parametros de las funciones de cen_colegiado
 		sentencia = sustituirParametrosColegiado(sentencia);
+		
+		//Quitamos ";" del final si tiene
+		sentencia = quitarUltimoCaracterPuntoComa(sentencia);
 
 		return sentencia;
 	}
 
+	private String quitarUltimoCaracterPuntoComa(String str) {
+		LOGGER.info(str);
+		str = str.replaceAll("\\s+$", "");
+		if(str.charAt(str.length()- 1) == ';') {
+			str = str.substring(0,str.length() -1);
+		}
+		return str;
+	}
+	
 	public String sustituirParametrosColegiado(String select) {
 		select = select.replaceAll("@FECHA@", "SYSDATE");
 		if (select.indexOf(SigaConstants.NOMBRETABLA_CEN_CLIENTE) != -1) {
@@ -2426,6 +2545,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 				LOGGER.error("ejecutarConsultaConClaves() -> Consulta no permitida: " + sentencia);
 			} else {
+				//Para ejecutar la sentencia se pasa a miniscula.
 				result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
 			}
 
@@ -2443,6 +2563,10 @@ public class ConsultasServiceImpl implements IConsultasService {
 				return resultCopia;
 			}
 		} catch (Exception e) {
+			if(e.getCause()!= null && e.getCause().toString().contains("Interrupted attempting lock")) {
+				LOGGER.warn("CONSULTA INTERRUMPIDA POR TIMEOUT CONFIGURADO - GENERACION DE INFORMES");
+				throw new BusinessSQLException("CONSULTA INTERRUMPIDA POR TIMEOUT CONFIGURADO - GENERACION DE INFORMES");
+			}
 			LOGGER.error("Error al ejecutar la consulta", e);
 			if ((e instanceof DataAccessException) && e.getCause() != null) {
 				throw new BusinessSQLException(e.getMessage(), e);
@@ -2614,5 +2738,939 @@ public class ConsultasServiceImpl implements IConsultasService {
 		}
 		
 	}
+	
+	public static int contador = 1;
+    public static List criterioLst = new ArrayList();
 
+	@Override
+	@Transactional
+	public QueryBuilderDTO constructorConsultas(HttpServletRequest request, QueryBuilderDTO queryBuilderDTO) throws Exception {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		Error error = new Error();
+		
+		String consulta = "";
+		criterioLst.clear();
+        contador = 1;
+		
+		int statusDeleteConCriterioConsulta = 0;
+		int statusInsertConCriterioConsulta = 0;
+		
+		List<Integer> listIndicesLikes = new ArrayList<Integer>();
+		if(queryBuilderDTO.getConsulta().contains("LIKE")) {
+			listIndicesLikes = this.findWord(queryBuilderDTO.getConsulta(), "LIKE");
+			
+			queryBuilderDTO.setConsulta(this.eliminarParentesisOperadorLike(queryBuilderDTO.getConsulta(), listIndicesLikes));
+		}
+		
+		//PRIMERO ANTES DE INSERTAR ELIMINAMOS LOS CRITERIOS YA EXISTENTES EN CON_CRITERIOCONSULTA EN CASO QUE EXISTIERA ALGUNO/S
+		LOGGER.info(
+				"constructorConsultas() / ConCriterioConsultaMapper.deleteByPrimaryKey() -> Entrada a ConCriterioConsultaMapper para eliminar los registros ya existentes antes de insertar los nuevos");
+		//Primero obtenemos todos los registros de con_criterioconsulta existentes
+		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
+		
+		constructorConsultasDTO = this.obtenerDatosConsulta(request, queryBuilderDTO.getIdconsulta(), queryBuilderDTO.getIdinstitucion());
+		//Eliminamos todos los existentes en caso de que tuviera alguno antes de insertar los nuevos.
+		if(constructorConsultasDTO.getConstructorConsultasItem().size() > 0 && constructorConsultasDTO.getConstructorConsultasItem() != null) {
+			for (ConstructorConsultasItem rule : constructorConsultasDTO.getConstructorConsultasItem()) {
+				ConCriterioconsulta conCriterioConsultaEliminar = new ConCriterioconsulta();
+				
+				conCriterioConsultaEliminar.setOrden((short) rule.getOrden());
+				conCriterioConsultaEliminar.setIdinstitucion(Short.valueOf(queryBuilderDTO.getIdinstitucion()));
+				conCriterioConsultaEliminar.setIdconsulta((long) rule.getIdconsulta());
+				
+				statusDeleteConCriterioConsulta = conCriterioConsultaMapper.deleteByPrimaryKey(conCriterioConsultaEliminar);
+				
+				if(statusDeleteConCriterioConsulta == 0) {
+					throw new Exception("Ha fallado la eliminacion del registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + queryBuilderDTO.getIdinstitucion());
+				}else if(statusDeleteConCriterioConsulta == 1){
+					LOGGER.info(
+							"constructorConsultas() / ConCriterioConsultaMapper.deleteByPrimaryKey() -> Eliminado con exito el registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + queryBuilderDTO.getIdinstitucion());
+				}
+						
+			}
+		}
+		
+		LOGGER.info(
+				"constructorConsultas() / ConCriterioConsultaMapper.deleteByPrimaryKey() -> Salida de ConCriterioConsultaMapper para eliminar los registros ya existentes antes de insertar los nuevos");
+
+		LOGGER.info("constructorConsultas() -> Entrada al servicio para crear una nueva consulta desde el constructor de consultas");
+
+	
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"constructorConsultas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"constructorConsultas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+						
+				if(queryBuilderDTO.getConsulta() != null && !queryBuilderDTO.getConsulta().equals("")) {
+					//Inserto en con_criterioconsulta los campos recibidos del constructor de consultas
+					ConCriterioconsulta conCriterioConsultaInsertar = new ConCriterioconsulta();
+					
+					conCriterioConsultaInsertar.setIdinstitucion(Short.valueOf(queryBuilderDTO.getIdinstitucion()));
+					conCriterioConsultaInsertar.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
+					
+		            String delimitador = null;
+		                      
+		            //Procesamos la consulta llegada del constructor para transformarla en un objeto entendible para la tabla con_consultacriterio
+		            extraeCriterio(queryBuilderDTO.getConsulta(), delimitador);
+		            
+		            //Recorro la lista y voy insertando en con_criterioconsulta
+		            for(int i = 0; i < criterioLst.size(); i++) {
+		            	Criterio criterio = (Criterio) criterioLst.get(i);
+		            	
+		            	if(criterio.isAbrirParentesis()) {
+		            		conCriterioConsultaInsertar.setAbrirpar("1");
+		            	}else {
+		            		conCriterioConsultaInsertar.setAbrirpar("0");
+		            	}
+		            	
+		            	if(criterio.getOperador() != null) {
+		            		conCriterioConsultaInsertar.setOperador(criterio.getOperador());
+		            	}
+		            	
+		            	String[] filtroSplit = criterio.getFiltro().split(" ");
+		            		            	
+		            	String idCampo = filtroSplit[0].substring(1);
+		            	conCriterioConsultaInsertar.setIdcampo(Long.valueOf(idCampo));
+		            		
+		            	LOGGER.info(
+								"constructorConsultas() / ConConsultaExtendsMapper.getIdOperacion() -> Entrada al servicio para obtener el idOperacion necesario para la insercion en con_criterioconsulta");
+		           
+		            	//Segun el simbolo obtenido del constructor de consultas para realizar la insercion en con_critericonsultas necesitamos el idoperacion el cual depende del simbolo y del idcampo seleccionado en el constructor
+		            	if(!filtroSplit[1].equals("IS")) {
+		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(idCampo, filtroSplit[1].toLowerCase());
+		            		if(idoperacion != 0) {
+		            			conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
+		            		}else {
+		            			error.setCode(HttpStatus.SC_BAD_GATEWAY);
+		            			error.setMessage("El operador: " + filtroSplit[1] + " no puede ser usado en ese campo");
+		            			queryBuilderDTO.setError(error);
+		            			
+		            			throw new Exception("El operador: " + filtroSplit[1] + " no puede ser usado en ese campo");
+		            		}
+		            	}else{
+		            		String simbolo = filtroSplit[1] + " " + filtroSplit[2];
+		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(idCampo, simbolo.toLowerCase());
+		            		if(idoperacion != 0) {
+		            		conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
+		            		}else {
+		            			error.setCode(HttpStatus.SC_BAD_GATEWAY);
+		            			error.setMessage("El operador: " + simbolo + " no puede ser usado en ese campo");
+		            			queryBuilderDTO.setError(error);
+		            			
+		            			throw new Exception("El operador: " + simbolo + " no puede ser usado en ese campo");
+		            		}
+		            	}
+		            	          	
+		            	LOGGER.info(
+								"constructorConsultas() / ConConsultaExtendsMapper.getIdOperacion() -> Salida del servicio para obtener el idOperacion necesario para la insercion en con_criterioconsulta");
+		            		
+		            	if(!filtroSplit[1].equals("IS")) {
+		            		conCriterioConsultaInsertar.setValor(filtroSplit[2]);
+		            	}else {
+		            		conCriterioConsultaInsertar.setValor(null);
+		            	}
+		                        	
+		            	if(criterio.isCerrarParentesis()) {
+		            		conCriterioConsultaInsertar.setCerrarpar("1");
+		            	}else {
+		            		conCriterioConsultaInsertar.setCerrarpar("0");
+		            	}
+		            	
+		            	conCriterioConsultaInsertar.setOrden((short) criterio.getOrden());
+		            	
+		            	conCriterioConsultaInsertar.setFechamodificacion(new Date());
+						conCriterioConsultaInsertar.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+						statusInsertConCriterioConsulta = conCriterioConsultaMapper.insertSelective(conCriterioConsultaInsertar);
+						
+						if(statusInsertConCriterioConsulta == 0) {
+							criterioLst.clear();
+				            contador = 1;
+							throw new Exception("No se ha podido realizar la insercion parcial de la consulta en la tabla con_criterioconsulta, fallo en la rule num:" + criterio.orden);
+							
+						}else if(statusInsertConCriterioConsulta == 1) {
+							LOGGER.info(
+									"constructorConsultas() / ConCriterioConsultaMapper.insertSelective() -> Se ha podido realizar la insercion parcial de la consulta en la tabla con_criterioconsulta, numero de inserciones: " + criterio.orden);
+						}
+		            }
+		            
+				}
+		            
+		            int statusUpdateConConsulta = 0;
+		            boolean queryPorDefecto = false;
+		            
+		            
+		            //Si hay criterios, es decir la consulta no ha llegado vacia del constructor de consultas por lo que hemos insertado en con_criterioconsulta formamos la query basandonos en ellos
+		            if(!queryBuilderDTO.getConsulta().equals("")) {
+		            	consulta = obtenerConsultaByConCriterios(_conConsultasExtendsMapper.obtenerDatosConsulta(idioma, Short.valueOf(queryBuilderDTO.getIdinstitucion()), queryBuilderDTO.getIdconsulta()));
+		            	//Cambiamos @IDGRUPO@ por el idGrupo correcto
+						if (consulta.indexOf("@IDGRUPO@")!=-1){
+							consulta=UtilidadesString.replaceAllIgnoreCase(consulta,"@IDGRUPO@",""+null+",2000");
+						}
+						//Cambiamos @IDINSTITUCION@	 por el IdInstitucion correcto
+						consulta = UtilidadesString.reemplazaString("@IDINSTITUCION@", queryBuilderDTO.getIdinstitucion(), consulta);		
+						
+		            // Si no hay criterios, cogemos la select por defecto
+		            }else if(queryBuilderDTO.getConsulta().equals("")){
+		            	consulta = getQueryPorDefecto();
+						//Cambiamos @IDINSTITUCION@	 por el IdInstitucion correcto
+						consulta = UtilidadesString.reemplazaString("@IDINSTITUCION@", queryBuilderDTO.getIdinstitucion(), consulta);
+						queryPorDefecto = true;
+		            }
+		            
+		          //Creo el objeto con los valores a actualizar en CON_CONSULTA         
+		            ConConsulta conConsulta = new ConConsulta();
+		            
+					conConsulta.setIdinstitucion(Short.valueOf(queryBuilderDTO.getIdinstitucion()));
+					conConsulta.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
+		            
+		            conConsulta.setSentencia(consulta);            
+		            
+		          //Actualizo en CON_CONSULTA
+					statusUpdateConConsulta = _conConsultaMapper.updateByPrimaryKeySelective(conConsulta);
+						
+					if(statusUpdateConConsulta == 0) {			
+						throw new Exception("No se ha podido realizar la actualizacion de la consulta en la tabla con_consulta");
+							
+					}else if(statusUpdateConConsulta == 1) {
+						LOGGER.info(
+								"constructorConsultas() / ConConsultaMapper.updateByPrimaryKeySelective() -> Se ha podido realizar la actualizacion de la consulta en la tabla con_consulta");
+					}
+					
+				}
+		           
+		            //Actualizo PYS_SERVICIOSINSTITUCION (HABRIA QUE RECORRER PYS_SERVICIOSINSTITUCION EN BUSCA DE TODOS LOS SERVICIOS DE ESTA INSTITUCION QUE TENGAN ASIGNADA ESTA CONSULTA)
+					List<ServicioDetalleDTO> listaServicios = new ArrayList<ServicioDetalleDTO>();
+					
+					listaServicios = _conConsultasExtendsMapper.selectServiciosByConsulta(idInstitucion, queryBuilderDTO.getIdconsulta());
+					
+					if(listaServicios.size() > 0 && listaServicios != null) {
+						for (ServicioDetalleDTO servicioDetalleDTO : listaServicios) {
+							int statusUpdatePysServiciosInstitucion = 0;
+							PysServiciosinstitucion pysServiciosInstitucion = new PysServiciosinstitucion();
+							
+							pysServiciosInstitucion.setIdinstitucion(idInstitucion);
+							pysServiciosInstitucion.setIdserviciosinstitucion((long) servicioDetalleDTO.getIdserviciosinstitucion());
+							pysServiciosInstitucion.setIdservicio((long) servicioDetalleDTO.getIdservicio());
+							pysServiciosInstitucion.setIdtiposervicios((short) servicioDetalleDTO.getIdtiposervicios());
+							
+							pysServiciosInstitucion.setCriterios(consulta);
+							
+							pysServiciosInstitucion.setFechamodificacion(new Date());
+							pysServiciosInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							statusUpdatePysServiciosInstitucion = _pysServiciosInstitucionMapper.updateByPrimaryKeySelective(pysServiciosInstitucion);
+							
+							if(statusUpdatePysServiciosInstitucion == 0) {			
+								throw new Exception("No se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
+								
+							}else if(statusUpdatePysServiciosInstitucion == 1) {
+								LOGGER.info(
+										"constructorConsultas() / _pysServiciosInstitucionMapper.updateByPrimaryKeySelective) -> Se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
+							}		
+						}
+					}
+					
+					//Actualizo PYS_PRECIOSSERVICIOS (HABRIA QUE RECORRER PYS_PRECIOSSERVICIOS EN BUSCA DE TODOS LOS PRECIOS DE ESTA INSTITUCION QUE TENGAN ASIGNADA ESTA CONSULTA)
+					List<FichaTarjetaPreciosItem> listaPrecios = new ArrayList<FichaTarjetaPreciosItem>();
+					
+					listaPrecios = _conConsultasExtendsMapper.selectPreciosByConsulta(idInstitucion, queryBuilderDTO.getIdconsulta());
+				
+					if(listaPrecios.size() > 0 && listaPrecios != null) {
+						for (FichaTarjetaPreciosItem fichaTarjetaPreciosItem : listaPrecios) {
+							int statusUpdatePysPreciosServicios = 0;
+							PysPreciosservicios pysPreciosservicios = new PysPreciosservicios();
+							
+							pysPreciosservicios.setIdinstitucion(idInstitucion);
+							pysPreciosservicios.setIdserviciosinstitucion((long) fichaTarjetaPreciosItem.getIdserviciosinstitucion());
+							pysPreciosservicios.setIdservicio((long) fichaTarjetaPreciosItem.getIdservicio());
+							pysPreciosservicios.setIdtiposervicios((short) fichaTarjetaPreciosItem.getIdtiposervicios());
+							pysPreciosservicios.setIdperiodicidad((short) fichaTarjetaPreciosItem.getIdperiodicidad());
+							pysPreciosservicios.setIdpreciosservicios((short) fichaTarjetaPreciosItem.getIdpreciosservicios());
+													
+							pysPreciosservicios.setCriterios(consulta);
+							
+							pysPreciosservicios.setFechamodificacion(new Date());
+							pysPreciosservicios.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							statusUpdatePysPreciosServicios = _pysPreciosServiciosMapper.updateByPrimaryKeySelective(pysPreciosservicios);
+							
+							if(statusUpdatePysPreciosServicios == 0) {			
+								throw new Exception("No se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_preciosservicios");
+								
+							}else if(statusUpdatePysPreciosServicios == 1) {
+								LOGGER.info(
+										"constructorConsultas() / _pysPreciosServiciosMapper.updateByPrimaryKeySelective) -> Se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_preciosservicios");
+							}		
+						}
+					}
+				}		
+			
+			LOGGER.info("constructorConsultas() -> Salida del servicio para crear una nueva consulta desde el constructor de consultas");
+
+			ConConsultaKey conConsultaKey = new ConConsultaKey();
+			
+			conConsultaKey.setIdinstitucion(Short.valueOf(queryBuilderDTO.getIdinstitucion()));
+			conConsultaKey.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
+			
+			ConConsulta conConsulta = _conConsultaMapper.selectByPrimaryKey(conConsultaKey);
+			
+			queryBuilderDTO.setSentencia(conConsulta.getSentencia());
+			
+			return queryBuilderDTO;
+				
+	}
+	
+	
+	//INICIO CONVERTIR DATOS CON_CRITERIOCONSULTA A QUERY NECESARIA PARA CON_CONSULTA Y PYS_SERVICIOSINSTITUCION
+	
+	public String obtenerConsultaByConCriterios(List<ConstructorConsultasItem> constructorDeConsultasList) throws Exception {
+		//Obtener tablas
+		List<String> nombreTablas = new ArrayList<String>();
+		for (int i = 0; i < constructorDeConsultasList.size(); i++) {
+			if(i == 0) {
+				nombreTablas.add(constructorDeConsultasList.get(i).getDescripciontabla());
+			}else {
+				if(!nombreTablas.contains(constructorDeConsultasList.get(i).getDescripciontabla())) {
+					nombreTablas.add(constructorDeConsultasList.get(i).getDescripciontabla());
+				}
+			}
+		}
+		
+		// variable resultado
+	  	String consulta="SELECT ";
+	  	try{
+//	  		//campos de consulta
+	  		consulta += " " + getCamposSalida(nombreTablas);
+//	  		
+//	  		//tablas a consultar
+	  		consulta += " FROM" + getFrom(nombreTablas);
+//	  		
+//	  		//where fijo
+	  		consulta += " WHERE" + getWhereFijo(nombreTablas);
+//	  		
+//	  		//where variable
+	  		if (constructorDeConsultasList != null && constructorDeConsultasList.size() > 0)
+	  			consulta += " AND (" + getWhereVariable(constructorDeConsultasList) + ") ";
+//	  		
+//	  		//join de las tablas
+	  		consulta += (nombreTablas.size()>1?" AND (" + getCriteriosJoin(nombreTablas) + ") ":"");
+		}catch(Exception e){
+	  		throw new Exception ("Error en ConsultasServiceImpl.obtenerConsultaByConCriterios()");
+	  	}
+	  return consulta;
+	}
+	
+	public String getCamposSalida(List<String> nombreTablas) throws Exception {
+	  	
+	  	//String resultado
+	  	String resultado = "";
+	  	
+	  	try{
+		  	// para saber si se ha incluido ya el primer campo 
+		  	// para incluir "," antes de los campos
+		  	boolean hayPrimero = false;
+		  	
+		  	// COMPROBAMOS LA TABLA CEN_CLIENTE
+		  	resultado += (nombreTablas.contains("CEN_CLIENTE")? "CEN_CLIENTE.IDINSTITUCION, CEN_CLIENTE.IDPERSONA" :"");
+		  	// comprobamos si ya se han insertado los primeros campos
+		  	if(!resultado.equals("")) hayPrimero=true; 
+		  	
+		  	// COMPROBAMOS LA TABLA CEN_COLEGIADO
+		  	resultado += (nombreTablas.contains("CEN_COLEGIADO")&&(!hayPrimero)? "CEN_COLEGIADO.IDINSTITUCION, CEN_COLEGIADO.IDPERSONA" :"");
+		  	// comprobamos si ya se han insertado los primeros campos
+		  	if(!resultado.equals("")) hayPrimero=true;
+		  	
+		  	// COMPROBAMOS LA TABLA CEN_GRUPOSCLIENTE_CLIENTE
+		  	resultado += (nombreTablas.contains("CEN_GRUPOSCLIENTE_CLIENTE")&&(!hayPrimero)?  "CEN_GRUPOSCLIENTE_CLIENTE.IDINSTITUCION, CEN_GRUPOSCLIENTE_CLIENTE.IDPERSONA" :"");
+		  	// comprobamos si ya se han insertado los primeros campos
+		  	if(!resultado.equals("")) hayPrimero=true;
+		  	
+		  	// SI NO SE HAN INCLUIDO NINGUNA DE LAS DOS TABLAS, 
+		  	// POR DEFECTO, INCLUIMOS LA DE CEN_CLIENTE
+		  	if (!hayPrimero) resultado += "CEN_CLIENTE.IDINSTITUCION, CEN_CLIENTE.CenClienteBean.IDPERSONA";
+	  	}catch(Exception e){
+	  		throw new Exception ("Error en ConsultasServiceServiceImpl.getCamposSalida()");
+	  	}
+	  	
+	  	// Devolvemos el resultado final
+	  	return resultado;
+	  }
+
+	public String getFrom (List<String> nombreTablas) throws Exception {
+	  	
+	  	// String resultado final 
+	  	String resultado = "";
+	  	
+	  	try{
+		  	// para saber si se ha incluido ya la primera tabla 
+		  	// para incluir la tabla por defecto
+		  	boolean hayPrimero = false;
+
+		  	// COMPROBAMOS LA TABLA CEN_CLIENTE
+		  	resultado += (nombreTablas.contains("CEN_CLIENTE")?" CEN_CLIENTE":"");
+		  	// comprobamos si ya se ha insertado la primera tabla
+		  	if(!resultado.equals("")) hayPrimero=true; 
+		  	
+		  	// COMPROBAMOS LA TABLA CEN_COLEGIADO
+		  	resultado += (nombreTablas.contains("CEN_COLEGIADO")?(hayPrimero?", ":" ") + "CEN_COLEGIADO ":"");
+		  	// comprobamos si ya se ha insertado la primera tabla
+		  	if(!resultado.equals("")) hayPrimero=true;
+
+		  	// COMPROBAMOS LA TABLA CEN_PERSONA
+		  	resultado += (nombreTablas.contains("CEN_PERSONA")?(hayPrimero?", ":" ") + " CEN_PERSONA ":"");
+		  	// comprobamos si ya se ha insertado la primera tabla
+		  	if(!resultado.equals("")) hayPrimero=true;
+
+		  	// COMPROBAMOS LA TABLA CEN_GRUPOSCLIENTE_CLIENTE
+		  	resultado += (nombreTablas.contains("CEN_GRUPOSCLIENTE_CLIENTE")?(hayPrimero?", ":" ") + " CEN_GRUPOSCLIENTE_CLIENTE ":"");
+		  	// comprobamos si ya se ha insertado la primera tabla
+		  	if(!resultado.equals("")) hayPrimero=true;
+		  	
+		  	// SI NO SE HAN INCLUIDO NINGUNA DE LAS DOS TABLAS, 
+		  	// POR DEFECTO, INCLUIMOS LA DE CEN_CLIENTE
+		  	if (!hayPrimero) resultado += "CEN_CLIENTE ";
+		  	
+	  	}catch(Exception e){
+	  		throw new Exception ("Error en getFrom()");
+	  	}
+	  	return resultado;
+	}
+	
+	public static String getWhereFijo (List<String> nombreTablas) throws Exception {
+
+	  	// String resultado
+	  	String resultado = "";
+	  	
+	  	try{
+		  	// para saber si se ha incluido ya la primera cláusula del where 
+		  	// para incluir "AND" antes de la siguiente, o para anhadir la consulta por defecto.
+		  	boolean hayPrimero = false;
+		  	
+		  	// COMPROBAMOS LA TABLA CEN_CLIENTE
+		  	if (nombreTablas.contains("CEN_CLIENTE")){
+		  		resultado += " CEN_CLIENTE.IDINSTITUCION" + " = " + "@IDINSTITUCION@ ";
+		  		resultado += " AND CEN_CLIENTE.IDPERSONA" + " = " + "@IDPERSONA@ ";
+		  	}
+		  	// comprobamos si ya se han insertado los primeros campos
+		  	if(!resultado.equals("")) hayPrimero=true; 
+		  	
+		  	// COMPROBAMOS LA TABLA CEN_COLEGIADO
+		  	if(nombreTablas.contains("CEN_COLEGIADO")&&(!hayPrimero)){
+		  		resultado += (hayPrimero?" AND ":" ") + "CEN_COLEGIADO.IDINSTITUCION" + " = " + "@IDINSTITUCION@ ";
+		  		resultado += " AND CEN_COLEGIADO.IDPERSONA" + " = " + "@IDPERSONA@ ";
+		  	}
+		  	if(!resultado.equals("")) hayPrimero=true; 
+
+		  	// COMPROBAMOS LA TABLA CEN_GRUPOSCLIENTE_CLIENTE
+		  	if(nombreTablas.contains("CEN_GRUPOSCLIENTE_CLIENTE")&&(!hayPrimero)){
+		  		resultado += (hayPrimero?" AND ":" ") + "CEN_GRUPOSCLIENTE_CLIENTE.IDINSTITUCION" + " = " + "@IDINSTITUCION@ ";
+		  		resultado += " AND CEN_GRUPOSCLIENTE_CLIENTE.IDPERSONA" + " = " + "@IDPERSONA@ ";
+		  	}
+		  	if(!resultado.equals("")) hayPrimero=true; 
+		  	
+		  	// SI NO SE HAN INCLUIDO NINGUNA DE LAS DOS TABLAS, 
+		  	// POR DEFECTO, INCLUIMOS LA DE CEN_CLIENTE
+		  	if (!hayPrimero) {
+		  		resultado += " CEN_CLIENTE.IDINSTITUCION" + " = " + "@IDINSTITUCION@ ";
+		  		resultado += " AND CEN_CLIENTE.IDPERSONA" + " = " + "@IDPERSONA@ ";
+		  	}
+
+	  	}catch(Exception e){
+	  		throw new Exception ("Error en getWhereFijo()");
+	  	}
+	  	
+	  	// Devolvemos el resultado final
+	  	return resultado;
+	}
+	
+	public static String getWhereVariable (List<ConstructorConsultasItem> constructorDeConsultasList)throws Exception{
+
+	  	//variable resultado
+	  	String resultado="";
+	  	
+
+	  	try{
+
+		  	// recorremos el vector de los criterios, accediendo a cada Hashtable
+		  	// y recuperamos la key y el valor 
+		  	for(int cont=0;cont<constructorDeConsultasList.size();cont++){
+		  		
+		  		//variable auxiliar para recuperar cada criterio
+		  		ConstructorConsultasItem registroConCriterioConsulta = constructorDeConsultasList.get(cont);
+		  		String operador = "";
+	  			String abrirPar = registroConCriterioConsulta.getAbrirparentesis();
+	  			if (abrirPar!=null && abrirPar.equals("1")) abrirPar = "("; else abrirPar = ""; 
+	  			String cerrarPar = registroConCriterioConsulta.getCerrarparentesis();
+	  			if (cerrarPar!=null && cerrarPar.equals("1")) cerrarPar = ")"; else cerrarPar = ""; 
+	  			String value = registroConCriterioConsulta.getValor();
+		  		if (value!=null && value.indexOf("$")!=-1) {
+		  			// viene de GruposCliente_Cliente
+		  			String idGrupo = value.substring(1,value.indexOf("$")); 
+		  			String idInstGrupo = value.substring(value.indexOf("$")+1,value.length()-1); 
+		  			if (registroConCriterioConsulta.getConector()!=null&&(cont>0)){
+			  			if((registroConCriterioConsulta.getConector()).equalsIgnoreCase("Y"))
+							operador = " AND ";
+			  			else if ((registroConCriterioConsulta.getConector()).equalsIgnoreCase("O"))
+							operador = " OR ";
+			  		}
+		  			String nombreReal=registroConCriterioConsulta.getNombrereal().toString().replaceAll("@IDGRUPO@",""+idGrupo+","+idInstGrupo+"");
+			  		if (operador.equalsIgnoreCase("")&&cont>0)operador=" AND ";
+			  		//resultado += " " + operador + " " + abrirPar + " " + (String)hash.get("NOMBREREAL") + " " + (String)hash.get("OPERACION") + " " + idGrupo + " " + cerrarPar + " ";
+			  		resultado += " " + operador + " " + abrirPar + " " + nombreReal + " " + registroConCriterioConsulta.getSimbolo() + " 1 " + cerrarPar + " ";
+		  			
+		  			// criterio idInstitucionGrupo
+			  		if (registroConCriterioConsulta.getConector()!=null&&(cont>0)){
+			  			if(registroConCriterioConsulta.getConector().equalsIgnoreCase("Y"))
+							operador = " AND ";
+			  			else if (registroConCriterioConsulta.getConector().equalsIgnoreCase("O"))
+							operador = " OR ";
+			  		}
+			  		
+
+		  			
+		  		} else {
+			  		if (registroConCriterioConsulta.getConector()!=null&&(cont>0)){
+			  			if(registroConCriterioConsulta.getConector().equalsIgnoreCase("Y"))
+							operador = " AND ";
+			  			else if (registroConCriterioConsulta.getConector().equalsIgnoreCase("O"))
+							operador = " OR ";
+			  		}
+			  		if (operador.equalsIgnoreCase("")&&cont>0)operador=" AND ";
+			  		
+			  		resultado += " " + operador + " " + abrirPar + " " + registroConCriterioConsulta.getNombrereal() + " ";
+			  		
+			  		String operacion = registroConCriterioConsulta.getSimbolo();
+			  		if (operacion.trim().equalsIgnoreCase("is null")) {
+			  		    String valor = registroConCriterioConsulta.getValor();
+			  		    resultado += operacion;
+//			  		    if (valor.trim().equalsIgnoreCase("1")||valor.trim().equalsIgnoreCase("'1'"))
+//			  		      resultado += operacion;
+//			  		    if (valor.trim().equalsIgnoreCase("0")||valor.trim().equalsIgnoreCase("'0'"))
+//			  		      resultado += " is not null ";
+			  		}
+			  		else {
+			  		    resultado += operacion + " " + registroConCriterioConsulta.getValor() + " ";
+			  		}
+			  		resultado += cerrarPar + " "; 
+		  		}
+		  	}
+	  	}catch(Exception e){
+	  		throw new Exception ("Error en getWhereVariable()");
+	  	}
+
+	  	//devolvemos el resultado 
+	  	return resultado;
+	}
+	
+	public static String getCriteriosJoin (List<String> nombreTablas) throws Exception{
+	  	
+	  	// Variable con el resultado final 
+	  	String resultado="";
+	  	try{
+
+	  		// para saber si se ha incluido ya la primera cláusula del where 
+	  		// para incluir "AND" antes de la siguiente, o para añadir la consulta por defecto.
+		  	boolean hayPrimero = false;
+		  	
+		  	// COMPROBAMOS LA TABLA CEN_CLIENTE con CEN_PERSONA
+		  	if (nombreTablas.contains("CEN_CLIENTE") && nombreTablas.contains("CEN_PERSONA"))
+		  		resultado += " CEN_CLIENTE.IDPERSONA = CEN_PERSONA.IDPERSONA ";
+		  	// comprobamos si ya se han insertado los primeros campos
+		  	if(!resultado.equals("")) hayPrimero=true; 
+		  	
+		  	//COMPROBAMOS LA TABLA CEN_CLIENTE con CEN_COLEGIADO
+		  	if(nombreTablas.contains("CEN_CLIENTE") && nombreTablas.contains("CEN_COLEGIADO")){
+		  		resultado += (hayPrimero?" AND ":" ")+ "CEN_CLIENTE.IDPERSONA = CEN_COLEGIADO.IDPERSONA(+) ";
+		  		resultado += " AND CEN_CLIENTE.IDINSTITUCION  =  CEN_COLEGIADO.IDINSTITUCION(+) ";
+		  	}
+		  	if(!resultado.equals("")) hayPrimero=true; 
+		  	
+//		  	// COMPROBAMOS LA TABLA CEN_COLEGIADO con CEN_PERSONA
+		  	if (!nombreTablas.contains("CEN_CLIENTE")){//  hacemos join de las tablas cen_colegiado y cen_persona 
+		  		                                                // siempre que no exista join entre cen_cliente y cen_colegiado
+			  	if(nombreTablas.contains("CEN_COLEGIADO") && nombreTablas.contains("CEN_PERSONA")){
+			  		resultado += (hayPrimero?" AND ":" ")+"CEN_COLEGIADO.IDPERSONA(+) = CEN_PERSONA.IDPERSONA ";
+			  	}
+			  	if(!resultado.equals("")) hayPrimero=true; 
+		  	}
+
+	  	} catch(Exception e) {
+	  		throw new Exception ("Error en ConsultasServiceImpl.getCriteriosJoin()");
+	  	}
+	  	return resultado;
+	}
+	
+	 public static String getQueryPorDefecto () throws Exception{
+		  	
+		  	//devuelve una consulta por defecto
+		  	String consulta = "SELECT CEN_CLIENTE.IDINSTITUCION, CEN_CLIENTE.IDPERSONA FROM CEN_CLIENTE WHERE CEN_CLIENTE.IDINSTITUCION = @IDINSTITUCION@ AND CEN_CLIENTE.IDPERSONA = @IDPERSONA@";
+		  	
+		  	return consulta;
+	 }
+	 
+	//FINAL CONVERTIR DATOS CON_CRITERIOCONSULTA A QUERY NECESARIA PARA CON_CONSULTA Y PYS_SERVICIOSINSTITUCION
+
+	//INICIO METODOS CONVERTIR SQL A OBJETO ENTENDIBLE PARA SU INSERCION EN CON_CRITERIOCONSULTA 
+    public void extraeCriterio(String consulta, String delimitador) {
+        if (delimitador!=null) {
+                      consulta = consulta.replaceFirst(delimitador, "");
+        }
+        int posicionAnd = consulta.indexOf("AND");
+        int posicionOr = consulta.indexOf("OR");
+        int posicionProxima = 0;
+        String proximoDelimitador = null;
+        //buscamos el fin del criterio, si es AND, si es OR o si no hay nada más
+        if (posicionAnd!=-1 && posicionOr!=-1) {
+                      if (posicionAnd < posicionOr) {
+                                     proximoDelimitador = "AND";
+                                     posicionProxima = posicionAnd;
+                      }else {
+                                     proximoDelimitador = "OR";
+                                     posicionProxima = posicionOr;
+                      }
+        }else if (posicionAnd!=-1 && posicionOr==-1) {
+                      proximoDelimitador = "AND";
+                      posicionProxima = posicionAnd;
+        }else if (posicionAnd==-1 && posicionOr!=-1) {
+                      proximoDelimitador = "OR";
+                      posicionProxima = posicionOr;
+        }
+
+        if (proximoDelimitador!=null) {
+                      
+                      String subcadena = consulta.substring(0, posicionProxima);
+                      System.out.println("la subcadena a almacenar es:"+subcadena+"*");
+                      
+                      creaObjetoCriterio(subcadena, delimitador);
+                      
+                      String cadenaActual = consulta.substring( posicionProxima);
+                      extraeCriterio(cadenaActual, proximoDelimitador);
+                      
+        }else {
+                      System.out.println("la subcadena es la ultima:"+consulta+"*");
+                      
+                      creaObjetoCriterio(consulta, delimitador);
+        }
+    }
+    
+    private static void creaObjetoCriterio (String cadena, String delimitador) {
+        
+        Criterio cri = new Criterio();
+        cri.setOperador(delimitador);
+        cri.setAbrirParentesis(cadena.contains("("));
+        cri.setCerrarParentesis(cadena.contains(")"));
+        cri.setFiltro(cadena.replace("(", "").replace(")", ""));
+        
+        if(cri.getFiltro() != null && !cri.getFiltro().equals("")) {
+	        if(cri.getFiltro().charAt(0) == ' '){
+	            cri.setFiltro(cri.getFiltro().substring(1));
+	        }
+        }
+        
+        cri.setOrden(contador);
+        
+        criterioLst.add(cri);
+        
+        System.out.println(cri.toString());
+        
+        contador++;
+    }
+
+    public List<Integer> findWord(String textString, String word) {
+        List<Integer> indexes = new ArrayList<Integer>();
+        String lowerCaseTextString = textString.toLowerCase();
+        String lowerCaseWord = word.toLowerCase();
+
+        int index = 0;
+        while(index != -1){
+            index = lowerCaseTextString.indexOf(lowerCaseWord, index);
+            if (index != -1) {
+                indexes.add(index);
+                index++;
+            }
+        }
+        return indexes;
+    }
+    
+    public String eliminarParentesisOperadorLike(String consulta, List<Integer> listIndicesLike){
+    	StringBuilder stringBuilder = new StringBuilder(consulta);
+    	
+    	for(int i = 0; i < listIndicesLike.size(); i++) {
+    		//Encontrar indice parentesis ( post LIKE
+    		int posicionPrimerParentesis = stringBuilder.indexOf("(", listIndicesLike.get(i));    		
+    		    	
+    		stringBuilder.deleteCharAt(posicionPrimerParentesis);
+    		//Encontrar indice parentesis ) post LIKE
+    		int posicionSegundoParentesis = stringBuilder.indexOf(")", listIndicesLike.get(i));
+    		stringBuilder.deleteCharAt(posicionSegundoParentesis);
+    	}
+  
+    	return stringBuilder.toString();	
+    }
+  //FIN METODOS CONVERTIR SQL A OBJETO ENTENDIBLE PARA SU INSERCION EN CON_CRITERIOCONSULTA 
+
+	
+	
+	@Override
+	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta, String idInstitucion) {
+		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
+		Error error = new Error();
+		
+		LOGGER.info("obtenerDatosConsulta() -> Entrada al servicio para precargar la consulta ya existente en el constructor de consultas");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionLog = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucionLog);
+			
+
+				LOGGER.info(
+						"obtenerDatosConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				
+
+				LOGGER.info(
+						"obtenerDatosConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"obtenerDatosConsulta() / ConConsultasExtendsMapper.obtenerDatosConsulta() -> Entrada a ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					
+					List<ConstructorConsultasItem> constructorDeConsultasList = _conConsultasExtendsMapper.obtenerDatosConsulta(idioma, Short.valueOf(idInstitucion), idConsulta);
+					
+					String consulta = "";
+					if (constructorDeConsultasList != null && constructorDeConsultasList.size() > 0) {
+						for (ConstructorConsultasItem constructorConsultasItem : constructorDeConsultasList) {
+							//CONECTOR
+							if(constructorConsultasItem.getConector() != null) {
+								if(constructorConsultasItem.getConector().equals("Y")  || constructorConsultasItem.getConector().equals("AND")) {
+									consulta = consulta + " AND ";						 
+								}else if(constructorConsultasItem.getConector().equals("O")  || constructorConsultasItem.getConector().equals("OR")) {
+									consulta = consulta + " OR ";
+								}
+							}
+							
+							//ABRIRPAR
+							if(constructorConsultasItem.getAbrirparentesis() != null) {
+								if(constructorConsultasItem.getAbrirparentesis().equals("1")) {
+									consulta = consulta + "(";						 
+								}
+							}
+							
+							//NOMBREENCONSULTA
+//							if(constructorConsultasItem.getCampo().contains(" ")) {
+//								constructorConsultasItem.setCampo("'" + constructorConsultasItem.getCampo() + "'");
+//							}
+//							
+//							consulta = consulta + constructorConsultasItem.getCampo();
+							
+							//IDCAMPO
+							consulta = consulta + "A" + constructorConsultasItem.getIdcampo();
+							
+							//SIMBOLO
+							consulta = consulta + " " + constructorConsultasItem.getSimbolo().toUpperCase();
+							
+							//VALOR
+							if(constructorConsultasItem.getValor() != null) {
+								
+								if(constructorConsultasItem.getSimbolo().toUpperCase().equals("LIKE")) {
+									consulta = consulta + " (%" + constructorConsultasItem.getValor() + "%)";
+								}else{
+									consulta = consulta + " " + constructorConsultasItem.getValor();
+								}
+						
+							}
+							
+							//CERRARPAR
+							if(constructorConsultasItem.getCerrarparentesis() != null) {
+								if(constructorConsultasItem.getCerrarparentesis().equals("1")) {
+									consulta = consulta + ")";						 
+								}
+							}
+							
+						}
+					}
+					
+					constructorConsultasDTO.setConsulta(consulta);
+
+					if (constructorDeConsultasList != null && constructorDeConsultasList.size() > 0) {
+						constructorConsultasDTO.setConstructorConsultasItem(constructorDeConsultasList);
+					}
+					
+					
+
+					LOGGER.info(
+							"obtenerDatosConsulta() / ConConsultasExtendsMapper.obtenerDatosConsulta() -> Salida de ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas");
+
+				}
+			}
+			
+		} catch (Exception e) {
+			LOGGER.error(
+					"ConsultasServiceImpl.obtenerDatosConsulta() -> Se ha producido un error al obtener los datos de la consulta necesarios para precargarla en el constructor de datos",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			constructorConsultasDTO.setError(error);
+		}
+
+		
+		LOGGER.info("obtenerDatosConsulta() -> Salida del servicio para obtener los datos de la consulta necesarios para precargarla en el constructor de datos");
+
+		return constructorConsultasDTO;
+	}
+
+	@Override
+	public ConfigColumnasQueryBuilderDTO obtenerConfigColumnasQueryBuilder(HttpServletRequest request) {
+		ConfigColumnasQueryBuilderDTO configColumnasQueryBuilderDTO = new ConfigColumnasQueryBuilderDTO();
+		Error error = new Error();
+
+		LOGGER.info("obtenerConfigColumnasQueryBuilder() -> Entrada al servicio para recuperar la configuracion de las columnas del query builder");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"obtenerConfigColumnasQueryBuilder() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"obtenerConfigColumnasQueryBuilder() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"obtenerConfigColumnasQueryBuilder() / ConConsultasExtendsMapper.obtenerConfigColumnasQueryBuilder() -> Entrada a ConConsultasExtendsMapper para obtener la configuracion de las columnas del query builder");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ConfigColumnasQueryBuilderItem> listaConfigColumnasQueryBuilderItem = _conConsultasExtendsMapper.obtenerConfigColumnasQueryBuilder();
+
+					LOGGER.info(
+							"obtenerConfigColumnasQueryBuilder() / ConConsultasExtendsMapper.obtenerConfigColumnasQueryBuilder() -> Salida de ConConsultasExtendsMapper para obtener la configuracion de las columnas del query builder");
+
+					
+					if (listaConfigColumnasQueryBuilderItem != null && listaConfigColumnasQueryBuilderItem.size() > 0) {
+						configColumnasQueryBuilderDTO.setConfigColumnasQueryBuilderItem(listaConfigColumnasQueryBuilderItem);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ConsultasServiceImpl.obtenerConfigColumnasQueryBuilder() -> Se ha producido un error al obtener la configuracion de las columnas del query builder",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			configColumnasQueryBuilderDTO.setError(error);
+		}
+
+		LOGGER.info("obtenerConfigColumnasQueryBuilder() -> Salida del servicio para obtener la configuracion de las columnas del query builder");
+
+		return configColumnasQueryBuilderDTO;
+	}
+	
+	@Override
+	public ComboDTO obtenerCombosQueryBuilder(HttpServletRequest request, ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem) {
+		LOGGER.info(
+				"obtenerCombosQueryBuilder() -> Entrada al servicio para obtener el combo de la columna seleccionada en el constructor de consultas");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			String idioma = usuarios.get(0).getIdlenguaje();
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				comboItems = _conConsultasExtendsMapper.obtenerCombosQueryBuilder(configColumnasQueryBuilderItem, idioma, idInstitucion);
+
+				comboDTO.setCombooItems(comboItems);
+
+			}
+		}
+
+		LOGGER.info("obtenerCombosQueryBuilder() -> Salida del servicio para obtener el combo de la columna seleccionada en el constructor de consultas");
+
+		return comboDTO;
+	}
+
+	@Override
+	public String procesarEjecutarConsultaImprimir(AdmUsuarios usuario, String sentencia, String sentenciaImprimir, List<List<String>> listaKeyFiltros) {
+		if(sentencia.contains("%%IN%%")) {
+			sentencia = sentencia.replace("%%IN%%", "IN");
+		}
+		
+		if(sentencia.contains("%%BUSQUEDA%%") && sentenciaImprimir != null) {
+			sentencia = sentencia.replace("%%BUSQUEDA%%", "(" + sentenciaImprimir + ")");
+		}else if(sentencia.contains("%%BUSQUEDA%%") && sentenciaImprimir == null && listaKeyFiltros != null && listaKeyFiltros.size() > 0 ) {
+			sentencia = sentencia.replace("%%BUSQUEDA%%", convertirListaAnidadaEnCadena(listaKeyFiltros));
+		}
+		LOGGER.info(sentencia);
+		return sentencia;
+	}
+	
+	private String convertirListaAnidadaEnCadena(List<List<String>> listaKeyFiltros) {
+        StringBuilder resultado = new StringBuilder("(");
+
+        for (int i = 0; i < listaKeyFiltros.size(); i++) {
+            List<String> subLista = listaKeyFiltros.get(i);
+            resultado.append("(");
+
+            for (int j = 0; j < subLista.size(); j++) {
+                resultado.append(subLista.get(j));
+                if (j < subLista.size() - 1) {
+                    resultado.append(",");
+                }
+            }
+
+            resultado.append(")");
+            if (i < listaKeyFiltros.size() - 1) {
+                resultado.append(", ");
+            }
+        }
+
+        resultado.append(")");
+        return resultado.toString();
+    }
+	
 }

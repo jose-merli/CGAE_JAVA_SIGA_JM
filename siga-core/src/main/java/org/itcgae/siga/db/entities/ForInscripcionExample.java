@@ -1123,122 +1123,98 @@ public class ForInscripcionExample {
 			addCriterion("IDPETICIONSUSCRIPCION not between", value1, value2, "idpeticionsuscripcion");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoIsNull() {
 			addCriterion("IDFORMAPAGO is null");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoIsNotNull() {
 			addCriterion("IDFORMAPAGO is not null");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoEqualTo(Long value) {
 			addCriterion("IDFORMAPAGO =", value, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoNotEqualTo(Long value) {
 			addCriterion("IDFORMAPAGO <>", value, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoGreaterThan(Long value) {
 			addCriterion("IDFORMAPAGO >", value, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoGreaterThanOrEqualTo(Long value) {
 			addCriterion("IDFORMAPAGO >=", value, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoLessThan(Long value) {
 			addCriterion("IDFORMAPAGO <", value, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoLessThanOrEqualTo(Long value) {
 			addCriterion("IDFORMAPAGO <=", value, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoIn(List<Long> values) {
 			addCriterion("IDFORMAPAGO in", values, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoNotIn(List<Long> values) {
 			addCriterion("IDFORMAPAGO not in", values, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoBetween(Long value1, Long value2) {
 			addCriterion("IDFORMAPAGO between", value1, value2, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdformapagoNotBetween(Long value1, Long value2) {
 			addCriterion("IDFORMAPAGO not between", value1, value2, "idformapago");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteIsNull() {
 			addCriterion("IDFICHEROCOMPROBANTE is null");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteIsNotNull() {
 			addCriterion("IDFICHEROCOMPROBANTE is not null");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteEqualTo(Long value) {
 			addCriterion("IDFICHEROCOMPROBANTE =", value, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteNotEqualTo(Long value) {
 			addCriterion("IDFICHEROCOMPROBANTE <>", value, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteGreaterThan(Long value) {
 			addCriterion("IDFICHEROCOMPROBANTE >", value, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteGreaterThanOrEqualTo(Long value) {
 			addCriterion("IDFICHEROCOMPROBANTE >=", value, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteLessThan(Long value) {
 			addCriterion("IDFICHEROCOMPROBANTE <", value, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteLessThanOrEqualTo(Long value) {
 			addCriterion("IDFICHEROCOMPROBANTE <=", value, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteIn(List<Long> values) {
 			addCriterion("IDFICHEROCOMPROBANTE in", values, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteNotIn(List<Long> values) {
 			addCriterion("IDFICHEROCOMPROBANTE not in", values, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteBetween(Long value1, Long value2) {
 			addCriterion("IDFICHEROCOMPROBANTE between", value1, value2, "idficherocomprobante");
 			return (Criteria) this;
 		}
-
 		public Criteria andIdficherocomprobanteNotBetween(Long value1, Long value2) {
 			addCriterion("IDFICHEROCOMPROBANTE not between", value1, value2, "idficherocomprobante");
 			return (Criteria) this;

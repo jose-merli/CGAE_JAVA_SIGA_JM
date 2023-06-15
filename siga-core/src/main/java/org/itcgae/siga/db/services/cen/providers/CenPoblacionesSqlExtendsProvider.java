@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.CenPoblacionesSqlProvider;
 
 public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
@@ -23,21 +24,27 @@ public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
 		
 		SQL sql = new SQL();
 
-		sql.SELECT("IDPOBLACION");
-		sql.SELECT("NOMBRE");
-		sql.SELECT("IDPROVINCIA");
-		sql.SELECT("FECHAMODIFICACION");
-		sql.SELECT("USUMODIFICACION");
-		sql.SELECT("IDPARTIDO");
-		sql.SELECT("CODIGOEXT");
-		sql.SELECT("INE");
-		sql.SELECT("IDPOBLACIONMUNICIPIO");
-		sql.SELECT("PRIORIDAD");	
+		sql.SELECT_DISTINCT("poblacion.IDPOBLACION");
+		sql.SELECT("poblacion.NOMBRE");
+		sql.SELECT("poblacion.IDPROVINCIA");
+		sql.SELECT("poblacion.FECHAMODIFICACION");
+		sql.SELECT("poblacion.USUMODIFICACION");
+		sql.SELECT("poblacion.IDPARTIDO");
+		sql.SELECT("poblacion.CODIGOEXT");
+		sql.SELECT("poblacion.INE");
+		sql.SELECT("poblacion.IDPOBLACIONMUNICIPIO");
+		sql.SELECT("poblacion.PRIORIDAD");	
 		
-		sql.FROM("CEN_POBLACIONES");
-		sql.WHERE("IDPROVINCIA ='" + idProvincia + "'");
-		sql.WHERE(filtroTextoBusquedas("NOMBRE", filtro));
-		sql.ORDER_BY("NOMBRE");
+		sql.FROM("CEN_POBLACIONES poblacion");
+		//sql.FROM("scs_juzgado juzgado");
+		
+		if(!UtilidadesString.esCadenaVacia(idProvincia)) {
+			sql.WHERE("poblacion.IDPROVINCIA ='" + idProvincia + "'");
+		}
+		if(!filtro.equals("-1")) {
+			sql.WHERE(filtroTextoBusquedas("poblacion.NOMBRE", filtro));
+		}
+		sql.ORDER_BY("PRIORIDAD, NOMBRE");
 
 		return sql.toString();
 		

@@ -65,7 +65,7 @@ import org.itcgae.siga.db.services.form.mappers.ForCertificadoscursoExtendsMappe
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
-import org.itcgae.siga.db.services.form.mappers.PysPeticioncomprasuscripcionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysProductossolicitadosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosinstitucionExtendsMapper;

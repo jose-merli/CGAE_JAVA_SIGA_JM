@@ -4,20 +4,24 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.NuevaComunicacionItem;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IComunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/comunicaciones")
@@ -105,13 +110,24 @@ public class ComunicacionesController {
     		e.printStackTrace();    
 		}	  
 		headers = new HttpHeaders();
-		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		headers.add("Pragma", "no-cache");
-		headers.add("Expires", "0");
-		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+//		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+//		headers.add("Pragma", "no-cache");
+//		headers.add("Expires", "0");
+//		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+        headers.set("Content-Disposition",
+                "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+        headers.setContentLength(file.length());
 		System.out.println("The length of the file is : "+file.length());
 		  
-		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+		if(file != null) {
+			return new ResponseEntity<InputStreamResource>(resource, headers,
+                HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<InputStreamResource>(resource, headers,
+	                HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		//return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
     }
 	
 	@RequestMapping(value="/detalle/descargarCertificado", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -142,4 +158,12 @@ public class ComunicacionesController {
 		
 		return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.OK);
     }	
+	
+	@RequestMapping(value = "/saveNuevaComm",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveNuevaComm(MultipartHttpServletRequest request) throws SigaExceptions, NumberFormatException, IOException, Exception {
+		
+		InsertResponseDTO response = _comunicacionesService.saveNuevaComm(request);
+
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
 }

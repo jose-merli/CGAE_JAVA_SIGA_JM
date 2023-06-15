@@ -12,6 +12,7 @@ public class TarjetaModeloConfiguracionDTO {
 	private String visible;
 	private String idPlantillaEnvio;
 	private String idTipoEnvio;
+	private String informeUnico;
 	
 	public String getVisible() {
 		return visible;
@@ -72,6 +73,12 @@ public class TarjetaModeloConfiguracionDTO {
 	}
 	public void setIdTipoEnvio(String idTipoEnvio) {
 		this.idTipoEnvio = idTipoEnvio;
+	}
+	public String getInformeUnico() {
+		return informeUnico;
+	}
+	public void setInformeUnico(String informeUnico) {
+		this.informeUnico = informeUnico;
 	}
 	
 	

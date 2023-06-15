@@ -24,4 +24,5 @@ public interface CenInfluenciaExtendsMapper extends CenInfluenciaMapper {
 	})
 	List<ComboItem> getJudicialDistrict(String idInstitucion);
 	
+			
 }

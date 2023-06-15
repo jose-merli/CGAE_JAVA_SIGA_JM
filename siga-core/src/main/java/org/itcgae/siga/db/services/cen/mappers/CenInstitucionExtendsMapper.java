@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.CenInstitucionExt;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.services.cen.providers.CenInstitucionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -86,7 +87,7 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
 		 		@Result(column = "ABREVIATURA", property = "label", jdbcType = JdbcType.VARCHAR)
 			})
-	List<ComboItem> comboColegiosModelo(Short idInstitucionUser); 
+	List<ComboItem> comboColegiosModelo(Short idInstitucionUser);
 	
 	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getComboInstitucionesCol")
 	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
@@ -94,5 +95,32 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 			})
 	List<ComboItem> getComboInstitucionesCol(String idInstitucion); 
 	
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getComboInstitucionesNombre")
+	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
+		 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
+			})
+	List<ComboItem> getComboInstitucionesNombre(); 
 	
+
+	@Select({ "select ins.IDINSTITUCION, col.codigoext as CODIGOEXTCOLEGIO from cen_institucion ins ",
+			 " inner join cen_institucion col on ins.cen_inst_idinstitucion = col.IDINSTITUCION" })
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "CODIGOEXTCOLEGIO", property = "codigoExtColegio", jdbcType = JdbcType.VARCHAR)
+		})
+	List<CenInstitucionExt> getInstitucionesConColegios();
+
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "isConsejo")
+	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> isConsejo(String idInstitucion);
+
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getInstitucionesConsejo")
+	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getInstitucionesConsejo(String idInstitucion);
+
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getInstitucionByGrupo")
+	List<CenInstitucion> getInstitucionByGrupo(Short idInstitucion, String codigoGrupo);
 }

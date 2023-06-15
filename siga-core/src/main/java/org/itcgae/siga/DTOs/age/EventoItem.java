@@ -12,6 +12,7 @@ public class EventoItem {
 	private Short idInstitucion;
 	private String titulo;
 	private Date fechaInicio;
+	private Date fechaInicioOld;
 	private Date fechaFin;
 	private Date realEnd;
 	private boolean allDay = false;
@@ -19,6 +20,7 @@ public class EventoItem {
 	private Long tipoAcceso;
 	private String lugar;
 	private String descripcion;
+	private String descripcionOld;
 	private String recursos;
 	private String idEstadoEvento;
 	private String idTipoEvento;
@@ -49,6 +51,11 @@ public class EventoItem {
 	private String tipoCalendario;
 	private String tipoEvento;
 	private String fechaInicioString;
+	
+	private String fiestaLocalPartido;
+	private String anio;
+	private boolean historico;
+	private String nombre;
 	
 	
 	/**
@@ -129,6 +136,22 @@ public class EventoItem {
 
 	public void setFechaInicio(Date fechaInicio) {
 		this.fechaInicio = fechaInicio;
+	}
+	
+	/**
+	 **/
+	public EventoItem fechaInicioOld(Date fechaInicioOld) {
+		this.fechaInicioOld = fechaInicioOld;
+		return this;
+	}
+
+	@JsonProperty("fechaInicioOld")
+	public Date getFechaInicioOld() {
+		return fechaInicioOld;
+	}
+
+	public void setFechaInicioOld(Date fechaInicioOld) {
+		this.fechaInicioOld = fechaInicioOld;
 	}
 
 	/**
@@ -211,6 +234,30 @@ public class EventoItem {
 		this.descripcion = descripcion;
 	}
 	
+	/**
+	 **/
+	public EventoItem descripcionOld(String descripcionOld) {
+		this.descripcionOld = descripcionOld;
+		return this;
+	}
+
+	@JsonProperty("descripcionOld")
+	public String getDescripcionOld() {
+		return descripcionOld;
+	}
+
+	public void setDescripcionOld(String descripcionOld) {
+		this.descripcionOld = descripcionOld;
+	}
+	
+	/**
+	 **/
+	public EventoItem tipoAcceso(Long tipoAcceso) {
+		this.tipoAcceso = tipoAcceso;
+		return this;
+	}
+
+	@JsonProperty("tipoAcceso")
 	public Long getTipoAcceso() {
 		return tipoAcceso;
 	}
@@ -590,6 +637,45 @@ public class EventoItem {
 		this.idEventoOriginal = idEventoOriginal;
 	}
 
+	/**
+	 **/
+	public EventoItem fiestaLocalPartido(String fiestaLocalPartido) {
+		this.fiestaLocalPartido = fiestaLocalPartido;
+		return this;
+	}
+
+	@JsonProperty("fiestaLocalPartido")	
+	public String getFiestaLocalPartido() {
+		return fiestaLocalPartido;
+	}
+
+	public void setFiestaLocalPartido(String fiestaLocalPartido) {
+		this.fiestaLocalPartido = fiestaLocalPartido;
+	}
+	
+	/**
+	 **/
+	public EventoItem realEnd(Date realEnd) {
+		this.realEnd = realEnd;
+		return this;
+	}
+	
+	/**
+	 **/
+	public EventoItem nombre(String nombre) {
+		this.nombre = nombre;
+		return this;
+	}
+
+	@JsonProperty("nombre")
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
 	@Override
 	public String toString() {
 		return "EventoItem [idEvento=" + idEvento + ", idCalendario=" + idCalendario + ", idInstitucion="
@@ -603,9 +689,10 @@ public class EventoItem {
 				+ ", tipoDiasRepeticion=" + tipoDiasRepeticion + ", tipoRepeticion=" + tipoRepeticion
 				+ ", fechaInicioRepeticion=" + fechaInicioRepeticion + ", fechaFinRepeticion=" + fechaFinRepeticion
 				+ ", idPartidoJudicial=" + idPartidoJudicial + ", idCurso=" + idCurso + ", estadoEvento=" + estadoEvento
-				+ ", fechaHoraInicio=" + fechaHoraInicio + ", fechaHoraFin=" + fechaHoraFin + ", formadores="
+				+ ", fechaHoraInicio=" + fechaHoraInicio + ", fechaInicioOld=" + fechaInicioOld + ", fechaHoraFin=" + fechaHoraFin + ", formadores="
 				+ formadores + " , tipoCalendario=" + tipoCalendario + " , tipoEvento=" + tipoEvento + " , fechaInicioString=" + fechaInicioString 
-				+ " , idEventoOriginal=" + idEventoOriginal + "]";
+				+ " , idEventoOriginal=" + idEventoOriginal + " , fiestaLocalPartido=" + fiestaLocalPartido
+				+ " , anio=" + anio  + " , historico=" + historico + " , nombre=" + nombre + " , descripcionOld=" + descripcionOld +"]";
 	}
 
 	@Override
@@ -622,6 +709,7 @@ public class EventoItem {
 		result = prime * result + ((fechaHoraFin == null) ? 0 : fechaHoraFin.hashCode());
 		result = prime * result + ((fechaHoraInicio == null) ? 0 : fechaHoraInicio.hashCode());
 		result = prime * result + ((fechaInicio == null) ? 0 : fechaInicio.hashCode());
+		result = prime * result + ((fechaInicioOld == null) ? 0 : fechaInicioOld.hashCode());
 		result = prime * result + ((fechaInicioRepeticion == null) ? 0 : fechaInicioRepeticion.hashCode());
 		result = prime * result + ((fechaModificacion == null) ? 0 : fechaModificacion.hashCode());
 		result = prime * result + ((formadores == null) ? 0 : formadores.hashCode());
@@ -648,6 +736,13 @@ public class EventoItem {
 		result = prime * result + Arrays.hashCode(valoresRepeticion);
 		result = prime * result + ((valoresRepeticionString == null) ? 0 : valoresRepeticionString.hashCode());
 		result = prime * result + ((idEventoOriginal == null) ? 0 : idEventoOriginal.hashCode());
+		result = prime * result + ((fiestaLocalPartido == null) ? 0 : fiestaLocalPartido.hashCode());
+		result = prime * result + ((anio == null) ? 0 : anio.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((descripcionOld == null) ? 0 : descripcionOld.hashCode());
+		result = prime * result + ((!historico) ? 0 : 1);
+
+		
 		return result;
 	}
 
@@ -706,6 +801,11 @@ public class EventoItem {
 			if (other.fechaInicio != null)
 				return false;
 		} else if (!fechaInicio.equals(other.fechaInicio))
+			return false;
+		if (fechaInicioOld == null) {
+			if (other.fechaInicioOld != null)
+				return false;
+		} else if (!fechaInicioOld.equals(other.fechaInicioOld))
 			return false;
 		if (fechaInicioRepeticion == null) {
 			if (other.fechaInicioRepeticion != null)
@@ -834,13 +934,28 @@ public class EventoItem {
 				return false;
 		} else if (!idEventoOriginal.equals(other.idEventoOriginal))
 			return false;
+		if (fiestaLocalPartido == null) {
+			if (other.fiestaLocalPartido != null)
+				return false;
+		} else if (!fiestaLocalPartido.equals(other.fiestaLocalPartido))
+			return false;
+		if (anio == null) {
+			if (other.anio != null)
+				return false;
+		} else if (!anio.equals(other.anio))
+			return false;
+		if (nombre == null) {
+			if (other.nombre != null)
+				return false;
+		} else if (!nombre.equals(other.nombre))
+			return false;
+		if (descripcionOld == null) {
+			if (other.descripcionOld != null)
+				return false;
+		} else if (!descripcionOld.equals(other.descripcionOld))
+			return false;
 		return true;
 	}
-
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
 	private String toIndentedString(java.lang.Object o) {
 		if (o == null) {
 			return "null";
@@ -854,6 +969,34 @@ public class EventoItem {
 
 	public void setRealEnd(Date realEnd) {
 		this.realEnd = realEnd;
+	}
+	
+	public EventoItem historico(boolean historico) {
+		this.historico = historico;
+		return this;
+	}
+
+	@JsonProperty("historico")
+	public boolean isHistorico() {
+		return historico;
+	}
+
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
+	}
+	
+	public EventoItem anio(String anio) {
+		this.anio = anio;
+		return this;
+	}
+
+	@JsonProperty("anio")	
+	public String getAnio() {
+		return anio;
+	}
+
+	public void setAnio(String anio) {
+		this.anio = anio;
 	}
 	
 }

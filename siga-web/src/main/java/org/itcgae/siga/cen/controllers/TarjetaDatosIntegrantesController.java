@@ -2,11 +2,17 @@ package org.itcgae.siga.cen.controllers;
 
 
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosLiquidacionIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosLiquidacionIntegrantesSearchItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesDeleteDTO;
@@ -94,9 +100,28 @@ public class TarjetaDatosIntegrantesController {
 			return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "tarjetaIntegrantes/listadoHistoricoLiquidacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DatosLiquidacionIntegrantesSearchDTO> listadoHistoricoLiquidacion(@RequestBody DatosLiquidacionIntegrantesSearchItem datosLiquidacion, HttpServletRequest request) { 
+		DatosLiquidacionIntegrantesSearchDTO response = tarjetaDatosIntegrantesService.listadoHistoricoLiquidacion(datosLiquidacion, request);
+			return new ResponseEntity<DatosLiquidacionIntegrantesSearchDTO>(response, HttpStatus.OK);
+	}
+	
+		@RequestMapping(value = "tarjetaIntegrantes/eliminarLiquidacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<DeleteResponseDTO> eliminarLiquidacion(@RequestBody List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacionDTO, HttpServletRequest request) { 
+			DeleteResponseDTO response = tarjetaDatosIntegrantesService.eliminarLiquidacion(datosLiquidacionDTO, request);
+				return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		}
+	
+		@RequestMapping(value = "tarjetaIntegrantes/insertHistoricoLiquidacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<InsertResponseDTO> insertHistoricoLiquidacion(@RequestBody List<DatosLiquidacionIntegrantesSearchItem> datosLiquidacionDTO, HttpServletRequest request) { 
+			InsertResponseDTO response = tarjetaDatosIntegrantesService.insertHistoricoLiquidacion(datosLiquidacionDTO, request);
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		}
 	
 	
-	
-	
-
+		@RequestMapping(value = "tarjetaIntegrantes/buscarPagosColegiados", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<Boolean> buscarPagosColegiados(@RequestBody DatosLiquidacionIntegrantesSearchItem datosLiquidacionDTO, HttpServletRequest request) { 
+			Boolean response = tarjetaDatosIntegrantesService.buscarPagosColegiados(datosLiquidacionDTO, request);
+				return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+		}
 }

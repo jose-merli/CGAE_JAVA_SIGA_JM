@@ -144,8 +144,8 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		//sqlPrincipal.FROM(sql.toString());
 		
 		sqlPrincipal.FROM( "(" + sql.toString() + ") DIRECCIONES");
-		
 		sqlPrincipal.ORDER_BY("ordenlist");
+		
 		
 		return sqlPrincipal.toString();
 	}
@@ -274,18 +274,190 @@ public String selectDireccionesSolEsp(String idPersona, String idDireccion,Strin
 	
 	
 	
+	public String getDireccionLetradoSalidaOficio(String idPersona, String idInstitucion) {
+		
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql2.SELECT(" DIR.domicilio DOMICILIO_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.codigopostal CP_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.idpoblacion IDPOBLACION_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.poblacionextranjera POBLACION_DESPACHO_LETRADO ");					
+		sql2.SELECT(" DIR.idprovincia IDPROVINCIA_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.telefono1 TELEFONO1_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.telefono2 TELEFONO2_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.fax1 FAX1_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.fax2 FAX2_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.correoelectronico EMAIL_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.movil MOVIL_DESPACHO_LETRADO");
+		sql2.SELECT(" (SELECT NOMBRE FROM CEN_PROVINCIAS WHERE IDPROVINCIA = DIR.idprovincia) PROVINCIA_DESPACHO_LETRADO");
+		sql2.FROM(" CEN_DIRECCIONES DIR, " +
+				" CEN_DIRECCION_TIPODIRECCION TIP ");
+		sql2.WHERE("dir.idinstitucion = tip.idinstitucion ");
+		sql2.WHERE("dir.idpersona = tip.idpersona  ");
+		sql2.WHERE("dir.iddireccion = tip.iddireccion ");
+		sql2.WHERE("tip.idtipodireccion = 2 ");
+		sql2.WHERE("dir.fechabaja is null ");
+		sql2.WHERE("dir.idinstitucion = " + idInstitucion );
+		sql2.WHERE("dir.idpersona = " + idPersona);
+		sql2.ORDER_BY("dir.fechamodificacion DESC ");
+		sql.SELECT("* FROM ("+ sql2 + ")" );
+		
+		sql.WHERE(" ROWNUM = 1 "); 
+		
+		return sql.toString();
+	}
+	
+	public String getDireccionPersonalSalidaOficio(String idPersona, String idInstitucion) {
+		
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql2.SELECT(" DIR.domicilio DOMICILIO_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.codigopostal CP_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.idpoblacion IDPOBLACION_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.poblacionextranjera POBLACION_GUARDIA_LETRADO ");					
+		sql2.SELECT(" DIR.idprovincia IDPROVINCIA_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.telefono1 TELEFONO1_GUARDIA_LETRADO "); 
+		sql2.SELECT(" DIR.telefono2 TELEFONO2_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.fax1 FAX1_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.fax2 FAX2_GUARDIA_LETRADO "); 
+		sql2.SELECT(" DIR.correoelectronico EMAIL_GUARDIA_LETRADO "); 
+		sql2.SELECT(" DIR.movil MOVIL_GUARDIA_LETRADO");
+		sql2.SELECT(" (SELECT NOMBRE FROM CEN_PROVINCIAS WHERE IDPROVINCIA = DIR.idprovincia) PROVINCIA_GUARDIA_LETRADO");
+		sql2.FROM(" CEN_DIRECCIONES DIR, " +
+				" CEN_DIRECCION_TIPODIRECCION TIP ");
+		sql2.WHERE("dir.idinstitucion = tip.idinstitucion ");
+		sql2.WHERE("dir.idpersona = tip.idpersona  ");
+		sql2.WHERE("dir.iddireccion = tip.iddireccion ");
+		sql2.WHERE("tip.idtipodireccion = 2 ");
+		sql2.WHERE("dir.fechabaja is null ");
+		sql2.WHERE("dir.idinstitucion = " + idInstitucion );
+		sql2.WHERE("dir.idpersona = " + idPersona);
+		sql2.ORDER_BY("dir.fechamodificacion DESC ");
+		
+		sql.SELECT("* FROM ("+ sql2 + ")" );
+		
+		sql.WHERE("  ROWNUM = 1 "); 
+		
+		return sql.toString();
+	}
+	
+	public String getIdProvinciaImpreso190(String idPersona, String idinstitucion, int tipoDireccionFac ) {
+		SQL sql = new SQL();
+		sql.SELECT("IDPROVINCIA");
+		sql.FROM("CEN_DIRECCIONES");
+		sql.WHERE("IDINSTITUCION = "+idinstitucion);
+		sql.WHERE("IDPERSONA = "+idPersona);
+		sql.WHERE("IDDIRECCION = F_SIGA_GETIDDIRECCION_TIPOPREF(" + idinstitucion +","+idPersona+","+ tipoDireccionFac +")");
+		
+		
+		return sql.toString();
+	}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	public String getEntradaDireccionEspecifica(String idPersona, String idInstitucion, String idDireccion) {
+		SQL subQueryPoblacion = new SQL();
+		subQueryPoblacion.SELECT("PO.NOMBRE");
+		subQueryPoblacion.FROM("CEN_POBLACIONES PO");
+		subQueryPoblacion.WHERE("PO.IDPOBLACION = D.IDPOBLACION");
 
+		SQL subQueryProvincia = new SQL();
+		subQueryProvincia.SELECT("PRO.NOMBRE");
+		subQueryProvincia.FROM("CEN_PROVINCIAS PRO");
+		subQueryProvincia.WHERE("PRO.IDPROVINCIA = D.IDPROVINCIA");
+
+		SQL sql = new SQL();
+		sql.SELECT("D.IDPERSONA");
+		sql.SELECT("D.IDINSTITUCION");
+		sql.SELECT("D.IDDIRECCION");
+		sql.SELECT("NVL(D.DOMICILIO, '-') DOMICILIO");
+		sql.SELECT("NVL(D.CODIGOPOSTAL, '-') CODIGOPOSTAL");
+		sql.SELECT("NVL(D.TELEFONO1, '-') TELEFONO1");
+		sql.SELECT("D.TELEFONO2 TELEFONO2");
+		sql.SELECT("D.MOVIL MOVIL");
+		sql.SELECT("D.FAX1");
+		sql.SELECT("D.FAX2");
+		sql.SELECT("NVL(D.CORREOELECTRONICO, '-') CORREOELECTRONICO");
+		sql.SELECT("D.PAGINAWEB");
+		sql.SELECT("D.FECHABAJA");
+		sql.SELECT("D.PREFERENTE");
+		sql.SELECT("D.IDPAIS");
+		sql.SELECT("D.IDPROVINCIA");
+		sql.SELECT("D.IDPOBLACION");
+		sql.SELECT("D.POBLACIONEXTRANJERA");
+		sql.SELECT("D.FECHAMODIFICACION");
+		sql.SELECT("D.USUMODIFICACION");
+		sql.SELECT("(" + subQueryPoblacion + ") POBLACION");
+		sql.SELECT("(" + subQueryProvincia + ") PROVINCIA");
+		sql.FROM("CEN_DIRECCIONES D");
+
+		String innerJoin = "CEN_DIRECCION_TIPODIRECCION TD ON TD.IDINSTITUCION = D.IDINSTITUCION AND TD.IDPERSONA = D.IDPERSONA AND TD.IDDIRECCION = D.IDDIRECCION";
+
+		if (idDireccion != null && !idDireccion.equals("")) {
+			if (new Integer(idDireccion) != null) {
+				innerJoin += " AND TD.IDTIPODIRECCION = " + idDireccion;
+			} else {
+				innerJoin += " UPPER(D.PREFERENTE) LIKE UPPER('%" + idDireccion + "%')";
+			}
+		}
+
+		sql.INNER_JOIN(innerJoin);
+		sql.WHERE("D.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("D.IDPERSONA = " + idPersona);
+		sql.WHERE("D.FECHABAJA IS NULL");
+		sql.WHERE("ROWNUM < 2");
+
+		return sql.toString();
+	}
+
+	public String getDirecciones(Long idPersona, Integer idInstitucion, boolean bIncluirRegistrosConBajaLogica) {
+		SQL sql = new SQL();
+
+		sql.SELECT("CEN_DIRECCIONES.IDINSTITUCION");
+		sql.SELECT("CEN_DIRECCIONES.IDPERSONA");
+		sql.SELECT("CEN_DIRECCIONES.IDDIRECCION");
+		sql.SELECT("CEN_DIRECCIONES.DOMICILIO");
+		sql.SELECT("CEN_DIRECCIONES.CODIGOPOSTAL");
+		sql.SELECT("CEN_DIRECCIONES.TELEFONO1");
+		sql.SELECT("CEN_DIRECCIONES.TELEFONO2");
+		sql.SELECT("CEN_DIRECCIONES.MOVIL");
+		sql.SELECT("CEN_DIRECCIONES.FAX1");
+		sql.SELECT("CEN_DIRECCIONES.FAX2");
+		sql.SELECT("CEN_DIRECCIONES.CORREOELECTRONICO");
+		sql.SELECT("CEN_DIRECCIONES.PAGINAWEB");
+		sql.SELECT("CEN_DIRECCIONES.FECHABAJA");
+		sql.SELECT("CEN_DIRECCIONES.PREFERENTE");
+		sql.SELECT("CEN_DIRECCIONES.IDPAIS AS IDPAISDIREC");
+		sql.SELECT("CEN_DIRECCIONES.IDPROVINCIA");
+		sql.SELECT("CEN_DIRECCIONES.IDPOBLACION");
+		sql.SELECT("CEN_DIRECCIONES.POBLACIONEXTRANJERA");
+		sql.SELECT("CEN_DIRECCIONES.FECHAMODIFICACION");
+		sql.SELECT("CEN_DIRECCIONES.USUMODIFICACION");
+		sql.SELECT("CEN_DIRECCIONES.OTRAPROVINCIA");
+		sql.SELECT("CEN_POBLACIONES.NOMBRE AS POBLACION");
+		sql.SELECT("CEN_PROVINCIAS.NOMBRE AS PROVINCIA");
+		sql.SELECT("F_SIGA_GETRECURSO(CEN_PAIS.NOMBRE, 1) AS NOMBREPAIS");
+		sql.SELECT("CEN_PAIS.IDPAIS AS IDPAIS");
+		sql.SELECT("F_SIGA_GETTIPOSDIRECCION(CEN_DIRECCIONES.IDINSTITUCION, CEN_DIRECCIONES.IDPERSONA, CEN_DIRECCIONES.IDDIRECCION, 1) AS DESCRIPCIONTIPODIRECCION");
+		sql.SELECT("F_SIGA_GET_IDTIPOSDIRECCION(CEN_DIRECCIONES.IDINSTITUCION, CEN_DIRECCIONES.IDPERSONA, CEN_DIRECCIONES.IDDIRECCION) AS IDTIPODIRECCION");
+		sql.SELECT("NVL((SELECT INS.ABREVIATURA FROM CEN_INSTITUCION INS WHERE INS.IDINSTITUCION = CEN_DIRECCIONES.IDINSTITUCIONALTA), '') AS COLEGIOORIGEN");
+
+		sql.FROM("CEN_DIRECCIONES " +
+				"LEFT JOIN CEN_POBLACIONES ON CEN_DIRECCIONES.IDPOBLACION = CEN_POBLACIONES.IDPOBLACION " +
+				"LEFT JOIN CEN_PROVINCIAS ON CEN_DIRECCIONES.IDPROVINCIA = CEN_PROVINCIAS.IDPROVINCIA " +
+				"LEFT JOIN CEN_PAIS ON CEN_DIRECCIONES.IDPAIS = CEN_PAIS.IDPAIS");
+
+		sql.WHERE("CEN_DIRECCIONES.IDPERSONA = " + idPersona);
+		sql.WHERE("CEN_DIRECCIONES.IDINSTITUCION = " + idInstitucion);
+
+		if (!bIncluirRegistrosConBajaLogica) {
+			sql.WHERE("CEN_DIRECCIONES.FECHABAJA IS NULL");
+		}
+
+		sql.ORDER_BY("CEN_DIRECCIONES.IDINSTITUCION");
+		sql.ORDER_BY("CEN_DIRECCIONES.IDPERSONA");
+		sql.ORDER_BY("CEN_DIRECCIONES.IDDIRECCION");
+
+		return sql.toString();
+	}
 }

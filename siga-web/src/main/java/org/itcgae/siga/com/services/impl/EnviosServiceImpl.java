@@ -76,12 +76,13 @@ import org.springframework.stereotype.Component;
 
 import com.ecos.ws.solicitarenvio.SolicitudEnvioSMS;
 
+import org.springframework.stereotype.Service;
 import service.serviciosecos.EnviarSMSDocument;
 import service.serviciosecos.EnviarSMSDocument.EnviarSMS;
 import service.serviciosecos.EnviarSMSResponseDocument;
 import service.serviciosecos.EnviarSMSResponseDocument.EnviarSMSResponse;
 
-@Component
+@Service
 public class EnviosServiceImpl implements IEnviosService{
 
     Logger LOGGER = Logger.getLogger(EnviosServiceImpl.class);    
@@ -355,7 +356,7 @@ public class EnviosServiceImpl implements IEnviosService{
                         
                         insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, "OK");
                     } catch (BusinessException e) {
-                        LOGGER.warn(e);
+                        LOGGER.error(e);
                         idEstadoEnvio = SigaConstants.ENVIO_PROCESADO_CON_ERRORES;
                         insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, e.getMessage());
                     } catch(Exception e) {

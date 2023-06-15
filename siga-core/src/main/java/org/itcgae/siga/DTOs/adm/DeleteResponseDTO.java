@@ -11,6 +11,7 @@ public class DeleteResponseDTO {
 	
 	private String status = new String();
 	private Error error = null;
+	private String id = new String();
 	
 	
 	/**
@@ -88,6 +89,14 @@ public class DeleteResponseDTO {
 			return "null";
 		}
 		return o.toString().replace("\n", "\n    ");
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 	
 	

@@ -53,6 +53,9 @@ public interface IFichaDatosColegialesService {
 
 	public UpdateResponseDTO datosColegialesUpdateMasivo(ColegiadoItemDTO listColegiadoItem,
 			HttpServletRequest request);
+
+	public StringDTO getCuentaContableSJCS(ColegiadoItem colegiadoItem,
+			HttpServletRequest request);
 	
 //	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
 	

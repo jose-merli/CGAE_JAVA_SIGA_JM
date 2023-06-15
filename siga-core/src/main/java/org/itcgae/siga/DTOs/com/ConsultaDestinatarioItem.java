@@ -3,6 +3,7 @@ package org.itcgae.siga.DTOs.com;
 public class ConsultaDestinatarioItem {
 
 	private String idEnvio;
+	private String idSerieFacturacion;
 	private String idConsulta;
 	private String idInstitucion;
 	
@@ -25,6 +26,12 @@ public class ConsultaDestinatarioItem {
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-	
-	
+
+	public String getIdSerieFacturacion() {
+		return idSerieFacturacion;
+	}
+
+	public void setIdSerieFacturacion(String idSerieFacturacion) {
+		this.idSerieFacturacion = idSerieFacturacion;
+	}
 }

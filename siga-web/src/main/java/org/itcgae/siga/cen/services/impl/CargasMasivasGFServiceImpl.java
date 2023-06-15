@@ -122,6 +122,9 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 	@Autowired
 	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
+	
+	@Autowired
+	private ExcelHelper excelHelper;
 
 	private Logger LOGGER = Logger.getLogger(CargasMasivasGFServiceImpl.class);
 
@@ -135,7 +138,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
+		File XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
 
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -202,7 +205,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 	public CargaMasivaDTO searchEtiquetas(CargaMasivaItem cargaMasivaItem, HttpServletRequest request) {
 
 		LOGGER.info("searchEtiquetas() -> Entrada al servicio para obtener etiquetas");
-
+		Error error = new Error();		
 		CargaMasivaDTO cargaMasivaDTO = new CargaMasivaDTO();
 		List<CargaMasivaItem> cargaMasivaItemList = new ArrayList<CargaMasivaItem>();
 
@@ -212,6 +215,12 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 			cargaMasivaItemList = cenCargaMasivaExtendsMapper.selectEtiquetas(idInstitucion, cargaMasivaItem);
 			cargaMasivaDTO.setCargaMasivaItem(cargaMasivaItemList);
+			
+			if((cargaMasivaItemList != null) && (cargaMasivaItemList.size()) >= 200) {
+				error.setCode(200);
+				error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+				cargaMasivaDTO.setError(error);
+			}
 
 			if (cargaMasivaItemList == null || cargaMasivaItemList.size() == 0) {
 
@@ -245,8 +254,8 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		String nombreFichero = file.getOriginalFilename();
 
 		// Extraer la información del excel
-		LOGGER.debug("uploadFileExcel() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 		Vector<Hashtable<String, Object>> datosLog = new Vector<Hashtable<String, Object>>();
 		Hashtable<String, Object> datosHashtable = null;
 		Map<String, String> revisionLetradoMap = null;
@@ -381,11 +390,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 				registrosErroneos.setValue(registrosErroneos.getValue() + 1);
 			}
 
-			Hashtable<String, Object> e = new Hashtable<String, Object>();
-			e = convertItemtoHash(cargaMasivaDatosGFVo);
-			// Guardar log
-			datosLog.add(e);
-			errores.concat(cargaMasivaDatosGFVo.getErrores());
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
 
 		}
 
@@ -406,7 +411,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			
 		} else {
 
-			byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
+			byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
 
 			cenCargamasivaGF.setTipocarga(SigaConstants.TIPO_CARGA);
 			cenCargamasivaGF.setIdinstitucion(idInstitucion);
@@ -948,7 +953,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		return e;
 	}
 
-	private String getDirectorioFichero(Short idInstitucion) {
+	public String getDirectorioFichero(Short idInstitucion) {
 		Date dateLog = new Date();
 		LOGGER.info(dateLog + ":inicio.CargaMasivaDatosGFImpl.getDirectorioFichero");
 		

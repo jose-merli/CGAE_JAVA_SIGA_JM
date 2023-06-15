@@ -70,6 +70,9 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		sql.SELECT("DIGITOCONTROL");
 		sql.SELECT("NUMEROCUENTA");
 		sql.SELECT("concat(CBO_CODIGO,concat(CODIGOSUCURSAL,concat(DIGITOCONTROL,DIGITOCONTROL))) AS BANCO");
+		sql.SELECT("NUM_REGISTRO");
+		sql.SELECT("CLAVECONSULTAREGTEL");
+		sql.SELECT("NUM_EXPEDIENTE");
 		
 		
 		sql.FROM("CEN_SOLICITUDINCORPORACION SOLICITUD");
@@ -122,7 +125,7 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		return sql.toString();
 	}
 
-	public String getMaxNColegiado(String idInstitucion){
+	/*public String getMaxNColegiado(String idInstitucion){
 		SQL sql = new SQL();
 		sql.SELECT("NVL(MAX(NCOLEGIADO + 1),0001) AS NCOLEGIADO");
 		sql.FROM("CEN_COLEGIADO");
@@ -145,6 +148,27 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		
 		return sql.toString();
+	}*/
+
+	public String getMaxNColegiado(String idInstitucion){
+		SQL sql = new SQL();
+		sql.SELECT("greatest((select nvl(max(to_number(ncolegiado+1)),0001) from cen_colegiado where idinstitucion = "+idInstitucion+"), (select nvl(max(to_number(ncolegiado+1)),0001) from cen_reserva_ncolegiado where idinstitucion = "+idInstitucion+" and tipo_ncolegiado='E')) as ncolegiado");
+		sql.FROM("DUAL");
+		return sql.toString();
 	}
-	
+
+	public String getMaxNComunitario(String idInstitucion){
+		SQL sql = new SQL();
+		sql.SELECT("greatest((select nvl(max(to_number(ncomunitario+1)),0001) from cen_colegiado where idinstitucion = "+idInstitucion+"), (select nvl(max(to_number(ncolegiado+1)),0001) from cen_reserva_ncolegiado where idinstitucion = "+idInstitucion+" and tipo_ncolegiado='I')) as NCOMUNITARIO");
+		sql.FROM("DUAL");
+		return sql.toString();
+	}
+
+	public String getMaxNColegiadoComunitario(String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("greatest((SELECT NVL(CASE WHEN max(to_number(ncolegiado)) >= max(to_number(ncomunitario)) THEN max(to_number(ncolegiado))+1 ELSE max(to_number(ncomunitario))+1 END, 0001) from cen_colegiado where idinstitucion = "+idInstitucion+"), (select nvl(max(to_number(ncolegiado+1)),0001) from cen_reserva_ncolegiado where idinstitucion = "+idInstitucion+")) as ncolegiado");
+		sql.FROM("DUAL");
+		return sql.toString();
+	}
+
 }

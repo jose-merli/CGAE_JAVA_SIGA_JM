@@ -20,6 +20,7 @@ public class FichaPersonaItem {
 	private String tipoIdentificacion;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaAlta;
+	private String colegiado;
 	
 	
 	/**
@@ -213,7 +214,15 @@ public class FichaPersonaItem {
 		this.tipoIdentificacion = tipoIdentificacion;
 	}
 	
+	/**
+	 */
 	
+	@JsonProperty("colegiado")	
+	public String getColegiado() {
+		return colegiado;
+	}
+
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -260,6 +269,7 @@ public class FichaPersonaItem {
 	    sb.append("    situacion: ").append(toIndentedString(situacion)).append("\n");
 	    sb.append("    tipoIdentificacion: ").append(toIndentedString(tipoIdentificacion)).append("\n");
 	    sb.append("    fechaAlta: ").append(toIndentedString(fechaAlta)).append("\n");
+
 	    sb.append("}");
 	    return sb.toString();
 	}

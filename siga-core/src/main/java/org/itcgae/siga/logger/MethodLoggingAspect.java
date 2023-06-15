@@ -94,7 +94,7 @@ public class MethodLoggingAspect {
 			MethodSignature signature = (MethodSignature) pjp.getSignature();
 
 			sb.append(String.format("%s ---> %s %s", pjp.getSignature().getName(), request.getMethod(),
-					request.getRequestURL().toString()));
+					request.getRequestURI().toString()));
 			if (signature.getParameterNames().length > 0) {
 				for (int i = 0; signature.getParameterNames().length > i; i++) {
 					sb.append(String.format(" [%s", signature.getParameterNames()[i]));
@@ -120,7 +120,7 @@ public class MethodLoggingAspect {
 			MethodSignature signature = (MethodSignature) pjp.getSignature();
 
 			sb.append(String.format("%s ---> %s %s", pjp.getSignature().getName(), request.getMethod(),
-					request.getRequestURL().toString()));
+					request.getRequestURI().toString()));
 			if (signature.getParameterNames().length > 0) {
 				for (int i = 0; signature.getParameterNames().length > i; i++) {
 					sb.append(String.format(" [%s = %s]", signature.getParameterNames()[i],

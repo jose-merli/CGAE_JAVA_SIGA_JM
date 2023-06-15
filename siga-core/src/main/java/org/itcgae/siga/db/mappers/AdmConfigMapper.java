@@ -16,7 +16,9 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface AdmConfigMapper {
 
 	/**

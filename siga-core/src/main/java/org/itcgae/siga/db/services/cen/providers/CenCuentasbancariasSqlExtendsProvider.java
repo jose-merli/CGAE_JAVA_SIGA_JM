@@ -208,6 +208,44 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		
 		return sql.toString();
 	}
+
+	public String getComboCuentas(String idPersona, String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDCUENTA,NUMEROCUENTA");
+		sql.FROM("CEN_CUENTASBANCARIAS");
+		sql.WHERE("IDPERSONA = '"+idPersona+"'");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql.ORDER_BY("IDCUENTA");
+		return sql.toString();
+	}
+
+	public String getCuentaActivaServiciosActivos(Short idInstitucion, Long idPersona) {
+		SQL countNumServicios = new SQL();
+		countNumServicios.SELECT("count(*)");
+		countNumServicios.FROM("PYS_SUSCRIPCION SUS");
+		countNumServicios.WHERE("SUS.IDINSTITUCION = BANCO.IDINSTITUCION");
+		countNumServicios.WHERE("SUS.IDPERSONA = BANCO.IDPERSONA");
+		countNumServicios.WHERE("SUS.IDCUENTA = BANCO.IDCUENTA");
+		countNumServicios.WHERE("SUS.FECHABAJA IS NULL");
+
+		SQL numServicios = new SQL();
+		numServicios.SELECT("BANCO.IDCUENTA");
+		numServicios.SELECT("( " + countNumServicios.toString() + " ) AS NUM_SERVICIOS_ASOCIADOS");
+		numServicios.FROM("CEN_CUENTASBANCARIAS BANCO");
+		numServicios.WHERE("BANCO.IDINSTITUCION = '" + idInstitucion + "'");
+		numServicios.WHERE("BANCO.IDPERSONA = '" + idPersona + "'");
+		numServicios.WHERE("BANCO.FECHABAJA IS NULL");
+		numServicios.WHERE("BANCO.ABONOCARGO IN ('T', 'C')");
+
+		SQL principal = new SQL();
+		principal.SELECT("TABLA.IDCUENTA");
+		principal.SELECT("TABLA.NUM_SERVICIOS_ASOCIADOS");
+		principal.FROM("( " + numServicios.toString() + " ) TABLA");
+		principal.WHERE("TABLA.NUM_SERVICIOS_ASOCIADOS > 0");
+		principal.ORDER_BY("TABLA.NUM_SERVICIOS_ASOCIADOS DESC");
+		return principal.toString();
+	}
+
 }
 
 

@@ -685,6 +685,11 @@ public class ScsMaestroretencionesExample {
             addCriterion("CLAVEM190 <=", value, "clavem190");
             return (Criteria) this;
         }
+        
+        public Criteria andFechabajaIsNull() {
+			addCriterion("FECHABAJA is null");
+			return (Criteria) this;
+		}
 
         public Criteria andClavem190Like(String value) {
             addCriterion("CLAVEM190 like", value, "clavem190");

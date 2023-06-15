@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.services.cen.providers.GenFicheroSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,12 @@ public interface GenFicheroExtendsMapper extends GenFicheroMapper{
 		@Result(column = "IDFICHERO2", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectMaxIdFichero();
+	
+	
+	@SelectProvider(type = GenFicheroSqlExtendsProvider.class, method = "nextIdGenFichero")
+	@Results({
+		@Result(column = "IDFICHERO", property="IDFICHERO", jdbcType = JdbcType.VARCHAR)})
+	String nextIdGenFichero();
 	
 	@SelectProvider(type = GenFicheroSqlExtendsProvider.class, method = "selectMaxIdFicheroByIdInstitucion")
 	@Results({

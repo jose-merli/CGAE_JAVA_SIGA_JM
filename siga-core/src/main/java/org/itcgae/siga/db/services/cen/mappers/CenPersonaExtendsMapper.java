@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
@@ -19,6 +20,8 @@ import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
+import org.itcgae.siga.DTOs.scs.Impreso190Item;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
@@ -160,5 +163,58 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	FichaPersonaItem getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion);
 	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getColegiadoByIdPersona")
+	@Results({
+		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COLEGIADO", property = "colegiado", jdbcType = JdbcType.VARCHAR),
+
+	})
+	FichaPersonaItem getColegiadoByIdPersona(String idPersona, Short idInstitucion);
 	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "busquedaColegiadoExpress")//falta hacer query
+	@Results({
+		@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ColegiadoJGItem> busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDestinatariosSeries")
+	@Results({
+		@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idinstitucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellidos1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellidos2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nifcif", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "movil", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "correoelectronico", property = "correoElectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "domicilio", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+	})
+	List<DestinatariosSeriesItem> getDestinatariosSeries(Short idInstitucion, String idSerieFacturacion);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDatosPersonaForImpreso190")
+	@Results({
+		@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "idtipoidentificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPERSONA", property = "nombrePersona", jdbcType = JdbcType.VARCHAR),
+
+	})
+	Impreso190Item getDatosPersonaForImpreso190(String idPersona);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDatosInstitucionForImpreso190")
+	@Results({
+		@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "idtipoidentificacion", jdbcType = JdbcType.VARCHAR),
+
+	})
+	CenPersona getDatosInstitucionForImpreso190(String idinstitucion);
 }

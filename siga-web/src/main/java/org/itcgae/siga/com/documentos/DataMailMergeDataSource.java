@@ -39,9 +39,13 @@ public class DataMailMergeDataSource implements IMailMergeDataSource{
     public boolean getValue(String fieldName,  Object[] fieldValue)
     {
     	HashMap registro = (HashMap)lista.get(mRecordIndex);
-    	if (registro.containsKey(fieldName) && registro.get(fieldName) != null) {
-            fieldValue[0] = registro.get(fieldName).toString();
+    	if (registro.containsKey(fieldName.toUpperCase()) ) {
+    		if(registro.get(fieldName.toUpperCase()) != null)
+    			fieldValue[0] = registro.get(fieldName.toUpperCase()).toString();
+    		else
+    			fieldValue[0] = "";
             return true;
+            
         }
         else
         {

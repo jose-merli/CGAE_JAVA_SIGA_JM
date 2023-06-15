@@ -1,6 +1,7 @@
 package org.itcgae.siga.commons.utils;
 
 import java.io.File;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
@@ -28,21 +29,27 @@ public class SIGAHelper {
 			perms.add(PosixFilePermission.OTHERS_READ);
 			perms.add(PosixFilePermission.OTHERS_WRITE);
 			perms.add(PosixFilePermission.OTHERS_EXECUTE);
+			
 			try {
-				
 				File parentFile = file.getParentFile();
 				if (parentFile != null && parentFile.exists()) {
 					LOGGER.debug("Cambiando los permisos del padre: " + parentFile.getAbsolutePath());
 					addPerm777(parentFile);
 				}
-				Files.setPosixFilePermissions(file.toPath(), perms);
+				boolean isPosix = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+				if (isPosix) {
+					Files.setPosixFilePermissions(file.toPath(), perms);
+				} else {
+					file.setReadable(true);
+					file.setWritable(true);
+					file.setExecutable(false);
+				}
 			} catch (Exception e) {
-				LOGGER.warn("Error al cambiar los permisos del fichero " + file.getAbsolutePath());
+				LOGGER.warn("No se pudieron cambiar los permisos del directorio: " + file.getAbsolutePath() + " CAUSA: " + e.getMessage());
 			}
-			
 		}
 	}
-	
+
 	public static String quitarEtiquetas(String sentencia) {	
 		if (sentencia != null) {
 			sentencia = sentencia.toUpperCase();
@@ -78,4 +85,18 @@ public class SIGAHelper {
 		
 		return sentencia;
 	}
+
+	public static void mkdirs(String filePath) {
+
+		if (filePath == null || filePath.trim().equalsIgnoreCase("")) {
+			return;
+		}
+
+		File fileDir = new File(filePath.toString());
+		if (fileDir != null && !fileDir.exists()) {
+			fileDir.mkdirs();
+			addPerm777(fileDir);
+		}
+	}
+
 }

@@ -143,4 +143,23 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 
 	})
 	List<EventoItem> getRepeteadEvents(String idEvento, String idInstitucion, String idLenguaje);
+	
+	@SelectProvider(type = AgeEventoSqlExtendsProvider.class, method = "searchFestivos")
+	@Results({
+		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONOLD", property = "descripcionOld", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAINICIOOLD", property = "fechaInicioOld", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "LUGAR", property = "lugar", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FIESTALOCALPARTIDO", property = "fiestaLocalPartido", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "RECURSOS", property = "recursos", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.NUMERIC),
+	})
+	List<EventoItem> searchFestivos(EventoItem eventoItem, Short idInstitucion);
 }

@@ -14,6 +14,7 @@ public class DialogoComunicacionItem {
 	private List<ConsultaItem> consultas = new ArrayList<ConsultaItem>();
 	private String ruta;
 	private boolean comunicar;
+	private String sentenciaImprimir;
 	
 	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
@@ -62,6 +63,12 @@ public class DialogoComunicacionItem {
 	}
 	public void setComunicar(boolean comunicar) {
 		this.comunicar = comunicar;
+	}
+	public String getSentenciaImprimir() {
+		return sentenciaImprimir;
+	}
+	public void setSentenciaImprimir(String sentenciaImprimir) {
+		this.sentenciaImprimir = sentenciaImprimir;
 	}
 	
 	

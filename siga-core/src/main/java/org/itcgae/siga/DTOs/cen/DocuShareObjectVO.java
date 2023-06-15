@@ -19,7 +19,9 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>  {
 	private String originalFilename;
 	private String idPersona;
 	private String parent;
-
+	private String idTipoEjg;
+	private String anio;
+	private String numero;
 
 
 	@JsonProperty("id")
@@ -191,6 +193,30 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>  {
 
 	public void setParent(String parent) {
 		this.parent = parent;
+	}
+
+	public String getIdTipoEjg() {
+		return idTipoEjg;
+	}
+
+	public void setIdTipoEjg(String idTipoEjg) {
+		this.idTipoEjg = idTipoEjg;
+	}
+
+	public String getAnio() {
+		return anio;
+	}
+
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
+
+	public String getNumero() {
+		return numero;
+	}
+
+	public void setNumero(String numero) {
+		this.numero = numero;
 	}
 	
 	

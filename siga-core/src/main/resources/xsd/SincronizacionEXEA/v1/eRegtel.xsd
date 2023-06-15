@@ -1,0 +1,788 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xmime="https://www.w3.org/2005/05/xmlmime" xmlns="http://www.redabogacia.org/regtel/ws/eregtel" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.redabogacia.org/regtel/ws/eregtel">
+	<xs:complexType name="Adjunto">
+		<xs:sequence>
+			<xs:element ref="numeroSecuencia"/>
+			<xs:element ref="nombreOriginalArchivo"/>
+			<xs:element minOccurs="0" ref="descripcion"/>
+			<xs:element minOccurs="0" ref="codigoTipoDocumento"/>
+			<xs:element name="hash" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Hash SHA-1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ficheroAdjunto" type="xs:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="RegistroEntrada">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="presentador" type="Interesado"/>
+				<xs:element name="entidadDestinataria" type="Entidad"/>
+				<xs:element minOccurs="0" name="departamentoDestino">
+					<xs:annotation>
+						<xs:documentation> Código del Departamento a quién va dirigido el asiento que se registra </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="999999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element ref="asunto">
+					<xs:annotation>
+						<xs:documentation> Asunto del registro </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element minOccurs="0" name="datosExpedienteEntrada" type="DatosExpediente"/>
+				<xs:element minOccurs="0" name="datosEspecificos" type="xs:string"/>
+				<xs:element minOccurs="0" name="adjuntos">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" name="adjunto" type="Adjunto"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="DatosExpediente">
+		<xs:sequence>
+			<xs:element minOccurs="0" ref="codigoProcedimiento"/>
+			<xs:element minOccurs="0" ref="codigoTramite"/>
+			<xs:element minOccurs="0" name="numeroExpediente">
+				<xs:annotation>
+					<xs:documentation>Para relacionar registros de un mismo expediente </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Interesado">
+		<xs:sequence>
+			<xs:element name="identidad" type="Persona"/>
+			<xs:element name="email">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+						<xs:pattern value="([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="telefono">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="numero">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="9"/>
+									<xs:maxLength value="16"/>
+									<xs:pattern value="\+?\d{9,15}"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="aceptaSMS" type="xs:boolean"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element minOccurs="0" name="identificacionColegiacion">
+				<xs:annotation>
+					<xs:documentation> El presentador puede ser un abogado, en este caso se puede rellenar la información de este elemento, si no es abogado no se rellena </xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="colegio">
+							<xs:annotation>
+								<xs:documentation>Código según TC-CGPJ</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="6"/>
+									<xs:pattern value="[A]\d{5}"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="numeroColegiado">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="30"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element minOccurs="0" name="enRepresentacionDe">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="identidad" type="Persona"/>
+						<xs:element minOccurs="0" name="enCalidadDe">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="50"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Persona">
+		<xs:choice>
+			<xs:element name="personaFisica" type="PersonaFisica"/>
+			<xs:element name="personaJuridica" type="PersonaJuridica"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="PersonaFisica">
+		<xs:sequence>
+			<xs:element name="identificacion" type="IdentificacionPF">
+				<xs:annotation>
+					<xs:documentation>Identificación de la persona física: NIF, NIE o Pasaporte </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="nombre">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="apellido1">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="apellido2">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PersonaJuridica">
+		<xs:sequence>
+			<xs:element name="NIF">
+				<xs:annotation>
+					<xs:documentation>NIF de persona Jurídica</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="9"/>
+						<xs:pattern value="[A-Za-z]\d{1,7}[A-Za-z0-9]"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="razonSocial">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IdentificacionPF">
+		<xs:choice>
+			<xs:element name="DNI">
+				<xs:annotation>
+					<xs:documentation>DNI de la persona</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="9"/>
+						<xs:pattern value="\d{1,8}[A-Za-z]"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="NIE">
+				<xs:annotation>
+					<xs:documentation>NIE de la persona</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="9"/>
+						<xs:pattern value="[X-Zx-z]\d{1,7}[A-Za-z]"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Pasaporte">
+				<xs:annotation>
+					<xs:documentation>Pasaporte de la persona</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="RegistroEntradaResponse" type="RespuestaRegistro"/>
+	<xs:element name="RegistroSalida">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="destinatario" type="Interesado"/>
+				<xs:element name="entidadOrigen" type="Entidad"/>
+				<xs:element minOccurs="0" name="departamentoOrigen">
+					<xs:annotation>
+						<xs:documentation> Código del Departamento que registra el asiento </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="999999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element ref="asunto">
+					<xs:annotation>
+						<xs:documentation> Asunto del registro </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element minOccurs="0" name="datosExpedienteSalida" type="DatosExpediente"/>
+				<xs:element minOccurs="0" name="tipoComunicacion" type="TipoComunicacion">
+					<xs:annotation>
+						<xs:documentation> Opcional: puede ser: Email / Comunicación Electrónica / Notificación Electrónica (envío delegado en 3ro) </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element minOccurs="0" name="datosEspecificos" type="xs:string"/>
+				<xs:element minOccurs="0" name="adjuntos">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" name="adjunto" type="Adjunto"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element minOccurs="0" name="datosComunicacion" type="datosComunicacionType"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="TipoComunicacion">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Email"/>
+			<xs:enumeration value="Comunicacion_Electronica"/>
+			<xs:enumeration value="Notificacion_Electronica"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="RegistroSalidaResponse" type="RespuestaRegistro"/>
+	<xs:element name="BusquedaAsiento">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="camposBusqueda" type="DatosGenericosAsiento"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="DatosGenericosAsiento">
+		<xs:sequence>
+			<xs:element name="codigoInstitucion">
+				<xs:annotation>
+					<xs:documentation>Código de Colegio o Consejo, según TC-CGPJ, que registró el asiento </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="6"/>
+						<xs:pattern value="[A][C0-9]\d{4}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="fechaHoraRegistroDesde" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Formato: yyyy-MM-ddTHH:mm:ssX (Ejemplo: 2018-04-25T12:36:45+02:00) </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="fechaHoraRegistroHasta" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Formato: yyyy-MM-ddTHH:mm:ssX (Ejemplo: 2018-04-25T12:36:45+02:00) </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="tipoRegistro" type="TipoRegistro"> </xs:element>
+			<xs:choice>
+				<xs:element minOccurs="0" name="codigoRegistro">
+					<xs:simpleType>
+						<xs:annotation>
+							<xs:documentation>Utilizado para una búsqueda exacta por código de registro </xs:documentation>
+						</xs:annotation>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="50"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:sequence>
+					<xs:element minOccurs="0" name="numRegistroDesde" type="NumeroRegistroDetalle">
+						<xs:annotation>
+							<xs:documentation>Utilizado para una búsqueda por rango </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="numRegistroHasta" type="NumeroRegistroDetalle">
+						<xs:annotation>
+							<xs:documentation>Utilizado para una búsqueda por rango </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:choice>
+			<xs:element minOccurs="0" name="departamento">
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:minInclusive value="0"/>
+						<xs:maxInclusive value="999999"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" ref="asunto"/>
+			<xs:element minOccurs="0" ref="texto"/>
+			<xs:element minOccurs="0" ref="codigoProcedimiento"/>
+			<xs:element minOccurs="0" ref="codigoTramite"/>
+			<xs:element minOccurs="0" name="numeroExpediente">
+				<xs:annotation>
+					<xs:documentation>Relaciona registros de un mismo expediente </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="tipoComunicacion" type="TipoComunicacion">
+				<xs:annotation>
+					<xs:documentation> Opcional: puede ser: Email / Comunicación Electrónica / Notificación Electrónica (envío delegado en 3ro) Sólo empleado para búsquedas de registros de salida </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="interesadoBusq" type="PersonaBusq">
+				<xs:annotation>
+					<xs:documentation> Refiere al interesado(presentador/destinatario) del registro </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="enRepresentacionDe" type="Activo">
+				<xs:annotation>
+					<xs:documentation> Tag que indica si se busca también al interesado en los representados </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="contenido">
+				<xs:annotation>
+					<xs:documentation> Texto a buscar en el gestor documental </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="5"/>
+						<xs:maxLength value="1000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="ordenacion" type="Ordenacion"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TipoRegistro">
+		<xs:annotation>
+			<xs:documentation> Valores válidos para tipos de registro: 1: Registro de Entrada 2: Registro de Salida </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="1"/>
+			<xs:enumeration value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="NumeroRegistroDetalle">
+		<xs:sequence>
+			<xs:element name="numeroRegistro">
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="1"/>
+						<xs:maxInclusive value="999999"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="anio">
+				<xs:annotation>
+					<xs:documentation>Año cuando se hizo el registro</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PersonaBusq">
+		<xs:choice>
+			<xs:element name="personaFisicaBusq" type="PersonaFisicaBusq"/>
+			<xs:element name="personaJuridicaBusq" type="PersonaJuridicaBusq"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="PersonaFisicaBusq">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="identificacion" type="IdentificacionPF">
+				<xs:annotation>
+					<xs:documentation>Identificación de la persona física: NIF, NIE o Pasaporte </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="nombre">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="apellido1">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="apellido2">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PersonaJuridicaBusq">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="NIF">
+				<xs:annotation>
+					<xs:documentation>NIF de persona Jurídica</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="9"/>
+						<xs:pattern value="[A-Za-z]\d{1,7}[A-Za-z0-9]"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="razonSocial">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Ordenacion">
+		<xs:sequence>
+			<xs:element name="columnaBD" type="ColumnaBD"> </xs:element>
+			<xs:element minOccurs="0" name="tipoOrdenacion" type="TipoOrdenacion">
+				<xs:annotation>
+					<xs:documentation>Por defecto es ascendente</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="BusquedaAsientoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" name="asientos">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" name="asiento" type="Asiento"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="respuesta" type="Respuesta"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="ColumnaBD">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="fecha"/>
+			<xs:enumeration value="codigoRegistro"/>
+			<xs:enumeration value="entidad">
+				<xs:annotation>
+					<xs:documentation>Código de Colegio o Consejo según TC-CGPJ </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="estadoDocumento"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoOrdenacion">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ASC"/>
+			<xs:enumeration value="DESC"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="Asiento">
+		<xs:sequence>
+			<xs:element ref="fechaHoraRegistro"/>
+			<xs:element ref="codigoRegistro"/>
+			<xs:element name="entidad" type="Entidad"/>
+			<xs:choice>
+				<xs:element name="departamentosDestino">
+					<xs:annotation>
+						<xs:documentation>Si el registro es de entrada </xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" name="departamentoDestino" type="Departamento"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="departamentosOrigen">
+					<xs:annotation>
+						<xs:documentation>Si el registro es de entrada </xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" name="departamentoOrigen" type="Departamento"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="estadoDocumento">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="presentadores">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" name="presentador" type="Interesado"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="destinatarios">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" name="destinatario" type="Interesado"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element minOccurs="0" ref="asunto"/>
+			<xs:element minOccurs="0" ref="texto"/>
+			<xs:element minOccurs="0" name="datosExpedienteAsiento" type="DatosExpediente"/>
+			<xs:element ref="claveConsulta"/>
+			<xs:element minOccurs="0" name="listaAdjuntos">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element maxOccurs="unbounded" name="informacionAdjunto" type="InformacionAdjunto"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InformacionAdjunto">
+		<xs:sequence>
+			<xs:element ref="numeroSecuencia"/>
+			<xs:element ref="nombreOriginalArchivo"/>
+			<xs:element minOccurs="0" ref="descripcion"/>
+			<xs:element minOccurs="0" ref="codigoTipoDocumento"/>
+			<xs:element name="enlaceGestorDocumental" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Enlace para acceder al documento en el gestor documental </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ConsultaAsiento">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="claveConsulta"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConsultaAsientoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" name="asiento" type="Asiento"/>
+				<xs:element name="respuesta" type="Respuesta"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="Departamento">
+		<xs:sequence>
+			<xs:element name="codigoDepartamento">
+				<xs:annotation>
+					<xs:documentation>Código del Departamento</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:minInclusive value="0"/>
+						<xs:maxInclusive value="999999"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="nombreDepartamento">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ConsultaAdjunto">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="claveConsulta"/>
+				<xs:element name="nroSecuenciaAdjunto">
+					<xs:simpleType>
+						<xs:annotation>
+							<xs:documentation>Indica el orden que ocupa el fichero entre todos los ficheros subidos en el registro del asiento. Valores válidos del 1 al 999. Se consideran también los valores 0 y -1 El valor -1 se refiere al justificante creado al registrar el asiento. El valor 0 se refiere al documento xml que guarda el servicio web como evidencia de la llamada que se recibió para registrar un asiento. </xs:documentation>
+						</xs:annotation>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="-1"/>
+							<xs:maxInclusive value="999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConsultaAdjuntoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" name="adjunto" type="Adjunto"/>
+				<xs:element name="respuesta" type="Respuesta"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="asunto">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="2048"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="texto">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="2048"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="codigoProcedimiento">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="6"/>
+				<xs:pattern value="[A]\d{5}"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="codigoTramite">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="2"/>
+				<xs:pattern value="\d{2}"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:complexType name="RespuestaRegistro">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="datosRespuesta" type="DatosRespuestaRegistro"/>
+			<xs:element name="respuesta" type="Respuesta"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Respuesta">
+		<xs:sequence>
+			<xs:element name="codigo" type="xs:string"/>
+			<xs:element minOccurs="0" ref="descripcion"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DatosRespuestaRegistro">
+		<xs:sequence>
+			<xs:element ref="codigoRegistro"/>
+			<xs:element ref="fechaHoraRegistro"/>
+			<xs:element name="csv">
+				<xs:annotation>
+					<xs:documentation>Localizador para descargar el Justificante de registro desde la PFD </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element ref="claveConsulta"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Entidad">
+		<xs:annotation>
+			<xs:documentation>Código de Colegio o Consejo según TC-CGPJ </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="6"/>
+			<xs:pattern value="[A][C0-9]\d{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Activo">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Si"/>
+			<xs:enumeration value="No"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="numeroSecuencia">
+		<xs:simpleType>
+			<xs:annotation>
+				<xs:documentation>Indica el orden que ocupa el fichero entre todos los ficheros subidos en el registro del asiento. En el registro de un asiento los valores válidos del 1 al 999. Para las consultas de asientos se consideran también los valores 0 y -1 El valor -1 se refiere al justificante creado al registrar el asiento. El valor 0 se refiere al documento xml que guarda el servicio web como evidencia de la llamada que se recibió para registrar un asiento. </xs:documentation>
+			</xs:annotation>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="-1"/>
+				<xs:maxInclusive value="999"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="nombreOriginalArchivo">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="200"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="descripcion">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="100"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="codigoTipoDocumento">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="10"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="fechaHoraRegistro" type="xs:dateTime">
+		<xs:annotation>
+			<xs:documentation>Formato: yyyy-MM-ddTHH:mm:ssX (Ejemplo: 2018-04-25T12:36:45+02:00) </xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="codigoRegistro">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="50"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="claveConsulta">
+		<xs:annotation>
+			<xs:documentation>Código que permite la consulta de un asiento </xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="100"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:complexType name="datosComunicacionType">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="asunto" type="xs:string"/>
+			<xs:element minOccurs="0" name="idioma" type="xs:string"/>
+			<xs:element minOccurs="0" name="plazoDias" type="xs:int"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -272,6 +272,55 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info("datosColegialesSearch() -> Salida del servicio para la búsqueda por filtros de Colegiados");
 		return datosColegialesDTO;
 	}
+	
+	@Override
+	public StringDTO getCuentaContableSJCS(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+
+		LOGGER.info("getCuentaContableSJCS() -> Entrada al servicio para la obtención de la cuenta contable SJCS");
+
+		StringDTO cuentaContableSJCS = new StringDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getCuentaContableSJCS() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getCuentaContableSJCS() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getCuentaContableSJCS() / CenColegiadoExtendsMapper.selectCuentaContableSJCS() -> Entrada a CenColegiadoExtendsMapper para busqueda de la cuenta contable SJCS");
+				
+				List<ColegiadoItem> colegiadoListItem = cenColegiadoExtendsMapper.selectCuentaContableSJCS(idInstitucion, colegiadoItem);
+				
+				if (colegiadoListItem.size() > 0) {
+					cuentaContableSJCS.setValor(colegiadoListItem.get(0).getCuentaContable());
+				} else {
+					cuentaContableSJCS.setValor("");
+				}
+				
+				LOGGER.info(
+						"getCuentaContableSJCS() / CenColegiadoExtendsMapper.selectCuentaContableSJCS() -> Salida de CenColegiadoExtendsMapper para busqueda de la cuenta contable SJCS");
+			} else {
+				LOGGER.warn(
+						"getCuentaContableSJCS() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("getCuentaContableSJCS() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("getCuentaContableSJCS() -> Salida del servicio para la búsqueda de la cuenta contable SJCS");
+		return cuentaContableSJCS;
+	}
 
 	@Override
 	public UpdateResponseDTO datosColegialesUpdate(ColegiadoItem colegiadoItem, HttpServletRequest request) {

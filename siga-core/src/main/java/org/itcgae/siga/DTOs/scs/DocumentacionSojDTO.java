@@ -1,0 +1,91 @@
+package org.itcgae.siga.DTOs.scs;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.itcgae.siga.DTOs.gen.Error;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class DocumentacionSojDTO {
+	
+	private List<DocumentacionSojItem> documentacionSojItems = new ArrayList<DocumentacionSojItem>();
+	  private Error error = null;
+	  
+	  /**
+	   * 
+	   **/
+	  public DocumentacionSojDTO documentacionSojItems(List<DocumentacionSojItem> documentacionSojItems) {
+	    this.documentacionSojItems = documentacionSojItems;
+	    return this;
+	  }
+	  
+	  @JsonProperty("documentacionSojItems")
+	  public List<DocumentacionSojItem> documentacionSojItems() {
+	    return documentacionSojItems;
+	  }
+	  
+	  public void setDocumentacionEjgItems(List<DocumentacionSojItem> documentacionSojItems) {
+	    this.documentacionSojItems = documentacionSojItems;
+	  }
+	  
+	  
+	  /**
+	   * 
+	   **/
+	  public DocumentacionSojDTO error(Error error) {
+	    this.error = error;
+	    return this;
+	  }
+	  
+	  @JsonProperty("error")
+	  public Error getError() {
+	    return error;
+	  }
+	  
+	  public void setError(Error error) {
+	    this.error = error;
+	  }
+	  
+	  
+	  @Override
+	  public boolean equals(java.lang.Object o) {
+	    if (this == o) {
+	      return true;
+	    }
+	    if (o == null || getClass() != o.getClass()) {
+	      return false;
+	    }
+	    DocumentacionSojDTO documentacionSojDTO = (DocumentacionSojDTO) o;
+	    return Objects.equals(this.documentacionSojItems, documentacionSojDTO.documentacionSojItems) &&
+	        Objects.equals(this.error, documentacionSojDTO.error);
+	  }
+
+	  @Override
+	  public int hashCode() {
+	    return Objects.hash(documentacionSojItems, error);
+	  }
+
+	  @Override
+	  public String toString() {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("class DocumentacionSojDTO {\n");
+	    
+	    sb.append("    documentacionSojItems: ").append(toIndentedString(documentacionSojItems)).append("\n");
+	    sb.append("    error: ").append(toIndentedString(error)).append("\n");
+	    sb.append("}");
+	    return sb.toString();
+	  }
+
+	  /**
+	   * Convert the given object to string with each line indented by 4 spaces
+	   * (except the first line).
+	   */
+	  private String toIndentedString(java.lang.Object o) {
+	    if (o == null) {
+	      return "null";
+	    }
+	    return o.toString().replace("\n", "\n    ");
+	  }
+}

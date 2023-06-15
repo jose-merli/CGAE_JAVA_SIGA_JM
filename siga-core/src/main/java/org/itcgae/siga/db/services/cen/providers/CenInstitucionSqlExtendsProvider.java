@@ -438,5 +438,49 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		
 		return sql.toString();
 	}
-    
+	
+	public String getComboInstitucionesNombre() {
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("NOMBRE");
+		sql.FROM("CEN_INSTITUCION");
+		sql.ORDER_BY("NOMBRE");
+		return sql.toString();
+	}
+
+	public String isConsejo(String idInstitucion) {
+		SQL superQuery = new SQL();
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("NOMBRE");
+		sql.FROM("CEN_INSTITUCION");
+		sql.WHERE("IDINSTITUCION = 2000 OR (IDINSTITUCION > 3000 AND IDINSTITUCION < 3500)");
+		superQuery.SELECT("IDINSTITUCION");
+		superQuery.SELECT("NOMBRE");
+		superQuery.FROM("(" + sql + ")");
+		superQuery.WHERE("IDINSTITUCION = " + idInstitucion);
+		return superQuery.toString();
+	}
+
+	public String getInstitucionesConsejo(String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("NOMBRE");
+		sql.FROM("CEN_INSTITUCION");
+		sql.WHERE("CEN_INST_IDINSTITUCION = '" + idInstitucion+"'");
+		return sql.toString();
+	}
+
+	public String getInstitucionByGrupo(Short idInstitucion, String codigoGrupo) {
+		SQL sql = new SQL();
+		sql.SELECT("CI.*");
+
+		sql.FROM("CEN_INSTITUCION CI");
+		sql.INNER_JOIN("CEN_GRUPOSINSTITUCION_INSTITU GRUINS ON CI.IDINSTITUCION =  GRUINS.IDINSTITUCION");
+		sql.INNER_JOIN("CEN_GRUPOSINSTITUCION GRU ON GRUINS.IDGRUPO = GRU.IDGRUPO");
+
+		sql.WHERE(String.format("CODIGO = '%s'", codigoGrupo));
+		sql.WHERE(String.format("CI.IDINSTITUCION = '%s'", idInstitucion));
+		return sql.toString();
+	}
 }

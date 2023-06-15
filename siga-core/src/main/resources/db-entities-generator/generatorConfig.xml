@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="C:\Users\acorral\Downloads\ojdbc6.jar" />
+	<classPathEntry location="C:\repositorio_weblogic\ojdbc6.jar" />
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae" 
+			connectionURL="jdbc:oracle:thin:@//192.168.18.18:1546/SIGADES" 
 			driverClass="oracle.jdbc.OracleDriver"
-			userId="uscgae"
-			password="uscgae" />
-			
-			
+			userId="USCGAE_INT"
+			password="oradesaINT19" />
+
 		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
 		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
 		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER"/>
@@ -33,14 +32,20 @@
 <!-- 		<table schema="USCGAE" tableName="FOR_CURSO"> -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			<generatedKey column="IDCURSO"  -->
-<!--  				sqlStatement="SELECT SEQ_FORCURSO.NEXTVAL FROM DUAL" /> -->
+<!--  				sqlStatement="SELECT SEQ_FORCURSO.NEXTVAL FROM DUAL" /> -->    
 <!-- 		</table>   -->
-		<table schema="USCGAE" tableName="ENV_DESTINATARIOS_BUROSMS">
+	
+		<table schema="USCGAE_INT" tableName="SCS_PROG_CALENDARIOS">
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="idprogcalendario" sqlStatement="SELECT SEQ_SCSPROGCALENDARIOS.NEXTVAL FROM DUAL" />
 		</table>
-		<table schema="USCGAE" tableName="ENV_DOCUMENTOS">
+<!-- 		<table schema="USCGAE" tableName="ENV_DOCUMENTOS">
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
-		</table>
-
+		</table>-->
+<!--		<table schema="USCGAE" tableName="ECOM_COLA_PARAMETROS">
+			<property name="ignoreQualifiersAtRuntime" value="true" />
+		</table>-->
+	
 	</context>
+	
 </generatorConfiguration>

@@ -4,6 +4,7 @@ package org.itcgae.siga.db.services.com.providers;
 import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 
 public class ConConsultasExtendsSqlProvider {
@@ -28,7 +29,6 @@ public class ConConsultasExtendsSqlProvider {
 		sql.SELECT("CONSULTA.FECHABAJA");
 		sql.SELECT("CONSULTA.IDOBJETIVO");
 		sql.SELECT("(SELECT DISTINCT rec.DESCRIPCION FROM CON_OBJETIVO objetivo INNER JOIN GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = objetivo.NOMBRE AND rec.IDLENGUAJE = '1') WHERE objetivo.IDOBJETIVO=CONSULTA.IDOBJETIVO) AS NOMBREOBJETIVO");
-		sql.SELECT("CONSULTA.IDCLASE");
 		sql.SELECT("CONSULTA.IDCLASECOMUNICACION");
 		sql.SELECT("(SELECT CAT2.DESCRIPCION FROM MOD_CLASECOMUNICACIONES CLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT2 ON CAT2.IDRECURSO = CLA.DESCRIPCION WHERE CLA.IDCLASECOMUNICACION = CONSULTA.IDCLASECOMUNICACION AND CLA. CAT2.IDLENGUAJE = '" + idLenguaje + "') AS NOMBRECLASE");
 		sql.FROM("CON_CONSULTA CONSULTA");
@@ -119,12 +119,12 @@ public class ConConsultasExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo){
+	public String selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo){
 		
 		SQL sql = new SQL();
 		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION, IDCLASECOMUNICACION");
 		sql.FROM("CON_CONSULTA");
-		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
+		sql.WHERE("(IDINSTITUCION = "+ IdInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
 		if(idClaseComunicacion != null){
 			sql.WHERE("IDCLASECOMUNICACION = "+ idClaseComunicacion);
@@ -219,4 +219,126 @@ public class ConConsultasExtendsSqlProvider {
 		sql.WHERE("cc.IDINSTITUCION = '" + idInstitucion + "' AND cc.IDCONSULTA = " + idConsulta);
 		return sql.toString();
 	}
+	
+	public String obtenerDatosConsulta(String idLenguaje, Short idInstitucion, String idConsulta){
+			
+			SQL sql = new SQL();
+			sql.SELECT(" criterio_con.IDCONSULTA");
+			sql.SELECT(" criterio_con.ORDEN");
+			sql.SELECT(" criterio_con.OPERADOR conector");
+			sql.SELECT(" criterio_con.ABRIRPAR");
+			sql.SELECT(" campo_con.IDCAMPO");		
+			sql.SELECT(" campo_con.IDTABLA");
+			sql.SELECT(" tablaconsulta_con.DESCRIPCION");
+			sql.SELECT(" campo_con.NOMBREREAL");	
+			sql.SELECT(" campo_con.NOMBREENCONSULTA");
+			sql.SELECT(" f_siga_getrecurso(operacion_con.DESCRIPCION, " + idLenguaje + ") operador");
+			sql.SELECT(" operacion_con.SIMBOLO");
+			sql.SELECT(" criterio_con.VALOR");
+			sql.SELECT(" criterio_con.CERRARPAR");
+	
+			sql.FROM(" CON_CRITERIOCONSULTA criterio_con");
+			sql.FROM(" CON_CAMPOCONSULTA campo_con");
+			sql.FROM(" CON_TABLACONSULTA tablaconsulta_con");
+			sql.FROM(" CON_OPERACIONCONSULTA operacion_con");
+			
+			sql.WHERE(" criterio_con.idinstitucion = " + idInstitucion);
+			sql.WHERE(" criterio_con.idconsulta = " + idConsulta);
+			sql.WHERE(" campo_con.idcampo (+) = criterio_con.idcampo");
+			sql.WHERE(" campo_con.idtabla = tablaconsulta_con.idtabla");
+			sql.WHERE(" operacion_con.idoperacion (+) = criterio_con.idoperacion");
+			sql.ORDER_BY(" orden");
+			
+			return sql.toString();
+	
+		}
+	
+	public String obtenerConsulta(Short idInstitucion, String idConsulta){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" SENTENCIA");
+		
+		sql.FROM(" CON_CONSULTA");
+		
+		sql.WHERE(" idconsulta = " + idConsulta);
+		sql.WHERE(" idinstitucion = " + idInstitucion);
+		
+		return sql.toString();
+	}
+	
+	public String obtenerConfigColumnasQueryBuilder(){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" distinct CASE tipocampo WHEN 'D' THEN 'date' WHEN 'A' THEN 'string' WHEN 'N' THEN 'number' END AS tipocampo");
+		sql.SELECT(" idcampo");
+		sql.SELECT(" nombreenconsulta");
+		sql.SELECT(" selectayuda");
+		
+		sql.FROM(" CON_CAMPOCONSULTA");
+		
+		sql.WHERE(" visibilidad = 'P'");
+		
+		return sql.toString();
+	}
+	
+	public String obtenerCombosQueryBuilder(ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem, String idioma, Short idInstitucion){
+	
+		if(configColumnasQueryBuilderItem.getSelectayuda().contains("@IDIOMA@")) {
+			configColumnasQueryBuilderItem.setSelectayuda(configColumnasQueryBuilderItem.getSelectayuda().replace("@IDIOMA@", idioma));
+		}
+		
+		if(configColumnasQueryBuilderItem.getSelectayuda().contains("@IDINSTITUCION@")) {
+			configColumnasQueryBuilderItem.setSelectayuda(configColumnasQueryBuilderItem.getSelectayuda().replace("@IDINSTITUCION@", idInstitucion.toString()));
+		}
+	
+		return configColumnasQueryBuilderItem.getSelectayuda();
+	}
+
+	public String getIdOperacion(String idCampo, String simbolo){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" NVL(MIN(con_opeconsulta.IDOPERACION),0) idoperacion");
+		
+		sql.FROM(" CON_OPERACIONCONSULTA con_opeconsulta");
+		sql.FROM(" CON_CAMPOCONSULTA con_campocon");
+		
+		sql.WHERE(" con_campocon.tipocampo = con_opeconsulta.tipooperador");
+		sql.WHERE(" con_campocon.IDCAMPO = " + idCampo);
+		sql.WHERE(" con_opeconsulta.simbolo = '" + simbolo + "'");
+		
+		return sql.toString();
+	}
+	
+	public String selectServiciosByConsulta(Short idInstitucion, String idConsulta){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" IDSERVICIOSINSTITUCION");
+		sql.SELECT(" IDSERVICIO");
+		sql.SELECT(" IDTIPOSERVICIOS");
+		
+		sql.FROM(" PYS_SERVICIOSINSTITUCION");
+		
+		sql.WHERE(" IDINSTITUCION = " + idInstitucion);
+		sql.WHERE(" IDCONSULTA = " + idConsulta);
+		
+		return sql.toString();
+	}
+	
+	public String selectPreciosByConsulta(Short idInstitucion, String idConsulta){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" idtiposervicios");
+		sql.SELECT(" idservicio");
+		sql.SELECT(" idserviciosinstitucion");
+		sql.SELECT(" idperiodicidad");
+		sql.SELECT(" idpreciosservicios");
+		
+		sql.FROM(" pys_preciosservicios");
+		
+		sql.WHERE(" IDINSTITUCION = " + idInstitucion);
+		sql.WHERE(" IDCONSULTA = " + idConsulta);
+		
+		return sql.toString();
+	}
+	
 }

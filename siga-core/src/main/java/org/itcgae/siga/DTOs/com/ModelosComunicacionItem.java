@@ -26,6 +26,7 @@ public class ModelosComunicacionItem {
 	private String tipoEnvio;
 	private String generacionExcel;
 	private Short generarExcel;
+	private String informeUnico;
 	
 	private List<ComboItem> plantillas = new ArrayList<ComboItem>();
 	
@@ -275,6 +276,12 @@ public class ModelosComunicacionItem {
 				+ claseComunicacion + ", idPlantillaEnvio=" + idPlantillaEnvio + ", idTipoEnvio=" + idTipoEnvio
 				+ ", porDefecto=" + porDefecto + ", tipoEnvio=" + tipoEnvio + ", generacionExcel=" + generacionExcel
 				+ ", generarExcel=" + generarExcel + ", plantillas=" + plantillas + "]";
+	}
+	public String getInformeUnico() {
+		return informeUnico;
+	}
+	public void setInformeUnico(String informeUnico) {
+		this.informeUnico = informeUnico;
 	}
 	
 	

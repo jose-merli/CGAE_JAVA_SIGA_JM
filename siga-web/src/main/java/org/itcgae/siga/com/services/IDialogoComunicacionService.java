@@ -3,6 +3,7 @@ package org.itcgae.siga.com.services;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +21,7 @@ import org.itcgae.siga.DTOs.com.ResponseDateDTO;
 import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.springframework.util.concurrent.ListenableFuture;
 
 public interface IDialogoComunicacionService {
 	
@@ -34,6 +36,8 @@ public interface IDialogoComunicacionService {
 	public Error generarEnvios(HttpServletRequest request, DialogoComunicacionItem dialogo);
 	public String obtenerNombreFicheroSalida(String idModeloComunicacion, PlantillaModeloDocumentoDTO plantilla, HashMap<String, Object> hDatosGenerales, String idLenguaje, int numFichero, String pathFicheroSalida, String campoSufijo);
 	public List<DatosDocumentoItem> generarDocumentosEnvio(String idInstitucion, String idEnvio) throws Exception;
-	public File obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo,
+	public  ListenableFuture<File> obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo,
 			HttpServletResponse resp);
+	//public CompletableFuture<File> generacionAsyncInforme(Long i, HttpServletRequest request,
+		//	DialogoComunicacionItem dialogo, HttpServletResponse resp);
 }

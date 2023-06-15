@@ -67,8 +67,32 @@ public class SolIncorporacionItem {
 	private String bic;
 	private String nombreBanco;
 	private Date fechaEstadoSolicitud;
-	
-	
+	private String numRegistro;
+	private String claveConsulta;
+	private String numExpediente;
+
+	public String getNumExpediente() {
+		return numExpediente;
+	}
+
+	public void setNumExpediente(String numExpediente) {
+		this.numExpediente = numExpediente;
+	}
+
+	public String getClaveConsulta() {
+		return claveConsulta;
+	}
+
+	public void setClaveConsulta(String claveConsulta) {
+		this.claveConsulta = claveConsulta;
+	}
+
+	public String getNumRegistro() {
+		return numRegistro;
+	}
+	public void setNumRegistro(String numRegistro) {
+		this.numRegistro = numRegistro;
+	}
 	public String getIdTratamiento() {
 		return idTratamiento;
 	}

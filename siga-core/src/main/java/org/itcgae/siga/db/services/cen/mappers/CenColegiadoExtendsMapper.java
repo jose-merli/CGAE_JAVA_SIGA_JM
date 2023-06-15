@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
@@ -130,8 +131,8 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR)
-
+			@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "COLEGIORESULTADO", property = "colegioResultado", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> selectColegiadosByIdPersona(Short idInstitucion, String idPersona);
 
@@ -268,20 +269,39 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> selectColegiacionActual(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
-	
-	
-	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiacionHistor")
+
+//	sql.SELECT("COLEGIADO.IDPERSONA,INSTITUCION.ABREVIATURA,COLEGIADO.idinstitucion");
+//	sql.SELECT("DECODE(COLEGIADO.COMUNITARIO,0,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO) AS NCOLEGIADO");
+//	sql.SELECT("PERSONA.NIFCIF");
+//	sql.SELECT("RECURSO.DESCRIPCION");
+//	sql.SELECT("(PERSONA.APELLIDOS1  || ' ' || PERSONA.APELLIDOS2 || ' ' || PERSONA.NOMBRE) AS NOMBRE");
+//	sql.SELECT("DECODE(COUNT(INSCRIPCIONTURNO.IDTURNO),0,'NO','SI') AS INSCRITOTURNO");
+//	sql.SELECT("DECODE(COUNT(INSCRIPCIONGUARDIA.IDTURNO),0,'NO','SI') AS INSCRITOGUARDIA");
+//	sql.SELECT("DIRECCION.TELEFONO1 AS TELEFONO");
+//	sql.SELECT("Select count(*)      From Scs_Cabeceraguardias Cab Where Cab.Idinstitucion = COLEGIADO.idinstitucion and cab.idpersona = COLEGIADO.idpersona and Cab.Fecha_Fin >= Sysdate) as guardiasPendientes");
+
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "busquedaColegiadosSJCS")
 	@Results({ 
-		@Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAESTADO", property = "fechaEstadoStr", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAESTADODATE", property = "fechaEstado", jdbcType = JdbcType.DATE),
-		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INSCRITOTURNO", property = "inscritoturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INSCRITOGUARDIA", property = "inscritoguardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "GUARDIASPENDIENTES", property = "guardiasPendientes", jdbcType = JdbcType.VARCHAR)
+
 	})
-	List<ColegiadoItem> selectColegiacionHistor(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
+	List<ColegiadosSJCSItem> busquedaColegiadosSJCS(String idInstitucion, ColegiadosSJCSItem colegiadosSJCSItem);
 	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectCuentaContableSJCS")
+	@Results({ 
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "cuentaContable", property = "cuentaContable", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ColegiadoItem> selectCuentaContableSJCS(Short idInstitucion, ColegiadoItem colegiadoItem);
 }

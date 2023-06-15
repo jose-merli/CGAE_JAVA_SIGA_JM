@@ -110,8 +110,10 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 	private GenRecursosMapper genRecursosMapper;
 	@Autowired
 	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
-@Autowired 
-private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	@Autowired 
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	@Autowired
+	private ExcelHelper excelHelper;
 	
 	@Override
 	public File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector)
@@ -120,7 +122,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemploCV);
+		File XLSFile = this.excelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemploCV);
 		return XLSFile;
 	}
 
@@ -202,7 +204,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
-		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datos = this.excelHelper.parseExcelFile(file.getBytes());
 
 		CenCargamasiva cenCargamasivacv = new CenCargamasiva();
 
@@ -286,7 +288,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 					error.setMessage("No existen registros en el fichero.");
 					updateResponseDTO.setStatus(SigaConstants.OK); 
 				}else {
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCV, datosLog);
+					byte[] bytesLog = this.excelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCV, datosLog);
 
 					cenCargamasivacv.setTipocarga("CV");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -985,6 +987,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 		LOGGER.info("searchCV() -> Entrada al servicio para obtener datos curriculares");
 
+		Error error = new Error();		
 		CargaMasivaDTO cargaMasivaDTO = new CargaMasivaDTO();
 		List<CargaMasivaItem> cargaMasivaItemList = new ArrayList<CargaMasivaItem>();
 
@@ -994,6 +997,12 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 			cargaMasivaItemList = cenCargaMasivaExtendsMapper.selectEtiquetas(idInstitucion, cargaMasivaItem);
 			cargaMasivaDTO.setCargaMasivaItem(cargaMasivaItemList);
+			
+			if((cargaMasivaItemList != null) && (cargaMasivaItemList.size()) >= 200) {
+				error.setCode(200);
+				error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+				cargaMasivaDTO.setError(error);
+			}
 
 			if (cargaMasivaItemList == null || cargaMasivaItemList.size() == 0) {
 

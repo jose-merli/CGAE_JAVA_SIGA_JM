@@ -4,15 +4,26 @@ import java.util.List;
 import java.util.Objects;
 
 import org.itcgae.siga.DTOs.gen.Error;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class RetencionesDTO {
 
 	
 	private List<RetencionesItem> retencionesItemList;
 	private Error error;
+	private boolean activo;
 	
+	public boolean isActivo() {
+		return activo;
+	}
+
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
+
+
 	/**
 	 *
 	 */

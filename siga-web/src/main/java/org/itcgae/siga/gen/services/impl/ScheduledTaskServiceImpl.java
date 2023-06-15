@@ -6,6 +6,7 @@ import org.itcgae.siga.cen.services.IBusquedaSancionesService;
 import org.itcgae.siga.com.services.IProcesaEnviosAntiguosService;
 import org.itcgae.siga.form.services.IFichaCursosService;
 import org.itcgae.siga.gen.services.IScheduledTaskService;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 	
 	@Autowired
 	private IProcesaEnviosAntiguosService procesaEnviosAntiguosService;
+	
+	@Autowired
+	private IFacturacionSJCSServices facturacionServices;
 	
 	@Scheduled(cron = "${cron.pattern.scheduled.forCurso}")
 	@Override

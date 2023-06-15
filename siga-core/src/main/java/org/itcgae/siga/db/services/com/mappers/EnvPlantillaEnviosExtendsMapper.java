@@ -101,4 +101,11 @@ public interface EnvPlantillaEnviosExtendsMapper extends EnvPlantillasenviosMapp
 		@Result(column = "IDTIPOENVIOS", property = "subValue", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboPlantillasItem> getPlantillasByIdInstitucion(String idInstitucion);
+
+	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "comboPlantillasEnvio")
+	@Results({
+		@Result(column = "idplantillaenvios", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> comboPlantillasEnvio(Short idInstitucion);
 }

@@ -3,6 +3,8 @@ package org.itcgae.siga.db.services.age.providers;
 import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.age.EventoItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.mappers.AgeEventoSqlProvider;
 
@@ -216,6 +218,66 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("evento.idEventoOriginal = '" + idEvento + "'");
 
+		return sql.toString();
+	}
+	
+		
+		
+
+		
+		// Colegio
+	
+		// Consejo
+		
+	public String searchFestivos(EventoItem eventoItem, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("DECODE(age_evento.TITULO,'Fiesta Local', age_evento.IDINSTITUCION, null) as IDINSTITUCION");
+		sql.SELECT("DECODE(age_evento.TITULO,'Fiesta Local', age_evento.idevento, null) as idevento");
+		sql.SELECT("age_evento.FECHAINICIO");
+		sql.SELECT("age_evento.FECHAINICIO as FECHAINICIOOLD");
+		sql.SELECT("age_evento.FECHAFIN");
+		sql.SELECT("age_evento.DESCRIPCION AS NOMBRE"); 
+		sql.SELECT("age_evento.DESCRIPCION as DESCRIPCIONOLD"); 
+		sql.SELECT("age_evento.DESCRIPCION"); 
+		sql.SELECT("age_evento.TITULO"); 
+		sql.SELECT("TO_DATE(age_evento.FECHABAJA, 'dd/MM/yyyy') as FECHABAJA");
+		sql.SELECT("age_evento.RECURSOS"); 
+		sql.SELECT("age_evento.LUGAR");
+		sql.SELECT("DECODE(age_evento.TITULO,'Fiesta Local',CEN_PARTIDOJUDICIAL.NOMBRE,age_evento.TITULO) as FIESTALOCALPARTIDO");
+		sql.SELECT("age_evento.IDTIPOEVENTO");
+		sql.SELECT("AGE_CALENDARIO.IDTIPOCALENDARIO");
+		
+		sql.FROM("age_evento age_evento");
+		sql.LEFT_OUTER_JOIN("CEN_PARTIDOJUDICIAL CEN_PARTIDOJUDICIAL ON CEN_PARTIDOJUDICIAL.IDPARTIDO = age_evento.LUGAR");
+		sql.LEFT_OUTER_JOIN("CEN_INFLUENCIA CEN_INFLUENCIA ON CEN_PARTIDOJUDICIAL.IDPARTIDO = CEN_INFLUENCIA.IDPARTIDO AND CEN_INFLUENCIA.IDINSTITUCION = age_evento.IDINSTITUCION");
+		sql.INNER_JOIN("AGE_CALENDARIO AGE_CALENDARIO on age_evento.idCalendario = AGE_CALENDARIO.idCalendario and age_evento.idinstitucion = AGE_CALENDARIO.idinstitucion");
+		sql.LEFT_OUTER_JOIN("CEN_INSTITUCION CEN_INSTITUCION ON CEN_INSTITUCION.IDINSTITUCION = AGE_EVENTO.IDINSTITUCION");
+
+		
+		// Colegio
+		if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100")) {
+			sql.WHERE("age_evento.IDINSTITUCION = '" + idInstitucion + "'");
+	
+		// Consejo
+		} else if(!idInstitucion.equals(SigaConstants.IDINSTITUCION_2000)) {
+			sql.WHERE("(age_evento.IDINSTITUCION = '" + idInstitucion + "' or cen_institucion.CEN_INST_IDINSTITUCION = '" + idInstitucion + "')");
+		}
+		
+		sql.WHERE("age_evento.idtipoevento = '9'");
+		sql.WHERE("AGE_CALENDARIO.IDTIPOCALENDARIO like '2'");
+		sql.WHERE("age_evento.descripcion not like 'No Laborable'");
+		
+		if(eventoItem.getAnio() != null && eventoItem.getAnio() != "") {
+			sql.WHERE("extract(year from age_evento.FECHAINICIO) = '" + eventoItem.getAnio() + "'");
+		}
+		
+		if(!eventoItem.isHistorico()) {
+			sql.WHERE("age_evento.FECHABAJA is null");
+		}
+		
+		sql.ORDER_BY("age_evento.FECHAINICIO");
+		
 		return sql.toString();
 	}
 }

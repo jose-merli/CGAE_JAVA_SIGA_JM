@@ -516,7 +516,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				String nombreFichero = fileName.substring(0, fileName.lastIndexOf("."));
 
 				if (extension.contains("doc") || extension.contains("docx") || extension.contains("xls")
-						|| extension.contains("xlsx")) {
+						|| extension.contains("xlsx") || extension.contains("fo")) {
 					try {
 
 						// Obtenemos el idplantilladocumento para concatenarlo con el nombre del fichero

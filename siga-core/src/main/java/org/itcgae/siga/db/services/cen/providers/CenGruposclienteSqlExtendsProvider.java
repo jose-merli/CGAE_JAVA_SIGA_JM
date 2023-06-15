@@ -109,4 +109,16 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		
 		return sql.toString();
 	}
+	
+	public String comboEtiquetas(String idioma, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("gc.idgrupo as id");
+		sql.SELECT("f_siga_getrecurso(gc.nombre, " + idioma + ") as descripcion");
+		sql.FROM("CEN_GRUPOSCLIENTE gc");
+		sql.WHERE("gc.idinstitucion="+ idInstitucion);
+		sql.ORDER_BY("descripcion");
+			
+		return sql.toString();
+	}
 }

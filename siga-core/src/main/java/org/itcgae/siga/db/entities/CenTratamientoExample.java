@@ -127,7 +127,7 @@ public class CenTratamientoExample {
 
 		protected GeneratedCriteria() {
 			super();
-			criteria = new ArrayList<Criterion>();
+			criteria = new ArrayList<>();
 		}
 
 		public boolean isValid() {

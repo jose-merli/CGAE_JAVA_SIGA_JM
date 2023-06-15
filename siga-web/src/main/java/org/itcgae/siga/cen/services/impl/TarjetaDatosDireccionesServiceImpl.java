@@ -140,7 +140,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		if(null != datosDireccionesSearchDTO.getIdInstitucion() && !datosDireccionesSearchDTO.getIdInstitucion().isEmpty()) {
+			idInstitucion = Short.valueOf(datosDireccionesSearchDTO.getIdInstitucion());
+		}
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -400,6 +402,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		ComboDTO poblacionesReturn = new ComboDTO();
 		List<CenPoblaciones> poblaciones = new ArrayList<CenPoblaciones>();
 
+		//Tratamiento apostrofes
+        filtro = UtilidadesString.tratamientoApostrofes(filtro);
+		
 		poblaciones = cenPoblacionesExtendsMapper.selectByFilter(filtro, idProvincia);
 
 		if (null != poblaciones && poblaciones.size() > 0) {
@@ -1148,7 +1153,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
 				direcciones.setIdprovincia(datosDireccionesItem.getIdProvincia());
 				direcciones.setMovil(datosDireccionesItem.getMovil());
-				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
+				if(datosDireccionesItem.getOtraProvincia() != null) {
+					direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
+				}
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
 

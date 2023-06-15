@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -158,6 +159,10 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 //			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" +colegiadoItem.getApellidos().replaceAll("\\s+","")
 //					+ "%')");
 		}
+		
+		if (colegiadoItem.getIdPersona() != null && colegiadoItem.getIdPersona() != "") {
+			sql.WHERE("per.idpersona = " + colegiadoItem.getIdPersona());
+		}		
 		
 		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
 			sql.WHERE("(decode(col.comunitario,1,col.ncomunitario,col.ncolegiado) = '" + colegiadoItem.getNumColegiado() + "')");
@@ -831,6 +836,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
 
+		sql.SELECT_DISTINCT("inst.abreviatura as colegioResultado");
+		
+		
 		sql1.SELECT("partidojudicial.nombre");
 		sql1.FROM("cen_partidojudicial partidojudicial");
 		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
@@ -838,7 +846,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql1.INNER_JOIN(
 				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
 						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
-
+		
 		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
 		sql1.WHERE("direcciones.idpersona = dir.idpersona");
 		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
@@ -1210,44 +1218,63 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		return sql.toString();
 	}
+	public String busquedaColegiadosSJCS(String idInstitucion, ColegiadosSJCSItem colegiadosSJCSItem) {
+		SQL sql = new SQL();
+		sql.SELECT("COLEGIADO.IDPERSONA,INSTITUCION.ABREVIATURA,COLEGIADO.idinstitucion");
+		sql.SELECT("DECODE(COLEGIADO.COMUNITARIO,0,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO) AS NCOLEGIADO");
+		sql.SELECT("PERSONA.NIFCIF");
+		sql.SELECT("RECURSO.DESCRIPCION");
+		sql.SELECT("(PERSONA.APELLIDOS1  || ' ' || PERSONA.APELLIDOS2 || ' ' || PERSONA.NOMBRE) AS NOMBRE");
+		sql.SELECT("DECODE(COUNT(INSCRIPCIONTURNO.IDTURNO),0,'NO','SI') AS INSCRITOTURNO");
+		sql.SELECT("DECODE(COUNT(INSCRIPCIONGUARDIA.IDTURNO),0,'NO','SI') AS INSCRITOGUARDIA");
+		sql.SELECT("DIRECCION.TELEFONO1 AS TELEFONO");
+		sql.SELECT("(Select count(*)      From Scs_Cabeceraguardias Cab Where Cab.Idinstitucion = COLEGIADO.idinstitucion and cab.idpersona = COLEGIADO.idpersona and Cab.Fecha_Fin >= Sysdate) as GUARDIASPENDIENTES");
+		sql.FROM("CEN_COLEGIADO COLEGIADO");
+		sql.INNER_JOIN("CEN_INSTITUCION INSTITUCION ON COLEGIADO.IDINSTITUCION = INSTITUCION.IDINSTITUCION");
+		sql.INNER_JOIN("CEN_CLIENTE CLIENTE ON CLIENTE.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = CLIENTE.IDINSTITUCION");
+		sql.INNER_JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA = CLIENTE.IDPERSONA");
+		sql.INNER_JOIN("CEN_DATOSCOLEGIALESESTADO ESTADOCOLEGIAL ON ESTADOCOLEGIAL.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = ESTADOCOLEGIAL.IDINSTITUCION AND  ESTADOCOLEGIAL.FECHAESTADO = (SELECT MAX(FECHAESTADO) FROM CEN_DATOSCOLEGIALESESTADO ESTADOCOLEGIAL2 WHERE ESTADOCOLEGIAL2.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = ESTADOCOLEGIAL2.IDINSTITUCION)");
+		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL ESTADO ON ESTADO.IDESTADO = ESTADOCOLEGIAL.IDESTADO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS RECURSO ON ESTADO.DESCRIPCION = RECURSO.IDRECURSO AND RECURSO.IDLENGUAJE = 1");
+		sql.LEFT_OUTER_JOIN("(SELECT DIRECCIONES.IDPERSONA,DIRECCIONES.IDINSTITUCION,DIRECCIONES.TELEFONO1 FROM CEN_DIRECCIONES DIRECCIONES INNER JOIN CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON  TIPODIRECCION.IDPERSONA = DIRECCIONES.IDPERSONA AND DIRECCIONES.IDINSTITUCION = TIPODIRECCION.IDINSTITUCION AND TIPODIRECCION.IDDIRECCION = DIRECCIONES.IDDIRECCION AND TIPODIRECCION.IDTIPODIRECCION = 6 WHERE DIRECCIONES.FECHABAJA IS NULL AND DIRECCIONES.IDINSTITUCION = 2005) direccion on DIRECCION.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = DIRECCION.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("scs_inscripcionturno INSCRIPCIONTURNO ON INSCRIPCIONTURNO.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = INSCRIPCIONTURNO.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("SCS_INSCRIPCIONGUARDIA INSCRIPCIONGUARDIA ON INSCRIPCIONGUARDIA.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = INSCRIPCIONGUARDIA.IDINSTITUCION");
+		sql.WHERE("COLEGIADO.IDINSTITUCION = '"+idInstitucion+"'");
+		if(colegiadosSJCSItem.getnColegiado() != null && colegiadosSJCSItem.getnColegiado() != "")sql.WHERE("NVL(COLEGIADO.NCOLEGIADO, COLEGIADO.NCOMUNITARIO) = '"+ colegiadosSJCSItem.getnColegiado()+"'");			
+		if(colegiadosSJCSItem.getIdTurno() != null) { 
+			sql.WHERE("INSCRIPCIONTURNO.IDTURNO = '"+colegiadosSJCSItem.getIdTurno()+"'");
+			if(colegiadosSJCSItem.getIdGuardia() != null)sql.WHERE("(INSCRIPCIONGUARDIA.IDTURNO = '"+colegiadosSJCSItem.getIdTurno()+"'  AND INSCRIPCIONGUARDIA.IDGUARDIA = '"+colegiadosSJCSItem.getIdGuardia()+"')");
+		}
+		if(colegiadosSJCSItem.getIdEstado() != null) sql.WHERE("ESTADOCOLEGIAL.IDESTADO = '"+colegiadosSJCSItem.getIdEstado()+"'");
+		if(colegiadosSJCSItem.getFechaestado() != null) sql.WHERE("ESTADOCOLEGIAL.FECHAESTADO = '"+colegiadosSJCSItem.getFechaestado()+"'");
+		if(colegiadosSJCSItem.getNif() != null && colegiadosSJCSItem.getNif() != "") sql.WHERE("PERSONA.NIFCIF =  '"+colegiadosSJCSItem.getNif()+"'");
+		if (colegiadosSJCSItem.getApellidos() != null && colegiadosSJCSItem.getApellidos() != ""){ 
+			String columna = "REPLACE(CONCAT(PERSONA.apellidos1,PERSONA.apellidos2), ' ', '')";
+			String cadena = colegiadosSJCSItem.getApellidos();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));	
+		}
+		if (colegiadosSJCSItem.getNombre() != null && colegiadosSJCSItem.getNombre() != "") {
+			String columna = "PERSONA.NOMBRE";
+			String cadena = colegiadosSJCSItem.getNombre();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));	
+		}
+		sql.GROUP_BY("COLEGIADO.IDPERSONA,INSTITUCION.ABREVIATURA,COLEGIADO.idinstitucion, COLEGIADO.COMUNITARIO,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO, PERSONA.NIFCIF,RECURSO.DESCRIPCION, PERSONA.APELLIDOS1  ,PERSONA.APELLIDOS2 ,PERSONA.NOMBRE,DIRECCION.TELEFONO1");
+		return sql.toString();
+	}	
 	
-	public String selectColegiacionHistor(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem) {
+	public String selectCuentaContableSJCS(Short idInstitucion, ColegiadoItem colegiadoItem) {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("TO_CHAR(fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
-		sql.SELECT("cat.descripcion as estadoColegial");
-		sql.SELECT("decode (col.situacionresidente, 1, 'Si', 0, 'No') as residenteInscrito");
-		sql.SELECT("decode (colest.situacionresidente, 1, 'Si', 0, 'No') as situacionResidente");
-		sql.SELECT("observaciones");
-		sql.SELECT("TO_CHAR(fechaestado,'DD/MM/YYYY') AS fechaestado");
-		sql.SELECT("fechaestado AS fechaestadodate");
-		sql.SELECT("colest.idestado AS idEstado");
-		sql.SELECT("col.idinstitucion as idInstitucion");
+		sql.SELECT("IDPERSONA");
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("NVL(CUENTACONTABLESJCS,' ') AS cuentaContable");
 
-		sql.FROM("cen_colegiado col");
-//		sql.INNER_JOIN(
-//				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");		
-		sql.INNER_JOIN(
-				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
-						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
-						+ " and datcol.fechaestado < sysdate))");
-		
-		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
-		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"
-				+ idLenguaje + "')");
+		sql.FROM("cen_colegiado");
 
-		sql.WHERE("col.idpersona = '" + colegiadoItem.getIdPersona() + "'");
+		sql.WHERE("idpersona = '" + colegiadoItem.getIdPersona() + "'");
+		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 
-		if (idInstitucion != Short.parseShort("2000")) {
-			sql.WHERE("colest.idinstitucion != '" + idInstitucion + "'");
-		}
-		// sql1.WHERE("dir.fechabaja is null");
-
-		sql.ORDER_BY("fechaestadodate desc");
-		// sql.ORDER_BY("per.nombre");
-		
-		LOGGER.info("selectColegiacionHistor() -> " + sql.toString());
 		return sql.toString();
 	}
 }

@@ -371,6 +371,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 					if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 						BusquedaPerFisicaSearchDTO segundaBusqueda = new BusquedaPerFisicaSearchDTO();
 						segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
+						segundaBusqueda.setIdInstitucion(busquedaPerFisicaSearchDTO.getIdInstitucion());
 						busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje,
 								null);
 
@@ -462,13 +463,15 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 
 							// Buscamos si se encuentra en nuestra bbdd
 						} else {
+							//Buscamos si es persona juridica
 							CenPersonaExample cenPersonaExample = new CenPersonaExample();
 							cenPersonaExample.createCriteria().andIdtipoidentificacionEqualTo(Short.valueOf("20"))
-									.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+							.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+						
+							List<CenPersona> listPersonaJuridica = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 
-							List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
-
-							if (null != listPersona && listPersona.size() > 0) {
+							if(listPersonaJuridica != null && listPersonaJuridica.size() > 0) {
+								//Si es persona jurídica devolvemos el error
 								Error error = new Error();
 								error.setMessage("general.mensaje.busquedaGeneral.noexiste.personaFisica");
 								busquedaPerFisicaDTO.setError(error);
@@ -650,10 +653,14 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				String tipo = isNifNie(documento);
 				// Rellenamos la peticion
 				IdentificacionType identificacion = IdentificacionType.Factory.newInstance();
-				if (tipo.equals("NIF")) {
-					identificacion.setNIF(documento);
-				} else if (tipo.equals("NIE")) {
-					identificacion.setNIE(documento);
+				if(tipo != null) {
+						if (tipo.equals("NIF")) {
+						identificacion.setNIF(documento);
+					} else if (tipo.equals("NIE")) {
+						identificacion.setNIE(documento);
+					}
+				}else {
+					identificacion.setPasaporte(documento);
 				}
 				colegiadoRequest.setIdentificacion(identificacion);
 
@@ -726,7 +733,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+				//AdmUsuarios usuario = usuarios.get(0);
 				// Buscamos a la persona como colegiado
 				List<ColegiadoItem> colegiado = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion,
 						idPersona);
@@ -775,7 +782,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+				//AdmUsuarios usuario = usuarios.get(0);
 				// Buscamos a la persona como colegiado
 				List<ColegiadoItem> colegiado = cenColegiadoExtendsMapper
 						.selectColegiadosByIdPersona(Short.parseShort(idInstitucionPersona), idPersona);
