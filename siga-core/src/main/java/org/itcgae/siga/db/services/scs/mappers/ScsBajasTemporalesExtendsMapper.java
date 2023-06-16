@@ -44,6 +44,22 @@ public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMappe
 				@Result(column = "FECHAESTADO", property = "fechaestado", jdbcType = JdbcType.TIMESTAMP) })
 	    List<BajasTemporalesItem> busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem,Short idInstitucion, Integer tamMaximo);
 	 
+	 @SelectProvider(type=ScsBajasTemporalesSqlExtendsProvider.class, method="busquedaBajasTemporalesValidadas")
+	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "FECHABT", property = "fechabt", jdbcType = JdbcType.TIMESTAMP, id = true),
+			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHADESDE", property = "fechadesde", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHAHASTA", property = "fechahasta", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHAALTA", property = "fechaalta", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "VALIDADO", property = "validado", jdbcType = JdbcType.CHAR),
+			@Result(column = "ELIMINADO", property = "eliminado", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "FECHAESTADO", property = "fechaestado", jdbcType = JdbcType.TIMESTAMP) })
+    List<BajasTemporalesItem> busquedaBajasTemporalesValidadas(BajasTemporalesItem bajasTemporalesItem);
+	 
 
 	@SelectProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "comboEstado")
 		@Results({

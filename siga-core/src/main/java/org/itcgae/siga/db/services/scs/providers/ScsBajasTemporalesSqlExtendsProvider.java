@@ -79,6 +79,26 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		return sql2.toString();
 	}
 	
+	public String busquedaBajasTemporalesValidadas(BajasTemporalesItem bajasTemporalesItem) {
+		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		sql.SELECT("bt.idinstitucion");
+		sql.FROM("cen_bajastemporales bt");
+		sql.WHERE("bt.idinstitucion = '"+bajasTemporalesItem.getIdinstitucion()+"'");
+		sql.WHERE("bt.idpersona = '"+bajasTemporalesItem.getIdpersona()+"'");
+		sql.WHERE("bt.validado = '"+'1'+"'");
+		
+		
+		if(bajasTemporalesItem.getFechadesde() != null) {
+			sql.WHERE("TRUNC(bt.fechaBt) >=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"','DD/MM/RRRR')");
+		}
+		if(bajasTemporalesItem.getFechahasta() != null) {
+			sql.WHERE("TRUNC(bt.fechaBt) <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"','DD/MM/RRRR')");
+		}
+		
+		return sql.toString();
+	}
+	
 	public String comboEstado() {
 
 		SQL sql = new SQL();
@@ -195,7 +215,7 @@ public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer
 	sql.VALUES("VALIDADO", "2");
 	sql.VALUES("FECHAESTADO", "TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR')");
 	sql.VALUES("FECHAMODIFICACION", "SYSDATE");
-	sql.VALUES("FECHAALTA", "TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR')");
+	sql.VALUES("FECHAALTA", "SYSDATE");
 	sql.VALUES("ELIMINADO", "0");
 	sql.VALUES("FECHABT","TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
 	sql.VALUES("IDPERSONA", bajasTemporalesItem.getIdpersona());

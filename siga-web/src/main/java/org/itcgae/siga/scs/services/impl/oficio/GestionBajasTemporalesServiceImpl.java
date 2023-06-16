@@ -558,31 +558,30 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						LocalDate dateAfter = LocalDate.parse(strDateHasta);
 						
 						long fechasBT = ChronoUnit.DAYS.between(dateBefore, dateAfter);
-						
-						if(fechasBT == 0) {
-							bjtmp.setFechabt(bjtmp.getFechadesde());
-							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
-						}else if(fechasBT == 1) {
-							bjtmp.setFechabt(bjtmp.getFechadesde());
-							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
-							bjtmp.setFechabt(bjtmp.getFechahasta());
-							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
-						}else if(fechasBT > 1) {
-							bjtmp.setFechabt(bjtmp.getFechadesde());
-							Date dateAux = bjtmp.getFechadesde();
-							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
-							for (int i = 0; i < fechasBT; i++) {
-								dateAux = this.diaSiguienteDate(dateAux);
-								//String strAux = dateFormat.format(bjtmp.getFechabt());  
-								bjtmp.setFechabt(dateAux);
+						if(scsBajasTemporalesExtendsMapper.busquedaBajasTemporalesValidadas(bjtmp).isEmpty()) {
+							if(fechasBT == 0) {
+								bjtmp.setFechabt(bjtmp.getFechadesde());
 								response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+							}else if(fechasBT == 1) {
+								bjtmp.setFechabt(bjtmp.getFechadesde());
+								response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+								bjtmp.setFechabt(bjtmp.getFechahasta());
+								response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+							}else if(fechasBT > 1) {
+								bjtmp.setFechabt(bjtmp.getFechadesde());
+								Date dateAux = bjtmp.getFechadesde();
+								response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+								for (int i = 0; i < fechasBT; i++) {
+									dateAux = this.diaSiguienteDate(dateAux);
+									//String strAux = dateFormat.format(bjtmp.getFechabt());  
+									bjtmp.setFechabt(dateAux);
+									response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+								}
 							}
+							//eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
 						}
-
-						eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
-						
 					}
-				}catch (Exception e) {
+				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");

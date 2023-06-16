@@ -1094,7 +1094,6 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 				
 				//Comprobamos el tipo de guardias asociadas al turno. En caso de ser obligatorias (valor 0), no se realizarian las inscripciones.  2- A elegir; 1-Todas o ninguna;
 				if(!listGu.isEmpty()) {
-					if(!listGu.get(0).getObligatoriedad().equals("0")) {
 					
 						ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
 						key2.setIdinstitucion(idInstitucion);
@@ -1144,8 +1143,6 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 						
 //						}
 //						else errorLinea.append("El colegiado no esta inscrito en el turno indicado.");
-					}
-					else errorLinea.append("Las guardias en el turno son obligatorias por lo que no se puede realizar la fila.");
 				}
 //				else errorLinea.append("No se ha encontrado guardias asociadas al turno indicado.");
 			}

@@ -123,10 +123,10 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			sql.LEFT_OUTER_JOIN(
 					"SCS_AREA ON SCS_AREA.IDAREA = SCS_TURNO.IDAREA AND SCS_AREA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION");
 
-			// FILTRO AREA | MATERIA
-			if (guardiaItem.getMateria() != null && guardiaItem.getMateria() != "")
-				sql.LEFT_OUTER_JOIN(
-						"SCS_MATERIA ON SCS_MATERIA.IDAREA = SCS_AREA.IDAREA AND SCS_MATERIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION");
+		// FILTRO AREA | MATERIA
+		if (guardiaItem.getMateria() != null && guardiaItem.getMateria() != "")
+			sql.LEFT_OUTER_JOIN(
+					"SCS_MATERIA ON SCS_MATERIA.IDMATERIA = SCS_TURNO.IDMATERIA AND SCS_MATERIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION");
 		}
 		// FILTRO GRUPOZONA
 		if (guardiaItem.getGrupoZona() != null && guardiaItem.getGrupoZona() != "") {
@@ -1480,7 +1480,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		
 		//sql.WHERE("NOT EXISTS (" + sql2 + ")");
 		
-		sql.ORDER_BY("PC.FECHACALINICIO desc, PC.FECHACALFIN desc, PC.FECHAPROGRAMACION desc");
+		sql.ORDER_BY("PC.FECHAPROGRAMACION desc, PC.FECHACALINICIO desc, PC.FECHACALFIN desc");
 
 		
 		return sql.toString();
