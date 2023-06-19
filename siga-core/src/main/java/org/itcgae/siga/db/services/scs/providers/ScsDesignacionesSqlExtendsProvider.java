@@ -618,17 +618,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 				if (designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")) {
 //					sql += " and PER.NIF = " + "'" + designaItem.getNif().trim() + "'";
-					sql += " and LTRIM(UPPER(PER.NIF),'0') LIKE LTRIM(UPPER('" + designaItem.getNif().trim()
-							+ "%'),'0')";
+					sql += " AND des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE sp.NIF like '"+designaItem.getNif()+"%' AND IDINSTITUCION = "+idInstitucion+"))";
 				}
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
 //					sql += " and PER.NOMBRE = " + "'" + designaItem.getNombreInteresado().trim() + "'";
-					sql += " AND upper(PER.NOMBRE) like UPPER('%" + designaItem.getNombreInteresado().trim() + "%')";
+					sql += " AND des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.NOMBRE) like UPPER('%"+designaItem.getNombreInteresado()+"%') AND IDINSTITUCION = "+idInstitucion+"))";
 				}
 				if (designaItem.getApellidosInteresado() != null
 						&& !designaItem.getApellidosInteresado().equalsIgnoreCase("")) {
-					sql += " and upper(PER.APELLIDO1 || ' ' || PER.APELLIDO2) like upper ('%" + designaItem.getApellidosInteresado() + "%')";
+					sql += " AND des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.APELLIDO1 || ' ' ||sp.APELLIDO2) LIKE UPPER('%"+designaItem.getApellidosInteresado()+"%') AND sp.IDINSTITUCION = "+idInstitucion+"))";
 				}
 			}
 
