@@ -76,7 +76,7 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "nombrePoblacion", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "pais", property = "idPais", jdbcType = JdbcType.VARCHAR)
 	})
-	List<BusquedaPerFisicaItem> searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje, String idInstitucion);
+	List<BusquedaPerFisicaItem> searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje, String idinstitucion);
 	
 	
 	

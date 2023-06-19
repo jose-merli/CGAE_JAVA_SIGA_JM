@@ -42,6 +42,12 @@ public interface IFichaDatosColegialesService {
 	public ColegiadoDTO datosColegialesSearchActual(int numPagina, ColegiadoItem colegiadoItem,
 			HttpServletRequest request);
 	
+	public ColegiadoDTO datosColegialesSearchHistor(ColegiadoItem colegiadoItem,
+			HttpServletRequest request);
+	
+	public ColegiadoDTO sendMailsOtherCentres(String[] centresToSendMails,
+			HttpServletRequest request);
+	
 	public StringDTO getTurnosGuardias(ColegiadoItem colegiadoItem,
             HttpServletRequest request);
 
