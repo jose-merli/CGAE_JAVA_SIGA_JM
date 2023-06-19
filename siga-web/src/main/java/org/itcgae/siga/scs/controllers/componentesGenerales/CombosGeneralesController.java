@@ -149,6 +149,12 @@ public class CombosGeneralesController {
 		ComboDTO response = comboService.comboGuardias(request, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@GetMapping("/guardiasDiasSemana")
+    public ResponseEntity<ComboDTO> comboGuardiasDiasSemana(HttpServletRequest request, @RequestParam("idTurno") String idTurno, @RequestParam("fecha") String fecha) {
+		ComboDTO response = comboService.comboGuardiasDiasSemana(request, idTurno, fecha);
+        return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+    }
 
 	@GetMapping("/guardiasNoBajaNoExistentesEnListaGuardias")
 	public ResponseEntity<ComboDTO> comboGuardiasNoBajaNoExistentesEnListaGuardias(HttpServletRequest request, String idTurno, String idListaGuardias) {

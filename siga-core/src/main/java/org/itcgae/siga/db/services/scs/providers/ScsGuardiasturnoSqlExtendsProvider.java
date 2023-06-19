@@ -282,6 +282,50 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		return sql.toString();
 	}
+	
+	public String comboGuardiasDiasSemana(String idTurno, String diaSemana, String idInstitucion, boolean isFestivo) {
+        SQL sql = new SQL();
+
+        sql.SELECT("NOMBRE");
+        sql.SELECT("IDGUARDIA");
+
+        sql.FROM("SCS_GUARDIASTURNO");
+        if (!idTurno.equals("null") && idTurno != null &&  !idTurno.isEmpty() && !idTurno.equals("undefined")) {
+            sql.WHERE("IDTURNO IN (" + idTurno + ")");
+        }
+        if (idInstitucion != null &&  !idInstitucion.isEmpty()) {
+            sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+        }
+        if(diaSemana != null && !diaSemana.isEmpty()) {
+            if(isFestivo) {
+                sql.WHERE("SELECCIONFESTIVOS LIKE '%" + diaSemana + "%'");
+            } else {
+                sql.WHERE("SELECCIONLABORABLES LIKE '%" + diaSemana + "%'");
+            }
+        }
+        sql.WHERE("FECHABAJA IS NULL");
+        sql.ORDER_BY("nombre");
+
+        return sql.toString();
+    }
+	
+    public String comboInstitucionFestivos(String idInstitucion, String fecha) {
+        SQL sql = new SQL();
+
+        sql.SELECT("COUNT(IDFESTIVO) AS CONTADOR");
+        
+        sql.FROM("AGE_FESTIVOS af");
+        
+        if (idInstitucion != null &&  !idInstitucion.isEmpty()) {
+            sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+        }
+        if(fecha != null && !fecha.isEmpty()) {
+            sql.WHERE("FECHA = TO_DATE('" + fecha + "', 'YYYY-MM-dd')");
+        }
+        sql.WHERE("FECHABAJA IS NULL");
+
+        return sql.toString();
+    }
 
 	public String comboGuardiasNoBaja(String idTurno, String idInstitucion) {
 		SQL sql = new SQL();

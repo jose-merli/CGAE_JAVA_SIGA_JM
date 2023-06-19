@@ -71,6 +71,15 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
 	List<ComboItem> comboGuardias(String idTurno, String idInstitucion);
 	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardiasDiasSemana")
+    @Results({ @Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)})
+    List<ComboItem>comboGuardiasDiasSemana(String idTurno, String fecha, String idInstitucion, boolean isFestivo);
+	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboInstitucionFestivos")
+    @Results()
+    int comboInstitucionFestivos(String idInstitucion, String fecha);
+	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchNombreTurnoGuardiaNoAbrev")
 	@Results({
 		@Result(column = "NOMBRETURNO", property = "nombreTurno", jdbcType = JdbcType.VARCHAR),
