@@ -735,8 +735,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 			if (null != usuarios && usuarios.size() > 0) {
 				//AdmUsuarios usuario = usuarios.get(0);
 				// Buscamos a la persona como colegiado
-				List<ColegiadoItem> colegiado = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion,
-						idPersona);
+				List<ColegiadoItem> colegiado = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion, idPersona);
 
 				if (colegiado != null && colegiado.size() > 0) {
 					// Persona encontrada

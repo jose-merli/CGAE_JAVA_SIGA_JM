@@ -392,8 +392,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					}
 
-					List<ComboItem> comboItems = scsGuardiascolegiadoExtendsMapper.getColegiadosGuardiaDia(idTurno,
-							idGuardia, idInstitucion, guardiaDia);
+					List<ComboItem> comboItems = scsGuardiascolegiadoExtendsMapper.getColegiadosGuardiaDia(idTurno, idGuardia, idInstitucion, guardiaDia);
 
 					if (comboItems != null && !comboItems.isEmpty()) {
 						comboDTO.setCombooItems(comboItems);

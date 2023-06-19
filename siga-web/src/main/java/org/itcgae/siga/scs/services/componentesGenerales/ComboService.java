@@ -127,4 +127,6 @@ public interface ComboService {
 	public ComboDTO comboTurnosGrupo(HttpServletRequest request);
 
 	public ComboDTO comboTurnosAsuntos(HttpServletRequest request, String idTipo);
+	
+	public ComboDTO comboGuardiasDiasSemana(HttpServletRequest request, String idTurno, String fecha);
 }
