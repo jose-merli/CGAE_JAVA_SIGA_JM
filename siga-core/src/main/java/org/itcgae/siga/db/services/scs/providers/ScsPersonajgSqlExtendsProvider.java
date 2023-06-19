@@ -339,6 +339,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		}
 
 		sqlUnidadFamiliar.WHERE("(" + idPersonasIn + ")");
+		sqlUnidadFamiliar.WHERE("UNIDADFAMILIAR.FECHABAJA IS NULL");
 
 		SQL sqlContrarioEjg = new SQL();
 		sqlContrarioEjg.SELECT("CONTRARIOEJG.idpersona");
