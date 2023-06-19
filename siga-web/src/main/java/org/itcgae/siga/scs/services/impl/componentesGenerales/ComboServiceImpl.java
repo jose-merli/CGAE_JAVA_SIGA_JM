@@ -1,10 +1,15 @@
 package org.itcgae.siga.scs.services.impl.componentesGenerales;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -133,6 +138,8 @@ public class ComboServiceImpl implements ComboService {
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosMapper;
 	
+	@Autowired
+	private ScsGuardiascolegiadoExtendsMapper scsGuardiascolegiadoExtendsMapper;
 
 	@Override
 	public ComboDTO comboTipoEjg(HttpServletRequest request) {
@@ -1107,6 +1114,89 @@ public class ComboServiceImpl implements ComboService {
 		return comboDTO;
 
 	}
+	
+	@Override
+    public ComboDTO comboGuardiasDiasSemana(HttpServletRequest request, String idTurno, String fecha) {
+        LOGGER.info("comboGuardiasDiasSemana() -> Entrada al servicio para búsqueda de las guardia con sus dias laborales y festivoss");
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ComboDTO comboDTO = new ComboDTO();
+        if (idInstitucion != null) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            LOGGER.info(
+                    "comboGuardiasDiasSemana() / scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana() -> admUsuariosExtendsMapper.selectByExample(exampleUsuarios) -> ");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            if (usuarios != null && usuarios.size() > 0) {
+                //TODO
+                //Saber el dia de la semana
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                LocalDate fechaParseada = LocalDate.parse(fecha, formatter);
+                int indiceDiaSemana = fechaParseada.getDayOfWeek().getValue();
+                String[] diasSemanasArray = {"L","M","X","J","V","S","D"};                
+                String diaSemana = diasSemanasArray[indiceDiaSemana-1];
+                
+                //Para poder usar la fecha dentro de la consulta
+                SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                SimpleDateFormat formatoEspanol = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = null;
+                String formattedDate = null;
+                try {
+                    date = inputFormat.parse(fecha);
+                    formattedDate = outputFormat.format(date);
+                } catch (ParseException e) {
+                	LOGGER.error("comboGuardiasDiasSemana() - Error parseando las fechas: " + e.getMessage());
+                    e.printStackTrace();
+                } 
+                
+                LOGGER.info(
+                        "comboGuardiasDiasSemana() / scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias con sus dias laborales y festivos");
+                
+                List<ComboItem> comboItems = null;
+                //Festivos de un colegio filtrado por la fecha
+                int contadorFestivos = scsGuardiasturnoExtendsMapper.comboInstitucionFestivos(idInstitucion.toString(), formattedDate);
+                
+                if (contadorFestivos > 0) { //Que existen días festivos en ese centro
+                    comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana(idTurno, diaSemana,
+                            idInstitucion.toString(), true);
+                    
+                } else { //Que no existen días festivos en ese centro
+                    comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana(idTurno, diaSemana,
+                            idInstitucion.toString(), false); 
+                }
+                
+                //Recorremos el comboIntems y repasamos sus Guardias para no devolverlas si no tienen letrados de guardia para el dia marcado
+                List<ComboItem> borraPosList = new ArrayList<ComboItem>();
+                for (ComboItem comboItem : comboItems) {
+                	String idGuardia = comboItem.getValue();
+                	String guardiaDia = formatoEspanol.format(date);
+                	List<ComboItem> listGuardLetr = scsGuardiascolegiadoExtendsMapper.getColegiadosGuardiaDia(idTurno, idGuardia, idInstitucion, guardiaDia);
+                	 
+                	 //Si no tiene letrado de guardia para ese dia, apuntamos la guardia para no devolverla
+                	 if(listGuardLetr.isEmpty()) {
+                		 borraPosList.add(comboItem);
+                	 }
+				}
+                
+                //Borramos los indices de las guardias que no hay que devolver
+                for(int j = 0; j < borraPosList.size(); j++) {
+                	comboItems.remove(borraPosList.get(j));
+                }
+               
+
+                comboDTO.setCombooItems(comboItems);
+                LOGGER.info(
+                        "comboGuardiasDiasSemana() / scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana() -> Salida a scsGuardiasturnoExtendsMapper para obtener las guardias con sus dias laborales y festivos");
+            }
+            
+        }
+        return comboDTO;
+    }
+	
 	@Override
 	public ComboDTO comboGuardiasNoBaja(HttpServletRequest request, String idTurno) {
 		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
