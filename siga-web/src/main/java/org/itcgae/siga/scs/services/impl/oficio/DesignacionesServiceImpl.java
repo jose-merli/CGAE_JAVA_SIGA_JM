@@ -5459,7 +5459,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								turnoExample.createCriteria().andIdturnoEqualTo(scsTurnoInscrito.getIdturno());
 								List<ScsTurno> turnoInscritoIt = this.scsTurnosExtendsMapper
 										.selectByExample(turnoExample);
-
+								
+								if(turnoInscritoIt.get(0).getIdtipoturno()!=null) {//
+									
 								if (CollectionUtils.isNotEmpty(turnoInscritoIt) && Short.toUnsignedInt(turnoInscritoIt
 										.get(0).getIdtipoturno()) != SigaConstants.TIPO_TURNO_DESIGNACION.intValue()) {
 									error.setCode(HttpStatus.NOT_ACCEPTABLE.value());
@@ -5469,6 +5471,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									updateResponseDTO.setError(error);
 									return updateResponseDTO;
 								}
+								
+								}//
+								
 							}
 						} else {
 							letradoDesigSinTurno = Boolean.TRUE;

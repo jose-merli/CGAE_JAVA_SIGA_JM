@@ -1535,7 +1535,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje) {
+	public String busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje, Integer tamMaximo) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		SQL sql3 = new SQL();
@@ -1642,6 +1642,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "    estado,\r\n" + "    residente,\r\n" + "    tieneguardias,\r\n" + "    guardiaspendientes,\r\n"
 				+ "    CASE sumaturnos\r\n" + "        WHEN 0 THEN\r\n" + "            'No'\r\n" + "        ELSE\r\n"
 				+ "            'Sí'\r\n" + "    END AS tieneturno FROM ( " + sql.toString() + ")");
+		
+		if(tamMaximo != null) {
+			sql3.FETCH_FIRST_ROWS_ONLY(tamMaximo+1);
+		}
 
 //		if (tamMaximo != null) {
 //			Integer tamMaxNumber = tamMaximo + 1;
