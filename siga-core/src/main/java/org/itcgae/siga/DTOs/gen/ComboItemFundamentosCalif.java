@@ -10,6 +10,7 @@ public class ComboItemFundamentosCalif {
 	private String label = null;
 	private String value = null;
 	private String fechaBaja = null;
+	private String bloqueado = null;
 
 	/**
 	 **/
@@ -42,8 +43,6 @@ public class ComboItemFundamentosCalif {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
-	
 
 	public String getFechaBaja() {
 		return fechaBaja;
@@ -51,6 +50,14 @@ public class ComboItemFundamentosCalif {
 
 	public void setFechaBaja(String fechaBaja) {
 		this.fechaBaja = fechaBaja;
+	}
+
+	public String getBloqueado() {
+		return bloqueado;
+	}
+
+	public void setBloqueado(String bloqueado) {
+		this.bloqueado = bloqueado;
 	}
 
 	@Override
@@ -62,7 +69,8 @@ public class ComboItemFundamentosCalif {
 			return false;
 		}
 		ComboItemFundamentosCalif comboItem = (ComboItemFundamentosCalif) o;
-		return Objects.equals(this.label, comboItem.label) && Objects.equals(this.value, comboItem.value) && Objects.equals(this.fechaBaja, comboItem.fechaBaja);
+		return Objects.equals(this.label, comboItem.label) && Objects.equals(this.value, comboItem.value)
+				&& Objects.equals(this.fechaBaja, comboItem.fechaBaja);
 	}
 
 	@Override

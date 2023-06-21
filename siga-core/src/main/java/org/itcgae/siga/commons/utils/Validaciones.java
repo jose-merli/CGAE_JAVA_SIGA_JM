@@ -161,7 +161,7 @@ public class Validaciones {
 	private static boolean validaDenominacion(String denominacion) {
 
 		// Se comprueba que la denominación tenga un mínimo de 1 y un máximo de 500 caracteres
-		if (denominacion.length() >= 1 && denominacion.length() >= 500) {
+		if (denominacion.length() >= 1 && denominacion.length() <= 500) {
 			return true;
 		} else {
 			return false;
