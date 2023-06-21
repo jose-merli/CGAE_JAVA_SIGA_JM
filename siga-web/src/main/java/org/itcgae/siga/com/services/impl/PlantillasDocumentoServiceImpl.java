@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -805,8 +806,14 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 //							for (ModRelPlantillaSufijo modSufijo : sufijosGuardados) {
 //								modRelPlantillaSufijoMapper.deleteByPrimaryKey(modSufijo.getIdplantillasufijo());
 //							}
-
-							for (DocumentoPlantillaItem idPlantillaDoc : plantillaDoc.getPlantillas()) {
+							List<DocumentoPlantillaItem> listaPlantillas = new ArrayList<>(plantillaDoc.getPlantillas().stream()
+									.collect(Collectors.toMap(
+											DocumentoPlantillaItem::getIdIdioma,
+											x -> x,
+											(plantiA,plantiB) -> plantiA
+											)).values()
+									);
+							for (DocumentoPlantillaItem idPlantillaDoc : listaPlantillas) {
 
 								ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
 
