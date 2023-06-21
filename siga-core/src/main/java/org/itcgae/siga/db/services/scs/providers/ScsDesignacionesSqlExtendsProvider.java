@@ -1519,6 +1519,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                AND ejd.numeroejg = ejg.numero ");
 		sql.append(" WHERE D.IDINSTITUCION = " + idInstitucion);
 
+		if(item.getNumEJG()!=null) {
+			sql.append(" AND ejg.numero = "+item.getNumEJG());
+		}
+		
+		if(item.getAnioEJG()!=null) {
+			sql.append(" AND ejg.anio = "+item.getAnioEJG());
+		}
+		
 		if (item.getSinEJG()!=null) {
 			if (item.getSinEJG().equals("0")) {
 				sql.append(" AND ejg.anio is not null ");
