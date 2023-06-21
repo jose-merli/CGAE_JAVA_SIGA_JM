@@ -2097,7 +2097,7 @@ public class WSCommons {
 		 * @return
 		 */
 		private boolean validaSociedadActualizacion(SociedadActualizacion sociedadActualizacion) {
-			
+			LOGGER.debug("WSCommons.validaSociedadActualizacion() - INICIO");
 			Validaciones.setMotivoNoValido("La sociedad no es válida");
 			
 			// Comprueba si se ha proporcionado un CIF o NIF válido
@@ -2114,12 +2114,16 @@ public class WSCommons {
 					if (sociedadActualizacion.getObjetoSocial() != null &&
 						sociedadActualizacion.getObjetoSocial().length() > 500) {
 						Validaciones.setMotivoNoValido("El objeto social supera los 500 caracteres");
+						LOGGER.debug("WSCommons.validaSociedadActualizacion(): " + Validaciones.getMotivoNoValido());
+						LOGGER.debug("WSCommons.validaSociedadActualizacion() - FIN");
 						return false;
 					}
 					
 					// Comprueba que exista al menos un integrante en la sociedad
 					if (sociedadActualizacion.getIntegranteSociedadArray().length == 0) {
 						Validaciones.setMotivoNoValido("No existe ningún integrante en la sociedad");
+						LOGGER.debug("WSCommons.validaSociedadActualizacion(): " + Validaciones.getMotivoNoValido());
+						LOGGER.debug("WSCommons.validaSociedadActualizacion() - FIN");
 						return false;
 					} else {
 						for (IntegranteSociedad integrante: sociedadActualizacion.getIntegranteSociedadArray()) {
@@ -2141,9 +2145,11 @@ public class WSCommons {
 										Validaciones.setMotivoNoValido("El integrante de la sociedad no es válido");
 									}
 								} catch (Exception e) {
+									LOGGER.error("ERROR - WSCommons.validaSociedadActualizacion(): " + e.getMessage());
 									Validaciones.setMotivoNoValido("El integrante de la sociedad no es válido");
 								}
-								
+								LOGGER.debug("WSCommons.validaSociedadActualizacion(): " + Validaciones.getMotivoNoValido());
+								LOGGER.debug("WSCommons.validaSociedadActualizacion() - FIN");
 								return false;
 							}
 						}
@@ -2154,6 +2160,8 @@ public class WSCommons {
 					if (sociedadActualizacion.getDireccion() == null ||
 						!Validaciones.validaDireccion(sociedadActualizacion.getDireccion())) {
 						Validaciones.setMotivoNoValido("La dirección de la sociedad no es válida");
+						LOGGER.debug("WSCommons.validaSociedadActualizacion(): " + Validaciones.getMotivoNoValido());
+						LOGGER.debug("WSCommons.validaSociedadActualizacion() - FIN");
 						return false;
 					}
 					
@@ -2161,14 +2169,18 @@ public class WSCommons {
 					if (sociedadActualizacion.getDatosNotario().getDomNode().hasChildNodes() &&
 						!Validaciones.validaDatosNotario(sociedadActualizacion.getDatosNotario())) {
 						Validaciones.setMotivoNoValido("El nombre del notario no es válido");
+						LOGGER.debug("WSCommons.validaSociedadActualizacion(): " + Validaciones.getMotivoNoValido());
+						LOGGER.debug("WSCommons.validaSociedadActualizacion() - FIN");
 						return false;
 					}
 				} else {
 					Validaciones.setMotivoNoValido("No se ha proporcionado un CIF/NIF válido o faltan datos obligatorios de la sociedad");
+					LOGGER.debug("WSCommons.validaSociedadActualizacion(): " + Validaciones.getMotivoNoValido());
+					LOGGER.debug("WSCommons.validaSociedadActualizacion() - FIN");
 					return false;
 				}
 				
-			
+			LOGGER.debug("WSCommons.validaSociedadActualizacion() - FIN");
 			return true;
 		}
 	
