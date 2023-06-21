@@ -493,9 +493,6 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							}
 						}
 						if(inscripcionesItem.getEstadonombre().equals("Pendiente de Baja")) {
-							if (inscripcionesItem.getTipoguardias().equals("Obligatorias")
-									|| inscripcionesItem.getTipoguardias().equals("Todas o ninguna")) {
-								
 								List<ScsInscripcionguardia> inscripcionguardia = null;
 								ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
 								exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -509,9 +506,8 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								guardia.setFechabaja(inscripcionesItem.getFechaActual());
 								guardia.setFechamodificacion(new Date());
 								guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
-								
+
 								response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardia);
-							}
 							}
 						}
 						
