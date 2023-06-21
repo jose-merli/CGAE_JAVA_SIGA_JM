@@ -501,13 +501,16 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 								inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
 								for (int i = 0; i < inscripcionguardia.size(); i++) {
-								ScsInscripcionguardia guardia = inscripcionguardia.get(i);
-								guardia.setObservacionesvalbaja(inscripcionesItem.getObservaciones());
-								guardia.setFechabaja(inscripcionesItem.getFechaActual());
-								guardia.setFechamodificacion(new Date());
-								guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
+									if(inscripcionguardia.get(i).getFechadenegacion() == null) {
+										ScsInscripcionguardia guardia = inscripcionguardia.get(i);
+										guardia.setObservacionesvalbaja(inscripcionesItem.getObservaciones());
+										guardia.setFechabaja(inscripcionesItem.getFechaActual());
+										guardia.setFechamodificacion(new Date());
+										guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-								response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardia);
+										response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardia);
+									}
+
 							}
 						}
 						
@@ -1158,23 +1161,23 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							
 							if(!guardias.isEmpty()) {
 							
-								for(ScsInscripcionguardia guardia:guardias) {
-		                        
-								guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
-								guardia.setFechasolicitudbaja(new Date());
-								guardia.setFechamodificacion(new Date());
-								guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
-								
+								for (ScsInscripcionguardia guardia : guardias) {
+									if (guardia.getFechadenegacion() == null) {
+										guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
+										guardia.setFechasolicitudbaja(new Date());
+										guardia.setFechamodificacion(new Date());
+										guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
+
 //								guardia.setIdinstitucion(Short.parseShort(inscripcionesItem.getIdinstitucion()));
 //								guardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 //								guardia.setIdguardia(Integer.parseInt(inscripcionesItem.getIdguardia()));
 //								guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 //								guardia.setFechasuscripcion(inscripcionesItem.getFechasolicitud());
 //	
-								response = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
-								
+										response = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
+									}
 								}
-							
+
 							}
 						} else {
 							
