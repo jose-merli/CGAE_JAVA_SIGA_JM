@@ -1352,14 +1352,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			subquery.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
 			subquery.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
 			subquery.WHERE("DESIGNALETRADO.IDTURNO = LET2.IDTURNO");
-			subquery.WHERE("TRUNC(LET2.FECHADESIGNA) <= act.fecha");
+			//Se elimina esta condición para que se muestren las actuaciones con fecha anterior a la fecha de designa.			
+			//subquery.WHERE("TRUNC(LET2.FECHADESIGNA) <= act.fecha");
 
 			sql.append(
 					" AND act.idinstitucion = designaletrado.idinstitucion (+)"
 							+ "AND act.idturno = designaletrado.idturno (+) "
 							+ "AND act.anio = designaletrado.anio (+) "
 							+ "AND act.numero = designaletrado.numero (+) "
-							+ "AND act.fecha >= TRUNC(designaletrado.fechadesigna) "
+							//Se elimina esta condición para que se muestren las actuaciones con fecha anterior a la fecha de designa.										
+							//+ "AND act.fecha >= TRUNC(designaletrado.fechadesigna) "
 							+ "AND designaletrado.fechadesigna = ( " + subquery.toString() + " ) ");
 			sql.append(
 					" AND colegiado.idpersona = designaletrado.idpersona (+) "
