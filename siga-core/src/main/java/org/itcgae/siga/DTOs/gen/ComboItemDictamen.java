@@ -10,6 +10,7 @@ public class ComboItemDictamen {
 	private String label = null;
 	private String value = null;
 	private String bloqueado = null;
+	private String fechaBaja = null;
 
 	/**
 	 **/
@@ -42,8 +43,6 @@ public class ComboItemDictamen {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
-	
 
 	public String getBloqueado() {
 		return bloqueado;
@@ -51,6 +50,14 @@ public class ComboItemDictamen {
 
 	public void setBloqueado(String bloqueado) {
 		this.bloqueado = bloqueado;
+	}
+
+	public String getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(String fechaBaja) {
+		this.fechaBaja = fechaBaja;
 	}
 
 	@Override
@@ -62,7 +69,8 @@ public class ComboItemDictamen {
 			return false;
 		}
 		ComboItemDictamen comboItem = (ComboItemDictamen) o;
-		return Objects.equals(this.label, comboItem.label) && Objects.equals(this.value, comboItem.value) && Objects.equals(this.bloqueado, comboItem.bloqueado);
+		return Objects.equals(this.label, comboItem.label) && Objects.equals(this.value, comboItem.value)
+				&& Objects.equals(this.bloqueado, comboItem.bloqueado);
 	}
 
 	@Override
