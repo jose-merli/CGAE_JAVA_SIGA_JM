@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -89,66 +90,58 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	@Override
 	public Document sustituyeDocumento(Document doc, HashMap<String, Object> dato) throws Exception {
 
-		try {
-			Set<String> claves = new HashSet<>();
-			Set<String> clavesRegion = new HashSet<>();
-			for (String clave : dato.keySet()) {
-				if(clave.equals("row"))
-					claves.add(clave);
-				else
-					clavesRegion.add(clave);
-			}
+		 try {
+		        List<String> claves = new ArrayList<>();
+		        List<String> clavesRegion = new ArrayList<>();
+		        
+		        for (String clave : dato.keySet()) {
+		            if (clave.equals("row"))
+		                claves.add(clave);
+		            else
+		                clavesRegion.add(clave);
+		        }
 
-			int controlLast = 0;
-			for (String clave : clavesRegion) {
-				controlLast++;
-					Object o = dato.get(clave);
-					if (o instanceof List) {
-						List aux = (List) o;
-							if(controlLast == clavesRegion.size())
-								doc = sustituyeRegionDocumento(doc, clave, aux, true);	
-							else
-								doc = sustituyeRegionDocumento(doc, clave, aux, false);				
-						//dato.remove(o);
-					} 	
-			}
-			
-			for (String clave : claves) {
-					Object datosMap = (Object) dato.get(clave);
-					if (datosMap instanceof HashMap) {
-						HashMap htRowDatosInforme = (HashMap) datosMap;
-						doc = sustituyeDatos(doc, htRowDatosInforme);
-					}
-			}
+		        int sizeClavesRegion = clavesRegion.size();
+		        for (int i = 0; i < sizeClavesRegion; i++) {
+		            String clave = clavesRegion.get(i);
+		            Object o = dato.get(clave);
+		            if (o instanceof List) {
+		                List aux = (List) o;
+		                doc = sustituyeRegionDocumento(doc, clave, aux, i == sizeClavesRegion - 1);    
+		            }
+		        }
+		        
+		        for (String clave : claves) {
+		            Object datosMap = dato.get(clave);
+		            if (datosMap instanceof HashMap) {
+		                HashMap htRowDatosInforme = (HashMap) datosMap;
+		                doc = sustituyeDatos(doc, htRowDatosInforme);
+		            }
+		        }
 
-
-		} catch (Exception e) {
-			LOGGER.error(
-					"GeneracionDocumentosServiceImpl.sustituyeDocumento :: Error al sustituir los datos del documento",
-					e);
-			throw new BusinessException("Error al reemplazar los datos en el documento", e);
-		}
-		return doc;
+		    } catch (Exception e) {
+		        LOGGER.error(
+		                "GeneracionDocumentosServiceImpl.sustituyeDocumento :: Error al sustituir los datos del documento",
+		                e);
+		        throw new BusinessException("Error al reemplazar los datos en el documento", e);
+		    }
+		    return doc;
 	}
 
 	private Document sustituyeRegionDocumento(Document doc, String region, List dato, boolean ultimo) throws Exception {
-		DataMailMergeDataSource dataMerge = new DataMailMergeDataSource(region, dato);
-
-		try {
-			if (doc != null && doc.getMailMerge() != null && !ultimo) {
-				doc.getMailMerge().executeWithRegions(dataMerge);
-			}
-			else if (doc != null && doc.getMailMerge() != null && ultimo) {
-				doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS);
-				doc.getMailMerge().executeWithRegions(dataMerge);
-			}
-			
-			
-		} catch (Exception e) {
-			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeRegionDocumento :: Error al sustituir región", e);
-			throw e;
-		}
-		return doc;
+		 DataMailMergeDataSource dataMerge = new DataMailMergeDataSource(region, dato);
+		    try {
+		        if (doc != null && doc.getMailMerge() != null) {
+		            if (ultimo) {
+		                doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS);
+		            }
+		            doc.getMailMerge().executeWithRegions(dataMerge);
+		        }
+		    } catch (Exception e) {
+		        LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeRegionDocumento :: Error al sustituir región", e);
+		        throw e;
+		    }
+		    return doc;
 	}
 
 	private Document sustituyeDatos(Document doc, HashMap<String, Object> dato) {
@@ -159,27 +152,23 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 			DocumentBuilder builder = new DocumentBuilder(doc);
 
-			if (claves.size() != 0) {
-
-				for (String clave : claves) {
-					while (builder.moveToMergeField(clave)) {
-						Object o = dato.get(clave);
-						try {
-							if (o != null) {
-								builder.write(o.toString().trim());
-							} //else {
-							//	builder.write(" ");  
-							//}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
-					}
-				}
-
-			} else {
-				doc = null;
-			}
+			   if (!dato.isEmpty()) {
+		            for (Map.Entry<String, Object> entry : dato.entrySet()) {
+		                Object o = entry.getValue();
+		                if (o != null) {
+		                    String clave = entry.getKey();
+		                    while (builder.moveToMergeField(clave)) {
+		                        try {
+		                            builder.write(o.toString().trim());
+		                        } catch (Exception e) {
+		                            e.printStackTrace();
+		                        }
+		                    }
+		                }
+		            }
+		        } else {
+		            doc = null;
+		        }
 
 			
 			//doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS
@@ -199,35 +188,35 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		// nombrefichero incluye la extension .doc
 		File archivo = null;
 		DatosDocumentoItem documento = new DatosDocumentoItem();
-		try {
-			if (doc != null) {
-				doc.removeMacros();
-				doc.save(pathfinal + nombrefichero);
-				archivo = new File(pathfinal + nombrefichero);
-				if (!archivo.exists())
-					return null;
+		
+		 if (doc == null) {
+		        return null;
+		  }
+		 
+		 String fullFilePath = pathfinal + nombrefichero;
+		 
+		 try {
+		        doc.removeMacros();
+		        doc.save(fullFilePath);
 
-				byte[] byteArray = null;
+		        byte[] byteArray;
 
-				if (firmado) {
-					String docFirmado = pfdService.firmarPDF(archivo);
-					byteArray = Base64.decodeBase64(docFirmado.getBytes());
-				} else {
-					byteArray = Files.readAllBytes(archivo.toPath());
-				}
+		        if (firmado) {
+		            String docFirmado = pfdService.firmarPDF(new File(fullFilePath));
+		            byteArray = Base64.decodeBase64(docFirmado.getBytes());
+		        } else {
+		            byteArray = Files.readAllBytes(Paths.get(fullFilePath));
+		        }
 
-				WSCommons.fileBytes(byteArray, pathfinal + nombrefichero);
-				
-				documento.setFileName(nombrefichero);
-				documento.setDatos(byteArray);
-				documento.setPathDocumento(pathfinal);
-				documento.setDocumentoFile(new File(pathfinal + nombrefichero));
-			} else {
-				documento = null;
-			}
+		        WSCommons.fileBytes(byteArray, fullFilePath);
+		        
+		        documento.setFileName(nombrefichero);
+		        documento.setDatos(byteArray);
+		        documento.setPathDocumento(pathfinal);
+		        documento.setDocumentoFile(new File(fullFilePath));
 
-		} catch (Exception e) {
-			String mensaje = "Error al guardar el documento: " + pathfinal + nombrefichero;
+		    } catch (Exception e) {
+			String mensaje = "Error al guardar el documento: " + fullFilePath;
 			if(e.getMessage() != null && e.getMessage().contains("PDF")) {
 				 mensaje = 	e.getMessage();
 			}

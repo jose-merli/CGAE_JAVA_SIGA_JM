@@ -34,9 +34,20 @@ public interface ModModeloPlantillaDocumentoExtendsMapper {
 		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPLANTILLAS", property = "idPlantillas", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREFICHEROSALIDA", property = "nombreFicheroSalida", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FORMATOSALIDA", property = "formatoSalida", jdbcType = JdbcType.VARCHAR)	
+		@Result(column = "FORMATOSALIDA", property = "formatoSalida", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idPlantillaDocumento", property = "idPlantillaDocumento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<PlantillaModeloDocumentoDTO> selectInformesGenerar(Long idModeloComunicacion, String idLenguaje);
+	
+	@SelectProvider(type = ModModeloPlantillaDocumentoExtendsSqlProvider.class, method = "selectInformesGenerarConDest")
+	@Results({
+		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLAS", property = "idPlantillas", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREFICHEROSALIDA", property = "nombreFicheroSalida", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FORMATOSALIDA", property = "formatoSalida", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idPlantillaDocumento", property = "idPlantillaDocumento", jdbcType = JdbcType.VARCHAR),
+	})
+	List<PlantillaModeloDocumentoDTO> selectInformesGenerarConDest(Long idModeloComunicacion, String idLenguaje);
 	
 	@SelectProvider(type = ModModeloPlantillaDocumentoExtendsSqlProvider.class, method = "selectPlantillaGenerar")
 	@Results({
