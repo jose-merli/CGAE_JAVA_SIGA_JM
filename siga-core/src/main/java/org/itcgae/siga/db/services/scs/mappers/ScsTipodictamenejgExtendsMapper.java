@@ -23,6 +23,7 @@ public interface ScsTipodictamenejgExtendsMapper extends ScsTipodictamenejgMappe
 	@SelectProvider(type = ScsTipodictamenejgSqlExtendsProvider.class, method = "comboDictamen")
 	@Results({ @Result(column = "IDTIPODICTAMENEJG", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "BLOQUEADO", property = "bloqueado", jdbcType = JdbcType.VARCHAR)})
 	List<ComboItemDictamen> comboDictamen(String idLenguaje, String idInstitucion);
 	

@@ -11,10 +11,11 @@ public class ScsTipodictamenejgSqlExtendsProvider extends ScsTipodictamenejgSqlP
 		sql.SELECT("tipodictamen.IDTIPODICTAMENEJG");
 		sql.SELECT("catalogoDictamen.DESCRIPCION");
 		sql.SELECT("tipodictamen.BLOQUEADO");
+		sql.SELECT("tipodictamen.FECHA_BAJA");
 
 		sql.FROM("SCS_TIPODICTAMENEJG tipodictamen");
 		sql.JOIN("GEN_RECURSOS_CATALOGOS catalogoDictamen on catalogoDictamen.idrecurso = tipodictamen.DESCRIPCION and catalogoDictamen.idlenguaje ="+idLenguaje);
-		sql.WHERE("tipodictamen.fecha_baja is null");
+		//sql.WHERE("tipodictamen.fecha_baja is null");
 		//sql.WHERE("tipodictamen.bloqueado = 'N'");
 		sql.WHERE("tipodictamen.idinstitucion = "+idInstitucion);
 		sql.ORDER_BY("catalogoDictamen.DESCRIPCION");
