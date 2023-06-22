@@ -1161,12 +1161,15 @@ public class ComboServiceImpl implements ComboService {
                 int contadorFestivos = scsGuardiasturnoExtendsMapper.comboInstitucionFestivos(idInstitucion.toString(), formattedDate);
                 
                 if (contadorFestivos > 0) { //Que existen días festivos en ese centro
-                    comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana(idTurno, diaSemana,
-                            idInstitucion.toString(), true);
+                    comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana(idTurno, diaSemana,  idInstitucion.toString(), true);
                     
                 } else { //Que no existen días festivos en ese centro
-                    comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana(idTurno, diaSemana,
-                            idInstitucion.toString(), false); 
+                    if(contadorFestivos <= 0 && diaSemana.equals("D")) {
+                    	//Los domingos siempre deben ser considerados festivos aunque no estén anadidos en el calendairo de festivos
+                    	comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana(idTurno, diaSemana, idInstitucion.toString(), true);
+                    } else {
+                    	comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasDiasSemana(idTurno, diaSemana,  idInstitucion.toString(), false); 
+                    }
                 }
                 
                 //Recorremos el comboIntems y repasamos sus Guardias para no devolverlas si no tienen letrados de guardia para el dia marcado
