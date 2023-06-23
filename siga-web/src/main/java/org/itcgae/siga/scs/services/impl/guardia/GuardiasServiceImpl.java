@@ -293,8 +293,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Autowired
 	private PlatformTransactionManager transactionManagerCalendarios;
 	
-	@Autowired
-	private ScsInscripcionesTurnoExtendsMapper scsInscripcionesTurnoExtendsMapper;
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -1047,54 +1045,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					response = scsGuardiasturnoExtendsMapper.insertSelective(guardia);
 					
-					if (!UtilidadesString.esCadenaVacia(guardiasItem.getIdGuardiaPrincipal())
-							&& !UtilidadesString.esCadenaVacia(guardiasItem.getIdTurnoPrincipal())) {
-
-					//Si es creacion apartir de una guardia Principal, se pasa las inscripciones de la original a la nueva, TURNO y GUARDIAS.
-					
-					//Buscamos sus Inscripciones Guardia de la Original:
-					ScsInscripcionguardiaExample guardiasOrigenExameple = new ScsInscripcionguardiaExample();
-					guardiasOrigenExameple.createCriteria().andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurnoPrincipal()))
-					.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardiaPrincipal()))
-					.andIdinstitucionEqualTo(idInstitucion).andFechasolicitudbajaIsNull().andFechadenegacionIsNull().andFechavalidacionIsNotNull();
-					List<ScsInscripcionguardia> listaGuardiasOrigen = scsInscripcionguardiaExtendsMapper.selectByExample(guardiasOrigenExameple);
-									
-					//Por cada inscrito de la guardia Origen, se pasa copiara los datos de las inscripciones al nuevo turno/guardia
-					for(ScsInscripcionguardia insGuardia : listaGuardiasOrigen) {
-						
-						//Comprobamos que el inscrito esté en el turno a insertar, si no lo encuentra, pasamos a insertarlo como alta.
-						//Se busca turno de ALTA
-						ScsInscripcionturnoExample turnoOrigenExample = new ScsInscripcionturnoExample();
-						turnoOrigenExample.createCriteria().andIdturnoEqualTo(guardia.getIdturno())
-						.andIdpersonaEqualTo(insGuardia.getIdpersona()).andIdinstitucionEqualTo(idInstitucion).andFechasolicitudbajaIsNull().andFechadenegacionIsNull()
-						.andFechavalidacionIsNotNull();
-						
-						List<ScsInscripcionturno> listaTurno = scsInscripcionesTurnoExtendsMapper.selectByExample(turnoOrigenExample);
-						if(listaTurno.isEmpty() || listaTurno == null) {
-							ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
-							inscripcionturno.setObservacionessolicitud(null);
-							inscripcionturno.setFechasolicitud(new Date());
-							inscripcionturno.setFechavalidacion(new Date());
-							inscripcionturno.setIdturno(guardia.getIdturno());
-							inscripcionturno.setIdpersona(insGuardia.getIdpersona());
-							inscripcionturno.setIdinstitucion(idInstitucion);
-							inscripcionturno.setFechamodificacion(new Date());
-							inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-							scsInscripcionesTurnoExtendsMapper.insert(inscripcionturno);
-						}
-	
-						//Obtenemos la inscripcion 
-
-						insGuardia.setIdguardia(guardia.getIdguardia());
-						insGuardia.setFechasuscripcion( new Date());
-						insGuardia.setFechavalidacion(new Date());
-						insGuardia.setIdturno(guardia.getIdturno());
-						insGuardia.setFechamodificacion(new Date());
-						int res = scsInscripcionguardiaExtendsMapper.insertSelective(insGuardia);
-					}
-					
-					}
 					LOGGER.info(
 							"createGuardia() / scsGuardiasturnoExtendsMapper.insert() -> Salida de scsGuardiasturnoExtendsMapper para insertar la nueva guardia");
 
