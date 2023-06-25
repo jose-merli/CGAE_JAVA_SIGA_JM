@@ -1558,7 +1558,7 @@ public class SigaConstants {
 	public static String EEJG_IDSISTEMA ="EEJG_IDSISTEMA";
 	public static String EEJG_URLWS ="EEJG_URLWS";
 	public static String SIGAFRONT_VERSION = "202109071016";
-	public static String SIGAWEB_VERSION = "1.0.93_0";
+	public static String SIGAWEB_VERSION = "1.0.94_0";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";
