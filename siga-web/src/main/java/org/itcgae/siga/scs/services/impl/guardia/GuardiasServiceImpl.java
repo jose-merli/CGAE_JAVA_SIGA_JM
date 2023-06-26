@@ -292,6 +292,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private PlatformTransactionManager transactionManagerCalendarios;
+	
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -982,7 +983,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardia.setIdturnoprincipal(Integer.valueOf(guardiasItem.getIdTurnoPrincipal()));
 						guardia.setFechasuscripcionUltimo(null);
 						guardia.setIdpersonaUltimo(null);
-
 					} else {
 						LOGGER.info(
 								"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Setteo de los campos que se han introducido y el resto de datos por defecto");
@@ -1044,7 +1044,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							"createGuardia() / scsGuardiasturnoExtendsMapper.insert() -> Entrada a scsGuardiasturnoExtendsMapper para insertar la nueva guardia");
 
 					response = scsGuardiasturnoExtendsMapper.insertSelective(guardia);
-
+					
 					LOGGER.info(
 							"createGuardia() / scsGuardiasturnoExtendsMapper.insert() -> Salida de scsGuardiasturnoExtendsMapper para insertar la nueva guardia");
 

@@ -803,7 +803,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 								guardia.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
 
-								result = scsInscripcionguardiaMapper.insert(guardia);
+								//result = scsInscripcionguardiaMapper.insert(guardia);
+								result = scsInscripcionguardiaMapper.insertSelective(guardia);
 
 								if (result == 0) {
 									errores += "Error insertando la inscripcion de la linea " + z + ". <br/>";
@@ -822,6 +823,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									idInstitucion.toString(), usuario.getIdlenguaje());
 
 							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
+							ScsInscripcionguardiaExample scsInscripcionguardiaExample = new ScsInscripcionguardiaExample();
 
 							guardia.setFechabaja(cargaMasivaDatosITItem.getFechaEfectiva());
 							guardia.setFechasolicitudbaja(cargaMasivaDatosITItem.getFechaEfectiva());
@@ -840,6 +842,17 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								while (i < listGu.size() && result != 0) {
 
 									GuardiasItem gu = listGu.get(i);
+									
+									scsInscripcionguardiaExample.createCriteria().andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+									.andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+									.andIdguardiaEqualTo(Integer.parseInt(gu.getIdGuardia()));
+									
+									List<ScsInscripcionguardia> insguaList = scsInscripcionguardiaMapper.selectByExample(scsInscripcionguardiaExample);
+									
+									//Si hay resultados, la fecha de suscripcion sera en el pasado y hay que poner ese valor en el update
+									if (insguaList != null && insguaList.size() != 0) {
+										guardia.setFechasuscripcion(insguaList.get(0).getFechasuscripcion());
+									}
 
 									guardia.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
 
@@ -870,6 +883,17 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									}
 								}
 							} else {
+																
+								scsInscripcionguardiaExample.createCriteria().andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+								.andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+								.andIdguardiaEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
+								
+								List<ScsInscripcionguardia> insguaList = scsInscripcionguardiaMapper.selectByExample(scsInscripcionguardiaExample);
+								
+								//Si hay resultados, la fecha de suscripcion sera en el pasado y hay que poner ese valor en el update
+								if (insguaList != null && insguaList.size() != 0) {
+									guardia.setFechasuscripcion(insguaList.get(0).getFechasuscripcion());
+								}
 
 								guardia.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
 
@@ -1225,7 +1249,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									ig.setUsumodificacion(usuario.getIdusuario());
 									ig.setFechasuscripcion(new Date());
 									
-									scsInscripcionguardiaMapper.insertSelective(ig);
+									//scsInscripcionguardiaMapper.insertSelective(ig);
 
 								} else {
 									errorLinea.append("El colegiado no esta inscrito en el turno indicado.");

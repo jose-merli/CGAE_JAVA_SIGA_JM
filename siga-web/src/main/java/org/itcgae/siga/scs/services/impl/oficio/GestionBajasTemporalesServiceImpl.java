@@ -408,7 +408,10 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 							if(nombres[0].equals("tipo") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								record.setTipo(nombres[1]);
 							}
-							if(nombres[0].equals("descripcion") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
+							if(nombres[0].equals("descripcion")) {
+								if(nombres[1]== null || nombres[1].equals("null") || nombres[1].isEmpty()) {
+									nombres[1] = "";
+								}
 								record.setDescripcion(nombres[1]);
 							}
 							if(nombres[0].equals("fechadesde") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {

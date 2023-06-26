@@ -185,6 +185,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 	@Autowired
 	private ScsContrariosejgMapper scsContrariosejgMapper;
+	
+	@Autowired
+	private CenColegiadoMapper cenColegiadoMapper;
 
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
@@ -703,8 +706,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 								// Obtenemos proximo numero de una nueva asistencia
 								String anioAsistencia = asistencia.getFiltro().getDiaGuardia().split("/")[2];
-								String numeroAsistencia = scsAsistenciaExtendsMapper
-										.getNextNumeroAsistencia(anioAsistencia, idInstitucion);
+								String numeroAsistencia = scsAsistenciaExtendsMapper.getNextNumeroAsistencia(anioAsistencia, idInstitucion);
 
 								// Montamos bean e insertamos asistencia
 								ScsAsistencia asistenciaBBDD = fromTarjetaAsistenciaItemToScsAsistencia2(asistencia,
@@ -733,8 +735,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 											numeroAsistencia, tipoAsistenciaGeneral, idInstitucion, true,
 											usuarios.get(0));
 
-									int responseActuacion = scsActuacionasistenciaExtendsMapper
-											.insertSelective(actuacionBBDD);
+									int responseActuacion = scsActuacionasistenciaExtendsMapper.insertSelective(actuacionBBDD);
 									if (responseActuacion == 0) {
 										LOGGER.error(
 												"guardarAsistenciasExpres() / No se ha insertado la nueva actuacion");
@@ -750,8 +751,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								ScsAsistencia asistenciaBBDD = fromTarjetaAsistenciaItemToScsAsistencia2(asistencia,
 										null, null, tipoAsistenciaGeneral, idPersona, idInstitucion, usuarios.get(0));
 								scsAsistenciaExtendsMapper.updateByPrimaryKey(asistenciaBBDD);
-								int responseAsistencia = scsAsistenciaExtendsMapper
-										.updateByPrimaryKeySelective(asistenciaBBDD);
+								int responseAsistencia = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(asistenciaBBDD);
+								
 								if (responseAsistencia == 0) {
 									LOGGER.error("guardarAsistenciasExpres() / No se ha actualizado la asistencia");
 									error.setCode(500);
@@ -772,8 +773,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									// Si es nueva la insertamos, si no updateamos
 									if (isNuevaActuacion) {
 										LOGGER.info("guardarAsistenciasExpres() / Nueva actuacion");
-										int responseActuacion = scsActuacionasistenciaExtendsMapper
-												.insertSelective(actuacionBBDD);
+										int responseActuacion = scsActuacionasistenciaExtendsMapper.insertSelective(actuacionBBDD);
 										if (responseActuacion == 0) {
 											LOGGER.error(
 													"guardarAsistenciasExpres() / No se ha insertado al nueva Actuacion");
@@ -784,8 +784,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									} else {
 										LOGGER.info("guardarAsistenciasExpres() / Actuacion existente, actualizamos");
 										actuacionBBDD.setIdactuacion(Long.valueOf(i + 1));
-										int responseActuacion = scsAsistenciaExtendsMapper
-												.updateAsistenciaExpress(actuacionBBDD);
+										int responseActuacion = scsAsistenciaExtendsMapper.updateAsistenciaExpress(actuacionBBDD);
+										
 										if (responseActuacion == 0) {
 											LOGGER.error(
 													"guardarAsistenciasExpres() / No se han actualizado las actuaciones");
@@ -797,7 +797,6 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								}
 
 							}
-
 						});
 
 						// Si no ha habido ningún error, procesamos las guardias
@@ -1084,7 +1083,20 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 			if (asistencia.getFiltro() != null
 					&& !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdLetradoManual())) {
-				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoManual()));
+//				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoManual()));
+				
+				//Recuperamos el IDPERSONA a partir del idLetradoManual (su nColegiado)
+				CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+				cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(asistencia.getFiltro().getIdLetradoManual());
+				
+				List<CenColegiado> listCol = cenColegiadoMapper.selectByExample(cenColegiadoExample);
+				
+				if(listCol != null && !listCol.isEmpty()) {
+					asistenciaBBDD.setIdpersonacolegiado(listCol.get(0).getIdpersona());
+				} else {
+					asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoManual()));
+				}
+				
 			} else {
 				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoGuardia()));
 			}
@@ -1337,8 +1349,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 
 		} catch (Exception e) {
-			throw new SigaExceptions(e,
-					"No se han podido procesar las guardias de colegiado, compruebe que no existen facturaciones");
+			throw new SigaExceptions(e, "No se han podido procesar las guardias de colegiado, compruebe que no existen facturaciones");
 		}
 	}
 
@@ -2540,7 +2551,17 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						.selectByExample(example);
 
 				if (scsCalendarioguardias != null && !scsCalendarioguardias.isEmpty()) {
-
+					//Recuperamos el IDPERSONA a partir del idLetradoGuardia (su nColegiado)
+					Long idPersona = 0L;
+					CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+					cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(tarjetaAsistenciaResponseItem.getIdLetradoGuardia());
+					
+					List<CenColegiado> listCol = cenColegiadoMapper.selectByExample(cenColegiadoExample);
+					
+					if(listCol != null && !listCol.isEmpty()) {
+						idPersona = listCol.get(0).getIdpersona();
+					}
+					
 					ScsGuardiascolegiado scsGuardiascolegiado = new ScsGuardiascolegiado();
 					scsGuardiascolegiado.setIdinstitucion(idInstitucion);
 					scsGuardiascolegiado.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
@@ -2549,8 +2570,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 					scsGuardiascolegiado.setFechafin(new SimpleDateFormat("dd/MM/yyyy")
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
-					scsGuardiascolegiado
-							.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					if(idPersona == 0L) {
+						scsGuardiascolegiado.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					}else {
+					scsGuardiascolegiado.setIdpersona(idPersona);
+					}
 					scsGuardiascolegiado.setDiasguardia((long) 1);
 					scsGuardiascolegiado.setDiasacobrar((long) 1);
 					scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
@@ -2572,7 +2596,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy HH:mm")
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
-					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					if(idPersona == 0L) {
+						scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					} else {
+						scsCabeceraguardias.setIdpersona(idPersona);
+					}
 					scsCabeceraguardias.setPosicion((short) 1);
 					scsCabeceraguardias.setFechamodificacion(new Date());
 					scsCabeceraguardias.setSustituto("0");

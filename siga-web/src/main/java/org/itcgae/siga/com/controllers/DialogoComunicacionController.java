@@ -156,7 +156,7 @@ public class DialogoComunicacionController {
 		try {		
 		fileFuture = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
 
-		File file = fileFuture.get(10, TimeUnit.MINUTES);
+		File file = fileFuture.get();
 
 			if (file != null) {
 				fileInfoDTO.setFilePath(file.getAbsolutePath());
@@ -166,40 +166,7 @@ public class DialogoComunicacionController {
 				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-		} catch (InterruptedException | TimeoutException e) {
-
-			
-				String mensaje = "504 - TimeOut";
-				try {
-					fileFuture.cancel(true);
-					// Conseguimos información del usuario logeado
-					String token = request.getHeader("Authorization");
-					String dni = UserTokenUtils.getDniFromJWTToken(token);
-					Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-					exampleUsuarios.createCriteria().andNifEqualTo(dni)
-							.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-					AdmUsuarios usuario = usuarios.get(0);
-
-					GenRecursosExample genRecursosExample = new GenRecursosExample();
-					genRecursosExample.createCriteria()
-							.andIdrecursoEqualTo("informesycomunicaciones.descarga.mensaje.errorTimeOut")
-							.andIdlenguajeEqualTo(usuario.getIdlenguaje());
-					List<GenRecursos> genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
-
-					mensaje = genRecursos.get(0).getDescripcion();
-					LOGGER.error(mensaje);
-				} catch (Exception ex) {
-					LOGGER.error(ex.getCause());
-				}
-				fileInfoDTO.setMessageError(mensaje);
-				return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.GATEWAY_TIMEOUT);
-			
-			
-		}catch(ExecutionException e) {
+		} catch(ExecutionException e) {
 			if(e.getCause() != null )		
 				fileInfoDTO.setMessageError(e.getCause().getMessage());
 			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
