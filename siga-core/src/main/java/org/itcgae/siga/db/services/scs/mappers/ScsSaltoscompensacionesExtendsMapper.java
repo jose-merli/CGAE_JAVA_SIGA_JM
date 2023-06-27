@@ -100,6 +100,10 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "selectNuevoIdSaltosCompensacionesGrupo")
 	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })
 	MaxIdDto selectNuevoIdSaltosCompensacionesGrupo();
+	
+	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "selectIdSiguienteSaltosCompensacionesGrupo")
+	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.NUMERIC), })
+	MaxIdDto selectIdSiguienteSaltosCompensacionesGrupo();
 
 	@InsertProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "guardarSaltosCompensaciones")
 	int guardarSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion, String idSaltosTurno,
