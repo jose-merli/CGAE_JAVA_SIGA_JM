@@ -15,6 +15,7 @@ public class DialogoComunicacionItem {
 	private String ruta;
 	private boolean comunicar;
 	private String sentenciaImprimir;
+	private String descripcionDefecto;
 	
 	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
@@ -69,6 +70,12 @@ public class DialogoComunicacionItem {
 	}
 	public void setSentenciaImprimir(String sentenciaImprimir) {
 		this.sentenciaImprimir = sentenciaImprimir;
+	}
+	public String getDescripcionDefecto() {
+		return descripcionDefecto;
+	}
+	public void setDescripcionDefecto(String descripcionDefecto) {
+		this.descripcionDefecto = descripcionDefecto;
 	}
 	
 	
