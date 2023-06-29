@@ -2283,7 +2283,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-						response = scsEstadoejgMapper.bajaEstadoEjg(record);
+						response = scsEstadoejgExtendsMapper.bajaEstadoEjg(record);
 
 						if (response != 1) {
 							responsedto.setStatus(SigaConstants.KO);

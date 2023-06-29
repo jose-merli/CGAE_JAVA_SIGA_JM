@@ -5,12 +5,16 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
+import org.itcgae.siga.db.entities.ScsEstadoejg;
+import org.itcgae.siga.db.entities.ScsEstadoejgKey;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
+import org.itcgae.siga.db.mappers.ScsEstadoejgSqlProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsEstadoejgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -78,4 +82,7 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
           		@Result(column = "EDITABLECOMISION",  jdbcType = JdbcType.VARCHAR)
           	})
             String getEditResolEjg(EjgItem ejgItem, String idInstitucion);
+            
+        	@UpdateProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "bajaEstadoEjg")
+        	int bajaEstadoEjg(ScsEstadoejg estado);
 }
