@@ -2067,6 +2067,46 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 	}
 	
+	public String selectGuardiaTurnoAltasByTurno(Short idInstitucion, String idTurno) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("DISTINCT IDGUARDIA, IDINSTITUCION, FECHASUSCRIPCION, IDPERSONA, IDINSTITUCION, IDTURNO , FECHASOLICITUDBAJA, FECHABAJA ");
+		sql.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("FECHABAJA IS NULL AND FECHADENEGACION IS NULL AND FECHAVALIDACION IS NOT NULL ");
+
+		return sql.toString();
+	}
+	
+	public String selectGuardiaTurnoBajasByTurnoFecha(Short idInstitucion, String idTurno, String fechaBaja) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("DISTINCT IDGUARDIA, IDINSTITUCION, FECHASUSCRIPCION, IDPERSONA, IDINSTITUCION, IDTURNO , FECHASOLICITUDBAJA, FECHABAJA ");
+		sql.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("TRUNC(FECHABAJA) = TRUNC(TO_DATE('" + fechaBaja + "','DD/MM/RRRR')) AND FECHADENEGACION IS NULL");
+
+		return sql.toString();
+	}
+	
+	public String selectGuardiaTurnoGuardiaBajasByTurnoFecha(Short idInstitucion, String idTurno, String idGuardia,  String fechaBaja) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("DISTINCT IDGUARDIA, IDINSTITUCION, FECHASUSCRIPCION, IDPERSONA, IDINSTITUCION, IDTURNO , FECHASOLICITUDBAJA, FECHABAJA ");
+		sql.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("IDGUARDIA = '" + idGuardia + "'");
+		sql.WHERE("TRUNC(FECHABAJA) = TRUNC(TO_DATE('" + fechaBaja + "','DD/MM/RRRR')) AND FECHADENEGACION IS NULL");
+
+		return sql.toString();
+	}
+	
 	public String selectGuardiaConfiguradasTurno(Short idInstitucion, String idTurno) {
 
 		SQL sql = new SQL();
@@ -2080,6 +2120,19 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 	}
 	
+	public String selectGuardiaConfiguradasBajaByTurnoFechaBaja(Short idInstitucion, String idTurno, String fechaBaja) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("DISTINCT IDGUARDIA, IDTURNO, IDINSTITUCION");
+		sql.FROM("SCS_GUARDIASTURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("TRUNC(FECHABAJA) = TRUNC(TO_DATE('" + fechaBaja + "','DD/MM/RRRR'))");
+
+
+		return sql.toString();
+	}
 	
 	
 //GENERAR CALENDARIOS:

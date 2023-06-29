@@ -768,6 +768,32 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectInscripcionTurnoBajasByTurnoFechaBaja(Short idInstitucion, String idTurno, String fechaBaja) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDINSTITUCION,IDPERSONA, IDTURNO,FECHASOLICITUD");
+		sql.FROM("SCS_INSCRIPCIONTURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("TRUNC(FECHABAJA) = TRUNC(TO_DATE('" + fechaBaja + "','DD/MM/RRRR'))");
+
+		return sql.toString();
+	}
+	
+	public String selectInscripcionAltasTurnoByTurno(Short idInstitucion, String idTurno) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDINSTITUCION,IDPERSONA, IDTURNO,FECHASOLICITUD, FECHASOLICITUDBAJA");
+		sql.FROM("SCS_INSCRIPCIONTURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("FECHABAJA IS NULL AND FECHADENEGACION IS NULL AND FECHAVALIDACION IS NOT NULL");
+
+		return sql.toString();
+	}
+	
 	
 	public String getObligatoriedadByTurno(Short idInstitucion, String idTurno) {
 

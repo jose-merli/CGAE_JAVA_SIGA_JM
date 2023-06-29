@@ -36,6 +36,7 @@ import org.itcgae.siga.db.entities.CenBajastemporales;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
+import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
@@ -481,11 +482,50 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "FECHASUSCRIPCION", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP)})
 	    List<GuardiasItem> selectGuardiaTurnoByTurno(Short idInstitucion, String idTurno);
 	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="selectGuardiaTurnoAltasByTurno")
+	 @Results({ @Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHASUSCRIPCION", property = "fechasuscripcion", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
+			})
+	    List<ScsInscripcionguardia> selectGuardiaTurnoAltasByTurno(Short idInstitucion, String idTurno);
+	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="selectGuardiaTurnoBajasByTurnoFecha")
+	 @Results({ @Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHASUSCRIPCION", property = "fechasuscripcion", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
+			})
+	    List<ScsInscripcionguardia> selectGuardiaTurnoBajasByTurnoFecha(Short idInstitucion, String idTurno, String fechaBaja);
+	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="selectGuardiaTurnoGuardiaBajasByTurnoFecha")
+	 @Results({ @Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+		 @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHASUSCRIPCION", property = "fechasuscripcion", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
+			})
+	    List<ScsInscripcionguardia> selectGuardiaTurnoGuardiaBajasByTurnoFecha(Short idInstitucion, String idTurno,String idGuardia, String fechaBaja);
+	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="selectGuardiaConfiguradasTurno")
 	 @Results({ @Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.DECIMAL),
 		 @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DECIMAL),
 		 @Result(column = "IDINSTITUCION", property = "jurisdiccion", jdbcType = JdbcType.DECIMAL)})
 	    List<GuardiasItem> selectGuardiaConfiguradasTurno(Short idInstitucion, String idTurno);
+	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="selectGuardiaConfiguradasBajaByTurnoFechaBaja")
+	 @Results({ @Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDINSTITUCION", property = "jurisdiccion", jdbcType = JdbcType.DECIMAL)})
+	    List<GuardiasItem> selectGuardiaConfiguradasBajaByTurnoFechaBaja(Short idInstitucion, String idTurno, String fechaBaja);
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="setguardiaInConjuntoGuardias")
 	 @Results({})

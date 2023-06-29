@@ -90,6 +90,7 @@ import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
 import org.itcgae.siga.db.mappers.ScsHcoConfProgCalendariosMapper;
+import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaCabeceraMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.mappers.ScsProgCalendariosMapper;
@@ -293,6 +294,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Autowired
 	private PlatformTransactionManager transactionManagerCalendarios;
 	
+	@Autowired
+	private ScsInscripcionguardiaMapper scsInscripcionguardiaMapper;
+	
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -442,6 +446,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							if (inscripcionesActivas != null && !inscripcionesActivas.isEmpty()) {
 
 								inscripcionesActivas.forEach(inscripcion -> {
+									inscripcion.setFechasolicitudbaja(new Date());
 									inscripcion.setFechabaja(new Date());
 									inscripcion.setFechamodificacion(new Date());
 									inscripcion.setUsumodificacion(usuario.getIdusuario());
@@ -496,7 +501,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		//List<List<ScsInscripcionguardia>> inscripcionesGuardiasTurno = new ArrayList<>();
+		//List<String> guardiasTrabajadas = new ArrayList<>(); 
+		
+		/*List<InscripcionTurnoItem> inscripcionTurnos = new ArrayList<>();
+		List<List<InscripcionTurnoItem>> listaInscripcionesTurno = new ArrayList<>();
+		
+		List<org.itcgae.siga.DTO.scs.GuardiasItem> guardiasConfiguradas = new ArrayList<>();
+		List<List<org.itcgae.siga.DTO.scs.GuardiasItem>> listaGuardiasConfiguradas = new ArrayList<>();
+		
+		List<ScsInscripcionguardia> inscripcionGuardia = new ArrayList<>();
+		*/
+		
 
+		
+		
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -514,47 +533,157 @@ public class GuardiasServiceImpl implements GuardiasService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-
+					// Guardias desde FRONT , pueden ser mas Guardias por Configuracion //
+					// Obligatorias, Todas o ninguna...
 					for (GuardiasItem guardiaItem : guardiasDTO.getGuardiaItems()) {
+						//if (!guardiasTrabajadas.contains(guardiaItem.getIdGuardia())) { // Si no está en guardias trabajadas empezamos a con esa guardia.
+							
+							// Comprobamos Configuracion de turnos para de alta
+							ScsTurnoKey turnoPrincipalBusqueda = new ScsTurnoKey();
+							turnoPrincipalBusqueda.setIdinstitucion(idInstitucion);
+							turnoPrincipalBusqueda.setIdturno(Integer.parseInt(guardiaItem.getIdTurno()));
 
-						ScsGuardiasturnoExample scsGuardiasExample = new ScsGuardiasturnoExample();
-						scsGuardiasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdguardiaEqualTo(Integer.valueOf(guardiaItem.getIdGuardia()))
-								.andIdturnoEqualTo(Integer.valueOf(guardiaItem.getIdTurno()));
+							ScsTurno turnoPrincipal = scsTurnosExtendsMapper.selectByPrimaryKey(turnoPrincipalBusqueda);
+							
+							//Codigo viejo:
+							if (turnoPrincipal.getFechabaja() != null) {
+								throw new Exception("justiciaGratuita.guardias.mensaje.turnos.error");
+							}
+							
 
-						LOGGER.info(
-								"activateGuardias() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a scsGuardiasturnoExtendsMapper para buscar la guardia");
+							//Short tipoGuardias = turnoPrincipal.getGuardias();
+							// 0 Obligatorias //1 - Todas o ninguna // 2- A elegir
 
-						List<ScsGuardiasturno> guardiasList = scsGuardiasturnoExtendsMapper
-								.selectByExample(scsGuardiasExample);
+							// Damos de alta el turno si esta de baja
+							/*if (turnoPrincipal.getFechabaja() != null) {
+								turnoPrincipal.setFechabaja(null);
+								turnoPrincipal.setUsumodificacion(usuario.getIdusuario());
+								turnoPrincipal.setFechamodificacion(new Date());
+								scsTurnosExtendsMapper.updateByPrimaryKey(turnoPrincipal);
+							}*/
+							
+							//CODIGO PARA FUTURA ACTIVACION DE GUARDIAS CON SUS INSCRIPCIONES Y TIPO DE TURNO.
 
-						LOGGER.info(
-								"activateGuardias() / scsGuardiasturnoExtendsMapper.selectByExample() -> Salida de scsGuardiasturnoExtendsMapper para buscar la guardia");
+							/*if (tipoGuardias != 2) { // Si es 	// 0 Obligatorias //1 - Todas o ninguna 
 
-						if (null != guardiasList && guardiasList.size() > 0) {
+								SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-							ScsGuardiasturno guardia = guardiasList.get(0);
+								String fechaComoCadena = sdf.format(guardiaItem.getFechabaja());
 
-							guardia.setFechabaja(null);
-							guardia.setFechamodificacion(new Date());
-							guardia.setUsumodificacion(usuario.getIdusuario());
+								// Obtenemos las inscripciones al turno en estado de BAJA con fecha informada
+								// fechabaja
+								inscripcionTurnos = scsTurnosExtendsMapper.selectInscripcionTurnoBajasByTurnoFechaBaja(
+										idInstitucion, turnoPrincipal.getIdturno().toString(), fechaComoCadena);
+								if (inscripcionTurnos.size() != 0) {
+									listaInscripcionesTurno.add(inscripcionTurnos);
+								}
 
-							LOGGER.info(
-									"activateGuardias() / scsGuardiasturnoExtendsMapper.updateByPrimaryKey() -> Entrada a scsGuardiasturnoExtendsMapper para dar de baja a una prision");
+								// Obtenemos las inscripcions de guardia del turno en Baja by fecha.
+								inscripcionGuardia = scsGuardiasturnoExtendsMapper.selectGuardiaTurnoBajasByTurnoFecha(
+										idInstitucion, turnoPrincipal.getIdturno().toString(), fechaComoCadena);
+								if (inscripcionGuardia.size() != 0) {
+									inscripcionesGuardiasTurno.add(inscripcionGuardia);
+								}
 
-							response = scsGuardiasturnoExtendsMapper.updateByPrimaryKey(guardia);
+								// Obtenemos las guardiasConfiguradasTurno.
+								guardiasConfiguradas = scsGuardiasturnoExtendsMapper
+										.selectGuardiaConfiguradasBajaByTurnoFechaBaja(idInstitucion,
+												turnoPrincipal.getIdturno().toString(), fechaComoCadena);
+								if (guardiasConfiguradas.size() != 0) {
+									listaGuardiasConfiguradas.add(guardiasConfiguradas);
+								}
 
-							LOGGER.info(
-									"activateGuardias() / scsGuardiasturnoExtendsMapper.updateByPrimaryKey() -> Salida de scsGuardiasturnoExtendsMapper para dar de baja a una prision");
-						}
+								//Guardamos los idGuardia de las guardias ya trabajadas.
+								guardiasTrabajadas.addAll(guardiasConfiguradas.stream()
+										.map(guardiaItemA -> String.valueOf(guardiaItemA.getIdGuardia()))
+										.collect(Collectors.toList()));
+
+							} */ 
+							/*else {
+								//2- A elegir / Solo damos de alta la guardia seleccionada, y si viene informada
+
+
+								ScsGuardiasturnoKey guardiaKey = new ScsGuardiasturnoKey();
+								guardiaKey.setIdguardia(Integer.parseInt(guardiaItem.getIdGuardia()));
+								guardiaKey.setIdinstitucion(guardiaItem.getIdInstitucion());
+								guardiaKey.setIdturno(Integer.parseInt(guardiaItem.getIdTurno()));
+
+								ScsGuardiasturno guardiaUpdate = scsGuardiasturnoExtendsMapper
+										.selectByPrimaryKey(guardiaKey);
+								guardiaUpdate.setFechamodificacion(new Date());
+								guardiaUpdate.setFechabaja(null);
+								guardiaUpdate.setUsumodificacion(usuario.getIdusuario());
+
+								scsGuardiasturnoExtendsMapper.updateByPrimaryKey(guardiaUpdate);
+
+								if (guardiaItem.getFechabaja() != null) { // Si viene con fecha baja es que la fecha fue
+																			// informada para dar de alta esas fechas,
+																			// sino, no se activaras sus suscripciones,
+																			// y solo se dara de alta la guardia.
+									SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+									String fechaComoCadena = sdf.format(guardiaItem.getFechabaja());
+
+									// Obtenemos las guardias inscritas al turno en alta.
+									inscripcionGuardia = scsGuardiasturnoExtendsMapper
+											.selectGuardiaTurnoGuardiaBajasByTurnoFecha(idInstitucion,
+													guardiaUpdate.getIdturno().toString(),
+													guardiaUpdate.getIdguardia().toString(), fechaComoCadena);
+									if (inscripcionGuardia.size() != 0) {
+										inscripcionesGuardiasTurno.add(inscripcionGuardia);
+									}
+								}
+
+								guardiasTrabajadas.add(guardiaItem.getIdGuardia());
+							}*/
+
+						//}
 
 					}
+					for (GuardiasItem guardiaItem : guardiasDTO.getGuardiaItems()) {
+						ScsGuardiasturnoKey guardiaKey = new ScsGuardiasturnoKey();
+						guardiaKey.setIdguardia(Integer.parseInt(guardiaItem.getIdGuardia()));
+						guardiaKey.setIdinstitucion(idInstitucion);
+						guardiaKey.setIdturno(Integer.parseInt(guardiaItem.getIdTurno()));
+
+						ScsGuardiasturno guardiaUpdate = scsGuardiasturnoExtendsMapper
+								.selectByPrimaryKey(guardiaKey);
+						guardiaUpdate.setFechamodificacion(new Date());
+						guardiaUpdate.setFechabaja(null);
+						guardiaUpdate.setUsumodificacion(usuario.getIdusuario());
+
+						response = scsGuardiasturnoExtendsMapper.updateByPrimaryKey(guardiaUpdate);
+					}
+
+					// ELIMINAMOS LAS INSCRIPCIONES A LAS GUARDIAS DEL TURNO
+					/*for (List<ScsInscripcionguardia> listaInscripcionesGuardia : inscripcionesGuardiasTurno) {
+						for (ScsInscripcionguardia inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
+							ScsInscripcionguardia guardiaupdate = new ScsInscripcionguardia();
+							guardiaupdate.setIdinstitucion(inscripcionGuardiaAAnular.getIdinstitucion());
+							guardiaupdate.setIdturno(inscripcionGuardiaAAnular.getIdturno());
+							guardiaupdate.setIdpersona(inscripcionGuardiaAAnular.getIdpersona());
+							guardiaupdate.setFechasuscripcion(inscripcionGuardiaAAnular.getFechasuscripcion());
+							guardiaupdate.setIdguardia(inscripcionGuardiaAAnular.getIdguardia());
+
+							ScsInscripcionguardia guardiaActualUpdate = scsInscripcionguardiaMapper
+									.selectByPrimaryKey(guardiaupdate);
+
+							if (guardiaActualUpdate.getFechasolicitudbaja().equals(guardiaActualUpdate.getFechabaja()))
+								guardiaActualUpdate.setFechasolicitudbaja(null);
+
+							guardiaActualUpdate.setFechabaja(null);
+							guardiaActualUpdate.setFechamodificacion(new Date());
+							guardiaActualUpdate.setUsumodificacion(usuarios.get(0).getIdusuario());
+							scsInscripcionguardiaMapper.updateByPrimaryKey(guardiaActualUpdate);
+
+						}
+					}*/
 
 				} catch (Exception e) {
 					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
-					error.setDescription("general.mensaje.error.bbdd");
+					if(e.getMessage() != null ) error.setDescription(e.getMessage());
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}

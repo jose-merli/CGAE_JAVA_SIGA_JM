@@ -45,4 +45,6 @@ public interface IGestionTurnosService {
 	public Error guardartarjetaPesos2(HttpServletRequest request, TarjetaPesosDTO tarjetaPesos); 
 	
 	public UpdateResponseDTO changeRequisitoGuardias(TurnosItem turnosItem, HttpServletRequest request);
+
+	public UpdateResponseDTO activarTurnos(TurnosDTO turnosDTO, HttpServletRequest request);
 }

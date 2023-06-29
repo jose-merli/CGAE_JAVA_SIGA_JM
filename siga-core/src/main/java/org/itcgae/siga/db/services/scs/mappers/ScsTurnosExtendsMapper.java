@@ -281,5 +281,20 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.TIMESTAMP) })
 	List<InscripcionTurnoItem> selectInscripcionTurnoByTurno(Short idInstitucion, String idTurno);
+	
+	@SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="selectInscripcionTurnoBajasByTurnoFechaBaja")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.TIMESTAMP) })
+	List<InscripcionTurnoItem> selectInscripcionTurnoBajasByTurnoFechaBaja(Short idInstitucion, String idTurno,String fechaBaja);
+	
+	@SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="selectInscripcionAltasTurnoByTurno")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.TIMESTAMP) })
+	List<InscripcionTurnoItem> selectInscripcionAltasTurnoByTurno(Short idInstitucion, String idTurno);
 
 }
