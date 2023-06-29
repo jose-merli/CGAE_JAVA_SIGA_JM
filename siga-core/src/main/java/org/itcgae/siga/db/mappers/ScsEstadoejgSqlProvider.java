@@ -7,6 +7,7 @@ import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample.Criteria;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample.Criterion;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.entities.ScsEstadoejgKey;
 
 public class ScsEstadoejgSqlProvider {
 
@@ -225,6 +226,18 @@ public class ScsEstadoejgSqlProvider {
 		sql.WHERE("ANIO = #{anio,jdbcType=DECIMAL}");
 		sql.WHERE("NUMERO = #{numero,jdbcType=DECIMAL}");
 		sql.WHERE("IDESTADOPOREJG = #{idestadoporejg,jdbcType=DECIMAL}");
+		return sql.toString();
+	}
+	
+	public String bajaEstadoEjg(ScsEstadoejgKey key) {
+		SQL sql = new SQL();
+		sql.UPDATE("SCS_ESTADOEJG");
+		sql.SET("FECHABAJA = SYSDATE");
+		sql.WHERE("IDINSTITUCION = #{idinstitucion,jdbcType=DECIMAL}");
+		sql.WHERE("IDTIPOEJG = #{idtipoejg,jdbcType=DECIMAL}");
+		sql.WHERE("ANIO = #{anio,jdbcType=DECIMAL}");
+		sql.WHERE("NUMERO = #{numero,jdbcType=DECIMAL}");
+		sql.WHERE("IDESTADOPOREJG = #{idestadoporejg,jdbcType=DECIMAL}");		
 		return sql.toString();
 	}
 
