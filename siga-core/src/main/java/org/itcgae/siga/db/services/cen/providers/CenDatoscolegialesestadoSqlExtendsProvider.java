@@ -52,7 +52,7 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		// }
 		
 		if (record.getObservaciones() != null) {
-			sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
+			sql.SET("OBSERVACIONES = '" + record.getObservaciones().replace("'", "") + "'");
 
 		}else {
 			sql.SET("OBSERVACIONES = ''");

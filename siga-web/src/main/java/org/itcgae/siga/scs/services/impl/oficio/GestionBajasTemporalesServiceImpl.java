@@ -360,7 +360,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	
 	@Override
 	public UpdateResponseDTO saveBajaTemporal(List<Object> bajasTemporalesItem, HttpServletRequest request) {
-		LOGGER.info("saveBajaTemporal() ->  Entrada al servicio para eliminar bajas temporales");
+		LOGGER.info("saveBajaTemporal() ->  Entrada al servicio para guardar bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -408,7 +408,10 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 							if(nombres[0].equals("tipo") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								record.setTipo(nombres[1]);
 							}
-							if(nombres[0].equals("descripcion") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
+							if(nombres[0].equals("descripcion")) {
+								if(nombres[1]== null || nombres[1].equals("null") || nombres[1].isEmpty()) {
+									nombres[1] = "";
+								}
 								record.setDescripcion(nombres[1]);
 							}
 							if(nombres[0].equals("fechadesde") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
@@ -458,19 +461,19 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				
 				if (response == 0 && error.getDescription() == null) {
 					error.setCode(400);
-					error.setDescription("No se ha eliminado la baja temporal");
+					error.setDescription("No se ha guardado la baja temporal");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				} else if (response == 1 && existentes != 0) {
 					error.setCode(200);
-					error.setDescription("Se han elimiando las bajas temporales excepto algunas");
+					error.setDescription("Se han guardado las bajas temporales excepto algunas");
 				} else if (error.getCode() == null) {
 					error.setCode(200);
-					error.setDescription("Se ha eliminado la baja temporal correctamente");
+					error.setDescription("Se ha guardado la baja temporal correctamente");
 				}
 
 				updateResponseDTO.setError(error);
 
-				LOGGER.info("saveBajaTemporal() -> Salida del servicio para eliminar bajas temporales");
+				LOGGER.info("saveBajaTemporal() -> Salida del servicio para guardar bajas temporales");
 
 			}
 
@@ -482,7 +485,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	@Override
 	@Transactional
 	public InsertResponseDTO nuevaBajaTemporal(List<Object> bajasTemporalesItem, HttpServletRequest request) {
-		LOGGER.info("nuevaBajaTemporal() ->  Entrada al servicio para eliminar bajas temporales");
+		LOGGER.info("nuevaBajaTemporal() ->  Entrada al servicio para crear nuevas bajas temporales");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -511,7 +514,9 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				try {
 					String nombres[];
 					SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-					for(Object bti: bajasTemporalesItem) {
+					for(int j=0; j < bajasTemporalesItem.size(); j++ ) {
+						LOGGER.info("Tamaño bajas temporales: " + bajasTemporalesItem.size());
+						Object bti = bajasTemporalesItem.get(j);
 						BajasTemporalesItem bjtmp = new BajasTemporalesItem();
 						java.util.LinkedHashMap bj = (java.util.LinkedHashMap)bti;
 						Set entrySet = bj.entrySet();
@@ -539,7 +544,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 								bjtmp.setFechahasta(format2.parse(nombres[1]));
 							}
 							if(nombres.length > 1 &&nombres[0].equals("fechaalta") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
-								bjtmp.setFechaalta(format2.parse(nombres[1]));
+								bjtmp.setFechaalta(format2.parse(format2.format(new Date())));
 							}
 							if(nombres.length > 1 && nombres[0].equals("validado") && nombres[1]!= null && !nombres[1].equals("null") && !nombres[1].isEmpty()) {
 								bjtmp.setValidado(nombres[1]);
@@ -558,7 +563,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						LocalDate dateAfter = LocalDate.parse(strDateHasta);
 						
 						long fechasBT = ChronoUnit.DAYS.between(dateBefore, dateAfter);
-						if(scsBajasTemporalesExtendsMapper.busquedaBajasTemporalesValidadas(bjtmp).isEmpty()) {
+						//if(!scsBajasTemporalesExtendsMapper.busquedaBajasTemporalesValidadas(bjtmp).isEmpty()) {
 							if(fechasBT == 0) {
 								bjtmp.setFechabt(bjtmp.getFechadesde());
 								response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
@@ -579,7 +584,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 								}
 							}
 							//eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
-						}
+						//}
 					}
 				} catch (Exception e) {
 					response = 0;
@@ -590,19 +595,19 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				
 				if (response == 0 && error.getDescription() == null) {
 					error.setCode(400);
-					error.setDescription("No se ha eliminado la baja temporal");
+					error.setDescription("No se ha creado la baja temporal");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				} else if (response == 1 && existentes != 0) {
 					error.setCode(200);
-					error.setDescription("Se han elimiando las bajas temporales excepto algunas");
+					error.setDescription("Se han creado las bajas temporales excepto algunas");
 				} else if (error.getCode() == null) {
 					error.setCode(200);
-					error.setDescription("Se ha eliminado la baja temporal correctamente");
+					error.setDescription("Se ha creado la baja temporal correctamente");
 				}
 
 				insertResponseDTO.setError(error);
 
-				LOGGER.info("nuevaBajaTemporal() -> Salida del servicio para eliminar bajas temporales");
+				LOGGER.info("nuevaBajaTemporal() -> Salida del servicio para crear bajas temporales");
 
 			}
 

@@ -175,6 +175,30 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 		return comboDTO;
 	}
+	
+	@Override
+	public ComboDTO getSituacionGlobalColegiado(String idPersona, HttpServletRequest request) {
+		LOGGER.info("getSituacionGlobalColegiado() -> Entrada al servicio para obtener las situaciones de todos los colegios de la persona");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		if (idPersona != null || idPersona != "") {
+			LOGGER.info(
+					"getSituacionGlobalColegiado() / cenEstadocolegialExtendsMapper.getSituacionGlobalColegiado() -> "
+					+ "Entrada a cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
+			comboItems = cenEstadocolegialExtendsMapper.getSituacionGlobalColegiado(idPersona);
+			LOGGER.info(
+					"getSituacionGlobalColegiado() / cenEstadocolegialExtendsMapper.getSituacionGlobalColegiado() -> "
+					+ "Salida de cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
+		}
+		
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info("getSituacionGlobalColegiado() -> Salida del servicio para obtener las situaciones de todos los colegios de la persona");
+		
+		return comboDTO;
+	}
 
 	@Override
 	public ComboDTO getCVCategory(HttpServletRequest request) {

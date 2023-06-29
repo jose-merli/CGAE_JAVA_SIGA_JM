@@ -225,7 +225,7 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 								if (!UtilidadesString.esCadenaVacia(saltoCompGuardiaItem.getGrupo())) {
 
 									MaxIdDto nuevoIdGrupo = saltoscompensacionesMapper
-											.selectNuevoIdSaltosCompensacionesGrupo();
+											.selectIdSiguienteSaltosCompensacionesGrupo();//selectNuevoIdSaltosCompensacionesGrupo();
 
 									int insertado = saltoscompensacionesMapper.guardarSaltosCompensacionesGrupo(
 											saltoCompGuardiaItem, idInstitucion.toString(),

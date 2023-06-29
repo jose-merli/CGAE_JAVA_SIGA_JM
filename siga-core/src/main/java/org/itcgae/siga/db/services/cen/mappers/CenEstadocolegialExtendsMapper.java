@@ -23,4 +23,11 @@ public interface CenEstadocolegialExtendsMapper extends CenEstadocolegialMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> distinctSituacionColegial(String idLenguaje);
+	
+	@SelectProvider(type = CenEstadocolegialSqlExtendsProvider.class, method = "getSituacionGlobalColegiado")
+	@Results({
+		@Result(column = "IDESTADO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> getSituacionGlobalColegiado(String idPersona);
 }
