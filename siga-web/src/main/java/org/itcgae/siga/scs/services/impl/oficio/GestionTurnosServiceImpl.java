@@ -247,7 +247,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						
 						//Obtenemos las guardiasConfiguradasTurno.
 						guardiasConfiguradas = scsGuardiasturnoExtendsMapper.selectGuardiaConfiguradasTurno(idInstitucion, turnosItem.getIdturno());
-						if(inscripcionGuardia.size() != 0) {
+						if(guardiasConfiguradas.size() != 0) {
 							guardiasConfiguradasTurno.add(guardiasConfiguradas);
 						}
 						
