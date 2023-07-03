@@ -923,7 +923,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "    JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONGUARDIA.IDINSTITUCION AND SCS_TURNO.IDTURNO=SCS_INSCRIPCIONGUARDIA.IDTURNO\r\n"
 				+ "     WHERE SCS_TURNO.IDINSTITUCION = '" + idInstitucion + "' AND SCS_INSCRIPCIONGUARDIA.IDPERSONA='"
 				+ inscripcion.getIdpersona() + "' "
-				+ " AND (SCS_INSCRIPCIONGUARDIA.FECHABAJA IS NOT NULL OR SCS_INSCRIPCIONGUARDIA.FECHADENEGACION IS NOT NULL) ),\r\n"
+				+ " AND SCS_INSCRIPCIONGUARDIA.FECHADENEGACION IS NOT NULL ),\r\n"
 				+ "    TURNOS_NO_ASIGNADOS (IDTURNO, IDINSTITUCION) AS(SELECT DISTINCT SCS_TURNO.IDTURNO, SCS_TURNO.IDINSTITUCION\r\n"
 				+ "	FROM  SCS_TURNO\r\n" + "    WHERE SCS_TURNO.IDINSTITUCION = '" + idInstitucion
 				+ "' AND IDTURNO NOT IN (\r\n" + "    SELECT IDTURNO FROM TURNOS_ASIGNADOS)), "
@@ -934,7 +934,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "									  AND scs_guardiasturno.IDTURNO = scs_inscripcionguardia.IDTURNO"
 				+ "	                                  AND scs_guardiasturno.idguardia = scs_inscripcionguardia.idguardia "
 				+ "	    WHERE " + "	        scs_guardiasturno.idinstitucion = '" + idInstitucion + "' "
-				+ "	        AND scs_inscripcionguardia.idpersona = '" + inscripcion.getIdpersona() + "' "
+				+ "	        AND scs_inscripcionguardia.idpersona = '" + inscripcion.getIdpersona() + "' AND scs_inscripcionguardia.fechabaja IS NULL "
 				+ "	), guardia_no_asignados ( " + "	    idguardia, " + "	    idinstitucion " + "	) AS ( "
 				+ "	    SELECT DISTINCT " + "	        scs_guardiasturno.idguardia, "
 				+ "	        scs_guardiasturno.idinstitucion " + "	    FROM " + "	        scs_guardiasturno "

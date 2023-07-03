@@ -195,6 +195,7 @@ public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer 
 public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer usuario) {
 	
 	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 	
 	SQL sql = new SQL();
 	sql.INSERT_INTO("cen_bajastemporales");
@@ -215,7 +216,7 @@ public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer
 	sql.VALUES("VALIDADO", "2");
 	sql.VALUES("FECHAESTADO", "TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR')");
 	sql.VALUES("FECHAMODIFICACION", "SYSDATE");
-	sql.VALUES("FECHAALTA", "SYSDATE");
+	sql.VALUES("FECHAALTA", "TO_DATE('"+ dateFormat2.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR HH24:MI:SS')");
 	sql.VALUES("ELIMINADO", "0");
 	sql.VALUES("FECHABT","TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
 	sql.VALUES("IDPERSONA", bajasTemporalesItem.getIdpersona());

@@ -18,4 +18,24 @@ public class CenEstadocolegialSqlExtendsProvider extends CenEstadocolegialSqlPro
 		
 		return sql.toString();
 	}
+	
+	public String getSituacionGlobalColegiado(String idPersona) {
+
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		//Subconsulta para traer la última fecha
+		sql2.SELECT("MAX(FECHAESTADO)");
+		sql2.FROM("CEN_DATOSCOLEGIALESESTADO");
+		sql2.WHERE("IDPERSONA = '" + idPersona + "'");
+		sql2.GROUP_BY("IDINSTITUCION ,IDPERSONA");
+		
+		sql.SELECT("IDESTADO");
+		sql.SELECT("IDINSTITUCION");
+		sql.FROM("CEN_DATOSCOLEGIALESESTADO");
+		sql.WHERE("IDPERSONA = '" + idPersona + "'");
+		sql.WHERE("FECHAESTADO IN (" + sql2 + ")");
+
+		return sql.toString();
+	}
 }

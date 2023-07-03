@@ -103,6 +103,13 @@ public class BusquedaColegiadosController {
 		ColegiadoDTO response = busquedaColegiadosService.searchColegiadoFicha(colegiadoItem, request);
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/busquedaColegiado/getSituacionGlobalColegiado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> searchColegiado(@RequestBody String idPersona, HttpServletRequest request) {
+		ComboDTO response = busquedaColegiadosService.getSituacionGlobalColegiado(idPersona, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "busquedaColegiados/getCurricularTypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboTiposCVDTO> getCurricularTypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) { 
 		ComboTiposCVDTO response = tipoCurricularService.getCurricularTypeCombo(idTipoCV, false, request);

@@ -14,6 +14,8 @@ public interface IBusquedaColegiadosService {
 	
 	public ComboDTO getSituacion(HttpServletRequest request);
 	
+	public ComboDTO getSituacionGlobalColegiado (String idPersona, HttpServletRequest request);
+	
 	public ComboDTO getCVCategory(HttpServletRequest request);
 	
 	public ColegiadoDTO searchColegiado( ColegiadoItem colegiadoItem, HttpServletRequest request);

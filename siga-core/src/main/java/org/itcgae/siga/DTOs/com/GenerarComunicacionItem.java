@@ -8,6 +8,7 @@ public class GenerarComunicacionItem {
 	private List<DatosDocumentoItem> listaDocumentos;
 	private List<ModelosEnvioItem> listaModelosEnvio;
 	private Date fechaProgramada;
+	private String descripcionDefecto;
 	
 	public List<DatosDocumentoItem> getListaDocumentos() {
 		return listaDocumentos;
@@ -26,6 +27,12 @@ public class GenerarComunicacionItem {
 	}
 	public void setListaModelosEnvio(List<ModelosEnvioItem> listaModelosEnvio) {
 		this.listaModelosEnvio = listaModelosEnvio;
+	}
+	public String getDescripcionDefecto() {
+		return descripcionDefecto;
+	}
+	public void setDescripcionDefecto(String descripcionDefecto) {
+		this.descripcionDefecto = descripcionDefecto;
 	}
 
 }

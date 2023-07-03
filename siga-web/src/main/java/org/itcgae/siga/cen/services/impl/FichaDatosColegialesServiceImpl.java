@@ -977,13 +977,24 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							datosColegiales.setIdinstitucion(idInstitucionColegial);
 							datosColegiales.setIdpersona(idPersonaColegial);
 							datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
-
-							CenDatoscolegialesestadoKey cenDatoscolegialesestadoKey = new CenDatoscolegialesestadoKey();
-							cenDatoscolegialesestadoKey.setIdpersona(idPersonaColegial);
-							cenDatoscolegialesestadoKey.setIdinstitucion(idInstitucionColegial);
-							cenDatoscolegialesestadoKey.setFechaestado(colegiadoItem.getFechaEstado());
-							CenDatoscolegialesestado cenDatoscolegialesestadosBBDD = cenDatoscolegialesestadoExtendsMapper
-									.selectByPrimaryKey(cenDatoscolegialesestadoKey);
+							
+							CenDatoscolegialesestado cenDatoscolegialesestadosBBDD;
+							CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
+							cenDatoscolegialesestadoExample.createCriteria()
+								.andIdpersonaEqualTo(idPersonaColegial)	
+								.andIdinstitucionEqualTo(idInstitucionColegial)
+								.andFechaestadoGreaterThanOrEqualTo(colegiadoItem.getFechaEstado());
+							
+							List<CenDatoscolegialesestado> cenDatoscolegialesestadosList = cenDatoscolegialesestadoExtendsMapper
+									.selectByExample(cenDatoscolegialesestadoExample);
+							
+							if(null != cenDatoscolegialesestadosList && cenDatoscolegialesestadosList.size() > 0) {
+								cenDatoscolegialesestadosBBDD = cenDatoscolegialesestadosList.get(0);
+							}
+							else {
+								cenDatoscolegialesestadosBBDD = null;
+							}
+							
 
 							boolean updateDate = false;
 							if (cenDatoscolegialesestadosBBDD != null) {
@@ -2045,12 +2056,12 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						"datosColegialesUpdateMasivo() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
 				//1. Actualizamos el colegiado
 				CenColegiadoKey colegiadoKey = new CenColegiadoKey();
-				colegiadoKey.setIdinstitucion(idInstitucion);
+				colegiadoKey.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
 				colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 				CenColegiado cenColegiadoAnterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey);
 				CenColegiado colegiado = new CenColegiado();
 				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
-				colegiado.setIdinstitucion(idInstitucion);
+				colegiado.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
 				colegiado.setUsumodificacion(usuario.getIdusuario());
 				/*if (colegiadoItem.getNumColegiado() != null) {
 					colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
@@ -2137,7 +2148,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 						LOGGER.info(
 								"datosColegialesUpdateMasivo() / Entrada a insertar auditoria");
-						colegiadoKey.setIdinstitucion(idInstitucion);
+						colegiadoKey.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
 						colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 						CenColegiado cenColegiadoPosterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey);
 						// AUDITORIA => actualizamos cen_historico si todo es correcto

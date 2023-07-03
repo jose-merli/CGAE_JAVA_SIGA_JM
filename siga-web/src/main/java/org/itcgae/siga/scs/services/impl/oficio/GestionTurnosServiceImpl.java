@@ -54,6 +54,7 @@ import org.itcgae.siga.scs.services.oficio.IGestionTurnosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GestionTurnosServiceImpl implements IGestionTurnosService {
@@ -178,7 +179,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		return turnosDTO;
 	}
 
-	@Override
+	@Transactional
 	public UpdateResponseDTO eliminateTurnos(TurnosDTO turnosDTO, HttpServletRequest request) {
 		LOGGER.info("deleteModules() ->  Entrada al servicio para eliminar modulos");
 
@@ -208,10 +209,11 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				try {
 					List<List<InscripcionTurnoItem>> inscripcionesTurno = new ArrayList<>();
 					List<InscripcionTurnoItem> inscripcion = new ArrayList<>();
-					List<List<GuardiasItem>> inscripcionesGuardiasTurno = new ArrayList<>();
-					List<GuardiasItem> inscripcionGuardia = new ArrayList<>();
+					List<List<ScsInscripcionguardia>> inscripcionesGuardiasTurno = new ArrayList<>();
+					List<ScsInscripcionguardia> inscripcionGuardia = new ArrayList<>();
 					List<GuardiasItem> guardiasConfiguradas = new ArrayList<>();
 					List<List<GuardiasItem>> guardiasConfiguradasTurno = new ArrayList<>();
+					
 					for (TurnosItem turnosItem : turnosDTO.getTurnosItems()) {
 
 						ScsTurno turno = new ScsTurno();
@@ -219,14 +221,9 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						turno.setIdinstitucion(idInstitucion);
 
 						turno = scsTurnosExtendsMapper.selectByPrimaryKey(turno);
-
-						if (turnosItem.getFechabaja() == null) {
-							turno.setFechabaja(new Date());
-							turno.setVisibilidad("0");
-						} else {
-							turno.setFechabaja(null);
-							turno.setVisibilidad("1");
-						}
+						turno.setFechabaja(new Date());
+						turno.setVisibilidad("0");
+						
 
 						turno.setFechamodificacion(new Date());
 						turno.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -236,18 +233,21 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 						response = scsTurnosExtendsMapper.updateByPrimaryKey(turno);
 						
-						inscripcion = scsTurnosExtendsMapper.selectInscripcionTurnoByTurno(idInstitucion, turnosItem.getIdturno());
+						//Obtenemos las inscripciones al turno en estado ALTA
+						inscripcion = scsTurnosExtendsMapper.selectInscripcionAltasTurnoByTurno(idInstitucion, turnosItem.getIdturno());
 						if(inscripcion.size() != 0) {
 							inscripcionesTurno.add(inscripcion);
 						}
 						
-						inscripcionGuardia = scsGuardiasturnoExtendsMapper.selectGuardiaTurnoByTurno(idInstitucion, turnosItem.getIdturno());
+						//Obtenemos las guardias inscritas al turno en alta.
+						inscripcionGuardia = scsGuardiasturnoExtendsMapper.selectGuardiaTurnoAltasByTurno(idInstitucion, turnosItem.getIdturno());
 						if(inscripcionGuardia.size() != 0) {
 							inscripcionesGuardiasTurno.add(inscripcionGuardia);
 						}
 						
+						//Obtenemos las guardiasConfiguradasTurno.
 						guardiasConfiguradas = scsGuardiasturnoExtendsMapper.selectGuardiaConfiguradasTurno(idInstitucion, turnosItem.getIdturno());
-						if(inscripcionGuardia.size() != 0) {
+						if(guardiasConfiguradas.size() != 0) {
 							guardiasConfiguradasTurno.add(guardiasConfiguradas);
 						}
 						
@@ -263,25 +263,33 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 							turnoupdate.setIdturno(inscripcionTurnoAAnular.getIdturno());
 							turnoupdate.setIdpersona(inscripcionTurnoAAnular.getIdpersona());
 							turnoupdate.setFechasolicitud(inscripcionTurnoAAnular.getFechasolicitud());
-							turnoupdate.setFechabaja(new Date());
-							turnoupdate.setFechamodificacion(new Date());
-							turnoupdate.setUsumodificacion(usuarios.get(0).getIdusuario());
-							scsInscripcionturnoMapper.updateByPrimaryKey(turnoupdate);
+							
+							ScsInscripcionturno turnoActualupdate = scsInscripcionturnoExtendsMapper.selectByPrimaryKey(turnoupdate);
+							
+							//Si no tiene fecha baja solicitud se añade la de hoy
+							if(turnoActualupdate.getFechasolicitudbaja() == null) turnoActualupdate.setFechasolicitudbaja(new Date());
+							
+							turnoActualupdate.setFechabaja(new Date());
+							turnoActualupdate.setFechamodificacion(new Date());
+							turnoActualupdate.setUsumodificacion(usuarios.get(0).getIdusuario());
+							scsInscripcionturnoMapper.updateByPrimaryKey(turnoActualupdate);
 							
 						}
 					}
 					
 					//ELIMINAMOS LAS INSCRIPCIONES A LAS GUARDIAS DEL TURNO
-					for(List<GuardiasItem> listaInscripcionesGuardia : inscripcionesGuardiasTurno) {
-						for(GuardiasItem inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
+					for(List<ScsInscripcionguardia> listaInscripcionesGuardia : inscripcionesGuardiasTurno) {
+						for(ScsInscripcionguardia inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
 							ScsInscripcionguardia guardiaupdate = new ScsInscripcionguardia();
-							guardiaupdate.setIdinstitucion(new Short(inscripcionGuardiaAAnular.getJurisdiccion()));
-							guardiaupdate.setIdturno(Integer.parseInt(inscripcionGuardiaAAnular.getIdTurno()));
-							guardiaupdate.setIdpersona(new Long(inscripcionGuardiaAAnular.getIdPersonaUltimo()));
-							guardiaupdate.setFechasuscripcion(inscripcionGuardiaAAnular.getFechabaja());
-							guardiaupdate.setIdguardia(Integer.parseInt(inscripcionGuardiaAAnular.getIdGuardia()));
-							
+							guardiaupdate.setIdinstitucion(inscripcionGuardiaAAnular.getIdinstitucion());
+							guardiaupdate.setIdturno(inscripcionGuardiaAAnular.getIdturno());
+							guardiaupdate.setIdpersona(inscripcionGuardiaAAnular.getIdpersona());
+							guardiaupdate.setFechasuscripcion(inscripcionGuardiaAAnular.getFechasuscripcion());
+							guardiaupdate.setIdguardia(inscripcionGuardiaAAnular.getIdguardia());
+	
 							ScsInscripcionguardia guardiaActualUpdate = scsInscripcionguardiaMapper.selectByPrimaryKey(guardiaupdate);
+							
+							if(guardiaActualUpdate.getFechasolicitudbaja() == null) guardiaActualUpdate.setFechasolicitudbaja(new Date());
 							
 							guardiaActualUpdate.setFechabaja(new Date());
 							guardiaActualUpdate.setFechamodificacion(new Date());
@@ -328,6 +336,173 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		updateResponseDTO.setError(error);
 
 		LOGGER.info("deleteModules() -> Salida del servicio para eliminar modulos");
+
+		return updateResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO activarTurnos(TurnosDTO turnosDTO, HttpServletRequest request) {
+		LOGGER.info("activarTurnos() ->  Entrada al servicio para eliminar modulos");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"activarTurnos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"activarTurnos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					List<List<InscripcionTurnoItem>> inscripcionesTurno = new ArrayList<>();
+					List<InscripcionTurnoItem> inscripcion = new ArrayList<>();
+					List<List<ScsInscripcionguardia>> inscripcionesGuardiasTurno = new ArrayList<>();
+					List<ScsInscripcionguardia> inscripcionGuardia = new ArrayList<>();
+					List<GuardiasItem> guardiasConfiguradas = new ArrayList<>();
+					List<List<GuardiasItem>> guardiasConfiguradasTurno = new ArrayList<>();
+					for (TurnosItem turnosItem : turnosDTO.getTurnosItems()) {
+
+						ScsTurno turno = new ScsTurno();
+						turno.setIdturno(Integer.parseInt(turnosItem.getIdturno()));
+						turno.setIdinstitucion(idInstitucion);
+						turno = scsTurnosExtendsMapper.selectByPrimaryKey(turno);
+						turno.setFechabaja(null);
+						turno.setVisibilidad("1");
+						turno.setFechamodificacion(new Date());
+						turno.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+						LOGGER.info(
+								"activarTurnos() / scsTurnosExtendsMapper.updateByPrimaryKey() -> Entrada a scsTurnosExtendsMapper para activar turnos");
+
+						response = scsTurnosExtendsMapper.updateByPrimaryKey(turno);
+						 
+						if(turnosItem.getFechabaja() != null) { // Si viene la fecha informada
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+						     String fechaComoCadena = sdf.format(turnosItem.getFechabaja());
+
+							
+							//Obtenemos las inscripciones al turno en estado de BAJA con fecha informada fechabaja
+							inscripcion = scsTurnosExtendsMapper.selectInscripcionTurnoBajasByTurnoFechaBaja(idInstitucion, turnosItem.getIdturno(),fechaComoCadena);
+							if(inscripcion.size() != 0) {
+								inscripcionesTurno.add(inscripcion);
+							}
+							
+							//Obtenemos las guardias inscritas al turno en Baja.
+							inscripcionGuardia = scsGuardiasturnoExtendsMapper.selectGuardiaTurnoBajasByTurnoFecha(idInstitucion, turnosItem.getIdturno(), fechaComoCadena);
+							if(inscripcionGuardia.size() != 0) {
+								inscripcionesGuardiasTurno.add(inscripcionGuardia);
+							}
+							
+							//Obtenemos las guardiasConfiguradasTurno.
+							guardiasConfiguradas = scsGuardiasturnoExtendsMapper.selectGuardiaConfiguradasBajaByTurnoFechaBaja(idInstitucion, turnosItem.getIdturno(),fechaComoCadena);
+							if(inscripcionGuardia.size() != 0) {
+								guardiasConfiguradasTurno.add(guardiasConfiguradas);
+							}
+						}
+						 
+						
+						LOGGER.info(
+								"activarTurnos() /  scsTurnosExtendsMapper.updateByPrimaryKey() -> Entrada a scsTurnosExtendsMapper para activar turnos");
+					}
+
+					//ELIMINAMOS LAS INSCRIPCIONES A LOS TURNOS
+					for(List<InscripcionTurnoItem> listaInscripcionesTurnos : inscripcionesTurno) {
+						for(InscripcionTurnoItem inscripcionTurnoAAnular : listaInscripcionesTurnos) {
+							ScsInscripcionturno turnoupdate = new ScsInscripcionturno();
+							turnoupdate.setIdinstitucion(inscripcionTurnoAAnular.getIdinstitucion());
+							turnoupdate.setIdturno(inscripcionTurnoAAnular.getIdturno());
+							turnoupdate.setIdpersona(inscripcionTurnoAAnular.getIdpersona());
+							turnoupdate.setFechasolicitud(inscripcionTurnoAAnular.getFechasolicitud());
+							
+							ScsInscripcionturno turnoActualupdate = scsInscripcionturnoExtendsMapper.selectByPrimaryKey(turnoupdate);
+							
+							if(turnoActualupdate.getFechasolicitudbaja().equals(turnoActualupdate.getFechabaja()))
+								turnoActualupdate.setFechasolicitudbaja(null);
+							
+							turnoActualupdate.setFechabaja(null);
+							turnoActualupdate.setFechamodificacion(new Date());
+							turnoActualupdate.setUsumodificacion(usuarios.get(0).getIdusuario());
+							scsInscripcionturnoMapper.updateByPrimaryKey(turnoActualupdate);
+							
+						}
+					}
+					
+					//ELIMINAMOS LAS INSCRIPCIONES A LAS GUARDIAS DEL TURNO
+					for(List<ScsInscripcionguardia> listaInscripcionesGuardia : inscripcionesGuardiasTurno) {
+						for(ScsInscripcionguardia inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
+							ScsInscripcionguardia guardiaupdate = new ScsInscripcionguardia();
+							guardiaupdate.setIdinstitucion(inscripcionGuardiaAAnular.getIdinstitucion());
+							guardiaupdate.setIdturno(inscripcionGuardiaAAnular.getIdturno());
+							guardiaupdate.setIdpersona(inscripcionGuardiaAAnular.getIdpersona());
+							guardiaupdate.setFechasuscripcion(inscripcionGuardiaAAnular.getFechasuscripcion());
+							guardiaupdate.setIdguardia(inscripcionGuardiaAAnular.getIdguardia());
+	
+							ScsInscripcionguardia guardiaActualUpdate = scsInscripcionguardiaMapper.selectByPrimaryKey(guardiaupdate);
+	
+							if(guardiaActualUpdate.getFechasolicitudbaja().equals(guardiaActualUpdate.getFechabaja()))
+								guardiaActualUpdate.setFechasolicitudbaja(null);
+							
+							guardiaActualUpdate.setFechabaja(null);
+							guardiaActualUpdate.setFechamodificacion(new Date());
+							guardiaActualUpdate.setUsumodificacion(usuarios.get(0).getIdusuario());
+							scsInscripcionguardiaMapper.updateByPrimaryKey(guardiaActualUpdate);
+							
+						}
+					}
+					
+//					//ELIMINAMOS LAS GUARDIAS CONFIGURADAS PARA EL TURNO
+					for(List<GuardiasItem> listaInscripcionesGuardia : guardiasConfiguradasTurno) {
+						for(GuardiasItem inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
+							ScsGuardiasturno guardiaupdate = new ScsGuardiasturno();
+							guardiaupdate.setIdinstitucion(new Short(inscripcionGuardiaAAnular.getJurisdiccion()));
+							guardiaupdate.setIdturno(Integer.parseInt(inscripcionGuardiaAAnular.getIdTurno()));
+							guardiaupdate.setIdguardia(Integer.parseInt(inscripcionGuardiaAAnular.getIdGuardia()));
+							ScsGuardiasturno guardiaTurnoActual = scsGuardiasturnoMapper.selectByPrimaryKey(guardiaupdate);
+							
+							guardiaTurnoActual.setFechabaja(null);
+							guardiaTurnoActual.setUsumodificacion(usuarios.get(0).getIdusuario());
+							scsGuardiasturnoMapper.updateByPrimaryKey(guardiaTurnoActual);
+							
+						}
+					}
+					
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("activarTurnos() -> Salida del servicio para activar turnos");
 
 		return updateResponseDTO;
 	}

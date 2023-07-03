@@ -241,24 +241,19 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		SQL sql = new SQL();
 		
 		sql.SELECT(  
-				"       ( CASE\r\n" + 
+				"       ( CASE\r\n" +  
 				"            WHEN ins.fechadenegacion IS NOT NULL THEN '4'\r\n" + 
-				"            WHEN ins.fechabaja IS NOT NULL\r\n" + 
-				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 
-				"                 AND ins.fechavalidacion IS NULL THEN '4' /*Denegacion*/\r\n" + 
 				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
 				"                 AND ins.fechabaja IS NOT NULL\r\n" + 
-				"                 AND ins.fechavalidacion IS NOT NULL THEN '3' /*Baja*/\r\n" + 
+				"                THEN '3' /*Baja*/\r\n" + 
 				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
 				"                 AND ins.fechabaja IS NULL\r\n" + 
 				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 
-				"                 AND ins.fechavalidacion IS NOT NULL THEN '2' /*Pendiente de Baja*/\r\n" + 
+				"                 THEN '2' /*Pendiente de Baja*/\r\n" + 
 				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
-				"                 AND ins.fechabaja IS NULL\r\n" + 
 				"                 AND ins.fechasolicitudbaja IS NULL\r\n" + 
 				"                 AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/\r\n" + 
 				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
-				"                 AND ins.fechabaja IS NULL\r\n" + 
 				"                 AND ins.fechasolicitudbaja IS NULL\r\n" + 
 				"                 AND ins.fechavalidacion IS NULL THEN '0' /*Pendiente de Alta*/\r\n" + 
 				"            ELSE ''\r\n" + 

@@ -3,6 +3,8 @@ package org.itcgae.siga.db.services.scs.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.db.entities.ScsEstadoejg;
+import org.itcgae.siga.db.entities.ScsEstadoejgKey;
 import org.itcgae.siga.db.mappers.ScsEstadoejgSqlProvider;
 
 public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
@@ -47,6 +49,18 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 
         return sql.toString();
     }
+	
+	public String bajaEstadoEjg(ScsEstadoejg estado) {
+		SQL sql = new SQL();
+		sql.UPDATE("SCS_ESTADOEJG");
+		sql.SET("FECHABAJA = SYSDATE");
+		sql.WHERE("IDINSTITUCION = "+estado.getIdinstitucion());
+		sql.WHERE("IDTIPOEJG = "+estado.getIdtipoejg());
+		sql.WHERE("ANIO = "+estado.getAnio());
+		sql.WHERE("NUMERO = "+estado.getNumero());
+		sql.WHERE("IDESTADOPOREJG = "+estado.getIdestadoporejg());		
+		return sql.toString();
+	}
     
     public String getEstados(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();

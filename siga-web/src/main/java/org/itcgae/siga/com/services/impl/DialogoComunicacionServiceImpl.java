@@ -1095,7 +1095,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 			}
 		}
-		if(plantillasSinFiltro != null && !plantillasSinFiltro.isEmpty()){
+		if(plantillasSinFiltro != null && !plantillasSinFiltro.isEmpty() && !esEnvio){
 			LOGGER.error("No hay consulta de destinatario para el modelo de comunicacion: "
 					+ modelosComunicacionItem.getIdModeloComunicacion());
 
@@ -1922,7 +1922,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				try{
-					generarComunicacion = generarComunicacion(request, dialogo,usuario, true);					
+					generarComunicacion = generarComunicacion(request, dialogo,usuario, true);	
+					generarComunicacion.setDescripcionDefecto(dialogo.getDescripcionDefecto());
 					
 					// Insertamos las consultas para los envios
 					insertarConsultasEnvio(usuario, idInstitucion, generarComunicacion);
@@ -1991,6 +1992,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								if(dest.getCamposEnvio()!= null && dest.getCamposEnvio().getIdentificador() != null && !dest.getCamposEnvio().getIdentificador().isEmpty() ) {
 									descripcion = dest.getCamposEnvio().getIdentificador();
 								}
+								if(generarComunicacion.getDescripcionDefecto() != null && !generarComunicacion.getDescripcionDefecto().isEmpty())
+									descripcion =  generarComunicacion.getDescripcionDefecto() + " " + descripcion;
 								
 								envio.setDescripcion(descripcion);
 

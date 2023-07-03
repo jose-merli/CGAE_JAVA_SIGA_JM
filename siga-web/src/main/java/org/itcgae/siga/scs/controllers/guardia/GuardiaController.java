@@ -94,7 +94,12 @@ public class GuardiaController {
 	ResponseEntity<UpdateResponseDTO> activateGuardias(@RequestBody GuardiasDTO guardiasDTO,
 			HttpServletRequest request) {
 		UpdateResponseDTO response = guardiasService.activateGuardias(guardiasDTO, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if(response.getStatus().equals(SigaConstants.KO)) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}else {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
+	
 	}
 
 	@PostMapping(value = "/busquedaGuardia/updateGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
