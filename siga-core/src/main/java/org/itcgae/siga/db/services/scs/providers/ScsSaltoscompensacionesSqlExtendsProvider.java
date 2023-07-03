@@ -37,7 +37,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 				+ "		CEN_COLEGIADO.IDPERSONA = SCS_SALTOSCOMPENSACIONES.IDPERSONA\r\n"
 				+ "		AND CEN_COLEGIADO.IDINSTITUCION = SCS_SALTOSCOMPENSACIONES.IDINSTITUCION\r\n" + "UNION ALL\r\n"
 				+ "	SELECT\r\n" + "		SCS_SALTOCOMPENSACIONGRUPO.IDINSTITUCION,\r\n"
-				+ "		SCS_GRUPOGUARDIA.IDGRUPOGUARDIA AS GRUPO,\r\n" + "		SCS_TURNO.IDTURNO,\r\n"
+				+ "		SCS_GRUPOGUARDIA.NUMEROGRUPO AS GRUPO,\r\n" + "		SCS_TURNO.IDTURNO,\r\n"
 				+ "		SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + "		SCS_GUARDIASTURNO.IDGUARDIA,\r\n"
 				+ "		SCS_GUARDIASTURNO.NOMBRE AS NOMBRE_GUARDIA,\r\n"
 				+ "		SCS_SALTOCOMPENSACIONGRUPO.IDSALTOCOMPENSACIONGRUPO,\r\n"
@@ -254,7 +254,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idInstitucion = '" + idInstitucion.trim() + "'");
 		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idturno = '" + saltoItem.getIdTurno().trim() + "'");
 		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idguardia = '" + saltoItem.getIdGuardia().trim() + "'");
-		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idgrupoguardia = '" + saltoItem.getGrupo().trim() + "'");
+		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idgrupoguardia IN (SELECT sgg.IDGRUPOGUARDIA FROM SCS_GRUPOGUARDIA sgg WHERE sgg.NUMEROGRUPO = "+saltoItem.getGrupo().trim()+" AND IDINSTITUCION = "+idInstitucion+" AND IDGUARDIA = "+saltoItem.getIdGuardia().trim()+")");
 		sql.WHERE("SCS_GRUPOGUARDIACOLEGIADO.idpersona in ( " + sql2 + " )");
 
 		sql.ORDER_BY("CEN_PERSONA.APELLIDOS1");
@@ -357,9 +357,23 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 	public String selectNuevoIdSaltosCompensacionesGrupo() {
 
 		SQL sql = new SQL();
-
+		
 		sql.SELECT("sq_scs_saltocompensaciongrupo.NEXTVAL AS ID");
 		sql.FROM("dual");
+
+		return sql.toString();
+	}
+	
+	public String selectIdSiguienteSaltosCompensacionesGrupo() {
+
+		SQL sql = new SQL();
+		//SELECT max(ss.IDSALTOCOMPENSACIONGRUPO)+1 AS ID FROM SCS_SALTOCOMPENSACIONGRUPO ss;
+		/*
+		sql.SELECT("sq_scs_saltocompensaciongrupo.NEXTVAL AS ID");
+		sql.FROM("dual");
+		*/
+		sql.SELECT("max(ss.IDSALTOCOMPENSACIONGRUPO)+1 AS ID");
+		sql.FROM("SCS_SALTOCOMPENSACIONGRUPO ss");
 
 		return sql.toString();
 	}

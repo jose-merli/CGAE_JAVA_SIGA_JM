@@ -641,6 +641,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		if (idInstitucion != Short.parseShort("2000")) {
 			sql.WHERE("colest.idinstitucion = '" + idInstitucion + "'");
 		}
+		
+		sql.WHERE("col.idinstitucion = '" + colegiadoItem.getIdInstitucion() + "'");
 		// sql1.WHERE("dir.fechabaja is null");
 
 		sql.ORDER_BY("fechaestadodate desc");
