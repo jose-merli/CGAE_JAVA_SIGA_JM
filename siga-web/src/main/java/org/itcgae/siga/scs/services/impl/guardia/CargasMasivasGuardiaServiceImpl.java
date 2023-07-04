@@ -898,7 +898,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								guardia.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
 
 								result = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
-								if (result != 0) {
+								if (result == 0) {
 									errores += "Error insertando la inscripcion de la linea " + z + ". <br/>";
 									error.setDescription(errores);
 									deleteResponseDTO.setError(error);
