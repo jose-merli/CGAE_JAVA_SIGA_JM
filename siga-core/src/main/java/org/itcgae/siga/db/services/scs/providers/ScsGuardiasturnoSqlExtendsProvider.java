@@ -3225,18 +3225,23 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 
 		sql.INSERT_INTO("SCS_SALTOCOMPENSACIONGRUPO");
 
-		//sql.VALUES("IDSALTOCOMPENSACIONGRUPO", "'" + saltoItem.getIdSaltoCompensacionGrupo() + "'"); //
-		sql.VALUES("IDSALTOCOMPENSACIONGRUPO", "(SELECT MAX(idsaltocompensaciongrupo)+1 as ID  FROM SCS_SALTOCOMPENSACIONGRUPO)");
-		sql.VALUES("IDGRUPOGUARDIA", "'" + saltoItem.getIdGrupoGuardia() + "'");
+		// sql.VALUES("IDSALTOCOMPENSACIONGRUPO", "'" +
+		// saltoItem.getIdSaltoCompensacionGrupo() + "'"); //
+		sql.VALUES("IDSALTOCOMPENSACIONGRUPO",
+				"(SELECT MAX(idsaltocompensaciongrupo)+1 as ID  FROM SCS_SALTOCOMPENSACIONGRUPO)");
+		if (saltoItem.getIdGrupoGuardia() != null)
+			sql.VALUES("IDGRUPOGUARDIA", "'" + saltoItem.getIdGrupoGuardia() + "'");
+		else
+			sql.VALUES("IDGRUPOGUARDIA", "null");
 		sql.VALUES("SALTOOCOMPENSACION", "'" + saltoItem.getSaltoCompensacion() + "'");
 		sql.VALUES("FECHA", "'" + saltoItem.getFecha() + "'");
-		
-		if(saltoItem.getFechaCumplimiento() != null )
-			sql.VALUES("FECHACUMPLIMIENTO", "'" + saltoItem.getFechaCumplimiento()+ "'");
+
+		if (saltoItem.getFechaCumplimiento() != null)
+			sql.VALUES("FECHACUMPLIMIENTO", "'" + saltoItem.getFechaCumplimiento() + "'");
 		else
 			sql.VALUES("FECHACUMPLIMIENTO", "null");
 		sql.VALUES("MOTIVO", "'" + saltoItem.getMotivo() + "'");
-		sql.VALUES("MOTIVOCUMPLIMIENTO", "'" +saltoItem.getMotivoCumplimiento()+ "'");
+		sql.VALUES("MOTIVOCUMPLIMIENTO", "'" + saltoItem.getMotivoCumplimiento() + "'");
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
 		sql.VALUES("IDTURNO", "'" + saltoItem.getIdTurno() + "'");
 		sql.VALUES("IDGUARDIA", "'" + saltoItem.getIdGuardia() + "'");
@@ -3248,9 +3253,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.VALUES("FECHACREACION", "SYSTIMESTAMP");
 		sql.VALUES("USUCREACION", usuario.toString());
 		sql.VALUES("FECHAMODIFICACION", "SYSTIMESTAMP");
-		sql.VALUES("USUMODIFICACION",  usuario.toString() );
+		sql.VALUES("USUMODIFICACION", usuario.toString());
 		sql.VALUES("IDCALENDARIOGUARDIASCREACION", saltoItem.getIdCalendarioGuardias());
-		//sql.VALUES("TIPOMANUAL",  saltoItem.getTipoManual());
+		// sql.VALUES("TIPOMANUAL", saltoItem.getTipoManual());
 
 		return sql.toString();
 	}
