@@ -1919,11 +1919,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
 		if(filtro == 0) {
-			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= "+ fecha);
-			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= " + fecha + " OR MODULO.FECHAHASTAVIGOR IS NULL)");
+			if(fecha.contains("/")) {
+				sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) >= TO_DATE('"+ fecha + "','DD//MM//YYYY')");
+				sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) <= TO_DATE('" + fecha + "','DD//MM//YYYY') OR MODULO.FECHAHASTAVIGOR IS NULL)");
+			} else {
+				sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) >= "+ fecha);
+				sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) <= " + fecha + " OR MODULO.FECHAHASTAVIGOR IS NULL)");
+			}
 		}else {
-			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
-			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) >= TO_DATE('" + fecha + "','DD/MM/YYYY') OR MODULO.FECHAHASTAVIGOR IS NULL)");
+			sql.WHERE("TRUNC(MODULO.FECHADESDEVIGOR) >= TO_DATE('" + fecha + "','DD//MM//YYYY')");
+			sql.WHERE("(TRUNC(MODULO.FECHAHASTAVIGOR) <= TO_DATE('" + fecha + "','DD//MM//YYYY') OR MODULO.FECHAHASTAVIGOR IS NULL)");
 		}
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.ORDER_BY("MODULO.NOMBRE");
