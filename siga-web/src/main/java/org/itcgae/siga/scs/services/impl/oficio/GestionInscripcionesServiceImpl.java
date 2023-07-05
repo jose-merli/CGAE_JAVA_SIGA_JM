@@ -958,33 +958,6 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						ScsTurno turnoItem = scsTurnoMapper.selectByPrimaryKey(turnoKey);
 						String valid = turnoItem.getValidarinscripciones();
 
-						// Buscamos las inscripciones ya existentes
-						ScsInscripcionturnoExample scsInscripcionturnoExample = new ScsInscripcionturnoExample();
-						scsInscripcionturnoExample.createCriteria()
-								.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-								.andIdinstitucionEqualTo(idInstitucion)
-								.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
-
-						List<ScsInscripcionturno> oldListInscripcionturno = scsInscripcionturnoMapper
-								.selectByExample(scsInscripcionturnoExample);
-
-						// Si hay inscripciones ya existentes las eliminamos
-						if (!oldListInscripcionturno.isEmpty()) {
-
-							for (ScsInscripcionturno scsInscripcionturno : oldListInscripcionturno) {
-
-								ScsInscripcionturnoKey scsInscripcionturnoKey = new ScsInscripcionturnoKey();
-								scsInscripcionturnoKey.setIdturno(scsInscripcionturno.getIdturno());
-								scsInscripcionturnoKey.setIdinstitucion(scsInscripcionturno.getIdinstitucion());
-								scsInscripcionturnoKey.setIdpersona(scsInscripcionturno.getIdpersona());
-								scsInscripcionturnoKey.setFechasolicitud(scsInscripcionturno.getFechasolicitud());
-
-								scsInscripcionturnoMapper.deleteByPrimaryKey(scsInscripcionturnoKey);
-
-							}
-
-						}
-
 						// Procedemos a insertar la nueva inscripción
 						ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
 						inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
@@ -1005,31 +978,14 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						inscripcionturno.setFechamodificacion(new Date());
 						inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-						response = scsInscripcionturnoMapper.insert(inscripcionturno);
-
+						// Si unicamente se inscribe el turno (= no tendra idGuardia)
+						// Con un if evitamos multiples intentos de insercion o errores
+						if(inscripcionesItem.getIdguardia() == null) {
+							response = scsInscripcionturnoMapper.insert(inscripcionturno);
+						}
+						
 						// Creamos inscripcion a turno
 						if (inscripcionesItem.getIdguardia() != null) {
-
-							// ScsInscripcionguardiaExample exampleguardia = new
-							// ScsInscripcionguardiaExample();
-							// exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							// .andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()));
-
-							ScsInscripcionguardiaKey keyinscripcionguardia = new ScsInscripcionguardiaKey();
-
-							keyinscripcionguardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
-							keyinscripcionguardia.setIdinstitucion(idInstitucion);
-							keyinscripcionguardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
-							String fechaSolicitud = dateFormat.format(inscripcionesItem.getFechasolicitud());
-							keyinscripcionguardia.setFechasuscripcion(dateFormat.parse(fechaSolicitud));
-							keyinscripcionguardia.setIdguardia(Integer.parseInt(inscripcionesItem.getIdguardia()));
-
-							ScsInscripcionguardia oldInscripcionguardia = scsInscripcionguardiaMapper
-									.selectByPrimaryKey(keyinscripcionguardia);
-
-							if (oldInscripcionguardia != null) {
-								scsInscripcionguardiaMapper.deleteByPrimaryKey(keyinscripcionguardia);
-							}
 
 							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
 
