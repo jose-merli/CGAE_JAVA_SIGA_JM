@@ -1331,6 +1331,10 @@ public class SigaConstants {
 
 	public static final List<String> CAMPOSMODEL_IT = Arrays.asList(IT_TURNO, IT_GUARDIA, IT_NCOLEGIADO,
 			IT_FECHAEFECTIVA, IT_TIPO, IT_GRUPO, IT_ORDEN);
+	
+	public static final List<String> CAMPOSMODEL_ITOFICIO = Arrays.asList(IT_TURNO, IT_NCOLEGIADO,
+			IT_FECHAEFECTIVA, IT_TIPO);
+	
 	public static final List<String> CAMPOSLOGIT = Arrays.asList(IT_TURNO, IT_GUARDIA, IT_NCOLEGIADO, IT_FECHAEFECTIVA,
 			IT_TIPO, IT_GRUPO, IT_ORDEN, ERRORES);
 

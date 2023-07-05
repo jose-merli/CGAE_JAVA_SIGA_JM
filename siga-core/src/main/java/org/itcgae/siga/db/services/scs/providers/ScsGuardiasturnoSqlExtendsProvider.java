@@ -47,6 +47,20 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		return sql.toString();
 	}
+	
+	public String getConfiguracionGuardiasTurno(Short idInstitucion, String idTurno) {
+		
+		SQL sql = new SQL();
+		
+		//SELECT GUARDIAS FROM SCS_TURNO st WHERE IDINSTITUCION = 2005 AND NOMBRE LIKE '%Alicante Prueba%';
+		sql.SELECT("GUARDIAS");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("IDINSTITUCION ="+idInstitucion);
+		sql.WHERE("IDTURNO = "+idTurno+"");
+		
+		return sql.toString();
+	}
+	
 	public String searchNombreTurnoGuardiaNoAbrev(String idInstitucion, String nombreGuardia) {
 		SQL sql = new SQL();
 
