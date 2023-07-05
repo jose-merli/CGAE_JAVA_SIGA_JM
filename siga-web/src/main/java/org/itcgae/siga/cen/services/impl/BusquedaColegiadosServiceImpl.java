@@ -34,6 +34,7 @@ import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.CenPersonaItem;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -54,6 +55,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocolegialExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
+import org.itcgae.siga.scs.services.impl.oficio.DesignacionesServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,6 +92,9 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private DesignacionesServiceImpl desigancionesServiceImpl;
 	
 	private static final int EXCEL_ROW_FLUSH = 1000;
 	
@@ -191,6 +196,25 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			LOGGER.info(
 					"getSituacionGlobalColegiado() / cenEstadocolegialExtendsMapper.getSituacionGlobalColegiado() -> "
 					+ "Salida de cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
+			
+			try {
+				LOGGER.info(
+						"getSituacionGlobalColegiado() / desigancionesServiceImpl.getPersonaPorId() -> "
+						+ "Entrada a desigancionesServiceImpl para obtener datos generales persona y saber si esta fallecido");
+				CenPersonaItem cenPersonaItem = desigancionesServiceImpl.getPersonaPorId(idPersona);
+				LOGGER.info(
+						"getSituacionGlobalColegiado() / desigancionesServiceImpl.getPersonaPorId() -> "
+						+ "Salida de desigancionesServiceImpl para obtener datos generales persona y saber si esta fallecido");
+				if(cenPersonaItem != null && cenPersonaItem.getFallecido().equals("1")) {
+					ComboItem incluirFallecido = new ComboItem();
+					incluirFallecido.setLabel("FFFF");
+					incluirFallecido.setValue("60");					
+					comboItems.add(incluirFallecido);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		comboDTO.setCombooItems(comboItems);
