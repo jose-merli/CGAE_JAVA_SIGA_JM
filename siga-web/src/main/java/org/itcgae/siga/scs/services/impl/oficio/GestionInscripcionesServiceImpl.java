@@ -478,7 +478,8 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
 								exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 										.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-										.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+										.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()))
+										.andFechabajaIsNull();
 
 								inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
 								for (int i = 0; i < inscripcionguardia.size(); i++) {
@@ -497,7 +498,8 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
 								exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 										.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-										.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+										.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()))
+										.andFechabajaIsNull();
 
 								inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
 								for (int i = 0; i < inscripcionguardia.size(); i++) {
@@ -620,7 +622,8 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
 									exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 											.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-											.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+											.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()))
+											.andFechabajaIsNull();
 	
 									inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
 									for (int i = 0; i < inscripcionguardia.size(); i++) {
@@ -647,7 +650,8 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
 									exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 											.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-											.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+											.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()))
+											.andFechabajaIsNull();
 	
 									inscripcionguardia = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
 									for (int i = 0; i < inscripcionguardia.size(); i++) {
