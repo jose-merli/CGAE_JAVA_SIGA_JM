@@ -1331,6 +1331,10 @@ public class SigaConstants {
 
 	public static final List<String> CAMPOSMODEL_IT = Arrays.asList(IT_TURNO, IT_GUARDIA, IT_NCOLEGIADO,
 			IT_FECHAEFECTIVA, IT_TIPO, IT_GRUPO, IT_ORDEN);
+	
+	public static final List<String> CAMPOSMODEL_ITOFICIO = Arrays.asList(IT_TURNO, IT_NCOLEGIADO,
+			IT_FECHAEFECTIVA, IT_TIPO);
+	
 	public static final List<String> CAMPOSLOGIT = Arrays.asList(IT_TURNO, IT_GUARDIA, IT_NCOLEGIADO, IT_FECHAEFECTIVA,
 			IT_TIPO, IT_GRUPO, IT_ORDEN, ERRORES);
 
@@ -1558,7 +1562,7 @@ public class SigaConstants {
 	public static String EEJG_IDSISTEMA ="EEJG_IDSISTEMA";
 	public static String EEJG_URLWS ="EEJG_URLWS";
 	public static String SIGAFRONT_VERSION = "202109071016";
-	public static String SIGAWEB_VERSION = "1.0.96_1";
+	public static String SIGAWEB_VERSION = "1.0.97_0";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";

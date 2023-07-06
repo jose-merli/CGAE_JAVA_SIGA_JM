@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -451,7 +452,13 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		Integer usuModificacionGeneral = null;
+		
+		if(idInstitucion == Short.parseShort(SigaConstants.InstitucionGeneral)) {
+			idInstitucion= Short.parseShort(colegiadoItem.getIdInstitucion());
+			usuModificacionGeneral = 0;
+		}
+		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -489,7 +496,11 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					CenColegiado colegiado = new CenColegiado();
 					colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 					colegiado.setIdinstitucion(idInstitucion);
-					colegiado.setUsumodificacion(usuario.getIdusuario());
+					if(usuModificacionGeneral == null) {
+						colegiado.setUsumodificacion(usuario.getIdusuario());	
+					} else {
+						colegiado.setUsumodificacion(usuModificacionGeneral);
+					}
 					if (colegiadoItem.getNumColegiado() != null) {
 						colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
 					}
@@ -628,13 +639,19 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							}
 						}
 
-						datosColegiales.setFechaestado(colegiadoItem.getFechaEstado());
+						Date fechaSinHoras = quitarHorasFechas(colegiadoItem.getFechaEstado());
+						
+						datosColegiales.setFechaestado(fechaSinHoras);
 						datosColegiales.setFechamodificacion(new Date());
 						datosColegiales.setIdestado(Short.valueOf(colegiadoItem.getSituacion()));
 
 						datosColegiales.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
 						datosColegiales.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
-						datosColegiales.setUsumodificacion(usuario.getIdusuario());
+						if(usuModificacionGeneral == null) {
+							datosColegiales.setUsumodificacion(usuario.getIdusuario());	
+						} else {
+							datosColegiales.setUsumodificacion(usuModificacionGeneral);
+						}
 						if(colegiadoItem.getObservaciones() != null) {
 							datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
 						}else {
@@ -1016,6 +1033,12 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 									}
 									
 								}
+							} else {
+								Error error = new Error();
+								response.setStatus(SigaConstants.KO);
+								error.setMessage("Error durante la actualización del estado de colegiado");
+								response.setError(error);
+								return response;
 							}
 
 //							if (colegiadoSiguienteFechaEstado != null) {
@@ -1029,7 +1052,11 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								datosColegiales.setFechamodificacion(new Date());
 							}
 
-							datosColegiales.setUsumodificacion(usuario.getIdusuario());
+							if (idInstitucion == Short.parseShort(SigaConstants.InstitucionGeneral)) {
+								datosColegiales.setUsumodificacion(0);
+							} else {
+								datosColegiales.setUsumodificacion(usuario.getIdusuario());								
+							}
 
 							datosColegiales.setIdestado(Short.valueOf(colegiadoItem.getIdEstado()));
 
@@ -1255,7 +1282,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 					} else {
 						if(updateEstado){
-						response.setStatus(SigaConstants.KO);
+							response.setStatus(SigaConstants.KO);
 						}else{
 							response.setStatus(SigaConstants.OK);
 						}
@@ -1401,8 +1428,12 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 					CenColegiado colegiado = new CenColegiado();
 					colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
-					colegiado.setIdinstitucion(idInstitucion);
-					colegiado.setUsumodificacion(usuario.getIdusuario());
+					if(idInstitucion == Short.parseShort(SigaConstants.InstitucionGeneral)) {
+						colegiado.setIdinstitucion(Short.parseShort(colegiadoItem.getIdInstitucion()));
+						colegiado.setUsumodificacion(0);
+					} else {
+						colegiado.setUsumodificacion(usuario.getIdusuario());						
+					}
 					if (colegiadoItem.getNumColegiado() != null) {
 						colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
 					}
@@ -1596,7 +1627,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 						/// Llamamos al Pl
 						Object[] paramTurno = new Object[3];
-						paramTurno[0] = usuario.getIdinstitucion().toString();
+//						paramTurno[0] = usuario.getIdinstitucion().toString();
+						paramTurno[0] = colegiado.getIdinstitucion().toString();
 						paramTurno[1] = estadoColegial.getIdpersona().toString();
 						paramTurno[2] = usuario.getIdusuario().toString();
 						String resultadoPlTurno[] = new String[2];
@@ -2042,7 +2074,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(colegiadoItem.getIdInstitucion()));
 			LOGGER.info(
 					"datosColegialesUpdateMasivo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
@@ -2056,13 +2088,24 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						"datosColegialesUpdateMasivo() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
 				//1. Actualizamos el colegiado
 				CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+
 				colegiadoKey.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
 				colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 				CenColegiado cenColegiadoAnterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey);
 				CenColegiado colegiado = new CenColegiado();
 				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
-				colegiado.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
-				colegiado.setUsumodificacion(usuario.getIdusuario());
+
+				if(idInstitucion != Short.parseShort(SigaConstants.InstitucionGeneral)) {
+					colegiado.setIdinstitucion(idInstitucion);					
+				} else {
+					colegiado.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));					
+				}
+				if(idInstitucion != Short.parseShort(SigaConstants.InstitucionGeneral)) {
+					colegiado.setUsumodificacion(usuario.getIdusuario());
+				} else {
+					colegiado.setUsumodificacion(0);
+				}
+
 				/*if (colegiadoItem.getNumColegiado() != null) {
 					colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
 				}*/
@@ -2123,7 +2166,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				if (response.getStatus().equals(SigaConstants.OK)) {
 					
 				
-					//3 Insertamos el estado si así precisa
+				//3 Insertamos el estado si así precisa
 					if (null != listColegiadoItem.getNuevocolegiadoItem() && null != listColegiadoItem.getNuevocolegiadoItem().getIdPersona()) {
 
 						LOGGER.info(
@@ -2137,13 +2180,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				}
 				
 				
-				
-				
-				
 				//4 Añadimos auditoria
 				if (responseUpdateColegiado >= 1 && response.getStatus().equals(SigaConstants.OK) && responseinsert.getStatus().equals(SigaConstants.OK)) {
 
-					// Añadimos auditoria
 					if (!UtilidadesString.esCadenaVacia(colegiadoItem.getMotivo())) {
 
 						LOGGER.info(
@@ -2323,5 +2362,21 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		return envio.getIdenvio();
 	}
 
+	private Date quitarHorasFechas(Date fecha) {
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(fecha);
+
+		// Seteamos la hora a 00:00:00
+		cal.set(Calendar.HOUR_OF_DAY, 00);
+		cal.set(Calendar.MINUTE, 00);
+		cal.set(Calendar.SECOND, 00);
+		cal.set(Calendar.MILLISECOND, 000);
+
+		fecha = cal.getTime();
+
+		return fecha;
+
+	}      
 
 }

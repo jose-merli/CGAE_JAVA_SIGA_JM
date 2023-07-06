@@ -1961,7 +1961,8 @@ public class ComboServiceImpl implements ComboService {
 					GenParametrosExample exampleParametroAux = new GenParametrosExample();
 					exampleParametroAux.createCriteria().andParametroEqualTo("FILTRAR_MODULOS_PORFECHA").andIdinstitucionEqualTo(Short.valueOf("0"));
 					List<GenParametros> valorAux = genParametrosMapper.selectByExample(exampleParametroAux);
-					filtro = Integer.parseInt(valorAux.get(0).getValor());
+					if(!valorAux.isEmpty() && valorAux.get(0).getValor() != null)
+						filtro = Integer.parseInt(valorAux.get(0).getValor());
 				}else {
 					filtro = Integer.parseInt(valor.get(0).getValor());
 				}

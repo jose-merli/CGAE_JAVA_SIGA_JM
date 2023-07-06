@@ -363,19 +363,19 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 	
 	public File  newModelIT(String turnos, String guardias, Short idInstitucion) throws FileNotFoundException, IOException, EncryptedDocumentException, InvalidFormatException {
 		Workbook wb =  new HSSFWorkbook();
-		Sheet sheet = wb.createSheet("Modelo Inscripciones Guardias");
+		Sheet sheet = wb.createSheet("Modelo Inscripciones Turno");
 
 		// Create a row and put some cells in it. Rows are 0 based.
 		Row row = sheet.createRow(0);
 		//CABECERA
-		for(String p :SigaConstants.CAMPOSMODEL_IT) {
+		for(String p :SigaConstants.CAMPOSMODEL_ITOFICIO) {
 			if(row.getLastCellNum()==-1)row.createCell(row.getLastCellNum()+1).setCellValue(p);
 			else row.createCell(row.getLastCellNum()).setCellValue(p);
 			//sheet.autoSizeColumn(row.getLastCellNum()-1);
 		}
 		
 		String[] gparts = guardias.split(",");
-		String[] tparts = turnos.split(",");
+		String[] tparts = turnos.split("-");
 		String[] listTurnos = new String[gparts.length];
 		
 		if(!guardias.equals("") ) {
@@ -590,9 +590,10 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 						
 						// En el caso que se haya introducido un tipo alta
 						if (cargaMasivaDatosITItem.getTipo().equals("ALTA")) {
-
-							//Se comprueba si el turno tiene turnos o no
-							if (!listGu.isEmpty()) {
+							//Sacamos la configuración de las guardias de cada turno (Obligatorias=0, Todas o ninguna=1, A elegir=2)
+							Integer configuracionGuardiasTurno = scsGuardiasTurnoExtendsMapper.getConfiguracionGuardiasTurno(idInstitucion, cargaMasivaDatosITItem.getIdTurno());
+							//Se comprueba si el turno tiene guardias y es obligatorio
+							if (!listGu.isEmpty()&&configuracionGuardiasTurno==0) {
 								
 								//Se compruaba si hay inscripciones guardias ya insertadas con los valores introducidos
 								ScsInscripcionguardia guardia = new ScsInscripcionguardia();
