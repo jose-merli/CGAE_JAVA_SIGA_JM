@@ -67,18 +67,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL letrado = new SQL();
         letrado.SELECT("cen_persona.apellidos2 || ' ' || cen_persona.apellidos1 || ',' || cen_persona.nombre");
         letrado.FROM("scs_ejgdesigna ejgdesigna");
-        letrado.JOIN("scs_designasletrado des ON des.idinstitucion = ejgdesigna.idinstitucion and des.idturno = ejgdesigna.idturno and des.anio = ejgdesigna.aniodesigna AND des.numero = ejgdesigna.numerodesigna");
-        letrado.JOIN("cen_persona ON cen_persona.idpersona = des.idpersona");
+        letrado.JOIN("cen_persona ON cen_persona.idpersona = F_SIGA_GETIDLETRADO_DESIGNA(ejgdesigna.IDINSTITUCION, ejgdesigna.IDTURNO , ejgdesigna.ANIODESIGNA , ejgdesigna.NUMERODESIGNA)");
         letrado.WHERE("ejgdesigna.idinstitucion = ejg.idinstitucion");
         letrado.WHERE("ejgdesigna.ANIOEJG = ejg.anio");
         letrado.WHERE("ejgdesigna.NUMEROEJG = ejg.numero");
         letrado.WHERE("ejgdesigna.IDTIPOEJG = ejg.IDTIPOEJG");
-        letrado.WHERE("FECHADESIGNA = (SELECT MAX(FECHADESIGNA) "
-                    + " FROM scs_designasletrado des2 "
-                    + " WHERE des.idinstitucion = des2.idinstitucion "
-                    + " AND des.anio = des2.anio "
-                    + " AND des.numero = des2.numero "
-                    + " AND des.idturno = des2.idturno) ");
         letrado.ORDER_BY("ejgdesigna.aniodesigna DESC, ejgdesigna.numerodesigna DESC");
         
         //sql turno
@@ -130,7 +123,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sqlEstado.SELECT("f_siga_getrecurso(MAESTROESTADO.DESCRIPCION, " + idLenguaje + ")");
 			sqlEstado.FROM("SCS_MAESTROESTADOSEJG MAESTROESTADO, SCS_ESTADOEJG ESTADO2");
 			sqlEstado.WHERE("ESTADO2.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");
-			sqlEstado.WHERE("MAESTROESTADO.IDESTADOEJG NOT IN (25,26,13,0,9,10,12,15,16,20)");
+			sqlEstado.WHERE("MAESTROESTADO.VISIBLECOMISION = 0");
 			sqlEstado.WHERE("ESTADO2.IDINSTITUCION = ESTADO.IDINSTITUCION");
 			sqlEstado.WHERE("ESTADO2.IDTIPOEJG = ESTADO.IDTIPOEJG");
 			sqlEstado.WHERE("ESTADO2.ANIO = ESTADO.ANIO");
@@ -144,7 +137,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			SQL sqlEstado = new SQL();
 			sqlEstado.SELECT("f_siga_getrecurso(MAESTROESTADO.DESCRIPCION, " + idLenguaje + ")");
 			sqlEstado.FROM("SCS_MAESTROESTADOSEJG MAESTROESTADO");
-			sqlEstado.WHERE("ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG AND MAESTROESTADO.IDESTADOEJG NOT IN (25,26,13,0,9,10,12,15,16,20) AND ROWNUM = 1");
+			sqlEstado.WHERE("ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG AND MAESTROESTADO.VISIBLECOMISION = 0 AND ROWNUM = 1");
 			
 			sql.SELECT("(" + sqlEstado.toString() + ") AS ESTADOEJG");
 		}
@@ -166,11 +159,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.LEFT_OUTER_JOIN("SCS_TURNO  TURNO ON TURNO.IDINSTITUCION = ejg.IDINSTITUCION AND TURNO.IDTURNO = EJG.GUARDIATURNO_IDTURNO");
         sql.LEFT_OUTER_JOIN("SCS_GUARDIASTURNO GUARDIA  ON GUARDIA.IDINSTITUCION =EJG.IDINSTITUCION AND GUARDIA.IDTURNO =EJG.GUARDIATURNO_IDTURNO  AND GUARDIA.IDGUARDIA =EJG.GUARDIATURNO_IDGUARDIA");
         
-        //ARR
         String joinEstado = "SCS_ESTADOEJG ESTADO ON ESTADO.IDINSTITUCION = EJG.IDINSTITUCION AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG AND ESTADO.ANIO = EJG.ANIO AND ESTADO.NUMERO = EJG.NUMERO ";
-        if (!(ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "" && !ejgItem.isUltimoEstado())) {
-        	joinEstado = joinEstado + "AND ESTADO.IDESTADOPOREJG = (SELECT MAX(ESTADO2.IDESTADOPOREJG) FROM SCS_ESTADOEJG ESTADO2 WHERE ESTADO2.IDINSTITUCION = ESTADO.IDINSTITUCION AND ESTADO2.IDTIPOEJG = ESTADO.IDTIPOEJG AND ESTADO2.ANIO = ESTADO.ANIO AND ESTADO2.NUMERO = ESTADO.NUMERO )";
-        }
         sql.JOIN(joinEstado);
         
 		if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") || (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
@@ -178,8 +167,14 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.JOIN("scs_actacomision ac ON ejgacta.idinstitucionacta = ac.idinstitucion AND ejgacta.idacta = ac.idacta AND ejgacta.anioacta = ac.anioacta");
 		}
 
-		//WHERE ARR
-		sql.WHERE("ejg.idinstitucion = " + idInstitucion + " AND ESTADO.FECHABAJA IS NULL");
+		//WHERE 
+		sql.WHERE("ejg.idinstitucion = " + idInstitucion );
+		
+		sql.WHERE("ESTADO.FECHABAJA IS NULL");
+		//Arreglo último estado
+		if (!(ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "" && !ejgItem.isUltimoEstado())) {
+        	sql.WHERE("ESTADO.IDESTADOEJG = F_SIGA_GET_IDULTIMOESTADOEJG (ESTADO.IDINSTITUCION, ESTADO.IDTIPOEJG, ESTADO.ANIO,ESTADO.NUMERO )");
+		}
 		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
 
