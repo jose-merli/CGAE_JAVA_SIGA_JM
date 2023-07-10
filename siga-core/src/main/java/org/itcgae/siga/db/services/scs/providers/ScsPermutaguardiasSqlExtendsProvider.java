@@ -194,10 +194,11 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         sql.JOIN("scs_guardiasturno g ON g.idinstitucion = si.idinstitucion AND g.idguardia = si.IDGUARDIA");
         sql.JOIN("cen_persona per ON per.idpersona = gc.idpersona");
         sql.JOIN("cen_colegiado col ON col.idpersona = gc.idpersona");
-
+        
+        sql.WHERE("col.IDINSTITUCION = " + idinstitucion);
         sql.WHERE("gc.idinstitucion = " + idinstitucion);
-        sql.WHERE("gc.FECHAINICIO >= TO_DATE('" + fechainicio + "', 'DD/MM/RRRR')");
-        sql.WHERE("TO_DATE('" + fechainicio + "', 'DD/MM/RRRR') between si.FECHAVALIDACION and nvl(si.FECHABAJA, '31/12/2999')");
+        sql.WHERE("gc.FECHAINICIO >= SYSDATE");
+        sql.WHERE("SYSDATE between si.FECHAVALIDACION and nvl(si.FECHABAJA, '31/12/2999')");
         sql.WHERE("gc.IDTURNO = " + guardiaItem.getIdTurno());
         sql.WHERE("gc.IDGUARDIA = " + guardiaItem.getIdGuardia());
         sql.WHERE("gc.IDCALENDARIOGUARDIAS = " + guardiaItem.getIdCalendarioGuardias());
