@@ -357,7 +357,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				if (busquedaPerFisicaItems.size() == 0 || null == busquedaPerFisicaItems) {
 
 					CenPersonaExample cenPersonaExample = new CenPersonaExample();
-					cenPersonaExample.createCriteria().andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
+					cenPersonaExample.createCriteria().andIdtipoidentificacionEqualTo(Short.valueOf("20"))
 							.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
 
 					List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
@@ -412,8 +412,11 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 									.concat(busquedaPerFisica.getSegundoApellido()));
 							if (null != colegiado.getDatosPersonales().getIdentificacion().getNIF()) {
 								busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
-							} else {
+							} 
+							else if (null != colegiado.getDatosPersonales().getIdentificacion().getNIE()) {
 								busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIE());
+							} else {
+								busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getPasaporte());
 							}
 							busquedaPerFisica.setNombre(colegiado.getDatosPersonales().getNombre());
 
