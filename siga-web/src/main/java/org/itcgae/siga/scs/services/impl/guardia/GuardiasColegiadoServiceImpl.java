@@ -2068,6 +2068,10 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				permutaGuardia.setFechainicioConfirmador(permutaConfirmador.getFecha());
 				permutaGuardia.setIdPerCabConfirmador(permutaConfirmador.getIdPermutaCabecera());
 
+				if(permutaItem.getFechaconfirmacion()!=null) {
+					permutaGuardia.setFechaconfirmacion(permutaItem.getFechaconfirmacion());
+				}
+				
 				ScsPermutaguardiasExample existePerGuar = new ScsPermutaguardiasExample();
 				existePerGuar.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 						.andIdturnoSolicitanteEqualTo(permutaGuardia.getIdturnoSolicitante())
