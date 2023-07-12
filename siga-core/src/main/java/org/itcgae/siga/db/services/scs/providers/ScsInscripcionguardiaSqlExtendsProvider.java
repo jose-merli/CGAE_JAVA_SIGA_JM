@@ -38,7 +38,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sqlListadoInscripciones.SELECT(
 				"Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS");
 		sqlListadoInscripciones
-				.SELECT("DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) numerocolegiado");
+				.SELECT("TO_NUMBER(DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado)) numerocolegiado");
 		sqlListadoInscripciones.SELECT("Per.Fechanacimiento FECHANACIMIENTO");
 		sqlListadoInscripciones.SELECT("Ins.Fechavalidacion AS ANTIGUEDADCOLA");
 		sqlListadoInscripciones

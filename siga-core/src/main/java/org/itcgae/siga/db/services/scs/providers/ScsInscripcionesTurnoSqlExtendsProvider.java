@@ -612,7 +612,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"				Per.Apellidos1,\r\n" + 
 				"				DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2,\r\n" + 
 				"				Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,\r\n" + 
-				"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
+				"				TO_NUMBER(DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado)) NUMEROCOLEGIADO,\r\n" + 
 				"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 				"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,(\r\n" + 
 				"					SELECT\r\n" + 
