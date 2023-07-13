@@ -39,7 +39,7 @@ public class CalendarioAutomatico {
 	private List<String> listaFestivos = null;
 
 	////////////////////CONSTRUCTORES ////////////////////
-	public CalendarioAutomatico(GuardiasTurnoItem beanGuardiasTurno, String fInicio, String fFin,
+	public CalendarioAutomatico(GuardiasTurnoItem guardiasTurnoItem, String fechaDesde, String fechaHasta,
 			List<String> vDiasFestivos) {
 		//variables
 		String semana;
@@ -47,27 +47,27 @@ public class CalendarioAutomatico {
 		//FECHAS:
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		try {
-			this.fechaInicio = fInicio;
-			this.fechaFin = fFin;
+			this.fechaInicio = fechaDesde;
+			this.fechaFin = fechaHasta;
 		} catch (Exception e) {
 			this.fechaInicio = "";
 			this.fechaFin = "";
 		}
 
 		//DURACION:
-		this.duracion = beanGuardiasTurno.getDiasGuardia().intValue();
-		this.unidadesDuracion = this.convertirUnidadesDuracion(beanGuardiasTurno.getTipodiasGuardia());
+		this.duracion = guardiasTurnoItem.getDiasGuardia().intValue();
+		this.unidadesDuracion = this.convertirUnidadesDuracion(guardiasTurnoItem.getTipodiasGuardia());
 
 		//PERIODO:
-		if (beanGuardiasTurno.getDiasPeriodo() != null)
-			this.periodo = beanGuardiasTurno.getDiasPeriodo().intValue();
+		if (guardiasTurnoItem.getDiasPeriodo() != null)
+			this.periodo = guardiasTurnoItem.getDiasPeriodo().intValue();
 		else
 			this.periodo = 0;
-		this.unidadesPeriodo = this.convertirUnidadesDuracion(beanGuardiasTurno.getTipoDiasPeriodo());
+		this.unidadesPeriodo = this.convertirUnidadesDuracion(guardiasTurnoItem.getTipoDiasPeriodo());
 
 		//Seleccion de laborables:
 		this.seleccionLaborables = new Vector();
-		semana = beanGuardiasTurno.getSeleccionLaborables();
+		semana = guardiasTurnoItem.getSeleccionLaborables();
 
 		if (semana != null) {
 			for (int i = 0; i < semana.length(); i++)
@@ -77,8 +77,8 @@ public class CalendarioAutomatico {
 
 		//Seleccion de festivos:
 		this.seleccionFestivos = new Vector();
-		if (beanGuardiasTurno.getSeleccionFestivos() != null) {
-			semana = beanGuardiasTurno.getSeleccionFestivos();
+		if (guardiasTurnoItem.getSeleccionFestivos() != null) {
+			semana = guardiasTurnoItem.getSeleccionFestivos();
 
 			if (semana != null) {
 				for (int i = 0; i < semana.length(); i++)
@@ -89,6 +89,7 @@ public class CalendarioAutomatico {
 
 		//FESTIVOS:
 		this.listaFestivos = vDiasFestivos;
+		
 	} // CalendarioAutomatico ()
 
 	//////////////////// METODOS ////////////////////

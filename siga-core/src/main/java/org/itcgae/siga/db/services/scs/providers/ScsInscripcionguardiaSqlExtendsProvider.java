@@ -106,7 +106,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "	linscripciones_ordenada.apellidos2," + "	linscripciones_ordenada.numerocolegiado,"
 				+ "	linscripciones_ordenada.fechavalidacion," + "	linscripciones_ordenada.alfabeticoapellidos,"
 				+ " linscripciones_ordenada.numerogrupo," + " linscripciones_ordenada.ordengrupo,"
-				+ "	linscripciones_ordenada.fechabaja"
+				+ "	linscripciones_ordenada.fechabaja," + "  linscripciones_ordenada.idgrupoguardiacolegiado"
 				+ "   FROM     linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
 				+ "  where linscripciones_ordenada.orden > nvl(ultimo_cola.orden, 0)  " + "  UNION ALL   " + "  SELECT "
 				+ "	 linscripciones_ordenada.idinstitucion," + "	 linscripciones_ordenada.idturno,"
@@ -115,7 +115,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "	 linscripciones_ordenada.apellidos2," + "	 linscripciones_ordenada.numerocolegiado,"
 				+ "	 linscripciones_ordenada.fechavalidacion," + "	 linscripciones_ordenada.alfabeticoapellidos,"
 				+ "  linscripciones_ordenada.numerogrupo," + "  linscripciones_ordenada.ordengrupo,"
-				+ "	 linscripciones_ordenada.fechabaja"
+				+ "	 linscripciones_ordenada.fechabaja," + "  linscripciones_ordenada.idgrupoguardiacolegiado"
 				+ "   FROM   linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
 				+ "  where linscripciones_ordenada.orden <= nvl(ultimo_cola.orden, 0)) consulta_total ");
 		sql.ORDER_BY("orden_cola ASC");
@@ -1467,12 +1467,12 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.SELECT("*");
 		sql.FROM("scs_inscripcionguardia");
 
-		if (fechaFin != null) {
-			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR') <= TO_DATE('" + fechaFin + "','DD,MM/RRRR')");
-		}
-		if (fechaInicio != null) {
-			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR') >= TO_DATE('" + fechaInicio + "','DD,MM/RRRR')");
-		}
+//		if (fechaFin != null) {
+//			sql.WHERE("trunc(FECHASUSCRIPCION) <= TO_DATE('" + fechaFin + "','dd/MM/yyyy')");//baja >(despues) final, borrar se controla en 1499
+//		}
+//		if (fechaInicio != null) {
+//			sql.WHERE("trunc(FECHASUSCRIPCION) >= TO_DATE('" + fechaInicio + "','dd/MM/yyyy')");  //suscripcion <(antes) inicio, borrar se controla en 1495
+//		}
 
 		if (idInstitucion != null) {
 			sql.WHERE("IDINSTITUCION =" + idInstitucion);
@@ -1492,14 +1492,14 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		if (fechaInicio != null) {
 			// fechavalidacion <= fechaInicio && (fechabaja >= fechafin || fechabaja is
 			// null)
-			sql.WHERE("TO_CHAR(FECHAVALIDACION,'DD/MM/RRRR') <= TO_DATE('" + fechaInicio + "','DD,MM/RRRR')");
+			sql.WHERE("trunc(FECHAVALIDACION) <= TO_DATE('" + fechaInicio + "','dd/MM/yyyy')");
 		}
 		if (fechaFin != null) {
 			sql.WHERE(
-					"TO_CHAR(FECHABAJA,'DD/MM/RRRR') >= TO_DATE('" + fechaFin + "','DD,MM/RRRR') OR FECHABAJA IS NULL"); // nvl(fechabaja,
+					"(trunc(FECHABAJA) >= TO_DATE('" + fechaFin + "','dd/MM/yyyy') OR FECHABAJA IS NULL) AND FECHADENEGACION IS NULL"); // nvl(fechabaja,
 																															// 'fechafin')
 		}
-		sql.WHERE("ROWNUM <= 200");
+//		sql.WHERE("ROWNUM <= 200");
 		return sql.toString();
 	}
 

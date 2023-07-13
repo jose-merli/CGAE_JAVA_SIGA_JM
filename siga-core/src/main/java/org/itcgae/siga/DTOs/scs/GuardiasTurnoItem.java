@@ -37,12 +37,14 @@ public class GuardiasTurnoItem {
 	private String		seleccionTiposDia;
 	private String		descripcionTipoDiasGuardia;
 	
-	private String  turno;
+	private String  	turno;
 	private Integer 	idInstitucionPrincipal;
 	private Integer 	idTurnoPrincipal;
 	private Integer 	idGuardiaPrincipal;
 	private Integer 	idTipoGuardiaSeleccionado;
 	private String		envioCentralita;
+	
+	
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}

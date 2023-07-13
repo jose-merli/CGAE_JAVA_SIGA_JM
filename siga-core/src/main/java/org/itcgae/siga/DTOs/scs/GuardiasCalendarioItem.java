@@ -40,6 +40,35 @@ public class GuardiasCalendarioItem {
 		this.idcalendarioguardiasprincipal = idcalendarioguardiasprincipal;
 	}
 	
+	public GuardiasCalendarioItem(String idinstitucion, String idturno, String idguardia, String idcalendarioguardias,
+			String fechainicio, String fechafin, String observaciones) {
+		this.idinstitucion = idinstitucion;
+		this.idturno = idturno;
+		this.idguardia = idguardia;
+		this.idcalendarioguardias = idcalendarioguardias;
+		this.fechainicio = fechainicio;
+		this.fechafin = fechafin;
+		this.observaciones = observaciones;
+	}
+	
+	public GuardiasCalendarioItem(String idinstitucion, String idturno, String idguardia, String idcalendarioguardias,
+			String fechainicio, String fechafin, String observaciones, String fechamodificacion, String usumodificacion,
+			String idturnoprincipal, String idguardiaprincipal, String idcalendarioguardiasprincipal) {
+		
+		this.idinstitucion = idinstitucion;
+		this.idturno = idturno;
+		this.idguardia = idguardia;
+		this.idcalendarioguardias = idcalendarioguardias;
+		this.fechafin = fechafin;
+		this.fechainicio = fechainicio;
+		this.observaciones = observaciones;
+		this.fechamodificacion = fechamodificacion;
+		this.usumodificacion = usumodificacion;
+		this.idturnoprincipal = idturnoprincipal;
+		this.idguardiaprincipal = idguardiaprincipal;
+		this.idcalendarioguardiasprincipal = idcalendarioguardiasprincipal;
+	}
+	
 	public GuardiasCalendarioItem() {
 		super();
 		// TODO Auto-generated constructor stub

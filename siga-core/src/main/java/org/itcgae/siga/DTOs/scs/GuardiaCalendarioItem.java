@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Date;
+
 public class GuardiaCalendarioItem {
 	private String orden;
 	private String turno;
@@ -10,6 +12,12 @@ public class GuardiaCalendarioItem {
 	private String idCalendarioGuardia;
 	private Boolean nuevo;
 	private String estado;
+	private String observaciones;
+	private String fechaInicio;
+	private String fechaFinal;
+	private String idInstitucion;
+	private String usuModificacion;
+	private String fechaModificacion;
 	
 	public String getOrden() {
 		return orden;
@@ -66,5 +74,41 @@ public class GuardiaCalendarioItem {
 	}
 	public void setEstado(String estado) {
 		this.estado = estado;
+	}
+	public String getObservaciones() {
+		return observaciones;
+	}
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+	public String getFechaFinal() {
+		return fechaFinal;
+	}
+	public void setFechaFinal(String fechaFinal) {
+		this.fechaFinal = fechaFinal;
+	}
+	public String getFechaInicio() {
+		return fechaInicio;
+	}
+	public void setFechaInicio(String fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+	public String getUsuModificacion() {
+		return usuModificacion;
+	}
+	public void setUsuModificacion(String usuModificacion) {
+		this.usuModificacion = usuModificacion;
+	}
+	public String getFechaModificacion() {
+		return fechaModificacion;
+	}
+	public void setFechaModificacion(String fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
 	}
 }
