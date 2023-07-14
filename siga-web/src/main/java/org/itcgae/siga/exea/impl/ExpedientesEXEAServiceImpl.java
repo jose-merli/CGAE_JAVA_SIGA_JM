@@ -712,8 +712,8 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                     MultipartFile file = request.getFile(itr.next());
                     String nombreFichero = file.getOriginalFilename().split(";")[0];
                     String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
-                    DocumentacionIncorporacionItem documentacionIncorporacionItem = objectMapper.readValue(json,
-                            DocumentacionIncorporacionItem.class);
+                    LOGGER.info("ExpedientesEXEAServiceImpl.subirDocumentoSolIncorp() - El objeto JSON contiene: " + json);
+                    DocumentacionIncorporacionItem documentacionIncorporacionItem = objectMapper.readValue(json, DocumentacionIncorporacionItem.class);
                     String extension = FilenameUtils.getExtension(nombreFichero);
 
                     Long idFichero = uploadFile(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucionSol,
