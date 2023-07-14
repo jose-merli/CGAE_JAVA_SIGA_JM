@@ -30,7 +30,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sqlListadoInscripciones.SELECT("per.idpersona");
 		sqlListadoInscripciones.SELECT("Ins.fechasuscripcion AS Fechasuscripcion");
 		sqlListadoInscripciones.SELECT("TO_CHAR(trunc(ins.fechavalidacion), 'DD/MM/YYYY') AS fechavalidacion");
-		sqlListadoInscripciones.SELECT("TRUNC(Ins.fechabaja) AS fechabaja");
+		sqlListadoInscripciones.SELECT("TO_CHAR(trunc(ins.fechabaja), 'DD/MM/YYYY') AS fechabaja");
 		sqlListadoInscripciones.SELECT("Per.Nifcif");
 		sqlListadoInscripciones.SELECT("Per.Nombre AS nombre");
 		sqlListadoInscripciones.SELECT("Per.Apellidos1 AS apellidos1");
@@ -106,7 +106,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "	linscripciones_ordenada.apellidos2," + "	linscripciones_ordenada.numerocolegiado,"
 				+ "	linscripciones_ordenada.fechavalidacion," + "	linscripciones_ordenada.alfabeticoapellidos,"
 				+ " linscripciones_ordenada.numerogrupo," + " linscripciones_ordenada.ordengrupo,"
-				+ "	linscripciones_ordenada.fechabaja"
+				+ "	linscripciones_ordenada.idgrupoguardiacolegiado," + "	linscripciones_ordenada.fechabaja"
 				+ "   FROM     linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
 				+ "  where linscripciones_ordenada.orden > nvl(ultimo_cola.orden, 0)  " + "  UNION ALL   " + "  SELECT "
 				+ "	 linscripciones_ordenada.idinstitucion," + "	 linscripciones_ordenada.idturno,"
@@ -115,7 +115,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "	 linscripciones_ordenada.apellidos2," + "	 linscripciones_ordenada.numerocolegiado,"
 				+ "	 linscripciones_ordenada.fechavalidacion," + "	 linscripciones_ordenada.alfabeticoapellidos,"
 				+ "  linscripciones_ordenada.numerogrupo," + "  linscripciones_ordenada.ordengrupo,"
-				+ "	 linscripciones_ordenada.fechabaja"
+				+ "	 linscripciones_ordenada.idgrupoguardiacolegiado," + "	 linscripciones_ordenada.fechabaja"
 				+ "   FROM   linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
 				+ "  where linscripciones_ordenada.orden <= nvl(ultimo_cola.orden, 0)) consulta_total ");
 		sql.ORDER_BY("orden_cola ASC");
