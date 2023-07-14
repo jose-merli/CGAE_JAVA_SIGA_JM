@@ -10933,17 +10933,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 				int actualizado = scsGuardiasTurnoMapper.updateByPrimaryKeySelective(guardia);
 				if(actualizado != 1)
 					LOGGER.info("ERROR AL ACTUALIZAR ULTIMO EN LA COLA");
-				
-				///LOG PARA VER SI SE ACTUALIZA EL ULTIMO LETRADO
-				/*ScsGuardiasturnoKey guardiaLOG = new ScsGuardiasturnoKey();
-				guardiaLOG.setIdinstitucion(Short.parseShort(sIdinstitucion));
-				guardiaLOG.setIdturno(Integer.parseInt(sIdTurno));
-				guardiaLOG.setIdguardia(Integer.parseInt(sIdGuardia));
-
-				ScsGuardiasturno guardiaLOGUnico = scsGuardiasTurnoMapper.selectByPrimaryKey(guardiaLOG);
-				String ultimo = guardiaLOGUnico.getIdpersonaUltimo().toString();
-				LOGGER.info("ACTUALIZANDO ULTIMO IDPERSONA ANTERIOR: " +guardia.getIdpersonaUltimo() +" CAMBIADO A ---> "+ ultimo);*/
-
 			}
 			//select inscripcionguardiasbyexample
 			
