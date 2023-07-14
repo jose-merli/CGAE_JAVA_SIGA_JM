@@ -2196,7 +2196,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										item.setEstado("4");//Estado pendiente para scs_hco_conf_prog_calendarios
 										
 										//Inserta en SCS_CALENDARIOGUARDIAS
-										String nextIdCalendarioGuardias = scsCalendarioguardiasExtendsMapper.getNextIdCalendarioGuardias();
+										String nextIdCalendarioGuardias =scsGuardiasturnoExtendsMapper.nextIdCalprog();;// scsCalendarioguardiasExtendsMapper.getNextIdCalendarioGuardias();
 										LOGGER.info("uploadFileCalendariosAsync() -> Insertando en SCS_CALENDARIOGUARDIAS");
 										int res2 = scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(null,
 												null, null, observaciones, idTurno, idGuardia,

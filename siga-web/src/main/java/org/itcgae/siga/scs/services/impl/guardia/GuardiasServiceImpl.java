@@ -10093,7 +10093,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 										lg.setIdTurno(Integer.parseInt(calendario.getIdturno()));
 										lg.setIdGuardia(Integer.parseInt(calendario.getIdguardia()));
 									}
-
+									LOGGER.info("Vinculacion: IDTURNO: " + calendario.getIdturno() + "/ IDGUARDIA: "+calendario.getIdguardia() );
 									// guardando en BD
 									almacenarAsignacionGuardia(new Integer(calendario.getIdcalendarioguardias()),
 											alLetradosInsertar, segundoPeriodo, lDiasASeparar,
@@ -11041,6 +11041,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				if (valorValidar != null && valorValidar.equals("0")) {
 					// directamente quedan validados
 					beanCabeceraGuardias.setValidado("1");// true
+					beanCabeceraGuardias.setFechaalta(new Date());
 				} else {
 					// quedan pendientes de validacion
 					beanCabeceraGuardias.setValidado("0");// false

@@ -426,9 +426,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 //	List<String> separarGuardias(String idGuardia, String idTurno, String idInstitucion);
 //	
 
-	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getAgrupacionFechas")
-	@Results({})
-	String getAgrupacionFechas(String idGuardia, String idTurno, String idInstitucion);
+
 	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardiasNoGrupo")
 	@Results({
