@@ -162,7 +162,7 @@ public class CalendarioEfectivo {
 				this.fechaFin, this.duracion, this.fechaFin);
 
 		// recorriendo los periodos
-		while (punteroFecha.before(inicioSiguiente) || punteroFecha.equals(inicioSiguiente))
+		while (punteroFecha.before(inicioSiguiente) /*|| punteroFecha.equals(inicioSiguiente)*/) // TODO (L) Quitaría la segunda parte de la condición: || punteroFecha.equals(inicioSiguiente)
 		{
 			periodoActual = new PeriodoEfectivoItem();
 			tiempoPendiente = this.duracion;
@@ -172,7 +172,7 @@ public class CalendarioEfectivo {
 					inicioSiguiente, this.duracion, this.fechaFin);
 
 			// recorriendo los dias
-			while (tiempoPendiente > 0 && (punteroFecha.before(inicioSiguiente) || punteroFecha.equals(inicioSiguiente))) {
+			while (tiempoPendiente > 0 && (punteroFecha.before(inicioSiguiente) /*|| punteroFecha.equals(inicioSiguiente)*/)) {// TODO (L) Quitaría la segunda parte de la condición: || punteroFecha.equals(inicioSiguiente)
 				if (cumple(punteroFecha)) {
 					// anyadiendo fecha efectiva al periodo actual
 					periodoActual.add((Date) punteroFecha.clone());
@@ -207,7 +207,7 @@ public class CalendarioEfectivo {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(fechaInicioSiguientePeriodo);
 
-		while (!haTerminadoLaUnidadDeTiempo(unidades, cal))
+		while (!haTerminadoLaUnidadDeTiempo(unidades, cal)) // (L) si no empieza en lunes va sumando dias para que comience en lunes
 			cal.add(Calendar.DATE, 1);
 
 		return cal.getTime();

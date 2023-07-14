@@ -55,8 +55,4 @@ public interface ScsCalendarioguardiasExtendsMapper extends ScsCalendarioguardia
 	@Results({@Result(column = "TOTAL", property = "TOTAL", jdbcType = JdbcType.DECIMAL)})
 	int getTotalGuardiasColegiadoInsertados(String idInstitucion, String idTurno, String idGuardia, String fechaDesde, String FechaHasta);
 
-	@SelectProvider(type = ScsCalendarioguardiasSqlExtendsProvider.class, method = "getNextIdCalendarioGuardias")
-	@Results()
-	String getNextIdCalendarioGuardias();
-	
 }

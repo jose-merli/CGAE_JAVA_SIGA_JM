@@ -2229,7 +2229,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SELECT("*");
 		sql.FROM("SCS_HCO_CONF_PROG_CALENDARIOS");
 		sql.WHERE("IDPROGCALENDARIO = " + calendarioItem.getIdCalendarioProgramado());
-		sql.WHERE("IDCONJUNTOGUARDIA = " + calendarioItem.getIdCalG());
+		sql.WHERE("IDCONJUNTOGUARDIA = " + calendarioItem.getIdCalG()); //Como IdCalG es null la query where IDC = NULL no devuelve nada, no se deberia mandar, poner if
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("IDTURNO = " +  calendarioItem.getIdTurno());
 		sql.WHERE("IDGUARDIA = " + calendarioItem.getIdGuardia());
@@ -2639,12 +2639,12 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		SQL sql = new SQL();
 		sql.SELECT("IDINSTITUCION, IDTURNO, IDGUARDIA, NOMBRE, NUMEROLETRADOSGUARDIA, NUMEROSUSTITUTOSGUARDIA, DIASGUARDIA, DIASPAGADOS, VALIDARJUSTIFICACIONES, \r\n" + 
 				"		DIASSEPARACIONGUARDIAS, NUMEROASISTENCIAS, NUMEROACTUACIONES, DESCRIPCION, DESCRIPCIONFACTURACION, DESCRIPCIONPAGO, IDORDENACIONCOLAS, IDPARTIDAPRESUPUESTARIA, \r\n" + 
-				"		IDPERSONA_ULTIMO, IDGRUPOGUARDIA_ULTIMO, FECHASUSCRIPCION_ULTIMO, DIASPERIODO, TIPODIASPERIODO, FECHAMODIFICACION, USUMODIFICACION, SELECCIONLABORABLES, \r\n" + 
+				"		IDPERSONA_ULTIMO, IDGRUPOGUARDIA_ULTIMO, FECHASUSCRIPCION_ULTIMO, DIASPERIODO, TIPODIASPERIODO, SELECCIONLABORABLES, \r\n" + 
 				"		SELECCIONFESTIVOS, IDGUARDIASUSTITUCION, IDTURNOSUSTITUCION, PORGRUPOS, ROTARCOMPONENTES, IDINSTITUCIONPRINCIPAL, IDTURNOPRINCIPAL, IDGUARDIAPRINCIPAL, \r\n" + 
 				"		TIPODIASGUARDIA, IDTIPOGUARDIA, ENVIOCENTRALITA");
 		sql.FROM("SCS_GUARDIASTURNO");
 		if(idInstitucion != null) {
-			sql.WHERE("idinstitucionprincipal = " + idInstitucion);
+			sql.WHERE("idinstitucion = " + idInstitucion);//(L) idinstitucionprincipal
 		}
 		if(idTurno != null) {
 			sql.WHERE("idturnoprincipal = " + idTurno);
@@ -2753,8 +2753,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SELECT("TO_CHAR(FECHAINICIO, 'dd/MM/yyyy') as FECHAINICIO");
 		sql.SELECT("TO_CHAR(FECHAFIN, 'dd/MM/yyyy')AS FECHAFIN  ");
 		sql.FROM("AGE_EVENTO");
-		sql.WHERE("FECHAINICIO >=  TO_DATE('" + fechaInicio + "','DD/MM/YYYY')" );
-	//	sql.WHERE("FECHAFIN <=  TO_DATE('" + fechaFin + "','DD/MM/YYYY')" );
+		sql.WHERE("((FECHAINICIO >=  TO_DATE('" + fechaInicio + "','DD/MM/YYYY') AND FECHAINICIO <=  TO_DATE('" + fechaFin + "','DD/MM/YYYY'))"+
+				"OR(FECHAFIN >=  TO_DATE('" + fechaInicio + "','DD/MM/YYYY') AND FECHAFIN <=  TO_DATE('" + fechaFin + "','DD/MM/YYYY'))"+
+				"OR(FECHAINICIO <  TO_DATE('" + fechaInicio + "','DD/MM/YYYY') AND FECHAFIN >  TO_DATE('" + fechaFin + "','DD/MM/YYYY')))");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("IDTIPOEVENTO = 9");//TIPO FESTIVOS 
 		
@@ -2857,7 +2858,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 	}
 	
-	public String getBajasTemporalesGuardias(String idInstitucion, String idTurno, String idGuardia, String fechaDesde, String fechaHasta) {
+	public String getBajasTemporalesGuardias(String idInstitucion, String idTurno, String idGuardia, String idPersona, String fechaDesde, String fechaHasta) {
 //		select.append(" SELECT BAJAS.* ");
 //		select.append("   FROM CEN_BAJASTEMPORALES BAJAS, SCS_INSCRIPCIONGUARDIA INS ");
 //		select.append("  WHERE BAJAS.IDINSTITUCION = INS.IDINSTITUCION ");
@@ -2895,6 +2896,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		//sql.WHERE("TRUNC(BAJAS.FECHABT) BETWEEN '" + fechaDesde + "' AND '" + fechaHasta +  "'");
 		sql.WHERE("TRUNC(BAJAS.FECHADESDE) >= " + "'"+fechaDesde+"'");
 		sql.WHERE("TRUNC(BAJAS.FECHAHASTA) <= " + "'"+fechaHasta+"'");
+		if(idPersona!=null) {
+			sql.WHERE("IDPERSONA = "+ idPersona);
+		}
 		return sql.toString();
 	}
 	
@@ -3524,7 +3528,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 	
 	
 	public String marcarSaltoCompensacion(Integer usuario, String idturno, ScsSaltoscompensaciones saltoCompensacion,String s_idpersona, String s_idinstitucion, String s_idturno, String s_idguardia,String s_saltocompensacion, String fechaCumplimiento) {
-		SQL sql = new SQL();
+		SQL sql = new SQL();//TODO:(L) Borrar idturno
 
 		sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
 		sql.SET("FECHACUMPLIMIENTO = " + "TO_DATE( '" + fechaCumplimiento + "', 'dd/MM/yy')");
@@ -3538,7 +3542,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		}
 		sql.WHERE("IDINSTITUCION = " + s_idinstitucion);
 
-		if (idturno != null && !s_idturno.equals("")) {
+		if (s_idturno != null && !s_idturno.equals("")) {
 			sql.WHERE("IDTURNO = " + s_idturno);
 		}
 		if (s_idguardia != null && !s_idguardia.equals("")) {

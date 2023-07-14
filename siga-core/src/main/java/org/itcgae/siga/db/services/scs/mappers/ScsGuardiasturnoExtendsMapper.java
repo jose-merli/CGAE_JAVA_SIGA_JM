@@ -431,6 +431,8 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 //	List<String> separarGuardias(String idGuardia, String idTurno, String idInstitucion);
 //	
 
+
+	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardiasNoGrupo")
 	@Results({
 		@Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
@@ -834,42 +836,40 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 
 	
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getGuardiasVnculadas")
-	 @Results({@Result(column = "IDINSTITUCION", property = "IDINSTITUCION", jdbcType = JdbcType.DECIMAL),
-		 @Result(column = "IDTURNO", property = "IDTURNO", jdbcType = JdbcType.DECIMAL),
-		 @Result(column = "IDGUARDIA", property = "IDGUARDIA", jdbcType = JdbcType.DECIMAL),
-		 @Result(column = "NOMBRE", property = "NOMBRE", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "NUMEROLETRADOSGUARDIA", property = "NUMEROLETRADOSGUARDIA", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "NUMEROSUSTITUTOSGUARDIA", property = "NUMEROSUSTITUTOSGUARDIA", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "DIASGUARDIA", property = "DIASGUARDIA", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "DIASPAGADOS", property = "DIASPAGADOS", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "VALIDARJUSTIFICACIONES", property = "VALIDARJUSTIFICACIONES", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "DIASSEPARACIONGUARDIAS", property = "DIASSEPARACIONGUARDIAS", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "NUMEROASISTENCIAS", property = "NUMEROASISTENCIAS", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "NUMEROACTUACIONES", property = "NUMEROACTUACIONES", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "DESCRIPCION", property = "DESCRIPCION", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "DESCRIPCIONFACTURACION", property = "DESCRIPCIONFACTURACION", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "DESCRIPCIONPAGO", property = "DESCRIPCIONPAGO", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDORDENACIONCOLAS", property = "IDORDENACIONCOLAS", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "IDPARTIDAPRESUPUESTARIA", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDPERSONA_ULTIMO", property = "IDPERSONA_ULTIMO", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDGRUPOGUARDIA_ULTIMO", property = "IDGRUPOGUARDIA_ULTIMO", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "FECHASUSCRIPCION_ULTIMO", property = "FECHASUSCRIPCION_ULTIMO", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "DIASPERIODO", property = "DIASPERIODO", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "TIPODIASPERIODO", property = "TIPODIASPERIODO", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "FECHAMODIFICACION", property = "FECHAMODIFICACION", jdbcType = JdbcType.TIMESTAMP),
-		 @Result(column = "USUMODIFICACION", property = "USUMODIFICACION", jdbcType = JdbcType.DECIMAL),
-		 @Result(column = "SELECCIONLABORABLES", property = "SELECCIONLABORABLES", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "SELECCIONFESTIVOS", property = "SELECCIONFESTIVOS", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDTURNOSUSTITUCION", property = "IDTURNOSUSTITUCION", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDGUARDIASUSTITUCION", property = "IDGUARDIASUSTITUCION", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "PORGRUPOS", property = "PORGRUPOS", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "ROTARCOMPONENTES", property = "ROTARCOMPONENTES", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDINSTITUCIONPRINCIPAL", property = "IDINSTITUCIONPRINCIPAL", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDTURNOPRINCIPAL", property = "IDTURNOPRINCIPAL", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDGUARDIAPRINCIPAL", property = "IDGUARDIAPRINCIPAL", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "TIPODIASGUARDIA", property = "TIPODIASGUARDIA", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDTIPOGUARDIA", property = "IDTIPOGUARDIA", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "ENVIOCENTRALITA", property = "ENVIOCENTRALITA", jdbcType = JdbcType.VARCHAR),
+	 @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "NUMEROLETRADOSGUARDIA", property = "numeroLetradosGuardia", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "NUMEROSUSTITUTOSGUARDIA", property = "numeroSustitutosGuardia", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "DIASGUARDIA", property = "diasGuardia", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "DIASPAGADOS", property = "diasPagados", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "VALIDARJUSTIFICACIONES", property = "validarJustificaciones", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "DIASSEPARACIONGUARDIAS", property = "diasSeparacionGuardia", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "NUMEROASISTENCIAS", property = "numeroAsistencias", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "NUMEROACTUACIONES", property = "numeroActuaciones", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "DESCRIPCIONFACTURACION", property = "descripcionFacturacion", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "DESCRIPCIONPAGO", property = "descripcionPago", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDORDENACIONCOLAS", property = "idOrdenacionColas", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDPERSONA_ULTIMO", property = "idPersona_Ultimo", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDGRUPOGUARDIA_ULTIMO", property = "idGrupoGuardiaColegiado_Ultimo", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "FECHASUSCRIPCION_ULTIMO", property = "fechaSuscripcion_Ultimo", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "DIASPERIODO", property = "diasPeriodo", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "TIPODIASPERIODO", property = "tipoDiasPeriodo", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "SELECCIONLABORABLES", property = "seleccionLaborables", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "SELECCIONFESTIVOS", property = "seleccionFestivos", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDTURNOSUSTITUCION", property = "idTurnoSustitucion", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDGUARDIASUSTITUCION", property = "idGuardiaSustitucion", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "PORGRUPOS", property = "porGrupos", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "ROTARCOMPONENTES", property = "rotarComponentes", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDINSTITUCIONPRINCIPAL", property = "idInstitucionPrincipal", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDTURNOPRINCIPAL", property = "idTurnoPrincipal", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDGUARDIAPRINCIPAL", property = "idGuardiaPrincipal", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "TIPODIASGUARDIA", property = "tipodiasGuardia", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDTIPOGUARDIA", property = "idTipoGuardiaSeleccionado", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "ENVIOCENTRALITA", property = "envioCentralita", jdbcType = JdbcType.VARCHAR),
 	 	})
 	 List<GuardiasTurnoItem> getGuardiasVnculadas(String idInstitucion, String idTurno, String idGuardia);
 	 
@@ -1048,7 +1048,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "VALIDADO", property = "validado", jdbcType = JdbcType.CHAR),
 			@Result(column = "FECHAESTADO", property = "fechaestado", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "ELIMINADO", property = "eliminado", jdbcType = JdbcType.DECIMAL)})
-		List<BajasTemporalesItem> getBajasTemporalesGuardias(String idInstitucion, String idTurno, String idGuardia, String fechaDesde, String fechaHasta);
+		List<BajasTemporalesItem> getBajasTemporalesGuardias(String idInstitucion, String idTurno, String idGuardia, String idPersona, String fechaDesde, String fechaHasta);
 		
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="insertGrupoGuardiaColegiadoCalendario")
 	 @Results({})
