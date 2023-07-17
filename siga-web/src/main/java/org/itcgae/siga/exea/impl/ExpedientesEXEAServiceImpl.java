@@ -710,6 +710,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                 while (itr.hasNext()) {
 
                     MultipartFile file = request.getFile(itr.next());
+                    LOGGER.info("ExpedientesEXEAServiceImpl.subirDocumentoSolIncorp() - El fileName contiene: " + file.getOriginalFilename());
                     String nombreFichero = file.getOriginalFilename().split(";")[0];
                     String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
                     LOGGER.info("ExpedientesEXEAServiceImpl.subirDocumentoSolIncorp() - El objeto JSON contiene: " + json);
