@@ -99,7 +99,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 			sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE('" + saltoItem.getFechaHasta() + "', 'DD/MM/YYYY'))");
 		}
 
-		sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");
+		sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO");
 
 		sql2.SELECT("*");
 		sql2.FROM("( " + sql.toString() + " )");
@@ -218,7 +218,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
             sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE('" + salto.getFechaHasta() + "', 'DD/MM/YYYY HH24:MI:SS'))");
         }
     
-        sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");
+        sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO");
         
         return sql.toString();
 	}
