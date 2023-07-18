@@ -393,13 +393,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						"getDocRequerida() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && usuarios.size() > 0) {
-
+					LOGGER.info("SolicitudIncorporacionServiceImpl.getDocRequerida() -> Comienza recuperación del documento.");
+					LOGGER.info("Primero recuperamos el codDocAnexo");
 					String codDocAnexo = genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.COD_DOC_ANEXO_PARAM, idInstitucion.toString()).getValor();
-
+					LOGGER.info("Después recuperamos los documentos");
 					List<DocumentacionIncorporacionItem> documentosInstitucion = cenDocumentsolicitudinstituExtendsMapper.getDocRequerida(idInstitucion,tipoColegiacion,tipoSolicitud,modalidad,usuarios.get(0).getIdlenguaje(), idSolicitud, codDocAnexo);
 
 					documentacionIncorporacionDTO.setDocumentacionIncorporacionItem(documentosInstitucion);
-
+					LOGGER.info("SolicitudIncorporacionServiceImpl.getDocRequerida() -> Fimanilza recuperación del documento.");
 				}
 			}
 		}catch(Exception e){
