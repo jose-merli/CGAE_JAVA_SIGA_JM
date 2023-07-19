@@ -32,6 +32,7 @@ import org.itcgae.siga.DTOs.scs.CheckAccionesRemesas;
 import org.itcgae.siga.DTOs.scs.CheckAccionesRemesasDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
 import org.itcgae.siga.DTOs.scs.RemesaAccionItem;
@@ -71,6 +72,7 @@ import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.mappers.CajgRemesaMapper;
 import org.itcgae.siga.db.mappers.CajgRemesaestadosMapper;
 import org.itcgae.siga.db.mappers.CajgRespuestaEjgremesaMapper;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
@@ -168,6 +170,12 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
+	
+	@Autowired
+	private ScsEstadoejgExtendsMapper scsEstadoEjgextendsMapper;
+	
+	@Autowired
+	private CajgRemesaMapper cajgRemesaMapper;
 
 	@Override
 	public ComboDTO comboEstado(HttpServletRequest request) {
@@ -1131,6 +1139,83 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					} else {
 						res = getFichero(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
 					}
+					
+					if(res != null) {						
+						//Actualizamos estado remesa
+						CajgRemesaestados cajgRemesa = new CajgRemesaestados();
+						
+						cajgRemesa.setIdremesa(Long.valueOf(remesaAccionItem.getIdRemesa()));
+						cajgRemesa.setIdinstitucion(idInstitucion);
+						cajgRemesa.setIdestado(Short.valueOf("2")); //ENVIADA
+						cajgRemesa.setFecharemesa(new Date());
+						cajgRemesa.setFechamodificacion(new Date());
+						cajgRemesa.setUsumodificacion(usuarios.get(0).getUsumodificacion());
+						
+						LOGGER.debug(
+								"insert() / cajgRemesaEstadosMapper.insert() -> Entrada añadir estado ENVIADA a la remesa");
+						
+						cajgRemesaEstadosMapper.insert(cajgRemesa);
+						
+						LOGGER.debug(
+								"insert() / cajgRemesaEstadosMapper.insert() -> Entrada añadir estado ENVIADA a la remesa");
+						
+						// Obtenemos el numero de la remesa 
+						CajgRemesaKey key = new CajgRemesaKey();							
+						key.setIdinstitucion(idInstitucion);
+						key.setIdremesa((long) remesaAccionItem.getIdRemesa());							
+						CajgRemesa remesaSelected = cajgRemesaMapper.selectByPrimaryKey(key);
+						
+						//Buscamos los EJG asociados y les añadimos el estado "remitido a comision"
+						RemesasItem remesaActual = new RemesasItem();
+						remesaActual.setIdRemesa(remesaAccionItem.getIdRemesa());
+						EJGRemesaDTO listaEJGRemesa = getEJGRemesa(remesaActual, request);
+						
+						if(listaEJGRemesa != null && listaEJGRemesa.getRemesasItem().size() > 0) {
+														
+							LOGGER.debug("Entrada FOR de EJGs asociados remesa para actulizar estado a REMITIDO COMISION");
+							for(EJGRemesaItem ejg : listaEJGRemesa.getRemesasItem()) {
+								
+								ScsEstadoejg estado = new ScsEstadoejg();
+								estado.setIdinstitucion(idInstitucion);
+								estado.setIdtipoejg((short) ejg.getIdTipoEJG());
+								estado.setAnio((short) ejg.getAnioEJG());
+								estado.setNumero((long) ejg.getNumeroEJG());
+								estado.setIdestadoejg(Short.parseShort("9"));	//id de estado correspondiente a Remitido comision.
+								estado.setObservaciones("Nº Remesa: " + remesaSelected.getNumero());
+								estado.setFechainicio(new Date());
+								estado.setFechamodificacion(new Date());
+								estado.setUsumodificacion(usuarios.get(0).getIdusuario());
+								estado.setAutomatico("1");
+								
+								//asignamiento del id de estado por EJG.
+								
+								// obtenemos el maximo de idestadoporejg
+								ScsEstadoejgExample example = new ScsEstadoejgExample();
+
+								example.setOrderByClause("IDESTADOPOREJG DESC");
+								example.createCriteria().andAnioEqualTo((short) ejg.getAnioEJG()).andIdinstitucionEqualTo(idInstitucion)
+										.andIdtipoejgEqualTo((short) ejg.getIdTipoEJG()).andNumeroEqualTo((long) ejg.getNumeroEJG());
+
+								List<ScsEstadoejg> listEjg = scsEstadoEjgextendsMapper.selectByExample(example);
+
+								// damos el varlo al idestadoporejg + 1
+								if (listEjg.size() > 0) {
+									estado.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+								} else {
+									estado.setIdestadoporejg(Long.parseLong("1"));
+								}
+								
+								scsEstadoEjgextendsMapper.insertSelective(estado);
+								
+							}
+							LOGGER.debug("Salida FOR de EJGs asociados remesa para actulizar estado a REMITIDO COMISION");
+						}
+						else {
+							LOGGER.error("Error!!! No se han encontrado EJGs asociados a la remesa (id / numero): " 
+									+ remesaAccionItem.getIdRemesa() + " / " + remesaSelected.getNumero());
+						}
+					}
+					
 				}else {
 					LOGGER.error("Error al descargar la remesa. No cumple los requisitos");
 					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(byteInput), null, HttpStatus.BAD_REQUEST);
