@@ -106,7 +106,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "	linscripciones_ordenada.apellidos2," + "	linscripciones_ordenada.numerocolegiado,"
 				+ "	linscripciones_ordenada.fechavalidacion," + "	linscripciones_ordenada.alfabeticoapellidos,"
 				+ " linscripciones_ordenada.numerogrupo," + " linscripciones_ordenada.ordengrupo,"
-				+ "	linscripciones_ordenada.fechabaja," + "  linscripciones_ordenada.idgrupoguardiacolegiado"
+				+ "	linscripciones_ordenada.fechabaja," + "linscripciones_ordenada.fechasuscripcion,"
+				+ " linscripciones_ordenada.idgrupoguardiacolegiado"
 				+ "   FROM     linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
 				+ "  where linscripciones_ordenada.orden > nvl(ultimo_cola.orden, 0)  " + "  UNION ALL   " + "  SELECT "
 				+ "	 linscripciones_ordenada.idinstitucion," + "	 linscripciones_ordenada.idturno,"
@@ -115,7 +116,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "	 linscripciones_ordenada.apellidos2," + "	 linscripciones_ordenada.numerocolegiado,"
 				+ "	 linscripciones_ordenada.fechavalidacion," + "	 linscripciones_ordenada.alfabeticoapellidos,"
 				+ "  linscripciones_ordenada.numerogrupo," + "  linscripciones_ordenada.ordengrupo,"
-				+ "	 linscripciones_ordenada.fechabaja," + "  linscripciones_ordenada.idgrupoguardiacolegiado"
+				+ "	 linscripciones_ordenada.fechabaja," + "linscripciones_ordenada.fechasuscripcion,"
+				+ "  linscripciones_ordenada.idgrupoguardiacolegiado"
 				+ "   FROM   linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
 				+ "  where linscripciones_ordenada.orden <= nvl(ultimo_cola.orden, 0)) consulta_total ");
 		sql.ORDER_BY("orden_cola ASC");
