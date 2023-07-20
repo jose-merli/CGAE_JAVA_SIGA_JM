@@ -2271,11 +2271,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 				OptionalInt maxGrupo = inscripciones.stream()
 						.filter(item -> !UtilidadesString.esCadenaVacia(item.getNumeroGrupo()))
 						.mapToInt(item -> Integer.parseInt(item.getNumeroGrupo())).max();
-				OptionalInt maxOrden = inscripciones.stream()
+				OptionalInt maxOrden;
+				try{
+					maxOrden = inscripciones.stream()
 						.filter(item -> !UtilidadesString.esCadenaVacia(item.getNumeroGrupo()) && maxGrupo.isPresent()
 								&& Integer.parseInt(item.getNumeroGrupo()) == maxGrupo.getAsInt())
 						.mapToInt(item -> Integer.parseInt(item.getOrden())).max();
-
+				}catch(Exception e) {
+					maxOrden = maxGrupo;
+				}
 				for (InscripcionGuardiaItem item : inscripciones) {
 					if (UtilidadesString.esCadenaVacia(item.getOrden())
 							&& UtilidadesString.esCadenaVacia(item.getNumeroGrupo())
