@@ -682,13 +682,16 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
     @Override
     @Transactional
     public InsertResponseDTO subirDocumentoSolIncorp(MultipartHttpServletRequest request) {
-        String token = request.getHeader("Authorization");
+    	LOGGER.info("ExpedientesEXEAServiceImpl.subirDocumentoSolIncorp() - INICIO");
+    	InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+    	String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        
         Error error = new Error();
         ObjectMapper objectMapper = new ObjectMapper();
         int affectedRows = 0;
+        
         try {
 
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -704,17 +707,23 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             if (usuarios != null && !usuarios.isEmpty()) {
 
                 String idSolicitud = request.getParameter("idSolicitud");
+                String json = "";
+                String[] jsons = request.getParameter("documentosJSON").replace("[", "").replace("]", "").replace("},{", "};{").split(";");
+                Collections.reverse(Arrays.asList(jsons)); //El orden del JSON es inverso al de los documentos, lo revertimos
                 Iterator<String> itr = request.getFileNames();
                 Short idInstitucionSol = cenSolicitudincorporacionExtendsMapper.selectByPrimaryKey(Long.valueOf(idSolicitud)).getIdinstitucion();
-
+                int i = 0;
+                
                 while (itr.hasNext()) {
-
+                	//Recuperamos el documentoItem del json
+                	json = jsons[i];
+                    i++;
+                    LOGGER.info("ExpedientesEXEAServiceImpl.subirDocumentoSolIncorp() - El objeto JSON contiene: " + json);
+                	DocumentacionIncorporacionItem documentacionIncorporacionItem = objectMapper.readValue(json, DocumentacionIncorporacionItem.class);
+                	
                     MultipartFile file = request.getFile(itr.next());
                     LOGGER.info("ExpedientesEXEAServiceImpl.subirDocumentoSolIncorp() - El fileName contiene: " + file.getOriginalFilename());
-                    String nombreFichero = file.getOriginalFilename().split(";")[0];
-                    String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
-                    LOGGER.info("ExpedientesEXEAServiceImpl.subirDocumentoSolIncorp() - El objeto JSON contiene: " + json);
-                    DocumentacionIncorporacionItem documentacionIncorporacionItem = objectMapper.readValue(json, DocumentacionIncorporacionItem.class);
+                    String nombreFichero = file.getOriginalFilename();
                     String extension = FilenameUtils.getExtension(nombreFichero);
 
                     Long idFichero = uploadFile(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucionSol,
@@ -754,9 +763,8 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                         error.setDescription("Error al insertar el registro del documento de la solicitud");
                         insertResponseDTO.setError(error);
                     }
-
+                    
                 }
-
             }
         }catch(Exception e){
             LOGGER.error(
@@ -767,7 +775,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             error.setMessage(e.getMessage());
             insertResponseDTO.setError(error);
         }
-
+        LOGGER.info("ExpedientesEXEAServiceImpl.subirDocumentoSolIncorp() - FIN");
         return insertResponseDTO;
     }
 
