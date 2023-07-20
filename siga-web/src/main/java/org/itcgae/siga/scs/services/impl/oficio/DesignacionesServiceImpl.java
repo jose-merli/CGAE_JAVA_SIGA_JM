@@ -802,7 +802,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setFechamodificacion(new Date());
 					record.setAcuerdoextrajudicial((short) 0);
 					record.setAnulacion((short) 0);
-
+					record.setIdprocedimiento(item.getIdProcedimiento());
 					
 					
 					ScsProcedimientosKey procedimientosKey = new ScsProcedimientosKey();
