@@ -42,10 +42,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sqlListadoInscripciones.SELECT("Per.Fechanacimiento FECHANACIMIENTO");
 		sqlListadoInscripciones.SELECT("Ins.Fechavalidacion AS ANTIGUEDADCOLA");
 		sqlListadoInscripciones
-				.SELECT("DECODE(Gua.Porgrupos, '1', Gru.IDGRUPOGUARDIACOLEGIADO, NULL) AS Idgrupoguardiacolegiado");
-		sqlListadoInscripciones.SELECT("DECODE(Gua.Porgrupos, '1', Gru.IDGRUPOGUARDIA, NULL) AS Grupo");
-		sqlListadoInscripciones.SELECT("DECODE(Gua.Porgrupos, '1', Grg.NUMEROGRUPO, NULL) AS numeroGrupo");
-		sqlListadoInscripciones.SELECT("DECODE(Gua.Porgrupos, '1', Gru.ORDEN, NULL) AS Ordengrupo");
+				.SELECT("Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado");
+		sqlListadoInscripciones.SELECT("Gru.IDGRUPOGUARDIA AS Grupo");
+		sqlListadoInscripciones.SELECT("Grg.NUMEROGRUPO AS numeroGrupo");
+		sqlListadoInscripciones.SELECT("Gru.ORDEN AS Ordengrupo");
 		sqlListadoInscripciones.SELECT("(SELECT COUNT(1) numero   FROM scs_saltoscompensaciones salto"
 				+ " WHERE salto.idinstitucion = gua.idinstitucion  AND  salto.idturno = gua.IDTURNO  AND"
 				+ "  salto.idguardia =gua.idguardia  AND  salto.saltoocompensacion = 'S'  AND"
@@ -62,9 +62,9 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sqlListadoInscripciones.LEFT_OUTER_JOIN("scs_grupoguardia grg ON grg.IDGRUPOGUARDIA = gru.IDGRUPOGUARDIA");
 
 		sqlListadoInscripciones.WHERE("1=1");
-		sqlListadoInscripciones.WHERE("nvl(TRUNC(Ins.Fechavalidacion), '31/12/2999') <= NVL(TO_DATE('" + fecha
+		sqlListadoInscripciones.WHERE("nvl(TRUNC(TO_DATE(Ins.Fechavalidacion, 'DD/MM/RRRR')), TO_DATE('31/12/2999', 'DD/MM/RRRR')) <= NVL(TO_DATE('" + fecha
 				+ "', 'DD/MM/RRRR'), trunc(sysdate))");
-		sqlListadoInscripciones.WHERE("nvl(TRUNC(Ins.fechabaja), '31/12/2999') >= NVL(TO_DATE('" + fecha
+		sqlListadoInscripciones.WHERE("nvl(TRUNC(TO_DATE(Ins.fechabaja, 'DD/MM/RRRR')), TO_DATE('31/12/2999', 'DD/MM/RRRR')) >= NVL(TO_DATE('" + fecha
 				+ "', 'DD/MM/RRRR'), trunc(sysdate))");
 		sqlListadoInscripciones.WHERE("Gua.Idinstitucion = " + idInstitucion);
 		sqlListadoInscripciones.WHERE("Gua.Idturno = " + idTurno);
