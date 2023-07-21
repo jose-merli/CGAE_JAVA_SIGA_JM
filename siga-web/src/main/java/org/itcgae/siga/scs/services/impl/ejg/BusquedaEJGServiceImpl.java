@@ -582,7 +582,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	}
 
 	@Override
-	public ComboDTO comboEstadoEJG(HttpServletRequest request, String filtroEstadoEjg) {
+	public ComboDTO comboEstadoEJG(HttpServletRequest request, String resolucion) {
 		// TODO Auto-generated method stub
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -607,7 +607,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				LOGGER.info(
 						"comboEstadoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				comboItems = scsEstadoEjgextendsMapper.comboEstadoEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()),filtroEstadoEjg);
+				comboItems = scsEstadoEjgextendsMapper.comboEstadoEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()));
 
 				LOGGER.info(
 						"comboEstadoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");

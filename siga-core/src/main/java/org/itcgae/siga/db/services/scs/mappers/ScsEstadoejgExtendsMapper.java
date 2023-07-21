@@ -37,7 +37,7 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
                   @Result(column = "IDESTADOEJG", property = "value", jdbcType = JdbcType.VARCHAR),
                   @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
               })
-              List<ComboItem> comboEstadoEjg(Short idLenguaje, String filtroEstadoEjg);
+              List<ComboItem> comboEstadoEjg(Short idLenguaje);
               
             @SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "getEstados")
           	@Results({ 
