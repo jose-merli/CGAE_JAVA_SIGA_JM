@@ -1584,14 +1584,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					colaGuardia.removeAll(needToRemove);
 					
 					colaGuardia.addAll(colaGuardiaUltimos);
-					for (InscripcionGuardiaItem cG : colaGuardia) {
-						if (!colaGuardiaAux.contains(cG)) {
-							colaGuardiaAux.add(cG);
-						}
-					}
-
-					colaGuardia.clear();
-					colaGuardia.addAll(colaGuardiaAux);
+					
 					// no se permiten repetidos
 					Set<InscripcionGuardiaItem> colaGuardiaHS2 = new LinkedHashSet<InscripcionGuardiaItem>(colaGuardia);
 
@@ -1600,6 +1593,22 @@ public class GuardiasServiceImpl implements GuardiasService {
 					
 					colaGuardia.addAll(colaGuardiaNulos);
 					// reordenamos
+					
+					//Vamos a modificar los número de orden
+					Integer orden = 1;
+					for (InscripcionGuardiaItem cG : colaGuardia) {
+						if(porGrupos != "1") {
+							cG.setOrdenCola(orden.toString());
+							orden++;
+						}
+						if (!colaGuardiaAux.contains(cG)) {
+							colaGuardiaAux.add(cG);
+						}
+					}
+
+					colaGuardia.clear();
+					colaGuardia.addAll(colaGuardiaAux);
+					
 
 					inscritos.setInscripcionesItem(colaGuardia);
 
