@@ -39,12 +39,29 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
                     return sql.toString();
           }
 
-	public String comboEstadoEjg(Short idLenguaje) {
+	public String comboEstadoEjg(Short idLenguaje, String filtroEstadoEjg) {
                     SQL sql = new SQL();
 
         sql.SELECT("IDESTADOEJG, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS DESCRIPCION, CODIGOEXT, BLOQUEADO, ORDEN, VISIBLECOMISION, EDITABLECOMISION");
         sql.FROM("SCS_MAESTROESTADOSEJG");
-        sql.WHERE("IDESTADOEJG NOT IN (25,26,13,0,9,10,12,15,16,20)");
+        switch(filtroEstadoEjg) {
+        
+        	case "1" :
+        		sql.WHERE("IDESTADOEJG NOT IN (25,26,13,0,9,10,12,15,16,20)");
+        		
+        		break;
+        		
+        	case "2" :
+        			
+        		break;
+        		
+        	default:
+        		sql.WHERE("IDESTADOEJG NOT IN (25,26,13,0,9,10,12,15,16,20)");
+        		
+        		break;
+        	
+        }
+       
         sql.ORDER_BY("ORDEN");
 
         return sql.toString();
