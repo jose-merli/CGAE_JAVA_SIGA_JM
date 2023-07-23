@@ -137,8 +137,8 @@ public class EjgController {
 	}
 
 	@RequestMapping(value = "/filtros-ejg/comboEstadoEJG", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboEstadoEJG(HttpServletRequest request, String filtroEstadoEjg) {
-		ComboDTO response = busquedaEJG.comboEstadoEJG(request, filtroEstadoEjg);
+	ResponseEntity<ComboDTO> comboEstadoEJG(HttpServletRequest request, String resolucion, String filtroEstadoEjg) {
+		ComboDTO response = busquedaEJG.comboEstadoEJG(request, resolucion, filtroEstadoEjg);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 

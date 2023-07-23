@@ -30,7 +30,7 @@ public interface IBusquedaEJG {
 
 	ComboDTO ComboFundamentoJurid(HttpServletRequest request, String resolucion);
 
-	ComboDTO comboEstadoEJG(HttpServletRequest request, String filtroEstadoEjg);
+	ComboDTO comboEstadoEJG(HttpServletRequest request, String resolucion, String filtroEstadoEjg);
 
 	EjgDTO busquedaEJG(EjgItem ejgItem, HttpServletRequest request);
 

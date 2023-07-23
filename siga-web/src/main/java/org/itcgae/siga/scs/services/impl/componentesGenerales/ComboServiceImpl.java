@@ -174,7 +174,7 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboEstadoEjg(HttpServletRequest request) {
+	public ComboDTO comboEstadoEjg(HttpServletRequest request, String filtroEstadoEjg) {
 
 		LOGGER.info("comboEstadoEjg() -> Entrada al servicio para combo estadoEJG");
 		String token = request.getHeader("Authorization");
@@ -192,7 +192,7 @@ public class ComboServiceImpl implements ComboService {
 						"comboEstadoEjg() / scsEstadoEJGExtendsMapper.comboEstadoEjg() -> Entrada a scsTipoEJGExtendsMapper para obtener combo EstadoEjg");
 
 				List<ComboItem> comboItems = scsEstadoEJGExtendsMapper
-						.comboEstadoEjg(Short.parseShort(usuarios.get(0).getIdlenguaje()), "1");
+						.comboEstadoEjg(Short.parseShort(usuarios.get(0).getIdlenguaje()), filtroEstadoEjg);
 
 				LOGGER.info(
 						"comboEstadoEjg() / scsEstadoEJGExtendsMapper.comboEstadoEjg() -> Salida e scsTipoEJGExtendsMapper para obtener combo EstadoEjg");

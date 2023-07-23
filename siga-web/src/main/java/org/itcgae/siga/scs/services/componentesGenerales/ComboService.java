@@ -46,7 +46,7 @@ public interface ComboService {
 
 	public ComboDTO comboGuardiasUpdate(HttpServletRequest request, String idTurno);
 
-	public ComboDTO comboEstadoEjg(HttpServletRequest request);
+	public ComboDTO comboEstadoEjg(HttpServletRequest request, String filtroEstadoEjg);
 
 	public ComboDTO comboTipoEjg(HttpServletRequest request);
 	
@@ -129,4 +129,6 @@ public interface ComboService {
 	public ComboDTO comboTurnosAsuntos(HttpServletRequest request, String idTipo);
 	
 	public ComboDTO comboGuardiasDiasSemana(HttpServletRequest request, String idTurno, String fecha);
+
+
 }
