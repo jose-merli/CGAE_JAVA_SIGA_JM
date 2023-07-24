@@ -582,7 +582,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	}
 
 	@Override
-	public ComboDTO comboEstadoEJG(HttpServletRequest request, String resolucion, String filtroEstadoEjg) {
+	public ComboDTO comboEstadoEJG(HttpServletRequest request, String filtroEstadoEjg) {
 		// TODO Auto-generated method stub
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");

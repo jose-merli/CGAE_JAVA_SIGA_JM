@@ -139,8 +139,8 @@ public class CombosGeneralesController {
 	}
 
 	@GetMapping("/comboEstadoEjg")
-	public ResponseEntity<ComboDTO> comboEstadoEjg(HttpServletRequest request, String filtroEstadoEjg) {
-		ComboDTO response = comboService.comboEstadoEjg(request, filtroEstadoEjg);
+	public ResponseEntity<ComboDTO> comboEstadoEjg(HttpServletRequest request) {
+		ComboDTO response = comboService.comboEstadoEjg(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
