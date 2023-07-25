@@ -48,18 +48,21 @@ public class ScsRemesasExtendsProvider {
 		subquery.WHERE("est.idinstitucion = rem.idinstitucion");
 		subquery.WHERE("est.idremesa = rem.idremesa");
 		subquery.WHERE("est.idestado = 1");
+		subquery.WHERE("ROWNUM = 1");
 
 		subquery1.SELECT("fecharemesa");
 		subquery1.FROM("cajg_remesaestados est");
 		subquery1.WHERE("est.idinstitucion = rem.idinstitucion");
 		subquery1.WHERE("est.idremesa = rem.idremesa");
 		subquery1.WHERE("est.idestado = 2");
+		subquery.WHERE("ROWNUM = 1");
 
 		subquery2.SELECT("fecharemesa");
 		subquery2.FROM("cajg_remesaestados est");
 		subquery2.WHERE("est.idinstitucion = rem.idinstitucion");
 		subquery2.WHERE("est.idremesa = rem.idremesa");
 		subquery2.WHERE("est.idestado = 3");
+		subquery.WHERE("ROWNUM = 1");
 
 		subquery4.SELECT("idestado");
 		subquery4.FROM("cajg_remesaestados");
@@ -283,7 +286,7 @@ public class ScsRemesasExtendsProvider {
 
 		sql.SELECT("rem.idremesa");
 		sql.SELECT("REM.IDINSTITUCION");
-		sql.SELECT("TO_CHAR(rem.FECHAMODIFICACION, 'dd/MM/yyyy HH24:MI:SS') FECHAMODIFICACION");
+		sql.SELECT("TO_CHAR(NVL(rem.FECHAMODIFICACION, rem.FECHAREMESA), 'dd/MM/yyyy HH24:MI:SS') FECHAMODIFICACION");
 		sql.SELECT("F_SIGA_GETRECURSO(tip.descripcion, " + idLenguaje + ") estado");
 		sql.SELECT("tip.idestado");
 		sql.FROM("cajg_remesaestados rem");

@@ -1134,22 +1134,22 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			validar = validarAccion(remesaAccionItem, request, remesaAccionItem.getDescripcion());
 			
 			if (remesaAccionItem.getAccion() == 8) {
-				if(validar) {
+				if(validar) {					
 					if (parametro.getValor().equals("3") || parametro.getValor().equals("6")) {
-						 res = getFicheroXML(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
-					} else {
-						res = getFichero(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));
+						res = getFicheroXML(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa())); 
+					} else { 
+						res = getFichero(idInstitucion.toString(), String.valueOf(remesaAccionItem.getIdRemesa()));					  
 					}
-					
-					if(res != null) {			
-						//Comprobamos que no se haya enviado ya
-						CajgRemesaestadosKey keyEstado = new CajgRemesaestadosKey();							
-						keyEstado.setIdinstitucion(idInstitucion);
-						keyEstado.setIdremesa((long) remesaAccionItem.getIdRemesa());			
-						keyEstado.setIdestado(Short.valueOf("2"));			
-						CajgRemesaestados cajgEnviada = cajgRemesaEstadosMapper.selectByPrimaryKey(keyEstado);
+					  
+					if(res != null) {					 		
+						//Comprobamos que no se haya enviado ya						
+						CajgRemesaestadosExample remesaEstadoKey = new CajgRemesaestadosExample();
+						remesaEstadoKey.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdremesaEqualTo(Long.valueOf(remesaAccionItem.getIdRemesa()))
+								.andIdestadoEqualTo(Short.valueOf("2"));
+						List<CajgRemesaestados> cajgEnviada = cajgRemesaEstadosMapper.selectByExample(remesaEstadoKey);
 						
-						if (cajgEnviada == null) {
+						if (cajgEnviada == null || cajgEnviada.size() == 0) {
 							//Actualizamos estado remesa
 							CajgRemesaestados cajgRemesa = new CajgRemesaestados();
 							
