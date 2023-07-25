@@ -200,10 +200,10 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         sql.WHERE("gc.FECHAINICIO > SYSDATE");
         //sql.WHERE("SYSDATE between si.FECHAVALIDACION and nvl(si.FECHABAJA, '31/12/2999')");
         sql.WHERE("gc.IDTURNO = " + guardiaItem.getIdTurno());
-        //sql.WHERE("gc.IDGUARDIA = " + guardiaItem.getIdGuardia());
-        //sql.WHERE("gc.IDCALENDARIOGUARDIAS = " + guardiaItem.getIdCalendarioGuardias());
+        sql.WHERE("gc.IDGUARDIA = " + guardiaItem.getIdGuardia());
+        sql.WHERE("gc.IDCALENDARIOGUARDIAS = " + guardiaItem.getIdCalendarioGuardias());
         //SIGARNV-2885@DTT.JAMARTIN@06/02/2023@INICIO
-        //sql.WHERE("gc.IDPERSONA <> " + guardiaItem.getIdPersona());
+        sql.WHERE("gc.IDPERSONA <> " + guardiaItem.getIdPersona());
         //SIGARNV-2885@DTT.JAMARTIN@06/02/2023@FIN 
 
         return sql.toString();
