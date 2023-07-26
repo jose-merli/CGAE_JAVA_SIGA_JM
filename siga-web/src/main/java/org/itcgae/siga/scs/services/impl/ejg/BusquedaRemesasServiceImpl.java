@@ -1182,13 +1182,14 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 							if(listaEJGRemesa != null && listaEJGRemesa.getRemesasItem().size() > 0) {
 															
 								LOGGER.debug("Entrada FOR de EJGs asociados remesa para actulizar estado a REMITIDO COMISION");
-								for(EJGRemesaItem ejg : listaEJGRemesa.getRemesasItem()) {
+								for(EJGRemesaItem ejg : listaEJGRemesa.getRemesasItem()) {									
+									String[] partesIdEJG = ejg.getIdentificadorEJG().split("-"); // El ultimo valor del identificador es el numero
 									
 									ScsEstadoejg estado = new ScsEstadoejg();
 									estado.setIdinstitucion(idInstitucion);
 									estado.setIdtipoejg((short) ejg.getIdTipoEJG());
 									estado.setAnio((short) ejg.getAnioEJG());
-									estado.setNumero((long) ejg.getNumeroEJG());
+									estado.setNumero(Long.parseLong(partesIdEJG[3])); // aqui es el valor de numero no de numeroEJG							
 									estado.setIdestadoejg(Short.parseShort("9"));	//id de estado correspondiente a Remitido comision.
 									estado.setObservaciones("Nº Remesa: " + remesaSelected.getNumero());
 									estado.setFechainicio(new Date());
@@ -1203,7 +1204,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	
 									example.setOrderByClause("IDESTADOPOREJG DESC");
 									example.createCriteria().andAnioEqualTo((short) ejg.getAnioEJG()).andIdinstitucionEqualTo(idInstitucion)
-											.andIdtipoejgEqualTo((short) ejg.getIdTipoEJG()).andNumeroEqualTo((long) ejg.getNumeroEJG());
+											.andIdtipoejgEqualTo((short) ejg.getIdTipoEJG()).andNumeroEqualTo(Long.parseLong(partesIdEJG[3]));
 	
 									List<ScsEstadoejg> listEjg = scsEstadoEjgextendsMapper.selectByExample(example);
 	
