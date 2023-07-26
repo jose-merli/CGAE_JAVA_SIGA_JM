@@ -1557,9 +1557,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 					List<InscripcionGuardiaItem> colaGuardiaUltimos = new ArrayList<InscripcionGuardiaItem>();
 					List<InscripcionGuardiaItem> colaGuardiaAux = new ArrayList<InscripcionGuardiaItem>();
 
-					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,")) {
+					//Provisionalmente quitamos esta ordenacion porque sospechamos que no la hace bien en todos los casos
+					// y que ahora viene bien ordenado desde la query
+					/*if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,")) {
 						Collections.sort(colaGuardia);
-					}
+					}*/
 					
 					for (int y = 0; y < colaGuardia.size(); y++) {
 						System.out.println("i: " + String.valueOf(y));
