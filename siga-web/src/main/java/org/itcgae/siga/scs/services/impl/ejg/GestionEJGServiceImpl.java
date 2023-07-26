@@ -3430,7 +3430,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				record.setNumerodiligencia(datos.getNumerodiligencia());
 				record.setComisaria(datos.getComisaria());
 				record.setCalidad(datos.getCalidad());
-
+				record.setIdtipoencalidad(Short.parseShort(datos.getCalidad()));
+				
 				// Datos pre-designacion
 				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@INICIO
 				// record.setNumeroprocedimiento(datos.getNumAnnioProcedimiento());
@@ -3438,8 +3439,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// record.setAnioprocedimiento(datos.getAnnio());
 				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@FIN
 				record.setNig(datos.getNig());
-				if (datos.getJuzgado() != null)
+				if (datos.getJuzgado() != null) {
 					record.setJuzgado(Long.parseLong(datos.getJuzgado()));
+					record.setJuzgadoidinstitucion(idInstitucion);
+				}
 				else
 					record.setJuzgado(null);
 				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@INICIO
