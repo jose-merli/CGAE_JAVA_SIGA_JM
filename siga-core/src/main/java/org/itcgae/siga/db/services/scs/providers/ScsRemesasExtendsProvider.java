@@ -55,14 +55,14 @@ public class ScsRemesasExtendsProvider {
 		subquery1.WHERE("est.idinstitucion = rem.idinstitucion");
 		subquery1.WHERE("est.idremesa = rem.idremesa");
 		subquery1.WHERE("est.idestado = 2");
-		subquery.WHERE("ROWNUM = 1");
+		subquery1.WHERE("ROWNUM = 1");
 
 		subquery2.SELECT("fecharemesa");
 		subquery2.FROM("cajg_remesaestados est");
 		subquery2.WHERE("est.idinstitucion = rem.idinstitucion");
 		subquery2.WHERE("est.idremesa = rem.idremesa");
 		subquery2.WHERE("est.idestado = 3");
-		subquery.WHERE("ROWNUM = 1");
+		subquery2.WHERE("ROWNUM = 1");
 
 		subquery4.SELECT("idestado");
 		subquery4.FROM("cajg_remesaestados");
