@@ -4750,7 +4750,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 //															generarCalendario2(soloVacio);															
 															
 															//Nuevo
-															generarCalendario3(guardiasCalendarioItem3, soloVacio);
+															generarCalendario3(guardiasCalendarioItem3, soloVacio, null);
 															
 															if (controlError == 0) {
 																LOGGER.info(
@@ -5657,7 +5657,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	}
 	
-	public void generarCalendario3(GuardiasCalendarioItem guardiasCalendarioItem, boolean soloVacio) throws Exception {
+	public void generarCalendario3(GuardiasCalendarioItem guardiasCalendarioItem, boolean soloVacio, InscripcionGuardiaItem inscripcion) throws Exception {
 		String usuModificacion = guardiasCalendarioItem.getUsumodificacion();
 		
 		String idInstitucion = guardiasCalendarioItem.getIdinstitucion();
@@ -5752,10 +5752,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 				boolean cargaMasiva = true;
 				if(cargaMasiva) {
 					if (porGrupos) {
-						calcularMatrizLetradosGuardiaPorGrupos3(guardiasCalendarioItem, calendariosVinculados, guardia, arrayPeriodosDiasGuardia, lDiasASeparar, rotacion);
+						calcularMatrizLetradosGuardiaPorGrupos3(guardiasCalendarioItem, calendariosVinculados, guardia, arrayPeriodosDiasGuardia, lDiasASeparar, rotacion, inscripcion);
 					} else {
 						//GuardiasCalendarioItem guardiasCalendarioItem, List<GuardiasCalendarioItem> calendariosVinculados, GuardiasTurnoItem guardiasTurnoItem ,ArrayList<ArrayList<String>> arrayPeriodosDiasGuardia, List lDiasASeparar
-						calcularMatrizLetradosGuardia3(guardiasCalendarioItem, calendariosVinculados, guardia, arrayPeriodosDiasGuardia, lDiasASeparar);//(L) arrayPeriodosLetradosSJCS1,calendariosVinculados
+						calcularMatrizLetradosGuardia3(guardiasCalendarioItem, calendariosVinculados, guardia, arrayPeriodosDiasGuardia, lDiasASeparar,  inscripcion);//(L) arrayPeriodosLetradosSJCS1,calendariosVinculados
 					}
 				}else {
 					if (porGrupos) {
@@ -6833,7 +6833,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		
 	} // calcularMatrizLetradosGuardiaPorGrupos()
 	
-	public void calcularMatrizLetradosGuardiaPorGrupos3(GuardiasCalendarioItem guardiasCalendarioItem, List<GuardiasCalendarioItem> calendariosVinculados, GuardiasTurnoItem guardiasTurnoItem ,ArrayList<ArrayList<String>> arrayPeriodosDiasGuardia, List<Integer> lDiasASeparar, boolean rotacion) throws Exception {
+	public void calcularMatrizLetradosGuardiaPorGrupos3(GuardiasCalendarioItem guardiasCalendarioItem, List<GuardiasCalendarioItem> calendariosVinculados, GuardiasTurnoItem guardiasTurnoItem ,ArrayList<ArrayList<String>> arrayPeriodosDiasGuardia, List<Integer> lDiasASeparar, boolean rotacion, InscripcionGuardiaItem inscripcion) throws Exception {
 
 		LOGGER.info("INICIO generarCalendarioAsync.calcularMatrizLetradosGuardiaPorGrupos:");
 		String idInstitucion = guardiasCalendarioItem.getIdinstitucion();
@@ -6940,8 +6940,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 			// obteniendo cola de letrados
 			punteroListaLetrados = new Puntero();
 			try {
-				alLetradosOrdenados = getColaGuardia(Integer.valueOf(idInstitucion), Integer.valueOf(idTurno), Integer.valueOf(idGuardia), (String) diasGuardia.get(0),
-						(String) diasGuardia.get(diasGuardia.size() - 1));
+				if(inscripcion != null) {
+					alLetradosOrdenados = getInscritoInfo(inscripcion);
+				}else {
+					alLetradosOrdenados = getColaGuardia(Integer.valueOf(idInstitucion), Integer.valueOf(idTurno), Integer.valueOf(idGuardia), (String) diasGuardia.get(0),
+							(String) diasGuardia.get(diasGuardia.size() - 1));
+				}
+				
 			} catch (Exception e) {
 				errorGeneracionCalendario = "Error obteniendo la cola de guardia";
 			}
@@ -10198,7 +10203,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	} // calcularMatrizLetradosGuardia()
 	
 
-	public void calcularMatrizLetradosGuardia3(GuardiasCalendarioItem guardiasCalendarioItem, List<GuardiasCalendarioItem> calendariosVinculados, GuardiasTurnoItem guardiasTurnoItem ,ArrayList<ArrayList<String>> arrayPeriodosDiasGuardia, List lDiasASeparar) throws Exception {
+	public void calcularMatrizLetradosGuardia3(GuardiasCalendarioItem guardiasCalendarioItem, List<GuardiasCalendarioItem> calendariosVinculados, GuardiasTurnoItem guardiasTurnoItem ,ArrayList<ArrayList<String>> arrayPeriodosDiasGuardia, List lDiasASeparar, InscripcionGuardiaItem inscripcion) throws Exception {
 		
 		String idInstitucion = guardiasCalendarioItem.getIdinstitucion();
 		String idTurno = guardiasCalendarioItem.getIdturno();
@@ -10294,8 +10299,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 					// obteniendo cola de letrados
 					punteroListaLetrados = new Puntero();
 					try {//TODO: (L) Aqui podría insertar letrado de Cargas Masivas(?) - No se analizan incompatibilidades, obtiene la cola de guardias para new Date
-						alLetradosOrdenados = getColaGuardia(Integer.valueOf(idInstitucion), Integer.valueOf(idTurno), Integer.valueOf(idGuardia),
-								(String) diasGuardia.get(0), (String) diasGuardia.get(diasGuardia.size() - 1));
+						if(inscripcion != null) {
+							alLetradosOrdenados = getInscritoInfo(inscripcion);
+						}else {
+							alLetradosOrdenados = getColaGuardia(Integer.valueOf(idInstitucion), Integer.valueOf(idTurno), Integer.valueOf(idGuardia),
+									(String) diasGuardia.get(0), (String) diasGuardia.get(diasGuardia.size() - 1));
+						}
 					} catch (Exception e) {
 						errorGeneracionCalendario = "Error obteniendo la cola de letrados ordenados: " + e;
 						controlError++;
@@ -10622,6 +10631,32 @@ public class GuardiasServiceImpl implements GuardiasService {
 		
 	} // calcularMatrizLetradosGuardia()
 	
+	private List<LetradoInscripcionItem> getInscritoInfo(InscripcionGuardiaItem inscripcion) {
+		// Controles
+		List<LetradoInscripcionItem> colaLetrados = new ArrayList<LetradoInscripcionItem>();
+		InscripcionGuardiaItem punteroInscripciones;
+		
+		
+		List<InscripcionGuardiaItem> listaLetrados = scsInscripcionguardiaExtendsMapper.getColaGuardiasByNumColegiado(inscripcion.getIdGuardia(), inscripcion.getIdTurno(), 
+				inscripcion.getFechaIni(), inscripcion.getFechaFin(), inscripcion.getIdInstitucion(), inscripcion.getnColegiado());
+
+		if (listaLetrados == null || listaLetrados.size() == 0)
+			return colaLetrados;
+		for (int i = 0; i < listaLetrados.size(); i++) {
+			punteroInscripciones = listaLetrados.get(i);
+
+			LetradoInscripcionItem letradoInscripcionItem = new LetradoInscripcionItem();
+			letradoInscripcionItem.setInscripcionGuardia(punteroInscripciones);
+			colaLetrados.add(letradoInscripcionItem);
+
+		}
+
+		// usando saltos si es necesario (en guardias no)
+
+		return colaLetrados;
+
+	}
+
 	/**
 	 * Obtiene todos los saltos asociados a una guardia
 	 *

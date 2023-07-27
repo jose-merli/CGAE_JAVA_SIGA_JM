@@ -37,6 +37,10 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 	private String idInstitucion;
 	private Integer ultimoCola;
 	
+	//Atributos Auxiliares
+	private String fechaIni;
+	private String fechaFin;
+	
 	public InscripcionGuardiaItem(String numeroGrupo, String idGrupoGuardiaColegiado, String orden, String nColegiado,
 			String fechaValidacion, String fechabaja, String compensaciones, String saltos, String apellido1,
 			String apellido2, String nombre, String idPersona, String ordenCola, String idTurno, String idGuardia,
@@ -580,6 +584,22 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 		} else if (!usumodificacion.equals(other.usumodificacion))
 			return false;
 		return true;
+	}
+
+	public String getFechaIni() {
+		return fechaIni;
+	}
+
+	public void setFechaIni(String fechaIni) {
+		this.fechaIni = fechaIni;
+	}
+
+	public String getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(String fechaFin) {
+		this.fechaFin = fechaFin;
 	}
 
 
