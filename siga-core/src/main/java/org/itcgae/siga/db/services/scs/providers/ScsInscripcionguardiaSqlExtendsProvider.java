@@ -123,6 +123,102 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		return sql.toString();
 	}
 
+	public String getColaGuardiasByNumColegiado(String idGuardia, String idTurno, String fechaIni, String fechaFin, String idInstitucion, String numCol) {
+		SQL sql = new SQL();
+        SQL sqlListadoInscripciones = new SQL();
+        SQL sqlListadoInscripcionesConRownum = new SQL();
+        SQL sqlUltimoCola = new SQL();
+
+        sqlListadoInscripciones.SELECT("ins.idinstitucion");
+        sqlListadoInscripciones.SELECT("ins.idturno");
+        sqlListadoInscripciones.SELECT("ins.idguardia");
+        sqlListadoInscripciones.SELECT("per.idpersona");
+        sqlListadoInscripciones.SELECT("Ins.fechasuscripcion AS Fechasuscripcion");
+        sqlListadoInscripciones.SELECT("TO_CHAR(trunc(ins.fechavalidacion), 'DD/MM/YYYY') AS fechavalidacion");
+        sqlListadoInscripciones.SELECT("TO_CHAR(trunc(ins.fechabaja), 'DD/MM/YYYY') AS fechabaja");
+        sqlListadoInscripciones.SELECT("Per.Nifcif");
+        sqlListadoInscripciones.SELECT("Per.Nombre AS nombre");
+        sqlListadoInscripciones.SELECT("Per.Apellidos1 AS apellidos1");
+        sqlListadoInscripciones.SELECT("DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2");
+        sqlListadoInscripciones.SELECT(
+                "Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS");
+        sqlListadoInscripciones
+                .SELECT("TO_NUMBER(DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado)) numerocolegiado");
+        sqlListadoInscripciones.SELECT("Per.Fechanacimiento FECHANACIMIENTO");
+        sqlListadoInscripciones.SELECT("Ins.Fechavalidacion AS ANTIGUEDADCOLA");
+        sqlListadoInscripciones
+                .SELECT("Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado");
+        sqlListadoInscripciones.SELECT("Gru.IDGRUPOGUARDIA AS Grupo");
+        sqlListadoInscripciones.SELECT("Grg.NUMEROGRUPO AS numeroGrupo");
+        sqlListadoInscripciones.SELECT("Gru.ORDEN AS Ordengrupo");
+        sqlListadoInscripciones.SELECT("(SELECT COUNT(1) numero   FROM scs_saltoscompensaciones salto"
+                + " WHERE salto.idinstitucion = gua.idinstitucion  AND  salto.idturno = gua.IDTURNO  AND"
+                + "  salto.idguardia =gua.idguardia  AND  salto.saltoocompensacion = 'S'  AND"
+                + "  salto.fechacumplimiento IS NULL  AND  salto.idpersona = ins.IDPERSONA )  as saltos");
+
+        sqlListadoInscripciones.FROM("scs_inscripcionguardia  ins");
+        sqlListadoInscripciones.INNER_JOIN("cen_persona per ON per.idpersona = ins.IDPERSONA");
+        sqlListadoInscripciones.INNER_JOIN(
+                "cen_colegiado col ON col.idpersona = per.idpersona and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA");
+        sqlListadoInscripciones.INNER_JOIN(
+                "scs_guardiasturno gua ON gua.idturno = ins.idturno and gua.idguardia = ins.idguardia and gua.IDINSTITUCION = ins.IDINSTITUCION");
+        sqlListadoInscripciones.LEFT_OUTER_JOIN(
+                "scs_grupoguardiacolegiado gru ON gru.IDINSTITUCION = ins.IDINSTITUCION and gru.IDTURNO = ins.IDTURNO and gru.IDGUARDIA = ins.IDGUARDIA and gru.IDPERSONA = per.idpersona and gru.FECHASUSCRIPCION = ins.FECHASUSCRIPCION");
+        sqlListadoInscripciones.LEFT_OUTER_JOIN("scs_grupoguardia grg ON grg.IDGRUPOGUARDIA = gru.IDGRUPOGUARDIA");
+
+        sqlListadoInscripciones.WHERE("1=1");
+        sqlListadoInscripciones.WHERE("nvl(TRUNC(TO_DATE(Ins.Fechavalidacion, 'DD/MM/RRRR')), TO_DATE('31/12/2999', 'DD/MM/RRRR')) <= NVL(TO_DATE('" + fechaIni
+                + "', 'DD/MM/RRRR'), trunc(sysdate))");
+        sqlListadoInscripciones.WHERE("nvl(TRUNC(TO_DATE(Ins.fechabaja, 'DD/MM/RRRR')), TO_DATE('31/12/2999', 'DD/MM/RRRR')) >= NVL(TO_DATE('" + fechaFin
+                + "', 'DD/MM/RRRR'), trunc(sysdate))");
+        sqlListadoInscripciones.WHERE("Gua.Idinstitucion = " + idInstitucion);
+        sqlListadoInscripciones.WHERE("Gua.Idturno = " + idTurno);
+        sqlListadoInscripciones.WHERE("Gua.idguardia = " + idGuardia);
+        if(numCol != null)
+			sqlListadoInscripciones.WHERE("col.Ncolegiado = " + numCol);
+
+        sqlListadoInscripcionesConRownum.SELECT("ROWNUM AS orden");
+        sqlListadoInscripcionesConRownum.SELECT("linscripciones.*");
+        sqlListadoInscripcionesConRownum.FROM("(" + sqlListadoInscripciones + ") linscripciones");
+
+        sqlUltimoCola.SELECT("ROWNUM AS orden");
+        sqlUltimoCola.SELECT("linscripciones.*");
+        sqlUltimoCola.FROM("(" + sqlListadoInscripciones + ") linscripciones");
+        sqlUltimoCola.WHERE("exists (select 1 from SCS_GUARDIASTURNO ultimo where 1=1");
+        sqlUltimoCola.WHERE("  ultimo.Idinstitucion = '" + idInstitucion + "'");
+        sqlUltimoCola.WHERE("  ultimo.Idturno = '" + idTurno + "'");
+        sqlUltimoCola.WHERE("  ultimo.idguardia ='" + idGuardia + "'");
+        sqlUltimoCola.WHERE("  fechasuscripcion = ultimo.FECHASUSCRIPCION_ULTIMO ");
+        sqlUltimoCola.WHERE("  idpersona = ultimo.IDPERSONA_ULTIMO");
+
+        sql.SELECT("ROWNUM AS  orden_cola, consulta_total.*");
+        sql.FROM("(WITH linscripciones_ordenada AS (   SELECT *   FROM     (" + sqlListadoInscripcionesConRownum
+                + ")),  " + "  ultimo_cola AS (   SELECT *   FROM     (" + sqlUltimoCola + "))) " + "  SELECT "
+                + " linscripciones_ordenada.idinstitucion," + " linscripciones_ordenada.idturno,"
+                + " linscripciones_ordenada.idguardia," + " linscripciones_ordenada.idpersona,"
+                + " linscripciones_ordenada.nombre," + "    linscripciones_ordenada.apellidos1,"
+                + " linscripciones_ordenada.apellidos2," + "    linscripciones_ordenada.numerocolegiado,"
+                + " linscripciones_ordenada.fechavalidacion," + "   linscripciones_ordenada.alfabeticoapellidos,"
+                + " linscripciones_ordenada.numerogrupo," + " linscripciones_ordenada.ordengrupo,"
+                + " linscripciones_ordenada.fechabaja," + "linscripciones_ordenada.fechasuscripcion,"
+                + " linscripciones_ordenada.idgrupoguardiacolegiado"
+                + "   FROM     linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
+                + "  where linscripciones_ordenada.orden > nvl(ultimo_cola.orden, 0)  " + "  UNION ALL   " + "  SELECT "
+                + "  linscripciones_ordenada.idinstitucion," + "     linscripciones_ordenada.idturno,"
+                + "  linscripciones_ordenada.idguardia," + "     linscripciones_ordenada.idpersona,"
+                + "  linscripciones_ordenada.nombre," + "    linscripciones_ordenada.apellidos1,"
+                + "  linscripciones_ordenada.apellidos2," + "    linscripciones_ordenada.numerocolegiado,"
+                + "  linscripciones_ordenada.fechavalidacion," + "   linscripciones_ordenada.alfabeticoapellidos,"
+                + "  linscripciones_ordenada.numerogrupo," + "  linscripciones_ordenada.ordengrupo,"
+                + "  linscripciones_ordenada.fechabaja," + "linscripciones_ordenada.fechasuscripcion,"
+                + "  linscripciones_ordenada.idgrupoguardiacolegiado"
+                + "   FROM   linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
+                + "  where linscripciones_ordenada.orden <= nvl(ultimo_cola.orden, 0)) consulta_total ");
+        sql.ORDER_BY("orden_cola ASC");
+
+        return sql.toString();
+    }
+	
 	private String saltosOCompensaciones(Boolean porGrupos) {
 		return !porGrupos
 				? ("				(\r\n" + "				SELECT\r\n" + "					COUNT(1) numero\r\n"
