@@ -186,6 +186,35 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                 //Si no está dado de alta como colegiado procedemos a buscar, dependiendo del tipo de colegiacion, el proximo numero de colegiado
                 if (!yaDadoAlta) {
+                	GenParametrosKey key = new GenParametrosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setModulo(SigaConstants.MODULO_CENSO);
+					key.setParametro(SigaConstants.PARAMETRO_COMPROCACION_CERTIFICADO_SOL_INC);
+					GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+					
+					String comprobarCertificado = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
+					
+					key = new GenParametrosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setModulo(SigaConstants.MODULO_CENSO);
+					key.setParametro(SigaConstants.FECHA_CONTROL_EXISTENCIA_CNI);
+					genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+					
+					String fechaControlExistenciaCNI = genParametro == null || genParametro.getValor() == null ? "01/08/2007" : genParametro.getValor();
+					
+					String literalCertificadoNoValido = "Se requiere un certificado de nueva incorporación para aprobar la solicitud";
+					
+					if ("1".equals(comprobarCertificado)
+							&& (TipoColegiacionType.E.equals(request.getTipoSolicitud()) || TipoColegiacionType.N.equals(request.getTipoSolicitud()))) {
+						
+						String existeCertificado = cenPersonaExtendsMapper.getCertificado(identificacion, request.getTipoSolicitud().toString(),
+								fechaControlExistenciaCNI);
+						
+						if (existeCertificado == null) {
+							throw new ValidationException(literalCertificadoNoValido);
+						}
+					}
+                	
                     LOGGER.info("SincronizacionEXEAServiceImpl.getNumColegiacion() / No dado de alta, se procede a buscar nuevo numero de colegiado");
 
                     nextNumColegiado = checkIfNColegiadoLiberado(request.getTipoSolicitud(), idInstitucion, request.getNumeroExpediente());
@@ -193,11 +222,11 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                     //Si no hay ninguno liberado, buscamos el siguiente con MAX+1
                     if(UtilidadesString.esCadenaVacia(nextNumColegiado)) {
                         // Comprobamos si para la institucion tiene un contador unico
-                        GenParametrosKey key = new GenParametrosKey();
+                        key = new GenParametrosKey();
                         key.setIdinstitucion(idInstitucion);
                         key.setModulo(SigaConstants.MODULO_CENSO);
                         key.setParametro(SigaConstants.PARAMETRO_CONTADOR_UNICO);
-                        GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+                        genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
 
                         String contadorUnico = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
                         //Si la institucion tiene un contador unico

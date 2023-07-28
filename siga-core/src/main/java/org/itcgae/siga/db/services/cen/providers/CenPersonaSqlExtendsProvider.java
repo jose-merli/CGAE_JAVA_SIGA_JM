@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -601,5 +602,44 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.JOIN("Cen_Institucion INS ON INS.IDINSTITUCION = " + idinstitucion + " and INS.IDPERSONA = PER.IDPERSONA");
 
 		return sql.toString();
+	}
+	
+	public String getCertificado(String dni, String idSituacionEjer, String fechaControlExistenciaCNI) {
+		String institucionGeneral = SigaConstants.InstitucionGeneral;
+		String cEstadoSolFinalizado = SigaConstants.C_ESTADO_SOL_FINALIZADO;
+		int estadoColegialEjerciente = SigaConstants.ESTADO_COLEGIAL_EJERCIENTE;
+		int estadoColegialSinEjercer = SigaConstants.ESTADO_COLEGIAL_SINEJERCER;
+		
+		SQL sql1 = new SQL();
+		SQL sql2 = new SQL();
+		String sqlFinal;
+
+		sql1.SELECT("cc.fechaincorporacion fecha");
+		sql1.FROM("cen_persona per");
+		sql1.INNER_JOIN("cen_colegiado cc ON per.idpersona = cc.idpersona");
+		sql1.WHERE("per.nifcif = '" + dni + "'");
+		sql1.WHERE("cc.fechaincorporacion < '" + fechaControlExistenciaCNI + "'");
+		
+		sql2.SELECT("solcer.fechaemisioncertificado");
+		sql2.FROM("cen_persona per");
+		sql2.INNER_JOIN("cer_solicitudcertificados solcer ON solcer.idinstitucion = " + institucionGeneral
+				+ "	AND solcer.idpersona_des = per.idpersona");
+		sql2.INNER_JOIN("pys_productosinstitucion  pp ON solcer.idinstitucion = pp.idinstitucion"
+				+ "	AND solcer.ppn_idtipoproducto = pp.idtipoproducto"
+				+ "	AND solcer.ppn_idproducto = pp.idproducto"
+				+ "	AND solcer.ppn_idproductoinstitucion = pp.idproductoinstitucion");
+		sql2.WHERE("solcer.idestadosolicitudcertificado = " + cEstadoSolFinalizado);
+		sql2.WHERE("per.nifcif = '" + dni + "'");
+		sql2.WHERE("( ( " + idSituacionEjer + " = " + estadoColegialEjerciente
+				+ "            AND ( pp.codigoext LIKE 'NI%'"
+				+ "                  OR pp.codigoext LIKE 'CA%' ) )"
+				+ "          OR ( " + idSituacionEjer + " = " + estadoColegialSinEjercer
+				+ "               AND ( pp.codigoext LIKE 'NI%'"
+				+ "                     OR pp.codigoext LIKE 'CA%'"
+				+ "                     OR pp.codigoext LIKE 'NE%' ) ) )");
+
+		sqlFinal = sql1.toString() + " UNION " + sql2.toString();
+		
+		return sqlFinal;
 	}
 }

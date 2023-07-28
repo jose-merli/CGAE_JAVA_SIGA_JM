@@ -217,4 +217,7 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 
 	})
 	CenPersona getDatosInstitucionForImpreso190(String idinstitucion);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getCertificado")
+	String getCertificado(String dni, String idSituacionEjer, String fechaControlExistenciaCNI);
 }

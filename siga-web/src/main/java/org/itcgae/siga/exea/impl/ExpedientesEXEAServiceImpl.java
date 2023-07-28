@@ -27,6 +27,8 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.CenComunidadesautonomasMapper;
 import org.itcgae.siga.db.mappers.CenDocumentacionpresentadaMapper;
+import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
+import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -97,6 +99,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     @Autowired
     private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private CenPersonaExtendsMapper _cenPersonaExtendsMapper;
 
     @Autowired
     private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
@@ -121,6 +126,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
     @Autowired
     private CenSolicitudincorporacionExtendsMapper cenSolicitudincorporacionExtendsMapper;
+    
+    @Autowired
+    private GenDiccionarioMapper genDiccionarioMapper;
 
     @Autowired
     private CenDocumentacionpresentadaMapper cenDocumentacionpresentadaMapper;
@@ -1051,9 +1059,41 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                         "iniciarTramiteColegiacionEXEA() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
                 if (usuarios != null && usuarios.size() > 0) {
-
-                    String idSolicitud = data.split("/")[0];
+                	String idSolicitud = data.split("/")[0];
                     String asunto = data.split("/")[1];
+                    
+                	GenParametrosKey key = new GenParametrosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setModulo(SigaConstants.MODULO_CENSO);
+					key.setParametro(SigaConstants.PARAMETRO_COMPROCACION_CERTIFICADO_SOL_INC);
+					GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+					
+					String comprobarCertificado = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
+					
+					key = new GenParametrosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setModulo(SigaConstants.MODULO_CENSO);
+					key.setParametro(SigaConstants.FECHA_CONTROL_EXISTENCIA_CNI);
+					genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+					
+					String fechaControlExistenciaCNI = genParametro == null || genParametro.getValor() == null ? "01/08/2007" : genParametro.getValor();
+					
+					CenSolicitudincorporacion solIncorporacion;
+					solIncorporacion = cenSolicitudincorporacionExtendsMapper.selectByPrimaryKey(Long.valueOf(idSolicitud));
+					
+					String literalCertificadoNoValido = getTraduccionLiteral("censo.solicitudIncorporacion.ficha.errorCertificado",
+							usuarios.get(0).getIdlenguaje());
+					
+					if ("1".equals(comprobarCertificado)
+							&& (solIncorporacion.getIdtipocolegiacion() == 10 || solIncorporacion.getIdtipocolegiacion() == 20)) {
+						
+						String existeCertificado = _cenPersonaExtendsMapper.getCertificado(solIncorporacion.getNumeroidentificador(),
+								String.valueOf(solIncorporacion.getIdtipocolegiacion()), fechaControlExistenciaCNI);
+						
+						if (existeCertificado == null) {
+							throw new Exception(literalCertificadoNoValido);
+						}
+					}
 
                     CenSolicitudincorporacion solicitudincorporacion = cenSolicitudincorporacionExtendsMapper.selectByPrimaryKey(Long.valueOf(idSolicitud));
 
@@ -1149,6 +1189,15 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             updateResponseDTO.setError(error);
         }
         return updateResponseDTO;
+    }
+    
+    private String getTraduccionLiteral(String idRecurso, String idLenguaje) {
+
+        GenDiccionarioKey genDiccionarioKey = new GenDiccionarioKey();
+        genDiccionarioKey.setIdlenguaje(idLenguaje);
+        genDiccionarioKey.setIdrecurso(idRecurso);
+
+        return genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
     }
 
     private ExpedienteItem fillExpedienteItem(Expediente expediente) throws ParserConfigurationException, IOException, SAXException {

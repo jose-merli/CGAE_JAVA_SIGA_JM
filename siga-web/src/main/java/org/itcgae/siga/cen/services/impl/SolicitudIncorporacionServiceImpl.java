@@ -84,6 +84,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	private CenPersonaExtendsMapper _cenPersonaExtendsMapper;
 	
 	@Autowired
+    private GenDiccionarioMapper genDiccionarioMapper;
+	
+	@Autowired
 	private CenDireccionesExtendsMapper _cenDireccionesMapper;
 	
 	@Autowired
@@ -750,9 +753,40 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
 					
-					// Se llama a un método inferior para no perder el rollback de la transacción en caso de error
-					aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request);
+					GenParametrosKey key = new GenParametrosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setModulo(SigaConstants.MODULO_CENSO);
+					key.setParametro(SigaConstants.PARAMETRO_COMPROCACION_CERTIFICADO_SOL_INC);
+					GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
 					
+					String comprobarCertificado = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
+	
+					key = new GenParametrosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setModulo(SigaConstants.MODULO_CENSO);
+					key.setParametro(SigaConstants.FECHA_CONTROL_EXISTENCIA_CNI);
+					genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+					
+					String fechaControlExistenciaCNI = genParametro == null || genParametro.getValor() == null ? "01/08/2007" : genParametro.getValor();
+					
+					CenSolicitudincorporacion solIncorporacion;
+					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
+					
+					String literalCertificadoNoValido = getTraduccionLiteral("censo.solicitudIncorporacion.ficha.errorCertificado",
+							usuarios.get(0).getIdlenguaje());
+					
+					if ("1".equals(comprobarCertificado)
+							&& (solIncorporacion.getIdtipocolegiacion() == 10 || solIncorporacion.getIdtipocolegiacion() == 20)) {
+						
+						String existeCertificado = _cenPersonaExtendsMapper.getCertificado(solIncorporacion.getNumeroidentificador(),
+								String.valueOf(solIncorporacion.getIdtipocolegiacion()), fechaControlExistenciaCNI);
+						
+						if (existeCertificado == null) {
+							throw new Exception(literalCertificadoNoValido);
+						}
+					}
+					
+					aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request);
 				}catch(Exception e){
 					LOGGER.error(e.getMessage());
 					error.setMessage(e.getMessage());
@@ -768,6 +802,15 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		LOGGER.info("aprobarSolicitud() -> Salida del servicio para aprobar una solicitud");
 		return response;
 	}
+	
+	private String getTraduccionLiteral(String idRecurso, String idLenguaje) {
+
+        GenDiccionarioKey genDiccionarioKey = new GenDiccionarioKey();
+        genDiccionarioKey.setIdlenguaje(idLenguaje);
+        genDiccionarioKey.setIdrecurso(idRecurso);
+
+        return genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+    }
 	
 	@Transactional(timeout=2400)
 	private void aprobarSolicitudTransaccion(List<AdmUsuarios> usuarios, Long idSolicitud, InsertResponseDTO response, HttpServletRequest request) throws Exception {
