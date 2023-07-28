@@ -186,6 +186,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                 //Si no está dado de alta como colegiado procedemos a buscar, dependiendo del tipo de colegiacion, el proximo numero de colegiado
                 if (!yaDadoAlta) {
+                	
+                	// Obtención del parámetro que indica si la comprobación del certificado está activa
                 	GenParametrosKey key = new GenParametrosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setModulo(SigaConstants.MODULO_CENSO);
@@ -194,6 +196,7 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 					
 					String comprobarCertificado = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
 					
+					// Obtención del parámetro que informa la fecha de control de la existencia CNI
 					key = new GenParametrosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setModulo(SigaConstants.MODULO_CENSO);
@@ -204,12 +207,16 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 					
 					String literalCertificadoNoValido = "Se requiere un certificado de nueva incorporación para aprobar la solicitud";
 					
+					// Se comprobará el certificado de solicitud de incorporación si está activo y si el tipo de solicitud es
+					// ejerciente o no ejerciente
 					if ("1".equals(comprobarCertificado)
 							&& (TipoColegiacionType.E.equals(request.getTipoSolicitud()) || TipoColegiacionType.N.equals(request.getTipoSolicitud()))) {
 						
+						// Consultamos si existe el certificado
 						String existeCertificado = cenPersonaExtendsMapper.getCertificado(identificacion, request.getTipoSolicitud().toString(),
 								fechaControlExistenciaCNI);
 						
+						// Si no existe certificado lanzamos una excepción indicando la descripción del error y se para el proceso
 						if (existeCertificado == null) {
 							throw new ValidationException(literalCertificadoNoValido);
 						}
