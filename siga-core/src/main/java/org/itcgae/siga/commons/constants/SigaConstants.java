@@ -1050,7 +1050,7 @@ public class SigaConstants {
 	public static final String MODULO_CENSO = "CEN";
 	public static final String PARAMETRO_CONTADOR_UNICO = "CONTADOR_UNICO_NCOLEGIADO_NCOMUNIT";
 	
-	public static final String PARAMETRO_COMPROCACION_CERTIFICADO_SOL_INC = "censo.parametro.activo_control_certificado_ni";
+	public static final String PARAMETRO_COMPROCACION_CERTIFICADO_SOL_INC = "ACTIVO_CONTROL_CERTIFICADO_NI";
 	public static final String FECHA_CONTROL_EXISTENCIA_CNI = "FECHA_CONTROL_EXISTENCIA_CNI";
 	public static final String C_ESTADO_SOL_FINALIZADO = "4";
 
