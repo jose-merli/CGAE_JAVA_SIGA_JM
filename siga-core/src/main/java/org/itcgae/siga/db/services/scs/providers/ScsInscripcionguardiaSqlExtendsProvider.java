@@ -123,6 +123,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.ORDER_BY("orden_cola ASC");
 
 		return sql.toString();
+		
 	}
 
 	public String getColaGuardiasByNumColegiado(String idGuardia, String idTurno, String fechaIni, String fechaFin, String idInstitucion, String numCol) {
@@ -313,22 +314,17 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		// subQuerysql4.WHERE("tur2.idinstitucion = ins.idinstitucion");
 		// subQuerysql4.WHERE("tur2.idturno = ins.idturno");
 
-		sql.SELECT("(CASE" + "            WHEN ins.fechadenegacion IS NOT NULL THEN '4'"
-				//+ "            WHEN ins.fechabaja IS NOT NULL"
-			//	+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
-				//+ "                 AND ins.fechavalidacion IS NULL THEN '4' /*Denegacion*/"
-				+ "            WHEN ins.fechadenegacion IS NULL" + "                 AND ins.fechabaja IS NOT NULL"
-				+ "                  THEN '3' /*Baja*/"
-				+ "            WHEN ins.fechadenegacion IS NULL" + "                 AND ins.fechabaja IS NULL"
-				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
-				+ "                  THEN '2' /*Pendiente de Baja*/"
-				+ "            WHEN ins.fechadenegacion IS NULL" + "                 AND ins.fechabaja IS NULL"
-				+ "                 AND ins.fechasolicitudbaja IS NULL"
-				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/"
-				+ "            WHEN ins.fechadenegacion IS NULL" + "                 AND ins.fechabaja IS NULL"
-				+ "                 AND ins.fechasolicitudbaja IS NULL"
-				+ "                 AND ins.fechavalidacion IS NULL THEN '0' /*Pendiente de Alta*/"
-				+ "            ELSE ''" + "        END" + "    ) estado");
+		// OJO CON EL ORDEN, ES IMPORTANTE YA QUE ES COMO UN IF-ELSE
+		sql.SELECT("(CASE" + 
+				"			 WHEN ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL AND ins.fechadenegacion IS NOT NULL THEN '4' /*Alta - denegada*/\r\n" +
+				"			 WHEN ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL AND ins.fechadenegacion IS NULL THEN '6' /*Alta - pendiente*/\r\n" +
+				"			 WHEN ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL THEN '2' /*Alta - confrimada*/\r\n" +
+				"			 WHEN ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NULL AND ins.fechadenegacion IS NOT NULL THEN '5' /*Baja - denegada*/\r\n" +
+				"			 WHEN ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NULL AND ins.fechadenegacion IS NULL THEN '7' /*Baja - pendiente*/\r\n" +		
+				"			 WHEN ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NOT NULL THEN '3' /*Baja - confirmada*/\r\n" +
+				"            WHEN ins.fechasolicitudbaja IS NULL THEN '0' /*Alta*/\r\n" + 
+				"			 WHEN ins.fechasolicitudbaja IS NOT NULL THEN '1' /*Baja*/\r\n" + 
+				"            ELSE ''" + "        END" + "    ) estado");
 
 		sql.SELECT("tur.nombre nombre");
 		sql.SELECT("tur.abreviatura abreviatura");
@@ -397,28 +393,33 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 			for (int i = 0; i < estados.length; i++) {
 				if (i > 0)
 					condestados += " or ";
-				// Pendiente de alta
-				if (estados[i].equals("0")) {
-					condestados += " (ins.fechavalidacion is null and ins.fechadenegacion is null and ins.fechasuscripcion is not null)";
-				}
-				// Alta
-				else if (estados[i].equals("1")) {
-					condestados += " (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL"
-							+ " AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)";
-				}
-				// Pendiente de Baja
-				else if (estados[i].equals("2")) {
-					condestados += " (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL"
-							+ " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL)";
-				}
-				// Baja
-				else if (estados[i].equals("3")) {
-					condestados += " (ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
-							+ " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL )";
-				}
-				// Denegada
-				else if (estados[i].equals("4")) {
-					condestados += " (ins.fechadenegacion is not null)";
+				
+				switch(estados[i]) {
+					//Alta
+					case "0": 
+						condestados+="(ins.fechasolicitudbaja IS NULL)" ; break;
+					//Baja
+					case "1":
+						condestados+="(ins.fechasolicitudbaja IS NOT NULL)" ; break;
+					//Confimada Alta
+					case "2":
+						condestados+="(ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)" ; break;
+					//Confimada Baja
+					case "3":
+						condestados+="(ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NOT NULL)" ; break;
+					//Denegada Alta
+					case "4":
+						condestados+="(ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL AND ins.fechadenegacion IS NOT NULL)" ; break;
+					//Denegada Baja
+					case "5":
+						condestados+="(ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NULL AND ins.fechadenegacion IS NOT NULL)" ; break;
+					//Pendiente Alta
+					case "6":
+						condestados+="(ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL AND ins.fechadenegacion IS NULL)" ; break;
+					//Pendiente Baja
+					case "7":
+						condestados+="(ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NULL AND ins.fechadenegacion IS NULL)" ; break;
+					default: break;
 				}
 			}
 			condestados += ")";
@@ -441,13 +442,26 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		}
 
 		if (inscripciones.getFechaDesde() != null) {
-			sql.WHERE("ins.fechasuscripcion >= TO_DATE('" + inscripciones.getFechaDesde()
-					+ " 00:00:00','DD/MM/YYYY HH24:MI:SS')");
-		}
-
-		if (inscripciones.getFechaHasta() != null) {
-			sql.WHERE("ins.fechasuscripcion <= TO_DATE('" + inscripciones.getFechaHasta()
-					+ " 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+			if (inscripciones.getIdEstado() != null) {
+				if((inscripciones.getIdEstado().indexOf('1') != -1) || (inscripciones.getIdEstado().indexOf('3') != -1) ||
+						(inscripciones.getIdEstado().indexOf('5') != -1) || (inscripciones.getIdEstado().indexOf('7') != -1)) {
+					sql.WHERE("ins.fechasolicitudbaja >= TO_DATE('" + inscripciones.getFechaDesde() + " 00:00:00','DD/MM/YYYY HH24:MI:SS')");
+					if (inscripciones.getFechaHasta() != null) {
+						sql.WHERE("ins.fechasolicitudbaja <= TO_DATE('" + inscripciones.getFechaHasta() + " 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+					}
+				} else {
+					sql.WHERE("ins.fechasuscripcion >= TO_DATE('" + inscripciones.getFechaDesde() + " 00:00:00','DD/MM/YYYY HH24:MI:SS')");
+					if (inscripciones.getFechaHasta() != null) {
+						sql.WHERE("ins.fechasuscripcion <= TO_DATE('" + inscripciones.getFechaHasta() + " 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+					}
+				}
+				
+			} else {
+				sql.WHERE("ins.fechasuscripcion >= TO_DATE('" + inscripciones.getFechaDesde() + " 00:00:00','DD/MM/YYYY HH24:MI:SS')");
+				if (inscripciones.getFechaHasta() != null) {
+					sql.WHERE("ins.fechasuscripcion <= TO_DATE('" + inscripciones.getFechaHasta() + " 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+				}
+			}			
 		}
 
 		if (inscripciones.getnColegiado() != null) {

@@ -240,22 +240,17 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 
 		SQL sql = new SQL();
 		
+		// OJO CON EL ORDEN, ES IMPORTANTE YA QUE ES COMO UN IF-ELSE
 		sql.SELECT(  
 				"       ( CASE\r\n" +  
-				"            WHEN ins.fechadenegacion IS NOT NULL THEN '4'\r\n" + 
-				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
-				"                 AND ins.fechabaja IS NOT NULL\r\n" + 
-				"                THEN '3' /*Baja*/\r\n" + 
-				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
-				"                 AND ins.fechabaja IS NULL\r\n" + 
-				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 
-				"                 THEN '2' /*Pendiente de Baja*/\r\n" + 
-				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
-				"                 AND ins.fechasolicitudbaja IS NULL\r\n" + 
-				"                 AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/\r\n" + 
-				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
-				"                 AND ins.fechasolicitudbaja IS NULL\r\n" + 
-				"                 AND ins.fechavalidacion IS NULL THEN '0' /*Pendiente de Alta*/\r\n" + 
+				"			 WHEN ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL AND ins.fechadenegacion IS NOT NULL THEN '4' /*Alta - denegada*/\r\n" +
+				"			 WHEN ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL AND ins.fechadenegacion IS NULL THEN '6' /*Alta - pendiente*/\r\n" +
+				"			 WHEN ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL THEN '2' /*Alta - confrimada*/\r\n" +
+				"			 WHEN ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NULL AND ins.fechadenegacion IS NOT NULL THEN '5' /*Baja - denegada*/\r\n" +
+				"			 WHEN ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NULL AND ins.fechadenegacion IS NULL THEN '7' /*Baja - pendiente*/\r\n" +		
+				"			 WHEN ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NOT NULL THEN '3' /*Baja - confirmada*/\r\n" +
+				"            WHEN ins.fechasolicitudbaja IS NULL THEN '0' /*Alta*/\r\n" + 
+				"			 WHEN ins.fechasolicitudbaja IS NOT NULL THEN '1' /*Baja*/\r\n" + 
 				"            ELSE ''\r\n" + 
 				"        END\r\n" + 
 				"    ) estado,\r\n" + 
@@ -315,33 +310,35 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			String[] estados = inscripcionesItem.getEstado().split(",");
 			for(int i = 0; i< estados.length; i++) {
 				if(i>0) condestados+=" or ";
-				// Pendiente de alta
-				if(estados[i].equals("0")) {
-					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
-							" AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL)" ;
+				
+				switch(estados[i]) {
+					//Alta
+					case "0": 
+						condestados+="(ins.fechasolicitudbaja IS NULL)" ; break;
+					//Baja
+					case "1":
+						condestados+="(ins.fechasolicitudbaja IS NOT NULL)" ; break;
+					//Confimada Alta
+					case "2":
+						condestados+="(ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)" ; break;
+					//Confimada Baja
+					case "3":
+						condestados+="(ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NOT NULL)" ; break;
+					//Denegada Alta
+					case "4":
+						condestados+="(ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL AND ins.fechadenegacion IS NOT NULL)" ; break;
+					//Denegada Baja
+					case "5":
+						condestados+="(ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NULL AND ins.fechadenegacion IS NOT NULL)" ; break;
+					//Pendiente Alta
+					case "6":
+						condestados+="(ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NULL AND ins.fechadenegacion IS NULL)" ; break;
+					//Pendiente Baja
+					case "7":
+						condestados+="(ins.fechasolicitudbaja IS NOT NULL AND ins.fechabaja IS NULL AND ins.fechadenegacion IS NULL)" ; break;
+					default: break;
 				}
-				// Alta
-				else if(estados[i].equals("1")) {
-					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
-							" AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)" ;
-				}
-				// Pendiente de Baja
-				else if(estados[i].equals("2")) {
-					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
-							" AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL)" ;
-				}
-				// Baja
-				else if(estados[i].equals("3")) {
-					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
-							+ " AND ins.fechavalidacion IS NOT NULL )" ;
-				}
-				// Denegada
-				else if(estados[i].equals("4")) {
-					condestados+="((ins.fechadenegacion is not null) or"
-							+ "(ins.fechabaja IS NOT NULL"
-							+ " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NULL )"
-							+" )" ;
-				}
+				
 			}
 			condestados+=")";
 			sql.WHERE(condestados);
@@ -351,12 +348,29 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 					" ins.fechasolicitudbaja is not null and ins.fechasolicitudbaja <= TO_DATE('"+afechade+" 00:00:00','DD/MM/YYYY HH24:MI:SS')))"
 							+ "AND ( ins.fechabaja is null or ins.fechabaja >= TO_DATE('"+afechade+" 23:59:59','DD/MM/YYYY HH24:MI:SS'))") ;
 		}
+		
 		if(inscripcionesItem.getFechadesde() != null) {
-			sql.WHERE("ins.fechasolicitud >= TO_DATE('"+fechadesde+" 00:00:00','DD/MM/YYYY HH24:MI:SS')");
-			if(inscripcionesItem.getFechahasta() != null)
-			sql.WHERE("ins.fechasolicitud <= TO_DATE('"+fechahasta+" 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+			if(inscripcionesItem.getEstado() != null) {
+				if((inscripcionesItem.getEstado().indexOf('1') != -1) || (inscripcionesItem.getEstado().indexOf('3') != -1) ||
+						(inscripcionesItem.getEstado().indexOf('5') != -1) || (inscripcionesItem.getEstado().indexOf('7') != -1)) {
+					sql.WHERE("ins.fechasolicitudbaja >= TO_DATE('"+fechadesde+" 00:00:00','DD/MM/YYYY HH24:MI:SS')");
+					if(inscripcionesItem.getFechahasta() != null)
+					sql.WHERE("ins.fechasolicitudbaja <= TO_DATE('"+fechahasta+" 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+				} else {
+					sql.WHERE("ins.fechasolicitud >= TO_DATE('"+fechadesde+" 00:00:00','DD/MM/YYYY HH24:MI:SS')");
+					if(inscripcionesItem.getFechahasta() != null)
+					sql.WHERE("ins.fechasolicitud <= TO_DATE('"+fechahasta+" 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+				}
+			} else {
+				sql.WHERE("ins.fechasolicitud >= TO_DATE('"+fechadesde+" 00:00:00','DD/MM/YYYY HH24:MI:SS')");
+				if(inscripcionesItem.getFechahasta() != null)
+				sql.WHERE("ins.fechasolicitud <= TO_DATE('"+fechahasta+" 23:59:59','DD/MM/YYYY HH24:MI:SS')");
+			}
+			
 		}
+
 		sql.ORDER_BY("fechasolicitud DESC");
+				
 		if (tamMax != null) {
 			Integer tamMaxNumber = tamMax + 1;
 			sql.WHERE("rownum <= " + tamMaxNumber);

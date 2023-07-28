@@ -433,17 +433,19 @@ public class InscripcionServiceImpl implements InscripcionService {
         
         ScsInscripcionturno inscripcionTurno = scsInscripcionturnoMapper.selectByPrimaryKey(keyInscripcion);
 			
-		inscripcionTurno.setFechamodificacion(new Date());
-		inscripcionTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
-				
-		if (inscripcion.getFechadenegacionNUEVA() != null) {
-			inscripcionTurno.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
-			if(inscripcion.getObservacionesdenegacionNUEVA()!= null) {
-				inscripcionTurno.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
-			}
-		}
-		
-		contadorKO = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionTurno);
+        if (inscripcionTurno != null) {
+        	inscripcionTurno.setFechamodificacion(new Date());
+    		inscripcionTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
+    				
+    		if (inscripcion.getFechadenegacionNUEVA() != null) {
+    			inscripcionTurno.setFechadenegacion(inscripcion.getFechadenegacionNUEVA());
+    			if(inscripcion.getObservacionesdenegacionNUEVA()!= null) {
+    				inscripcionTurno.setObservacionesdenegacion(inscripcion.getObservacionesdenegacionNUEVA());
+    			}
+    		}
+    		
+    		contadorKO = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionTurno);
+        }		
 		
 		if (contadorKO != 0) {
 		
@@ -988,18 +990,20 @@ public class InscripcionServiceImpl implements InscripcionService {
 							// buscar si es Requerida o no
 							requeridaValidacion = inscripcionGuardiaExtendsMapper
 									.requeridaValidacionCampo(idInstitucion.toString(), idturno, idguardia, idpersona);
-							// modificar la fecha y el estado
-							if (requeridaValidacion.equals("S")) {
-								// se queda en Pendiente de Baja, donde la fecha de baja es null
-								a.setFechabaja(null);
-							}
+							if(requeridaValidacion != null) {
+								// modificar la fecha y el estado
+								if (requeridaValidacion.equals("S")) {
+									// se queda en Pendiente de Baja, donde la fecha de baja es null
+									a.setFechabaja(null);
+								}
 
-							Date fechaHoy2 = new Date();
-							if (requeridaValidacion.equals("N")) {
-								// se cambia a baja donde la fecha de baja es distinta de null
-								a.setFechabaja(fechaHoy2);
+								Date fechaHoy2 = new Date();
+								if (requeridaValidacion.equals("N")) {
+									// se cambia a baja donde la fecha de baja es distinta de null
+									a.setFechabaja(fechaHoy2);
 
-							}
+								}
+							}							
 
 							if (a.getFechabaja() != null) {
 								FECHABAJA = formatter.format(a.getFechabaja());
