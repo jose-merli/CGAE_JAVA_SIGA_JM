@@ -20,7 +20,8 @@ public interface IGestionTiposAsistenciaService {
 
 	public ComboDTO getTiposGuardia(HttpServletRequest request);
 
-
+	public ComboDTO getTiposGuardia2(HttpServletRequest request);
+	
 	public UpdateResponseDTO updateTiposAsistencias(TiposAsistenciasDTO tiposAsistenciasDTO, HttpServletRequest request);
 
 	public UpdateResponseDTO deleteTipoAsitencia(TiposAsistenciasDTO tiposAsistenciasDTO, HttpServletRequest request);

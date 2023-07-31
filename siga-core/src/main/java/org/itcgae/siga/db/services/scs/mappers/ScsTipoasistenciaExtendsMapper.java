@@ -56,6 +56,13 @@ public interface ScsTipoasistenciaExtendsMapper extends ScsTipoasistenciaMapper{
     })
 	List<ComboItem> getTiposGuardia(String idLenguaje,Short idInstitucion);
 	
+	@SelectProvider(type=ScsTipoasistenciaSqlExtendsProvider.class, method="getTiposGuardia2")
+    @Results({
+        @Result(column="IDTIPOASISTENCIA", property="value", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="DESCRIPCION", property="label", jdbcType=JdbcType.VARCHAR)
+    })
+	List<ComboItem> getTiposGuardia2(String idLenguaje,Short idInstitucion);
+	
 	@SelectProvider(type=ScsTipoasistenciaSqlExtendsProvider.class, method="updateTiposAsistencia")
     @Results({
         @Result(column="IDTIPOASISTENCIA", property="idtipoasistencia", jdbcType=JdbcType.DECIMAL, id=true),

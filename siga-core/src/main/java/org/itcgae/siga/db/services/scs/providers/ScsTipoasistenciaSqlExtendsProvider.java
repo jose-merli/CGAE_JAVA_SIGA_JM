@@ -32,6 +32,20 @@ public class ScsTipoasistenciaSqlExtendsProvider extends ScsTipoasistenciaSqlPro
 		return sql.toString();
 	}
 	
+	public String getTiposGuardia2(String idLenguaje,Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDTIPOGUARDIA as IDTIPOASISTENCIA");
+		sql.SELECT("'(' || GUARDIA.DESCRIPCION || ') ' || CATGUARDIA.DESCRIPCION AS DESCRIPCION");
+		sql.FROM("SCS_TIPOSGUARDIAS  GUARDIA");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catguardia on (catguardia.idrecurso = guardia.descripcion and catguardia.idlenguaje = '"+idLenguaje+"')");
+		sql.WHERE("FECHA_BAJA IS NULL");
+		sql.ORDER_BY("CATGUARDIA.DESCRIPCION");
+		
+		return sql.toString();
+	}
+	
 	public String updateTiposAsistencia(TiposAsistenciaItem tiposAsistenciasItem,Short idInstitucion) {
 
 		SQL sql = new SQL();

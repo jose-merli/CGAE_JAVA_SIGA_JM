@@ -208,6 +208,47 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 	}
 	
 	@Override
+	public ComboDTO getTiposGuardia2(HttpServletRequest request) {
+		LOGGER.info("getPartidoJudicial() -> Entrada al servicio para obtener combo partidos judiciales");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO combo = new ComboDTO();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getPartidoJudicial() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getPartidoJudicial() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getPartidoJudicial() / cenPartidojudicialExtendsMapper.getPartidosJudiciales() -> Entrada a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
+
+				List<ComboItem> comboItems = scsTipoasistenciaExtendsMapper.getTiposGuardia2(usuario.getIdlenguaje(),
+						idInstitucion);
+
+				LOGGER.info(
+						"getPartidoJudicial() / cenPartidojudicialExtendsMapper.getPartidosJudiciales() -> Salida a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
+
+				combo.setCombooItems(comboItems);
+			}
+
+		}
+		LOGGER.info("getPartidoJudicial() -> Salida del servicio para obtener combo partidos judiciales");
+		return combo;
+	}
+	
+	@Override
 	public ComboDTO getComboAsistencia(HttpServletRequest request) {
 		LOGGER.info("getPartidoJudicial() -> Entrada al servicio para obtener combo partidos judiciales");
 
