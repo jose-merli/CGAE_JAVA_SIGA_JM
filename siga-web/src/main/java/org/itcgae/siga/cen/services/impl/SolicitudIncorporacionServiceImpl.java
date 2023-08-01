@@ -752,6 +752,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
+					String idTipoSolicitud;
 					
 					// Obtención del parámetro que indica si la comprobación del certificado está activa
 					GenParametrosKey key = new GenParametrosKey();
@@ -781,16 +782,24 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					
 					// Se comprobará el certificado de solicitud de incorporación si está activo y si el tipo de solicitud es
 					// ejerciente o no ejerciente
-					if ("1".equals(comprobarCertificado)
-							&& (solIncorporacion.getIdtipocolegiacion() == 10 || solIncorporacion.getIdtipocolegiacion() == 20)) {
+					if ("1".equals(comprobarCertificado) &&
+							(solIncorporacion.getIdtipocolegiacion() != 20 || solIncorporacion.getIdtipocolegiacion() != 50)) {
 						
-						// Consultamos si existe el certificado
-						String existeCertificado = _cenPersonaExtendsMapper.getCertificado(solIncorporacion.getNumeroidentificador(),
-								String.valueOf(solIncorporacion.getIdtipocolegiacion()), fechaControlExistenciaCNI);
+						if (solIncorporacion.getIdtiposolicitud() == 10 || solIncorporacion.getIdtiposolicitud() == 30 ) {
+							idTipoSolicitud = "20";
+						}else{
+							idTipoSolicitud = "10";
+						}
 						
-						// Si no existe certificado lanzamos una excepción indicando la descripción del error y se para el proceso
-						if (existeCertificado == null) {
-							throw new Exception(literalCertificadoNoValido);
+						if ("20".equals(idTipoSolicitud) && solIncorporacion.getIdtipocolegiacion() != 20) {
+							// Consultamos si existe el certificado
+							String existeCertificado = _cenPersonaExtendsMapper.getCertificado(solIncorporacion.getNumeroidentificador(),
+									idTipoSolicitud, fechaControlExistenciaCNI);
+							
+							// Si no existe certificado lanzamos una excepción indicando la descripción del error y se para el proceso
+							if (existeCertificado == null) {
+								throw new Exception(literalCertificadoNoValido);
+							}
 						}
 					}
 					
