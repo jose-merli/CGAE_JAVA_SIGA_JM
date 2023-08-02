@@ -1100,7 +1100,9 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 							idTipoSolicitud = "10";
 						}
 						
-						if ("20".equals(idTipoSolicitud) && solIncorporacion.getIdtipocolegiacion() != 20) {
+						if ("20".equals(idTipoSolicitud) && solIncorporacion.getIdtipocolegiacion() == 20) {
+							LOGGER.info("iniciarTramiteColegiacionEXEA() / Inscrito ejerciente, no se comprueba certificado");
+						} else {
 							// Consultamos si existe el certificado
 							String existeCertificado = _cenPersonaExtendsMapper.getCertificado(solIncorporacion.getNumeroidentificador(),
 									idTipoSolicitud, fechaControlExistenciaCNI);

@@ -753,6 +753,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
 					String idTipoSolicitud;
+					boolean inscritoEjerciente = false;
 					
 					// Obtención del parámetro que indica si la comprobación del certificado está activa
 					GenParametrosKey key = new GenParametrosKey();
@@ -791,7 +792,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 							idTipoSolicitud = "10";
 						}
 						
-						if ("20".equals(idTipoSolicitud) && solIncorporacion.getIdtipocolegiacion() != 20) {
+						if ("20".equals(idTipoSolicitud) && solIncorporacion.getIdtipocolegiacion() == 20) {
+							inscritoEjerciente = true;
+							aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request);
+						} else {
 							// Consultamos si existe el certificado
 							String existeCertificado = _cenPersonaExtendsMapper.getCertificado(solIncorporacion.getNumeroidentificador(),
 									idTipoSolicitud, fechaControlExistenciaCNI);
@@ -804,7 +808,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					}
 					
 					// Continuamos el proceso de aprobación de solicitud
-					aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request);
+					if (inscritoEjerciente != true) {
+						aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request);
+					}
 				}catch(Exception e){
 					LOGGER.error(e.getMessage());
 					error.setMessage(e.getMessage());
