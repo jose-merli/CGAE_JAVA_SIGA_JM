@@ -28,6 +28,7 @@ public class ScsRemesasExtendsProvider {
 
 	public String buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
+		SQL subquery0 = new SQL();
 		SQL subquery = new SQL();
 		SQL subquery1 = new SQL();
 		SQL subquery2 = new SQL();
@@ -43,6 +44,14 @@ public class ScsRemesasExtendsProvider {
 		SQL idestado = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
+		
+		subquery0.SELECT("fecharemesa");
+		subquery0.FROM("cajg_remesaestados est");
+		subquery0.WHERE("est.idinstitucion = rem.idinstitucion");
+		subquery0.WHERE("est.idremesa = rem.idremesa");
+		subquery0.WHERE("est.idestado = 0");
+		subquery0.WHERE("ROWNUM = 1");
+		
 		subquery.SELECT("fecharemesa");
 		subquery.FROM("cajg_remesaestados est");
 		subquery.WHERE("est.idinstitucion = rem.idinstitucion");
@@ -155,13 +164,14 @@ public class ScsRemesasExtendsProvider {
 		idestado.FROM("cajg_remesaestados est2");
 		idestado.WHERE("est2.idinstitucion = rem.idinstitucion");
 		idestado.WHERE("est2.idremesa = rem.idremesa");
-
+		
 		sql.SELECT("REM.IDREMESA IDREMESA");
 		sql.SELECT("REM.IDINSTITUCION IDINSTITUCION");
 		sql.SELECT("REM.PREFIJO PREFIJO");
 		sql.SELECT("rem.numero NUMERO");
 		sql.SELECT("REM.SUFIJO SUFIJO");
 		sql.SELECT("rem.descripcion");
+		sql.SELECT("(" + subquery0.toString() + ") fecha_creacion");
 		sql.SELECT("(" + subquery.toString() + ") fecha_generacion");
 		sql.SELECT("(" + subquery1.toString() + ") fecha_envio");
 		sql.SELECT("(" + subquery2.toString() + ") fecha_recepcion");
@@ -235,11 +245,11 @@ public class ScsRemesasExtendsProvider {
 			sql.WHERE("exists (" + subquery8.toString() + ")"); // año deEJG
 		}
 
-		if(tamMaximo != null)
-			sql.WHERE("ROWNUM <= " + tamMaximo);
+		sql.ORDER_BY("FECHA_CREACION DESC");
 		
-		sql.ORDER_BY("FECHA_GENERACION DESC");
-
+		if(tamMaximo != null)
+		sql.FETCH_FIRST_ROWS_ONLY(tamMaximo);
+		
 		LOGGER.info(sql.toString());
 
 		return sql.toString();
