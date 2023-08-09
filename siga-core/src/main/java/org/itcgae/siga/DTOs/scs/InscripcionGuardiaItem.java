@@ -9,7 +9,7 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 	private String orden;
 	private String nColegiado;
 	private String fechaValidacion;
-	private String fechabaja;
+	private String fechaBaja;
 	private String compensaciones;
 	private String saltos;
 	private String apellido1;
@@ -30,7 +30,7 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 	private String observacionesvalidacion;
 	private Date fechadenegacion;
 	private String observacionesdenegacion;
-	private Date fechaBaja;
+	private Date fechabaja;
 	private String observacionesvalbaja;
 	// Atributos calculados
 	private String	estado;
@@ -42,7 +42,7 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 	private String fechaFin;
 	
 	public InscripcionGuardiaItem(String numeroGrupo, String idGrupoGuardiaColegiado, String orden, String nColegiado,
-			String fechaValidacion, String fechabaja, String compensaciones, String saltos, String apellido1,
+			String fechaValidacion, Date fechabaja, String compensaciones, String saltos, String apellido1,
 			String apellido2, String nombre, String idPersona, String ordenCola, String idTurno, String idGuardia,
 			String idGrupoGuardia, Date fechaSuscripcion, Date fechamodificacion, Integer usumodificacion,
 			String observacionessuscripcion, String observacionesbaja, Date fechasolicitudbaja, Date fechavalidacion2,
@@ -162,11 +162,11 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 	public void setFechaValidacion(String fechaValidacion) {
 		this.fechaValidacion = fechaValidacion;
 	}
-	public String getFechabaja() {
-		return fechabaja;
+	public String getFechaBaja() {
+		return fechaBaja;
 	}
-	public void setFechabaja(String fechabaja) {
-		this.fechabaja = fechabaja;
+	public void setFechaBaja(String fechaBaja) {
+		this.fechaBaja = fechaBaja;
 	}
 	public String getCompensaciones() {
 		return compensaciones;
@@ -326,11 +326,11 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 	}
 	
 
-	public Date getFechaBaja() {
-		return fechaBaja;
+	public Date getFechabaja() {
+		return fechabaja;
 	}
-	public void setFechaBaja(Date fechaBaja) {
-		this.fechaBaja = fechaBaja;
+	public void setFechabaja(Date fechabaja) {
+		this.fechabaja = fechabaja;
 	}
 	/**
 	 * @return the observacionesvalbaja

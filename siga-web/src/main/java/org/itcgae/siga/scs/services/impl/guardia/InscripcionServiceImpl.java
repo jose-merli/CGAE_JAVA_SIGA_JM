@@ -63,10 +63,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class InscripcionServiceImpl implements InscripcionService {
 
+	private final String VALIDACION_ALTA = "Validacion Alta";
 	private final String VALIDACION_BAJA = "Validacion Baja";
 	private final String DENEGACION = "Denegacion";
-	private final String SOLICITUD_DE_ALTA = "Solicitud de Alta";
-	private final String SOLICITUD_DE_BAJA = "Solicitud de Baja";
+	private final String SOLICITUD_DE_ALTA = "Solicitud Alta";
+	private final String SOLICITUD_DE_BAJA = "Solicitud Baja";
 	private final String SOLICITUD = "Solicitud";
 
 	private Logger LOGGER = Logger.getLogger(InscripcionServiceImpl.class);
@@ -1210,8 +1211,25 @@ public class InscripcionServiceImpl implements InscripcionService {
 							
 							HistoricoInscripcionItem solicitud = new HistoricoInscripcionItem();
 							solicitud.setFecha(fecha);
-							solicitud.setAccion(SOLICITUD);
+							solicitud.setAccion(SOLICITUD_DE_ALTA);
 							solicitud.setObservacion(inscripcionesGuardiaItems.get(0).getObservacionessuscripcion());
+							inscripcionHistoricaItems.add(solicitud);
+							cont++;
+						}
+						
+						if (inscripcionesGuardiaItems.get(0).getFechavalidacion() != null) {
+
+							DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+							long ts = (inscripcionesGuardiaItems.get(0).getFechavalidacion()).getTime();
+							Calendar calendar = Calendar.getInstance();
+							calendar.setTimeInMillis(ts);
+							String fecha = formatter.format(calendar.getTime());
+
+							HistoricoInscripcionItem solicitud = new HistoricoInscripcionItem();
+							solicitud.setFecha(fecha);
+							solicitud.setAccion(VALIDACION_ALTA);
+							solicitud.setObservacion(inscripcionesGuardiaItems.get(0).getObservacionesvalidacion());
 							inscripcionHistoricaItems.add(solicitud);
 							cont++;
 						}
@@ -1233,19 +1251,21 @@ public class InscripcionServiceImpl implements InscripcionService {
 							cont++;
 						}
 
-						if (inscripcionesGuardiaItems.get(0).getFechavalidacion() != null) {
+
+						if (inscripcionesGuardiaItems.get(0).getFechabaja() != null) {
 
 							DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-							long ts = (inscripcionesGuardiaItems.get(0).getFechavalidacion()).getTime();
+							long ts = (inscripcionesGuardiaItems.get(0).getFechabaja()).getTime();
+
 							Calendar calendar = Calendar.getInstance();
 							calendar.setTimeInMillis(ts);
 							String fecha = formatter.format(calendar.getTime());
 
 							HistoricoInscripcionItem solicitud = new HistoricoInscripcionItem();
 							solicitud.setFecha(fecha);
-							solicitud.setAccion(SOLICITUD_DE_ALTA);
-							solicitud.setObservacion(inscripcionesGuardiaItems.get(0).getObservacionesvalidacion());
+							solicitud.setAccion(VALIDACION_BAJA);
+							solicitud.setObservacion(inscripcionesGuardiaItems.get(0).getObservacionesvalbaja());
 							inscripcionHistoricaItems.add(solicitud);
 							cont++;
 						}
@@ -1263,24 +1283,6 @@ public class InscripcionServiceImpl implements InscripcionService {
 							solicitud.setFecha(fecha);
 							solicitud.setAccion(DENEGACION);
 							solicitud.setObservacion(inscripcionesGuardiaItems.get(0).getObservacionesdenegacion());
-							inscripcionHistoricaItems.add(solicitud);
-							cont++;
-						}
-
-						if (inscripcionesGuardiaItems.get(0).getFechaBaja() != null) {
-
-							DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-							long ts = (inscripcionesGuardiaItems.get(0).getFechaBaja()).getTime();
-
-							Calendar calendar = Calendar.getInstance();
-							calendar.setTimeInMillis(ts);
-							String fecha = formatter.format(calendar.getTime());
-
-							HistoricoInscripcionItem solicitud = new HistoricoInscripcionItem();
-							solicitud.setFecha(fecha);
-							solicitud.setAccion(VALIDACION_BAJA);
-							solicitud.setObservacion(inscripcionesGuardiaItems.get(0).getObservacionesvalbaja());
 							inscripcionHistoricaItems.add(solicitud);
 							cont++;
 						}

@@ -1329,6 +1329,8 @@ public class SigaConstants {
 	public static final String IT_TIPO = "TIPO";
 	public static final String IT_GRUPO = "GRUPO";
 	public static final String IT_ORDEN = "ORDEN";
+	public static final String IT_OBSERVACIONES_SOL = "OBSERVACIONES SOLICITUD";
+	public static final String IT_OBSERVACIONES_VAL = "OBSERVACIONES VALIDACION";
 
 	public static final String nombreFicheroModeloIT = "PlantillaMasivaDatosIT";
 
@@ -1336,7 +1338,7 @@ public class SigaConstants {
 			IT_FECHAEFECTIVA, IT_TIPO, IT_GRUPO, IT_ORDEN);
 	
 	public static final List<String> CAMPOSMODEL_ITOFICIO = Arrays.asList(IT_TURNO, IT_NCOLEGIADO,
-			IT_FECHAEFECTIVA, IT_TIPO);
+			IT_FECHAEFECTIVA, IT_TIPO, IT_OBSERVACIONES_SOL, IT_OBSERVACIONES_VAL);
 	
 	public static final List<String> CAMPOSLOGIT = Arrays.asList(IT_TURNO, IT_GUARDIA, IT_NCOLEGIADO, IT_FECHAEFECTIVA,
 			IT_TIPO, IT_GRUPO, IT_ORDEN, ERRORES);
@@ -1397,11 +1399,13 @@ public class SigaConstants {
 		public static final String TIPO = "TIPO";
 		public static final String GRUPO = "GRUPO";
 		public static final String ORDEN = "ORDEN";
+		public static final String OBSERVACIONES_SOL = "OBSERVACIONES SOLICITUD";
+		public static final String OBSERVACIONES_VAL = "OBSERVACIONES VALIDACION";
 
 		public static final String nombreFicheroModeloI = "PlantillaMasivaDatosI";
 
 		public static final List<String> CAMPOSMODEL_I = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
-				FECHAEFECTIVA, TIPO, GRUPO, ORDEN);
+				FECHAEFECTIVA, TIPO, GRUPO, ORDEN, OBSERVACIONES_SOL, OBSERVACIONES_VAL);
 		public static final List<String> CAMPOSLOGI = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO, FECHAEFECTIVA,
 				TIPO, GRUPO, ORDEN, ERRORES);
 		// CARGA MASIVA GRUPOS COLA - Guardia

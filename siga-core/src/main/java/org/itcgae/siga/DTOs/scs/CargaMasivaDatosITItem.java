@@ -16,6 +16,8 @@ public class CargaMasivaDatosITItem {
 	private String idGuardia;
 	private String idPersona;
 	private String errores;
+	private String obsVal;
+	private String obsSol;
 	
 	
 	public String getErrores() {
@@ -89,6 +91,18 @@ public class CargaMasivaDatosITItem {
 	}
 	public void setOrden(String orden) {
 		this.orden = orden;
+	}
+	public String getObsVal() {
+		return obsVal;
+	}
+	public void setObsVal(String obsVal) {
+		this.obsVal = obsVal;
+	}
+	public String getObsSol() {
+		return obsSol;
+	}
+	public void setObsSol(String obsSol) {
+		this.obsSol = obsSol;
 	}
 	
 }
