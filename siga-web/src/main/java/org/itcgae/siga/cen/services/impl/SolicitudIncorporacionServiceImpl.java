@@ -1709,14 +1709,19 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
 				datosColegiales.setFechaestado(solicitud.getFechaestado());
 				datosColegiales.setFechamodificacion(new Date());
-				if (null != solicitud.getIdtiposolicitud()) {
-					if (solicitud.getIdtiposolicitud() == 10 || solicitud.getIdtiposolicitud() == 30 ) {
-						datosColegiales.setIdestado(Short.valueOf("20"));
+				if (solicitud.getFechaestadocolegial().before(new Date())) {
+					if (null != solicitud.getIdtiposolicitud()) {
+						if (solicitud.getIdtiposolicitud() == 10 || solicitud.getIdtiposolicitud() == 30 ) {
+							datosColegiales.setIdestado(Short.valueOf("20"));
+						}else{
+							datosColegiales.setIdestado(Short.valueOf("10"));
+						}
 					}else{
 						datosColegiales.setIdestado(Short.valueOf("10"));
 					}
-				}else{
-					datosColegiales.setIdestado(Short.valueOf("10"));
+				}
+				else {
+					datosColegiales.setIdestado(Short.valueOf("70")); // Nuevo valor en caso incorporacion sea en el futuro
 				}
 				if(solicitud.getResidente().equals("1")) {
 					datosColegiales.setSituacionresidente("1");

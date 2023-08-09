@@ -55,7 +55,21 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.SELECT_DISTINCT("nvl(decode(nvl(col.comunitario,0),0, col.ncolegiado, col.ncomunitario), col.ncolegiado) as numcolegiado");
 			sql.SELECT_DISTINCT("colest.idestado as situacion");
 			sql.SELECT_DISTINCT("colest.fechaestado as fechaestado");
-			sql.SELECT("decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitación','50','Suspensión Ejercicio','60','Baja por Deceso','Baja por Deceso') AS estadoColegial");
+			sql.SELECT("CASE colest.IDESTADO \r\n"
+					+ "			WHEN 10 \r\n"
+					+ "			THEN 'No Ejerciente'\r\n"
+					+ "			WHEN 20\r\n"
+					+ "			THEN 'Ejerciente'\r\n"
+					+ "			WHEN 30\r\n"
+					+ "			THEN 'Baja Colegial'\r\n"
+					+ "			WHEN 40\r\n"
+					+ "			THEN 'Inhabilitación'\r\n"
+					+ "			WHEN 50\r\n"
+					+ "			THEN 'Suspensión Ejercicio'\r\n"
+					+ "			WHEN 60\r\n"
+					+ "			THEN 'Baja por Deceso'\r\n"
+					+ "			ELSE 'Sin estado'\r\n"
+					+ "		END estadoColegial");
 			sql.SELECT_DISTINCT("col.situacionresidente as situacionresidente");
 
 			sql.SELECT_DISTINCT(
@@ -86,8 +100,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
-						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
-						+ " and datcol.fechaestado < sysdate))");
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
 		
 		if (colegiadoItem.getIdgrupo() != null && colegiadoItem.getIdgrupo().length > 0) {
 		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
@@ -136,7 +149,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			}
 		}
 		
-		sql.WHERE("per.idtipoidentificacion not in '20'");
+		//sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		if (colegiadoItem.getNif() != null && colegiadoItem.getNif() != "") {
 			sql.WHERE("upper(per.nifcif) like upper('%" + colegiadoItem.getNif() + "%')");
@@ -463,8 +476,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
-						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
-						+ " and datcol.fechaestado < sysdate))");
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
 		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
 		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
 		sql.LEFT_OUTER_JOIN(
@@ -497,7 +509,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 				
 			}
 		}
-		sql.WHERE("per.idtipoidentificacion not in '20'");
+		//sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		
 		if (colegiadoItem.getIdPersona() != null && colegiadoItem.getIdPersona() != "") {
@@ -880,7 +892,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 
-		sql.WHERE("per.idtipoidentificacion not in '20'");
+		//sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		sql.WHERE("per.idpersona = '" + idPersona + "'");
 
@@ -993,7 +1005,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 				
 		}
 		
-		sql.WHERE("per.idtipoidentificacion not in '20'");
+		//sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		if (colegiadoItem.getNif() != null && colegiadoItem.getNif() != "") {
 			sql.WHERE("upper(per.nifcif) like upper('%" + colegiadoItem.getNif() + "%')");
@@ -1194,8 +1206,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 //				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");		
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
-						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
-						+ " and datcol.fechaestado < sysdate))");
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
 		
 		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
 		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"
@@ -1233,8 +1244,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 //				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");		
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
-						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
-						+ " and datcol.fechaestado < sysdate))");
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
 		
 		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
 		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"
