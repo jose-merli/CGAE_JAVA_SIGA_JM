@@ -902,7 +902,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					}	
 					
 					envDestinatariosBurosms.setIdsolicitudecos(idSolicitudEcos);
-					envDestinatariosBurosms.setIddocumento(envDocumentos.getIddocumento());
+					envDestinatariosBurosms.setIddocumento(Short.valueOf(envDocumentos.getIddocumento().toString()));
 					
 					buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);	
 					}
