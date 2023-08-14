@@ -1837,7 +1837,7 @@ public abstract class ProcesoFacPyS {
 
                     documentoBean.setIdinstitucion(destBean.getIdinstitucion());
                     documentoBean.setIdenvio(destBean.getIdenvio());
-                    documentoBean.setIddocumento(idDoc.shortValue());
+                    documentoBean.setIddocumento(idDoc.longValue());
                     documentoBean.setPathdocumento(doc.getDocumento().getName());
                     documentoBean.setDescripcion(doc.getDescripcion());
                     doc.setBeanAsociado(documentoBean);
