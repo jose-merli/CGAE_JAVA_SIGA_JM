@@ -1111,7 +1111,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						if (inscripcionesItem.getValidarinscripciones().equals("S")) {
 							
 							inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
-							inscripcionturno.setFechasolicitudbaja(new Date());
+							inscripcionturno.setFechasolicitudbaja(inscripcionesItem.getFechasolicitudbaja());
 							inscripcionturno.setFechamodificacion(new Date());
 							inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 							
@@ -1127,7 +1127,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								for (ScsInscripcionguardia guardia : guardias) {
 									if (guardia.getFechadenegacion() == null) {
 										guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
-										guardia.setFechasolicitudbaja(new Date());
+										guardia.setFechasolicitudbaja(inscripcionesItem.getFechasolicitudbaja());
 										guardia.setFechamodificacion(new Date());
 										guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
 
