@@ -93,7 +93,8 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 				+ "     || perso.apellidos2"
 				+ "     || ','"
 				+ "     || perso.nombre colegiado,"
-				+ "coleg.ncolegiado numeroColegiado");
+				+ "coleg.ncolegiado numeroColegiado, "
+				+ "guard.comensustitucion");
 		
 				sql.FROM(" scs_cabeceraguardias guard,"
 						+ "    cen_persona perso,"

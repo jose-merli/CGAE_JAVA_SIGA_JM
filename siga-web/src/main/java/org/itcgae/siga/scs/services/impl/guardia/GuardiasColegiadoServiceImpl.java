@@ -1102,6 +1102,8 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 		for (ScsPermutaguardias permuta: permutaComoConfirmador){
 			if (permuta.getFechaconfirmacion() != null) {
 				permuta.setIdpersonaConfirmador(newLetrado);
+				//numero mayor al más alto de las permutas por ahora
+				permuta.setNumero(Long.valueOf(scsPermutaguardiasExtendsMapper.maxIdPermutaGuardia(String.valueOf(idInstitucion)))+1);
 				scsPermutaguardiasMapper.insert(permuta);
 			}
 		}
