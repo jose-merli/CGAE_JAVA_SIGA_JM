@@ -1203,15 +1203,8 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         }catch(Exception e){
             LOGGER.error("iniciarTramiteColegiacionEXEA() / ERROR: " + e.getMessage(), e);
             error.setCode(500);
-            
-            if (e.getMessage().contains("certif")) {
-            	error.setMessage(e.getMessage().toString());
-                error.description(e.getMessage().toString());
-            } else {
-            	error.setMessage("Error al iniciar el tramite de colegiacion por EXEA");
-                error.description("Error al iniciar el tramite de colegiacion por EXEA");
-            }
-            
+            error.setMessage("Error al iniciar el tramite de colegiacion por EXEA");
+            error.description("Error al iniciar el tramite de colegiacion por EXEA");
             updateResponseDTO.setStatus(SigaConstants.KO);
             updateResponseDTO.setError(error);
         }
