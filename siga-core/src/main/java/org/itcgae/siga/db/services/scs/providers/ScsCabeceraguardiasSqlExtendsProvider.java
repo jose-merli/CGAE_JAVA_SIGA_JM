@@ -143,6 +143,8 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
                         + " AND "
                         + "guard.fecha_fin <= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR') )");
 			}
+			
+			sql.ORDER_BY("fechainicio DESC");
 
 			SQL_PADRE.SELECT(" *");
 			SQL_PADRE.FROM("( " + sql.toString() + " )");
