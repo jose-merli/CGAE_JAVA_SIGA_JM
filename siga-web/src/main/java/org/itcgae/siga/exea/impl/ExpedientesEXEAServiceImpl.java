@@ -1062,7 +1062,6 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                 	String idSolicitud = data.split("/")[0];
                     String asunto = data.split("/")[1];
                     
-                    // Obtención del parámetro que indica si la comprobación del certificado está activa
                 	GenParametrosKey key = new GenParametrosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setModulo(SigaConstants.MODULO_CENSO);
@@ -1071,7 +1070,6 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 					
 					String comprobarCertificado = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
 					
-					// Obtención del parámetro que informa la fecha de control de la existencia CNI
 					key = new GenParametrosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setModulo(SigaConstants.MODULO_CENSO);
@@ -1080,24 +1078,18 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 					
 					String fechaControlExistenciaCNI = genParametro == null || genParametro.getValor() == null ? "01/08/2007" : genParametro.getValor();
 					
-					// Obtenemos los datos de la solicitud
 					CenSolicitudincorporacion solIncorporacion;
 					solIncorporacion = cenSolicitudincorporacionExtendsMapper.selectByPrimaryKey(Long.valueOf(idSolicitud));
 					
-					// Preparamos los literales de para informar el error en formato multiidioma
 					String literalCertificadoNoValido = getTraduccionLiteral("censo.solicitudIncorporacion.ficha.errorCertificado",
 							usuarios.get(0).getIdlenguaje());
 					
-					// Se comprobará el certificado de solicitud de incorporación si está activo y si el tipo de solicitud es
-					// ejerciente o no ejerciente
 					if ("1".equals(comprobarCertificado)
 							&& (solIncorporacion.getIdtipocolegiacion() == 10 || solIncorporacion.getIdtipocolegiacion() == 20)) {
 						
-						// Consultamos si existe el certificado
 						String existeCertificado = _cenPersonaExtendsMapper.getCertificado(solIncorporacion.getNumeroidentificador(),
 								String.valueOf(solIncorporacion.getIdtipocolegiacion()), fechaControlExistenciaCNI);
 						
-						// Si no existe certificado lanzamos una excepción indicando la descripción del error y se para el proceso
 						if (existeCertificado == null) {
 							throw new Exception(literalCertificadoNoValido);
 						}

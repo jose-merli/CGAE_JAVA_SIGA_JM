@@ -753,7 +753,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
 					
-					// Obtención del parámetro que indica si la comprobación del certificado está activa
 					GenParametrosKey key = new GenParametrosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setModulo(SigaConstants.MODULO_CENSO);
@@ -762,7 +761,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					
 					String comprobarCertificado = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
 	
-					// Obtención del parámetro que informa la fecha de control de la existencia CNI
 					key = new GenParametrosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setModulo(SigaConstants.MODULO_CENSO);
@@ -771,30 +769,23 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					
 					String fechaControlExistenciaCNI = genParametro == null || genParametro.getValor() == null ? "01/08/2007" : genParametro.getValor();
 					
-					// Obtenemos los datos de la solicitud
 					CenSolicitudincorporacion solIncorporacion;
 					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
 					
-					// Preparamos los literales de para informar el error en formato multiidioma
 					String literalCertificadoNoValido = getTraduccionLiteral("censo.solicitudIncorporacion.ficha.errorCertificado",
 							usuarios.get(0).getIdlenguaje());
 					
-					// Se comprobará el certificado de solicitud de incorporación si está activo y si el tipo de solicitud es
-					// ejerciente o no ejerciente
 					if ("1".equals(comprobarCertificado)
 							&& (solIncorporacion.getIdtipocolegiacion() == 10 || solIncorporacion.getIdtipocolegiacion() == 20)) {
 						
-						// Consultamos si existe el certificado
 						String existeCertificado = _cenPersonaExtendsMapper.getCertificado(solIncorporacion.getNumeroidentificador(),
 								String.valueOf(solIncorporacion.getIdtipocolegiacion()), fechaControlExistenciaCNI);
 						
-						// Si no existe certificado lanzamos una excepción indicando la descripción del error y se para el proceso
 						if (existeCertificado == null) {
 							throw new Exception(literalCertificadoNoValido);
 						}
 					}
 					
-					// Continuamos el proceso de aprobación de solicitud
 					aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request);
 				}catch(Exception e){
 					LOGGER.error(e.getMessage());

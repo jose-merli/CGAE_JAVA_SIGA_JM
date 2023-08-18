@@ -638,7 +638,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 				+ "                     OR pp.codigoext LIKE 'CA%'"
 				+ "                     OR pp.codigoext LIKE 'NE%' ) ) )");
 
-		sqlFinal = "SELECT MAX(fecha) FROM (" + sql1.toString() + " UNION " + sql2.toString() + ")";
+		sqlFinal = sql1.toString() + " UNION " + sql2.toString();
 		
 		return sqlFinal;
 	}
