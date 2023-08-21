@@ -5272,10 +5272,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		letradoSaliente.setObservaciones(item[4]);
 		letradoSaliente.setIdtipomotivo(Short.parseShort(item[5]));
 		if (item[6] != null) {
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(Long.parseLong(item[6]));
-			letradoSaliente.setFechadesigna(formatter.parse(formatter.format(calendar.getTime())));
+			
+			SimpleDateFormat formattter = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+			if(item[6].length() !=10) {
+				String date = item[6].substring(0, 10);
+				letradoSaliente.setFechadesigna(formattter.parse(date));
+			} else {
+				String date = item[6].substring(0,10);
+				letradoSaliente.setFechadesigna(format.parse(date));
+			}
+			
+			
 		}
 		if (item[7] != null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
