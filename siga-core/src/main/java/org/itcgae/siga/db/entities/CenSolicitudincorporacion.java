@@ -1246,5 +1246,32 @@ public class CenSolicitudincorporacion {
 	public void setNumExpediente(String numExpediente) {
 		this.numExpediente = numExpediente;
 	}
+
+	@Override
+	public String toString() {
+		return "CenSolicitudincorporacion [idsolicitud=" + idsolicitud + ", fechasolicitud=" + fechasolicitud
+				+ ", idtratamiento=" + idtratamiento + ", nombre=" + nombre + ", apellido1=" + apellido1
+				+ ", apellido2=" + apellido2 + ", numeroidentificador=" + numeroidentificador + ", domicilio="
+				+ domicilio + ", codigopostal=" + codigopostal + ", telefono1=" + telefono1 + ", correoelectronico="
+				+ correoelectronico + ", idinstitucion=" + idinstitucion + ", idestado=" + idestado
+				+ ", idtiposolicitud=" + idtiposolicitud + ", idtipocolegiacion=" + idtipocolegiacion
+				+ ", fechamodificacion=" + fechamodificacion + ", usumodificacion=" + usumodificacion
+				+ ", fechanacimiento=" + fechanacimiento + ", idtipoidentificacion=" + idtipoidentificacion
+				+ ", idprovincia=" + idprovincia + ", idpoblacion=" + idpoblacion + ", fechaestado=" + fechaestado
+				+ ", ncolegiado=" + ncolegiado + ", telefono2=" + telefono2 + ", movil=" + movil + ", fax1=" + fax1
+				+ ", fax2=" + fax2 + ", observaciones=" + observaciones + ", idestadocivil=" + idestadocivil
+				+ ", idpais=" + idpais + ", naturalde=" + naturalde + ", sexo=" + sexo + ", poblacionextranjera="
+				+ poblacionextranjera + ", idmodalidaddocumentacion=" + idmodalidaddocumentacion
+				+ ", fechaestadocolegial=" + fechaestadocolegial + ", titular=" + titular + ", codigosucursal="
+				+ codigosucursal + ", cboCodigo=" + cboCodigo + ", digitocontrol=" + digitocontrol + ", numerocuenta="
+				+ numerocuenta + ", abonosjcs=" + abonosjcs + ", abonocargo=" + abonocargo + ", residente=" + residente
+				+ ", idpersona=" + idpersona + ", fechaalta=" + fechaalta + ", idpersonatemp=" + idpersonatemp
+				+ ", iddirecciontemp=" + iddirecciontemp + ", iban=" + iban + ", fechaestadosolicitud="
+				+ fechaestadosolicitud + ", nombrebanco=" + nombrebanco + ", bic=" + bic + ", numRegistro="
+				+ numRegistro + ", claveconsultaregtel=" + claveconsultaregtel + ", numExpediente=" + numExpediente
+				+ "]";
+	}
+	
+	
 	
 }
