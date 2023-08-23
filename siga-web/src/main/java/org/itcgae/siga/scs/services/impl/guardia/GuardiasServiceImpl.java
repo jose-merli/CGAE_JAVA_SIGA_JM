@@ -12456,15 +12456,16 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	private void setEstadoGuardiaCol(Short idInstitucion, GuardiasItem guardiaCol) {
 		if (guardiaCol.getFechadesde() != null && guardiaCol.getFechadesde().after(new Date())) {
-			guardiaCol.setEstadoGuardia("Pendiente de Realizar.");
+			guardiaCol.setEstadoGuardia("dato.jgr.guardiacolegiado.estadoguardia.pendienterealizar");
 		}
 
-		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date()))) {
-			guardiaCol.setEstadoGuardia("Realizada y no validada.");
+		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date()))
+				/*&& (guardiaCol.getValidada().equals("0") || guardiaCol.getValidada()==null)*/) {
+			guardiaCol.setEstadoGuardia("dato.jgr.guardiacolegiado.estadoguardia.realizadanovalidada");
 		}
 
 		if (guardiaCol.getFechadesde() != null && guardiaCol.getValidada()!=null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date())) && guardiaCol.getValidada().equals("1")) {
-			guardiaCol.setEstadoGuardia("Realizada y validada.");
+			guardiaCol.setEstadoGuardia("dato.jgr.guardiacolegiado.estadoguardia.realizadavalidada");
 		}
 		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) ||
 				guardiaCol.getFechadesde().equals(new Date())) &&
@@ -12478,7 +12479,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	
 				List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper.selectByExample(facturacionExample);
 				if (facturas!=null && !facturas.isEmpty()) {
-					guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
+					guardiaCol.setEstadoGuardia("dato.jgr.guardiacolegiado.estadoguardia.facturada*" + facturas.get(0).getNombre());
 				}
 			}
 
