@@ -6,7 +6,7 @@ public class EJGRemesaItem {
 	private int idInstitucion;
 	private String turnoGuardiaEJG;
 	private int anioEJG;
-	private int numeroEJG;
+	private String numeroEJG;
 	private String estadoEJG;
 	private String solicitante;
 	private int nuevaRemesa;
@@ -65,11 +65,11 @@ public class EJGRemesaItem {
 		this.anioEJG = anioEJG;
 	}
 	
-	public int getNumeroEJG() {
+	public String getNumeroEJG() {
 		return numeroEJG;
 	}
 	
-	public void setNumeroEJG(int numeroEJG) {
+	public void setNumeroEJG(String numeroEJG) {
 		this.numeroEJG = numeroEJG;
 	}
 	
