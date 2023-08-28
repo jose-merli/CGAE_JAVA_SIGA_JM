@@ -188,6 +188,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	
 	@Autowired
 	private CenColegiadoMapper cenColegiadoMapper;
+	
+	@Autowired
+	private ScsEjgMapper scsEjgMapper;
 
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
@@ -3949,7 +3952,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						"asociarEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty() && !UtilidadesString.esCadenaVacia(anioNumero)) {
-
+					//Consulta a SCS_EJG para recuperar su informacion correctamente, puede que traiga el NUMERO con el valor de NUMEJG y no coincidan en valor ambos
+					ScsEjgExample scsEjgExample = new ScsEjgExample();
+					scsEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andAnioEqualTo(Short.valueOf(ejg.getAnnio()))
+						.andNumejgEqualTo(ejg.getNumero())
+						.andIdtipoejgEqualTo(Short.valueOf(ejg.getTipoEJG()));
+					
+					ScsEjg ejg2 = scsEjgMapper.selectByExample(scsEjgExample).get(0);
+					
 					ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
 					scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
 					scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
@@ -3957,9 +3968,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
 
 					if (scsAsistencia != null && ejg != null) {
-						scsAsistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
-						scsAsistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
-						scsAsistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
+						scsAsistencia.setEjganio(ejg2.getAnio());
+						scsAsistencia.setEjgnumero(ejg2.getNumero());
+						scsAsistencia.setEjgidtipoejg(ejg2.getIdtipoejg());
 						scsAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
 						scsAsistencia.setFechamodificacion(new Date());
 						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);

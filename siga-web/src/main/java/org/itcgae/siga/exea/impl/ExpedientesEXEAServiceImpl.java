@@ -1894,8 +1894,13 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         idiomaElement.appendChild(doc.createTextNode("es"));
         detallesElement.appendChild(idiomaElement);
 
-        Element emailElement = doc.createElement("emailContacto");
-        emailElement.appendChild(doc.createTextNode(solicitudincorporacion.getCorreoelectronico()));
+        Element emailElement = doc.createElement("emailContacto");//poner logger
+        LOGGER.info(solicitudincorporacion.toString());
+        if(solicitudincorporacion.getCorreoelectronico()!=null) {
+        	emailElement.appendChild(doc.createTextNode(solicitudincorporacion.getCorreoelectronico()));
+        }else {
+        	emailElement.appendChild(doc.createTextNode(""));
+        }
         detallesElement.appendChild(emailElement);
 
         //Ya no se pasa

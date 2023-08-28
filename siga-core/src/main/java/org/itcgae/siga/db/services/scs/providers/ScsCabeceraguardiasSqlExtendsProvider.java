@@ -169,6 +169,7 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		if (record.getFechavalidacion() != null) {
 			sql.SET("FECHAVALIDACION =  TO_DATE('" + fechavalidacion + "', 'DD/MM/RRRR')");
 		}
+		sql.SET("VALIDADO = 1");
 		
 		sql.WHERE("IDINSTITUCION = '" + record.getIdinstitucion() + "'");
 		sql.WHERE("IDTURNO = " + record.getIdturno());
@@ -186,6 +187,7 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		sql.UPDATE("SCS_CABECERAGUARDIAS");
 		
 		sql.SET("FECHAVALIDACION =  null");
+		sql.SET("VALIDADO = 0");
 		
 		sql.WHERE("IDINSTITUCION = '" + record.getIdinstitucion() + "'");
 		sql.WHERE("IDTURNO = " + record.getIdturno());

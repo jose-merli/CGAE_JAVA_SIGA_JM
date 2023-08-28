@@ -1176,18 +1176,12 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								response = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
 	                        	}
 							}
-
 						}
-						
 
-
-						
 						LOGGER.info(
 								"updateSolicitarBaja() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 					}
-				}
-
-				catch (Exception e) {
+				}catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
@@ -1211,9 +1205,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				updateResponseDTO.setError(error);
 
 				LOGGER.info("updateSolicitarBaja() -> Salida del servicio para solicitar baja en una inscripcion");
-
 			}
-
 		}
 
 		return updateResponseDTO;
