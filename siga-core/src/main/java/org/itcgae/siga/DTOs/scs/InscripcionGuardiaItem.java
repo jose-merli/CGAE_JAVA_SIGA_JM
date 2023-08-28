@@ -40,6 +40,7 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 	//Atributos Auxiliares
 	private String fechaIni;
 	private String fechaFin;
+	private int posicion;
 	
 	public InscripcionGuardiaItem(String numeroGrupo, String idGrupoGuardiaColegiado, String orden, String nColegiado,
 			String fechaValidacion, Date fechabaja, String compensaciones, String saltos, String apellido1,
@@ -600,6 +601,14 @@ public class InscripcionGuardiaItem implements Comparable<InscripcionGuardiaItem
 
 	public void setFechaFin(String fechaFin) {
 		this.fechaFin = fechaFin;
+	}
+
+	public int getPosicion() {
+		return posicion;
+	}
+
+	public void setPosicion(int posicion) {
+		this.posicion = posicion;
 	}
 
 

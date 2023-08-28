@@ -23,6 +23,7 @@ public class CargaMasivaDatosGuardiatem {
 	private String grupo;
 	private String orden;
 	private String errores;
+	private String posicion;
 	
 	
 	public String getnColegiado() {
@@ -120,6 +121,12 @@ public class CargaMasivaDatosGuardiatem {
 	}
 	public void setNombreGuardia(String nombreGuardia) {
 		this.nombreGuardia = nombreGuardia;
+	}
+	public String getPosicion() {
+		return posicion;
+	}
+	public void setPosicion(String posicion) {
+		this.posicion = posicion;
 	}
 
 }
