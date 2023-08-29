@@ -37,7 +37,7 @@ public class ScsTipoasistenciaSqlExtendsProvider extends ScsTipoasistenciaSqlPro
 		SQL sql = new SQL();
 
 		sql.SELECT("IDTIPOGUARDIA as IDTIPOASISTENCIA");
-		sql.SELECT("'(' || GUARDIA.DESCRIPCION || ') ' || CATGUARDIA.DESCRIPCION AS DESCRIPCION");
+		sql.SELECT("'(' || GUARDIA.CODIGO || ') ' || CATGUARDIA.DESCRIPCION AS DESCRIPCION");
 		sql.FROM("SCS_TIPOSGUARDIAS  GUARDIA");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catguardia on (catguardia.idrecurso = guardia.descripcion and catguardia.idlenguaje = '"+idLenguaje+"')");
 		sql.WHERE("FECHA_BAJA IS NULL");
