@@ -791,6 +791,10 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			ejgRemesaItems = scsRemesasExtendsMapper.getEJGRemesa(remesasItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 
 			for (int i = 0; i < ejgRemesaItems.size(); i++) {
+				 // le ponemos 0 al principio hasta completar los 5 digitos que son los requeridos
+				while(ejgRemesaItems.get(i).getNumeroEJG().length() < 5) {
+					ejgRemesaItems.get(i).setNumeroEJG("0" + ejgRemesaItems.get(i).getNumeroEJG());
+				}
 				String incidencias = ejgRemesaItems.get(i).getNumIncidencias() + "/"
 						+ ejgRemesaItems.get(i).getIncidenciasAntesEnvio() + "/"
 						+ ejgRemesaItems.get(i).getIncidenciasDespuesEnvio() + "/"
