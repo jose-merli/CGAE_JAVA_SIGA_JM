@@ -2378,7 +2378,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										"Calendario generado automáticamente desde Cargas Masivas.");
 
 								guardiasCalendarioItem3.setUsumodificacion(usuario.getIdusuario().toString());
-								guardiasCalendarioItem3 = guardiasServiceImpl.crearCalendario3(guardiasCalendarioItem3); // Aqui se crea, si es necesario.
+								guardiasCalendarioItem3 = guardiasServiceImpl.crearCalendario3(guardiasCalendarioItem3, true); // Aqui se crea, si es necesario.
 
 								//Construccion para informacion para la generacion del colegiado.
 								InscripcionGuardiaItem ins = new InscripcionGuardiaItem();
@@ -2391,9 +2391,12 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								ins.setIdTurno(idTurno);
 								ins.setIdInstitucion(idInstitucion.toString());
 								ins.setnColegiado(cargaMasivaDatosBTItem.getnColegiado());
+								if(cargaMasivaDatosBTItem.getPosicion() != null && !cargaMasivaDatosBTItem.getPosicion().isEmpty())
+									ins.setPosicion(Integer.parseInt(cargaMasivaDatosBTItem.getPosicion()));
 								// Generacion guardia colegiado
 								try {
-									guardiasServiceImpl.generarCalendario3(guardiasCalendarioItem3, false, ins);
+									
+									guardiasServiceImpl.generarCalendario3(guardiasCalendarioItem3, false, ins, true);
 									result = 1;
 								} catch (Exception e) {
 									updateHcoConfigProgCal(historico,
@@ -2610,7 +2613,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		if (idInstitucion != SigaConstants.IDINSTITUCION_2000) {
 			idInstituciones.add(SigaConstants.IDINSTITUCION_2000);
 		}
-
+		ArrayList<String> arrListIntControl = new ArrayList<>();
 		StringBuffer errorLinea = null;
 		int numLinea = 1;
 		for (Hashtable<String, Object> hashtable : datos) {
@@ -2707,6 +2710,24 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				errorLinea.append("Es obligatorio introducir el turno. ");
 				cargaMasivaDatosBTItem.setIdTurno(null);
 			}
+			
+			// Comprobamos POSICION
+			if (hashtable.get(SigaConstants.POSICION) != null
+					&& !hashtable.get(SigaConstants.POSICION).toString().equals("")) {
+				try {
+					if (esConvertibleNumero(hashtable.get(SigaConstants.POSICION).toString())) {
+						cargaMasivaDatosBTItem.setPosicion(hashtable.get(SigaConstants.POSICION).toString());
+						arrListIntControl.add(hashtable.get(SigaConstants.POSICION).toString());
+					}else {
+						errorLinea.append("La posicion no es un numero.");
+						cargaMasivaDatosBTItem.setIdGuardia(null);
+					}
+				} catch (Exception e) {
+					errorLinea.append("La posicion no es un numero.");
+					cargaMasivaDatosBTItem.setIdGuardia(null);
+				}
+			} 
+
 			if (errorLinea.toString().isEmpty()) {
 				// 1. Si la guardia de colegiado ya existe en el sistema, dará error.
 				List<String> idGuardiaList = scsGuardiasturnoExtendsMapper
@@ -2917,6 +2938,15 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosCVImpl.parseExcelFileBT");
 		return masivaDatosBTVos;
+	}
+	
+	private static boolean esConvertibleNumero(String str) {
+		try {
+			Integer.parseInt(str);
+			return true;
+		}catch(NumberFormatException e) {
+			return false;
+		}
 	}
 
 	private ArrayList<PeriodoEfectivoItem> generarCalendarioEfectivo2(Boolean cumple, int unidadesPeriodo,

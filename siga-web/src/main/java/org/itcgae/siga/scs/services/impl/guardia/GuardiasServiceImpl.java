@@ -4734,7 +4734,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 																fechaHasta, textoAutomatico);
 														guardiasCalendarioItem3.setUsumodificacion(USU_MODIFICACION);
 														
-														guardiasCalendarioItem3 = crearCalendario3(guardiasCalendarioItem3);														
+														guardiasCalendarioItem3 = crearCalendario3(guardiasCalendarioItem3,false);														
 														idCalendarioGuardias3 = ("0".equals(guardiasCalendarioItem3.getIdcalendarioguardias())) ? idCalendarioGuardias3 : Integer.parseInt(guardiasCalendarioItem3.getIdcalendarioguardias());
 
 														TransactionStatus txCalendario = getNeTransactionCalendarios();
@@ -4750,7 +4750,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 //															generarCalendario2(soloVacio);															
 															
 															//Nuevo
-															generarCalendario3(guardiasCalendarioItem3, soloVacio, null);
+															generarCalendario3(guardiasCalendarioItem3, soloVacio, null, false);
 															
 															if (controlError == 0) {
 																LOGGER.info(
@@ -5268,7 +5268,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return 0;
 	}
 	
-	public GuardiasCalendarioItem crearCalendario3(GuardiasCalendarioItem guardiasCalendarioItem)
+	public GuardiasCalendarioItem crearCalendario3(GuardiasCalendarioItem guardiasCalendarioItem, boolean cargaMasiva)
 			throws Exception {
 		String idInstitucion = guardiasCalendarioItem.getIdinstitucion();
 		String idTurno = guardiasCalendarioItem.getIdturno();
@@ -5292,10 +5292,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		if (calGuardiaList != null && calGuardiaList.size() > 0) { //Hay un calendario creado
 			GuardiasCalendarioItem calGuardia = calGuardiaList.get(0);
-
+			
 			calGuardia.setFechainicio(changeDateFormat(DATE_LONG_MSEC, DATE_SHORT_SLASH, calGuardia.getFechainicio()));
 			calGuardia.setFechafin(changeDateFormat(DATE_LONG_MSEC, DATE_SHORT_SLASH, calGuardia.getFechafin()));
-			
+			if(cargaMasiva) return calGuardia;
 			
 			//SELECT FROM SCS_CABECERAGUARDIAS
 			CabeceraGuardiasCalendarioItem cabGuardia = scsGuardiasturnoExtendsMapper.cabGuardiavVector(calGuardia,
@@ -5657,7 +5657,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	}
 	
-	public void generarCalendario3(GuardiasCalendarioItem guardiasCalendarioItem, boolean soloVacio, InscripcionGuardiaItem inscripcion) throws Exception {
+	public void generarCalendario3(GuardiasCalendarioItem guardiasCalendarioItem, boolean soloVacio, InscripcionGuardiaItem inscripcion, boolean esCargaMasiva) throws Exception {
 		String usuModificacion = guardiasCalendarioItem.getUsumodificacion();
 		
 		String idInstitucion = guardiasCalendarioItem.getIdinstitucion();
@@ -5701,7 +5701,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						textoAutomatico, today, usuModificacion, idTurno,
 						idGuardia,idCalendarioGuardias);
 				
-				calendarioGuardiasVinc = crearCalendario3(calendarioGuardiasVinc);
+				calendarioGuardiasVinc = crearCalendario3(calendarioGuardiasVinc,false);
 				String idCalendarioVinculado = calendarioGuardiasVinc.getIdcalendarioguardias();
 //				int idCalendario = crearCalendario2(calendarioGuardiasVinc.getIdinstitucion(),
 //						calendarioGuardiasVinc.getIdturno(), calendarioGuardiasVinc.getIdguardia(),
@@ -5749,8 +5749,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardia.getNombre() + " (" + fechaDesde + " - " + fechaHasta + ")" });
 				
 				//TODO(L) Podria hacer aqui la distinción entre calendarios programados y carga masiva?
-				boolean cargaMasiva = true;
-				if(cargaMasiva) {
+				
+				if(!esCargaMasiva) {
 					if (porGrupos) {
 						calcularMatrizLetradosGuardiaPorGrupos3(guardiasCalendarioItem, calendariosVinculados, guardia, arrayPeriodosDiasGuardia, lDiasASeparar, rotacion, inscripcion);
 					} else {
@@ -5758,11 +5758,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						calcularMatrizLetradosGuardia3(guardiasCalendarioItem, calendariosVinculados, guardia, arrayPeriodosDiasGuardia, lDiasASeparar,  inscripcion);//(L) arrayPeriodosLetradosSJCS1,calendariosVinculados
 					}
 				}else {
-					if (porGrupos) {
-						calcularMatrizLetradosGuardiaPorGrupos(lDiasASeparar, rotacion);
-					} else {
-						calcularMatrizLetradosGuardia(lDiasASeparar);//(L) arrayPeriodosLetradosSJCS1
-					}
+						insertarGuardiasColegiadoCM(guardiasCalendarioItem, calendariosVinculados, guardia, arrayPeriodosDiasGuardia, lDiasASeparar,  inscripcion);
 				}
 				
 				Map<String, Object> mapLog1 = new HashMap();
@@ -5781,6 +5777,97 @@ public class GuardiasServiceImpl implements GuardiasService {
 				}
 			}
 		}
+	}
+
+	
+
+	private void insertarGuardiasColegiadoCM(GuardiasCalendarioItem guardiasCalendarioItem,
+			List<GuardiasCalendarioItem> calendariosVinculados, GuardiasTurnoItem guardia,
+			ArrayList<ArrayList<String>> arrayPeriodosDiasGuardia, List<Integer> lDiasASeparar,
+			InscripcionGuardiaItem inscripcion) {
+		// Variables generales
+		ArrayList<String> diasGuardia, primerPeriodo, segundoPeriodo; // Periodo o dia de guardia para rellenar con
+		// letrado
+		diasGuardia = new ArrayList<String>();
+		int posicion = 1;
+		int inicial = 0;
+
+		primerPeriodo = (ArrayList<String>) arrayPeriodosDiasGuardia.get(0);
+		segundoPeriodo = null;
+		if (calendariosVinculados == null || calendariosVinculados.isEmpty())
+			inicial = 0;
+		else {
+			Map<String, Object> mapLog2 = new HashMap();
+			// log.addLog(new String[] {"Guardias vinculadas",
+			// calendariosVinculados1.toString()});
+			mapLog2.put("*Guardias vinculadas ", calendariosVinculados.toString());
+			listaDatosExcelGeneracionCalendarios.add(mapLog2);
+			LOGGER.info("*Guardias vinculadas " + calendariosVinculados.toString());
+			inicial = 1;
+		}
+		// Para cada dia o conjunto de dias:
+		for (int i = inicial; i < arrayPeriodosDiasGuardia.size(); i++) {
+
+			// obteniendo conjunto de dias
+			// Nota: cada periodo es un arraylist de fechas (String en formato de fecha
+			// corto DD/MM/YYYY)
+			if (calendariosVinculados == null || calendariosVinculados.isEmpty()) {
+				diasGuardia = (ArrayList<String>) arrayPeriodosDiasGuardia.get(i);
+			} // Si hay guardias vinculadas, hay que mirar dos periodos a la vez
+			else {
+				segundoPeriodo = (ArrayList<String>) arrayPeriodosDiasGuardia.get(i);
+				diasGuardia = new ArrayList<String>();
+				diasGuardia.addAll(primerPeriodo);
+				diasGuardia.addAll(segundoPeriodo);
+			}
+
+		}
+
+		List<LetradoInscripcionItem> alLetradosOrdenados = new ArrayList<LetradoInscripcionItem>();
+		alLetradosOrdenados = getInscritoInfo(inscripcion);
+
+		ArrayList<LetradoInscripcionItem> alLetradosInsertar = new ArrayList<LetradoInscripcionItem>();
+		LetradoInscripcionItem letradoGuardia = alLetradosOrdenados.get(0);
+
+		letradoGuardia.setPeriodoGuardias(diasGuardia); // (L) Se supone que aqui esta el letrado seleccionado
+		LetradoInscripcionItem letradoGuardiaClone = (LetradoInscripcionItem) letradoGuardia;
+		if (inscripcion.getPosicion() != 0) {
+			letradoGuardiaClone.setPosicion(inscripcion.getPosicion());
+		} else {
+			letradoGuardiaClone.setPosicion(posicion);
+			posicion++;
+		}
+
+		alLetradosInsertar.add(letradoGuardiaClone);
+
+		try {
+			if (calendariosVinculados == null || calendariosVinculados.isEmpty()) {// TODO: (L) Insertas en
+																					// guardiacolegiado y cabecera
+				almacenarAsignacionGuardia3(guardiasCalendarioItem, guardia, alLetradosInsertar, diasGuardia,
+						lDiasASeparar, "gratuita.literal.comentario.sustitucion");
+			} else {
+				// guardando la principal
+				almacenarAsignacionGuardia3(guardiasCalendarioItem, guardia, alLetradosInsertar, primerPeriodo,
+						lDiasASeparar, "gratuita.literal.comentario.sustitucion");
+
+				// guardando para cada una de las vinculadas
+				for (GuardiasCalendarioItem calendario : calendariosVinculados) {
+					// modificando la guardia y calendario en el que se insertaran las guardias
+					for (LetradoInscripcionItem lg : alLetradosInsertar) {
+						lg.setIdinstitucion(new Short(calendario.getIdinstitucion()));
+						lg.setIdTurno(Integer.parseInt(calendario.getIdturno()));
+						lg.setIdGuardia(Integer.parseInt(calendario.getIdguardia()));
+					}
+
+					// guardando en BD
+					almacenarAsignacionGuardia3(guardiasCalendarioItem, guardia, alLetradosInsertar, segundoPeriodo,
+							lDiasASeparar, "gratuita.literal.comentario.sustitucion");
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getStackTrace());
+		}
+
 	}
 
 	public boolean esUltimoCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno,
@@ -10298,13 +10385,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					// obteniendo cola de letrados
 					punteroListaLetrados = new Puntero();
-					try {//TODO: (L) Aqui podría insertar letrado de Cargas Masivas(?) - No se analizan incompatibilidades, obtiene la cola de guardias para new Date
-						if(inscripcion != null) {
-							alLetradosOrdenados = getInscritoInfo(inscripcion);
-						}else {
-							alLetradosOrdenados = getColaGuardia(Integer.valueOf(idInstitucion), Integer.valueOf(idTurno), Integer.valueOf(idGuardia),
-									(String) diasGuardia.get(0), (String) diasGuardia.get(diasGuardia.size() - 1));
-						}
+					try {
+
+						alLetradosOrdenados = getColaGuardia(Integer.valueOf(idInstitucion), Integer.valueOf(idTurno),
+								Integer.valueOf(idGuardia), (String) diasGuardia.get(0),
+								(String) diasGuardia.get(diasGuardia.size() - 1));
+
 					} catch (Exception e) {
 						errorGeneracionCalendario = "Error obteniendo la cola de letrados ordenados: " + e;
 						controlError++;

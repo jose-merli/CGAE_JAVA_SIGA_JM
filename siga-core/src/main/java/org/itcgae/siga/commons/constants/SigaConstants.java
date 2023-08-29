@@ -1398,6 +1398,7 @@ public class SigaConstants {
 		public static final String ORDEN = "ORDEN";
 		public static final String OBSERVACIONES_SOL = "OBSERVACIONES SOLICITUD";
 		public static final String OBSERVACIONES_VAL = "OBSERVACIONES VALIDACION";
+		public static final String POSICION = "POSICION";
 
 		public static final String nombreFicheroModeloI = "PlantillaMasivaDatosI";
 
