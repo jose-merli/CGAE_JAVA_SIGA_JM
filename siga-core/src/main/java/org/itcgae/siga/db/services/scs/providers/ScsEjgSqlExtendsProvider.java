@@ -123,7 +123,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sqlEstado.SELECT("f_siga_getrecurso(MAESTROESTADO.DESCRIPCION, " + idLenguaje + ")");
 			sqlEstado.FROM("SCS_MAESTROESTADOSEJG MAESTROESTADO, SCS_ESTADOEJG ESTADO2");
 			sqlEstado.WHERE("ESTADO2.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");
-			sqlEstado.WHERE("MAESTROESTADO.VISIBLECOMISION = 0");
 			sqlEstado.WHERE("ESTADO2.IDINSTITUCION = ESTADO.IDINSTITUCION");
 			sqlEstado.WHERE("ESTADO2.IDTIPOEJG = ESTADO.IDTIPOEJG");
 			sqlEstado.WHERE("ESTADO2.ANIO = ESTADO.ANIO");
@@ -137,7 +136,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			SQL sqlEstado = new SQL();
 			sqlEstado.SELECT("f_siga_getrecurso(MAESTROESTADO.DESCRIPCION, " + idLenguaje + ")");
 			sqlEstado.FROM("SCS_MAESTROESTADOSEJG MAESTROESTADO");
-			sqlEstado.WHERE("ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG AND MAESTROESTADO.VISIBLECOMISION = 0 AND ROWNUM = 1");
+			sqlEstado.WHERE("ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG AND ROWNUM = 1");
 			
 			sql.SELECT("(" + sqlEstado.toString() + ") AS ESTADOEJG");
 		}
