@@ -135,8 +135,10 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			// comboItem =
 			// cenPersonaExtendsMapper.loadPhotography(etiquetaUpdateDTO.getIdPersona(),
 			// String.valueOf(idInstitucion));
-			comboItem = cenPersonaExtendsMapper.loadPhotography(etiquetaUpdateDTO.getIdPersona(),
-					idInstitucion.toString());
+			if(etiquetaUpdateDTO.getIdPersona() != null) {
+			comboItem = cenPersonaExtendsMapper.loadPhotography(etiquetaUpdateDTO.getIdPersona(), idInstitucion.toString());
+			}
+		
 			LOGGER.info(
 					"loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> Salida de cenPersonaExtendsMapper para obtener el nombre del archivo de la fotografía");
 

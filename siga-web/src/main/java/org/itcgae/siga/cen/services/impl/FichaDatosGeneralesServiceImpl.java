@@ -839,8 +839,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
-				comboEtiquetasItems = cenGruposclienteClienteExtendsMapper
-						.selectGruposPersonaJuridicaLenguaje(colegiadoItem.getIdPersona(), String.valueOf(idInstitucion), usuario.getIdlenguaje());
+				if(colegiadoItem.getIdPersona() != null) {
+					comboEtiquetasItems = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridicaLenguaje(colegiadoItem.getIdPersona(), String.valueOf(idInstitucion), usuario.getIdlenguaje());
+				}
+				
 				LOGGER.info(
 						"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
 			}
@@ -918,8 +920,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 			if (null != usuarios && usuarios.size() > 0) {
 				LOGGER.info(
 						"datosDireccionesSearch() / cenDireccionesExtendsMapper.selectDirecciones() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de direcciones");
-				datosDireccionesItem = cenDireccionesExtendsMapper.selectPartidoJudicial(colegiadoItem.getIdPersona(),
-						idInstitucion.toString());
+				if(colegiadoItem.getIdPersona() != null) {
+					datosDireccionesItem = cenDireccionesExtendsMapper.selectPartidoJudicial(colegiadoItem.getIdPersona(), idInstitucion.toString());
+				}
 				LOGGER.info(
 						"datosDireccionesSearch() / cenDireccionesExtendsMapper.selectDirecciones() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de direcciones");
 
@@ -1957,8 +1960,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 				LOGGER.info(
 						"getTopicsSpecificPerson() / forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson -> Entrada a forTemaCursoPersonaExtendsMapper para obtener los temas según la persona");
-				comboItems = forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson(idInstitucion.toString(),
-						idPersona, usuario.getIdlenguaje());
+				if(idPersona != null && !idPersona.equals("undefined")) {
+					comboItems = forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson(idInstitucion.toString(), idPersona, usuario.getIdlenguaje());
+				}
+				
 				LOGGER.info(
 						"getTopicsSpecificPerson() / forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson -> Salida de forTemaCursoPersonaExtendsMapper para obtener los temas según la persona");
 

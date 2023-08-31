@@ -4627,9 +4627,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.info(
 						"generarCalendarioAsync()  -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
 				// commitProgramaciones(txProgramacion);
-				List<DatosCalendarioProgramadoItem> programacionItemList = scsGuardiasturnoExtendsMapper
-						.getAllCalendariosProgramadosSigaClassiquePendiente();
+				List<DatosCalendarioProgramadoItem> programacionItemList = scsGuardiasturnoExtendsMapper.getAllCalendariosProgramadosSigaClassiquePendiente();
 				// commitProgramaciones(txProgramacion);
+				
 				System.out.print("programacionItemList : ");
 				System.out.print(programacionItemList);
 				if (programacionItemList != null && !programacionItemList.isEmpty()) {
