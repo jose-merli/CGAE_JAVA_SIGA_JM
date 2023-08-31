@@ -136,7 +136,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			// cenPersonaExtendsMapper.loadPhotography(etiquetaUpdateDTO.getIdPersona(),
 			// String.valueOf(idInstitucion));
 			if(etiquetaUpdateDTO.getIdPersona() != null) {
-			comboItem = cenPersonaExtendsMapper.loadPhotography(etiquetaUpdateDTO.getIdPersona(), idInstitucion.toString());
+				comboItem = cenPersonaExtendsMapper.loadPhotography(etiquetaUpdateDTO.getIdPersona(), idInstitucion.toString());
 			}
 		
 			LOGGER.info(
