@@ -1644,17 +1644,20 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				datosColegiales.setFechamodificacion(new Date());
 				if (solicitud.getFechaestadocolegial().before(new Date())) {
 					if (null != solicitud.getIdtiposolicitud()) {
-						if (solicitud.getIdtiposolicitud() == 10 || solicitud.getIdtiposolicitud() == 30 ) {
-							datosColegiales.setIdestado(Short.valueOf("20"));
+						if (solicitud.getIdtiposolicitud() == SigaConstants.REINCORPORACION_EJERCIENTE 
+								|| solicitud.getIdtiposolicitud() == SigaConstants.INCORPORACION_EJERCIENTE ) {
+							datosColegiales.setIdestado((short)SigaConstants.ESTADO_COLEGIAL_EJERCIENTE);
 						}else{
-							datosColegiales.setIdestado(Short.valueOf("10"));
+							datosColegiales.setIdestado((short)SigaConstants.ESTADO_COLEGIAL_SINEJERCER);
 						}
 					}else{
-						datosColegiales.setIdestado(Short.valueOf("10"));
+						datosColegiales.setIdestado((short)SigaConstants.ESTADO_COLEGIAL_SINEJERCER);
 					}
-				}
-				else {
-					datosColegiales.setIdestado(Short.valueOf("70")); // Nuevo valor en caso incorporacion sea en el futuro
+				} else {
+//					datosColegiales.setIdestado(Short.valueOf("70")); // Nuevo valor en caso incorporacion sea en el futuro
+					//No tiene que insertar otro estado mas que el corresponda según el tipo de solicitud y la fecha de primer estado colegial
+					//Solo mostrar “Sin estado” en la busqueda y en la ficha de colegiados cuando el ultimo estado sea del futuro.
+					LOGGER.debug("NO TIENE ESTADO");
 				}
 				if(solicitud.getResidente().equals("1")) {
 					datosColegiales.setSituacionresidente("1");
@@ -1665,7 +1668,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				datosColegiales.setIdpersona(idPersona);
 				datosColegiales.setUsumodificacion(usuario.getIdusuario());
 				datosColegiales.setObservaciones(solicitud.getObservaciones());
-				resultado = cenDatoscolegialesestadoMapper.insert(datosColegiales );
+				if(datosColegiales.getIdestado() != null) { //Si no tiene estado no insertamos
+					resultado = cenDatoscolegialesestadoMapper.insert(datosColegiales);
+				}
 			}
 			return resultado;
 		} else {
