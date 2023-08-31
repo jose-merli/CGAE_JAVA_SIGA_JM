@@ -33,10 +33,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sqlListadoInscripciones.SELECT("TO_CHAR(trunc(ins.fechabaja), 'DD/MM/YYYY') AS fechabaja");
 		sqlListadoInscripciones.SELECT("Per.Nifcif");
 		sqlListadoInscripciones.SELECT("Per.Nombre AS nombre");
-		sqlListadoInscripciones.SELECT("Per.Apellidos1 AS apellidos1");
-		sqlListadoInscripciones.SELECT("DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2");
+		sqlListadoInscripciones.SELECT("COALESCE(NULLIF(Per.Apellidos1, ''), ' ') AS apellidos1");
+		sqlListadoInscripciones.SELECT("COALESCE(NULLIF(Per.Apellidos2, ''), ' ') AS apellidos2");
 		sqlListadoInscripciones.SELECT(
-				"Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS");
+		    "COALESCE(NULLIF(Per.Apellidos1, '') || NULLIF(' ' || Per.Apellidos2, ''), ' ') AS ALFABETICOAPELLIDOS");
 		sqlListadoInscripciones
 				.SELECT("TO_NUMBER(DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado)) numerocolegiado");
 		sqlListadoInscripciones.SELECT("Per.Fechanacimiento FECHANACIMIENTO");

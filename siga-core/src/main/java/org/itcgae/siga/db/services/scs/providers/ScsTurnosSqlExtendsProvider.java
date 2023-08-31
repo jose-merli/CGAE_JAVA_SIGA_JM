@@ -361,9 +361,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 				"				ins.fechasolicitud AS fechasolicitud,\r\n" +
 				"				Per.Nifcif,\r\n" +
 				"				Per.Nombre as nombrepersona,\r\n" +
-				"				Per.Apellidos1,\r\n" +
-				"				DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2,\r\n" +
-				"				Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,\r\n" +
+				"				COALESCE(NULLIF(Per.Apellidos1, ''), ' ') AS Apellidos1,\r\n" +
+				"				COALESCE(NULLIF(Per.Apellidos2, ''), ' ') AS Apellidos2,\r\n" +
+				"				COALESCE(NULLIF(Per.Apellidos1, '') || NULLIF(' ' || Per.Apellidos2, ''), ' ') AS ALFABETICOAPELLIDOS,\r\n" +
 				"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" +
 				"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" +
 				"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,(\r\n" +
