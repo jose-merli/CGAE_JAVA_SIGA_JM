@@ -12,21 +12,21 @@ public class ScsTipofundamentosSqlExtendsProvider extends ScsTipofundamentos{
 		
 		sql.SELECT("fundamento.idfundamento");
 		sql.SELECT("fundamento.codigo");
-		sql.SELECT("catalogoFundamento.descripcion");
+		sql.SELECT("NVL(catalogoFundamento.descripcion, fundamento.descripcion) as descripcion");
 		sql.SELECT("fundamento.idinstitucion");
 		sql.SELECT("fundamento.codigoejis");
 		sql.SELECT("fundamento.textoplantilla");
 		sql.SELECT("fundamento.TEXTOPLANTILLA2");
 		sql.SELECT("fundamento.TEXTOPLANTILLA3");
 		sql.SELECT("fundamento.TEXTOPLANTILLA4");
-		sql.SELECT("catalogoResolucion.descripcion as descripcionresolucion");
+		sql.SELECT("NVL(catalogoResolucion.descripcion, tiporesolucion.descripcion) as descripcionresolucion");
 		sql.SELECT("fundamento.fechabaja");
 		sql.SELECT("fundamento.IDTIPORESOLUCION");
 		sql.SELECT("catalogoFundamento.idrecurso as recursofundamento");
 
 		sql.FROM("SCS_TIPOFUNDAMENTOS fundamento");
 		
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catalogoFundamento on catalogoFundamento.idrecurso = fundamento.DESCRIPCION and catalogoFundamento.idlenguaje = '" + idLenguaje + "'");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoFundamento on catalogoFundamento.idrecurso = fundamento.DESCRIPCION and catalogoFundamento.idlenguaje = '" + idLenguaje + "'");
 		sql.LEFT_OUTER_JOIN("SCS_TIPORESOLUCION tiporesolucion on fundamento.IDTIPORESOLUCION = tiporesolucion.IDTIPORESOLUCION");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = '" + idLenguaje + "'");
 		
