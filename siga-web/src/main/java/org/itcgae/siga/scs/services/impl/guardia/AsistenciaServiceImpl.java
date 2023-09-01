@@ -1132,10 +1132,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			
 			if (!UtilidadesString.esCadenaVacia(asistencia.getComisaria())) {
 				asistenciaBBDD.setComisaria(Long.valueOf(asistencia.getComisaria()));
+				asistenciaBBDD.setComisariaidinstitucion(idInstitucion);
 			}
 			
 			if (!UtilidadesString.esCadenaVacia(asistencia.getJuzgado())) {
 				asistenciaBBDD.setJuzgado(Long.valueOf(asistencia.getJuzgado()));
+				asistenciaBBDD.setJuzgadoidinstitucion(idInstitucion);
 			}
 			
 			if (asistencia.getNumDiligencia() != null) {
