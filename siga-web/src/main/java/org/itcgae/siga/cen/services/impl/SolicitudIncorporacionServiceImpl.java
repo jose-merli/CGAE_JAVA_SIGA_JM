@@ -1642,8 +1642,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
 				datosColegiales.setFechaestado(solicitud.getFechaestado());
 				datosColegiales.setFechamodificacion(new Date());
-				if (solicitud.getFechaestadocolegial().before(new Date())) {
-					if (null != solicitud.getIdtiposolicitud()) {
+//				if (solicitud.getFechaestadocolegial().before(new Date())) { //Desde solicitudes de incorporacion al insertar no es necesario comprobar las fechas de estados
+					if (null != solicitud.getIdtiposolicitud()) { //no es posible dejar el tipo de solicitud vacia desde solicitud de incorporacion, deberia lanzar incidencia
 						if (solicitud.getIdtiposolicitud() == SigaConstants.REINCORPORACION_EJERCIENTE 
 								|| solicitud.getIdtiposolicitud() == SigaConstants.INCORPORACION_EJERCIENTE ) {
 							datosColegiales.setIdestado((short)SigaConstants.ESTADO_COLEGIAL_EJERCIENTE);
@@ -1651,14 +1651,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 							datosColegiales.setIdestado((short)SigaConstants.ESTADO_COLEGIAL_SINEJERCER);
 						}
 					}else{
-						datosColegiales.setIdestado((short)SigaConstants.ESTADO_COLEGIAL_SINEJERCER);
+						datosColegiales.setIdestado((short)SigaConstants.ESTADO_COLEGIAL_SINEJERCER); //TODO: lanzar error en lugar de insertar no ejerciente?
 					}
-				} else {
+//				} else {
 //					datosColegiales.setIdestado(Short.valueOf("70")); // Nuevo valor en caso incorporacion sea en el futuro
 					//No tiene que insertar otro estado mas que el corresponda según el tipo de solicitud y la fecha de primer estado colegial
 					//Solo mostrar “Sin estado” en la busqueda y en la ficha de colegiados cuando el ultimo estado sea del futuro.
-					LOGGER.debug("NO TIENE ESTADO");
-				}
+//					LOGGER.debug("NO TIENE ESTADO");
+//				}
 				if(solicitud.getResidente().equals("1")) {
 					datosColegiales.setSituacionresidente("1");
 				}else {
