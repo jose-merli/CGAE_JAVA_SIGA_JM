@@ -37,7 +37,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "ORDENINSC", property = "ordenBD", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COMPENSACIONES", property = "compensaciones", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SALTOS", property = "saltos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),

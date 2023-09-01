@@ -10032,6 +10032,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						//alCompensaciones.forEach(compensacion -> {
 							int indexCompensacion = 0;
 							for(LetradoInscripcionItem compensacion : alCompensaciones) {
+							Map<String, Object> mapLog3A = new HashMap();
 							String nombre = "";
 							String ap1 = "";
 							String ap2 = "";
@@ -10042,11 +10043,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ap1 = compensacion.getInscripcionGuardia().getApellido1().toString();
 								if (compensacion.getInscripcionGuardia().getNombre() != null)
 									nombre = compensacion.getInscripcionGuardia().getNombre().toString();
-								mapLog3.put("Lista Compensaciones-" + indexCompensacion, ap1 + " " + ap2 + ", " + nombre);
-								listaDatosExcelGeneracionCalendarios.add(mapLog3);
+								mapLog3A.put("Lista Compensaciones-" + indexCompensacion, ap1 + " " + ap2 + ", " + nombre);
+								listaDatosExcelGeneracionCalendarios.add(mapLog3A);
 								LOGGER.info("Lista Compensaciones-" + ap1 + " " + ap2 + ", " + nombre);
 							} else if (compensacion.getInscripcionTurno() != null) {
-								mapLog3.put("*Compensaciones ",
+								mapLog3A.put("*Compensaciones ",
 										compensacion.getInscripcionTurno().getApellidos1() + " "
 												+ compensacion.getInscripcionTurno().getApellidos2() + ", "
 												+ compensacion.getInscripcionTurno().getNombre());
@@ -10056,8 +10057,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 									ap1 = compensacion.getInscripcionTurno().getApellidos1().toString();
 								if (compensacion.getInscripcionTurno().getNombre() != null)
 									nombre = compensacion.getInscripcionTurno().getNombre().toString();
-								mapLog3.put("Lista Compensaciones-" +indexCompensacion, ap1 + " " + ap2 + ", " + nombre);
-								listaDatosExcelGeneracionCalendarios.add(mapLog3);
+								mapLog3A.put("Lista Compensaciones-" +indexCompensacion, ap1 + " " + ap2 + ", " + nombre);
+								listaDatosExcelGeneracionCalendarios.add(mapLog3A);
 								LOGGER.info("Lista Compensaciones-" + ap1 + " " + ap2 + ", " + nombre);
 							}
 							indexCompensacion++;
@@ -10355,9 +10356,17 @@ public class GuardiasServiceImpl implements GuardiasService {
 					Map<String, Object> mapLog2 = new HashMap();
 					// log.addLog(new String[] {"Guardias vinculadas",
 					// calendariosVinculados1.toString()});
-					mapLog2.put("*Guardias vinculadas ", calendariosVinculados.toString());
+					mapLog2.put("*Guardias vinculadas ", "");
 					listaDatosExcelGeneracionCalendarios.add(mapLog2);
 					LOGGER.info("*Guardias vinculadas " + calendariosVinculados.toString());
+					String idGuardiaVin = "";
+					String idTurnoVin = "";
+					for(GuardiasCalendarioItem item : calendariosVinculados) {
+						idGuardiaVin = item.getIdguardia();
+						idTurnoVin = item.getIdturno();
+						String nombreLog = scsGuardiasturnoExtendsMapper.searchNombresGuardiaByIdturnoIdguardia(idInstitucion, idGuardiaVin, idTurnoVin);
+						mapLog2.put("*Guardias vinculadas ", nombreLog);
+					}
 					inicial = 1;
 				}
 				// Para cada dia o conjunto de dias:
@@ -11295,7 +11304,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		ScsCabeceraguardias beanCabeceraGuardias;
 		ScsGuardiascolegiado beanGuardiasColegiado;
 		LetradoInscripcionItem letrado = null;
-
+		Short idInstitucion = 0;
 		List alPeriodosSinAgrupar = getPeriodos(periodoDiasGuardia, lDiasASeparar);
 		for (int j = 0; j < alPeriodosSinAgrupar.size(); j++) {
 			ArrayList alDiasPeriodo = (ArrayList) alPeriodosSinAgrupar.get(j);
@@ -11315,6 +11324,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				if (letrado.getInscripcionGuardia() != null) {
 					beanCabeceraGuardias
 							.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
+					idInstitucion = new Short(letrado.getInscripcionGuardia().getIdInstitucion());
 					// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
 					beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
 					// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
@@ -11323,6 +11333,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					beanCabeceraGuardias.setIdpersona(new Long(letrado.getInscripcionGuardia().getIdPersona()));
 				} else if (letrado.getInscripcionTurno() != null) {
 					beanCabeceraGuardias.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
+					idInstitucion = new Short(letrado.getInscripcionTurno().getIdinstitucion());
 					// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
 					beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
 					// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
@@ -11332,6 +11343,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				}
 
 				beanCabeceraGuardias.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
+				idInstitucion = new Short(letrado.getInscripcionGuardia().getIdInstitucion());
 				// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
 				beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
 				// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
@@ -11460,20 +11472,30 @@ public class GuardiasServiceImpl implements GuardiasService {
 					Map<String, Object> mapLog10 = new HashMap();
 					String g = "";
 					String t = "";
+					String idGuardiaVin = "";
+					String idTurnoVin = "";
+					String nombreLog = "";
+					
 					if(letrado.getIdGuardia()!=null) {
 						g = "con guadia " + new Integer(letrado.getIdGuardia());
+						idGuardiaVin = letrado.getIdGuardia().toString();
 						t = "con turno " + new Integer(letrado.getIdTurno());
+						idTurnoVin = letrado.getIdTurno().toString();
 					}
 					else if (letrado.getInscripcionGuardia() != null) {
 						g = "con guadia " + new Integer(letrado.getInscripcionGuardia().getIdGuardia());
+						idGuardiaVin = letrado.getInscripcionGuardia().getIdGuardia().toString();
 						t = "con turno " + new Integer(letrado.getInscripcionGuardia().getIdTurno());
+						idTurnoVin = letrado.getInscripcionGuardia().getIdTurno();
 					} else if (letrado.getInscripcionTurno() != null) {
 						g = "con guadia null";
 						t = "con turno " + new Integer(letrado.getInscripcionTurno().getIdturno());
 					}
-					mapLog10.put("*Almacenando guardia ", g + " y " + t);
+					nombreLog = scsGuardiasturnoExtendsMapper.searchNombresGuardiaByIdturnoIdguardia(beanCabeceraGuardias.getIdinstitucion().toString(), idGuardiaVin, idTurnoVin);
+					
+					mapLog10.put("*Almacenando guardia ", nombreLog);
 					listaDatosExcelGeneracionCalendarios.add(mapLog10);
-					LOGGER.info("*Almacenando guardia " + g + " y " + t);
+					LOGGER.info("*Almacenando guardia " + g + " y " + t + " " + nombreLog );
 					Map<String, Object> mapLog11 = new HashMap();
 					mapLog11.put("","");
 					listaDatosExcelGeneracionCalendarios.add(mapLog11);

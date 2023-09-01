@@ -2233,7 +2233,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		int controlSolapamiento = 0;
 		ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
 		DatosCalendarioProgramadoItem calendarioItemPrin = new DatosCalendarioProgramadoItem();
-
+		boolean sinRegistros = false;
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -2294,7 +2294,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						}
 					}
 				}
-				if (controlSolapamiento == 0) {
+				
 					for (CargaMasivaDatosGuardiatem cargaMasivaDatosBTItem : cargaMasivaDatosBTItems) {
 
 						int result = -1;
@@ -2434,9 +2434,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						i++;
 
 					}
-				}
+				
 
-				boolean sinRegistros = false;
 				if (cargaMasivaDatosBTItems.isEmpty()) {
 					error.setMessage("No existen registros en el fichero.");
 					LOGGER.info("uploadFileC() -> No existen registros en el fichero.");
