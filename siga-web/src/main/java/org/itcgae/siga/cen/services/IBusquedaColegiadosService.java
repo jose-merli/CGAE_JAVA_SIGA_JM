@@ -1,5 +1,7 @@
 package org.itcgae.siga.cen.services;
 
+import java.text.ParseException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
@@ -18,7 +20,7 @@ public interface IBusquedaColegiadosService {
 	
 	public ComboDTO getCVCategory(HttpServletRequest request);
 	
-	public ColegiadoDTO searchColegiado( ColegiadoItem colegiadoItem, HttpServletRequest request);
+	public ColegiadoDTO searchColegiado( ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException;
 	
 	public ComboInstitucionDTO getLabel(HttpServletRequest request);
 

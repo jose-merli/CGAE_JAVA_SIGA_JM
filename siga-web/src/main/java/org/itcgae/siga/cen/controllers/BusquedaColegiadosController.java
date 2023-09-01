@@ -3,6 +3,7 @@ package org.itcgae.siga.cen.controllers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -94,7 +95,7 @@ public class BusquedaColegiadosController {
 	}
 		
 	@RequestMapping(value = "/busquedaColegiado/searchColegiado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ColegiadoDTO> searchColegiado(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) {
+	ResponseEntity<ColegiadoDTO> searchColegiado(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
 		ColegiadoDTO response = busquedaColegiadosService.searchColegiado(colegiadoItem, request);
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}

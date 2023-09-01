@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -306,7 +307,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	}
 
 	@Override
-	public ColegiadoDTO searchColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+	public ColegiadoDTO searchColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
 
 		LOGGER.info("searchColegiado() -> Entrada al servicio para obtener colegiados");
 		Error error = new Error();
@@ -336,7 +337,25 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
             tamMaximo = null;
         }
 	    
+        //Recuperamos los colegiados con el ultimo estado con fecha anterior al dia de hoy
 		colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem, tamMaximo);
+		
+		//Recorremos los colegiados, si su ultimo estado es con fecha hacia el futuro le cambiamos el estado a "Sin estado"
+		if(colegiadoItemList != null && !colegiadoItemList.isEmpty()) {
+			for (int i = 0; i < colegiadoItemList.size(); i++) {
+				if(colegiadoItemList.get(i).getFechaEstado() != null && colegiadoItemList.get(i).getFechaEstado().after(new Date())) {
+					colegiadoItemList.get(i).setEstadoColegial("Sin estado");
+				} else {
+					//Formateamos la fecha que viene en string
+					Date fechaEst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(colegiadoItemList.get(i).getFechaEstadoStr());
+					
+					if(fechaEst.after(new Date())) {
+						colegiadoItemList.get(i).setEstadoColegial("Sin estado");
+					}
+				}
+			}
+		}
+		
 		//colegiadosDTO.setColegiadoItem(colegiadoItemList);
 		if((colegiadoItemList != null) && tamMaximo != null && (colegiadoItemList.size()) > tamMaximo) {
 			error.setCode(200);
