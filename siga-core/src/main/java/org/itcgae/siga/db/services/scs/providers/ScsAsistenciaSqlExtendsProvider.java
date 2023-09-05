@@ -758,7 +758,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
             	" SELECT COUNT(*) cantidad FROM scs_actuacionasistencia act" +
             	" WHERE act.idinstitucion = a.idinstitucion AND act.anio = a.anio AND act.numero = a.numero" +
             " ) = 0 THEN" +
-            	" 'VACÍO'" +
+            	" 'NO'" + // Antiguamente la cadena era = 'VACÍO'  
             " WHEN (" +
             	" SELECT COUNT(*) cantidad FROM scs_actuacionasistencia act" +
             	" WHERE act.idinstitucion = a.idinstitucion AND act.anio = a.anio AND act.numero = a.numero AND act.validada = 0" +
@@ -767,10 +767,18 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
             " ELSE" +
             	" 'SI'" +
 			" END actuacionesvalidadas");
+		
+		
 		SQL.SELECT("a.IDTIPOASISTENCIACOLEGIO");
 		SQL.SELECT("a.fechacierre");
 		SQL.SELECT("a.fechasolicitud");
 		SQL.SELECT("(SELECT g.requeridavalidacion FROM scs_guardiasturno g WHERE a.idguardia = g.idguardia AND a.idinstitucion = g.idinstitucion AND a.idturno = g.idturno) requeridavalidacion");
+		
+		// Incluir el numero de actuaciones
+		SQL.SELECT("(SELECT COUNT(*) cantidad FROM scs_actuacionasistencia act" +
+            	" WHERE act.idinstitucion = a.idinstitucion AND act.anio = a.anio AND act.numero = a.numero) numeroactuaciones");
+            	
+		
 		SQL.FROM("scs_asistencia a");
 
 		SQL.INNER_JOIN(
