@@ -2094,14 +2094,15 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				if (existePer.size() == 0) {
 					responsePerm = scsPermutaguardiasExtendsMapper.insert(permutaGuardia);
 				} else {
-					ScsPermutaguardias permutaGuardiaMod = new ScsPermutaguardias();
-					permutaGuardiaMod.setIdinstitucion(idInstitucion);
-					permutaGuardiaMod.setNumero(existePer.get(0).getNumero());
-					permutaGuardiaMod.setFechasolicitud(new Date());
-					permutaGuardiaMod.setFechamodificacion(new Date());
-					permutaGuardiaMod.setUsumodificacion(usuarios.get(0).getIdusuario());
-					permutaGuardiaMod.setMotivossolicitante(permutaItem.getMotivossolicitante());
-					responsePerm = scsPermutaguardiasExtendsMapper.updateByPrimaryKey(permutaGuardiaMod);
+					// Si existe, se actualizan los datos
+				    ScsPermutaguardias permutaGuardiaExistente = existePer.get(0);
+				    // Actualiza los campos de la permuta
+				    permutaGuardiaExistente.setMotivossolicitante(permutaItem.getMotivossolicitante());
+				    permutaGuardiaExistente.setFechaconfirmacion(permutaItem.getFechaconfirmacion());
+				    permutaGuardiaExistente.setFechamodificacion(new Date());
+				    permutaGuardiaExistente.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				    responsePerm = scsPermutaguardiasExtendsMapper.updateByPrimaryKey(permutaGuardiaExistente);
 				}
 
 				LOGGER.info(
