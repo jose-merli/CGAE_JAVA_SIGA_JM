@@ -4533,15 +4533,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 			// Fecha
 			Row rowFecha = sheet.createRow(0);
 			rowFecha.createCell(0).setCellValue("FECHA");
-			rowFecha.createCell(1).setCellValue("ACCIÓN");
-			rowFecha.createCell(2).setCellValue("DESCRIPCION");
+			rowFecha.createCell(1).setCellValue("ESTADO");
+			rowFecha.createCell(2).setCellValue("DETALLE");
 
 			Date date = new Date();
 			String fecha = dateFormat.format(date);
 			// Fecha
 			Row Accion = sheet.createRow(1);
 			Accion.createCell(0).setCellValue(fecha);
-			Accion.createCell(1).setCellValue("CREACIÓN");
+			Accion.createCell(1).setCellValue("Creado");
 			Accion.createCell(2).setCellValue("CALENDARIO PROGRAMADO CREADO");
 
 			sheet.setColumnWidth(0, 7000);
@@ -4693,7 +4693,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 													+ hcoConfProgCalendariosItem.getEstado());
 											if (hcoConfProgCalendariosItem != null) {
 												if (cantidadHcoEstado(hcoConfProgCalendariosItem, PROCESADO_CON_ERRORES) == 0) { // Buscamos que no tenga HCO en estado ERROR, sino, pasamos los demas a pendiente
-
+													editarLog(d, "En proceso", "Turno "+hcoConfProgCalendariosItem.getIdturno()+" Guardia "+hcoConfProgCalendariosItem.getIdguardia());
 													LOGGER.info(
 															"generarCalendarioAsync() -> INICIO generacion base HCO "
 																	+ hcoConfProgCalendariosItem.getNombre());
@@ -4708,8 +4708,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 														controlError = 0;
 														// updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 														// realizado antes, estado en proceso
-														editarLog(d, "INICIO", "Guardias Calendario - "
-																+ hcoConfProgCalendariosItem.getNombre());
+														editarLog(d, "Programada", "nueva fecha");
+																//+ hcoConfProgCalendariosItem.getNombre());
 														// El metodo crear calerndario nos creara los calendarios. Hay
 														// mas de
 														// uno ya
@@ -4764,12 +4764,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 															
 														} catch (Exception exp) {
 															rollBackCalendarios(txCalendario);
-															editarLog(d, "ERROR",exp.getMessage());
+															editarLog(d, "Con errores", "Error en la programación: "+exp.getMessage());
 														}
 														
 														
-														editarLog(d, "FIN", "Guardias Calendario - "
-																+ hcoConfProgCalendariosItem.getNombre());
+														
 														String nombreFicheroSalida = hcoConfProgCalendariosItem.getIdturno() + "." + hcoConfProgCalendariosItem.getIdguardia()+ "."
 																+ /*idCalendario*/ idCalendarioGuardias3+ "-"
 																+ fechaDesde.replace('/', '.') + "-"
@@ -4820,13 +4819,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 												//		rollBackCalendarios(txCalendario);
 														updateHcoConfigProgCal(hcoConfProgCalendariosItem,
 																PROCESADO_CON_ERRORES);
-														editarLog(d, "ERROR", e.getMessage());
+														editarLog(d, "Con errores", "Error en la programación: "+e.getMessage());
 														setGeneracionEnProceso(d.getIdCalendarioProgramado(), "0");
 														d.setEstado(PROCESADO_CON_ERRORES);
 														updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 													}
 												} else {
 													updateHcoConfigProgCal(hcoConfProgCalendariosItem, PENDIENTE);
+													editarLog(d, "Con errores", "Errores en la generación");
 												}
 											} // null
 
@@ -4845,9 +4845,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 									if (todoGenerado || soloVacio) {
 										d.setEstado(FINALIZADO);// FINALIZADO
 										updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
+										editarLog(d, "Finalizada", "");
 									} else {
 										d.setEstado(PROCESADO_CON_ERRORES);// FINALIZADO
 										updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
+										editarLog(d, "Procesado con errores", "");
 									}
 									setGeneracionEnProceso(d.getIdCalendarioProgramado(), "0");
 									// commitProgramaciones(txProgramacion);
@@ -4862,7 +4864,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 											"generarCalendarioAsync() -> Se ha producido un error al trabajar con el histórico",
 											e);
 									if (d != null) {
-										editarLog(d, "ERROR", e.getMessage());
+										editarLog(d, "Con errores", "Error en la programación: "+e.getMessage());
 										d.setEstado(PROCESADO_CON_ERRORES);
 										updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 									}
@@ -4883,7 +4885,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 										e);
 
 								if (d != null) {
-									editarLog(d, "ERROR", e.getMessage());
+									editarLog(d, "Con errores", "Error en la programación: "+e.getMessage());
 									d.setEstado(PROCESADO_CON_ERRORES);
 									updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 								}
@@ -5002,7 +5004,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							insertResponseDTO.setStatus("OK");
 
 						// añadir si el generado pasa a reprogramado.
-
+						editarLog(programacionItem, "Pendiente", "");
 						List<Short> listaCompatibles = new ArrayList<Short>();
 						listaCompatibles.add((short) 2);
 						listaCompatibles.add((short) 4);
@@ -5513,15 +5515,18 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
-			int rowCount = sheet.getLastRowNum();
-			sheet.shiftRows(1, rowCount, 1);
+			//int rowCount = sheet.getLastRowNum();
+			//sheet.shiftRows(1, rowCount, 1);
 			Date date = new Date();
 			String fecha = dateFormat.format(date);
 			// Fecha
-			Row Accion = sheet.createRow(1);
+			Row Accion = sheet.createRow(sheet.getLastRowNum()+1);
 			Accion.createCell(0).setCellValue(fecha);
 			Accion.createCell(1).setCellValue(accion);
 			Accion.createCell(2).setCellValue(descripcion);
+			if(descripcion.equalsIgnoreCase("nueva fecha")) {
+				Accion.createCell(2).setCellValue(fecha);
+			}
 
 			sheet.setColumnWidth(0, 6500);
 			sheet.setColumnWidth(1, 4000);
