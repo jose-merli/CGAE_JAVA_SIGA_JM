@@ -4541,8 +4541,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 			// Fecha
 			Row Accion = sheet.createRow(1);
 			Accion.createCell(0).setCellValue(fecha);
-			Accion.createCell(1).setCellValue("Creado");
-			Accion.createCell(2).setCellValue("CALENDARIO PROGRAMADO CREADO");
+			Accion.createCell(1).setCellValue("Pendiente");
+			Accion.createCell(2).setCellValue("");
 
 			sheet.setColumnWidth(0, 7000);
 			sheet.setColumnWidth(1, 4000);
@@ -4708,7 +4708,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 														controlError = 0;
 														// updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 														// realizado antes, estado en proceso
-														editarLog(d, "Programada", "nueva fecha");
 																//+ hcoConfProgCalendariosItem.getNombre());
 														// El metodo crear calerndario nos creara los calendarios. Hay
 														// mas de
@@ -4825,7 +4824,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 														updateEstado(d, Short.valueOf(d.getIdInstitucion()), 0);
 													}
 												} else {
-													updateHcoConfigProgCal(hcoConfProgCalendariosItem, PENDIENTE);
+													updateHcoConfigProgCal(hcoConfProgCalendariosItem, PROCESADO_CON_ERRORES);
 													editarLog(d, "Con errores", "Errores en la generación");
 												}
 											} // null
@@ -5004,7 +5003,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 							insertResponseDTO.setStatus("OK");
 
 						// añadir si el generado pasa a reprogramado.
-						editarLog(programacionItem, "Pendiente", "");
+						Date fecha = new Date();
+						editarLog(programacionItem, "Programado", fecha.toString());
 						List<Short> listaCompatibles = new ArrayList<Short>();
 						listaCompatibles.add((short) 2);
 						listaCompatibles.add((short) 4);
