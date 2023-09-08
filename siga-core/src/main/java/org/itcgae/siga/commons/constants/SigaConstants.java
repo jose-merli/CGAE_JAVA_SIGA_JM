@@ -1420,7 +1420,7 @@ public class SigaConstants {
 		public static final String nombreFicheroModeloC = "PlantillaMasivaDatosC";
 
 		public static final List<String> CAMPOSMODEL_C = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
-				FECHAI, FECHAF);
+				FECHAI, FECHAF, POSICION);
 		public static final List<String> CAMPOSLOGC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
 				FECHAI, FECHAF, ERRORES);
 	// AGENDA
