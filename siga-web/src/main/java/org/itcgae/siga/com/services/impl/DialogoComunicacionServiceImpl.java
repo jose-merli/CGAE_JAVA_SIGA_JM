@@ -1490,15 +1490,39 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}
 		return sufijo;
 	}
+	
+	private String formatearConsulta(String consulta) {
+	    // Eliminar espacios en blanco al inicio y al final
+	    consulta = consulta.trim();
+	    
+	    // Verificar si la consulta termina con un comentario
+	    if (consulta.endsWith("*/")) {
+	        // Eliminar cualquier comentario al final de la consulta
+	        int comentarioInicio = consulta.lastIndexOf("/*");
+	        consulta = consulta.substring(0, comentarioInicio).trim();
+	    } else if (consulta.endsWith(";")) {
+	        // Eliminar el punto y coma final, si lo hay
+	        consulta = consulta.substring(0, consulta.length() - 1).trim();
+	    } else if (consulta.endsWith(")") && consulta.indexOf('(') == -1) {
+	        // Si la consulta termina con un paréntesis pero no tiene uno de apertura correspondiente,
+	        // elimina el paréntesis final
+	        consulta = consulta.substring(0, consulta.length() - 1).trim();
+	    }
+	    
+	    return consulta;
+	}
 
 
 
 	private String reemplazarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ConsultaItem consulta, HashMap<String, String> mapaClave, boolean esEnvio, ModelosComunicacionItem modelosComunicacionItem,List<List<String>> listaKeyFiltros) {
-		
-		String sentencia = null;
+				String sentencia = null;
 		//Buscamos la consulta con sus parametros dinamicos
 		
+		String idObjetivoRepuesto = consulta.getIdObjetivo();
+		String regionRepuesto = consulta.getRegion();
 		consulta = findConsultaItem(dialogo.getConsultas(), consulta);
+		consulta.setIdObjetivo(idObjetivoRepuesto);
+		consulta.setRegion(regionRepuesto);
 		
 		if(consulta != null){
 			// Reemplazamos los datos insertados desde pantalla		
@@ -1518,15 +1542,32 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(mapaClave != null && mapaClave.size() > 0) {
 				for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
 					sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
+					LOGGER.info("Sentencia antes de meter máximo" + sentencia);
 				}
 			}	
 			
+//			 Formateamos la consulta antes de su ejecución
+	        sentencia = formatearConsulta(sentencia);
+	        
+			LOGGER.info("*******QUERY ANTES DE FILTRO MAXIMO***********" + sentencia);
 			if(consulta.getIdObjetivo() != null) {
 				//añadirmos maximo por depende del idObjetivo
-
-			}
+				if(consulta.getIdObjetivo().equals("1") || consulta.getIdObjetivo().equals("2") || consulta.getIdObjetivo().equals("3")){
+					
+					sentencia = addMaxQuery(sentencia, 10000);
+					
+					}else if(consulta.getRegion() != null && !consulta.getRegion().isEmpty()) {
+					
+						sentencia = addMaxQuery(sentencia, 10000);
+					}else {
+						
+						sentencia = addMaxQuery(sentencia, 1);
+					}				
+					
+				}			
 			
 			
+			LOGGER.info("-----QUERY CON FILTRO MAXIMO-----------" + sentencia);	
 		}else{
 			LOGGER.error("No se ha encontrado la consulta");
 			throw new BusinessException("No se ha encontrado la consulta");
@@ -1537,7 +1578,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	private String addMaxQuery(String consulta, int maximo) {
 		
-		String consultaModificada = "SELECT * FROM (" + consulta + ") WHERE ROWNUM < " + ( maximo + 1) ;
+		String consultaModificada =  consulta + " OFFSET 0 ROWS FETCH NEXT "+ maximo +" ROWS ONLY";
  		
 		return consultaModificada;
 	}
