@@ -4771,7 +4771,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 														String nombreFicheroSalida = hcoConfProgCalendariosItem.getIdturno() + "." + hcoConfProgCalendariosItem.getIdguardia()+ "."
 																+ /*idCalendario*/ idCalendarioGuardias3+ "-"
 																+ fechaDesde.replace('/', '.') + "-"
-																+ fechaHasta.replace('/', '.') + "-log";
+																+ fechaHasta.replace('/', '.') + "-log.xlsx";
 														LOGGER.info("generarCalendarioAsync() -> NOMBRE LOG DE "
 																+ hcoConfProgCalendariosItem.getNombre() + " : "
 																+ nombreFicheroSalida);
@@ -12202,7 +12202,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		LOGGER.info("descargarExcelLog() - > INFO CAL A DESCARGAR - > Turno:" + calyprogItem.getIdTurno() +  " / Guardia: " + calyprogItem.getIdGuardia() + "/ idCalG: " + calyprogItem.getIdCalendarioGuardias());
 		try {
 			String pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
-			String nombreFicheroSalida = nombreLog + ".xlsx";
+			String nombreFicheroSalida = nombreLog;
 			String path = pathFicheroSalida + nombreFicheroSalida;
 			LOGGER.info("descargarExcelLog() -> NOMBRE PATH : " + path);
 			
