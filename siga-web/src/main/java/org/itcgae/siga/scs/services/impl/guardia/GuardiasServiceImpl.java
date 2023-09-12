@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -71,14 +72,19 @@ import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.ECOM_ESTADOSCOLA;
 import org.itcgae.siga.commons.utils.Puntero;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.EcomGuardiacolegiadoMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
+import org.itcgae.siga.db.mappers.ScsCvGuardiacolegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
@@ -90,6 +96,8 @@ import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.mappers.ScsProgCalendariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EcomColaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.exception.BusinessException;
@@ -295,6 +303,23 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Autowired
 	private PlatformTransactionManager transactionManagerCalendarios;
 	
+	@Autowired
+	private EcomColaExtendsMapper ecomColaExtendsMapper;
+	
+	@Autowired
+	private EcomGuardiacolegiadoMapper ecomGuardiacolegiadoMapper;
+	
+	@Autowired
+	private CenDireccionesMapper cenDireccionesMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
+	
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
+	@Autowired
+	private ScsCvGuardiacolegiadoMapper scsCvGuardiacolegiadoMapper;
 	
 
 	@Override
@@ -4771,7 +4796,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 														String nombreFicheroSalida = hcoConfProgCalendariosItem.getIdturno() + "." + hcoConfProgCalendariosItem.getIdguardia()+ "."
 																+ /*idCalendario*/ idCalendarioGuardias3+ "-"
 																+ fechaDesde.replace('/', '.') + "-"
-																+ fechaHasta.replace('/', '.') + "-log.xlsx";
+																+ fechaHasta.replace('/', '.') + "-log";
 														LOGGER.info("generarCalendarioAsync() -> NOMBRE LOG DE "
 																+ hcoConfProgCalendariosItem.getNombre() + " : "
 																+ nombreFicheroSalida);
@@ -11273,7 +11298,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 					beanGuardiasColegiado.setPagado("N");
 					beanGuardiasColegiado.setIdfacturacion(null);
 					scsGuardiascolegiadoMapper.insertSelective2(beanGuardiasColegiado, fechaInicioPSt, fechaFinPSt,
-							today); // generado
+							today); // generado					
+					try {
+						beanGuardiasColegiado.setFechainicio(new SimpleDateFormat("yyyy-MM-dd").parse(fechaInicioPSt));
+						beanGuardiasColegiado.setFechafin(new SimpleDateFormat("yyyy-MM-dd").parse(fechaFinPSt));
+						this.triggerGuardiaColegiadoAID(beanGuardiasColegiado, 1);
+					} catch (Exception e) {
+						LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+					}					
 				}
 			}
 		}
@@ -11471,6 +11503,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 						beanGuardiasColegiado.setIdfacturacion(null);
 						scsGuardiascolegiadoMapper.insertSelective2(beanGuardiasColegiado, fechaInicioPSt, fechaFinPSt,
 								today); // generado
+						try {
+							beanGuardiasColegiado.setFechainicio(new SimpleDateFormat("yyyy-MM-dd").parse(fechaInicioPSt));
+							beanGuardiasColegiado.setFechafin(new SimpleDateFormat("yyyy-MM-dd").parse(fechaFinPSt));
+							this.triggerGuardiaColegiadoAID(beanGuardiasColegiado, 1);
+						} catch (Exception e) {
+							LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+						}
 					}
 					
 					// (L) Refactorizado
@@ -12202,7 +12241,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		LOGGER.info("descargarExcelLog() - > INFO CAL A DESCARGAR - > Turno:" + calyprogItem.getIdTurno() +  " / Guardia: " + calyprogItem.getIdGuardia() + "/ idCalG: " + calyprogItem.getIdCalendarioGuardias());
 		try {
 			String pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
-			String nombreFicheroSalida = nombreLog;
+			String nombreFicheroSalida = nombreLog + ".xlsx";
 			String path = pathFicheroSalida + nombreFicheroSalida;
 			LOGGER.info("descargarExcelLog() -> NOMBRE PATH : " + path);
 			
@@ -12918,12 +12957,39 @@ public class GuardiasServiceImpl implements GuardiasService {
 		this.scsPermutaguardiasExtendsMapper.deletePermutasCalendarioConfirmador(
 				Integer.valueOf(deleteCalBody.getIdInstitucion()), Integer.valueOf(idCalendarioGuardias),
 				Integer.valueOf(deleteCalBody.getIdTurno()), Integer.valueOf(deleteCalBody.getIdGuardia()));
-		LOGGER.info("Elimina deletePermutasCalendarioConfirmador OK");
-		this.scsGuardiascolegiadoExtendsMapper.deleteGuardiasCalendario(
-				Integer.valueOf(deleteCalBody.getIdInstitucion()), Integer.valueOf(idCalendarioGuardias),
-				Integer.valueOf(deleteCalBody.getIdTurno()), Integer.valueOf(deleteCalBody.getIdGuardia()),
-				deleteCalBody.getFechaDesde(), deleteCalBody.getFechaHasta());
-		LOGGER.info("Elimina deleteGuardiasCalendario OK");
+		LOGGER.info("Elimina deletePermutasCalendarioConfirmador OK");		
+		try {
+			//Conseguir el listado de registros a borrar
+			ScsGuardiascolegiadoExample filter = new ScsGuardiascolegiadoExample();
+			String NEW_FORMAT2 = "yyyy-MM-dd HH:mm:ss";
+			String OLD_FORMAT2 = "dd/MM/yyyy";
+			String fechaIni = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2, deleteCalBody.getFechaDesde());
+			String fechaFin = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2, deleteCalBody.getFechaHasta());
+			filter.createCriteria().andIdinstitucionEqualTo(Short.valueOf(deleteCalBody.getIdInstitucion()))
+				.andIdturnoEqualTo(Integer.valueOf(deleteCalBody.getIdTurno()))
+				.andIdguardiaEqualTo(Integer.valueOf(deleteCalBody.getIdGuardia()))
+				.andFechainicioGreaterThanOrEqualTo(new SimpleDateFormat("yyyy-MM-dd").parse(fechaIni))
+				.andFechafinLessThanOrEqualTo(new SimpleDateFormat("yyyy-MM-dd").parse(fechaFin));
+			List<ScsGuardiascolegiado> rowsToDelete = this.scsGuardiascolegiadoExtendsMapper.selectByExample(filter);
+			
+			this.scsGuardiascolegiadoExtendsMapper.deleteGuardiasCalendario(
+					Integer.valueOf(deleteCalBody.getIdInstitucion()), Integer.valueOf(idCalendarioGuardias),
+					Integer.valueOf(deleteCalBody.getIdTurno()), Integer.valueOf(deleteCalBody.getIdGuardia()),
+					deleteCalBody.getFechaDesde(), deleteCalBody.getFechaHasta());
+			
+			LOGGER.info("Elimina deleteGuardiasCalendario OK");
+			
+			//For para llamar al trigger con esos registros
+			for(ScsGuardiascolegiado row : rowsToDelete) {
+				this.triggerGuardiaColegiadoAID(row, 2);
+			}			
+			LOGGER.info("triggerGuardiaColegiadoAID - accion 2 (delete) - OK");
+			
+		} catch (ParseException e) {
+			LOGGER.info("Elimina deleteGuardiasCalendario KO - fallo al buscar registros a eliminar (trigger)");
+		} catch (Exception e) {
+			LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 2 (delete)");
+		}
 		this.scsCabeceraguardiasExtendsMapper.deleteCabecerasGuardiasCalendario(
 				Integer.valueOf(deleteCalBody.getIdInstitucion()), Integer.valueOf(idCalendarioGuardias),
 				Integer.valueOf(deleteCalBody.getIdTurno()), Integer.valueOf(deleteCalBody.getIdGuardia()),
@@ -12967,6 +13033,124 @@ public class GuardiasServiceImpl implements GuardiasService {
 				Integer.parseInt(deleteCalBody.getIdTurno()),idCalendarioGuardias,
 				deleteCalBody.getFechaDesde(), deleteCalBody.getFechaHasta());
 		LOGGER.info("EliminaCalendario() deleteGuardiConcreto OK");
+	}
+	
+	/*
+	 * SIGARNV-2918 :: este metodo forma parte de la solucion final (deshabilitar trigger + mejora generacion guardias colegiado)
+	 * El comportamiento aqui descrito es identico al del DB TRIGGER SCS_GUARDIASCOLEGIADO_AID
+	 * A fecha de 12/09/2023 se deja comentado hasta obtener la solucion final
+	 */
+	public int triggerGuardiaColegiadoAID(ScsGuardiascolegiado registro, Integer accion) throws Exception {
+		// Si la accion es 1 es un insert, si la accion es 2 es un delete
+		int response = 0;
+		/*String activocolegio = "";
+		
+		//Revisa si la institucion tiene habilitado envios a centralita
+		activocolegio = this.genParametrosExtendsMapper
+				.selectParametroPorInstitucion("CENTRALITAVIRTUAL_ACTIVO", String.valueOf(registro.getIdinstitucion())).getValor();
+		
+		if(activocolegio != "0") {
+			//Revisa si la guardia debe enviarse a centralita
+			ScsGuardiasturnoKey guardiaKey = new ScsGuardiasturnoKey();
+			guardiaKey.setIdinstitucion(registro.getIdinstitucion());
+			guardiaKey.setIdturno(registro.getIdturno());
+			guardiaKey.setIdguardia(registro.getIdguardia());
+			
+			ScsGuardiasturno guardia = scsGuardiasTurnoMapper.selectByPrimaryKey(guardiaKey);
+			
+			if(guardia != null && guardia.getEnviocentralita() == Short.valueOf("1")) {
+				// 1. Insert en Ecom_Cola
+				EcomCola nuevoEcomCola = new EcomCola();
+				Integer lastIdEcomCola = ecomColaExtendsMapper.selectLastIdEcomCola();
+				nuevoEcomCola.setIdinstitucion(registro.getIdinstitucion());
+				nuevoEcomCola.setIdestadocola(ECOM_ESTADOSCOLA.INICIAL.getId());
+				nuevoEcomCola.setIdoperacion(35);
+				nuevoEcomCola.setReintento(0);
+				nuevoEcomCola.setFechacreacion(new Date());
+				nuevoEcomCola.setFechamodificacion(new Date());
+				nuevoEcomCola.setUsumodificacion(SigaConstants.USUMODIFICACION_0);
+				response = response + ecomColaExtendsMapper.insert(nuevoEcomCola);
+				
+				LOGGER.info("Despues insercion Ecom_Cola :: " +  response);
+				
+				//2. Insert en Ecom_Guardiacolegiado
+				EcomGuardiacolegiado nuevoEcomGuardiaCol = new EcomGuardiacolegiado();
+				Integer lastIdEcomGuardiaCol = ecomGuardiacolegiadoMapper.selectLastIdEcomGuardiaColegiado();
+				CenDireccionesKey direccionABuscar = new CenDirecciones();
+				direccionABuscar.setIdinstitucion(registro.getIdinstitucion());
+				direccionABuscar.setIdpersona(registro.getIdpersona());
+				direccionABuscar.setIddireccion(new Long(6));
+				CenDirecciones direccionAInsertar = cenDireccionesMapper.selectByPrimaryKey(direccionABuscar);			
+				CenPersona datosPersona = cenPersonaMapper.selectByPrimaryKey(registro.getIdpersona());
+				String nombreColegiado = "";
+				if(datosPersona != null) {
+					nombreColegiado = (datosPersona.getNombre() == null ? "" : datosPersona.getNombre() + " ") 
+							+ (datosPersona.getApellidos1() == null ? "" : datosPersona.getApellidos1() + " ") 
+							+ (datosPersona.getApellidos2() == null ? "" : datosPersona.getApellidos2());
+				}
+				else {
+					nombreColegiado = registro.getIdpersona().toString();
+				}			
+				CenColegiadoKey colegiadoABuscar = new CenColegiadoKey();
+				colegiadoABuscar.setIdinstitucion(registro.getIdinstitucion());
+				colegiadoABuscar.setIdpersona(registro.getIdpersona());
+				String numColegiado = cenColegiadoExtendsMapper.selectCalculoNColegiado(colegiadoABuscar);
+				ScsCabeceraguardiasKey cabeceraABuscar = new ScsCabeceraguardiasKey();
+				cabeceraABuscar.setIdinstitucion(registro.getIdinstitucion());
+				cabeceraABuscar.setIdturno(registro.getIdturno());			
+				cabeceraABuscar.setIdguardia(registro.getIdguardia());
+				cabeceraABuscar.setIdpersona(registro.getIdpersona());
+				cabeceraABuscar.setFechainicio(registro.getFechainicio());
+				ScsCabeceraguardias datosCabecera = scsCabeceraguardiasMapper.selectByPrimaryKey(cabeceraABuscar);
+				
+				//ScsGuardiasturno selectByPrimaryKey(ScsGuardiasturnoKey key);
+				
+				nuevoEcomGuardiaCol.setIdecomguardiacolegiado(lastIdEcomGuardiaCol + 1); // +1 ya que el id no se aumenta automaticamente
+				nuevoEcomGuardiaCol.setIdinstitucion(registro.getIdinstitucion());
+				nuevoEcomGuardiaCol.setIdguardia(registro.getIdguardia());
+				nuevoEcomGuardiaCol.setFechaguardia(registro.getFechafin());
+				nuevoEcomGuardiaCol.setNombreguardia(guardia.getNombre());
+				nuevoEcomGuardiaCol.setOrdenguardia(datosCabecera != null ? datosCabecera.getPosicion() : null);			
+				nuevoEcomGuardiaCol.setNumerocolegiado(numColegiado);			
+				nuevoEcomGuardiaCol.setNombrecolegiado(nombreColegiado);			
+				nuevoEcomGuardiaCol.setTelefono1(direccionAInsertar != null && direccionAInsertar.getTelefono1() != null ?
+						direccionAInsertar.getTelefono1() : "000000000");
+				nuevoEcomGuardiaCol.setTelefono2(direccionAInsertar != null ? direccionAInsertar.getTelefono2() : "");
+				nuevoEcomGuardiaCol.setTelefonomovil(direccionAInsertar != null ? direccionAInsertar.getMovil() : "");
+				nuevoEcomGuardiaCol.setEmail(direccionAInsertar != null ? direccionAInsertar.getCorreoelectronico() : "");
+				nuevoEcomGuardiaCol.setAccion(accion.shortValue());
+				nuevoEcomGuardiaCol.setIdecomcola(new Long(lastIdEcomCola + 1)); // +1 por la ultima insercion de arriba
+				response = response + ecomGuardiacolegiadoMapper.insert(nuevoEcomGuardiaCol);
+				
+				LOGGER.info("Despues insercion Ecom_Guardiacolegiado :: " + nombreColegiado + " :: " +  response);
+				
+				//3. Insert en Scs_Cv_Guardiacolegiado
+				ScsCvGuardiacolegiado nuevoScsCvGuardiaCol = new ScsCvGuardiacolegiado();
+				Integer lastIdScsCvGuardiaCol = scsCvGuardiacolegiadoMapper.selectLastIdScsCvGuardiacolegiado();
+				nuevoScsCvGuardiaCol.setIdscsguardiacolegiado(lastIdScsCvGuardiaCol + 1); // +1 ya que el id no se aumenta automaticamente
+				nuevoScsCvGuardiaCol.setIdinstitucion(registro.getIdinstitucion());
+				nuevoScsCvGuardiaCol.setIdguardia(registro.getIdguardia());
+				nuevoScsCvGuardiaCol.setFechaguardia(registro.getFechafin());
+				nuevoScsCvGuardiaCol.setNombreguardia(guardia.getNombre());
+				nuevoScsCvGuardiaCol.setOrdenguardia(nuevoEcomGuardiaCol.getOrdenguardia());
+				nuevoScsCvGuardiaCol.setFecharecepcion(new Date());
+				nuevoScsCvGuardiaCol.setNumerocolegiado(numColegiado);
+				nuevoScsCvGuardiaCol.setNombrecolegiado(nombreColegiado);
+				nuevoScsCvGuardiaCol.setTelefono1(nuevoEcomGuardiaCol.getTelefono1());
+				nuevoScsCvGuardiaCol.setTelefono2(nuevoEcomGuardiaCol.getTelefono2());
+				nuevoScsCvGuardiaCol.setTelefonomovil(nuevoEcomGuardiaCol.getTelefonomovil());
+				nuevoScsCvGuardiaCol.setEmail(nuevoEcomGuardiaCol.getEmail());
+				nuevoScsCvGuardiaCol.setAccion(accion.shortValue());
+				nuevoScsCvGuardiaCol.setIdturno(registro.getIdturno());
+				nuevoScsCvGuardiaCol.setIdpersona(registro.getIdpersona());
+				response = response + scsCvGuardiacolegiadoMapper.insert(nuevoScsCvGuardiaCol);
+				
+				LOGGER.info("Despues insercion Scs_Cv_Guardiacolegiado :: " + nombreColegiado + " :: " +  response);
+				
+			}
+		}
+		*/
+		return response;
 	}
 
 }

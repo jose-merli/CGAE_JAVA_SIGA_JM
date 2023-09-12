@@ -191,6 +191,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
+	
+	@Autowired
+	private GuardiasServiceImpl guardiasServiceImpl;
 
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
@@ -2533,6 +2536,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
 					guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
 						scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+						try {
+							this.guardiasServiceImpl.triggerGuardiaColegiadoAID(scsGuardiascolegiado, 1);
+						} catch (Exception e) {
+							LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+						}
 					});
 					if (affectedRows <= 0) {
 						LOGGER.error(
@@ -2618,6 +2626,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
 					affectedRows += scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+					
+					try {
+						this.guardiasServiceImpl.triggerGuardiaColegiadoAID(scsGuardiascolegiado, 1);
+					} catch (Exception e) {
+						LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+					}
 
 					if (affectedRows <= 0) {
 						LOGGER.error(
@@ -2727,6 +2741,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
 					guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
 						scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+						try {
+							this.guardiasServiceImpl.triggerGuardiaColegiadoAID(scsGuardiascolegiado, 1);
+						} catch (Exception e) {
+							LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+						}
 					});
 					if (affectedRows <= 0) {
 						LOGGER.error(
@@ -2799,6 +2818,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 						affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
 						affectedRows += scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+						
+						try {
+							this.guardiasServiceImpl.triggerGuardiaColegiadoAID(scsGuardiascolegiado, 1);
+						} catch (Exception e) {
+							LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+						}
 
 						if (affectedRows <= 0) {
 							LOGGER.error(

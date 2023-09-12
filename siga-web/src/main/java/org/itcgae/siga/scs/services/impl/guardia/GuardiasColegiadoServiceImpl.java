@@ -128,6 +128,9 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 	@Autowired
 	private ScsCalendarioguardiasMapper scsCalendarioguardiasMapper;
 	
+	@Autowired
+	private GuardiasServiceImpl guardiasServiceImpl;
+	
 	//SIGARNV-2885@DTT.JAMARTIN@14/02/2023@INICIO
 	@Autowired
 	private FcsFactApunteMapper fcsFactApunteMapper;
@@ -426,7 +429,16 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 						itemIn.setFechainicio(new SimpleDateFormat("dd/MM/yyyy").parse(listaFechas.get(0)));
 						itemIn.setFechafin(new SimpleDateFormat("dd/MM/yyyy").parse(listaFechas.get(i)));
 						int rese = crearGuardiaColegiado(itemIn);
-						if(rese != 1)controlError++;
+						if(rese == 1) {
+							try {
+								this.guardiasServiceImpl.triggerGuardiaColegiadoAID(itemIn, 1);
+							} catch (Exception e) {
+								LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+							}
+						}
+						else {
+							controlError++;
+						}
 					}
 				//	response = scsCabeceraguardiasExtendsMapper.insertSelective(guardia);
 
@@ -1026,6 +1038,12 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 			for (ScsGuardiascolegiado guardiascolegiado: guardiasColegiadoSaliente){
 				scsGuardiascolegiadoExtendsMapper.deleteByPrimaryKey(guardiascolegiado);
+				try {
+					this.guardiasServiceImpl.triggerGuardiaColegiadoAID(guardiascolegiado, 2);
+				} catch (Exception e) {
+					LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 2 (delete)");
+				}
+				
 			}
 
 			//----------------------------------------------------------------------------------------------------
@@ -1075,6 +1093,11 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 			for (ScsGuardiascolegiado guardiascolegiado: guardiasColegiadoSaliente) {
 				guardiascolegiado.setIdpersona(newLetrado);
 				scsGuardiascolegiadoExtendsMapper.insert(guardiascolegiado);
+				try {
+					this.guardiasServiceImpl.triggerGuardiaColegiadoAID(guardiascolegiado, 1);
+				} catch (Exception e) {
+					LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+				}
 			}
 		}
 
@@ -1193,7 +1216,14 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				// Borramos los registros de la tabla SCS_GUARDIASCOLEGIADO para el letrado saliente
 				//-----------------------------------------------------------------------------------------------------
 
-				guardiasColegiadoSaliente.forEach(scsGuardiascolegiadoExtendsMapper::deleteByPrimaryKey);
+				guardiasColegiadoSaliente.forEach(guardiaColegiado -> {
+					scsGuardiascolegiadoExtendsMapper.deleteByPrimaryKey(guardiaColegiado);
+					try {
+						this.guardiasServiceImpl.triggerGuardiaColegiadoAID(guardiaColegiado, 2);
+					} catch (Exception e) {
+						LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 2 (delete)");
+					}
+				}); 
 
 				//----------------------------------------------------------------------------------------------------
 				// Borramos el registro de la tabla SCS_CABECERAGUARDIAS para el letrado saliente
@@ -1691,6 +1721,11 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 								// Insertamos en SCS_CABECERAGUARDIAS el Conf
 								if (insertGuarColSol != 0) {
+									try {
+										this.guardiasServiceImpl.triggerGuardiaColegiadoAID(guardiaSolAux, 1);
+									} catch (Exception e) {
+										LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+									}									
 									LOGGER.info("validarPermuta() / insertando nueva cabecera guardia del confirmador");
 //									ScsCabeceraguardias cabGuardiaConfAux = cabGuardiaSolCopy;
 									ScsCabeceraguardias cabGuardiaConfAux = copyScsCabeceraguardias(cabGuardiaSolCopy);
@@ -1713,6 +1748,11 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 										// Actualizamos SCS_PERMUTAGUARDIAS con la nueva permuta
 										if (insertGuarColConf != 0) {
+											try {
+												this.guardiasServiceImpl.triggerGuardiaColegiadoAID(guardiaConfAux, 1);
+											} catch (Exception e) {
+												LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+											}
 											LOGGER.info("validarPermuta() / actualizando permuta guardia");
 //											ScsPermutaguardias permutaGuardiaAux = permutaGuardiaCopy;
 											ScsPermutaguardias permutaGuardiaAux = copyScsPermutaguardias(permutaGuardiaCopy);
@@ -1760,6 +1800,18 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 														// Borramos SCS_GUARDIASCOLEGIADO antigua del Conf
 														if (deleteGuardColSol != 0) {
+															try {
+																ScsGuardiascolegiado wrapperGuardiasColegiado = new ScsGuardiascolegiado();
+																wrapperGuardiasColegiado.setIdinstitucion(guardiaSolCopy.getIdinstitucion());
+																wrapperGuardiasColegiado.setIdpersona(guardiaSolCopy.getIdpersona());
+																wrapperGuardiasColegiado.setIdturno(guardiaSolCopy.getIdturno());
+																wrapperGuardiasColegiado.setIdguardia(guardiaSolCopy.getIdguardia());
+																wrapperGuardiasColegiado.setFechainicio(guardiaSolCopy.getFechainicio());
+																wrapperGuardiasColegiado.setFechafin(guardiaSolCopy.getFechafin());
+																this.guardiasServiceImpl.triggerGuardiaColegiadoAID(wrapperGuardiasColegiado, 2);
+															} catch (Exception e) {
+																LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 2 (delete)");
+															}
 															LOGGER.info("validarPermuta() / borrando guardia antigua del confirmador");
 															guardiaConfCopy.setIdpersona(perm.getIdpersonaConfirmador());
 //															int deleteGuardColConf = scsGuardiascolegiadoExtendsMapper.deleteByPrimaryKey(guardiaConfCopy);
@@ -1775,6 +1827,18 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 															// Borramos SCS_CABECERAGUARDIAS antigua del Sol
 															if (deleteGuardColConf != 0) {
+																try {
+																	ScsGuardiascolegiado wrapperGuardiasColegiado = new ScsGuardiascolegiado();
+																	wrapperGuardiasColegiado.setIdinstitucion(guardiaConfCopy.getIdinstitucion());
+																	wrapperGuardiasColegiado.setIdpersona(guardiaConfCopy.getIdpersona());
+																	wrapperGuardiasColegiado.setIdturno(guardiaConfCopy.getIdturno());
+																	wrapperGuardiasColegiado.setIdguardia(guardiaConfCopy.getIdguardia());
+																	wrapperGuardiasColegiado.setFechainicio(guardiaConfCopy.getFechainicio());
+																	wrapperGuardiasColegiado.setFechafin(guardiaConfCopy.getFechafin());
+																	this.guardiasServiceImpl.triggerGuardiaColegiadoAID(wrapperGuardiasColegiado, 2);
+																} catch (Exception e) {
+																	LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 2 (delete)");
+																}
 																LOGGER.info("validarPermuta() / borrando cabecera guardia antigua del solicitante");
 																cabGuardiaSolCopy.setIdpersona(perm.getIdpersonaSolicitante());
 																int deleteCabGuardSol = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardiaSolCopy);

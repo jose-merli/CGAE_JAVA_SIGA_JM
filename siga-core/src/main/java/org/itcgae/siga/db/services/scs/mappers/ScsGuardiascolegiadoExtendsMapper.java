@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -108,4 +109,10 @@ public interface ScsGuardiascolegiadoExtendsMapper extends ScsGuardiascolegiadoM
     @DeleteProvider(type = ScsGuardiascolegiadoSqlExtendsProvider.class, method = "deleteGuardiasCalendario")
     public boolean deleteGuardiasCalendario(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia, String fechaInicio, String fechaFin);
 
+    @SelectProvider(type = ScsGuardiascolegiadoSqlExtendsProvider.class, method = "getIdPersonaSelective")
+    @Results({
+    	@Result(column="IDPERSONA", property="idpersona", jdbcType=JdbcType.DECIMAL, id=true)
+    })
+    List<Long> getIdPersonaSelective(Integer idInstitucion, Integer idTurno, Integer idGuardia, String fechaInicio);
+    
 }

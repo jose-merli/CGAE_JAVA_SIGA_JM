@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.GuardiasCalendarioItem;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
@@ -207,6 +208,22 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         return sql.toString();
 
     }
+    
+    
+    public String getIdPersonaSelective(Integer idInstitucion, Integer idTurno, Integer idGuardia, String fechaInicio) {
+        SQL sql = new SQL();
+
+        sql.SELECT("IDPERSONA");
+        sql.FROM("SCS_GUARDIASCOLEGIADO");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDTURNO = " + idTurno);
+        sql.WHERE("IDGUARDIA = " + idGuardia);
+        sql.WHERE( "FECHAINICIO >= TO_DATE('"+fechaInicio+"','DD/MM/YYYY')");
+
+        return sql.toString();
+
+    }
+    
 
 }
 
