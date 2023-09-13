@@ -153,16 +153,16 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			DocumentBuilder builder = new DocumentBuilder(doc);
 
 			   if (!dato.isEmpty()) {
-		            for (Map.Entry<String, Object> entry : dato.entrySet()) {
+				   for (Map.Entry<String, Object> entry : dato.entrySet()) {
 		                Object o = entry.getValue();
-		                if (o != null) {
-		                    String clave = entry.getKey();
-		                    while (builder.moveToMergeField(clave)) {
-		                        try {
-		                            builder.write(o.toString().trim());
-		                        } catch (Exception e) {
-		                            e.printStackTrace();
-		                        }
+		                String clave = entry.getKey();
+		                String valueToWrite = (o != null) ? o.toString().trim() : ""; // Si el valor es nulo, utilizamos una cadena vacía.
+
+		                while (builder.moveToMergeField(clave)) {
+		                    try {
+		                        builder.write(valueToWrite);
+		                    } catch (Exception e) {
+		                        e.printStackTrace();
 		                    }
 		                }
 		            }
