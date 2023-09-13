@@ -74,8 +74,8 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 
 			ordenaciones = ordenaciones.trim();
 
-			if (",".equals(ordenaciones.substring(ordenaciones.length() - 1, ordenaciones.length()))) {
-				ordenaciones = ordenaciones.substring(0, (ordenaciones.trim().length() - 1));
+			while (ordenaciones.endsWith(",")) {
+				ordenaciones = ordenaciones.substring(0, ordenaciones.length() - 1);
 			}
 
 			sqlListadoInscripciones.ORDER_BY(" " + ordenaciones + " ");

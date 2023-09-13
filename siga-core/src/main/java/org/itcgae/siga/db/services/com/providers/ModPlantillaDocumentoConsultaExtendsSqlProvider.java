@@ -77,6 +77,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 
 		sql.SELECT("con_consulta.DESCRIPCION");
 		sql.SELECT("con_consulta.IDCONSULTA");
+		sql.SELECT("con_consulta.IDOBJETIVO");
 		sql.SELECT("con_consulta.SENTENCIA");
 		sql.SELECT("con_consulta.IDINSTITUCION");
 		sql.SELECT("plantillaConsulta.REGION");

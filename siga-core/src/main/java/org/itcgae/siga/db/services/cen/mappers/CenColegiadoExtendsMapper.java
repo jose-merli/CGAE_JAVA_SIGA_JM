@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
@@ -16,6 +17,7 @@ import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.services.cen.providers.CenColegiadoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -309,4 +311,12 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "cuentaContable", property = "cuentaContable", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> selectCuentaContableSJCS(Short idInstitucion, ColegiadoItem colegiadoItem);
+	
+	@Select({ "select", "nvl(decode(nvl(comunitario,0),0, ncolegiado, ncomunitario), ncolegiado) as NCOLEGIADO", 
+		"from CEN_COLEGIADO",
+		"where IDINSTITUCION = #{idinstitucion,jdbcType=DECIMAL}",
+		"and IDPERSONA = #{idpersona,jdbcType=DECIMAL}" })
+	@Results({ 
+			@Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR) })
+	String selectCalculoNColegiado(CenColegiadoKey key);
 }
