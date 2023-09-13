@@ -6216,6 +6216,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 			periodosDiasGuardiaSJCS.addAll(listaDiasPeriodos);
 		else
 			throw new Exception("periodoSinDias");
+		
+		//Las guaridas vinculadas no tienen configuración, si se añade una guardia vinculada, solo se hace el insert en el dia despues de la insercion en la guardia normal.
 
 		/*
 		 * En el caso de que existan guardias vinculadas, se ha de generar un periodo
@@ -6224,7 +6226,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		 * que la unica forma es: generar el calendario real (antes) y (ahora) uno
 		 * ampliado para obtener el periodo de mas
 		 */
-		if (hasGuardiasVinculadas) {
+		/*if (hasGuardiasVinculadas) {
 			// obteniendo una fechaFin suficientemente posterior
 			try {
 //				SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_JAVA);
@@ -6248,7 +6250,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			// anyadiendo el primer periodo del calendario ampliado
 			periodosDiasGuardiaSJCS.add(listaDiasPeriodosAmpliado.get(listaDiasPeriodos.size()));
-		}
+		}*/
+		
 		return periodosDiasGuardiaSJCS;
 	}
 	

@@ -2652,6 +2652,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if(idGuardia != null) {
 			sql.WHERE("idguardiaprincipal = " + idGuardia);
 		}
+		sql.WHERE("FECHABAJA IS NULL");
 		sql.ORDER_BY("IDINSTITUCION, IDTURNO, IDGUARDIA");
 		return sql.toString();
 	}
