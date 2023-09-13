@@ -1401,13 +1401,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 	public InscripcionGuardiaDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request, String from) {
 		Short idInstitucion =null ;
 		String dni = "";
+		boolean isOrdenacionManual = false;
+		
 		if(!"Calendarios".equals(from)) {
 			String token = request.getHeader("Authorization");
 			 dni = UserTokenUtils.getDniFromJWTToken(token);
 			 idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		}
 	
-		// idInstitucion = (short) 2005; // borrar
+		
 		String ordenaciones = "";
 		InscripcionGuardiaDTO inscritos = new InscripcionGuardiaDTO();
 		
@@ -1484,8 +1486,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO desc, ");
 
 						}
-						if (cola.get(0).getOrdenacionmanual() > 0)
+						if (cola.get(0).getOrdenacionmanual() > 0) {
 							mapilla.put(cola.get(0).getOrdenacionmanual(), "NUMEROGRUPO, ORDENGRUPO, ");
+							isOrdenacionManual = true;}
 
 						if (cola.get(0).getNumerocolegiado() > 0 && cola.get(0).getOrdenacionmanual() <= 0)
 							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO asc, ");
@@ -1759,7 +1762,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								}
 							}
 
-						}
+						}if(!isOrdenacionManual){ 
 						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
 								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
 								idInstitucion.toString(), grupoUltimo, porGrupos == "1");
@@ -1769,6 +1772,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								colaGuardia.remove(i);
 							}
 						}
+					}
 						inscritos.setInscripcionesItem(colaGuardia);
 					}
 
