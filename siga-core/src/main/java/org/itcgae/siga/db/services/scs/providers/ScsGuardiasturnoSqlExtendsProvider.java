@@ -514,12 +514,14 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		return sql.toString();
 	}
 
-	public String getResumen(String idGuardia, String idTurno, String idInstitucion, String idLenguaje) {
+	public String getResumen(String idGuardia, String idTurno, String idInstitucion, String idLenguaje, boolean tipoGuardiaVacia) {
 		SQL sql = new SQL();
 
 		sql.SELECT("SCS_GUARDIASTURNO.NOMBRE AS nombreguardia");
 		sql.SELECT("SCS_TURNO.NOMBRE AS nombreturno");
+		if(!tipoGuardiaVacia) {
 		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION AS tipoguardia");
+		}
 		sql.SELECT("(\r\n" + "	SELECT\r\n" + "		COUNT(*)\r\n" + "\r\n" + "		FROM SCS_INSCRIPCIONGUARDIA\r\n"
 				+ "	WHERE\r\n" + "		idinstitucion = SCS_GUARDIASTURNO.IDINSTITUCION\r\n"
 				+ "		AND idturno = SCS_GUARDIASTURNO.IDTURNO\r\n"
@@ -531,14 +533,18 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		sql.JOIN("SCS_TURNO ON\r\n" + "	scs_turno.IDTURNO = scs_guardiasturno.IDTURNO\r\n"
 				+ "	AND scs_turno.IDINSTITUCION = scs_guardiasturno.IDINSTITUCION");
+		if(!tipoGuardiaVacia) {
 		sql.JOIN("SCS_TIPOSGUARDIAS ON\r\n" + "	SCS_TIPOSGUARDIAS.IDTIPOGUARDIA = SCS_GUARDIASTURNO.IDTIPOGUARDIA");
 		sql.JOIN(
 				"GEN_RECURSOS_CATALOGOS ON\r\n" + "	SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO");
+		}
 
 		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA = " + idGuardia);
 		sql.WHERE("SCS_GUARDIASTURNO.IDTURNO = " + idTurno);
+		if(!tipoGuardiaVacia) {
 		sql.WHERE("IDLENGUAJE = " + idLenguaje);
+		}
 
 		return sql.toString();
 

@@ -1236,6 +1236,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<GuardiasItem> guardias = new ArrayList<GuardiasItem>();
+		boolean tipoGuardiaVacia = false;
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -1250,9 +1251,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("resumenGuardia() -> Entrada para obtener datos resumen");
-
+				
+				if(guardiasItem.getTipoGuardia() == null) {
+					tipoGuardiaVacia = true;
+				}
+				
 				guardias = scsGuardiasturnoExtendsMapper.getResumen(guardiasItem.getIdGuardia(),
-						guardiasItem.getIdTurno(), idInstitucion.toString(), usuarios.get(0).getIdlenguaje());
+						guardiasItem.getIdTurno(), idInstitucion.toString(), usuarios.get(0).getIdlenguaje(), tipoGuardiaVacia);
 
 				LOGGER.info("resumenGuardia() -> Salida ya con los datos recogidos");
 			}

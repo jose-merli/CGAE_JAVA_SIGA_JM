@@ -176,7 +176,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "nombreturno", property = "turno", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "tipoguardia", property = "idTipoGuardia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NLETRADOSINSCRITOS", property = "letradosGuardia", jdbcType = JdbcType.VARCHAR) })
-	List<org.itcgae.siga.DTOs.scs.GuardiasItem> getResumen(String idGuardia, String idTurno, String idInstitucion, String idLenguaje);
+	List<org.itcgae.siga.DTOs.scs.GuardiasItem> getResumen(String idGuardia, String idTurno, String idInstitucion, String idLenguaje, boolean tipoGuardiaVacia);
 
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getCalendario")
 	@Results({ @Result(column = "FECHAINICIO", property = "fechaDesde", jdbcType = JdbcType.VARCHAR),
