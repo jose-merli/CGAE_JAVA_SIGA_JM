@@ -1909,10 +1909,13 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         detallesElement.appendChild(coberturaElement);*/
 
         if(solicitudincorporacion.getIdestadocivil() != null){
-            String cdgoEstadoCivil = cenEstadocivilExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdestadocivil()).getCodigoejis().substring(0,1);
-            Element estadoCivilElement = doc.createElement("estadoCivil");
-            estadoCivilElement.appendChild(doc.createTextNode(cdgoEstadoCivil));
-            detallesElement.appendChild(estadoCivilElement);
+        	String cenEstadoCivil = cenEstadocivilExtendsMapper.selectByPrimaryKey(solicitudincorporacion.getIdestadocivil()).getCodigoejis();
+        	if(cenEstadoCivil != null) {
+        		String cdgoEstadoCivil = cenEstadoCivil.substring(0,1);
+                Element estadoCivilElement = doc.createElement("estadoCivil");
+                estadoCivilElement.appendChild(doc.createTextNode(cdgoEstadoCivil));
+                detallesElement.appendChild(estadoCivilElement);
+        	}
         }
 
         Element autorizaCesionElement = doc.createElement("autorizaCesion");
