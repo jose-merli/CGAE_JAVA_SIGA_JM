@@ -255,6 +255,33 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	
 	List<DatosCalendarioProgramadoItem> getCalendariosProgramadosSigaClassique(CalendariosProgDatosEntradaItem obj, String idIns);
 	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getCalendariosProgramadosSigaClassiqueTarjeta")
+	@Results({ @Result(column = "institucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "turno", property = "turno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "guardia", property = "guardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idTurno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idGuardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaDesde", property = "fechaDesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaHasta", property = "fechaHasta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "generado", property = "generado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaProgramacion", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "listaGuardias", property = "listaGuardias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idCalG", property = "idCalG", jdbcType = JdbcType.INTEGER),
+			@Result(column = "numGuardias", property = "numGuardias", jdbcType = JdbcType.INTEGER),
+			@Result(column = "idCalendarioProgramado", property = "idCalendarioProgramado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "facturado", property = "facturado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "asistenciasAsociadas", property = "asistenciasAsociadas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CONTADORGENERADOS", property = "contadorGenerados", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "SOLOGENERARVACIO", property = "soloGenerarVacio", jdbcType = JdbcType.CHAR),
+			@Result(column = "estadoProgramacion", property = "estadoProgramacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDCALENDARIOGUARDIAS", property = "idCalendarioGuardia", jdbcType = JdbcType.VARCHAR)})
+	
+	List<DatosCalendarioProgramadoItem> getCalendariosProgramadosSigaClassiqueTarjeta(CalendariosProgDatosEntradaItem obj, String idIns);
+	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getLastCalendariosProgramadosSigaClassique")
 	@Results({ @Result(column = "institucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "turno", property = "turno", jdbcType = JdbcType.VARCHAR),
