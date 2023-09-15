@@ -1236,6 +1236,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<GuardiasItem> guardias = new ArrayList<GuardiasItem>();
+		boolean tipoGuardiaVacia = false;
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -1250,9 +1251,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("resumenGuardia() -> Entrada para obtener datos resumen");
-
+				
+				if(guardiasItem.getTipoGuardia() == null) {
+					tipoGuardiaVacia = true;
+				}
+				
 				guardias = scsGuardiasturnoExtendsMapper.getResumen(guardiasItem.getIdGuardia(),
-						guardiasItem.getIdTurno(), idInstitucion.toString(), usuarios.get(0).getIdlenguaje());
+						guardiasItem.getIdTurno(), idInstitucion.toString(), usuarios.get(0).getIdlenguaje(), tipoGuardiaVacia);
 
 				LOGGER.info("resumenGuardia() -> Salida ya con los datos recogidos");
 			}
@@ -3101,6 +3106,123 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		return datos;
 	}
+	
+	@Override
+	public List<DatosCalendarioProgramadoItem> getCalendarioProgramadoTarjeta(
+			CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<DatosCalendarioProgramadoItem> datos = new ArrayList<DatosCalendarioProgramadoItem>();
+		List<DatosCalendarioProgramadoItem> datosFull = new ArrayList<DatosCalendarioProgramadoItem>();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getCalendarioProgramado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getCalendarioProgramado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("getCalendarioProgramado() -> Entrada para obtener los datos del calendario");
+
+				// datos =
+				// scsGuardiasturnoExtendsMapper.getCalendarioProgramado(calendarioProgBody,
+				// idInstitucion.toString());
+				String OLD_FORMAT = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
+				String OLD_FORMAT1 = "yyyy-MM-dd HH:mm:ss";
+				String NEW_FORMAT = "dd/MM/yyyy";
+				String NEW_FORMAT1 = "dd/MM/yyyy HH:mm:ss";
+				// 2017-02-06 00:00:00.0
+				if (calendarioProgBody.getFechaCalendarioDesde() != null) {
+					String fecha = null;
+					String format = NEW_FORMAT;
+					if(calendarioProgBody.getFechaCalendarioDesde().length() == 29 ) 
+						format = OLD_FORMAT;
+					else if (calendarioProgBody.getFechaCalendarioDesde().length() == 10 )
+						format = NEW_FORMAT;
+					else
+						format = OLD_FORMAT;
+					fecha = changeDateFormat(format, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
+					calendarioProgBody.setFechaCalendarioDesde(fecha);
+				}
+				if (calendarioProgBody.getFechaCalendarioHasta() != null) {
+					String fecha = null;
+					String format = NEW_FORMAT;
+					if(calendarioProgBody.getFechaCalendarioHasta().length() == 29 ) 
+						format = OLD_FORMAT;
+					else if (calendarioProgBody.getFechaCalendarioHasta().length() == 10 )
+						format = NEW_FORMAT;
+					else
+						format = OLD_FORMAT;
+					fecha = changeDateFormat(format, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
+					calendarioProgBody.setFechaCalendarioHasta(fecha);
+				}
+				if (calendarioProgBody.getFechaProgramadaDesde() != null) {
+					String fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT1,
+							calendarioProgBody.getFechaProgramadaDesde());
+					calendarioProgBody.setFechaProgramadaDesde(fecha);
+				}
+				if (calendarioProgBody.getFechaProgramadaHasta() != null) {
+					String fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT1,
+							calendarioProgBody.getFechaProgramadaHasta());
+					calendarioProgBody.setFechaProgramadaHasta(fecha);
+				}
+				datos = scsGuardiasturnoExtendsMapper.getCalendariosProgramadosSigaClassiqueTarjeta(calendarioProgBody,
+						idInstitucion.toString());
+
+//				datos.forEach(d -> {
+//					d.setFacturado(false);
+//					String numGuardias = scsGuardiasturnoExtendsMapper.getNumGuardiasCalProg(d.getIdCalG(), d.getIdCalendarioProgramado(), d.getIdInstitucion());
+//					//String numGuardias = scsGuardiasturnoExtendsMapper.getNumGuardiasCalProg2(idInstitucion.toString(), d.getIdTurno(), calendarioProgBody.getIdGuardia(), d.getIdCalendarioProgramado());
+//
+//					String turno = scsGuardiasturnoExtendsMapper.getTurnoCalProg( d.getIdTurno(), d.getIdCalG(), d.getIdInstitucion());
+//					String guardia = scsGuardiasturnoExtendsMapper.getGuardiaCalProg( d.getIdTurno(), d.getIdGuardia(), d.getIdCalG(), d.getIdInstitucion());
+//					//existen guardias de colegiado facturadas en esos calendarios
+//					List<String> guardiasAsociadas =  scsGuardiasturnoExtendsMapper.getGuardiasAsociadasCalProg(d.getIdCalG(), d.getIdCalendarioProgramado(), d.getIdInstitucion());
+//					if (guardiasAsociadas != null && !guardiasAsociadas.isEmpty()) {
+//					guardiasAsociadas.forEach(idGuardia -> {
+//						List<String> facturado = scsGuardiasturnoExtendsMapper.getFacturada(idGuardia);
+//						if (facturado != null && !facturado.isEmpty()) {
+//							if (facturado.get(0).equals("1")) {
+//								d.setFacturado(true);
+//							}
+//						}
+//						Integer asistenciasAsociadas = scsGuardiasturnoExtendsMapper.getAsistencias(idGuardia);
+//						if (asistenciasAsociadas != null && asistenciasAsociadas != 0) {
+//							d.setAsistenciasAsociadas(true);
+//						}
+//					});
+//					}
+//
+//					String OLD_FORMAT2 = "yyyy-MM-dd HH:mm:ss.S";
+//					String NEW_FORMAT2 = "yyyy-MM-dd";
+//
+//
+//					if(numGuardias != null){
+//						d.setNumGuardias(numGuardias);
+//					}
+//					if(turno != null){
+//					d.setTurno(turno);
+//					}
+//					if(guardia != null){
+//					d.setGuardia(guardia);
+//					}
+//					datosFull.add(d);
+//				});
+
+				LOGGER.info("getCalendarioProgramado() -> Salida ya con los datos recogidos");
+			}
+		}
+
+		return datos;
+	}
 
 	@Override
 	public DatosCalendarioProgramadoItem getLastCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
@@ -4835,6 +4957,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 																		"generarCalendarioAsync: HCO SIN REGISTROS - Procesado con errores ");
 																updateHcoConfigProgCal(hcoConfProgCalendariosItem,
 																		PROCESADO_CON_ERRORES);
+																editarLog(d, "Procesado con errores", "");
 															}
 
 														} else {// Si viene con check solo generar vacio

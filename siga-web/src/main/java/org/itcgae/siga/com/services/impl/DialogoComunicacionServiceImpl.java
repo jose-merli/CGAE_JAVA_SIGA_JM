@@ -3137,9 +3137,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	private static void replaceAll(StringBuilder sb, String from, String to) {
 	    int index = sb.indexOf(from);
+	    if(to == null) {
+	    	to = "";
+	    }
 	    while(index != -1) {
-	        sb.replace(index, index + from.length(), to);
-	        index += to.length(); 
+	    	sb.replace(index, index + from.length(), to);
+	    	index += to.length(); 
 	        index = sb.indexOf(from, index);
 	    }
 	}

@@ -265,6 +265,14 @@ public class GuardiaController {
 				request);
 		return new ResponseEntity<List<DatosCalendarioProgramadoItem>>(response, HttpStatus.OK);
 	}
+	
+	@PostMapping(value = "/buscarCalendariosProgramadosTarjeta", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<DatosCalendarioProgramadoItem>> getCalendarioProgramadoTarjeta(
+			@RequestBody CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request) {
+		List<DatosCalendarioProgramadoItem> response = guardiasService.getCalendarioProgramadoTarjeta(calendarioProgBody,
+				request);
+		return new ResponseEntity<List<DatosCalendarioProgramadoItem>>(response, HttpStatus.OK);
+	}
 
 	@GetMapping(value = "/getGuardiasCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<GuardiaCalendarioItem>> getGuardiasCalendario(@RequestParam("idCalendar") String idCalendar,

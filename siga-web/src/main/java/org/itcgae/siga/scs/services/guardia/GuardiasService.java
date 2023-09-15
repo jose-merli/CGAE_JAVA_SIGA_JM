@@ -99,6 +99,9 @@ public interface GuardiasService {
 	public List<DatosCalendarioProgramadoItem> getCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
 			HttpServletRequest request);
 	
+	public List<DatosCalendarioProgramadoItem> getCalendarioProgramadoTarjeta(CalendariosProgDatosEntradaItem calendarioProgBody,
+			HttpServletRequest request);
+	
 	public DatosCalendarioProgramadoItem getLastCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
 			HttpServletRequest request);
 
