@@ -1897,7 +1897,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("g.idguardiaprincipal = " + idGuardia);
 		sql.WHERE("g.idturnoprincipal = " + idTurno);
 		sql.WHERE("g.idinstitucion = " + idInstitucion);
-
+		sql.WHERE("g.fechabaja is null");
 		return sql.toString();
 
 	}
