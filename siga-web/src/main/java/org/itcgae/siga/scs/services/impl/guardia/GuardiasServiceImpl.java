@@ -4840,6 +4840,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 																		"generarCalendarioAsync: HCO SIN REGISTROS - Procesado con errores ");
 																updateHcoConfigProgCal(hcoConfProgCalendariosItem,
 																		PROCESADO_CON_ERRORES);
+																editarLog(d, "Procesado con errores", "");
 															}
 
 														} else {// Si viene con check solo generar vacio
