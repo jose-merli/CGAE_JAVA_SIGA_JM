@@ -86,7 +86,7 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         }
         
         subquery6.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  < 0"); 
-    	subquery6.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
+    	//subquery6.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
         
         subquery6.WHERE("FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = "+idInstitucion);
 
@@ -250,12 +250,14 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
        
         if(movimientoItem.isHistorico()) {
         	subquery2.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  = 0"); 
-         }else {
-        	 subquery2.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  > 0");  	   
-         }
+         }//else {
+        	 //subquery2.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  > 0");  	   
+         //}
         
-        subquery2.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
-        
+        //subquery2.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
+        if(movimientoItem.getNcolegiado() != null && !movimientoItem.getNcolegiado().equalsIgnoreCase("")) {
+        	subquery2.WHERE("cen_colegiado.ncolegiado = "+movimientoItem.getNcolegiado());
+        }
         subquery2.WHERE("FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = "+idInstitucion+") MINUS "+ subquery6);
         
        
