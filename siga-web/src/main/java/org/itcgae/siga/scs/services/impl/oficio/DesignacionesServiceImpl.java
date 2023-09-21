@@ -2365,17 +2365,23 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 							scsDesigna.setNig(designaItem.getNig());
 							scsDesigna.setNumprocedimiento(designaItem.getNumProcedimiento());
-							scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
+							scsDesigna.setIdprocedimiento(designaItem.getIdModulo());
 							if (designaItem.getEstado() != null && !designaItem.getEstado().isEmpty()) {
 								scsDesigna.setEstado(designaItem.getEstado());
 							}
-							Long juzgado = new Long(designaItem.getIdJuzgado());
-							scsDesigna.setIdjuzgado(juzgado);
-							if (designaItem.getIdPretension() == 0) {
+							if (designaItem.getIdJuzgado() != null) {
+								Long juzgado = new Long(designaItem.getIdJuzgado());
+								scsDesigna.setIdjuzgado(juzgado);
+							}else {
+								scsDesigna.setIdjuzgado(null);
+							}
+							
+							if (designaItem.getIdProcedimiento() == null || designaItem.getIdProcedimiento().isEmpty()) {
 								scsDesigna.setIdpretension(null);
 							} else {
-								Short idPretension = new Short((short) designaItem.getIdPretension());
+								Short idPretension = Short.parseShort(designaItem.getIdProcedimiento());
 								scsDesigna.setIdpretension(idPretension);
+								
 							}
 							scsDesigna.setFechaestado(designaItem.getFechaEstado());
 							scsDesigna.setFechafin(designaItem.getFechaFin());
@@ -2422,7 +2428,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LOGGER.info(
 								"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
 						if (nigValido == true) {
-							scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+//							scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+							ScsDesignaExample scsDesignaExample = new ScsDesignaExample();
+							scsDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdturnoEqualTo(scsDesigna.getIdturno())
+									.andAnioEqualTo(scsDesigna.getAnio())
+									.andNumeroEqualTo(scsDesigna.getNumero());
+							scsDesignacionesExtendsMapper.updateByExample(scsDesigna, scsDesignaExample);
 						} else {
 							LOGGER.error("ERROR: NIG no válido.");
 							error.setCode(400);
@@ -9193,7 +9205,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			ejg.setNumeroprocedimiento(designa.getNumprocedimiento());
 			ejg.setNig(designa.getNig());
 			ejg.setObservaciones(designa.getResumenasunto()); // Campo Asunto
-			ejg.setIdpretension(designa.getIdpretension().longValue());
+			if(designa.getIdpretension()!= null) {
+				ejg.setIdpretension(designa.getIdpretension().longValue());
+			}else {
+				ejg.setIdpretension(null);
+			}			
 			ejg.setJuzgado(designa.getIdjuzgado());
 
 			ejg.setUsumodificacion(usuario.getIdusuario());
