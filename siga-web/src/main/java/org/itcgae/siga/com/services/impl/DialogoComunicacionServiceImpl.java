@@ -1549,7 +1549,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 //			 Formateamos la consulta antes de su ejecución
 	        sentencia = formatearConsulta(sentencia);
 	        
-			LOGGER.info("*******QUERY ANTES DE FILTRO MAXIMO***********" + sentencia);
+			/* LOGGER.info("*******QUERY ANTES DE FILTRO MAXIMO***********" + sentencia);
 			if(consulta.getIdObjetivo() != null) {
 				//añadirmos maximo por depende del idObjetivo
 				if(consulta.getIdObjetivo().equals("1") || consulta.getIdObjetivo().equals("2") || consulta.getIdObjetivo().equals("3")){
@@ -1564,7 +1564,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						sentencia = addMaxQuery(sentencia, 1);
 					}				
 					
-				}			
+				}		 */ 	
 			
 			
 			LOGGER.info("-----QUERY CON FILTRO MAXIMO-----------" + sentencia);	
