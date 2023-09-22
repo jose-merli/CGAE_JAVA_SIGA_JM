@@ -99,8 +99,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and col.idinstitucion = cli2.idinstitucion)");
 		}
 		sql.LEFT_OUTER_JOIN(
-				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
-						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion)");
 		
 		if (colegiadoItem.getIdgrupo() != null && colegiadoItem.getIdgrupo().length > 0) {
 		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
@@ -148,6 +147,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 				
 			}
 		}
+		
+		sql.WHERE("colest.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion)");
 		
 		//sql.WHERE("per.idtipoidentificacion not in '20'");
 
@@ -475,8 +476,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 				+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
 		}
 		sql.LEFT_OUTER_JOIN(
-				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
-						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion)");
 		sql.LEFT_OUTER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
 		sql.LEFT_OUTER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
 		sql.LEFT_OUTER_JOIN(
@@ -509,6 +509,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 				
 			}
 		}
+		
+		sql.WHERE("colest.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion)");
+		
 		//sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		
