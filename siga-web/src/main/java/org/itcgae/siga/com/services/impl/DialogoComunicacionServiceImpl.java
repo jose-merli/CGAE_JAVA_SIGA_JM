@@ -762,7 +762,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
 					for (ConsultaItem consulta : consultasItemDest) {
 						String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
-								mapaClave, esEnvio, null, null);
+								mapaClave, esEnvio, null, null,false);
 
 						List<Map<String, Object>> result;
 						try {
@@ -844,7 +844,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										for (ConsultaItem consultaCondicional : consultasItemCondicional) {
 
 											consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo,
-													consultaCondicional, mapaClave, esEnvio, null, null);
+													consultaCondicional, mapaClave, esEnvio, null, null,false);
 
 											idConsultaEjecutarCondicional = Long
 													.parseLong(consultaCondicional.getIdConsulta());
@@ -973,7 +973,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 													&& listaConsultasPlantillaEnvio.size() > 0) {
 												for (ConsultaItem consultaPlantilla : listaConsultasPlantillaEnvio) {
 													String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario,
-															dialogo, consultaPlantilla, mapaClave, esEnvio, null, null);
+															dialogo, consultaPlantilla, mapaClave, esEnvio, null, null,false);
 													listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
 															Long.parseLong(consultaPlantilla.getIdConsulta()),
 															consultaPlantillaEnvio, usuario.getIdinstitucion(),
@@ -1011,7 +1011,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento");
 											for (ConsultaItem consultaMulti : consultasItemMulti) {
 												String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo,
-														consultaMulti, mapaClave, esEnvio, null, null);
+														consultaMulti, mapaClave, esEnvio, null, null,false);
 
 												if (esEnvio) {
 													// Guardamos la consulta multidocumento
@@ -1226,7 +1226,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					
 					for(ConsultaItem consulta:consultasItemCondicional){
 						
-						consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio, null,null);
+						consultaEjecutarCondicional = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio, null,null,esExcel);
 						
 						idConsultaEjecutarCondicional = Long.parseLong(consulta.getIdConsulta());
 						
@@ -1272,7 +1272,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
 						for (ConsultaItem consulta : consultasItemDest) {
 							String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
-									mapaClave, esEnvio, null, null);
+									mapaClave, esEnvio, null, null,esExcel);
 	
 							List<Map<String, Object>> result;
 							try {
@@ -1331,7 +1331,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												&& listaConsultasPlantillaEnvio.size() > 0) {
 											for (ConsultaItem consultaPlantilla : listaConsultasPlantillaEnvio) {
 												String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario,
-														dialogo, consultaPlantilla, mapaClave, esEnvio, null, null);
+														dialogo, consultaPlantilla, mapaClave, esEnvio, null, null,esExcel);
 												listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
 														Long.parseLong(consultaPlantilla.getIdConsulta()),
 														consultaPlantillaEnvio, usuario.getIdinstitucion(),
@@ -1383,7 +1383,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento" );
 					for (ConsultaItem consultaMulti : consultasItemMulti) {
 						String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti,
-								mapaClave, esEnvio, null,null);
+								mapaClave, esEnvio, null,null,esExcel);
 
 						if (esEnvio) {
 							// Guardamos la consulta multidocumento
@@ -1514,7 +1514,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 
-	private String reemplazarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ConsultaItem consulta, HashMap<String, String> mapaClave, boolean esEnvio, ModelosComunicacionItem modelosComunicacionItem,List<List<String>> listaKeyFiltros) {
+	private String reemplazarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ConsultaItem consulta, HashMap<String, String> mapaClave, boolean esEnvio, ModelosComunicacionItem modelosComunicacionItem,List<List<String>> listaKeyFiltros, boolean esExcel) {
 				String sentencia = null;
 		//Buscamos la consulta con sus parametros dinamicos
 		
@@ -1550,21 +1550,22 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	        sentencia = formatearConsulta(sentencia);
 	        
 			LOGGER.info("*******QUERY ANTES DE FILTRO MAXIMO***********" + sentencia);
-			if(consulta.getIdObjetivo() != null) {
-				//añadirmos maximo por depende del idObjetivo
-				if(consulta.getIdObjetivo().equals("1") || consulta.getIdObjetivo().equals("2") || consulta.getIdObjetivo().equals("3")){
-					
+			if (consulta.getIdObjetivo() != null && !esExcel) {
+				// añadirmos maximo por depende del idObjetivo
+				if (consulta.getIdObjetivo().equals("1") || consulta.getIdObjetivo().equals("2")
+						|| consulta.getIdObjetivo().equals("3")) {
+
 					sentencia = addMaxQuery(sentencia, 10000);
-					
-					}else if(consulta.getRegion() != null && !consulta.getRegion().isEmpty()) {
-					
-						sentencia = addMaxQuery(sentencia, 10000);
-					}else {
-						
-						sentencia = addMaxQuery(sentencia, 1);
-					}				
-					
-				}			
+
+				} else if (consulta.getRegion() != null && !consulta.getRegion().isEmpty()) {
+
+					sentencia = addMaxQuery(sentencia, 10000);
+				} else {
+
+					sentencia = addMaxQuery(sentencia, 1);
+				}
+
+			}			
 			
 			
 			LOGGER.info("-----QUERY CON FILTRO MAXIMO-----------" + sentencia);	
@@ -2906,7 +2907,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		for(ConsultaItem consultaDatos:consultasItemFinal){																			
 			
-			String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio, modelosComunicacionItem, listaKeyFiltros);
+			String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio, modelosComunicacionItem, listaKeyFiltros, esExcel);
 			String nombreConsulta = consultaDatos.getDescripcion();
 			if(esEnvio){
 				//Guardamos la consulta datos															
