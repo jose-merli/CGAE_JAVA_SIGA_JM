@@ -2705,12 +2705,17 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	public String existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa) {
 
-		SQL sql = new SQL();
+		SQL sql = new SQL();			
 		sql.SELECT("count(1) as num");
 		sql.FROM("SCS_DESIGNA");
-		sql.WHERE("IDJUZGADO = '" + designa.getIdJuzgado() + "'");
-		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");
-
+		
+		if(designa.getIdJuzgado() != null) {
+			sql.WHERE("IDJUZGADO = '" + designa.getIdJuzgado() + "'");
+		}else{
+			sql.WHERE("IDJUZGADO = ''");
+		}
+		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");								
+		
 		return sql.toString();
 	}
 

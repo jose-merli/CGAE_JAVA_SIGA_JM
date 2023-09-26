@@ -2294,7 +2294,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 						}
 					}
 				}
-				
+				LOGGER.info("uploadFileCalendariosAsync() -> Tiene solapamiento: " + controlSolapamiento);
 					for (CargaMasivaDatosGuardiatem cargaMasivaDatosBTItem : cargaMasivaDatosBTItems) {
 
 						int result = -1;
@@ -2316,7 +2316,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								// que se pasa a crear la programacion
 								if (primeraEntrada) {
 									primeraEntrada = false;
-
+									LOGGER.info("uploadFileCalendariosAsync() -> Creamos programacion. ");
 									SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 									String today = formatter.format(new Date());
 									calendarioItemPrin = new DatosCalendarioProgramadoItem();
@@ -2362,8 +2362,8 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									historico.setUsumodificacion(usuario.getIdusuario());
 									historico.setOrden(ordenDefault);
 									ordenDefault++;
-									scsHcoConfProgCalendariosMapper.insertSelective(historico);
-
+									int val = scsHcoConfProgCalendariosMapper.insertSelective(historico);
+									LOGGER.info("uploadFileCalendariosAsync() -> Insertando en scsHcoConfProgCalendariosMapper" +val );
 								}
 
 								// Y creamos un calendario para ese idGuardia
@@ -2395,8 +2395,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									ins.setPosicion(Integer.parseInt(cargaMasivaDatosBTItem.getPosicion()));
 								// Generacion guardia colegiado
 								try {
-									
+									LOGGER.info("uploadFileCalendariosAsync() -> Empieza Generacion" );
 									guardiasServiceImpl.generarCalendario3(guardiasCalendarioItem3, false, ins, true);
+									LOGGER.info("uploadFileCalendariosAsync() -> Termina Generacion" );
 									result = 1;
 								} catch (Exception e) {
 									updateHcoConfigProgCal(historico,
@@ -2488,13 +2489,17 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 					cenCargamasivacv.setIdfichero(idFile);
 					cenCargamasivacv.setIdficherolog(idLogFile);
-
-					int result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
-
-					if (result == 0) {
-						error.setCode(SigaConstants.CODE_400);
-						errores += "Error al insertar en cargas masivas";
+					try {
+						int result = cenCargaMasivaExtendsMapper.insertSelective(cenCargamasivacv);
+						if (result == 0) {
+							error.setCode(SigaConstants.CODE_400);
+							errores += "Error al insertar en cargas masivas";
+						}
+					}catch (Exception e) {
+						LOGGER.info(e.getStackTrace());
 					}
+				
+					
 
 					LOGGER.info("uploadFileC() -> Salida al servicio para subir un archivo");
 					int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
