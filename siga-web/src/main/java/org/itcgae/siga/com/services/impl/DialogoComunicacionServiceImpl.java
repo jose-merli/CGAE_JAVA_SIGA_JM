@@ -755,9 +755,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
 								SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo(), idiomaUsu,
 								plantilla.getIdPlantillaDocumento());
-				if (consultasItemDest != null && consultasItemDest.size() > 0
-						&& !(null != modelosComunicacionItem.getIdClaseComunicacion()
-								&& modelosComunicacionItem.getIdClaseComunicacion().equals("5"))) {
+				if (consultasItemDest != null && consultasItemDest.size() > 0) {
 
 					LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
 					for (ConsultaItem consulta : consultasItemDest) {
