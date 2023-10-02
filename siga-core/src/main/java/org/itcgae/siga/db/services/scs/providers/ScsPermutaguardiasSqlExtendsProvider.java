@@ -170,15 +170,18 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
     public String getTurnoInscrito(Long idPersona, Short idinstitucion) {
     	
         SQL sql = new SQL();
+        SQL sql2 = new SQL();
 
+        sql2.SELECT("cabguar.IDTURNO");
+        sql2.FROM("SCS_CABECERAGUARDIAS cabguar");
+        sql2.WHERE("cabguar.FECHAINICIO >= SYSDATE");
+        sql2.WHERE("cabguar.IDINSTITUCION = " + idinstitucion);
+        
         sql.SELECT("UNIQUE turno.IDTURNO,"
                 + "turno.NOMBRE");
         sql.FROM("SCS_TURNO turno");
-        sql.JOIN("SCS_GUARDIASTURNO sg ON turno.IDINSTITUCION = sg.IDINSTITUCION AND turno.IDTURNO = sg.IDTURNO");
-        sql.JOIN("SCS_INSCRIPCIONGUARDIA si ON sg.IDINSTITUCION = si.IDINSTITUCION AND sg.IDTURNO = si.IDTURNO AND sg.IDGUARDIA = si.IDGUARDIA");
-        sql.JOIN("SCS_CALENDARIOGUARDIAS sc ON si.IDINSTITUCION = sc.IDINSTITUCION AND si.IDTURNO = si.IDTURNO AND si.IDGUARDIA = sc.IDGUARDIA");
+        sql.WHERE("turno.IDTURNO IN (" + sql2 + ")");
         sql.WHERE("turno.IDINSTITUCION = " + idinstitucion);
-        sql.WHERE("sc.FECHAINICIO >= SYSDATE");
 
         return sql.toString();
     }

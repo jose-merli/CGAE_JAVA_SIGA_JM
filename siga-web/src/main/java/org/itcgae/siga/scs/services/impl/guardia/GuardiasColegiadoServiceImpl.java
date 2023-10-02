@@ -1769,17 +1769,20 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 											if (updatePermutaGuardia != 0) {
 												LOGGER.info("validarPermuta() / actualizando permuta cabecera del solicitante");
 //												ScsPermutaCabecera permCabSolCopyAux = permCabSolCopy;
-												ScsPermutaCabecera permCabSolCopyAux = copyScsPermutaCabecera(permCabSolCopy);
-												permCabSolCopyAux.setFecha(permCabConfCopy.getFecha());
-
+												ScsPermutaCabecera permCabSolCopyAux = copyScsPermutaCabecera(permCabConfCopy);
+												//permCabSolCopyAux.setFecha(permCabConfCopy.getFecha());
+												permCabSolCopyAux.setIdpersona(permCabSolCopy.getIdpersona());
+												permCabSolCopyAux.setIdPermutaCabecera(permCabSolCopy.getIdPermutaCabecera());
 												int updatePerCabSol = scsPermutaCabeceraMapper.updateByPrimaryKey(permCabSolCopyAux);
 
 												// Actualizamos SCS_PERMUTA_CABECERA del Conf
 												if (updatePerCabSol != 0) {
 													LOGGER.info("validarPermuta() / actualizando permuta cabecera del confirmador");
 //													ScsPermutaCabecera permCabConfCopyAux = permCabConfCopy;
-													ScsPermutaCabecera permCabConfCopyAux = copyScsPermutaCabecera(permCabConfCopy);
-													permCabConfCopyAux.setFecha(permCabSolCopy.getFecha());
+													ScsPermutaCabecera permCabConfCopyAux = copyScsPermutaCabecera(permCabSolCopy);
+													//permCabConfCopyAux.setFecha(permCabSolCopy.getFecha());
+													permCabConfCopyAux.setIdpersona(permCabConfCopy.getIdpersona());
+													permCabConfCopyAux.setIdPermutaCabecera(permCabConfCopy.getIdPermutaCabecera());
 
 													int updatePerCabConf = scsPermutaCabeceraMapper.updateByPrimaryKey(permCabConfCopyAux);
 
@@ -2133,10 +2136,6 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				permutaGuardia.setIdcalendarioguardiasConfirmad(permutaConfirmador.getIdcalendarioguardias());
 				permutaGuardia.setFechainicioConfirmador(permutaConfirmador.getFecha());
 				permutaGuardia.setIdPerCabConfirmador(permutaConfirmador.getIdPermutaCabecera());
-
-				if(permutaItem.getFechaconfirmacion()!=null) {
-					permutaGuardia.setFechaconfirmacion(permutaItem.getFechaconfirmacion());
-				}
 				
 				ScsPermutaguardiasExample existePerGuar = new ScsPermutaguardiasExample();
 				existePerGuar.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -2157,6 +2156,15 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				LOGGER.info("permutarGuardia() / comprobando si existe la permuta de guardia ");
 				if (existePer.size() == 0) {
 					responsePerm = scsPermutaguardiasExtendsMapper.insert(permutaGuardia);
+					if(permutaItem.getFechaconfirmacion()!=null) {
+						List<PermutaItem> listaPerm = new ArrayList<PermutaItem>();
+						permutaItem.setNumero(permutaGuardia.getNumero());
+						permutaItem.setIdPerCabConfirmador(permutaGuardia.getIdPerCabConfirmador());
+						permutaItem.setIdPerCabSolicitante(permutaGuardia.getIdPerCabSolicitante());
+						permutaItem.setFechaconfirmacion(permutaGuardia.getFechaconfirmacion());
+						listaPerm.add(permutaItem);
+						this.validarPermuta(listaPerm, request);
+					}	
 				} else {
 					// Si existe, se actualizan los datos
 				    ScsPermutaguardias permutaGuardiaExistente = existePer.get(0);
@@ -2167,6 +2175,16 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				    permutaGuardiaExistente.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 				    responsePerm = scsPermutaguardiasExtendsMapper.updateByPrimaryKey(permutaGuardiaExistente);
+				    if(permutaItem.getFechaconfirmacion()!=null) {
+				    	List<PermutaItem> listaPerm = new ArrayList<PermutaItem>();
+						permutaItem.setNumero(permutaGuardia.getNumero());
+						permutaItem.setIdPerCabConfirmador(permutaGuardia.getIdPerCabConfirmador());
+						permutaItem.setIdPerCabSolicitante(permutaGuardia.getIdPerCabSolicitante());
+						permutaItem.setFechaconfirmacion(permutaGuardia.getFechaconfirmacion());
+						listaPerm.add(permutaItem);
+						this.validarPermuta(listaPerm, request);
+				    }
+				    
 				}
 
 				LOGGER.info(
