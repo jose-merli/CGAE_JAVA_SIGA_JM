@@ -8,6 +8,7 @@ import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.db.mappers.ScsHitofacturableguardiaMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsHitofacturableguardiaSqlExtendsProvider;
 import org.springframework.stereotype.Service;
 
@@ -63,4 +64,8 @@ public interface ScsHitofacturableguardiaExtendsMapper extends ScsHitofacturable
 
 	})
 	List<BaremosGuardiaItem> getTurnoGuarConf(String idInstitucion);
+	
+	@SelectProvider(type = ScsHitofacturableguardiaSqlExtendsProvider.class, method = "getAgruparGuardia")
+	@Results()
+	String getAgruparGuardia(String idInstitucion, String idTurno, String idGuardia);
 }
