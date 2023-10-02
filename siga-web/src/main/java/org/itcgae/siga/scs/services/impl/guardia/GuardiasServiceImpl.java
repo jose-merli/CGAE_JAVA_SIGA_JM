@@ -11469,7 +11469,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Iterator iterLetrados;
 		String fechaInicioPeriodo = null, fechaFinPeriodo = null, fechaPeriodo = null;
 		ScsCabeceraguardias beanCabeceraGuardias;
-		ScsGuardiascolegiado beanGuardiasColegiado;
 		LetradoInscripcionItem letrado = null;
 		Short idInstitucion = 0;
 		List alPeriodosSinAgrupar = getPeriodos(periodoDiasGuardia, lDiasASeparar);
@@ -11589,58 +11588,25 @@ public class GuardiasServiceImpl implements GuardiasService {
 								letrado.getInscripcionGuardia().getIdGuardia(),
 								letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
 					}
-					// Paso2: inserto un registro por dia de guardia en cada guardia:
-					iter = alDiasPeriodo.iterator();
-					while (iter.hasNext()) {
-						fechaPeriodo = (String) iter.next();
-
-						beanGuardiasColegiado = new ScsGuardiascolegiado();
-						if (letrado.getInscripcionGuardia() != null) {
-							beanGuardiasColegiado
-									.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
-							beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
-							beanGuardiasColegiado.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
-							beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionGuardia().getIdPersona()));
-						} else if (letrado.getInscripcionTurno() != null) {
-							beanGuardiasColegiado
-									.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
-							beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
-							beanGuardiasColegiado.setIdguardia(null);
-							beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionTurno().getIdpersona()));
+					
+					Boolean separarGuardia = separarGuardias(guardiasTurnoItem);
+					
+					if(separarGuardia) {
+						// Paso2: inserto un registro por dia de guardia en cada guardia:
+						iter = alDiasPeriodo.iterator();
+						while (iter.hasNext()) {
+							fechaPeriodo = (String) iter.next();
+							ScsGuardiascolegiado beanGuardiasColegiado = createBeanGuardiasColegiado(letrado, fechaInicioPeriodo, fechaPeriodo, guardiasTurnoItem, usuModificacion);
+							insertGuardiaColegiado(fechaInicioPeriodo, fechaPeriodo, formatter, beanGuardiasColegiado);
 						}
+					} else {
 
-//							beanGuardiasColegiado.setIdinstitucion(letrado.getIdinstitucion());
-//							beanGuardiasColegiado.setIdturno(letrado.getIdturno());
-//							beanGuardiasColegiado.setIdguardia(letrado.getIdguardia());
-//							beanGuardiasColegiado.setIdpersona(letrado.getIdpersona());
-						beanGuardiasColegiado.setFechainicio(new Date(fechaInicioPeriodo));
-						fechaInicioPSt = changeDateFormat(DATE_SHORT_SLASH, DATE_LONG, fechaInicioPeriodo);
-						beanGuardiasColegiado.setFechafin(new Date(fechaPeriodo));
-						fechaFinPSt = changeDateFormat(DATE_SHORT_SLASH, DATE_LONG, fechaPeriodo);
-						// Duracion segun tipoDias MES, SEMANA, QUINCENA, DIAS
-						int duracion = convertirUnidadesDuracion(guardiasTurnoItem.getTipodiasGuardia());
-						// beanGuardiasColegiado.setDiasguardia(new
-						// Long(beanGuardiasTurno1.getDiasGuardia().longValue()));
-						beanGuardiasColegiado.setDiasguardia(new Long(duracion));
-						beanGuardiasColegiado.setDiasacobrar(new Long(guardiasTurnoItem.getDiasPagados().longValue()));
-						beanGuardiasColegiado.setFechamodificacion(new Date());
-						today = changeDateFormat(DATE_SHORT_SLASH, DATE_LONG, formatter.format(new Date()));
-						beanGuardiasColegiado.setUsumodificacion(usuModificacion);
-						beanGuardiasColegiado.setReserva("N");
-						beanGuardiasColegiado.setObservaciones("-");
-						beanGuardiasColegiado.setFacturado("N");
-						beanGuardiasColegiado.setPagado("N");
-						beanGuardiasColegiado.setIdfacturacion(null);
-						scsGuardiascolegiadoMapper.insertSelective2(beanGuardiasColegiado, fechaInicioPSt, fechaFinPSt,
-								today); // generado
-						try {
-							beanGuardiasColegiado.setFechainicio(new SimpleDateFormat("yyyy-MM-dd").parse(fechaInicioPSt));
-							beanGuardiasColegiado.setFechafin(new SimpleDateFormat("yyyy-MM-dd").parse(fechaFinPSt));
-							this.triggerGuardiaColegiadoAID(beanGuardiasColegiado, 1);
-						} catch (Exception e) {
-							LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
-						}
+						//TODO Esta fecha (fechaPeriodo), que es la fecha de fin, hay que obtenerla o calcularla.
+						fechaPeriodo = "30/09/2025";				
+						ScsGuardiascolegiado beanGuardiasColegiado = createBeanGuardiasColegiado(letrado, fechaInicioPeriodo, fechaPeriodo, guardiasTurnoItem, usuModificacion);
+						insertGuardiaColegiado(fechaInicioPeriodo, fechaPeriodo, formatter, beanGuardiasColegiado);
 					}
+					
 					
 					// (L) Refactorizado
 					Map<String, Object> mapLog10 = new HashMap();
@@ -11674,6 +11640,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					mapLog11.put("","");
 					listaDatosExcelGeneracionCalendarios.add(mapLog11);
 				}catch(Exception e) {
+					LOGGER.error("Error: " + e.getMessage());
 					if(e.getMessage().equals("gratuita.calendarios.guardias.mensaje.existe")) {
 						String ap2 = null;
 						String ap1 = null;
@@ -11731,6 +11698,84 @@ public class GuardiasServiceImpl implements GuardiasService {
 //		mapLog11.put("","");
 //		listaDatosExcelGeneracionCalendarios.add(mapLog11);
 
+	}
+	
+	private Boolean separarGuardias(GuardiasTurnoItem guardiasTurnoItem) {
+		
+		//Se comprueba si el check de agrupar guardias está marcado.
+		try {
+			//Aquí habría que comprobar el check, y si no hay que separar se coge la primera fecha y la última y se hace solo un insert
+			String agruparGuardia = scsHitofacturableguardiaExtendsMapper.getAgruparGuardia(guardiasTurnoItem.getIdInstitucion().toString(),
+					guardiasTurnoItem.getIdTurno().toString(), guardiasTurnoItem.getIdGuardia().toString());
+			LOGGER.info("*Agrupar guardia: " + agruparGuardia);
+			if(agruparGuardia.equals("0")){
+				LOGGER.info("*Separar guardia: activado");
+				return true;
+			}
+		} catch(Exception e) {
+			LOGGER.info("Error en la consulta separarGuadia");
+			LOGGER.info(e.getStackTrace().toString());
+		}
+		LOGGER.info("*Separar guardia: desactivado");
+		return false;
+	}
+	
+	private void insertGuardiaColegiado(String fechaInicioPeriodo, String fechaPeriodo, SimpleDateFormat formatter, ScsGuardiascolegiado beanGuardiasColegiado) {
+		
+		String fechaInicioPSt = changeDateFormat(DATE_SHORT_SLASH, DATE_LONG, fechaInicioPeriodo);
+		String fechaFinPSt = changeDateFormat(DATE_SHORT_SLASH, DATE_LONG, fechaPeriodo);
+		String today = changeDateFormat(DATE_SHORT_SLASH, DATE_LONG, formatter.format(new Date()));
+		scsGuardiascolegiadoMapper.insertSelective2(beanGuardiasColegiado, fechaInicioPSt, fechaFinPSt,
+				today); // generado
+		try {
+			beanGuardiasColegiado.setFechainicio(new SimpleDateFormat("yyyy-MM-dd").parse(fechaInicioPSt));
+			beanGuardiasColegiado.setFechafin(new SimpleDateFormat("yyyy-MM-dd").parse(fechaFinPSt));
+			this.triggerGuardiaColegiadoAID(beanGuardiasColegiado, 1);
+		} catch (Exception e) {
+			LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+		}
+	}
+	
+	private ScsGuardiascolegiado createBeanGuardiasColegiado(LetradoInscripcionItem letrado, String fechaInicioPeriodo, String fechaPeriodo, 
+			GuardiasTurnoItem guardiasTurnoItem, Integer usuModificacion) {
+		
+		ScsGuardiascolegiado beanGuardiasColegiado = new ScsGuardiascolegiado();
+		if (letrado.getInscripcionGuardia() != null) {
+			beanGuardiasColegiado
+					.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
+			beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
+			beanGuardiasColegiado.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
+			beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionGuardia().getIdPersona()));
+		} else if (letrado.getInscripcionTurno() != null) {
+			beanGuardiasColegiado
+					.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
+			beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
+			beanGuardiasColegiado.setIdguardia(null);
+			beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionTurno().getIdpersona()));
+		}
+
+//			beanGuardiasColegiado.setIdinstitucion(letrado.getIdinstitucion());
+//			beanGuardiasColegiado.setIdturno(letrado.getIdturno());
+//			beanGuardiasColegiado.setIdguardia(letrado.getIdguardia());
+//			beanGuardiasColegiado.setIdpersona(letrado.getIdpersona());
+		beanGuardiasColegiado.setFechainicio(new Date(fechaInicioPeriodo));
+		beanGuardiasColegiado.setFechafin(new Date(fechaPeriodo));
+		// Duracion segun tipoDias MES, SEMANA, QUINCENA, DIAS
+		int duracion = convertirUnidadesDuracion(guardiasTurnoItem.getTipodiasGuardia());
+		// beanGuardiasColegiado.setDiasguardia(new
+		// Long(beanGuardiasTurno1.getDiasGuardia().longValue()));
+		beanGuardiasColegiado.setDiasguardia(new Long(duracion));
+		beanGuardiasColegiado.setDiasacobrar(new Long(guardiasTurnoItem.getDiasPagados().longValue()));
+		beanGuardiasColegiado.setFechamodificacion(new Date());
+
+		beanGuardiasColegiado.setUsumodificacion(usuModificacion);
+		beanGuardiasColegiado.setReserva("N");
+		beanGuardiasColegiado.setObservaciones("-");
+		beanGuardiasColegiado.setFacturado("N");
+		beanGuardiasColegiado.setPagado("N");
+		beanGuardiasColegiado.setIdfacturacion(null);
+		
+		return beanGuardiasColegiado;
 	}
 
 	private int convertirUnidadesDuracion(String tipoDiasGuardia) {

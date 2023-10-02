@@ -131,5 +131,18 @@ public class ScsHitofacturableguardiaSqlExtendsProvider extends ScsHitofacturabl
 
 		return sql.toString();
 	}
+	
+	public String getAgruparGuardia(String idInstitucion, String idTurno, String idGuardia) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("MAX(AGRUPAR)");
+		sql.FROM("SCS_HITOFACTURABLEGUARDIA sh");
+		sql.WHERE("sh.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("sh.IDTURNO = '" + idTurno + "'");
+		sql.WHERE("sh.IDGUARDIA = '" + idGuardia + "'");
+		sql.WHERE("sh.AGRUPAR IS NOT NULL");
+		
+		return sql.toString();
+	}
 
 }
