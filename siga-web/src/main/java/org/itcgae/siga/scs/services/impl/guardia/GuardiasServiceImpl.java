@@ -11601,7 +11601,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 					} else {
 
-						//Calcular la fecha del fin del grupo de guardías
+						//TODO Esta fecha (fechaPeriodo), que es la fecha de fin, hay que obtenerla o calcularla.
 						fechaPeriodo = "30/09/2025";				
 						ScsGuardiascolegiado beanGuardiasColegiado = createBeanGuardiasColegiado(letrado, fechaInicioPeriodo, fechaPeriodo, guardiasTurnoItem, usuModificacion);
 						insertGuardiaColegiado(fechaInicioPeriodo, fechaPeriodo, formatter, beanGuardiasColegiado);
