@@ -790,12 +790,12 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						if (datosTarjeta.getIdTipoEnvio() != null) {
 							modeloCom.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 						}
-                        if (datosTarjeta.getInformeUnico() != null) {
-                            modeloCom.setInformeunico(Short.parseShort(datosTarjeta.getInformeUnico()));
-                        } else {
-                            modeloCom.setInformeunico(null);
-                        }
-                        
+						if (datosTarjeta.getInformeUnico() != null) {
+							modeloCom.setInformeunico(Short.parseShort(datosTarjeta.getInformeUnico()));
+						} else {
+							modeloCom.setInformeunico(null);
+						}
+						
 						modModelocomunicacionMapper.updateByPrimaryKey(modeloCom);
 					} else {
 						modeloCom = new ModModelocomunicacion();
