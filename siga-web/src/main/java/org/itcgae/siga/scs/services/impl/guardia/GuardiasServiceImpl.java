@@ -1291,6 +1291,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.info("resumenConfiguracionCola() -> Salida ya con los datos recogidos");
 			}
 		}
+		if(guardias.isEmpty()) {
+			return new GuardiasItem();
+		}
 		return guardias.get(0);
 	}
 
