@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -98,6 +99,48 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 		}
 		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
 		return tiposActuacionDTO;
+	}
+	
+	@Override
+	public StringDTO searchTipoActuacionPorDefecto(String descripcionTipoAsistencia, String juzgadoComisaria, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		StringDTO tipoActuacionPorDefectoDTO = new StringDTO();
+		String tipoActuacionPorDefecto = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchTipoActuacionPorDefecto() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchTipoActuacionPorDefecto() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"searchTipoActuacionPorDefecto() / scsTipoactuacionExtendsMapper.searchTipoActuacionPorDefecto() -> Entrada a scsTipoactuacionExtendsMapper para obtener el tipo de actuación por defecto");
+
+				tipoActuacionPorDefecto = scsTipoactuacionExtendsMapper.searchTipoActuacionPorDefecto(usuario.getIdlenguaje(), idInstitucion, descripcionTipoAsistencia, juzgadoComisaria);
+
+				LOGGER.info(
+						"searchTipoActuacionPorDefecto() / scsTipoactuacionExtendsMapper.searchTipoActuacionPorDefecto() -> Salida a scsTipoactuacionExtendsMapper para obtener el tipo de actuación por defecto");
+				
+				tipoActuacionPorDefectoDTO.setValor(tipoActuacionPorDefecto);
+
+			}
+
+		}
+		LOGGER.info("searchTipoActuacionPorDefecto() -> Salida del servicio para obtener el tipo de actuación por defecto");
+		return tipoActuacionPorDefectoDTO;
 	}
 
 	@Override
@@ -194,6 +237,8 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 						if (scsTipoactuaciones != null && scsTipoactuaciones.size() > 0) {
 
 							ScsTipoactuacion scsTipoActuacion = scsTipoactuaciones.get(0);
+							
+							scsTipoActuacion.setComisariajuzgadopordefecto(tiposActuacionItem.getComisariajuzgado());
 
 							// Buscamos si existe una descripcion que sea igual en fundamentos q no sea el
 							// propio
@@ -630,7 +675,9 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 									"createFundamentosResolucion() / genRecursosCatalogosExtendsMapper.selectByExample(example) -> Salida a genRecursosCatalogosExtendsMapper para guardar descripcion");
 
 							scsTipoactuacion.setDescripcion(genRecursosCatalogo.getIdrecurso());
-
+							
+							scsTipoactuacion.setComisariajuzgadopordefecto(tiposActuacionItem.getComisariajuzgado());
+							
 							insertarRestoIdiomas(genRecursosCatalogo);
 
 							LOGGER.info(

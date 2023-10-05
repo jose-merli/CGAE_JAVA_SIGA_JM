@@ -39,9 +39,16 @@ public interface ScsTipoactuacionExtendsMapper extends ScsTipoactuacionMapper{
 			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "IMPORTEMAXIMO", property = "importemaximo", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "COMISARIAJUZGADOPORDEFECTO", property = "comisariajuzgado", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
 	
 	List<TiposActuacionItem> searchTiposActuacion(boolean historico, String idLenguaje, Short idInstitucion);
+	
+	@SelectProvider(type = ScsTipoactuacionSqlExtendsProvider.class, method = "searchTipoActuacionPorDefecto")
+	String searchTipoActuacionPorDefecto(String idLenguaje, Short idInstitucion, String descripcionTipoAsistencia, String juzgadoComisaria);
+	
+	@SelectProvider(type = ScsTipoactuacionSqlExtendsProvider.class, method = "searchTipoActuacionPorDefectoIdTipoAsistencia")
+	String searchTipoActuacionPorDefectoIdTipoAsistencia(String idLenguaje, Short idInstitucion, String descripcionTipoAsistencia, String juzgadoComisaria);
 	
 	@SelectProvider(type=ScsTipoactuacionSqlExtendsProvider.class, method="getTiposAsistencia")
     @Results({

@@ -17,6 +17,15 @@ public class TiposActuacionItem {
 	private String descripciontipoactuacion;
 	private String descripciontipoasistencia;
 	private String idtipoasistencia;
+	private String comisariajuzgado;
+	
+	public String getComisariajuzgado() {
+		return comisariajuzgado;
+	}
+
+	public void setComisariajuzgado(String comisariajuzgado) {
+		this.comisariajuzgado = comisariajuzgado;
+	}
 	private boolean historico;
 	
 	public String getIdinstitucion() {

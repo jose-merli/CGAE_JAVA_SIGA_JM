@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AreasDTO;
 import org.itcgae.siga.DTOs.scs.CosteFijoDTO;
@@ -35,6 +36,13 @@ public class TiposActuacionController {
 	ResponseEntity<TiposActuacionDTO> searchTiposActuacion(@RequestParam("historico") boolean historico, HttpServletRequest request) {
 		TiposActuacionDTO response = TiposActuacionService.searchTiposActuacion(historico, request);
 		return new ResponseEntity<TiposActuacionDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/gestionTiposActuacion/busquedaTipoActuacionPorDefecto", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> searchTipoActuacionPorDefecto(@RequestParam("descripcionTipoAsistencia") String descripcionTipoAsistencia,
+															@RequestParam("juzgadocomisaria") String juzgadoComisaria, HttpServletRequest request) {
+		StringDTO response = TiposActuacionService.searchTipoActuacionPorDefecto(descripcionTipoAsistencia, juzgadoComisaria, request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/gestionTiposAsistencia/ComboTiposActuacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
