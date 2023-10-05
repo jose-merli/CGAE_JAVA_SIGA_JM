@@ -346,18 +346,12 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				if(colegiadoItemList.get(i).getFechaEstado() != null && colegiadoItemList.get(i).getFechaEstado().after(new Date())) {
 					colegiadoItemList.get(i).setEstadoColegial("Sin estado");
 				} else {
-					if (colegiadoItemList.get(i).getFechaEstadoStr() != null) {
-						//Formateamos la fecha que viene en string
-						Date fechaEst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(colegiadoItemList.get(i).getFechaEstadoStr());
-						
-						if(fechaEst.after(new Date())) {
-							colegiadoItemList.get(i).setEstadoColegial("Sin estado");
-						}
-					} else {
+					//Formateamos la fecha que viene en string
+					Date fechaEst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(colegiadoItemList.get(i).getFechaEstadoStr());
+					
+					if(fechaEst.after(new Date())) {
 						colegiadoItemList.get(i).setEstadoColegial("Sin estado");
 					}
-					
-					
 				}
 			}
 		}
