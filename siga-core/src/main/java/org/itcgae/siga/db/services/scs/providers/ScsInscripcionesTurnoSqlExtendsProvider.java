@@ -155,10 +155,10 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"    DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" +
 				"FROM\r\n" + 
 				"    scs_inscripcionturno ins\r\n" + 
-				"    JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
+				"    INNER JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
 				"                                    AND col.idinstitucion = ins.idinstitucion\r\n" + 
-				"     JOIN cen_persona per ON per.idpersona = col.idpersona\r\n" + 
-				"    LEFT JOIN scs_turno tur ON tur.idturno = ins.idturno\r\n" + 
+				"     INNER JOIN cen_persona per ON per.idpersona = col.idpersona\r\n" + 
+				"    INNER JOIN scs_turno tur ON tur.idturno = ins.idturno\r\n" + 
 				"                                AND tur.idinstitucion = ins.idinstitucion");
 		sql.WHERE("ins.idinstitucion ='"+idInstitucion+"'");
 		if(inscripcionesItem.getIdturno() != null) {
@@ -285,10 +285,10 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"    DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" +
 				"FROM\r\n" + 
 				"    scs_inscripcionturno ins\r\n" + 
-				"    JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
+				"    INNER JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
 				"                                    AND col.idinstitucion = ins.idinstitucion\r\n" + 
-				"     JOIN cen_persona per ON per.idpersona = col.idpersona\r\n" + 
-				"    LEFT JOIN scs_turno tur ON tur.idturno = ins.idturno\r\n" + 
+				"     INNER JOIN cen_persona per ON per.idpersona = col.idpersona\r\n" + 
+				"    INNER JOIN scs_turno tur ON tur.idturno = ins.idturno\r\n" + 
 				"                                AND tur.idinstitucion = ins.idinstitucion");
 		sql.WHERE("ins.idinstitucion ='"+idInstitucion+"'");
 		if(inscripcionesItem.getIdturno() != null) {
