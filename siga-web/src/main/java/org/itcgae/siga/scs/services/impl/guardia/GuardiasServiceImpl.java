@@ -11604,7 +11604,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if(permitoInsertGuardiasColegiado) {
 						if (!separarGuardia) {
 							fechaInicioUnica = fechaInicioPSt;
-							fechaFinPSt = guardiasCalendarioItem.getFechafin();
 						}
 						int a = 0;
 						//Comprobar separarGuardia y si está false meterle a fecha fin la del ultimo dia del periodo
