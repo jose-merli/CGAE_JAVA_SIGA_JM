@@ -1,6 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,12 +17,14 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoGeneralDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.IBusquedaPerService;
 import org.itcgae.siga.cen.services.IInstitucionesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
@@ -30,8 +33,11 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
@@ -72,6 +78,9 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
@@ -348,6 +357,39 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 					busquedaPerFisicaSearchDTO.setNif(nifPer);
 				}
 
+				// 0. Contamos los registros y si supera el máximo lo indicamos
+				
+				Integer maxCenso = 0;
+				
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
+				genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+						.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				LOGGER.info(
+						"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+				List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+				LOGGER.info(
+						"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				if (tamMax != null) {
+					maxCenso = Integer.valueOf(tamMax.get(0).getValor());
+				} else {
+					maxCenso = null;
+				}
+				
+				LOGGER.info(
+						"searchPerFisica() / cenPersonaExtendsMapper.searchPerFisica() -> Entrada a cenPersonaExtendsMapper para contar la lista de personas físicas");
+				MaxIdDto count = cenPersonaExtendsMapper.countPerFisica(busquedaPerFisicaSearchDTO, idLenguaje,
+						String.valueOf(idInstitucion));
+				
+				if(count != null && count.getIdMax() > maxCenso) {
+					Error error = new Error();
+					error.setMessage("general.message.consulta.max.resultados");
+					busquedaPerFisicaDTO.setError(error);
+					return busquedaPerFisicaDTO;
+				}
+				
 				// 1. Buscamos colegiados dentro de nuestro colegio
 				LOGGER.info(
 						"searchPerFisica() / cenPersonaExtendsMapper.searchPerFisica() -> Entrada a cenPersonaExtendsMapper para obtener lista de personas físicas");
