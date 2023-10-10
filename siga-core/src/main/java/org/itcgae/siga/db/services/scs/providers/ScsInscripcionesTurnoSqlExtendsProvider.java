@@ -151,7 +151,6 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"    ins.observacionesvalbaja,\r\n" + 
 				"    ins.fechadenegacion,\r\n" + 
 				"    ins.observacionesdenegacion,\r\n" + 
-				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado," +
 				"    DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" +
 				"FROM\r\n" + 
 				"    scs_inscripcionturno ins\r\n" + 
@@ -229,8 +228,12 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		}
 		sql.ORDER_BY("fechasolicitud DESC");
 		if (tamMax != null) {
+			SQL sqlPpal = new SQL();
+			sqlPpal.SELECT("*");
+			sqlPpal.FROM("(" + sql.toString() + ") consulta");
 			Integer tamMaxNumber = tamMax + 1;
-			sql.WHERE("rownum <= " + tamMaxNumber);
+			sqlPpal.WHERE("rownum <= " + tamMaxNumber);
+			return sqlPpal.toString();
 		}
 			
 		return sql.toString();
@@ -281,7 +284,6 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"    ins.observacionesvalbaja,\r\n" + 
 				"    ins.fechadenegacion,\r\n" + 
 				"    ins.observacionesdenegacion,\r\n" + 
-				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado," +
 				"    DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" +
 				"FROM\r\n" + 
 				"    scs_inscripcionturno ins\r\n" + 
@@ -372,8 +374,12 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		sql.ORDER_BY("fechasolicitud DESC");
 				
 		if (tamMax != null) {
+			SQL sqlPpal = new SQL();
+			sqlPpal.SELECT("*");
+			sqlPpal.FROM("(" + sql.toString() + ") consulta");
 			Integer tamMaxNumber = tamMax + 1;
-			sql.WHERE("rownum <= " + tamMaxNumber);
+			sqlPpal.WHERE("rownum <= " + tamMaxNumber);
+			return sqlPpal.toString();
 		}
 			
 		return sql.toString();

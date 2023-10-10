@@ -12545,6 +12545,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<BusquedaInscripcionItem> inscripciones = new ArrayList<BusquedaInscripcionItem>();
 		InscripcionesResponseDTO ins = new InscripcionesResponseDTO();
+		Error error = new Error();
+		Integer tamMaximo = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -12557,9 +12559,27 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("getInscripciones() -> Entrada para obtener las inscripciones");
+				
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
+
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+				LOGGER.info(
+						"searchJusticiables() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+				if (tamMax != null) {
+					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+				} else {
+					tamMaximo = null;
+				}
 
 				inscripciones = scsInscripcionguardiaExtendsMapper.getListadoInscripciones(inscripcionesBody,
-						idInstitucion.toString());
+						idInstitucion.toString(), tamMaximo);
 
 				for (BusquedaInscripcionItem inscrip : inscripciones) {
 					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -12573,6 +12593,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 					}
 
 				}
+				
+				if((inscripciones != null) && tamMaximo != null && (inscripciones.size()) > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					ins.setError(error);
+					inscripciones.remove(inscripciones.size()-1);
+					}
 
 				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
 			}

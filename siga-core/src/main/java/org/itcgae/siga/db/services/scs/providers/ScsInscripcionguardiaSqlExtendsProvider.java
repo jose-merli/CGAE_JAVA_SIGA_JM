@@ -282,7 +282,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		return sql.toString();
 	}
 
-	public String listadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion) {
+	public String listadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion, Integer tamMax) {
 
 		SQL sql = new SQL();
 
@@ -469,9 +469,16 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					+ inscripciones.getnColegiado() + ")");
 		}
 
-		sql.WHERE("ROWNUM <= 200");
-
-		sql.ORDER_BY("tur.nombre");
+		sql.ORDER_BY("ins.fechasuscripcion desc");
+		
+		if (tamMax != null) {
+			SQL sqlPpal = new SQL();
+			sqlPpal.SELECT("*");
+			sqlPpal.FROM("(" + sql.toString() + ") consulta");
+			Integer tamMaxNumber = tamMax + 1;
+			sqlPpal.WHERE("rownum <= " + tamMaxNumber);
+			return sqlPpal.toString();
+		}
 
 		// LOGGER.info("++++ [SIGA TEST] - ScsInscripcionguardiaSqlExtendsProvider /
 		// listadoInscripciones -> query = " + sql.toString());

@@ -249,7 +249,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "FECHASUSCRIPCION", property = "fechaSol", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 	})
-	List<BusquedaInscripcionItem> getListadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion);
+	List<BusquedaInscripcionItem> getListadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion, Integer tamMax);
 	
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "getLastInscripciones")
 	@Results({ 
