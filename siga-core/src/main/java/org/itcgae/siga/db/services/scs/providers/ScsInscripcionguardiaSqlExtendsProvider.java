@@ -364,7 +364,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 
 		sql.FROM("scs_inscripcionguardia ins");
 		sql.INNER_JOIN(
-				"SCS_GUARDIASTURNO guar on guar.IDGUARDIA = ins.IDGUARDIA and guar.IDINSTITUCION = ins.IDINSTITUCION");
+				"SCS_GUARDIASTURNO guar on guar.IDINSTITUCION = ins.IDINSTITUCION and guar.IDGUARDIA = ins.IDGUARDIA and guar.IDTURNO = ins.IDTURNO");
 		sql.INNER_JOIN("cen_colegiado col ON col.idpersona = ins.idpersona AND col.idinstitucion = ins.idinstitucion");
 		sql.INNER_JOIN("cen_persona per ON per.idpersona = col.idpersona");
 		sql.INNER_JOIN("scs_turno tur ON tur.idturno = ins.idturno AND tur.idinstitucion = ins.idinstitucion");
