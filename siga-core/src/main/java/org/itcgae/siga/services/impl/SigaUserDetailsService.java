@@ -24,11 +24,13 @@ import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.EstUserRegistry;
 import org.itcgae.siga.db.mappers.AdmPerfilRolMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuarioEfectivoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.mappers.EstUserRegistryMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmRolExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -61,6 +63,9 @@ public class SigaUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	AdmUsuariosMapper usuarioMapper;
+	
+	@Autowired
+	EstUserRegistryMapper estUserRegistryMapper;
 
 	@Autowired
 	GenProcesosExtendsMapper permisosMapper;
@@ -208,6 +213,13 @@ public class SigaUserDetailsService implements UserDetailsService {
 					for (PermisoEntity permisoEntity : permisos) {
 						response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
 					}
+					EstUserRegistry logAuditoria = new EstUserRegistry();
+					logAuditoria.setIdusuario(usuarios.get(0).getIdusuario());
+					logAuditoria.setIdperfil(formatPerfiles(idperfiles));
+					logAuditoria.setIdinstitucion(Short.valueOf(institucion));
+					logAuditoria.setFechaRegistro(new Date());
+					estUserRegistryMapper.insert(logAuditoria);
+					
 					return new UserCgae(dni, grupo, institucion, response,idperfiles,letrado, rol, nombre);
 				}else {
 					 throw new BadCredentialsException("El usuario no tiene permisos");
@@ -433,6 +445,15 @@ public class SigaUserDetailsService implements UserDetailsService {
 		}catch(Exception e) {
 			LOGGER.error("Se ha producido un error al crear el usuario efectivo en base de datos", e);
 		}
+	}
+	
+	public String formatPerfiles (List<String> idPerfiles) {
+		String idPerfilesFormatted = new String(idPerfiles.toString());
+		
+		idPerfilesFormatted = idPerfilesFormatted.replace("[", "").replace("]", "");
+		idPerfilesFormatted = idPerfilesFormatted.replaceAll("'", "");
+		
+		return idPerfilesFormatted;
 	}
 	
 	public static boolean isNumeric(final String str) {
