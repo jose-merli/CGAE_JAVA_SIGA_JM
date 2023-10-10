@@ -11477,7 +11477,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	
 	private void almacenarAsignacionGuardia3(GuardiasCalendarioItem guardiasCalendarioItem,  GuardiasTurnoItem guardiasTurnoItem, ArrayList arrayLetrados, //(L) El letrado y el periodo(getPeriodoGuardias o periodoDiasGuardia) van en arrayLetrados
 			ArrayList periodoDiasGuardia, List lDiasASeparar, String mensaje) throws Exception {
-		
+		permitoInsertGuardiasColegiado = true;
 		Integer idCalendarioGuardias = Integer.valueOf(guardiasCalendarioItem.getIdcalendarioguardias());
 		Integer usuModificacion = Integer.valueOf(guardiasCalendarioItem.getUsumodificacion());
 		LOGGER.info("GuardiasServiceImpl.almacenarAsignacionGuardia3() - INICIO");
@@ -11494,18 +11494,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 			ArrayList alDiasPeriodo = (ArrayList) alPeriodosSinAgrupar.get(j);
 
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-			fechaInicioPeriodo = (String) alDiasPeriodo.get(0);
-//			fechaFinPeriodo = (String) alDiasPeriodo.get(alDiasPeriodo.size() - 1);
 			
-			Calendar c = Calendar.getInstance();
-			c.setTime(sdf.parse(fechaInicioPeriodo));
-			c.add(Calendar.DATE, (Collections.max(listDiasAseparar)) - 1);  // sumamos dias del periodo TENER EN CUENTA EL ULTIMO DIA QUE VALOR ES Y SUMARLE SOLO ESE
-			fechaFinPeriodo = sdf.format(c.getTime());
-
+			boolean separarGuardia = separarGuardias(guardiasTurnoItem);
+			if(separarGuardia){
+				fechaInicioPeriodo = (String) alDiasPeriodo.get(0);
+				fechaFinPeriodo = (String) alDiasPeriodo.get(alDiasPeriodo.size() - 1);
+			}else {
+				List dias = (List) alPeriodosSinAgrupar.get(alPeriodosSinAgrupar.size() - 1);
+				fechaFinPeriodo = (String) dias.get(0);
+				dias = (List) alPeriodosSinAgrupar.get(0);
+				fechaInicioPeriodo = (String) dias.get(0);
+			}
 			iterLetrados = arrayLetrados.iterator();
 			while (iterLetrados.hasNext()) {
 				letrado = (LetradoInscripcionItem) iterLetrados.next();
-				String OLD_FORMAT = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
+				String OLD_FORMAT = "yyyy'-'MM'-'dd'T'HH':'mm':'ss"; 
 				String NEW_FORMAT = "dd/MM/yyyy";
 				// Paso1: inserto un registro cada guardia:
 				LOGGER.info("Paso1: inserto un registro cada guardia:");
@@ -11599,7 +11602,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
 					
 					// Cuando en el front el checkbox esta activo, en el back se guarda como "0"
-					boolean separarGuardia = separarGuardias(guardiasTurnoItem);
+					//boolean separarGuardia = separarGuardias(guardiasTurnoItem);
 					LOGGER.info("El separarGuardia está " + separarGuardia +" y el permitoInsertGuardiasColegiado está " + permitoInsertGuardiasColegiado);
 					if(permitoInsertGuardiasColegiado) {
 						if (!separarGuardia) {
@@ -11630,7 +11633,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 									letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
 						}
 						//Si hay que agrupar, solo necesitamos un Insert en	SCS_CabeceraGuardia y N en Scs_Guardiascolegiado
-						if (!separarGuardia) {
+						if (!separarGuardia && !iterLetrados.hasNext()) {
 							permitoInsertGuardiasColegiado = false;
 						}
 					}
@@ -11683,6 +11686,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					listaDatosExcelGeneracionCalendarios.add(mapLog11);
 				}catch(Exception e) {
 					LOGGER.error("Error: " + e.getMessage());
+					permitoInsertGuardiasColegiado = true;
 					if(e.getMessage().equals("gratuita.calendarios.guardias.mensaje.existe")) {
 						String ap2 = null;
 						String ap1 = null;
