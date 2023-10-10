@@ -3213,34 +3213,28 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 	
 	public String getUltimoColegiadoGrupo(String idTurno, String idInstitucion, String idGuardia) {
 		StringBuffer sql = new StringBuffer();
-		sql.append(" SELECT idpersona, Fechasuscripcion, IdgrupoguardiaColegiado ");
-		sql.append("   FROM  ");
-		sql.append(" ( ");
-		sql.append(" SELECT gru.idpersona, gru.Fechasuscripcion, Gru.IdgrupoguardiaColegiado, gru.orden, gru.idgrupoguardia ");
-		sql.append("   FROM Scs_Grupoguardiacolegiado Gru, ");
-		sql.append("        Scs_Guardiasturno         Gua, ");
-		sql.append("        Scs_Grupoguardiacolegiado gruult ");
+		sql.append(" SELECT idpersona, Fechasuscripcion, IdgrupoguardiaColegiado \r\n"
+				+ "		FROM\r\n"
+				+ "		( SELECT gru.idpersona, gru.Fechasuscripcion, Gru.IdgrupoguardiaColegiado, gru.orden, gru.idgrupoguardia \r\n"
+				+ "			FROM Scs_Grupoguardiacolegiado Gru, \r\n"
+				+ "		  Scs_Guardiasturno   Gua, \r\n"
+				+ "		 SCS_INSCRIPCIONGUARDIA si \r\n"
+				+ "		WHERE Gru.Idinstitucion = Gua.Idinstitucion \r\n"
+				+ "		 AND Gru.Idturno = Gua.Idturno \r\n"
+				+ "		AND Gru.Idguardia = Gua.Idguardia \r\n"
+				+ "		and gru.idgrupoguardiacolegiado = Gua.Idgrupoguardia_Ultimo 		\r\n"
+				+ "		 AND gru.idpersona = si.IDPERSONA \r\n"
+				+ "		 AND gru.idinstitucion = si.IDINSTITUCION \r\n"
+				+ "		 AND Gru.idturno = si.IDTURNO \r\n"
+				+ "		 AND gru.idguardia= si.IDGUARDIA \r\n"
+				+ "		 AND gru.fechasuscripcion = si.FECHASUSCRIPCION \r\n"
+				+ "		 AND si.FECHABAJA IS NULL ");
+		sql.append("AND Gru.Idinstitucion = "+ idInstitucion +"\r\n"
+				+ "		AND Gru.Idturno = "+ idTurno +"\r\n"
+				+ "		 AND Gru.Idguardia = "+ idGuardia +"\r\n");
+		sql.append("ORDER BY Gru.Orden desc \r\n"
+				+ "		 )");
 
-		// ... dado el grupo que figura como ultimo en la guardia ...
-		sql.append("  WHERE Gruult.Idinstitucion = Gua.Idinstitucion ");
-		sql.append("    AND Gruult.Idturno = Gua.Idturno ");
-		sql.append("    AND Gruult.Idguardia = Gua.Idguardia ");
-		sql.append("    and gruult.idgrupoguardiacolegiado = Gua.Idgrupoguardia_Ultimo ");
-		
-		// ... se sacan los colegiados de dicho grupo ...
-		sql.append("    and gruult.idgrupoguardia = gru.idgrupoguardia ");
-		sql.append("    and gruult.Idinstitucion = Gru.Idinstitucion ");
-		sql.append("    AND gruult.Idturno = Gru.Idturno ");
-		sql.append("    AND gruult.Idguardia = Gru.Idguardia ");
-
-		sql.append("    AND Gru.Idinstitucion = " + idInstitucion + " ");
-		sql.append("    AND Gru.Idturno = " + idTurno + " ");
-		sql.append("    AND Gru.Idguardia = " + idGuardia);
-		
-		// ... se ordenan por su orden de forma descendente ...
-		sql.append("  ORDER BY Gru.Orden desc ");
-		sql.append("  ) ");
-		
 		// ... y asi podemos obtener el ultimo colegiado del grupo ...
 		sql.append("  WHERE ROWNUM = 1 ");
 		

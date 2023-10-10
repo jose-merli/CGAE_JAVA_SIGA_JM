@@ -282,7 +282,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		return sql.toString();
 	}
 
-	public String listadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion) {
+	public String listadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion, Integer tamMax) {
 
 		SQL sql = new SQL();
 
@@ -364,7 +364,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 
 		sql.FROM("scs_inscripcionguardia ins");
 		sql.INNER_JOIN(
-				"SCS_GUARDIASTURNO guar on guar.IDGUARDIA = ins.IDGUARDIA and guar.IDINSTITUCION = ins.IDINSTITUCION");
+				"SCS_GUARDIASTURNO guar on guar.IDINSTITUCION = ins.IDINSTITUCION and guar.IDGUARDIA = ins.IDGUARDIA and guar.IDTURNO = ins.IDTURNO");
 		sql.INNER_JOIN("cen_colegiado col ON col.idpersona = ins.idpersona AND col.idinstitucion = ins.idinstitucion");
 		sql.INNER_JOIN("cen_persona per ON per.idpersona = col.idpersona");
 		sql.INNER_JOIN("scs_turno tur ON tur.idturno = ins.idturno AND tur.idinstitucion = ins.idinstitucion");
@@ -469,9 +469,16 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					+ inscripciones.getnColegiado() + ")");
 		}
 
-		sql.WHERE("ROWNUM <= 200");
-
-		sql.ORDER_BY("tur.nombre");
+		sql.ORDER_BY("ins.fechasuscripcion desc");
+		
+		if (tamMax != null) {
+			SQL sqlPpal = new SQL();
+			sqlPpal.SELECT("*");
+			sqlPpal.FROM("(" + sql.toString() + ") consulta");
+			Integer tamMaxNumber = tamMax + 1;
+			sqlPpal.WHERE("rownum <= " + tamMaxNumber);
+			return sqlPpal.toString();
+		}
 
 		// LOGGER.info("++++ [SIGA TEST] - ScsInscripcionguardiaSqlExtendsProvider /
 		// listadoInscripciones -> query = " + sql.toString());

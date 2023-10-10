@@ -148,7 +148,26 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			}
 		}
 		
-		sql.WHERE("colest.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion)");
+		sql.WHERE("( colest.fechaestado = (\r\n"
+                + "                SELECT\r\n"
+                + "                    MAX(datcol.fechaestado)\r\n"
+                + "                FROM\r\n"
+                + "                    cen_datoscolegialesestado datcol\r\n"
+                + "                WHERE\r\n"
+                + "                        datcol.idpersona = colest.idpersona\r\n"
+                + "                    AND datcol.idinstitucion = colest.idinstitucion\r\n"
+                + "                    AND datcol.fechaestado <= sysdate\r\n"
+                + "            )\r\n"
+                + "                    OR colest.fechaestado = (\r\n"
+                + "                SELECT\r\n"
+                + "                    MAX(datcol.fechaestado)\r\n"
+                + "                FROM\r\n"
+                + "                    cen_datoscolegialesestado datcol\r\n"
+                + "                WHERE\r\n"
+                + "                        datcol.idpersona = colest.idpersona\r\n"
+                + "                    AND datcol.idinstitucion = colest.idinstitucion\r\n"
+                + "                    AND datcol.fechaestado > sysdate\r\n"
+                + "            ) )");
 		
 		//sql.WHERE("per.idtipoidentificacion not in '20'");
 
@@ -339,7 +358,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		
-		sql.ORDER_BY("NOMBRE");
+		sql.ORDER_BY("NOMBRE, FECHAESTADO");
 
 		sql2.SELECT("CONSULTA.*, ROW_NUMBER() OVER(PARTITION BY concat(CONSULTA.idpersona,CONSULTA.idinstitucion) ORDER BY CONSULTA.idpersona) AS RN");
 		sql2.FROM("(" + sql + ") CONSULTA");

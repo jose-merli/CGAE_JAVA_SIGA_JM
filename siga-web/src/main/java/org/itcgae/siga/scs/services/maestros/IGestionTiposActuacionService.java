@@ -7,6 +7,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.PartidasJudicialesDTO;
 import org.itcgae.siga.DTOs.cen.PartidasJudicialesItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
 import org.itcgae.siga.DTOs.scs.CosteFijoDTO;
@@ -29,6 +30,8 @@ public interface IGestionTiposActuacionService {
 	public UpdateResponseDTO activateTipoActuacion(TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request);
 
 	public InsertResponseDTO createTiposActuacion(TiposActuacionItem tiposActuacionItem, HttpServletRequest request);
+
+	public StringDTO searchTipoActuacionPorDefecto(String descripcionTipoAsistencia, String juzgadoComisaria, HttpServletRequest request);
 
 	
 

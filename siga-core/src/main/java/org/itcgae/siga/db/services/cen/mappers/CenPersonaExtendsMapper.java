@@ -40,7 +40,12 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	ComboItem loadPhotography(String idPersona, String idInstitucion);
 	
-
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "countPerFisica")
+	@Results({
+		@Result(column = "count", property = "idMax", jdbcType = JdbcType.NUMERIC)
+	})
+	MaxIdDto countPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje, String idinstitucion);
+	
 	
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "searchPerFisica")
 	@Results({

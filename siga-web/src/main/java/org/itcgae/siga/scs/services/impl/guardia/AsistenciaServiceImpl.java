@@ -65,6 +65,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 	@Autowired
 	private ScsCalendarioguardiasMapper scsCalendarioguardiasMapper;
+	
+    @Autowired
+    private GenDiccionarioMapper genDiccionarioMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -705,10 +708,20 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							// devolvemos idPersona
 							LOGGER.info("guardarAsistenciasExpres() / Comprobamos si existe el justiciable");
 							String idPersona = getIdPersonaJusticiable(asistencia, idInstitucion, usuarios.get(0));
+							String comisariaJuzgado = "0";
 
 							if (UtilidadesString.esCadenaVacia(asistencia.getAnioNumero())) {
 								// Si no viene informado el anionumero es que se trata de una nueva asistencia
 								LOGGER.info("guardarAsistenciasExpres() / Nueva asistencia");
+								
+								if (asistencia.getComisaria() != null) {
+									comisariaJuzgado = "1";
+								} else if (asistencia.getJuzgado() != null) {
+									comisariaJuzgado = "2";
+								}
+								
+								// Comprobamos que exista un tipo de actuación configurado por defecto
+								getTipoActuacionPorDefecto(usuarios.get(0), idInstitucion, asistencia.getFiltro().getIdTipoAsistenciaColegiado(), comisariaJuzgado);
 
 								// Obtenemos proximo numero de una nueva asistencia
 								String anioAsistencia = asistencia.getFiltro().getDiaGuardia().split("/")[2];
@@ -721,6 +734,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								// Como es una nueva Asistencia, le ponemos estado ACTIVO
 								asistenciaBBDD.setIdestadoasistencia((short) 1);
 								asistenciaBBDD.setIdorigenasistencia((short) 30); // 30 - Es una asistencia expres
+								
 								int responseAsistencia = scsAsistenciaExtendsMapper.insertSelective(asistenciaBBDD);
 
 								if (responseAsistencia == 0) {
@@ -1182,6 +1196,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			AdmUsuarios usuario) {
 
 		ScsActuacionasistencia actuacionBBDD = new ScsActuacionasistencia();
+		String comisariaJuzgado = "0";
 		try {
 
 			if (!UtilidadesString.esCadenaVacia(anioAsistencia)) {
@@ -1211,9 +1226,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				if ("C".equals(actuacion.getComisariaJuzgado())) {
 					actuacionBBDD.setIdinstitucionComis(idInstitucion);
 					actuacionBBDD.setIdcomisaria(Long.valueOf(actuacion.getLugar()));
+					comisariaJuzgado = "1";
 				} else {
 					actuacionBBDD.setIdinstitucionJuzg(idInstitucion);
 					actuacionBBDD.setIdjuzgado(Long.valueOf(actuacion.getLugar()));
+					comisariaJuzgado = "2";
 				}
 			}
 
@@ -1225,7 +1242,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				actuacionBBDD.setUsucreacion(usuario.getIdusuario());
 				actuacionBBDD.setFechacreacion(new Date());
 				actuacionBBDD.setAcuerdoextrajudicial((short) 0);
-				actuacionBBDD.setIdtipoactuacion((short) 1);
+				actuacionBBDD.setIdtipoactuacion(Short.parseShort(getTipoActuacionPorDefecto(usuario, idInstitucion, asistencia.getFiltro().getIdTipoAsistenciaColegiado(), comisariaJuzgado)));
 			}
 
 		} catch (ParseException e) {
@@ -1237,6 +1254,31 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 		return actuacionBBDD;
 	}
+	
+	private String getTipoActuacionPorDefecto (AdmUsuarios usuario, Short idInstitucion, String idTipoAsistencia, String juzgadoComisaria) {
+		String idTipoActuacion = null;
+		
+        String literalErrorTipoActuacionPorDefecto = getTraduccionLiteral("justiciaGratuita.guardia.asistenciasexpress.errorvalorpordefectotipoactuacion",
+                usuario.getIdlenguaje());
+		
+		idTipoActuacion = scsTipoactuacionExtendsMapper.searchTipoActuacionPorDefectoIdTipoAsistencia(usuario.getIdlenguaje(),
+				idInstitucion,idTipoAsistencia, juzgadoComisaria);
+
+		if (idTipoActuacion == null) {
+			throw new RuntimeException(literalErrorTipoActuacionPorDefecto);
+		}
+		
+		return idTipoActuacion;
+	}
+	
+    private String getTraduccionLiteral(String idRecurso, String idLenguaje) {
+
+        GenDiccionarioKey genDiccionarioKey = new GenDiccionarioKey();
+        genDiccionarioKey.setIdlenguaje(idLenguaje);
+        genDiccionarioKey.setIdrecurso(idRecurso);
+
+        return genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+    }
 
 	/**
 	 * Metodo que obtiene y setea el siguiente IdActuacion

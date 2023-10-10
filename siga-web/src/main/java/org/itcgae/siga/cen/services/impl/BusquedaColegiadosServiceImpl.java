@@ -316,6 +316,8 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		Integer tamMaximo = null;
 		
 		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
+		List<ColegiadoItem> colegiadoItemListFinal = new ArrayList<ColegiadoItem>();
+		HashMap<String,ColegiadoItem> mapaColegiadoItemFinal = new HashMap<String,ColegiadoItem>();
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -342,29 +344,49 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		
 		//Recorremos los colegiados, si su ultimo estado es con fecha hacia el futuro le cambiamos el estado a "Sin estado"
 		if(colegiadoItemList != null && !colegiadoItemList.isEmpty()) {
+			
 			for (int i = 0; i < colegiadoItemList.size(); i++) {
+				
 				if(colegiadoItemList.get(i).getFechaEstado() != null && colegiadoItemList.get(i).getFechaEstado().after(new Date())) {
 					colegiadoItemList.get(i).setEstadoColegial("Sin estado");
 				} else {
-					//Formateamos la fecha que viene en string
-					Date fechaEst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(colegiadoItemList.get(i).getFechaEstadoStr());
-					
-					if(fechaEst.after(new Date())) {
+					if (colegiadoItemList.get(i).getFechaEstadoStr() != null) {
+						//Formateamos la fecha que viene en string
+						Date fechaEst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(colegiadoItemList.get(i).getFechaEstadoStr());
+						
+						if(fechaEst.after(new Date())) {
+							colegiadoItemList.get(i).setEstadoColegial("Sin estado");
+						}
+					} else {
 						colegiadoItemList.get(i).setEstadoColegial("Sin estado");
 					}
+					
 				}
+				if(mapaColegiadoItemFinal.isEmpty()) {
+					mapaColegiadoItemFinal.put(colegiadoItemList.get(i).getNif(), colegiadoItemList.get(i));
+				}
+				//Quitamos los que ya estén insertados
+				if(!mapaColegiadoItemFinal.containsKey(colegiadoItemList.get(i).getNif())){
+					mapaColegiadoItemFinal.put(colegiadoItemList.get(i).getNif(), colegiadoItemList.get(i));
+				}
+				
 			}
+			
+			
 		}
 		
+		colegiadoItemListFinal.addAll(mapaColegiadoItemFinal.values());
+		colegiadoItemListFinal.sort(new NombreComparator());
+		
 		//colegiadosDTO.setColegiadoItem(colegiadoItemList);
-		if((colegiadoItemList != null) && tamMaximo != null && (colegiadoItemList.size()) > tamMaximo) {
+		if((colegiadoItemListFinal != null) && tamMaximo != null && (colegiadoItemListFinal.size()) > tamMaximo) {
 			error.setCode(200);
 			error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
 			colegiadosDTO.setError(error);
-			colegiadoItemList.remove(colegiadoItemList.size()-1);
+			colegiadoItemListFinal.remove(colegiadoItemListFinal.size()-1);
 			}
-		colegiadosDTO.setColegiadoItem(colegiadoItemList);
-			if (colegiadoItemList == null || colegiadoItemList.size() == 0) {
+		colegiadosDTO.setColegiadoItem(colegiadoItemListFinal);
+			if (colegiadoItemListFinal == null || colegiadoItemListFinal.size() == 0) {
 
 				LOGGER.warn(
 						"searchColegiado() / cenColegiadoExtendsMapper.searchColegiado() -> No existen colegiados con las condiciones recibidas en la Institucion = "
@@ -1024,4 +1046,11 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 	}
 
+}
+
+class NombreComparator implements java.util.Comparator<ColegiadoItem> {
+    @Override
+    public int compare(ColegiadoItem a, ColegiadoItem b) {
+        return a.getNombre().compareTo(b.getNombre());
+    }
 }
