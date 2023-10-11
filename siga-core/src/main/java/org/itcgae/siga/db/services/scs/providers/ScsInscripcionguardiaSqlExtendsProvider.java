@@ -469,7 +469,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					+ inscripciones.getnColegiado() + ")");
 		}
 
-		sql.ORDER_BY("ins.fechasuscripcion desc");
+		sql.ORDER_BY("ins.fechasuscripcion desc, tur.nombre asc, guar.nombre asc");
 		
 		if (tamMax != null) {
 			SQL sqlPpal = new SQL();
