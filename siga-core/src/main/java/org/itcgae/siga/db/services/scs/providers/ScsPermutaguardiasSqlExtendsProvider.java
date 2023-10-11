@@ -82,16 +82,17 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         sql2.SELECT("1");
         sql2.FROM("SCS_PERMUTAGUARDIAS sp2");
         sql2.WHERE("sp2.idinstitucion = " + idInstitucion);
-        
+        sql2.WHERE(permutaItem.getIdpersona() + " IN (sp2.IDPERSONA_SOLICITANTE, sp2.IDPERSONA_CONFIRMADOR)");
         sql2.WHERE("((" + permutaItem.getIdturno() + " = sp2.IDTURNO_SOLICITANTE "
         		+ "and " + permutaItem.getIdguardia() + " = sp2.IDGUARDIA_SOLICITANTE "
-        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = sp2.FECHAINICIO_SOLICITANTE "
-        		+ "and " + permutaItem.getIdpersona() + " = sp2.IDPERSONA_SOLICITANTE "
+        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = TRUNC(sp2.FECHAINICIO_SOLICITANTE) "
+        		//+ "and " + permutaItem.getIdpersona() + " = sp2.IDPERSONA_SOLICITANTE "
         		+ ")"
         		+ "or (" + permutaItem.getIdturno() + " = sp2.IDTURNO_CONFIRMADOR "
         		+ "and " + permutaItem.getIdguardia() + " = sp2.IDGUARDIA_CONFIRMADOR "
-        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = sp2.FECHAINICIO_CONFIRMADOR "
-        		+ "and " + permutaItem.getIdpersona() + " = sp2.IDPERSONA_CONFIRMADOR))");
+        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = TRUNC(sp2.FECHAINICIO_CONFIRMADOR) "
+        		//+ "and " + permutaItem.getIdpersona() + " = sp2.IDPERSONA_CONFIRMADOR"
+        				+ "))");
         
         sql.SELECT("  sp.fechasolicitud,"
                 + "    sp.fechaconfirmacion,"
@@ -149,11 +150,11 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         
         sql.WHERE("((" + permutaItem.getIdturno() + " = sp.IDTURNO_SOLICITANTE "
         		+ "and " + permutaItem.getIdguardia() + " = sp.IDGUARDIA_SOLICITANTE "
-        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = sp.FECHAINICIO_SOLICITANTE "
+        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = TRUNC(sp.FECHAINICIO_SOLICITANTE) "
         		+ ")"
         		+ "or (" + permutaItem.getIdturno() + " = sp.IDTURNO_CONFIRMADOR "
         		+ "and " + permutaItem.getIdguardia() + " = sp.IDGUARDIA_CONFIRMADOR)"
-        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = sp.FECHAINICIO_CONFIRMADOR "
+        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = TRUNC(sp.FECHAINICIO_CONFIRMADOR) "
         		+ ")");
         
         sql.WHERE("EXISTS (" + sql2 + ")");
