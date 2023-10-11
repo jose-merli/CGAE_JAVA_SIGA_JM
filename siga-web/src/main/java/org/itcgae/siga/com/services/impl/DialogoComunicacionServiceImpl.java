@@ -80,6 +80,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
 import org.itcgae.siga.commons.constants.SigaConstants.GEN_PARAMETROS;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenColegiado;
@@ -1539,7 +1540,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			// Remplazamos las claves de la query
 			if(mapaClave != null && mapaClave.size() > 0) {
 				for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
-					sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
+					
+					sentencia = UtilidadesString.replaceAllIgnoreCase(sentencia,SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
+					//sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
 					LOGGER.info("Sentencia antes de meter máximo" + sentencia);
 				}
 			}	
