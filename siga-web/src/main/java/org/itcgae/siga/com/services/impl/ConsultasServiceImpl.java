@@ -1120,7 +1120,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					// Map<String,String> mapa = new HashMap<String,String>();
 					// mapa = obtenerMapaConsulta(sentencia);
 
-					sentencia = quitarEtiquetas(sentencia.toUpperCase());
+					sentencia = quitarEtiquetas(sentencia);
 
 					if (sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER)
 							|| sentencia.contains(SigaConstants.SENTENCIA_CREATE)
@@ -2236,7 +2236,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		String sentenciaCabecera = "";
 
-		sentencia = sentencia.toUpperCase();
+		//sentencia = sentencia.toUpperCase();
 
 		// sustituyendo la marca '%%idinstitucion%%' por la institucion actual
 		// cuando no se trate de una consulta experta de facturacion
@@ -2312,14 +2312,15 @@ public class ConsultasServiceImpl implements IConsultasService {
 						// etiqueta += cDinamicos[j].getHp().replaceAll
 						// (ClsConstants.CONSTANTESUSTITUIRCOMILLAS,"\"");
 					}
-					pos_iniEtiqueta = sentencia.indexOf(etiqueta);
+					pos_iniEtiqueta = sentencia.indexOf(etiqueta.toUpperCase());
 					sentenciaAux = sentencia.substring(0, pos_iniEtiqueta + etiqueta.length());
 
 					if (pos_iniEtiqueta >= 0) {
 						if (etiqueta.equals(SigaConstants.ETIQUETATIPOENVIO)) {
 							// Si es de tipoEnvio reemplazamos el valor
-							sentencia = sentencia.replace(SigaConstants.ETIQUETATIPOENVIO,
-									listaCampos.get(j).getValor());
+							sentencia = UtilidadesString.replaceAllIgnoreCase(sentencia, SigaConstants.ETIQUETATIPOENVIO,
+									listaCampos.get(j).getValor());//sentencia.replace(SigaConstants.ETIQUETATIPOENVIO,
+									//listaCampos.get(j).getValor());
 							j++;
 						} else {
 							operador = listaCampos.get(j).getOperacion();
@@ -2473,14 +2474,16 @@ public class ConsultasServiceImpl implements IConsultasService {
 		while (indice != -1) {
 			String numero = sentenciaAux3.substring(indice + 2, sentenciaAux3.indexOf("@:", indice));
 			if (codigosLike.containsKey(new Integer(numero))) {
-				sentencia = sentencia.replaceFirst(":@" + numero + "@:", 
-						"'%" + (String) codigosBind.get(new Integer(numero)) + "%'");
+				sentencia = UtilidadesString.replaceFirstIgnoreCase(sentencia, ":@" + numero + "@:", 
+						"'%" + (String) codigosBind.get(new Integer(numero)) + "%'");//sentencia.replaceFirst(":@" + numero + "@:", 
+						//"'%" + (String) codigosBind.get(new Integer(numero)) + "%'");
 			} else {
 				contadorOrdenados++;
 				codigosOrdenados.put(new Integer(contadorOrdenados),
 						String.valueOf(codigosBind.get(new Integer(numero))));
-				sentencia = sentencia.replaceFirst(":@" + numero + "@:",
-						String.valueOf(codigosBind.get(new Integer(numero))));
+				sentencia = UtilidadesString.replaceFirstIgnoreCase(sentencia, ":@" + numero + "@:",
+						String.valueOf(codigosBind.get(new Integer(numero))));//sentencia.replaceFirst(":@" + numero + "@:",
+						//String.valueOf(codigosBind.get(new Integer(numero))));
 			}
 			indice = sentenciaAux3.indexOf(":@", indice + 2);
 		}
@@ -2635,7 +2638,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		String sentenciaCompleta = null;
 
-		sentencia = quitarEtiquetas(sentencia.toUpperCase());
+		sentencia = quitarEtiquetas(sentencia);//sentencia.toUpperCase()
 		sentenciaCompleta = quitaPuntosAlias(sentencia);
 
 		return sentenciaCompleta;
