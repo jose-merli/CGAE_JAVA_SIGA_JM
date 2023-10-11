@@ -86,7 +86,9 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         }
         
         subquery6.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  < 0"); 
-    	subquery6.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
+        if(movimientoItem.isHistorico()) {
+        	subquery6.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
+        }
         
         subquery6.WHERE("FCS_MOVIMIENTOSVARIOS.IDINSTITUCION = "+idInstitucion);
 
