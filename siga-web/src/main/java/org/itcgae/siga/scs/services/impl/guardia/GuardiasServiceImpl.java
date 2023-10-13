@@ -48,7 +48,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
-
+import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -11764,6 +11764,18 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 		LOGGER.info("*Separar guardia: desactivado");
 		return false;
+	}
+	
+	public boolean getSeparar(GuardiasItem item, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		boolean separar = false;
+		String agruparGuardia = scsHitofacturableguardiaExtendsMapper.getAgruparGuardia(String.valueOf(idInstitucion),//
+				item.getIdTurno().toString(), item.getIdGuardia().toString());
+		if(agruparGuardia.equalsIgnoreCase("1")) {
+			separar = true;
+		}
+		return separar;
 	}
 	
 	private void insertGuardiaColegiado(String fechaInicioPeriodo, String fechaPeriodo, SimpleDateFormat formatter, ScsGuardiascolegiado beanGuardiasColegiado) {

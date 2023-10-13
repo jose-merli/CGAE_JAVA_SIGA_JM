@@ -46,6 +46,8 @@ import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
 public interface GuardiasService {
 
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request);
+	
+	public boolean getSeparar(GuardiasItem guardiasItem, HttpServletRequest request);
 
 	public UpdateResponseDTO deleteGuardias(GuardiasDTO guardiasDTO, HttpServletRequest request);
 
