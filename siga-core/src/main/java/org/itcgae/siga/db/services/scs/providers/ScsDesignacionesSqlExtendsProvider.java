@@ -1671,7 +1671,54 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (item.getEstado() != null) {
 			sql.append(" AND D.ESTADO ='" + item.getEstado() + "'");
 		}
-
+		if (imprimir) {
+			if(item.isMuestraPendiente()) {
+				sql.append(" AND NOT EXISTS( "
+						+ "				SELECT 1 "
+						+ "FROM "
+						+ "	scs_actuaciondesigna act, "
+						+ "	scs_procedimientos pro, "
+						+ "	scs_acreditacionprocedimiento acp, "
+						+ "	scs_acreditacion ac, "
+						+ "	scs_tipoacreditacion tac, "
+						+ "	scs_juzgado j , "
+						+ "	scs_designasletrado designaletrado, "
+						+ "	cen_colegiado colegiado "
+						+ "WHERE "
+						+ "	ac.idtipoacreditacion = tac.idtipoacreditacion (+) "
+						+ "	AND act.idinstitucion = j.idinstitucion (+) "
+						+ "	AND act.idjuzgado = j.idjuzgado (+) "
+						+ "	AND act.idacreditacion = ac.idacreditacion (+) "
+						+ "	AND act.idacreditacion = acp.idacreditacion (+) "
+						+ "	AND act.idinstitucion_proc = acp.idinstitucion (+) "
+						+ "	AND act.idprocedimiento = acp.idprocedimiento (+) "
+						+ "	AND act.idinstitucion_proc = pro.idinstitucion (+) "
+						+ "	AND act.idprocedimiento = pro.idprocedimiento (+) "
+						+ "	AND act.idinstitucion = designaletrado.idinstitucion (+) "
+						+ "	AND act.idturno = designaletrado.idturno (+) "
+						+ "	AND act.anio = designaletrado.anio (+) "
+						+ "	AND act.numero = designaletrado.numero (+) "
+						+ "	AND designaletrado.fechadesigna = ( "
+						+ "	SELECT "
+						+ "		MAX(LET2.FECHADESIGNA) "
+						+ "	FROM "
+						+ "		SCS_DESIGNASLETRADO LET2 "
+						+ "	WHERE "
+						+ "		(DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION "
+						+ "			AND DESIGNALETRADO.ANIO = LET2.ANIO "
+						+ "			AND DESIGNALETRADO.NUMERO = LET2.NUMERO "
+						+ "			AND DESIGNALETRADO.IDTURNO = LET2.IDTURNO) ) "
+						+ "	AND colegiado.idpersona = designaletrado.idpersona (+) "
+						+ "	AND colegiado.idinstitucion = designaletrado.idinstitucion (+) "
+						+ "	AND act.idinstitucion = d.idinstitucion "
+						+ "	AND act.idturno = d.idturno "
+						+ "	AND act.anio = d.anio "
+						+ "	AND act.numero = d.numero "
+						+ "	AND ACT.ANULACION = '0' "
+						+ "	AND acp.porcentaje >= 100 "
+						+ "	AND act.VALIDADA = 1 )");
+			}
+		}
 		sql.append(" ) ALLDESIGNAS ");
 
 		StringBuilder tiposResolucionBuilder = new StringBuilder();

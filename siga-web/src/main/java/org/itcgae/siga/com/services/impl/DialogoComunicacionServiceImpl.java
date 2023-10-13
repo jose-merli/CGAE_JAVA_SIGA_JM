@@ -761,7 +761,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
 					for (ConsultaItem consulta : consultasItemDest) {
 						String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
-								mapaClave, esEnvio, null, null,false);
+								mapaClave, esEnvio, modelosComunicacionItem, listaKeyFiltros,false);
 
 						List<Map<String, Object>> result;
 						try {
@@ -791,7 +791,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								Set<String> keyList = dest.keySet();
 
 								for (String key : keyList) {
-									if (dest.get(key) != null)
+									if (dest.get(key) != null && mapaClave != null)
 										mapaClave.put(key, dest.get(key).toString()); // Añadimos informacion adicional del
 																						// destinatario.
 								}
