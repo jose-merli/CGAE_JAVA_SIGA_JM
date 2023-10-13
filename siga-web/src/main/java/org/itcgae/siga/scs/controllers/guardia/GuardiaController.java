@@ -76,6 +76,12 @@ public class GuardiaController {
 		GuardiasDTO response = guardiasService.searchGuardias(guardiasItem, request);
 		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
 	}
+	
+	@PostMapping(value = "/getSeparar", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> getSeparar(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request) {
+		boolean response = guardiasService.getSeparar(guardiasItem, request);
+		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+	}
 
 	@PostMapping(value = "/busquedaGuardia/busquedaGuardiasColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<GuardiasDTO> busquedaGuardiasColegiado(@RequestBody GuardiasItem guardiasItem,
