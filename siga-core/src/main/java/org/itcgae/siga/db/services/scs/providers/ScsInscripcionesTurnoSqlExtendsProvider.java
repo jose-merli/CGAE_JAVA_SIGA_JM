@@ -226,7 +226,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			if(inscripcionesItem.getFechahasta() != null)
 			sql.WHERE("ins.fechasolicitud <= TO_DATE('"+fechahasta+" 23:59:59','DD/MM/YYYY HH24:MI:SS')");
 		}
-		sql.ORDER_BY("fechasolicitud DESC");
+		sql.ORDER_BY("fechasolicitud DESC, tur.nombre asc");
 		if (tamMax != null) {
 			SQL sqlPpal = new SQL();
 			sqlPpal.SELECT("*");
@@ -371,7 +371,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			
 		}
 
-		sql.ORDER_BY("fechasolicitud DESC");
+		sql.ORDER_BY("fechasolicitud DESC, tur.nombre asc");
 				
 		if (tamMax != null) {
 			SQL sqlPpal = new SQL();

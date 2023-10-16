@@ -1667,7 +1667,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 						guardiaSol.setIdturno(cabGuardiaSolCopy.getIdturno());
 						guardiaSol.setIdpersona(cabGuardiaSolCopy.getIdpersona());
 						guardiaSol.setFechainicio(cabGuardiaSolCopy.getFechainicio());
-						guardiaSol.setFechafin(cabGuardiaSolCopy.getFechaFin());
+						guardiaSol.setFechafin(cabGuardiaSolCopy.getFechainicio());
 
 						ScsGuardiascolegiado guardiaSolCopy = scsGuardiascolegiadoExtendsMapper.selectByPrimaryKey(guardiaSol);
 
@@ -1687,7 +1687,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 						guardiaConf.setIdturno(cabGuardiaConfCopy.getIdturno());
 						guardiaConf.setIdpersona(cabGuardiaConfCopy.getIdpersona());
 						guardiaConf.setFechainicio(cabGuardiaConfCopy.getFechainicio());
-						guardiaConf.setFechafin(cabGuardiaConfCopy.getFechaFin());
+						guardiaConf.setFechafin(cabGuardiaConfCopy.getFechainicio());
 
 						ScsGuardiascolegiado guardiaConfCopy = scsGuardiascolegiadoExtendsMapper.selectByPrimaryKey(guardiaConf);
 
