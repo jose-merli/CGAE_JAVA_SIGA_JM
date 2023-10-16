@@ -791,9 +791,15 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								Set<String> keyList = dest.keySet();
 
 								for (String key : keyList) {
+									
+									if (mapaClave == null) {
+										mapaClave = new HashMap<String, String>();
+									}
+									
 									if (dest.get(key) != null && mapaClave != null)
 										mapaClave.put(key, dest.get(key).toString()); // Añadimos informacion adicional del
 																						// destinatario.
+								
 								}
 
 								String idioma = "";
@@ -1528,15 +1534,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			try {
 				sentencia = _consultasService.procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
 
-				if(modelosComunicacionItem != null && modelosComunicacionItem.getInformeUnico() != null && modelosComunicacionItem.getInformeUnico().equals("1")) {
-					sentencia = _consultasService.procesarEjecutarConsultaImprimir(usuario, sentencia, dialogo.getSentenciaImprimir(), listaKeyFiltros);
-				}
-				
-			} catch (ParseException e) {
-				LOGGER.error("Error al ejecutar la consulta con id " + consulta.getIdConsulta(), e);
-				throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
-			}
-			
 			// Remplazamos las claves de la query
 			if(mapaClave != null && mapaClave.size() > 0) {
 				for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
@@ -1568,8 +1565,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 			}			
 			
-			
 			LOGGER.info("-----QUERY CON FILTRO MAXIMO-----------" + sentencia);	
+			
+			if(modelosComunicacionItem != null && modelosComunicacionItem.getInformeUnico() != null && modelosComunicacionItem.getInformeUnico().equals("1")) {
+				sentencia = _consultasService.procesarEjecutarConsultaImprimir(usuario, sentencia, dialogo.getSentenciaImprimir(), listaKeyFiltros);
+			}
+				
+			} catch (ParseException e) {
+				LOGGER.error("Error al ejecutar la consulta con id " + consulta.getIdConsulta(), e);
+				throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
+			}
 		}else{
 			LOGGER.error("No se ha encontrado la consulta");
 			throw new BusinessException("No se ha encontrado la consulta");
