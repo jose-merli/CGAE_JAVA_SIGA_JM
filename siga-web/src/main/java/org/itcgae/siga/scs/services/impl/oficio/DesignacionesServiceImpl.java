@@ -977,10 +977,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion,
 							tamMaximo);
 
-					if ((designas != null) && (designas.size()) >= 200) {
+					if ((designas != null) && tamMaximo != null
+							&& designas.size() >= tamMaximo) {
 						error.setCode(200);
-						error.setDescription(
-								"La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
 						designas.get(0).setError(error);
 					}
 

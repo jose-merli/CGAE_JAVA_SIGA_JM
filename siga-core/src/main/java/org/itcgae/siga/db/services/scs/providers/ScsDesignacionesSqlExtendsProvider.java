@@ -222,11 +222,81 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo) throws Exception {
 		String sql = "";
 		
+		SQL sqlDesigna = new SQL();
 		SQL sqlDefendidos = new SQL();
 
 		Hashtable codigosBind = new Hashtable();
 		int contador = 0;
 		// Acceso a BBDD
+		
+		
+		sqlDesigna.SELECT("*");
+		sqlDesigna.FROM("scs_designa");
+		sqlDesigna.WHERE("IDINSTITUCION = " + idInstitucion);
+		
+		if (designaItem.getIdTurnos() != null
+				&& (String.valueOf(designaItem.getIdTurnos()) != "-1" && designaItem.getIdTurnos().length != 0)
+				&& !String.valueOf(designaItem.getIdTurnos()).equals("")) {
+			if (designaItem.getIdTurnos().length == 1) {
+				sqlDesigna.WHERE("idTurno = " + designaItem.getIdTurnos()[0]);
+			} else {
+				String turnoIN = "";
+				for (int i = 0; i < designaItem.getIdTurnos().length; i++) {
+					String turno = designaItem.getIdTurnos()[i];
+					if (i == designaItem.getIdTurnos().length - 1) {
+						turnoIN = turnoIN + turno;
+					} else {
+						turnoIN = turnoIN + turno + " ,";
+					}
+				}
+				sqlDesigna.WHERE("idTurno IN ( " + turnoIN + " )");
+			}
+		}
+
+		if (designaItem.getAno() != 0 && String.valueOf(designaItem.getAno()) != null
+				&& !String.valueOf(designaItem.getAno()).equalsIgnoreCase("")) {
+
+			if (String.valueOf(designaItem.getAno()).indexOf('*') >= 0) {
+
+				contador++;
+				sqlDesigna.WHERE(prepararSentenciaCompletaBind(String.valueOf(designaItem.getAno()).trim(),
+						"anio", contador, codigosBind));
+
+			} else if (designaItem.getAno() != 0) {
+				sqlDesigna.WHERE("anio = " + String.valueOf(designaItem.getAno()));
+			}
+		}
+
+		if (designaItem.getCodigo() != null && !designaItem.getCodigo().equalsIgnoreCase("")) {
+
+			if ((designaItem.getCodigo().indexOf(',') != -1) && (designaItem.getCodigo().indexOf('-') == -1)) {
+				String[] parts = designaItem.getCodigo().split(",");
+				String cadena = "";
+				cadena += " (codigo = ";
+				for (int i = 0; i < parts.length; i++) {
+					if (i == parts.length - 1) {
+						cadena += parts[i].trim() + ")";
+					} else {
+						cadena += parts[i].trim() + " OR codigo = ";
+					}
+				}
+				sqlDesigna.WHERE(cadena);
+			} else if ((designaItem.getCodigo().indexOf('-') != -1)
+					&& (designaItem.getCodigo().indexOf(',') == -1)) {
+				String[] parts = designaItem.getCodigo().split("-");
+				if (parts.length == 2) {
+					sqlDesigna.WHERE("codigo BETWEEN " + parts[0] + " AND " + parts[1]);
+				}
+			} else if ((designaItem.getCodigo().indexOf('-') == -1)
+					&& (designaItem.getCodigo().indexOf(',') == -1)) {
+				sqlDesigna.WHERE(" ltrim(codigo,'0') = ltrim(" + designaItem.getCodigo() + ",'0')");
+			}
+		}
+		sqlDesigna.ORDER_BY("idturno,anio DESC,codigo DESC");
+		if (tamMaximo != null) { 
+			Integer tamMaxNumber = tamMaximo*2;
+			sqlDesigna.FETCH_FIRST_ROWS_ONLY(tamMaxNumber);
+		}
 		
 		sqlDefendidos.SELECT("NVL(PER.APELLIDO1, '') || ' ' || NVL(PER.APELLIDO2, '') || ', ' || NVL(PER.NOMBRE, '')");
 		sqlDefendidos.FROM("scs_defendidosdesigna ded");
@@ -247,7 +317,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql +=  " colegiado.ncolegiado, persona.idpersona, NVL(persona.nombre,'') as nombrepersona, NVL(persona.APELLIDOS1,'') as apellido1persona, NVL(persona.APELLIDOS2,'') as apellido2persona ,";
 			sql += " (" + sqlDefendidos.toString() +")  AS NOMBREINTERESADO";
 			
-			sql += " FROM scs_designa             des\r\n"; 
+			sql += " FROM ( " + sqlDesigna + " ) des\r\n"; 
 				sql += "   LEFT OUTER JOIN scs_designasletrado     l ON l.anio = des.anio\r\n" + 
 					"                                  AND l.numero = des.numero\r\n" + 
 					"                                  AND l.idinstitucion = des.idinstitucion\r\n" + 
@@ -347,7 +417,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 				} else if (designaItem.getAno() != 0) {
 					contador++;
-					codigosBind.put(new Integer(contador), String.valueOf(designaItem.getAno()).trim());
 					sql += " AND des.anio = " + String.valueOf(designaItem.getAno());
 				}
 			}
@@ -716,7 +785,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			// y hacemos a parte el tratamiento de mayusculas y signos de acentuación
 			
 			
-			sql = " SELECT * FROM (" + sql + ") consulta WHERE rownum <= " + tamMaximo;
+			if (tamMaximo != null) { 
+				Integer tamMaxNumber = tamMaximo;
+				sql += "FETCH FIRST " + tamMaxNumber + " ROWS ONLY";
+			}
 		} catch (Exception e) {
 			throw e;
 		}
