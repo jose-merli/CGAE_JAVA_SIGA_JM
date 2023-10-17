@@ -26,7 +26,9 @@ import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.PermutaDTO;
+import org.itcgae.siga.DTOs.scs.PermutaDTO2;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
+import org.itcgae.siga.DTOs.scs.PermutaItem2;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
@@ -1402,11 +1404,11 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 	}
 
 	@Override
-	public PermutaDTO getPemutasColeg(PermutaItem permutaItem, HttpServletRequest request) {
+	public PermutaDTO2 getPemutasColeg(PermutaItem permutaItem, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		PermutaDTO permutaDTO = new PermutaDTO();
+		PermutaDTO2 permutaDTO = new PermutaDTO2();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1423,14 +1425,14 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("getGuardiaColeg() -> Entrada para obtener la informacion del turno");
 
-				PermutaItem permItem = new PermutaItem();
+				PermutaItem2 permItem = new PermutaItem2();
 
 				permItem.setIdguardia(permutaItem.getIdguardia());
 				permItem.setIdturno(permutaItem.getIdturno());
 				permItem.setIdpersona(permutaItem.getIdpersona());
 				permItem.setFechainicioSolicitante(permutaItem.getFechasolicitud());
 
-				List<PermutaItem> permutas = scsPermutaguardiasExtendsMapper.getPermutasGuardiaColeg(permItem, idInstitucion);
+				List<PermutaItem2> permutas = scsPermutaguardiasExtendsMapper.getPermutasGuardiaColeg(permItem, idInstitucion);
 
 				permutaDTO.setPermutaItems(permutas);
 
@@ -1757,8 +1759,8 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 //											ScsPermutaguardias permutaGuardiaAux = permutaGuardiaCopy;
 											ScsPermutaguardias permutaGuardiaAux = copyScsPermutaguardias(permutaGuardiaCopy);
 
-											permutaGuardiaAux.setIdPerCabSolicitante(permutaGuardiaCopy.getIdPerCabConfirmador());
-											permutaGuardiaAux.setIdPerCabConfirmador(permutaGuardiaCopy.getIdPerCabSolicitante());
+											permutaGuardiaAux.setIdPerCabSolicitante(permutaGuardiaCopy.getIdPerCabSolicitante());
+											permutaGuardiaAux.setIdPerCabConfirmador(permutaGuardiaCopy.getIdPerCabConfirmador());
 											permutaGuardiaAux.setFechaconfirmacion(new Date());
 											permutaGuardiaAux.setMotivosconfirmador(perm.getMotivos());
 											permutaGuardiaAux.setNumero(perm.getNumero());

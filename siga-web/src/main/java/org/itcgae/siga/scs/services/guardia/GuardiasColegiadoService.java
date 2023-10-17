@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.PermutaDTO;
+import org.itcgae.siga.DTOs.scs.PermutaDTO2;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
@@ -32,7 +33,7 @@ public interface GuardiasColegiadoService {
 	public TurnosDTO getTurnoGuardiaColeg(TurnosItem turnosItem, HttpServletRequest request);
 	public List<DatosCalendarioItem> getCalendarioColeg(String[] datosCalendarioItem, HttpServletRequest request);
 	public ColegiadoDTO getColegiado(ColegiadoItem guardiasItem, HttpServletRequest request);
-	public PermutaDTO getPemutasColeg(PermutaItem permutaItem, HttpServletRequest request);
+	public PermutaDTO2 getPemutasColeg(PermutaItem permutaItem, HttpServletRequest request);
 	
 	//acciones tarjeta Datos Generales de guardias de colegiado
 	public UpdateResponseDTO  updateGuardiaColeg(GuardiasItem guardiasItem, HttpServletRequest request);

@@ -7,6 +7,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.PermutaDTO;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
+import org.itcgae.siga.DTOs.scs.PermutaItem2;
 import org.itcgae.siga.db.mappers.ScsPermutaguardiasSqlProvider;
 
 public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlProvider {
@@ -71,13 +72,88 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         return sql.toString();
     }
     
-    public String getPermutasGuardiaColeg(PermutaItem permutaItem, Short idInstitucion) {
+    public String getPermutasGuardiaColeg(PermutaItem2 permutaItem, Short idInstitucion) {
     	String fechainicio;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         fechainicio = dateFormat.format(permutaItem.getFechainicioSolicitante());
 
         SQL sql = new SQL();
         SQL sql2 = new SQL();
+        /*
+         * SELECT
+	sp.fechasolicitud,
+	sp.fechaconfirmacion,
+	turno.nombre turnopermuta,
+	guardia.nombre guardiadestino,
+	sp.motivossolicitante motivos,
+	sp.idinstitucion,
+	sp.numero,
+	sp.idpersona_solicitante,
+	sp.idpersona_confirmador,
+	sp.idturno_solicitante,
+	sp.idcalendarioguardias_solicitan,
+	sp.idguardia_solicitante,
+	sp.idturno_confirmador,
+	sp.idcalendarioguardias_confirmad,
+	sp.idguardia_confirmador,
+	sp.fechainicio_solicitante,
+	sp.fechainicio_confirmador,
+	sp.motivosconfirmador,
+	sp.motivossolicitante,
+	sp.id_per_cab_solicitante,
+	sp.id_per_cab_confirmador,
+	pc.idcalendarioguardias,
+	pc.fecha,
+	pc.idturno,
+	pc.idguardia,
+	pc.idpersona,
+	(PERSONA1.APELLIDOS1 || ' ' || PERSONA1.APELLIDOS2 || ', ' || PERSONA1.NOMBRE) AS NOMBRE_PERSONA_SOLICITANTE
+	,
+	(PERSONA2.APELLIDOS1 || ' ' || PERSONA2.APELLIDOS2 || ', ' || PERSONA2.NOMBRE) AS NOMBRE_PERSONA_CONFIRMADOR
+FROM
+	SCS_PERMUTAGUARDIAS sp
+JOIN scs_permuta_cabecera pc ON
+	sp.idinstitucion = pc.idinstitucion
+	AND ( sp.id_per_cab_solicitante = pc.id_permuta_cabecera
+		OR sp.id_per_cab_confirmador = pc.id_permuta_cabecera )
+JOIN scs_turno turno ON
+	turno.idinstitucion = pc.idinstitucion
+	AND turno.idturno = pc.idturno
+JOIN scs_guardiasturno guardia ON
+	guardia.idinstitucion = sp.idinstitucion
+	AND guardia.idguardia = pc.idguardia
+JOIN CEN_PERSONA PERSONA1 ON
+	sp.IDPERSONA_SOLICITANTE = PERSONA1.IDPERSONA
+JOIN CEN_PERSONA PERSONA2 ON
+	sp.IDPERSONA_CONFIRMADOR = PERSONA2.IDPERSONA
+WHERE
+	(sp.idinstitucion = 2068
+		AND ((3709 = sp.IDTURNO_SOLICITANTE
+			AND 2043 = sp.IDGUARDIA_SOLICITANTE
+			AND TO_DATE('31/05/2025', 'DD/MM/YYYY') = TRUNC(sp.FECHAINICIO_SOLICITANTE) )
+			OR (3709 = sp.IDTURNO_CONFIRMADOR
+				AND 2043 = sp.IDGUARDIA_CONFIRMADOR)
+			AND TO_DATE('31/05/2025', 'DD/MM/YYYY') = TRUNC(sp.FECHAINICIO_CONFIRMADOR) )
+			AND EXISTS (
+			SELECT
+				1
+			FROM
+				SCS_PERMUTAGUARDIAS sp2
+			WHERE
+				(sp2.idinstitucion = 2068
+					AND 2050002608 IN (sp2.IDPERSONA_SOLICITANTE, sp2.IDPERSONA_CONFIRMADOR)
+						AND ((3709 = sp2.IDTURNO_SOLICITANTE
+							AND 2043 = sp2.IDGUARDIA_SOLICITANTE
+							AND TO_DATE('31/05/2025', 'DD/MM/YYYY') = TRUNC(sp2.FECHAINICIO_SOLICITANTE) )
+							OR (3709 = sp2.IDTURNO_CONFIRMADOR
+								AND 2043 = sp2.IDGUARDIA_CONFIRMADOR
+								AND TO_DATE('31/05/2025', 'DD/MM/YYYY') = TRUNC(sp2.FECHAINICIO_CONFIRMADOR) ))))
+				AND pc.IDPERSONA <> 2050002608
+				AND ROWNUM <= 200)
+ORDER BY
+	FECHACONFIRMACION DESC;*/
+        
+        
         
         sql2.SELECT("1");
         sql2.FROM("SCS_PERMUTAGUARDIAS sp2");
@@ -121,7 +197,8 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
                 + "    pc.idguardia,"
                 + "    pc.idpersona,"
                 //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@INICIO
-        		+ "    (PERSONA.APELLIDOS1 || ' ' || PERSONA.APELLIDOS2 || ', ' || PERSONA.NOMBRE) AS NOMBRE_PERSONA");
+        		+ "	(PERSONA1.APELLIDOS1 || ' ' || PERSONA1.APELLIDOS2 || ', ' || PERSONA1.NOMBRE) AS NOMBRE_PERSONA_SOLICITANTE,"
+        		+ "	(PERSONA2.APELLIDOS1 || ' ' || PERSONA2.APELLIDOS2 || ', ' || PERSONA2.NOMBRE) AS NOMBRE_PERSONA_CONFIRMADOR");
         		//SIGARNV-2885@DTT.JAMARTIN@07/02/2023@FIN
         
         sql.FROM("SCS_PERMUTAGUARDIAS sp");
@@ -144,7 +221,8 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
                 + "    AND"
                 + "        guardia.idguardia = pc.idguardia");
         //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@INICIO
-        sql.JOIN("CEN_PERSONA PERSONA ON pc.IDPERSONA = PERSONA.IDPERSONA");
+        sql.JOIN("CEN_PERSONA PERSONA1 ON sp.IDPERSONA_SOLICITANTE = PERSONA1.IDPERSONA");
+        sql.JOIN("CEN_PERSONA PERSONA2 ON sp.IDPERSONA_CONFIRMADOR = PERSONA2.IDPERSONA");
         //SIGARNV-2885@DTT.JAMARTIN@07/02/2023@FIN
         sql.WHERE("sp.idinstitucion = " + idInstitucion);
         
