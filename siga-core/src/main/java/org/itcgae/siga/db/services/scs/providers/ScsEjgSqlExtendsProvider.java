@@ -46,27 +46,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlEjg.SELECT("*");
 		sqlEjg.FROM("scs_ejg");
 		sqlEjg.WHERE("idinstitucion = " + idInstitucion );
-		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
-			sqlEjg.WHERE("anio =" + ejgItem.getAnnio());
-
-		if (ejgItem.getNumero() != null && !ejgItem.getNumero().isEmpty()) {
-
-			String[] parts;
-
-			if (ejgItem.getNumero().trim().contains("-")) {
-				parts = ejgItem.getNumero().trim().split("-");
-
-				sqlEjg.WHERE("NUMEJG BETWEEN " + parts[0].trim() + " AND " + parts[1].trim());
-
-			} else {
-				sqlEjg.WHERE(" NUMEJG = " + ejgItem.getNumero().trim());
-			}
-		}
-		sqlEjg.ORDER_BY("ANIO DESC, NUMERO DESC");
-		if (tamMaximo != null) { 
-			Integer tamMaxNumber = tamMaximo + 1;
-			sqlEjg.FETCH_FIRST_ROWS_ONLY(tamMaxNumber);
-		}
+		
 		
 
 		String condicionAnnioNumActas = " ac.idinstitucion = " + idInstitucion;
