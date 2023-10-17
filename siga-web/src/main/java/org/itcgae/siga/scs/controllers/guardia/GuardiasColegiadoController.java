@@ -33,6 +33,7 @@ import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.PermutaDTO;
+import org.itcgae.siga.DTOs.scs.PermutaDTO2;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
@@ -121,9 +122,9 @@ public class GuardiasColegiadoController {
 	}
 	
 	@PostMapping(value = "/getPermutasColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PermutaDTO> getPermutasColegiado(@RequestBody PermutaItem permutaItem, HttpServletRequest request) {
-		PermutaDTO response = guardiasColegiadoService.getPemutasColeg(permutaItem, request);
-		return new ResponseEntity<PermutaDTO>(response, HttpStatus.OK);
+	ResponseEntity<PermutaDTO2> getPermutasColegiado(@RequestBody PermutaItem permutaItem, HttpServletRequest request) {
+		PermutaDTO2 response = guardiasColegiadoService.getPemutasColeg(permutaItem, request);
+		return new ResponseEntity<PermutaDTO2>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/getTurnoInscrito")

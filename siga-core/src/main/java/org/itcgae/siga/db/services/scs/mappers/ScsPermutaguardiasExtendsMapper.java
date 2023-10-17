@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ComboGuardiasFuturasItem;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
+import org.itcgae.siga.DTOs.scs.PermutaItem2;
 import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsPermutaCabeceraSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsPermutaguardiasSqlExtendsProvider;
@@ -82,9 +83,10 @@ public interface ScsPermutaguardiasExtendsMapper extends ScsPermutaguardiasMappe
 		@Result(column = "idturno", property = "idturno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idguardia", property = "idguardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idpersona", property = "idpersona", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE_PERSONA", property = "nombreColegiado", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "NOMBRE_PERSONA_CONFIRMADOR", property = "nombreColegiadoConfirmador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE_PERSONA_SOLICITANTE", property = "nombreColegiadoSolicitante", jdbcType = JdbcType.VARCHAR)
 	})
-	List<PermutaItem> getPermutasGuardiaColeg(PermutaItem permutaItem, Short idInstitucion);
+	List<PermutaItem2> getPermutasGuardiaColeg(PermutaItem2 permutaItem, Short idInstitucion);
 	//SIGARNV-2885@DTT.JAMARTIN@07/02/2023@FIN 
 	
 	@SelectProvider(type = ScsPermutaguardiasSqlExtendsProvider.class, method = "getTurnoInscrito")
