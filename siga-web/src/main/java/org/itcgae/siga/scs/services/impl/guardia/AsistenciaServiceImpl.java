@@ -1244,6 +1244,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				actuacionBBDD.setAcuerdoextrajudicial((short) 0);
 				actuacionBBDD.setIdtipoactuacion(Short.parseShort(getTipoActuacionPorDefecto(usuario, idInstitucion, asistencia.getFiltro().getIdTipoAsistenciaColegiado(), comisariaJuzgado)));
 			}
+			
+			// Se valida la actuación de  la asistencia
+			actuacionBBDD.setFechavalidacion(new Date());
+			actuacionBBDD.setValidada("1");
+			actuacionBBDD.setUsuvalidacion(usuario.getIdusuario());
 
 		} catch (ParseException e) {
 			LOGGER.error("guardarAsistencias() / ERROR AL PARSEAR FECHAS: " + e.getMessage(), e);
