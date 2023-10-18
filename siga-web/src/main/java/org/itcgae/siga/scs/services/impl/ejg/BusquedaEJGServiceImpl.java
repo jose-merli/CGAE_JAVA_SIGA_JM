@@ -669,11 +669,25 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				// para obtener registros separados por ,
 				
 				String[] parts;
-				if(ejgItem.getNumero() == null || ejgItem.getNumero().isEmpty()) {
-					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-							usuarios.get(0).getIdlenguaje().toString()));
-					//ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-						//	usuarios.get(0).getIdlenguaje().toString())));
+				String stringListaEJG = "";
+				List<EjgItem> listaEjgs;
+				if(ejgItem.getNumero() == null || ejgItem.getNumero().isEmpty()) {					
+					//Saca todos los ejg con los filtros
+					listaEjgs = scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString());
+					if(listaEjgs.size() > 0 && listaEjgs != null) {
+						for(int i = 0; i < listaEjgs.size(); i++) {
+							if(i == listaEjgs.size()-1) {
+								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+							}else {
+								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+							}
+						}
+						//Saca los datos de los ejgs de la primera consulta
+						ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJGFinal(ejgItem, idInstitucion.toString(), tamMaximo,
+								usuarios.get(0).getIdlenguaje().toString(), stringListaEJG));
+					}
+
 				}else if (ejgItem.getNumero().trim().contains(",")) {
 					parts = ejgItem.getNumero().trim().split(",");
 					//se crea un objeto auxiliar para obtener la consulta de cada numero de EJG
@@ -685,11 +699,20 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 					for (String str : parts) {
 						//al EJG se le aplica un numero del array
 						ejgItem.setNumero(str.trim());
-						//se carga los registros obtenidos de la consulta (se espera uno solo)
-						listAux.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-								usuarios.get(0).getIdlenguaje().toString()));
-						//listAux.setEjgItems( getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-						//		usuarios.get(0).getIdlenguaje().toString())));
+						listaEjgs = scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+								usuarios.get(0).getIdlenguaje().toString());
+						if(listaEjgs.size() > 0 && listaEjgs != null) {
+							for(int i = 0; i < listaEjgs.size(); i++) {
+								if(i == listaEjgs.size()-1) {
+									stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+								}else {
+									stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+								}
+							}
+							//se carga los registros obtenidos de la consulta (se espera uno solo)
+							listAux.setEjgItems(scsEjgExtendsMapper.busquedaEJGFinal(ejgItem, idInstitucion.toString(), tamMaximo,
+									usuarios.get(0).getIdlenguaje().toString(), stringListaEJG));
+						}
 						//se almacena en la lista de EJGItem el primer registro obtenido.
 						listAux2.add(listAux.getEjgItems().get(0));
 				
@@ -702,15 +725,36 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 
 					
 				} else if(ejgItem.getNumero().trim().contains("-")) {
-					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-							usuarios.get(0).getIdlenguaje().toString()));
-//					ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-//						usuarios.get(0).getIdlenguaje().toString())));
+					listaEjgs = scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString());
+					
+					if(listaEjgs.size() > 0 && listaEjgs != null) {
+						for(int i = 0; i < listaEjgs.size(); i++) {
+							if(i == listaEjgs.size()-1) {
+								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+							}else {
+								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+							}
+						}
+						ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJGFinal(ejgItem, idInstitucion.toString(), tamMaximo,
+								usuarios.get(0).getIdlenguaje().toString(), stringListaEJG));
+					}
+					
 				}else {
-				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-						usuarios.get(0).getIdlenguaje().toString()));
-//				ejgDTO.setEjgItems(getRelaciones(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
-//						usuarios.get(0).getIdlenguaje().toString())));
+					listaEjgs = scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString());
+					if(listaEjgs.size() > 0 && listaEjgs != null) {
+						for(int i = 0; i < listaEjgs.size(); i++) {
+							if(i == listaEjgs.size()-1) {
+								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+							}else {
+								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+							}
+						}
+						ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJGFinal(ejgItem, idInstitucion.toString(), tamMaximo,
+								usuarios.get(0).getIdlenguaje().toString(), stringListaEJG));
+					}
+					
 				}
 				LOGGER.info(
 						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");

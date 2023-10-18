@@ -69,6 +69,16 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	@Results({
 
 			@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numejg", property = "numEjg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idInstitucion", property = "idInstitucion", jdbcType = JdbcType.INTEGER),
+
+	})
+	List<EjgItem> busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaEJGFinal")
+	@Results({
+
+			@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numejg", property = "numEjg", jdbcType = JdbcType.VARCHAR),
@@ -87,7 +97,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
 
 	})
-	List<EjgItem> busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
+	List<EjgItem> busquedaEJGFinal(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje, String stringListaEjgs);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "datosEJG")
 	@Results({
