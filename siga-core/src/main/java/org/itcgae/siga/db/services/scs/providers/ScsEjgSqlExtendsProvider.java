@@ -35,11 +35,18 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		String fechaResolucionHast;
 
 		SQL sql = new SQL();
+		SQL sqlEjg = new SQL();
 		SQL sqlUF = new SQL();
 		SQL sqlContrarios = new SQL();
 		SQL sqlUFRep = new SQL();
 		SQL sqlTurno = new SQL();
 		SQL sqlTurnoGuardia = new SQL();
+		
+		
+		sqlEjg.SELECT("*");
+		sqlEjg.FROM("scs_ejg");
+		sqlEjg.WHERE("idinstitucion = " + idInstitucion );
+		
 		
 
 		String condicionAnnioNumActas = " ac.idinstitucion = " + idInstitucion;
@@ -150,7 +157,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		//sql.SELECT("GUARDIA.NOMBRE");
 
 		// from
-		sql.FROM("scs_ejg ejg");
+		sql.FROM("( " + sqlEjg.toString() + " ) ejg"); 
 
 		// joins
 		sql.LEFT_OUTER_JOIN("cen_persona per on per.idpersona = ejg.idpersona");
@@ -939,6 +946,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		 */
 
 		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
+		
+		if (tamMaximo != null) { 
+			Integer tamMaxNumber = tamMaximo + 1;
+			sql.FETCH_FIRST_ROWS_ONLY(tamMaxNumber);
+		}
 
 		//LOGGER.info(sql.toString());
 

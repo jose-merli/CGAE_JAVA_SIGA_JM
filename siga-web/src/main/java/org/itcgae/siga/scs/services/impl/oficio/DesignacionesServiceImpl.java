@@ -932,7 +932,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		// DesignaItem result = new DesignaItem();
 		Error error = new Error();
 		List<DesignaItem> designas = null;
-		List<DesignaItem> designasNuevas = null;
+		List<DesignaItem> designasFinal = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
 
@@ -974,13 +974,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						"DesignacionesServiceImpl.busquedaDesignas -> Entrada a servicio para la busqueda de justifiacion express");
 
 				try {
-					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion,
+					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones2(designaItem, idInstitucion,
 							tamMaximo);
-
-					if ((designas != null) && (designas.size()) >= 200) {
+					if(designas != null && !designas.isEmpty()) {
+						List<String> ids = new ArrayList<String>();
+						for(DesignaItem item : designas) {
+							ids.add("'" + item.getAno() + "','" + item.getCodigo() + "'");
+						}
+						designasFinal = scsDesignacionesExtendsMapper.busquedaDesignacionesFinal(ids, idInstitucion,
+								tamMaximo);
+					}
+					if ((designasFinal != null) && tamMaximo != null
+							&& designasFinal.size() >= tamMaximo) {
 						error.setCode(200);
-						error.setDescription(
-								"La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
 						designas.get(0).setError(error);
 					}
 
@@ -992,7 +1001,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 		}
 
-		return designas;
+		return designasFinal;
 	}
 
 	@Override
