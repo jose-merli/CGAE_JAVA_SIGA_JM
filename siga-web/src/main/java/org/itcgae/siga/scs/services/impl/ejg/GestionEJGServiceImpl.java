@@ -5387,18 +5387,34 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
 			for (EjgDocumentacionItem doc : listadocumentoEjgItem) {
-				if (doc.getNombreFichero() != null) {
-					zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero()+ "_" + doc.getNombreFichero()));
-					String extension = doc.getNombreFichero()
-							.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
-							.toLowerCase();
-					String path = getDirectorioFicheroEjg(idInstitucion);
-					path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
+					//path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
+
+					GenFicheroExample genFicheroExampleP = new GenFicheroExample();
+					genFicheroExampleP.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdficheroEqualTo(Long.valueOf(doc.getIdFichero()));
+					List<GenFichero> genFichero = genFicheroMapper.selectByExample(genFicheroExampleP);
+					
+					if(doc.getNombreFichero() != null) {
+						zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero()+ "_" + doc.getNombreFichero()));
+					}else{
+						zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero()+ "." + genFichero.get(0).getExtension()));
+					}
+					
+					String path = genFichero.get(0).getDirectorio();
+					String extension = genFichero.get(0).getExtension();
+					LOGGER.warn("AGUERRA - EXTENSION: " + extension);
+
+					if(doc.getNombreFichero() != null) {//si viene con nombre de fichero es de siga novo y hay que concatenárselo
+						path += File.separator + idInstitucion + "_" + genFichero.get(0).getIdfichero();
+					}
+					
+					path += "."+extension;
+					
+					LOGGER.warn("AGUERRA - TIPOMIME: " + extension);
+					//String mimeType = getMimeType("."+extension);
 					File file = new File(path);
 					FileInputStream fileInputStream = new FileInputStream(file);
 					IOUtils.copy(fileInputStream, zipOutputStream);
 					fileInputStream.close();
-				}
 			}
 
 			zipOutputStream.closeEntry();
@@ -6047,40 +6063,40 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			if (usuarios != null && !usuarios.isEmpty() && !listadocumentoEjgItem.isEmpty()) {
 
-				if (listadocumentoEjgItem.size() == 1 && listadocumentoEjgItem.get(0).getNombreFichero() != null) {
-
-					String extension = listadocumentoEjgItem.get(0).getNombreFichero()
-							.substring(listadocumentoEjgItem.get(0).getNombreFichero().lastIndexOf("."),
-									listadocumentoEjgItem.get(0).getNombreFichero().length())
-							.toLowerCase();
+				if(listadocumentoEjgItem.size() == 1) {
+					
+					GenFicheroExample genFicheroExampleP = new GenFicheroExample();
+					genFicheroExampleP.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdficheroEqualTo(Long.valueOf(listadocumentoEjgItem.get(0).getIdFichero()));
+					List<GenFichero> genFichero = genFicheroMapper.selectByExample(genFicheroExampleP);
+					String path = genFichero.get(0).getDirectorio();
+					
+					String extension = genFichero.get(0).getExtension();
 
 					LOGGER.warn("AGUERRA - EXTENSION: " + extension);
-
-					String path = getDirectorioFicheroEjg(idInstitucion);
-
+					
+					if(listadocumentoEjgItem.get(0).getNombreFichero() != null) {//si viene con nombre de fichero es de siga novo y hay que concatenárselo
+						path += File.separator + idInstitucion + "_" + genFichero.get(0).getIdfichero();
+					}
+					
+					path += "." + extension;
 					LOGGER.warn("AGUERRA - RUTA: " + path);
-
-					path += File.separator + idInstitucion + "_" + listadocumentoEjgItem.get(0).getIdFichero()
-							+ extension;
-
-					LOGGER.warn("AGUERRA - PATH DESPUES: " + path);
 
 					File file = new File(path);
 					fileStream = new FileInputStream(file);
 
-					String tipoMime = getMimeType(extension);
-					LOGGER.warn("AGUERRA - TIPOMIME: " + tipoMime);
-
-					if (tipoMime == "") {
+					//String tipoMime = getMimeType(extension);
+					LOGGER.warn("AGUERRA - TIPOMIME: " + extension);
+					 String mimeType = getMimeType("."+extension);
+					if (mimeType == "") {
 						LOGGER.warn("AGUERRA - ENTRA EN LA EXCEPCION DE LA EXTENSION NO SOPORTADA");
 						throw new Exception("Error: el documento contiene una extensión no soportada");
 					} else {
-						headers.setContentType(MediaType.parseMediaType(tipoMime));
+						headers.setContentType(MediaType.parseMediaType(mimeType));
 						headers.set("Content-Disposition",
 								"attachment; filename=\"" + listadocumentoEjgItem.get(0).getNombreFichero() + "\"");
 						headers.setContentLength(file.length());
 					}
-				} else {
+				}else {
 					fileStream = getZipFileDocumentosEjg(listadocumentoEjgItem, idInstitucion);
 
 					headers.setContentType(MediaType.parseMediaType("application/zip"));
@@ -6089,10 +6105,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
 						HttpStatus.OK);
-				// Si no hay ningún fichero asociado al unico registro seleccionado
-				if (listadocumentoEjgItem.get(0).getNombreFichero() == null && listadocumentoEjgItem.size() == 1) {
-					res = new ResponseEntity<InputStreamResource>(null, headers, HttpStatus.OK);
-				}
 			}
 
 		} catch (Exception e) {
