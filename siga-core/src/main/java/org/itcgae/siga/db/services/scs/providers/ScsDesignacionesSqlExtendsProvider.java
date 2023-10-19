@@ -767,6 +767,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			boolean tiene_acreditacion = designaItem.getIdAcreditacion() != null
 					&& (designaItem.getIdAcreditacion().length != 0);
 			boolean tiene_modulo = designaItem.getIdModuloActuaciones() != null && designaItem.getIdModuloActuaciones().length >0;
+			boolean tiene_documentacion = designaItem.getDocumentacionActuacion()!= null && designaItem.getDocumentacionActuacion().length() >0;
+			boolean tiene_procActuacion = designaItem.getIdProcedimientoActuaciones()!=null && designaItem.getIdProcedimientoActuaciones().length>0;
 			boolean tiene_fechaJustificacionDesde = designaItem.getFechaJustificacionDesde() != null
 					&& designaItem.getFechaJustificacionDesde().toString() != null
 					&& !designaItem.getFechaJustificacionDesde().toString().equalsIgnoreCase("");
@@ -781,7 +783,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimientos() != null
 					&& designaItem.getIdProcedimientos().length > 0);
 
-			if (tiene_juzg||tiene_asunto||tiene_acreditacion||tiene_modulo||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta || tiene_origen){
+			if(tiene_modulo||tiene_documentacion||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta||tiene_juzg||tiene_acreditacion||tiene_origen) {
 				sql.JOIN("scs_actuaciondesigna act ON act.idturno = des.idturno" +
 												" and act.idinstitucion = des.idinstitucion " +
 												" and act.anio = des.anio " +
@@ -798,9 +800,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			}
 
 
-			if (tienePretensionesDesignacion) {
-				sql.JOIN("SCS_PRETENSION pret ON des.idinstitucion = pret.idinstitucion AND des.idpretension = pret.idpretension");
-			}
+//			if (tienePretensionesDesignacion) {
+//				sql.JOIN("SCS_PRETENSION pret ON des.idinstitucion = pret.idinstitucion AND des.idpretension = pret.idpretension");
+//			}
 
 			if (idInstitucion != null) {
 				sql.WHERE("des.IDINSTITUCION = " + idInstitucion );
@@ -832,7 +834,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (designaItem.getIdTurnos() != null
 					&& (String.valueOf(designaItem.getIdTurnos()) != "-1" && designaItem.getIdTurnos().length != 0)
 					&& !String.valueOf(designaItem.getIdTurnos()).equals("")) {
-				sql.JOIN("scs_turno turno ON des.idturno = turno.idturno AND des.idinstitucion = turno.idinstitucion");
 				
 				if (designaItem.getIdTurnos().length == 1) {
 					sql.WHERE("des.idTurno = " + designaItem.getIdTurnos()[0]);
@@ -891,8 +892,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			}
 			if (designaItem.getIdJuzgados() != null && designaItem.getIdJuzgados().length > 0) {
 				if (designaItem.getIdJuzgados().length == 1) {
-					sql.LEFT_OUTER_JOIN("scs_juzgado juzgado ON des.idjuzgado = juzgado.idjuzgado" + 
-							" AND des.idinstitucion = juzgado.idinstitucion");
 					sql.WHERE(" des.idjuzgado = " + designaItem.getIdJuzgados()[0]);
 				} else {
 					String juzgadoIN = "";
@@ -1204,7 +1203,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			// cuando se busca por colegiado
 			//sql += " order by des.anio desc, des.NUMERO desc";
 			
-			sql.ORDER_BY("des.idturno, des.anio desc, des.codigo desc ");
+			sql.ORDER_BY("des.anio desc, des.codigo desc ");
 			
 			// No utilizamos la clase Paginador para la busqueda de letrados porque al
 			// filtrar por residencia la sql no devolvia bien los
