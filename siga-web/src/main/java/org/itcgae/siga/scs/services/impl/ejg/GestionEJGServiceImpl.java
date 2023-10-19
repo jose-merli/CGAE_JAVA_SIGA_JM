@@ -882,13 +882,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						//Comprobamos si venimos desde editar creando uno nuevo para editar la relacion antigua en SCS_UNIDADFAMILIAREJG
 						if (item.size() > 5 && Boolean.parseBoolean(item.get(5))) {
 							editadoNuevo = true;
-							familiar.setIdinstitucion(idInstitucion);
-							familiar.setIdpersona(Long.parseLong(item.get(1)));
-							familiar.setAnio(Short.parseShort(item.get(2)));
-							familiar.setIdtipoejg(Short.parseShort(item.get(3)));
-							familiar.setNumero(Long.parseLong(item.get(4)));
-							familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
-							familiar.setFechamodificacion(new Date());
 							familiar.setFechabaja(null);
 							primero = compruebaSiSolicitanteEjg(idInstitucion, item);
 
@@ -971,15 +964,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				.andFechabajaIsNull();
 		List<ScsUnidadfamiliarejg> uf = scsUnidadfamiliarejgMapper.selectByExample(exampleFamiliar);
 
+		ScsEjgKey keyEjg = new ScsEjgKey();
+		keyEjg.setAnio(Short.valueOf(item.get(2)));
+		keyEjg.setIdinstitucion(idInstitucion);
+		keyEjg.setNumero(Long.valueOf(item.get(4)));
+		keyEjg.setIdtipoejg(Short.valueOf(item.get(3)));
+		
+		ScsEjgWithBLOBs ejg = scsEjgExtendsMapper.selectByPrimaryKey(keyEjg);
 		//Si no hay resultados se inserta como solicitante principal
-		if(uf.isEmpty()) {
-			ScsEjgKey keyEjg = new ScsEjgKey();
-			keyEjg.setAnio(Short.valueOf(item.get(2)));
-			keyEjg.setIdinstitucion(idInstitucion);
-			keyEjg.setNumero(Long.valueOf(item.get(4)));
-			keyEjg.setIdtipoejg(Short.valueOf(item.get(3)));
+		if((uf.isEmpty()) || (item.size()>5 && ejg.getIdpersonajg().toString().equals(item.get(6)))) {
 			
-			ScsEjgWithBLOBs ejg = scsEjgExtendsMapper.selectByPrimaryKey(keyEjg);
 			//Si es el primero se marca como solicitante principal
 			ejg.setIdpersonajg(Long.parseLong(item.get(1)));
 			scsEjgExtendsMapper.updateByPrimaryKeySelective(ejg);
