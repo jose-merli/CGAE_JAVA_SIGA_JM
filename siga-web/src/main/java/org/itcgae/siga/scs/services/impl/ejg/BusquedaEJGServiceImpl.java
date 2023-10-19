@@ -759,7 +759,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				LOGGER.info(
 						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
 				if (ejgDTO.getEjgItems() != null && tamMaximo != null
-						&& ejgDTO.getEjgItems().size() > tamMaximo) {
+						&& ejgDTO.getEjgItems().size() >= tamMaximo) {
 					error.setCode(200);
 					error.setDescription("La consulta devuelve más de " + tamMaximo
 							+ " resultados, pero se muestran sólo los " + tamMaximo
