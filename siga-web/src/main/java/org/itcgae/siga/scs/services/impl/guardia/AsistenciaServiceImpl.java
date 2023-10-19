@@ -4466,7 +4466,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					extension = genFicheroMapper.selectByPrimaryKey(genFicheroKey).getExtension();
 
 					String path = getDirectorioFicheroAsi(idInstitucion);
-					path += File.separator + idInstitucion + "_" + documentos.get(0).getIdFichero() + "." + extension;
+					path += "/" + idInstitucion + "_" + documentos.get(0).getIdFichero() + "." + extension;
 
 					File file = new File(path);
 					fileStream = new FileInputStream(file);
@@ -4496,6 +4496,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			LOGGER.error(
 					"AsistenciaServiceImpl.descargarDocumento() -> Se ha producido un error al descargar un archivo asociado a la asistencia",
 					e);
+			res = new ResponseEntity<InputStreamResource>(HttpStatus.NOT_FOUND);
 		}
 
 		return res;
@@ -5847,7 +5848,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 		StringBuffer directorioFichero = new StringBuffer(path);
 		directorioFichero.append(idInstitucion);
-		directorioFichero.append(File.separator);
+		directorioFichero.append("/");
 
 		// Extraemos el path concreto para actuaciones
 		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
