@@ -42,7 +42,9 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 		}
 		if (juzgadoItem.getNombre() != null && juzgadoItem.getNombre() != "") {
-			sql.WHERE("UPPER(juzgado.nombre) like UPPER('%" + juzgadoItem.getNombre() + "%')");
+			sql.WHERE("TRANSLATE(UPPER(juzgado.nombre), 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž', 'AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') "
+					+ "LIKE TRANSLATE(UPPER('%" + juzgadoItem.getNombre() + "%'), 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž', 'AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz')");
+
 		}
 
 		if (juzgadoItem.getCodigoExt() != null && juzgadoItem.getCodigoExt() != "") {
