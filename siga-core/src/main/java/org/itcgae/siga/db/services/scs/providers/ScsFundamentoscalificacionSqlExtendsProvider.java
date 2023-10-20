@@ -59,7 +59,7 @@ public class ScsFundamentoscalificacionSqlExtendsProvider extends ScsTipofundame
 			}
 			if (!indiferente) {
 				dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
-				sql.WHERE("fundamento.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
+				sql.WHERE("(fundamento.IDTIPODICTAMENEJG IN (" + dictamenCad + ") OR fundamento.IDTIPODICTAMENEJG IS NULL )");
 			}
 
 		}
@@ -67,7 +67,7 @@ public class ScsFundamentoscalificacionSqlExtendsProvider extends ScsTipofundame
 		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS catalogoFundamento on catalogoFundamento.idrecurso = fundamento.DESCRIPCION and catalogoFundamento.idlenguaje ="
 						+ idLenguaje);
-		sql.WHERE("fundamento.fecha_baja is null and fundamento.idinstitucion  = '" + idInstitucion + "'");
+		sql.WHERE("(fundamento.fecha_baja is null OR fundamento.IDFUNDAMENTOCALIF = -1) and fundamento.idinstitucion  = '" + idInstitucion + "'");
 		
 		sql.ORDER_BY("catalogoFundamento.descripcion ASC");
 		
