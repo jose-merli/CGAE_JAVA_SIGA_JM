@@ -41,6 +41,32 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 	List<EjgItem> busquedaEJGComision(EjgItem ejgItem, String string, Integer tamMaximo,
 			String idLenguaje);
 	
+	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "busquedaEJGComisionFinal")
+	@Results({
+
+			@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numejg", property = "numEjg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idInstitucion", property = "idInstitucion", jdbcType = JdbcType.INTEGER),
+			@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TURNOGUARDIA", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaapertura", property = "fechaApertura", jdbcType = JdbcType.DATE),
+			@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER),
+			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "EDITABLECOMISION", property = "editableComision", jdbcType = JdbcType.INTEGER)
+
+	})
+	List<EjgItem> busquedaEJGComisionFinal(EjgItem ejgItem, String string, Integer tamMaximo,
+			String idLenguaje, String stringListaEjgs);
+	
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "busquedaEJGActaComision")
 	@Results({
 

@@ -287,12 +287,26 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 				//idUltimoEstado = scsEjgComisionExtendsMapper.idUltimoEstado(ejgItem, idInstitucion.toString());
 
 				LOGGER.info(
-						"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
-				ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGComision(ejgItem,
-						idInstitucion.toString(), tamMaximo, "1"));
+						"busquedaEJGComision() / scsEjgComisionExtendsMapper.busquedaEJGComision() -> Entrada a scsEjgComisionExtendsMapper para obtener el EJG");
+				List<EjgItem> listaEjgs = scsEjgComisionExtendsMapper.busquedaEJGComision(ejgItem,
+						idInstitucion.toString(), tamMaximo, "1");
+				String stringListaEJG = "";
+				if(listaEjgs.size() > 0 && listaEjgs != null) {
+					for(int i = 0; i < listaEjgs.size(); i++) {
+						if(i == listaEjgs.size()-1) {
+							stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+						}else {
+							stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+						}
+					}
+					//se carga los registros obtenidos de la consulta (se espera uno solo)
+					ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGComisionFinal(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString(), stringListaEJG));
+				}
+				
 				LOGGER.info(
-						"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
-				if (ejgDTO.getEjgItems() != null && tamMaximo != null && ejgDTO.getEjgItems().size() > tamMaximo) {
+						"busquedaEJGComision() / scsEjgComisionExtendsMapper.busquedaEJGComision() -> Salida de scsEjgComisionExtendsMapper para obtener lista de EJGs");
+				if (ejgDTO.getEjgItems() != null && tamMaximo != null && ejgDTO.getEjgItems().size() >= tamMaximo) {
 					error.setCode(200);
 					error.setDescription("La consulta devuelve más de " + tamMaximo
 							+ " resultados, pero se muestran sólo los " + tamMaximo

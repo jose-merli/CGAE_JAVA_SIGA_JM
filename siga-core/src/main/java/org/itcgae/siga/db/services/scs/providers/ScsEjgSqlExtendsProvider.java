@@ -877,14 +877,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	public String busquedaEJGFinal(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje, String stringListaEjgs) {
 
 		SQL sql = new SQL();
-		SQL sqlEjg = new SQL();
 		SQL sqlTurno = new SQL();
 		SQL sqlTurnoGuardia = new SQL();
-		
-		
-		sqlEjg.SELECT("*");
-		sqlEjg.FROM("scs_ejg");
-		sqlEjg.WHERE("idinstitucion = " + idInstitucion );
 
 		SQL letrado = new SQL();
         letrado.SELECT("cen_persona.apellidos2 || ' ' || cen_persona.apellidos1 || ',' || cen_persona.nombre");
