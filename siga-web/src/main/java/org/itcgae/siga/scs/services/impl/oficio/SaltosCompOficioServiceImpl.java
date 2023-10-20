@@ -414,8 +414,8 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 
 			ComboItem comboItem = new ComboItem();
 
-			comboItem.setLabel("(" + letradoGuardiaItem.getNumeroColegiado() + ") " + letradoGuardiaItem.getApellidos2()
-					+ " " + letradoGuardiaItem.getApellidos1() + ", " + letradoGuardiaItem.getNombre());
+			comboItem.setLabel("(" + letradoGuardiaItem.getNumeroColegiado() + ") " + letradoGuardiaItem.getApellidos1()
+					+ " " + letradoGuardiaItem.getApellidos2() + ", " + letradoGuardiaItem.getNombre());
 			comboItem.setValue(letradoGuardiaItem.getIdPersona());
 			listaCombo.add(comboItem);
 
