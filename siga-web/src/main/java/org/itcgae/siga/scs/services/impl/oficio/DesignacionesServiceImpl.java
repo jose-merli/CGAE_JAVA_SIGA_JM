@@ -990,7 +990,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						error.setDescription("La consulta devuelve más de " + tamMaximo
 								+ " resultados, pero se muestran sólo los " + tamMaximo
 								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
-						designas.get(0).setError(error);
+						designasFinal.get(0).setError(error);
 					}
 
 				} catch (Exception e) {
