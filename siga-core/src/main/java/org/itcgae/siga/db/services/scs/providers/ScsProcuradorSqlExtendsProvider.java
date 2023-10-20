@@ -87,6 +87,14 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 
 			sql.WHERE("procurador.fechabaja is null");
 		}
+		
+		if (procuradorItem.getCodigoExt() != null && !procuradorItem.getCodigoExt().isEmpty()) {
+			
+			sql.AND();
+
+			sql.WHERE("procurador.codigo = '" + procuradorItem.getCodigoExt() + "'");
+		}
+		
 
 		sql.ORDER_BY("procurador.nombre");
 
