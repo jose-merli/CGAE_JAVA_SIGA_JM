@@ -4030,7 +4030,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					ScsEjgExample scsEjgExample = new ScsEjgExample();
 					scsEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 						.andAnioEqualTo(Short.valueOf(ejg.getAnnio()))
-						.andNumejgEqualTo(ejg.getNumero())
+						.andNumeroEqualTo(Long.valueOf(ejg.getNumero()))
 						.andIdtipoejgEqualTo(Short.valueOf(ejg.getTipoEJG()));
 					
 					ScsEjg ejg2 = scsEjgMapper.selectByExample(scsEjgExample).get(0);
