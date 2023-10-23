@@ -5403,11 +5403,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					String extension = genFichero.get(0).getExtension();
 					LOGGER.warn("AGUERRA - EXTENSION: " + extension);
 
-					if(doc.getNombreFichero() != null) {//si viene con nombre de fichero es de siga novo y hay que concatenárselo
-						path += File.separator + idInstitucion + "_" + genFichero.get(0).getIdfichero();
-					}
+					path += File.separator + idInstitucion + "_" + genFichero.get(0).getIdfichero();
 					
-					path += "."+extension;
+					path += "." + extension;
 					
 					LOGGER.warn("AGUERRA - TIPOMIME: " + extension);
 					//String mimeType = getMimeType("."+extension);
