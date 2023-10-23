@@ -99,6 +99,7 @@ import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.GenFichero;
 import org.itcgae.siga.db.entities.GenFicheroKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
@@ -7190,12 +7191,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
 			for (DocumentoDesignaItem doc : listaDocumentoDesignaItem) {
-
-				zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero() + "_" + doc.getNombreFichero()));
-				String extension = doc.getNombreFichero()
-						.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
-						.toLowerCase();
-				String path = getDirectorioFicheroDes(idInstitucion);
+				GenFicheroKey ficheroKey = new GenFicheroKey();
+				ficheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+				ficheroKey.setIdinstitucion(idInstitucion);
+				GenFichero ficheroDesigna = genFicheroMapper.selectByPrimaryKey(ficheroKey);
+				
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero() + "." + ficheroDesigna.getExtension()));
+				
+				String extension = "." + ficheroDesigna.getExtension();
+				String path = ficheroDesigna.getDirectorio();
 				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
 				File file = new File(path);
 				FileInputStream fileInputStream = new FileInputStream(file);
@@ -7777,11 +7781,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				if (listaDocumentoDesignaItem.size() == 1) {
 
-					String extension = listaDocumentoDesignaItem.get(0).getNombreFichero()
-							.substring(listaDocumentoDesignaItem.get(0).getNombreFichero().lastIndexOf("."),
-									listaDocumentoDesignaItem.get(0).getNombreFichero().length())
-							.toLowerCase();
-					String path = getDirectorioFicheroDes(idInstitucion);
+					
+					//String path = getDirectorioFicheroDes(idInstitucion);
+					
+					
+					GenFicheroKey keyFichero = new GenFicheroKey();
+					keyFichero.setIdinstitucion(idInstitucion);
+					keyFichero.setIdfichero(Long.valueOf(listaDocumentoDesignaItem.get(0).getIdFichero()));
+					
+					GenFichero ficheroDesigna = genFicheroMapper.selectByPrimaryKey(keyFichero);
+					String path = ficheroDesigna.getDirectorio();
+					String extension = "." + ficheroDesigna.getExtension();
+					
 					path += File.separator + idInstitucion + "_" + listaDocumentoDesignaItem.get(0).getIdFichero()
 							+ extension;
 
