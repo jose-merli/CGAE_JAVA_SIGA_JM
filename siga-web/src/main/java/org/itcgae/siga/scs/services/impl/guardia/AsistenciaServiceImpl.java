@@ -5922,12 +5922,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				GenFicheroKey genFicheroKey = new GenFicheroKey();
 				genFicheroKey.setIdfichero(Long.valueOf(documentos.get(0).getIdFichero()));
 				genFicheroKey.setIdinstitucion(idInstitucion);
-				String extension = genFicheroMapper.selectByPrimaryKey(genFicheroKey).getExtension();
+				GenFichero miFichero = genFicheroMapper.selectByPrimaryKey(genFicheroKey);
+				String extension = miFichero.getExtension();
 				if (UtilidadesString.esCadenaVacia(doc.getNombreFichero())) {
 					doc.setNombreFichero("default(" + (i++) + ")." + extension);
 				}
 				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
-				String path = getDirectorioFicheroAsi(idInstitucion);
+				String path = miFichero.getDirectorio();
 				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + "." + extension;
 				File file = new File(path);
 				FileInputStream fileInputStream = new FileInputStream(file);
