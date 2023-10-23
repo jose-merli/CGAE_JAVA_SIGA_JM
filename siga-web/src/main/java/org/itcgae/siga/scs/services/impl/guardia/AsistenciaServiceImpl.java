@@ -4459,13 +4459,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 				if (documentos.size() == 1) {
 					String extension = "";
-
 					GenFicheroKey genFicheroKey = new GenFicheroKey();
 					genFicheroKey.setIdfichero(Long.valueOf(documentos.get(0).getIdFichero()));
 					genFicheroKey.setIdinstitucion(idInstitucion);
-					extension = genFicheroMapper.selectByPrimaryKey(genFicheroKey).getExtension();
+					GenFichero miFichero = genFicheroMapper.selectByPrimaryKey(genFicheroKey);
+					extension = miFichero.getExtension();
 
-					String path = getDirectorioFicheroAsi(idInstitucion);
+					String path = miFichero.getDirectorio();
 					path += "/" + idInstitucion + "_" + documentos.get(0).getIdFichero() + "." + extension;
 
 					File file = new File(path);
