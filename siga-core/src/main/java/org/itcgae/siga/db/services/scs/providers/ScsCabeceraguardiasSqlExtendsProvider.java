@@ -149,7 +149,6 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 			SQL_PADRE.SELECT(" *");
 			SQL_PADRE.FROM("( " + sql.toString() + " )");
 			if(tamMax != null && tamMax > 0) {
-				tamMax += 1;
 				SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
 			}
 
