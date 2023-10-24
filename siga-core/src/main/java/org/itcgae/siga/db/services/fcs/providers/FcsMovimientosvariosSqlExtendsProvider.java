@@ -85,9 +85,13 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         	subquery6.INNER_JOIN("fcs_movimientosvarios_tipo ON fcs_movimientosvarios.idinstitucion = fcs_movimientosvarios_tipo.idinstitucion AND fcs_movimientosvarios.idtipomovimiento = fcs_movimientosvarios_tipo.idtipomovimiento");
         }
         
-        subquery6.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  < 0"); 
+//        subquery6.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  < 0"); 
         if(movimientoItem.isHistorico()) {
-        	subquery6.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
+        	subquery6.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") ) <> 0");
+        } 
+        else {
+        	subquery6.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  = 0"); 
+//        	subquery6.WHERE("fcs_aplica_movimientosvarios.importeaplicado IS NOT NULL");
         }
 
         
@@ -251,11 +255,12 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         }
           
        
-        if(movimientoItem.isHistorico()) {
-        	subquery2.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  = 0"); 
-         }//else {
-        	 //subquery2.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") )  > 0");  	   
-         //}
+		if (movimientoItem.isHistorico()) {
+        	subquery2.WHERE("(fcs_movimientosvarios.cantidad - ("+subquery3+") ) = 0");
+		} else {
+			subquery2.WHERE("(fcs_movimientosvarios.cantidad - (" + subquery3 + ") )  <> 0");
+			subquery6.WHERE("fcs_aplica_movimientosvarios.importeaplicado IS NOT NULL");
+		}
         
         //subquery2.WHERE("fcs_aplica_movimientosvarios.importeaplicado  IS NOT NULL");
         if(movimientoItem.getNcolegiado() != null && !movimientoItem.getNcolegiado().equalsIgnoreCase("")) {
