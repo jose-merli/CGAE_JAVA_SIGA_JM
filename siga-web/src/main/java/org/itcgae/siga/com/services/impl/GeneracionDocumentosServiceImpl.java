@@ -220,7 +220,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			if(e.getMessage() != null && e.getMessage().contains("PDF")) {
 				 mensaje = 	e.getMessage();
 			}
- 
+			LOGGER.error(e);
 			LOGGER.error(mensaje);
 			throw new BusinessException(mensaje, e);
 		}
