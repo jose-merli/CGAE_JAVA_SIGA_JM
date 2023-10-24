@@ -381,7 +381,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					return it;
 				}).collect(Collectors.toList());
 
-				if ((guardias != null) && tamMaximo != null && (guardias.size()) > tamMaximo) {
+				if ((guardias != null) && tamMaximo != null && (guardias.size()) >= tamMaximo) {
 					error.setCode(200);
 					error.setDescription("La consulta devuelve más de " + tamMaximo
 							+ " resultados, pero se muestran sólo los " + tamMaximo

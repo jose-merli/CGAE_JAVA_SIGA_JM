@@ -212,7 +212,6 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		SQL_PADRE.SELECT_DISTINCT(" *");
 		SQL_PADRE.FROM("( " + sql.toString() + " )");
 		if(tamMax != null && tamMax > 0) {
-			tamMax += 1;
 			SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
 		}
 
