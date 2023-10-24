@@ -3356,7 +3356,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sqlDelitos.WHERE("sd.ANIO = '" + designa.getAno() + "'");
 		sqlDelitos.WHERE("sd.IDINSTITUCION = '" + idInstitucion + "'");
 		
-		sql.SELECT("FECHAOFICIOJUZGADO, (" + sqlDelitos.toString() + ") AS DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
+		sql.SELECT("FECHAOFICIOJUZGADO, DELITOS, (" + sqlDelitos.toString() + ") AS IDDELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
 		sql.FROM("SCS_DESIGNA");
 		sql.WHERE("NUMERO = '" + designa.getNumero() + "'");
 		sql.WHERE("IDTURNO = '" + designa.getIdTurno() + "'");

@@ -2393,6 +2393,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								scsDesigna.setIdpretension(idPretension);
 								
 							}
+							if (designaItem.getDelitos() != null) {
+								scsDesigna.setDelitos(designaItem.getDelitos());
+							}else {
+								scsDesigna.setDelitos(null);
+							}
 							scsDesigna.setFechaestado(designaItem.getFechaEstado());
 							scsDesigna.setFechafin(designaItem.getFechaFin());
 
