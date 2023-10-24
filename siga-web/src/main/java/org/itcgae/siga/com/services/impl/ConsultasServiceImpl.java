@@ -1183,7 +1183,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 	@Override
 	public String quitarEtiquetas(String sentencia) {
-		return SIGAHelper.quitarEtiquetas(sentencia);
+		return SIGAHelper.quitarEtiquetasSinUpper(sentencia);
 	}
 
 	public boolean comprobarCamposDestinarios(String sentencia) {
