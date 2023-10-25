@@ -4368,12 +4368,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			if (usuarios != null && !usuarios.isEmpty()) {
 
 				for (DocumentacionAsistenciaItem doc : documentos) {
-
-					String path = getDirectorioFicheroAsi(idInstitucion);
+					
+					GenFicheroKey ficheroKey = new GenFicheroKey();
+					ficheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+					ficheroKey.setIdinstitucion(idInstitucion);
+					GenFichero miFichero = genFicheroMapper.selectByPrimaryKey(ficheroKey);
+					
+					String path = miFichero.getDirectorio();
 					path += File.separator + idInstitucion + "_" + doc.getIdFichero()
-							+ doc.getNombreFichero()
-									.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
-									.toLowerCase();
+							+ "." + miFichero.getExtension();
 
 					File file = new File(path);
 
@@ -5813,7 +5816,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 		FicheroVo ficheroVo = new FicheroVo();
 
-		String directorioFichero = getDirectorioFicheroAsi(idInstitucion);
+		String directorioFichero = getDirectorioFicheroAsi(idInstitucion, anioNumero);
 		ficheroVo.setDirectorio(directorioFichero);
 		ficheroVo.setNombre(nombreFichero);
 		ficheroVo.setDescripcion("Fichero asociado a la asistencia " + anioNumero);
@@ -5838,14 +5841,16 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * @param idInstitucion
 	 * @return
 	 */
-	private String getDirectorioFicheroAsi(Short idInstitucion) {
+	private String getDirectorioFicheroAsi(Short idInstitucion, String anioNumero) {
 
 		// Extraemos el path para los ficheros
 		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
 		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
 		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
-		String path = genPropertiesPath.get(0).getValor();
-
+		String path = genPropertiesPath.get(0).getValor();// /Datos/SIGA/ficheros/archivo/
+		/*scsDocumentacionasi.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					scsDocumentacionasi.setNumero(Long.valueOf(anioNumero.split("/")[1]));*/
+		
 		StringBuffer directorioFichero = new StringBuffer(path);
 		directorioFichero.append(idInstitucion);
 		directorioFichero.append("/");
@@ -5855,6 +5860,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.asistencias");
 		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
 		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+		directorioFichero.append(File.separator + anioNumero.split("/")[0] + "_" + anioNumero.split("/")[1] + File.separator);
 
 		return directorioFichero.toString();
 	}
