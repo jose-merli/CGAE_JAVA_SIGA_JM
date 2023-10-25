@@ -6028,9 +6028,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					LOGGER.warn("AGUERRA - EXTENSION: " + extension);
 					
-					if(listadocumentoEjgItem.get(0).getNombreFichero() != null) {//si viene con nombre de fichero es de siga novo y hay que concatenárselo
-						path += File.separator + idInstitucion + "_" + genFichero.get(0).getIdfichero();
-					}
+					path += File.separator + idInstitucion + "_" + genFichero.get(0).getIdfichero();
 					
 					path += "." + extension;
 					LOGGER.warn("AGUERRA - RUTA: " + path);
