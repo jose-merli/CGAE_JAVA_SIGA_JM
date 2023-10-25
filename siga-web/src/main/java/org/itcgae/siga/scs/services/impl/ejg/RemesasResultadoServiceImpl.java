@@ -131,6 +131,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 	public RemesaResultadoDTO buscarRemesasResultado(RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
 		LOGGER.info("getLabel() -> Entrada del servicio para obtener las remesas de resultados");
 		
+		Error error = new Error();
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		RemesaResultadoDTO remesaResultadoDTO = new RemesaResultadoDTO();
@@ -156,6 +157,14 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 			
 			if (remesasResultadoItems != null) {
 				remesaResultadoDTO.setRemesasResultadosItem(remesasResultadoItems);
+			}
+			if (remesaResultadoDTO.getRemesasResultadosItem() != null && tamMaximo != null
+					&& remesaResultadoDTO.getRemesasResultadosItem().size() >= tamMaximo) {
+				error.setCode(200);
+				error.setDescription("La consulta devuelve más de " + tamMaximo
+						+ " resultados, pero se muestran sólo los " + tamMaximo
+						+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+				remesaResultadoDTO.setError(error);			
 			}
 		}
 		

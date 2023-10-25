@@ -222,6 +222,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	public RemesaBusquedaDTO buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		// Conseguimos debugrmación del usuario logeado
+		Error error = new Error();
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -303,6 +304,15 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 			if (remesasItems != null) {
 				remesaBusquedaDTO.setRemesasItem(remesasItems);
+			}
+			
+			if (remesaBusquedaDTO.getRemesasItem() != null && tamMaximo != null
+					&& remesaBusquedaDTO.getRemesasItem().size() >= tamMaximo) {
+				error.setCode(200);
+				error.setDescription("La consulta devuelve más de " + tamMaximo
+						+ " resultados, pero se muestran sólo los " + tamMaximo
+						+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+				remesaBusquedaDTO.setError(error);			
 			}
 
 		}
