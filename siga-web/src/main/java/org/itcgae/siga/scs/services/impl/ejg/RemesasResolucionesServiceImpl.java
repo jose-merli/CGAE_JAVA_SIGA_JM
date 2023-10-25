@@ -140,7 +140,7 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 	public RemesaResolucionDTO buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem,
 			HttpServletRequest request) {
 		LOGGER.info("getLabel() -> Entrada al servicio para obtener las remesas de resoluciones");
-		
+		Error error = new Error();
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		RemesaResolucionDTO remesaResultadoDTO = new RemesaResolucionDTO();
@@ -165,6 +165,14 @@ public class RemesasResolucionesServiceImpl implements IRemesasResoluciones{
 			remesasResolucionesItem = scsRemesasResolucionesExtendsMapper.buscarRemesasResoluciones(remesasResolucionItem, idInstitucion, tamMaximo);
 			if(remesasResolucionesItem != null ) {
 				remesaResultadoDTO.setRemesasResolucionItem(remesasResolucionesItem);
+			}
+			if (remesaResultadoDTO.getRemesasResolucionItem() != null && tamMaximo != null
+					&& remesaResultadoDTO.getRemesasResolucionItem().size() >= tamMaximo) {
+				error.setCode(200);
+				error.setDescription("La consulta devuelve más de " + tamMaximo
+						+ " resultados, pero se muestran sólo los " + tamMaximo
+						+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+				remesaResultadoDTO.setError(error);			
 			}
 		}
 		return remesaResultadoDTO;
