@@ -6850,11 +6850,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	private Long uploadFileDesigna(byte[] bytes, Integer idUsuario, Short idInstitucion, String nombreFichero,
-			String extension) {
+			String extension, DocumentoDesignaItem documentoDesignaItem) {
 
 		FicheroVo ficheroVo = new FicheroVo();
 
-		String directorioFichero = getDirectorioFicheroDes(idInstitucion);
+		String directorioFichero = getDirectorioFicheroDes(idInstitucion, documentoDesignaItem.getAnio(), documentoDesignaItem.getIdTurno(), documentoDesignaItem.getNumero());
 		ficheroVo.setDirectorio(directorioFichero);
 		ficheroVo.setNombre(nombreFichero);
 		ficheroVo.setDescripcion("Fichero asociado a la designación " + ficheroVo.getNombre());
@@ -6893,7 +6893,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return directorioFichero.toString();
 	}
 
-	private String getDirectorioFicheroDes(Short idInstitucion) {
+	private String getDirectorioFicheroDes(Short idInstitucion, String anioDesigna, String idTurnoDesigna, String numeroDesigna) {
 
 		// Extraemos el path para los ficheros
 		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
@@ -6910,6 +6910,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.designaciones");
 		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
 		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+		directorioFichero.append(File.separator + anioDesigna + "_" + idTurnoDesigna + "_" + numeroDesigna);
 
 		return directorioFichero.toString();
 	}
@@ -7434,7 +7435,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					String extension = FilenameUtils.getExtension(nombreFichero);
 
 					Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-							nombreFichero, extension);
+							nombreFichero, extension, documentoDesignaItem);
 
 					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
 
@@ -7599,7 +7600,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					String extension = FilenameUtils.getExtension(nombreFichero);
 
 					Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-							nombreFichero, extension);
+							nombreFichero, extension, documentoDesignaItem);
 
 					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
 
@@ -7690,11 +7691,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				for (DocumentoDesignaItem doc : listaDocumentoDesignaItem) {
 
-					String path = getDirectorioFicheroDes(idInstitucion);
+					//String path = getDirectorioFicheroDes(idInstitucion, doc.getAnio(), doc.getIdTurno(), doc.getNumero());
+					
+					GenFicheroKey ficheroKey = new GenFicheroKey();
+					ficheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+					ficheroKey.setIdinstitucion(idInstitucion);
+					GenFichero miFichero = genFicheroMapper.selectByPrimaryKey(ficheroKey);
+					String path = miFichero.getDirectorio();
+					
 					path += File.separator + idInstitucion + "_" + doc.getIdFichero()
-							+ doc.getNombreFichero()
-									.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
-									.toLowerCase();
+							+ "." + miFichero.getExtension();
 
 					File file = new File(path);
 
