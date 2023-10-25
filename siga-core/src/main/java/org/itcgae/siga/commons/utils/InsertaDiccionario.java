@@ -47,36 +47,53 @@ public class InsertaDiccionario {
 	    StringBuffer trace = new StringBuffer();
 	    InputStreamReader isr=new InputStreamReader(System.in);
         BufferedReader br=new BufferedReader(isr);
+        System.out.println("¿Cual es el nombre de la incidencia?");
+		String nombre = br.readLine();
+		
+		//Anade comentarios de cabecera al script
+		trace.append("\nspool  "+nombre.toUpperCase()+".log");
+		trace.append("\nprompt "+nombre.toUpperCase());
+		trace.append("\nselect to_char(sysdate, 'hh24:mi:ss') as \"Inicio\" from dual;");
+		trace.append("\nprompt");
+		trace.append("\n");
+		
 	    while (enumer.hasMoreElements()) {
 	    	String clave = (String) enumer.nextElement();
 	    	String valor = (String)properties.getProperty(clave);
 	    	if (valor!=null) {
-	    		System.out.println("¿Cual es el nombre de la incidencia?");
-	    		String nombre = br.readLine();
 	    		
 	    	    if (!existeEnDiccionario(clave)) {
 		    		//trace.append("\n delete GEN_DICCIONARIO where IDRECURSO='"+clave+"';");
-	    	    	insertGenDiccionario(trace, clave, valor,nombre);
+	    	    	insertGenDiccionario(trace, clave, valor, nombre);
 	    	    } else {
 	    	        // caso de pregunta o update
 	    		    
 	    	        System.out.println("Se ha encontrado la clave "+clave+" en GEN_DICCIONARIO");
-	    	        System.out.println("Es una modificación de recurso? (s/n)");
+	    	        System.out.println("Es un UPDATE de recurso? (s/n)");
 	    		    String texto = br.readLine();
-	    	        if (texto.equals("s")) {
-	    	        	updateGenDiccionario(trace, clave, valor,nombre);// Meter nombre archivo
-	    	        } else {
+	    	        if (texto.equals("s") || texto.equals("S")) {
+	    	        	updateGenDiccionario(trace, clave, valor, nombre);
+	    	        } else if((texto.equals("n") || texto.equals("N"))) {
 	    	            System.out.println("ATENCIÓN!!! Estas usando un idrecurso en GEN_DICCIONARIO que ya existe. TE LO VAS A CARGAR!!");
 	    	            System.out.println("Anda, empieza de nuevo. La clave duplicada es "+clave);
 	    	            System.out.println("Adiós");
 	    	            break;
-	    	            
+	    	        } else {
+	    	        	System.out.println("????????? No entiendo '" +texto+"'. Esta sentencia no te la creo, te toca ejecutar otra vez ;).");
 	    	        }
 	    	        
 	    	    }
 	    	    
-	    	}
+	    	}	
 	    }
+	    
+	    //Anade comentarios de fin al script
+	    trace.append("\nCOMMIT;");
+	    trace.append("\n");
+		trace.append("\nprompt .");
+		trace.append("\nselect to_char(sysdate, 'hh24:mi:ss') as \"Fin\" from dual;");
+		trace.append("\nspool off");
+		
 	    try {
 		    if (args.length > 1 && args[1]!=null) {
 			    PrintWriter printer = new PrintWriter(new BufferedWriter(new FileWriter(args[1], false)));
@@ -92,9 +109,8 @@ public class InsertaDiccionario {
 	    	throw e;
         }
 	    
+	    System.out.println(">>>>>>>FIN CORRECTO, las sentencias generadas son: ");
 	    System.out.println(trace);
-	    System.out.println("fin correcto");
-
 		
 	} finally {
 		if (con != null) {
@@ -146,42 +162,19 @@ public class InsertaDiccionario {
 	}
 	
 	private static void insertGenDiccionario(StringBuffer trace, String clave, String valor,String nombre) {
-		trace.append("\nspool  "+nombre.toUpperCase()+".log");
-		trace.append("\nprompt "+nombre.toUpperCase());
-		trace.append("\nselect to_char(sysdate, 'hh24:mi:ss') as \"Inicio\" from dual;");
-		trace.append("\nprompt");
-		trace.append("\n");
 		trace.append("\ninsert into GEN_DICCIONARIO (IDRECURSO, DESCRIPCION, ERROR, IDLENGUAJE, FECHAMODIFICACION, USUMODIFICACION, IDPROPIEDAD) values ('"+clave+"', '"+valor+"', 0, '1', sysdate, 0, '19');");
 		trace.append("\ninsert into GEN_DICCIONARIO (IDRECURSO, DESCRIPCION, ERROR, IDLENGUAJE, FECHAMODIFICACION, USUMODIFICACION, IDPROPIEDAD) values ('"+clave+"', '"+valor+"#CA', 0, '2', sysdate, 0, '19');");
 		trace.append("\ninsert into GEN_DICCIONARIO (IDRECURSO, DESCRIPCION, ERROR, IDLENGUAJE, FECHAMODIFICACION, USUMODIFICACION, IDPROPIEDAD) values ('"+clave+"', '"+valor+"#EU', 0, '3', sysdate, 0, '19');");
 		trace.append("\ninsert into GEN_DICCIONARIO (IDRECURSO, DESCRIPCION, ERROR, IDLENGUAJE, FECHAMODIFICACION, USUMODIFICACION, IDPROPIEDAD) values ('"+clave+"', '"+valor+"#GL', 0, '4', sysdate, 0, '19');");
-		trace.append("\n");
-		trace.append("\nCOMMIT;");
-		trace.append("\n");
-		trace.append("\nprompt .");
-		trace.append("\nselect to_char(sysdate, 'hh24:mi:ss') as \"Fin\" from dual;");
-		trace.append("\nspool off");
-		
+		trace.append("\n");	
 	}
 
 	private static void updateGenDiccionario(StringBuffer trace, String clave, String valor,String nombre) {
-		trace.append("\nspool  "+nombre.toUpperCase()+".log");
-		trace.append("\nprompt "+nombre.toUpperCase());
-		trace.append("\nselect to_char(sysdate, 'hh24:mi:ss') as \"Inicio\" from dual;");
-		trace.append("\nprompt");
-		trace.append("\n");
-		
 		trace.append("\nupdate GEN_DICCIONARIO set fechamodificacion=sysdate, DESCRIPCION='"+valor+"' where idrecurso='"+clave+"' and idlenguaje='1';"); 
 		trace.append("\nupdate GEN_DICCIONARIO set fechamodificacion=sysdate, DESCRIPCION='"+valor+"#CA' where idrecurso='"+clave+"' and idlenguaje='2';"); 
 		trace.append("\nupdate GEN_DICCIONARIO set fechamodificacion=sysdate, DESCRIPCION='"+valor+"#EU' where idrecurso='"+clave+"' and idlenguaje='3';"); 
 		trace.append("\nupdate GEN_DICCIONARIO set fechamodificacion=sysdate, DESCRIPCION='"+valor+"#GL' where idrecurso='"+clave+"' and idlenguaje='4';"); 
 		trace.append("\n");
-		trace.append("\nCOMMIT;");
-		trace.append("\n");
-		trace.append("\nprompt .");
-		trace.append("\nselect to_char(sysdate, 'hh24:mi:ss') as \"Fin\" from dual;");
-		trace.append("\nspool off");
-		
 	}
 
 }
