@@ -5374,12 +5374,21 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
 		
 		//Extraemos el año y el número del ejg
-		ScsDocumentacionejg docuKey = new ScsDocumentacionejg();
+		ScsDocumentacionejgKey docuKey = new ScsDocumentacionejgKey();
 		docuKey.setIddocumentacion(Integer.valueOf(idDoc));
 		docuKey.setIdinstitucion(idInstitucion);
 		ScsDocumentacionejg miDocu = scsDocumentacionejgMapper.selectByPrimaryKey(docuKey);
-		directorioFichero.append(File.separator + miDocu.getAnio() + "_" + miDocu.getNumero());
-
+		directorioFichero.append(File.separator + miDocu.getAnio() + "_");
+		
+		//Extraemos el ejg para usar su numejg
+		ScsEjgKey ejgKey = new ScsEjgKey();
+		ejgKey.setAnio(miDocu.getAnio());
+		ejgKey.setIdinstitucion(miDocu.getIdinstitucion());
+		ejgKey.setNumero(miDocu.getNumero());
+		ejgKey.setIdtipoejg(miDocu.getIdtipoejg());
+		ScsEjg miEjg = scsEjgExtendsMapper.selectByPrimaryKey(ejgKey);
+		directorioFichero.append(miEjg.getNumejg());
+		
 		return directorioFichero.toString();
 	}
 
