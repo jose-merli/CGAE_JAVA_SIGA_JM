@@ -185,7 +185,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		String sql = "";
 		
 		try {
-			sql =   "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+			sql =   "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, des.idpretension,"
+						+ " F_SIGA_GETRECURSO(SP.DESCRIPCION, 1) AS procedimiento, SP2.nombre as modulo, SP2.IDPROCEDIMIENTO as IDMODULO, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
 						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 						+ "  des.fechaestado fechaestado,juzgado.nombre as nombrejuzgado,  turno.nombre,";
@@ -202,7 +203,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql += 	"    JOIN scs_turno               turno ON des.idturno = turno.idturno\r\n" + 
 					"                            AND des.idinstitucion = turno.idinstitucion\r\n" + 
 					"    LEFT OUTER JOIN scs_juzgado             juzgado ON des.idjuzgado = juzgado.idjuzgado\r\n" + 
-					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n";
+					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n" +
+					"    INNER JOIN SCS_PRETENSION sp ON SP.IDINSTITUCION = DES.IDINSTITUCION AND SP.IDPRETENSION\r\n" +
+					" = DES.IDPRETENSION" +
+					"    INNER JOIN SCS_PROCEDIMIENTOS sp2 ON sp2.IDINSTITUCION = DES.IDINSTITUCION AND sp2.IDPROCEDIMIENTO\r\n" +
+					"= DES.IDPROCEDIMIENTO";
 			sql += 	" where des.IDINSTITUCION = " + key.getIdinstitucion() ;
 			sql += 	" AND des.idTurno = " + key.getIdturno();
 			sql += 	" AND des.anio = " + key.getAnio();
