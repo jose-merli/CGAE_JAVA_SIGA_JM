@@ -7202,7 +7202,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				ficheroKey.setIdinstitucion(idInstitucion);
 				GenFichero ficheroDesigna = genFicheroMapper.selectByPrimaryKey(ficheroKey);
 				
-				zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero() + "." + ficheroDesigna.getExtension()));
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero() + "-" + doc.getNombreFichero()));
 				
 				String extension = "." + ficheroDesigna.getExtension();
 				String path = ficheroDesigna.getDirectorio();
