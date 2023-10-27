@@ -204,9 +204,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					"                            AND des.idinstitucion = turno.idinstitucion\r\n" + 
 					"    LEFT OUTER JOIN scs_juzgado             juzgado ON des.idjuzgado = juzgado.idjuzgado\r\n" + 
 					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n" +
-					"    INNER JOIN SCS_PRETENSION sp ON SP.IDINSTITUCION = DES.IDINSTITUCION AND SP.IDPRETENSION\r\n" +
+					"    LEFT JOIN SCS_PRETENSION sp ON SP.IDINSTITUCION = DES.IDINSTITUCION AND SP.IDPRETENSION\r\n" +
 					" = DES.IDPRETENSION" +
-					"    INNER JOIN SCS_PROCEDIMIENTOS sp2 ON sp2.IDINSTITUCION = DES.IDINSTITUCION AND sp2.IDPROCEDIMIENTO\r\n" +
+					"    LEFT JOIN SCS_PROCEDIMIENTOS sp2 ON sp2.IDINSTITUCION = DES.IDINSTITUCION AND sp2.IDPROCEDIMIENTO\r\n" +
 					"= DES.IDPROCEDIMIENTO";
 			sql += 	" where des.IDINSTITUCION = " + key.getIdinstitucion() ;
 			sql += 	" AND des.idTurno = " + key.getIdturno();
