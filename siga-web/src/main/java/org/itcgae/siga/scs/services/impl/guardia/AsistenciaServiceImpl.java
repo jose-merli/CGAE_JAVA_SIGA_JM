@@ -5731,7 +5731,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		ScsContrariosasistenciaExample scsContrariosasistenciaExample = new ScsContrariosasistenciaExample();
 		scsContrariosasistenciaExample.createCriteria().andAnioEqualTo(scsAsistencia.getAnio())
 				.andNumeroEqualTo(scsAsistencia.getNumero()).andIdinstitucionEqualTo(scsAsistencia.getIdinstitucion())
-				.andFechabajaIsNotNull();
+				.andFechabajaIsNull();
 
 		List<ScsContrariosasistencia> contrarios = scsContrariosasistenciaMapper
 				.selectByExample(scsContrariosasistenciaExample);
