@@ -1841,6 +1841,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							.andIdinstitucionEqualTo(idInstitucion)
 							.andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG()))
 							.andNumeroejgEqualTo(Long.parseLong(datos.getNumero()));
+					
+					example.setOrderByClause(" NUMERODESIGNA DESC");
 
 					List<ScsEjgdesigna> ejgDesignas = scsEjgdesignaMapper.selectByExample(example);
 
