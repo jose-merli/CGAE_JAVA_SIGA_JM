@@ -678,9 +678,9 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 					if(listaEjgs.size() > 0 && listaEjgs != null) {
 						for(int i = 0; i < listaEjgs.size(); i++) {
 							if(i == listaEjgs.size()-1) {
-								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+								stringListaEJG += "(" + listaEjgs.get(i).getidInstitucion() + ", " + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumero() + ", " + listaEjgs.get(i).getTipoEJG() + ")";
 							}else {
-								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+								stringListaEJG += "(" + listaEjgs.get(i).getidInstitucion() + ", " + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumero() + ", " + listaEjgs.get(i).getTipoEJG() + "), ";
 							}
 						}
 						//Saca los datos de los ejgs de la primera consulta
@@ -704,9 +704,9 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 						if(listaEjgs.size() > 0 && listaEjgs != null) {
 							for(int i = 0; i < listaEjgs.size(); i++) {
 								if(i == listaEjgs.size()-1) {
-									stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+									stringListaEJG += "(" + listaEjgs.get(i).getidInstitucion() + ", " + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumero() + ", " + listaEjgs.get(i).getTipoEJG() + ")";
 								}else {
-									stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+									stringListaEJG += "(" + listaEjgs.get(i).getidInstitucion() + ", " + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumero() + ", " + listaEjgs.get(i).getTipoEJG() + "), ";
 								}
 							}
 							//se carga los registros obtenidos de la consulta (se espera uno solo)
@@ -731,9 +731,9 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 					if(listaEjgs.size() > 0 && listaEjgs != null) {
 						for(int i = 0; i < listaEjgs.size(); i++) {
 							if(i == listaEjgs.size()-1) {
-								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+								stringListaEJG += "(" + listaEjgs.get(i).getidInstitucion() + ", " + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumero() + ", " + listaEjgs.get(i).getTipoEJG() + ")";
 							}else {
-								stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+								stringListaEJG += "(" + listaEjgs.get(i).getidInstitucion() + ", " + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumero() + ", " + listaEjgs.get(i).getTipoEJG() + "), ";
 							}
 						}
 						ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJGFinal(ejgItem, idInstitucion.toString(), tamMaximo,

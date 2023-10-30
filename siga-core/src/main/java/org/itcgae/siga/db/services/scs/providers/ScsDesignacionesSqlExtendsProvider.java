@@ -1264,10 +1264,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.LEFT_OUTER_JOIN("cen_colegiado colegiado ON colegiado.idinstitucion = l.idinstitucion" + 
 								" AND colegiado.idpersona = l.idpersona"); 
 			sql.LEFT_OUTER_JOIN("cen_persona persona ON l.idpersona = persona.idpersona");
-			
-			if (idInstitucion != null) {
-				sql.WHERE("des.IDINSTITUCION = " + idInstitucion );
-			}
 
 			String cadenaIds = "";
 			
@@ -1278,7 +1274,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					cadenaIds += ",(" + id + ")";
 				}
 			}
-			sql.WHERE("(des.anio,des.codigo) IN (" + cadenaIds + ")");
+			sql.WHERE("(des.idinstitucion,des.idturno,des.anio,des.numero) IN (" + cadenaIds + ")");
 
 			sql.WHERE(" (l.Fechadesigna is null or" +
 					" l.Fechadesigna = (SELECT MAX(LET2.Fechadesigna) FROM SCS_DESIGNASLETRADO LET2" +
@@ -1286,7 +1282,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					" AND l.ANIO = LET2.ANIO AND l.NUMERO = LET2.NUMERO" +
 					" AND TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)))");
 			
-			sql.ORDER_BY("des.idturno, des.anio desc, des.codigo desc ");
+			sql.ORDER_BY("des.anio desc, des.codigo desc ");
 			
 			// No utilizamos la clase Paginador para la busqueda de letrados porque al
 			// filtrar por residencia la sql no devolvia bien los

@@ -62,9 +62,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		condicionNumRegRemesa = condicionNumRegRemesa + "))";
 		
 		// select
-		sql.SELECT("DISTINCT ejg.anio");
+		sql.SELECT("DISTINCT ejg.anio anio");
 		sql.SELECT("ejg.idinstitucion");
-		sql.SELECT("ejg.numejg numejg");
+		sql.SELECT("ejg.numero numero");
+		sql.SELECT("ejg.idtipoejg idtipoejg");
 		
 		// from
 		sql.FROM("scs_ejg ejg"); 
@@ -961,11 +962,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 
 		//WHERE 
-		sql.WHERE("ejg.idinstitucion = " + idInstitucion );
+		//sql.WHERE("ejg.idinstitucion = " + idInstitucion );
+		sql.WHERE("(ejg.idinstitucion, ejg.anio, ejg.numero, ejg.idtipoejg) IN (" + stringListaEjgs + ")");
 		
 		sql.WHERE("ESTADO.FECHABAJA IS NULL");
         sql.WHERE("ESTADO.IDESTADOEJG = F_SIGA_GET_IDULTIMOESTADOEJG (ESTADO.IDINSTITUCION, ESTADO.IDTIPOEJG, ESTADO.ANIO,ESTADO.NUMERO )");
-		sql.WHERE("(ejg.anio, ejg.numejg) IN (" + stringListaEjgs + ")");
 
 		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
 		

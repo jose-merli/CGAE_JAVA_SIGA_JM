@@ -980,7 +980,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if(designas != null && !designas.isEmpty()) {
 						List<String> ids = new ArrayList<String>();
 						for(DesignaItem item : designas) {
-							ids.add("'" + item.getAno() + "','" + item.getCodigo() + "'");
+							ids.add(idInstitucion + "," + item.getIdTurno() + "," + item.getAno() + "," + item.getNumero());
 						}
 						designasFinal = scsDesignacionesExtendsMapper.busquedaDesignacionesFinal(ids, idInstitucion,
 								tamMaximo);
