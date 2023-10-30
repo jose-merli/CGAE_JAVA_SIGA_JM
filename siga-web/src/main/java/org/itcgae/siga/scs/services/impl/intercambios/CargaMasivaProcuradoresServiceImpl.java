@@ -397,7 +397,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 							
 							// Se introduce el documento en el historico
 							LOGGER.debug("cargarFichero() -> Se introduce el documento en el historico");
-							insertaCenHistoricoIT(cargaMasivaDatosPDItem, usuario);
+//							insertaCenHistoricoIT(cargaMasivaDatosPDItem, usuario);
 
 						} else {
 							errores += cargaMasivaDatosPDItem.getErrores();
@@ -435,7 +435,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 						cenCargamasivacv.setIdfichero(idFile);
 						cenCargamasivacv.setIdficherolog(idLogFile);
 
-						result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
+						result = cenCargaMasivaExtendsMapper.insertSelective(cenCargamasivacv);
 					}catch(IOException e) {
 						LOGGER.error(e.getStackTrace());
 						throw e;
@@ -644,9 +644,9 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 				!hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString().equals("Opcional")){
 				cargaMasivaDatosPDItem.setNumDesignaProcurador(hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString());
 				
-				if(cargaMasivaDatosPDItem.getNumDesignaProcurador().length() != 5) {
-					errorLinea.append("Numero de designa del procurador mal introducida. Debe ser nnnnn. ");
-				}
+//				if(cargaMasivaDatosPDItem.getNumDesignaProcurador().length() != 5) {
+//					errorLinea.append("Numero de designa del procurador mal introducida. Debe ser nnnnn. ");
+//				}
 			}
 			
 			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna FECHADESIGPROCURADOR");
@@ -699,11 +699,11 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 					cargaMasivaDatosPDItem.setNombreProcurador(nombre.toString());
 					cargaMasivaDatosPDItem.setIdProcurador(scsProcurador.getIdprocurador());
 					
-					CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
-					cenColegiadoExample.createCriteria().andNcolegiadoEqualTo(scsProcurador.getNcolegiado()).andIdinstitucionEqualTo(scsProcurador.getIdinstitucion());
-					List<CenColegiado> cenColegiado = cenColegiadoMapper.selectByExample(cenColegiadoExample);
-
-					cargaMasivaDatosPDItem.setIdPersona(Long.valueOf(cenColegiado.get(0).getIdpersona().toString()));
+//					CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+//					cenColegiadoExample.createCriteria().andNcolegiadoEqualTo(scsProcurador.getNcolegiado()).andIdinstitucionEqualTo(scsProcurador.getIdinstitucion());
+//					List<CenColegiado> cenColegiado = cenColegiadoMapper.selectByExample(cenColegiadoExample);
+//
+//					cargaMasivaDatosPDItem.setIdPersona(Long.valueOf(cenColegiado.get(0).getIdpersona().toString()));
 				}else{
 					cargaMasivaDatosPDItem.setNombreProcurador("Procurador no encontrado");
 					errorLinea.append("Procurador no encontrado. ");
