@@ -284,7 +284,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		if (ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
 			sql.WHERE("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
 		// LOGICA DE ROL
-		if (ejgItem.getRol() != null && ejgItem.getRol() != "") {
+		if (ejgItem.getRol() != null && ejgItem.getRol() != ""
+			&& ((ejgItem.getNif()!= null && !ejgItem.getNif().isEmpty())
+				|| (ejgItem.getApellidos()!= null && !ejgItem.getApellidos().isEmpty())
+				|| (ejgItem.getNombre()!= null && !ejgItem.getNombre().isEmpty())
+					)) {
 			// Controlar que Rol es el 1 para añadir el parentesís necesario para la QUERY.
 			boolean banderaRolprimero = false;
 			// Controlar si ya esta activo el 1 Rol.
