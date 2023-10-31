@@ -2506,6 +2506,19 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			Short idInstitucion) throws SigaExceptions {
 
 		try {
+			
+			if (Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()) < 1000000) {
+				//Recuperamos el IDPERSONA a partir del idLetradoGuardia (su nColegiado)
+				Long idPersona = 0L;
+				CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+				cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(tarjetaAsistenciaResponseItem.getIdLetradoGuardia());
+				
+				List<CenColegiado> listCol = cenColegiadoMapper.selectByExample(cenColegiadoExample);
+				
+				if(listCol != null && !listCol.isEmpty()) {
+					tarjetaAsistenciaResponseItem.setIdLetradoGuardia(listCol.get(0).getIdpersona().toString());
+				}
+			}
 
 			int affectedRows = 0;
 			// Buscamos las guardias de colegiado para el letrado seleccionado
