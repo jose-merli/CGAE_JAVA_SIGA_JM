@@ -48,7 +48,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
-import org.itcgae.siga.DTOs.scs.GuardiasItem;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -12820,7 +12820,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					List<ScsPermutaCabecera> tienePermutaCabecera = scsPermutaCabeceraMapper
 							.selectByExample(permutaExample);
 
-					// Establecemos el estado
+					// Establecemos el estado y si se puede validar o no
 					setEstadoGuardiaCol(idInstitucion, guardiaCol);
 					// Ahora comprobamos si tiene permutas
 					if (!tienePermutaCabecera.isEmpty()) {
@@ -12884,17 +12884,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 			guardiaCol.setEstadoGuardia("dato.jgr.guardiacolegiado.estadoguardia.pendienterealizar");
 		}
 
-		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date()))
-				/*&& (guardiaCol.getValidada().equals("0") || guardiaCol.getValidada()==null)*/) {
-			guardiaCol.setEstadoGuardia("dato.jgr.guardiacolegiado.estadoguardia.realizadanovalidada");
-		}
-
-		if (guardiaCol.getFechadesde() != null && guardiaCol.getValidada()!=null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date())) && guardiaCol.getValidada().equals("1")) {
-			guardiaCol.setEstadoGuardia("dato.jgr.guardiacolegiado.estadoguardia.realizadavalidada");
+		if (guardiaCol.getFechadesde() != null && guardiaCol.getValidada()!=null && (guardiaCol.getFechadesde().before(new Date()) || guardiaCol.getFechadesde().equals(new Date()))) {
+			guardiaCol.setEstadoGuardia("dato.jgr.guardiacolegiado.estadoguardia.realizada");//dato.jgr.guardiacolegiado.estadoguardia.realizadavalidada
 		}
 		if (guardiaCol.getFechadesde() != null && (guardiaCol.getFechadesde().before(new Date()) ||
 				guardiaCol.getFechadesde().equals(new Date())) &&
-				(guardiaCol.getValidada() != null && guardiaCol.getValidada().equals("1")) &&
 				(guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1"))) {
 
 			if(guardiaCol.getIdFacturacion()!=null) {
@@ -13018,11 +13012,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 					guardia.setIdguardia(Integer.parseInt(guardiasItem.getIdGuardia()));
 					guardia.setIdpersona(Long.parseLong(guardiasItem.getIdPersona()));
 					guardia.setFechainicio(guardiasItem.getFechadesde());
-					if (guardiasItem.getFechaValidacion() == null) {
-						response = 0;
-					} else {
+					//if (guardiasItem.getFechaValidacion() == null) {
+						//response = 0;
+					//} else {
+					if(guardiasItem.getFacturado().equals("0")) {
 						response = scsCabeceraguardiasExtendsMapper.desvalidarGuardiaColegiado(guardia);
 					}
+					//}
 
 				} catch (Exception e) {
 					LOGGER.error(e);
@@ -13072,23 +13068,63 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("eliminarGuardiaColegiado() -> Entrada para borrar las incompatibilidades");
-
-				FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
-				facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdfacturacionEqualTo(guardiasItem.getIdFacturacion());
-
-				List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper
-						.selectByExample(facturacionExample);
-				if (facturas.isEmpty()) {
-					ScsCabeceraguardiasKey keyGuardia = new ScsCabeceraguardiasKey();
+				List<FcsFacturacionjg> facturas = new ArrayList<>();
+				
+				if(guardiasItem.getIdFacturacion() != null) {
+					FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
+					facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdfacturacionEqualTo(guardiasItem.getIdFacturacion());
+					facturas = fcsFacturacionJGExtendsMapper
+							.selectByExample(facturacionExample);
+				}
+				
+				if (facturas.isEmpty() || guardiasItem.getIdFacturacion() == null) {
+					try {
+					scsPermutaguardiasExtendsMapper.deletePermutasGuardia(guardiasItem, idInstitucion);
+					/*
+					ScsPermutaguardiasExample perExampleSol = new ScsPermutaguardiasExample();
+					perExampleSol.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdturnoSolicitanteEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).andIdguardiaSolicitanteEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
+					.andIdpersonaSolicitanteEqualTo(Long.valueOf(guardiasItem.getIdPersona()));
+					this.scsPermutaguardiasExtendsMapper.deleteByExample(perExampleSol);
+					ScsPermutaguardiasExample perExampleConf = new ScsPermutaguardiasExample();
+					perExampleConf.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdturnoConfirmadorEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).andIdguardiaConfirmadorEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
+					.andIdpersonaConfirmadorEqualTo(Long.valueOf(guardiasItem.getIdPersona()));
+					this.scsPermutaguardiasExtendsMapper.deleteByExample(perExampleConf);*/
+					//Borramos cabeceras de permutas
+					ScsPermutaCabeceraExample permCabExample = new ScsPermutaCabeceraExample();
+					permCabExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcalendarioguardiasEqualTo(Integer.valueOf(guardiasItem.getIdCalendarioGuardias()))
+					.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
+					.andIdpersonaEqualTo(Long.valueOf(guardiasItem.getIdPersona()));
+					this.scsPermutaCabeceraMapper.deleteByExample(permCabExample);
+					//Borramos guardias
+					ScsGuardiascolegiadoKey keyGuardia = new ScsGuardiascolegiadoKey();
 
 					keyGuardia.setIdinstitucion(idInstitucion);
 					keyGuardia.setIdturno(Integer.parseInt(guardiasItem.getIdTurno()));
 					keyGuardia.setIdguardia(Integer.parseInt(guardiasItem.getIdGuardia()));
 					keyGuardia.setIdpersona(Long.parseLong(guardiasItem.getIdPersona()));
 					keyGuardia.setFechainicio(guardiasItem.getFechadesde());
+					keyGuardia.setFechafin(guardiasItem.getFechadesde()); // en la base de datos está guardando la fecha de fin con el valor de la fecha de inicio
 					
-					response = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(keyGuardia);
+					response = scsGuardiascolegiadoExtendsMapper.deleteByPrimaryKey(keyGuardia);
+					
+					//Borramos cabeceras de guardias
+					
+						ScsCabeceraguardiasKey guarCabKey = new ScsCabeceraguardiasKey();
+						guarCabKey.setFechainicio(guardiasItem.getFechadesde());
+						guarCabKey.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
+						guarCabKey.setIdinstitucion(idInstitucion);
+						guarCabKey.setIdpersona(Long.valueOf(guardiasItem.getIdPersona()));
+						guarCabKey.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
+						this.scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(guarCabKey);
+						
+					}catch(Exception e) {
+						LOGGER.error(e);
+					}
+					
+					
 				}else {
 					response = 0;
 				}
