@@ -5478,6 +5478,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		case ".rtf":
 			mime = "application/rtf";
 			break;
+		case ".zip":
+			mime = "application/zip";
+			break;
 		case ".txt":
 			mime = "text/plain";
 			break;
