@@ -13230,7 +13230,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 		this.scsPermutaguardiasExtendsMapper.deletePermutasCalendarioConfirmador(
 				Integer.valueOf(deleteCalBody.getIdInstitucion()), Integer.valueOf(idCalendarioGuardias),
 				Integer.valueOf(deleteCalBody.getIdTurno()), Integer.valueOf(deleteCalBody.getIdGuardia()));
-		LOGGER.info("Elimina deletePermutasCalendarioConfirmador OK");		
+		LOGGER.info("Elimina deletePermutasCalendarioConfirmador OK");
+		ScsPermutaCabeceraExample permutaCabeceraExample = new ScsPermutaCabeceraExample();
+		permutaCabeceraExample.createCriteria().andIdinstitucionEqualTo(Short.valueOf(deleteCalBody.getIdInstitucion()))
+		.andIdcalendarioguardiasEqualTo(Integer.valueOf(idCalendarioGuardias)).andIdturnoEqualTo(Integer.valueOf(deleteCalBody.getIdTurno())).andIdguardiaEqualTo(Integer.valueOf(deleteCalBody.getIdGuardia()));
+		this.scsPermutaCabeceraMapper.deleteByExample(permutaCabeceraExample);
+		LOGGER.info("Elimina deletePermutaCabecera OK");
 		try {
 			//Conseguir el listado de registros a borrar
 			ScsGuardiascolegiadoExample filter = new ScsGuardiascolegiadoExample();
