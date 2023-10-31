@@ -2405,7 +2405,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 							sentenciaAux = sentenciaAux.substring(0, posEtiquetaOperador) + sentenciaAux1;
 							if (!listaCampos.get(j).getAlias().equals("-1")) {
 								alias = listaCampos.get(j).getAlias();
-								posAlias = sentenciaAux.lastIndexOf(alias);
+								posAlias = sentenciaAux.toLowerCase().lastIndexOf(alias.toLowerCase());
 								sentenciaAux2 = sentenciaAux.substring(posAlias + alias.length());
 								sentenciaAux = sentenciaAux.substring(0, posAlias) + sentenciaAux2;
 							}

@@ -185,7 +185,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		String sql = "";
 		
 		try {
-			sql =   "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+			sql =   "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, des.idpretension,"
+						+ " F_SIGA_GETRECURSO(SP.DESCRIPCION, 1) AS procedimiento, SP2.nombre as modulo, SP2.IDPROCEDIMIENTO as IDMODULO, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
 						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 						+ "  des.fechaestado fechaestado,juzgado.nombre as nombrejuzgado,  turno.nombre,";
@@ -202,7 +203,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql += 	"    JOIN scs_turno               turno ON des.idturno = turno.idturno\r\n" + 
 					"                            AND des.idinstitucion = turno.idinstitucion\r\n" + 
 					"    LEFT OUTER JOIN scs_juzgado             juzgado ON des.idjuzgado = juzgado.idjuzgado\r\n" + 
-					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n";
+					"                                           AND des.idinstitucion = juzgado.idinstitucion\r\n" +
+					"    LEFT JOIN SCS_PRETENSION sp ON SP.IDINSTITUCION = DES.IDINSTITUCION AND SP.IDPRETENSION\r\n" +
+					" = DES.IDPRETENSION" +
+					"    LEFT JOIN SCS_PROCEDIMIENTOS sp2 ON sp2.IDINSTITUCION = DES.IDINSTITUCION AND sp2.IDPROCEDIMIENTO\r\n" +
+					"= DES.IDPROCEDIMIENTO";
 			sql += 	" where des.IDINSTITUCION = " + key.getIdinstitucion() ;
 			sql += 	" AND des.idTurno = " + key.getIdturno();
 			sql += 	" AND des.anio = " + key.getAnio();
@@ -1259,10 +1264,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.LEFT_OUTER_JOIN("cen_colegiado colegiado ON colegiado.idinstitucion = l.idinstitucion" + 
 								" AND colegiado.idpersona = l.idpersona"); 
 			sql.LEFT_OUTER_JOIN("cen_persona persona ON l.idpersona = persona.idpersona");
-			
-			if (idInstitucion != null) {
-				sql.WHERE("des.IDINSTITUCION = " + idInstitucion );
-			}
 
 			String cadenaIds = "";
 			
@@ -1273,7 +1274,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					cadenaIds += ",(" + id + ")";
 				}
 			}
-			sql.WHERE("(des.anio,des.codigo) IN (" + cadenaIds + ")");
+			sql.WHERE("(des.idinstitucion,des.idturno,des.anio,des.numero) IN (" + cadenaIds + ")");
 
 			sql.WHERE(" (l.Fechadesigna is null or" +
 					" l.Fechadesigna = (SELECT MAX(LET2.Fechadesigna) FROM SCS_DESIGNASLETRADO LET2" +
@@ -1281,7 +1282,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					" AND l.ANIO = LET2.ANIO AND l.NUMERO = LET2.NUMERO" +
 					" AND TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)))");
 			
-			sql.ORDER_BY("des.idturno, des.anio desc, des.codigo desc ");
+			sql.ORDER_BY("des.anio desc, des.codigo desc ");
 			
 			// No utilizamos la clase Paginador para la busqueda de letrados porque al
 			// filtrar por residencia la sql no devolvia bien los

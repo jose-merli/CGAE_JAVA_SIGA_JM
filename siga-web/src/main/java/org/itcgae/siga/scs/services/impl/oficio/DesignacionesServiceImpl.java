@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -526,11 +527,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							boolean existePdte = false;
 							
 							for (ActuacionesJustificacionExpressItem actuacion: record.getActuaciones()) {
-								if (!existePdte && "1".equals(actuacion.getValidada())) {
+								if ("1".equals(actuacion.getValidada())) {
 									porcentajeTotal += Float.valueOf(actuacion.getPorcentaje().replace(",", "."));
 								} else {
 									existePdte = true;
 								}
+							}
+							
+							if (porcentajeTotal >= 100) {
+								existePdte = false;
 							}
 							
 							if (!existePdte && ("A".equals(record.getEstado())
@@ -980,7 +985,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if(designas != null && !designas.isEmpty()) {
 						List<String> ids = new ArrayList<String>();
 						for(DesignaItem item : designas) {
-							ids.add("'" + item.getAno() + "','" + item.getCodigo() + "'");
+							ids.add(idInstitucion + "," + item.getIdTurno() + "," + item.getAno() + "," + item.getNumero());
 						}
 						designasFinal = scsDesignacionesExtendsMapper.busquedaDesignacionesFinal(ids, idInstitucion,
 								tamMaximo);
@@ -6850,11 +6855,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	private Long uploadFileDesigna(byte[] bytes, Integer idUsuario, Short idInstitucion, String nombreFichero,
-			String extension) {
+			String extension, DocumentoDesignaItem documentoDesignaItem) {
 
 		FicheroVo ficheroVo = new FicheroVo();
 
-		String directorioFichero = getDirectorioFicheroDes(idInstitucion);
+		String directorioFichero = getDirectorioFicheroDes(idInstitucion, documentoDesignaItem.getAnio(), documentoDesignaItem.getIdTurno(), documentoDesignaItem.getNumero());
 		ficheroVo.setDirectorio(directorioFichero);
 		ficheroVo.setNombre(nombreFichero);
 		ficheroVo.setDescripcion("Fichero asociado a la designación " + ficheroVo.getNombre());
@@ -6893,7 +6898,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return directorioFichero.toString();
 	}
 
-	private String getDirectorioFicheroDes(Short idInstitucion) {
+	private String getDirectorioFicheroDes(Short idInstitucion, String anioDesigna, String idTurnoDesigna, String numeroDesigna) {
 
 		// Extraemos el path para los ficheros
 		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
@@ -6910,6 +6915,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.designaciones");
 		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
 		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+		directorioFichero.append(File.separator + anioDesigna + "_" + idTurnoDesigna + "_" + numeroDesigna);
 
 		return directorioFichero.toString();
 	}
@@ -7201,15 +7207,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				ficheroKey.setIdinstitucion(idInstitucion);
 				GenFichero ficheroDesigna = genFicheroMapper.selectByPrimaryKey(ficheroKey);
 				
-				zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero() + "." + ficheroDesigna.getExtension()));
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getIdFichero() + "-" + doc.getNombreFichero()));
 				
 				String extension = "." + ficheroDesigna.getExtension();
 				String path = ficheroDesigna.getDirectorio();
 				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
-				File file = new File(path);
-				FileInputStream fileInputStream = new FileInputStream(file);
-				IOUtils.copy(fileInputStream, zipOutputStream);
-				fileInputStream.close();
+				
+				try {
+					File file = new File(path);
+					FileInputStream fileInputStream = new FileInputStream(file);
+					IOUtils.copy(fileInputStream, zipOutputStream);
+					fileInputStream.close();
+				} catch (FileNotFoundException e) {
+					
+				}
+				
 			}
 
 			zipOutputStream.closeEntry();
@@ -7434,7 +7446,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					String extension = FilenameUtils.getExtension(nombreFichero);
 
 					Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-							nombreFichero, extension);
+							nombreFichero, extension, documentoDesignaItem);
 
 					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
 
@@ -7599,7 +7611,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					String extension = FilenameUtils.getExtension(nombreFichero);
 
 					Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-							nombreFichero, extension);
+							nombreFichero, extension, documentoDesignaItem);
 
 					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
 
@@ -7690,11 +7702,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				for (DocumentoDesignaItem doc : listaDocumentoDesignaItem) {
 
-					String path = getDirectorioFicheroDes(idInstitucion);
+					//String path = getDirectorioFicheroDes(idInstitucion, doc.getAnio(), doc.getIdTurno(), doc.getNumero());
+					
+					GenFicheroKey ficheroKey = new GenFicheroKey();
+					ficheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+					ficheroKey.setIdinstitucion(idInstitucion);
+					GenFichero miFichero = genFicheroMapper.selectByPrimaryKey(ficheroKey);
+					String path = miFichero.getDirectorio();
+					
 					path += File.separator + idInstitucion + "_" + doc.getIdFichero()
-							+ doc.getNombreFichero()
-									.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
-									.toLowerCase();
+							+ "." + miFichero.getExtension();
 
 					File file = new File(path);
 

@@ -837,20 +837,14 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				SQL.WHERE("UPPER(pjg.nif)=UPPER('" + filtroAsistenciaItem.getNif() + "')");
 			}
 			if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNombre())) {
-				SQL.WHERE("UPPER(pjg.nombre)=UPPER('" + filtroAsistenciaItem.getNombre() + "')");
+				String columna = "pjg.NOMBRE";
+				String cadena = filtroAsistenciaItem.getNombre();
+				SQL.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			}
 			if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getApellidos())) {
-				if (filtroAsistenciaItem.getApellidos().contains(" ")) {
-					String[] apellidos = filtroAsistenciaItem.getApellidos().split(" ");
-					if (apellidos.length == 2) {
-						SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + apellidos[0] + "')");
-						SQL.WHERE("UPPER(pjg.apellido2)=UPPER('" + apellidos[1] + "')");
-					} else if (apellidos.length == 1) {
-						SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + apellidos[0] + "')");
-					}
-				} else {
-					SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + filtroAsistenciaItem.getApellidos() + "')");
-				}
+				String columna = "REPLACE(CONCAT(pjg.apellido1,pjg.apellido2), ' ', '')";
+				String cadena = filtroAsistenciaItem.getApellidos().replaceAll("\\s+", "");
+				SQL.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			}
 		}else{
 
@@ -861,20 +855,14 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 						SQL.WHERE("UPPER(pjg.nif)=UPPER('" + filtroAsistenciaItem.getNif() + "')");
 					}
 					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNombre())) {
-						SQL.WHERE("UPPER(pjg.nombre)=UPPER('" + filtroAsistenciaItem.getNombre() + "')");
+						String columna = "pjg.NOMBRE";
+						String cadena = filtroAsistenciaItem.getNombre();
+						SQL.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 					}
 					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getApellidos())) {
-						if (filtroAsistenciaItem.getApellidos().contains(" ")) {
-							String[] apellidos = filtroAsistenciaItem.getApellidos().split(" ");
-							if (apellidos.length == 2) {
-								SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + apellidos[0] + "')");
-								SQL.WHERE("UPPER(pjg.apellido2)=UPPER('" + apellidos[1] + "')");
-							} else if (apellidos.length == 1) {
-								SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + apellidos[0] + "')");
-							}
-						} else {
-							SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + filtroAsistenciaItem.getApellidos() + "')");
-						}
+						String columna = "REPLACE(CONCAT(pjg.apellido1,pjg.apellido2), ' ', '')";
+						String cadena = filtroAsistenciaItem.getApellidos().replaceAll("\\s+", "");
+						SQL.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 					}
 					break;
 				case SigaConstants.JUSTICIABLE_ROL_CONTRARIO:
@@ -888,20 +876,14 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 						SQL.WHERE("UPPER(perjgcontrario.nif)=UPPER('" + filtroAsistenciaItem.getNif() + "')");
 					}
 					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNombre())) {
-						SQL.WHERE("UPPER(perjgcontrario.nombre)='" + filtroAsistenciaItem.getNombre() + "'");
+						String columna = "perjgcontrario.NOMBRE";
+						String cadena = filtroAsistenciaItem.getNombre();
+						SQL.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 					}
 					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getApellidos())) {
-						if (filtroAsistenciaItem.getApellidos().contains(" ")) {
-							String[] apellidos = filtroAsistenciaItem.getApellidos().split(" ");
-							if (apellidos.length == 2) {
-								SQL.WHERE("UPPER(perjgcontrario.apellido1)=UPPER('" + apellidos[0] + "')");
-								SQL.WHERE("UPPER(perjgcontrario.apellido2)=UPPER('" + apellidos[1] + "')");
-							} else if (apellidos.length == 1) {
-								SQL.WHERE("UPPER(perjgcontrario.apellido1)=UPPER('" + apellidos[0] + "')");
-							}
-						} else {
-							SQL.WHERE("UPPER(perjgcontrario.apellido1)=UPPER('" + filtroAsistenciaItem.getApellidos() + "')");
-						}
+						String columna = "REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')";
+						String cadena = filtroAsistenciaItem.getApellidos().replaceAll("\\s+", "");
+						SQL.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 					}
 					break;
 				case SigaConstants.JUSTICIABLE_ROL_REPRESENTANTE:
@@ -912,20 +894,14 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 						SQL.WHERE("UPPER(representante.nif)=UPPER('" + filtroAsistenciaItem.getNif() + "')");
 					}
 					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNombre())) {
-						SQL.WHERE("UPPER(representante.nombre)=UPPER('" + filtroAsistenciaItem.getNombre() + "')");
+						String columna = "representante.NOMBRE";
+						String cadena = filtroAsistenciaItem.getNombre();
+						SQL.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 					}
 					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getApellidos())) {
-						if (filtroAsistenciaItem.getApellidos().contains(" ")) {
-							String[] apellidos = filtroAsistenciaItem.getApellidos().split(" ");
-							if (apellidos.length == 2) {
-								SQL.WHERE("UPPER(representante.apellido1)=UPPER('" + apellidos[0] + "')");
-								SQL.WHERE("UPPER(representante.apellido2)=UPPER('" + apellidos[1] + "')");
-							} else if (apellidos.length == 1) {
-								SQL.WHERE("UPPER(representante.apellido1)=UPPER('" + apellidos[0] + "')");
-							}
-						} else {
-							SQL.WHERE("UPPER(representante.apellido1)=UPPER('" + filtroAsistenciaItem.getApellidos() + "')");
-						}
+							String columna = "REPLACE(CONCAT(representante.apellido1,representante.apellido2), ' ', '')";
+							String cadena = filtroAsistenciaItem.getApellidos().replaceAll("\\s+", "");
+							SQL.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 					}
 					break;
 				/*case SigaConstants.JUSTICIABLE_ROL_UNIDADFAMILIAR: //No hay unidad familiar en Asistencias

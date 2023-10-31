@@ -62,9 +62,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		condicionNumRegRemesa = condicionNumRegRemesa + "))";
 		
 		// select
-		sql.SELECT("DISTINCT ejg.anio");
+		sql.SELECT("DISTINCT ejg.anio anio");
 		sql.SELECT("ejg.idinstitucion");
-		sql.SELECT("ejg.numejg numejg");
+		sql.SELECT("ejg.numero numero");
+		sql.SELECT("ejg.idtipoejg idtipoejg");
 		
 		// from
 		sql.FROM("scs_ejg ejg"); 
@@ -122,7 +123,21 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 			String[] parts;
 
-			if (ejgItem.getNumero().trim().contains("-")) {
+			if (ejgItem.getNumero().trim().contains(",")) {
+				parts = ejgItem.getNumero().trim().split(",");
+				String numeros = "(";
+				for (String str : parts) {
+					if(numeros.equals("(")) {
+						numeros += str;
+					}else {
+						numeros += "," + str;
+					}
+				}
+				numeros += ")";
+				
+				sql.WHERE("EJG.NUMEJG IN " + numeros);
+
+			} else if (ejgItem.getNumero().trim().contains("-")) {
 				parts = ejgItem.getNumero().trim().split("-");
 
 				sql.WHERE("EJG.NUMEJG BETWEEN " + parts[0].trim() + " AND " + parts[1].trim());
@@ -283,7 +298,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		if (ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
 			sql.WHERE("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
 		// LOGICA DE ROL
-		if (ejgItem.getRol() != null && ejgItem.getRol() != "") {
+		if (ejgItem.getRol() != null && ejgItem.getRol() != ""
+			&& ((ejgItem.getNif()!= null && !ejgItem.getNif().isEmpty())
+				|| (ejgItem.getApellidos()!= null && !ejgItem.getApellidos().isEmpty())
+				|| (ejgItem.getNombre()!= null && !ejgItem.getNombre().isEmpty())
+					)) {
 			// Controlar que Rol es el 1 para añadir el parentesís necesario para la QUERY.
 			boolean banderaRolprimero = false;
 			// Controlar si ya esta activo el 1 Rol.
@@ -961,11 +980,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 
 		//WHERE 
-		sql.WHERE("ejg.idinstitucion = " + idInstitucion );
+		//sql.WHERE("ejg.idinstitucion = " + idInstitucion );
+		sql.WHERE("(ejg.idinstitucion, ejg.anio, ejg.numero, ejg.idtipoejg) IN (" + stringListaEjgs + ")");
 		
 		sql.WHERE("ESTADO.FECHABAJA IS NULL");
         sql.WHERE("ESTADO.IDESTADOEJG = F_SIGA_GET_IDULTIMOESTADOEJG (ESTADO.IDINSTITUCION, ESTADO.IDTIPOEJG, ESTADO.ANIO,ESTADO.NUMERO )");
-		sql.WHERE("(ejg.anio, ejg.numejg) IN (" + stringListaEjgs + ")");
 
 		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
 		
