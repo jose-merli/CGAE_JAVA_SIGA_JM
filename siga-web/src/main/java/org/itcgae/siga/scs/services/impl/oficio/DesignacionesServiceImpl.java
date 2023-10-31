@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -7211,10 +7212,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String extension = "." + ficheroDesigna.getExtension();
 				String path = ficheroDesigna.getDirectorio();
 				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
-				File file = new File(path);
-				FileInputStream fileInputStream = new FileInputStream(file);
-				IOUtils.copy(fileInputStream, zipOutputStream);
-				fileInputStream.close();
+				
+				try {
+					File file = new File(path);
+					FileInputStream fileInputStream = new FileInputStream(file);
+					IOUtils.copy(fileInputStream, zipOutputStream);
+					fileInputStream.close();
+				} catch (FileNotFoundException e) {
+					
+				}
+				
 			}
 
 			zipOutputStream.closeEntry();
