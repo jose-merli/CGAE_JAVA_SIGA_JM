@@ -152,6 +152,27 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
 
         return sql.toString();
     }
+    
+    public String deletePermutasGuardia(GuardiasItem permutaItem, Short idInstitucion) {
+    	String fechainicio;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        fechainicio = dateFormat.format(permutaItem.getFechadesde());
+    	SQL sql = new SQL();
+    	
+    	
+    	sql.DELETE_FROM("SCS_PERMUTAGUARDIAS sp");
+    	 sql.WHERE("sp.idinstitucion = " + idInstitucion);
+    	sql.WHERE("((" + permutaItem.getIdTurno() + " = sp.IDTURNO_SOLICITANTE "
+        		+ "and " + permutaItem.getIdGuardia() + " = sp.IDGUARDIA_SOLICITANTE "
+        		+ "and TO_DATE('" + fechainicio + "', 'DD/MM/YYYY') = TRUNC(sp.FECHAINICIO_SOLICITANTE) "
+        		+ ")"
+        		+ "or (" + permutaItem.getIdTurno() + " = sp.IDTURNO_CONFIRMADOR "
+        		+ "and " + permutaItem.getIdGuardia() + " = sp.IDGUARDIA_CONFIRMADOR)"
+        		+ "and TO_DATE('" +  fechainicio + "', 'DD/MM/YYYY') = TRUNC(sp.FECHAINICIO_CONFIRMADOR) "
+        		+ ")");
+    	sql.WHERE("(sp.IDPERSONA_SOLICITANTE <> " + permutaItem.getIdPersona() + " OR sp.IDPERSONA_CONFIRMADOR <> " + permutaItem.getIdPersona() + ")");
+    	return sql.toString();
+    }
 
     public String getTurnoInscrito(Long idPersona, Short idinstitucion) {
     	

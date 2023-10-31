@@ -117,5 +117,8 @@ public interface ScsPermutaguardiasExtendsMapper extends ScsPermutaguardiasMappe
 
 	@DeleteProvider(type=ScsPermutaguardiasSqlExtendsProvider.class, method="deletePermutasCalendarioConfirmador")
 	public boolean deletePermutasCalendarioConfirmador(Integer idInstitucion, Integer idCalendarioGuardias, Integer idTurno, Integer idGuardia);
+	
+	@DeleteProvider(type=ScsPermutaguardiasSqlExtendsProvider.class, method="deletePermutasGuardia")
+	public boolean deletePermutasGuardia(GuardiasItem permutaItem, Short idInstitucion);
 
 }
