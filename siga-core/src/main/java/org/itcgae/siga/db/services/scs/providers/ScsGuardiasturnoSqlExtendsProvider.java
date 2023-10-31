@@ -2719,7 +2719,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if(idGuardia != null) {
 			sql2.WHERE("cal2.IDGUARDIA = " + idGuardia);
 		}
-		if(idGuardia != null) {
+		if(idCalendarioGuardias != null) {
 			sql2.WHERE("cal2.IDCALENDARIOGUARDIAS = " + idCalendarioGuardias);
 		}
 
