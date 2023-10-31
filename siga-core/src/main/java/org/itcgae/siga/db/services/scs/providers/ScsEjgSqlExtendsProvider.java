@@ -123,7 +123,21 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 			String[] parts;
 
-			if (ejgItem.getNumero().trim().contains("-")) {
+			if (ejgItem.getNumero().trim().contains(",")) {
+				parts = ejgItem.getNumero().trim().split(",");
+				String numeros = "(";
+				for (String str : parts) {
+					if(numeros.equals("(")) {
+						numeros += str;
+					}else {
+						numeros += "," + str;
+					}
+				}
+				numeros += ")";
+				
+				sql.WHERE("EJG.NUMEJG IN " + numeros);
+
+			} else if (ejgItem.getNumero().trim().contains("-")) {
 				parts = ejgItem.getNumero().trim().split("-");
 
 				sql.WHERE("EJG.NUMEJG BETWEEN " + parts[0].trim() + " AND " + parts[1].trim());
