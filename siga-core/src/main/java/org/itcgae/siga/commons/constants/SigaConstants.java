@@ -1709,6 +1709,9 @@ public class SigaConstants {
     public static final int K_BUROSMS = 5;
     public static final int K_ENVIOTELEMATICO = 6;
     public static final int K_DOCUMENTACIONLETRADO  = 7;
+    
+    public static String[] formatosPermitidosSubidaDocumentacionDesignas = new String[] { "doc", "docx", "pdf", "jpg", "png",
+    																						"rtf", "txt" };
 
     public static final String TIPODESTINATARIO_SCSPERSONAJG = "SCS_PERSONAJG";
     public static final String TIPODESTINATARIO_SCSJUZGADO = "SCS_JUZGADO";

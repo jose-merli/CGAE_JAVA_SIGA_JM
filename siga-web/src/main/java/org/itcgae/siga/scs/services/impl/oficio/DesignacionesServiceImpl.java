@@ -7435,6 +7435,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (usuarios != null && !usuarios.isEmpty()) {
 
 				Iterator<String> itr = request.getFileNames();
+				boolean formatoNoValido = false;
 
 				while (itr.hasNext()) {
 
@@ -7444,114 +7445,125 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					DocumentoDesignaItem documentoDesignaItem = objectMapper.readValue(json,
 							DocumentoDesignaItem.class);
 					String extension = FilenameUtils.getExtension(nombreFichero);
-
-					Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-							nombreFichero, extension, documentoDesignaItem);
-
-					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
-
-					ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
-
-					scsDocumentaciondesigna.setAnio(Short.valueOf(documentoDesignaItem.getAnio()));
-					scsDocumentaciondesigna.setNumero(Long.valueOf(documentoDesignaItem.getNumero()));
-					scsDocumentaciondesigna.setIdturno(Integer.valueOf(documentoDesignaItem.getIdTurno()));
-
-					if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getObservaciones())) {
-						scsDocumentaciondesigna.setObservaciones(documentoDesignaItem.getObservaciones());
-					}
-					scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(nuevoId.getIdMax().toString()));
-					scsDocumentaciondesigna.setNombrefichero(nombreFichero);
-					scsDocumentaciondesigna
-							.setIdtipodocumento(Short.valueOf(documentoDesignaItem.getIdTipodocumento()));
-					scsDocumentaciondesigna.setIdfichero(idFile);
-					scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
-					scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsDocumentaciondesigna.setFechamodificacion(new Date());
-					scsDocumentaciondesigna.setFechaentrada(new Date());
-
-					if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getIdActuacion())) {
-						scsDocumentaciondesigna.setIdactuacion(Long.valueOf(documentoDesignaItem.getIdActuacion()));
-						scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf("1"));
-					}
-
-					int response = scsDocumentaciondesignaMapper.insertSelective(scsDocumentaciondesigna);
-
-					if (response == 1) {
-						insertResponseDTO.setStatus(SigaConstants.OK);
-					}
-
-					if (response == 0) {
+					
+					if (!extensionValida(extension) || formatoNoValido) {
+						formatoNoValido = true;
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
 								"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
 						error.setCode(500);
-						error.setDescription("general.mensaje.error.bbdd");
+						error.setDescription("justiciaGratuita.oficio.designa.formatoDocumentacionNoValido");
 						insertResponseDTO.setError(error);
-					}
+					} else {
+						Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+								nombreFichero, extension, documentoDesignaItem);
 
+						MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
+
+						ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
+
+						scsDocumentaciondesigna.setAnio(Short.valueOf(documentoDesignaItem.getAnio()));
+						scsDocumentaciondesigna.setNumero(Long.valueOf(documentoDesignaItem.getNumero()));
+						scsDocumentaciondesigna.setIdturno(Integer.valueOf(documentoDesignaItem.getIdTurno()));
+
+						if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getObservaciones())) {
+							scsDocumentaciondesigna.setObservaciones(documentoDesignaItem.getObservaciones());
+						}
+						scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(nuevoId.getIdMax().toString()));
+						scsDocumentaciondesigna.setNombrefichero(nombreFichero);
+						scsDocumentaciondesigna
+								.setIdtipodocumento(Short.valueOf(documentoDesignaItem.getIdTipodocumento()));
+						scsDocumentaciondesigna.setIdfichero(idFile);
+						scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+						scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsDocumentaciondesigna.setFechamodificacion(new Date());
+						scsDocumentaciondesigna.setFechaentrada(new Date());
+
+						if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getIdActuacion())) {
+							scsDocumentaciondesigna.setIdactuacion(Long.valueOf(documentoDesignaItem.getIdActuacion()));
+							scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf("1"));
+						}
+
+						int response = scsDocumentaciondesignaMapper.insertSelective(scsDocumentaciondesigna);
+
+						if (response == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+
+						if (response == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+							error.setCode(500);
+							error.setDescription("general.mensaje.error.bbdd");
+							insertResponseDTO.setError(error);
+						}
+					}
 				}
 
-				String documentos = request.getParameter("documentosActualizar");
-				List<DocumentoDesignaItem> listaDocumentos = objectMapper.readValue(documentos,
-						new TypeReference<List<DocumentoDesignaItem>>() {
-						});
+				if (!formatoNoValido) {
+					String documentos = request.getParameter("documentosActualizar");
+					List<DocumentoDesignaItem> listaDocumentos = objectMapper.readValue(documentos,
+							new TypeReference<List<DocumentoDesignaItem>>() {
+							});
 
-				if (listaDocumentos != null && !listaDocumentos.isEmpty()) {
-					
-					DocumentoDesignaItem docuDesigItem = new DocumentoDesignaItem();
+					if (listaDocumentos != null && !listaDocumentos.isEmpty()) {
+						
+						DocumentoDesignaItem docuDesigItem = new DocumentoDesignaItem();
 
-					docuDesigItem.setAnio(listaDocumentos.get(0).getAnio());
-					docuDesigItem.setNumero(listaDocumentos.get(0).getNumero());
-					docuDesigItem.setIdTurno(listaDocumentos.get(0).getIdTurno());
-					docuDesigItem.setIdActuacion(listaDocumentos.get(0).getIdActuacion());
+						docuDesigItem.setAnio(listaDocumentos.get(0).getAnio());
+						docuDesigItem.setNumero(listaDocumentos.get(0).getNumero());
+						docuDesigItem.setIdTurno(listaDocumentos.get(0).getIdTurno());
+						docuDesigItem.setIdActuacion(listaDocumentos.get(0).getIdActuacion());
 
-					List<DocumentoDesignaItem> listaDocumentosBBDD = scsDesignacionesExtendsMapper
-							.getDocumentosPorDesigna(docuDesigItem, idInstitucion);
+						List<DocumentoDesignaItem> listaDocumentosBBDD = scsDesignacionesExtendsMapper
+								.getDocumentosPorDesigna(docuDesigItem, idInstitucion);
 
-					for (DocumentoDesignaItem doc : listaDocumentos) {
-						boolean igual = false;
-						for (DocumentoDesignaItem doc2 : listaDocumentosBBDD) {
+						for (DocumentoDesignaItem doc : listaDocumentos) {
+							boolean igual = false;
+							for (DocumentoDesignaItem doc2 : listaDocumentosBBDD) {
 
-							if (doc2.getNombreFichero().equals(doc.getNombreFichero())
-									&& doc2.getObservaciones().equals(doc.getObservaciones())) {
-								igual = true;
+								if (doc2.getNombreFichero() != null && doc2.getObservaciones() != null
+										&& doc2.getNombreFichero().equals(doc.getNombreFichero())
+										&& doc2.getObservaciones().equals(doc.getObservaciones())) {
+									igual = true;
+								}
+
+							}
+
+							if (!igual) {
+								ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
+
+								if (!UtilidadesString.esCadenaVacia(doc.getObservaciones())) {
+									scsDocumentaciondesigna.setObservaciones(doc.getObservaciones());
+								}
+
+								scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+								scsDocumentaciondesigna.setFechamodificacion(new Date());
+								scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+								scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
+
+								int response2 = scsDocumentaciondesignaMapper
+										.updateByPrimaryKeySelective(scsDocumentaciondesigna);
+
+								if (response2 == 1) {
+									insertResponseDTO.setStatus(SigaConstants.OK);
+								}
+
+								if (response2 == 0) {
+									insertResponseDTO.setStatus(SigaConstants.KO);
+									LOGGER.error(
+											"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+									error.setCode(500);
+									error.setDescription("general.mensaje.error.bbdd");
+									insertResponseDTO.setError(error);
+								}
 							}
 
 						}
 
-						if (!igual) {
-							ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
-
-							if (!UtilidadesString.esCadenaVacia(doc.getObservaciones())) {
-								scsDocumentaciondesigna.setObservaciones(doc.getObservaciones());
-							}
-
-							scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-							scsDocumentaciondesigna.setFechamodificacion(new Date());
-							scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
-							scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
-
-							int response2 = scsDocumentaciondesignaMapper
-									.updateByPrimaryKeySelective(scsDocumentaciondesigna);
-
-							if (response2 == 1) {
-								insertResponseDTO.setStatus(SigaConstants.OK);
-							}
-
-							if (response2 == 0) {
-								insertResponseDTO.setStatus(SigaConstants.KO);
-								LOGGER.error(
-										"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
-								error.setCode(500);
-								error.setDescription("general.mensaje.error.bbdd");
-								insertResponseDTO.setError(error);
-							}
-						}
-
 					}
-
 				}
-
 			} else {
 				LOGGER.error(
 						"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error, el usuario no pertenece a la tabla de cen_persona o a la tabla de adm_usuarios");
@@ -7573,6 +7585,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return insertResponseDTO;
+	}
+	
+	private boolean extensionValida(String extension) {
+		
+		for (String extensionPermitida: SigaConstants.formatosPermitidosSubidaDocumentacionDesignas) {
+			if (extensionPermitida.equals(extension)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	@Override
