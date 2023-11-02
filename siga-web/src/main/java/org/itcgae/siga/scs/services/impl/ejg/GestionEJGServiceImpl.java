@@ -5503,18 +5503,27 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return mime;
 	}
+	
+	private boolean extensionValida(String extension) {
+		for(String extensionCorrecta: SigaConstants.formatosPermitidosSubidaDocumentacionDesignas) {
+			if(extensionCorrecta.equals(extension)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	@Transactional
 	public InsertResponseDTO crearDocumentacionEjg(EjgDocumentacionItem documentacionEjgItem,
 			HttpServletRequest request) throws Exception {
-
+		boolean extensionErronea = false;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
-		int response = 1;
+		int response = 0;
 		// Se comentan el try y el catch para que @Transactional funcione adecuadamente
 //        try {
 
@@ -5529,7 +5538,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				"GestionEJGServiceImpl.crearDocumentacionEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 		if (usuarios != null && !usuarios.isEmpty()) {
-
+			String[] extension = documentacionEjgItem.getNombreFichero().split("\\.");
+			if(!extensionValida(extension[1])) {
+				extensionErronea = true;
+			}
+			else {
 			MaxIdDto nuevoId = scsEjgExtendsMapper.getNewIdDocumentacionEjg(idInstitucion);
 
 			ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
@@ -5598,7 +5611,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				if (response == 0)
 					throw (new Exception("Error al introducir la nueva documentación en el EJG"));
 			}
-
+		}
 		}
 
 //        } catch (Exception e) {
@@ -5618,13 +5631,20 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			error.setCode(200);
 			insertResponseDTO.setError(error);
 		}
-
-		if (response == 0) {
+		
+		if (response == 0 && !extensionErronea) {
 			insertResponseDTO.setStatus(SigaConstants.KO);
 			LOGGER.error(
 					"GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg");
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
+			insertResponseDTO.setError(error);
+		}
+		if(extensionErronea) {
+			insertResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.error("GestionEJGServiceImpl.crearDocumentacionEjg() -> Formato incorrecto");
+			error.setCode(500);
+			error.setDescription("justiciaGratuita.oficio.designa.formatoDocumentacionNoValido");
 			insertResponseDTO.setError(error);
 		}
 
