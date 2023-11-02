@@ -527,15 +527,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							boolean existePdte = false;
 							
 							for (ActuacionesJustificacionExpressItem actuacion: record.getActuaciones()) {
-								if ("1".equals(actuacion.getValidada())) {
+								if (!existePdte && "1".equals(actuacion.getValidada())) {
 									porcentajeTotal += Float.valueOf(actuacion.getPorcentaje().replace(",", "."));
 								} else {
 									existePdte = true;
 								}
-							}
-							
-							if (porcentajeTotal >= 100) {
-								existePdte = false;
 							}
 							
 							if (!existePdte && ("A".equals(record.getEstado())
