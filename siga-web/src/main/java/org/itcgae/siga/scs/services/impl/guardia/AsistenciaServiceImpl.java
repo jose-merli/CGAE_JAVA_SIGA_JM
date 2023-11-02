@@ -4233,6 +4233,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		return tarjetaAsistenciaResponseDTO;
 	}
+	
+	private boolean extensionValida(String extension) {
+		for(String extensionCorrecta: SigaConstants.formatosPermitidosSubidaDocumentacionDesignas) {
+			if(extensionCorrecta.equals(extension)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public InsertResponseDTO subirDocumentoAsistencia(MultipartHttpServletRequest request) {
@@ -4260,17 +4269,28 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 				String anioNumero = request.getParameter("anioNumero");
 				Iterator<String> itr = request.getFileNames();
-
+				
+				boolean formatoNoValido = false;
 				while (itr.hasNext()) {
 
 					MultipartFile file = request.getFile(itr.next());
-					LOGGER.info("DesignacionesServiceImpl.subirDocumentoDesigna() / FileName : "
+					LOGGER.info("DesignacionesServiceImpl.subirDocumentoAsistencia() / FileName : "
 							+ file.getOriginalFilename());
 					String nombreFichero = file.getOriginalFilename().split(";")[0];
 					String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
 					DocumentacionAsistenciaItem documentacionAsistenciaItem = objectMapper.readValue(json,
 							DocumentacionAsistenciaItem.class);
+				
 					String extension = FilenameUtils.getExtension(nombreFichero);
+					
+					if(!extensionValida(extension) || formatoNoValido) {
+						formatoNoValido = true;
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error("AsistenciaServiceImpl.subirDocumentoAsistencia() -> Formato no válido");
+						error.setCode(500);
+						error.setDescription("justiciaGratuita.oficio.designa.formatoDocumentacionNoValido");
+						insertResponseDTO.setError(error);
+					}else {
 					LOGGER.info("DesignacionesServiceImpl.subirDocumentoDesigna() / json : " + json);
 					Long idFichero = uploadFile(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
 							nombreFichero, extension, anioNumero);
@@ -4342,7 +4362,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					}
 
 				}
-
+				}
 			}
 		} catch (Exception e) {
 			LOGGER.error(
