@@ -1714,7 +1714,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				record.setFechamodificacion(new Date());
 				record.setUsucreacion(usuarios.get(0).getIdusuario());
 				record.setUsumodificacion(usuarios.get(0).getIdusuario());
-
+				if(datos.getPerceptivo() != null) {
+					record.setIdpreceptivo(Short.valueOf(datos.getPerceptivo()));
+				}
+				if(datos.getCalidad() != null) {
+					record.setCalidad(datos.getCalidad());
+				}
+				
 				// Campos opcionales
 				record.setFechapresentacion(datos.getFechapresentacion());
 				record.setFechalimitepresentacion(datos.getFechalimitepresentacion());
