@@ -5822,6 +5822,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		scsEjg.setJuzgadoidinstitucion(scsAsistencia.getJuzgadoidinstitucion());
 		scsEjg.setComisaria(scsAsistencia.getComisaria());
 		scsEjg.setComisariaidinstitucion(scsAsistencia.getComisariaidinstitucion());
+		scsEjg.setObservaciones(scsAsistencia.getDatosdefensajuridica());
 		if (!UtilidadesString.esCadenaVacia(scsAsistencia.getNumeroprocedimiento())) {
 			scsEjg.setNumeroprocedimiento(scsAsistencia.getNumeroprocedimiento());
 		} else {
