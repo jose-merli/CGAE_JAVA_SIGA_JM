@@ -13015,7 +13015,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					//if (guardiasItem.getFechaValidacion() == null) {
 						//response = 0;
 					//} else {
-					if(guardiasItem.getFacturado().equals("0")) {
+					if(guardiasItem.getFacturado() == null || guardiasItem.getFacturado().equals("0")) {
 						response = scsCabeceraguardiasExtendsMapper.desvalidarGuardiaColegiado(guardia);
 					}
 					//}
