@@ -1249,7 +1249,14 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			actuacionBBDD.setFechavalidacion(new Date());
 			actuacionBBDD.setValidada("1");
 			actuacionBBDD.setUsuvalidacion(usuario.getIdusuario());
-
+			
+			Date fechaActuacion = new SimpleDateFormat("dd/MM/yyyy").parse(actuacion.getFechaActuacion());
+			Date fechaAsistencia = new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFechaAsistencia());
+			
+			if (compruebaDiaDespues(fechaAsistencia, fechaActuacion) == true) {
+				actuacionBBDD.setDiadespues("S");
+			}
+			
 		} catch (ParseException e) {
 			LOGGER.error("guardarAsistencias() / ERROR AL PARSEAR FECHAS: " + e.getMessage(), e);
 		} catch (Exception e) {
@@ -1258,6 +1265,28 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 
 		return actuacionBBDD;
+	}
+	
+	private Date reiniciaHoraFecha(Date dia) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dia);
+		
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		
+		return calendar.getTime();
+	}
+	
+	private boolean compruebaDiaDespues(Date dia, Date posibleDiaDespues) {
+		dia = reiniciaHoraFecha(dia);
+		posibleDiaDespues = reiniciaHoraFecha(posibleDiaDespues);
+		
+		long diferenciaEnMilisegundos = posibleDiaDespues.getTime() - dia.getTime();
+		long DiferenciaEnDias = diferenciaEnMilisegundos / (1000 * 60 * 60 * 24);
+				
+		return DiferenciaEnDias == 1;
 	}
 	
 	private String getTipoActuacionPorDefecto (AdmUsuarios usuario, Short idInstitucion, String idTipoAsistencia, String juzgadoComisaria) {
