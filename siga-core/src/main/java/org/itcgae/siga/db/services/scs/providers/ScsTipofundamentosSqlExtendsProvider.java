@@ -65,7 +65,10 @@ public class ScsTipofundamentosSqlExtendsProvider extends ScsTipofundamentos{
 		sql.SELECT("F_SIGA_GETRECURSO( fundamento.DESCRIPCION,1) descripcion");
 //		sql.SELECT("fundamento.IDTIPORESOLUCION");
 		sql.FROM("SCS_TIPOFUNDAMENTOS fundamento");
-		sql.WHERE("fundamento.fecha_baja is null AND fundamento.IDINSTITUCION =" + idInstitucion + " AND fundamento.IDTIPORESOLUCION =" +resolucion);
+		sql.WHERE("fundamento.fecha_baja is null AND fundamento.IDINSTITUCION =" + idInstitucion);
+		if(resolucion != null && !resolucion.isEmpty()) {
+			sql.WHERE("fundamento.IDTIPORESOLUCION =" +resolucion);
+		}
 		//Añadido para que no salte un error cuando se intenta arreglar la tilde de un nulo
 		sql.ORDER_BY("descripcion");
 		return sql.toString();

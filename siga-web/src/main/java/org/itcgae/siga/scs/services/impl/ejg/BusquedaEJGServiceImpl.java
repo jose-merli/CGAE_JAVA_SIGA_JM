@@ -568,6 +568,10 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				comboItems = scsTipofundamentosExtendsMapper.comboFundamentoJurid(usuarios.get(0).getIdlenguaje(),
 						idInstitucion.toString(), resolucion);
 
+				if(comboItems == null || comboItems.isEmpty()){
+					comboItems = scsTipofundamentosExtendsMapper.comboFundamentoJurid(usuarios.get(0).getIdlenguaje(),
+							idInstitucion.toString(), null);
+				}
 				LOGGER.info(
 						"ComboFundamentoJurid() / scsTipofundamentosSqlExtendsMapper.ComboFundamentoJurid() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener combo");
 
