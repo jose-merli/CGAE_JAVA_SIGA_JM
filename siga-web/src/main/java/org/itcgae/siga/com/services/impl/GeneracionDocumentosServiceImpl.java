@@ -221,8 +221,14 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				 mensaje = 	e.getMessage();
 			}
 			LOGGER.error(e);
-			LOGGER.error(e.getStackTrace());
-			e.printStackTrace();
+			
+			StackTraceElement[] stack = e.getStackTrace();
+		    String exception = "";
+		    for (StackTraceElement s : stack) {
+		        exception = exception + s.toString() + "\n\t\t";
+		    }
+		    
+			LOGGER.error(exception);
 			LOGGER.error(mensaje);
 			throw new BusinessException(mensaje, e);
 		}
