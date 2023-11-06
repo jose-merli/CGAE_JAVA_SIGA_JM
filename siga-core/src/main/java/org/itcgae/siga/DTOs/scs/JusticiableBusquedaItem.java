@@ -27,6 +27,7 @@ public class JusticiableBusquedaItem {
 	private String numeroAsuntos;
 	private String ultimoAsunto;
 	private String filas;
+	private Boolean modoBusqueda;
 	
 	/**
 	 **/
@@ -338,6 +339,14 @@ public class JusticiableBusquedaItem {
 
 	public void setFilas(String filas) {
 		this.filas = filas;
+	}
+
+	public Boolean getModoBusqueda() {
+		return modoBusqueda;
+	}
+
+	public void setModoBusqueda(Boolean modoBusqueda) {
+		this.modoBusqueda = modoBusqueda;
 	}
 
 	@Override
