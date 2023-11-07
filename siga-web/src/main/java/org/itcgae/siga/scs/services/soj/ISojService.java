@@ -23,4 +23,5 @@ public interface ISojService {
 	DocumentacionSojDTO getDocumentosSOJ(FichaSojItem fichaSojItem, HttpServletRequest request) throws Exception;
 	InsertResponseDTO subirDocumentoSOJ(List<DocumentacionSojItem> documentacionesSOJ, HttpServletRequest request);
 	DeleteResponseDTO eliminarDocumentoSOJ(HttpServletRequest request, List<DocumentacionSojItem> documentos);
+	UpdateResponseDTO asociarEJGaSOJ(List<String> datos, HttpServletRequest request);
 }

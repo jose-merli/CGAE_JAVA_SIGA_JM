@@ -22,16 +22,23 @@ import org.itcgae.siga.db.entities.ScsAsistencia;
 import org.itcgae.siga.db.entities.ScsAsistenciaExample;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionsoj;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgExample;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsSoj;
+import org.itcgae.siga.db.entities.ScsSojExample;
 import org.itcgae.siga.db.entities.ScsSojKey;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionsojMapper;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
+import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.scs.services.soj.ISojService;
@@ -39,6 +46,7 @@ import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -73,6 +81,12 @@ public class SojServiceImpl implements ISojService {
 	private ScsSojExtendsMapper ScsSojExtendsMapper;
 	
 	@Autowired
+	private ScsEjgExtendsMapper scsEjgExtendsMapper;
+	
+	@Autowired
+	private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
+	
+	@Autowired
 	private ScsDocumentacionsojMapper scsDocumentacionsojMapper;
 
 	@Override
@@ -84,9 +98,16 @@ public class SojServiceImpl implements ISojService {
 		// Conseguimos información del usuario logeado
 		LOGGER.info("getDetallesSoj() -> Entrando al servicio de autenticación");
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		LOGGER.info("getDetallesSoj() -> Saliendo del servicio de autenticación");
+		
+		if(fichaSojItem.getIdInstitucion() == null) {
+			fichaSojItem.setIdInstitucion(String.valueOf(idInstitucion));
+		}
 
 		fichaSojDTO.setFichaSojItems(scsSojExtendsMapper.busquedaSoj(fichaSojItem));
+		
 		LOGGER.info("getDetallesSoj() -> Saliendo del servicio que obtiene los datos de un SOJ");
 		return fichaSojDTO;
 	}
@@ -118,7 +139,7 @@ public class SojServiceImpl implements ISojService {
 				"guardarDatosGenerales() -> Entrada al servicio para actualizar los datos asociados Datos Generales del SOJ");
 
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
-
+		String numero = null;
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -140,6 +161,7 @@ public class SojServiceImpl implements ISojService {
 			if (usuarios != null && usuarios.size() > 0) {
 				try {
 					// Seleccionamos el SOJ que vamos a actualizar
+					if(datos.getAnio() != null && datos.getIdTipoSoj() != null && datos.getNumero() != null) {
 					ScsSojKey key = new ScsSojKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setIdtiposoj(Short.parseShort(datos.getIdTipoSoj()));
@@ -148,13 +170,25 @@ public class SojServiceImpl implements ISojService {
 					ScsSoj sojItem = scsSojExtendsMapper.selectByPrimaryKey(key);
 					// Una vez tenemos el SOJ, introducimos la informacion seleccionada en la
 					// tarjeta
+					
 					if (sojItem != null) {
 						sojItem.setFechaapertura(datos.getFechaApertura());
-						sojItem.setIdtiposojcolegio(Short.parseShort(datos.getIdTipoSojColegio()));
-						sojItem.setIdtipoconsulta(Short.parseShort(datos.getIdTipoConsulta()));
-						sojItem.setIdtiporespuesta(Short.parseShort(datos.getIdTipoRespuesta()));
-						sojItem.setDescripcionconsulta(datos.getDescripcionConsulta());
-						sojItem.setRespuestaletrado(datos.getRespuestaLetrado());
+						if(datos.getIdTipoSojColegio() != null) {
+							sojItem.setIdtiposojcolegio(Short.parseShort(datos.getIdTipoSojColegio()));
+						}
+						if(datos.getIdTipoConsulta() != null) {
+							sojItem.setIdtipoconsulta(Short.parseShort(datos.getIdTipoConsulta()));
+						}
+						if(datos.getIdTipoRespuesta() != null) {
+							sojItem.setIdtiporespuesta(Short.parseShort(datos.getIdTipoRespuesta()));
+						}
+						if(datos.getDescripcionConsulta() != null) {
+							sojItem.setDescripcionconsulta(datos.getDescripcionConsulta());
+						}
+						if(datos.getRespuestaLetrado() != null) {
+							sojItem.setRespuestaletrado(datos.getRespuestaLetrado());
+						}
+						
 						LOGGER.info(
 								"guardarDatosGenerales() / scsSojExtendsMapper.updateByPrimaryKeySelective() -> Entrada a scsEjgMapper para actualizar el SOJ");
 
@@ -162,6 +196,13 @@ public class SojServiceImpl implements ISojService {
 
 						LOGGER.info(
 								"guardarDatosGenerales() / scsSojExtendsMapper.updateByPrimaryKeySelective() -> Salida a scsEjgMapper para actualizar el SOJ");
+					}
+					}else {
+						//Si no encontramos el SOJ lo creamos
+						ScsSoj sojItem = this.traducirFichaASOJ(datos, idInstitucion, usuarios);
+						
+						response = scsSojExtendsMapper.insert(sojItem);
+						numero = String.valueOf(sojItem.getNumero()) + "*" + sojItem.getNumsoj();
 					}
 
 					if (response != 1) {
@@ -171,6 +212,7 @@ public class SojServiceImpl implements ISojService {
 						throw new Exception("ERROR: No se ha actualizado Datos Generales de SOJ.");
 					} else {
 						responsedto.setStatus(SigaConstants.OK);
+						responsedto.setId(numero);
 					}
 
 				} catch (Exception e) {
@@ -184,6 +226,153 @@ public class SojServiceImpl implements ISojService {
 		}
 		LOGGER.info("guardarServiciosTramitacion() -> Salida del servicio para actualizar Datos Generales de SOJ.");
 		return responsedto;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO asociarEJGaSOJ(List<String> datos, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+		int response = 1;
+
+		if (idInstitucion != null) {
+			LOGGER.debug("GestionEJGServiceImpl.asociarSOJ() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.asociarSOJ() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("GestionEJGServiceImpl.asociarSOJ() -> Entrada para asociar un EJG a un SOJ");
+				try {
+
+					ScsSojExample exampleSOJ = new ScsSojExample();
+					exampleSOJ.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdtiposojEqualTo(Short.parseShort(datos.get(3)))
+							.andAnioEqualTo(Short.parseShort(datos.get(1))).andNumsojEqualTo(datos.get(2));
+					
+					List<ScsSoj> soj = scsSojExtendsMapper.selectByExample(exampleSOJ);
+					
+					ScsEjgExample exampleEJG = new ScsEjgExample();
+					exampleEJG.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andAnioEqualTo(Short.valueOf(datos.get(5)))
+							.andNumejgEqualTo(datos.get(6))
+							.andIdtipoejgEqualTo(Short.valueOf(datos.get(4)));
+					List<ScsEjg> ejg = scsEjgExtendsMapper.selectByExample(exampleEJG);
+					
+					ScsUnidadfamiliarejgExample exampleUnidadFamiliar = new ScsUnidadfamiliarejgExample();
+					exampleUnidadFamiliar.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andAnioEqualTo(ejg.get(0).getAnio())
+							.andNumeroEqualTo(ejg.get(0).getNumero())
+							.andIdtipoejgEqualTo(ejg.get(0).getIdtipoejg());
+					List<ScsUnidadfamiliarejg> unidadFamiliar = scsUnidadfamiliarejgMapper.selectByExample(exampleUnidadFamiliar);
+					//response = scsSojExtendsMapper.updateByExampleSelective(record, example);
+					if(unidadFamiliar.size() >0) {//Si el ejg ya tiene justiciables y el nuestro no se encuentra entre ellos se inserta una unidad familiar
+						boolean existe = false;
+						for(ScsUnidadfamiliarejg unidad : unidadFamiliar) {
+							if(unidad.getIdpersona().equals(soj.get(0).getIdpersonajg())) {
+								existe = true;
+								break;
+							}
+						}
+						if(!existe) {
+							ScsUnidadfamiliarejg unidadNueva = new ScsUnidadfamiliarejg();
+							unidadNueva.setIdinstitucion(idInstitucion);
+							unidadNueva.setIdtipoejg(ejg.get(0).getIdtipoejg());
+							unidadNueva.setAnio(ejg.get(0).getAnio());
+							unidadNueva.setNumero(ejg.get(0).getNumero());
+							unidadNueva.setIdpersona(soj.get(0).getIdpersonajg());
+							unidadNueva.setSolicitante(Short.valueOf("0"));
+							unidadNueva.setFechamodificacion(new Date());
+							unidadNueva.setUsumodificacion(usuarios.get(0).getIdusuario());
+							int responseUnidad = scsUnidadfamiliarejgMapper.insert(unidadNueva);
+						}
+					}else {//si el ejg no tiene unidades familiares ponemos el justiciable del soj como solicitante
+						//actualizamos el ejg con el idpersonajg del soj
+						scsEjgExtendsMapper.updatePersonaJG(ejg.get(0), soj.get(0).getIdpersonajg());
+						
+						//e insertamos la nueva unidad familiar
+						ScsUnidadfamiliarejg unidadNueva = new ScsUnidadfamiliarejg();
+						unidadNueva.setIdinstitucion(idInstitucion);
+						unidadNueva.setIdtipoejg(ejg.get(0).getIdtipoejg());
+						unidadNueva.setAnio(ejg.get(0).getAnio());
+						unidadNueva.setNumero(ejg.get(0).getNumero());
+						unidadNueva.setIdpersona(soj.get(0).getIdpersonajg());
+						unidadNueva.setSolicitante(Short.valueOf("1"));
+						unidadNueva.setFechamodificacion(new Date());
+						unidadNueva.setUsumodificacion(usuarios.get(0).getIdusuario());
+						int responseUnidad = scsUnidadfamiliarejgMapper.insert(unidadNueva);
+					}
+					//Actualizamos el soj
+					ScsSoj record = soj.get(0);
+					record.setEjganio(ejg.get(0).getAnio());
+					record.setEjgidtipoejg(ejg.get(0).getIdtipoejg());
+					record.setEjgnumero(ejg.get(0).getNumero());
+					int respuesta = scsSojExtendsMapper.updateByExample(soj.get(0), exampleSOJ);
+
+				} catch (Exception e) {
+					LOGGER.debug(
+							"SojServiceImpl.asociarEJGaSOJ() -> Se ha producido un error al asociar el EJG al SOJ ",
+							e);
+					response = 0;
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response != 1) {
+
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.asociarSOJ() -> KO. No se ha asociado ningun elemento");
+
+					} else {
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					}
+				}
+			}
+		}
+
+		return updateResponseDTO;
+	}
+	
+	private ScsSoj traducirFichaASOJ(FichaSojItem datos, Short idInstitucion, List<AdmUsuarios> usuarios) {
+		ScsSoj sojItem = new ScsSoj();
+		
+		//Campos obligatorios
+		sojItem.setAnio(Short.valueOf(datos.getAnio()));
+		sojItem.setEstado("A");
+		sojItem.setFechamodificacion(new Date());
+		sojItem.setUsumodificacion(usuarios.get(0).getIdusuario());
+		sojItem.setFechaapertura(datos.getFechaApertura());
+		sojItem.setIdtiposoj(Short.valueOf(datos.getIdTipoSoj()));
+		sojItem.setNumero(Long.valueOf(scsSojExtendsMapper.selectNuevoNumero(datos, idInstitucion)));
+		sojItem.setNumsoj(scsSojExtendsMapper.selectNuevoNumeroSOJ(datos, idInstitucion));
+		sojItem.setIdinstitucion(idInstitucion);
+		
+		//Campos opcionales
+		if(datos.getIdTipoSojColegio() != null) {
+			sojItem.setIdtiposojcolegio(Short.valueOf(datos.getIdTipoSojColegio()));
+		}
+		if(datos.getIdTipoConsulta() != null) {
+			sojItem.setIdtipoconsulta(Short.valueOf(datos.getIdTipoConsulta()));
+		}
+		if(datos.getIdTipoRespuesta() != null) {
+			sojItem.setIdtiporespuesta(Short.valueOf(datos.getIdTipoRespuesta()));
+		}
+		if(datos.getDescripcionConsulta() != null) {
+			sojItem.setDescripcionconsulta(datos.getDescripcionConsulta());
+		}	
+		if(datos.getRespuestaLetrado() != null) {
+			sojItem.setRespuestaletrado(datos.getRespuestaLetrado());
+		}
+		if(datos.getIdPersonaJG() != null) {
+			sojItem.setIdpersonajg(Long.valueOf(datos.getIdPersonaJG()));
+		}
+		
+		return sojItem;
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
@@ -2531,6 +2532,19 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.WHERE("numeroejg = " + ejgItem.getNumero());
 		sql.WHERE("IDTIPOEJG = " + ejgItem.getTipoEJG());
 		
+		
+		return sql.toString();
+	}
+	
+	public String updatePersonaJG(ScsEjg ejg, Long idPersona) {
+		SQL sql = new SQL();
+		
+		sql.UPDATE("SCS_EJG");
+		sql.SET("IDPERSONAJG = " + idPersona);
+		sql.WHERE("IDINSTITUCION = " + ejg.getIdinstitucion());
+		sql.WHERE("ANIO = " + ejg.getAnio());
+		sql.WHERE("NUMERO = " + ejg.getNumero());
+		sql.WHERE("IDTIPOEJG = " + ejg.getIdtipoejg());
 		
 		return sql.toString();
 	}
