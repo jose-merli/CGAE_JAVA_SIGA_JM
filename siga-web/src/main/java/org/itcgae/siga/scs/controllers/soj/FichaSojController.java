@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.FichaSojDTO;
 import org.itcgae.siga.DTOs.scs.FichaSojItem;
 import org.itcgae.siga.DTOs.scs.JusticiableItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.scs.services.soj.ISojService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,17 @@ public class FichaSojController {
 			return new ResponseEntity<FichaSojDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	// Asociar SOJ
+		@RequestMapping(value = "/asociarEJGaSOJ", produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> asociarSOJ(@RequestBody List<String> datos, HttpServletRequest request) {
+			UpdateResponseDTO response = sojService.asociarEJGaSOJ(datos, request);
+
+			if (response.getStatus().equals(SigaConstants.OK))
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 	// Guardar Datos Generales
 	@RequestMapping(value = "/guardarDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,7 +65,12 @@ public class FichaSojController {
 		UpdateResponseDTO response = null;
 		try {
 			response = sojService.guardarDatosGenerales(fichaSojItem, request);
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			if(response.getStatus().equals(SigaConstants.OK)) {
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			}else {
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
 		} catch (Exception e) {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
