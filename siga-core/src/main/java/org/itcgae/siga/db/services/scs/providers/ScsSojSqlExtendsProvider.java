@@ -253,8 +253,6 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
     }
 
     public String busquedaSoj(FichaSojItem fichaSojItem) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("DD-MM-YYYY");
-    	String fechaApertura = sdf.format(fichaSojItem.getFechaApertura().getTime());
 		SQL sql = new SQL();
 		sql.SELECT("ss.*");
 		sql.SELECT("DECODE(col.comunitario,1,col.ncomunitario,col.NCOLEGIADO) as ncolegiado");

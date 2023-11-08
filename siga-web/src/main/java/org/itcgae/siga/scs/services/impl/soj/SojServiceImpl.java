@@ -254,7 +254,7 @@ public class SojServiceImpl implements ISojService {
 					ScsSojExample exampleSOJ = new ScsSojExample();
 					exampleSOJ.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 							.andIdtiposojEqualTo(Short.parseShort(datos.get(3)))
-							.andAnioEqualTo(Short.parseShort(datos.get(1))).andNumsojEqualTo(datos.get(2));
+							.andAnioEqualTo(Short.parseShort(datos.get(1))).andNumeroEqualTo(Long.valueOf(datos.get(2)));
 					
 					List<ScsSoj> soj = scsSojExtendsMapper.selectByExample(exampleSOJ);
 					
