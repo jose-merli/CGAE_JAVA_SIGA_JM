@@ -57,6 +57,8 @@ import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModeloDialogoItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
+import org.itcgae.siga.DTOs.com.ModelosComunicacionSearchConNombreConsultaDestinatarios;
+import org.itcgae.siga.DTOs.com.ModelosComunicacionesItemConNombreConsultaDestinatarios;
 import org.itcgae.siga.DTOs.com.ModelosEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
@@ -328,8 +330,44 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		return comboDTO;
 	}
-
-
+	
+	@Override
+	public ModelosComunicacionSearchConNombreConsultaDestinatarios obtenerModelosConConsultaDestinatarios(HttpServletRequest request, ModeloDialogoItem modeloDTO) {
+		
+		LOGGER.info("obtenerModelosConConsultaDestinatarios() -> Entrada al servicio para obtener los modelos de comunicacion");
+		
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+		
+		ModelosComunicacionSearchConNombreConsultaDestinatarios respuesta = new ModelosComunicacionSearchConNombreConsultaDestinatarios();
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (usuarios != null && usuarios.size() > 0) {
+				try{
+					AdmUsuarios usuario = usuarios.get(0);
+					List<ModelosComunicacionesItemConNombreConsultaDestinatarios> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogoConConsultaDestinatarios(String.valueOf(idInstitucion), modeloDTO.getIdInstitucion(), modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje(), modeloDTO.getIdConsulta(), perfiles);
+					respuesta.setModelosComunicacionItems(modelos);
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription("Error al obtener los modelos");
+					error.setMessage(e.getMessage());
+					LOGGER.error(e);
+				}
+			}
+		}
+		
+		LOGGER.info("obtenerModelosConConsultaDestinatarios() -> Salida del servicio para obtener los modelos de comunicacion");
+		
+		return respuesta;
+	}
 
 	@Override
 	public ModelosComunicacionSearch obtenerModelos(HttpServletRequest request, ModeloDialogoItem modeloDTO) {
