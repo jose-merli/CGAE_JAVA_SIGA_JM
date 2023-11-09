@@ -9,6 +9,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.com.ModelosComunicacionesItemConNombreConsultaDestinatarios;
 import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
@@ -72,6 +73,22 @@ public interface ModModeloComunicacionExtendsMapper extends ModModelocomunicacio
 
 	})
 	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idInstitucionLogueada, String idInstitucion, String idClaseComunicacion,
+			String idModulo, String idLenguaje, String idConsulta, List<String> perfiles);
+	
+	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosComunicacionDialgConConsultaDestinatarios")
+	@Results({ @Result(column = "IDMODELOCOMUNICACION", property = "idModeloComunicacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PRESELECCIONAR", property = "preseleccionar", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INFORMEUNICO", property = "informeUnico", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRECONSULTADESTINATARIOS", property = "nombreConsultaDestinatarios", jdbcType = JdbcType.VARCHAR)
+
+	})
+	List<ModelosComunicacionesItemConNombreConsultaDestinatarios> selectModelosComunicacionDialogoConConsultaDestinatarios(String idInstitucionLogueada, String idInstitucion, String idClaseComunicacion,
 			String idModulo, String idLenguaje, String idConsulta, List<String> perfiles);
 
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosClasesComunicacion")
