@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -1253,8 +1254,18 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			Date fechaActuacion = new SimpleDateFormat("dd/MM/yyyy").parse(actuacion.getFechaActuacion());
 			Date fechaAsistencia = new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFechaAsistencia());
 			
-			if (compruebaDiaDespues(fechaAsistencia, fechaActuacion) == true) {
-				actuacionBBDD.setDiadespues("S");
+			if (compruebaFueraGuardia(idInstitucion, asistencia.getIdTurno(), asistencia.getIdGuardia())) {
+				if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, true)) {
+					actuacionBBDD.setDiadespues("S");
+				} else {
+					actuacionBBDD.setDiadespues("N");
+				}
+			} else {
+				if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, false)) {
+					actuacionBBDD.setDiadespues("S");
+				} else {
+					actuacionBBDD.setDiadespues("N");
+				}
 			}
 			
 		} catch (ParseException e) {
@@ -1267,6 +1278,31 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return actuacionBBDD;
 	}
 	
+	// Comprueba si el baremo de guardia tiene
+	private boolean compruebaFueraGuardia(Short idInstitucion, String idTurno, String idGuardia) {
+		
+		try {
+			ScsHitofacturableguardiaExample hfg = new ScsHitofacturableguardiaExample();
+			hfg.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+			.andIdturnoEqualTo(Integer.parseInt(idTurno))
+			.andIdguardiaEqualTo(Integer.parseInt(idGuardia));
+			
+			List<ScsHitofacturableguardia> hitos = scsHitofacturableguardiaExtendsMapper.selectByExample(hfg);
+			
+			for(ScsHitofacturableguardia hito: hitos) {
+				for (String hitoFueraGuardia: SigaConstants.hitosFueraGuardia) {
+					if (hito.getIdhito() == Long.parseLong(hitoFueraGuardia)) {
+						return true;
+					}
+				}
+			}
+		} catch(Exception e) {
+			return false;
+		}
+		
+		return false;
+	}
+
 	private Date reiniciaHoraFecha(Date dia) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(dia);
@@ -1279,14 +1315,19 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return calendar.getTime();
 	}
 	
-	private boolean compruebaDiaDespues(Date dia, Date posibleDiaDespues) {
+	private boolean compruebaDiaDespues(Date dia, Date posibleDiaDespues, boolean variosDiasdespues) {
 		dia = reiniciaHoraFecha(dia);
 		posibleDiaDespues = reiniciaHoraFecha(posibleDiaDespues);
 		
 		long diferenciaEnMilisegundos = posibleDiaDespues.getTime() - dia.getTime();
 		long DiferenciaEnDias = diferenciaEnMilisegundos / (1000 * 60 * 60 * 24);
 				
-		return DiferenciaEnDias == 1;
+		if (variosDiasdespues) {
+			return DiferenciaEnDias >= 1;
+		} else {
+			return DiferenciaEnDias == 1;
+		}
+		
 	}
 	
 	private String getTipoActuacionPorDefecto (AdmUsuarios usuario, Short idInstitucion, String idTipoAsistencia, String juzgadoComisaria) {

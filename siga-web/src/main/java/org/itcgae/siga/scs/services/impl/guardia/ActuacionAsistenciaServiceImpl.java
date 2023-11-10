@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +55,9 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
 
     @Autowired
     private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
+    
+    @Autowired
+	private ScsHitofacturableguardiaExtendsMapper scsHitofacturableguardiaExtendsMapper;
 
     @Autowired
     private ScsDocumentacionasiMapper scsDocumentacionasiMapper;
@@ -414,6 +418,8 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
 						
                         List<ScsTipoactuacion> tipoActList = scsTipoactuacionMapper.selectByExample(scsTipoactuacionExample);
                         
+                        procesaDiaDespuesFueraGuardia(newActuacion, idInstitucion, scsAsistencia);
+                        
                         if(tipoActList != null && tipoActList.isEmpty()) {
                         	ScsTipoactuacion scsTipoactuacionRecord = new ScsTipoactuacion();
                         	scsTipoactuacionRecord.setIdinstitucion(newActuacion.getIdinstitucion());
@@ -501,6 +507,8 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             if(datosGenerales.isDiaDespues()) scsActuacionasistencia.setDiadespues("S");
                             else scsActuacionasistencia.setDiadespues("N");
                             
+                            procesaDiaDespuesFueraGuardia(scsActuacionasistencia, idInstitucion, scsAsistencia);
+                            
                             scsActuacionasistencia.setDescripcionbreve(datosGenerales.getDescripcion());
                             scsActuacionasistencia.setObservaciones(datosGenerales.getObservaciones());
                             affectedRows += scsActuacionasistenciaExtendsMapper.updateByPrimaryKey(scsActuacionasistencia);
@@ -553,7 +561,80 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
         return updateResponseDTO;
     }
 
-    @Override
+    private void procesaDiaDespuesFueraGuardia(ScsActuacionasistencia scsActuacionasistencia, Short idInstitucion,
+			ScsAsistencia scsAsistencia) {
+    	
+    	Date fechaActuacion = scsActuacionasistencia.getFecha();
+		Date fechaAsistencia = scsAsistencia.getFechahora();
+		
+    	if (compruebaFueraGuardia(idInstitucion, scsAsistencia.getIdturno(), scsAsistencia.getIdguardia())) {
+			if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, true)) {
+				scsActuacionasistencia.setDiadespues("S");
+			} else {
+				scsActuacionasistencia.setDiadespues("N");
+			}
+		} else {
+			if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, false)) {
+				scsActuacionasistencia.setDiadespues("S");
+			} else {
+				scsActuacionasistencia.setDiadespues("S");
+			}
+		}
+	}
+    
+    // Comprueba si el baremo de guardia tiene
+ 	private boolean compruebaFueraGuardia(Short idInstitucion, Integer idTurno, Integer idGuardia) {
+ 		
+ 		try {
+ 			ScsHitofacturableguardiaExample hfg = new ScsHitofacturableguardiaExample();
+ 			hfg.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+ 			.andIdturnoEqualTo(idTurno)
+ 			.andIdguardiaEqualTo(idGuardia);
+ 			
+ 			List<ScsHitofacturableguardia> hitos = scsHitofacturableguardiaExtendsMapper.selectByExample(hfg);
+ 			
+ 			for(ScsHitofacturableguardia hito: hitos) {
+ 				for (String hitoFueraGuardia: SigaConstants.hitosFueraGuardia) {
+ 					if (hito.getIdhito() == Long.parseLong(hitoFueraGuardia)) {
+ 						return true;
+ 					}
+ 				}
+ 			}
+ 		} catch(Exception e) {
+ 			return false;
+ 		}
+ 		
+ 		return false;
+ 	}
+
+ 	private Date reiniciaHoraFecha(Date dia) {
+ 		Calendar calendar = Calendar.getInstance();
+ 		calendar.setTime(dia);
+ 		
+ 		calendar.set(Calendar.HOUR_OF_DAY, 0);
+ 		calendar.set(Calendar.MINUTE, 0);
+ 		calendar.set(Calendar.SECOND, 0);
+ 		calendar.set(Calendar.MILLISECOND, 0);
+ 		
+ 		return calendar.getTime();
+ 	}
+ 	
+ 	private boolean compruebaDiaDespues(Date dia, Date posibleDiaDespues, boolean variosDiasdespues) {
+ 		dia = reiniciaHoraFecha(dia);
+ 		posibleDiaDespues = reiniciaHoraFecha(posibleDiaDespues);
+ 		
+ 		long diferenciaEnMilisegundos = posibleDiaDespues.getTime() - dia.getTime();
+ 		long DiferenciaEnDias = diferenciaEnMilisegundos / (1000 * 60 * 60 * 24);
+ 				
+ 		if (variosDiasdespues) {
+ 			return DiferenciaEnDias >= 1;
+ 		} else {
+ 			return DiferenciaEnDias == 1;
+ 		}
+ 		
+ 	}
+
+	@Override
     public TarjetaJustificacionActuacionAsistenciaDTO searchTarjetaJustificacion(HttpServletRequest request, String anioNumero, String idActuacion) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
