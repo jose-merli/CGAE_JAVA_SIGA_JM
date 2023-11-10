@@ -30,7 +30,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 
 		if (justiciableBusquedaItem.getNombre() != null && justiciableBusquedaItem.getNombre() != "") {
-			if(justiciableBusquedaItem.getModoBusqueda()) {
+			if(justiciableBusquedaItem.isModoBusqueda()) {
 				sql.WHERE(" nombre = '" + justiciableBusquedaItem.getNombre() + "'");
 			} else {
 				String columna = "nombre";
@@ -40,7 +40,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		}
 
 		if (justiciableBusquedaItem.getApellido1() != null && justiciableBusquedaItem.getApellido1() != "") {
-			if(justiciableBusquedaItem.getModoBusqueda()) {
+			if(justiciableBusquedaItem.isModoBusqueda()) {
 				sql.WHERE(" apellido1 = '" + justiciableBusquedaItem.getApellido1() + "'");
 			} else {
 				String columna = "apellido1";
@@ -50,7 +50,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		}
 		
 		if (justiciableBusquedaItem.getApellido2() != null && justiciableBusquedaItem.getApellido2() != "") {
-			if(justiciableBusquedaItem.getModoBusqueda()) {
+			if(justiciableBusquedaItem.isModoBusqueda()) {
 				sql.WHERE(" apellido2 = '" + justiciableBusquedaItem.getApellido2() + "'");
 			} else {
 				String columna = "apellido2";

@@ -169,9 +169,9 @@ public class UtilidadesString {
 	
 	public static String filtroTextoBusquedasPorDerecha(String columna, String cadena) {
 		StringBuilder cadenaWhere = new StringBuilder();
-		cadenaWhere.append(" LOWER( " + columna + ") ");
+		cadenaWhere.append(" " + columna + " ");
 		cadenaWhere.append(" LIKE");
-		cadenaWhere.append(" LOWER('" + cadena + "%') ");
+		cadenaWhere.append(" '" + cadena + "%' ");
 		return cadenaWhere.toString();
 	}
 
