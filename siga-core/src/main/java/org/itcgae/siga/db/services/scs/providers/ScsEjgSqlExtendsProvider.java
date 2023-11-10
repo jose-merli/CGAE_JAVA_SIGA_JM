@@ -1597,17 +1597,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.INNER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = PER.IDPERSONA)");
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION )");
-		if ((item.getIdGuardia() != null && item.getIdGuardia().length > 0)
-				|| (item.getIdTurno() != null && item.getIdTurno().length > 0)) {
-			sql.INNER_JOIN(
-					"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
-		}
 
 		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL TIPOESTADO ON (TIPOESTADO.IDESTADO=ESTADO.IDESTADO)");
 		sql.INNER_JOIN("CEN_INSTITUCION INS ON (INS.IDINSTITUCION=COL.IDINSTITUCION)");
-		sql.LEFT_OUTER_JOIN("scs_inscripcionturno        tur ON ( tur.idinstitucion = col.idinstitucion\r\n"
+		sql.INNER_JOIN("scs_inscripcionturno        tur ON ( tur.idinstitucion = col.idinstitucion\r\n"
 				+ "                                                          AND tur.idpersona = col.idpersona )\r\n");
-		sql.LEFT_OUTER_JOIN("scs_inscripcionguardia      guar ON ( guar.idinstitucion = tur.idinstitucion\r\n"
+		sql.INNER_JOIN("scs_inscripcionguardia      guar ON ( guar.idinstitucion = tur.idinstitucion\r\n"
 				+ "                                                             AND guar.idpersona = tur.idpersona\r\n"
 				+ "                                                             AND guar.idturno = tur.idturno )\r\n");
 		sql.LEFT_OUTER_JOIN(
@@ -1649,10 +1644,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			for (int i = 1; i < item.getIdTurno().length; i++) {
 				inSQL += ", " + item.getIdTurno()[i];
 			}
-			//SIGARNV-3125@DTT.JAMARTIN@15/02/2023@INICIO
-//			sql.WHERE("GUARDIAS.IDTURNO IN  (" + inSQL + ")");
+
 			sql.WHERE("tur.IDTURNO IN  (" + inSQL + ")");
-			//SIGARNV-3125@DTT.JAMARTIN@15/02/2023@FIN 
 		}
 
 		if (item.getIdGuardia() != null && item.getIdGuardia().length > 0) {
@@ -1660,7 +1653,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			for (int i = 1; i < item.getIdGuardia().length; i++) {
 				inSQL += ", " + item.getIdGuardia()[i];
 			}
-			sql.WHERE("GUARDIAS.IDGUARDIA IN (" + inSQL + ")");
+			sql.WHERE("guar.IDGUARDIA IN (" + inSQL + ")");
+			sql.WHERE("guar.fechasolicitudbaja IS NULL");
 		}
 
 		if (item.getNif() != null && !item.getNif().isEmpty()) {
