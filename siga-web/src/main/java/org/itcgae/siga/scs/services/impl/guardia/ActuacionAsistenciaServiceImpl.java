@@ -420,6 +420,11 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         
                         procesaDiaDespuesFueraGuardia(newActuacion, idInstitucion, scsAsistencia);
                         
+                        // Se valida la actuación de  la asistencia
+                        newActuacion.setFechavalidacion(new Date());
+                        newActuacion.setValidada("1");
+                        newActuacion.setUsuvalidacion(usuarios.get(0).getIdusuario());
+                        
                         if(tipoActList != null && tipoActList.isEmpty()) {
                         	ScsTipoactuacion scsTipoactuacionRecord = new ScsTipoactuacion();
                         	scsTipoactuacionRecord.setIdinstitucion(newActuacion.getIdinstitucion());
@@ -507,7 +512,10 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             if(datosGenerales.isDiaDespues()) scsActuacionasistencia.setDiadespues("S");
                             else scsActuacionasistencia.setDiadespues("N");
                             
-                            procesaDiaDespuesFueraGuardia(scsActuacionasistencia, idInstitucion, scsAsistencia);
+                            // Se valida la actuación de  la asistencia
+                            scsActuacionasistencia.setFechavalidacion(new Date());
+                            scsActuacionasistencia.setValidada("1");
+                            scsActuacionasistencia.setUsuvalidacion(usuarios.get(0).getIdusuario());
                             
                             scsActuacionasistencia.setDescripcionbreve(datosGenerales.getDescripcion());
                             scsActuacionasistencia.setObservaciones(datosGenerales.getObservaciones());
@@ -577,7 +585,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
 			if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, false)) {
 				scsActuacionasistencia.setDiadespues("S");
 			} else {
-				scsActuacionasistencia.setDiadespues("S");
+				scsActuacionasistencia.setDiadespues("N");
 			}
 		}
 	}
