@@ -1600,9 +1600,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL TIPOESTADO ON (TIPOESTADO.IDESTADO=ESTADO.IDESTADO)");
 		sql.INNER_JOIN("CEN_INSTITUCION INS ON (INS.IDINSTITUCION=COL.IDINSTITUCION)");
-		sql.INNER_JOIN("scs_inscripcionturno        tur ON ( tur.idinstitucion = col.idinstitucion\r\n"
+		sql.LEFT_OUTER_JOIN("scs_inscripcionturno        tur ON ( tur.idinstitucion = col.idinstitucion\r\n"
 				+ "                                                          AND tur.idpersona = col.idpersona )\r\n");
-		sql.INNER_JOIN("scs_inscripcionguardia      guar ON ( guar.idinstitucion = tur.idinstitucion\r\n"
+		sql.LEFT_OUTER_JOIN("scs_inscripcionguardia      guar ON ( guar.idinstitucion = tur.idinstitucion\r\n"
 				+ "                                                             AND guar.idpersona = tur.idpersona\r\n"
 				+ "                                                             AND guar.idturno = tur.idturno )\r\n");
 		sql.LEFT_OUTER_JOIN(
@@ -1654,8 +1654,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				inSQL += ", " + item.getIdGuardia()[i];
 			}
 			sql.WHERE("guar.IDGUARDIA IN (" + inSQL + ")");
-			sql.WHERE("guar.fechasolicitudbaja IS NULL");
+			
 		}
+		
+		sql.WHERE("guar.fechasolicitudbaja IS NULL");
+		sql.WHERE("tur.fechasolicitudbaja IS NULL");
 
 		if (item.getNif() != null && !item.getNif().isEmpty()) {
 			sql.WHERE("PER.NIFCIF = '" + item.getNif() + "'");
