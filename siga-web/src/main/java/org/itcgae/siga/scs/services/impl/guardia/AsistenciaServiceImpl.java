@@ -1414,48 +1414,30 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * @throws Exception
 	 */
 	@Transactional
-	private void procesarSustitucionGuardia(FiltroAsistenciaItem filtro, Short idInstitucion,
-			HttpServletRequest request) throws SigaExceptions {
-
+	private void procesarSustitucionGuardia(FiltroAsistenciaItem filtro, Short idInstitucion, HttpServletRequest request) throws SigaExceptions {
 		try {
 			if ("S".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
-				String diaGuardia = String
-						.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime());
+				String diaGuardia = String.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime());
 				String[] datos = new String[11];
 				datos[0] = filtro.getIdTurno();
 				datos[1] = filtro.getIdGuardia();
-				datos[2] = diaGuardia; // Fecha
-										// desde
-										// la
-										// que
-										// se
-										// sustituye
+				datos[2] = diaGuardia; // Fecha desde la que se sustituye
 				datos[3] = filtro.getIdLetradoGuardia(); // Letrado al que vamos a sustituir
 				datos[4] = filtro.getIdLetradoManual(); // Letrado que sustituye
-				datos[5] = diaGuardia; // Fecha
-										// de
-										// sustitucion
+				datos[5] = diaGuardia; // Fecha de sustitucion
 				datos[6] = ""; // Comentario
 				datos[7] = filtro.getSalto(); // Salto (S) o compensacion (C) y Salto y compensacion (S/C)
 				datos[8] = scsGuardiasturnoExtendsMapper.getIdCalendarioGuardiasFecha(filtro.getIdTurno(),
 						filtro.getIdGuardia(), idInstitucion.toString(), filtro.getDiaGuardia()); // idCalendario
-				datos[9] = diaGuardia; // Fecha
-										// hasta
-										// la
-										// que
-										// se
-										// sustituye
+				datos[9] = diaGuardia; // Fecha hasta la que se sustituye
 				datos[10] = "True";
 
 				// Sustituimos el que está de guardia por el de la asistencia
 				LOGGER.info("procesarSustitucionGuardia() / Se sustituye letrado de guardia");
-				UpdateResponseDTO updateResponseDTO = guardiasColegiadoServiceImpl.sustituirGuardiaColeg(datos,
-						request);
+				UpdateResponseDTO updateResponseDTO = guardiasColegiadoServiceImpl.sustituirGuardiaColeg(datos, request);
 
-			} else if ("N".equals(filtro.getIsSustituto())
-					&& !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
-				LOGGER.info(
-						"procesarSustitucionGuardia() / Se añade el letrado de la asistencia como refuerzo en la guardia");
+			} else if ("N".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
+				LOGGER.info("procesarSustitucionGuardia() / Se añade el letrado de la asistencia como refuerzo en la guardia");
 				TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = new TarjetaAsistenciaResponseItem();
 				tarjetaAsistenciaResponseItem.setIdTurno(filtro.getIdTurno());
 				tarjetaAsistenciaResponseItem.setIdGuardia(filtro.getIdGuardia());
@@ -1470,10 +1452,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				tarjetaAsistenciaResponseItem.setFechaAsistencia(filtro.getDiaGuardia() + " 00:00");
 				tarjetaAsistenciaResponseItem.setIdLetradoGuardia(filtro.getIdLetradoGuardia());
 				procesaGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion);
-
 			}
 
 		} catch (Exception e) {
+			LOGGER.error("AsistenciaServiceImpl.procesarSustitucionGuardia() - ERROR: " + e.getMessage()); 
 			throw new SigaExceptions(e, "No se han podido procesar las guardias de colegiado, compruebe que no existen facturaciones");
 		}
 	}
@@ -2772,13 +2754,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 
 		} catch (Exception e) {
-			LOGGER.error(
-					"procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, "
-							+ e,
-					e);
-			throw new SigaExceptions(e,
-					"procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, "
-							+ e);
+			LOGGER.error( "procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, " + e, e);
+			throw new SigaExceptions(e, "procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, " + e);
 		}
 
 	}
