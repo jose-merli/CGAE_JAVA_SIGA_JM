@@ -1261,7 +1261,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					actuacionBBDD.setDiadespues("N");
 				}
 			} else {
-				if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, false)) {
+				if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, true)) {
 					actuacionBBDD.setDiadespues("S");
 				} else {
 					actuacionBBDD.setDiadespues("N");
