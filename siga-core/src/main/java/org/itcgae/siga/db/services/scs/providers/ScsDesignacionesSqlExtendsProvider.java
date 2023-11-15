@@ -1930,6 +1930,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			subquery.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
 			subquery.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
 			subquery.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
+			subquery.WHERE("DESIGNALETRADO.IDPERSONA = LET2.IDPERSONA");
 			subquery.WHERE("DESIGNALETRADO.IDTURNO = LET2.IDTURNO");
 			//Se elimina esta condición para que se muestren las actuaciones con fecha anterior a la fecha de designa.			
 			//subquery.WHERE("TRUNC(LET2.FECHADESIGNA) <= act.fecha");
@@ -2098,11 +2099,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                AND ejd.numeroejg = ejg.numero ");
 		sql.append(" WHERE D.IDINSTITUCION = " + idInstitucion);
 
-		if(item.getNumEJG()!=null) {
-			sql.append(" AND ejg.numero = "+item.getNumEJG());
+		if(item.getNumEJG()!=null && !item.getNumEJG().isEmpty()) {
+			sql.append(" AND ejg.numejg = "+item.getNumEJG());
 		}
 		
-		if(item.getAnioEJG()!=null) {
+		if(item.getAnioEJG()!=null && !item.getAnioEJG().isEmpty()) {
 			sql.append(" AND ejg.anio = "+item.getAnioEJG());
 		}
 		
