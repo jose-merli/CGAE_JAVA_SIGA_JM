@@ -8,18 +8,19 @@ public class ScsTipoIngresoSqlExtendsProvider extends ScsTipoingresoSqlProvider{
 	public String getTiposIngresos(String idLenguaje) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("TIPOINGRESO.IDTIPOINGRESO AS IDGRUPO");
-		sql.SELECT("catalogoTIPOINGRESO.descripcion");
-
+		sql.SELECT("f_siga_getrecurso(TIPOINGRESO.descripcion,"+idLenguaje+") DESCRIPCION");
+		
 		sql.FROM("SCS_TIPOINGRESO TIPOINGRESO");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catalogoTIPOINGRESO on catalogoTIPOINGRESO.idrecurso = TIPOINGRESO.DESCRIPCION and catalogoTIPOINGRESO.idlenguaje = "+idLenguaje);
-
+		
 		//sql.WHERE("tiporesolucion.fechabaja is null");
 		sql.WHERE("TIPOINGRESO.fecha_baja is null");
 
-		sql.ORDER_BY("catalogoTIPOINGRESO.descripcion");
-
-		return sql.toString();
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 }

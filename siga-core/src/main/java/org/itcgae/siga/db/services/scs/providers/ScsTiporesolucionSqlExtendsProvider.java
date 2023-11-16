@@ -9,14 +9,12 @@ public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlPro
 	public String getResoluciones(String idLenguaje, String origen) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("tiporesolucion.idtiporesolucion");
-		sql.SELECT("catalogoResolucion.descripcion");
-
+		sql.SELECT("f_siga_getrecurso(tiporesolucion.descripcion,"+idLenguaje+") DESCRIPCION");
+		
 		sql.FROM("SCS_TIPORESOLUCION tiporesolucion");
-		sql.INNER_JOIN(
-				"GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = "
-						+ idLenguaje);
 
 		sql.WHERE("tiporesolucion.fechabaja is null");
 		sql.WHERE("tiporesolucion.fecha_baja is null");
@@ -24,26 +22,28 @@ public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlPro
 			sql.WHERE("tiporesolucion.idtiporesolucion <> 12");
 		}
 
-		sql.ORDER_BY("catalogoResolucion.descripcion");
-		return sql.toString();
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 	public String getResoluciones2(String idLenguaje) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("tiporesolucion.idtiporesolucion");
-		sql.SELECT("catalogoResolucion.descripcion");
-
+		sql.SELECT("f_siga_getrecurso(tiporesolucion.descripcion,"+idLenguaje+") DESCRIPCION");
+		
 		sql.FROM("SCS_TIPORESOLUCION tiporesolucion");
-		sql.INNER_JOIN(
-				"GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = "
-						+ idLenguaje);
 
 		sql.WHERE("tiporesolucion.fechabaja is null");
 		sql.WHERE("tiporesolucion.fecha_baja is null");
 
-		sql.ORDER_BY("catalogoResolucion.descripcion");
-		return sql.toString();
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 }

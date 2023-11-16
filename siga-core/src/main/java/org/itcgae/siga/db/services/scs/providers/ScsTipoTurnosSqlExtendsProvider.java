@@ -8,13 +8,15 @@ public class ScsTipoTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 	public String comboTipoTurnos(String idLenguaje) {
 
 		SQL sql = new SQL();
-
-		sql.SELECT("SCS_TIPOTURNO.IDTIPOTURNO, GEN_RECURSOS_CATALOGOS.DESCRIPCION");
+		SQL sqlfinal = new SQL();
+		sql.SELECT("SCS_TIPOTURNO.IDTIPOTURNO, f_siga_getrecurso(SCS_TIPOTURNO.DESCRIPCION,"+idLenguaje+") DESCRIPCION");
 		sql.FROM("SCS_TIPOTURNO");
-		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS ON SCS_TIPOTURNO.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO");
-		sql.WHERE("SCS_TIPOTURNO.FECHA_BAJA IS NULL AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE ='"+idLenguaje+"'");
-		sql.ORDER_BY("GEN_RECURSOS_CATALOGOS.DESCRIPCION");
-		return sql.toString();
+		sql.WHERE("SCS_TIPOTURNO.FECHA_BAJA IS NULL");
+		
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 
 

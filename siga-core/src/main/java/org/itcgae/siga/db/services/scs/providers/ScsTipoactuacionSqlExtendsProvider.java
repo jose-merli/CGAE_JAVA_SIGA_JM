@@ -8,48 +8,48 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 	public String getComboActuacion(String idTipoAsistencia, String idLenguaje, Short idInstitucion) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("tipoactuacion.idtipoactuacion");
-		sql.SELECT("actuades.descripcion");
+		sql.SELECT("f_siga_getrecurso(tipoactuacion.descripcion,"+idLenguaje+") DESCRIPCION");
 		sql.FROM("SCS_TIPOACTUACION tipoactuacion");
-		sql.INNER_JOIN("gen_recursos_catalogos actuades on actuades.IDRECURSO = tipoactuacion.descripcion and actuades.idlenguaje = '" + idLenguaje + "'" );
 		sql.WHERE("tipoactuacion.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("tipoactuacion.idtipoasistencia = '" + idTipoAsistencia + "'");
-		sql.ORDER_BY("actuades.descripcion");
 
-		return sql.toString();
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 	
 	public String searchTiposActuacion(boolean historico, String idLenguaje, Short idInstitucion) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("ACTUACION.idinstitucion");
 		sql.SELECT("ACTUACION.IDTIPOACTUACION");
 		sql.SELECT("ACTUACION.importe");
 		sql.SELECT("ACTUACION.importemaximo");
 		sql.SELECT("ACTUACION.comisariajuzgadopordefecto");
 		sql.SELECT("to_date(ACTUACION.fechabaja,'DD/MM/RRRR') as fechabaja ");
-		sql.SELECT("cat.descripcion as DESCRIPCIONTIPOACTUACION");
-		sql.SELECT("LISTAGG(catasis.descripcion, ', ') WITHIN GROUP (ORDER BY ACTUACION.IDTIPOACTUACION)  AS DESCRIPCIONTIPOASISTENCIA");
+		sql.SELECT("f_siga_getrecurso(ACTUACION.descripcion,"+idLenguaje+") DESCRIPCIONTIPOACTUACION");
+		sql.SELECT("LISTAGG(f_siga_getrecurso(asis.descripcion,"+idLenguaje+"), ', ') WITHIN GROUP (ORDER BY ACTUACION.IDTIPOACTUACION)  AS DESCRIPCIONTIPOASISTENCIA");
 		sql.SELECT("LISTAGG(ACTUACION.idtipoasistencia, ', ') WITHIN GROUP (ORDER BY ACTUACION.IDTIPOACTUACION)  AS IDTIPOASISTENCIA");
-	
 		sql.FROM("SCS_TIPOACTUACION ACTUACION");
 		sql.INNER_JOIN(
-				"GEN_RECURSOS_CATALOGOS cat on (cat.idrecurso = ACTUACION.descripcion and cat.idlenguaje = '"+idLenguaje+"' AND cat.NOMBRETABLA = 'SCS_TIPOACTUACION' AND CAT.IDINSTITUCION = ACTUACION.IDINSTITUCION)");
-		sql.INNER_JOIN(
 				"SCS_TIPOASISTENCIACOLEGIO asis on asis.idtipoasistenciacolegio = ACTUACION.idtipoasistenciA and asis.idinstitucion = ACTUACION.idinstitucion");
-		sql.INNER_JOIN(
-				"GEN_RECURSOS_CATALOGOS catasis on (catasis.idrecurso = asis.descripcion and catasis.idlenguaje = '"+idLenguaje+"')");
 		sql.WHERE("ACTUACION.IDINSTITUCION = '"+idInstitucion+"'");
 		if(!historico) {
 			sql.WHERE("ACTUACION.FECHABAJA IS NULL");
 		}
 		sql.GROUP_BY("ACTUACION.idinstitucion, ACTUACION.IDTIPOACTUACION, ACTUACION.importe, ACTUACION.importemaximo,actuacion.comisariajuzgadopordefecto, to_date(ACTUACION.fechabaja,'DD/MM/RRRR'), cat.descripcion");
-		sql.ORDER_BY("cat.descripcion");
 
-		return sql.toString();
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 	public String searchTipoActuacionPorDefecto(String idLenguaje, Short idInstitucion, String descripcionTipoAsistencia, String juzgadoComisaria) {
