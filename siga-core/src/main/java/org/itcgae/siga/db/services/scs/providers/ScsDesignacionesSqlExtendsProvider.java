@@ -3049,6 +3049,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 				sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 				sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
+			} else {
+				sql.SET("FECHAJUSTIFICACION = SYSDATE");
+				sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
+				sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
 			}
 		}else {
 			sql.SET("FECHAVALIDACION = NULL");
