@@ -534,7 +534,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 				+ "	AND scs_turno.IDINSTITUCION = scs_guardiasturno.IDINSTITUCION");
 		if(!tipoGuardiaVacia) {
 		sql.JOIN("SCS_TIPOSGUARDIAS ON\r\n" + "	SCS_TIPOSGUARDIAS.IDTIPOGUARDIA = SCS_GUARDIASTURNO.IDTIPOGUARDIA");
-		sql.JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS ON\r\n" + "	SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO");
 		}
 

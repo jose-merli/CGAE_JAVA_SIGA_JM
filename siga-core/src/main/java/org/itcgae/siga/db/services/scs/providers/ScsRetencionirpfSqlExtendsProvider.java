@@ -22,7 +22,7 @@ public class ScsRetencionirpfSqlExtendsProvider extends ScsMaestroretencionesSql
 		
 		sql.FROM("SCS_MAESTRORETENCIONES ret");
 		
-		sql.INNER_JOIN("gen_recursos_catalogos cat on ret.descripcion = cat.idrecurso and cat.idlenguaje = "+idLenguaje);
+		sql.LEFT_OUTER_JOIN("gen_recursos_catalogos cat on ret.descripcion = cat.idrecurso and cat.idlenguaje = "+idLenguaje);
 		sql.LEFT_OUTER_JOIN("cen_tiposociedad soc on soc.letracif = ret.letranifsociedad");
 		sql.LEFT_OUTER_JOIN("gen_recursos_catalogos cats on cats.idrecurso = soc.descripcion and cats.idlenguaje ="+idLenguaje);
 //		sql.WHERE("cat.idinstitucion = '" + retencionItem.getIdInstituxcion() + "'");

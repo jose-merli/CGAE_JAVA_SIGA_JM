@@ -68,11 +68,11 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		sql.SELECT("LISTAGG(ACTUACION.idtipoasistencia, ', ') WITHIN GROUP (ORDER BY ACTUACION.IDTIPOACTUACION)  AS IDTIPOASISTENCIA");
 	
 		sql.FROM("SCS_TIPOACTUACION ACTUACION");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS cat on (cat.idrecurso = ACTUACION.descripcion and cat.idlenguaje = '"+idLenguaje+"' AND cat.NOMBRETABLA = 'SCS_TIPOACTUACION' AND CAT.IDINSTITUCION = ACTUACION.IDINSTITUCION)");
 		sql.INNER_JOIN(
 				"SCS_TIPOASISTENCIACOLEGIO asis on asis.idtipoasistenciacolegio = ACTUACION.idtipoasistenciA and asis.idinstitucion = ACTUACION.idinstitucion");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS catasis on (catasis.idrecurso = asis.descripcion and catasis.idlenguaje = '"+idLenguaje+"')");
 		sql.WHERE("ACTUACION.IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("ACTUACION.FECHABAJA IS NULL");
@@ -101,11 +101,11 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		sql.SELECT("LISTAGG(ACTUACION.idtipoasistencia, ', ') WITHIN GROUP (ORDER BY ACTUACION.IDTIPOACTUACION)  AS IDTIPOASISTENCIA");
 	
 		sql.FROM("SCS_TIPOACTUACION ACTUACION");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS cat on (cat.idrecurso = ACTUACION.descripcion and cat.idlenguaje = '"+idLenguaje+"' AND cat.NOMBRETABLA = 'SCS_TIPOACTUACION' AND CAT.IDINSTITUCION = ACTUACION.IDINSTITUCION)");
 		sql.INNER_JOIN(
 				"SCS_TIPOASISTENCIACOLEGIO asis on asis.idtipoasistenciacolegio = ACTUACION.idtipoasistenciA and asis.idinstitucion = ACTUACION.idinstitucion");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS catasis on (catasis.idrecurso = asis.descripcion and catasis.idlenguaje = '"+idLenguaje+"')");
 		sql.WHERE("ACTUACION.IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("ACTUACION.FECHABAJA IS NULL");
@@ -120,14 +120,18 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 	public String getTiposAsistencia(String idLenguaje,Short idInstitucion) {
 
 		SQL sql = new SQL();
-
-		sql.SELECT("IDTIPOASISTENCIACOLEGIO, CAT.DESCRIPCION");
+		SQL sqlfinal = new SQL();
+		
+		sql.SELECT("IDTIPOASISTENCIACOLEGIO");
+		sql.SELECT("f_siga_getrecurso(asis.descripcion,"+idLenguaje+") DESCRIPCION");
 		sql.FROM("SCS_TIPOASISTENCIACOLEGIO asis");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat on (cat.idrecurso = asis.descripcion and cat.idlenguaje = '"+idLenguaje+"')");
 		sql.WHERE("ASIS.IDINSTITUCION ='"+idInstitucion+"'");
 		sql.WHERE("FECHA_BAJA IS NULL");
 
-		return sql.toString();
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 	public String getIdTipoactuacion(Short idInstitucion) {

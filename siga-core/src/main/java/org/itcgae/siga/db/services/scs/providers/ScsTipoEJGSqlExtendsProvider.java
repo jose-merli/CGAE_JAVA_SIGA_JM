@@ -8,17 +8,17 @@ public class ScsTipoEJGSqlExtendsProvider extends ScsTipoejgSqlProvider {
 	public String comboTipoEjg(Short idLenguaje) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("tipoejg.IDTIPOEJG");
-		sql.SELECT("cat.descripcion");
+		sql.SELECT("f_siga_getrecurso(tipoejg.descripcion,"+idLenguaje+") DESCRIPCION");
 		sql.FROM("SCS_TIPOEJG tipoejg");
-		sql.INNER_JOIN(
-				"gen_recursos_catalogos cat on cat.IDRECURSO = tipoejg.descripcion and cat.idlenguaje = '"
-						+ idLenguaje + "'");
 		sql.WHERE("tipoejg.fecha_baja is null");
-		sql.ORDER_BY("cat.descripcion");
-
-		return sql.toString();
+		
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 }

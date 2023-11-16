@@ -21,7 +21,7 @@ public class ScsJuzgadoprocedimientoSqlExtendsProvider extends ScsJuzgadoprocedi
 		sql.FROM("SCS_JUZGADOPROCEDIMIENTO procedimiento");
 		sql.INNER_JOIN("SCS_PROCEDIMIENTOS proc on proc.idprocedimiento = procedimiento.idprocedimiento and procedimiento.idinstitucion = proc.idinstitucion");
 		sql.INNER_JOIN("SCS_JURISDICCION jurisdiccion on jurisdiccion.IDJURISDICCION =  proc.IDJURISDICCION");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS juris on (juris.idrecurso = jurisdiccion.DESCRIPCION and idlenguaje = '" + idLenguaje + "')");;
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS juris on (juris.idrecurso = jurisdiccion.DESCRIPCION and idlenguaje = '" + idLenguaje + "')");;
 		
 		sql.WHERE("proc.idinstitucion = '" + idInstitucion + "'");
 		
