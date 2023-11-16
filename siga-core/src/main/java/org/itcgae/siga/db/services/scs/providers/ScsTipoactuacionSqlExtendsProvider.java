@@ -17,7 +17,7 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		sql.WHERE("tipoactuacion.idtipoasistencia = '" + idTipoAsistencia + "'");
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}
@@ -47,7 +47,7 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		sql.GROUP_BY("ACTUACION.idinstitucion, ACTUACION.IDTIPOACTUACION, ACTUACION.importe, ACTUACION.importemaximo,actuacion.comisariajuzgadopordefecto, to_date(ACTUACION.fechabaja,'DD/MM/RRRR'), cat.descripcion");
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}
@@ -129,7 +129,7 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		sql.WHERE("FECHA_BAJA IS NULL");
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}

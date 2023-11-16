@@ -20,7 +20,7 @@ public class ScsTipodictamenejgSqlExtendsProvider extends ScsTipodictamenejgSqlP
 		sql.WHERE("tipodictamen.idinstitucion = "+idInstitucion);
 		
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}

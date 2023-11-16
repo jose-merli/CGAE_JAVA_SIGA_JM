@@ -16,7 +16,7 @@ public class ScsTipoasistenciaColegioSqlExtendsProvider extends ScsTipoasistenci
 		sql.FROM("SCS_TIPOASISTENCIA tipoasistencia");
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}
@@ -32,7 +32,7 @@ public class ScsTipoasistenciaColegioSqlExtendsProvider extends ScsTipoasistenci
 		sql.WHERE("FECHA_BAJA IS NULL");
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}

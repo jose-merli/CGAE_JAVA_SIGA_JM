@@ -23,7 +23,7 @@ public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlPro
 		}
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}
@@ -42,7 +42,7 @@ public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlPro
 		sql.WHERE("tiporesolucion.fecha_baja is null");
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}

@@ -20,7 +20,7 @@ public class ScsParentescoSqlExtendsProvider extends ScsParentescoSqlProvider {
 		sql.WHERE("PARENTESCO.idinstitucion = "+idInstitucion);
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}

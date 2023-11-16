@@ -16,7 +16,7 @@ public class ScsRenunciaSqlExtendsProvider extends ScsRenunciaSqlProvider{
 		sql.WHERE("renuncia.fecha_baja is null");
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}

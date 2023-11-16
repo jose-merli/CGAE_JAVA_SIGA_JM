@@ -20,7 +20,7 @@ public class ScsTipoGrupoLaboralSqlExtendsProvider extends ScsTipogrupolaboralSq
 		sql.WHERE("tipoGRUPOLAB.idinstitucion ="+idInstitucion);
 
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}

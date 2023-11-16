@@ -16,7 +16,7 @@ public class ScsTiposGuardiasSqlExtendsProvider extends ScsTiposguardiasSqlProvi
 		sql.WHERE("SCS_TIPOSGUARDIAS.FECHA_BAJA IS NULL");
 		
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}
