@@ -790,7 +790,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
 						sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
 					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA " + ejgItem.getIdGuardia());
+						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA =" + ejgItem.getIdGuardia());
 				} else if (ejgItem.getTipoLetrado().equals("D")) {
 
 					// letrado designas
@@ -882,6 +882,13 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			}
 			sql.INNER_JOIN("SCS_EEJG_XML EXML " + "ON PET.IDPETICION = EXML.IDPETICION ");
 			sql.WHERE("EXML.IDXML IS NOT NULL");
+		}
+		
+		if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDTURNO =")) {
+			sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+		}
+		if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDGUARDIA =")) {
+			sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
 		}
 
 		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
