@@ -821,7 +821,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
 						}
 
-						if (result != null && result.size() > 0 && result.get(0) != null) {
+						if (!esEnvio || (esEnvio && (result != null && result.size() > 0 && result.get(0) != null))) {
 							LOGGER.info("Se han obtenido " + result.size() + " destinatarios");
 
 							for (Map<String, Object> dest : result) {
