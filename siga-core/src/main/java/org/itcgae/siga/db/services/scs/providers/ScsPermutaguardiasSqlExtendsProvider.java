@@ -121,9 +121,12 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         
         sql.FROM("SCS_PERMUTAGUARDIAS sp");
 
+//        sql.JOIN("scs_turno turno ON\r\n"
+//        		+ "	turno.idinstitucion = sp.idinstitucion\r\n"
+//        		+ "	AND (turno.idturno = sp.IDTURNO_SOLICITANTE OR turno.idturno = sp.IDTURNO_CONFIRMADOR)");
         sql.JOIN("scs_turno turno ON\r\n"
-        		+ "	turno.idinstitucion = sp.idinstitucion\r\n"
-        		+ "	AND (turno.idturno = sp.IDTURNO_SOLICITANTE OR turno.idturno = sp.IDTURNO_CONFIRMADOR)");
+                + "	turno.idinstitucion = sp.idinstitucion\r\n"
+                + "	AND turno.idturno = sp.IDTURNO_CONFIRMADOR");
         sql.JOIN("scs_guardiasturno guardia ON\r\n"
         		+ "	guardia.idinstitucion = sp.idinstitucion\r\n"
         		+ "	AND (guardia.idguardia = sp.IDGUARDIA_SOLICITANTE OR guardia.idguardia = sp.IDGUARDIA_SOLICITANTE)");
