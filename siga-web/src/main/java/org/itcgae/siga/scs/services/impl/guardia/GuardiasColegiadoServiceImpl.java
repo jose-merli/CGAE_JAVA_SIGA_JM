@@ -15,11 +15,13 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ActuacionAsistenciaItem;
 import org.itcgae.siga.DTOs.scs.ComboGuardiasFuturasDTO;
 import org.itcgae.siga.DTOs.scs.ComboGuardiasFuturasItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
@@ -41,6 +43,8 @@ import org.itcgae.siga.db.entities.FcsFactApunte;
 import org.itcgae.siga.db.entities.FcsFactApunteExample;
 import org.itcgae.siga.db.entities.FcsFactApunteKey;
 import org.itcgae.siga.db.entities.FcsFactGuardiascolegiadoExample;
+import org.itcgae.siga.db.entities.ScsActuacionasistencia;
+import org.itcgae.siga.db.entities.ScsActuacionasistenciaKey;
 import org.itcgae.siga.db.entities.ScsAsistencia;
 import org.itcgae.siga.db.entities.ScsAsistenciaExample;
 import org.itcgae.siga.db.entities.ScsCabeceraguardias;
@@ -58,11 +62,13 @@ import org.itcgae.siga.db.entities.ScsPermutaguardiasKey;
 import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
 import org.itcgae.siga.db.mappers.FcsFactApunteMapper;
 import org.itcgae.siga.db.mappers.FcsFactGuardiascolegiadoMapper;
+import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsCalendarioguardiasMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaCabeceraMapper;
 import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsCabeceraguardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiascolegiadoExtendsMapper;
@@ -90,12 +96,18 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Autowired
 	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
 
 	@Autowired
 	private ScsSubzonapartidoExtendsMapper scsSubzonapartidoExtendsMapper;
+	
+	@Autowired
+	private ScsActuacionasistenciaMapper scsActuacionasistenciaMapper;
 
 	@Autowired
 	private ScsCabeceraguardiasExtendsMapper scsCabeceraguardiasExtendsMapper;
@@ -1168,6 +1180,8 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 		}
 
 		if (moverAsistencias) {
+			
+			String letradoOriginal = obtenerNombreCompletoLetrado(newLetrado.toString(), idInstitucion);
 			//-------------------------------------------------------------------------------------------------
 			// Actualizamos la tabla de asistencias cambiando en dicha tabla el idpersona del saliente por el
 			//idpersona del entrante. Actualizamos aquellas asistencias para las que la fecha de realizacion sea
@@ -1182,13 +1196,42 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 			List<ScsAsistencia> asistencias = scsAsistenciaExtendsMapper.selectByExample(asistenciasExample);
 			for (ScsAsistencia asistencia: asistencias) {
+				String anio = asistencia.getAnio().toString();
+				String numero = asistencia.getNumero().toString();
+				
 				asistencia.setIdpersonacolegiado(newLetrado);
 				scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+				
+				List<ActuacionAsistenciaItem> actuaciones = scsAsistenciaExtendsMapper.searchActuaciones(anio, numero, idInstitucion, 1, "S");
+				
+				for (ActuacionAsistenciaItem actuacion: actuaciones) {
+
+					ScsActuacionasistenciaKey scsActuacionasistenciaKey = new ScsActuacionasistenciaKey();
+					scsActuacionasistenciaKey.setIdinstitucion(idInstitucion);
+					scsActuacionasistenciaKey.setAnio(Short.valueOf(anio));
+					scsActuacionasistenciaKey.setNumero(Long.valueOf(numero));
+					scsActuacionasistenciaKey.setIdactuacion(Long.valueOf(actuacion.getIdActuacion()));
+					ScsActuacionasistencia actuacionItem = scsActuacionasistenciaMapper.selectByPrimaryKey(scsActuacionasistenciaKey);
+
+					actuacionItem.setObservaciones("La guardia ha pasado al letrado " + letradoOriginal);
+					
+					scsActuacionasistenciaMapper.updateByPrimaryKeySelective(actuacionItem);
+				}
 			}
 
 			cabeceraGuardiaSaliente.setFechavalidacion(new Date());
 			scsCabeceraguardiasExtendsMapper.validarSolicitudGuardia(cabeceraGuardiaSaliente);
 		}
+	}
+	
+	private String obtenerNombreCompletoLetrado(String idLetrado, Short idInstitucion) {
+		String nombreCompleto = "";
+		FichaPersonaItem fichaPersonaItem;
+		
+		fichaPersonaItem = cenPersonaExtendsMapper.getColegiadoByIdPersona(idLetrado, idInstitucion);
+		
+		nombreCompleto = fichaPersonaItem.getApellido1() + " " + fichaPersonaItem.getApellido2() + ", " +  fichaPersonaItem.getNombre();
+		return nombreCompleto;
 	}
 
 	@Override
