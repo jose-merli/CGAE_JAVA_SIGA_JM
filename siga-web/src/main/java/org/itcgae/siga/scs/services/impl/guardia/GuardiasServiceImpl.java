@@ -961,6 +961,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 								&& Short.valueOf(guardiasItem.getFiltros().split(",")[4]) != 0) {
 							resetGrupos = true;
 						}
+						
+						if (colas.get(0).getOrdenacionmanual() != 0) {
+							resetGrupos = true;
+						}
+						
 						guardia.setPorgrupos((Boolean.valueOf(guardiasItem.getPorGrupos()) ? "1" : "0"));
 						guardia.setIdordenacioncolas(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
 						// ROTAR COMPONENTES?
