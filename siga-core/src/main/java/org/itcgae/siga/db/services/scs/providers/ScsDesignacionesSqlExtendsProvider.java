@@ -2078,7 +2078,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
 
 		}else {
-			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO ");
+			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO, DL.IDPERSONA ");
 		
 		}
 		
@@ -2101,6 +2101,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if(item.getNumEJG()!=null && !item.getNumEJG().isEmpty()) {
 			sql.append(" AND ejg.numejg = "+item.getNumEJG());
+		}
+		if (imprimir) {
+			if(item.isMuestraPendiente()) {
+				sql.append(" AND D.ESTADO <> 'F' ");
+				sql.append(" AND D.ESTADO <> 'A' ");
+	
+			}
 		}
 		
 		if(item.getAnioEJG()!=null && !item.getAnioEJG().isEmpty()) {
