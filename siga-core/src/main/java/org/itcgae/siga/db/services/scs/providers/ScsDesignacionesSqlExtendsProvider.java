@@ -1236,7 +1236,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sqlDefendidos.SELECT("NVL(PER.APELLIDO1, '') || ' ' || NVL(PER.APELLIDO2, '') || ', ' || NVL(PER.NOMBRE, '')");
 		sqlDefendidos.FROM("scs_defendidosdesigna ded");
 		sqlDefendidos.JOIN("scs_personajg per ON ded.idinstitucion = per.idinstitucion	AND ded.idpersona = per.idpersona");
-		sqlDefendidos.WHERE("calidad IS NOT NULL");
+		//sqlDefendidos.WHERE("calidad IS NOT NULL");
 		sqlDefendidos.WHERE("ded.anio = des.anio");
 		sqlDefendidos.WHERE("ded.numero = des.numero");
 		sqlDefendidos.WHERE("ded.idinstitucion = des.idinstitucion");
