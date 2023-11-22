@@ -1665,7 +1665,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 		
 		sql.WHERE("guar.fechasolicitudbaja IS NULL");
+		sql.WHERE("guar.fechadenegacion IS NULL");
 		sql.WHERE("tur.fechasolicitudbaja IS NULL");
+		sql.WHERE("tur.fechadenegacion IS NULL");
 
 		if (item.getNif() != null && !item.getNif().isEmpty()) {
 			sql.WHERE("PER.NIFCIF = '" + item.getNif() + "'");
