@@ -654,7 +654,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 			if(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR)!=null && !hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("") &&
 				!hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("dd/mm/yyyy") && !hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("Requerido")){
 				try {
-					cargaMasivaDatosPDItem.setFechaDesignaProcurador(new SimpleDateFormat("dd-MM-yyyy").parse(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString()));
+					cargaMasivaDatosPDItem.setFechaDesignaProcurador(new SimpleDateFormat("dd/MM/yyyy").parse(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString()));
 				} catch (ParseException e1) {
 					errorLinea.append("Fecha de designacion de procurador mal introducida. Debe ser dd/mm/yyyy. ");
 				}
