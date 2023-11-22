@@ -1383,7 +1383,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("ejg.idinstitucion, ejg.anio, ejg.numejg numero, ( 'E' || ejg.anio || '/' || ejg.numejg) asunto,"
+		sql.SELECT("ejg.idinstitucion, ejg.anio, ejg.numero numero, ( 'E' || ejg.anio || '/' || ejg.numejg) asunto,"
 				+ "(nvl(t.abreviatura,'') || '/' || nvl(g.nombre,'')) turnoguardia,ejg.idtipoejg,"
 				+ "f_siga_getrecurso(nvl(te.descripcion,'')," + idLenguaje + ") tipoejg,"
 				+ "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
