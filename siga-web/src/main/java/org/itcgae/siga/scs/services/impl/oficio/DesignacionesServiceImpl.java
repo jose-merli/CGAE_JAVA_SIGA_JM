@@ -563,11 +563,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								}
 							}
 							
-							if (!existePdte && ("A".equals(record.getEstado())
-									|| "F".equals(record.getEstado())
-									|| porcentajeTotal >= 100)) {
+							if ("A".equals(record.getEstado()) || "F".equals(record.getEstado()) || (!existePdte && porcentajeTotal >= 100)) {
 								it.remove();
 							}
+							
+//							if (!existePdte && ("A".equals(record.getEstado())
+//									|| "F".equals(record.getEstado())
+//									|| porcentajeTotal >= 100)) {
+//								it.remove();
+//							}
 						}
 						
 						

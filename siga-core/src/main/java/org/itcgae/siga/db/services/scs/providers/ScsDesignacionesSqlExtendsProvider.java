@@ -1236,7 +1236,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sqlDefendidos.SELECT("NVL(PER.APELLIDO1, '') || ' ' || NVL(PER.APELLIDO2, '') || ', ' || NVL(PER.NOMBRE, '')");
 		sqlDefendidos.FROM("scs_defendidosdesigna ded");
 		sqlDefendidos.JOIN("scs_personajg per ON ded.idinstitucion = per.idinstitucion	AND ded.idpersona = per.idpersona");
-		sqlDefendidos.WHERE("calidad IS NOT NULL");
+		//sqlDefendidos.WHERE("calidad IS NOT NULL");
 		sqlDefendidos.WHERE("ded.anio = des.anio");
 		sqlDefendidos.WHERE("ded.numero = des.numero");
 		sqlDefendidos.WHERE("ded.idinstitucion = des.idinstitucion");
@@ -2078,7 +2078,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
 
 		}else {
-			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO ");
+			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO, DL.IDPERSONA ");
 		
 		}
 		
@@ -2101,6 +2101,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if(item.getNumEJG()!=null && !item.getNumEJG().isEmpty()) {
 			sql.append(" AND ejg.numejg = "+item.getNumEJG());
+		}
+		if (imprimir) {
+			if(item.isMuestraPendiente()) {
+				sql.append(" AND D.ESTADO <> 'F' ");
+				sql.append(" AND D.ESTADO <> 'A' ");
+	
+			}
 		}
 		
 		if(item.getAnioEJG()!=null && !item.getAnioEJG().isEmpty()) {
@@ -3045,7 +3052,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SET("FECHAVALIDACION = SYSDATE");
 			sql.SET("USUVALIDACION = '" + usuario.getIdusuario() + "'");
 			
-			if (UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
+			if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
 				sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 				sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 				sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");

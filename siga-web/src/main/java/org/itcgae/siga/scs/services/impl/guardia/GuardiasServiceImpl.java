@@ -957,10 +957,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 						// Esto sirve para ver si habrá que generar grupos automaticamente despues de
 						// updatear
 						resetGrupos = false;
-						if ((item.get(0).getPorgrupos().equals("1") || colas.get(0).getOrdenacionmanual() == 0)
+						if (("1".equals(item.get(0).getPorgrupos()) || colas.get(0).getOrdenacionmanual() == 0)
 								&& Short.valueOf(guardiasItem.getFiltros().split(",")[4]) != 0) {
 							resetGrupos = true;
 						}
+						
+						if (colas.get(0).getOrdenacionmanual() != 0) {
+							resetGrupos = true;
+						}
+						
 						guardia.setPorgrupos((Boolean.valueOf(guardiasItem.getPorGrupos()) ? "1" : "0"));
 						guardia.setIdordenacioncolas(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
 						// ROTAR COMPONENTES?
@@ -1465,8 +1470,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					String ultimo = "";
 
 					if (guardias != null && !guardias.isEmpty())
-						ultimo = guardias.get(0).getIdpersonaUltimo() == null ? ""
-								: guardias.get(0).getIdpersonaUltimo().toString();
+						ultimo = guardias.get(0).getIdpersonaUltimo() == null ? "" : guardias.get(0).getIdpersonaUltimo().toString();
 
 
 					ScsOrdenacioncolasExample example2 = new ScsOrdenacioncolasExample();
@@ -1563,14 +1567,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 					String porGrupos = guardiasItem.getPorGrupos();
 					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
 							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
-							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
+							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos.equals("1"));
 					// cuando marcamos orden = manual por primera vez
-					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos == "1") {
+					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && "1".equals(porGrupos)) {
 						int j = 1;
 						for (int x = 0; x < colaGuardia.size(); x++) {
 							// rellenar todos los numero grupo y orden
 							if (colaGuardia.get(x).getNumeroGrupo() == null
-									|| colaGuardia.get(x).getNumeroGrupo().equals("null")) {
+									|| "null".equals(colaGuardia.get(x).getNumeroGrupo().toLowerCase())) {
 
 								colaGuardia.get(x).setNumeroGrupo(String.valueOf(x + 1));
 								j++;
@@ -1578,12 +1582,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 							}
 						}
 
-					} else if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos != "1") {
+					} else if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && !"1".equals(porGrupos)) {
 						int j = colaGuardia.size();
 						for (int x = 0; x < colaGuardia.size(); x++) {
 							// rellenar todos los numero grupo y orden
 							if (colaGuardia.get(x).getNumeroGrupo() == null
-									|| colaGuardia.get(x).getNumeroGrupo().equals("null")) {
+									|| "null".equals(colaGuardia.get(x).getNumeroGrupo().toLowerCase())) {
 								
 								colaGuardia.get(x).setNumeroGrupo(String.valueOf(j));
 								colaGuardia.get(x).setOrden("1");
@@ -1615,8 +1619,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 							}
 							
 						}
-						if (porGrupos == "1" && (colaGuardia.get(y).getNumeroGrupo() == null
-								|| "null".equals(colaGuardia.get(y).getNumeroGrupo()))) {
+						if ("1".equals(porGrupos) && (colaGuardia.get(y).getNumeroGrupo() == null
+								|| "null".equals(colaGuardia.get(y).getNumeroGrupo().toLowerCase()))) {
 							needToRemove.add(colaGuardia.get(y)); // remove after
 							colaGuardiaNulos.add(colaGuardia.get(y));
 						}
@@ -1633,12 +1637,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 					colaGuardia.addAll(colaGuardiaHS2);
 					
 					colaGuardia.addAll(colaGuardiaNulos);
-					// reordenamos
 					
-					//Vamos a modificar los número de orden
+					// Reordenamos vamos a modificar los número de orden
 					Integer orden = 1;
 					for (InscripcionGuardiaItem cG : colaGuardia) {
-						if(porGrupos != "1") {
+						if("1".equals(porGrupos)) {
 							cG.setOrdenCola(orden.toString());
 							orden++;
 						}
@@ -1668,7 +1671,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						List<InscripcionGuardiaItem> todaColaGuardia = scsInscripcionguardiaExtendsMapper
 								.getColaGuardias(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), strDate,
-										ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
+										ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, "1".equals(porGrupos));
 						// Obtenemos el ultimo id generado en los grupos
 						ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
 						grupoGuardiaExample.createCriteria()
@@ -1776,10 +1779,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}if(!isOrdenacionManual){ 
 						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
 								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
-								idInstitucion.toString(), grupoUltimo, porGrupos == "1");
+								idInstitucion.toString(), grupoUltimo, "1".equals(porGrupos));
 						for (int i = 0; i < colaGuardia.size(); i++) {
 							if (colaGuardia.get(i).getNumeroGrupo() == null
-									|| colaGuardia.get(i).getNumeroGrupo() == "null") {
+									|| "null".equals(colaGuardia.get(i).getNumeroGrupo().toLowerCase())) {
 								colaGuardia.remove(i);
 							}
 						}
@@ -2123,7 +2126,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						for (int i = 0; i < inscripcionesGrupoNuevo.size(); i++) {
 							if (inscripcionesGrupoNuevo.get(i).getNumeroGrupo() == null
-									|| inscripcionesGrupoNuevo.get(i).getNumeroGrupo().equals("")) {
+									|| "".equals(inscripcionesGrupoNuevo.get(i).getNumeroGrupo())) {
 								Long idGGC = null;
 								if (inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado() != null) {
 									idGGC = Long.valueOf(inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado());
@@ -3430,7 +3433,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						try {
 							String respuestaAlEliminar = this.deleteByIdProgramacionCalendarios(listaNum.get(i), listDeleteCalBody, idInstitucion,
 									usuarios);
-							if ( respuestaAlEliminar == "") // si es vacio la respuesta, fue todo bien
+							if ( "".equals(respuestaAlEliminar)) // si es vacio la respuesta, fue todo bien
 								response++;
 							else
 								erroresRespuesta.add(respuestaAlEliminar);
@@ -5791,7 +5794,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.info(new String[] { "*INICIO generacion",
 						guardia.getNombre() + " (" + fechaInicio1 + " - " + fechaFin1 + ")" });
 				//TODO(L) Podria hacer aqui la distinción entre calendarios programados y carga masiva?
-				if (porGrupos.equals("1")) {
+				if ("1".equals(porGrupos)) {
 					calcularMatrizLetradosGuardiaPorGrupos(lDiasASeparar, rotacion);
 				} else {
 					calcularMatrizLetradosGuardia(lDiasASeparar);//(L) arrayPeriodosLetradosSJCS1
@@ -7788,7 +7791,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			GuardiasTurnoItem vGuardia = scsGuardiasturnoExtendsMapper.getGuardia(idGuardia.toString(),
 					idTurno.toString(), idInstitucion.toString());
 			beanGuardia = (GuardiasTurnoItem) vGuardia;
-			porGrupos = beanGuardia.getPorGrupos().equals("1");// true
+			porGrupos = "1".equals(beanGuardia.getPorGrupos());// true
 			idOrdenacionColas = beanGuardia.getIdOrdenacionColas();
 			idPersonaUltimo = beanGuardia.getIdPersona_Ultimo();
 			idGrupoGuardiaUltimo = beanGuardia.getIdGrupoGuardiaColegiado_Ultimo();
