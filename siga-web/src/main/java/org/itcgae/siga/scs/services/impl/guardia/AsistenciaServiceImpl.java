@@ -6139,7 +6139,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		scsEjg.setGuardiaturnoIdguardia(scsAsistencia.getIdguardia());
 		// No se incluye el letrado como tramitador
 		// scsEjg.setIdpersona(scsAsistencia.getIdpersonacolegiado());
-		scsEjg.setIdpersonajg(scsAsistencia.getIdpersonajg());
+		if(scsEjg.getIdpersonajg() == null) {
+			scsEjg.setIdpersonajg(scsAsistencia.getIdpersonajg());
+		}
 		scsEjg.setJuzgado(scsAsistencia.getJuzgado());
 		scsEjg.setJuzgadoidinstitucion(scsAsistencia.getJuzgadoidinstitucion());
 		scsEjg.setComisaria(scsAsistencia.getComisaria());
