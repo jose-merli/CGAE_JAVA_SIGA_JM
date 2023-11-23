@@ -2675,6 +2675,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setPosicion((short) (scsCabeceraguardias.getPosicion().shortValue() + 1));
 					scsCabeceraguardias.setFechamodificacion(new Date());
 					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFacturado(null);
+					scsCabeceraguardias.setIdfacturacion(null);
 					scsCabeceraguardias.setFechavalidacion(new Date());
 					scsCabeceraguardias.setUsumodificacion(0);
 					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
@@ -2904,6 +2906,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setValidado("1");
 					scsCabeceraguardias.setFechavalidacion(new Date());
 					scsCabeceraguardias.setUsumodificacion(0);
+					scsCabeceraguardias.setFacturado(null);
+					scsCabeceraguardias.setIdfacturacion(null);
 					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
 					
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
