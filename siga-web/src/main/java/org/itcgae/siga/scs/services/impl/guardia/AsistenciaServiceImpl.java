@@ -6176,11 +6176,27 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			record.setIdpersona(scsAsistencia.getIdpersonajg());
 			record.setIdtipoejg(scsEjg.getIdtipoejg());
 			record.setNumero(scsEjg.getNumero());
-			record.setObservaciones(
-					"Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
+			record.setObservaciones("Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
 			record.setSolicitante(new Short("1"));
 			record.setUsumodificacion(usuario);
-			affectedRows += scsUnidadfamiliarejgMapper.insert(record);
+			
+			ScsUnidadfamiliarejgExample exampleUF = new ScsUnidadfamiliarejgExample();
+			exampleUF.createCriteria().andIdinstitucionEqualTo(record.getIdinstitucion())
+					.andIdtipoejgEqualTo(record.getIdtipoejg())
+					.andAnioEqualTo(record.getAnio())
+					.andNumeroEqualTo(record.getNumero())
+					.andIdpersonaEqualTo(record.getIdpersona());
+			
+			//Primero intentamos actualizar por si ya existe un registro previo de esa persona como unidad familiar pero como solicitante a 0
+			int actualizados = 0;
+			actualizados = scsUnidadfamiliarejgMapper.updateByExample(record, exampleUF);
+			
+			if(actualizados > 0) {
+				affectedRows += actualizados;
+			} else {
+				//Si el update no devuelve registros es porque hay que crear la Unidad Familiar nueva
+				affectedRows += scsUnidadfamiliarejgMapper.insert(record);
+			}
 		}
 
 		return affectedRows;
