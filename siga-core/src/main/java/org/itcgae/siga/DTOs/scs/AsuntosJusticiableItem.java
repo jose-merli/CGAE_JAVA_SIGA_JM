@@ -16,6 +16,7 @@ public class AsuntosJusticiableItem {
 	private String datosInteres;
 	private String anio;
 	private String numero;
+	private String numeroAsoc;
 	private String clave;
 	private String rol;
 	private String nombre;
@@ -196,6 +197,14 @@ public class AsuntosJusticiableItem {
 	@JsonProperty("idPersonaColegiado")
 	public String getIdPersonaColegiado() {
 		return idPersonaColegiado;
+	}
+
+	public String getNumeroAsoc() {
+		return numeroAsoc;
+	}
+
+	public void setNumeroAsoc(String numeroAsoc) {
+		this.numeroAsoc = numeroAsoc;
 	}
 
 	public void setIdPersonaColegiado(String idPersonaColegiado) {
