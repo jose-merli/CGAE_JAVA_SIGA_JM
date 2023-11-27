@@ -6691,6 +6691,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				idDS = docushareHelper.createCollectionEjg(idInstitucion, title, "");
 
+				if (idDS == null || idDS.isEmpty()) {
+					throw (new Exception("Error al crear la colección en Regtel para el EJG"));
+				}
+				
 				LOGGER.info("insertCollectionEjg() / docushareHelper.createCollectionEjg() -> Valor de idDS obtenido: "
 						+ idDS);
 

@@ -2675,6 +2675,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setPosicion((short) (scsCabeceraguardias.getPosicion().shortValue() + 1));
 					scsCabeceraguardias.setFechamodificacion(new Date());
 					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFacturado(null);
+					scsCabeceraguardias.setIdfacturacion(null);
 					scsCabeceraguardias.setFechavalidacion(new Date());
 					scsCabeceraguardias.setUsumodificacion(0);
 					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
@@ -2904,6 +2906,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setValidado("1");
 					scsCabeceraguardias.setFechavalidacion(new Date());
 					scsCabeceraguardias.setUsumodificacion(0);
+					scsCabeceraguardias.setFacturado(null);
+					scsCabeceraguardias.setIdfacturacion(null);
 					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
 					
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
@@ -4390,7 +4394,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					ScsEjgExample scsEjgExample = new ScsEjgExample();
 					scsEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 						.andAnioEqualTo(Short.valueOf(ejg.getAnnio()))
-						.andNumeroEqualTo(Long.valueOf(ejg.getNumero()))
+						.andNumejgEqualTo(ejg.getNumero())
 						.andIdtipoejgEqualTo(Short.valueOf(ejg.getTipoEJG()));
 					
 					ScsEjg ejg2 = scsEjgMapper.selectByExample(scsEjgExample).get(0);
@@ -6135,7 +6139,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		scsEjg.setGuardiaturnoIdguardia(scsAsistencia.getIdguardia());
 		// No se incluye el letrado como tramitador
 		// scsEjg.setIdpersona(scsAsistencia.getIdpersonacolegiado());
-		scsEjg.setIdpersonajg(scsAsistencia.getIdpersonajg());
+		if(scsEjg.getIdpersonajg() == null) {
+			scsEjg.setIdpersonajg(scsAsistencia.getIdpersonajg());
+		}
 		scsEjg.setJuzgado(scsAsistencia.getJuzgado());
 		scsEjg.setJuzgadoidinstitucion(scsAsistencia.getJuzgadoidinstitucion());
 		scsEjg.setComisaria(scsAsistencia.getComisaria());
@@ -6170,11 +6176,27 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			record.setIdpersona(scsAsistencia.getIdpersonajg());
 			record.setIdtipoejg(scsEjg.getIdtipoejg());
 			record.setNumero(scsEjg.getNumero());
-			record.setObservaciones(
-					"Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
+			record.setObservaciones("Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
 			record.setSolicitante(new Short("1"));
 			record.setUsumodificacion(usuario);
-			affectedRows += scsUnidadfamiliarejgMapper.insert(record);
+			
+			ScsUnidadfamiliarejgExample exampleUF = new ScsUnidadfamiliarejgExample();
+			exampleUF.createCriteria().andIdinstitucionEqualTo(record.getIdinstitucion())
+					.andIdtipoejgEqualTo(record.getIdtipoejg())
+					.andAnioEqualTo(record.getAnio())
+					.andNumeroEqualTo(record.getNumero())
+					.andIdpersonaEqualTo(record.getIdpersona());
+			
+			//Primero intentamos actualizar por si ya existe un registro previo de esa persona como unidad familiar pero como solicitante a 0
+			int actualizados = 0;
+			actualizados = scsUnidadfamiliarejgMapper.updateByExample(record, exampleUF);
+			
+			if(actualizados > 0) {
+				affectedRows += actualizados;
+			} else {
+				//Si el update no devuelve registros es porque hay que crear la Unidad Familiar nueva
+				affectedRows += scsUnidadfamiliarejgMapper.insert(record);
+			}
 		}
 
 		return affectedRows;

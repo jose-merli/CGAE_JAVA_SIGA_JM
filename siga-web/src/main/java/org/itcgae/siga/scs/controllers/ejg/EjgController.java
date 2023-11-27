@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboFundamentosCalifDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
@@ -891,8 +892,13 @@ public class EjgController {
 	@RequestMapping(value = "/gestion-ejg/insertCollectionEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<String> insertCollectionEjg(@RequestBody EjgItem ejgItem, HttpServletRequest request)
 			throws Exception {
-		String response = gestionEJG.insertCollectionEjg(ejgItem, request);
-		return new ResponseEntity<String>(response, HttpStatus.OK);
+		try {
+			String response = gestionEJG.insertCollectionEjg(ejgItem, request);
+	        return new ResponseEntity<String>(response, HttpStatus.OK);
+		}catch(Exception ex) {
+			String response = ex.getMessage();
+			return new ResponseEntity<String>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value = "/gestion-ejg/searchListDirEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
