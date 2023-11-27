@@ -2348,7 +2348,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 							if (colegiado != null) {
 								asistenciaResponse.setNombreColegiado(colegiado.getApellido1() + " "
-										+ colegiado.getApellido2() + " " + colegiado.getNombre());
+										+ (colegiado.getApellido2() != null ? colegiado.getApellido2() : "") + " " + colegiado.getNombre());
 								asistenciaResponse.setNumeroColegiado(colegiado.getNumeroColegiado());
 							}
 
