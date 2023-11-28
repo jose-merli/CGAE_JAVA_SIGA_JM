@@ -2477,8 +2477,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 			recordGrupoGuardia.setUsucreacion(idUsuario);
 			recordGrupoGuardia.setFechamodificacion(new Date());
 			recordGrupoGuardia.setUsumodificacion(idUsuario);
-
-			scsGrupoguardiaExtendsMapper.insert(recordGrupoGuardia);
+			if(ordenGrupo == 0) {
+				scsGrupoguardiaExtendsMapper.insert(recordGrupoGuardia);
+			}
+			
 		}
 
 		boolean nuevoGrupoGuardiaColegiado = false;
@@ -2496,7 +2498,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 		
 		recordGrupoGuardiaColegiado.setIdpersona(idPersona);
-		recordGrupoGuardiaColegiado.setOrden(ordenGrupo);
+		recordGrupoGuardiaColegiado.setOrden(1);
 		recordGrupoGuardiaColegiado.setIdgrupoguardia(idGrupoGuardia);
 		recordGrupoGuardiaColegiado.setIdinstitucion(idInstitucion);
 		recordGrupoGuardiaColegiado.setIdturno(idTurno);
@@ -2507,8 +2509,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 		recordGrupoGuardiaColegiado.setFechamodificacion(new Date());
 		recordGrupoGuardiaColegiado.setUsumodificacion(idUsuario);
 
-		if (nuevoGrupoGuardiaColegiado) {
-			scsGrupoguardiacolegiadoMapper.insert(recordGrupoGuardiaColegiado);
+		if (nuevoGrupoGuardiaColegiado && ordenGrupo == 0) {
+			scsGrupoguardiacolegiadoMapper.insert(recordGrupoGuardiaColegiado); // ESTE ES EL INSERT QUE LO EXPLOTA TODO
 		} else {
 			scsGrupoguardiacolegiadoMapper.updateByPrimaryKey(recordGrupoGuardiaColegiado);
 		}

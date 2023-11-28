@@ -122,7 +122,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "  where linscripciones_ordenada.orden <= nvl(ultimo_cola.orden, 0)) consulta_total ");
 		sql.ORDER_BY("orden_cola ASC");
 
-		return sql.toString();
+		return sqlListadoInscripcionesConRownum.toString();
 		
 	}
 
