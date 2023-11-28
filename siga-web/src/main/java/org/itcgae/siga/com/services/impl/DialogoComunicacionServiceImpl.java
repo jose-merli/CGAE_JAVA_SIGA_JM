@@ -168,6 +168,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import com.aspose.words.Document;
+import com.aspose.words.FolderFontSource;
+import com.aspose.words.FontInfo;
+import com.aspose.words.FontInfoCollection;
+import com.aspose.words.FontSettings;
+import com.aspose.words.FontSourceBase;
+import com.aspose.words.SystemFontSource;
 import com.google.common.io.Files;
 
 import oracle.security.crypto.core.DES;
@@ -3058,6 +3064,23 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					}
 					
 					docGenerado = _generacionDocService.grabaDocumento(doc, rutaTmp, nombreFicheroSalida, firmado);
+					
+					// Fuente que ha obtenido de la plantilla, mas las que trae por defecto Aspose (La que tiene la plantilla suele estar en penultima posicion)
+					FontInfoCollection fontsInfo = doc.getFontInfos();
+					for (FontInfo info : fontsInfo) {
+						LOGGER.info("Font Name: " + info.getName() + ", Type: " + info.isTrueType());
+					}
+					
+					// Linea de codigo para elegir el directorio de Fuentes manualmente de donde leera las fuentes Aspose
+					// para usarlas en la generacion del documento (Por defecto es C:\\Windows\\Fonts)
+					//FontSettings.setFontsSources(new FontSourceBase[] {new SystemFontSource(), new FolderFontSource("C:\\Windows\\Fonts", true) });
+					
+					// Linea de codigo para ver de donde esta recogiendo las fuentes Aspose para usarlas en el nuevo documento (Por defecto es C:\\Windows\\Fonts)
+					FontSourceBase[] fontSource = FontSettings.getFontsSources();
+					// Fuente que Aspose usara por defecto si no se puede usar la de la plantilla
+					String fontName = FontSettings.getDefaultFontName();
+					//LOGGER.info("Default Font Name: " + fontName + ", Font Source: " + fontSource);
+
 
 				} catch (Exception e) {
 					
