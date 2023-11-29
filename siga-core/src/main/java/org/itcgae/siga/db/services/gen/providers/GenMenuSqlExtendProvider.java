@@ -30,12 +30,13 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
         sql.SELECT("MENU.IDCLASS");
         sql.SELECT("DECODE(MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO)),5,0,MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO))) AS DERECHOACCESO");
         sql.FROM(" GEN_MENU  MENU ");
-        sql.INNER_JOIN("gen_menu_institucion on MENU.idmenu = gen_menu_institucion.idmenu and gen_menu_institucion.idinstitucion = idInstitucion");
-        sql.INNER_JOIN("ADM_TIPOSACCESO ACCESO ON  ACCESO.IDPROCESO = MENU.IDPROCESO AND MENU.FECHA_BAJA IS NULL ");
+        sql.INNER_JOIN("gen_menu_institucion menuinst on MENU.idmenu = menuinst.idmenu");
+        sql.INNER_JOIN("ADM_TIPOSACCESO ACCESO ON  ACCESO.IDPROCESO = MENU.IDPROCESO AND ACCESO.IDINSTITUCION = menuinst.IDINSTITUCION");
         if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
         	sql.INNER_JOIN("GEN_PROCESOS GENPRO ON (GENPRO.IDPROCESO = MENU.IDPROCESO and UPPER(GENPRO.DESCRIPCION) not like UPPER('%hidden%'))");
 		}
-        sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"' and IDPERFIL in (" + idPerfiles +")");
+        sql.WHERE("menuinst.IDINSTITUCION = '"+ idInstitucion +"' and ACCESO.IDPERFIL in (" + idPerfiles +")");
+        sql.WHERE("MENU.FECHA_BAJA IS NULL ");
         sql.GROUP_BY("MENU.IDMENU, MENU.ORDEN , MENU.IDPARENT, MENU.IDRECURSO,MENU.IDPROCESO, MENU.PATH, MENU.IDCLASS");
         sql.ORDER_BY("MENU.ORDEN ASC");
 

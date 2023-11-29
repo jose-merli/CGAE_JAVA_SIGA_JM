@@ -26,7 +26,7 @@ public interface GenProcesosExtendsMapper extends GenProcesosMapper{
 		@Result(column = "DERECHOACCESO", property = "derechoacceso", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PARENT", property = "parent", jdbcType = JdbcType.VARCHAR)
 	})
-	List<PermisoEntity> getProcesosPermisos(PermisoRequestItem request,String idInstitucionCert);
+	List<PermisoEntity> getProcesosPermisos(PermisoRequestItem request,String idInstitucionCert, String idLenguaje);
 	  
 
 	
