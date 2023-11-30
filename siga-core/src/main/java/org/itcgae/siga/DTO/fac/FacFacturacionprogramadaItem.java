@@ -20,6 +20,7 @@ public class FacFacturacionprogramadaItem {
     private String importeHasta;
 
     private String idEstadoConfirmacion;
+    private String estadoGeneracion;
     private String estadoConfirmacion;
     private String idEstadoPDF;
     private String estadoPDF;
@@ -187,15 +188,23 @@ public class FacFacturacionprogramadaItem {
         this.idEstadoConfirmacion = idEstadoConfirmacion;
     }
 
+    public String getEstadoGeneracion() {
+        return estadoGeneracion;
+    }
+
+    public void setEstadoGeneracion(String estadoGeneracion) {
+        this.estadoGeneracion = estadoGeneracion;
+    }
+
     public String getEstadoConfirmacion() {
-        return estadoConfirmacion;
-    }
+		return estadoConfirmacion;
+	}
 
-    public void setEstadoConfirmacion(String estadoConfirmacion) {
-        this.estadoConfirmacion = estadoConfirmacion;
-    }
+	public void setEstadoConfirmacion(String estadoConfirmacion) {
+		this.estadoConfirmacion = estadoConfirmacion;
+	}
 
-    public String getIdEstadoPDF() {
+	public String getIdEstadoPDF() {
         return idEstadoPDF;
     }
 
@@ -556,7 +565,7 @@ public class FacFacturacionprogramadaItem {
                 Objects.equals(importeDesde, that.importeDesde) &&
                 Objects.equals(importeHasta, that.importeHasta) &&
                 Objects.equals(idEstadoConfirmacion, that.idEstadoConfirmacion) &&
-                Objects.equals(estadoConfirmacion, that.estadoConfirmacion) &&
+                Objects.equals(estadoGeneracion, that.estadoGeneracion) &&
                 Objects.equals(idEstadoPDF, that.idEstadoPDF) &&
                 Objects.equals(estadoPDF, that.estadoPDF) &&
                 Objects.equals(idEstadoEnvio, that.idEstadoEnvio) &&
@@ -606,7 +615,7 @@ public class FacFacturacionprogramadaItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idSerieFacturacion, compraSuscripcion, fechaInicioServicios, fechaInicioProductos, fechaFinServicios, fechaFinProductos, fechaCompraSuscripcionDesde, fechaCompraSuscripcionHasta, importe, importeDesde, importeHasta, idEstadoConfirmacion, estadoConfirmacion, idEstadoPDF, estadoPDF, idEstadoEnvio, estadoEnvio, idEstadoTraspaso, estadoTraspaso, fechaPrevistaGeneracion, fechaPrevistaGeneracionDesde, fechaPrevistaGeneracionHasta, fechaPrevistaConfirm, fechaPrevistaConfirmDesde, fechaPrevistaConfirmHasta, fechaRealGeneracion, fechaRealGeneracionDesde, fechaRealGeneracionHasta, fechaConfirmacion, fechaConfirmacionDesde, fechaConfirmacionHasta, idProgramacion, descripcion, nombreAbreviado, fechaProgramacion, archivarFact, usuModificacion, fechaModificacion, nombreFichero, logError, logTraspaso, traspasoFacturas, generaPDF, envio, idTipoPlantillaMail, tipoPlantillaMail, traspasoPlatilla, traspasoCodAuditoriaDef, fechaPresentacion, fechaRecibosPrimeros, fechaRecibosRecurrentes, fechaRecibosCOR1, fechaRecibosB2B, idModeloFactura, idModeloRectificativa, modeloFactura, modeloRectificativa, esDatosGenerales);
+        return Objects.hash(idSerieFacturacion, compraSuscripcion, fechaInicioServicios, fechaInicioProductos, fechaFinServicios, fechaFinProductos, fechaCompraSuscripcionDesde, fechaCompraSuscripcionHasta, importe, importeDesde, importeHasta, idEstadoConfirmacion, estadoGeneracion, idEstadoPDF, estadoPDF, idEstadoEnvio, estadoEnvio, idEstadoTraspaso, estadoTraspaso, fechaPrevistaGeneracion, fechaPrevistaGeneracionDesde, fechaPrevistaGeneracionHasta, fechaPrevistaConfirm, fechaPrevistaConfirmDesde, fechaPrevistaConfirmHasta, fechaRealGeneracion, fechaRealGeneracionDesde, fechaRealGeneracionHasta, fechaConfirmacion, fechaConfirmacionDesde, fechaConfirmacionHasta, idProgramacion, descripcion, nombreAbreviado, fechaProgramacion, archivarFact, usuModificacion, fechaModificacion, nombreFichero, logError, logTraspaso, traspasoFacturas, generaPDF, envio, idTipoPlantillaMail, tipoPlantillaMail, traspasoPlatilla, traspasoCodAuditoriaDef, fechaPresentacion, fechaRecibosPrimeros, fechaRecibosRecurrentes, fechaRecibosCOR1, fechaRecibosB2B, idModeloFactura, idModeloRectificativa, modeloFactura, modeloRectificativa, esDatosGenerales);
     }
 
     @Override
@@ -624,7 +633,7 @@ public class FacFacturacionprogramadaItem {
                 ", importeDesde='" + importeDesde + '\'' +
                 ", importeHasta='" + importeHasta + '\'' +
                 ", idEstadoConfirmacion='" + idEstadoConfirmacion + '\'' +
-                ", estadoConfirmacion='" + estadoConfirmacion + '\'' +
+                ", estadoConfirmacion='" + estadoGeneracion + '\'' +
                 ", idEstadoPDF='" + idEstadoPDF + '\'' +
                 ", estadoPDF='" + estadoPDF + '\'' +
                 ", idEstadoEnvio='" + idEstadoEnvio + '\'' +

@@ -35,7 +35,30 @@ public class FacFacturacionprogramadaExtendsSqlProvider extends FacFacturacionpr
         sql.SELECT("facprog.fechaconfirmacion");
         sql.SELECT("facprog.fecharealgeneracion");
         sql.SELECT("facprog.idestadoconfirmacion");
-        sql.SELECT("( SELECT f_siga_getrecurso(f.descripcion, " + idioma + ") FROM fac_estadoconfirmfact f WHERE f.idestado = NVL(facprog.idestadoconfirmacion,5) ) estadoconfirmacion");
+        sql.SELECT("(\r\n"
+        		+ "		   SELECT\r\n"
+        		+ "		        CASE \r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 2 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 5)\r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 18 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 5)\r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 19 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 5)\r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 20 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 5)\r\n"
+        		+ "		            ELSE (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = NVL(facprog.idestadoconfirmacion, 5))\r\n"
+        		+ "		        END AS idestadoconfirmacionCon\r\n"
+        		+ "		    FROM FAC_ESTADOCONFIRMFACT fe\r\n"
+        		+ "		    WHERE fe.IDESTADO = facprog.idestadoconfirmacion\r\n"
+        		+ "		) estadoConfirmacion");
+        sql.SELECT("(SELECT\r\n"
+        		+ "		        CASE \r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 1 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 2)\r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 3 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 2)\r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 4 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 2)\r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 17 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 2)\r\n"
+        		+ "		            WHEN facprog.idestadoconfirmacion = 21 THEN (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = 2)\r\n"
+        		+ "		            ELSE (SELECT f_siga_getrecurso(f.descripcion,1) FROM fac_estadoconfirmfact f WHERE f.idestado = NVL(facprog.idestadoconfirmacion, 5))\r\n"
+        		+ "		        END AS idestadoconfirmacionCon\r\n"
+        		+ "		    FROM FAC_ESTADOCONFIRMFACT fe\r\n"
+        		+ "		    WHERE fe.IDESTADO = facprog.idestadoconfirmacion\r\n"
+        		+ "		) AS estadogeneracion");
         sql.SELECT("facprog.idestadopdf");
         sql.SELECT("( SELECT f_siga_getrecurso(f.descripcion, " + idioma + ") FROM fac_estadoconfirmfact f WHERE f.idestado = NVL(facprog.idestadopdf,5) ) estadopdf");
         sql.SELECT("facprog.idestadoenvio");
