@@ -99,7 +99,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 
 		sql.SELECT("ROWNUM AS  orden_cola, consulta_total.*");
 		sql.FROM("(WITH linscripciones_ordenada AS (   SELECT *   FROM     (" + sqlListadoInscripcionesConRownum
-				+ ")),  " + "  ultimo_cola AS (   SELECT *   FROM     (" + sqlUltimoCola + "))) " + "  SELECT "
+				+ ")),  " + "  ultimo_cola AS (   SELECT *   FROM     (" + sqlUltimoCola + "))) " + "  SELECT distinct "
 				+ "	linscripciones_ordenada.idinstitucion," + "	linscripciones_ordenada.idturno,"
 				+ "	linscripciones_ordenada.idguardia," + "	linscripciones_ordenada.idpersona,"
 				+ "	linscripciones_ordenada.nombre," + "	linscripciones_ordenada.apellidos1,"
@@ -109,7 +109,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "	linscripciones_ordenada.fechabaja," + "linscripciones_ordenada.fechasuscripcion,"
 				+ " linscripciones_ordenada.idgrupoguardiacolegiado"
 				+ "   FROM     linscripciones_ordenada     left outer join ultimo_cola on 1=1 "
-				+ "  where linscripciones_ordenada.orden > nvl(ultimo_cola.orden, 0)  " + "  UNION ALL   " + "  SELECT "
+				+ "  where linscripciones_ordenada.orden > nvl(ultimo_cola.orden, 0)  " + "  UNION ALL   " + "  SELECT distinct"
 				+ "	 linscripciones_ordenada.idinstitucion," + "	 linscripciones_ordenada.idturno,"
 				+ "	 linscripciones_ordenada.idguardia," + "	 linscripciones_ordenada.idpersona,"
 				+ "	 linscripciones_ordenada.nombre," + "	 linscripciones_ordenada.apellidos1,"
@@ -122,7 +122,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "  where linscripciones_ordenada.orden <= nvl(ultimo_cola.orden, 0)) consulta_total ");
 		sql.ORDER_BY("orden_cola ASC");
 
-		return sqlListadoInscripcionesConRownum.toString();
+		return sql.toString();
 		
 	}
 
