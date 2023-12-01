@@ -29,7 +29,8 @@ public interface FcsRetencionesJudicialesExtendsMapper extends FcsRetencionesJud
             @Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.TIMESTAMP),
             @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
             @Result(column = "RETENCIONAPLICADA", property = "retencionAplicada", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "RESTANTE", property = "restante", jdbcType = JdbcType.VARCHAR)
+            @Result(column = "RESTANTE", property = "restante", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ESDETURNO", property = "esDeTurno", jdbcType = JdbcType.VARCHAR)
     })
     List<RetencionesItem> searchRetenciones(Short idInstitucion, RetencionesRequestDTO retencionesRequestDTO, String idLenguaje, Integer tamMaximo);
 
