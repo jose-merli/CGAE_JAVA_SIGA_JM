@@ -63,7 +63,7 @@ application:
     /pys/savePagoCompraSuscripcion: [39]
 
     # Permisos para el módulo de PNJ
-    /comunicaciones/saveNuevaComm: [30G]
+    /comunicaciones/saveNuevaComm: [COMNU]
 
     /pys/liquidacionMonederos: [52A]
     /pys/updateMovimientosMonedero: [52B]
