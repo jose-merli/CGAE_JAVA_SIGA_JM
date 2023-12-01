@@ -182,7 +182,7 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         SQL sql = new SQL();
         SQL sql2 = new SQL();
 
-        sql2.SELECT("cabguar.IDTURNO");
+        /*sql2.SELECT("cabguar.IDTURNO");
         sql2.FROM("SCS_CABECERAGUARDIAS cabguar");
         sql2.WHERE("cabguar.FECHAINICIO >= SYSDATE");
         sql2.WHERE("cabguar.IDINSTITUCION = " + idinstitucion);
@@ -191,8 +191,22 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
                 + "turno.NOMBRE");
         sql.FROM("SCS_TURNO turno");
         sql.WHERE("turno.IDTURNO IN (" + sql2 + ")");
-        sql.WHERE("turno.IDINSTITUCION = " + idinstitucion);
-
+        sql.WHERE("turno.IDINSTITUCION = " + idinstitucion);*/
+        
+        sql2.SELECT("cabguar.IDTURNO");
+        sql2.FROM("SCS_CABECERAGUARDIAS cabguar");
+        sql2.WHERE("(cabguar.FECHAINICIO >= SYSDATE\r\n"
+        		+ "			AND cabguar.IDINSTITUCION = 2005)\r\n"
+        		+ "	AND turno.IDINSTITUCION = 2005");
+        
+    	sql.SELECT("UNIQUE turno.IDTURNO,"
+                + "CONCAT(CONCAT(turno.NOMBRE,' / '),sg.nombre) AS NOMBRE");
+    	sql.FROM("SCS_TURNO turno");
+    	sql.JOIN("SCS_GUARDIASTURNO sg ON\r\n"
+        		+ "	sg.IDTURNO = turno.IDTURNO");
+    	sql.WHERE("turno.IDTURNO IN (" + sql2 + ")" );
+    	
+    	sql.ORDER_BY("NOMBRE");
         return sql.toString();
     }
 
@@ -202,7 +216,7 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         fechainicio = dateFormat.format(guardiaItem.getFechadesde());
 
         SQL sql = new SQL();
-        sql.SELECT("UNIQUE g.NOMBRE || ' | ' || col.ncolegiado || ' ' || (CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) || ' | ' || gc.FECHAINICIO AS GUARDIA,"
+        sql.SELECT("UNIQUE col.ncolegiado || ' ' || (CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) || ' | ' || gc.FECHAINICIO AS GUARDIA,"
                 + "gc.idguardia  || ' | ' || gc.idturno || ' | ' || gc.idpersona || ' | ' ||  gc.IDCALENDARIOGUARDIAS DATOS,"
                 + "gc.fechainicio");
         sql.FROM("SCS_CABECERAGUARDIAS  gc");
@@ -221,7 +235,10 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         //SIGARNV-2885@DTT.JAMARTIN@06/02/2023@INICIO
         //sql.WHERE("gc.IDPERSONA <> " + guardiaItem.getIdPersona());
         //SIGARNV-2885@DTT.JAMARTIN@06/02/2023@FIN 
-
+        
+     // Agregar la cláusula ORDER BY para ordenar por el campo idguardia de forma ascendente
+        
+      
         return sql.toString();
     }
 
