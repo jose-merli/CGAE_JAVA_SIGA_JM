@@ -3621,6 +3621,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				commitCalendarios(tx);
 			} catch (Exception e) {
+				LOGGER.error(e.getCause());
 				LOGGER.error(Arrays.toString(e.getStackTrace()).replaceAll(", ", "\n"));
 				respuesta = "Error al eliminar calendarios programados";
 				// TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
